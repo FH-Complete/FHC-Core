@@ -35,6 +35,28 @@ if (!$conn = pg_pconnect(CONN_STRING))
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+// ******************* bis.tbl_nation.eu *********************
+if($result = @pg_query($conn, "SELECT count(*) anzahl FROM bis.tbl_nation WHERE eu is null"))
+{
+	$row = pg_fetch_object($result);
+	
+	if($row->anzahl>0)
+	{
+		$qry = "UPDATE bis.tbl_nation SET eu=false WHERE eu IS NULL;
+				ALTER TABLE bis.tbl_nation ALTER COLUMN eu SET NOT NULL;
+				UPDATE bis.tbl_nation SET ewr=false WHERE ewr IS NULL;
+				ALTER TABLE bis.tbl_nation ALTER COLUMN ewr SET NOT NULL;";
+		
+		if(!pg_query($conn, $qry))
+			echo '<strong>bis.tbl_nation: '.pg_last_error($conn).'</strong><br>';
+		else 
+			echo ' bis.tbl_nation: spalte eu auf NOT NULL gesetzt!<br>';
+	}
+	else 
+	{
+		echo '<strong>bis.tbl_nation: '.pg_last_error($conn).'</strong><br>';
+	}
+}
 // **************** lehre.tbl_projektarbeit.sprache *******************************
 if(!$result = @pg_query($conn, "SELECT sprache FROM lehre.tbl_projektarbeit LIMIT 1;"))
 {
