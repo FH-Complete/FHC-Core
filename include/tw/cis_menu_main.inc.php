@@ -224,6 +224,10 @@
 						  	<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/archiv/archiv_03-04.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;2003/04</a></td>
 						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="http://www.technikum-wien.at/studium/lifelong_learning/cisco_academy/" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Cisco Academy</a></td>
+						</tr>
 					</table>
 					</td>
 				</tr>
