@@ -50,10 +50,10 @@ loadVariables($conn, $user);
 	$workbook = new Spreadsheet_Excel_Writer();
 
 	// sending HTTP headers
-	$workbook->send("Projektarbeit". "_" . date("d_m_Y") . ".xls");
+	$workbook->send("Abschlusspruefung". "_" . date("d_m_Y") . ".xls");
 
 	// Creating a worksheet
-	$worksheet =& $workbook->addWorksheet("Studenten");
+	$worksheet =& $workbook->addWorksheet("Abschlusspruefung");
 
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
