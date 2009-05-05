@@ -159,8 +159,14 @@ foreach ($fachbereiche as $fb)
 			$selected='selected';
 		else 
 			$selected='';
-		
-		$outp.= '<option value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
+		if($fb->aktiv)
+		{
+			$outp.= '<option value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
+		}
+		else 
+		{
+			$outp.= '<option style="color: red;" value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
+		}
 	//}
 	
 }
@@ -241,16 +247,22 @@ if($rechte->isBerechtigt('admin',0))
 		echo '
 		<tr><td><i>Institut</i></td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
 	      			<option value="-1">- ausw&auml;hlen -</option>';
-	
 		foreach($fachbereiche as $fb)
 		{
 			if($fb->fachbereich_kurzbz==$lf->fachbereich_kurzbz)
 				$selected='selected';
 			else 
 				$selected='';
-			
-			echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
-			echo " >$fb->fachbereich_kurzbz</option>\n";
+			if($fb->aktiv)
+			{
+				echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
+
+			}
+			else 
+			{
+				echo "<option style=\"color: red;\" value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
+			}
+			echo " >$fb->fachbereich_kurzbz.$gg</option>\n";
 		}
 	
 		echo '</SELECT></td></tr>';
@@ -324,7 +336,15 @@ if($rechte->isBerechtigt('admin',0))
 	
 				foreach($fachbereiche as $fb)
 				{
-					echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" ";
+					if($fb->aktiv)
+					{
+						echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\"";
+		
+					}
+					else 
+					{
+						echo "<option style=\"color: red;\" value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\"";
+					}
 					echo " >$fb->fachbereich_kurzbz</option>\n";
 				}
 	
