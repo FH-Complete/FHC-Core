@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger		<christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher	<andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl			<rudolf.hangl@technikum-wien.at> and
+ *          Gerald Simane-Sequens	<gerald.simane-sequens@technikum-wien.at>
  */
 /**
  * Exportiert eine Liste der Absolventen in ein Excel File.
