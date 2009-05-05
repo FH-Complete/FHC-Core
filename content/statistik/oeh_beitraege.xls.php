@@ -49,7 +49,7 @@ if($studiensemester_kurzbz!='')
 	{
 		if ($row=@pg_fetch_object($result))
 		{
-			$erhalter=sprintf("%03s\n",$row->erhalter_kz);
+			$erhalter=sprintf("%03s",$row->erhalter_kz);
 		}
 		else 
 		{
