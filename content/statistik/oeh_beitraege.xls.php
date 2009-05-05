@@ -30,6 +30,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
+$erhalter='';
 $heute=date("d.m.Y");
 // Datenbank Verbindung
 if (!$conn = pg_pconnect(CONN_STRING))
@@ -42,7 +43,23 @@ $studiensemester_kurzbz = isset($_GET['studiensemester_kurzbz'])?$_GET['studiens
 if($studiensemester_kurzbz!='')
 {
 	
-	
+	//Erhalter einlesen
+	$qry="SELECT * FROM public.tbl_erhalter";
+	if($result=@pg_query($conn, $qry))
+	{
+		if ($row=@pg_fetch_object($result))
+		{
+			$erhalter=sprintf("%03s\n",$row->erhalter_kz);
+		}
+		else 
+		{
+			die('Kein Erhalter gefunden!');
+		}
+	}
+	else 
+	{
+		die('Der Erhalter konnte nicht geladen werden!');
+	}
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
 
@@ -119,7 +136,7 @@ if($studiensemester_kurzbz!='')
 	
 		
 	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant (auch wenn im gleichen Semester Absolvent oder Abbrecher)
-	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, '005' as erhalter, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
+	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
 		geburtsnation AS nation, titelpre, uid || '@technikum-wien.at' AS email, 
 		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
 		(SELECT nation FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse ASC  LIMIT 1) AS s_nation, 
@@ -150,8 +167,7 @@ if($studiensemester_kurzbz!='')
 			if(strlen($row->personenkennzahl)>$maxlength[$spalte])
 				$maxlength[$spalte]=strlen($row->personenkennzahl);
 				
-			$worksheet->write($zeile,++$spalte,'="'.$row->erhalter.'"',$format_right);
-
+			$worksheet->write($zeile,++$spalte,'="'.$erhalter.'"',$format_right);
 			$worksheet->write($zeile,++$spalte,$row->studiengang_kz);
 			if(strlen($row->studiengang_kz)>$maxlength[$spalte])
 				$maxlength[$spalte]=strlen($row->studiengang_kz);
@@ -285,7 +301,7 @@ if($studiensemester_kurzbz!='')
 	
 		
 	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant (auch wenn im gleichen Semester Absolvent oder Abbrecher), die bezahlt haben
-	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, '005' as erhalter, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
+	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
 	geburtsnation AS nation, titelpre, uid || '@technikum-wien.at' AS email, 
 	(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
 	(SELECT nation FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse ASC  LIMIT 1) AS s_nation, 
@@ -320,7 +336,7 @@ if($studiensemester_kurzbz!='')
 			if(strlen($row->personenkennzahl)>$maxlength[$spalte])
 				$maxlength[$spalte]=strlen($row->personenkennzahl);
 				
-			$worksheet2->write($zeile,++$spalte,'="'.$row->erhalter.'"',$format_right);
+			$worksheet2->write($zeile,++$spalte,'="'.$erhalter.'"',$format_right);
 
 			$worksheet2->write($zeile,++$spalte,$row->studiengang_kz);
 			if(strlen($row->studiengang_kz)>$maxlength[$spalte])
