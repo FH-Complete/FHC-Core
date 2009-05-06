@@ -132,7 +132,10 @@ foreach ($adresse_obj->result as $row)
 	echo "<td>".$adresstyp_arr[$row->typ]."</td>";
 	echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
-	echo "<td>".($row->firma_id!=''?$firma_arr[$row->firma_id]:'')."</td>";
+	$firma=new firma($conn);
+	if($row->firma_id!='')
+		$firma->load($row->firma_id);
+	echo "<td>".$firma->name."</td>";
 }
 echo '</table>';
 //PREINTERESSENT
