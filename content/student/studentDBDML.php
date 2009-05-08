@@ -248,31 +248,46 @@ if(!$error)
 						{
 							$student_lvb = new student($conn, null, true);
 
-							if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
-								$student_lvb->new = false;
-							else
-								$student_lvb->new = true;
-
-							$student_lvb->uid = $_POST['uid'];
-							$student_lvb->studiensemester_kurzbz = $semester_aktuell;
-							$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
-							$student_lvb->semester = $_POST['semester'];
-							$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-							$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
-							$student_lvb->updateamum = date('Y-m-d H:i:s');
-							$student_lvb->updatevon = $user;
-
-							if($student_lvb->save_studentlehrverband())
+							// Studentlehrverband Eintrag nur Speichern, wenn der Student in diesem Studiensemester
+							// einen Status besitzt da es sonst beim Bearbeiten von alten Studenten immer in das
+							// entsprechende Studiensemester gewechselt werden muss.
+							$prestudentobj = new prestudent($conn);
+							$prestudentobj->getPrestudentRolle($student->prestudent_id, null, $semester_aktuell); 
+							
+							if(count($prestudentobj->result)>0)
 							{
-								$return = true;
-								$error=false;
-								$data = $student->prestudent_id;
+								if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
+									$student_lvb->new = false;
+								else
+									$student_lvb->new = true;
+	
+								$student_lvb->uid = $_POST['uid'];
+								$student_lvb->studiensemester_kurzbz = $semester_aktuell;
+								$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
+								$student_lvb->semester = $_POST['semester'];
+								$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+								$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+								$student_lvb->updateamum = date('Y-m-d H:i:s');
+								$student_lvb->updatevon = $user;
+	
+								if($student_lvb->save_studentlehrverband())
+								{
+									$return = true;
+									$error=false;
+									$data = $student->prestudent_id;
+								}
+								else
+								{
+									$error = true;
+									$errormsg = $student_lvb->errormsg;
+									$return = false;
+								}
 							}
-							else
+							else 
 							{
-								$error = true;
-								$errormsg = $student_lvb->errormsg;
-								$return = false;
+								$error = false;
+								$return = true;
+								$data = $student->prestudent_id;
 							}
 						}
 						else
