@@ -24,9 +24,11 @@
  * @create 2007-05-14
  */
 
-class konto
+require_once ('basis_db.class.php');
+
+class konto extends basis_db
 {
-	var $conn;     // @var resource DB-Handle
+	//var $conn;     // @var resource DB-Handle
 	var $new;       // @var boolean
 	var $errormsg;  // @var string
 	var $result = array(); // @var adresse Objekt
@@ -65,9 +67,10 @@ class konto
 	// * @param $conn      Connection
 	// *        $buchungsnr ID der Adresse die geladen werden soll (Default=null)
 	// **************************************************************************
-	function konto($conn, $buchungsnr=null, $unicode=false)
+	function konto($buchungsnr=null, $unicode=false)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		//$this->conn = $conn;
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -78,7 +81,7 @@ class konto
 			{
 				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
 			}
-			if(!pg_query($conn,$qry))
+			if(!pg_query($this->db_conn,$qry))
 			{
 				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 				return false;
@@ -105,9 +108,9 @@ class konto
 		$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 			FROM public.tbl_konto JOIN public.tbl_person USING (person_id) WHERE buchungsnr='$buchungsnr'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($result = $this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->buchungsnr = $row->buchungsnr;
 				$this->person_id = $row->person_id;
@@ -347,12 +350,12 @@ class konto
 			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		if($studiengang_kz!='')
 			$stgwhere = " AND tbl_konto.studiengang_kz='$studiengang_kz' ";
-		else 
+		else
 			$stgwhere = '';
-		
+
 		if($filter=='offene')
 		{
 			//Alle Buchungen und 'darunterliegende' holen die noch offen sind
@@ -477,7 +480,7 @@ class konto
 
 
 	// ******************************
-	// * ueberprueft, ob studiengebuehr gebucht ist fuer  
+	// * ueberprueft, ob studiengebuehr gebucht ist fuer
 	// * student_uid und studiensemester
 	// * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
 	// ******************************
@@ -495,8 +498,8 @@ class konto
 					$buch_date[] = $subrow->buchungsdatum;
 			}
 		}
-		
-		
+
+
 		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='".$buch_nr[0]."' OR buchungsnr_verweis='".$buch_nr[0]."'";
 
 		if($result = pg_query($this->conn, $qry))
@@ -506,8 +509,8 @@ class konto
 				if ($row->differenz == 0)
 				{
 					$this->buchungsdatum = isset($buch_date[1])?$buch_date[1]:'';
-					return true;	
-				}				
+					return true;
+				}
 				else
 					return false;
 			}
