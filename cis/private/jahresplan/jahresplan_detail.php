@@ -1,4 +1,4 @@
-﻿<?php
+<?php
  
 /* Copyright (C) 2008 Technikum-Wien
  *
@@ -107,7 +107,7 @@
 <html>
 <head>
 <title>Veranstaltungsdetail ID <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		if (window.opener) {
