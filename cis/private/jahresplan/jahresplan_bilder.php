@@ -1,4 +1,3 @@
- <!-- charset=UTF-8 -->  
 <?php
 
 /* Copyright (C) 2006 Technikum-Wien

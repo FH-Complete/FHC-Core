@@ -1,5 +1,4 @@
 <?php
- 
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -168,7 +167,7 @@
 <html>
 <head>
 <title>Reservierungen zu ID <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		var openfirst='<?php echo $openfirst; ?>';
