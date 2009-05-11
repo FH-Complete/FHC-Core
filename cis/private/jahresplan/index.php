@@ -1,5 +1,4 @@
-<?php
- 
+ï»¿<?php
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -118,10 +117,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-
-<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
-
 <title>Jahresplan</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -223,14 +220,14 @@
 	function callWindows(url,nameID)
 	{
 		 // width=(Pixel) - erzwungene Fensterbreite 
-		 // height=(Pixel) - erzwungene Fensterhöhe 
-		 // resizable=yes/no - Größe fest oder veränderbar 
+		 // height=(Pixel) - erzwungene Fensterh&ouml;he 
+		 // resizable=yes/no - Gr&ouml;&szlig;e fest oder ver&auml;nderbar 
 		 // scrollbars=yes/no - fenstereigene Scrollbalken 
 		 // toolbar=yes/no - fenstereigene Buttonleiste 
 		 // status=yes/no - fenstereigene Statuszeile 
 		 // directories=yes/no - fenstereigene Directory-Buttons (Netscape) 
-		 // menubar=yes/no - fenstereigene Menüleiste 
-		 // location=yes/no - fenstereigenes Eingabe-/Auswahlfeld für URLs 
+		 // menubar=yes/no - fenstereigene Men&uuml;leiste 
+		 // location=yes/no - fenstereigenes Eingabe-/Auswahlfeld f&uuml;r URLs 
 		 
 		if (InfoWin) {
 			InfoWin.close();

@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -250,7 +250,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Jahresplan</title>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -382,14 +382,14 @@
 	function callWindows(url,nameID)
 	{
 		 // width=(Pixel) - erzwungene Fensterbreite 
-		 // height=(Pixel) - erzwungene Fensterhöhe 
-		 // resizable=yes/no - Größe fest oder veränderbar 
+		 // height=(Pixel) - erzwungene Fensterh&ouml;he 
+		 // resizable=yes/no - Gr&ouml;&szlig;e fest oder ver&auml;nderbar 
 		 // scrollbars=yes/no - fenstereigene Scrollbalken 
 		 // toolbar=yes/no - fenstereigene Buttonleiste 
 		 // status=yes/no - fenstereigene Statuszeile 
 		 // directories=yes/no - fenstereigene Directory-Buttons (Netscape) 
-		 // menubar=yes/no - fenstereigene Menüleiste 
-		 // location=yes/no - fenstereigenes Eingabe-/Auswahlfeld für URLs 
+		 // menubar=yes/no - fenstereigene Men&uuml;leiste 
+		 // location=yes/no - fenstereigenes Eingabe-/Auswahlfeld f&uuml;r URLs 
 		 
 		if (InfoWin) {
 			InfoWin.close();
@@ -533,7 +533,7 @@
 						}	
 						?>	
 						</select> 
-					 &nbsp;Ganztägige Veranstaltung
+					 &nbsp;Ganzt&auml;gige Veranstaltung
 					 &nbsp;<input  <?php echo ( ($veranstaltung['start_zeit']=='00:00' && $veranstaltung['ende_zeit']=='23:45')?' checked="checked" ':'' );   ?> type="checkbox"  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.Zeit1.options.selectedIndex=0;window.document.selVeranstaltung.Zeit2.options.selectedIndex=(window.document.selVeranstaltung.Zeit2.options.length - 1); }; var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (time_stamp) {window.document.selVeranstaltung.start.value=time_stamp; }; time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (time_stamp) {window.document.selVeranstaltung.ende.value=time_stamp; };" name="tmpGanztag" >
 					</td>	
 				</tr>				
