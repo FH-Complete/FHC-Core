@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 //-------------------------------------------------------------------------------------------------
 /* Copyright (C) 2008 Technikum-Wien
  *
@@ -1013,7 +1013,7 @@ function jahresplan_date_to_timestamp($string="")
 	return 	$cTmpWert;	
 }
  
-# Testfunktion zur Anzeige einer übergebenen Variable oder Array, Default ist GLOBALS
+# Testfunktion zur Anzeige einer &uuml;bergebenen Variable oder Array, Default ist GLOBALS
 function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
 {
 
