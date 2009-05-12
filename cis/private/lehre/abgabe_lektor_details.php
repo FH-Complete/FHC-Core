@@ -287,11 +287,13 @@ if(isset($_POST["del"]))
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td>";
-$htmlstr .= "<td width=20% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' target='_blank' method='GET'>";
+$htmlstr .= "<td width=10% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' title='Benotungsformular' target='_blank' method='GET'>";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-$htmlstr .= "<input type='submit' name='note' value='benoten'></form></td></tr>";
+$htmlstr .= "<input type='submit' name='note' value='benoten'></form></td>";
+$htmlstr .= "<td width=10% align=center><form action='http://www.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
+$htmlstr .= "<input type='submit' name='ephorus' value='Plagiatspr&uuml;fung'></form></td></tr>";
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
@@ -349,10 +351,10 @@ $result=@pg_query($conn, $qry);
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";		
-		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
+		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
 		if(!$row->abgabedatum)
 		{
-			$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()'></td>";
+			$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()' title='Termin l&ouml;schen'></td>";
 		}
 		else 
 		{
@@ -360,7 +362,7 @@ $result=@pg_query($conn, $qry);
 		}
 		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
-			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' border=0></a></td>";
+			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
 		}
 		else 
 		{
@@ -396,7 +398,7 @@ $htmlstr .= "		</select></td>\n";
 
 $htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
 $htmlstr .= "		<td>&nbsp;</td>\n";		
-$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
+$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='neuen Termin speichern'></td>";
 
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</form>\n";
@@ -404,6 +406,7 @@ $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
 
 	echo $htmlstr;
+	
 function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
 
 {
