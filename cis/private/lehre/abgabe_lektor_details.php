@@ -292,7 +292,7 @@ $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbei
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 $htmlstr .= "<input type='submit' name='note' value='benoten'></form></td>";
-$htmlstr .= "<td width=10% align=center><form action='http://www.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
+$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
 $htmlstr .= "<input type='submit' name='ephorus' value='Plagiatspr&uuml;fung'></form></td></tr>";
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br>";
 $htmlstr .= "</tr>\n";
