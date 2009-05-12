@@ -54,10 +54,12 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="content" href="private/jahresplan/index.php"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Eventkalender</a></td>
 		  		</tr>
+
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="content" href="documents/fotos/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
+					<td class="tdwrap"><a class="Item" target="content" href="/documents/fotos/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
 		  		</tr>
+
 				
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
