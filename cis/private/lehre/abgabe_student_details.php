@@ -329,7 +329,7 @@ if($command!="add")
 			$htmlstr .= "		<td width='250'>$row->kurzbz</td>\n";		
 			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
 			$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";			
-			$htmlstr .= "		<td><input type='submit' name='schick' value='abgeben'></td>";
+			$htmlstr .= "		<td><input type='submit' name='schick' value='abgeben' title='ausgew&auml;hlte Datei hochladen'></td>";
 			$htmlstr .= "	</tr>\n";
 			
 			$htmlstr .= "</form>\n";
