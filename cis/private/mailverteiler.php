@@ -52,7 +52,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-<script language="JavaScript">
+<title>Mailverteiler</title>
+<script language="JavaScript" type="text/javascript">
 <!--
 	__js_page_array = new Array();
 
@@ -97,7 +98,8 @@
 	      <tr>
 	        <td width ="690" class="ContentHeader"><font class="ContentHeader">Kommunikation - Mailverteiler</font></td>
 	      </tr>
-	      </table><br><br>
+	      </table>
+		  <br><br>
 		   	<strong><font class="error">Hinweis: </font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
 		   		<br>
 		   	<?php
@@ -107,9 +109,44 @@
             <br>
 <?php
 		$stg_obj = new studiengang($conn);
-		if(!$stg_obj->getAll('ascii(bezeichnung), bezeichnung, typ', true))
+#		if(!$stg_obj->getAll('ascii(bezeichnung), bezeichnung, typ', true))
+		if(!$stg_obj->getAll(null, true))
 			echo $stg_obj->errormsg;
-
+			
+			
+		// Sortieren nach Kuerzel	
+		if (!is_object($stg_obj->result) &&  count($stg_obj->result)>0)
+		{
+			$tw_arr=array();
+			$nicht_tw_arr=array();	
+			foreach($stg_obj->result as $row)
+			{
+				if (trim($row->kuerzel)=='ETW')
+				{
+					$tw_arr['ETW']=$row;
+				}
+				else
+				{
+					$nicht_tw_arr[trim($row->kuerzel)]=$row;
+				}	
+			}
+			if(ksort($nicht_tw_arr))
+			{	
+				if ($new_tw_arr=array_merge($tw_arr,$nicht_tw_arr))
+				{
+					$stg_obj->result=array();
+					foreach ($new_tw_arr as $key => $val) 
+					{
+						$stg_obj->result[]=$val;
+					}
+				}	
+			}			
+			if (isset($tw_arr)) unset($tw_arr);
+			if (isset($new_tw_arr)) unset($new_tw_arr);
+			if (isset($nicht_tw_arr)) unset($nicht_tw_arr);
+		}
+		
+		
 		foreach($stg_obj->result as $row)
 		{
 		    // Kopfzeile hinausschreiben
@@ -118,9 +155,9 @@
 		    echo "<tr>";
 		  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
 		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
-		    echo "   <td width=\"20\"class=\"ContentHeader2\">&nbsp;</td>";
-		    echo "   <td width=\"200\"class=\"ContentHeader2\">&nbsp;</td>";
-			echo "   <td width=\"100\"class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
+		    echo "   <td width=\"20\" class=\"ContentHeader2\">&nbsp;</td>";
+		    echo "   <td width=\"200\" class=\"ContentHeader2\">&nbsp;</td>";
+			echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
 			echo "   </tr>";
 		    echo "<tr><td>&nbsp;</td></tr>\n";
 
@@ -145,7 +182,7 @@
 					{
 						/* open a popup containing the final dispatcher address */
 						if(MAILVERTEILER_SPERRE)
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
+							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&amp;desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="Verteiler" src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
 				    	echo "</td>";
 					 	echo " <td width='200'>";
 					 	echo "<a href='mailto:".$row1->gruppe_kurzbz."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a></td>";
@@ -166,9 +203,9 @@
 				}
 
 				if(strtolower($row1->gruppe_kurzbz)=='tw_std')
-					echo '<td width=\"100\" align="right">&nbsp;</td>';
+					echo '<td width="100" align="right">&nbsp;</td>';
 				else
-					echo ' <td width=\"100\" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
+					echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
 
 				echo "</tr>\n";
 	  		}
@@ -194,7 +231,7 @@
 						{
 							echo " <td width=\"20\">";
 							if(MAILVERTEILER_SPERRE)
-								echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
+								echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&amp;desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="Verteiler" src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
 							/* open a popup containing the final dispatcher address */
 						    echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@".DOMAIN."\" class=\"Item\">".strtolower($row->kuerzel)."_std@".DOMAIN."</a></td>";
 						}
@@ -205,7 +242,7 @@
 				  			echo " <td width=\"200\" >gesperrt</td>";
 						}
 
-					    echo ' <td width=\"100\" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
+					    echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&amp;all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
 						echo "</tr>\n";
 			  		}
 		  			echo "\n";
@@ -237,18 +274,18 @@
 				  			{
 				  				if($row_cnt->anzahl>0)
 				  				{
-				  					$param = "kz=".$row->studiengang_kz."&sem=".$row1->semester;
+				  					$param = "kz=".$row->studiengang_kz."&amp;sem=".$row1->semester;
 				  					$strhelp = strtolower($row->kuerzel.trim($row1->semester).trim($row1->verband).trim($row1->gruppe));
 						  			echo "<tr>\n";
 						  			echo "  <td width=\"390\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
 						  			if(trim($row1->verband)!='')
 						  			{
-						  				$param .="&verband=$row1->verband";
+						  				$param .="&amp;verband=$row1->verband";
 						  				echo " Verband $row1->verband";
 						  			}
 						  			if(trim($row1->gruppe)!='')
 						  			{
-							  			$param .="&grp=$row1->gruppe";
+							  			$param .="&amp;grp=$row1->gruppe";
 							  			echo " Gruppe $row1->gruppe";
 							  		}
 
@@ -280,8 +317,7 @@
 		  echo "</table>";
 ?>
   	</td>
-	<td class="tdwidth10">&nbsp;
-	</td>
+	<td class="tdwidth10">&nbsp;</td>
   </tr>
 </table>
 
