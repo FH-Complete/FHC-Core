@@ -50,6 +50,7 @@
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/termine/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Veranstaltungen</a></td>
 		  		</tr>
 -->
+<!--
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="content" href="private/jahresplan/index.php"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Eventkalender</a></td>
@@ -59,7 +60,19 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="content" href="/documents/fotos/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
 		  		</tr>
-
+-->
+	  			<tr>
+	          		<td class="tdwrap"></td>
+					<td><a target="content" href="private/jahresplan/index.php" class="MenuItem" onClick="js_toggle_container('jahresplan');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Eventkalender</a>
+				  	<table class="tabcontent" id="jahresplan" style="display: none">
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a target="content" class="Item" href="/documents/fotos/" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
+						</tr>
+					</table>
+					</td>
+	  			</tr>				
+				
 				
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
