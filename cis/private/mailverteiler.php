@@ -83,7 +83,37 @@
      	else
      		return true;
   	}
+	function show_layer(x)
+	{
+ 		if (document.getElementById && document.getElementById(x)) 
+		{  
+			document.getElementById(x).style.visibility = 'visible';
+			document.getElementById(x).style.display = 'inline';
+		} else if (document.all && document.all[x]) {      
+		   	document.all[x].visibility = 'visible';
+			document.all[x].style.display='inline';
+	      	} else if (document.layers && document.layers[x]) {                          
+	           	 document.layers[x].visibility = 'show';
+			 document.layers[x].style.display='inline';
+	          }
 
+	}
+
+	function hide_layer(x)
+	{
+		if (document.getElementById && document.getElementById(x)) 
+		{                       
+		   	document.getElementById(x).style.visibility = 'hidden';
+			document.getElementById(x).style.display = 'none';
+       	} else if (document.all && document.all[x]) {                                
+			document.all[x].visibility = 'hidden';
+			document.all[x].style.display='none';
+       	} else if (document.layers && document.layers[x]) {                          
+	           	 document.layers[x].visibility = 'hide';
+			 document.layers[x].style.display='none';
+	          }
+	}			
+	
 //-->
 </script>
 
@@ -94,14 +124,16 @@
   <tr>
     <td class="tdwidth10">&nbsp;</td>
     <td>
+	
     	<table class="tabcontent">
 	      <tr>
 	        <td width ="690" class="ContentHeader"><font class="ContentHeader">Kommunikation - Mailverteiler</font></td>
 	      </tr>
 	      </table>
+		  
 		  <br><br>
 		   	<strong><font class="error">Hinweis: </font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
-		   		<br>
+	   		<br>
 		   	<?php
 		   	if(MAILVERTEILER_SPERRE)
 		   		echo '<strong><font class="error">Info: </font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler';
@@ -146,20 +178,39 @@
 			if (isset($nicht_tw_arr)) unset($nicht_tw_arr);
 		}
 		
-		
+		 
 		foreach($stg_obj->result as $row)
 		{
 		    // Kopfzeile hinausschreiben
-		    echo "<table class='tabcontent2'>";
-		    echo "<tr><td>&nbsp;</td></tr>";
-		    echo "<tr>";
-		  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
-		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
-		    echo "   <td width=\"20\" class=\"ContentHeader2\">&nbsp;</td>";
-		    echo "   <td width=\"200\" class=\"ContentHeader2\">&nbsp;</td>";
-			echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
-			echo "   </tr>";
-		    echo "<tr><td>&nbsp;</td></tr>\n";
+		    echo "<table class='tabcontent2' id='hide".$row->kuerzel."'>";
+#			    echo "<tr><td>&nbsp;</td></tr>";
+			    echo '<tr onClick="hide_layer(\'hide'.$row->kuerzel.'\');show_layer(\'show'.$row->kuerzel.'\');">';
+			  	echo "   <td width=\"10\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'></td>";
+
+			  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
+			    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
+			    echo "   <td width=\"20\" class=\"ContentHeader2\">&nbsp;</td>";
+			    echo "   <td width=\"200\" class=\"ContentHeader2\">&nbsp;</td>";
+				echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
+				echo "   </tr>";
+#			    echo "<tr><td>&nbsp;</td></tr>\n";
+		  echo "</table>";
+
+		    // Kopfzeile hinausschreiben
+		    echo "<table class='tabcontent2' style='display:none;' id='show".$row->kuerzel."'>";
+#			    echo "<tr><td>&nbsp;</td></tr>";
+			    echo '<tr  onClick="show_layer(\'hide'.$row->kuerzel.'\');hide_layer(\'show'.$row->kuerzel.'\');">';
+
+			  	echo "   <td width=\"10\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_down.png' title='ausblenden' alt='ausblenden' border='0'></td>";
+			
+			  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
+			    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
+			    echo "   <td width=\"20\" class=\"ContentHeader2\">&nbsp;</td>";
+			    echo "   <td width=\"200\" class=\"ContentHeader2\">&nbsp;</td>";
+				echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
+				echo "   </tr>";
+#			    echo "<tr><td>&nbsp;</td></tr>\n";
+
 
 			// Verteiler Normal
 			$grp_obj = new gruppe($conn);
@@ -169,7 +220,8 @@
 			foreach($grp_obj->result as $row1)
 			{
 				echo "<tr>";
-				echo " <td width=\"390\" >&#8226; $row1->beschreibung</td>";
+				  	echo "   <td width=\"10\">&nbsp;</td>";
+					echo " <td width=\"390\" >&#8226; $row1->beschreibung</td>";
 
 				// LINK for opening a closed mail dispatcher
 				// display the open-link only when its a closed dispatcher and if the user has status lector
@@ -183,29 +235,34 @@
 						/* open a popup containing the final dispatcher address */
 						if(MAILVERTEILER_SPERRE)
 							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&amp;desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="Verteiler" src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
-				    	echo "</td>";
+				    	echo "&nbsp;</td>";
+					
 					 	echo " <td width='200'>";
-					 	echo "<a href='mailto:".$row1->gruppe_kurzbz."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a></td>";
+					 		echo "<a href='mailto:".$row1->gruppe_kurzbz."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a>";
+						echo "&nbsp;</td>";
 					}
 					else
 					{
-						echo "</td>";
-						echo " <td width='200'>";
-						//echo "".$row1->mail."@technikum-wien.at</td>";
-						echo "gesperrt</td>";
+						echo "&nbsp;</td>";
+							echo " <td width='200'>";
+							//echo "".$row1->mail."@technikum-wien.at</td>";
+								echo "gesperrt";
+							echo "&nbsp;</td>";
 					}
 				}
 				else
 				{
-					echo "</td>";
+					echo "&nbsp;</td>";
 					echo " <td width='200'>";
-					echo "<a href='mailto:".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a></td>";
+						echo "<a href='mailto:".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a>";
+					echo "&nbsp;</td>";
 				}
 
-				if(strtolower($row1->gruppe_kurzbz)=='tw_std')
-					echo '<td width="100" align="right">&nbsp;</td>';
-				else
-					echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
+					if(strtolower($row1->gruppe_kurzbz)=='tw_std')
+						echo '<td width="100" align="right">';
+					else
+						echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
+					echo "&nbsp;</td>";
 
 				echo "</tr>\n";
 	  		}
@@ -312,16 +369,10 @@
 		  		{
 		  			echo "</table>";
 		  		}
-
+			
 		  }
 		  echo "</table>";
-?>
-  	</td>
-	<td class="tdwidth10">&nbsp;</td>
-  </tr>
-</table>
 
-<?php
 	//Menue oeffnen wenn kurzbz uebergeben wird
   	if(isset($_GET['kbzl']) AND $_GET['kbzl']!='')
   	{
