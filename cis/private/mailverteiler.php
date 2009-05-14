@@ -132,20 +132,24 @@
 	      </table>
 		  
 		  <br><br>
-		   	<strong><font class="error">Hinweis: </font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
+		   	<strong><font class="error">Hinweis:&nbsp;</font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
 	   		<br>
 		   	<?php
-		   	if(MAILVERTEILER_SPERRE)
-		   		echo '<strong><font class="error">Info: </font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler';
-		   	?>
+		   	if(MAILVERTEILER_SPERRE) 
+			{
+		   		echo '<strong><font class="error">Info:&nbsp;</font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler';
+		   	}
+			?>
             <br>
+			<hr>
+		   	<h3>Zum Verteiler anzeigen bitte auf &nbsp;[&nbsp;<img src='../../skin/iages/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;]&nbsp;klicken&nbsp; bzw. zum Ausblenden auf&nbsp;&nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_down.png' title='Ausblenden' alt='Ausblenden' border='0'>&nbsp;]&nbsp;klicken</h3>
+	   		<br>
 <?php
 		$stg_obj = new studiengang($conn);
 #		if(!$stg_obj->getAll('ascii(bezeichnung), bezeichnung, typ', true))
 		if(!$stg_obj->getAll(null, true))
 			echo $stg_obj->errormsg;
-			
-			
+
 		// Sortieren nach Kuerzel	
 		if (!is_object($stg_obj->result) &&  count($stg_obj->result)>0)
 		{
@@ -178,18 +182,15 @@
 			if (isset($nicht_tw_arr)) unset($nicht_tw_arr);
 		}
 		
-		 
 		foreach($stg_obj->result as $row)
 		{
 		    // Kopfzeile hinausschreiben
-		    echo "<table class='tabcontent2' id='hide".$row->kuerzel."'>";
+		    echo "<table class='tabcontent2' id='hide".$row->kuerzel."' >";
 #			    echo "<tr><td>&nbsp;</td></tr>";
 			    echo '<tr onClick="hide_layer(\'hide'.$row->kuerzel.'\');show_layer(\'show'.$row->kuerzel.'\');">';
-			  	echo "   <td width=\"10\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'></td>";
-
-			  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
+			  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;";
 			    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
-			    echo "   <td width=\"20\" class=\"ContentHeader2\">&nbsp;</td>";
+			    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 			    echo "   <td width=\"200\" class=\"ContentHeader2\">&nbsp;</td>";
 				echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
 				echo "   </tr>";
@@ -201,11 +202,10 @@
 #			    echo "<tr><td>&nbsp;</td></tr>";
 			    echo '<tr  onClick="show_layer(\'hide'.$row->kuerzel.'\');hide_layer(\'show'.$row->kuerzel.'\');">';
 
-			  	echo "   <td width=\"10\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_down.png' title='ausblenden' alt='ausblenden' border='0'></td>";
 			
-			  	echo "   <td width=\"390\" class=\"ContentHeader2\">";
+			  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_down.png' title='ausblenden' alt='ausblenden' border='0'>&nbsp;";
 			    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
-			    echo "   <td width=\"20\" class=\"ContentHeader2\">&nbsp;</td>";
+			    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 			    echo "   <td width=\"200\" class=\"ContentHeader2\">&nbsp;</td>";
 				echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
 				echo "   </tr>";
@@ -217,16 +217,25 @@
 			if(!$grp_obj->getgruppe($row->studiengang_kz, null, true, true))
 				echo $grp_obj->errormsg;
 
+			$zeile=0;	
 			foreach($grp_obj->result as $row1)
 			{
-				echo "<tr>";
-				  	echo "   <td width=\"10\">&nbsp;</td>";
-					echo " <td width=\"390\" >&#8226; $row1->beschreibung</td>";
+				$zeile++;
+				if ($zeile%2)
+				{
+					$class=' class="row-odd" ';				
+				}
+				else
+				{
+					$class=' class="row-even" ';	
+				}
+				echo "<tr ".$class.">";
+					echo " <td width=\"420\" >&#8226; $row1->beschreibung</td>";
 
 				// LINK for opening a closed mail dispatcher
 				// display the open-link only when its a closed dispatcher and if the user has status lector
 				// if dispatcher has attribute aktiv=true no opening action is needed
-				echo "<td width=\"20\">";
+				echo "<td width=\"23\">";
 				if(!$row1->aktiv && MAILVERTEILER_SPERRE)
 				{
 					//Studentenvertreter duerfen den Verteiler fuer alle Studenten oeffnen
@@ -281,7 +290,7 @@
 
 			  		if($row_stud->anzahl>0)
 			  		{
-			  			echo "<tr><td width=\"390\" >&#8226; Alle Studenten dieses Studiengangs</td>";
+			  			echo "<tr><td width=\"420\" >&#8226; Alle Studenten dieses Studiengangs</td>";
 
 						// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
 						if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz || !MAILVERTEILER_SPERRE)
@@ -294,7 +303,7 @@
 						}
 						else
 						{
-							echo " <td width=\"20\">&nbsp</td>";
+							echo " <td width=\"23\">&nbsp</td>";
 				  			//echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kurzbz)."_std@technikum-wien.at\" class=\"Item\">".strtolower($row->kurzbz)."_std@technikum-wien.at</a></td>";
 				  			echo " <td width=\"200\" >gesperrt</td>";
 						}
@@ -315,6 +324,7 @@
 			  		echo "\n";
 			  		foreach($lv_obj->result as $row1)
 			  		{
+
 			  			if((!is_null($row1->semester)) && ($row1->semester != "") && ($row1->semester<=$row->max_semester) && ($row1->semester>'0')) //($row1->semester<'10'))
 			  			{
 			  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND student_uid NOT LIKE '_Dummy%'";
@@ -326,15 +336,25 @@
 				  					$qry_cnt .= " AND gruppe='$row1->gruppe'";
 			  				}
 
-
 				  			if($row_cnt = pg_fetch_object(pg_query($conn, $qry_cnt)))
 				  			{
 				  				if($row_cnt->anzahl>0)
 				  				{
+								
+									$zeile++;
+									if ($zeile%2)
+									{
+										$class=' class="row-odd" ';				
+									}
+									else
+									{
+										$class=' class="row-even" ';	
+									}
+								
 				  					$param = "kz=".$row->studiengang_kz."&amp;sem=".$row1->semester;
 				  					$strhelp = strtolower($row->kuerzel.trim($row1->semester).trim($row1->verband).trim($row1->gruppe));
-						  			echo "<tr>\n";
-						  			echo "  <td width=\"390\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
+						  			echo "<tr ".$class.">\n";
+						  			echo "  <td width=\"420\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
 						  			if(trim($row1->verband)!='')
 						  			{
 						  				$param .="&amp;verband=$row1->verband";
@@ -347,7 +367,7 @@
 							  		}
 
 						  			echo "</td>";
-						  			echo "  <td width='20'></td>";
+						  			echo "  <td width='23'></td>";
 						  			echo "  <td width=\"200\"><a href='mailto:$strhelp@".DOMAIN."' class=\"Item\">$strhelp@".DOMAIN."</a></td>";
 						  			echo "  <td width=\"100\" align=\"right\"><a class=\"Item\" href=\"#\" onClick='javascript:window.open(\"stud_in_grp.php?".$param."\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes,resizable=1\");return false;'>Personen</a></td>";
 						  			echo "</tr>";
