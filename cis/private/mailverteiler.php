@@ -142,7 +142,7 @@
 			?>
             <br>
 			<hr>
-		   	<h3>Zum Verteiler anzeigen bitte auf &nbsp;[&nbsp;<img src='../../skin/iages/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;]&nbsp;klicken&nbsp; bzw. zum Ausblenden auf&nbsp;&nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_down.png' title='Ausblenden' alt='Ausblenden' border='0'>&nbsp;]&nbsp;klicken</h3>
+		   	<h3>Zum Verteiler anzeigen bitte auf &nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;]&nbsp;klicken&nbsp; bzw. zum Ausblenden auf&nbsp;&nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_down.png' title='Ausblenden' alt='Ausblenden' border='0'>&nbsp;]&nbsp;klicken</h3>
 	   		<br>
 <?php
 		$stg_obj = new studiengang($conn);
