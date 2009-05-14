@@ -396,23 +396,20 @@ if ($result_lv!=0)
 			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'>";
 			echo "<SELECT name='orgform'>";
 			echo "<option value=''>-- Keine Auswahl --</option>";
-			if($row->orgform_kurzbz=='BB')
-			{
-				echo "<option value='BB' selected='selected'>Berufsbegleitend</option>";
-			}
-			else 
-			{
-				echo "<option value='BB'>Berufsbegleitend</option>";
-			}
-			if($row->orgform_kurzbz=='VZ')
-			{
-				echo "<option value='VZ' selected='selected'>Vollzeit</option>";
-			}
-			else 
-			{
-				echo "<option value='VZ'>Vollzeit</option>";
-			}
 			
+			$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
+			if($result_orgform = pg_query($conn, $qry_orgform))
+			{
+				while($row_orgform = pg_fetch_object($result_orgform))
+				{
+					if($row_orgform->orgform_kurzbz==$row->orgform_kurzbz)
+						$selected='selected';
+					else 
+						$selected='';
+					echo "<option value='$row_orgform->orgform_kurzbz' $selected>$row_orgform->bezeichnung</option>";
+				}
+			}
+						
 			echo "</SELECT><input type='submit' value='ok' name='submitorg'></form>";
 
 		}
