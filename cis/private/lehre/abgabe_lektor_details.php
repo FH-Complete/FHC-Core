@@ -368,6 +368,14 @@ $result=@pg_query($conn, $qry);
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
+		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
+		{
+			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
+		}
+		else 
+		{
+			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+		}
 		$htmlstr .= "	</tr>\n";
 		
 		
