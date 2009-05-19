@@ -4,7 +4,7 @@ class basis_db extends db
 {
 	function db_connect()
 	{
-		$conn_str=CONN_STRING;
+		$conn_str='host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' user='.DB_USER.' password='.DB_PASSWORD;
 		//Connection Herstellen
 		if (DB_CONNECT_PERSISTENT)
 		{
@@ -20,18 +20,29 @@ class basis_db extends db
 
 	function db_query($sql)
 	{
+		//echo $sql.'<BR/>';
 		if ($this->db_result=pg_query(basis_db::$db_conn,$sql))
 			return true;
 		else
 		{
-			$this->errormsg='Abfrage in Datenbank fehlgeschlagen! '.$this->db_lasterror();
+			$this->errormsg.='Abfrage in Datenbank fehlgeschlagen! '.$this->db_last_error();
 			return false;
 		}
+	}
+
+	function db_num_rows()
+	{
+		return pg_num_rows($this->db_result);
 	}
 
 	function db_fetch_object()
 	{
 		return pg_fetch_object($this->db_result);
+	}
+
+	function db_last_error()
+	{
+		return pg_last_error();
 	}
 }
 ?>
