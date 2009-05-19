@@ -86,7 +86,7 @@
 		  			<td class="tdwrap"></td>
 					<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Ouml;H-Wahl 2009</a>
 				  	<table class="tabcontent" id="oehwahl" style="display: visible;">
-						<tr style="display:none;">
+						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/oeh/bewerber.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kandidaturen</a></td>
 						</tr>
