@@ -460,7 +460,7 @@
 					$mailto.= ($mailto!=''?',':'').$row->email;
 				}
 				echo "</tbody></table>";
-				echo "<br><a href='mailto:$mailto'>Mail an alle senden</a>";
+				echo "<br><a href='mailto:?bcc=$mailto'>Mail an alle senden</a>";
 			}
 		}
 		echo '
