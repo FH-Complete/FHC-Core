@@ -79,7 +79,8 @@ else
 	$abstract_en = (isset($_POST['abstract_en'])?$_POST['abstract_en']:'-1');
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
 }
-		
+if($uid=='-1')
+	exit;		
 		
 $user = get_uid();
 $datum_obj = new datum();
