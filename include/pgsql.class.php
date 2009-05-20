@@ -35,9 +35,12 @@ class basis_db extends db
 		return pg_num_rows($this->db_result);
 	}
 
-	function db_fetch_object()
+	function db_fetch_object($result = null)
 	{
-		return pg_fetch_object($this->db_result);
+		if(is_null($result))
+			return pg_fetch_object($this->db_result);
+		else 
+			return pg_fetch_object($result);
 	}
 
 	function db_last_error()

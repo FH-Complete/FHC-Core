@@ -25,13 +25,13 @@
  * Die Menuepunkt mit den zugehoerigen Links befinden sich in einem
  * Array welches includiert wird.
  */
-	require('config.inc.php');
+	require('../config/vilesci.config.inc.php');
  	require('../include/functions.inc.php');
  	require('../include/benutzerberechtigung.class.php');
  	require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
  	$uid=get_uid();
- 	$conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
-	$berechtigung=new benutzerberechtigung($conn);
+ 	//$conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
+	$berechtigung=new benutzerberechtigung();
 	$berechtigung->getBerechtigungen($uid);
 	if (!($berechtigung->isBerechtigt('admin') || 
 		  $berechtigung->isBerechtigt('support') || 
@@ -39,7 +39,6 @@
 		  $berechtigung->isBerechtigt('lehre') || 
 		  $berechtigung->isBerechtigt('lv-plan') ))
 		die ('Keine Berechtigung!');
-
 	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

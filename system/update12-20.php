@@ -57,5 +57,117 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_rolle LIMIT 1;"))
 				constrains umbenannt';
 }
 
+if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_organisationseinheit LIMIT 1;"))
+{
+	$qry = "CREATE TABLE public.tbl_organisationseinheit 
+			(
+ 				oe_kurzbz Character varying(32) NOT NULL,
+ 				oe_parent_kurzbz Character varying(32),
+ 				bezeichnung Character varying(256),
+ 				organisationseinheittyp_kurzbz Character varying(16) NOT NULL
+			)
+			WITH (OIDS=FALSE);
 
+			ALTER TABLE public.tbl_organisationseinheit ADD CONSTRAINT pk_tbl_organisationseinheit PRIMARY KEY (oe_kurzbz);
+			ALTER TABLE public.tbl_organisationseinheit ADD CONSTRAINT oe_parent_oe FOREIGN KEY (oe_parent_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			
+			CREATE TABLE public.tbl_organisationseinheittyp
+			(
+ 				organisationseinheittyp_kurzbz Character varying(16) NOT NULL,
+ 				bezeichnung Character varying(256),
+ 				beschreibung text
+			)
+			WITH (OIDS=FALSE);
+			
+			ALTER TABLE public.tbl_organisationseinheittyp ADD CONSTRAINT pk_organisationseinheittyp PRIMARY KEY (organisationseinheittyp_kurzbz);
+			ALTER TABLE public.tbl_organisationseinheit ADD CONSTRAINT organisationseinheit_organisationseinheittyp FOREIGN KEY (organisationseinheittyp_kurzbz) REFERENCES public.tbl_organisationseinheittyp (organisationseinheittyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;			
+			
+			GRANT SELECT on public.tbl_organisationseinheit TO GROUP web;
+			GRANT SELECT, INSERT, UDPATE, DELETE on public.tbl_organisationseinheit TO GROUP admin;
+			
+			GRANT SELECT on public.tbl_organisationseinheittyp TO GROUP web;
+			GRANT SELECT, INSERT, UPDATE, DELETE on public.tbl_organisationseinheittyp TO GROUP admin;
+			
+			ALTER TABLE public.tbl_studiengang ADD COLUMN oe_kurzbz character varying(32);
+			ALTER TABLE public.tbl_studiengang ADD CONSTRAINT studiengang_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			
+			ALTER TABLE public.tbl_fachbereich ADD COLUMN oe_kurzbz character varying(32);
+			ALTER TABLE public.tbl_fachbereich ADD CONSTRAINT fachbereich_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			
+			";
+	if(!pg_query($conn, $qry))
+		echo '<strong>public.tbl_organisationsform: '.pg_last_error($conn).' </strong><br>';
+	else
+		echo '	public.tbl_organisationsform: Tabelle wurde hinzugefügt!<br>';
+;
+}
+
+if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;"))
+{
+	$qry = "CREATE SCHEMA system;
+			CREATE TABLE system.tbl_benutzerrolle
+			(
+ 				benutzerberechtigung_id serial NOT NULL,
+ 				uid Character varying(16),
+ 				funktion_kurzbz Character varying(16),
+ 				rolle_kurzbz Character varying(32),
+ 				berechtigung_kurzbz Character varying(16),
+ 				art Character varying(5) DEFAULT 'r'::character varying NOT NULL,
+ 				oe_kurzbz Character varying(32),
+				studiensemester_kurzbz Character varying(16),
+				start Date,
+				ende Date,
+				negativ Boolean DEFAULT FALSE NOT NULL,
+				updateamum Timestamp,
+				updatevon Character varying(16),
+				insertamum Timestamp DEFAULT now(),
+				insertvon Character varying(16)
+			)
+			WITH (OIDS=FALSE);
+			
+			CREATE INDEX idx_userberechtigung_uid ON system.tbl_benutzerrolle (uid);
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT pk_tbl_benutzerberechtigung PRIMARY KEY (benutzerberechtigung_id);
+			
+			CREATE TABLE system.tbl_berechtigung
+			(
+ 				berechtigung_kurzbz Character varying(16) NOT NULL,
+ 				beschreibung Character varying(256)
+			)
+			WITH (OIDS=FALSE);
+			ALTER TABLE system.tbl_berechtigung ADD CONSTRAINT pk_tbl_berechtigung PRIMARY KEY (berechtigung_kurzbz);
+			
+			CREATE TABLE system.tbl_rolle
+			(
+ 				rolle_kurzbz Character varying(32) NOT NULL,
+ 				beschreibung Character varying(256)
+			) WITH (OIDS=FALSE);
+			
+			ALTER TABLE system.tbl_rolle ADD CONSTRAINT pk_tbl_rolle PRIMARY KEY (rolle_kurzbz);
+			
+			CREATE TABLE system.tbl_rolleberechtigung
+			(
+ 				berechtigung_kurzbz Character varying(16) NOT NULL,
+ 				rolle_kurzbz Character varying(32) NOT NULL
+			)
+			WITH (OIDS=FALSE);
+			
+			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT pk_tbl_rolleberechtigung PRIMARY KEY (berechtigung_kurzbz,rolle_kurzbz);
+
+			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP web;
+			GRANT SELECT ON system.tbl_berechtigung TO GROUP web;
+			GRANT SELECT ON system.tbl_rolle TO GROUP web;
+			GRANT SELECT ON system.tbl_rolleberechtigung TO GROUP web;
+			
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_benutzerrolle TO GROUP web;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_berechtigung TO GROUP web;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolle TO GROUP web;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolleberechtigung TO GROUP web;
+			";
+	
+	if(!pg_query($conn, $qry))
+		echo '<strong>system schema: '.pg_last_error($conn).' </strong><br>';
+	else
+		echo 'system schema: Tabellen wurde hinzugefügt!<br>';
+
+}
 ?>
