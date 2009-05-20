@@ -110,6 +110,7 @@ class gebiet
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->antwortenprozeile = $row->antwortenprozeile;
 				
 				return true;
 			}
@@ -189,6 +190,10 @@ class gebiet
 			$this->errormsg = 'Maxpunkte muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($this->antwortenprozeile) || $this->antwortenprozeile<=0)
+		{
+			$this->errormsg = 'AntortenProZeile muss eine gueltige Zahl und groesser als 0 sein';
+		}
 
 		return true;
 	}
@@ -212,7 +217,7 @@ class gebiet
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse, 
 					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab, 
-					levelgleichverteilung, maxpunkte, insertamum, insertvon , updateamum, updatevon) VALUES('.
+					levelgleichverteilung, maxpunkte, antwortenprozeile, insertamum, insertvon , updateamum, updatevon) VALUES('.
 			       $this->addslashes($this->kurzbz).",".
 			       $this->addslashes($this->bezeichnung).",'".
 			       $this->addslashes($this->beschreibung).",'".
@@ -227,6 +232,7 @@ class gebiet
 			       $this->addslashes($this->level_sprung_ab).",".
 			       ($this->levelgleichverteilung?'true':($this->levelgleichverteilung==false?'false':'null')).",".
 			       $this->addslashes($this->maxpunkte).",".
+			       $this->addslashes($this->antwortenprozeile).",".
 			       $this->addslashes($this->insertamum).",".
 			       $this->addslashes($this->insertvon).
 			       ",null, null);";
@@ -248,6 +254,7 @@ class gebiet
 			       ' level_sprung_ab='.$this->addslashes($this->level_sprung_ab).','.
 			       ' levelgleichverteilung='.($this->levelgleichverteilung?'true':($this->levelgleichverteilung==false?'false':'null')).','.
 			       ' maxpunkte='.$this->addslashes($this->maxpunkte).','.
+			       ' antwortenprozeile='.$this->addslashes($this->antwortenprozeile).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE gebiet_id='".addslashes($this->gebiet_id)."';";
@@ -449,6 +456,7 @@ class gebiet
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->antwortenprozeile = $row->antwortenprozeile;
 				
 				$this->result[] = $obj;
 			}
