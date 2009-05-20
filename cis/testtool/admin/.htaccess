@@ -1,0 +1,10 @@
+AuthName "Technikum-Wien"
+AuthType Basic
+AuthLDAPURL ldap://ldap.technikum-wien.at/ou=People,dc=technikum-wien,dc=at?uid?one?objectclass=posixAccount
+AuthLDAPGroupAttributeIsDN Off
+AuthLDAPGroupAttribute memberuid
+require group cn=fhadmin,ou=Group,dc=technikum-wien,dc=at
+require group cn=hadesadm,ou=Group,dc=technikum-wien,dc=at
+require user tw01e061
+require user masik
+require user dpt
