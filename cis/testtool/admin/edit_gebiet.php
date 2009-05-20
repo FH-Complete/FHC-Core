@@ -106,6 +106,7 @@ if(isset($_POST['speichern']))
 		$gebiet->level_sprung_ab = $_POST['level_sprung_ab'];
 		$gebiet->updateamum = date('Y-m-d H:i:s');
 		$gebiet->updatevon = $user;
+		$gebiet->antwortenprozeile = $_POST['antwortenprozeile'];
 		
 		if($gebiet->save(false))
 		{
@@ -162,6 +163,8 @@ if($gebiet_id!='')
 	echo '<td>Maximale Punkteanzahl</td><td><input type="text" size="5" maxlength="5" name="maxpunkte" value="'.htmlentities($gebiet->maxpunkte).'">'.$hinweis.'</td>';
 	echo '</tr><tr>';
 	echo '<td>Maximale Fragenanzahl</td><td><input type="text" size="5" maxlength="5" name="maxfragen" value="'.htmlentities($gebiet->maxfragen).'"></td>';
+	echo '</tr><tr>';
+	echo '<td>Antworten pro Zeile</td><td><input type="text" size="5" maxlength="5" name="antwortenprozeile" value="'.htmlentities($gebiet->antwortenprozeile).'"></td>';
 	echo '</tr><tr>';
 	echo '<td>Start Level</td><td><input type="text" size="5" maxlength="5" name="level_start" value="'.htmlentities($gebiet->level_start).'"></td>';
 	echo '</tr><tr>';

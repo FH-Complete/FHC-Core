@@ -51,7 +51,7 @@ if(isset($_GET['frage_id']))
 else
 	$frage_id = '';
 
-$MAX_VORSCHLAEGE_PRO_ZEILE=4;
+//$MAX_VORSCHLAEGE_PRO_ZEILE=4;
 ?>
 <?xml version="1.0" ?>
 <?xml-stylesheet type="text/xsl" href="mathml.xsl" ?>
@@ -440,7 +440,7 @@ if($frage->frage_id!='')
 		echo "</td>";
 		$anzahl++;
 
-		if($anzahl>$MAX_VORSCHLAEGE_PRO_ZEILE)
+		if($anzahl>$gebiet->antwortenprozeile)
 		{
 			echo '</tr><tr>';
 			$anzahl=1;
