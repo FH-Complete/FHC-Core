@@ -33,6 +33,7 @@
      $cutlength=10;
 	// Variablen setzen
 	$user = get_uid();
+
 	if (isset($_GET['course_id']))
 		$course_id=$_GET['course_id'];
 	if (isset($_GET['term_id']))
@@ -197,14 +198,13 @@ function js_toggle_container(conid)
 			  	<td class="tdwrap">
 			  	<select name="course" onChange="MM_jumpMenu('self',this,0)">
 				<?php
+
 					$stg_obj = new studiengang($sql_conn);
 					$stg_obj->getAll('typ, kurzbz');
 					//$sql_query = "SELECT DISTINCT studiengang_kz AS id, kurzbzlang FROM public.tbl_studiengang WHERE NOT(studiengang_kz='0') ORDER BY kurzbzlang";
-
 					//$result = pg_exec($sql_conn, $sql_query);
 					//$num_rows_result = pg_num_rows($result);
 					$sel_kurzbzlang='';
-
 					foreach($stg_obj->result as $row)
 					{
 						if($row->studiengang_kz!=0)
@@ -352,25 +352,31 @@ function js_toggle_container(conid)
 					<td class="tdwrap">
 					<ul style="margin-top: 0px; margin-bottom: 0px;">
 					<?php
+					
 					$stsemobj = new studiensemester($sql_conn);
 					$stsem = $stsemobj->getAktorNext();
-	
-					
-	
-					//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
+						//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
 					$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
 					        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 					        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 					        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'";
-	
+
 					if($result = pg_query($sql_conn,$qry))
 					{
 							while($row = pg_fetch_object($result))
 							{
 								if($row->studiengang_kz==0 AND $row->semester==0)
-									echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->lehreverzeichnis, $cutlength).'</a></li>';
+								{
+									echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->lehreverzeichnis, $cutlength).' ?</a></li>';
+								}	
 								else
-									echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$stg[$row->studiengang_kz].$row->semester.' '.CutString($row->bezeichnung, $cutlength)."</a></li>";
+								{
+									$stg_obj = new studiengang($sql_conn);
+									$stg_obj->load($row->studiengang_kz);
+									$kurzbz = $stg_obj->kuerzel.'-'.$row->semester;
+									// Altes Kuerzel $kurzbz=$stg[$row->studiengang_kz].$row->semester;
+									echo "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$kurzbz.' '.CutString($row->bezeichnung, $cutlength)."</a></li>";
+								}	
 							}
 					}
 					else
@@ -403,11 +409,12 @@ function js_toggle_container(conid)
 								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
 								exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
 							}
-	
 						}
-						$dest_dir = @dir($path);
-						echo '<a href="'.$dest_dir->path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
-	
+						if(is_dir($path))
+						{
+							$dest_dir = @dir($path);
+							echo '<a href="'.$dest_dir->path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
+						}
 					?>
 				</td>
 			
