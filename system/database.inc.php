@@ -27,7 +27,14 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+	'{3A7F9B8D-001E-4D33-8FD0-0558492DBD41}'  => array
+	(
+    		"id" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD41}" ,
+    		"name" => "foo" ,
+    		"caption" => "foo" ,
+    		"comments" => "" ,
+    		"ordinal" => "0"
+	),
 	'{A0178E89-8366-4582-834F-E124208C684D}'  => array
 	(
     		"id" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
@@ -45807,6 +45814,28 @@ $datatypes['{3DD56C5A-B10A-4E02-8CB2-C7B4880B63DD}']=array
     	"comments" => "",
     	"ordinal" => "0"
 );
+$datatypes['{E62BD1D3-18CA-4571-9A16-606FF04DC894}']=array
+(
+    	"id" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}",
+    	"name" => "Numeric",
+    	"caption" => "numeric",
+	"length" => "0",
+	"default" => "'0'" ,
+    	"comments" => "",
+    	"ordinal" => "0"
+);
+$datatypes['{36A9DD5B-49C4-4BB7-86DB-2D4BCCAF58AF}']=array
+(
+    	"id" => "{36A9DD5B-49C4-4BB7-86DB-2D4BCCAF58AF}",
+    	"name" => "Real",
+    	"caption" => "real",
+	"length" => "0",
+	"default" => "'0'" ,
+    	"comments" => "",
+    	"ordinal" => "0"
+);
+
+
 $datatypes['']=array
 (
     	"id" => "",
