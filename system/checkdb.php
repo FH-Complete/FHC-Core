@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
 /*
  * Script zur Pruefung der Datenbank
@@ -26,22 +27,23 @@
  * verglichen und eventuelle Aenderungen werden angezeigt.
  */
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/system.config.inc.php');
 require_once('database.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
 // Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect('host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' user='.DB_USER.' password='.DB_PASSWORD))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
 $uid=get_uid();
 
-$rechte = new benutzerberechtigung($conn);
+/*
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung für diese Seite');
-
+*/
 echo '
 <html>
 <head>
@@ -72,7 +74,7 @@ function disableSchemas()
 	for(i=0;i<elem.length;i++)
 	{
 		div = elem[i];
-		if(div.id && (div.id.startsWith("schema.") || div.id.startsWith("table.") || div.id.startsWith("attributes.")))
+		if(div.id && (div.id.startsWith("schema.") || div.id.startsWith("table.") || div.id.startsWith("attrib.")))
 		{
 			document.getElementById(div.id).style.display="none";
 		}
@@ -86,7 +88,7 @@ function disableTables()
 	for(i=0;i<elem.length;i++)
 	{
 		div=elem[i];
-		if(div.id && (div.id.startsWith("table.") || div.id.startsWith("attributes.")))
+		if(div.id && (div.id.startsWith("table.") || div.id.startsWith("attrib.")))
 		{
 			document.getElementById(div.id).style.display="none";
 		}
@@ -117,7 +119,7 @@ function disableTables()
 </head>
 <body>';
 
-echo '<H2>Datenbank Pr&uuml;fung</H2><br />';
+echo '<H2>Datenbank Pr&uuml;fung</H2>';
 $obj=array();
 $obj['']=array();
 $obj['']['error']=false;
@@ -263,6 +265,7 @@ foreach ($tabellen AS $tabelle)
 						//	echo $schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].'.'.$attribut['caption'].' wurde erfolgreich hinzugefuegt!<BR>';
 						$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]['qry']=$sql_query;
 						$obj[$schemas[$tabelle['schemaid']]['caption']]['error']=true;
+						$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['error']=true;
 					}
 					$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]['datatype']=$datatypes[$attribut['datatypeid']]['caption'];
 					$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]['attribute']=$attribut;
@@ -274,8 +277,8 @@ foreach ($tabellen AS $tabelle)
 	flush();
 	$i++;
 }
-/*
-echo '<H2>Pruefe Constraints!</H2>';
+
+//echo '<H2>Pruefe Constraints!</H2>';
 
 function getTablenameFromAttributIDs($attr)
 {
@@ -315,23 +318,48 @@ foreach ($relations AS $relation)
 	{
 		foreach ($relation['foreignkeys'] AS $foreignkey)
 		{		
+			$sql_query='';
 			$parenttable=getTablenameFromAttributIDs($foreignkey['attrparent']);
 			$childtable=getTablenameFromAttributIDs($foreignkey['attrchild']);
 			$parentattr=getAttributesnameFromAttributIDs($foreignkey['attrparent']);
 			$childattr=getAttributesnameFromAttributIDs($foreignkey['attrchild']);
 			//$constrname=str_replace('.','_',);
-			$sql_query='ALTER TABLE '.$childtable.' ADD CONSTRAINT '.$relation['caption'].' FOREIGN KEY ('.$childattr.') REFERENCES '.$parenttable.' ('.$parentattr.') ';
-			$sql_query.='ON UPDATE CASCADE ON DELETE RESTRICT;';
+			
+			list($schema, $tablename) = explode(".", $childtable);
+			
+			$qry = "SELECT * FROM pg_constraint WHERE contype='f' AND conrelid=(
+						SELECT oid FROM pg_class WHERE relname='".$tablename."' AND relnamespace=(
+							SELECT oid FROM pg_namespace WHERE nspname='".$schema."'))
+						AND conname='".$relation['caption']."'";
+			if($result = pg_query($conn, $qry))
+			{
+				if(pg_num_rows($result)==0)
+				{
+					$sql_query='ALTER TABLE '.$childtable.' ADD CONSTRAINT '.$relation['caption'].' FOREIGN KEY ('.$childattr.') REFERENCES '.$parenttable.' ('.$parentattr.') ';
+					$sql_query.='ON UPDATE CASCADE ON DELETE RESTRICT;'.$tablename.'/'.$schema;
+					
+					if(isset($obj[$schema]) && 
+					   isset($obj[$schema]['tables'][$tablename]) && 
+					   isset($obj[$schema]['tables'][$tablename]['attribute']) && 
+					   isset($obj[$schema]['tables'][$tablename]['attribute'][$childattr]['qry']))
+						$obj[$schema]['tables'][$tablename]['attribute'][$childattr]['qry'].=$sql_query;
+					else 
+						$obj[$schema]['tables'][$tablename]['attribute'][$childattr]['qry']=$sql_query;
+					$obj[$schema]['error']=true;
+					$obj[$schema]['tables'][$tablename]['error']=true;
+				}
+			}
+			
 			//if (refintegritychildupdate)
 			//	$sql_query.='
-			echo $sql_query.'<BR>';
+			//echo $sql_query.'<BR>';
 		}
 	}
 
 	flush();
 	$i++;
 }
-			
+/*
 echo '<H2>Gegenpruefung!</H2>';
 $sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'papaya';";
 if (!$result=@pg_query($conn,$sql_query))
@@ -376,7 +404,7 @@ function querybox($title, $qry, $id)
 	if(strlen($qry)>50)
 	{
 		$cols=55;
-		$rows = strlen($qry)/50;
+		$rows = strlen($qry)/50+1;
 		
 		if($rows>10)
 			$rows = 10;
@@ -396,6 +424,8 @@ $out_schema.= '<div class="box" id="schema">';
 $out_schema.= '<div class="boxhead">Schema</div>';
 $out_schema.= '<table>';
 
+$gesamtqry = '';
+
 foreach ($obj as $schema=>$value)
 {
 	
@@ -406,6 +436,7 @@ foreach ($obj as $schema=>$value)
 	{
 		if(isset($value['qry']) && $value['qry']!='')
 		{
+			$gesamtqry .= $value['qry']."\n";
 			$out_schema_data.=querybox($schema, $value['qry'], 'schema.'.$schema);
 			$img = "exclamation.png";
 		}
@@ -413,8 +444,8 @@ foreach ($obj as $schema=>$value)
 		{
 			$img = "error_go.png";
 		}
-		$out_schema.= '<td><a href="#" onclick="display(\'schema.'.$schema.'\')"><img src="../skin/images/'.$img.'" /></a></td>';
-		$out_schema.= '<td><a href="#" onclick="display(\'schema.'.$schema.'\')">'.$schema.'</a></td>';
+		$out_schema.= '<td><a href="#" onclick="display(\'schema.'.$schema.'\'); return false;"><img src="../skin/images/'.$img.'" /></a></td>';
+		$out_schema.= '<td><a href="#" onclick="display(\'schema.'.$schema.'\'); return false;">'.$schema.'</a></td>';
 		
 		
 		
@@ -422,7 +453,7 @@ foreach ($obj as $schema=>$value)
 	else 
 	{
 		$out_schema.= '<td></td>';
-		$out_schema.= '<td><a href="#" onclick="display(\'schema.'.$schema.'\')">'.$schema.'</a></td>';
+		$out_schema.= '<td><a href="#" onclick="display(\'schema.'.$schema.'\'); return false;">'.$schema.'</a></td>';
 	}
 	$out_schema.= '</tr>';
 
@@ -439,16 +470,25 @@ foreach ($obj as $schema=>$value)
 			$out_tbl.= '<tr>';
 			if(isset($tabvalue['qry']) && $tabvalue['qry']!='')
 			{
-				$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$tables.'\')"><img src="../skin/images/exclamation.png" /></a></td>';
-				$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$tables.'\')">'.$tables.'</a></td>';
+				$gesamtqry .= $tabvalue['qry']."\n";
+				$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$schema.$tables.'\'); return false;"><img src="../skin/images/exclamation.png" /></a></td>';
+				$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$schema.$tables.'\'); return false;">'.$tables.'</a></td>';
 				
-				$out_tbl_data.=querybox($tables, $tabvalue['qry'], 'table.'.$tables);
+				$out_tbl_data.=querybox($tables, $tabvalue['qry'], 'table.'.$schema.$tables);
 				
 			}
 			else 
 			{
-				$out_tbl.= '<td></td>';
-				$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$tables.'\')">'.$tables.'</a></td>';
+				if(isset($tabvalue['error']) && $tabvalue['error'])
+				{
+					$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$schema.$tables.'\'); return false;"><img src="../skin/images/error_go.png" /></a></td>';
+					$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$schema.$tables.'\'); return false;">'.$tables.'</a></td>';
+				}
+				else 
+				{
+					$out_tbl.= '<td></td>';
+					$out_tbl.= '<td><a href="#" onclick="display(\'table.'.$schema.$tables.'\'); return false;">'.$tables.'</a></td>';
+				}
 			}
 			$out_tbl.= '</tr>';
 		
@@ -456,7 +496,7 @@ foreach ($obj as $schema=>$value)
 			if(isset($tabvalue['attribute']))
 			{
 				$out_att.= "\n";
-				$out_att.= '<div class="box" id="table.'.$tables.'" style="display: none">';
+				$out_att.= '<div class="box" id="table.'.$schema.$tables.'" style="display: none">';
 				$out_att.= '<div class="boxhead">'.$tables.'</div>';
 				$out_att.= '<table>';
 				
@@ -465,17 +505,18 @@ foreach ($obj as $schema=>$value)
 					$out_att.= '<tr>';
 					if(isset($attvalue['qry']) && $attvalue['qry']!='')
 					{
-						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$attrib.'\')"><img src="../skin/images/exclamation.png" /></a></td>';
-						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$attrib.'\')">'.$attrib.'</a></td>';
+						$gesamtqry .= $attvalue['qry']."\n";
+						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;"><img src="../skin/images/exclamation.png" /></a></td>';
+						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.$attrib.'</a></td>';
 						
-						$out_att_data.=querybox($attrib, $attvalue['qry'], 'attrib.'.$attrib);
+						$out_att_data.=querybox($attrib, $attvalue['qry'], 'attrib.'.$schema.$tables.$attrib);
 					}
 					else 
 					{
 						$out_att.= '<td></td>';
-						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$attrib.'\')">'.$attrib.'</a></td>';
-						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$attrib.'\')">'.$attvalue['datatype'].($attvalue['attribute']['length']!=''?' ('.$attvalue['attribute']['length'].')':'').'</a></td>';
-						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$attrib.'\')">'.
+						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.$attrib.'</a></td>';
+						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.$attvalue['datatype'].($attvalue['attribute']['length']!=''?' ('.$attvalue['attribute']['length'].')':'').'</a></td>';
+						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.
 									($attvalue['attribute']['unique']=='1'?'U':'').
 									($attvalue['attribute']['notnull']=='1'?'NN':'').
 									'</a></td>';
@@ -495,7 +536,10 @@ foreach ($obj as $schema=>$value)
 $out_schema.= '</table>';
 $out_schema.= '</div>';
 
+echo '<a href="#" onclick="display(\'schema.gesamtqry\'); return false;"><img src="../skin/images/system-software-update.png" title="Gesamtsystem aktualisieren" alt="Gesamtsystem aktualisieren"><br /></a>';
+
 echo $out_schema;
+echo querybox('Gesamtsystem aktualisieren',$gesamtqry, 'schema.gesamtqry');
 echo $out_schema_data;
 echo $out_tbl;
 echo $out_tbl_data;
