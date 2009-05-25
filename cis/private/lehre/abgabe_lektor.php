@@ -61,9 +61,11 @@ if(!$erg=pg_query($conn, $sql_query))
 }
 else
 {
-	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+	//$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>";
+	$htmlstr .= "<form name='multitermin' action='abgabe_lektor_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
+	$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
-	$htmlstr .= "<th class='table-sortable:default'>UID</th>
+	$htmlstr .= "<th></th><th class='table-sortable:default'>UID</th>
 				<th>Email</th>
 				<th class='table-sortable:default'>Vorname</th>
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
@@ -77,6 +79,7 @@ else
 	while($row=pg_fetch_object($erg))
 	{
 		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
+		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
 		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
@@ -90,6 +93,8 @@ else
 		$i++;
 	}
 	$htmlstr .= "</tbody></table>\n";
+	$htmlstr .= "<table><tr><td rowspan=3><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td></tr></table>\n";
+	$htmlstr .= "</form>";
 }
 
 ?>
