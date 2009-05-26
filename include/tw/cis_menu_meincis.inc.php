@@ -109,7 +109,7 @@
 					</table>
 		  			</td>
 				</tr>';
-				/*
+				//Projektarbeitsabgabe
 				echo '
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -119,7 +119,6 @@
 				    	</a>
 				    </td>
 				</tr>';
-				*/
 			}
 
 			//Eigene LVs des eingeloggten Lektors anzeigen
@@ -203,7 +202,7 @@
 					</table>
 		  			</td>
 				</tr>
-				<!--
+				<!--Projektarbeitsabgabe-->
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class='tdwrap'>
@@ -212,7 +211,6 @@
 				    	</a>
 				    </td>
 				</tr>
-				-->
 			<?php
 			}
 			
