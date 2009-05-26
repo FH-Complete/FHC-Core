@@ -35,11 +35,51 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 </head>
 <body class="Background_main">
 	<h2>Organisationseinheiten - Übersicht</h2><br />';
-$arr = array();
 
-$arr = getChilds('etw');
-$arr1['etw'] = $arr;
-displayh($arr1);
+//Benutzerdefiniert Sortierfunktion damit die Eintraege mit 
+//Kindelementen nach oben sortiert werden
+function mysort($a, $b)
+{
+	if(is_array($a) && is_array($b))
+	{
+		if(count($a)==count($b))
+			return 0;
+			
+		if(count($a)>count($b))
+			return -1;
+		else 
+			return 1;
+	}
+	else
+	{
+		if(is_array($a))
+			return 1;
+		if(is_array($b)) 
+			return -1;
+		else 
+			return 0;
+	}
+}
+
+//Alle obersten Organisationseinheiten holen
+$oe = new organisationseinheit();
+$oe->getHeads();
+
+foreach ($oe->result as $result)
+{
+	$arr = array();
+	//Array mit den Kindelementen erzeugen
+	$arr = getChilds($result->oe_kurzbz);
+	
+	//Sortieren damit die Eintraege mit Kindern weiter oben stehen
+	uasort($arr,'mysort');
+	
+	//Parent hinzufuegen
+	$arr1[$result->oe_kurzbz] = $arr;
+	
+	//Anzeigen
+	displayh($arr1);
+}
 
 //Liefert die Kindelemente einer Organisationseinheit in 
 //einem verschachteltem Array zurueck
@@ -56,7 +96,7 @@ function getChilds($foo)
 		$hlp = getChilds($val); 
 		$arr[$val] = $hlp;
 	}
-
+	
 	return $arr;
 }
 
