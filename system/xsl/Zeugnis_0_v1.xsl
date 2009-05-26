@@ -34,7 +34,7 @@
 				</fo:block-container>
 				<fo:block-container position="absolute" top="47mm" left="31.5mm" height="20mm">
 					<fo:block text-align="left" line-height="18pt" font-family="sans-serif" font-size="16pt">
-						<xsl:value-of select="studiengang_art"/>
+						<xsl:value-of select="studiengang_art"/>-Studiengang
 					</fo:block>
 				</fo:block-container>
 				<fo:block-container position="absolute" top="54mm" left="30mm" height="20mm">
@@ -179,7 +179,7 @@
 								</fo:table-cell>
 								<fo:table-cell>
 									<fo:block font-size="10pt" content-width="75mm" text-align="center">
-										<xsl:value-of select="ort_datum"/>
+										Wien, am <xsl:value-of select="ort_datum"/>
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>

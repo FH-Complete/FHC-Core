@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,24 +16,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  ******************************************************************************
  * Beschreibung:
  * Dieses Skript fuehrt Datenbankupdates von Version 1.2 auf 2.0 durch
  */
 
-require_once ('../vilesci/config.inc.php');
+require_once ('../config/system.config.inc.php');
 
 // Datenbank Verbindung
 //if (!$conn = pg_pconnect("host=.technikum-wien.at dbname= user= password="))
-if (!$conn = pg_pconnect(CONN_STRING))
+if (!$conn = pg_pconnect('host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' user='.DB_USER.' password='.DB_PASSWORD))
    	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
 
 echo '<H1>DB-Updates!</H1>';
 echo '<H2>Version 1.2 &rarr; 2.0</H2>';
 
-// **************** lehre.tbl_projektarbeit.sprache *******************************
+// **************** lehre.tbl_prestudentrolle -> tbl_prestudentstatus ************************
 if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_rolle LIMIT 1;"))
 {
 	$qry = "ALTER TABLE public.tbl_rolle RENAME TO tbl_status;
@@ -57,6 +58,7 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_rolle LIMIT 1;"))
 				constrains umbenannt';
 }
 
+// *************** public.tbl_organisationseinheit *******************************
 if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_organisationseinheit LIMIT 1;"))
 {
 	$qry = "CREATE TABLE public.tbl_organisationseinheit 
@@ -82,11 +84,11 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_organisationseinheit LI
 			ALTER TABLE public.tbl_organisationseinheittyp ADD CONSTRAINT pk_organisationseinheittyp PRIMARY KEY (organisationseinheittyp_kurzbz);
 			ALTER TABLE public.tbl_organisationseinheit ADD CONSTRAINT organisationseinheit_organisationseinheittyp FOREIGN KEY (organisationseinheittyp_kurzbz) REFERENCES public.tbl_organisationseinheittyp (organisationseinheittyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;			
 			
-			GRANT SELECT on public.tbl_organisationseinheit TO GROUP web;
-			GRANT SELECT, INSERT, UDPATE, DELETE on public.tbl_organisationseinheit TO GROUP admin;
+			GRANT SELECT on public.tbl_organisationseinheit TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT, INSERT, UDPATE, DELETE on public.tbl_organisationseinheit TO GROUP ".DB_FAS_USER_GROUP.";
 			
-			GRANT SELECT on public.tbl_organisationseinheittyp TO GROUP web;
-			GRANT SELECT, INSERT, UPDATE, DELETE on public.tbl_organisationseinheittyp TO GROUP admin;
+			GRANT SELECT on public.tbl_organisationseinheittyp TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE on public.tbl_organisationseinheittyp TO GROUP ".DB_FAS_USER_GROUP.";
 			
 			ALTER TABLE public.tbl_studiengang ADD COLUMN oe_kurzbz character varying(32);
 			ALTER TABLE public.tbl_studiengang ADD CONSTRAINT studiengang_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -102,6 +104,7 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_organisationseinheit LI
 ;
 }
 
+// ************* system.tbl_berechtigung ******************
 if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;"))
 {
 	$qry = "CREATE SCHEMA system;
@@ -153,21 +156,21 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 			
 			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT pk_tbl_rolleberechtigung PRIMARY KEY (berechtigung_kurzbz,rolle_kurzbz);
 
-			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP web;
-			GRANT SELECT ON system.tbl_berechtigung TO GROUP web;
-			GRANT SELECT ON system.tbl_rolle TO GROUP web;
-			GRANT SELECT ON system.tbl_rolleberechtigung TO GROUP web;
+			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_berechtigung TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_rolle TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_rolleberechtigung TO GROUP ".DB_CIS_USER_GROUP.";
 			
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_benutzerrolle TO GROUP web;
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_berechtigung TO GROUP web;
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolle TO GROUP web;
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolleberechtigung TO GROUP web;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_benutzerrolle TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_berechtigung TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolle TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolleberechtigung TO GROUP ".DB_FAS_USER_GROUP.";
 			";
 	
 	if(!pg_query($conn, $qry))
 		echo '<strong>system schema: '.pg_last_error($conn).' </strong><br>';
 	else
-		echo 'system schema: Tabellen wurde hinzugefügt!<br>';
+		echo 'system schema: Berechtigunstabellen wurden hinzugefügt!<br>';
 
 }
 ?>
