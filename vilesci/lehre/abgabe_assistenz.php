@@ -46,7 +46,7 @@ $zweitbegutachter='';
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
-	$stg_kz='';
+	$stg_kz=0;
 if(!is_numeric($stg_kz) && $stg_kz!='')
 	$stg_kz='0';
 
