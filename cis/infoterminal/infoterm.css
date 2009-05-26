@@ -81,12 +81,12 @@
 		 table.raum_liste_detail td{padding-left:2px; padding-bottom : 2px; padding-top : 2px; font-size:smaller;}
 	
 		 table.raum_liste_detail .raum_liste_detail_stundenplan_aktuell {height:50px;background-color: #0085D0;	border : 1px solid Black;}
-		 table.raum_liste_detail .raum_liste_detail_stundenplan_normal {height: 50px;background-color: #0085D0;border : 1px solid ;}
+		 table.raum_liste_detail .raum_liste_detail_stundenplan_normal {height: 50px;background-color: #0085D0;border : 1px solid transparent;}
 	
 		/* Stundenplan */ 
 		 
 		 table.stundenplan {border:0px;}
-		
+	
 	 	 table.stundenplan tr{height: 20px;}
 
 		 table.stundenplan th{color:#FFF;background-color: #009e84;font-weight: bold;border: 1px solid #FFF;font-size:smaller;}
@@ -94,7 +94,7 @@
 		
 		 table.stundenplan .stundenplan_stunden_detail {color:#FFF;vertical-align: top;font-size:xx-small;font-weight: bold;vertical-align: top;padding: 4px 4px 4px 4px;text-align:center;background-color: #009e84;}
 		 table.stundenplan .stundenplan_detail_aktuell {width:14%;	vertical-align: top;	font-size:x-small;	background-color:#0085D0;	border : 1px solid Black;}
-		 table.stundenplan .stundenplan_detail_normal {width:14%;vertical-align: top;font-size:x-small;background-color: #0085D0;	border : 1px solid ;}
+		 table.stundenplan .stundenplan_detail_normal {width:14%;vertical-align: top;font-size:x-small;background-color: #0085D0;	border : 1px solid transparent;}
 
 	
 	
