@@ -30,6 +30,7 @@ class organisationseinheit extends basis_db
 {
 	public $new;     			// @var boolean
 	public $errormsg; 			// @var string
+	public $result;
 	
 	//Tabellenspalten
 	public $oe_kurzbz;
@@ -85,6 +86,32 @@ class organisationseinheit extends basis_db
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Laedt alle Organisationseinheiten an oberster Stelle
+	 *
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getHeads()
+	{
+		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz is null";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new organisationseinheit();
+				
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
 	}
 	
 	/**
