@@ -87,7 +87,7 @@ if(isset($_POST["schick"]))
 			}
 			else 
 			{
-				echo "neuer Termin";
+				//echo "neuer Termin";
 				$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
 					VALUES ('".$termine[$j]."', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
 				//echo $qry;	
@@ -132,7 +132,7 @@ $htmlstr='';
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<html>
 		<head>
-		<title>Zusatzdaten PA-Abgabe</title>
+		<title>Mehrfachtermin PA-Abgabe</title>
 		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
