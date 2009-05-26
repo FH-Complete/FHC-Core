@@ -38,12 +38,11 @@ if (!$conn = pg_pconnect('host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' u
 
 $uid=get_uid();
 
-/*
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung für diese Seite');
-*/
+
 echo '
 <html>
 <head>
@@ -120,6 +119,16 @@ function disableTables()
 <body>';
 
 echo '<H2>Datenbank Pr&uuml;fung</H2>';
+
+if(isset($_POST['commit']))
+{
+	if(isset($_POST['qry']))
+	{
+		if(!pg_query($conn, $_POST['qry']))
+			echo pg_last_error($conn);
+	}
+}
+
 $obj=array();
 $obj['']=array();
 $obj['']['error']=false;
@@ -336,7 +345,7 @@ foreach ($relations AS $relation)
 				if(pg_num_rows($result)==0)
 				{
 					$sql_query='ALTER TABLE '.$childtable.' ADD CONSTRAINT '.$relation['caption'].' FOREIGN KEY ('.$childattr.') REFERENCES '.$parenttable.' ('.$parentattr.') ';
-					$sql_query.='ON UPDATE CASCADE ON DELETE RESTRICT;'.$tablename.'/'.$schema;
+					$sql_query.='ON UPDATE CASCADE ON DELETE RESTRICT;';
 					
 					if(isset($obj[$schema]) && 
 					   isset($obj[$schema]['tables'][$tablename]) && 
@@ -414,8 +423,9 @@ function querybox($title, $qry, $id)
 		$cols=strlen($qry);
 		$rows=1;
 	}
-	$ret.='<br /><textarea readonly="true" cols="'.$cols.'" rows="'.$rows.'">'.$qry.'</textarea>';
-	$ret.='<br /><br /><input type="button" value="Commit" />';
+	$ret.='<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+	$ret.='<br /><textarea readonly="true" cols="'.$cols.'" rows="'.$rows.'" name="qry">'.$qry.'</textarea>';
+	$ret.='<br /><br /><input type="submit" value="Commit" name="commit" /></form>';
 	$ret.='</div>';
 	
 	return $ret;
