@@ -364,7 +364,7 @@ $result=@pg_query($conn, $qry);
 		}
 		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
-			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
+			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
 		}
 		else 
 		{
@@ -372,7 +372,7 @@ $result=@pg_query($conn, $qry);
 		}
 		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
 		{
-			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
+			$htmlstr .= "		<td><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zusätzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
 		}
 		else 
 		{
