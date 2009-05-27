@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,56 +16,51 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
+require_once('basis_db.class.php');
+require_once('organisationseinheit.class.php');
 
-class benutzerberechtigung
+class benutzerberechtigung extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $berechtigungen = array(); // benutzerberechtigung Objekt
+	public $errormsg; // string
+	public $new;      // boolean
+	public $berechtigungen = array(); // benutzerberechtigung Objekt
 
 	//Tabellenspalten
-	var $benutzerberechtigung_id;	// int
-	var $art;						// varchar(16)
-	var $fachbereich_kurzbz;		// int
-	var $studiengang_kz;			// int
-	var $berechtigung_kurzbz;		// varchar(16)
-	var $uid;						// varchar(32)
-	var $studiensemester_kurzbz;	// varchar(16)
-	var $start;						// date
-	var $ende;						// date
-	var $starttimestamp;
-	var $endetimestamp;
+	public $benutzerberechtigung_id;	// serial
+	public $uid;						// varchar(32)
+	public $funktion_kurzbz;			// varchar(16)
+	public $rolle_kurzbz;				// varchar(32)
+	public $berechtigung_kurzbz;		// varchar(16)
+	public $art;						// varchar(5)
+	public $oe_kurzbz;					// varchar(32)
+	public $studiensemester_kurzbz;		// varchar(16)
+	public $start;						// date
+	public $ende;						// date
+	public $negativ;					// boolean
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
 
+	public $starttimestamp;
+	public $endetimestamp;
+	
 	//Attribute des Mitarbeiters
-	var $fix;
-	var $lektor;
+	public $fix;
+	public $lektor;
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
-	// * @param $conn        	Datenbank-Connection
-	// *        $benutzerberechtigung_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// * @param $benutzerberechtigung_id
 	// *************************************************************************
-	function benutzerberechtigung($conn, $benutzerberechtigung_id=null, $unicode=false)
+	public function __construct($benutzerberechtigung_id=null)
 	{
-		$this->conn = $conn;
-
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-
+		parent::__construct();
+		
 		if($benutzerberechtigung_id!=null)
 			$this->load($benutzerberechtigung_id);
 	}
@@ -74,7 +69,7 @@ class benutzerberechtigung
 	// * Laedt eine Benutzerberechtigung
 	// * @param benutzerberechtigung_id
 	// *********************************************************
-	function load($benutzerberechtigung_id)
+	public function load($benutzerberechtigung_id)
 	{
 		return true;
 	}
@@ -84,7 +79,7 @@ class benutzerberechtigung
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function validate()
+	protected function validate()
 	{
 		if(strlen($this->art)>16)
 		{
@@ -125,30 +120,20 @@ class benutzerberechtigung
 
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
+	
 	// ************************************************************
 	// * Speichert Benutzerberechtigung in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
 
+		/*
 		if($this->new)
 		{
 			$qry = 'INSERT INTO public.tbl_benutzerberechtigung (art, fachbereich_kurzbz, studiengang_kz, berechtigung_kurzbz,
@@ -186,6 +171,8 @@ class benutzerberechtigung
 			$this->errormsg = 'Fehler beim Speichern der Benutzerberechtigung:'.$qry;
 			return false;
 		}
+		*/
+		return false;
 	}
 
 	// ************************************************************
@@ -196,6 +183,7 @@ class benutzerberechtigung
 	// ************************************************************
 	function delete($benutzerberechtigung_id)
 	{
+		/*
 		// Berechtigungen holen
 		$sql_query="DELETE from tbl_benutzerberechtigung where benutzerberechtigung_id = '".$benutzerberechtigung_id."'";
 
@@ -203,63 +191,116 @@ class benutzerberechtigung
 		{
 			$this->errormsg='Fehler beim l&ouml;schen';
 			return false;
-		}
-		return true;
+		}*/
+		return false;
 	}
 
-	//****************************************************************************
-	// * Rueckgabewert ist ein Array mit den Ergebnissen. Bei Fehler false und die
-	// * Fehlermeldung liegt in errormsg.
-	// * Wenn der Parameter stg_kz NULL ist tritt einheit_kurzbzb in Kraft.
-	// * @param string $uid    UserID
-	// * @return variable Array mit LVA, false bei Fehler
-	// ***************************************************************************
-	function getBerechtigungen($uid,$all=false)
+	// *******************************************************************************
+	// * Laedt die Berechtigungen eines Users
+	// * @param $uid
+	// * @param $all wenn $all auf true gesetzt wird, werden auch bereits abgelaufene
+	//*              berechtigungen geladen.
+	// *******************************************************************************
+	public function getBerechtigungen($uid,$all=false)
 	{
 		// Berechtigungen holen
-		$sql_query="SELECT * FROM public.tbl_benutzerberechtigung WHERE uid='$uid'";
-		if (!$all)
-			$sql_query .= " AND (start<now() OR start IS NULL) AND (ende>now() OR ende IS NULL)";
-		$sql_query .= " order by benutzerberechtigung_id";
-
-		if(!$erg=pg_query($this->conn, $sql_query))
+		
+		$qry = "SELECT 
+					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+				FROM 
+					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) 
+				WHERE uid='".addslashes($uid)."'
+				
+				UNION
+				
+				SELECT 
+					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+				FROM 
+					system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz) 
+					JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz) 
+					JOIN system.tbl_berechtigung ON(tbl_rolleberechtigung.berechtigung_kurzbz=tbl_berechtigung.berechtigung_kurzbz)
+				WHERE uid='".addslashes($uid)."'
+				
+				UNION
+				
+				SELECT 
+					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+				FROM 
+					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
+				WHERE tbl_benutzerfunktion.uid='".addslashes($uid)."'
+				ORDER BY negativ DESC";
+					
+		
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg='Fehler beim laden der Berechtigungen';
+			$this->errormsg='Fehler beim Laden der Berechtigungen';
 			return false;
 		}
 
-		while($row=pg_fetch_object($erg))
+		while($row=$this->db_fetch_object())
 		{
-   			$b=new benutzerberechtigung($this->conn);
-
-   			$b->benutzerberechtigung_id = $row->benutzerberechtigung_id;
-			$b->art=$row->art;
-			$b->fachbereich_kurzbz=$row->fachbereich_kurzbz;
-			$b->studiengang_kz=$row->studiengang_kz;
-			$b->berechtigung_kurzbz=$row->berechtigung_kurzbz;
-			$b->uid=$row->uid;
-			$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
-			$b->start=$row->start;
-			if ($row->start!=null)
-				$b->starttimestamp=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8),substr($row->start,0,4));
-			else
-				$b->starttimestamp=null;
-			$b->ende=$row->ende;
-			if ($row->ende!=null)
-				$b->endetimestamp=mktime(23,59,59,substr($row->ende,5,2),substr($row->ende,8),substr($row->ende,0,4));
-
-
-			$this->berechtigungen[]=$b;
+			//wenn die Berechtigung an einer Organisationseinheit haengt, dann werden
+			//auch die Berechtigungen fuer die darunterliegenden Organisationseinheiten angelegt
+			if($row->oe_kurzbz!='')
+			{
+				$organisationseinheit = new organisationseinheit();
+				$oes = $organisationseinheit->getChilds($row->oe_kurzbz);
+			}
+			else 
+			{
+				$oes[]=$row->oe_kurzbz;	
+			}
+			
+			foreach ($oes as $oe_kurzbz)
+			{
+	   			$b=new benutzerberechtigung();
+	
+	   			$b->benutzerberechtigung_id = $row->benutzerberechtigung_id;
+	   			$b->uid=$row->uid;
+	   			$b->funktion_kurzbz=$row->funktion_kurzbz;
+	   			$b->rolle_kurzbz = $row->rolle_kurzbz;
+	   			$b->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$b->art=$row->art;
+				$b->oe_kurzbz = $oe_kurzbz;
+				$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+				$b->start=$row->start;
+				if ($row->start!=null)
+					$b->starttimestamp=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8),substr($row->start,0,4));
+				else
+					$b->starttimestamp=null;
+				$b->ende=$row->ende;
+				if ($row->ende!=null)
+					$b->endetimestamp=mktime(23,59,59,substr($row->ende,5,2),substr($row->ende,8),substr($row->ende,0,4));
+				$b->negativ = ($row->negativ=='t'?true:false);
+				$b->updateamum = $row->updateamum;
+				$b->updatevon = $row->updatevon;
+				$b->insertamum = $row->insertamum;
+				$b->insertvon = $row->insertvon;
+				
+				$this->berechtigungen[]=$b;
+			}
 		}
 
 		// Attribute des Mitarbeiters holen
-		$sql_query="SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
-		if(!$erg=pg_query($this->conn, $sql_query))
+		$sql_query="SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'";
+		if(!$this->db_query($sql_query))
 		{
-			$this->errormsg='Fehler beim laden der Berechtigungen';
+			$this->errormsg='Fehler beim Laden der Berechtigungen';
 			return false;
 		}
-		while($row=pg_fetch_object($erg))
+		while($row=$this->db_fetch_object())
 		{
    			if ($row->fixangestellt=='t')
    				$this->fix=true;
@@ -275,20 +316,36 @@ class benutzerberechtigung
 	}
 
 	//****************************************************************************
-	// * Rueckgabewert ist TRUE wenn eine Berechtigung entspricht.
-	// * Wenn der Parameter stg_kz NULL ist tritt einheit_kurzbzb in Kraft.
-	// * @param string $uid    UserID
-	// * @return variable Array mit LVA, false bei Fehler
+	// * Prueft ob die Berechtigung vorhanden ist. Vor der Verwendung muss die
+	// * Funktion getBerechtigungen aufgerufen werden.
+	// *
+	// * @param $berechtigung
+	// * @param $oe_kurzbz
+	// * @param $art
+	// * @return true wenn eine Berechtigung entspricht.
 	// ***************************************************************************
-	function isBerechtigt($berechtigung,$studiengang_kz=null,$art=null, $fachbereich_kurzbz=null)
+	public function isBerechtigt($berechtigung_kurzbz,$oe_kurzbz=null,$art=null)
 	{
 		$timestamp=time();
+		
 		foreach ($this->berechtigungen as $b)
 		{
-			//echo 'Admin<BR>';
-			//Admin auf alles ist immer TRUE
-			if ($b->berechtigung_kurzbz=='admin' && is_null($b->fachbereich_kurzbz) && is_null($b->studiengang_kz) )
-			//if ($b->berechtigung_kurzbz=='admin' && $b->fachbereich_kurzbz===NULL && $b->studiengang_kz===NULL )
+			//Pruefen ob eine negativ-Berechtigung vorhanden ist
+			if($b->berechtigung_kurzbz==$berechtigung_kurzbz && $b->negativ && $oe_kurzbz==$b->oe_kurzbz)
+			{
+				if (!is_null($b->starttimestamp) && !is_null($b->endetimestamp))
+				{
+					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
+						return false;
+				}
+				else
+					return false;
+			}
+		
+			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
+			   && (is_null($art) || strstr($b->art, $art))
+			   && (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz))
+			{
 				if (!is_null($b->starttimestamp) && !is_null($b->endetimestamp))
 				{
 					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
@@ -296,73 +353,17 @@ class benutzerberechtigung
 				}
 				else
 					return true;
-
-			//echo 'Fachbereich<BR>';
-			//Fachbereichsberechtigung
-			if($fachbereich_kurzbz!=null)
-			{
-				//Wenn Fachbereichs oder Adminberechtigung
-				if(($berechtigung == $b->berechtigung_kurzbz || $b->berechtigung_kurzbz == 'admin') 
-				   && ($b->fachbereich_kurzbz==$fachbereich_kurzbz || is_null($b->fachbereich_kurzbz))
-				   && (is_null($b->studiengang_kz) || $b->studiengang_kz==$studiengang_kz)
-				   && ($art==null || strstr($b->art, $art)))
-				{
-					if ($b->starttimestamp!=null && $b->endetimestamp!=null)
-					{
-						if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
-							return true;
-					}
-					else
-						return true;
-				}
 			}
-
-			//echo 'Klasse<BR>';
-			//Wenn Berechtigung fuer Bestimmte Klasse vorhanden ist
-			if	(	($berechtigung==$b->berechtigung_kurzbz && is_null($studiengang_kz) && is_null($art) && is_null($fachbereich_kurzbz))
-					||
-					($b->berechtigung_kurzbz=='admin'
-						&& (is_null($studiengang_kz) && (is_null($b->studiengang_kz) || $b->studiengang_kz==$studiengang_kz) )
-						&& (is_null($fachbereich_kurzbz) && (is_null($b->fachbereich_kurzbz) || $b->fachbereich_kurzbz==$fachbereich_kurzbz) )
-				 	)
-				)
-				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
-				{
-					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
-						return true;
-				}
-				else
-					return true;
-
-			//echo 'Studiengang<BR>';
-			//Wenn Berechtigung fuer Bestimmten Studiengang vorhanden ist
-			if	($berechtigung==$b->berechtigung_kurzbz && ($studiengang_kz==$b->studiengang_kz || is_null($b->studiengang_kz)) && $art==null && $b->fachbereich_kurzbz==null)
-				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
-				{
-					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
-						return true;
-				}
-				else
-					return true;
-
-			//Wenn Berechtigung mit Studiengang und der richtigen BerechtigungsArt (suid) vorhanden ist
-			if	($berechtigung==$b->berechtigung_kurzbz
-			     && ($studiengang_kz==$b->studiengang_kz || is_null($b->studiengang_kz))
-			     && strstr($b->art,$art)
-			     && is_null($b->fachbereich_kurzbz))
-				if ($b->starttimestamp!=null && $b->endetimestamp!=null)
-				{
-					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
-						return true;
-				}
-				else
-					return true;
-					
 		}
+
 		return false;
 	}
 
-	function isFix()
+	// ******************************************************
+	// * Prueft ob die Person Fixangestellt ist
+	// * @return true wenn ja, false wenn nein
+	// ******************************************************
+	public function isFix()
 	{
 		if ($this->fix)
 			return true;
@@ -371,42 +372,128 @@ class benutzerberechtigung
 	}
 
 	// ********************************************************************
-	// * Gibt Array mit Kennzahlen der Studiengaenge sortiert zurueck.
+	// * Gibt Array mit den Studiengangskennzahlen zurueck fuer welche die
+	// * Person eine Berechtigung besitzt.
 	// * Optional wird auf Berechtigung eingeschraenkt.
-	// * Wenn Berechtigung ueber alle Studiengaenge steht im ersten Feld 0.
 	// ********************************************************************
-	function getStgKz($berechtigung=null)
+	public function getStgKz($berechtigung_kurzbz=null)
 	{
 		$studiengang_kz=array();
 		$timestamp=time();
-
+		$in='';
+		$not='';
+		$all=false;
+		
 		foreach ($this->berechtigungen as $b)
-			if	($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
-				if($b->fachbereich_kurzbz==null)
-					$studiengang_kz[]=$b->studiengang_kz;
+		{
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
+				&& (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
+			{
+				if($b->negativ)
+				{
+					//Negativ-Recht
+					if(!is_null($b->oe_kurzbz))
+						$not .="'".addslashes($b->oe_kurzbz)."',";
+					else 
+						return array();
+				}
+				else 
+				{
+					if(!is_null($b->oe_kurzbz))
+						$in .= "'".addslashes($b->oe_kurzbz)."',"; 
+					else 
+					{
+						//Wenn NULL dann berechtigung auf alles
+						$all = true;
+						break;
+					}
+				}
+			}
+		}
+			
+		if(!$all)
+		{
+			if($in=='')
+				return array();
+			else
+				$in = ' AND oe_kurzbz IN('.substr($in,0, strlen($in)-1).')';
+		}
+		
+		if($not!='')
+			$not = ' AND oe_kurzbz NOT IN('.substr($not,0, strlen($not)-1).')';
+		
+		$qry = "SELECT studiengang_kz FROM public.tbl_studiengang WHERE 1=1 $in $not";
+		
+		if($this->db_query($qry))
+			while($row = $this->db_fetch_object())
+				$studiengang_kz[]=$row->studiengang_kz;	
+					
 		$studiengang_kz=array_unique($studiengang_kz);
 		sort($studiengang_kz);
 		return $studiengang_kz;
 	}
 
-	function getFbKz($berechtigung=null)
+	/**
+	 * Gibt eine Array mit den Fachbereichen/Instituten zurueck
+	 *
+	 * @param $berechtigung
+	 * @return array mit fachbereichen
+	 */
+	public function getFbKz($berechtigung_kurzbz=null)
 	{
-		$fachbereichs_kz=array();
+		$fachbereich_kurzbz=array();
 		$timestamp=time();
-
-		foreach($this->berechtigungen as $b)
+		$in='';
+		$not='';
+		$all=false;
+		
+		foreach ($this->berechtigungen as $b)
 		{
-			if(($berechtigung==$b->berechtigung_kurzbz || $berechtigung==null)
-			   && (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
+				&& (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
 			{
-				if($b->fachbereich_kurzbz!='' && !in_array($b->fachbereich_kurzbz,$fachbereichs_kz))
-					$fachbereichs_kz[] = $b->fachbereich_kurzbz;
-				if($b->fachbereich_kurzbz=='' && ($b->studiengang_kz==0 || $b->studiengang_kz==''))
-					$fachbereichs_kz[] = '0';
+				if($b->negativ)
+				{
+					//Negativ-Recht
+					if(!is_null($b->oe_kurzbz))
+						$not .="'".addslashes($b->oe_kurzbz)."',";
+					else 
+						return array();
+				}
+				else 
+				{
+					if(!is_null($b->oe_kurzbz))
+						$in .= "'".addslashes($b->oe_kurzbz)."',"; 
+					else 
+					{
+						//Wenn NULL dann berechtigung auf alles
+						$all = true;
+						break;
+					}
+				}
 			}
 		}
-		sort($fachbereichs_kz);
-		return $fachbereichs_kz;
+			
+		if(!$all)
+		{
+			if($in=='')
+				return array();
+			else
+				$in = ' AND oe_kurzbz IN('.substr($in,0, strlen($in)-1).')';
+		}
+		
+		if($not!='')
+			$not = ' AND oe_kurzbz NOT IN('.substr($not,0, strlen($not)-1).')';
+		
+		$qry = "SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE 1=1 $in $not";
+		
+		if($this->db_query($qry))
+			while($row = $this->db_fetch_object())
+				$fachbereich_kurzbz[]=$row->fachbereich_kurzbz;	
+					
+		$fachbereich_kurzbz=array_unique($fachbereich_kurzbz);
+		sort($fachbereich_kurzbz);
+		return $fachbereich_kurzbz;
 	}
 }
 ?>

@@ -108,7 +108,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml_fussnote='';
 		$projektarbeit=array();
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung, tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung, tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
 		//echo $query;
 		if($result = pg_query($conn, $query))
 		{
@@ -166,14 +166,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .=	"		<semester>".$row->semester."</semester>";
 		$xml .=	"		<semester_bezeichnung>".$bezeichnung."</semester_bezeichnung>";
 		$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
+		$xml .= "		<studiengang_englisch>".$row->english."</studiengang_englisch>";
 		if($row->typ=='b')
-			$bezeichnung='Bachelor-Studiengang';
+			$bezeichnung='Bachelor';
 		elseif($row->typ=='m')
-			$bezeichnung='Master-Studiengang';
+			$bezeichnung='Master';
 		elseif($row->typ=='d')
-			$bezeichnung='Diplom-Studiengang';
+			$bezeichnung='Diplom';
 		else 
-			$bezeichnung='Studiengang';
+			$bezeichnung='';
 		$studiengang_typ=$row->typ;
 		$semester = $row->semester;
 		
@@ -187,7 +188,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
 		$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname.($stgl_row->titelpost!=''?", ".$stgl_row->titelpost:'')."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
-		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
+		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
 		
 		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".$uid_arr[$i]."' AND studiensemester_kurzbz='$studiensemester_kurzbz' AND projekttyp_kurzbz in('Bachelor', 'Diplom')";
 		if($result_proj = pg_query($conn, $qry_proj))
@@ -240,6 +241,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				if(array_key_exists($row->lehrveranstaltung_id, $projektarbeit))
 				{
 					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma.' '.$fussnotenzeichen[$anzahl_fussnoten];
+					$bezeichnung_englisch = $row->lehrveranstaltung_bezeichnung_english.$firma.' '.$fussnotenzeichen[$anzahl_fussnoten];
 					$xml_fussnote .="\n <fussnote>";
 					$xml_fussnote .=" 		<fussnotenzeichen>".$fussnotenzeichen[$anzahl_fussnoten]."</fussnotenzeichen>";
 					
@@ -279,7 +281,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$anzahl_fussnoten++;
 				}
 				else 
+				{
 					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma;
+					$bezeichnung_englisch = $row->lehrveranstaltung_bezeichnung_english.$firma;
+				}
 				
 					
 				$bisio_von = '';
@@ -314,6 +319,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				}
 				$xml .= "\n			<unterrichtsfach>";
 				$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
+				$xml .= "				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
 				$xml .= "				<note>".$note2."</note>";
 				$xml .= "				<sws>".($row->semesterstunden==0?'':sprintf('%.1f',$row->semesterstunden/$wochen))."</sws>";
 				$xml .= "				<ects>".($row->ects==0 || $row->ects==''?'':number_format($row->ects,1))."</ects>";

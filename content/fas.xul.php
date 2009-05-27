@@ -97,11 +97,13 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-statistic-substatistik-lvplanunggesamtsj-excel:command" oncommand="StatistikPrintLvPlanungGesamtSJ();"/>  
   <command id="menu-statistic-absolventenstatistik:command" oncommand="StatistikPrintAbsolventenstatistik();"/>
   <command id="menu-statistic-studentenstatistik:command" oncommand="StatistikPrintStudentenstatistik();"/>
+  <command id="menu-statistic-oehbeitraege:command" oncommand="StatistikPrintOehBeitrag();"/>
   <command id="menu-statistic-mitarbeiterstatistik:command" oncommand="StatistikPrintMitarbeiterstatistik();"/>
   <command id="menu-statistic-studentendetails:command" oncommand="StatistikPrintStudentExportExtended();"/>
   <command id="menu-statistic-lektorenstatistik:command" oncommand="StatistikPrintLektorenstatistik();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
-  <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis();"/>
+  <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis');"/>
+  <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng');"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
@@ -120,6 +122,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-lehrfachverwaltung:command" oncommand="ExtrasShowLehrfachverwaltung();"/>
   <command id="menu-extras-lektorenzuordnunginstitute:command" oncommand="ExtrasShowLektorenzuordnunginstitute();"/>
   <command id="menu-extras-preinteressentenuebernahme:command" oncommand="ExtrasShowPreinteressentenuebernahme();"/>
+  <command id="menu-extras-projektarbeitsabgaben:command" oncommand="ExtrasShowProjektarbeitsabgaben();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
@@ -226,81 +229,97 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
     </menu>
     <!-- ********** BERICHTE ********** -->
     <menu id="menu-statistic" label="&menu-statistic.label;" accesskey="&menu-statistic.accesskey;">
-          <menupopup id="menu-statistic-popup">
-            <menuitem
-               id        =  "menu-statistic-koordinatorstunden"
-               key       =  "menu-statistic-koordinatorstunden:key"
-               label     = "&menu-statistic-koordinatorstunden.label;"
-               command   =  "menu-statistic-koordinatorstunden:command"
-               accesskey = "&menu-statistic-koordinatorstunden.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-lehrauftraege"
-               key       =  "menu-statistic-lehrauftraege:key"
-               label     = "&menu-statistic-lehrauftraege.label;"
-               command   =  "menu-statistic-lehrauftraege:command"
-               accesskey = "&menu-statistic-lehrauftraege.accesskey;"/>
-            <menu id="menu-statistic-sublvplanung" label="&menu-statistic-sublvplanung.label;" accesskey="&menu-statistic-sublvplanung.accesskey;">
-				<menupopup id="menu-statistic-substatistik-popup">
+		<menupopup id="menu-statistic-popup">
+			<!-- *** LEHRE *** -->
+			<menu id="menu-statistic-lehre" label="&menu-statistic-lehre.label;" accesskey="&menu-statistic-lehre.accesskey;">
+				<menupopup id="menu-statistic-lehre-popup">
+					<menu id="menu-statistic-sublvplanung" label="&menu-statistic-sublvplanung.label;" accesskey="&menu-statistic-sublvplanung.accesskey;">
+						<menupopup id="menu-statistic-substatistik-popup">
+				            <menuitem
+				               id        =  "menu-statistic-lvplanung"
+				               key       =  "menu-statistic-lvplanung:key"
+				               label     = "&menu-statistic-lvplanung.label;"
+				               command   =  "menu-statistic-lvplanung:command"
+				               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
+				            <menuitem
+				               id        =  "menu-statistic-lvplanungexcel"
+				               key       =  "menu-statistic-lvplanungexcel:key"
+				               label     = "&menu-statistic-lvplanungexcel.label;"
+				               command   =  "menu-statistic-lvplanungexcel:command"
+				               accesskey = "&menu-statistic-lvplanungexcel.accesskey;"/>
+				        </menupopup>
+				    </menu>
+					<menuitem
+		               id        =  "menu-statistic-projektarbeit"
+		               key       =  "menu-statistic-projektarbeit:key"
+		               label     = "&menu-statistic-projektarbeit.label;"
+		               command   =  "menu-statistic-projektarbeit:command"
+		               accesskey = "&menu-statistic-projektarbeit.accesskey;"/>
+					<menuitem
+		               id        =  "menu-statistic-abschlusspruefung"
+		               key       =  "menu-statistic-abschlusspruefung:key"
+		               label     = "&menu-statistic-abschlusspruefung.label;"
+		               command   =  "menu-statistic-abschlusspruefung:command"
+		               accesskey = "&menu-statistic-abschlusspruefung.accesskey;"/>
+          		</menupopup>
+          	</menu>
+          	<!-- *** Mitarbeiter *** -->
+			<menu id="menu-statistic-mitarbeiter" label="&menu-statistic-mitarbeiter.label;" accesskey="&menu-statistic-mitarbeiter.accesskey;">
+				<menupopup id="menu-statistic-mitarbeiter-popup">
+					<menuitem
+		               id        =  "menu-statistic-koordinatorstunden"
+		               key       =  "menu-statistic-koordinatorstunden:key"
+		               label     = "&menu-statistic-koordinatorstunden.label;"
+		               command   =  "menu-statistic-koordinatorstunden:command"
+		               accesskey = "&menu-statistic-koordinatorstunden.accesskey;"/>
 		            <menuitem
-		               id        =  "menu-statistic-lvplanung"
-		               key       =  "menu-statistic-lvplanung:key"
-		               label     = "&menu-statistic-lvplanung.label;"
-		               command   =  "menu-statistic-lvplanung:command"
-		               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
-		            <menuitem
-		               id        =  "menu-statistic-lvplanungexcel"
-		               key       =  "menu-statistic-lvplanungexcel:key"
-		               label     = "&menu-statistic-lvplanungexcel.label;"
-		               command   =  "menu-statistic-lvplanungexcel:command"
-		               accesskey = "&menu-statistic-lvplanungexcel.accesskey;"/>
-		        </menupopup>
-		    </menu>
-             <menuitem
-               id        =  "menu-statistic-lehrauftragsliste"
-               key       =  "menu-statistic-lehrauftragsliste:key"
-               label     = "&menu-statistic-lehrauftragsliste.label;"
-               command   =  "menu-statistic-lehrauftragsliste:command"
-               accesskey = "&menu-statistic-lehrauftragsliste.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-projektarbeit"
-               key       =  "menu-statistic-projektarbeit:key"
-               label     = "&menu-statistic-projektarbeit.label;"
-               command   =  "menu-statistic-projektarbeit:command"
-               accesskey = "&menu-statistic-projektarbeit.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-abschlusspruefung"
-               key       =  "menu-statistic-abschlusspruefung:key"
-               label     = "&menu-statistic-abschlusspruefung.label;"
-               command   =  "menu-statistic-abschlusspruefung:command"
-               accesskey = "&menu-statistic-abschlusspruefung.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-fehlendedokumente"
-               key       =  "menu-statistic-fehlendedokumente:key"
-               label     = "&menu-statistic-fehlendedokumente.label;"
-               command   =  "menu-statistic-fehlendedokumente:command"
-               accesskey = "&menu-statistic-fehlendedokumente.accesskey;"/>
-             <menuitem
-               id        =  "menu-statistic-studentendetails"
-               key       =  "menu-statistic-studentendetails:key"
-               label     = "&menu-statistic-studentendetails.label;"
-               command   =  "menu-statistic-studentendetails:command"
-               accesskey = "&menu-statistic-studentendetails.accesskey;"/>
-             <menu id="menu-statistic-subnotenspiegel" label="&menu-statistic-subnotenspiegel.label;" accesskey="&menu-statistic-subnotenspiegel.accesskey;">
-				<menupopup id="menu-statistic-subnotenspiegel-popup">
-		             <menuitem
-		               id        =  "menu-statistic-notenspiegel-excel"
-		               key       =  "menu-statistic-notenspiegel-excel:key"
-		               label     = "&menu-statistic-notenspiegel-excel.label;"
-		               command   =  "menu-statistic-notenspiegel-excel:command"
-		               accesskey = "&menu-statistic-notenspiegel-excel.accesskey;"/>
-		             <menuitem
-		               id        =  "menu-statistic-notenspiegel"
-		               key       =  "menu-statistic-notenspiegel:key"
-		               label     = "&menu-statistic-notenspiegel.label;"
-		               command   =  "menu-statistic-notenspiegel:command"
-		               accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
+		               id        =  "menu-statistic-lehrauftragsliste"
+		               key       =  "menu-statistic-lehrauftragsliste:key"
+		               label     = "&menu-statistic-lehrauftragsliste.label;"
+		               command   =  "menu-statistic-lehrauftragsliste:command"
+		               accesskey = "&menu-statistic-lehrauftragsliste.accesskey;"/>
 				</menupopup>
-			</menu>
+          	</menu>
+          	<!-- *** Student *** -->
+			<menu id="menu-statistic-student" label="&menu-statistic-student.label;" accesskey="&menu-statistic-student.accesskey;">
+				<menupopup id="menu-statistic-student-popup">
+				<menuitem
+	               id        =  "menu-statistic-fehlendedokumente"
+	               key       =  "menu-statistic-fehlendedokumente:key"
+	               label     = "&menu-statistic-fehlendedokumente.label;"
+	               command   =  "menu-statistic-fehlendedokumente:command"
+	               accesskey = "&menu-statistic-fehlendedokumente.accesskey;"/>
+				<menuitem
+	               id        =  "menu-statistic-studentendetails"
+	               key       =  "menu-statistic-studentendetails:key"
+	               label     = "&menu-statistic-studentendetails.label;"
+	               command   =  "menu-statistic-studentendetails:command"
+	               accesskey = "&menu-statistic-studentendetails.accesskey;"/>
+				<menuitem
+	               id        =  "menu-statistic-oehbeitraege"
+	               key       =  "menu-statistic-oehbeitraege:key"
+	               label     = "&menu-statistic-oehbeitraege.label;"
+	               command   =  "menu-statistic-oehbeitraege:command"
+	               accesskey = "&menu-statistic-oehbeitraege.accesskey;"/>
+				<menu id="menu-statistic-subnotenspiegel" label="&menu-statistic-subnotenspiegel.label;" accesskey="&menu-statistic-subnotenspiegel.accesskey;">
+					<menupopup id="menu-statistic-subnotenspiegel-popup">
+						<menuitem
+			               id        =  "menu-statistic-notenspiegel-excel"
+			               key       =  "menu-statistic-notenspiegel-excel:key"
+			               label     = "&menu-statistic-notenspiegel-excel.label;"
+			               command   =  "menu-statistic-notenspiegel-excel:command"
+			               accesskey = "&menu-statistic-notenspiegel-excel.accesskey;"/>
+						<menuitem
+			               id        =  "menu-statistic-notenspiegel"
+			               key       =  "menu-statistic-notenspiegel:key"
+			               label     = "&menu-statistic-notenspiegel.label;"
+			               command   =  "menu-statistic-notenspiegel:command"
+			               accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
+					</menupopup>
+				</menu>
+            	</menupopup>
+          	</menu>
+			<!-- *** Statistik *** -->
 			<menu id="menu-statistic-substatistik" label="&menu-statistic-substatistik.label;" accesskey="&menu-statistic-substatistik.accesskey;">
 				<menupopup id="menu-statistic-substatistik-popup">
 					<menu id="menu-statistic-substatistik-studentenprosemester" label="&menu-statistic-substatistik-studentenprosemester.label;" accesskey="&menu-statistic-substatistik-studentenprosemester.accesskey;">
@@ -395,6 +414,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
     <!-- ********** DOKUMENTE ********** -->
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
           <menupopup id="menu-dokumente-popup">
+          <menuitem
+               id        =  "menu-statistic-lehrauftraege"
+               key       =  "menu-statistic-lehrauftraege:key"
+               label     = "&menu-statistic-lehrauftraege.label;"
+               command   =  "menu-statistic-lehrauftraege:command"
+               accesskey = "&menu-statistic-lehrauftraege.accesskey;"/>
             <menuitem
                id        =  "menu-dokumente-inskriptionsbestaetigung"
                key       =  "menu-dokumente-inskriptionsbestaetigung:key"
@@ -407,6 +432,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-dokumente-zeugnis.label;"
                command   =  "menu-dokumente-zeugnis:command"
                accesskey = "&menu-dokumente-zeugnis.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-zeugniseng"
+               key       =  "&menu-dokumente-zeugniseng.key;"
+               label     = "&menu-dokumente-zeugniseng.label;"
+               command   =  "menu-dokumente-zeugniseng:command"
+               accesskey = "&menu-dokumente-zeugniseng.accesskey;"/>
             <menuitem
                id        =  "menu-dokumente-diplsupplement"
                key       =  "menu-dokumente-diplsupplement:key"
@@ -531,7 +562,13 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                key       =  "menu-extras-lvverwaltung:key"
                label     = "&menu-extras-lvverwaltung.label;"
                command   =  "menu-extras-lvverwaltung:command"
-               accesskey = "&menu-extras-lvverwaltung.accesskey;"/>               
+               accesskey = "&menu-extras-lvverwaltung.accesskey;"/>
+             <menuitem
+               id        =  "menu-extras-projektarbeitsabgaben"
+               key       =  "menu-extras-projektarbeitsabgaben:key"
+               label     = "&menu-extras-projektarbeitsabgaben.label;"
+               command   =  "menu-extras-projektarbeitsabgaben:command"
+               accesskey = "&menu-extras-projektarbeitsabgaben.accesskey;"/>         
              <menuitem
                id        =  "menu-extras-projektarbeitsbenotung"
                key       =  "menu-extras-projektarbeitsbenotung:key"
