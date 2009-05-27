@@ -956,6 +956,17 @@ function StatistikPrintAbgaengerstatistik()
 }
 
 // ****
+// * Liefert eine Liste mit den Studenten die den OEH-Beitrag zahlen muessen / gezahlt haben
+// ****
+function StatistikPrintOehBeitrag()
+{
+	var stsem = getStudiensemester();
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/oeh_beitraege.xls.php?studiensemester_kurzbz='+stsem,'OEHBeitraege');
+
+}
+
+// ****
 // * Liefert eine statistik ueber die Anzahl der Absolventen pro Studiengang
 // ****
 function StatistikPrintAbsolventenstatistik()
@@ -1098,6 +1109,26 @@ function ExtrasShowProjektarbeitsBenotung()
 	window.open('<?php echo APP_ROOT ?>vilesci/lehre/projektarbeitsbenotung.php?stg_kz='+studiengang_kz,'Projektarbeitsbenotung','');
 }
 
+// ****
+// * Zeigt HTML Seite zum Eintragen von Abgabeterminen fuer Projektarbeit an
+// ****
+function ExtrasShowProjektarbeitsabgaben()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+		
+	window.open('<?php echo APP_ROOT ?>vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz='+studiengang_kz,'Projektarbeitsabgaben','');
+}
 
 // ****
 // * Zeigt HTML Seite zur Bearbeitung der Gruppen an

@@ -130,6 +130,8 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 			
 			CREATE INDEX idx_userberechtigung_uid ON system.tbl_benutzerrolle (uid);
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT pk_tbl_benutzerberechtigung PRIMARY KEY (benutzerberechtigung_id);
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_benutzer FOREIGN KEY (uid) REFERENCES public.tbl_benutzer (uid) ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_funktion FOREIGN KEY (funktion_kurzbz) REFERENCES public.tbl_funktion (funktion_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			
 			CREATE TABLE system.tbl_berechtigung
 			(
@@ -155,6 +157,14 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 			WITH (OIDS=FALSE);
 			
 			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT pk_tbl_rolleberechtigung PRIMARY KEY (berechtigung_kurzbz,rolle_kurzbz);
+			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_studienseemster FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
 
 			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP ".DB_CIS_USER_GROUP.";
 			GRANT SELECT ON system.tbl_berechtigung TO GROUP ".DB_CIS_USER_GROUP.";
@@ -170,7 +180,7 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 	if(!pg_query($conn, $qry))
 		echo '<strong>system schema: '.pg_last_error($conn).' </strong><br>';
 	else
-		echo 'system schema: Berechtigunstabellen wurden hinzugefügt!<br>';
+		echo 'system schema: Berechtigungstabellen wurden hinzugefügt!<br>';
 
 }
 ?>

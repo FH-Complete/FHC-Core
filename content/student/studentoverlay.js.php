@@ -2452,7 +2452,7 @@ function StudentKontoZahlungsbestaetigung()
 // ****
 // * Erstellt das Zeugnis fuer einen oder mehrere Studenten
 // ****
-function StudentCreateZeugnis()
+function StudentCreateZeugnis(xsl)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -2484,7 +2484,7 @@ function StudentCreateZeugnis()
 	}
 	
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&xsl=Zeugnis&uid='+paramList+'&ss='+ss+'&xsl_stg_kz='+xsl_stg_kz,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&xsl='+xsl+'&uid='+paramList+'&ss='+ss+'&xsl_stg_kz='+xsl_stg_kz,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

@@ -1180,5 +1180,18 @@ class basis {
     $result = @($regs[2] == $regs[1]) ? $regs[1] : '<br />';
     return $result;
   }
+  
+	// ************************************************
+	// * wenn $var '' ist wird NULL zurueckgegeben
+	// * wenn $var !='' ist werden Datenbankkritische
+	// * Zeichen mit Backslash versehen und das Ergbnis
+	// * unter Hochkomma gesetzt.
+	// ************************************************
+	protected function addslashes($var)
+	{
+		//TODO: diese Funktion gehoert ausgelagert in die BasisKlasse
+		return ($var!=''?"'".addslashes($var)."'":'null');
+	}
+
 }
 ?>

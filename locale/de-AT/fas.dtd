@@ -46,6 +46,22 @@
 <!ENTITY menu-statistic-koordinatorstunden.label		"Koordinatorstunden">
 <!ENTITY menu-statistic-koordinatorstunden.accesskey	"K">
 
+<!ENTITY menu-statistic-lehre.key		"L">
+<!ENTITY menu-statistic-lehre.label		"Lehre">
+<!ENTITY menu-statistic-lehre.accesskey	"L">
+
+<!ENTITY menu-statistic-mitarbeiter.key			"M">
+<!ENTITY menu-statistic-mitarbeiter.label		"Mitarbeiter">
+<!ENTITY menu-statistic-mitarbeiter.accesskey	"M">
+
+<!ENTITY menu-statistic-student.key			"S">
+<!ENTITY menu-statistic-student.label		"Student">
+<!ENTITY menu-statistic-student.accesskey	"S">
+
+<!ENTITY menu-statistic-oehbeitraege.key		"O">
+<!ENTITY menu-statistic-oehbeitraege.label		"OEH-Beitraege">
+<!ENTITY menu-statistic-oehbeitraege.accesskey	"O">
+
 <!ENTITY menu-statistic-lehrauftraege.key		"L">
 <!ENTITY menu-statistic-lehrauftraege.label		"Lehrauftraege">
 <!ENTITY menu-statistic-lehrauftraege.accesskey	"L">
@@ -164,6 +180,10 @@
 <!ENTITY menu-dokumente-zeugnis.label		"Zeugnis">
 <!ENTITY menu-dokumente-zeugnis.accesskey	"Z">
 
+<!ENTITY menu-dokumente-zeugniseng.key		"E">
+<!ENTITY menu-dokumente-zeugniseng.label		"Zeugnis Englisch">
+<!ENTITY menu-dokumente-zeugniseng.accesskey	"E">
+
 <!ENTITY menu-dokumente-diplsupplement.key		"S">
 <!ENTITY menu-dokumente-diplsupplement.label	"Diploma Supplement">
 <!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
@@ -235,6 +255,10 @@
 <!ENTITY menu-extras-preinteressentenuebernahme.key			"I">
 <!ENTITY menu-extras-preinteressentenuebernahme.label		"Preinteressenten uebernehmen">
 <!ENTITY menu-extras-preinteressentenuebernahme.accesskey	"I">
+
+<!ENTITY menu-extras-projektarbeitsabgaben.key			"A">
+<!ENTITY menu-extras-projektarbeitsabgaben.label		"Projektarbeitstermine">
+<!ENTITY menu-extras-projektarbeitsabgaben.accesskey	"A">
 
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
