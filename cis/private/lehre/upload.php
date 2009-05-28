@@ -27,9 +27,8 @@
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
-
 	$user = get_uid();
-
+	
 	if(isset($_GET['course_id']))
 		$course_id = $_GET['course_id'];
 
@@ -521,21 +520,29 @@ A:hover {
 				else
 				{
 					//$sql_query = "SELECT DISTINCT ON(bz2, lehrevz) tbl_student.studiengang_kz AS id, kurzbzlang, lehrevz AS kuerzel, (tbl_lehrfach.bezeichnung || '; XX') AS bezeichnung, SUBSTRING(tbl_lehrfach.bezeichnung || '; XX', 1, CHAR_LENGTH(tbl_lehrfach.bezeichnung || '; XX') - 4) AS bz2 FROM tbl_lehrfach, public.tbl_studiengang, public.tbl_student WHERE tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND lehrevz='$short' AND tbl_student.uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz LIMIT 1";
-					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_student, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND lehreverzeichnis='$short' AND tbl_student.student_uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.semester='$term_id' AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
+					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_student, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis='$short' AND tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND  tbl_student.student_uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
+
 					if(!$result_path_elements = pg_query($sql_conn, $sql_query))
 						die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
 
 					if(!$result_path_elements)
 						die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
-
 					$num_rows_path_elements = pg_numrows($result_path_elements);
-
 					if(!($num_rows_path_elements > 0))
 					{
-						echo "<tr><td>";
-						die('<p align="center"><strong>Sie haben keine Berechtigung für diesen Bereich</td></tr></table>');
+						// Pruefen ob dieser Kurs ein Wahlfach ist
+						$sql_query = "SELECT DISTINCT vw_student_lehrveranstaltung.bezeichnung, vw_student_lehrveranstaltung.lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM campus.vw_student_lehrveranstaltung , public.tbl_studiengang WHERE vw_student_lehrveranstaltung.lehre=true AND vw_student_lehrveranstaltung.studiengang_kz='".addslashes($course_id)."' AND vw_student_lehrveranstaltung.semester='".addslashes($term_id)."'	AND vw_student_lehrveranstaltung.lehreverzeichnis='".addslashes($short)."' AND vw_student_lehrveranstaltung.uid='".addslashes($user)."'	AND tbl_studiengang.studiengang_kz=vw_student_lehrveranstaltung.studiengang_kz LIMIT 1; ";
+						if(!$result_path_elements = pg_query($sql_conn, $sql_query))
+							die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+						if(!$result_path_elements)
+							die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+						$num_rows_path_elements = pg_numrows($result_path_elements);
+						if(!($num_rows_path_elements > 0))
+						{
+							echo "<tr><td>";
+							die('<p align="center"><strong>Sie haben keine Berechtigung für diesen Bereich</td></tr></table>');
+						}
 					}
-
 					$row = pg_fetch_object($result_path_elements, 0);
 
 					// Changed by ffe, 20050411 - fixed a bug while trying to upload in dirs with an underline in it
