@@ -21,40 +21,36 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
-require_once('../include/fas/benutzer.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/variable.class.php');
 
-// Testumgebung
 $user=get_uid();
 
 $error_msg='';
 
-//Variablen laden
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$user);
+//$error_msg.=loadVariables($user);
+$variable = new variable();
+$variable->loadVariables($user);
 
-$benutzer = new benutzer($conn);
-if(!$benutzer->loadVariables($user))
-	$error_msg = $benutzer->errormsg;
+//$benutzer = new benutzer($conn);
+//if(!$benutzer->loadVariables($user))
+//	$error_msg = $benutzer->errormsg;
 	
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-/*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css" ?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
-echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 ?>
 <!DOCTYPE window [
 	<?php require("../locale/de-AT/fas.dtd"); ?>
 ]>
 
-<!-- - <?php echo $semester_aktuell; ?>  -->
 <window
 	id="fas"
 	title="&window.title; - Version &window.version;"
@@ -200,16 +196,17 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
            label     = "Studiensemester">
            <menupopup id="menu-properties-popup">
        <?php
-       		$stsem_arr = $benutzer->getpossibilities('semester_aktuell');
-       		foreach ($stsem_arr as $stsem)
+       		$stsemobj = new studiensemester();
+       		$stsemobj->getAll();
+       		foreach ($stsemobj->result as $stsem)
        		{
   				echo "
 			<menuitem
 				id = 'menu-properies-studiensemester-name'
-				label = '$stsem'
+				label = '$stsem->studiensemester_kurzbz'
 				type = 'radio'
 				command = 'menu-properties-studiensemester:command'
-				checked = ".($benutzer->variable->semester_aktuell==$stsem?"'true' ":"'false'")." />";
+				checked = ".($variable->variable->semester_aktuell==$stsem->studiensemester_kurzbz?"'true' ":"'false'")." />";
        		}
        ?>
 
@@ -223,7 +220,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			 command   	="menu-prefs-kontofilterstg:command"
    			 accesskey 	="&menu-prefs-kontofilterstg.accesskey;"
    			 checkbox   ="true"
-   			 checked   ="<?php echo $kontofilterstg;?>"
+   			 checked   ="<?php echo $variable->variable->kontofilterstg;?>"
    			 />
 	    </menupopup>
     </menu>
@@ -465,9 +462,11 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	          <?php
 	          
 	          $qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 5";
-	          if($result = pg_query($conn, $qry))
+	          $db = new basis_db();
+	          
+	          if($db->db_query($qry))
 	          {
-	          	while($row = pg_fetch_object($result))
+	          	while($row = $db->db_fetch_object())
 	          	{
 	          		$stsem_kurzbz = $row->studiensemester_kurzbz;
 	          		
@@ -724,14 +723,14 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 				image="../skin/images/left.png"
 				oncommand="studiensemesterChange('', -1)"
 			/>
-		<toolbarbutton id="statusbarpanel-semester" label="<?php echo $semester_aktuell; ?>" oncommand="getStudiensemesterVariable()"/>
+		<toolbarbutton id="statusbarpanel-semester" label="<?php echo $variable->variable->semester_aktuell; ?>" oncommand="getStudiensemesterVariable()"/>
 		<toolbarbutton id="statusbarpanel-studiensemester-right"
 				tooltiptext="1 Studiensemester vor"
 				image="../skin/images/right.png"
 				oncommand="studiensemesterChange('', 1)"
 			/>
 	</statusbarpanel>
-	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7); ?>"/>
+	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo DB_NAME; ?>"/>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">
 		<progressmeter id="statusbar-progressmeter" class="progressmeter-statusbar" mode="determined" value="0%"/>

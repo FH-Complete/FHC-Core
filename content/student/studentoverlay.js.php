@@ -20,13 +20,14 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
-
-$conn = pg_pconnect(CONN_STRING);
+require_once('../../include/variable.class.php');
 
 $user = get_uid();
-loadVariables($conn, $user);
+
+$variable = new variable();
+$variable->loadVariables($user);
 ?>
 // *********** Globale Variablen *****************//
 var StudentSelectID=null; //Student der nach dem Refresh markiert werden soll
@@ -4002,7 +4003,7 @@ function StudentSendMail()
   			if(tree.view.getCellText(v,col).length>1)
   			{
   				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+'<?php echo $emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+					mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
 				else
 					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}

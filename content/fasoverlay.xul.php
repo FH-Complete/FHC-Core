@@ -20,27 +20,20 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Verbindung');
-
 $user = get_uid();
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentenoverlay.xul.php"?>';*/
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul.php"?>';
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xul.php"?>';
-echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 
 ?>
 
@@ -120,7 +113,6 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 	<tree id="tree-fachbereich" onmouseup="onFachbereichSelect(event);"
 		seltype="single" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/fachbereich/liste">
-		<!--<?php echo APP_ROOT;?>rdf/fachbereich_menue.rdf.php-->
 		<treecols>
 		    <treecol id="fachbereich-treecol-bezeichnung" label="Bezeichnung" flex="3" primary="true" />
 		    <splitter class="tree-splitter"/>
@@ -297,7 +289,6 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
-				//echo '<tab id="tab-interessenten" label="PreStudent" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-studenten" label="Studenten" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-lfvt" label="Lehrveranstaltungen" onclick="ChangeTabsToVerband()"/>';
 			}
@@ -312,8 +303,6 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '
-				<!--  Interessenten  -->
-				<!--<vbox id="InteressentenEditor" />-->
 				<!--  Studenten  -->
 				<vbox id="studentenEditor" />
 				<!-- Lehrfachverteilung -->

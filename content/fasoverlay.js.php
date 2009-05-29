@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,16 +16,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/variable.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
+$variable = new variable();
+$variable->loadVariables(get_uid());
 
-loadVariables($conn, get_uid());
 ?>
 
 var currentAuswahl=new auswahlValues();
@@ -206,7 +207,7 @@ function LektorFunktionMail()
   			if(tree.view.getCellText(v,col).length>1)
   			{
   				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+'<?php echo $emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+					mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
 				else
 					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,64 +16,53 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
+require_once('basis_db.class.php');
 
-class studiensemester
+class studiensemester extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $studiensemester = array(); // studiensemester Objekt
+	public $errormsg; // string
+	public $new;      // boolean
+	public $studiensemester = array(); // studiensemester Objekt
 
 	//Tabellenspalten
-	var $studiensemester_kurzbz; // varchar(16)
-	var $start; // date
-	var $ende;  // date
-	var $bezeichnung;
+	public $studiensemester_kurzbz; // varchar(16)
+	public $start; // date
+	public $ende;  // date
+	public $bezeichnung;
 
-	// ***********************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
-	// * @param $conn        Datenbank-Connection
-	// *        $studiensemester_kurzbz StSem das geladen werden soll (default=null)
-	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung
-	// *                     oder LATIN9 Codierung verarbeitet werden sollen
-	// ***********************************************************************
-	function studiensemester($conn, $studiensemester_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional ein StSem
+	 * 
+	 * @param $studiensemester_kurzbz StSem das geladen werden soll (default=null)
+	 */
+	public function __construct($studiensemester_kurzbz=null)
 	{
-		$this->conn = $conn;
-
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-
+		parent::__construct();
+		
 		if($studiensemester_kurzbz != null)
 			$this->load($studiensemester_kurzbz);
 	}
 
-	// **************************************************************
-	// * Laedt das Studiensemester mit der uebergebenen ID
-	// * @param $studiensemester_kurzbz Stsem das geladen werden soll
-	// **************************************************************
-	function load($studiensemester_kurzbz)
+	/**
+	 * Laedt das Studiensemester mit der uebergebenen ID
+	 * 
+	 * @param $studiensemester_kurzbz Stsem das geladen werden soll
+	 */
+	public function load($studiensemester_kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 
-		if(!$result=pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim lesen des Studiensemesters';
+			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
 		}
 
-		if($row = pg_fetch_object($result))
+		if($row = $this->db_fetch_object())
 		{
 			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 			$this->start = $row->start;
@@ -89,12 +78,13 @@ class studiensemester
 		return true;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * 
+	 * @return true wenn ok, false im Fehlerfall
+	 */	
+	private function validate()
 	{
 		if(strlen($this->studiensemester_kurzbz)>16)
 		{
@@ -109,24 +99,14 @@ class studiensemester
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert das Studiensemester in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	/**
+	 * Speichert das Studiensemester in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * 
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -147,35 +127,36 @@ class studiensemester
 			       " WHERE studiensemester_kurzbz='$this->studiensemester_kurzbz'";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Studiensemesters:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Studiensemesters';
 			return false;
 		}
 	}
 
-	// ******************************************************************
-	// * Liefert das Aktuelle Studiensemester
-	// * @return aktuelles Studiensemester oder false wenn es keines gibt
-	// ******************************************************************
-	function getakt()
+	/**
+	 * Liefert das aktuelle Studiensemester
+	 * 
+	 * @return aktuelles Studiensemester oder false wenn es keines gibt
+	 */
+	public function getakt()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now() AND ende >= now()";
 
-		if(!$res=pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = pg_errormessage($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 
-		if(pg_num_rows($res)>0)
+		if($this->db_num_rows()>0)
 		{
-		   $erg = pg_fetch_object($res);
+		   $erg = $this->db_fetch_object();
 		   return $erg->studiensemester_kurzbz;
 		}
 		else
@@ -185,43 +166,20 @@ class studiensemester
 		}
 	}
 
-	// ******************************************************************
-	// * Liefert ein Studiensemester mit Startdatum vom naechstgelegenen Studiensemester und
-	// * dem Startdatum vom folgeden Studiensemester als Endedatum
-	// * @return boolean
-	// ******************************************************************
-	function getNearestTillNext()
+	/**
+	 * Liefert ein Studiensemester mit Startdatum vom naechstgelegenen Studiensemester und
+	 * dem Startdatum vom folgeden Studiensemester als Endedatum
+	 * 
+	 * @return boolean
+	 */
+	public function getNearestTillNext()
 	{
-		/*$qry = "SELECT * FROM public.vw_studiensemester ORDER BY delta LIMIT 1";
-		if(!$res=pg_query($this->conn,$qry))
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}
-
-		if(!$erg1 = pg_fetch_object($res))
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}
-
-		$qry = "SELECT * FROM public.vw_studiensemester WHERE ORDER BY delta LIMIT 1";
-		if(!$res=pg_query($this->conn,$qry))
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}
-
-		if(!$erg2 = pg_fetch_object($res))
-		{
-			$this->errormsg = pg_errormessage($this->conn);
-			return false;
-		}*/
-
 		if(!$nearest=$this->getNearest())
 			return false;
+		
 		$start=$this->start;
 		$studiensemester_kurzbz=$this->studiensemester_kurzbz;
+		
 		if (!$next=$this->getNextFrom($this->studiensemester_kurzbz))
 			return false;
 		$ende=$this->start;
@@ -235,18 +193,19 @@ class studiensemester
 
 	/**
 	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
+	 * 
 	 * @param $semester wenn das semester uebergeben wird, dann werden nur die studiensemester
 	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
 	 */
-	function getaktorNext($semester='')
+	public function getaktorNext($semester='')
 	{
 		if(($stsem=$this->getakt()) && $semester=='')
-		   return $stsem;
+			return $stsem;
 		else
 		{
 			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE true";
-			//$qry = "SELECT studiensemester_kurzbz FROM public.vw_studiensemester ";
+			
 			if($semester!='')
 			{
 				if($semester%2==0)
@@ -258,16 +217,15 @@ class studiensemester
 			}
 			$qry.= " AND ende >= now() ORDER BY ende LIMIT 1";
 
-			if(!$res=pg_query($this->conn,$qry))
-		    {
-				$this->errormsg = pg_errormessage($this->conn);
-				return false;
-		    }
-
-			if(pg_num_rows($res)>0)
+			if(!$this->db_query($qry))
 			{
-			   $erg = pg_fetch_object($res);
-			   return $erg->studiensemester_kurzbz;
+				$this->errormsg = $this->db_last_error();
+				return false;
+			}
+
+			if($erg = $this->db_fetch_object())
+			{
+				return $erg->studiensemester_kurzbz;
 			}
 			else
 			{
@@ -279,9 +237,12 @@ class studiensemester
 
 	/**
 	 * Liefert das naechstgelegenste Studiensemester
+	 * 
+	 * @param semester  wenn das semester uebergeben wird, dann werden nur die studiensemester
+	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
 	 */
-	function getNearest($semester='')
+	public function getNearest($semester='')
 	{
 		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester ";
 		if($semester!='')
@@ -294,17 +255,15 @@ class studiensemester
 			$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
 		}
 		$qry.=' ORDER BY delta LIMIT 1';
-		//echo $qry;
 
-		if(!$res=pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = pg_errormessage($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 
-		if(pg_num_rows($res)>0)
+		if($erg = $this->db_fetch_object())
 		{
-			$erg = pg_fetch_object($res);
 			$this->studiensemester_kurzbz=$erg->studiensemester_kurzbz;
 			$this->start=$erg->start;
 			$this->ende=$erg->ende;
@@ -317,16 +276,20 @@ class studiensemester
 		}
 	}
 
-
-	function getAll()
+	/**
+	 * Liefert alle Studiensemester
+	 *
+	 * @return true wenn ok, sonst false
+	 */
+	public function getAll()
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester ORDER BY ende";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$stsem_obj = new studiensemester($this->conn);
+				$stsem_obj = new studiensemester();
 
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
@@ -334,6 +297,7 @@ class studiensemester
 
 				$this->studiensemester[] = $stsem_obj;
 			}
+			return true;
 		}
 		else
 		{
@@ -342,12 +306,14 @@ class studiensemester
 		}
 	}
 
-	// ****
-	// * Liefert das naechste Studiensemester
-	// * Wenn art=WS dann wird das naechste Wintersemester geliefert
-	// * Wenn art=SS dann wird das naechste Sommersemester geliefert
-	// ****
-	function getNextStudiensemester($art='')
+	/**
+	 * Liefert das naechste Studiensemester
+	 * 
+	 * @param $art Wenn art=WS dann wird das naechste Wintersemester geliefert
+	 *             Wenn art=SS dann wird das naechste Sommersemester geliefert
+	 * @return true wenn ok, false wenn kein entsprechendes vorhanden ist
+	 */
+	public function getNextStudiensemester($art='')
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start>now() ";
 
@@ -356,13 +322,13 @@ class studiensemester
 
 		$qry.=" ORDER BY start LIMIT 1";
 
-		if(!$result=pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
 		}
 
-		if($row = pg_fetch_object($result))
+		if($row = $this->db_fetch_object())
 		{
 			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 			$this->start = $row->start;
@@ -377,16 +343,18 @@ class studiensemester
 		return true;
 	}
 
-	// ****
-	// * Liefert das vorige Studiensemester
-	// ****
-	function getPrevious()
+	/**
+	 * Liefert das vorige Studiensemester
+	 * 
+	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
+	 */
+	public function getPrevious()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 1";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->studiensemester_kurzbz;
 			}
@@ -401,18 +369,29 @@ class studiensemester
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
 		}
 	}
-	// ****
-	// * Liefert das vorvorige Studiensemester
-	// ****
-	function getBeforePrevious()
+	
+	/**
+	 * Liefert das vorvorige Studiensemester
+	 * 
+	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
+	 */
+	public function getBeforePrevious()
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 2";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result,1))
+			if($row = $this->db_fetch_object())
 			{
-				return $row->studiensemester_kurzbz;
+				if($row = $this->db_fetch_object())
+				{
+					return $row->studiensemester_kurzbz;
+				}
+				else
+				{
+					$this->errormsg = 'Es wurde kein vorjähriges Studiensemester gefunden';
+					return false;
+				}
 			}
 			else
 			{
@@ -423,22 +402,26 @@ class studiensemester
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des vorjährigen Studiensemesters';
+			return false;
 		}
 	}
 
-	// ****
-	// * Liefert das Studiensemester vor $studiensemester_kurzbz
-	// ****
-	function getPreviousFrom($studiensemester_kurzbz)
+	/**
+	 * Liefert das Studiensemester vor $studiensemester_kurzbz
+	 * 
+	 * @param $studiensemester_kurzbz
+	 * @return $studiensemester_kurzbz oder false wenn Fehler
+	 */
+	public function getPreviousFrom($studiensemester_kurzbz)
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
 				WHERE ende<(SELECT start FROM public.tbl_studiensemester
 				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
 		        ORDER BY ende DESC LIMIT 1";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->studiensemester_kurzbz;
 			}
@@ -451,22 +434,26 @@ class studiensemester
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
+			return false;
 		}
 	}
 
-	// ****
-	// * Liefert das Studiensemester nach $studiensemester_kurzbz
-	// ****
-	function getNextFrom($studiensemester_kurzbz)
+	/**
+	 * Liefert das Studiensemester nach $studiensemester_kurzbz
+	 * 
+	 * @param $studiensemester_kurzbz
+	 * @return $studiensemester_kurzbz oder false wenn Fehler
+	 */
+	public function getNextFrom($studiensemester_kurzbz)
 	{
 		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.tbl_studiensemester
 				WHERE start>(SELECT ende FROM public.tbl_studiensemester
 				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
 		        ORDER BY start LIMIT 1";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->start = $row->start;
@@ -482,13 +469,18 @@ class studiensemester
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
+			return false;
 		}
 	}
 
-	// ****
-	// * Springt von Studiensemester $studiensemester_kurzbz um $wert Studiensemester vor/zurueck
-	// ****
-	function jump($studiensemester_kurzbz, $wert)
+	/**
+	 * Springt von Studiensemester $studiensemester_kurzbz um $wert Studiensemester vor/zurueck
+	 * 
+	 * @param $studiensemester_kurzbz
+	 * @param $wert
+	 * @return studiensemester_kurzbz
+	 */
+	public function jump($studiensemester_kurzbz, $wert)
 	{
 		if($wert>0)
 		{
@@ -518,9 +510,9 @@ class studiensemester
 					) as foo
 				ORDER BY start DESC LIMIT 1";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->studiensemester_kurzbz;
 			}
