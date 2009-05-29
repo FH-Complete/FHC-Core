@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2009 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,21 +16,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
+require_once('basis_db.class.php');
 
-class variable
+class variable extends basis_db 
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $variables = array(); // variable Objekt
+	public $errormsg; // string
+	public $new;      // boolean
+	public $variables = array(); // variable Objekt
+	public $variable;
 
 	//Tabellenspalten
-	var $uid;	// varchar(32)
-	var $name;	// varchar(64)
-	var $wert;	// varchar(64)
+	public $uid;	// varchar(32)
+	public $name;	// varchar(64)
+	public $wert;	// varchar(64)
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Variable
@@ -40,35 +42,25 @@ class variable
 	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
 	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
 	// *************************************************************************
-	function variable($conn, $uid=null, $name=null, $unicode=false)
+	public function __construct($uid=null, $name=null)
 	{
-		$this->conn = $conn;
-
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-
+		parent::__construct();
+		
 		if($uid!=null && $name!=null)
 			$this->load($uid, $name);
 	}
 
 	// *********************************************************
-	// * Laedt die Variablen
-	// * @param
+	// * Laedt eine Variable
+	// * @param $uid
+	// * @param $name
 	// *********************************************************
-	function load($uid, $name)
+	public function load($uid, $name)
 	{
 		$qry = "SELECT wert FROM public.tbl_variable WHERE uid='".addslashes($uid)."' AND name='".addslashes($name)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->uid = $uid;
 				$this->name = $name;
@@ -88,7 +80,7 @@ class variable
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function validate()
+	private function validate()
 	{
 		if(strlen($this->uid)>32)
 		{
@@ -109,24 +101,13 @@ class variable
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
 	// ************************************************************
 	// * Speichert Variable in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save($new=null)
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -149,7 +130,7 @@ class variable
 			       " WHERE uid='".addslashes($this->uid)."' AND name='".addslashes($this->name)."';";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -164,7 +145,7 @@ class variable
 	// ****
 	// * Loescht einen Variableneintrag
 	// ****
-	function delete($name, $uid)
+	public function delete($name, $uid)
 	{
 		if($name=='' || $uid == '')
 		{
@@ -174,7 +155,7 @@ class variable
 		
 		$qry = "DELETE FROM public.tbl_variable WHERE name='".addslashes($name)."' AND uid='".addslashes($uid)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 
 		{
@@ -186,15 +167,15 @@ class variable
 	// ******
 	// * Liefert alle Variablen eines Benutzers
 	// ******
-	function getVars($uid)
+	public function getVars($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_variable WHERE uid='".addslashes($uid)."' ORDER BY name";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($result = $this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$v = new variable($this->conn, null, null, null);
+				$v = new variable();
 				
 				$v->uid = $row->uid;
 				$v->name = $row->name;
@@ -209,6 +190,69 @@ class variable
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+	
+	/**
+	 * Laedt die Variablen in ein assoziatives Array
+	 * 
+	 * Zugriff von aussen mit $obj->variable->semester_aktuell
+	 *
+	 * @param $user
+	 * @return true wenn ok, sonst false
+	 */
+	public function loadVariables($user)
+	{			
+		if(!$this->db_query("SELECT * FROM public.tbl_variable WHERE uid='".addslashes($user)."'"))
+		{
+			$this->errormsg.=$this->db_last_error();
+			return false;
+		}
+		else
+			$num_rows = $this->db_num_rows();
+		
+		while($row=$this->db_fetch_object())
+		{
+			$this->variable->{$row->name}=$row->wert;
+		}
+		
+		if (!isset($this->variable->semester_aktuell))
+		{
+			if(!$this->db_query('SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1'))
+			{
+				$this->errormsg.=$this->db_last_error();
+				return false;
+			}
+			else
+			{
+				if($row = $this->db_fetch_object())
+				{
+					$this->variable->semester_aktuell=$row->studiensemester_kurzbz;
+				}
+			}
+		}
+		
+		if (!isset($this->variable->db_stpl_table))
+			$this->variable->db_stpl_table='stundenplan';
+
+		if (!isset($this->variable->emailadressentrennzeichen))
+			$this->variable->emailadressentrennzeichen=',';
+
+		if (!isset($this->variable->db_stpl_table))
+			$this->variable->db_stpl_table='stundenplan';
+
+		if (!isset($this->variable->kontofilterstg))
+			$this->variable->kontofilterstg='false';
+
+		if (!isset($this->variable->ignore_kollision))
+			$this->variable->ignore_kollision='false';
+
+		if (!isset($this->variable->ignore_zeitsperre))
+			$this->variable->ignore_zeitsperre='false';
+
+		if (!isset($this->variable->ignore_reservierung))
+			$this->variable->ignore_reservierung='false';
+
+		return true;
 	}
 		
 }

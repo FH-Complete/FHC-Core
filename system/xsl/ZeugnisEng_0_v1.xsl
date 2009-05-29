@@ -170,7 +170,7 @@
 									<fo:block font-size="7pt"></fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">non-credit participation (na), participated(t), bestanden (b), approbiert (ap), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</fo:block>
+									<fo:block font-size="7pt">non-credit participation (na), participated(t), passed (b), approbiert (ap), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-body>
@@ -216,7 +216,7 @@
 								<fo:table-cell>
 									<fo:block font-size="8pt" content-width="75mm" text-align="center">
 										<xsl:value-of select="studiengangsleiter"/>
-										<xsl:text>\nDirector of Academic Degree Program</xsl:text>
+										<xsl:text>\nHead of Study Programme</xsl:text>
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell>
@@ -256,8 +256,23 @@
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
-					    Auslandsaufenthalt: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/>
-						\n Die im Ausland absolvierten Lehrveranstaltungen werden für das <xsl:value-of select="../semester"/>. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet  (Details siehe Transcript of Records der Gasthochschule).
+					    International Semester Abroad: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, at <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/>
+						\n All credits earned during the International Semester Abroad (ISA) are fully credited for the 
+									<xsl:value-of select="../semester"/>
+									<xsl:choose>
+										<xsl:when test="../semester=1">
+											<xsl:text>st</xsl:text>
+										</xsl:when>
+										<xsl:when test="../semester=2">
+											<xsl:text>nd</xsl:text>
+										</xsl:when>
+										<xsl:when test="../semester=3">
+											<xsl:text>rd</xsl:text>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>th</xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>. semester at the UAS Fachhochschule Technikum Wien. (see Transcript of Records)
 					  </xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="bezeichnung_englisch"/>
@@ -292,13 +307,30 @@
 					<xsl:value-of select="fussnotenzeichen"/>
 					<xsl:text> </xsl:text>
 					<fo:inline font-weight="bold">
-						<xsl:value-of select="themenbereich_bezeichnung"/>
+						<xsl:choose>
+							<xsl:when test="themenbereich_bezeichnung='Themenbereich: '">
+								<xsl:text>Subject Area:</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text></xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:text> </xsl:text>
 					</fo:inline>
 					<xsl:value-of select="themenbereich"/>
 					<xsl:text> </xsl:text>
 					<fo:inline font-weight="bold">
-						<xsl:value-of select="titel_bezeichnung"/>
+						<xsl:choose>
+							<xsl:when test="titel_bezeichnung='Bachelorarbeit:'">
+								<xsl:text>Bachelor Thesis:</xsl:text>
+							</xsl:when>
+							<xsl:when test="titel_bezeichnung='Diplomarbeit:'">
+								<xsl:text>Diploma Thesis:</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text></xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:text> </xsl:text>
 					</fo:inline>
 					<xsl:value-of select="titel"/>

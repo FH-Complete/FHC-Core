@@ -20,13 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../vilesci/config.inc.php');
-require_once('../../include/functions.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 
-$conn = pg_pconnect(CONN_STRING);
-
-$user = get_uid();
-loadVariables($conn, $user);
 ?>
 // *********** Globale Variablen *****************//
 var StudentAbschlusspruefungSelectID=null; //Id der Abschlusspruefung die nach dem Rebuild markiert werden soll

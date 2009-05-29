@@ -20,13 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../vilesci/config.inc.php');
-require_once('../../include/functions.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 
-$conn = pg_pconnect(CONN_STRING);
-
-$user = get_uid();
-loadVariables($conn, $user);
 ?>
 // *********** Globale Variablen *****************//
 
@@ -522,7 +517,7 @@ function LeDetailReset()
 	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value='German';
 	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value='Dummy';
 	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='Dummy';
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value='<?php echo $semester_aktuell; ?>';
+	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='UE';
 
 	//mitarbeiterlehreinheit tree leeren

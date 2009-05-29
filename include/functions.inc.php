@@ -185,30 +185,33 @@ function jahreskalenderjump($link)
 	echo '			</SMALL></CENTER></SMALL>'.$crlf;
 }
 
-function loadVariables($conn, $user)
+function loadVariables($user)
 {
+	$db = new basis_db();
+	
 	$error_msg='';
 	$num_rows=0;
 	$sql_query="SELECT * FROM public.tbl_variable WHERE uid='$user'";
-	if(!($result=pg_query($conn, $sql_query)))
-		$error_msg.=pg_errormessage($conn).'<BR>'.$sql_query;
+	if(!$db->db_query($sql_query))
+		$error_msg.=$db->db_last_error().'<BR>'.$sql_query;
 	else
-		$num_rows=pg_numrows($result);
+		$num_rows=$db->db_num_rows();
 
-	while ($row=pg_fetch_object($result))
+	while ($row=$db->db_fetch_object())
 	{
 		global ${$row->name};
 		${$row->name}=$row->wert;
 	}
+	
 	if (!isset($semester_aktuell))
-		if(!($result=pg_query($conn, 'SELECT * FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1')))
-			$error_msg.=pg_errormessage($conn).'<BR>'.$sql_query;
+		if(!$db->db_query('SELECT * FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1'))
+			$error_msg.=$db->db_last_error().'<BR>'.$sql_query;
 		else
 		{
-			$num_rows=pg_numrows($result);
+			$num_rows=$db->db_num_rows();
 			if ($num_rows>0)
 			{
-				$row=pg_fetch_object($result);
+				$row=$db->db_fetch_object();
 				global $semester_aktuell;
 				$semester_aktuell=$row->studiensemester_kurzbz;
 			}
