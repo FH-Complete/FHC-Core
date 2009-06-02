@@ -91,7 +91,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:false));
 #	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'AppList.xml'));	
 	
-	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'/documents/infrastruktur/AppList.xml'));	
+	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'../../../documents/infrastruktur/AppList.xml'));	
 									
 	if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
 	{
