@@ -1,7 +1,28 @@
 <?php
+/* Copyright (C) 2009 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ */
 header("Content-type: application/vnd.mozilla.xul+xml");
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
-require_once('../vilesci/config.inc.php');
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiensemester.class.php');
@@ -9,12 +30,10 @@ require_once('../include/studiengang.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lehrverbandsgruppe/';
 
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $berechtigt_studiengang=array();
 $uid='';
-$berechtigung=new benutzerberechtigung($conn);
+$berechtigung=new benutzerberechtigung();
+$dbo = new basis_db();
 
 // Berechtigungen ermitteln
 if(!isset($_SERVER['REMOTE_USER']))
@@ -68,21 +87,20 @@ else
 	die('Keine Berechtigung');
 }
 //echo $sql_query;
-if(!$result=pg_query($conn, $sql_query))
-	$error_msg.=pg_errormessage($conn);
+if(!$dbo->db_query($sql_query))
+	$error_msg.=$dbo->db_last_error();
 else
-	$num_rows=pg_numrows($result);
+	$num_rows=$dbo->db_num_rows();
 
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->getAll();
-
 
 //Bei Mischformen werden die Organisationsformen
 //getrennt aufgelistet
 function draw_orgformpart($stg_kz)
 {
 	global $conn, $orgform_sequence;
-	$stg_obj = new studiengang($conn, $stg_kz);
+	$stg_obj = new studiengang($stg_kz);
 	
 	//Zusatzfilterung nur bei Mischformen anzeigen
 	if($stg_obj->orgform_kurzbz!='VBB')
@@ -91,9 +109,9 @@ function draw_orgformpart($stg_kz)
 	$orgform_sequence[$stg_kz]='';
 	
 	$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz not in('VBB','ZGS')";
-	if($result = pg_query($conn, $qry))
+	if($stg_obj->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $stg_opj->db_fetch_object())
 		{
 			draw_orgformsubmenu($stg_kz, $row->orgform_kurzbz);
 		}
@@ -262,9 +280,9 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 	$sem='';
 	$ver='';
 	//echo $qry;
-	if($result = pg_query($conn, $qry))
+	if($stg_obj->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $stg_obj->db_fetch_object())
 		{
 			if ($sem!=$row->semester)
 		   	{
@@ -397,7 +415,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 <?php
 $stg_kz=null;
 $sem=null;
-while ($row=pg_fetch_object($result))
+while ($row=$dbo->db_fetch_object())
 {
 	if ($stg_kz!=$row->studiengang_kz)
 	{
@@ -592,7 +610,7 @@ draw_orgformpart($stg_kz);
 	$ver=null;
 	for ($i=0;$i<$num_rows;$i++)
 	{
-		$row=pg_fetch_object($result,$i);
+		$row=$dbo->db_fetch_object(null,$i);
 		if ($stg_kz!=$row->studiengang_kz)
 		{
 			//Verband schliessen

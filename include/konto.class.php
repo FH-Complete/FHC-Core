@@ -29,65 +29,45 @@ require_once ('basis_db.class.php');
 class konto extends basis_db
 {
 	//var $conn;     // @var resource DB-Handle
-	var $new;       // @var boolean
-	var $errormsg;  // @var string
-	var $result = array(); // @var adresse Objekt
-	var $buch_nr = array();
-	var $buch_date = array();
+	public $new;       // @var boolean
+	public $errormsg;  // @var string
+	public $result = array(); // @var adresse Objekt
+	public $buch_nr = array();
+	public $buch_date = array();
 
 	//Tabellenspalten
-	var $buchungsnr;
-	var $person_id;
-	var $studiengang_kz;
-	var $studiensemester_kurzbz;
-	var $buchungsnr_verweis;
-	var $betrag;
-	var $buchungsdatum;
-	var $buchungstext;
-	var $mahnspanne;
-	var $buchungstyp_kurzbz;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
-	var $ext_id;
-	var $anrede;
-	var $titelpost;
-	var $titelpre;
-	var $nachname;
-	var $vorname;
-	var $vornamen;
-	var $standardbetrag;
-	var $standardtext;
-
-	//var $beschreibung;
+	public $buchungsnr;
+	public $person_id;
+	public $studiengang_kz;
+	public $studiensemester_kurzbz;
+	public $buchungsnr_verweis;
+	public $betrag;
+	public $buchungsdatum;
+	public $buchungstext;
+	public $mahnspanne;
+	public $buchungstyp_kurzbz;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $ext_id;
+	public $anrede;
+	public $titelpost;
+	public $titelpre;
+	public $nachname;
+	public $vorname;
+	public $vornamen;
+	public $standardbetrag;
+	public $standardtext;
 
 	// **************************************************************************
 	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $buchungsnr ID der Adresse die geladen werden soll (Default=null)
+	// * @param $buchungsnr ID der Adresse die geladen werden soll (Default=null)
 	// **************************************************************************
-	function konto($buchungsnr=null, $unicode=false)
+	public function __construct($buchungsnr=null)
 	{
 		parent::__construct();
-		//$this->conn = $conn;
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($this->db_conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-
+				
 		if($buchungsnr!=null)
 			$this->load($buchungsnr);
 	}
@@ -97,7 +77,7 @@ class konto extends basis_db
 	// * @param  $buchungsnr ID der zu ladenden  Email
 	// * @return true wenn ok, false im Fehlerfall
 	// ************************************************
-	function load($buchungsnr)
+	public function load($buchungsnr)
 	{
 		if(!is_numeric($buchungsnr))
 		{
@@ -108,7 +88,7 @@ class konto extends basis_db
 		$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 			FROM public.tbl_konto JOIN public.tbl_person USING (person_id) WHERE buchungsnr='$buchungsnr'";
 
-		if($result = $this->db_query($qry))
+		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
@@ -152,7 +132,7 @@ class konto extends basis_db
 	// * Prueft die Variablen auf gueltigkeit
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function validate()
+	private function validate()
 	{
 		$this->betrag = str_replace(',','.',$this->betrag);
 		if(!is_numeric($this->betrag))
@@ -188,17 +168,6 @@ class konto extends basis_db
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
 	// ***********************************************************************
 	// * Speichert den aktuellen Datensatz in die Datenbank
 	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -206,7 +175,7 @@ class konto extends basis_db
 	// * @param $new true wenn insert false wenn update
 	// * @return true wenn ok, false im Fehlerfall
 	// ***********************************************************************
-	function save($new=null)
+	public function save($new=null)
 	{
 		//Variablen pruefen
 		if(!$this->validate())
@@ -258,29 +227,29 @@ class konto extends basis_db
 		}
 		//echo $qry;
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 				if($new)
 				{
 					$qry = "SELECT currval('public.tbl_konto_buchungsnr_seq') as id";
-					if($result = pg_query($this->conn, $qry))
+					if($this->db_query($qry))
 					{
-						if($row = pg_fetch_object($result))
+						if($row = $this->db_fetch_object())
 						{
 							$this->buchungsnr = $row->id;
-							pg_query($this->conn, 'COMMIT;');
+							$this->db_query('COMMIT;');
 						}
 						else
 						{
 							$this->errormsg = 'Fehler beim Auslesen der Sequence';
-							pg_query($this->conn, 'ROLLBACK;');
+							$this->db_query('ROLLBACK;');
 							return false;
 						}
 					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
@@ -298,13 +267,13 @@ class konto extends basis_db
 	// * @param buchungsnr ID die geloescht werden soll
 	// * @return true wenn ok, false im Fehlerfall
 	// ********************************************************
-	function delete($buchungsnr)
+	public function delete($buchungsnr)
 	{
 		//Pruefen ob Verweise auf diese Buchung Vorhanden sind
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE buchungsnr_verweis='".addslashes($buchungsnr)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
 				{
@@ -315,7 +284,7 @@ class konto extends basis_db
 				{
 					//Wenn keine Verweise Vorhanden sind, dann die Buchung loeschen
 					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr='".addslashes($buchungsnr)."'";
-					if(pg_query($this->conn, $qry))
+					if($this->db_query($qry))
 						return true;
 					else
 					{
@@ -343,7 +312,7 @@ class konto extends basis_db
 	// * @param person_id, filter
 	// * @return true wenn ok, false wenn fehler
 	// ******************************************
-	function getBuchungen($person_id, $filter='alle', $studiengang_kz='')
+	public function getBuchungen($person_id, $filter='alle', $studiengang_kz='')
 	{
 		if(!is_numeric($person_id))
 		{
@@ -377,11 +346,11 @@ class konto extends basis_db
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE person_id='".$person_id."' $stgwhere ORDER BY buchungsdatum";
 		//echo $qry;
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$buchung = new konto($this->conn, null, null);
+				$buchung = new konto();
 
 				$buchung->buchungsnr = $row->buchungsnr;
 				$buchung->person_id = $row->person_id;
@@ -427,15 +396,15 @@ class konto extends basis_db
 	// * Liefert alle Buchungstypen
 	// * @return true wenn ok, false wenn Fehler
 	// ******************************************
-	function getBuchungstyp()
+	public function getBuchungstyp()
 	{
 		$qry = "SELECT * FROM public.tbl_buchungstyp ORDER BY beschreibung";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$typ = new konto($this->conn, null, null);
+				$typ = new konto();
 
 				$typ->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
 				$typ->beschreibung = $row->beschreibung;
@@ -457,13 +426,13 @@ class konto extends basis_db
 	// * Berechnet den offenen Betrag
 	// * einer Buchung
 	// ******************************
-	function getDifferenz($buchungsnr)
+	public function getDifferenz($buchungsnr)
 	{
 		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='$buchungsnr' OR buchungsnr_verweis='$buchungsnr'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 				return $row->differenz*(-1);
 			else
 			{
@@ -484,15 +453,15 @@ class konto extends basis_db
 	// * student_uid und studiensemester
 	// * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
 	// ******************************
-	function checkStudienbeitrag($uid, $stsem)
+	public function checkStudienbeitrag($uid, $stsem)
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer WHERE tbl_konto.studiensemester_kurzbz = '".$stsem."' AND tbl_benutzer.uid = '".$uid."' AND tbl_benutzer.person_id = tbl_konto.person_id and tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
-		$subres = pg_query($this->conn, $subqry);
-		if (pg_num_rows($subres)==0)
+		$this->db_query($subqry);
+		if ($this->db_num_rows()==0)
 			return false;
 		else
 		{
-			while ($subrow = pg_fetch_object($subres))
+			while ($subrow = $this->db_fetch_object())
 			{
 					$buch_nr[] = $subrow->buchungsnr;
 					$buch_date[] = $subrow->buchungsdatum;
@@ -502,9 +471,9 @@ class konto extends basis_db
 
 		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='".$buch_nr[0]."' OR buchungsnr_verweis='".$buch_nr[0]."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if ($row->differenz == 0)
 				{

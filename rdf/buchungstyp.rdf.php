@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-// header für no cache
+// header fÃ¼r no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -30,15 +30,11 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/konto.class.php');
 
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 // studiensemester holen
-$typ = new konto($conn,null, true);
+$typ = new konto();
 $typ->getBuchungstyp();
 
 $rdf_url='http://www.technikum-wien.at/buchungstyp';

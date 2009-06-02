@@ -28,16 +28,13 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 
 // DAO
-include('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/functions.inc.php');
-
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if (isset($_GET['lektor']))
 {
@@ -87,9 +84,9 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 }
 else 	
 {
-	echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$lehrveranstaltung_id=null;
-	$mitarbeiter=new mitarbeiter($conn);
+	$mitarbeiter=new mitarbeiter();
 }
 
 // Mitarbeiter holen
@@ -125,7 +122,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 {
 	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
 	
-	$stg_obj = new studiengang($conn);
+	$stg_obj = new studiengang();
 	$stg_obj->getAll('typ, kurzbz', false);
 	foreach ($stg_obj->result as $stg)
 		$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
@@ -159,7 +156,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 	
 	if ($user)
 	{
-		$bb=new benutzerberechtigung($conn);
+		$bb=new benutzerberechtigung();
 		if($bb->getBerechtigungen(get_uid()))
 		{
 			$stge=$bb->getStgKz('admin');
