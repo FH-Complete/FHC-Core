@@ -85,8 +85,8 @@ else
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
 	$htmlstr .= "<th>Typ</th>
 				<th>Titel</th>
-				<th>1.Betreuer</th>
-				<th>2.Betreuer</th>";
+				<th>1.Begutachter</th>
+				<th>2.Begutachter</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=pg_fetch_object($erg))
