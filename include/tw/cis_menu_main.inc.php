@@ -71,9 +71,8 @@
 						</tr>
 					</table>
 					</td>
-	  			</tr>				
-				
-				
+	  			</tr>	
+
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://alumni.technikum-wien.at/member_area/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jobb&ouml;rse</a></td>
@@ -90,6 +89,10 @@
 							<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/oeh/bewerber.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kandidaturen</a></td>
 						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/oeh/Wahlergebnisse Bekanntgabe2009.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wahlergebnisse</a></td>
+						</tr>
 					</table>
 					</td>
 		  		</tr>
@@ -97,7 +100,7 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="https://twist.technikum-wien.at/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Studentenvertretung</a></td>
 		  		</tr>
-				
+
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.groll-gars.at/mensa.htm"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mensa</a></td>
@@ -136,6 +139,7 @@
 					<td class="tdwrap"><a class="Item" href="private/lehre/softgrid.php"  target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Software f&uuml;r Lehre</a></td>
 			  	</tr>
 
+				
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 	          		<td class="tdwrap"><a class="Item" href="public/tw_international.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;TW International</a></td>
@@ -188,7 +192,7 @@
 					</td>
 				</tr>	
 
-
+				
 				
 				</table>
 				&nbsp;
@@ -743,20 +747,14 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/faq_upload.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Upload Lehre FAQ</a></td>
 		  		</tr>
-		  		
 				<tr>
 			  		<td class="tdwidth11" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/faq_telefonbeschreibung.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Telefon FAQ</a></td>
-				</tr>
-				
-				
-				<tr>
+				</tr>				
+		  		<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/info/mail.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Einrichten des Mails</a></td>
 				</tr>
-				
-
-
 			  	</table>
 			</td>
 		</tr>
