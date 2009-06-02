@@ -133,7 +133,7 @@
 				</tr>
 	    	  	<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/lehre/softgrid.php"  target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Software für Lehre&auml;cher</a></td>
+					<td class="tdwrap"><a class="Item" href="private/lehre/softgrid.php"  target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Software f&uuml;r Lehre</a></td>
 			  	</tr>
 
 				<tr>
