@@ -19,40 +19,23 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+require_once('person.class.php');
 
 class benutzer extends person
 {
 	//Tabellenspalten
-	var $uid;		// varchar(32)
-	var $bnaktiv=true;	// boolean
-	var $alias;		// varchar(256)
-	var $bn_ext_id;
+	public $uid;			// varchar(32)
+	public $bnaktiv=true;	// boolean
+	public $alias;			// varchar(256)
+	public $bn_ext_id;
 		
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
-	// * @param $conn        	Datenbank-Connection
-	// *        $uid            Benutzer der geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// * @param $uid            Benutzer der geladen werden soll (default=null)
 	// *************************************************************************
-	function benutzer($conn, $uid=null, $unicode=false)
+	public function __construct($uid=null)
 	{
-		$this->conn = $conn;
-		
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
+		parent::__construct();
 		
 		if($uid != null)
 			$this->load($uid);
@@ -62,12 +45,13 @@ class benutzer extends person
 	// * Laedt Benutzer mit der uebergebenen ID
 	// * @param $uid ID der Person die geladen werden soll
 	// ***********************************************************
-	function load($uid)
+	public function load($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->uid = $row->uid;
 				$this->bnaktiv = ($row->aktiv=='t'?true:false);
@@ -95,7 +79,7 @@ class benutzer extends person
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function validate()
+	protected function validate()
 	{
 		if(strlen($this->uid)>32)
 		{
@@ -125,10 +109,10 @@ class benutzer extends person
 		
 		if($this->alias!='')
 		{
-			$qry = "SELECT * FROM tbl_benutzer WHERE alias='".addslashes($this->alias)."' AND uid!='".$this->uid."'";
-			if($result = pg_query($this->conn, $qry))
+			$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='".addslashes($this->alias)."' AND uid!='".addslashes($this->uid)."'";
+			if($this->db_query($qry))
 			{
-				if(pg_num_rows($result)>0)
+				if($this->db_num_rows()>0)
 				{
 					$this->errormsg = 'Dieser Alias ist bereits vergeben';
 					return false;
@@ -149,7 +133,7 @@ class benutzer extends person
 	// * ansonsten der Datensatz mit $uid upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ******************************************************************
-	function save($new=null, $saveperson=true)
+	public function save($new=null, $saveperson=true)
 	{
 		if($saveperson)
 		{
@@ -183,9 +167,9 @@ class benutzer extends person
 			//Wenn der Aktiv Status geaendert wurde, dann auch updateaktivamum und updateaktivvon setzen
 			$upd='';
 			$qry = "SELECT aktiv FROM public.tbl_benutzer WHERE uid='".addslashes($this->uid)."'";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					$aktiv = ($row->aktiv=='t'?true:false);
 					
@@ -203,7 +187,7 @@ class benutzer extends person
 			       " WHERE uid='".addslashes($this->uid)."';";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -218,13 +202,13 @@ class benutzer extends person
 	// ****
 	// * Prueft ob die UID bereits existiert
 	// ****
-	function uid_exists($uid)
+	public function uid_exists($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 			{
 				$this->errormsg = '';
 				return true;
@@ -247,13 +231,13 @@ class benutzer extends person
 	// ****
 	// * Prueft ob der alias bereits existiert
 	// ****
-	function alias_exists($alias)
+	public function alias_exists($alias)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='".addslashes($alias)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 			{
 				$this->errormsg = '';
 				return true;
@@ -270,7 +254,6 @@ class benutzer extends person
 			$this->errormsg = 'Fehler bei DatenbankAbfrage';
 			return false;
 		}
-		
 	}
 }
 ?>

@@ -22,68 +22,52 @@
 /*
  * Benoetigt functions.inc.php
  */
+require_once('basis_db.class.php');
 
-class person
+class person extends basis_db
 {
-	var $conn;     			// resource DB-Handle
-	var $errormsg; 		// string
-	var $new;      			// boolean
-	var $personen = array(); 	// person Objekt
-	var $done=false;		// boolean
+	public $errormsg;			// string
+	public $new;      			// boolean
+	public $personen = array(); // person Objekt
+	public $done=false;			// boolean
 
 	//Tabellenspalten
-	var $person_id;        		// integer
-	var $sprache;			// varchar(16)
-	var $anrede;			// varchar(16)
-	var $titelpost;         		// varchar(32)
-	var $titelpre;          		// varchar(64)
-	var $nachname;          	// varchar(64)
-	var $vorname;           	// varchar(32)
-	var $vornamen;          	// varchar(128)
-	var $gebdatum;          	// date
-	var $gebort;            		// varchar(128)
-	var $gebzeit;           		// time
-	var $foto;              		// text
-	var $anmerkungen;       	// varchar(256)
-	var $homepage;          	// varchar(256)
-	var $svnr;			// char(10)
-	var $ersatzkennzeichen; 	// char(10)
-	var $familienstand;     	// char(1)
-	var $anzahlkinder;      	// smalint
-	var $aktiv;             		// boolean
-	var $insertamum;        	// timestamp
-	var $insertvon;         		// varchar(16)
-	var $updateamum;        	// timestamp
-	var $updatevon;         	// varchar(16)
-	var $geschlecht;		// varchar(1)
-	var $staatsbuergerschaft;	// varchar(3)
-	var $geburtsnation;		// varchar(3);
-	var $ext_id;            		// bigint
-	var $kurzbeschreibung; 	// text
+	public $person_id;        	// integer
+	public $sprache;			// varchar(16)
+	public $anrede;				// varchar(16)
+	public $titelpost;         	// varchar(32)
+	public $titelpre;          	// varchar(64)
+	public $nachname;          	// varchar(64)
+	public $vorname;           	// varchar(32)
+	public $vornamen;          	// varchar(128)
+	public $gebdatum;          	// date
+	public $gebort;            	// varchar(128)
+	public $gebzeit;           	// time
+	public $foto;              	// text
+	public $anmerkungen;       	// varchar(256)
+	public $homepage;          	// varchar(256)
+	public $svnr;				// char(10)
+	public $ersatzkennzeichen; 	// char(10)
+	public $familienstand;     	// char(1)
+	public $anzahlkinder;      	// smalint
+	public $aktiv;             	// boolean
+	public $insertamum;			// timestamp
+	public $insertvon;			// varchar(16)
+	public $updateamum;			// timestamp
+	public $updatevon;			// varchar(16)
+	public $geschlecht;			// varchar(1)
+	public $staatsbuergerschaft;// varchar(3)
+	public $geburtsnation;		// varchar(3);
+	public $ext_id;				// bigint
+	public $kurzbeschreibung; 	// text
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
-	// * @param $conn        	Datenbank-Connection
-	// *        $person_id      Person die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
+	// * @param $person_id      Person die geladen werden soll (default=null)
 	// *************************************************************************
-	function person($conn, $person_id=null, $unicode=false)
+	public function __construct($person_id=null)
 	{
-		$this->conn = $conn;
-		if(!$unicode==null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden\n";
-				return false;
-			}
-		}
+		parent::__construct();
 
 		if($person_id != null)
 			$this->load($person_id);
@@ -93,7 +77,7 @@ class person
 	// * Laedt Person mit der uebergebenen ID
 	// * @param $person_id ID der Person die geladen werden soll
 	// *********************************************************
-	function load($person_id)
+	public function load($person_id)
 	{
 		//person_id auf gueltigkeit pruefen
 		if(is_numeric($person_id) && $person_id!='')
@@ -104,13 +88,13 @@ class person
 				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung
 				FROM public.tbl_person WHERE person_id='$person_id'";
 
-			if(!$result=pg_query($this->conn,$qry))
+			if(!$this->db_query($qry))
 			{
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
 				return false;
 			}
 
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;
@@ -161,7 +145,7 @@ class person
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	function validate()
+	protected function validate()
 	{
 		$this->nachname = trim($this->nachname);
 		$this->vorname = trim($this->vorname);
@@ -256,9 +240,9 @@ class person
 		{
 			//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
 			$qry = "SELECT person_id FROM public.tbl_person WHERE svnr='$this->svnr'";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					if($row->person_id!=$this->person_id)
 					{
@@ -362,24 +346,13 @@ class person
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
 	// ************************************************************
 	// * Speichert die Personendaten in die Datenbank
 	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	// * angelegt, ansonsten der Datensatz mit $person_id upgedated
 	// * @return true wenn erfolgreich, false im Fehlerfall
 	// ************************************************************
-	function save()
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!person::validate())
@@ -459,16 +432,24 @@ class person
 			       ' WHERE person_id='.$this->person_id.';';
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				$qry = "SELECT currval('public.tbl_person_person_id_seq') AS id;";
-				if($row=pg_fetch_object(pg_query($this->conn,$qry)))
-					$this->person_id=$row->id;
-				else
+				if($this->db_query($qry))
 				{
-					$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
+					if($row=$this->db_fetch_object())
+						$this->person_id=$row->id;
+					else
+					{
+						$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = "Fehler beim Auslesen der Sequence";
 					return false;
 				}
 			}
@@ -478,18 +459,18 @@ class person
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Speichern des Person-Datensatzes:".pg_errormessage($this->conn);
+			$this->errormsg = "Fehler beim Speichern des Person-Datensatzes:".$this->db_last_error();
 			return false;
 		}
 	}
+	
 	/**
 	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
-	 * @param 	$nn Nachname
-	 *		$vn Vorname
-	 *		$order Sortierkriterium
+	 * @param $filter String mit Vorname oder Nachname
+	 * @param $order Sortierkriterium
 	 * @return array mit LPersonen oder false=fehler
 	 */
-	function getTab($filter, $order='person_id')
+	public function getTab($filter, $order='person_id')
 	{
 		$sql_query = "SELECT * FROM public.tbl_person WHERE true ";
 		
@@ -505,11 +486,11 @@ class person
 		if($filter=='')
 		   $sql_query .= " LIMIT 30";
 		
-		if($result=pg_query($this->conn,$sql_query))
+		if($this->db_query($sql_query))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$l = new person($this->conn);
+				$l = new person();
 				$l->person_id = $row->person_id;
 				$l->staatsbuergerschaft = $row->staatsbuergerschaft;
 				$l->geburtsnation = $row->geburtsnation;
@@ -543,7 +524,7 @@ class person
 		}
 		else
 		{
-			$this->errormsg = pg_errormessage($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 		return true;
