@@ -131,6 +131,10 @@
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="http://valar.technikum-wien.at" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dynamic Power Trainer</a></td>
 				</tr>
+	    	  	<tr>
+			  		<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="private/lehre/softgrid.php"  target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Software für Lehre&auml;cher</a></td>
+			  	</tr>
 
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -183,6 +187,9 @@
 					</table>
 					</td>
 				</tr>	
+
+
+				
 				</table>
 				&nbsp;
 		  	</td>
