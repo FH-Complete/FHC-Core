@@ -29,9 +29,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-
 		<meta http-equiv="Content-Type' content='text/xml;charset=UTF-8" />
-
+		<meta name="mssmarttagspreventparsing" content="true" />
+		<meta http-equiv="imagetoolbar" content="no" />
+	
+		<meta http-equiv="expires" content="<?php echo gmdate("D, d M Y H:i:s") . ' GMT';?> " />
+		<meta http-equiv="Cache-Control" content="Private" />
+				
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 		<style type="text/css" >
 			
@@ -90,8 +94,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:false));
 #	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'AppList.xml'));	
+	if ($_SERVER["SERVER_NAME"]=="dav.technikum-wien.at")
+	{
+		$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']: dirname(__FILE__).'/AppList.xml'));	
+		if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
+		{
+			$cXMLFile="/var/www/htdocs/simane/test/appllist/AppList.xml";
+		}
+	}
+	else
+	{
+		$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'../../../documents/infrastruktur/AppList.xml'));	
+	}	
 	
-	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'../../../documents/infrastruktur/AppList.xml'));	
 									
 	if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
 	{
