@@ -32,7 +32,7 @@
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
 	
-	require_once('../../../include/Excel/excel.php');
+	//require_once('../../../include/Excel/excel.php');
 	
 	if (!$conn = pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
