@@ -1,4 +1,4 @@
-@charset "utf-8"
+@charset "utf-8";
 /* Allgemein */
 body
 {
@@ -35,11 +35,11 @@ hr
 @media screen {
 #menue
 {
-	top:9%;
+	top:70px;
 	width:19%;
 	height:86%;
 	z-index:1000;
-}
+} 
 /*Alle außer IE 6*/
 html>body #menue
 {
@@ -104,6 +104,7 @@ input.TextBox
 	background-image:url(styles/tw/TWLogo_klein.jpg);
 	width:170px;
 	height:53px;
+
 }
 .header_line
 {
@@ -572,4 +573,3 @@ img#layout
 	margin-bottom: 0px;
 	margin-top: 0px;
 }*/
-
