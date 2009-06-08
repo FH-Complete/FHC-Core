@@ -380,7 +380,7 @@
 	{
 		if($is_lector)
 		{
-			echo '<a href="#" onclick="alert(\'Das Übungstool kann nicht gleichzeitig mit Moodle verwendet werden.\nWenn Sie das Übungstool verwenden wollen, müssen Sie den Moodle Kurs entfernen. Wenden Sie sich hierzu bitte an den Lektorensupport\');" class="Item">
+			echo '<a href="#" onclick="alert(\'Das &Uuml;bungstool kann nicht gleichzeitig mit Moodle verwendet werden.\nWenn Sie das &Uuml;bungstool verwenden wollen, m&uuml;ssen Sie den Moodle Kurs entfernen. Wenden Sie sich hierzu bitte an den Lektorensupport\');" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
 	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a><br>
 	    			<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch [PDF]</a>';
@@ -467,7 +467,7 @@
 	else 
 	{
 		if($is_lector)
-			echo '<a href="#" onclick="alert(\'Moodle kann nicht gleichzeitig mit dem Übungstool verwendet werden.\nWenn Sie Moodle verwenden wollen, müssen Sie die Übungen im Übungstool entfernen\'); return false"  class="Item" >
+			echo '<a href="#" onclick="alert(\'Moodle kann nicht gleichzeitig mit dem &Uuml;bungstool verwendet werden.\nWenn Sie Moodle verwenden wollen, m&uuml;ssen Sie die &Uuml;bungen im &Uuml;bungstool entfernen\'); return false"  class="Item" >
 			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
 			    	<strong>Moodle</strong></a><br>';
 	}
