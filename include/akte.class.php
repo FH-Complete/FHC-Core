@@ -52,6 +52,7 @@ class akte
 	function akte($conn, $akte_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -65,7 +66,7 @@ class akte
 				return false;
 			}
 		}
-		
+*/	
 		if($akte_id != null)
 			$this->load($akte_id);
 	}

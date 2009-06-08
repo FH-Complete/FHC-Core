@@ -8,7 +8,7 @@
 /**
  * Synchronisiert Mitarbeiterdatensaetze von FAS DB in PORTAL DB
  * setzt voraus: tbl_nation, tbl_sprache, tbl_ort
- * benötigt: tbl_syncperson
+ * benÃ¶tigt: tbl_syncperson
  */
 require_once('../../../vilesci/config.inc.php');
 require_once('../sync_config.inc.php');
@@ -53,12 +53,12 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Mitarbeiter</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
 <?php
-$plausisvnr="Überprüfung Mitarbeiterdaten im FAS:\n\n";
+$plausisvnr="ÃœberprÃ¼fung Mitarbeiterdaten im FAS:\n\n";
 echo nl2br($error_log_fas);
 
 $qry="SELECT * FROM Person join Mitarbeiter ON person_pk=mitarbeiter.person_fk WHERE svnr='0005010400';";
@@ -150,7 +150,7 @@ if($resultp = pg_query($conn_fas, $qry))
 		}
 		if ($rowp->staatsbuergerschaft1<>$rowp->staatsbuergerschaft2)
 		{
-			$plausi.="Staatsbürgerschaft der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->staatsbuergerschaft2."'.\n";
+			$plausi.="StaatsbÃ¼rgerschaft der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->staatsbuergerschaft2."'.\n";
 			$error=true;
 		}
 		if ($rowp->familienstand1<>$rowp->familienstand2)
@@ -522,7 +522,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 						        myaddslashes($persongeburtsnation).", ".
 						        myaddslashes($personstaatsbuergerschaft).", ".
 						        myaddslashes($personext_id).");";
-						        $ausgabe_person="Person ".$personnachname." ".$personvorname." eingefügt.\n";
+						        $ausgabe_person="Person ".$personnachname." ".$personvorname." eingefÃ¼gt.\n";
 				}
 				else
 				{
@@ -533,7 +533,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 						$error=true;
 					}
 					
-					//update nur wenn änderungen gemacht
+					//update nur wenn Ã¤nderungen gemacht
 					$qryu="SELECT * FROM public.tbl_person WHERE person_id='$personperson_id';";
 					if($resultu = pg_query($conn, $qryu))
 					{
@@ -749,11 +749,11 @@ if($resultall = pg_query($conn_fas, $qryall))
 								$updatep=true;
 								if(strlen(trim($ausgabe_person))>0)
 								{
-									$ausgabe_person.=", Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
+									$ausgabe_person.=", StaatsbÃ¼rgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 								}
 								else
 								{
-									$ausgabe_person="Staatsbürgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
+									$ausgabe_person="StaatsbÃ¼rgerschaft: '".$personstaatsbuergerschaft."' (statt '".$row1->staatsbuergerschaft."')";
 								}
 							}
 							if($row1->insertamum!=$personinsertamum)
@@ -812,7 +812,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 								       staatsbuergerschaft=".myaddslashes($personstaatsbuergerschaft).", 
 								       ext_id=".myaddslashes($personext_id)." 
 								       WHERE person_id=".myaddslashes($personperson_id).";";
-								$ausgabe_person="Änderungen bei Person ".$personnachname." ".$personvorname.": ".$ausgabe_person."\n";
+								$ausgabe_person="Ã„nderungen bei Person ".$personnachname." ".$personvorname.": ".$ausgabe_person."\n";
 							}
 						}
 					}
@@ -875,7 +875,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							now() , 
 							'SYNC', 
 							null);";
-							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefügt.\n";
+							$ausgabe_benutzer="Benutzer ".$benutzeruid." ".$benutzeralias." eingefÃ¼gt.\n";
 					}
 					else
 					{	
@@ -945,7 +945,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 							       insertamum=".myaddslashes($benutzerinsertamum).", 
 							       insertvon=".myaddslashes($benutzerinsertvon)." 
 							       WHERE person_id='$personperson_id' AND uid='".$benutzeruid."';";
-							$ausgabe_benutzer="Änderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
+							$ausgabe_benutzer="Ã„nderungen bei Benutzer ".$benutzeruid." ".$benutzeralias.": ".$ausgabe_benutzer."\n";
 						}
 					}
 					if(!pg_query($conn,$qry))
@@ -956,11 +956,11 @@ if($resultall = pg_query($conn_fas, $qryall))
 					}
 					if(!$error)
 					{								
-						//überprüfen, ob eintrag in syncperson schon vorhanden
+						//Ã¼berprÃ¼fen, ob eintrag in syncperson schon vorhanden
 						$qryz="SELECT person_fas FROM sync.tbl_syncperson WHERE person_fas='$personext_id' AND person_portal='$personperson_id'";
 						if($resultz = pg_query($conn, $qryz))
 						{
-							if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist => hinzufügen
+							if(pg_num_rows($resultz)==0) //wenn dieser eintrag noch nicht vorhanden ist => hinzufÃ¼gen
 							{
 								$qry='INSERT INTO sync.tbl_syncperson (person_fas, person_portal)'.
 									'VALUES ('.$personext_id.', '.$personperson_id.');';
@@ -1018,7 +1018,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 								myaddslashes($mitarbeiterinsertamum).", ".
 								myaddslashes($mitarbeiterinsertvon)." , ".
 								myaddslashes($mitarbeiterext_id).");";
-								$ausgabe_mitarbeiter="Mitarbeiter ".$mitarbeiterpersonalnummer." ".$mitarbeiterkurzbz." eingefügt.\n";
+								$ausgabe_mitarbeiter="Mitarbeiter ".$mitarbeiterpersonalnummer." ".$mitarbeiterkurzbz." eingefÃ¼gt.\n";
 							}
 							else
 							{
@@ -1155,7 +1155,7 @@ if($resultall = pg_query($conn_fas, $qryall))
 									updatevon='SYNC', 
 									ext_id=".myaddslashes($mitarbeiterext_id)." 
 									WHERE mitarbeiter_uid='$mitarbeiteruid';";
-									$ausgabe_mitarbeiter="Änderungen bei Mitarbeiter ".$mitarbeiteruid.": ".$ausgabe_mitarbeiter."\n";
+									$ausgabe_mitarbeiter="Ã„nderungen bei Mitarbeiter ".$mitarbeiteruid.": ".$ausgabe_mitarbeiter."\n";
 								}
 							}
 							if(!@pg_query($conn,$qry))
@@ -1249,14 +1249,14 @@ else
 
 
 //echo nl2br($text);
-echo nl2br("\n\nGesamt FAS: $anzahl_quelle\nPerson:     Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person");
-echo nl2br("\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer");
-echo nl2br("\nMitarbeiter:  Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter");
+echo nl2br("\n\nGesamt FAS: $anzahl_quelle\nPerson:     EingefÃ¼gt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person");
+echo nl2br("\nBenutzer:     EingefÃ¼gt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer");
+echo nl2br("\nMitarbeiter:  EingefÃ¼gt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter");
 echo nl2br("\nLog:\n".$error_log);
 echo nl2br("\n=====\n".$ausgabe);
-$ausgabe="Mitarbeiter Sync\n----------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        Eingefügt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
-."\nBenutzer:     Eingefügt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
-."\nMitarbeiter: Eingefügt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter.\n\n".$ausgabe;
+$ausgabe="Mitarbeiter Sync\n----------------\n\nGesamt FAS: $anzahl_quelle\nPerson:        EingefÃ¼gt: $anzahl_eingefuegt_person / geaendert: $anzahl_geaendert_person / Fehler: $anzahl_fehler_person"
+."\nBenutzer:     EingefÃ¼gt: $anzahl_eingefuegt_benutzer / geaendert: $anzahl_geaendert_benutzer / Fehler: $anzahl_fehler_benutzer"
+."\nMitarbeiter: EingefÃ¼gt: $anzahl_eingefuegt_mitarbeiter / geaendert: $anzahl_geaendert_mitarbeiter / Fehler: $anzahl_fehler_mitarbeiter.\n\n".$ausgabe;
 
 if(strlen(trim($error_log))>0)
 {

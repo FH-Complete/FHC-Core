@@ -24,12 +24,14 @@ class lehrfunktion
 	function lehrfunktion($conn, $lehrfkt_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($lehrfkt_id != null)
 			$this->load($lehrfkt_id);
 	}

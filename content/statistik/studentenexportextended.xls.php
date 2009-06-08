@@ -112,7 +112,7 @@ loadVariables($conn, $user);
 	$maxlength[$i]=12;
 	$worksheet->write($zeile,++$i,"PERSONENKENNZEICHEN", $format_bold);
 	$maxlength[$i]=19;
-	$worksheet->write($zeile,++$i,"STAATSBÜRGERSCHAFT", $format_bold);
+	$worksheet->write($zeile,++$i,"STAATSBÃœRGERSCHAFT", $format_bold);
 	$maxlength[$i]=16;
 	$worksheet->write($zeile,++$i,"SVNR", $format_bold);
 	$maxlength[$i]=4;
@@ -143,7 +143,7 @@ loadVariables($conn, $user);
 	
 	$worksheet->write($zeile,++$i,"STATUS", $format_bold);
 	$maxlength[$i]=6;
-	$worksheet->write($zeile,++$i,"STATI IN ANDEREN STUDIENGÄNGEN", $format_bold);
+	$worksheet->write($zeile,++$i,"STATI IN ANDEREN STUDIENGÃ„NGEN", $format_bold);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"EMail Intern", $format_bold);
 	$maxlength[$i]=12;
@@ -197,7 +197,7 @@ loadVariables($conn, $user);
 		
 		$prestudent = new prestudent($conn, null, null);
 		$prestudent->getLastStatus($row->prestudent_id);
-		$status = $prestudent->rolle_kurzbz;
+		$status = $prestudent->status_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
 			
 		$i=0;

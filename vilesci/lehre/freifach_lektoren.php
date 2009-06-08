@@ -39,7 +39,7 @@ $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
-	die('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung fÃ¼r diese Seite');
 
 $stsem_obj = new studiensemester($conn);
 
@@ -57,7 +57,7 @@ else
 <html>
 <head>
 <title>Lehrveranstaltung Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>

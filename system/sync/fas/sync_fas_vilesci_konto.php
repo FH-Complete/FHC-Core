@@ -41,7 +41,7 @@ $update=false;
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Konto</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -164,7 +164,7 @@ if($result = pg_query($conn_fas, $qry))
 				if($row1=pg_fetch_object($result1))
 				{ 
 					$konto->person_id=$row1->person_portal;
-					$konto->new=true; //vorhandene Einträge wurden bereits übersprungen
+					$konto->new=true; //vorhandene EintrÃ¤ge wurden bereits Ã¼bersprungen
 				}
 				else 
 				{
@@ -220,8 +220,8 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else
 						{
-							$ausgabe.="Buchung (e) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag €".$konto->betrag." eingefügt.\n";
-							echo "Buchung (e) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag €".$konto->betrag." eingefügt.<br>";
+							$ausgabe.="Buchung (e) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag â‚¬".$konto->betrag." eingefÃ¼gt.\n";
+							echo "Buchung (e) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag â‚¬".$konto->betrag." eingefÃ¼gt.<br>";
 							$anzahl_eingefuegt++;
 						}
 					}
@@ -251,8 +251,8 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else
 						{
-							$ausgabe.="Buchung (a) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag €".$betrag." eingefügt.\n";
-							echo "Buchung (a) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag €".$betrag." eingefügt.<br>";
+							$ausgabe.="Buchung (a) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag â‚¬".$betrag." eingefÃ¼gt.\n";
+							echo "Buchung (a) von Person '".$konto->person_id."' mit Zahlung '".$row->zahlung_fk."', Text '".$konto->buchungstext."' und Betrag â‚¬".$betrag." eingefÃ¼gt.<br>";
 							$anzahl_eingefuegt++;
 						}
 					}
@@ -264,8 +264,8 @@ if($result = pg_query($conn_fas, $qry))
 echo "-------------------------------------------------------------------------------------------------------------------------------<br><br>";
 echo "Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 //echo nl2br($error_log);
-echo nl2br("\nZahlungen\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / bereits vorhanden: $anzahl_vorhanden / Fehler: $anzahl_fehler");
-$ausgabe="\nZahlungen\nGesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / bereits vorhanden: ".$anzahl_vorhanden." / Fehler: ". $anzahl_fehler."\n\n".$ausgabe;
+echo nl2br("\nZahlungen\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / bereits vorhanden: $anzahl_vorhanden / Fehler: $anzahl_fehler");
+$ausgabe="\nZahlungen\nGesamt: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt." / bereits vorhanden: ".$anzahl_vorhanden." / Fehler: ". $anzahl_fehler."\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler Konto von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

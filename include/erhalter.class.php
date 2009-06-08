@@ -43,7 +43,7 @@ class erhalter
 	function erhalter($conn, $erhalter_kz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+		/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -54,7 +54,7 @@ class erhalter
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-		
+		*/
 		if($erhalter_kz != null)
 			$this->load($erhalter_kz);
 	}
@@ -149,8 +149,8 @@ class erhalter
 	 */
 	function checkvars()
 	{	
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->kurzbz = str_replace("'",'´',$this->kurzbz);
+		$this->bezeichnung = str_replace("'",'Â´',$this->bezeichnung);
+		$this->kurzbz = str_replace("'",'Â´',$this->kurzbz);
 		
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>255)           

@@ -76,10 +76,10 @@ if (isset($_GET["download"])){
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -92,7 +92,7 @@ if (isset($_GET["download"])){
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('Wollen Sie die markierten EintrÃ€ge wirklich lÃ¶schen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
 	
 	function set_notenschluessel_prozent()
@@ -155,7 +155,7 @@ $beispiel_id = (isset($_GET['beispiel_id'])?$_GET['beispiel_id']:'');
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
 /*
-//Filenamen für up-/downloads bauen
+//Filenamen fÃŒr up-/downloads bauen
 // which kann sein angabe, abgabe oder zip
 function makeUploadName($conn, $which, $lehreinheit_id=null, $uebung_id=null, $ss=null)
 {
@@ -174,7 +174,7 @@ if ($which == "angabe")
 */
 
 
-//Angabedatei löschen
+//Angabedatei lÃ¶schen
 if (isset($_GET["deletefile"])){
 	$file=$_GET["deletefile"];
 	$ueb = new uebung($conn);
@@ -185,7 +185,7 @@ if (isset($_GET["deletefile"])){
 	unlink($filename);
 }
 
-//notenschlüssel anlegen
+//notenschlÃŒssel anlegen
 if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 {
 	$punkte_arr = array();
@@ -333,7 +333,7 @@ include("menue.inc.php");
 echo "\n<!--Menue-->\n";
 echo "<br>
 <a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Ãbersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
 <br><br>
@@ -344,7 +344,7 @@ echo "<br>
 //echo "lehrveranstaltung: $lvid<br>";
 //echo "lehreinheit: $lehreinheit_id<br>";
 
-echo "<h3>Übung verwalten</h3>";
+echo "<h3>Ãbung verwalten</h3>";
 
 //Anlegen einer neuen Uebung
 if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
@@ -840,7 +840,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	
 	echo "<table><tr><td valign='top'>";
 	//Bearbeiten der ausgewaehlten Uebung
-	echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>\n";
+	echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>\n";
 	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Aufgabe bearbeiten</td><td>&nbsp;</td></tr>\n";
 	echo "<tr><td>&nbsp;</td><td></td></tr>";
 
@@ -888,7 +888,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	//Beispiel neu Anlegen
 	if ($uebung_obj->beispiele)
 	{
-		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
+		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
 		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Neues Beispiel anlegen</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
 	
@@ -900,7 +900,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 		</form>";
 		
 		/*
-		// notenschlüssel
+		// notenschlÃŒssel
 		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$uebung_id' order by note";
 		if($result = pg_query($conn, $qry))
 		{
@@ -919,8 +919,8 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 			}
 		}
 		
-		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
-		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
+		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
+		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>NotenschlÃŒssel definieren</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
 	
 		echo "<tr><td>Note</td><td>Mindestpunkte</td></tr>";
@@ -942,7 +942,7 @@ echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2'
 	//Uebersicht der Beispiele
 	if ($uebung_obj->beispiele)
 	{
-		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
+		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
 		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Beispiele</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td><td></td></tr>\n\n";
 	
@@ -955,7 +955,7 @@ echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2'
 				<td align='center'>$row->punkte</td>
 				<td align='center'><input type='Checkbox' name='beispiel[]' value='$row->beispiel_id'></td>";
 			}
-			echo "<tr><td></td><td></td><td align='right'><input type='Submit' value='Auswahl löschen' onclick='return confirmdelete()' name='beispiel_delete'></td></tr>";
+			echo "<tr><td></td><td></td><td align='right'><input type='Submit' value='Auswahl lÃ¶schen' onclick='return confirmdelete()' name='beispiel_delete'></td></tr>";
 		}
 		else
 			echo "<tr><td colspan='3'>Derzeit sind keine Beispiele angelegt</td><td></td></tr>";
@@ -971,13 +971,13 @@ echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2'
 		//Bearbeiten eines Beispiels
 		if($beispiel_obj->load($beispiel_id))
 		{
-			echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$beispiel_id&liste_id=$liste_id' method=POST>\n";
+			echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$beispiel_id&liste_id=$liste_id' method=POST>\n";
 			echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Beispiel bearbeiten</td></tr>\n";
 			echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
 
 			echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' maxlength='32' value='$beispiel_obj->bezeichnung'>";
 			echo "&nbsp;Punkte <input type='text' size='2' name='punkte' value='$beispiel_obj->punkte'></td></tr>";
-			echo "<tr><td align='right'><input type='submit' name='beispiel_edit' value='Ändern'></td></tr>";
+			echo "<tr><td align='right'><input type='submit' name='beispiel_edit' value='Ãndern'></td></tr>";
 
 			echo "</table>
 					</form><br><br>";
@@ -993,8 +993,8 @@ else
 	{
 		echo "<table><tr><td valign='top'>";
 		//Bearbeiten der ausgewaehlten Liste
-		echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>\n";
-		echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Übung bearbeiten</td><td>&nbsp;</td></tr>\n";
+		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>\n";
+		echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ãbung bearbeiten</td><td>&nbsp;</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td></tr>";
 	
 		$liste_obj = new uebung($conn);
@@ -1010,7 +1010,7 @@ else
 	
 	//Gesamtuebersicht ueber alle Listen innerhalb der Uebung
 	echo "<table><tr><td valign='top'>";
-	echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>";
+	echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>";
 	echo "<table width='440'>";
 	$studentuebung = new uebung($conn);
 	if (!$studentuebung->check_studentuebung($liste_id))	
@@ -1112,7 +1112,7 @@ else
 				//Wenn eintraege fuer Combo vorhanden sind dann wirds angezeigt
 				if($has_option_content)
 				{
-					$copy_content.= "\n<form  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
+					$copy_content.= "\n<form accept-charset='UTF-8'  style='margin:1px;' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&kopieren=true&uebung_copy_id=$row->uebung_id' method='POST'>";
 					$copy_content.= "\n<SELECT name='lehreinheit_copy_id'>\n";
 					$copy_content.= $copy_option_content;
 					$copy_content.= '</SELECT> ';
@@ -1126,7 +1126,7 @@ else
 				$copy_content.= "</td></tr>";
 			}
 		}
-		echo "<tr><td></td><td></td><td><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td></tr>";
+		echo "<tr><td></td><td></td><td><input type='Submit' value='Auswahl lÃ¶schen' name='delete_uebung' onclick='return confirmdelete();'></td></tr>";
 		if ($row->beispiele)
 			$anzeigen = 'beispiele';
 		else
@@ -1172,7 +1172,7 @@ else
 	if ($anzeigen != 'abgabe' && $anzeigen != 'nada')
 	{
 		echo "
-	<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
+	<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
 	<table >
 	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Kreuzerlliste anlegen</td><td></td></tr>
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema' maxlength='32' value='$thema'></td><td><span class='error'>$error_thema</td></tr>
@@ -1190,7 +1190,7 @@ else
 	</table>
 	</form>
 	";
-		// notenschlüssel
+		// notenschlÃŒssel
 		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$liste_id' order by note";
 		if($result = pg_query($conn, $qry))
 		{
@@ -1214,16 +1214,16 @@ else
 			if ($liste_obj->prozent == 't')
 			{
 				$einheit = " %";
-				$einheit_link = "Notenschlüssel in <u>Prozent</u> / <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=punkte'>Punkten</a>";
+				$einheit_link = "NotenschlÃŒssel in <u>Prozent</u> / <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=punkte'>Punkten</a>";
 			}			
 			else
 			{
 				$einheit=" Punkte";
-				$einheit_link = "Notenschlüssel in <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=prozent'>Prozent</a> / <u>Punkten</u>";
+				$einheit_link = "NotenschlÃŒssel in <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=prozent'>Prozent</a> / <u>Punkten</u>";
 			}
 			
-			echo "<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method='POST' name='ns'>\n";
-			echo "<table><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
+			echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method='POST' name='ns'>\n";
+			echo "<table><tr><td colspan='3' class='ContentHeader3'>NotenschlÃŒssel definieren</td></tr>\n";
 			echo "<tr>";
 			echo "<td colspan='3'>";
 			echo $einheit_link;
@@ -1255,7 +1255,7 @@ else
 	if ($anzeigen != 'beispiele' && $anzeigen != 'nada')
 	{
 		echo "
-	<form action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
+	<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
 	<table >
 	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Abgabe anlegen</td><td></td></tr>
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema' maxlength='32' value='$thema'></td><td><span class='error'>$error_thema</td></tr>

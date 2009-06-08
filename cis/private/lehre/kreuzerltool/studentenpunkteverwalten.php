@@ -35,10 +35,10 @@ require_once('../../../../include/datum.class.php');
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -51,7 +51,7 @@ require_once('../../../../include/datum.class.php');
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('Wollen Sie die markierten EintrÃ¤ge wirklich lÃ¶schen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
   //-->
 </script>
@@ -215,7 +215,7 @@ if($lehreinheit_id=='')
 echo "\n<!--Menue-->\n";
 echo "<br>
 <a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Ãœbersichtstabelle</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</a>
 <br><br>
@@ -315,7 +315,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	if(count($uebung_obj->uebungen)>0)
 	{
 		echo "<table width='100%'><tr><td valign='top'>";
-		echo "<br>Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<br>WÃ¤hlen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		foreach ($uebung_obj->uebungen as $row)
 		{
 			if($uebung_id=='')
@@ -511,7 +511,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	<tr>
 		<td>&nbsp;</td>
 		<td>
-			<input type='button' value='Zurück' onclick='history.back();'>
+			<input type='button' value='ZurÃ¼ck' onclick='history.back();'>
 			<input type='submit' value='Speichern' name='submit'>
 		</td>
 

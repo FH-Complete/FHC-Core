@@ -1,6 +1,6 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Stundenplan-Synchro (stpldev-stpl)</title>
 </head>
 <body>
@@ -42,7 +42,7 @@ $message_sync='';
 
 // Mail Headers festlegen
 $headers= "MIME-Version: 1.0\r\n";
-$headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
+$headers.="Content-Type: text/html; charset=UTF-8\r\n";
 
 $ss=new studiensemester($conn);
 $ss->getNearestTillNext();

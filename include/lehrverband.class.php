@@ -46,7 +46,7 @@ class lehrverband
 	function lehrverband($conn, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -57,6 +57,7 @@ class lehrverband
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
+*/
 	}
 
 	function exists($studiengang_kz, $semester, $verband, $gruppe)

@@ -91,7 +91,7 @@ class ferien
 	{
 		if($studiengang_kz == '' || !is_numeric($studiengang_kz) || $bezeichnung=='')
 		{
-			$this->errormsg = 'ID ungültig';
+			$this->errormsg = 'ID ungÃ¼ltig';
 			return false;
 		}
 
@@ -139,7 +139,7 @@ class ferien
 	 */
 	function checkvars()
 	{
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
+		$this->bezeichnung = str_replace("'",'Â´',$this->bezeichnung);
 
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>64)
@@ -166,7 +166,7 @@ class ferien
 
 			if($this->studiengang_kz == '' || !is_numeric($this->studiengang_kz) || $this->bezeichnung=='')
 			{
-				$this->errormsg = 'ID ungültig';
+				$this->errormsg = 'ID ungÃ¼ltig';
 				return false;
 			}
 			$qry = 'INSERT INTO lehre.tbl_ferien (bezeichnung, studiengang_kz, vondatum, bisdatum) VALUES ('.
@@ -181,7 +181,7 @@ class ferien
 
 			if($this->studiengang_kz == '' || !is_numeric($this->studiengang_kz) || $this->bezeichnung=='')
 			{
-				$this->errormsg = 'ID der Ferien ungültig';
+				$this->errormsg = 'ID der Ferien ungÃ¼ltig';
 				return false;
 			}
 

@@ -63,7 +63,7 @@ class gebiet
 	public function gebiet($conn, $gebiet_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -74,7 +74,7 @@ class gebiet
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($gebiet_id != null)
 			$this->load($gebiet_id);
 	}

@@ -51,7 +51,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Verwendung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -109,7 +109,7 @@ if($result_ma = pg_query($conn_fas, $qry_ma))
 			{
 				if(!($row->verwendung>=1 AND $row->verwendung<=9))
 				{
-					$error_log.="Verwendungscode ungültig (".$row->verwendung.") bei funktion_pk=".$row->funktion_pk.".\n";
+					$error_log.="Verwendungscode ungÃ¼ltig (".$row->verwendung.") bei funktion_pk=".$row->funktion_pk.".\n";
 					$fehler++;
 					continue;
 				}
@@ -123,13 +123,13 @@ if($result_ma = pg_query($conn_fas, $qry_ma))
 				}
 				if(!($row->beschart1>=1 AND $row->beschart1<=6))
 				{
-					$error_log.="Beschäftigungsart 1 ungültig (".$row->beschart1.") bei funktion_pk=".$row->funktion_pk.".\n";
+					$error_log.="BeschÃ¤ftigungsart 1 ungÃ¼ltig (".$row->beschart1.") bei funktion_pk=".$row->funktion_pk.".\n";
 					$fehler++;
 					continue;
 				}
 				if(!($row->beschart2>=1 AND $row->beschart2<=2))
 				{
-					$error_log.="Beschäftigungsart 2 ungültig (".$row->beschart2.") bei funktion_pk=".$row->funktion_pk.".\n";
+					$error_log.="BeschÃ¤ftigungsart 2 ungÃ¼ltig (".$row->beschart2.") bei funktion_pk=".$row->funktion_pk.".\n";
 					$fehler++;
 					continue;
 				}

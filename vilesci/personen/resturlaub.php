@@ -35,7 +35,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <title>Resturlaub</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -46,7 +46,7 @@ function gesamt()
 }
 function conf_del()
 {
-	return confirm("Wollen Sie diesen Eintrag wirklich löschen?");
+	return confirm("Wollen Sie diesen Eintrag wirklich lÃ¶schen?");
 }
 </script>
 </head>
@@ -62,7 +62,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 {
 	if(isset($_GET['del']) && isset($_GET['zeitsperre_id']))
 	{
-		//echo "<script type='text/javascript'>check=confirm('Wollen Sie diesen Eintrag wirklich löschen?');</script>";
+		//echo "<script type='text/javascript'>check=confirm('Wollen Sie diesen Eintrag wirklich lÃ¶schen?');</script>";
 		$qry="DELETE FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$_GET['uid']."' AND zeitsperre_id='".$_GET['zeitsperre_id']."' ;";
 		if(!pg_query($conn, $qry))
 		{
@@ -104,7 +104,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 	$rechte->getBerechtigungen($user);
 	if($rechte->isBerechtigt('admin', '0', 'suid'))
 	{
-		echo "<h3>Übersicht Zeitsperren</h3>";
+		echo "<h3>Ãbersicht Zeitsperren</h3>";
 		echo "<input type='button' onclick='parent.lv_detail.location=\"resturlaub_details.php?neu=true&uid=$uid\"' value='Neu'/>";
 		echo"<table class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>
 		<thead>
@@ -190,7 +190,7 @@ if(isset($_GET['type']) && $_GET['type']=='save')
 	}
 	else 
 	{
-		die('Fehler beim Speichern der Daten: '.$resturlaub->errormsg.'<br><a href="javascript:history.back()">Zurück</a><br>');
+		die('Fehler beim Speichern der Daten: '.$resturlaub->errormsg.'<br><a href="javascript:history.back()">ZurÃŒck</a><br>');
 	}
 }
 

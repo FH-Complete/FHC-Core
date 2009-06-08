@@ -77,7 +77,7 @@ $lv->load($lvid);
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <script language="Javascript">
 <!--
@@ -231,7 +231,7 @@ if(isset($_POST['changegruppe']))
 	}
 	else 
 	{
-		echo '<span class="error">Es wurde keine oder eine ungueltige ID übergeben</span>';
+		echo '<span class="error">Es wurde keine oder eine ungueltige ID Ã¼bergeben</span>';
 	}
 }
 
@@ -283,7 +283,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 $mdl_course = new moodle_course($conn, $conn_moodle);
 if($mdl_course->course_exists_for_lv($lvid, $stsem) || $mdl_course->course_exists_for_allLE($lvid, $stsem))
 {
-	echo 'Es ist bereits ein Moodle Kurs für die Gesamt LV vorhanden';
+	echo 'Es ist bereits ein Moodle Kurs fÃ¼r die Gesamt LV vorhanden';
 }
 else 
 {
@@ -307,7 +307,7 @@ else
 	echo '<b>Moodle Kurs anlegen: </b><br><br>
 			<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$lvid.'&stsem='.$stsem.'" method="POST">
 			<input type="radio" '.$disable_lv.' name="art" value="lv" onclick="togglediv()" '.($art=='lv'?'checked':'').'>einen Moodle Kurs f&uuml;r die gesamte LV anlegen<br>
-			<input type="radio" id="radiole" name="art" value="le" onclick="togglediv()" '.($art=='le'?'checked':'').'>einen Moodle Kurs für einzelne Lehreinheiten anlegen
+			<input type="radio" id="radiole" name="art" value="le" onclick="togglediv()" '.($art=='le'?'checked':'').'>einen Moodle Kurs fÃ¼r einzelne Lehreinheiten anlegen
 		  ';
 	
 	$le = new lehreinheit($conn);
@@ -349,14 +349,14 @@ else
 	echo '</div>';
 	
 	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$lv->bezeichnung.'">';
-	echo '<br>Gruppen übernehmen: <input type="checkbox" name="gruppen" checked>';
+	echo '<br>Gruppen Ã¼bernehmen: <input type="checkbox" name="gruppen" checked>';
 	echo '<br><br><input type="submit" name="neu" value="Kurs anlegen">
 			</form>';
 }
 echo '</td>';
 
 echo '<td valign="top">';
-echo '<b>Vorhandene Moodle Kurse für diese LV</b>';
+echo '<b>Vorhandene Moodle Kurse fÃ¼r diese LV</b>';
 if(!$mdl_course->getAll($lvid, $stsem))
 	echo $mdl_course->errormsg;
 echo '<table>';
@@ -364,7 +364,7 @@ foreach ($mdl_course->result as $course)
 {
 	echo '<tr>';
 	echo '<td><a href="'.MOODLE_PATH.'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$course->mdl_fullname.'</a></td>';
-	echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='ok' name='changegruppe'></td>";
+	echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen Ã¼bernehmen <input type='submit' value='ok' name='changegruppe'></td>";
 }
 echo '</table>';
 echo '</td></tr></table>';

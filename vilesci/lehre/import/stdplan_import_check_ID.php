@@ -12,11 +12,11 @@
 <html>
 <head>
 <title>Check ID</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK rel="stylesheet" href="../../../include/styles.css" type="text/css">
 </head>
 <body class="background_main">
-<H1>ID's werden überprüft</H1>
+<H1>ID's werden Ã¼berprÃ¼ft</H1>
 <?php
 
 	//*****************************************************************************************
@@ -39,7 +39,7 @@
 				echo 'UID fuer Lektoren Kurzbezeichnung '.$row->lektor.' konnte nicht gefunden werden!<br>';
 			else
 			{
-				echo pg_cmdtuples($result_update).' Einträge für '.$row->lektor.' wurden upgedatet!<br>';
+				echo pg_cmdtuples($result_update).' EintrÃ¤ge fÃ¼r '.$row->lektor.' wurden upgedatet!<br>';
 				$countok++;
 			}
 		}
@@ -68,7 +68,7 @@
 			if (pg_cmdtuples($result_update)==0)
 				echo 'ID fuer Ort Kurzbezeichnung '.$row->ort.' konnte nicht gefunden werden!<br>';
 			else
-				echo pg_cmdtuples($result_update).' Einträge für '.$row->ort.' wurden upgedatet!<br>';
+				echo pg_cmdtuples($result_update).' EintrÃ¤ge fÃ¼r '.$row->ort.' wurden upgedatet!<br>';
 		}
 		echo 'Ort kurzbzs wurden erfolgreich vergeben!<br><br>';
 	}
@@ -97,7 +97,7 @@
 			if (pg_cmdtuples($result_update)==0)
 				echo 'ID fuer Lehrfach Kurzbezeichnung '.$row->lehrfach.' konnte nicht gefunden werden!<br>';
 			else
-				echo pg_cmdtuples($result_update).' Einträge für '.$row->lehrfach.' wurden upgedatet!<br>';
+				echo pg_cmdtuples($result_update).' EintrÃ¤ge fÃ¼r '.$row->lehrfach.' wurden upgedatet!<br>';
 		}
 		echo 'Lehrfach Nr wurden erfolgreich vergeben!<br><br>';
 	}
@@ -126,7 +126,7 @@
 			if (pg_cmdtuples($result_update)==0)
 				echo 'Einheit Kurzbezeichnung '.$row->lehrfach.' konnte nicht gefunden werden!<br>';
 			else
-				echo pg_cmdtuples($result_update).' Einträge für '.$row->lehrfach.' wurden upgedatet!<br>';
+				echo pg_cmdtuples($result_update).' EintrÃ¤ge fÃ¼r '.$row->lehrfach.' wurden upgedatet!<br>';
 		}
 		echo 'Einheiten wurden erfolgreich vergeben!<br><br>';
 	}
@@ -157,7 +157,7 @@
 			if (pg_cmdtuples($result_update)==0)
 				echo 'Klassenbezeichnung '.$row->klassenbez.' konnte nicht gefunden werden!<br>';
 			else
-				echo pg_cmdtuples($result_update).' Einträge für '.$row->klassenbez.' wurden upgedatet!<br>';
+				echo pg_cmdtuples($result_update).' EintrÃ¤ge fÃ¼r '.$row->klassenbez.' wurden upgedatet!<br>';
 		}
 		echo 'Klassen IDs wurden erfolgreich vergeben!<br><br>';
 	}

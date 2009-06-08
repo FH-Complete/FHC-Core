@@ -179,23 +179,23 @@ INSERT INTO tbl_zgvmaster VALUES (8, 'FH-Abschluss Dipl.-Ing. / Mag. / Master / 
 SET search_path = public, pg_catalog;
 
 --
--- Data for Name: tbl_rolle; Type: TABLE DATA; Schema: public; Owner: pam
+-- Data for Name: tbl_status; Type: TABLE DATA; Schema: public; Owner: pam
 --
 
-INSERT INTO tbl_rolle VALUES ('Interessent', NULL, NULL, 1);
-INSERT INTO tbl_rolle VALUES ('Bewerber', NULL, NULL, 2);
-INSERT INTO tbl_rolle VALUES ('Student', NULL, NULL, 3);
-INSERT INTO tbl_rolle VALUES ('Ausserordentlicher', NULL, NULL, 4);
-INSERT INTO tbl_rolle VALUES ('Abgewiesener', NULL, NULL, 5);
-INSERT INTO tbl_rolle VALUES ('Aufgenommener', NULL, NULL, 6);
-INSERT INTO tbl_rolle VALUES ('Wartender', NULL, NULL, 7);
-INSERT INTO tbl_rolle VALUES ('Abbrecher', NULL, NULL, 8);
-INSERT INTO tbl_rolle VALUES ('Unterbrecher', NULL, NULL, 9);
-INSERT INTO tbl_rolle VALUES ('Outgoing', NULL, NULL, 10);
-INSERT INTO tbl_rolle VALUES ('Incoming', NULL, NULL, 11);
-INSERT INTO tbl_rolle VALUES ('Praktikant', NULL, NULL, 12);
-INSERT INTO tbl_rolle VALUES ('Absolvent', NULL, NULL, 14);
-INSERT INTO tbl_rolle VALUES ('Diplomand', NULL, NULL, 13);
+INSERT INTO tbl_status VALUES ('Interessent', NULL, NULL, 1);
+INSERT INTO tbl_status VALUES ('Bewerber', NULL, NULL, 2);
+INSERT INTO tbl_status VALUES ('Student', NULL, NULL, 3);
+INSERT INTO tbl_status VALUES ('Ausserordentlicher', NULL, NULL, 4);
+INSERT INTO tbl_status VALUES ('Abgewiesener', NULL, NULL, 5);
+INSERT INTO tbl_status VALUES ('Aufgenommener', NULL, NULL, 6);
+INSERT INTO tbl_status VALUES ('Wartender', NULL, NULL, 7);
+INSERT INTO tbl_status VALUES ('Abbrecher', NULL, NULL, 8);
+INSERT INTO tbl_status VALUES ('Unterbrecher', NULL, NULL, 9);
+INSERT INTO tbl_status VALUES ('Outgoing', NULL, NULL, 10);
+INSERT INTO tbl_status VALUES ('Incoming', NULL, NULL, 11);
+INSERT INTO tbl_status VALUES ('Praktikant', NULL, NULL, 12);
+INSERT INTO tbl_status VALUES ('Absolvent', NULL, NULL, 14);
+INSERT INTO tbl_status VALUES ('Diplomand', NULL, NULL, 13);
 
 -- Lehrform
 

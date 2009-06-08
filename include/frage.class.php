@@ -66,7 +66,7 @@ class frage
 	public function frage($conn, $frage_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else

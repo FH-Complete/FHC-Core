@@ -1,7 +1,7 @@
 <?php
 	include('../../vilesci/config.inc.php');
 	header("Content-type: application/vnd.mozilla.xul+xml");
-	echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 ?>
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"

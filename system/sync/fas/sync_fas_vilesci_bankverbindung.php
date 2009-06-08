@@ -37,7 +37,7 @@ function validate($row)
 <html>
 <head>
 <title>Synchro - FAS -> Portal - Bankverbindung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -119,7 +119,7 @@ if($result = pg_query($conn_fas, $qry))
 								// insert, wenn datensatz noch nicht vorhanden
 								$bankverbindung->new=true;
 								$bankverbindung->person_id=$row1->person_portal;
-								$ausgabe="Bankverbindung eingefügt: Name '".$bankverbindung->name."', Typ '".$bankverbindung->typ."'.\n";
+								$ausgabe="Bankverbindung eingefÃ¼gt: Name '".$bankverbindung->name."', Typ '".$bankverbindung->typ."'.\n";
 							}
 						}
 					}
@@ -152,7 +152,7 @@ if($result = pg_query($conn_fas, $qry))
 
 
 //echo nl2br($text);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 echo nl2br("\n".$error_log);
 echo nl2br("\n".$ausgabe_all);
 if(strlen(trim($error_log))>0)

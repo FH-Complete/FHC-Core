@@ -81,7 +81,7 @@
 
 				if($news_obj->save())
 				{
-					echo '<script language="JavaScript">';
+					echo '<script language="JavaScript" type="text/javascript">';
 					echo "	document.location.href = 'pinboard_entry.php?course_id=$course_id&term_id=$term_id' + \"&message_sent=yes&changed=yes\";";
 					echo '</script>';
 				}
@@ -110,7 +110,7 @@
 
 				if($news_obj->save())
 				{
-					echo '<script language="JavaScript">';
+					echo '<script language="JavaScript" type="text/javascript">';
 					echo "	document.location.href = 'pinboard_entry.php?course_id=$course_id&term_id=$term_id' + \"&message_sent=yes\";";
 					echo '</script>';
 				}
@@ -133,10 +133,10 @@
 	}
 ?>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 
 	function focusFirstElement()
 	{
@@ -148,7 +148,7 @@
 
 </script>
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{

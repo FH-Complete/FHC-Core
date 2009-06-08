@@ -9,7 +9,8 @@
 	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	//Variablen laden
-	$error_msg.=loadVariables($conn,$REMOTE_USER);
+#gss	$error_msg.=loadVariables($conn,$REMOTE_USER);
+	$error_msg.=loadVariables($REMOTE_USER);
 
 	if ($type=='new')
 	{
@@ -44,7 +45,7 @@
 <html>
 <head>
 <title>Detail Studenten</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 

@@ -19,7 +19,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <body id="inhalt">
@@ -41,7 +41,7 @@
 	<tr>
 		<td width="3%">&nbsp;</td>
 			<?php
-				echo '<form method="POST" action="feedback.php?lvid='.$lvid.'" enctype="multipart/form-data">';
+				echo '<form accept-charset="UTF-8" method="POST" action="feedback.php?lvid='.$lvid.'" enctype="multipart/form-data">';
 			?>
 		<td width="97%">
 			<table class="tabcontent">

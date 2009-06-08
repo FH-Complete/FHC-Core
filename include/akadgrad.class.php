@@ -42,6 +42,7 @@ class akadgrad
 	function akadgrad($conn, $akadgrad_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -55,7 +56,7 @@ class akadgrad
 				return false;
 			}
 		}
-		
+*/		
 		if($akadgrad_id != null)
 			$this->load($akadgrad_id);
 	}

@@ -33,8 +33,8 @@ function validate($row)
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Schlüsseltyp</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Synchro - FAS -> Portal - SchlÃ¼sseltyp</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -47,7 +47,7 @@ $qry = "SELECT * FROM schluessel;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo nl2br("Schlüsseltyp Sync\n---------------------\n");
+	echo nl2br("SchlÃ¼sseltyp Sync\n---------------------\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
@@ -60,13 +60,13 @@ if($result = pg_query($conn_fas, $qry))
 		$betriebsmitteltyp->anzahl			=$row->anzahl==''?'0':$row->anzahl;
 		$betriebsmitteltyp->kaution			=$row->betrag==''?'0':$row->betrag;
 
-		if($row->name=='Gaderobenschlüssel')
+		if($row->name=='GaderobenschlÃ¼ssel')
 		{
 			$betriebsmitteltyp->betriebsmitteltyp='Gaderobe';
-		}elseif($row->name=='Generalschlüssel')
+		}elseif($row->name=='GeneralschlÃ¼ssel')
 		{
 			$betriebsmitteltyp->betriebsmitteltyp='Schluessel';
-		}elseif($row->name=='Schlüssel')
+		}elseif($row->name=='SchlÃ¼ssel')
 		{
 			$betriebsmitteltyp->betriebsmitteltyp='Schluessel';
 		}
@@ -85,7 +85,7 @@ if($result = pg_query($conn_fas, $qry))
 		else
 		{
 
-			//überprüfen, ob sync-eintrag schon vorhanden
+			//Ã¼berprÃ¼fen, ob sync-eintrag schon vorhanden
 			$qryz="SELECT * FROM sync.tbl_syncschluesseltyp WHERE fas_typ='$row->schluessel_pk' AND portal_typ='$betriebsmitteltyp->betriebsmitteltyp'";
 			if($resultz = pg_query($conn, $qryz))
 			{
@@ -104,8 +104,8 @@ if($result = pg_query($conn_fas, $qry))
 
 //echo nl2br($text);
 echo nl2br($error_log);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-$error_log.="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
+$error_log.="\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
 mail($adress, 'SYNC Schluesseltyp', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>

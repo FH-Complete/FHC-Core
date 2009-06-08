@@ -66,7 +66,7 @@ class studiengang
 	function studiengang($conn, $studiengang_kz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -77,7 +77,7 @@ class studiengang
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
-
+*/
 		if(is_numeric($studiengang_kz))
 			$this->load($studiengang_kz);
 		
@@ -223,10 +223,10 @@ class studiengang
 	 */
 	function checkvars()
 	{
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->kurzbz = str_replace("'",'´',$this->kurzbz);
-		$this->kurzbzlang = str_replace("'",'´',$this->kurzbzlang);
-		$this->english = str_replace("'",'´',$this->english);
+		$this->bezeichnung = str_replace("'",'Â´',$this->bezeichnung);
+		$this->kurzbz = str_replace("'",'Â´',$this->kurzbz);
+		$this->kurzbzlang = str_replace("'",'Â´',$this->kurzbzlang);
+		$this->english = str_replace("'",'Â´',$this->english);
 
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>128)

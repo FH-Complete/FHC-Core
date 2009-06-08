@@ -1,3 +1,4 @@
+@charset "utf-8"
 /* Allgemein */
 body
 {
@@ -61,7 +62,7 @@ iframe
 	z-index:1000;
 	overflow: auto;
 }
-/*Alle auﬂer IE 6*/
+/*Alle au√üer IE 6*/
 html>body #menue
 {
 	position:absolute;
@@ -74,7 +75,7 @@ html>body #menue
 	left:18%;
 	overflow: auto;	
 }
-/*Alle auﬂer IE 6*/
+/*Alle au√üer IE 6*/
 html>body #content
 {
 	position:absolute;
@@ -284,7 +285,7 @@ TABLE#tabterm
 td.ContentHeader
 {
 	background-color: #008381;
-	/*gr¸n*/
+	/*gr√ºn*/
 	font-weight: bold;
 	height: 15px;
 	font-size: x-small;
@@ -305,7 +306,7 @@ td.ContentHeader3
 }
 td.MarkLine
 {
-	background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiﬂ*/
+	background-color: #F2F2F2; /*wie #EEEEEE; also grau fast wei√ü*/
 }
 td.tdwidth10
 {
@@ -340,11 +341,11 @@ TR.liste
 }
 TR.liste0						
 {
-	background-color: #FFFFFF; /*weiﬂ*/
+	background-color: #FFFFFF; /*wei√ü*/
 }
 TR.liste1						
 {
-	background-color: #EEEEEE; /*grau fast weiﬂ*/
+	background-color: #EEEEEE; /*grau fast wei√ü*/
 }
 TR.tryellow
 {
@@ -376,7 +377,7 @@ TABLE#zeitsperren TD.feiertag
 }
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE /*grau fast weiﬂ*/
+	background-color: #EEEEEE /*grau fast wei√ü*/
 }
 
 /* Stundeplan */

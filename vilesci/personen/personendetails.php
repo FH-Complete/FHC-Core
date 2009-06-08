@@ -49,7 +49,7 @@ $studiengang->getAll('typ, kurzbz', false);
 echo '<html>
 	<head>
 		<title>PreInteressenten</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -165,7 +165,7 @@ if(count($preinteressent->result)>0)
 					<th>Anmerkung</th>
 					<th>AufmerksamDurch</th>
 					<th>Kontaktmedium (Woher)</th>
-					<th>Studiengänge</th>
+					<th>StudiengÃ€nge</th>
 					<th>Schule</th>
 				</tr>
 			</thead>
@@ -231,7 +231,7 @@ if(count($prestudent->result)>0)
 		{
 			if(pg_num_rows($result)>1)
 			{
-				$uid='ACHTUNG: Es gibt mehrere Studenteneinträge die auf diesen Prestudenten zeigen!';
+				$uid='ACHTUNG: Es gibt mehrere StudenteneintrÃ€ge die auf diesen Prestudenten zeigen!';
 			}
 			else 
 			{
@@ -246,7 +246,7 @@ if(count($prestudent->result)>0)
 		echo "<td>$gruppe</td>";
 		$prestudent1 = new prestudent($conn);
 		$prestudent1->getLastStatus($row->prestudent_id);	
-		echo "<td>$prestudent1->rolle_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
+		echo "<td>$prestudent1->status_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
 	}
 	echo '</tbody></table>';

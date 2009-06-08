@@ -97,13 +97,13 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Portal - Praxissemester</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
 
 //praxissemester
-//array mit Zähler studiengang_fk (fas) und Inhalt studiengang_kz (vilesci)
+//array mit ZÃ¤hler studiengang_fk (fas) und Inhalt studiengang_kz (vilesci)
 $qry="SELECT studiengang_kz, ext_id FROM public.tbl_studiengang WHERE ext_id IS NOT NULL;";
 if($result = pg_query($conn, $qry))
 {
@@ -139,7 +139,7 @@ if($result = pg_query($conn, $qry))
 		}
 	}
 }
-//array mit Zähler studiengang_kz und Inhalt Ausbildungssemester des Praxissemesters 
+//array mit ZÃ¤hler studiengang_kz und Inhalt Ausbildungssemester des Praxissemesters 
 $qry="SELECT studiengang_fk, semester, ausbildungssemester.name FROM ausbildungssemester WHERE ausbildungssemester.name='Praxissemester';";
 if($result = pg_query($conn_fas, $qry))
 {
@@ -174,7 +174,7 @@ $stg_praxissemester[336]='2';
 echo "<br>";
 var_dump($stg_fktokz);
 exit;*/
-//LVAs anlegen bzw. überprüfen
+//LVAs anlegen bzw. Ã¼berprÃ¼fen
 foreach ($stg_fktokz as $stg)
 {
 	if(isset($stg_praxissemester[$stg]))
@@ -214,14 +214,14 @@ foreach ($stg_fktokz as $stg)
 					"NULL);"; 
 					if($result = pg_query($conn, $qry))
 					{
-						echo "LVA 'PRAX' für Studiengang '".$stg."' angelegt!<BR>";
+						echo "LVA 'PRAX' fÃ¼r Studiengang '".$stg."' angelegt!<BR>";
 					}
 					else 
 					{
-						echo "LVA 'PRAX' für Studiengang '".$stg."' konnte nicht angelegt werden!<BR>";
+						echo "LVA 'PRAX' fÃ¼r Studiengang '".$stg."' konnte nicht angelegt werden!<BR>";
 					}
 			}
-			//else			echo "LVA 'PRAX' für Studiengang '".$stg."' vorhanden!<BR>";
+			//else			echo "LVA 'PRAX' fÃ¼r Studiengang '".$stg."' vorhanden!<BR>";
 		}
 		//echo $stg_praxissemester[$stg]."<br>";
 	}
@@ -266,7 +266,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		$projektarbeitstundensatz		=$row->kosten;
 		$projektarbeitgesamtstunden	=round($row->betreuungsstunden,4);
 		$projektarbeitthemenbereich	='';
-		$projektarbeitanmerkung		=substr($row->bemerkung,0,255);	//nur für testzwecke!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	
+		$projektarbeitanmerkung		=substr($row->bemerkung,0,255);	//nur fÃ¼r testzwecke!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	
 		//$projektarbeitupdateamum	='';
 		$projektarbeitupdatevon		="SYNC";
 		$projektarbeitinsertamum		=$row->insertamum;
@@ -1288,7 +1288,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										if($projektbetreuernew1)
 										{
 											$anzahl_pbb_insert++;
-											$ausgabe.="Praxissemesterbetreuer eingefügt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Praxissemesterbetreuer eingefÃ¼gt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}			
 										else 
 										{
@@ -1556,7 +1556,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											if($projektbetreuernew)
 											{
 												$anzahl_pbg_insert++;
-												$ausgabe.="Praxissemesterbegutachter eingefügt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+												$ausgabe.="Praxissemesterbegutachter eingefÃ¼gt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 											}			
 											else 
 											{
@@ -1678,7 +1678,7 @@ foreach($stg_nolva as $nolva)
 		$arr_nolva.=", ".$nolva;	
 	}
 }
-$error_log_prax.="Lehrveranstaltung 'PRAX' nicht vorhanden in den Studiengängen:\n'".$arr_nolva."' .\n";
+$error_log_prax.="Lehrveranstaltung 'PRAX' nicht vorhanden in den StudiengÃ¤ngen:\n'".$arr_nolva."' .\n";
 print_r($LVA_unbekannt_stg);
 echo "<br>";
 
@@ -1688,19 +1688,19 @@ echo nl2br("Praxissemestersynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['
 $error_log_fas="Sync Praxissemester\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8."\n------------------------\n";
 echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", (keine Semestereintragung: ".$semnull.", Student nicht gefunden: ".$studunbekannt.")\n"); 
 echo nl2br("Anzahl Praxissemester: ".$anzahl_quelle.", Ausbildungssemester nicht gefunden: ".$ausbsem_unbekannt.", LVA nicht gefunden: ".$LVA_unbekannt."\n");
-echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
-echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
-echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
-echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
+echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / EingefÃ¼gt: ".$anzahl_le_insert." / GeÃ¤ndert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
+echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / EingefÃ¼gt: ".$anzahl_pa_insert." / GeÃ¤ndert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
+echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / EingefÃ¼gt: ".$anzahl_pbb_insert." / GeÃ¤ndert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
+echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / EingefÃ¼gt: ".$anzahl_pbg_insert." / GeÃ¤ndert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all."<br>-----------<br>".$error_log_prax."<br><br>".$error_log1);
 
 mail($adress, 'SYNC Praxissemester von '.$_SERVER['HTTP_HOST'], 
 "Allgemeine Fehler: ".$anzahl_fehler.",  (keine Semestereintragung: ".$semnull.", Student nicht gefunden: ".$studunbekannt.")\nAnzahl Praxissemester: ".$anzahl_quelle.", Ausbildungssemester nicht gefunden: ".$ausbsem_unbekannt.", LVA nicht gefunden: ".$LVA_unbekannt.".\n".
-"Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
-"Projektarbeiten:     Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
-"Betreuer:            Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n".
-"Begutachter:         Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n".
+"Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / EingefÃ¼gt: ".$anzahl_le_insert." / GeÃ¤ndert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
+"Projektarbeiten:     Gesamt: ".$anzahl_pa_gesamt." / EingefÃ¼gt: ".$anzahl_pa_insert." / GeÃ¤ndert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
+"Betreuer:            Gesamt: ".$anzahl_pbb_gesamt." / EingefÃ¼gt: ".$anzahl_pbb_insert." / GeÃ¤ndert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n".
+"Begutachter:         Gesamt: ".$anzahl_pbg_gesamt." / EingefÃ¼gt: ".$anzahl_pbg_insert." / GeÃ¤ndert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n".
 $ausgabe_all,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC-Fehler Praxissemester  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");

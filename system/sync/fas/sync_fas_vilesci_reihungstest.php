@@ -44,7 +44,7 @@ function validate($row)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Reihungstest</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -144,14 +144,14 @@ if($result = pg_query($conn_fas, $qry))
 				{
 					if($reihungstest->new)
 					{
-						$ausgabe.="Reihungstest '$row->raum', '$row->datum' eingefügt!\n";
+						$ausgabe.="Reihungstest '$row->raum', '$row->datum' eingefÃ¼gt!\n";
 						$anzahl_eingefuegt++;
 					}
 					else
 					{
 						if($update)
 						{
-							$ausgabe.="Reihungstest geändert: ".$ausgabe_test." !\n";
+							$ausgabe.="Reihungstest geÃ¤ndert: ".$ausgabe_test." !\n";
 							$anzahl_update++;
 						}
 					}
@@ -167,11 +167,11 @@ if($result = pg_query($conn_fas, $qry))
 
 
 //echo nl2br($text);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler");
 echo nl2br("\n\n".$error_log);
 echo nl2br("\n\n".$ausgabe);
-//$ausgabe="\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n".$ausgabe;
-$ausgabe="Sync Reihungstest:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
+//$ausgabe="\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n".$ausgabe;
+$ausgabe="Sync Reihungstest:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler Reihungstest von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

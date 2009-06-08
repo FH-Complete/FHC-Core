@@ -45,7 +45,7 @@ class feedback
 	function feedback($conn, $feedback_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+		/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -56,7 +56,7 @@ class feedback
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+	*/
 		if($feedback_id!=null)
 			$this->load($feedback_id);
 	}

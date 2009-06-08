@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Stundenplan säubern</title>
+	<title>Stundenplan sÃ¤ubern</title>
 </head>
 <body>
 <h3>Stundenplan s&auml;ubern</h3>
@@ -16,7 +16,7 @@ $num_rows=mysql_num_rows($result);
 $num_fields=mysql_num_fields($result);
 $anz=0;
 
-// Tabelle für vergleiche vorbereiten
+// Tabelle fÃ¼r vergleiche vorbereiten
 for ($i=0; $i<$num_rows; $i++)
 {
 	$row=mysql_fetch_row($result);
@@ -32,7 +32,7 @@ for ($i=0; $i<$num_rows; $i++)
 	$stdplan_table[$i][1]=$help_str;
 }
 
-// Tabelle auf doppelte Einträge durchsuchen
+// Tabelle auf doppelte EintrÃ¤ge durchsuchen
 $equl=false;
 for ($i=1; $i<$num_rows; $i++)
 {
@@ -49,7 +49,7 @@ for ($i=1; $i<$num_rows; $i++)
 	else
 		$equl=false;
 }
-echo "$anz doppelte Einträge wurden gefunden und gelöscht.<br>$num_rows Einträge gesamt.";
+echo "$anz doppelte EintrÃ¤ge wurden gefunden und gelÃ¶scht.<br>$num_rows EintrÃ¤ge gesamt.";
 /*$foo = 0;
 for ($j=0; $j<$num_rows; $j++)
 {
@@ -69,6 +69,6 @@ for ($j=0; $j<$num_rows; $j++)
 </p>
 <hr>
 Erstellt am 28. Mai 2001 von <a href="mailto:humer@technikum-wien.at">Christian Humer</a><br>
-Letzte Änderung: 28. Mai 2001 von <a href="mailto:humer@technikum-wien.at">Christian Humer</a>
+Letzte Ã„nderung: 28. Mai 2001 von <a href="mailto:humer@technikum-wien.at">Christian Humer</a>
 </body>
 </html>

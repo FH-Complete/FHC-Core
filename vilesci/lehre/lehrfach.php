@@ -180,7 +180,7 @@ echo '
 <html>
 <head>
 <title>Lehrfach Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -407,7 +407,7 @@ if(!isset($_GET['type']))
 	if ($result_lehrfach!=0)
 	{
 		echo '
-		<h3>&Uuml;bersicht - '.pg_num_rows($result_lehrfach).' Einträge</h3>
+		<h3>&Uuml;bersicht - '.pg_num_rows($result_lehrfach).' EintrÃ¤ge</h3>
 		<table class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
 		<thead>';
 		

@@ -58,7 +58,7 @@ class pruefung
 	function pruefung($conn, $pruefung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -72,7 +72,7 @@ class pruefung
 				return false;
 			}
 		}
-
+*/
 		if($pruefung_id!=null)
 			$this->load($pruefung_id);
 	}

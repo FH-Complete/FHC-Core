@@ -167,7 +167,7 @@ class funktion
 
 		if($this->new)
 		{
-			//Pruefen ob funktion_kurzbz befüllt ist
+			//Pruefen ob funktion_kurzbz befÃ¼llt ist
 			if($this->funktion_kurzbz == '')
 			{
 				$this->errormsg = 'funktion_kurzbz darf nicht leer sein';

@@ -16,23 +16,23 @@
 		$result=pg_exec($conn, $sql_query);
 	}
 
-	// Daten für Lektorenauswahl
+	// Daten fÃ¼r Lektorenauswahl
 	$sql_query="SELECT id, nachname, vornamen, uid FROM lektor ORDER BY upper(nachname), vornamen, uid";
 	$result_lektor=pg_exec($conn, $sql_query);
 	if(!$result_lektor)
 		die (pg_errormessage($conn));
-	// Daten für Lehrfachauswahl
+	// Daten fÃ¼r Lehrfachauswahl
 	$sql_query="SELECT id, kurzbz, bezeichnung FROM lehrfach ORDER BY kurzbz";
 	$result_lehrfach=pg_exec($conn, $sql_query);
 	if(!$result_lehrfach)
 		die (pg_errormessage($conn));
-	// Daten für Studiengang
+	// Daten fÃ¼r Studiengang
 	$sql_query="SELECT id, kurzbz, bezeichnung FROM studiengang ORDER BY kurzbz";
 	$result_stg=pg_exec($conn, $sql_query);
 	if(!$result_stg)
 		die (pg_errormessage($conn));
 
-	// Daten für die Zuteilungen
+	// Daten fÃ¼r die Zuteilungen
 	if (!isset($order))
 		$order='upper(nachname), vornamen, uid';
 	$sql_query="SELECT lektorzuteilung.id, nachname, nachname, vornamen, uid, lehrfach.kurzbz AS lfkurzbz, studiengang.kurzbz AS stgkurzbz, semester";
@@ -47,7 +47,7 @@
 <html>
 <head>
 <title>Zuteilung der Lektoren</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <!--<link rel="stylesheet" href="../../include/styles.css" type="text/css"> -->
 <LINK rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>

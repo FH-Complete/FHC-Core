@@ -78,14 +78,14 @@
 ?>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Reservierungsliste</title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<script language="Javascript">
 	<!--
 	function printhelp()
 	{
-		alert('Erklärung\n'+
+		alert('ErklÃ¤rung\n'+
 			'LVNR: Interne FAS-Nummer der Lehrveranstaltung\n'+
 			'STG-S-V-G: Studiengang-Semester-Verband-Gruppe\n'+
 			'Gruppe: Spezialgruppen (Module, Projektgruppen, Spezialisierungsgruppen)\n'+

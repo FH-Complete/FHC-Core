@@ -7,13 +7,17 @@
 	//echo $sql_query."<br>";
 	$result=pg_exec($conn, $sql_query);
 	$num_rows=pg_numrows($result);
+
+$cfgBorder=1;
+$cfgBgcolorOne='liste0';
+$cfgBgcolorTwo='liste1';
 ?>
 
 <html>
 <head>
 <title>Reservierung Check Details</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<LINK rel="stylesheet" href="../../../include/styles.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<LINK rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 </head>
 <body>
 <H1>Mehrfachbelegungen in Reservierungen Detailansicht</H1>
@@ -31,9 +35,9 @@ if ($num_rows!=0)
 		$row=pg_fetch_row($result,$j);
 		$bgcolor = $cfgBgcolorOne;
 		$foo % 2  ? 0: $bgcolor = $cfgBgcolorTwo;
-		echo "<tr bgcolor=$bgcolor>";
+		echo '<tr class="'.$bgcolor.'">';
 	    for ($i=0; $i<$num_fields; $i++)
-			echo "<td bgcolor=$bgcolor>$row[$i]</td>";
+			echo "<td>$row[$i]&nbsp;</td>";
 		echo "<td><a href=\"res_check_delete.php?id=$row[0]\">Delete</a></td>";
 		echo "<td><a href=\"res_check_mail.php?id=$row[0]\">Mail&Delete</a></td>";
 

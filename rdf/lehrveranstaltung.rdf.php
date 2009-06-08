@@ -13,7 +13,7 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 // xml
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 include_once('../vilesci/config.inc.php');
 include_once('../include/functions.inc.php');

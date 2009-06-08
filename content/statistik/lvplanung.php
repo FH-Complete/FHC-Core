@@ -75,7 +75,7 @@ echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Lehreinheit</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <style>
@@ -197,7 +197,7 @@ if($result = pg_query($conn, $qry))
 				echo "<td align='right' style='border-top: 1px solid black; font-weight: bold;'>".sprintf('%.2f',$stunden_lv)."</td>";
 				echo '<td>&nbsp;</td>';
 				echo '<td>&nbsp;</td>';
-				echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." &euro;</td>";
+				echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." €</td>";
 				echo '<td>&nbsp;</td>';
 				echo '</tr>';
 				$gesamtkosten_lva +=$kosten_lv;
@@ -238,7 +238,7 @@ if($result = pg_query($conn, $qry))
 		echo "<td align='right'>$row->lektor_semesterstunden</td>";
 		echo "<td>$gruppen</td>";
 		echo "<td>$row->nachname $row->vorname</td>";
-		echo "<td align='right'>".number_format(($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden),2,',','.')." &euro;</td>";
+		echo "<td align='right'>".number_format(($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden),2,',','.')." €</td>";
 		echo '<td>&nbsp;</td>';
 		echo '</tr>';
 		$kosten_lv +=($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden);
@@ -253,8 +253,8 @@ if($result = pg_query($conn, $qry))
 	echo "<td align='right' style='border-top: 1px solid black; font-weight: bold;'>".sprintf('%.2f',$stunden_lv)."</td>";
 	echo '<td>&nbsp;</td>';
 	echo '<td>&nbsp;</td>';
-	echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." &euro;</td>";
-	echo '<td align="right"><b>'.number_format($gesamtkosten_lva,2,',','.').' &euro;</b></td>';
+	echo "<td align='right' style='border-top: 1px solid black; font-weight: bold'>".number_format($kosten_lv,2,',','.')." €</td>";
+	echo '<td align="right"><b>'.number_format($gesamtkosten_lva,2,',','.').' €</b></td>';
 	echo '</tr>';
 }
 
@@ -345,7 +345,7 @@ if($result = pg_query($conn, $qry))
 			$benutzer->load($row->student_uid);
 			echo "<td>$benutzer->nachname $benutzer->vorname</td>";
 			echo "<td>$row->nachname $row->vorname</td>";
-			echo "<td align='right'>".number_format(($row->stundensatz*$row->faktor*$row->stunden),2,',','.')." &euro;</td>";
+			echo "<td align='right'>".number_format(($row->stundensatz*$row->faktor*$row->stunden),2,',','.')." €</td>";
 			echo '<td>&nbsp;</td>';
 			echo '</tr>';
 			$gesamtkosten_betreuung +=($row->stundensatz*$row->faktor*$row->stunden);
@@ -360,8 +360,8 @@ if($result = pg_query($conn, $qry))
 		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format($stunden_betreuung,2)."</b></td>";
 		echo "<td>&nbsp;</td>";
 		echo "<td>&nbsp;</td>";
-		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format($gesamtkosten_betreuung,2,',','.')." &euro;</b></td>";
-		echo "<td align='right' ><b>".number_format($gesamtkosten_betreuung,2,',','.')." &euro;</b></td>";
+		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format($gesamtkosten_betreuung,2,',','.')." €</b></td>";
+		echo "<td align='right' ><b>".number_format($gesamtkosten_betreuung,2,',','.')." €</b></td>";
 		echo '</tr>';
 
 		echo '<tr>';
@@ -373,7 +373,7 @@ if($result = pg_query($conn, $qry))
 		echo "<td>&nbsp;</td>";
 		echo "<td>&nbsp;</td>";
 		echo "<td>&nbsp;</td>";
-		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format(($gesamtkosten_betreuung+$gesamtkosten_lva),2,',','.')." &euro;</b></td>";
+		echo "<td align='right' style='border-top: 1px solid black;'><b>".number_format(($gesamtkosten_betreuung+$gesamtkosten_lva),2,',','.')." €</b></td>";
 		echo '</tr>';
 	}
 }

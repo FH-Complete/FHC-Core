@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
+// header fÃ¼r no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -27,7 +27,7 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/vnd.mozilla.xul+xml");
 // xml
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 include('../vilesci/config.inc.php');
 

@@ -1481,7 +1481,7 @@ function StudentPrestudentRolleDelete()
 	if (tree.currentIndex==-1) return;
 
 	//markierte Rolle holen
-	var rolle_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-rolle_kurzbz', tree.currentIndex);
+	var status_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-status_kurzbz', tree.currentIndex);
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);	
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
@@ -1494,7 +1494,7 @@ function StudentPrestudentRolleDelete()
 
 		req.add('type', 'deleterolle');
 
-		req.add('rolle_kurzbz', rolle_kurzbz);
+		req.add('status_kurzbz', status_kurzbz);
 		req.add('prestudent_id', prestudent_id);
 		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 		req.add('ausbildungssemester', ausbildungssemester);
@@ -1530,12 +1530,12 @@ function StudentRolleBearbeiten()
 	if (tree.currentIndex==-1) return;
 
 	//Ausgewaehlte Nr holen
-	var rolle_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-rolle_kurzbz', tree.currentIndex);
+	var status_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-status_kurzbz', tree.currentIndex);
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);	
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
 
-	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&rolle_kurzbz='+rolle_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","chrome, status=no, width=500, height=300, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","chrome, status=no, width=500, height=300, centerscreen, resizable");
 }
 
 // ****
@@ -1546,9 +1546,9 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	prestudent_id = dialog.getElementById('student-rolle-textbox-prestudent_id').value;
 	if(studiensemester_old=='')
-		rolle_kurzbz = dialog.getElementById('student-rolle-menulist-rolle_kurzbz').value;
+		status_kurzbz = dialog.getElementById('student-rolle-menulist-status_kurzbz').value;
 	else
-		rolle_kurzbz = dialog.getElementById('student-rolle-textbox-rolle_kurzbz').value;
+		status_kurzbz = dialog.getElementById('student-rolle-textbox-status_kurzbz').value;
 	studiensemester_kurzbz = dialog.getElementById('student-rolle-menulist-studiensemester').value;
 	ausbildungssemester = dialog.getElementById('student-rolle-menulist-ausbildungssemester').value;
 	datum = dialog.getElementById('student-rolle-datum-datum').value;
@@ -1565,7 +1565,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 
 	req.add('type', 'saverolle');
 
-	req.add('rolle_kurzbz', rolle_kurzbz);
+	req.add('status_kurzbz', status_kurzbz);
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('studiensemester_old', studiensemester_old);
@@ -1749,7 +1749,7 @@ function StudentAddRolle(rolle, semester, studiensemester)
 		req.add('type', 'addrolle');
 
 		req.add('prestudent_id', paramList);
-		req.add('rolle_kurzbz', rolle);
+		req.add('status_kurzbz', rolle);
 		req.add('semester', semester);
 		if(typeof(studiensemester)!='unknown')
 			req.add('studiensemester_kurzbz', studiensemester);

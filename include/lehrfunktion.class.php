@@ -38,7 +38,7 @@ class lehrfunktion
 	function lehrfunktion($conn, $lehrfunktion_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -49,7 +49,7 @@ class lehrfunktion
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($lehrfunktion_kurzbz!=null)
 			$this->load($lehrfunktion_kurzbz);
 	}

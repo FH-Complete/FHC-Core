@@ -94,7 +94,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	if($result = pg_query($conn, $qry))
 	{
 		if(pg_num_rows($result)==0)
-			die('Sie haben keine Berechtigung für diese Seite');
+			die('Sie haben keine Berechtigung fÃ¼r diese Seite');
 	}
 	else 
 	{
@@ -153,7 +153,7 @@ function savenote($lvid, $student_uid, $note)
 		return $response;
 }
 
-// lvgesamtnote für studenten speichern
+// lvgesamtnote fÃ¼r studenten speichern
 if (isset($_REQUEST["submit"]))
 {
 	$lvid = $_REQUEST["lvid"];

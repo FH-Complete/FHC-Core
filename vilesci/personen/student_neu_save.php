@@ -58,7 +58,7 @@
 <html>
 <head>
 <title>Student Neu</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 
@@ -80,7 +80,7 @@
 
 <tr><td>Studiengang</td><td>
 <SELECT name="studiengang_kz">
-      <option value="-1">- auswählen -</option>
+      <option value="-1">- auswÃ¤hlen -</option>
       <?php
 		// Auswahl des Studiengangs
 		$stg=new studiengang($conn);

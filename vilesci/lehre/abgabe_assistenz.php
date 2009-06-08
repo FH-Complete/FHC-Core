@@ -22,8 +22,8 @@
  */
 /*******************************************************************************************************
  *				               abgabe_assistenz
- * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
- * 			            für Diplom- und Bachelorarbeiten
+ * 		abgabe_assistenz ist die AssistenzoberflÃ¤che des Abgabesystems 
+ * 			            fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../cis/config.inc.php');
@@ -54,7 +54,7 @@ $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+	die('Sie haben keine Berechtigung fÃ¼r diesen Studiengang');
 	
 $sql_query = "SELECT * 
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit  
@@ -142,11 +142,11 @@ else
 <html>
 <head>
 <title>Abgabesystem_Assistenzsicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 function confdel()
 {
 	if(confirm("Diesen Datensatz wirklick loeschen?"))

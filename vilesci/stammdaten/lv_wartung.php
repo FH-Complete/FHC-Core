@@ -139,7 +139,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$sql_query_upd1.="UPDATE campus.tbl_benutzerlvstudiensemester SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";
 		$sql_query_upd1.="UPDATE campus.tbl_feedback SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";
 		$sql_query_upd1.="UPDATE campus.tbl_lvgesamtnote SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";
-		//updateamum vergleichen - jüngeres Datum gewinnt
+		//updateamum vergleichen - jÃ¼ngeres Datum gewinnt
 		$qry1="SELECT updateamum FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
 		$qry2="SELECT updateamum FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
 		if($result1=pg_query($conn,$qry1))
@@ -158,7 +158,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 						}
 						else
 						{
-							//wenn lvinfo älter als die bestehende, wird sie gelöscht
+							//wenn lvinfo Ã¤lter als die bestehende, wird sie gelÃ¶scht
 							$sql_query_upd1.="DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
 						}
 					}
@@ -176,7 +176,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		}
 		else
 		{
-			$msg = "Die Änderung konnte nicht durchgeführt werden!";
+			$msg = "Die Ã„nderung konnte nicht durchgefÃ¼hrt werden!";
 			pg_query($conn,"ROLLBACK;");
 			$msg .= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
@@ -186,14 +186,14 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 }
 if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) || ($radio_1<0 || $radio_2<0))
 {
-		$msg="Es muß je ein Radio-Button pro Tabelle angeklickt werden";
+		$msg="Es muÃŸ je ein Radio-Button pro Tabelle angeklickt werden";
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
 <title>LV-Zusammenlegung</title>
@@ -215,7 +215,7 @@ $smax=$s[$stg_kz]->max_sem;
 	echo "<form name='form_table' action='lv_wartung.php?stg_kz=$stg_kz&semester=$semester&max=$smax&order_1=$order_1&order_2=$order_2' method='POST'>";
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
-		echo "<td valign='top'>Das wird gelöscht:";
+		echo "<td valign='top'>Das wird gelÃ¶scht:";
 
 	 //Tabelle 1
 	 echo "<table class='liste'><tr class='liste'>";

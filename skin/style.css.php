@@ -38,7 +38,7 @@ function jahresplan_check_mobile() {
     'cHTML', 'BlackBerry', 'Opera Mini',
     'Nokia'
   );
-  // Prüfen der Browserkennung
+  // PrÃ¼fen der Browserkennung
   for ($i=0; $i<count($agents); $i++) {
     if(isset($_SERVER["HTTP_USER_AGENT"]) && strpos($_SERVER["HTTP_USER_AGENT"], $agents[$i]) !== false)
       return true;

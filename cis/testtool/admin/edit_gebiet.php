@@ -40,7 +40,7 @@ echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -60,7 +60,7 @@ if(!$rechte->isBerechtigt('admin'))
 $gebiet = new gebiet($conn);
 $gebiet->getAll();
 
-echo '<a href="index.php?gebiet_id='.$gebiet_id.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
+echo '<a href="index.php?gebiet_id='.$gebiet_id.'" class="Item">ZurÃŒck zur Admin Seite</a><br /><br />';
 
 //Liste der Gebiete anzeigen
 echo '<form id="gebiet_form" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
@@ -148,9 +148,9 @@ if($gebiet_id!='')
 	echo '</tr><tr>';
 	echo '<td>Kategorien</td><td><input type="checkbox" name="kategorien" '.($gebiet->kategorien?'checked="checked"':'').'></td>';
 	echo '</tr><tr>';
-	echo '<td>Zufällige Fragereihenfolge</td><td><input type="checkbox" name="zufallfrage" '.($gebiet->zufallfrage?'checked="checked"':'').'></td>';
+	echo '<td>ZufÃ€llige Fragereihenfolge</td><td><input type="checkbox" name="zufallfrage" '.($gebiet->zufallfrage?'checked="checked"':'').'></td>';
 	echo '</tr><tr>';
-	echo '<td>Zufällige Vorschlagreihenfolge</td><td><input type="checkbox" name="zufallvorschlag" '.($gebiet->zufallvorschlag?'checked="checked"':'').'></td>';
+	echo '<td>ZufÃ€llige Vorschlagreihenfolge</td><td><input type="checkbox" name="zufallvorschlag" '.($gebiet->zufallvorschlag?'checked="checked"':'').'></td>';
 	echo '</tr><tr>';
 	echo '<td>Levelgleichverteilung</td><td><input type="checkbox" name="levelgleichverteilung" '.($gebiet->levelgleichverteilung?'checked="checked"':'').'></td>';
 	echo '</tr><tr>';

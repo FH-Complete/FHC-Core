@@ -40,7 +40,7 @@ $resturlaubstage = '0';
 $mehrarbeitsstunden = '0';
 $anspruch = '25';
 $zaehl=1;
-$tage=array();			//Array Tage für Kalenderanzeige
+$tage=array();			//Array Tage fÃ¼r Kalenderanzeige
 $hgfarbe=array_fill(0,44,'white'); 	//Array mit Hintegrundfarben der Kalenderfelder
 $datensatz=array_fill(0,44,0);
 $freigabevon=array();
@@ -48,7 +48,7 @@ $freigabeamum=array();
 $vertretung_uid=array();
 $erreichbarkeit_kurzbz=array();
 $monatsname = array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
-$jahre = array();			//Array Jahreszahlen für Auswahl (immer aktuelles Jahr und die 4 nächsten Jahre)
+$jahre = array();			//Array Jahreszahlen fÃ¼r Auswahl (immer aktuelles Jahr und die 4 nÃ¤chsten Jahre)
 $akette=array_fill(0,1,0);
 $ekette=array_fill(0,1,0);
 $links='';
@@ -152,7 +152,7 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 		$wjahr=$wjahr;
 	}
 }
-//Eintragung löschen
+//Eintragung lÃ¶schen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
 	//print_r($_GET['delete']);
@@ -237,7 +237,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				   {
 				   	$message.="Von ".date("d.m.Y", strtotime($akette[$i]))." bis ".date("d.m.Y", strtotime($ekette[$i]))."\n";
 				   }
-				   $message.="\nSie können diesen unter folgender Adresse freigeben:\n".
+				   $message.="\nSie kÃ¶nnen diesen unter folgender Adresse freigeben:\n".
 				   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".date("Y", strtotime($akette[0]));
 		$mail = new mail($to, 'vilesci@'.DOMAIN,'Freigabeansuchen Urlaub', $message);
 		if($mail->send())
@@ -356,20 +356,20 @@ $datum_obj = new datum();
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd"><html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="Javascript">
 function conf_del()
 {
-	return confirm('Wollen Sie diesen Eintrag wirklich löschen?');
+	return confirm('Wollen Sie diesen Eintrag wirklich lÃ¶schen?');
 }
 
 function checkval()
 {
 	if(document.getElementById('vertretung_uid').value=='')
 	{
-		alert('Bitte zuerst eine Vertretung auswählen');
+		alert('Bitte zuerst eine Vertretung auswÃ¤hlen');
 		return false;
 	}
 	else
@@ -443,11 +443,11 @@ $content_resturlaub.="<table><tr><td   nowrap><h3>Urlaub im Gesch&auml;ftsjahr $
 $content_resturlaub.="<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
 $content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td>";
 $content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td>";
-$content_resturlaub .="<td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+$content_resturlaub .="<td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem GeschÃ¤ftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen GeschÃ¤ftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfÃ¼gbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
 $content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
 $content_resturlaub.="</table>";
 
-//Formular Auswahl Monat und Jahr für Kalender
+//Formular Auswahl Monat und Jahr fÃ¼r Kalender
 echo '<table width="95%" align="center">';
 echo "<td class='tdvertical' align='left' colspan='2'>$content_resturlaub</td>";
 echo '</td></tr>';
@@ -616,7 +616,7 @@ for ($i=0;$i<6;$i++)
 				$content.='<b title="Vertretung: '.$vertretung_uid[$j+7*$i].' - erreichbar: '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';;
 				$k=$j+7*$i;
 				$content.="<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]' onclick='return conf_del()'>";
-				$content.='<img src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung löschen"></a></td>';
+				$content.='<img src="../../../skin/images/DeleteIcon.png" alt="loeschen" title="Eintragung lÃ¶schen"></a></td>';
 			}
 			elseif($hgfarbe[$j+7*$i]=='white')
 			{

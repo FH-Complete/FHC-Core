@@ -38,7 +38,7 @@
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
+       die('Fehler beim Ã¶ffnen der Datenbankverbindung');
 
     $senat=false;
     $short='';
@@ -171,7 +171,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <script language="Javascript">
 function show(id)
@@ -203,7 +203,7 @@ function show(id)
 
 		//Senatsbeschluesse duerfen nur die Mitarbeiter sehen
 		if(!check_lektor($user, $sql_conn))
-			die('<tr><td>Sie haben keine Berechtigung für diesen Bereich</td></tr>');
+			die('<tr><td>Sie haben keine Berechtigung fÃ¼r diesen Bereich</td></tr>');
 
 		echo '<tr><td>&nbsp;</td></tr>';
 		echo '<tr><td>';
@@ -594,16 +594,17 @@ function show(id)
 
 					$dir_empty = true;
 					$dest_dir = @dir($path);
-					while($entry = $dest_dir->read())
+					if(is_dir($path))
 					{
-						if($entry != "." && $entry != "..")
+						while($entry = $dest_dir->read())
 						{
-							$dir_empty = false;
-
-							break;
+							if($entry != "." && $entry != "..")
+							{
+								$dir_empty = false;
+								break;
+							}
 						}
 					}
-
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Lehrziele</a>';
@@ -632,15 +633,17 @@ function show(id)
 
 					}
 					$dest_dir = @dir($path);
-					while($entry = $dest_dir->read())
-					{
-						if($entry != "." && $entry != "..")
+					if(is_dir($path))
+					{					
+						while($entry = $dest_dir->read())
 						{
-							$dir_empty = false;
-							break;
+							if($entry != "." && $entry != "..")
+							{
+								$dir_empty = false;
+								break;
+							}
 						}
 					}
-
 					if(isset($dir_empty) && $dir_empty == false)
 					{
 						echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="'.$dest_dir->path.'/" class="Item" target="_blank">Allgemeiner Download</a>';

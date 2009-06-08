@@ -47,7 +47,7 @@ class benutzergruppe
 	function benutzergruppe($conn, $uid=null, $gruppe_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else 
@@ -58,7 +58,7 @@ class benutzergruppe
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+*/		
 		if($gruppe_kurzbz!=null && $uid!=null)
 			$this->load($uid, $gruppe_kurzbz);
 	}

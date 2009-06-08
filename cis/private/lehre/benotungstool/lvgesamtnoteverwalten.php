@@ -45,7 +45,7 @@ require_once('../../../../include/mail.class.php');
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <STYLE TYPE="text/css">
@@ -61,7 +61,7 @@ require_once('../../../../include/mail.class.php');
 }
 
 </STYLE>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -75,7 +75,7 @@ require_once('../../../../include/mail.class.php');
 	
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('Wollen Sie die markierten EintrÃ€ge wirklich lÃ¶schen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
 
 	function getTopOffset()
@@ -143,7 +143,7 @@ require_once('../../../../include/mail.class.php');
 		//wenn die Note gleich bleibt dann abbrechen
 		if 	(note == note_orig && note != "")
 		{
-			alert("Note unverändert!");
+			alert("Note unverÃ€ndert!");
 			return true;
 		}
 		else if ((note < 0) || (note > 5 && note != 8 && note != 7))
@@ -215,7 +215,7 @@ require_once('../../../../include/mail.class.php');
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
 	
-		str += "<tr><td colspan='2'><b>Prüfung für "+uid+" anlegen:</b></td></tr>";
+		str += "<tr><td colspan='2'><b>PrÃŒfung fÃŒr "+uid+" anlegen:</b></td></tr>";
 		str += "<tr><td>Datum:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [YYYY-MM-DD]</td>";
 		str += "</tr><tr><td>Note:</td>";
@@ -306,7 +306,7 @@ require_once('../../../../include/mail.class.php');
 					anlegendiv.style.visibility = "hidden";
 					//if (note == 9)
 					//	note = " ";
-					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
+					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='Ã€ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
                 }
                 else
          		{
@@ -358,7 +358,7 @@ require_once('../../../../include/mail.class.php');
 				}
 				catch(e)
 				{
-					alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
+					alert('Um den Import nutzen zu kÃ¶nnen mÃŒssen sie Ihre Sicherheitseinstellungen Ã€ndern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
 				}
 				var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
 				if (!clip) 
@@ -428,7 +428,7 @@ require_once('../../../../include/mail.class.php');
 		}
 		else
 		{
-			alert('Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die zwischenablage. Drücken sie danach diesen Knopf erneut um die Noten zu importieren');
+			alert('Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die zwischenablage. DrÃŒcken sie danach diesen Knopf erneut um die Noten zu importieren');
 		}
 	}
 
@@ -584,7 +584,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	if($result = pg_query($conn, $qry))
 	{
 		if(pg_num_rows($result)==0)
-			die('Sie haben keine Berechtigung für diese Seite');
+			die('Sie haben keine Berechtigung fÃŒr diese Seite');
 	}
 	else 
 	{
@@ -689,7 +689,7 @@ if(!isset($_GET['standalone']))
 }*/
 
 
-// lvgesamtnote für studenten speichern
+// lvgesamtnote fÃŒr studenten speichern
 if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 	
 	$jetzt = date("Y-m-d H:i:s");	
@@ -811,7 +811,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 }
 
 echo '<table width="100%"><tr><td>';
-echo "<h3><a href='javascript:window.history.back()'>Zurück</a></h3>";
+echo "<h3><a href='javascript:window.history.back()'>ZurÃŒck</a></h3>";
 echo '</td><td align="right">';
 echo '<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch (PDF)</a>';
 echo '</td></tr></table>';
@@ -820,7 +820,7 @@ echo '</td></tr></table>';
 echo "<h3>LV Gesamtnote verwalten</h3>";
 echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 
-// alle pruefungen für die LV holen
+// alle pruefungen fÃŒr die LV holen
 $studpruef_arr = array();
 $pr_all = new Pruefung($conn);
 if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
@@ -865,7 +865,7 @@ echo "
 				</form>
 				</td>
 				<td class='ContentHeader2'>Zeugnisnote</td>
-				<td class='ContentHeader2' colspan='2'>Nachprüfung</td>
+				<td class='ContentHeader2' colspan='2'>NachprÃŒfung</td>
 			</tr>
 			<tr>
 				<td colspan='9'>&nbsp;</td>
@@ -967,7 +967,7 @@ echo "
 					}
 					elseif(!$mdldata)
 					{
-						//den Error nur einmal anzeigen und nicht für jeden Studenten
+						//den Error nur einmal anzeigen und nicht fÃŒr jeden Studenten
 						if(!$errorshown)
 						{
 							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
@@ -1049,7 +1049,7 @@ echo "
 					$stylestr ="";
 				echo "<td".$stylestr." align='center'>".$znote."</td>";
 				
-				// prüfungen ///////////////////////////////////////////////////////////////////////////
+				// prÃŒfungen ///////////////////////////////////////////////////////////////////////////
 				//$pr = new pruefung($conn);
 				//$pr->getPruefungen($row_stud->uid, "Termin2", null);
 				//if (count($pr->result)>0)
@@ -1075,7 +1075,7 @@ echo "
 						
 						echo "<tr><td class='td_datum'>";
 						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
-						echo "<input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
+						echo "<input type='button' name='anlegen' value='Ã€ndern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
 						echo "</td></tr>";
 					}
 					echo "</table>";			

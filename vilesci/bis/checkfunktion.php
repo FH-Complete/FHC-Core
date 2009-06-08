@@ -51,7 +51,7 @@ foreach ($stg_obj->result as $stg)
 echo '<html>
 	<head>
 	<title>Check Funktion</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	</head>
 	<body class="Background_main">
@@ -62,7 +62,7 @@ $stsem = new studiensemester($conn);
 $stsemprev = $stsem->getPrevious();
 $stsemprevprev = $stsem->getBeforePrevious();
 
-echo "Generiere Funktionen für $stsemprevprev/$stsemprev<br>";
+echo "Generiere Funktionen fÃ¼r $stsemprevprev/$stsemprev<br>";
 
 $qry =  "SELECT tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehrveranstaltung.studiengang_kz, sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semstd
 		FROM lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung

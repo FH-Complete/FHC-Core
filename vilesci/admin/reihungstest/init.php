@@ -13,7 +13,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=5;	//Persönlichkeit
+				$reihung[7]=5;	//PersÃ¶nlichkeit
 				$reihung[8]=6;	//Englisch
 				$reihung[10]=0;	//Physik
 				break;
@@ -23,7 +23,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=5;	//Persönlichkeit
+				$reihung[7]=5;	//PersÃ¶nlichkeit
 				$reihung[8]=6;	//Englisch
 				$reihung[10]=0;	//Physik
 				break;
@@ -33,7 +33,7 @@
 			$reihung[3]=2;	//Funktionen
 			$reihung[4]=4;	//Schlussfolgerungen
 			$reihung[6]=0;	//Grundlagen der Elektrotechnik
-			$reihung[7]=0;	//Persönlichkeit
+			$reihung[7]=0;	//PersÃ¶nlichkeit
 			$reihung[8]=5;	//Englisch
 			$reihung[10]=0;	//Physik
 			break;
@@ -43,7 +43,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=5;	//Persönlichkeit
+				$reihung[7]=5;	//PersÃ¶nlichkeit
 				$reihung[8]=6;	//Englisch
 				$reihung[10]=0;	//Physik
 				break;
@@ -53,7 +53,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=6;	//Persönlichkeit
+				$reihung[7]=6;	//PersÃ¶nlichkeit
 				$reihung[8]=5;	//Englisch
 				$reihung[10]=7;	//Physik
 				break;
@@ -63,7 +63,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=5;	//Persönlichkeit
+				$reihung[7]=5;	//PersÃ¶nlichkeit
 				$reihung[8]=6;	//Englisch
 				$reihung[10]=0;	//Physik
 				break;
@@ -73,7 +73,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=5;	//Persönlichkeit
+				$reihung[7]=5;	//PersÃ¶nlichkeit
 				$reihung[8]=6;	//Englisch
 				$reihung[10]=0;	//Physik
 				break;
@@ -83,7 +83,7 @@
 				$reihung[3]=2;	//Funktionen
 				$reihung[4]=4;	//Schlussfolgerungen
 				$reihung[6]=0;	//Grundlagen der Elektrotechnik
-				$reihung[7]=0;	//Persönlichkeit
+				$reihung[7]=0;	//PersÃ¶nlichkeit
 				$reihung[8]=5;	//Englisch
 				$reihung[10]=6;	//Physik
 				break;
@@ -93,7 +93,7 @@
 			$reihung[3]=2;	//Funktionen
 			$reihung[4]=4;	//Schlussfolgerungen
 			$reihung[6]=0;	//Grundlagen der Elektrotechnik
-			$reihung[7]=5;	//Persönlichkeit
+			$reihung[7]=5;	//PersÃ¶nlichkeit
 			$reihung[8]=6;	//Englisch
 			$reihung[10]=7;	//Physik
 			break;
@@ -103,7 +103,7 @@
 			$reihung[3]=0;	//Funktionen
 			$reihung[4]=1;	//Schlussfolgerungen
 			$reihung[6]=0;	//Grundlagen der Elektrotechnik
-			$reihung[7]=0;	//Persönlichkeit
+			$reihung[7]=0;	//PersÃ¶nlichkeit
 			$reihung[8]=3;	//Englisch
 			$reihung[10]=4;	//Physik
 			break;

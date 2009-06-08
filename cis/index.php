@@ -27,7 +27,7 @@ require_once('config.inc.php');
 <html>
 <head>
 	<title>CIS - <?php echo CAMPUS_NAME; ?></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
@@ -63,7 +63,7 @@ require_once('config.inc.php');
   	</frameset>
 	<noframes>
 		<body>
-		<p>Diese Seite verwendet Frames. Frames werden von Ihrem Browser aber nicht	unterstützt.</p>
+		<p>Diese Seite verwendet Frames. Frames werden von Ihrem Browser aber nicht	unterstÃ¼tzt.</p>
 		</body>
 	</noframes>
 </frameset> -->

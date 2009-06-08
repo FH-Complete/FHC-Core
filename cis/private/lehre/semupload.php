@@ -42,17 +42,17 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 
 /****************************************************
  * @brief Zeigt eine Sicherheitsabfrage ob die Datei
- * 		  wirklich gelöscht werden soll
+ * 		  wirklich gelÃ¶scht werden soll
  ****************************************************/
 function ConfirmFile(handle)
 {
-	return confirm('Wollen Sie die ausgewählten Dateien wirklich löschen? Dieser Vorgang ist unwiderruflich!');
+	return confirm('Wollen Sie die ausgewÃ¤hlten Dateien wirklich lÃ¶schen? Dieser Vorgang ist unwiderruflich!');
 }
 
 </script>
@@ -74,7 +74,7 @@ function ConfirmFile(handle)
 
 
 	if(!$is_lector)
-		die('<tr><td class="tdwidth10">&nbsp;</td><td>Sie haben keine Berechtigung für diesen Bereich</td></tr>');
+		die('<tr><td class="tdwidth10">&nbsp;</td><td>Sie haben keine Berechtigung fÃ¼r diesen Bereich</td></tr>');
 
 	echo "<tr><td class='tdwidth10'>&nbsp;</td><td>";
 	if(isset($_POST['inhalt']))
@@ -87,7 +87,7 @@ function ConfirmFile(handle)
 				{
 					writeCISlog('DELETE', "rm -r '$openpath$inhalt'");
 					exec("rm -r '$openpath$inhalt'");
-					echo "<center>Datei erfolgreich gelöscht</center>";
+					echo "<center>Datei erfolgreich gelÃ¶scht</center>";
 				}
 				else
 				{
@@ -102,7 +102,7 @@ function ConfirmFile(handle)
 		}
 		else
 		{
-			echo "<center>Bitte zuerst eine Datei auswählen</center>";
+			echo "<center>Bitte zuerst eine Datei auswÃ¤hlen</center>";
 		}
 	}
 
@@ -132,7 +132,7 @@ function ConfirmFile(handle)
 
 	echo "</tr></td>";
 
-	echo "<tr><td class='tdwidth10'>&nbsp;</td><td><form name=\"form1\"  method=\"POST\" action=\"semupload.php?lvid=".$lvid."\"  onSubmit=\"return ConfirmFile(this);\">";
+	echo "<tr><td class='tdwidth10'>&nbsp;</td><td><form accept-charset="UTF-8" name=\"form1\"  method=\"POST\" action=\"semupload.php?lvid=".$lvid."\"  onSubmit=\"return ConfirmFile(this);\">";
 	echo "<select name=\"inhalt\" size=5>";
 	echo "<option selected>____Ordnerinhalt____</option>";
 	//Inhalt des Semesterplan Ordners Auslesen
@@ -146,11 +146,11 @@ function ConfirmFile(handle)
 		}
 	}
 	echo "</select>";
-	echo "<input type=\"submit\" value=\"Datei Löschen\">";
+	echo "<input type=\"submit\" value=\"Datei LÃ¶schen\">";
 	echo "</form></td><td>";
 
     //FileAuswahlfeld
-	echo '<tr><td class="tdwidth10">&nbsp;</td><td><br><form enctype="multipart/form-data" method="POST" action="semupload.php?lvid='.$lvid.'">';
+	echo '<tr><td class="tdwidth10">&nbsp;</td><td><br><form accept-charset="UTF-8" enctype="multipart/form-data" method="POST" action="semupload.php?lvid='.$lvid.'">';
 	echo ' <input type="file" name="userfile" size="30">';
 	echo ' <input type="submit" name="upload" value="Upload">';
 	echo '</form></td><td>';

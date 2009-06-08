@@ -53,7 +53,7 @@ class resturlaub
 	function resturlaub($conn, $uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -71,7 +71,7 @@ class resturlaub
 				return false;
 			}
 		}
-		
+*/		
 		if($uid!=null)
 			$this->load($uid);
 

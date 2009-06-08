@@ -83,10 +83,10 @@ if(isset($_GET['person_id']))
 	$benutzer->load($user);
 		
 	if($benutzer->person_id!=$_GET['person_id'])
-		die('Sie haben keine Berechtigung für diese Seite');
+		die('Sie haben keine Berechtigung fÃ¼r diese Seite');
 }
 else 
-	die('Fehler bei der Parameterübergabe');
+	die('Fehler bei der ParameterÃ¼bergabe');
 
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
@@ -192,8 +192,8 @@ if(isset($_POST['submitbild']))
 	}
 }
 	
-echo "	Bitte beachten Sie, dass derzeit nur Bilder im JPG Format mit einer Maximalgröße von 8MB hochgeladen werden können!<br>
-		<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
+echo "	Bitte beachten Sie, dass derzeit nur Bilder im JPG Format mit einer MaximalgrÃ¶ÃŸe von 8MB hochgeladen werden kÃ¶nnen!<br>
+		<form accept-charset='UTF-8' method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
 		Bild: <input type='file' name='bild' />
 		<input type='submit' name='submitbild' value='Upload' />
 		</form>

@@ -1,6 +1,6 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
-echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../vilesci/config.inc.php');
 require_once('../include/berechtigung.class.php');
 require_once('../include/functions.inc.php');

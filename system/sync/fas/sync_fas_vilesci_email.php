@@ -10,7 +10,7 @@
 //*
 //* Synchronisiert EMaildatensaetze von FAS DB in VILESCI DB
 //*
-//*benötigt: tbl_kontakttyp, tbl_syncperson
+//*benÃ¶tigt: tbl_kontakttyp, tbl_syncperson
 
 require_once('../../../vilesci/config.inc.php');
 require_once('../../../include/kontakt.class.php');
@@ -40,7 +40,7 @@ function validate($row)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - E-Mail</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -168,14 +168,14 @@ if($result = pg_query($conn_fas, $qry))
 				{
 					if($kontakt->new)
 					{
-						$ausgabe.="E-Mail $kontakt->kontakt eingefügt!\n";
+						$ausgabe.="E-Mail $kontakt->kontakt eingefÃ¼gt!\n";
 						$anzahl_eingefuegt++;
 					}
 					else 
 					{
 						if($update)
 						{
-							$ausgabe.="E-Mail $kontakt->kontakt geändert: ".$ausgabe_email." !\n";
+							$ausgabe.="E-Mail $kontakt->kontakt geÃ¤ndert: ".$ausgabe_email." !\n";
 							$anzahl_update++;
 						}
 					}
@@ -190,9 +190,9 @@ echo nl2br("Emailsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
-echo nl2br("\n\nE-Mailsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
+echo nl2br("\n\nE-Mailsync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler");
 echo nl2br("\n".$ausgabe);
-$ausgabe="E-Mailsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
+$ausgabe="E-Mailsync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler Email von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

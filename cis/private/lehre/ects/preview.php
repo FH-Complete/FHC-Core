@@ -39,7 +39,7 @@
 <html>
 <head>
 <title>ECTS - European Course Credit Transfer Systems (ECTS)</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" type="text/css" rel="stylesheet" />
 </head>
 <body>

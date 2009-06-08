@@ -23,7 +23,7 @@ $i=0;
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
 <title>Lehrfachpflege</title>
@@ -31,7 +31,7 @@ $i=0;
 <body>
 
 <H1>Lehrfachpflege</h1>
-<H3>Lehreinheiten mit nicht aktiven Lehrfächern</H3>
+<H3>Lehreinheiten mit nicht aktiven LehrfÃ¤chern</H3>
 <?php
 if(isset($_GET['lf_id']))
 {
@@ -81,8 +81,8 @@ $qry="SELECT tbl_lehrveranstaltung.bezeichnung as lvbez, tbl_lehrveranstaltung.k
 
 if($result = pg_query($conn, $qry))
 {
-	echo "<br>Anzahl der Datensätze: ".pg_num_rows($result);
-	echo "<table class='liste'><tr><th>ID</th><th>LV-Kürzel</th><th>LV-Bezeichnung</th><th>Stg-Kz</th><th>Sem.</th><th>LF-Kürzel</th><th>LF-Bezeichnung</th><th>Lehrfach-Auswahl</th><th></th></tr>";
+	echo "<br>Anzahl der DatensÃ¤tze: ".pg_num_rows($result);
+	echo "<table class='liste'><tr><th>ID</th><th>LV-KÃ¼rzel</th><th>LV-Bezeichnung</th><th>Stg-Kz</th><th>Sem.</th><th>LF-KÃ¼rzel</th><th>LF-Bezeichnung</th><th>Lehrfach-Auswahl</th><th></th></tr>";
 	while($row = pg_fetch_object($result))
 	{
 		$i++;

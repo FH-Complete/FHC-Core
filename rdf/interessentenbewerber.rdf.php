@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
+// header fÃ¼r no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -162,7 +162,7 @@ function DrawInteressent($row)
 				<PRESTD:punkte><![CDATA['.$row->punkte.']]></PRESTD:punkte>
 				<PRESTD:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></PRESTD:bismelden>
 				<PRESTD:anmerkung><![CDATA['.$row->anmerkung.']]></PRESTD:anmerkung>
-				<PRESTD:status><![CDATA['.$ps->rolle_kurzbz.']]></PRESTD:status>
+				<PRESTD:status><![CDATA['.$ps->status_kurzbz.']]></PRESTD:status>
 	      	</RDF:Description>
 	      </RDF:li>
 	      ';

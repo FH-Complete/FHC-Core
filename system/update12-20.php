@@ -34,27 +34,27 @@ if (!$conn = pg_pconnect('host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' u
 echo '<H1>DB-Updates!</H1>';
 echo '<H2>Version 1.2 &rarr; 2.0</H2>';
 
-// **************** lehre.tbl_prestudentrolle -> tbl_prestudentstatus ************************
-if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_rolle LIMIT 1;"))
+// **************** lehre.tbl_prestudentstatus -> tbl_prestudentstatus ************************
+if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_status LIMIT 1;"))
 {
-	$qry = "ALTER TABLE public.tbl_rolle RENAME TO tbl_status;
-			ALTER TABLE public.tbl_prestudentrolle RENAME TO tbl_prestudentstatus;
-			ALTER TABLE public.tbl_status RENAME COLUMN rolle_kurzbz TO status_kurzbz;
-			ALTER TABLE public.tbl_prestudentstatus RENAME COLUMN rolle_kurzbz TO status_kurzbz;
-			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_status' WHERE conname='pk_tbl_rolle';
+	$qry = "ALTER TABLE public.tbl_status RENAME TO tbl_status;
+			ALTER TABLE public.tbl_prestudentstatus RENAME TO tbl_prestudentstatus;
+			ALTER TABLE public.tbl_status RENAME COLUMN status_kurzbz TO status_kurzbz;
+			ALTER TABLE public.tbl_prestudentstatus RENAME COLUMN status_kurzbz TO status_kurzbz;
+			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_status' WHERE conname='pk_tbl_status';
 			UPDATE pg_catalog.pg_constraint SET conname='orgform_prestudentstatus' WHERE conname='orgform_prestudentrolle';
-			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_prestudentstatus' WHERE conname='pk_tbl_prestudentrolle';
+			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_prestudentstatus' WHERE conname='pk_tbl_prestudentstatus';
 			UPDATE pg_catalog.pg_constraint SET conname='prestudent_prestudentstatus' WHERE conname='prestudent_prestudentrolle';
 			UPDATE pg_catalog.pg_constraint SET conname='status_prestudentstatus' WHERE conname='rolle_prestudentrolle';
 			UPDATE pg_catalog.pg_constraint SET conname='studiensemester_prestudentstatus' WHERE conname='studiensemester_prestudentrolle';
 			";
 
 	if(!pg_query($conn, $qry))
-		echo '<strong>public.tbl_rolle: '.pg_last_error($conn).' </strong><br>';
+		echo '<strong>public.tbl_status: '.pg_last_error($conn).' </strong><br>';
 	else
-		echo '	public.tbl_rolle: Umbenannt auf tbl_status!<br>
+		echo '	public.tbl_status: Umbenannt auf tbl_status!<br>
 				constrains umbenannt
-				public.tbl_prestudentrolle: Umbenannt auf tbl_prestudentstatus!<br>
+				public.tbl_prestudentstatus: Umbenannt auf tbl_prestudentstatus!<br>
 				constrains umbenannt';
 }
 
@@ -113,7 +113,7 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
  				benutzerberechtigung_id serial NOT NULL,
  				uid Character varying(16),
  				funktion_kurzbz Character varying(16),
- 				rolle_kurzbz Character varying(32),
+ 				status_kurzbz Character varying(32),
  				berechtigung_kurzbz Character varying(16),
  				art Character varying(5) DEFAULT 'r'::character varying NOT NULL,
  				oe_kurzbz Character varying(32),
@@ -141,26 +141,26 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 			WITH (OIDS=FALSE);
 			ALTER TABLE system.tbl_berechtigung ADD CONSTRAINT pk_tbl_berechtigung PRIMARY KEY (berechtigung_kurzbz);
 			
-			CREATE TABLE system.tbl_rolle
+			CREATE TABLE system.tbl_status
 			(
- 				rolle_kurzbz Character varying(32) NOT NULL,
+ 				status_kurzbz Character varying(32) NOT NULL,
  				beschreibung Character varying(256)
 			) WITH (OIDS=FALSE);
 			
-			ALTER TABLE system.tbl_rolle ADD CONSTRAINT pk_tbl_rolle PRIMARY KEY (rolle_kurzbz);
+			ALTER TABLE system.tbl_status ADD CONSTRAINT pk_tbl_status PRIMARY KEY (status_kurzbz);
 			
-			CREATE TABLE system.tbl_rolleberechtigung
+			CREATE TABLE system.tbl_statusberechtigung
 			(
  				berechtigung_kurzbz Character varying(16) NOT NULL,
- 				rolle_kurzbz Character varying(32) NOT NULL
+ 				status_kurzbz Character varying(32) NOT NULL
 			)
 			WITH (OIDS=FALSE);
 			
-			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT pk_tbl_rolleberechtigung PRIMARY KEY (berechtigung_kurzbz,rolle_kurzbz);
-			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_statusberechtigung ADD CONSTRAINT pk_tbl_statusberechtigung PRIMARY KEY (berechtigung_kurzbz,status_kurzbz);
+			ALTER TABLE system.tbl_statusberechtigung ADD CONSTRAINT rolleberechtigung_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_statusberechtigung ADD CONSTRAINT rolleberechtigung_rolle FOREIGN KEY (status_kurzbz) REFERENCES system.tbl_status (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			
-			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (status_kurzbz) REFERENCES system.tbl_status (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_studienseemster FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -168,13 +168,13 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 
 			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP ".DB_CIS_USER_GROUP.";
 			GRANT SELECT ON system.tbl_berechtigung TO GROUP ".DB_CIS_USER_GROUP.";
-			GRANT SELECT ON system.tbl_rolle TO GROUP ".DB_CIS_USER_GROUP.";
-			GRANT SELECT ON system.tbl_rolleberechtigung TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_status TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_statusberechtigung TO GROUP ".DB_CIS_USER_GROUP.";
 			
 			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_benutzerrolle TO GROUP ".DB_FAS_USER_GROUP.";
 			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_berechtigung TO GROUP ".DB_FAS_USER_GROUP.";
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolle TO GROUP ".DB_FAS_USER_GROUP.";
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolleberechtigung TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_status TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_statusberechtigung TO GROUP ".DB_FAS_USER_GROUP.";
 			";
 	
 	if(!pg_query($conn, $qry))

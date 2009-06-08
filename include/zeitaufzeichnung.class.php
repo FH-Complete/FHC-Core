@@ -60,7 +60,7 @@ class zeitaufzeichnung
 	function zeitaufzeichnung($conn, $zeitaufzeichnung_id=null,$unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -74,7 +74,7 @@ class zeitaufzeichnung
 				return false;
 			}
 		}
-
+*/
 		if($zeitaufzeichnung_id != null)
 			$this->load($zeitaufzeichnung_id);
 	}

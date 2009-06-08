@@ -41,7 +41,7 @@
 	$rechte->getBerechtigungen($user);
 	
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('preinteressent') && !$rechte->isBerechtigt('assistenz'))
-		die('Sie haben keine Berechtigung für diese Seite');
+		die('Sie haben keine Berechtigung fÃŒr diese Seite');
 	
 	$htmlstr = '';
 	$errorstr = '';
@@ -193,7 +193,7 @@
 <html>
 <head>
 <title>Firma - Details</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
@@ -263,16 +263,16 @@ function confdel()
 	echo "</tr><tr>\n";
 		
 	echo "		<td>EMail: </td>";
-	echo "		<td><input type='text' name='email' value='".htmlentities($firma->email)."' size='40' maxlength='128' /></td>\n";
+	echo "		<td><input type='text' name='email' value='".$firma->email."' size='40' maxlength='128' /></td>\n";
 	echo "		<td>Telefon: </td>";
-	echo "		<td><input type='text' name='telefon' value='".htmlentities($firma->telefon)."' maxlength='32' /></td>\n";
+	echo "		<td><input type='text' name='telefon' value='".$firma->telefon."' maxlength='32' /></td>\n";
 	echo "		<td>Fax: </td>";
-	echo "		<td><input type='text' name='fax' value='".htmlentities($firma->fax)."' maxlength='32' /></td>\n";
+	echo "		<td><input type='text' name='fax' value='".$firma->fax."' maxlength='32' /></td>\n";
 	echo "		<td>Adresse (alt): </td>";
-	echo "		<td><input type='text' name='adresse' value='".htmlentities($firma->adresse)."' maxlength='256'></td>\n";
+	echo "		<td><input type='text' name='adresse' value='".$firma->adresse."' maxlength='256'></td>\n";
 	echo "</tr><tr valign='top'>";
 	echo "		<td>Anmerkung: </td>";
-	echo "		<td colspan='5'><textarea style='width:100%' name='anmerkung'/>".htmlentities($firma->anmerkung)."</textarea></td>\n";
+	echo "		<td colspan='5'><textarea style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
 	echo "		<td></td><td valign='bottom'><input type='submit' name='save' value='speichern'></td>\n";
 	echo "	</tr></table>\n";
 	echo "</form>\n";

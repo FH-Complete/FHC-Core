@@ -47,8 +47,7 @@ class zeitwunsch
 	function zeitwunsch($conn, $mitarbeiter_uid=null, $tag=null, $stunde=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
-		// Encoding
+/*		
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -59,7 +58,7 @@ class zeitwunsch
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		// ggf Mitarbeiter laden
 		if($mitarbeiter_uid != null && $tag!=null && $stunde!=null)
 			$this->load($mitarbeiter_uid, $tag, $stunde);

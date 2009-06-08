@@ -65,7 +65,7 @@ if ((isset($_GET['person2']) || isset($_POST['person2']))&&(isset($_GET['person1
 		}
 		else
 		{
-			$msg = "Die Änderung konnte nicht durchgeführt werden!";
+			$msg = "Die Ã„nderung konnte nicht durchgefÃ¼hrt werden!";
 			pg_query($conn,"ROLLBACK;");
 			$msg.= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
@@ -76,10 +76,10 @@ if ((isset($_GET['person2']) || isset($_POST['person2']))&&(isset($_GET['person1
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
-<title>Personen-Auflistung von Mehrfacheinträgen</title>
+<title>Personen-Auflistung von MehrfacheintrÃ¤gen</title>
 </head>
 <body>
 

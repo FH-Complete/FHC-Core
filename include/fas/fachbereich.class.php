@@ -26,12 +26,14 @@ class fachbereich
 	function fachbereich($conn, $fachb_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($fachb_id != null)
 			$this->load($fachb_id);
 	}

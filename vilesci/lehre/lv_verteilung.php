@@ -16,7 +16,7 @@
 	//echo $sql_query."<br>";
 	$result=pg_exec($conn, $sql_query);
 	$num_rows=pg_numrows($result);
-	// Daten in Array übernehmen
+	// Daten in Array Ã¼bernehmen
 	for ($i=0;$i<$num_rows;$i++) 
 	{
 		$row=pg_fetch_object ($result, $i);
@@ -32,7 +32,7 @@
 <html>
 <head>
 <title><?PHP echo $stg_bez; ?> - Lehrfachverteilung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <H1><?PHP echo $stg_bez; ?> - &Uuml;berblick des Stundenplans</H1>

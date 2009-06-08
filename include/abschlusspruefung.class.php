@@ -55,6 +55,7 @@ class abschlusspruefung
 	function abschlusspruefung($conn, $abschlusspruefung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -68,7 +69,7 @@ class abschlusspruefung
 				return false;
 			}
 		}
-		
+*/		
 		if($abschlusspruefung_id!= null)
 			$this->load($abschlusspruefung_id);
 	}

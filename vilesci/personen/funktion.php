@@ -7,7 +7,7 @@ require_once('../config.inc.php');
 $conn=pg_connect(CONN_STRING);
 if (isset($_POST['type']) && $_POST['type']=='save')
 {
-	//Einfügen in die Datenbank
+	//EinfÃ¼gen in die Datenbank
 	$sql_query="INSERT INTO public.tbl_funktion (beschreibung, funktion_kurzbz) VALUES ('".$_POST['bezeichnung']."', '".$_POST['kurzbz']."')";
 	$result=pg_query($conn, $sql_query);
 	if(!$result)
@@ -22,7 +22,7 @@ if(!$result_funktion)
 <html>
 <head>
 	<title>Funktionen</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 

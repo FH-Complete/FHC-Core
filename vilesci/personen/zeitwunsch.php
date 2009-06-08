@@ -1,7 +1,7 @@
 <?php
 	/**
 	 *	kopiert von stdplan/profile/zeitwuensche.php mit dem Unterschied,
-	 *  dass der User hier parametrisiert ist + Speichern läuft hier über
+	 *  dass der User hier parametrisiert ist + Speichern lÃ¤uft hier Ã¼ber
 	 *  POST statt GET - ist aber Geschmacksache
 	 *
 	 */
@@ -97,7 +97,7 @@
 <html>
 <head>
 <title>Profil</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 

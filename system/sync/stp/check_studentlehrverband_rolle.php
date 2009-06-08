@@ -19,10 +19,10 @@ $text='';
 
 //Alle Studenten mit Studiensemester der Rolle holen
 $qry = "SELECT 
-			distinct student_uid, tbl_prestudent.prestudent_id, tbl_prestudentrolle.studiensemester_kurzbz, tbl_student.studiengang_kz
+			distinct student_uid, tbl_prestudent.prestudent_id, tbl_prestudentstatus.studiensemester_kurzbz, tbl_student.studiengang_kz
 		FROM 
 			public.tbl_prestudent JOIN public.tbl_student USING(prestudent_id) 
-			JOIN public.tbl_prestudentrolle USING(prestudent_id) 
+			JOIN public.tbl_prestudentstatus USING(prestudent_id) 
 		ORDER BY 
 			student_uid";
 
@@ -41,12 +41,12 @@ if($result = pg_query($conn, $qry))
 		}
 		
 		//Abbrecher und Unterbrecher ins 0. Semester verschieben
-		if($prestd->rolle_kurzbz=='Abbrecher')
+		if($prestd->status_kurzbz=='Abbrecher')
 		{
 			$semester='0';
 			$verband='A';
 		}
-		elseif($prestd->rolle_kurzbz=='Unterbrecher')
+		elseif($prestd->status_kurzbz=='Unterbrecher')
 		{
 			$semester='0';
 			$verband='B';
@@ -59,7 +59,7 @@ if($result = pg_query($conn, $qry))
 		
 		//Keinen Eintrag erstellen fuer Semester in denen er noch kein Student war und
 		//keinen Eintrag fuer Diplomanden und Absolventen (werden weiter unten gesondert behandelt)
-		if(in_array($prestd->rolle_kurzbz, array('Interessent','Bewerber','Abgewiesener','Aufgenommener','Wartender', 'Diplomand','Absolvent')))
+		if(in_array($prestd->status_kurzbz, array('Interessent','Bewerber','Abgewiesener','Aufgenommener','Wartender', 'Diplomand','Absolvent')))
 			continue;
 			
 		if($student->load_studentlehrverband($row->student_uid, $row->studiensemester_kurzbz))
@@ -106,9 +106,9 @@ if($result = pg_query($conn, $qry))
 		if($student->save_studentlehrverband())
 		{
 			if($student->new)
-				$text.="Erstelle Studentlehrverbandeintrag für $row->student_uid im $row->studiensemester_kurzbz in Semester $student->semester\n";
+				$text.="Erstelle Studentlehrverbandeintrag fÃ¼r $row->student_uid im $row->studiensemester_kurzbz in Semester $student->semester\n";
 			else 
-				$text.="Aktualisiere Studentlehrverbandeintrag für $row->student_uid im $row->studiensemester_kurzbz in Semester $student->semester\n";
+				$text.="Aktualisiere Studentlehrverbandeintrag fÃ¼r $row->student_uid im $row->studiensemester_kurzbz in Semester $student->semester\n";
 		}
 		else 
 		{
@@ -125,14 +125,14 @@ $text.="\n\nAbsolventen, Diplomanden, 50er und 60er abgleichen\n\n";
 // steht die Anzahl der Semester hinzugezaehlt in denen er schon Diplomand ist.
 
 //Alle Studenten holen die einen Diplomanden oder Absolventeneintrag haben
-$qry = "SELECT distinct student_uid, prestudent_id, studiengang_kz, verband FROM public.tbl_prestudentrolle JOIN public.tbl_student USING(prestudent_id) WHERE rolle_kurzbz='Diplomand' OR rolle_kurzbz='Absolvent'";
+$qry = "SELECT distinct student_uid, prestudent_id, studiengang_kz, verband FROM public.tbl_prestudentstatus JOIN public.tbl_student USING(prestudent_id) WHERE status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'";
 
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))
 	{
 		//Alle Diplomandeneintraege des Studenten holen
-		$qry_diplomand = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$row->prestudent_id' AND rolle_kurzbz='Diplomand' ORDER BY datum";
+		$qry_diplomand = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$row->prestudent_id' AND status_kurzbz='Diplomand' ORDER BY datum";
 		
 		if($result_diplomand = pg_query($conn, $qry_diplomand))
 		{
@@ -150,7 +150,7 @@ if($result = pg_query($conn, $qry))
 				}
 				
 				//Wenn Diplomand nicht der letzte Status in diesem Semester ist, dann Weiterspringen
-				if($prestd->rolle_kurzbz!='Diplomand')
+				if($prestd->status_kurzbz!='Diplomand')
 				{
 					$i++;
 					continue;
@@ -207,9 +207,9 @@ if($result = pg_query($conn, $qry))
 				if($student->save_studentlehrverband())
 				{
 					if($student->new)
-						$text.="Erstelle Studentlehrverbandeintrag für $row->student_uid im $row_diplomand->studiensemester_kurzbz in Semester $student->semester (Diplomand)\n";
+						$text.="Erstelle Studentlehrverbandeintrag fÃ¼r $row->student_uid im $row_diplomand->studiensemester_kurzbz in Semester $student->semester (Diplomand)\n";
 					else 
-						$text.="Aktualisiere Studentlehrverbandeintrag für $row->student_uid im $row_diplomand->studiensemester_kurzbz in Semester $student->semester (Diplomand)\n";
+						$text.="Aktualisiere Studentlehrverbandeintrag fÃ¼r $row->student_uid im $row_diplomand->studiensemester_kurzbz in Semester $student->semester (Diplomand)\n";
 				}
 				else 
 				{
@@ -222,7 +222,7 @@ if($result = pg_query($conn, $qry))
 			//Absolventen Eintrag in der Tabelle Studentlehrverband anlegen
 			
 			//Absolventeneintrag holen
-			$qry_absolvent = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$row->prestudent_id' AND rolle_kurzbz='Absolvent' ORDER BY datum";
+			$qry_absolvent = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$row->prestudent_id' AND status_kurzbz='Absolvent' ORDER BY datum";
 			if($result_absolvent = pg_query($conn, $qry_absolvent))
 			{
 				while($row_absolvent = pg_fetch_object($result_absolvent))
@@ -277,9 +277,9 @@ if($result = pg_query($conn, $qry))
 					if($student->save_studentlehrverband())
 					{
 						if($student->new)
-							$text.="Erstelle Studentlehrverbandeintrag für $student->uid im $student->studiensemester_kurzbz in Semester $student->semester (Absolvent)\n";
+							$text.="Erstelle Studentlehrverbandeintrag fÃ¼r $student->uid im $student->studiensemester_kurzbz in Semester $student->semester (Absolvent)\n";
 						else 
-							$text.="Aktualisiere Studentlehrverbandeintrag für $student->uid im $student->studiensemester_kurzbz in Semester $student->semester (Absolvent)\n";
+							$text.="Aktualisiere Studentlehrverbandeintrag fÃ¼r $student->uid im $student->studiensemester_kurzbz in Semester $student->semester (Absolvent)\n";
 					}
 					else 
 					{

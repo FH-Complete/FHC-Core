@@ -220,7 +220,7 @@
 	$result_fas_alle=pg_query($conn_fas, $sql_query);
 	$num_rows=pg_num_rows($result_fas_alle);
 	$headtext.="Dies ist eine automatische eMail!\n\n";
-	$headtext.="Es wurde eine Synchronisation mit FAS durchgeführt.\n";
+	$headtext.="Es wurde eine Synchronisation mit FAS durchgefÃ¼hrt.\n";
 	$headtext.="Anzahl der Lehrveranstaltungen vom FAS: $num_rows \n";
 	$headtext.="Anzahl der Lehrveranstaltungen in Vilesci: $vilesci_anz_lva \n\n";
 
@@ -488,7 +488,7 @@
 <html>
 <head>
 	<title>FAS - Vilesci (Lehrveranstaltungen)</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php

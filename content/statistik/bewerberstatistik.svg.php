@@ -40,9 +40,9 @@
 			FROM 
 				public.tbl_studiengang 
 				JOIN public.tbl_prestudent USING(studiengang_kz)
-				JOIN public.tbl_prestudentrolle USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus USING(prestudent_id)
 			WHERE
-				tbl_prestudentrolle.rolle_kurzbz='Interessent' 
+				tbl_prestudentstatus.status_kurzbz='Interessent' 
 				AND studiensemester_kurzbz='$stsem'
 				AND studiengang_kz='$studiengang_kz'
 				AND ausbildungssemester=1
@@ -63,9 +63,9 @@
 			FROM 
 				public.tbl_studiengang 
 				JOIN public.tbl_prestudent USING(studiengang_kz)
-				JOIN public.tbl_prestudentrolle USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus USING(prestudent_id)
 			WHERE
-				tbl_prestudentrolle.rolle_kurzbz='Bewerber'
+				tbl_prestudentstatus.status_kurzbz='Bewerber'
 				AND studiensemester_kurzbz='$stsem'
 				AND studiengang_kz='$studiengang_kz'
 				AND ausbildungssemester=1
@@ -86,9 +86,9 @@
 			FROM 
 				public.tbl_studiengang 
 				JOIN public.tbl_prestudent USING(studiengang_kz)
-				JOIN public.tbl_prestudentrolle USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus USING(prestudent_id)
 			WHERE
-				tbl_prestudentrolle.rolle_kurzbz='Student' 
+				tbl_prestudentstatus.status_kurzbz='Student' 
 				AND studiensemester_kurzbz='$stsem'
 				AND studiengang_kz='$studiengang_kz'
 				AND ausbildungssemester=1

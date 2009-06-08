@@ -34,7 +34,7 @@
 		<html>
 		<head>
 			<title>STP - VILESCI (Lehrveranstaltungen)</title>
-			<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		</head>
 		<body>';
 
@@ -91,9 +91,9 @@
 	function cleankurzbz($kurzbz)
 	{
 		$kurzbz = str_replace('/', '', $kurzbz);
-		$kurzbz = str_replace('Ü', 'U', $kurzbz);
-		$kurzbz = str_replace('Ö', 'O', $kurzbz);
-		$kurzbz = str_replace('Ä', 'A', $kurzbz);
+		$kurzbz = str_replace('Ãœ', 'U', $kurzbz);
+		$kurzbz = str_replace('Ã–', 'O', $kurzbz);
+		$kurzbz = str_replace('Ã„', 'A', $kurzbz);
 
 		return $kurzbz;
 	}

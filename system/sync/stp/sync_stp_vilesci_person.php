@@ -73,13 +73,13 @@ $staat=array();
 <html>
 <head>
 <title>Synchro - StPoelten -> Vilesci - Person</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
 <?php
 
-//Array für Nationen erzeugen
+//Array fÃ¼r Nationen erzeugen
 $qry_staat="SELECT __staat, chkurzbez FROM sync.stp_staat";
 if($result_staat = pg_query($conn, $qry_staat))
 {
@@ -99,13 +99,13 @@ $qry='SELECT __Person,_Staatsbuerger,_GebLand,Briefanrede,chTitel,chNachname,chV
 		WHERE _cxGeschlecht!=3 AND _cxPersonTyp!=5
 			AND __Person NOT IN (SELECT __Person FROM sync.tbl_syncperson) ;';
 
-$error_log_ext="Überprüfung Personendaten in EXT-DB:\n\n";
+$error_log_ext="ÃœberprÃ¼fung Personendaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -133,7 +133,7 @@ if($result = pg_query($conn, $qry))
 		}
 		/*if($row->_staatsbuerger==NULL)
 		{
-			$error_log1.="\nKeine Staatsbürgerschaft eingetragen";
+			$error_log1.="\nKeine StaatsbÃ¼rgerschaft eingetragen";
 			$cont=true;
 			$error=true;
 		}
@@ -240,7 +240,7 @@ if($result = pg_query($conn, $qry))
 										'VALUES ('.$row->__person.', '.$person_id.');';
 									$resulti = pg_query($conn, $qry);
 								}
-								$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+								$ausgabe.="\n------------------\nÃœbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 								$eingefuegt++;
 								pg_query($conn, "COMMIT");
 							}
@@ -272,7 +272,7 @@ if($result = pg_query($conn, $qry))
 									'VALUES ('.$row->__person.', '.$row_dubel->person_id.');';
 								$resulti = pg_query($conn, $qry);
 							}
-							$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$ausgabe.="\n------------------\nÃœbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 							$eingefuegt++;
 							pg_query($conn, "COMMIT");
 						}
@@ -318,7 +318,7 @@ $log_updates='';
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt2=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze für updates: ".$anzahl_person_gesamt2."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze fÃ¼r updates: ".$anzahl_person_gesamt2."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -373,7 +373,7 @@ else
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
-echo "<br><br>Eingefügt:  ".$eingefuegt;
+echo "<br><br>EingefÃ¼gt:  ".$eingefuegt;
 echo "<br>Updates:  ".$updates;
 echo "<br>Doppelt:     ".$dublette;
 echo "<br>Fehler:       ".$fehler;
@@ -392,7 +392,7 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Person von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Person  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
-."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
+."Personen: Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Doppelt: ".$dublette
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: nsc@fhstp.ac.at");
 
 

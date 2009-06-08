@@ -55,10 +55,10 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 
 	var del = false;
 
@@ -125,8 +125,8 @@
 				if(!$is_berechtigt)
 					die('Sie haben keine Berechtigung fuer diesen Bereich');
 
-				//echo '<span class="error">ACHTUNG: Der Studentenupload steht nur noch bis zum Ende des Wintersemesters 2008 zur Verfügung</span><br><br>';
-				echo "<form method=\"POST\" action=\"lector_choice.php?lvid=$lvid\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+				//echo '<span class="error">ACHTUNG: Der Studentenupload steht nur noch bis zum Ende des Wintersemesters 2008 zur VerfÃ¼gung</span><br><br>';
+				echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"lector_choice.php?lvid=$lvid\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 
 				if(isset($delete_dir))
 				{

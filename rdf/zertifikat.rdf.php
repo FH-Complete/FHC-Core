@@ -21,7 +21,7 @@
  *			Gerald Raab <gerald.raab@technikum-wien.at>.
  */
 
-// header für no cache
+// header fÃŒr no cache
 //header("Cache-Control: no-cache");
 //header("Cache-Control: post-check=0, pre-check=0",false);
 //header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -43,7 +43,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 //loadVariables($conn, $user);
 $datum = new datum();
 $projektarbeit=array();
-$fussnotenzeichen=array('¹)','²)','³)');
+$fussnotenzeichen=array('Â¹)','Â²)','Â³)');
 $anzahl_fussnoten=0;
 $studiengang_typ='';
 $xml_fussnote='';
@@ -151,7 +151,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}		
 	}	
 	
-	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>";
+	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	$xml .= "<zertifikate>";
 	
 	$studiensemester = new studiensemester($conn);

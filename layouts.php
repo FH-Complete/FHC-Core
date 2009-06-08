@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>CIS - FH Technikum Wien</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
@@ -40,7 +40,7 @@
 		}
 	}
 
-	echo "<h3> Wählen Sie Ihr persönliches Layout! </h3>";
+	echo "<h3> WÃ¤hlen Sie Ihr persÃ¶nliches Layout! </h3>";
 	echo "<table>";
 
 	for($i = 0; $i <count($files_erg); $i++)

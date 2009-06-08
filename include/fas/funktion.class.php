@@ -44,12 +44,14 @@ class funktion
 	function funktion($conn, $fkt_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($fkt_id != null)
 			$this->load($fkt_id);
 	}

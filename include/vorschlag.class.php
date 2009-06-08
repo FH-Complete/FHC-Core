@@ -53,7 +53,7 @@ class vorschlag
 	function vorschlag($conn, $vorschlag_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -64,7 +64,7 @@ class vorschlag
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($vorschlag_id != null)
 			$this->load($vorschlag_id);
 	}

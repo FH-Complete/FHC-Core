@@ -83,7 +83,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 	}
 	else 
 	{
-		echo '<span class="error">Ihr Geburtsdatum stimmt nicht mit unseren Daten überein</span>';
+		echo '<span class="error">Ihr Geburtsdatum stimmt nicht mit unseren Daten ÃŒberein</span>';
 	}
 }
 	
@@ -153,7 +153,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 <?php 
 	if($reload_parent)
@@ -262,7 +262,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		<span style="font-size: 1.2em; font-style: italic;">
 			Herzlich Willkommen zum Reihungstest der Fachhochschule Technikum-Wien<br /><br />
 			Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson<br /><br />
-			Wir wünschen Ihnen einen erfolgreichen Start ins Studium
+			Wir wÃŒnschen Ihnen einen erfolgreichen Start ins Studium
 		</span>
 		</center>';
 	}

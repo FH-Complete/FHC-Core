@@ -30,7 +30,7 @@ $nachname=array();
 <html>
 <head>
 <title>Praxissemester-Datenkorrektur</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -95,14 +95,14 @@ echo "<table class='liste'><tr><th>FAS</th><th>Vilesci</th><th></th><th>Titel/Vo
 
 
 $qry="SELECT *,
-	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit,
-	trim(substring(trim(beurteiler) from ' [A-ü]*$')) as dritt
+	trim(substring(trim(firmenbetreuer) from ' [A-Ã¼]*$')) as zweit,
+	trim(substring(trim(beurteiler) from ' [A-Ã¼]*$')) as dritt
 	FROM praxissemester WHERE
 	((vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
 	(vilesci_beurteiler IS NULL AND trim(beurteiler)!=''))
 	ORDER BY praxissemester_pk
 	LIMIT 20;";
-//trim(substring(trim(ansprechpartner) from ' [A-ü]*$')) as erst,
+//trim(substring(trim(ansprechpartner) from ' [A-Ã¼]*$')) as erst,
 //(vilesci_ansprechpartner IS NULL AND trim(ansprechpartner)!='') OR
 
 if($result = pg_query($conn_fas, $qry))

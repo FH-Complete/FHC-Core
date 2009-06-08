@@ -193,7 +193,7 @@ $format_number->setBold();
 $format_number1 =& $workbook->addFormat();
 $format_number1->setNumFormat("#,##0.00");
 
-$worksheet->write(0, 0,"LV-Planung f¸r $stsem1/$stsem2", $format_bold);
+$worksheet->write(0, 0,"LV-Planung f√ºr $stsem1/$stsem2", $format_bold);
 
 $zeile=3;
 $spalte=0;

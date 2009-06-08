@@ -25,12 +25,14 @@ class raumtyp
 	 function raumtyp($conn, $raum_id=null)
 	{
 		$this->conn = $conn;
+/*		
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+*/	
 		if($raum_id != null)
 			$this->load($raum_id);
 	}

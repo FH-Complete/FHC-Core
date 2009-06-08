@@ -69,7 +69,7 @@
 
 			if($news_obj->save())
 			{
-				echo '<script language="JavaScript">';
+				echo '<script language="JavaScript" type="text/javascript">';
 				echo "	document.location.href = 'pinboard_entry.php?&message_sent=yes';";
 				echo '</script>';
 			}
@@ -92,10 +92,10 @@
 	}
 ?>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 
 	function focusFirstElement()
 	{

@@ -336,7 +336,7 @@
 	{
 
 		while($row = pg_fetch_object($result))
-		{
+		{
 			//$fasnoten_arr = getNoten4Student($conn_fas,$row->student_fk);
 			$fasnoten_arr = getNoten4Studiengang($conn_fas,$row->studiengang_pk);
 			
@@ -550,7 +550,7 @@
 		}
 	$text .= "</table>";
 	$text .= "<hr><h3>Stats</h3><hr>";
-	$text .= "Bearbeitete Studiengänge: ".$stg_processed."<br>";
+	$text .= "Bearbeitete StudiengÃ€nge: ".$stg_processed."<br>";
 	$text .= "Anzahl der bearbeiteten Studenten: ".$anz_students_processed."<br>";
 	$text .= "Anzahl der bearbeiteten Datens&auml;tze: ".$anz_processed."<br>";
 	$text .= "Anzahl Pr&uuml;fungseintr&auml;ge: ".$anz_processed_pruef."<br>";
@@ -584,7 +584,7 @@
 <html>
 <head>
 	<title>FAS - Vilesci (Noten)</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php

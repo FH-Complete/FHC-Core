@@ -47,7 +47,7 @@ else
 echo '<html>
 	<head>
 		<title>PreInteressenten</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -137,7 +137,7 @@ if(isset($_POST['uebertragen']))
 					//$preinteressent1->loadStudiengangszuteilung($preinteressent_id, $studiengang_kz);
 					
 					$prestudent->ausbildungssemester = 1;
-					$prestudent->rolle_kurzbz = 'Interessent';
+					$prestudent->status_kurzbz = 'Interessent';
 					$prestudent->datum = date('Y-m-d');
 					$prestudent->insertamum = date('Y-m-d H:i:s');
 					$prestudent->inservon = $user;
@@ -308,7 +308,7 @@ foreach ($preinteressent->result as $row)
 				}
 				else 
 				{
-					echo 'nur durch Administrator möglich';
+					echo 'nur durch Administrator mÃ¶glich';
 				}
 			}
 		}

@@ -36,12 +36,14 @@ $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $dontloadcontent=false;
 
 $user = get_uid();
-loadVariables($conn, $user);
+#gss loadVariables($conn, $user);
+loadVariables($user);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <title>Kollision Student</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css" />
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -114,7 +116,7 @@ if($dontloadcontent)
 if($stg_kz=='')
 {
 	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
-			FROM  lehre.vw_".$db_stpl_table."_student_unr
+			FROM lehre.vw_".$db_stpl_table."_student_unr
 			WHERE datum>='$beginn' AND datum<='$ende'
 			GROUP BY datum, stunde, student_uid
 			HAVING count(student_uid)>1
@@ -124,7 +126,7 @@ if($stg_kz=='')
 else 
 {
 	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
-			FROM  lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_student USING(student_uid)
+			FROM lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_student USING(student_uid)
 			WHERE datum>='$beginn' AND datum<='$ende' AND studiengang_kz='$stg_kz'
 			GROUP BY datum, stunde, student_uid
 			HAVING count(student_uid)>1
@@ -144,6 +146,7 @@ echo '<tr class="liste">
 	  </tr>
 	 </thead>
 	 <tbody>';
+	 
 if($result = pg_query($conn, $qry))
 {
 	while($row = pg_fetch_object($result))

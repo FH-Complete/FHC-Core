@@ -102,7 +102,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <html>
 	<head>
 		<title>PreInteressenten</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -250,10 +250,10 @@ if(isset($_GET['action']))
 									$to = $stg_obj->email;
 									//$to = 'oesi@technikum-wien.at';
 									$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
-												"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
-												"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
+												"Der Preinteressent $name wurde zur Ãbernahme freigegeben. \nSie kÃ¶nnen diesen ".
+												"im FAS unter 'Extras->Preinteressenten ÃŒbernehmen' oder unter folgendem Link\n\n".
 												APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$row->studiengang_kz \n".
-												"ins FAS übertragen";
+												"ins FAS ÃŒbertragen";
 									$mail = new mail($to, 'vilesci@'.DOMAIN, 'Preinteressent Freigabe', $message);
 									if($mail->send())
 										echo "<br><b>Freigabemail wurde an $to versendet</b>";
@@ -272,7 +272,7 @@ if(isset($_GET['action']))
 					}
 				}
 			}
-			echo "<br><b>Es wurden $anzahl_freigegeben Studiengänge freigegeben<br>";
+			echo "<br><b>Es wurden $anzahl_freigegeben StudiengÃ€nge freigegeben<br>";
 			echo "<script language='Javascript'>
 					parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=".$_GET['id']."&selection=\"+parent.preinteressent_detail.selection; 
 				 </script>";
@@ -282,7 +282,7 @@ if(isset($_GET['action']))
 		}
 		else 
 		{
-			echo '<b>Es können nur Preinteressenten freigegeben werden, bei denen ein Studiensemester angegeben wurde</b>';
+			echo '<b>Es kÃ¶nnen nur Preinteressenten freigegeben werden, bei denen ein Studiensemester angegeben wurde</b>';
 		}
 	}
 	elseif($_GET['action']=='loeschen')
@@ -297,12 +297,12 @@ if(isset($_GET['action']))
 			}
 			else 
 			{
-				echo "<br><b>Fehler beim Löschen: $preinteressent->errormsg</b>";
+				echo "<br><b>Fehler beim LÃ¶schen: $preinteressent->errormsg</b>";
 			}
 		}
 		else 
 		{
-			echo "<br><b>Fehler beim Laden des Datensatzes. Daten wurden NICHT gelöscht</b>";
+			echo "<br><b>Fehler beim Laden des Datensatzes. Daten wurden NICHT gelÃ¶scht</b>";
 		}
 	}
 	
@@ -401,7 +401,7 @@ foreach ($preinteressent->result as $row)
 				$status.=', ';
 			$prestudent1 = new prestudent($conn);
 			$prestudent1->getLastStatus($prestd->prestudent_id);
-			$status.= $prestudent1->rolle_kurzbz.' ('.$stg_obj->kuerzel_arr[$prestd->studiengang_kz].')';
+			$status.= $prestudent1->status_kurzbz.' ('.$stg_obj->kuerzel_arr[$prestd->studiengang_kz].')';
 		}
 	}
 	if($status=='')
@@ -442,10 +442,10 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$uebernahme</td>";
 	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 20),ENT_QUOTES)."</td>";
 	echo '<td>';
-	echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
+	echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='GesamtÃŒbersicht' title='Zeigt die Details dieser Person an'>";
 	echo " <input style='padding:0px;' type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";
-	echo " <input style='padding:0px;' type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'>";
-	echo " <input style='padding:0px;' type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'>";
+	echo " <input style='padding:0px;' type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle StudiengÃ€nge mit der hÃ¶chsten PrioritÃ€t frei'>";
+	echo " <input style='padding:0px;' type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='LÃ¶schen' title='LÃ¶scht diesen Preinteressenten'>";
 	echo '</td>';
 	echo '</tr>';
 }

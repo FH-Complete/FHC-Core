@@ -9,7 +9,7 @@
 		//$sql_query = "Delete from tbl_person where uid='".$_GET["uid"]."';";
 		//echo $sql_query;
 		//if(!pg_exec($conn,$sql_query))
-		//   echo "Fehler beim löschen: möglicherweise besteht noch eine Referenz zu einer anderen Tabelle<br>";
+		//   echo "Fehler beim lÃ¶schen: mÃ¶glicherweise besteht noch eine Referenz zu einer anderen Tabelle<br>";
 		echo 'Loeschen noch nicht implementiert';
 	}
 
@@ -30,9 +30,9 @@
 <html>
 <head>
 <title>Mitarbeiter Uebersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 function confdel()
 {
 	if(confirm("Diesen Datensatz wirklick loeschen?"))
@@ -95,7 +95,7 @@ function confdel()
 	else
 		echo "Fehler beim laden der Mitarbeiter: ".pg_errormessage($conn);
 
-	if(isset($_GET['fix']) || isset($_GET['lek'])) //Zum Anker hüpfen
+	if(isset($_GET['fix']) || isset($_GET['lek'])) //Zum Anker hÃ¼pfen
 	{
 		echo "<script language='JavaScript'>this.location.hash='#anker1'</script>";
 	}

@@ -49,7 +49,7 @@ if (!@pg_query($conn,'SELECT * FROM sync.stp_stgvertiefung LIMIT 1;'))
 <html>
 <head>
 <title>Synchro - FHDB -> FH-Complete - PreSyncStgVertiefung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 

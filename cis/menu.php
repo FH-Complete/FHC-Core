@@ -25,7 +25,7 @@ require_once('config.inc.php');
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 
 <script language="JavaScript" type="text/javascript">
@@ -54,17 +54,17 @@ require_once('config.inc.php');
 			}	
 			
 			// Anzeigen oder Ausblenden
-            if (status == "none")
+            if (status == 'none')
             {
 		 		if (document.getElementById && document.getElementById(conid)) 
 				{  
-					document.getElementById(conid).style.display = block;
+					document.getElementById(conid).style.display = 'block';
 				} else if (document.all && document.all[conid]) {      
-					document.all[conid].style.display=block;
+					document.all[conid].style.display='block';
 		      	} else if (document.layers && document.layers[conid]) {                          
-				 	document.layers[conid].style.display=block;
+				 	document.layers[conid].style.display='block';
 		        }				
-            	__js_page_array[conid] = block;
+            	__js_page_array[conid] = 'block';
             }
             else
             {
@@ -76,7 +76,7 @@ require_once('config.inc.php');
 		      	} else if (document.layers && document.layers[conid]) {                          
 				 	document.layers[conid].style.display='none';
 		        }				
-            	__js_page_array[conid] = "none";
+            	__js_page_array[conid] = 'none';
             }
             return false;
      	}

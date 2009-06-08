@@ -60,7 +60,8 @@ $studiengang=$s->result;
 
 $user = get_uid();
 // Benutzerdefinierte Variablen laden
-echo loadVariables($conn,$user);
+#gss echo loadVariables($conn,$user);
+echo loadVariables($user);
 
 // Bezeichnungen fuer Tabellen und Views
 $lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
@@ -161,7 +162,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 <html>
 <head>
 <title>Lehrveranstaltung Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>

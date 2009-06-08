@@ -64,7 +64,7 @@
 // @$bAnzeige Listenanzeige wenn Submitbottom Anzeige gedrueckt wurde
 	$bAnzeige= ($studiensemester_kurzbz!=''?True:False);
 // @cCharset Zeichensatz - Ajax mit UTF-8
-	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'iso-8859-15');
+	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'UTF-8');
 // @debug_switch Anzeige der xml-rfc Daten moegliche Stufen sind 0,1,2,3
 	$debug_switch= (isset($_REQUEST['debug'])?$_REQUEST['debug']:0);
 	
@@ -302,7 +302,7 @@
 
 
 #-------------------------------------------------------------------------------------------	
-# Testfunktion zur Anzeige einer übergebenen Variable oder Array, Default ist GLOBALS
+# Testfunktion zur Anzeige einer Ã¼bergebenen Variable oder Array, Default ist GLOBALS
 function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
 {
 

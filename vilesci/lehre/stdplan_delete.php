@@ -36,7 +36,7 @@
 <html>
 <head>
 <title>Delete Stundenplan</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <H1>Delete from Stundenplan</H1>
@@ -82,7 +82,7 @@ if ($type=="save")
 {
 	$error=false;
 	$stunde=$stdbegin;
-	echo "Auftrag wird ausgeführt!<br>";
+	echo "Auftrag wird ausgefÃ¼hrt!<br>";
 	echo "Kontrolle auf Doppelbelegungen! ... ";
 
 	// checken auf Ort
@@ -188,7 +188,7 @@ if ($type=="save")
 		}
 	}
 
-	//Einfügen in die Datenbank
+	//EinfÃ¼gen in die Datenbank
 	if (!$error)
 	{
 		echo "OK!<br>";
@@ -221,7 +221,7 @@ if ($type=="save")
 
 		}
 		if (!$error)
-			echo "Einfügen erfolgreich abgeschlossen!<br>";
+			echo "EinfÃ¼gen erfolgreich abgeschlossen!<br>";
 		else
 			echo "Es ist ein Fehler aufgetreten!<br>";
 	}

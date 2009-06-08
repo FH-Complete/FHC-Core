@@ -9,14 +9,14 @@
 <html>
 <head>
 <title>Check ID</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK rel="stylesheet" href="../../../include/styles.css" type="text/css">
 </head>
 <body class="background_main">
-<H1>Stundenplan wird übertragen</H1>
+<H1>Stundenplan wird Ã¼bertragen</H1>
 
 <?php
-	// Studiengänge abfragen
+	// StudiengÃ¤nge abfragen
 	$sql_query="SELECT id, unr, wochentag, stunde, ort_kurzbz, lehrfach_nr, lektor_uid, jahreswochen, studiengang_kz, semester, verband, gruppe FROM untis
 		WHERE ort_kurzbz IS NOT NULL AND lehrfach_nr>0 AND lektor_uid IS NOT NULL AND studiengang_kz IS NOT NULL AND lehrfach NOT LIKE '\\\\_%'";
 	//echo $sql_query;

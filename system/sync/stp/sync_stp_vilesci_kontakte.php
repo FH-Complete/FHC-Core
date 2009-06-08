@@ -77,7 +77,7 @@ $person_id='';
 <html>
 <head>
 <title>Synchro - StPoelten -> Vilesci - Kontakte</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
@@ -129,13 +129,13 @@ $qry="(SELECT __person as _person, chtelbemerkung, chvorwahl, chnummer, chklappe
 	FROM sync.stp_email JOIN public.tbl_person ON(_person=ext_id) WHERE  _Person IN (SELECT ext_id FROM public.tbl_person))
 	ORDER BY _Person;";
 
-$error_log_ext="Überprüfung Kontaktdaten in EXT-DB:\n\n";
+$error_log_ext="ÃœberprÃ¼fung Kontaktdaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -204,7 +204,7 @@ if($result = pg_query($conn, $qry))
 					}
 					else
 					{
-						$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+						$ausgabe.="\n------------------------------------\nÃœbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 						$ausgabe.="\n---Telefon: ".trim($row->chvorwahl).trim($row->chnummer).trim($row->chklappe).", ".$row->chtelbemerkung;
 						$eingefuegt1++;
 					}
@@ -249,7 +249,7 @@ if($result = pg_query($conn, $qry))
 					}
 					else
 					{
-						$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+						$ausgabe.="\n------------------------------------\nÃœbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 						$ausgabe.="\n---Email: ".trim($row->chemailadresse).", ".$row->chemailbemerkung;
 						$eingefuegt2++;
 					}
@@ -276,12 +276,12 @@ else
 
 
 echo "<br><b>Telefon: </b>";
-echo "<br>Eingefügt:  ".$eingefuegt1;
+echo "<br>EingefÃ¼gt:  ".$eingefuegt1;
 echo "<br>Updates:  ".$updates1;
 echo "<br>Doppelt:   ".$dublette1; 
 echo "<br>Fehler:     ".$fehler1;
 echo "<br><br><b>E-Mail: </b>";
-echo "<br>Eingefügt:  ".$eingefuegt2;
+echo "<br>EingefÃ¼gt:  ".$eingefuegt2;
 echo "<br>Updates:  ".$updates2;
 echo "<br>Doppelt:   ".$dublette2; 
 echo "<br>Fehler:     ".$fehler2;
@@ -303,7 +303,7 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Adresse von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Adresse  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
-."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler
+."Personen: Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler
 ."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: nsc@fhstp.ac.at");
 
 

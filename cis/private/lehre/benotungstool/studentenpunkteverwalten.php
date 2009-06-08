@@ -164,10 +164,10 @@ else
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Benotungstool</title>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -180,7 +180,7 @@ else
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('Wollen Sie die markierten EintrÃ€ge wirklich lÃ¶schen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
   //-->
 </script>
@@ -308,7 +308,7 @@ include("menue.inc.php");
 /*
 echo "\n<!--Menue-->\n";
 echo "<br><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Ãbersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
 <br><br>
@@ -476,7 +476,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 			}
 //		}
 //	}
-	echo "Bitte Wählen Sie eine/n Studierende/n aus: ";
+	echo "Bitte WÃ€hlen Sie eine/n Studierende/n aus: ";
 	$key = array_search($uid,$uid_arr);
 	$prev = $key-1;
 	$next = $key+1;
@@ -502,7 +502,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	if(count($uebung_obj->uebungen)>0)
 	{
 		echo "<table width='100%'><tr><td valign='top'>";
-		echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo "<br>WÃ€hlen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=&uid=$uid' selected></option>";
 		foreach ($uebung_obj->uebungen as $row)
 		{
@@ -601,7 +601,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		//$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$uid,$uebung_id);
 		//echo "<span class='studentnote'>Note: ".$studentnote->note." (Gewicht: ".$ueb_obj->gewicht.")</span><br><br>";
 		echo "
-		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
+		<form accept-charset='UTF-8' method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
 		Anmerkungen:<br>
 		<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
@@ -676,7 +676,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 	
 		
-		//Gesamtpunkte alle Kreuzerllisten in dieser Übung
+		//Gesamtpunkte alle Kreuzerllisten in dieser Ãbung
 		$ueb_help = new uebung($conn, $uebung_id);
 		$liste_id = $ueb_help->liste_id;
 		$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
@@ -732,7 +732,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 			<br><br>
 			<table border='1' width='210'>
 			<tr>
-				<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten dieser Übung:</td>
+				<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten dieser Ãbung:</td>
 			</tr>
 			<tr>
 				<td width='180'>Punkte insgesamt m&ouml;glich:</td>
@@ -765,7 +765,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-				<input type='button' value='Zurück' onclick='history.back();'>
+				<input type='button' value='ZurÃŒck' onclick='history.back();'>
 				<input type='submit' value='Speichern' name='submit'>
 			</td>
 	
@@ -792,7 +792,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		if ($filename != '')
 			echo "Abgabedatei: <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid&download_abgabe=$filename'>".$filename."</a><br><br>";
 		echo "
-		<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
+		<form accept-charset='UTF-8' method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
 		Anmerkungen:<br>
 		<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
@@ -805,7 +805,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		echo "
 		<tr>
 			<td colspan='2'>
-				<input type='button' value='Zurück' onclick='history.back();'>
+				<input type='button' value='ZurÃŒck' onclick='history.back();'>
 				<input type='submit' value='Speichern' name='submit'>	
 			</td>
 	
@@ -817,7 +817,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	echo "</td></tr></table>";	
 	echo "<table>\n";		
 	echo "	<tr>\n";
-	echo "	<form method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$uid' enctype='multipart/form-data'>\n";
+	echo "	<form accept-charset='UTF-8' method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$uid' enctype='multipart/form-data'>\n";
 	echo "		<td>\n";
 	echo "			<b>Studentenabgabedatei:</b><br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
 	echo "		</td>\n";	
@@ -828,7 +828,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 else
 {
 	
-	//Übungen benoten
+	//Ãbungen benoten
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load_uebung($lehreinheit_id,1);
 	if(count($uebung_obj->uebungen)>0)
@@ -903,7 +903,7 @@ else
 			echo "<a href='zipdownload_benotungstool.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&downloadname=$downloadname'> [Abgaben downloaden]</a>";
 		}
 		else
-			echo "[Keine Abgaben verfügbar]";
+			echo "[Keine Abgaben verfÃŒgbar]";
 		
 		echo '</td></tr></table>';
 	}

@@ -59,14 +59,14 @@ if(!$gruppe->load($kurzbz))
 <html>
 <head>
 <title>Gruppen Details</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 <body>
 <H1>Gruppe <?php echo $kurzbz ?></H1>
 
 <?php
-echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
+echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>ZurÃ¼ck zur &Uuml;bersicht</a><br><br>";
 
 if(!$gruppe->generiert)
 {

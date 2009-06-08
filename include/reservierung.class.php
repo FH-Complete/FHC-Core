@@ -51,7 +51,7 @@ class reservierung
 	function reservierung($conn, $reservierung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -63,8 +63,8 @@ class reservierung
 			return false;
 		}
 		else
+	*/
 			$this->new = true;
-
 		if($reservierung_id!=null)
 			$this->load($reservierung_id);
 	}

@@ -84,7 +84,7 @@ $b2angelegt=0;
 <html>
 <head>
 <title>Synchro - StPoelten -> Vilesci - Projektabeiten</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -97,13 +97,13 @@ $qry="SELECT chthema, chthemaengl, _cxbeurteilungsstufediplarbeit, COALESCE(dapr
 	WHERE __Person IN (SELECT __person FROM sync.tbl_syncperson) AND (_cxPersonTyp='1' OR _cxPersonTyp='2') 
 		AND chthema IS NOT NULL AND chthema!='' 
 		AND COALESCE(dapruefungsdat,dapruefteil1dat) IS NOT NULL;";
-//$error_log="Überprüfung Projektarbeitsdaten in EXT-DB:\n\n";
+//$error_log="ÃœberprÃ¼fung Projektarbeitsdaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -111,13 +111,13 @@ if($result = pg_query($conn, $qry))
 		{
 			$projekttyp_kurzbz='Diplom';
 			$kurzbz='DA';
-			$bezeichnung_engl='master´s thesis';
+			$bezeichnung_engl='masterÂ´s thesis';
 		}
 		else
 		{
 			$projekttyp_kurzbz='Bachelor';
 			$kurzbz='BA';
-			$bezeichnung_engl='bachelor´s thesis';
+			$bezeichnung_engl='bachelorÂ´s thesis';
 		}
 		//UID ermitteln
 		pg_query($conn, "BEGIN");
@@ -136,7 +136,7 @@ if($result = pg_query($conn, $qry))
 				continue;
 			}
 		}
-		//LEHRVERANSTALTUNG, LEHRFACH UND LEHREINHEIT ANLEGEN BZW. AUSWÄHLEN
+		//LEHRVERANSTALTUNG, LEHRFACH UND LEHREINHEIT ANLEGEN BZW. AUSWÃ„HLEN
 		$qry_lv="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz=".myaddslashes($row->studiengang_kz)." AND bezeichnung=".myaddslashes($projekttyp_kurzbz.'arbeit')." AND semester=".myaddslashes($row->max_semester);
 		if($result_lv = pg_query($conn, $qry_lv))
 		{
@@ -294,7 +294,7 @@ if($result = pg_query($conn, $qry))
 				");";
 				if(pg_query($conn, $ins_le))
 				{
-					echo "<br>Lehreinheit für LV ".$lehrveranstaltung_id." im Studiensemester ".$studiensemester_kurzbz." angelegt!";
+					echo "<br>Lehreinheit fÃ¼r LV ".$lehrveranstaltung_id." im Studiensemester ".$studiensemester_kurzbz." angelegt!";
 					//Sequenz auslesen
 					$qry_seq = "SELECT currval('lehre.tbl_lehreinheit_lehreinheit_id_seq') AS id;";
 					if($row_seq=pg_fetch_object(pg_query($conn,$qry_seq)))
@@ -326,7 +326,7 @@ if($result = pg_query($conn, $qry))
 		{
 			if (pg_num_rows($result_dubel)==0)
 			{
-				//Neue Abschlussprüfung anlegen
+				//Neue AbschlussprÃ¼fung anlegen
 				$sql="INSERT INTO lehre.tbl_projektarbeit
 					(projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, beginn, ende, faktor, 
 					freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung,  
@@ -353,7 +353,7 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
-					$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+					$ausgabe.="\n------------------------------------\nÃœbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 					$ausgabe.="\n---Projektarbeit (".$projekttyp_kurzbz."): Note: ".$row->_cxbeurteilungsstufediplarbeit.", Titel: ".$row->chthema;
 					$eingefuegt++;
 					pg_query($conn, "COMMIT");
@@ -415,7 +415,7 @@ if($result = pg_query($conn, $qry))
 					
 					if(strlen(trim($sql))==1)
 					{
-						//update nur mit änderungen 
+						//update nur mit Ã¤nderungen 
 						$sql="UPDATE lehre.tbl_projektarbeit SET ".$sql." 
 						WHERE student_uid='".$uid."' AND titel='".$row->chthema."';";
 						if(!$result_neu = pg_query($conn, $sql))
@@ -427,7 +427,7 @@ if($result = pg_query($conn, $qry))
 						}
 						else
 						{
-							$ausgabe.="\n------------------------------------\nGeändert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$ausgabe.="\n------------------------------------\nGeÃ¤ndert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 							$ausgabe.="\n---Projektarbeit (".$projekttyp_kurzbz."): Note: ".$row->_cxbeurteilungsstufediplarbeit.", Titel: ".$row->chthema;
 							$updates++;
 							pg_query($conn, "COMMIT");
@@ -541,12 +541,12 @@ if($result = pg_query($conn, $qry))
 					if(!pg_query($conn, $qry_ins))
 					{
 						$fehler1++;
-						$error_log3.="\nBetreuer1 ".$betreuer1." konnte für Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
+						$error_log3.="\nBetreuer1 ".$betreuer1." konnte fÃ¼r Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
 					}
 					else 
 					{
 						$b1angelegt++;
-						$ausgabe.="\nBetreuer1 (".$betreuer1.") wurde für Projektarbeit ID ".$projektarbeit_id." angelegt.";
+						$ausgabe.="\nBetreuer1 (".$betreuer1.") wurde fÃ¼r Projektarbeit ID ".$projektarbeit_id." angelegt.";
 					}
 				}
 				else 
@@ -580,12 +580,12 @@ if($result = pg_query($conn, $qry))
 					if(!pg_query($conn, $qry_ins)) 
 					{
 						$fehler2++;
-						$error_log4.="\nBetreuer2 ".$betreuer2." konnte für Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
+						$error_log4.="\nBetreuer2 ".$betreuer2." konnte fÃ¼r Projektarbeit ID ".$projektarbeit_id." nicht eingetragen werden!";
 					}
 					else
 					{
 						$b2angelegt++;
-						$ausgabe.="\nBetreuer2 (".$betreuer2.") wurde für Projektarbeit ID ".$projektarbeit_id." angelegt.";
+						$ausgabe.="\nBetreuer2 (".$betreuer2.") wurde fÃ¼r Projektarbeit ID ".$projektarbeit_id." angelegt.";
 					}
 				}
 				else 
@@ -602,7 +602,7 @@ else
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 echo "<br><br><b>Projektarbeiten:</b>";
-echo "<br>Eingefügt: ".$eingefuegt;
+echo "<br>EingefÃ¼gt: ".$eingefuegt;
 echo "<br>Updates: ".$updates;
 echo "<br>Bereits vorhanden:      ".$dublette;
 echo "<br>Fehler: ".$fehler;
@@ -626,7 +626,7 @@ echo nl2br("\n\n".$ausgabe);
 mail($adress, 'SYNC-Fehler StP-Projektarbeit von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Projektarbeit  von '.$_SERVER['HTTP_HOST'], "Sync Projektarbeit\n------------------\n\n"
-."Projektarbeiten: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Bereits vorhanden: ".$dublette
+."Projektarbeiten: Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Bereits vorhanden: ".$dublette
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 

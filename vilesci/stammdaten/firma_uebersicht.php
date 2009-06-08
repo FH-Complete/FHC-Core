@@ -77,11 +77,11 @@
 <html>
 <head>
 <title>Firma Uebersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 var firmentypfilter='<?php echo htmlentities($firmentypfilter)?>';
 var filter = '<?php echo htmlentities($filter)?>';
@@ -95,7 +95,7 @@ var filter = '<?php echo htmlentities($filter)?>';
 
 <?php 
 	echo '<table width="100%"><tr><td>';
-	echo '<h3>Übersicht</h3>';
+	echo '<h3>Ãbersicht</h3>';
 	echo '</td><td align="right">';
 	echo "<input type='button' onclick='parent.detail_firma.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/>";
 	echo '</td></tr></table>';

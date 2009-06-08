@@ -111,7 +111,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Portal - Diplomarbeit</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -177,11 +177,11 @@ if($result = pg_query($conn_fas, $qry))
 		{
 			$projektarbeitnote=3;
 		}
-		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='GENÜGEND' || trim($row->diplomarbeitgesamtnote)=='4')
+		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='GENÃœGEND' || trim($row->diplomarbeitgesamtnote)=='4')
 		{
 			$projektarbeitnote=4;
 		}
-		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='NICHT GENÜGEND' || trim($row->diplomarbeitgesamtnote)=='5')
+		elseif(trim(strtoupper($row->diplomarbeitgesamtnote))=='NICHT GENÃœGEND' || trim($row->diplomarbeitgesamtnote)=='5')
 		{
 			$projektarbeitnote=5;
 		}
@@ -192,7 +192,7 @@ if($result = pg_query($conn_fas, $qry))
 		elseif(trim($row->diplomarbeitgesamtnote)=='1,5' || trim($row->diplomarbeitgesamtnote)=='2,5' || trim($row->diplomarbeitgesamtnote)=='3,5')
 		{
 			$projektarbeitnote=round(0+trim($row->diplomarbeitgesamtnote));
-			$projektarbeitanmerkung="Diplomarbeitsnote ursprünglich ".trim($row->diplomarbeitgesamtnote)."!";
+			$projektarbeitanmerkung="Diplomarbeitsnote ursprÃ¼nglich ".trim($row->diplomarbeitgesamtnote)."!";
 		}
 		//$lehreinheitlehrveranstaltung_id	='';
 		//$lehreinheitstudiensemester_kz	='';
@@ -246,7 +246,7 @@ if($result = pg_query($conn_fas, $qry))
 		}
 
 		//lehrveranstaltung
-		//studiengang_kz über student ermitteln
+		//studiengang_kz Ã¼ber student ermitteln
 		$qry="SELECT studiengang_fk FROM public.student WHERE student_pk='".$row->student_fk."';";
 		if($results = pg_query($conn_fas, $qry))
 		{
@@ -376,7 +376,7 @@ if($result = pg_query($conn_fas, $qry))
 						if($resulto = pg_query($conn, $qry))
 						{
 							$ausgabe.="Lehrfach angelegt mit Fachbereich='Praxissemester u', Semester='".$semester."' und Studiengang='".$studiengang_kz."'.\n";
-							//sequenz auslesen für $lehreinheitlehrfach_id
+							//sequenz auslesen fÃ¼r $lehreinheitlehrfach_id
 							$qry= "SELECT currval('lehre.tbl_lehrfach_lehrfach_id_seq') AS id;";
 							if($rowseq=pg_fetch_object(pg_query($conn,$qry)))
 								$lehreinheitlehrfach_id=$rowseq->id;
@@ -389,7 +389,7 @@ if($result = pg_query($conn_fas, $qry))
 						else
 						{
 							$error=true;
-							$error_log.="Fehler beim Einfügen des Lehrfachs mit Fachbereich='Praxissemester u', Semester='".$semester."' und Studiengang='".$studiengang_kz."'.\n";
+							$error_log.="Fehler beim EinfÃ¼gen des Lehrfachs mit Fachbereich='Praxissemester u', Semester='".$semester."' und Studiengang='".$studiengang_kz."'.\n";
 						}
 					}
 				}
@@ -404,7 +404,7 @@ if($result = pg_query($conn_fas, $qry))
 					else
 					{
 						$error=true;
-						$error_log.="Studiensemester für Diplomarbeitsdatum '".$row->diplomarbeitsdatum."' nicht gefunden!\n";
+						$error_log.="Studiensemester fÃ¼r Diplomarbeitsdatum '".$row->diplomarbeitsdatum."' nicht gefunden!\n";
 					}
 				}
 
@@ -1109,11 +1109,11 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										$projektbetreuernote='3';
 									}
-									elseif(trim(strtoupper($row->noteerstbegutachter))=='GENÜGEND')
+									elseif(trim(strtoupper($row->noteerstbegutachter))=='GENÃœGEND')
 									{
 										$projektbetreuernote='4';
 									}
-									elseif(trim(strtoupper($row->noteerstbegutachter))=='NICHT GENÜGEND')
+									elseif(trim(strtoupper($row->noteerstbegutachter))=='NICHT GENÃœGEND')
 									{
 										$projektbetreuernote='5';
 									}
@@ -1344,11 +1344,11 @@ if($result = pg_query($conn_fas, $qry))
 											{
 												$projektbetreuernote='3';
 											}
-											elseif(trim(strtoupper($row->notezweitbegutachter))=='GENÜGEND')
+											elseif(trim(strtoupper($row->notezweitbegutachter))=='GENÃœGEND')
 											{
 												$projektbetreuernote='4';
 											}
-											elseif(trim(strtoupper($row->notezweitbegutachter))=='NICHT GENÜGEND')
+											elseif(trim(strtoupper($row->notezweitbegutachter))=='NICHT GENÃœGEND')
 											{
 												$projektbetreuernote='5';
 											}
@@ -1980,7 +1980,7 @@ if($result = pg_query($conn_fas, $qry))
 										if($projektbetreuernew1)
 										{
 											$anzahl_pbg_insert++;
-											$ausgabe.="Diplomarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Diplomarbeitsbetreuer eingefÃ¼gt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}
 										else
 										{
@@ -1993,7 +1993,7 @@ if($result = pg_query($conn_fas, $qry))
 										if($projektbetreuernew2)
 										{
 											$anzahl_pbg2_insert++;
-											$ausgabe.="Diplomarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id2."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Diplomarbeitsbetreuer eingefÃ¼gt: UID='".$projektbetreuerperson_id2."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}
 										else
 										{
@@ -2006,7 +2006,7 @@ if($result = pg_query($conn_fas, $qry))
 										if($projektbetreuernew3)
 										{
 											$anzahl_pbb_insert++;
-											$ausgabe.="Diplomarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id3."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Diplomarbeitsbetreuer eingefÃ¼gt: UID='".$projektbetreuerperson_id3."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}
 										else
 										{
@@ -2019,7 +2019,7 @@ if($result = pg_query($conn_fas, $qry))
 										if($projektbetreuernew4)
 										{
 											$anzahl_pbb2_insert++;
-											$ausgabe.="Diplomarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id4."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Diplomarbeitsbetreuer eingefÃ¼gt: UID='".$projektbetreuerperson_id4."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}
 										else
 										{
@@ -2138,25 +2138,25 @@ echo nl2br("Diplomarbeitsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HT
 
 $error_log_fas="Sync Diplomarbeit\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8."\n".$error_log_fas9;
 echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", Anzahl Diplomarbeiten: ".$anzahl_quelle.".\n");
-echo nl2br("Lehrveranstaltungen:       Gesamt: ".$anzahl_lv_gesamt." / Eingefügt: ".$anzahl_lv_insert." / Geändert: ".$anzahl_lv_update." / Fehler: ".$anzahl_fehler_lv."\n");
-echo nl2br("Lehreinheiten:       	Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
-echo nl2br("Projektarbeiten:   	Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
-echo nl2br("Begutachter1:  		Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg." / kein Erstbegutachter: ".$noe."\n");
-echo nl2br("Begutachter2:  		Gesamt: ".$anzahl_pbg2_gesamt." / Eingefügt: ".$anzahl_pbg2_insert." / Geändert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2." / kein Zweitbegutachter: ".$noz."\n");
-echo nl2br("Betreuer1:  		Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb." / kein Erstbetreuer: ".$no1."\n");
-echo nl2br("Betreuer2:  		Gesamt: ".$anzahl_pbb2_gesamt." / Eingefügt: ".$anzahl_pbb2_insert." / Geändert: ".$anzahl_pbb2_update." / Fehler: ".$anzahl_fehler_pbb2." / kein Zweitbetreuer: ".$no2."\n\n");
+echo nl2br("Lehrveranstaltungen:       Gesamt: ".$anzahl_lv_gesamt." / EingefÃ¼gt: ".$anzahl_lv_insert." / GeÃ¤ndert: ".$anzahl_lv_update." / Fehler: ".$anzahl_fehler_lv."\n");
+echo nl2br("Lehreinheiten:       	Gesamt: ".$anzahl_le_gesamt." / EingefÃ¼gt: ".$anzahl_le_insert." / GeÃ¤ndert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
+echo nl2br("Projektarbeiten:   	Gesamt: ".$anzahl_pa_gesamt." / EingefÃ¼gt: ".$anzahl_pa_insert." / GeÃ¤ndert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
+echo nl2br("Begutachter1:  		Gesamt: ".$anzahl_pbg_gesamt." / EingefÃ¼gt: ".$anzahl_pbg_insert." / GeÃ¤ndert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg." / kein Erstbegutachter: ".$noe."\n");
+echo nl2br("Begutachter2:  		Gesamt: ".$anzahl_pbg2_gesamt." / EingefÃ¼gt: ".$anzahl_pbg2_insert." / GeÃ¤ndert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2." / kein Zweitbegutachter: ".$noz."\n");
+echo nl2br("Betreuer1:  		Gesamt: ".$anzahl_pbb_gesamt." / EingefÃ¼gt: ".$anzahl_pbb_insert." / GeÃ¤ndert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb." / kein Erstbetreuer: ".$no1."\n");
+echo nl2br("Betreuer2:  		Gesamt: ".$anzahl_pbb2_gesamt." / EingefÃ¼gt: ".$anzahl_pbb2_insert." / GeÃ¤ndert: ".$anzahl_pbb2_update." / Fehler: ".$anzahl_fehler_pbb2." / kein Zweitbetreuer: ".$no2."\n\n");
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all);
 
 mail($adress, 'SYNC Diplomarbeit von '.$_SERVER['HTTP_HOST'],
 "Allgemeine Fehler: ".$anzahl_fehler.", Anzahl Diplomarbeiten: ".$anzahl_quelle.".\n".
-"Lehrveranstaltungen:    Gesamt: ".$anzahl_lv_gesamt." / Eingefügt: ".$anzahl_lv_insert." / Geändert: ".$anzahl_lv_update." / Fehler: ".$anzahl_fehler_lv."\n".
-"Lehreinheiten:       	Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
-"Projektarbeiten:    	Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
-"Begutachter1:  		Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg." / kein Erstbegutachter: ".$noe."\n".
-"Begutachter2:  		Gesamt: ".$anzahl_pbg2_gesamt." / Eingefügt: ".$anzahl_pbg2_insert." / Geändert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2." / kein Zweitbegutachter: ".$noz."\n".
-"Betreuer1:  		Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb." / kein Erstbetreuer: ".$no1."\n".
-"Betreuer2:  		Gesamt: ".$anzahl_pbb2_gesamt." / Eingefügt: ".$anzahl_pbb2_insert." / Geändert: ".$anzahl_pbb2_update." / Fehler: ".$anzahl_fehler_pbb2." / kein Zweitbetreuer: ".$no2."\n\n".
+"Lehrveranstaltungen:    Gesamt: ".$anzahl_lv_gesamt." / EingefÃ¼gt: ".$anzahl_lv_insert." / GeÃ¤ndert: ".$anzahl_lv_update." / Fehler: ".$anzahl_fehler_lv."\n".
+"Lehreinheiten:       	Gesamt: ".$anzahl_le_gesamt." / EingefÃ¼gt: ".$anzahl_le_insert." / GeÃ¤ndert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
+"Projektarbeiten:    	Gesamt: ".$anzahl_pa_gesamt." / EingefÃ¼gt: ".$anzahl_pa_insert." / GeÃ¤ndert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
+"Begutachter1:  		Gesamt: ".$anzahl_pbg_gesamt." / EingefÃ¼gt: ".$anzahl_pbg_insert." / GeÃ¤ndert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg." / kein Erstbegutachter: ".$noe."\n".
+"Begutachter2:  		Gesamt: ".$anzahl_pbg2_gesamt." / EingefÃ¼gt: ".$anzahl_pbg2_insert." / GeÃ¤ndert: ".$anzahl_pbg2_update." / Fehler: ".$anzahl_fehler_pbg2." / kein Zweitbegutachter: ".$noz."\n".
+"Betreuer1:  		Gesamt: ".$anzahl_pbb_gesamt." / EingefÃ¼gt: ".$anzahl_pbb_insert." / GeÃ¤ndert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb." / kein Erstbetreuer: ".$no1."\n".
+"Betreuer2:  		Gesamt: ".$anzahl_pbb2_gesamt." / EingefÃ¼gt: ".$anzahl_pbb2_insert." / GeÃ¤ndert: ".$anzahl_pbb2_update." / Fehler: ".$anzahl_fehler_pbb2." / kein Zweitbetreuer: ".$no2."\n\n".
 $ausgabe_all,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC-Fehler Diplomarbeiten  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");

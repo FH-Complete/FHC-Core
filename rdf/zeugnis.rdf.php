@@ -141,11 +141,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			//Wenn das Semester 0 ist, dann wird das Semester aus der Rolle geholt. (Ausnahme: Incoming)
 			//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
-			$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentrolle 
+			$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
 					WHERE 
 					prestudent_id='".addslashes($row->prestudent_id)."' AND 
 					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-					rolle_kurzbz!='Incoming' LIMIT 1";
+					status_kurzbz!='Incoming' LIMIT 1";
 			if($result_sem = pg_query($conn, $qry))
 			{
 				if($row_sem = pg_fetch_object($result_sem))

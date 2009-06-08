@@ -194,8 +194,8 @@ class moodle_user
 						
 						if($this->createZuteilung($this->mdl_user_id, $mdlcourse->mdl_context_id, 3))
 						{
-							$this->log.="\nder Lektor $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-							$this->log_public.="\nder Lektor $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log.="\nder Lektor $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefÃ¼gt";
+							$this->log_public.="\nder Lektor $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefÃ¼gt";
 							$this->sync_create++;
 						}
 						else 
@@ -350,8 +350,8 @@ class moodle_user
 								
 								if($this->createZuteilung($this->mdl_user_id, $mdlcourse->mdl_context_id, 5))
 								{
-									$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-									$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+									$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefÃ¼gt";
+									$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefÃ¼gt";
 									$this->sync_create++;
 								}
 								else 
@@ -761,8 +761,8 @@ class moodle_user
 					//Student ist noch nicht zugeteilt.
 					if($this->createZuteilung($this->mdl_user_id, $mdlcourse->mdl_context_id, 5))
 					{
-						$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+						$this->log.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefÃ¼gt";
+						$this->log_public.="\nder Student $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefÃ¼gt";
 						$this->sync_create++;
 					}
 					else 

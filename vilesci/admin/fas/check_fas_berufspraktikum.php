@@ -33,7 +33,7 @@ $firmaname=array();
 <html>
 <head>
 <title>Berufspraktikum-Datenkorrektur</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -127,14 +127,14 @@ echo "<table class='liste'><tr><th>&nbsp;&nbsp;&nbsp;</th><th>&nbsp;&nbsp;&nbsp;
 
 
 $qry="SELECT *,
-	trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as zweit
+	trim(substring(trim(firmenbetreuer) from ' [A-Ã¼]*$')) as zweit
 	FROM berufspraktikum WHERE
 	((vilesci_firmenbetreuer IS NULL AND trim(firmenbetreuer)!='') OR
 	(vilesci_firma IS NULL AND trim(firma)!=''))
 	ORDER BY berufspraktikum_pk
 	LIMIT 20;";
 
-//trim(substring(trim(firma) from ' [A-ü]*$')) as dritt
+//trim(substring(trim(firma) from ' [A-Ã¼]*$')) as dritt
 if($result = pg_query($conn_fas, $qry))
 {
 	for($k=0;$row=pg_fetch_object($result);$k++)

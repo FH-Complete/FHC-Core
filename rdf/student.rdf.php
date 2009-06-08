@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
+// header fÃŒr no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -28,7 +28,7 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 // xml
 if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
-	echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes"?>';
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 else
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
@@ -91,7 +91,7 @@ function checkfilter($row, $filter2)
 					buchungstyp_kurzbz='Studiengebuehr'";
 		if($result_filter = pg_query($conn, $qry))
 			if($row_filter = pg_fetch_object($result_filter))
-				if($row_filter->anzahl>0 || $prestudent->rolle_kurzbz=='Incoming')
+				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
 					return false;
 	}
 	elseif(strstr($filter2,'buchungstyp;'))
@@ -108,7 +108,7 @@ function checkfilter($row, $filter2)
 					buchungstyp_kurzbz='$buchungstyp'";
 		if($result_filter = pg_query($conn, $qry))
 			if($row_filter = pg_fetch_object($result_filter))
-				if($row_filter->anzahl>0 || $prestudent->rolle_kurzbz=='Incoming')
+				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
 					return false;
 	}
 	elseif($filter2=='zgvohnedatum')
@@ -147,7 +147,7 @@ function draw_content_liste($row)
 
 	$prestudent = new prestudent($conn, null, null);
 	$prestudent->getLastStatus($row->prestudent_id);
-	$status = $prestudent->rolle_kurzbz;
+	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
 
 	echo '
@@ -206,7 +206,7 @@ function draw_content($row)
 	{
 		$prestudent = new prestudent($conn, null, null);
 		$prestudent->getLastStatus($row->prestudent_id);
-		$status = $prestudent->rolle_kurzbz;
+		$status = $prestudent->status_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
 		
 		if($status=='Aufgenommener' || $status=='Bewerber' || $status=='Wartender' || $status=='Interessent')
@@ -385,7 +385,7 @@ if($xmlformat=='rdf')
 			//die Orgform keine ruecksicht genommen
 			if($verband=='' && $gruppe=='' && $orgform!='')
 			{
-				$where.=" AND EXISTS(SELECT prestudent_id FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_prestudent.prestudent_id AND orgform_kurzbz='$orgform'";
+				$where.=" AND EXISTS(SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND orgform_kurzbz='$orgform'";
 				if($studiensemester_kurzbz!=null)
 					$where.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
 				$where.=")";
@@ -424,7 +424,7 @@ if($xmlformat=='rdf')
 	}
 	elseif($typ=='incoming')
 	{
-		$qry = "SELECT prestudent_id FROM public.tbl_prestudentrolle WHERE rolle_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		if($result = pg_query($conn, $qry))
 		{
 			while($row = pg_fetch_object($result))
@@ -604,8 +604,8 @@ else
 
 			$studiengbeginn = '';
 			$studiensemester_kurzbz='';
-			$qry = "SELECT * FROM public.tbl_prestudentrolle JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-					WHERE prestudent_id='$student->prestudent_id' AND rolle_kurzbz in('Student','Incoming') ORDER BY datum LIMIT 1";
+			$qry = "SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+					WHERE prestudent_id='$student->prestudent_id' AND status_kurzbz in('Student','Incoming') ORDER BY datum LIMIT 1";
 			if($result = pg_query($conn, $qry))
 			{
 				if($row = pg_fetch_object($result))
@@ -620,7 +620,7 @@ else
 
 			$stsem->load($ss);
 
-			$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss' ORDER BY datum DESC";
+			$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss' ORDER BY datum DESC";
 			$semester=0;
 			if($result = pg_query($conn, $qry))
 			{

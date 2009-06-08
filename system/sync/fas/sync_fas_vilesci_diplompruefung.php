@@ -7,7 +7,7 @@
  */
 
 //*
-//* Synchronisiert Diplomprüfungsdatensätze von FAS DB in PORTAL DB
+//* Synchronisiert DiplomprÃ¼fungsdatensÃ¤tze von FAS DB in PORTAL DB
 //*
 //*
 
@@ -47,8 +47,8 @@ function myaddslashes($var)
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Diplomprüfung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Synchro - FAS -> Portal - DiplomprÃ¼fung</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -57,8 +57,8 @@ $qry = "SELECT *,creationdate::timestamp as insertamum FROM diplomarbeit WHERE m
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo nl2br("Diplomprüfung Sync\n------------------------\n");
-	echo nl2br("Diplomprüfungssynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+	echo nl2br("DiplomprÃ¼fung Sync\n------------------------\n");
+	echo nl2br("DiplomprÃ¼fungssynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
@@ -70,7 +70,7 @@ if($result = pg_query($conn_fas, $qry))
 		//$vorsitz				='';
 		$pruefer1				=$row->vilesci_pruefer;
 		$pruefer2				=$row->vilesci_pruefer1;
-		//$pruefer3				='';//kein dritter Prüfer bei Diplomprüfungen
+		//$pruefer3				='';//kein dritter PrÃ¼fer bei DiplomprÃ¼fungen
 		//$abschlussbeurteilung_kurzbz	='';
 		//$akadgrad_id			='';
 		$datum				=$row->pruefungsdatum;
@@ -202,11 +202,11 @@ if($result = pg_query($conn_fas, $qry))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
+							$ausgabe1.=", PrÃ¼fer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
+							$ausgabe1="PrÃ¼fer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
 						}
 					}
 					if($rowo->pruefer2!=$pruefer2) 
@@ -214,11 +214,11 @@ if($result = pg_query($conn_fas, $qry))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
+							$ausgabe1.=", PrÃ¼fer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
+							$ausgabe1="PrÃ¼fer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
 						}
 					}
 					if($rowo->abschlussbeurteilung_kurzbz!=$abschlussbeurteilung_kurzbz) 
@@ -250,11 +250,11 @@ if($result = pg_query($conn_fas, $qry))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfungsdatum: '".$datum."' (statt '".$rowo->datum."')";
+							$ausgabe1.=", PrÃ¼fungsdatum: '".$datum."' (statt '".$rowo->datum."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfungsdatum: '".$datum."' (statt '".$rowo->datum."')";
+							$ausgabe1="PrÃ¼fungsdatum: '".$datum."' (statt '".$rowo->datum."')";
 						}
 					}
 					if($rowo->sponsion!=$sponsion) 
@@ -274,11 +274,11 @@ if($result = pg_query($conn_fas, $qry))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
+							$ausgabe1.=", PrÃ¼fungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
+							$ausgabe1="PrÃ¼fungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
 						}
 					}
 					if($rowo->anmerkung!=$anmerkung) 
@@ -337,7 +337,7 @@ if($result = pg_query($conn_fas, $qry))
 							"updateamum= now(), ".
 							"ext_id=".myaddslashes($ext_id).
 							";";
-							$ausgabe.="Abschlussprüfung von Student mit UID '".$student_uid."' geändert: ".$ausgabe1."\n;";
+							$ausgabe.="AbschlussprÃ¼fung von Student mit UID '".$student_uid."' geÃ¤ndert: ".$ausgabe1."\n;";
 							$anzahl_geaendert++;
 					}
 					else 
@@ -366,7 +366,7 @@ if($result = pg_query($conn_fas, $qry))
 						"now(), ".
 						myaddslashes($ext_id).
 						");";
-						$ausgabe.="Abschlussprüfung von Student mit UID '".$student_uid."' am '".$datum."' eingetragen.\n";
+						$ausgabe.="AbschlussprÃ¼fung von Student mit UID '".$student_uid."' am '".$datum."' eingetragen.\n";
 						$anzahl_eingefuegt++;
 				}
 			}
@@ -378,7 +378,7 @@ if($result = pg_query($conn_fas, $qry))
 			if(!pg_query($conn,$qry))
 			{	
 				$anzahl_fehler++;		
-				$error_log.='Fehler beim Speichern des Diplomprüfung-Datensatzes von Student:'.$student_uid." \n".$qry."\n";
+				$error_log.='Fehler beim Speichern des DiplomprÃ¼fung-Datensatzes von Student:'.$student_uid." \n".$qry."\n";
 				$ausgabe1='';
 			}
 		}
@@ -389,20 +389,20 @@ if($result = pg_query($conn_fas, $qry))
 	}
 	
 //echo und mail
-echo nl2br("Diplomprüfungssynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+echo nl2br("DiplomprÃ¼fungssynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 
-$error_log_fas="Sync Diplomprüfung\n------------------------\n\n".$error_log;
-echo nl2br("Allgemeine Fehler: ".$anzahl_fehler."\nAnzahl Diplomprüfungen: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert.".\n\n");
+$error_log_fas="Sync DiplomprÃ¼fung\n------------------------\n\n".$error_log;
+echo nl2br("Allgemeine Fehler: ".$anzahl_fehler."\nAnzahl DiplomprÃ¼fungen: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt." / GeÃ¤ndert: ".$anzahl_geaendert.".\n\n");
 
 
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe);
 
-mail($adress, 'SYNC Diplomprüfung von '.$_SERVER['HTTP_HOST'], 
-"Allgemeine Fehler: ".$anzahl_fehler.", Anzahl Diplomprüfungen: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert.".\n\n".
+mail($adress, 'SYNC DiplomprÃ¼fung von '.$_SERVER['HTTP_HOST'], 
+"Allgemeine Fehler: ".$anzahl_fehler.", Anzahl DiplomprÃ¼fungen: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt." / GeÃ¤ndert: ".$anzahl_geaendert.".\n\n".
 $ausgabe,"From: vilesci@technikum-wien.at");
 
-mail($adress, 'SYNC-Fehler Diplomprüfung  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");
+mail($adress, 'SYNC-Fehler DiplomprÃ¼fung  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");
 }
 ?>
 </body>

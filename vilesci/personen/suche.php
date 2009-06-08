@@ -43,7 +43,7 @@ echo '
 <html>
 <head>
 <title>Suchergebnis</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 
@@ -56,11 +56,10 @@ $stg->getAll('typ, kurzbz', false);
 $stg_arr = array();
 foreach ($stg->result as $row)
 	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
-
 echo '
-	<form name="search" method="GET">
+	<form accept-charset="UTF-8" name="search" method="GET">
   		Bitte Suchbegriff eingeben: 
-  		<input type="text" name="searchstr" size="30" value="'.htmlentities($searchstr).'">
+  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
   		<input type="submit" value="Suchen">
   	</form>';
 
@@ -75,7 +74,6 @@ if($searchstr!='')
 			vorname || ' ' || nachname = '".addslashes($searchstr)."' OR 
 			uid ~* '".addslashes($searchstr)."'
 			) ORDER BY nachname, vorname;";
-	
 	
 	if($result = pg_query($conn, $qry))
 	{		
@@ -210,7 +208,7 @@ if($searchstr!='')
 								$content.= '<td></td>';
 								$content.= '<td></td>';
 								$content.= '<td></td>';
-								$content.= "<td>$student->rolle_kurzbz</td>";
+								$content.= "<td>$student->status_kurzbz</td>";
 								$content.= "<td><a href='personen_details.php?uid=$row_student->uid'>$row_student->uid</a></td>";
 								$content.= "<td>".($row_student->aktiv=='t'?'Ja':'Nein')."</td>";
 								

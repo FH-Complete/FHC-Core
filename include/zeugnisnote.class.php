@@ -60,7 +60,7 @@ class zeugnisnote
 	function zeugnisnote($conn, $lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null , $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -74,7 +74,7 @@ class zeugnisnote
 				return false;
 			}
 		}
-
+*/
 		if($lehrveranstaltung_id!=null && $student_uid!=null && $studiensemester_kurzbz!=null)
 			$this->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
 	}

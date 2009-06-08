@@ -34,7 +34,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
-
+
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
@@ -91,7 +91,7 @@ if($lehreinheit_id=='')
 
 $note = $_REQUEST["note"];
 
-// lvgesamtnote für studenten speichern
+// lvgesamtnote fÃ¼r studenten speichern
 
 if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))  ){
 	

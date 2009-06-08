@@ -26,12 +26,14 @@ class ausbildungssemester
 	function ausbildungssemester($conn, $ausbildungssemester_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($ausbildungssemester_id != null)
 			$this->load($ausbildungssemester_id);
 	}

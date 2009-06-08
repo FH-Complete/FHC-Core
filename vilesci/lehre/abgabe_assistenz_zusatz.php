@@ -22,8 +22,8 @@
  */
 /*******************************************************************************************************
  *				abgabe_assistenz
- * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 		abgabe_assistenz ist die AssistenzoberflÃ¤che des Abgabesystems 
+ * 			fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../cis/config.inc.php');
@@ -98,7 +98,7 @@ $htmlstr='';
 					<title>Zusatzdaten PA-Abgabe</title>
 					<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 					<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-					<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 					<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 					</head>
 					<body class="Background_main"  style="background-color:#eeeeee;">

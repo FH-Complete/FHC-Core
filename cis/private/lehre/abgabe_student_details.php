@@ -23,7 +23,7 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../config.inc.php');
@@ -94,7 +94,7 @@ $htmlstr='';
 
 if($command=='add')
 {
-	//zusätzliche Daten bearbeiten
+	//zusÃ¤tzliche Daten bearbeiten
 	//Check der Eingabedaten
 	if(strlen($kontrollschlagwoerter)<1)
 	{
@@ -182,7 +182,7 @@ if($command=="update" || $error==true)
 					<title>PA-Abgabe</title>
 					<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 					<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-					<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+					<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 					<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 					</head>
 					<body class="Background_main"  style="background-color:#eeeeee;">
@@ -193,7 +193,7 @@ if($command=="update" || $error==true)
 					$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br></div>\n";
 					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 					$htmlstr .= "<tr></tr>\n";
-					$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
+					$htmlstr .= "<form accept-charset='UTF-8' action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
@@ -269,7 +269,7 @@ if($command!="add")
 	<title>PA-Abgabe</title>
 	<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
 	<body class="Background_main"  style="background-color:#eeeeee;">
@@ -285,7 +285,7 @@ if($command!="add")
 	$result=@pg_query($conn, $qry);
 		while ($row=@pg_fetch_object($result))
 		{
-			$htmlstr .= "<form action='$PHP_SELF' method='POST' enctype='multipart/form-data' name='".$row->projektarbeit_id."'>\n";
+			$htmlstr .= "<form accept-charset='UTF-8' action='$PHP_SELF' method='POST' enctype='multipart/form-data' name='".$row->projektarbeit_id."'>\n";
 			$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
 			$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
 			$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$row->paabgabetyp_kurzbz."'>\n";

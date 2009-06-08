@@ -25,7 +25,7 @@ $eteam=array();
 $studiensemester=new studiensemester($conn);
 $ssem=$studiensemester->getaktorNext();		//aktuelles Semester
 $psem=$studiensemester->getPrevious();		//voriges Semester
-$bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
+$bsem=$studiensemester->getBeforePrevious();		//vorjÃ¤hriges Semester
 $datei='';
 $mitarbeiterzahl=0;
 $echt=0;
@@ -47,7 +47,7 @@ if(strstr($ssem,"WS"))
 }*/
 else
 {
-	echo "Ungültiges Semester!";
+	echo "UngÃ¼ltiges Semester!";
 	exit;
 }
 

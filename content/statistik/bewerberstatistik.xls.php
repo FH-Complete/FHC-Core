@@ -97,14 +97,14 @@ loadVariables($conn, $user);
 	// Daten holen
 	$qry = "SELECT *, tbl_person.person_id 
 			FROM 
-				public.tbl_prestudentrolle, public.tbl_prestudent, public.tbl_person 
+				public.tbl_prestudentstatus, public.tbl_prestudent, public.tbl_person 
 			WHERE 
-				tbl_prestudentrolle.prestudent_id=tbl_prestudent.prestudent_id AND
+				tbl_prestudentstatus.prestudent_id=tbl_prestudent.prestudent_id AND
 				tbl_prestudent.person_id=tbl_person.person_id AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-				rolle_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher','Diplomand','Incoming', 'Praktikant', 'Abgewiesener') AND
+				status_kurzbz in('Interessent','Bewerber','Student','Abbrecher','Unterbrecher','Diplomand','Incoming', 'Praktikant', 'Abgewiesener') AND
 				studiengang_kz not in(0, 203, 10001, 10002)
-			ORDER BY nachname, vorname, tbl_prestudentrolle.datum, tbl_prestudentrolle.insertamum, tbl_prestudentrolle.ext_id";
+			ORDER BY nachname, vorname, tbl_prestudentstatus.datum, tbl_prestudentstatus.insertamum, tbl_prestudentstatus.ext_id";
 	//'Outgoing',
 	
 	//echo $qry;
@@ -190,7 +190,7 @@ loadVariables($conn, $user);
 					$maxlength[$i]=strlen($row->zgv_code);
 			}
 			
-			switch($row->rolle_kurzbz)
+			switch($row->status_kurzbz)
 			{
 				case 'Interessent': 
 								$kuerzel = 'i'; 

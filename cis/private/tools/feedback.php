@@ -28,7 +28,7 @@
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
+       die('Fehler beim Ã¶ffnen der Datenbankverbindung');
 
 	$user = get_uid();
 
@@ -79,10 +79,10 @@
 	}
 ?>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 
 	function focusFirstElement()
 	{
@@ -128,7 +128,7 @@
 		  <h3>Ihre Meinung z&auml;hlt!</h3>
 		  <h3>Hier k&ouml;nnen Sie uns Feedback geben.</h3>
 		  <p>Helfen Sie mit, unseren Service zu verbessern und geben Sie uns hier Ihr Feedback. Haben Sie spezielle W&uuml;nsche und Anregungen f&uuml;r uns, vermissen Sie wichtige Informationen oder wollen Sie uns mal richtig die Meinung sagen? F&uuml;r Ihre Beitr&auml;ge haben wir immer ein offenes Ohr. Denn nur wenn wir Ihre Meinung kennen, k&ouml;nnen wir auf Ihre Belange und W&uuml;nsche eingehen.</p>
-		  <p>Für technische Gebrechen verwenden Sie bitte das <a href='https://bug.technikum-wien.at' target="_blank" class='Item'>Bugtracking-System</a></p>
+		  <p>FÃ¼r technische Gebrechen verwenden Sie bitte das <a href='https://bug.technikum-wien.at' target="_blank" class='Item'>Bugtracking-System</a></p>
 		  <table class="tabcontent">
 		  	<tr>
 			  <td nowrap><br>

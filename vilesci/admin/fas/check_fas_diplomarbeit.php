@@ -29,7 +29,7 @@ $nachname=array();
 <html>
 <head>
 <title>Diplomarbeiten-Datenkorrektur</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -113,9 +113,9 @@ if($result = pg_query($conn_fas, $qry))
 echo "<table class='liste'><tr><th>FAS</th><th>Vilesci</th><th></th><th>Titel/Vorname/Nachname</th></tr>";
 
 
-$qry="SELECT *, trim(substring(trim(erstbegutachter) from ' [A-ü]*$')) as erst, trim(substring(trim(zweitbegutachter) from ' [A-ü]*$')) as zweit, trim(substring(trim(betreuer) from ' [A-ü]*$')) as dritt,
-		trim(substring(trim(firmenbetreuer) from ' [A-ü]*$')) as viert, trim(substring(trim(pruefer) from ' [A-ü]*$')) as fuenft,
-		trim(substring(trim(vorsitzender) from ' [A-ü]*$')) as sechst, trim(substring(trim(pruefer1) from ' [A-ü]*$')) as siebent
+$qry="SELECT *, trim(substring(trim(erstbegutachter) from ' [A-Ã¼]*$')) as erst, trim(substring(trim(zweitbegutachter) from ' [A-Ã¼]*$')) as zweit, trim(substring(trim(betreuer) from ' [A-Ã¼]*$')) as dritt,
+		trim(substring(trim(firmenbetreuer) from ' [A-Ã¼]*$')) as viert, trim(substring(trim(pruefer) from ' [A-Ã¼]*$')) as fuenft,
+		trim(substring(trim(vorsitzender) from ' [A-Ã¼]*$')) as sechst, trim(substring(trim(pruefer1) from ' [A-Ã¼]*$')) as siebent
 	FROM diplomarbeit WHERE
 	((vilesci_erstbegutachter IS NULL AND trim(erstbegutachter)!='') OR
 	(vilesci_zweitbegutachter IS NULL AND trim(zweitbegutachter)!='') OR

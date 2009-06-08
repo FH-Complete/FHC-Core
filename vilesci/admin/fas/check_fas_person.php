@@ -28,7 +28,7 @@ $qry1='';
 <html>
 <head>
 <title>Personendatenkorrektur</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/vilesci_old.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -257,7 +257,7 @@ OR p1.postnomentitel<>p2.postnomentitel) LIMIT 20;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo "<table class='liste'><tr><th></th><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th><th></th></tr>";
+	echo "<table class='liste'><tr><th></th><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbÃ¼rgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th><th></th></tr>";
 	while($row = pg_fetch_object($result))
 	{
 		$i++;

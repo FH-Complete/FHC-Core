@@ -55,7 +55,7 @@ class firma
 	function firma($conn,$firma_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+		/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -72,6 +72,7 @@ class firma
 				return false;
 			}
 		}
+		*/
 		if($firma_id != null)
 			$this->load($firma_id);
 	}
@@ -135,12 +136,12 @@ class firma
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>128)
 		{
-			$this->errormsg = 'Name darf nicht länger als 128 Zeichen sein  - firma_id: '.$this->firma_id.'/'.$this->name;
+			$this->errormsg = 'Name darf nicht lÃ¤nger als 128 Zeichen sein  - firma_id: '.$this->firma_id.'/'.$this->name;
 			return false;
 		}
 		if(strlen($this->anmerkung)>256)
 		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein - firma_id: '.$this->firma_id.'/'.$this->name;
+			$this->errormsg = 'Anmerkung darf nicht lÃ¤nger als 256 Zeichen sein - firma_id: '.$this->firma_id.'/'.$this->name;
 			return false;
 		}
 

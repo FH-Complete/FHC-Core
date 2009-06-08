@@ -44,7 +44,7 @@ class benutzerlvstudiensemester
 	function benutzerlvstudiensemester($conn, $uid=null, $studiensemester_kurzbz=null, $lehrveranstaltung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -56,6 +56,7 @@ class benutzerlvstudiensemester
 			return false;
 		}
 		else
+*/	
 			$this->new = true;
 
 		if($uid!=null && $studiensemester_kurzbz!=null && $lehrveranstaltung_id!=null)

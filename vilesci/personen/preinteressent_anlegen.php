@@ -39,7 +39,8 @@ if(!$conn=pg_pconnect(CONN_STRING))
 $user=get_uid();
 $datum_obj = new datum();
 
-loadVariables($conn, $user);
+#gss loadVariables($conn, $user);
+loadVariables($user);
 
 function getGemeindeDropDown($postleitzahl)
 {
@@ -79,7 +80,7 @@ function getGemeindeDropDown($postleitzahl)
 
 if(isset($_GET['type']) && $_GET['type']=='getgemeindecontent' && isset($_GET['plz']))
 {
-	header('Content-Type: text/html; charset=iso-8859-15');
+	header('Content-Type: text/html; charset=UTF-8');
 
 	echo getGemeindeDropDown($_GET['plz']);
 	exit;
@@ -108,7 +109,7 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 }
 if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
 {
-	header('Content-Type: text/html; charset=iso-8859-15');
+	header('Content-Type: text/html; charset=UTF-8');
 	
 	echo getOrtDropDown($_GET['plz'], utf8_decode($_GET['gemeinde']));
 	exit;
@@ -117,7 +118,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/cis.css" rel="stylesheet" type="text/css">
 <script language="Javascript">
 function disablefields(obj)
@@ -715,8 +716,8 @@ if($adresse_nation=='A' && $plz!='')
 echo '</div><input type="text" style="display: '.($adresse_nation=='A'?'none':'block').';" id="adresse-ort-textfeld" maxlength="256" name="ort_txt" value="'.$ort.'"/></td></tr>';
 
 echo '</table>';
-echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse überschreiben</div>';
-echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufügen</div>';
+echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse Ã¼berschreiben</div>';
+echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufÃ¼gen</div>';
 echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="" onclick="disablefields2(true)">Adresse nicht anlegen</div>';
 echo '</fieldset></td></tr>';
 echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" name="email" value="'.$email.'" /></td></tr>';
@@ -791,7 +792,7 @@ echo '</td></tr>';
 echo '</table>';
 echo '
 <br><br>
-Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
+Felder die mit einem * gekennzeichnet sind mÃ¼ssen ausgefÃ¼llt werden!
 ';
 echo '</td>';
 echo '<td valign="top">';
@@ -851,7 +852,7 @@ if($where!='')
 			}
 			$status = substr($status, 0, strlen($status)-2);
 			
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'mÃ¤nnlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = pg_query($conn, $qry_adr))
 				while($row_adr=pg_fetch_object($result_adr))

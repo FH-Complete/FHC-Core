@@ -1,3 +1,4 @@
+@charset "utf-8"
 /* Allgemein */
 body
 {
@@ -37,7 +38,7 @@ hr
 	height:80%;
 	z-index:1000;
 }
-/*Alle außer IE 6*/
+/*Alle auÃŸer IE 6*/
 html>body #menue
 {
 	position:absolute;
@@ -49,7 +50,7 @@ html>body #menue
 	height:75%;
 	left:20%;
 }
-/*Alle außer IE 6*/
+/*Alle auÃŸer IE 6*/
 html>body #content
 {
 	position:absolute;
@@ -64,7 +65,7 @@ input.TextBox
 	position:relative;
 	top:-15px;
 	text-align: right;
-	color:#347b22; /*Dunkel-Grün*/
+	color:#347b22; /*Dunkel-GrÃ¼n*/
 }
 .home_logo
 {
@@ -109,12 +110,12 @@ div.tip
 /* Links */
 a
 {
-	color: #347b22; text-decoration: none; /*Dunkel-Grün*/
+	color: #347b22; text-decoration: none; /*Dunkel-GrÃ¼n*/
 	cursor: pointer;
 }
 a.HyperItem
 {
-	color: #347b22; text-decoration: none; /*Dunkel-Grün*/
+	color: #347b22; text-decoration: none; /*Dunkel-GrÃ¼n*/
 	font-weight: bold;
 }
 a:hover.HyperItem
@@ -136,11 +137,11 @@ a.Item2
 }
 a:hover.Item2
 {
-	color: #347b22; text-decoration: none; /*Dunkel-Grün*/
+	color: #347b22; text-decoration: none; /*Dunkel-GrÃ¼n*/
 }
 a.MenuItem
 {
-	color: #347b22; text-decoration: none; /*Dunkel-Grün*/
+	color: #347b22; text-decoration: none; /*Dunkel-GrÃ¼n*/
 	font-weight: bold;
 }
 a:hover.MenuItem
@@ -213,25 +214,25 @@ TABLE#tabterm
 }
 td.ContentHeader
 {
-	background-color: #43ab28; /*Mittel-Grün*/
+	background-color: #43ab28; /*Mittel-GrÃ¼n*/
 	font-weight: bold;
 	height: 19px;
 }
 td.ContentHeader2
 {
-	background-color: #d0e8cf; /*Pastel-Mittel-Grün*/
+	background-color: #d0e8cf; /*Pastel-Mittel-GrÃ¼n*/
 	font-weight: normal;
 	height: 19px
 }
 td.ContentHeader3					
 {
-	background-color: #d0e8cf; /*Pastel-Mittel-Grün*/
+	background-color: #d0e8cf; /*Pastel-Mittel-GrÃ¼n*/
 	font-weight: bold;
 	height: 19px
 }
 td.MarkLine
 {
-	background-color: #e9f5e8; /*Pastel-Grün*/
+	background-color: #e9f5e8; /*Pastel-GrÃ¼n*/
 }
 td.tdwidth10
 {
@@ -243,7 +244,7 @@ td.tdwidth30
 }
 td.tdgreen
 {
-	background-color: #ffdda4; /*Grün*/
+	background-color: #ffdda4; /*GrÃ¼n*/
 }
 td.tdborder
 {
@@ -266,7 +267,7 @@ TR.liste
 }
 TR.liste0						
 {
-	background-color: #FFFFFF; /*weiß*/
+	background-color: #FFFFFF; /*weiÃŸ*/
 }
 TR.liste1						
 {
@@ -292,7 +293,7 @@ TABLE#zeitsperren TH
 }
 TABLE#zeitsperren TH.feiertag
 {
-	background-color: #ffc76b; /*kräftiges Orange*/
+	background-color: #ffc76b; /*krÃ¤ftiges Orange*/
 }
 TABLE#zeitsperren TD.feiertag
 {
@@ -300,7 +301,7 @@ TABLE#zeitsperren TD.feiertag
 }
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE /*grau fast weiß*/
+	background-color: #EEEEEE /*grau fast weiÃŸ*/
 }
 
 /* Stundeplan */
@@ -320,7 +321,7 @@ TABLE.stdplan TD
 	background-color: #EEEEEE
 }
 .row-even { /*liste1*/
- background-color:#e9f5e8; /*Pastel-Grün*/
+ background-color:#e9f5e8; /*Pastel-GrÃ¼n*/
 }
 
 .row-odd { /*liste0*/
@@ -333,13 +334,13 @@ h1
 { 
 	font-size: medium;
 	color: #ffffff; 
-	background-color: #43ab28; /*Mittel-Grün*/
+	background-color: #43ab28; /*Mittel-GrÃ¼n*/
 }
 h1 td
 { 
 	font-size: medium; 
 	color: #ffffff; 
-	background-color: #43ab28; /*Mittel-Grün*/
+	background-color: #43ab28; /*Mittel-GrÃ¼n*/
 }
 h1 a
 {
@@ -354,13 +355,13 @@ h2
 { 
 	font-size: small; 
 	color: #000000; 
-	background-color: #d0e8cf; /*Pastel-Mittel-Grün*/
+	background-color: #d0e8cf; /*Pastel-Mittel-GrÃ¼n*/
 }
 h2 td
 { 
 	font-size: small; 
 	color: #000000;  
-	background-color: #d0e8cf; /*Pastel-Mittel-grün*/
+	background-color: #d0e8cf; /*Pastel-Mittel-grÃ¼n*/
 }
 h2 a
 {
@@ -375,7 +376,7 @@ h3
 { 
 	font-size: small; 
 	font-weight: bold; 
-	color: #43ab28; /*Mittel-Grün*/
+	color: #43ab28; /*Mittel-GrÃ¼n*/
 }
 h4 
 { 
@@ -385,7 +386,7 @@ h4
 	font-weight: bold; 
 	font-variant: normal; 
 	text-transform: none; 
-	color: #43ab28;  /*Mittel-Grün*/
+	color: #43ab28;  /*Mittel-GrÃ¼n*/
 	cursor: hand; 
 	text-decoration: none; 
 }
@@ -407,7 +408,7 @@ font.ContentHeader
 	-moz-border-radius-topleft: 10px;
 	width: 100%;
 	border: 1px solid #E0E0E0;
-	background-color: #d0e8cf; /*Pastel-Mittel-Grün*/
+	background-color: #d0e8cf; /*Pastel-Mittel-GrÃ¼n*/
 	
 }
 #news .news .titel
@@ -418,7 +419,7 @@ font.ContentHeader
 }
 #news .news .text
 {
-	background-color: #e9f5e8; /*Pastel-Grün*/
+	background-color: #e9f5e8; /*Pastel-GrÃ¼n*/
 	padding: 0px 10px 0px 10px;
 }
 

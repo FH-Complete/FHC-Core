@@ -21,7 +21,7 @@
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
 /*
-Vorrückung aller AKTIVEN Studenten ins nächste Semester.
+VorrÃ¼ckung aller AKTIVEN Studenten ins nÃ¤chste Semester.
 */
 require_once('../config.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -51,7 +51,7 @@ foreach($ss->studiensemester as $studiensemester)
 
 $user = get_uid();
 
-//Übergabeparameter
+//Ãœbergabeparameter
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
@@ -72,14 +72,14 @@ if (is_null($studiensemester_kurzbz))
 if (isset($_GET['studiensemester_kurzbz_akt']) || isset($_POST['studiensemester_kurzbz_akt']))
 	$studiensemester_kurzbz_akt=(isset($_GET['studiensemester_kurzbz_akt'])?$_GET['studiensemester_kurzbz_akt']:$_POST['studiensemester_kurzbz_akt']);
 else
-	die("Aktuelles Studiensemester wurde nicht übergeben.");
+	die("Aktuelles Studiensemester wurde nicht Ã¼bergeben.");
 	
 /*$ss->getNextStudiensemester();
-$studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;	//nächstes Semester*/
+$studiensemester_kurzbz_zk=$ss->studiensemester_kurzbz;	//nÃ¤chstes Semester*/
 if (isset($_GET['studiensemester_kurzbz_zk']) || isset($_POST['studiensemester_kurzbz_zk']))
 	$studiensemester_kurzbz_zk=(isset($_GET['studiensemester_kurzbz_zk'])?$_GET['studiensemester_kurzbz_zk']:$_POST['studiensemester_kurzbz_zk_']);
 else
-	die("Nächstes Studiensemester wurde nicht übergeben.");
+	die("NÃ¤chstes Studiensemester wurde nicht Ã¼bergeben.");
 
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
@@ -87,7 +87,7 @@ if(!is_numeric($stg_kz))
 if(!is_numeric($semester))
 	$semester=100;
 
-//Einlesen der maximalen, regulären Dauer der Studiengänge in einen Array
+//Einlesen der maximalen, regulÃ¤ren Dauer der StudiengÃ¤nge in einen Array
 $qry_stg="SELECT * FROM public.tbl_studiengang";
 if ($result_stg=pg_query($conn, $qry_stg))
 {
@@ -97,7 +97,7 @@ if ($result_stg=pg_query($conn, $qry_stg))
 	}
 }	
 	
-//select für die Anzeige
+//select fÃ¼r die Anzeige
 $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
 			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
@@ -106,7 +106,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
 if($semester<100)
 {
-	$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
+	$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wÃ¤hlt alle aus
 }
 $sql_query.="ORDER BY semester, nachname";
 
@@ -115,10 +115,10 @@ if (!$result_std=pg_query($conn, $sql_query))
 	error("Studenten not found!");
 $outp='';
 
-// ****************************** Vorrücken ******************************
+// ****************************** VorrÃ¼cken ******************************
 if (isset($_POST['vorr']))
 {
-//select für die Vorrückung
+//select fÃ¼r die VorrÃ¼ckung
 $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
 			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 			JOIN tbl_benutzer ON (student_uid=uid)
@@ -127,7 +127,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt'";
 	if($semester<100)
 	{
-		$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
+		$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wÃ¤hlt alle aus
 	}
 	$sql_query.="ORDER BY semester, nachname";
 	
@@ -138,11 +138,11 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 	while($row=pg_fetch_object($result_std))
 	{
 		//aktuelle Rolle laden
-		$qry_status="SELECT rolle_kurzbz,  ausbildungssemester FROM public.tbl_prestudentrolle JOIN public.tbl_prestudent USING(prestudent_id) 
+		$qry_status="SELECT status_kurzbz,  ausbildungssemester FROM public.tbl_prestudentstatus JOIN public.tbl_prestudent USING(prestudent_id) 
 		WHERE person_id=".myaddslashes($row->person_id)." 
 		AND studiengang_kz=".$row->studiengang_kz."  
 		AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz_akt)." 
-		ORDER BY datum desc, tbl_prestudentrolle.insertamum desc, tbl_prestudentrolle.ext_id desc LIMIT 1;";
+		ORDER BY datum desc, tbl_prestudentstatus.insertamum desc, tbl_prestudentstatus.ext_id desc LIMIT 1;";
 		if ($result_status=pg_query($conn, $qry_status))
 		{
 			if($row_status=pg_fetch_object($result_status))
@@ -156,7 +156,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 				{
 					$s=$row->semester_stlv+1;
 				}
-				if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->rolle_kurzbz=="Unterbrecher")
+				if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->status_kurzbz=="Unterbrecher")
 				{
 					$ausbildungssemester=$row_status->ausbildungssemester;
 				}
@@ -179,7 +179,7 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 					if (!$r=pg_query($conn, $lvb_ins))
 						die(pg_last_error($conn));
 				}
-				//Überprüfen ob Eintrag schon vorhanden
+				//ÃœberprÃ¼fen ob Eintrag schon vorhanden
 				$qry_chk="SELECT * FROM public.tbl_studentlehrverband 
 						WHERE student_uid=".myaddslashes($row->student_uid)." 
 						AND studiensemester_kurzbz=".myaddslashes($next_ss)." 
@@ -193,14 +193,14 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 						VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
 						'$s','$row->verband_stlv','$row->gruppe_stlv',NULL,NULL,now(),'$user',NULL);";
 				}
-				$qry_chk="SELECT * FROM public.tbl_prestudentrolle
+				$qry_chk="SELECT * FROM public.tbl_prestudentstatus
 						WHERE prestudent_id=".myaddslashes($row->prestudent_id)." 
 						AND studiensemester_kurzbz=".myaddslashes($next_ss).";";
 				if(pg_num_rows(pg_query($conn, $qry_chk))<1)
 				{
 					//Eintragen des neuen Status
-					$sql.="INSERT INTO tbl_prestudentrolle
-					VALUES ($row->prestudent_id, '$row_status->rolle_kurzbz', '$next_ss',
+					$sql.="INSERT INTO tbl_prestudentstatus
+					VALUES ($row->prestudent_id, '$row_status->status_kurzbz', '$next_ss',
 						$ausbildungssemester, now(), now(), '$user',
 					NULL, NULL, NULL, NULL);";
 				}
@@ -250,7 +250,7 @@ $outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester=100&studi
 <html>
 <head>
 <title>Studenten Vorrueckung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -285,17 +285,17 @@ if ($result_std!=0)
 	for($i=0;$i<$num_rows;$i++)
 	{
 		$row=pg_fetch_object($result_std,$i);
-		$qry_status="SELECT rolle_kurzbz, ausbildungssemester FROM public.tbl_prestudentrolle 
+		$qry_status="SELECT status_kurzbz, ausbildungssemester FROM public.tbl_prestudentstatus 
 			JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." 
 			AND studiengang_kz=".$row->studiengang_kz."  
 			AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." 
-			ORDER BY datum desc, tbl_prestudentrolle.insertamum desc, tbl_prestudentrolle.ext_id desc LIMIT 1;";
+			ORDER BY datum desc, tbl_prestudentstatus.insertamum desc, tbl_prestudentstatus.ext_id desc LIMIT 1;";
 		if ($result_status=pg_query($conn, $qry_status))
 		{
 			if($row_status=pg_fetch_object($result_status))
 			{
 				echo "<tr>";
-				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td>$row_status->rolle_kurzbz</td><td>$row_status->ausbildungssemester</td>";
+				echo "<td>$row->nachname</td><td>$row->vorname</td><td>$row->studiengang_kz</td><td>$row->semester_stlv</td><td>$row->verband_stlv</td><td>$row->gruppe_stlv</td><td>$row_status->status_kurzbz</td><td>$row_status->ausbildungssemester</td>";
 				echo "</tr>\n";
 			}
 			else 

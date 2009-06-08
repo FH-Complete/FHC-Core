@@ -84,7 +84,7 @@ class ortraumtyp
 	{
 		if($ort_kurzbz == '' || !is_numeric($hierarchie) || $hierarchie=='')
 		{
-			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
+			$this->errormsg = 'Kein gÃ¼ltiger SchlÃ¼ssel vorhanden';
 			return false;
 		}
 
@@ -131,8 +131,8 @@ class ortraumtyp
 	 */
 	function checkvars()
 	{
-		$this->ort_kurzbz = str_replace("'",'´',$this->ort_kurzbz);
-		$this->raumtyp_kurzbz = str_replace("'",'´',$this->raumtyp_kurzbz);
+		$this->ort_kurzbz = str_replace("'",'Â´',$this->ort_kurzbz);
+		$this->raumtyp_kurzbz = str_replace("'",'Â´',$this->raumtyp_kurzbz);
 
 
 		//Laenge Pruefen
@@ -161,10 +161,10 @@ class ortraumtyp
 
 		if($this->new)
 		{
-			//Pruefen ob id gültig ist
+			//Pruefen ob id gÃ¼ltig ist
 			if($this->ort_kurzbz == '' || !is_numeric($this->hierarchie) || $this->hierarchie=='')
 			{
-				$this->errormsg = 'Keine gültige ID';
+				$this->errormsg = 'Keine gÃ¼ltige ID';
 				return false;
 			}
 			//Neuen Datensatz anlegen
@@ -181,7 +181,7 @@ class ortraumtyp
 			//Pruefen ob id gueltig ist
 			if($this->ort_kurzbz == '' || !is_numeric($this->hierarchie) || $this->hierarchie=='')
 			{
-				$this->errormsg = 'Keine gültige ID';
+				$this->errormsg = 'Keine gÃ¼ltige ID';
 				return false;
 			}
 

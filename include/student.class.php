@@ -44,7 +44,7 @@ class student extends benutzer
 	function student($conn, $uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -58,7 +58,7 @@ class student extends benutzer
 				return false;
 			}
 		}
-
+*/
 		//Student laden
 		if($uid!=null)
 			$this->load($uid);
@@ -257,7 +257,7 @@ class student extends benutzer
 	 * @param string ver    Verband
 	 * @param integer sem    Semester
 	 * @param integer stg_kz    Kennzahl des Studiengangs
-	 * @return integer Anzahl der gefundenen Einträge; <b>negativ</b> bei Fehler
+	 * @return integer Anzahl der gefundenen EintrÃ¤ge; <b>negativ</b> bei Fehler
 	 */
 
 	function getStudents($stg_kz,$sem=null,$ver=null,$grp=null,$gruppe=null, $stsem=null)

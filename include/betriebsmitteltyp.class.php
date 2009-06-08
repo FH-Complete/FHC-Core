@@ -46,7 +46,7 @@ class betriebsmitteltyp
 	function betriebsmitteltyp($conn, $betriebsmitteltyp=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+		/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -60,7 +60,7 @@ class betriebsmitteltyp
 				return false;
 			}
 		}
-		
+		*/
 		if($betriebsmitteltyp!=null)
 			$this->load($betriebsmitteltyp);
 	}

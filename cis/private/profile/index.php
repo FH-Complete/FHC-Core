@@ -117,7 +117,7 @@
 <html>
 <head>
 <title>Profil</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <script language="Javascript">
 <!--
@@ -165,12 +165,12 @@ function RefreshImage()
 	
 	if($aktiv=='f')
 	{
-		$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?<br><br>";
-		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.<br>";
-		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
-		$message .= "- Ihr Account wird gelöscht.<br>";
-		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.<br>";
-		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.<br><br>";
+		$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun fÃ¼r Sie?<br><br>";
+		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelÃ¶scht.<br>";
+		$message .= "Wenn der Datensatz in den nÃ¤chsten Tagen nicht mehr aktiviert wird, fÃ¼hrt das System automatisch folgende Aktionen durch:<br>";
+		$message .= "- Ihr Account wird gelÃ¶scht.<br>";
+		$message .= "- Ihre Mailbox mit sÃ¤mtlichen Mails wird gelÃ¶scht.<br>";
+		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelÃ¶scht.<br><br>";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.<br>";
 
 		echo "<span style='color: red;'>Achtung!<br>$message</span>";
@@ -417,7 +417,7 @@ function RefreshImage()
 					$person = new person($conn);
 					$person->load($person_id);
 					echo '<hr>';
-					echo '<b>Kurzbeschreibung für die &Ouml;H-Kandidatur:</b><br>';
+					echo '<b>Kurzbeschreibung fÃ¼r die &Ouml;H-Kandidatur:</b><br>';
 					echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post">';
 					
 					// Automatically calculates the editor base path based on the _samples directory.
@@ -444,7 +444,7 @@ function RefreshImage()
 			Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$uid'%20sind%20nicht%20korrekt.%0D
 			Hier die richtigen Daten:%0DNachname:%20$nachname%0DVorname:%20$vorname%0DGeburtsdatum:%20$gebdatum
 			%0DGeburtsort:%20$gebort%0DTitelPre:%20$titelpre%0DTitelPost:%20$titelpost
-			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">zuständige Assistenz</a>";
+			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">zustÃ¤ndige Assistenz</a>";
 		
 		}
 	}

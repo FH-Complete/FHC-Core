@@ -46,7 +46,7 @@ else
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -87,7 +87,7 @@ if($stsem!='')
 					</tr>
 					<tr>
 						<th>Bachelor</th>
-						<th>Studiengänge</th>
+						<th>StudiengÃ€nge</th>
 						<th>Absolut / %</th>
 						<th>BB / VZ</th>
 						<th>m / w</th>
@@ -100,34 +100,34 @@ if($stsem!='')
 			 ";
 	//Bachelor
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
 					) a) AS gesamt_stg,
 					
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
-	   			 	WHERE rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND typ='b'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
+	   			 	WHERE status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND typ='b'
 					) a) AS gesamt_alle,
 					
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
 					) a) AS bb,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='VZ'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='VZ'
 					) a) AS vz,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
 					) a) AS w,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
 					) a) AS m,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND nation_code='A'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND nation_code='A'
 					) a) AS herkunft_at,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND eu AND nation_code<>'A'
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND eu AND nation_code<>'A'
 					) a) AS herkunft_eu,
-				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND NOT eu
+				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND NOT eu
 					) a) AS herkunft_noteu,
 				true
 			FROM
@@ -188,7 +188,7 @@ if($stsem!='')
 	echo '
 	<tr>
 		<th>Master</th>
-		<th>Studiengänge</th>
+		<th>StudiengÃ€nge</th>
 		<th>Absolut / %</th>
 		<th>BB / VZ</th>
 		<th>m / w</th>
@@ -197,34 +197,34 @@ if($stsem!='')
 		<th>Nicht-EU</th>
 	</tr>';
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
 					) AS gesamt_stg,
 					
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
-	   			 	WHERE rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND typ='m'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
+	   			 	WHERE status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND typ='m'
 					) AS gesamt_alle,
 					
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
 					) AS bb,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='VZ'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='VZ'
 					) AS vz,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
 					) AS w,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
 					) AS m,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND nation_code='A'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND nation_code='A'
 					) AS herkunft_at,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND eu AND nation_code<>'A'
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND eu AND nation_code<>'A'
 					) AS herkunft_eu,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentrolle USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND rolle_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND NOT eu
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND NOT eu
 					) AS herkunft_noteu,
 				true
 			FROM

@@ -4,24 +4,24 @@
 
 	function clean_string($string)
  	{
-	 	$trans = array("ä" => "ae",
-	 				   "ö" => "oe",
-	 				   "ü" => "ue",
-	 				   "Ä" => "ae",
-	 				   "Ö" => "oe",
-	 				   "Ü" => "ue",
-	 				   "á" => "a",
-	 				   "à" => "a",
-	 				   "é" => "e",
-	 				   "è" => "e",
-	 				   "ó" => "o",
-	 				   "ò" => "o",
-	 				   "í" => "i",
-	 				   "ì" => "i",
-	 				   "ú" => "u",
-	 				   "ù" => "u",
-	 				   "ß" => "ss",
-	 				   "´" => "",
+	 	$trans = array("Ã¤" => "ae",
+	 				   "Ã¶" => "oe",
+	 				   "Ã¼" => "ue",
+	 				   "Ã„" => "ae",
+	 				   "Ã–" => "oe",
+	 				   "Ãœ" => "ue",
+	 				   "Ã¡" => "a",
+	 				   "Ã " => "a",
+	 				   "Ã©" => "e",
+	 				   "Ã¨" => "e",
+	 				   "Ã³" => "o",
+	 				   "Ã²" => "o",
+	 				   "Ã­" => "i",
+	 				   "Ã¬" => "i",
+	 				   "Ãº" => "u",
+	 				   "Ã¹" => "u",
+	 				   "ÃŸ" => "ss",
+	 				   "Â´" => "",
 	 				   "`" => "",
 	 				   );
 		$string = strtr($string, $trans);
@@ -47,7 +47,7 @@
 	$result=pg_query($conn_fas, $sql_query);
 	$num_rows=pg_num_rows($result);
 	$text="Dies ist eine automatische eMail!\n\n";
-	$text.="Es wurde eine Synchronisation mit FAS durchgeführt.\n";
+	$text.="Es wurde eine Synchronisation mit FAS durchgefÃ¼hrt.\n";
 	$text.="Anzahl der Studenten vom FAS-Import: $num_rows \n";
 	$text.="Anzahl der Studenten in Portal: $vilesci_anz_std \n\n";
 	echo $text.'<BR>';
@@ -370,7 +370,7 @@
 <html>
 <head>
 	<title>FAS-Synchro mit Portal (Studenten)</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php

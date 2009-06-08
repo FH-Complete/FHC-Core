@@ -323,7 +323,7 @@
 	$htmlstr .= "			<table>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Zusatzinfo</td>\n";
-	$htmlstr .= " 					<td><textarea name='zusatzinfo_html' cols='50' rows='4' onchange='submitable()'>".htmlentities($zusatzinfo_html)."</textarea></td>\n";
+	$htmlstr .= " 					<td><textarea name='zusatzinfo_html' cols='50' rows='4' onchange='submitable()'>".$zusatzinfo_html."</textarea></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "			</table>\n";
 	$htmlstr .= "		</td>";
@@ -345,6 +345,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Studiengang - Details</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>

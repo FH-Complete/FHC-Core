@@ -28,12 +28,14 @@ class telefonnummer
 	function telefonnummer($conn, $telefonnummer_id = null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($telefonnummer_id != null)
 			$this->load($telefonnummer_id);		
 	}

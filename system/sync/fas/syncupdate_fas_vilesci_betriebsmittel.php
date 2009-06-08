@@ -39,8 +39,8 @@ function myaddslashes($var)
 
 <html>
 <head>
-<title>Zutrittskarten Datenergänzung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Zutrittskarten DatenergÃ¤nzung</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -84,9 +84,9 @@ if($result_bm = pg_query($conn, $qry_bm))
 		}		
 	}
 }
-echo nl2br("Anzahl Betriebsmittel: ".$all.", nicht gefunden(vilesci/fas): ".$ngef1."/".$ngef2.", geändert: ".$upd."\n\n".$ausgabe1."\n".$ausgabe2."\n".$ausgabe);
+echo nl2br("Anzahl Betriebsmittel: ".$all.", nicht gefunden(vilesci/fas): ".$ngef1."/".$ngef2.", geÃ¤ndert: ".$upd."\n\n".$ausgabe1."\n".$ausgabe2."\n".$ausgabe);
 mail($adress, 'SYNC-Update Betriebsmittel von '.$_SERVER['HTTP_HOST'], 
-"Anzahl Betriebsmittel: ".$all.", nicht gefunden(fas/vilesci): ".$ngef1."/".$ngef2.", geändert: ".$upd."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+"Anzahl Betriebsmittel: ".$all.", nicht gefunden(fas/vilesci): ".$ngef1."/".$ngef2.", geÃ¤ndert: ".$upd."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 ?>
 </body>
 </html>

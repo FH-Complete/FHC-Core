@@ -1,7 +1,7 @@
 
 <html>
 <head>
-	<title>Stundenplan säubern</title>
+	<title>Stundenplan sÃ¤ubern</title>
 </head>
 <body>
 <h3>Stundenplan s&auml;ubern</h3>
@@ -18,7 +18,7 @@ $num_rows=mysql_num_rows($result);
 $num_fields=mysql_num_fields($result);
 $anz=0;
 
-// Tabelle für vergleiche vorbereiten
+// Tabelle fÃ¼r vergleiche vorbereiten
 for ($i=0; $i<$num_rows; $i++) 
 {
 	$row=mysql_fetch_row($result);
@@ -43,12 +43,12 @@ for ($i=1; $i<$num_rows; $i++)
 		}
 	}
 	
-echo "$anz doppelte Einträge wurden gefunden und gelöscht.<br>$num_rows Einträge gesamt.";
+echo "$anz doppelte EintrÃ¤ge wurden gefunden und gelÃ¶scht.<br>$num_rows EintrÃ¤ge gesamt.";
 
 ?>
 </p>
 <hr>
 Erstellt am 28. Mai 2001 von <a href="mailto:humer@technikum-wien.at">Christian Humer</a><br>
-Letzte Änderung: 18. Juni 2001 von <a href="mailto:humer@technikum-wien.at">Christian Humer</a>
+Letzte Ã„nderung: 18. Juni 2001 von <a href="mailto:humer@technikum-wien.at">Christian Humer</a>
 </body>
 </html>

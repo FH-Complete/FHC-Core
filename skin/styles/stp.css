@@ -1,3 +1,4 @@
+@charset "utf-8"
 /* Allgemein */
 body
 {
@@ -37,7 +38,7 @@ hr
 	height:80%;
 	z-index:1000;
 }
-/*Alle auﬂer IE 6*/
+/*Alle au√üer IE 6*/
 html>body #menue
 {
 	position:absolute;
@@ -49,7 +50,7 @@ html>body #menue
 	height:80%;
 	left:20%;
 }
-/*Alle auﬂer IE 6*/
+/*Alle au√üer IE 6*/
 html>body #content
 {
 	position:absolute;
@@ -239,7 +240,7 @@ td.tdwidth30
 }
 td.tdgreen
 {
-	background-color: #ffdda4; /*Gr¸n*/
+	background-color: #ffdda4; /*Gr√ºn*/
 }
 td.tdborder
 {
@@ -262,7 +263,7 @@ TR.liste
 }
 TR.liste0						
 {
-	background-color: #FFFFFF; /*weiﬂ*/
+	background-color: #FFFFFF; /*wei√ü*/
 }
 TR.liste1						
 {
@@ -288,7 +289,7 @@ TABLE#zeitsperren TH
 }
 TABLE#zeitsperren TH.feiertag
 {
-	background-color: #ffc76b; /*kr‰ftiges Orange*/
+	background-color: #ffc76b; /*kr√§ftiges Orange*/
 }
 TABLE#zeitsperren TD.feiertag
 {
@@ -296,7 +297,7 @@ TABLE#zeitsperren TD.feiertag
 }
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE /*grau fast weiﬂ*/
+	background-color: #EEEEEE /*grau fast wei√ü*/
 }
 
 /* Stundeplan */

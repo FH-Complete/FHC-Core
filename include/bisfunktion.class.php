@@ -46,6 +46,7 @@ class bisfunktion
 	function bisfunktion($conn, $bisverwendung_id=null, $studiengang_kz=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -59,7 +60,7 @@ class bisfunktion
 				return false;
 			}
 		}
-		
+		*/
 		if($bisverwendung_id != null && $studiengang_kz != null)
 			$this->load($bisverwendung_id, $studiengang_kz);
 	}

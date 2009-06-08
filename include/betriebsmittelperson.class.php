@@ -61,6 +61,7 @@ class betriebsmittelperson
 	function betriebsmittelperson($conn,$betriebsmittel_id=null,$person_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -77,6 +78,7 @@ class betriebsmittelperson
 				return false;
 			}
 		}
+		*/
 		if($betriebsmittel_id!=null && $person_id!=null)
 			$this->load($betriebsmittel_id, $person_id);
 	}

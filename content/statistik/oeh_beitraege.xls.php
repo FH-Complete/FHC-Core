@@ -151,9 +151,9 @@ if($studiensemester_kurzbz!='')
 		FROM tbl_person 
 		JOIN tbl_benutzer using(person_id) 
 		JOIN tbl_student on(uid=student_uid)
-		JOIN tbl_prestudentrolle on(tbl_prestudentrolle.prestudent_id=tbl_student.prestudent_id)
-		WHERE tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-		AND (rolle_kurzbz='Student' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Praktikant')
+		JOIN tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
+		WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
+		AND (status_kurzbz='Student' OR status_kurzbz='Diplomand' OR status_kurzbz='Praktikant')
 		AND studiengang_kz<999 ";
 
 	if($result = pg_query($conn, $qry))
@@ -318,8 +318,8 @@ if($studiensemester_kurzbz!='')
 	JOIN tbl_konto as kb using(person_id) 
 	JOIN tbl_benutzer using(person_id) 
 	JOIN tbl_student on(uid=student_uid)
-	JOIN tbl_prestudentrolle on(tbl_prestudentrolle.prestudent_id=tbl_student.prestudent_id)
-	WHERE tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND (rolle_kurzbz='Student' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Praktikant')
+	JOIN tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
+	WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND (status_kurzbz='Student' OR status_kurzbz='Diplomand' OR status_kurzbz='Praktikant')
 	AND tbl_student.studiengang_kz<999 AND
 	ka.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
 	AND kb.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
@@ -486,10 +486,10 @@ if($studiensemester_kurzbz!='')
 	FROM tbl_person 
 	JOIN tbl_benutzer on(tbl_person.person_id=tbl_benutzer.person_id) 
 	JOIN tbl_student on(uid=student_uid)
-	JOIN tbl_prestudentrolle on(tbl_prestudentrolle.prestudent_id=tbl_student.prestudent_id)
+	JOIN tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
 	LEFT JOIN public.tbl_konto on(tbl_person.person_id=tbl_konto.person_id) 
-	WHERE tbl_prestudentrolle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-	AND (rolle_kurzbz='Student' OR rolle_kurzbz='Diplomand' OR rolle_kurzbz='Praktikant')
+	WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
+	AND (status_kurzbz='Student' OR status_kurzbz='Diplomand' OR status_kurzbz='Praktikant')
 	AND tbl_student.studiengang_kz<999 
 	AND tbl_person.person_id NOT IN (SELECT person_id FROM tbl_konto WHERE tbl_konto.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
 	AND tbl_konto.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=tbl_konto.studiengang_kz AND tbl_konto.buchungsnr_verweis IS NOT NULL 
@@ -595,7 +595,7 @@ else
 	<html>
 	<head>
 	<title>OEH-Beitragszahler</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	</head>
 	<body class="Background_main">

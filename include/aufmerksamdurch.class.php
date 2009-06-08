@@ -47,6 +47,7 @@ class aufmerksamdurch
 	function aufmerksamdurch($conn,$aufmerksamdurch_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -63,6 +64,7 @@ class aufmerksamdurch
 				return false;
 			}
 		}		
+*/	
 	}
 	
 	// *******************************************

@@ -50,7 +50,7 @@ class legesamtnote
 	function legesamtnote($conn, $student_uid=null, $lehreinheit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -61,7 +61,7 @@ class legesamtnote
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($student_uid != null)
 			$this->load($student_uid, $lehreinheit_id);
 	}
@@ -115,7 +115,8 @@ class legesamtnote
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id='".$lehreinheit_id."' order by student_uid";
+		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id='".$lehreinheit_id."' order by student_uid";
+
 
 		if($result=pg_query($this->conn, $qry))
 		{

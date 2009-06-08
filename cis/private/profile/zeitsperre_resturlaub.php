@@ -72,19 +72,19 @@
 "http://www.w3.org/TR/html4/loose.dtd"><html>
 <head>
 <title>Zeitsperre</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script language="Javascript">
 function conf_del()
 {
-	return confirm('Wollen Sie diesen Eintrag wirklich löschen?');
+	return confirm('Wollen Sie diesen Eintrag wirklich lÃ¶schen?');
 }
 
 function checkval()
 {
 	if(document.getElementById('vertretung_uid').value=='')
 	{
-		alert('Bitte zuerst eine Vertretung auswählen');
+		alert('Bitte zuerst eine Vertretung auswÃ€hlen');
 		return false;
 	}
 	else
@@ -99,13 +99,13 @@ function checkdatum()
 {
 	if(document.getElementById('vondatum').value.length<10)
 	{
-		alert('Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
+		alert('Von-Datum ist ungÃŒltig. Bitte beachten Sie das fÃŒhrende nullen angegeben werden mÃŒssen (Beispiel: 01.01.2008)');
 		return false;
 	}
 
 	if(document.getElementById('bisdatum').value.length<10)
 	{
-		alert('Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
+		alert('Bis-Datum ist ungÃŒltig. Bitte beachten Sie das fÃŒhrende nullen angegeben werden mÃŒssen (Beispiel: 01.01.2008)');
 		return false;
 	}
 
@@ -283,7 +283,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$message = "Dies ist eine automatische Mail! \n".
 								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
 								   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
-								   "Sie können diesen unter folgender Adresse freigeben:\n".
+								   "Sie kÃ¶nnen diesen unter folgender Adresse freigeben:\n".
 								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
 						$from='vilesci@'.DOMAIN;
 						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
@@ -491,9 +491,9 @@ $content_form.= '<tr><td>&nbsp;</td><td>';
 if(isset($_GET['type']) && $_GET['type']=='edit')
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Speichern'>";
 else
-	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' value='HinzufÃŒgen'>";
 $content_form.= '</td></tr>';
-$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>Achtung: Es werden alle eingegeben Tage berücksichtigt, daher müssen mehrtägige Zeitsperren<br> an Unterbrechungen wie Wochenenden oder Feiertagen unterteilt werden!</td</tr>";
+$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>Achtung: Es werden alle eingegeben Tage berÃŒcksichtigt, daher mÃŒssen mehrtÃ€gige Zeitsperren<br> an Unterbrechungen wie Wochenenden oder Feiertagen unterteilt werden!</td</tr>";
 $content_form.= '</table></form>';
 
 // ******* RESTURLAUB ******** //
@@ -607,7 +607,7 @@ if(URLAUB_TOOLS)
 	$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td></tr>";
 	$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
 	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
-	$content_resturlaub .="<tr></tr><tr><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+	$content_resturlaub .="<tr></tr><tr><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem GeschÃ€ftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen GeschÃ€ftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfÃŒgbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
 	$content_resturlaub .='<tr><td></td></tr>';
 	$content_resturlaub.="</table>";
 }

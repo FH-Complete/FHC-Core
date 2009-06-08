@@ -52,7 +52,7 @@ class mail
 	{
 		$this->to = $to;
 		$this->subject = $subject;
-		$this->setTextContent($text, 'ISO-8859-1', '8bit');
+		$this->setTextContent($text, 'UTF-8', '8bit');
 		$this->sender = $from;
 		$this->CC_revievers='';
 		$this->BCC_recievers='';
@@ -154,7 +154,7 @@ class mail
 	// **********************************************
 	// * Setzt den Text fuer ein Mail
 	// **********************************************
-	function setTextContent($text, $charset = 'ISO-8859-1', $encoding = '8bit')
+	function setTextContent($text, $charset = 'UTF-8', $encoding = '8bit')
 	{
 		$this->textContent[0] = $text;
 		$this->textContent[1] = $charset;
@@ -165,7 +165,7 @@ class mail
 	// **********************************************
 	// * Setzt den HTMLText fuer ein Mail
 	// **********************************************	
-	function setHTMLContent($html, $charset = 'ISO-8859-1', $encoding = '8bit')
+	function setHTMLContent($html, $charset = 'UTF-8', $encoding = '8bit')
 	{
 		$this->htmlContent[0] = $html;
 		$this->htmlContent[1] = $charset;

@@ -48,7 +48,7 @@ function validate($row)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Adresse</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -313,12 +313,12 @@ if($result = pg_query($conn_fas, $qry))
 									{
 										if($firma->new)
 										{
-											$ausgabe.="Firma ".$firma->name." eingefügt.\n";
+											$ausgabe.="Firma ".$firma->name." eingefÃ¼gt.\n";
 											$anzahl_eingefuegt2++;
 										}
 										else
 										{
-											$ausgabe.="Firma ".$firma->name." geändert.\n";
+											$ausgabe.="Firma ".$firma->name." geÃ¤ndert.\n";
 											$anzahl_update2++;
 										}
 
@@ -341,7 +341,7 @@ if($result = pg_query($conn_fas, $qry))
 			{
 				$ausgabe_adresse='';
 				$error=true;
-				$error_log.="Person mit person_pk '$row->person_fk' für Adresse mit adresse_pk '$row->adresse_pk' konnte in tbl_syncperson nicht gefunden werden!\n";
+				$error_log.="Person mit person_pk '$row->person_fk' fÃ¼r Adresse mit adresse_pk '$row->adresse_pk' konnte in tbl_syncperson nicht gefunden werden!\n";
 				$anzahl_fehler++;
 			}
 		}
@@ -359,14 +359,14 @@ if($result = pg_query($conn_fas, $qry))
 				{
 					if($adresse->new)
 					{
-						$ausgabe.="Adresse '".$adresse->plz."',  '".$adresse->strasse."' eingefügt.\n";
+						$ausgabe.="Adresse '".$adresse->plz."',  '".$adresse->strasse."' eingefÃ¼gt.\n";
 						$anzahl_eingefuegt++;
 					}
 					else
 					{
 						if($update)
 						{
-							$ausgabe.="Adresse '".$adresse->plz."', '".$adresse->strasse."' geändert: ".$ausgabe_adresse."\n";
+							$ausgabe.="Adresse '".$adresse->plz."', '".$adresse->strasse."' geÃ¤ndert: ".$ausgabe_adresse."\n";
 							$anzahl_update++;
 						}
 					}
@@ -383,11 +383,11 @@ if($result = pg_query($conn_fas, $qry))
 echo "Adressensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 //echo nl2br($text);
 echo nl2br($error_log);
-echo nl2br("\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
-echo nl2br("\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Geändert: $anzahl_update2 / Fehler: $anzahl_fehler2");
+echo nl2br("\nAdresse\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler");
+echo nl2br("\nFirma\nGesamt: $anzahl_quelle2 / EingefÃ¼gt: $anzahl_eingefuegt2 / GeÃ¤ndert: $anzahl_update2 / Fehler: $anzahl_fehler2");
 echo nl2br("\n".$ausgabe);
-$ausgabe="\nAdresse\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler"
-."\nFirma\nGesamt: $anzahl_quelle2 / Eingefügt: $anzahl_eingefuegt2 / Geändert: $anzahl_update2 / Fehler: $anzahl_fehler2\n\n".$ausgabe;
+$ausgabe="\nAdresse\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler"
+."\nFirma\nGesamt: $anzahl_quelle2 / EingefÃ¼gt: $anzahl_eingefuegt2 / GeÃ¤ndert: $anzahl_update2 / Fehler: $anzahl_fehler2\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler Adresse von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

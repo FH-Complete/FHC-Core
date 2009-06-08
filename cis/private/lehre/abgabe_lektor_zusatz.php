@@ -23,7 +23,7 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../config.inc.php');
@@ -98,7 +98,7 @@ $htmlstr='';
 					<title>Zusatzdaten PA-Abgabe</title>
 					<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 					<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-					<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 					<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 					</head>
 					<body class="Background_main"  style="background-color:#eeeeee;">

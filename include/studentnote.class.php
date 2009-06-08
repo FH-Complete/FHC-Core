@@ -47,7 +47,7 @@ class studentnote
 	function studentnote($conn, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -58,7 +58,7 @@ class studentnote
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 	}
 	
 	function calc_gesamtnote($lehreinheit_id, $ss, $student_uid)
