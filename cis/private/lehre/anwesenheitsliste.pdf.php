@@ -43,7 +43,13 @@
    
    if(!$conn=pg_pconnect(CONN_STRING))
       die('Fehler beim Herstellen der Datenbankverbindung');
-   
+
+	$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	if(!pg_query($conn,$qry))
+	{
+		die("Encoding konnte nicht gesetzt werden");
+	}   
+	
    //Uebergabeparameter abpruefen
    if(isset($_GET['stg'])) //Studiengang
    {

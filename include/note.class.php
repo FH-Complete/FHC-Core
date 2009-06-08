@@ -50,7 +50,7 @@ class note
 	function note($conn, $note = null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -64,7 +64,7 @@ class note
 				return false;
 			}
 		}
-
+*/
 		if($note != null)
 			$this->load($note);
 	}

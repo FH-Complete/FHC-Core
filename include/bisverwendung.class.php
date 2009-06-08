@@ -60,6 +60,7 @@ class bisverwendung
 	function bisverwendung($conn, $bisverwendung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -73,7 +74,7 @@ class bisverwendung
 				return false;
 			}
 		}
-		
+		*/
 		if($bisverwendung_id != null)
 			$this->load($bisverwendung_id);
 	}

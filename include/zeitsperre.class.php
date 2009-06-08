@@ -132,7 +132,7 @@ class zeitsperre
 
 		if(!is_numeric($zeitsperre_id))
 		{
-			$this->errormsg = 'zeitsperre_id muß eine gültige Zahl sein';
+			$this->errormsg = 'zeitsperre_id muÃŸ eine gÃ¼ltige Zahl sein';
 			return false;
 		}
 

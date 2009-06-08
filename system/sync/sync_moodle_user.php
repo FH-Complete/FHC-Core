@@ -118,7 +118,7 @@ if($stsem_kurzbz=$stsem->getakt())
 				if($message_lkt!='')
 				{
 					$header = "Dies ist eine automatische Mail!\n";
-					$header.= "Es wurden folgende Aktualisierungen an Ihren Moodle-Kursen durchgeführt:\n\n";
+					$header.= "Es wurden folgende Aktualisierungen an Ihren Moodle-Kursen durchgefÃ¼hrt:\n\n";
 	
 					$to = "$uid@".DOMAIN;
 					//$to = 'oesi@technikum-wien.at';
@@ -131,7 +131,7 @@ if($stsem_kurzbz=$stsem->getakt())
 			}
 			//Mail an Admin
 			$header = "Dies ist eine automatische Mail!\n";
-			$header.= "Folgende Syncros mit den MoodleKursen wurde durchgeführt:\n\n";
+			$header.= "Folgende Syncros mit den MoodleKursen wurde durchgefÃ¼hrt:\n\n";
 			$header.= "Anzahl der aktualisierten Lektoren: $sync_lektoren_gesamt\n";
 			$header.= "Anzahl der aktualisierten Studenten: $sync_studenten_gesamt\n";
 			$header.= "Anzahl der Fehler: $fehler\n";

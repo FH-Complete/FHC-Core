@@ -2,7 +2,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-<title>Passwort ändern</title>
+<title>Passwort Ã¤ndern</title>
 </head>
 <body id="inhalt">
 
@@ -54,14 +54,14 @@
 
 					if ($mod_r)
 					{
-						echo "<h4>Das Passwort wurde erfolgreich geändert!</h4>";
+						echo "<h4>Das Passwort wurde erfolgreich geÃ¤ndert!</h4>";
 						session_unregister('count');
 						echo '<meta http-equiv="refresh" content="5; URL=https://cis.technikum-wien.at/profile/index.php">';
 						exit;
 					}
 					else
 					{
-						echo "<h4>Beim Ändern des Passwortes ist ein Fehler aufgetreten!</h4>";
+						echo "<h4>Beim Ã„ndern des Passwortes ist ein Fehler aufgetreten!</h4>";
 					}
 				}
 				else
@@ -71,7 +71,7 @@
 			}
 			else
 			{
-				echo "<h4>Die neuen Passwörter stimmen nicht überein!</h4>";
+				echo "<h4>Die neuen PasswÃ¶rter stimmen nicht Ã¼berein!</h4>";
 			}
 		}
 		else

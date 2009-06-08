@@ -220,7 +220,7 @@ foreach($stg_obj->result as $row)
 
 <head>
 	<title>Testtool - Auswertung</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php">
 </head>
 

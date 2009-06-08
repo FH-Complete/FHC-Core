@@ -8,7 +8,7 @@
 	$conn_fas=pg_connect($conn_string_fas);
 
 	$headers ="MIME-Version: 1.0\r\n";
-	$headers.="Content-type: text/html; charset=iso-8859-1\r\n";
+	$headers.="Content-type: text/html; charset=UTF-8\r\n";
 	$headers.="From: vilesci@technikum-wien.at";
 
 	$bgcolor[0]="#CCCCCC";
@@ -30,7 +30,7 @@
 	$fehlend=$num_rows-$num_rows_fas;
 	$num_rows_fas=pg_numrows($result_fas);
 	$text.="Dies ist eine automatische eMail!<BR><BR>";
-	$text.="Es wurde eine Ueberpruefung der Daten in der FAS-View fuer Lektoren durchgeführt.<BR>";
+	$text.="Es wurde eine Ueberpruefung der Daten in der FAS-View fuer Lektoren durchgefÃ¼hrt.<BR>";
 	$text.='Anzahl der fehlenden Daten: $fehlend <BR><BR>';
 	$text.="Folgende Lektoren scheinen in der FAS-View nicht auf";
 	$text.='<TABLE border="0"><TR bgcolor="#D3DCE3"><TH>uid</TH><TH>Titel</TH><TH>Vornamen</TH><TH>Nachname</TH></TR>';

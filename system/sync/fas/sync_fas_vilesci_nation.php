@@ -72,15 +72,15 @@ if($result = pg_query($conn_fas, $qry))
 <html>
 <head>
 <title>Synchro - Vilesci -> Portal - Nation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
 
 //echo nl2br($text);
 echo nl2br($error_log);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
-$error_log.="Sync Nation:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
+$error_log.="Sync Nation:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler";
 mail($adress, 'SYNC Nation', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>

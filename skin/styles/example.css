@@ -1,3 +1,4 @@
+@charset "utf-8"
 /* Allgemein */
 body
 {
@@ -41,7 +42,7 @@ hr
 	position:relative;
 	right:-73%;
 }
-/*Alle auﬂer IE6*/
+/*Alle au√üer IE6*/
 html>body #menue
 {
 	position:absolute;
@@ -61,7 +62,7 @@ html>body #menue
 	background-repeat:repeat-x;
 	position:relative;
 }
-/*Alle auﬂer IE 6*/
+/*Alle au√üer IE 6*/
 html>body #content
 {
 	position:absolute;
@@ -441,7 +442,7 @@ font.ContentHeader
 }
 #news .news .text
 {
-	background-color: #FCFCFC; /*fast weiﬂ*/
+	background-color: #FCFCFC; /*fast wei√ü*/
 	padding: 0px 10px 0px 10px;
 }
 

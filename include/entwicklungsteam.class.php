@@ -51,6 +51,7 @@ class entwicklungsteam
 	function entwicklungsteam($conn, $mitarbeiter_uid=null, $studiengang_kz=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -64,7 +65,7 @@ class entwicklungsteam
 				return false;
 			}
 		}
-		
+		*/
 		if($mitarbeiter_uid != null && $studiengang_kz != null)
 			$this->load($mitarbeiter_uid, $studiengang_kz);
 	}

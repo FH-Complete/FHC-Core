@@ -471,21 +471,21 @@ if(!$error)
 						}
 					}
 
-					if($_POST['rolle_kurzbz']=='Bewerber' && !$prestd->anmeldungreihungstest)
+					if($_POST['status_kurzbz']=='Bewerber' && !$prestd->anmeldungreihungstest)
 					{
 						$error = true;
 						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein.";
 						$anzahl_fehler++;
 					}
 					
-					if($_POST['rolle_kurzbz']=='Bewerber' && !$prestd->reihungstestangetreten)
+					if($_POST['status_kurzbz']=='Bewerber' && !$prestd->reihungstestangetreten)
 					{
 						$error = true;
 						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Feld 'Zum Reihungstest angetreten' gesetzt sein.";
 						$anzahl_fehler++;
 					}
 					
-					if($_POST['rolle_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
+					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
 					{
 						$error = true;
 						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
@@ -494,7 +494,7 @@ if(!$error)
 										
 					$stg_obj = new studiengang($conn);
 					$stg_obj->load($prestd->studiengang_kz);
-					if($_POST['rolle_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
+					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
 					{
 						$error = true;
 						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
@@ -505,18 +505,18 @@ if(!$error)
 					{
 						if($prestd->getLastStatus($prestudent_id))
 						{
-							if($_POST['rolle_kurzbz']=='Absolvent' || $_POST['rolle_kurzbz']=='Diplomand')
+							if($_POST['status_kurzbz']=='Absolvent' || $_POST['status_kurzbz']=='Diplomand')
 								$studiensemester = $semester_aktuell;
 							else
 								$studiensemester = $prestd->studiensemester_kurzbz;
 							$hlp = new prestudent($conn);
 	
-							if($_POST['rolle_kurzbz']=='Student')
+							if($_POST['status_kurzbz']=='Student')
 								$sem=$_POST['semester'];
 							else
 								$sem=$prestd->ausbildungssemester;
 	
-							$hlp->getPrestudentRolle($prestudent_id, $_POST['rolle_kurzbz'], $studiensemester, "datum, insertamum", $sem);
+							$hlp->getPrestudentRolle($prestudent_id, $_POST['status_kurzbz'], $studiensemester, "datum, insertamum", $sem);
 							if(count($hlp->result)>0)
 							{
 								$errormsg .= "\n$prestd->vorname $prestd->nachname: Diese Rolle ist bereits vorhanden";
@@ -527,9 +527,9 @@ if(!$error)
 							{
 								//Wenn der Status auf Aufgenommener oder Wartender geaendert wird,
 								//muss ein Bewerberstatus vorhanden sein
-								if($_POST['rolle_kurzbz']=='Aufgenommener' || $_POST['rolle_kurzbz']=='Wartender')
+								if($_POST['status_kurzbz']=='Aufgenommener' || $_POST['status_kurzbz']=='Wartender')
 								{
-									$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='Bewerber'";
+									$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='".$prestudent_id."' AND status_kurzbz='Bewerber'";
 									if($result_bw = pg_query($conn, $qry))
 									{
 										if(pg_num_rows($result_bw)==0)
@@ -546,7 +546,7 @@ if(!$error)
 								{
 									$prestd_neu = new prestudent($conn);
 									$prestd_neu->prestudent_id = $prestudent_id;
-									$prestd_neu->rolle_kurzbz = $_POST['rolle_kurzbz'];
+									$prestd_neu->status_kurzbz = $_POST['status_kurzbz'];
 									$prestd_neu->studiensemester_kurzbz = $studiensemester;
 									$prestd_neu->datum = date('Y-m-d');
 									$prestd_neu->ausbildungssemester = $sem;
@@ -558,19 +558,19 @@ if(!$error)
 									if($prestd_neu->save_rolle())
 									{
 										//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
-										if($_POST['rolle_kurzbz']=='Unterbrecher' || $_POST['rolle_kurzbz']=='Abbrecher')
+										if($_POST['status_kurzbz']=='Unterbrecher' || $_POST['status_kurzbz']=='Abbrecher')
 										{
 											$student = new student($conn);
 											$uid = $student->getUid($prestudent_id);
 											$student->load($uid);
 											$student->studiensemester_kurzbz=$semester_aktuell;
 											$student->semester = '0';
-											if($_POST['rolle_kurzbz']=='Abbrecher')
+											if($_POST['status_kurzbz']=='Abbrecher')
 											{
 												$student->verband='A';
 												$student->gruppe='';
 											}
-											if($_POST['rolle_kurzbz']=='Unterbrecher')
+											if($_POST['status_kurzbz']=='Unterbrecher')
 											{
 												$student->verband='B';
 												$student->gruppe='';
@@ -613,7 +613,7 @@ if(!$error)
 		
 										//Wenn Unterbrecher zu Studenten werden, dann wird das Semester mituebergeben
 										//Verband und Gruppe wird entfernt.
-										if($_POST['rolle_kurzbz']=='Student')
+										if($_POST['status_kurzbz']=='Student')
 										{
 											$student = new student($conn);
 											$uid = $student->getUid($prestudent_id);
@@ -636,7 +636,7 @@ if(!$error)
 										}
 										
 										//bei Abbrechern und Absolventen wird der Aktiv Status auf false gesetzt
-										if($_POST['rolle_kurzbz']=='Abbrecher' || $_POST['rolle_kurzbz']=='Absolvent')
+										if($_POST['status_kurzbz']=='Abbrecher' || $_POST['status_kurzbz']=='Absolvent')
 										{
 											$student = new student($conn);
 											$uid = $student->getUid($prestudent_id);
@@ -686,18 +686,18 @@ if(!$error)
 	{
 		//Loescht eine Prestudentrolle
 
-		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['rolle_kurzbz']) &&
+		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['status_kurzbz']) &&
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
 		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
 		{
-			if($_POST['rolle_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid'))
+			if($_POST['status_kurzbz']=='Student' && !$rechte->isBerechtigt('admin', null, 'suid'))
 			{
 				$return = false;
 				$errormsg = 'Studentenrolle kann nur durch den Administrator geloescht werden';
 			}
 			else
 			{
-				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentrolle WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
 				if($result = pg_query($conn, $qry))
 				{
 					if($row = pg_fetch_object($result))
@@ -726,11 +726,11 @@ if(!$error)
 				if(!$error)
 				{
 					$rolle = new prestudent($conn, null, true);
-					if($rolle->load_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+					if($rolle->load_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 					{
 						if($rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') || $rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
 						{
-							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['rolle_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 							{
 								$return = true;
 							}
@@ -789,14 +789,14 @@ if(!$error)
 				
 				if(!$error)
 				{
-					if(($_POST['studiensemester_old']=='') || (!$rolle->load_rolle($_POST['prestudent_id'], $_POST['rolle_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old'])))
+					if(($_POST['studiensemester_old']=='') || (!$rolle->load_rolle($_POST['prestudent_id'], $_POST['status_kurzbz'], $_POST['studiensemester_old'], $_POST['ausbildungssemester_old'])))
 					{
 						$rolle->new = true;
 						$rolle->insertamum = date('Y-m-d H:i:s');
 						$rolle->insertvon = $user;
-						$rolle->rolle_kurzbz = $_POST['rolle_kurzbz'];
+						$rolle->status_kurzbz = $_POST['status_kurzbz'];
 
-						if($_POST['rolle_kurzbz']=='Student')
+						if($_POST['status_kurzbz']=='Student')
 						{
 							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
 							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
@@ -980,7 +980,7 @@ if(!$error)
 															//Prestudentrolle hinzugfuegen
 															$rolle = new prestudent($conn);
 															$rolle->prestudent_id = $prestd->prestudent_id;
-															$rolle->rolle_kurzbz = 'Student';
+															$rolle->status_kurzbz = 'Student';
 															$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
 															$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
 															$rolle->orgform_kurzbz = $hlp->result[0]->orgform_kurzbz;

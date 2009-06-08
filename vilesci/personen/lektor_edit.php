@@ -30,7 +30,7 @@ echo '
 <html>
 <head>
 <title>Lektor Edit</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 <body class="background_main">';
@@ -51,7 +51,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 	{
 		if (!isset ($_GET['id']))
 		{
-			echo "benötige ID für Lektor";
+			echo "benÃ¶tige ID fÃ¼r Lektor";
 		}
 		doEDIT($conn,$_GET['id']);
 	}

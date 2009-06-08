@@ -20,7 +20,7 @@
 	$result=pg_query($conn_fas, $sql_query);
 	$num_rows=pg_num_rows($result);
 	$text="Dies ist eine automatische eMail!\r\r";
-	$text.="Es wurde eine Synchronisation mit FAS durchgeführt.\r";
+	$text.="Es wurde eine Synchronisation mit FAS durchgefÃ¼hrt.\r";
 	$text.="Anzahl der Ex-Studenten vom FAS-Import: $num_rows \r";
 	$text.="Anzahl der Studenten in VileSci: $vilesci_anz_std \r\r";
 	echo $text.'<BR>';
@@ -84,7 +84,7 @@
 <html>
 <head>
 	<title>FAS-Synchro mit VileSci (Ex-Studenten)</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<LINK rel="stylesheet" href="../../include/styles.css" type="text/css">
 </head>
 <body>

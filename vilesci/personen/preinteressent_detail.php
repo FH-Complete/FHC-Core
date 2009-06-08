@@ -52,7 +52,7 @@ $selection = (isset($_GET['selection'])?$_GET['selection']:'preinteressent');
 //dann eine Liste aller firmen zurueckliefern die dem ueberbenen firmentyp entsprechen
 if(isset($_GET['type']) && $_GET['type']=='firmenrequest')
 {
-	header('Content-Type: text/html; charset=ISO-8859-15');
+	header('Content-Type: text/html; charset=UTF-8');
 	$firmentyp_kurzbz = (isset($_GET['firmentyp_kurzbz'])?$_GET['firmentyp_kurzbz']:'');
 	$firma = new firma($conn);
 	$firma->getFirmen($firmentyp_kurzbz);
@@ -65,7 +65,7 @@ if(isset($_GET['type']) && $_GET['type']=='firmenrequest')
 echo '<html>
 	<head>
 		<title>PreInteressenten</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -426,10 +426,10 @@ if(isset($_POST['freigabe']))
 					$to = $stg_obj->email;
 					//$to = 'oesi@technikum-wien.at';
 					$message = "Dies ist eine automatische Mail! $stg_obj->email\n\n".
-								"Der Preinteressent $name wurde zur Übernahme freigegeben. \nSie können diesen ".
-								"im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link\n\n".
+								"Der Preinteressent $name wurde zur Ãbernahme freigegeben. \nSie kÃ¶nnen diesen ".
+								"im FAS unter 'Extras->Preinteressenten ÃŒbernehmen' oder unter folgendem Link\n\n".
 								APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$zuordnung->studiengang_kz \n".
-								"ins FAS übertragen";
+								"ins FAS ÃŒbertragen";
 					$mail = new mail($to, 'vilesci@'.DOMAIN, 'Preinteressent Freigabe', $message);
 					if($mail->send())
 						echo "<br><b>Freigabemail wurde an $to versendet</b>";
@@ -530,7 +530,7 @@ echo "<td>Anrede:</td><td><input type='text' name='anrede' ".($disabled?'disable
 echo "<td>Titelpre:</td><td><input type='text' name='titelpre' ".($disabled?'disabled':'')." value='".htmlentities($person->titelpre, ENT_QUOTES)."'></td>";
 //Titelpost
 echo "<td>Titelpost:</td><td><input type='text' name='titelpost' ".($disabled?'disabled':'')." value='".htmlentities($person->titelpost, ENT_QUOTES)."'></td>";
-echo '<td width="100%" align="right"><a href="personendetails.php?id='.$person->person_id.'" target="_blank">Gesamtübersicht über diese Person</a></td>';
+echo '<td width="100%" align="right"><a href="personendetails.php?id='.$person->person_id.'" target="_blank">GesamtÃŒbersicht ÃŒber diese Person</a></td>';
 echo '</tr><tr>';
 //Nachname
 echo "<td>Nachname*:</td><td><input type='text' name='nachname' ".($disabled?'disabled':'')." value='".htmlentities($person->nachname, ENT_QUOTES)."'></td>";
@@ -610,7 +610,7 @@ echo "<td>SVNR:</td><td><input type='text' name='svnr' ".($disabled?'disabled':'
 echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' ".($disabled?'disabled':'')." value='".htmlentities($person->ersatzkennzeichen, ENT_QUOTES)."'></td>";
 //Geschlecht
 echo "<td>Geschlecht*</td><td><SELECT ".($disabled?'disabled':'')." name='geschlecht'>";
-echo '<option value="m" '.($person->geschlecht=='m'?'selected':'').'>männlich</option>';
+echo '<option value="m" '.($person->geschlecht=='m'?'selected':'').'>mÃ€nnlich</option>';
 echo '<option value="w" '.($person->geschlecht=='w'?'selected':'').'>weiblich</option>';
 echo '<option value="u" '.($person->geschlecht=='u'?'selected':'').'>unbekannt</option>';
 echo '</SELECT></td>';

@@ -53,7 +53,7 @@
 // @cSearchstr Suchtext in Tabelle Benutzer 
 	$cSearchstr = (isset($_REQUEST['searchstr'])?trim($_REQUEST['searchstr']):'');
 // @cCharset Zeichensatz - Ajax mit UTF-8
-	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'iso-8859-15');
+	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'UTF-8');
 // ***********************************************************************************************
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
@@ -196,7 +196,7 @@
 		</html>';
 	exit($content);
 #-------------------------------------------------------------------------------------------	
-# Testfunktion zur Anzeige einer übergebenen Variable oder Array, Default ist GLOBALS
+# Testfunktion zur Anzeige einer Ã¼bergebenen Variable oder Array, Default ist GLOBALS
 function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
 {
 

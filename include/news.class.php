@@ -214,7 +214,7 @@ class news
 		
 		if(!is_numeric($news_id))
 		{
-			$this->errormsg = 'news_id muß eine gültige Zahl sein';
+			$this->errormsg = 'news_id muÃŸ eine gÃ¼ltige Zahl sein';
 			return false;
 		}
 		
@@ -287,9 +287,9 @@ class news
 	 */
 	function checkvars()
 	{	
-		$this->betreff 	= str_replace("'",'´',$this->betreff);
-		$this->text 		= str_replace("'",'´',$this->text);
-		$this->verfasser 	= str_replace("'",'´',$this->verfasser);
+		$this->betreff 	= str_replace("'",'Â´',$this->betreff);
+		$this->text 		= str_replace("'",'Â´',$this->text);
+		$this->verfasser 	= str_replace("'",'Â´',$this->verfasser);
 
 		
 		//Laenge Pruefen

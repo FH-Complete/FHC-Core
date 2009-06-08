@@ -113,7 +113,7 @@ class lvinfo
 	{
 		if($lehrveranstaltung_id == '' || !is_numeric($lehrveranstaltung_id))
 		{
-			$this->errormsg = 'lvinfo_id ungültig';
+			$this->errormsg = 'lvinfo_id ungÃ¼ltig';
 			return false;
 		}
 		$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id = '$lehrveranstaltung_id' AND sprache='".addslashes($sprache)."';";
@@ -174,7 +174,7 @@ class lvinfo
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Löschen der Daten';
+			$this->errormsg = 'Fehler beim LÃ¶schen der Daten';
 			return false;
 		}
 	}
@@ -243,7 +243,7 @@ class lvinfo
 			//Pruefen ob lvinfo_id gueltig ist
 			if($this->lehrveranstaltung_id == '' || !is_numeric($this->lehrveranstaltung_id))
 			{
-				$this->errormsg = 'lehrveranstaltung_id '.$this->lehrveranstaltung_id.' ungültig';
+				$this->errormsg = 'lehrveranstaltung_id '.$this->lehrveranstaltung_id.' ungÃ¼ltig';
 				return false;
 			}
 

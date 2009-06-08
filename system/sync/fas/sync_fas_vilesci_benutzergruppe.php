@@ -48,7 +48,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Benutzergruppe</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -207,12 +207,12 @@ if($result = pg_query($conn_fas, $qry))
 										if($resultbg=pg_query($conn, $qrybg))
 										{
 											$anzahl_update++;
-											$ausgabe="Benutzergruppe auf UID='".$uid."', Gruppe='".$gruppe_kurzbz."', Studiensemester='".$studiensemester_kurzbz."' geändert (statt UID='".$rowchk2->uid."', Gruppe='".$rowchk2->gruppe_kurzbz."', Studiensemester='".$rowchk2->studiensemester_kurzbz."').\n";
+											$ausgabe="Benutzergruppe auf UID='".$uid."', Gruppe='".$gruppe_kurzbz."', Studiensemester='".$studiensemester_kurzbz."' geÃ¤ndert (statt UID='".$rowchk2->uid."', Gruppe='".$rowchk2->gruppe_kurzbz."', Studiensemester='".$rowchk2->studiensemester_kurzbz."').\n";
 										}
 										else 
 										{
 											$anzahl_fehler++;
-											$error_log="Fehler beim Ändern in Tabelle tbl_benutzergruppe. ".$qrybg."\n";
+											$error_log="Fehler beim Ã„ndern in Tabelle tbl_benutzergruppe. ".$qrybg."\n";
 										}
 									}
 								}
@@ -237,7 +237,7 @@ if($result = pg_query($conn_fas, $qry))
 								else 
 								{
 									$anzahl_fehler++;
-									$error_log="Fehler beim Einfügen in Tabelle tbl_benutzergruppe. ".$qrybg."\n";
+									$error_log="Fehler beim EinfÃ¼gen in Tabelle tbl_benutzergruppe. ".$qrybg."\n";
 								}
 							}
 						}		
@@ -254,10 +254,10 @@ if($result = pg_query($conn_fas, $qry))
 }
 
 //echo nl2br($text);
-echo nl2br("\nBenutzergruppe\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n");
+echo nl2br("\nBenutzergruppe\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n");
 echo nl2br("\nStudenten, die in tbl_benutzer nicht gefunden wurden: ".$nicht_gefunden."\n".$error_log_fas);
 echo nl2br ("\n\n".$ausgabe_all);
-$ausgabe="\nBenutzergruppe\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler."
+$ausgabe="\nBenutzergruppe\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler."
 ."\n\n".$ausgabe_all;
 
 if(strlen(trim($error_log_fas))>0)

@@ -188,7 +188,7 @@
 // -------------------------------------------------------------------------------------------------------------------------
 // HTML Ausgabe Datenstrom Teil I Header
 
-	$cTmpCharSet=(defined('HTML_HEADER_CHARSET')?HTML_HEADER_CHARSET:'iso-8859-1');
+	$cTmpCharSet=(defined('HTML_HEADER_CHARSET')?HTML_HEADER_CHARSET:'UTF-8');
 	if (stristr($oWettbewerb->clientENCODE,"UTF8"))
 		$cTmpCharSet="UTF-8";
 	elseif (stristr($oWettbewerb->clientENCODE,"UTF16"))
@@ -389,7 +389,7 @@ function doIt(userUID,nameID)
 	callURL=callURL+\'?userSel='.constKommuneUserXML.'&client_encode=UTF8&userUID=\'+userUID;
 	req.open("GET", callURL , true);
 
-       //Beim abschliessen des request wird diese Funktion ausgeführt
+       //Beim abschliessen des request wird diese Funktion ausgefÃ¼hrt
                 req.onreadystatechange = function(){            
                     switch(req.readyState) {
                             case 4:
@@ -421,7 +421,7 @@ function neuAufbau () {
 	    location.href = location.href;
 }
 
-/* Überwachung von Netscape initialisieren */
+/* Ãœberwachung von Netscape initialisieren */
 if (!window.Weite && window.innerWidth) {
   	window.onresize = neuAufbau;
   
@@ -434,7 +434,7 @@ if (!window.Weite && window.innerWidth) {
 <body id="hauptbody">
 <script type="text/javascript">
 <!--
-/* Überwachung von Internet Explorer initialisieren */
+/* Ãœberwachung von Internet Explorer initialisieren */
 if (!window.Weite && document.body && document.body.offsetWidth) 
 	{
 	  window.onresize = neuAufbau;

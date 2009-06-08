@@ -9,9 +9,9 @@
 	if ($num_rows==1)
 	{	
 		$row=pg_fetch_object($result,0);
-		$text="Dies ist eine automatische eMail!\r\rAufgrund einer Stundenplankollision wurde folgende Reservierung gelöscht:\r\r";
+		$text="Dies ist eine automatische eMail!\r\rAufgrund einer Stundenplankollision wurde folgende Reservierung gelÃ¶scht:\r\r";
 		$text.="Datum:\t$row->datum\rStunde:\t$row->stunde_id\rOrt:\t$row->ortkurzbz\rTitel:\t$row->titel\r\r";
-		$text.="Wir bitten um Verständnis.";
+		$text.="Wir bitten um VerstÃ¤ndnis.";
 		$adress=$row->uid.'@technikum-wien.at';
 		if (mail($adress,"Stundenplankollision",$text,"From: stpl@technikum-wien.at"))
 			$sendmail=true;
@@ -30,7 +30,7 @@
 <html>
 <head>
 <title>Reservierung Check Delete</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK rel="stylesheet" href="../../../include/styles.css" type="text/css">
 </head>
 <body>

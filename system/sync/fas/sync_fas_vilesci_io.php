@@ -40,7 +40,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - IO</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -119,11 +119,11 @@ if($result = pg_query($conn_fas, $qry))
 							$update=true;
 							if(strlen(trim($ausgabe_io))>0)
 							{
-								$ausgabe_io.=", Mobilitätsprogramm: '".$mobilitaetsprogramm_code."' (statt '".$row2->mobilitaetsprogramm_code."')";
+								$ausgabe_io.=", MobilitÃ¤tsprogramm: '".$mobilitaetsprogramm_code."' (statt '".$row2->mobilitaetsprogramm_code."')";
 							}
 							else
 							{
-								$ausgabe_io="Mobilitätsprogramm: '".$mobilitaetsprogramm_code."' (statt '".$row2->mobilitaetsprogramm_code."')";
+								$ausgabe_io="MobilitÃ¤tsprogramm: '".$mobilitaetsprogramm_code."' (statt '".$row2->mobilitaetsprogramm_code."')";
 							}
 						}
 						if($row2->nation_code!=$nation_code) 
@@ -233,7 +233,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				else 
 				{
-					//einfügen
+					//einfÃ¼gen
 					$qry="INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code,
 						student_uid, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
 						myaddslashes($mobilitaetsprogramm_code).", ".
@@ -266,8 +266,8 @@ echo nl2br("IO-Synchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
-echo nl2br("\n\nIO-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n$ausgabe");
-$ausgabe="IO-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
+echo nl2br("\n\nIO-Sync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n$ausgabe");
+$ausgabe="IO-Sync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler IO von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

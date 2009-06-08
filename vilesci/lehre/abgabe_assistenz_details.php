@@ -23,7 +23,7 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fÃŒr Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 //echo Test($_REQUEST);
 
@@ -99,7 +99,7 @@ echo '
 <title>Abgabe Lektor Details</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-15" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="Javascript">
 	function confdel()
@@ -169,7 +169,7 @@ if(isset($_POST["schick"]))
 			}
 			if($command=='update')
 			{
-				//Terminänderung
+				//TerminÃ€nderung
 				//Ermittlung der alten Daten
 				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
 				if(!$result_old=pg_query($conn, $qry_old))
@@ -216,8 +216,8 @@ if(isset($_POST["schick"]))
 						{
 							$row_typ->bezeichnung='';
 						}
-						//$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung",
-						//"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+						//$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "TerminÃ€nderung Bachelor-/Diplomarbeitsbetreuung",
+						//"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geÃ€ndert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 					}
 				}
 				$command='';
@@ -238,7 +238,7 @@ if(isset($_POST["schick"]))
 	}
 	unset($_POST["schick"]);
 }
-//Löschen eines Termines
+//LÃ¶schen eines Termines
 if(isset($_POST["del"]))
 {
 	if($datum)
@@ -263,7 +263,7 @@ if(isset($_POST["del"]))
 				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
 				if(!$result=pg_query($conn, $qry))
 				{
-					echo "<font color=\"#FF0000\">Fehler beim Löschen des Termins!</font><br>&nbsp;";
+					echo "<font color=\"#FF0000\">Fehler beim LÃ¶schen des Termins!</font><br>&nbsp;";
 				}
 				else 
 				{
@@ -372,7 +372,7 @@ $result=@pg_query($conn, $qry);
 		}
 		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
 		{
-			$htmlstr .= "		<td><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zusätzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
+			$htmlstr .= "		<td><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zusÃ€tzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
 		}
 		else 
 		{
@@ -384,7 +384,7 @@ $result=@pg_query($conn, $qry);
 		$htmlstr .= "</form>\n";
 	}	
 	
-//Eingabezeile für neuen Termin
+//Eingabezeile fÃŒr neuen Termin
 $htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";

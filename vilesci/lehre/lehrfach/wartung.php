@@ -69,7 +69,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
 <title>LV-Verteilung</title>
@@ -86,7 +86,7 @@
 	 echo "<td>";
 	 echo "<form name='form_filter_1' action='wartung.php?stg_2=$stg_2&sem_2=$sem_2&order_1=$order_1&order_2=$order_2' method='POST'>";
 
-	 //Drop Down Menü für Stg Tab1
+	 //Drop Down MenÃ¼ fÃ¼r Stg Tab1
 	 echo "<select name='stg_1'>";
 	 echo "<option value='-1'>--Alle--</option>";
 	 $sql_query_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kurzbz, studiengang_kz FROM public.tbl_studiengang ORDER BY kurzbz";
@@ -100,7 +100,7 @@
 	 }
 	 echo "</select>&nbsp;&nbsp;";
 
-	 //Drop Down Menü für Sem Tab1
+	 //Drop Down MenÃ¼ fÃ¼r Sem Tab1
 	 echo "<select name='sem_1'>";
 	 echo "<option value='-1'>--Alle--</option>";
 	 for($i=1;$i<=9;$i++)
@@ -119,7 +119,7 @@
 	 echo "<td>";
 	 echo "<form name='form_filter_2' action='wartung.php?stg_1=$stg_1&sem_1=$sem_1&order_1=$order_1&order_2=$order_2' method='POST'>";
 
-	 //Drop Down Menü für Stg Tab2
+	 //Drop Down MenÃ¼ fÃ¼r Stg Tab2
 	 echo "<select name='stg_2'>";
 	 echo "<option value='-1'>--Alle--</option>";
 	 $sql_query_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kurzbz, studiengang_kz FROM public.tbl_studiengang ORDER BY kurzbz";
@@ -133,7 +133,7 @@
 	 }
 	 echo "</select>&nbsp;&nbsp;";
 
-	 //Drop Down Menü für Sem Tab2
+	 //Drop Down MenÃ¼ fÃ¼r Sem Tab2
 	 echo "<select name='sem_2'>";
 	 echo "<option value='-1'>--Alle--</option>";
 	 for($i=1;$i<=9;$i++)

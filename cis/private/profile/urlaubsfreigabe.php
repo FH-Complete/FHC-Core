@@ -60,7 +60,7 @@ $datum_obj = new datum();
 echo '<html>
 <head>
 	<title>Urlaubsfreigabe</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
@@ -81,7 +81,7 @@ $mitarbeiter = new mitarbeiter($conn);
 $mitarbeiter->getUntergebene($user);
 
 if(count($mitarbeiter->untergebene)==0 && !$rechte->isBerechtigt('admin'))
-	die('Es sind Ihnen keine Mitarbeiter zugeteilt für die sie den Urlaub freigeben dürfen');
+	die('Es sind Ihnen keine Mitarbeiter zugeteilt fÃŒr die sie den Urlaub freigeben dÃŒrfen');
 $untergebene = '';
 foreach ($mitarbeiter->untergebene as $row)
 {
@@ -127,7 +127,7 @@ if(isset($_GET['action']) && $_GET['action']=='freigabe')
 		}
 		else 
 		{
-			echo '<b>Sie haben keine Berechtigung den Urlaub für diesen Mitarbeiter freizugeben</b>';
+			echo '<b>Sie haben keine Berechtigung den Urlaub fÃŒr diesen Mitarbeiter freizugeben</b>';
 		}
 	}
 	else 
@@ -281,7 +281,7 @@ if($uid!='')
 }
 
 echo '<br><center>';
-echo "<a href='".$_SERVER['PHP_SELF']."?uid=$uid&year=".($year-1)."' class='Item' title='Ein Jahr zurück'><img src='../../../skin/images/left.gif'></a>";
+echo "<a href='".$_SERVER['PHP_SELF']."?uid=$uid&year=".($year-1)."' class='Item' title='Ein Jahr zurÃŒck'><img src='../../../skin/images/left.gif'></a>";
 echo '&nbsp;<font size="+1"><b>';
 echo ($year-1).'/'.$year;
 echo '</b></font>&nbsp;';

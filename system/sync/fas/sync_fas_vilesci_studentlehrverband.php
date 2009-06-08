@@ -49,7 +49,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Studentlehrverband</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -398,7 +398,7 @@ if($result = pg_query($conn_fas, $qry))
 											       " studiengang_kz=".myaddslashes($studiengang_kz).", ".
 											       " semester=".myaddslashes($semester).", ".
 											       " verband=".myaddslashes($verband);
-											       //nicht updaten, wenn nur gruppe leer - zb.: 4A wird nicht über 4A1 geschrieben
+											       //nicht updaten, wenn nur gruppe leer - zb.: 4A wird nicht Ã¼ber 4A1 geschrieben
 											if(!(trim($row4->semester)==trim($semester) AND trim($row4->verband)==trim($verband) AND trim($row4->gruppe)!=trim($gruppe) AND $gruppe==' '))
 											{
 											       $qry.=", gruppe=".myaddslashes($gruppe);
@@ -407,7 +407,7 @@ if($result = pg_query($conn_fas, $qry))
 									        		       " updatevon=".myaddslashes($updatevon).", ".
 											       " ext_id=".myaddslashes($ext_id).
 											       " WHERE student_uid='".$student_uid."' AND studiensemester_kurzbz='".$studiensemester_kurzbz."';";
-											       $ausgabe="SLV-Änderungen bei Student ".$student_uid.", ".$row->familienname.", (".$row->perskz."): ".$ausgabe_slv."('".$semester.$verband.$gruppe."/".$studiensemester_kurzbz."'). ".$typ."\n";
+											       $ausgabe="SLV-Ã„nderungen bei Student ".$student_uid.", ".$row->familienname.", (".$row->perskz."): ".$ausgabe_slv."('".$semester.$verband.$gruppe."/".$studiensemester_kurzbz."'). ".$typ."\n";
 											       $ausgabe_slv='';
 
 										}
@@ -429,7 +429,7 @@ if($result = pg_query($conn_fas, $qry))
 									        now(),
 									        'SYNC',".
 									        myaddslashes($ext_id).");";
-									        $ausgabe="SLV für Student mit UID/Name/Perskz ".$student_uid.", ".$row->familienname.", (".$row->perskz.") eingefügt: Studiengang '".$studiengang_kz."', Sem.'".$studiensemester_kurzbz."' gruppe_pk='".$row1->gruppe_fk."' mit Semester/Verband/Gruppe: '".$semester."'/'".$verband."'/'".$gruppe."'.\n";
+									        $ausgabe="SLV fÃ¼r Student mit UID/Name/Perskz ".$student_uid.", ".$row->familienname.", (".$row->perskz.") eingefÃ¼gt: Studiengang '".$studiengang_kz."', Sem.'".$studiensemester_kurzbz."' gruppe_pk='".$row1->gruppe_fk."' mit Semester/Verband/Gruppe: '".$semester."'/'".$verband."'/'".$gruppe."'.\n";
 									        $anzahl_eingefuegt++;
 								}
 							}
@@ -467,10 +467,10 @@ if($result = pg_query($conn_fas, $qry))
 }
 
 //echo nl2br($text);
-echo nl2br("\nStudentlehrverband\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n");
+echo nl2br("\nStudentlehrverband\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n");
 echo nl2br("\nStudenten, die in tbl_student nicht gefunden wurden: ".$nicht_gefunden."\n".$error_log_fas);
 echo nl2br ("---------------------------------------------------------------------------------------------------------\n".$ausgabe_all);
-$ausgabe="\nStudentlehrverband\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler."
+$ausgabe="\nStudentlehrverband\nStudenten: $anzahl_quelle_student / Gruppen: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler."
 ."\n\n".$ausgabe_all;
 
 if(strlen(trim($error_log_fas))>0)

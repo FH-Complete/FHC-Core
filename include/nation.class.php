@@ -51,7 +51,7 @@ class nation
 	function nation($conn, $code=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -62,7 +62,7 @@ class nation
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($code != null)
 			$this->load($code);
 	}

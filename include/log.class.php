@@ -46,7 +46,7 @@ class log
 	function log($conn, $log_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -60,7 +60,7 @@ class log
 				return false;
 			}
 		}
-
+*/
 		if($log_id!=null)
 			$this->load($log_id);
 	}

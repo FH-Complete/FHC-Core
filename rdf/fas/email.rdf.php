@@ -4,7 +4,7 @@
  * Created on 23.3.2006
  * Aufruf: email.rdf.php?pers_id=xyz
  */
-// header für no cache
+// header fÃ¼r no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");

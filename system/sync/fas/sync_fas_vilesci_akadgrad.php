@@ -39,29 +39,29 @@ function validate($row)
 <html>
 <head>
 <title>Synchro - FAS -> Portal - Akademische Grade</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
 
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','11','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','11','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','91','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','91','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','92','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','92','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','94','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','94','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','145','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','145','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','182','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','182','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-//pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-//pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','204','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','204','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','222','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','222','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','11','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','11','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','91','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','91','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','92','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','92','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','94','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','94','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','145','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','145','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','182','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','182','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+//pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+//pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','203','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','204','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','204','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','222','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','222','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('BSc','227','Bachelor of Science in Engineering',null);");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('MSc','228','Master of Science in Engineering',null);");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('BSc','254','Bachelor of Science in Engineering',null);");
@@ -76,8 +76,8 @@ pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz,
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('MSc','301','Master of Science in Engineering',null);");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('MSc','302','Master of Science in Engineering',null);");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('MSc','303','Master of Science in Engineering',null);");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','308','Diplomingenieur (FH) für technisch-wissenschaftliche Berufe','m');");
-pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','308','Diplomingenieurin (FH) für technisch-wissenschaftliche Berufe','w');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','308','Diplomingenieur (FH) fÃ¼r technisch-wissenschaftliche Berufe','m');");
+pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('Dipl.-Ing.(FH)','308','Diplomingenieurin (FH) fÃ¼r technisch-wissenschaftliche Berufe','w');");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('BSc','327','Bachelor of Science in Engineering',null);");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('MSc','328','Master of Science in Engineering',null);");
 pg_query($conn,"INSERT INTO lehre.tbl_akadgrad (akadgrad_kurzbz, studiengang_kz, titel, geschlecht) VALUES ('MSc','329','Master of Science in Engineering',null);");

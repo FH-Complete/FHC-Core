@@ -313,7 +313,7 @@ function utf8_strlen($str)
 // ****************************************************************
 function strtoupperFULL($str)
 {
-   return(mb_strtoupper($str, "iso-8859-15"));
+   return(mb_strtoupper($str, "UTF-8"));
 }
 
 // ****************************************************************

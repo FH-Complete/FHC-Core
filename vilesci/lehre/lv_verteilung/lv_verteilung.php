@@ -21,9 +21,9 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/vilesci.css" rel="stylesheet" type="text/css">
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 
 function conf_del()
 {
@@ -377,7 +377,7 @@ else
 					  updateamum=now(), updatevon='".$user."' 
 					  WHERE lehreinheit_id='". $_GET['leid']."'";
 		if(pg_query($conn,$sql_query))
-			echo "<br><h2>Update durchgeführt</h2><br>";
+			echo "<br><h2>Update durchgefÃ¼hrt</h2><br>";
 		else 
 			echo "<br><h2>Update Fehlgeschlagen, Bitte erneut versuchen</h2><br>";
 	}
@@ -387,7 +387,7 @@ else
 	{
 		$sql_query = "UPDATE lehre.tbl_lehreinheit SET lehre=not lehre, updateamum=now(), updatevon='$user' WHERE lehreinheit_id ='".$_GET['leid']."'";
 		if(pg_query($conn,$sql_query))
-			echo "<br><h2>Update durchgeführt</h2><br>";
+			echo "<br><h2>Update durchgefÃ¼hrt</h2><br>";
 	    else
 	    	echo "<br><h2><font color='#FF0000'>Fehler beim Update</font></h2><br>";
 	}
@@ -398,7 +398,7 @@ else
 		$le_obj = new lehreinheit($conn);
 		if($le_obj->delete($_GET['le_id']))
 		{
-			echo "<br><h2>DELETE durchgeführt</h2><br>";
+			echo "<br><h2>DELETE durchgefÃ¼hrt</h2><br>";
 		}
 		else 
 			echo $le_obj->errormsg;
@@ -432,7 +432,7 @@ else
 	else 
 		echo "<option value='-1'>--Alle anzeigen--</option>";
 		
-	//Ausgeben der Studiengänge zb BEL, DVT etc
+	//Ausgeben der StudiengÃ¤nge zb BEL, DVT etc
 	foreach($stg_obj->result as $row)
 	{
 		if($row->studiengang_kz==$stg)
@@ -466,7 +466,7 @@ else
 	echo "</SELECT></form></td></tr><tr><td>";
 	echo "\n";
 	
-	if($stg!=-1) //Wenn ein Studiengang ausgewählt wurde
+	if($stg!=-1) //Wenn ein Studiengang ausgewÃ¤hlt wurde
 	{
 		//Anzeigen der Semester
 		echo "Semester:</td>";

@@ -479,9 +479,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							ondblclick="StudentRolleBearbeiten()"
 					>
 						<treecols>
-							<treecol id="student-prestudent-tree-rolle-rolle_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-status_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#rolle_kurzbz"/>
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-studiensemester_kurzbz" label="StSem" flex="5" hidden="false" persist="hidden, width, ordinal"
 							   class="sortDirectionIndicator"
@@ -510,7 +510,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treechildren flex="1" >
 				   					<treeitem uri="rdf:*">
 										<treerow>
-											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#rolle_kurzbz"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>

@@ -67,7 +67,7 @@ if(check_lektor($user, $conn) && (isset($_GET['uid']) && $_GET["uid"] != ""))
 	//if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
 	$lehreinheit=new lehreinheit($conn, $_GET["lehreinheit_id"]);
 	if(!check_lektor_lehrveranstaltung($conn, $user, $lehreinheit->lehrveranstaltung_id, $lehreinheit->studiensemester_kurzbz) && !$rights->isBerechtigt('admin',0))
-		die("Sie haben keine Berechtigung für diese Lehreinheit");
+		die("Sie haben keine Berechtigung fÃŒr diese Lehreinheit");
 	$lektorenansicht = 1;
 	$user = $_GET["uid"];
 }
@@ -122,10 +122,10 @@ if (isset($_GET["download"])){
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -397,13 +397,13 @@ if (!isset($_GET["notenuebersicht"]))
 	
 	if ($l > 0)
 	{
-		echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user'>Notenübersicht</a> f&uuml;r $name</b><br><br>";
+		echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user'>NotenÃŒbersicht</a> f&uuml;r $name</b><br><br>";
 		$uebung_obj = new uebung($conn);
 		$uebung_obj->load_uebung($lehreinheit_id,1);
 		if(count($uebung_obj->uebungen)>0)
 		{
 			echo "<table width='100%'><tr><td valign='top'>";
-			echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+			echo "<br>WÃ€hlen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 			echo "<option value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uid=$user' selected></option>";
 			foreach ($uebung_obj->uebungen as $row)
 			{
@@ -623,7 +623,7 @@ if (!isset($_GET["notenuebersicht"]))
 					if (aktbsp > maxbsp)
 					{			
 						document.bspform.reset();
-						alert('Sie dürfen maximal '+maxbsp+' Beispiele markieren!');		
+						alert('Sie dÃŒrfen maximal '+maxbsp+' Beispiele markieren!');		
 						aktbsp = ".$anzahl.";		
 					}
 					
@@ -647,7 +647,7 @@ if (!isset($_GET["notenuebersicht"]))
 					echo "<tr><td>Maximale Anzahl Studenten/Beispiel:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
 				echo "</table>";	
 				echo "
-				<form method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
+				<form accept-charset='UTF-8' method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
 				<table width='100%'>
 					<tr>
 						<td valign='top'><div style='width: 70%;'>
@@ -733,7 +733,7 @@ if (!isset($_GET["notenuebersicht"]))
 				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
 				{
 					echo "	<tr>\n";
-					echo "	<form method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data' name='kl_angabe'>\n";
+					echo "	<form accept-charset='UTF-8' method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data' name='kl_angabe'>\n";
 					echo "		<td>\n";
 					echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
 					echo "		</td>\n";	
@@ -760,7 +760,7 @@ if (!isset($_GET["notenuebersicht"]))
 				if($row = pg_fetch_object($result))
 					$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 			
-			//Gesamtpunkte alle Kreuzerllisten in dieser Übung
+			//Gesamtpunkte alle Kreuzerllisten in dieser Ãbung
 			$ueb_help = new uebung($conn, $uebung_id);
 			$liste_id = $ueb_help->liste_id;
 			$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
@@ -816,7 +816,7 @@ if (!isset($_GET["notenuebersicht"]))
 				<br><br>
 				<table border='1' width='210'>
 				<tr>
-					<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten dieser Übung:</td>
+					<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten dieser Ãbung:</td>
 				</tr>
 				<tr>
 					<td width='180'>Punkte insgesamt m&ouml;glich:</td>
@@ -950,7 +950,7 @@ if (!isset($_GET["notenuebersicht"]))
 			if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
 			{
 				echo "	<tr>\n";
-				echo "	<form method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
+				echo "	<form accept-charset='UTF-8' method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
 				echo "		<td>\n";
 				echo "			<br>Anmerkung:<br><textarea name='abgabe_anmerkung' rows='3' cols='50'>".$uebung_obj->abgabe_anmerkung."</textarea><br>";				
 				echo "			<br>Datei:<br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
@@ -964,7 +964,7 @@ if (!isset($_GET["notenuebersicht"]))
 	}
 
 }
-//notenübersicht
+//notenÃŒbersicht
 else
 {
 	if ($lektorenansicht == 1)
@@ -987,7 +987,7 @@ else
 			}
 
 		echo "<br><hr><br>";	
-		echo "Bitte Wählen Sie eine/n Studierende/n aus: ";
+		echo "Bitte WÃ€hlen Sie eine/n Studierende/n aus: ";
 		$key = array_search($uid,$uid_arr);
 		$prev = $key-1;
 		$next = $key+1;
@@ -1010,7 +1010,7 @@ else
 		echo "<br><hr><br>";
 	}
 	
-	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
+	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / NotenÃŒbersicht f&uuml;r $name</b><br><br>";	
 	echo "<table><tr><td>";
 	
 	$uebung_obj = new uebung($conn);

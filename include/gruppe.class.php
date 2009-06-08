@@ -55,7 +55,7 @@ class gruppe
 	function gruppe($conn, $gruppe_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -69,7 +69,7 @@ class gruppe
 				return false;
 			}
 		}
-
+*/
 		if($gruppe_kurzbz!=null)
 			$this->load($gruppe_kurzbz);
 	}

@@ -23,7 +23,7 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../config.inc.php');
@@ -101,11 +101,11 @@ else
 <html>
 <head>
 <title>Abgabesystem_Lekorensicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 function confdel()
 {
 	if(confirm("Diesen Datensatz wirklick loeschen?"))

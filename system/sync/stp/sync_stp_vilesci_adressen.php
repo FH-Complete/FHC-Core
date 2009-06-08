@@ -72,13 +72,13 @@ $person_id='';
 <html>
 <head>
 <title>Synchro - StPoelten -> Vilesci - Adresse</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
 <?php
 
-//Array für Nationen erzeugen
+//Array fÃ¼r Nationen erzeugen
 $qry_staat="SELECT __staat, chkurzbez FROM sync.stp_staat";
 if($result_staat = pg_query($conn, $qry_staat))
 {
@@ -125,13 +125,13 @@ $qry="(SELECT __person as _person, chtitel, chnachname, chvorname, _cxbundesland
 	FROM sync.stp_adresse JOIN public.tbl_person ON(_person=ext_id) WHERE  _Person IN (SELECT ext_id FROM public.tbl_person))
 	ORDER BY _Person;";
 
-$error_log_ext="Überprüfung Adressendaten in EXT-DB:\n\n";
+$error_log_ext="ÃœberprÃ¼fung Adressendaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -150,7 +150,7 @@ if($result = pg_query($conn, $qry))
 		}
 		if($row->chstrasse=='' || $row->chstrasse==NULL)
 		{
-			$error_log1.="\nKeine Straße eingetragen";
+			$error_log1.="\nKeine StraÃŸe eingetragen";
 			$cont=true;
 			$error=true;
 		}
@@ -227,7 +227,7 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
-					$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+					$ausgabe.="\n------------------------------------\nÃœbertragen: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 					$ausgabe.="\n---Adresse: ".trim(trim($row->chstrasse))." ".trim($row->chhausnr).", ".$row->chplz.", ".$row->chort.", ".$staat[$row->_staat].", Typ: ".$row->typ;
 					$ausgabe.="\n---------Heimatadresse: '".($row->boheimatadr?'Ja':'Nein')."', Standardadresse: '".($row->bostandardadr?'Ja':'Nein')."',\n---------Anmerkung: '".$row->chadrbemerkung."';";
 					$eingefuegt++;
@@ -334,7 +334,7 @@ if($result = pg_query($conn, $qry))
 						}
 						else
 						{
-							$ausgabe.="\n------------------------------------\nGeändert: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$ausgabe.="\n------------------------------------\nGeÃ¤ndert: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 							$ausgabe.="\n---Adresse: ".$row_dubel->strasse.", ".$row_dubel->plz.", ".$row_dubel->ort.", ".$row_dubel->nation.", Typ: ".$row_dubel->typ;
 							$ausgabe.="\n---Heimatadresse: '".($row_dubel->heimatadresse?'Ja':'Nein')."', Zustelladresse: '".($row_dubel->zustelladresse?'Ja':'Nein')."',\n---name: '".$row_dubel->name."'\n".$sql;
 							$updates++;
@@ -343,9 +343,9 @@ if($result = pg_query($conn, $qry))
 					}
 					else 
 					{
-						//$ausgabe.="\n------------------------------------\nGeändert: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+						//$ausgabe.="\n------------------------------------\nGeÃ¤ndert: ".$row->_person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
 						//$ausgabe.="\n---Adresse: ".$row_dubel->strasse.", ".$row_dubel->plz.", ".$row_dubel->ort.", ".$row_dubel->nation.", Typ: ".$row_dubel->typ;
-						//$ausgabe.="\n--->bereits vorhanden. keine Änderung.";
+						//$ausgabe.="\n--->bereits vorhanden. keine Ã„nderung.";
 						$dublette++;
 					}
 				}
@@ -367,7 +367,7 @@ else
 
 
 
-echo "<br><br>Eingefügt:  ".$eingefuegt;
+echo "<br><br>EingefÃ¼gt:  ".$eingefuegt;
 echo "<br>Updates:  ".$updates;
 echo "<br>Doppelt:   ".$dublette; 
 echo "<br>Fehler:       ".$fehler;
@@ -388,7 +388,7 @@ echo nl2br($ausgabe);
 mail($adress, 'SYNC-Fehler StP-Adresse von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Adresse  von '.$_SERVER['HTTP_HOST'], "Sync Person\n------------\n\n"
-."Personen: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler
+."Personen: Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler
 ."\n\nBeginn: ".$start."\nEnde:    ".date("d.m.Y H:i:s")."\n\n".$ausgabe.$log_updates, "From: nsc@fhstp.ac.at");
 
 

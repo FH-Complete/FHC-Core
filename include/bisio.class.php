@@ -59,6 +59,7 @@ class bisio
 	function bisio($conn, $bisio_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -74,8 +75,9 @@ class bisio
 				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 				return false;
 			}
+	
 		}
-
+	*/	
 		if($bisio_id!=null)
 			$this->load($bisio_id);
 	}

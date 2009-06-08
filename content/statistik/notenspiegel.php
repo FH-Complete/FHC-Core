@@ -304,7 +304,7 @@ else
 	<html>
 	<head>
 	<title>Lehreinheit</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<style type="text/css">
 	td, th

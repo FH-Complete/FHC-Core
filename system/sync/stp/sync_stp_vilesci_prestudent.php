@@ -12,7 +12,7 @@
 //*
 //*
 //* setzt voraus: sync von sync.stp_person
-//* benötigt: tbl_syncperson, tbl_zgv, tbl_zgvmaster, tbl_studiensemester
+//* benÃ¶tigt: tbl_syncperson, tbl_zgv, tbl_zgvmaster, tbl_studiensemester
 //*
 
 require_once('sync_config.inc.php');
@@ -87,7 +87,7 @@ $log_qry_ins='';
 <html>
 <head>
 <title>Synchro - StPoelten -> Vilesci - Prestudent</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
@@ -161,13 +161,13 @@ $qry="SELECT __Person, datenquelle, inAusmassBesch, HoechsteAusbildung, _cxZugan
 		(_cxPersonTyp='1' OR _cxPersonTyp='2');";
 
 //WHERE __Person IN (SELECT ext_id FROM tbl_person WHERE ext_id IS NOT NULL) AND
-$error_log_ext="Überprüfung Prestudentdaten in EXT-DB:\n\n";
+$error_log_ext="ÃœberprÃ¼fung Prestudentdaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -231,7 +231,7 @@ if($result = pg_query($conn, $qry))
 		}
 		if($row->_cxstudstatus=='3' || $row->_cxstudstatus=='4' || $row->_cxstudstatus=='9' || $row->_cxstudstatus=='10' || $row->_cxstudstatus=='11')
 		{
-			$row->chkalendersemstataend='W07';// Standardwert WS2007; von FH-StP gewünscht; 11.12.07
+			$row->chkalendersemstataend='W07';// Standardwert WS2007; von FH-StP gewÃ¼nscht; 11.12.07
 		}
 		if($error)
 		{
@@ -239,7 +239,7 @@ if($result = pg_query($conn, $qry))
 			if($cont)
 			{
 				$error_log.="\n*****\n".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).": ".$error_log1;
-				$error_log.="\n==>nicht übertragen!";
+				$error_log.="\n==>nicht Ã¼bertragen!";
 				$fehler++;
 				$error_log1='';
 				continue;
@@ -247,7 +247,7 @@ if($result = pg_query($conn, $qry))
 			else
 			{
 				$error_log2.="\n*****\n".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).": ".$error_log1;
-				$error_log2.="\n==>übertragen!";
+				$error_log2.="\n==>Ã¼bertragen!";
 				$error_log1='';
 			}
 		}
@@ -367,7 +367,7 @@ if($result = pg_query($conn, $qry))
 				{
 					if($iu=='i')
 					{
-						$ausgabe.="\n------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;
+						$ausgabe.="\n------------------\nÃœbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz;
 						$eingefuegt++;
 						//Prestudent_id ermitteln
 						$qry_seq = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') AS id;";
@@ -385,7 +385,7 @@ if($result = pg_query($conn, $qry))
 					}
 					elseif($iu=='u')
 					{
-						$ausgabe.="\n------------------\nGeändert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz."\n---".$qry_ins."\n---".$log_qry_ins;
+						$ausgabe.="\n------------------\nGeÃ¤ndert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname).", Stg: ".$row->studiengang_kz."\n---".$qry_ins."\n---".$log_qry_ins;
 						$prestudent_id=$row_chk->prestudent_id;
 						$update++;
 						pg_query($conn, "COMMIT");
@@ -412,19 +412,19 @@ if($result = pg_query($conn, $qry))
 			$row->instudiensemester=$maxsemester[$row->studiengang_kz];
 		}
 		$qry_ins='';
-		$qry_status="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."' AND ausbildungssemester='".$row->instudiensemester."';";
+		$qry_status="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='".$prestudent_id."' AND status_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."' AND ausbildungssemester='".$row->instudiensemester."';";
 		$result_status=pg_query($conn,$qry_status);
 		if(pg_num_rows($result_status)==0)
 		{
 			$iu='i';
-			$qry_ins="INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz,
+			$qry_ins="INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
 				studiensemester_kurzbz, ausbildungssemester,datum, orgform_kurzbz,
 				insertamum, insertvon, updateamum, updatevon, ext_id)
 				VALUES (".
 				myaddslashes($prestudent_id).", ".
 				myaddslashes($rolle).", ".
 				myaddslashes($Kalender).", ";
-				//max.studiendauer wenn ausbildungssemester größer (v.a. für 50er und 60er)
+				//max.studiendauer wenn ausbildungssemester grÃ¶ÃŸer (v.a. fÃ¼r 50er und 60er)
 				if($row->instudiensemester>$maxsemester[$row->studiengang_kz])
 				{
 					$qry_ins.=myaddslashes($maxsemester[$row->studiengang_kz]);
@@ -460,8 +460,8 @@ if($result = pg_query($conn, $qry))
 				}
 				if($qry_ins!='')
 				{
-					$qry_ins="UPDATE public.tbl_prestudentrolle SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
-					WHERE prestudent_id='".$prestudent_id."' AND rolle_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
+					$qry_ins="UPDATE public.tbl_prestudentstatus SET ".$qry_ins."updateamum=now(), updatevon='SYNC' 
+					WHERE prestudent_id='".$prestudent_id."' AND status_kurzbz='".$rolle."' AND studiensemester_kurzbz='".$Kalender."';";
 				}
 			}
 		}
@@ -478,12 +478,12 @@ if($result = pg_query($conn, $qry))
 				pg_query($conn, "COMMIT");
 				if($iu=='i')
 				{
-					$ausgabe.="\n---Rolle eingefügt: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
+					$ausgabe.="\n---Rolle eingefÃ¼gt: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
 					$eingefuegt1++;
 				}
 				elseif($iu=='u')
 				{
-					$ausgabe.="\n---Rolle geändert: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
+					$ausgabe.="\n---Rolle geÃ¤ndert: ".$rolle." im Studiensemester ".$Kalender." und Ausbildungssemeser ".$row->instudiensemester." (OrgForm ".$orgform.");";
 					$update1++;
 				}
 			}
@@ -495,12 +495,12 @@ else
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 echo "<br><b>Prestudent:</b>";
-echo "<br>Eingefügt:  ".$eingefuegt;
-echo "<br>Geändert:     ".$update;
+echo "<br>EingefÃ¼gt:  ".$eingefuegt;
+echo "<br>GeÃ¤ndert:     ".$update;
 echo "<br>Fehler:       ".$fehler;
 echo "<br><b>Prestudent-Rolle:</b>";
-echo "<br>Eingefügt:  ".$eingefuegt1;
-echo "<br>Geändert:     ".$update1;
+echo "<br>EingefÃ¼gt:  ".$eingefuegt1;
+echo "<br>GeÃ¤ndert:     ".$update1;
 echo "<br>Fehler:       ".$fehler1;
 echo "<br><br>";
 echo nl2br($error_log."\n----------------------------------------------------------------------------------------------------\n".$error_log2);
@@ -512,8 +512,8 @@ mail($adress, 'SYNC-Fehler StP-Prestudent von '.$_SERVER['HTTP_HOST'], $error_lo
 .$error_log2,"From: nsc@fhstp.ac.at");
 
 mail($adress, 'SYNC StP-Prestudent  von '.$_SERVER['HTTP_HOST'], "Sync Student\n------------\n\n"
-."Prestudenten:      Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Fehler: ".$fehler." / Geändert: ".$update
-."\nPrestudentrollen:  Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt1." / Fehler: ".$fehler1." / Geändert: ".$update1
+."Prestudenten:      Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt." / Fehler: ".$fehler." / GeÃ¤ndert: ".$update
+."\nPrestudentrollen:  Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt1." / Fehler: ".$fehler1." / GeÃ¤ndert: ".$update1
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 

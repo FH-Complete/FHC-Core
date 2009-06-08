@@ -52,7 +52,7 @@ class dokument
 	function dokument($conn, $dokument_kurzbz=null, $prestudent_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+		/*
 		if(!is_null($unicode))
 		{
 			if($unicode)
@@ -66,7 +66,7 @@ class dokument
 				return false;
 			}
 		}
-		
+		*/
 		if(!is_null($dokument_kurzbz) && !is_null($prestudent_id))
 			$this->load($dokument_kurzbz, $prestudent_id);
 	}

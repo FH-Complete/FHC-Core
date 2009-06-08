@@ -26,9 +26,9 @@
 	}
    }
 ?>
-<font class="h1"><b>Änderung des Technikum Wien Passwortes</b></font>
-<p>Sie können mit diesem Formular Ihr Technikum Wien Passwort ändern.<br>
-Es wird sowohl Ihr Windows als auch Ihr Unix bzw. Mail Passwort geändert!</p>
+<font class="h1"><b>Ã„nderung des Technikum Wien Passwortes</b></font>
+<p>Sie kÃ¶nnen mit diesem Formular Ihr Technikum Wien Passwort Ã¤ndern.<br>
+Es wird sowohl Ihr Windows als auch Ihr Unix bzw. Mail Passwort geÃ¤ndert!</p>
 <form method="POST" action="changepass.php">
   <table><tr><td>Username:</td>
     <td><INPUT type="text" name="username" readonly value="<?php echo $uid ?>"
@@ -44,8 +44,8 @@ Es wird sowohl Ihr Windows als auch Ihr Unix bzw. Mail Passwort geändert!</p>
     <td><INPUT type="password" name="newpass2"></td></tr>
 </table>
 <p>
-	<input type="submit" value="Passwort ändern" name="Send">
-	<input type="reset" value="Zurücksetzen" name="cancel">
+	<input type="submit" value="Passwort Ã¤ndern" name="Send">
+	<input type="reset" value="ZurÃ¼cksetzen" name="cancel">
 </p>
 </form>
 </body>

@@ -35,7 +35,7 @@ $user = get_uid();
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<title>Freifaecher Anmeldungsuebersicht</title>
 	</head>
@@ -127,7 +127,7 @@ if($result=pg_query($conn,$qry))
 
 	if($i==0)
 	{
-		echo "<b>Es gibt noch keine Anmeldungen für dieses Freifach</b>";
+		echo "<b>Es gibt noch keine Anmeldungen fÃ¼r dieses Freifach</b>";
 	}
 	else
 	{

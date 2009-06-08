@@ -21,7 +21,7 @@ class basis_db extends db
 	function db_query($sql)
 	{
 		//echo $sql.'<BR/>';
-		if ($this->db_result=pg_query(basis_db::$db_conn,$sql))
+		if ($this->db_result=@pg_query(basis_db::$db_conn,$sql))
 			return true;
 		else
 		{

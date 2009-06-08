@@ -8,7 +8,7 @@
 
 //*
 //* Synchronisiert Bachelorarbeitsdatensaetze von FAS DB in PORTAL DB
-//* benötigt: tbl_lehrveranstaltung, tbl_lehreinheit, tbl_fachbereich
+//* benÃ¶tigt: tbl_lehrveranstaltung, tbl_lehreinheit, tbl_fachbereich
 //*
 
 require_once('../../../vilesci/config.inc.php');
@@ -82,7 +82,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Portal - Bachelorarbeit</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -1417,7 +1417,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										if($projektbetreuernew1)
 										{
 											$anzahl_pbb_insert++;
-											$ausgabe.="Bachelorarbeitsbetreuer eingefügt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Bachelorarbeitsbetreuer eingefÃ¼gt: UID='".$projektbetreuerperson_id1."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}
 										else
 										{
@@ -1430,7 +1430,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										if($projektbetreuernew)
 										{
 											$anzahl_pbg_insert++;
-											$ausgabe.="Bachelorarbeitsbegutachter eingefügt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
+											$ausgabe.="Bachelorarbeitsbegutachter eingefÃ¼gt: UID='".$projektbetreuerperson_id."' und Projektarbeit='".$projektarbeitlehreinheit_id."'.\n";
 										}
 										else
 										{
@@ -1544,19 +1544,19 @@ echo nl2br("Bachelorarbeitsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['
 
 $error_log_fas="Sync Bachelorarbeit\n------------------------\n\n".$error_log_fas1."\n".$error_log_fas2."\n".$error_log_fas3."\n".$error_log_fas4."\n".$error_log_fas5."\n".$error_log_fas6."\n".$error_log_fas7."\n".$error_log_fas8;
 echo nl2br("Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk oder begutachter_fk<1: ".$anzahl_betreuer_fehler.", Anzahl Bachelorarbeiten: ".$anzahl_quelle.".\n");
-echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
-echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
-echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
-echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
+echo nl2br("Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / EingefÃ¼gt: ".$anzahl_le_insert." / GeÃ¤ndert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n");
+echo nl2br("Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / EingefÃ¼gt: ".$anzahl_pa_insert." / GeÃ¤ndert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n");
+echo nl2br("Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / EingefÃ¼gt: ".$anzahl_pbb_insert." / GeÃ¤ndert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n");
+echo nl2br("Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / EingefÃ¼gt: ".$anzahl_pbg_insert." / GeÃ¤ndert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n");
 echo nl2br($error_log_fas."\n--------------------------------------------------------------------------------\n");
 echo nl2br($ausgabe_all);
 
 mail($adress, 'SYNC Bachelorarbeit von '.$_SERVER['HTTP_HOST'],
 "Allgemeine Fehler: ".$anzahl_fehler.", lehrveranstaltung_fk<1: ".$anzahl_lv_fehler.", betreuer_fk oder begutachter_fk<1: ".$anzahl_betreuer_fehler.", Anzahl Bachelorarbeiten: ".$anzahl_quelle.".\n".
-"Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / Eingefügt: ".$anzahl_le_insert." / Geändert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
-"Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / Eingefügt: ".$anzahl_pa_insert." / Geändert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
-"Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / Eingefügt: ".$anzahl_pbb_insert." / Geändert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n".
-"Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / Eingefügt: ".$anzahl_pbg_insert." / Geändert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n".
+"Lehreinheiten:       Gesamt: ".$anzahl_le_gesamt." / EingefÃ¼gt: ".$anzahl_le_insert." / GeÃ¤ndert: ".$anzahl_le_update." / Fehler: ".$anzahl_fehler_le."\n".
+"Projektarbeiten:   Gesamt: ".$anzahl_pa_gesamt." / EingefÃ¼gt: ".$anzahl_pa_insert." / GeÃ¤ndert: ".$anzahl_pa_update." / Fehler: ".$anzahl_fehler_pa."\n".
+"Betreuer:       Gesamt: ".$anzahl_pbb_gesamt." / EingefÃ¼gt: ".$anzahl_pbb_insert." / GeÃ¤ndert: ".$anzahl_pbb_update." / Fehler: ".$anzahl_fehler_pbb."\n".
+"Begutachter:  Gesamt: ".$anzahl_pbg_gesamt." / EingefÃ¼gt: ".$anzahl_pbg_insert." / GeÃ¤ndert: ".$anzahl_pbg_update." / Fehler: ".$anzahl_fehler_pbg."\n\n".
 $ausgabe_all,"From: vilesci@technikum-wien.at");
 
 mail($adress, 'SYNC-Fehler Bachelorarbeiten  von '.$_SERVER['HTTP_HOST'], $error_log_fas, "From: vilesci@technikum-wien.at");

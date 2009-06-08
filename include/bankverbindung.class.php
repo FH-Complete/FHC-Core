@@ -57,7 +57,7 @@ class bankverbindung
 	function bankverbindung($conn,$bankverbindung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -74,7 +74,7 @@ class bankverbindung
 				return false;
 			}
 		}
-		
+*/		
 		if($bankverbindung_id!=null)
 			$this->load($bankverbindung_id);
 
@@ -139,32 +139,32 @@ class bankverbindung
 		//$this->errormsg = 'Eine der Maximiallaengen wurde ueberschritten';
 		if(strlen($this->name)>64)
 		{
-			$this->errormsg = 'Name darf nicht länger als 64 Zeichen sein: '.$this->name;
+			$this->errormsg = 'Name darf nicht lÃ¤nger als 64 Zeichen sein: '.$this->name;
 			return false;
 		}
 		if(strlen($this->anschrift)>128)
 		{
-			$this->errormsg = 'Anschrift darf nicht länger als 128 Zeichen sein: '.$this->anschrift;
+			$this->errormsg = 'Anschrift darf nicht lÃ¤nger als 128 Zeichen sein: '.$this->anschrift;
 			return false;
 		}
 		if(strlen($this->blz)>16)
 		{
-			$this->errormsg = 'BLZ darf nicht länger als 16 Zeichen sein: '.$this->blz;
+			$this->errormsg = 'BLZ darf nicht lÃ¤nger als 16 Zeichen sein: '.$this->blz;
 			return false;
 		}
 		if(strlen($this->bic)>16)
 		{
-			$this->errormsg = 'BIC darf nicht länger als 16 Zeichen sein: '.$this->bic;
+			$this->errormsg = 'BIC darf nicht lÃ¤nger als 16 Zeichen sein: '.$this->bic;
 			return false;
 		}
 		if(strlen($this->kontonr)>16)
 		{
-			$this->errormsg = 'KontoNr darf nicht länger als 16 Zeichen sein: '.$this->kontonr;
+			$this->errormsg = 'KontoNr darf nicht lÃ¤nger als 16 Zeichen sein: '.$this->kontonr;
 			return false;
 		}
 		if(strlen($this->iban)>32)
 		{
-			$this->errormsg = 'IBAN darf nicht länger als 32 Zeichen sein: '.$this->iban;
+			$this->errormsg = 'IBAN darf nicht lÃ¤nger als 32 Zeichen sein: '.$this->iban;
 			return false;
 		}
 				

@@ -1,11 +1,11 @@
 <?php
 /*******************************************************************************
 	File: 	funktion_det.php
-	Descr: 	Hier werden Personen aufgelistet, die zur in funktion.php ausgew‰hlten
-			Gruppe gehˆren. Es kˆnnen Datens‰tze hinzugef¸gt und gelˆscht werden.
+	Descr: 	Hier werden Personen aufgelistet, die zur in funktion.php ausgew√§hlten
+			Gruppe geh√∂ren. Es k√∂nnen Datens√§tze hinzugef√ºgt und gel√∂scht werden.
 			Dazu wird dieses File rekursiv aufgerufen.
 	Erstellt am: 25.05.2003 von Christian Paminger, Werner Masik
-	Letzte ƒnderung: 	28.10.2004 Anpassung an neues DB-Schema (WM)
+	Letzte √Ñnderung: 	28.10.2004 Anpassung an neues DB-Schema (WM)
 ********************************************************************************/
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -27,7 +27,7 @@ if (isset($_GET['type']))
 // Neue Funktionszuweisung speichern
 if ($type=='new' || $type=='editsave')
 {
-	//Einf¸gen in die Datenbank
+	//Einf√ºgen in die Datenbank
 	
 	$funktion=new benutzerfunktion($conn);
 	$funktion->uid=$_POST['uid'];
@@ -88,12 +88,12 @@ if ($type=='delete')
 	}
 }
 
-// Daten f¸r Personenauswahl
+// Daten f√ºr Personenauswahl
 $sql_query="SELECT nachname, vorname, uid FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) ORDER BY upper(nachname), vorname, uid";
 $result_person=pg_query($conn, $sql_query);
 if(!$result_person)
 	die (pg_errormessage($conn));
-// Daten f¸r Studiengangauswahl
+// Daten f√ºr Studiengangauswahl
 $sql_query="SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzbz, bezeichnung FROM public.tbl_studiengang ORDER BY kurzbz";
 $result_stg=pg_query($conn, $sql_query);
 if(!$result_stg)
@@ -114,7 +114,7 @@ if (!$funktion->load($kurzbz))
 <html>
 <head>
 	<title>Funktion Details</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
 <body>
@@ -190,7 +190,7 @@ if (!$funktion->load($kurzbz))
     </SELECT></td></tr>
 	<tr><td>Studiengang: </td><td>
     <SELECT name="stg_kz">
-      <option value="-1">- ausw‰hlen -</option>
+      <option value="-1">- ausw√§hlen -</option>
       <?php
 		// Auswahl des Studiengangs
 		$num_rows=pg_num_rows($result_stg);
@@ -205,7 +205,7 @@ if (!$funktion->load($kurzbz))
     </SELECT></td></tr>
     <tr><td>Fachbereich:</td><td>
     <SELECT name="fb_kurzbz">
-     <option value="-1">- ausw‰hlen -</option>
+     <option value="-1">- ausw√§hlen -</option>
       <?php
       // Auswahl Fachbereich
       $fachbereich=new fachbereich($conn);
@@ -226,7 +226,7 @@ if (!$funktion->load($kurzbz))
     </SELECT></td></tr></table>
     <input type="submit" name="Submit" value="<?php
 	if ($type!='edit')
-		echo 'Hinzuf¸gen';
+		echo 'Hinzuf√ºgen';
 	else
 		echo 'Speichern';
 	?>">

@@ -10,7 +10,7 @@
 //*
 //* Synchronisiert Telefondatensaetze von FAS DB in PORTAL DB
 //*
-//* benötigt: tbl_syncperson, tbl_kontakttyp
+//* benÃ¶tigt: tbl_syncperson, tbl_kontakttyp
 
 require_once('../../../vilesci/config.inc.php');
 require_once('../../../include/kontakt.class.php');
@@ -40,7 +40,7 @@ function validate($row)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Telefon</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -179,14 +179,14 @@ if($result = pg_query($conn_fas, $qry))
 					{
 						if($kontakt->new)
 						{
-							$ausgabe.="Telefonnummer '$kontakt->kontakt' eingefügt!\n";
+							$ausgabe.="Telefonnummer '$kontakt->kontakt' eingefÃ¼gt!\n";
 							$anzahl_eingefuegt++;
 						}
 						else 
 						{
 							if($update)
 							{
-								$ausgabe.="Telefonnummer '$kontakt->kontakt' geändert: ".$ausgabe_telefon." !\n";
+								$ausgabe.="Telefonnummer '$kontakt->kontakt' geÃ¤ndert: ".$ausgabe_telefon." !\n";
 								$anzahl_update++;
 							}
 						}
@@ -201,8 +201,8 @@ echo "Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler \n\n $ausgabe");
-$ausgabe="Telefonsync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler \n\n $ausgabe");
+$ausgabe="Telefonsync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler Telefon von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

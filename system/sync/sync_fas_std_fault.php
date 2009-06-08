@@ -8,7 +8,7 @@
 	$conn_fas=pg_connect($conn_string_fas);
 
 	$headers ="MIME-Version: 1.0\r\n";
-	$headers.="Content-type: text/html; charset=iso-8859-1\r\n";
+	$headers.="Content-type: text/html; charset=UTF-8\r\n";
 	$headers.="From: vilesci@technikum-wien.at";
 
 	$bgcolor[0]="#CCCCCC";
@@ -25,7 +25,7 @@
 	$num_rows=pg_numrows($result);
 	$num_fields=pg_numfields($result);
 	$text.="Dies ist eine automatische eMail!<BR><BR>";
-	$text.="Es wurde eine Ueberpruefung der Daten in der FAS-View fuer Studenten durchgeführt.<BR>";
+	$text.="Es wurde eine Ueberpruefung der Daten in der FAS-View fuer Studenten durchgefÃ¼hrt.<BR>";
 	$text.="Anzahl der fehlerhaften Daten: $num_rows <BR><BR>";
 	$text.="Folgende Studenten haben fehlerhafte Daten im FAS<BR><BR>";
 	$text.='<TABLE border="0"><TR><TH>STG_KZ</TH><TH>uid</TH><TH>Titel</TH><TH>Vornamen</TH><TH>Nachname</TH><TH>Matrikelnr</TH>';

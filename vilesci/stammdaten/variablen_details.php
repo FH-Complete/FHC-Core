@@ -36,7 +36,7 @@
 	$rechte->getBerechtigungen($user);
 	
 	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Rechte für diese Seite');
+		die('Sie haben keine Rechte fÃ¼r diese Seite');
 	
 	$reloadstr = "";  // neuladen der liste im oberen frame
 	$htmlstr = "";
@@ -72,7 +72,7 @@
 		if($error)
 			$errorstr.="Es konnten nicht alle Werte angelegt werden";
 		
-		$reloadstr .= "<script type='text/javascript'>\n";
+		$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
 		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
 		$reloadstr .= "</script>\n";
 	}
@@ -86,7 +86,7 @@
 				$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
 			else 
 			{
-				$reloadstr .= "<script type='text/javascript'>\n";
+				$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
 				$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
 				$reloadstr .= "</script>\n";
 			}
@@ -138,7 +138,7 @@
 			$var = new variable($conn);
 			$var->getVars($uid);
 	
-			$htmlstr .= "<br><div class='kopf'>Variablen für <b>".$uid."</b></div>\n";
+			$htmlstr .= "<br><div class='kopf'>Variablen fÃ¼r <b>".$uid."</b></div>\n";
 			$htmlstr .= "<table style='padding-top:10px;'>\n";
 			$htmlstr .= "<tr></tr>\n";
 			$htmlstr .= "<tr><td>Name</td><td>Wert</td></tr>\n";
@@ -199,6 +199,7 @@
 <html>
 <head>
 <title>Studiengang - Details</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>

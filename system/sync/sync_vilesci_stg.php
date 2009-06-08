@@ -40,7 +40,7 @@ while ($stg=pg_fetch_object($stg_vilesci))
 <html>
 <head>
 <title>FAS-Synchro mit VileSci</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <h3>Studiengaenge werden synchronisiert!</h3>

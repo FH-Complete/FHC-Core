@@ -105,7 +105,7 @@ else
 	$note = 9;
 
 
-// lvgesamtnote für studenten speichern
+// lvgesamtnote fÃ¼r studenten speichern
 if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 	
 		// lehreinheiten holen, in denen der student ist	

@@ -138,7 +138,7 @@ else
 	echo '<html>';
 	echo '<head>';
 	echo '<title>Kalender</title>';
-	echo '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">';
+	echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
 	echo '<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">';
 	echo '</head>';
 	echo '<body id="inhalt">';

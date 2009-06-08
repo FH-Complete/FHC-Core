@@ -37,9 +37,9 @@
 <html>
 <head>
 <title>Profil</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 function createStudienerfolg()
 {
 	var stsem = document.getElementById('stsem').value;
@@ -66,9 +66,9 @@ function createStudienerfolg()
 	  </tr>
 	</table>
 	<br>
-	Bitte wählen Sie das entsprechende Studiensemester aus.<br><br>
+	Bitte wÃ¤hlen Sie das entsprechende Studiensemester aus.<br><br>
 	<?php
-		$qry = "SELECT distinct studiensemester_kurzbz FROM campus.vw_student JOIN public.tbl_prestudentrolle USING(prestudent_id) WHERE uid='$uid'";
+		$qry = "SELECT distinct studiensemester_kurzbz FROM campus.vw_student JOIN public.tbl_prestudentstatus USING(prestudent_id) WHERE uid='$uid'";
 		if($result = pg_query($conn, $qry))
 		{
 			echo 'Studiensemester: <SELECT id="stsem">';

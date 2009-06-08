@@ -53,6 +53,7 @@ class reihungstest
 	function reihungstest($conn,$reihungstest_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -69,6 +70,7 @@ class reihungstest
 				return false;
 			}
 		}
+*/		
 	}
 	
 	/**
@@ -181,12 +183,12 @@ class reihungstest
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->ort_kurzbz)>8)
 		{
-			$this->errormsg = 'Ort_kurzbz darf nicht länger als 8 Zeichen sein  - Studiengang: '.$row->studiengang_kz;
+			$this->errormsg = 'Ort_kurzbz darf nicht lÃ¤nger als 8 Zeichen sein  - Studiengang: '.$row->studiengang_kz;
 			return false;
 		}
 		if(strlen($this->anmerkung)>64)
 		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 64 Zeichen sein - Studiengang: '.$row->studiengang_kz;
+			$this->errormsg = 'Anmerkung darf nicht lÃ¤nger als 64 Zeichen sein - Studiengang: '.$row->studiengang_kz;
 			return false;
 		}
 				

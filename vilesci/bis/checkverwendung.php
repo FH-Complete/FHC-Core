@@ -21,7 +21,7 @@
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
 //*
-//* Überprüfung der Verwendungsdatensaetze im FASonline
+//* ÃberprÃŒfung der Verwendungsdatensaetze im FASonline
 //*
 //*
 
@@ -53,7 +53,7 @@ function myaddslashes($var)
 <html>
 <head>
 	<title>BIS-Meldung - &Uuml;berpr&uuml;fung von Verwendungen</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -103,7 +103,7 @@ if($resultall = pg_query($conn, $qryall))
 						echo "<br><u>Aktive(r) Mitarbeiter(in) ".$row->nachname." ".$row->vorname." hat ".$num_rows." aktuelle Verwendungen (m&ouml;glicherweise korrekt):</u><br>";
 						$i++;
 					}
-					echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+					echo "Verwendung Code ".$row->verwendung_code.", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", mit AusmaÃ ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 				}
 			}
 			elseif($num_rows==0)
@@ -136,7 +136,7 @@ if($resultall = pg_query($conn, $qryall))
 					echo "<br><u>Aktive(r) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat keine aktuellen Verwendungen:</u><br>";
 					$i++;
 				}
-				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "Verwendung Code ".$row->verwendung_code.", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", mit AusmaÃ ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
@@ -168,7 +168,7 @@ if($resultall = pg_query($conn, $qryall))
 					echo "<br><u>Nicht aktive(r) Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname." hat ".$num_rows." aktuelle Verwendungen:</u><br>";
 					$i++;
 				}
-				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "Verwendung Code ".$row->verwendung_code.", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", mit AusmaÃ ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
@@ -198,12 +198,12 @@ if($resultall = pg_query($conn, $qryall))
 					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 					$i++;
 				}
-				echo "Verwendung Code ".$row->verwendung_code.", hauptberuflich ".($row->hauptberuflich=='t'?'ja':'nein').", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "Verwendung Code ".$row->verwendung_code.", hauptberuflich ".($row->hauptberuflich=='t'?'ja':'nein').", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", mit AusmaÃ ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
 }
-//5 - stimmt beschausmasscode mit vertragsstunden überein?
+//5 - stimmt beschausmasscode mit vertragsstunden ÃŒberein?
 $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE (beschausmasscode='1' AND vertragsstunden<='35')
@@ -218,7 +218,7 @@ $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern ist das Beschäftigungsausmaß nicht plausibel</H2>";
+	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern ist das BeschÃ€ftigungsausmaÃ nicht plausibel</H2>";
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i=0;
@@ -241,12 +241,12 @@ if($resultall = pg_query($conn, $qryall))
 					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 					$i++;
 				}
-				echo "Beschäftigungsausmaß ".$row->beschausmasscode.", Vertragsstunden ".$row->vertragsstunden.", Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", mit Ausmaß ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "BeschÃ€ftigungsausmaÃ ".$row->beschausmasscode.", Vertragsstunden ".$row->vertragsstunden.", Verwendung Code ".$row->verwendung_code.", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", mit AusmaÃ ".$row->beschausmasscode.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
 }
-//6 - aktive, freie lektoren auf verwendung 1 oder 2 prüfen
+//6 - aktive, freie lektoren auf verwendung 1 oder 2 prÃŒfen
 $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE aktiv 	AND lektor AND fixangestellt=false
@@ -273,7 +273,7 @@ if($resultall = pg_query($conn, $qryall))
 					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 					$i++;
 				}
-				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "Verwendung Code ".$row->verwendung_code.", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
@@ -302,7 +302,7 @@ if($resultall = pg_query($conn, $qryall))
 		{
 			while($row=pg_fetch_object($result))
 			{
-				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
+				echo "Verwendung Code ".$row->verwendung_code.", BeschÃ€ftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
 			}
 		}
 	}
@@ -317,7 +317,7 @@ $qryall="SELECT DISTINCT mitarbeiter_uid, nachname, vorname
 if($resultall = pg_query($conn, $qryall))
 {
 	$num_rows_all=pg_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all Lektoren sind die Angaben über Habilitationen nicht plausibel</H2>";
+	echo "<br><br><H2>Bei $num_rows_all Lektoren sind die Angaben ÃŒber Habilitationen nicht plausibel</H2>";
 	while($rowall=pg_fetch_object($resultall))
 	{
 		$i++;

@@ -29,7 +29,7 @@
 
     //Connection Herstellen
     if(!$conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim öffnen der Datenbankverbindung");
+       die("Fehler beim Ã¶ffnen der Datenbankverbindung");
 
     if(isset($_POST['cmbChoice']))
     	$cmbChoice = $_POST['cmbChoice'];
@@ -49,7 +49,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
@@ -65,7 +65,7 @@
         <td>&nbsp;</td>
       </tr>
 	  <tr>
-	  	<form method="post" action="psearch.php" name="SearchFormular">
+	  	<form  method="post" action="psearch.php" name="SearchFormular">
 	  	<td nowrap><input type="hidden" name="do_search">
 	  	  Suche nach:
 	  	  <input type="text" name="txtSearchQuery" size="45">
@@ -88,11 +88,11 @@
 
 					if(isset($cmbChoice) && $cmbChoice == $row->funktion_kurzbz)
 					{
-						echo "<option value=\"$row->funktion_kurzbz\" selected>$row->beschreibung</option>";
+						echo "<option value=\"$row->funktion_kurzbz\" selected>".$row->beschreibung."</option>";
 					}
 					else
 					{
-						echo "<option value=\"$row->funktion_kurzbz\">$row->beschreibung</option>";
+						echo "<option value=\"$row->funktion_kurzbz\">".$row->beschreibung."</option>";
 					}
 				}
 			  ?>
@@ -132,9 +132,12 @@
 							$sql_query = "SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) WHERE ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE UNION SELECT DISTINCT uid, titelpre, titelpost, nachname, vorname, vornamen,(''::varchar) AS standort_kurzbz, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, vw_student.semester, ''::varchar as ort, alias FROM campus.vw_student JOIN public.tbl_benutzerfunktion USING(uid) WHERE vw_student.semester <10 AND ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE ORDER BY nachname, vorname";
 						}
 					}
-
-					$result = pg_query($conn, $sql_query);
-					$num_rows = pg_num_rows($result);
+					
+					$num_rows=0;
+					if ($result = pg_query($conn, $sql_query))
+					{
+						$num_rows = pg_num_rows($result);
+					}	
 
 					if($num_rows > 0)
 					{
@@ -243,8 +246,12 @@
 								{
 									$qry = "SELECT telefon FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma WHERE tbl_standort.standort_kurzbz='$row->standort_kurzbz' AND tbl_standort.adresse_id=tbl_adresse.adresse_id AND tbl_adresse.firma_id=tbl_firma.firma_id";
 									if($result_tel = pg_query($conn, $qry))
-										if($row_tel = pg_fetch_object($result_tel))
+									{
+										if($result_tel && $row_tel = pg_fetch_object($result_tel))
+										{
 											$vorwahl = $row_tel->telefon;
+										}	
+									}	
 								}
 								if($i % 2 == 0)
 								{
@@ -317,11 +324,11 @@
 								}
 							}
 
+
 							$kurzbz='';
 							if($row->studiengang_kz != -1)
 							{
 								$stg_obj = new studiengang($conn, $row->studiengang_kz);
-
 								if($i % 2 == 0)
 								{
 									echo "<td align=\"left\" class='tdwrap'>&nbsp;$stg_obj->kuerzel</td>";
@@ -348,11 +355,11 @@
 							{
 								if($i % 2 == 0)
 								{
-									echo "	<td align=\"center\" class='tdwrap'>&nbsp;$row->semester</td>";
+									echo "	<td align=\"center\" class='tdwrap'>&nbsp;".$row->semester."</td>";
 								}
 								else
 								{
-									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;$row->semester</td>";
+									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;".$row->semester."</td>";
 								}
 							}
 							else
@@ -366,16 +373,18 @@
 									echo "	<td align=\"center\" class=\"MarkLine\" class='tdwrap'>&nbsp;</td>";
 								}
 							}
-
 							if($row->studiengang_kz != -1)
 							{
-								$std_obj = new student($conn, $row->uid);
-
-								$verband=$std_obj->verband;
-								$gruppe=$std_obj->gruppe;
-
+								$verband='';
+								$gruppe='';
+								if ($std_obj = new student($conn, $row->uid))
+								{
+									$verband=$std_obj->verband;
+									$gruppe=$std_obj->gruppe;
+								}
 								$kurzbz=strtolower($kurzbz);
 								$verband=strtolower($verband);
+								
 								if($i % 2 == 0)
 								{
 									echo "	<td align=\"center\" class='tdwrap'>&nbsp;<a class='Item' href='mailto:".trim($kurzbz.$row->semester.$verband.$gruppe)."@".DOMAIN."'>".trim($kurzbz.$row->semester.$verband.$gruppe)."@".DOMAIN."</td>";

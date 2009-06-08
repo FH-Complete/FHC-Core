@@ -21,7 +21,7 @@
  *			Gerald Raab <gerald.raab@technikum-wien.at>.
  */
 
-// header für no cache
+// header fÃ¼r no cache
 //header("Cache-Control: no-cache");
 //header("Cache-Control: post-check=0, pre-check=0",false);
 //header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -61,7 +61,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$studiensemester_aktuell = $studiensemester->getNearest();
 
 	$semester_aktuell='';
-	$qry_semester = "SELECT tbl_student.semester FROM public.tbl_student, public.tbl_prestudentrolle WHERE tbl_student.prestudent_id=tbl_prestudentrolle.prestudent_id AND tbl_prestudentrolle.rolle_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') AND studiensemester_kurzbz='$studiensemester_aktuell' AND tbl_student.student_uid = '".$uid."'";
+	$qry_semester = "SELECT tbl_student.semester FROM public.tbl_student, public.tbl_prestudentstatus WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') AND studiensemester_kurzbz='$studiensemester_aktuell' AND tbl_student.student_uid = '".$uid."'";
 	if($result_semester = pg_query($conn, $qry_semester))
 		if($row_semester = pg_fetch_object($result_semester))
 			$semester_aktuell=$row_semester->semester;
@@ -93,7 +93,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<datum>".$datum_aktuell."</datum>";
 
 	if(isset($_REQUEST['typ']) && $_REQUEST['typ']=='finanzamt')
-		$xml .= "		<finanzamt>(gemäß §2 Abs. 1 lit.b des Familienlastenausgleichsgesetzes 1967 zur Vorlage beim Wohnsitzfinanzamt)</finanzamt>";
+		$xml .= "		<finanzamt>(gemÃ¤ÃŸ Â§2 Abs. 1 lit.b des Familienlastenausgleichsgesetzes 1967 zur Vorlage beim Wohnsitzfinanzamt)</finanzamt>";
 	else
 		$xml .= "		<finanzamt></finanzamt>";
 
@@ -188,7 +188,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 	//Daten holen
 
-	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>\n";
+	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
 	$xml .= "<studienerfolge>";
 
 	if(isset($_GET['all']))
@@ -196,7 +196,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		for ($i = 0; $i < sizeof($uid_arr); $i++)
 		{
 			//Studienbestaetigung fuer alle Semester dieses Studenten
-			$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz in(SELECT studiensemester_kurzbz FROM public.tbl_prestudentrolle JOIN public.tbl_student USING(prestudent_id) WHERE student_uid='".addslashes($uid_arr[$i])."') ORDER BY start";
+			$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz in(SELECT studiensemester_kurzbz FROM public.tbl_prestudentstatus JOIN public.tbl_student USING(prestudent_id) WHERE student_uid='".addslashes($uid_arr[$i])."') ORDER BY start";
 			if($result = pg_query($conn, $qry))
 				while($row = pg_fetch_object($result))
 					draw_studienerfolg($uid_arr[$i], $row->studiensemester_kurzbz);

@@ -57,6 +57,7 @@ class projektbetreuer
 	function projektbetreuer($conn, $person_id=null, $projektarbeit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -73,6 +74,7 @@ class projektbetreuer
 				return false;
 			}
 		}
+*/
 		if($projektarbeit_id != null && $person_id!=null) 	
 			$this->load($person_id, $projektarbeit_id);
 	}
@@ -149,12 +151,12 @@ class projektbetreuer
 		}
 		if(strlen($this->betreuerart_kurzbz)>16)
 		{
-			$this->errormsg = 'betreuerart darf nicht l‰nger als 16 Zeichen sein';
+			$this->errormsg = 'betreuerart darf nicht l√§nger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->name)>32)
 		{
-			$this->errormsg = 'Name darf nicht l‰nger als 32 Zeichen sein';
+			$this->errormsg = 'Name darf nicht l√§nger als 32 Zeichen sein';
 			return false;
 		}
 		

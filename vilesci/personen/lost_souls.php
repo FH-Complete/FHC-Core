@@ -46,20 +46,20 @@ echo "Semester: ".$ssem."<br>";
 $qry="SELECT DISTINCT tbl_prestudent.prestudent_id, tbl_prestudent.studiengang_kz FROM public.tbl_person 
 	JOIN public.tbl_prestudent USING(person_id) 
 	JOIN public.tbl_student ON(tbl_prestudent.prestudent_id=tbl_student.prestudent_id)
-	JOIN public.tbl_prestudentrolle ON(tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id)  
-	WHERE tbl_person.aktiv AND rolle_kurzbz!='Incoming' ORDER by tbl_prestudent.studiengang_kz;";
+	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)  
+	WHERE tbl_person.aktiv AND status_kurzbz!='Incoming' ORDER by tbl_prestudent.studiengang_kz;";
 
 if ($result=pg_query($conn, $qry))
 {
 	while($row=pg_fetch_object($result))
 	{
 		$alle=pg_num_rows($result);
-		$qry_chk="SELECT prestudent_id FROM public.tbl_prestudentrolle WHERE (rolle_kurzbz='Abgewiesener' OR rolle_kurzbz='Abbrecher' OR rolle_kurzbz='Absolvent') AND prestudent_id='".$row->prestudent_id."';";
+		$qry_chk="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE (status_kurzbz='Abgewiesener' OR status_kurzbz='Abbrecher' OR status_kurzbz='Absolvent') AND prestudent_id='".$row->prestudent_id."';";
 		if ($result_chk=pg_query($conn, $qry_chk))
 		{
 			if(pg_num_rows($result_chk)==0)
 			{
-				$qry_chk2="SELECT prestudent_id FROM public.tbl_prestudentrolle WHERE studiensemester_kurzbz='".$ssem."' AND prestudent_id='".$row->prestudent_id."';";
+				$qry_chk2="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE studiensemester_kurzbz='".$ssem."' AND prestudent_id='".$row->prestudent_id."';";
 				if ($result_chk2=pg_query($conn, $qry_chk2))
 				{
 					if(pg_num_rows($result_chk2)==0)

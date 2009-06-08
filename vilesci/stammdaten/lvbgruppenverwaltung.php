@@ -30,9 +30,9 @@
 <html>
 <head>
 <title>Lehrverbandsgruppen Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 function replicateKurzbz()
 {
 	var kurzbz = document.copygroup.gruppe_kurzbz_copy.value;
@@ -102,7 +102,7 @@ else
 	$assistenz=false;
 
 if(!$admin && !$assistenz)
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+	die('Sie haben keine Berechtigung fÃ¼r diesen Studiengang');
 
 $studiengang = new studiengang($conn);
 $studiengang->load($studiengang_kz);
@@ -386,8 +386,11 @@ else
 {
 	$where = '';
 }
+if (empty($studiengang_kz))
+{
+	$studiengang_kz=0;
+}
 $qry = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$studiengang_kz' $where ORDER BY studiengang_kz, semester, verband, gruppe";
-
 if($result = pg_query($conn, $qry))
 {
 	$lastsemester='';
@@ -767,7 +770,7 @@ if($type=='edit')
 	}
 }
 echo '</td></tr></table>';
-if(isset($semester) || is_numeric($semester)) //Zum Anker hüpfen
+if(isset($semester) || is_numeric($semester)) //Zum Anker hÃ¼pfen
 {
 	echo "<script language='JavaScript'>this.location.hash='#".$semester."'</script>";
 }

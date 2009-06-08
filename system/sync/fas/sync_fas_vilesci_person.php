@@ -12,7 +12,7 @@
 //*
 //*
 //* setzt voraus: sync von tbl_nation, tbl_sprache
-//* benötigt: tbl_syncperson
+//* benÃ¶tigt: tbl_syncperson
 
 require_once('../../../vilesci/config.inc.php');
 require_once('../../../include/person.class.php');
@@ -44,7 +44,7 @@ $plausi='';
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Person</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 
@@ -70,12 +70,12 @@ order by p1.familienname;
 ";
 //AND (p1.svnr<>'0005010400' AND p2.svnr<>'0005010400')
 
-$error_log_fas="Überprüfung Personendaten im FAS:\n\n";
+$error_log_fas="ÃœberprÃ¼fung Personendaten im FAS:\n\n";
 
 
 if($resultp = pg_query($conn_fas, $qry))
 {
-	$error_log_fas.="Anzahl der Datensätze: ".pg_num_rows($resultp)."\n";
+	$error_log_fas.="Anzahl der DatensÃ¤tze: ".pg_num_rows($resultp)."\n";
 	echo nl2br($error_log_fas);
 	while($rowp=pg_fetch_object($resultp))
 	{
@@ -112,7 +112,7 @@ if($resultp = pg_query($conn_fas, $qry))
 		}
 		if ($rowp->staatsbuergerschaft1<>$rowp->staatsbuergerschaft2)
 		{
-			$plausi.="Staatsbürgerschaft der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->staatsbuergerschaft2."'.\n";
+			$plausi.="StaatsbÃ¼rgerschaft der Person ".$rowp->familienname1." (".$rowp->uid1.", person_pk=".$rowp->person1.") ist '".$rowp->staatsbuergerschaft1."' bei ".$rowp->familienname2." (".$rowp->uid2.", person_pk=".$rowp->person2.") aber '".$rowp->staatsbuergerschaft2."'.\n";
 			$error=true;
 		}
 		if ($rowp->familienstand1<>$rowp->familienstand2)
@@ -321,7 +321,7 @@ if($result = pg_query($conn_fas, $qry))
 				}
 				else
 				{
-					//überprüfen, ob eintrag schon vorhanden
+					//Ã¼berprÃ¼fen, ob eintrag schon vorhanden
 					$qryz="SELECT person_fas FROM sync.tbl_syncperson WHERE person_fas='$row->person_pk' AND person_portal='$person->person_id'";
 					if($resultz = pg_query($conn, $qryz))
 					{
@@ -360,8 +360,8 @@ else
 
 //echo nl2br($text);
 echo nl2br("\nLog:\n".$error_log);
-echo nl2br("\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler");
-$error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log;
+echo nl2br("\n\nGesamt FAS: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler");
+$error_log="Person Sync\n-------------\n\nGesamt FAS: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / GeÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n".$error_log;
 mail($adress, 'SYNC Personen', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>

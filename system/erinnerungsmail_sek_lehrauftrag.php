@@ -27,7 +27,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 $qry = "SELECT distinct email FROM public.tbl_studiengang WHERE studiengang_kz!=0 AND email is not null";
 
 $headers = "From: vilesci@technikum-wien.at";
-$message = "Dies ist eine automatische eMail!\n\nAm 20. jedes Monats wird die Lehrauftragsliste automatisch and die GST geschickt. Bitte führen Sie bis dahin noch alle anstehenden Korrekturen durch!\n\nBesten Dank,\nGeschäftsstelle";
+$message = "Dies ist eine automatische eMail!\n\nAm 20. jedes Monats wird die Lehrauftragsliste automatisch and die GST geschickt. Bitte fÃ¼hren Sie bis dahin noch alle anstehenden Korrekturen durch!\n\nBesten Dank,\nGeschÃ¤ftsstelle";
 
 if($result = pg_query($conn, $qry))
 {

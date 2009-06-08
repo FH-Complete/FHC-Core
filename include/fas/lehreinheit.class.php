@@ -65,12 +65,14 @@ class lehreinheit
 	function lehreinheit($conn, $lehreinheit_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($lehreinheit_id != null)
 			$this->load($lehreinheit_id);
 	}

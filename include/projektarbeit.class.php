@@ -65,7 +65,7 @@ class projektarbeit
 	function projektarbeit($conn,$projektarbeit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -82,6 +82,7 @@ class projektarbeit
 				return false;
 			}
 		}
+*/	
 		if($projektarbeit_id != null) 	
 			$this->load($projektarbeit_id);
 	}
@@ -162,32 +163,32 @@ class projektarbeit
 		}
 		if(strlen($this->projekttyp_kurzbz)>16)
 		{
-			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
+			$this->errormsg = 'Projektyp_kurzbz darf nicht lÃ¤nger als 16 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->titel)>1024)
 		{
-			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
+			$this->errormsg = 'Titel darf nicht lÃ¤nger als 1024 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->titel_english)>1024)
 		{
-			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
+			$this->errormsg = 'Titel darf nicht lÃ¤nger als 1024 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->themenbereich)>64)
 		{
-			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein';
+			$this->errormsg = 'Themenbereich darf nicht lÃ¤nger als 64 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->anmerkung)>256)
 		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
+			$this->errormsg = 'Anmerkung darf nicht lÃ¤nger als 256 Zeichen sein';
 			return false;
 		}
 		/*if(!is_numeric($this->note))
 		{
-			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Note muÃŸ ein numerischer Wert sein - student_uid: '.$this->student_uid;
 			return false;
 		}*/
 		if($this->punkte!='' && !is_numeric($this->punkte))

@@ -66,7 +66,7 @@ $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+	die('Sie haben keine Berechtigung fÃ¼r diesen Studiengang');
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 {
@@ -308,7 +308,7 @@ echo "<H2>Lehrveranstaltung Verwaltung (".(isset($s[$stg_kz]->kurzbz)?$s[$stg_kz
 echo '<html>
 	<head>
 	<title>Lehrveranstaltung Verwaltung</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -320,7 +320,7 @@ echo '<html>
 
 		if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
 		{
-			alert("Studiengang und Fachbereich dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+			alert("Studiengang und Fachbereich dÃ¼rfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
 			return false;
 		}
 		else

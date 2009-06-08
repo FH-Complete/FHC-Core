@@ -43,7 +43,7 @@ $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin'))
-	die('Sie haben keine Rechte für diese Seite');
+	die('Sie haben keine Rechte fÃ¼r diese Seite');
 
 if(isset($_GET['uebung_id_source']))
 	$uebung_id_source=$_GET['uebung_id_source'];
@@ -62,7 +62,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 	$copy_insert_bsp = 0;
 	$copy_update_bsp = 0;
 	if (!is_numeric($uebung_id_source) or !is_numeric($lehreinheit_id_target))
-		echo "<span class='error'>Übung und Lehreinheit muss ausgewählt sein!</span>";
+		echo "<span class='error'>Ãœbung und Lehreinheit muss ausgewÃ¤hlt sein!</span>";
 	else
 	{
 		$ueb_1 = new uebung($conn, $uebung_id_source);
@@ -115,12 +115,12 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			if (!$ueb_1_target->save($new))
 			{
 				$error = 1;
-				echo "<span class='error'>Hauptübung konnte nicht kopiert werden!</span>";
+				echo "<span class='error'>HauptÃ¼bung konnte nicht kopiert werden!</span>";
 			}
 				
 			else
 			{
-				// Subübungen durchlaufen			
+				// SubÃ¼bungen durchlaufen			
 				$error = 0;
 				$ueb_2 = new uebung($conn);
 
@@ -179,7 +179,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						if (!$ueb_2_target->save($new))
 						{
 							$error = 1;
-							echo "<span class='error'>Übung konnte nicht kopiert werden!</span>";
+							echo "<span class='error'>Ãœbung konnte nicht kopiert werden!</span>";
 						}
 						
 						//angabedatei syncen
@@ -239,7 +239,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 									echo "<span class='error'>Beispiele konnten nicht angelegt werden</span>";							
 								}
 								
-								//Notenschlüssel synchronisieren
+								//NotenschlÃ¼ssel synchronisieren
 								$clear = "delete from campus.tbl_notenschluesseluebung where uebung_id = '".$ueb_1_target->uebung_id."'";
 								pg_query($conn, $clear);
 								
@@ -264,8 +264,8 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			
 		if ($error == 0)
 		{
-			echo "Übung erfolgreich kopiert! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
-			echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'" class="Item">noch eine Übung Kopieren</a>';
+			echo "Ãœbung erfolgreich kopiert! (Ãœ: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
+			echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'" class="Item">noch eine Ãœbung Kopieren</a>';
 		}
 			
 	}
@@ -273,11 +273,11 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 else 
 {
 	echo '
-		<h1>Kopieren von Übungen in eine andere Lehreinheit</h1>
-		Script zum Kopieren einer Übung in eine beliebige Lehreinheit:<br><br>
+		<h1>Kopieren von Ãœbungen in eine andere Lehreinheit</h1>
+		Script zum Kopieren einer Ãœbung in eine beliebige Lehreinheit:<br><br>
 		<form action="'.$_SERVER['PHP_SELF'].'" method="GET">
-			ÜbungID die Kopiert werden soll: <input type="text" name="uebung_id_source"><br>
-			Lehreinheit_id in welche diese Übung kopiert werden soll: <input type="text" name="lehreinheit_id_target"><br>
+			ÃœbungID die Kopiert werden soll: <input type="text" name="uebung_id_source"><br>
+			Lehreinheit_id in welche diese Ãœbung kopiert werden soll: <input type="text" name="lehreinheit_id_target"><br>
 			<input type="submit" value="Kopieren">
 		</form>';
 }

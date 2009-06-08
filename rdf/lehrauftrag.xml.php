@@ -30,7 +30,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/fachbereich.class.php');
 
-// header für no cache
+// header fÃŒr no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -70,7 +70,7 @@ function CutString($strVal, $limit)
 }
 
 // GENERATE XML
-$xml = '<?xml version="1.0" encoding="ISO-8859-15" ?><lehrauftraege>';
+$xml = '<?xml version="1.0" encoding="UTF-8" ?><lehrauftraege>';
 $stg_arr = array();
 $studiengang = new studiengang($conn);
 $studiengang->getAll();

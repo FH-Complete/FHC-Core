@@ -70,13 +70,13 @@ if($person!='' && $prestudent!='')
 				}
 				else 
 				{
-					$q3="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".$prestudent." AND rolle_kurzbz='Interessent';";
+					$q3="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';";
 					if($result3 = pg_query($conn, $q3))
 					{
 						if(pg_num_rows($result3)==1)
 						{
-							//mehrere prestudenten an diesem studenten => nur prestudentrolle und prestudent werden gelöscht
-							$del="DELETE FROM public.tbl_prestudentrolle WHERE prestudent_id=".$prestudent." AND rolle_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";";
+							//mehrere prestudenten an diesem studenten => nur prestudentrolle und prestudent werden gelÃ¶scht
+							$del="DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";";
 							if(pg_query($conn, $del))
 							{
 								$msg="Prestudent mit ID ".$prestudent." und Prestudentrolle Interessent entfernt.<br>".str_replace(";DELETE",";<br>DELETE",$del);
@@ -101,13 +101,13 @@ if($person!='' && $prestudent!='')
 			{
 				if($row->prestudent_id==$prestudent)
 				{
-					$q3="SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id=".$prestudent." AND rolle_kurzbz='Interessent';";
+					$q3="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';";
 					if($result3 = pg_query($conn, $q3))
 					{
 						if(pg_num_rows($result3)==1)
 						{
-							//löschen von prestudentrolle, prestudent, adresse, kontakt und person werden gelöscht
-							$del="DELETE FROM public.tbl_prestudentrolle WHERE prestudent_id=".$prestudent." AND rolle_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";DELETE FROM public.tbl_adresse WHERE person_id=".$person.";DELETE FROM public.tbl_kontakt WHERE person_id=".$person.";DELETE FROM public.tbl_person WHERE person_id=".$person.";";
+							//lÃ¶schen von prestudentrolle, prestudent, adresse, kontakt und person werden gelÃ¶scht
+							$del="DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";DELETE FROM public.tbl_adresse WHERE person_id=".$person.";DELETE FROM public.tbl_kontakt WHERE person_id=".$person.";DELETE FROM public.tbl_person WHERE person_id=".$person.";";
 							if(pg_query($conn, $del))
 							{
 								$msg="Prestudent mit ID ".$prestudent." und Person mit ID ".$person." entfernt.<br>".str_replace(";DELETE",";<br>DELETE",$del);	
@@ -134,7 +134,7 @@ if($person!='' && $prestudent!='')
 		else 
 		{
 			//kein prestudent gefunden
-			$msg="Keinen Prestudent mit dieser person_id gefunden! Bitte Eingabe überprüfen!";
+			$msg="Keinen Prestudent mit dieser person_id gefunden! Bitte Eingabe Ã¼berprÃ¼fen!";
 		}
 	}
 }
@@ -147,7 +147,7 @@ else
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
 <title>Entfernen von (doppelten) Interessenten</title>

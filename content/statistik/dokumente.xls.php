@@ -85,13 +85,13 @@ if($studiengang_kz!='')
 				SELECT 
 					distinct prestudent_id 
 				FROM 
-					public.tbl_prestudent JOIN public.tbl_prestudentrolle USING(prestudent_id)
+					public.tbl_prestudent JOIN public.tbl_prestudentstatus USING(prestudent_id)
 				WHERE 
 					(SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang 
 					 WHERE 
 					 	dokument_kurzbz NOT IN(	SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE 
 					 							prestudent_id=tbl_prestudent.prestudent_id) AND studiengang_kz='$studiengang_kz')<>0 
-					 	AND tbl_prestudentrolle.studiensemester_kurzbz='$studiensemester_kurzbz' AND studiengang_kz='$studiengang_kz'
+					 	AND tbl_prestudentstatus.studiensemester_kurzbz='$studiensemester_kurzbz' AND studiengang_kz='$studiengang_kz'
 			)
 			ORDER BY nachname, vorname
 		   ";
@@ -140,7 +140,7 @@ else
 	<html>
 	<head>
 	<title>Dokumente</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	</head>
 	<body class="Background_main">

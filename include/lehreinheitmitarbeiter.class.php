@@ -55,7 +55,7 @@ class lehreinheitmitarbeiter
 	function lehreinheitmitarbeiter($conn, $lehreinheit_id=null, $mitarbeiter_uid=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -69,7 +69,7 @@ class lehreinheitmitarbeiter
 				return false;
 			}
 		}
-
+*/
 		if($lehreinheit_id!=null && $mitarbeiter_uid!=null)
 			$this->load($lehreinheit_id, $mitarbeiter_uid);
 	}

@@ -21,7 +21,7 @@ else
 	if (strlen($ss_where)>0) $ss_where=" ($ss_where) ";
 }
 
-// error log für jeden Studiengang
+// error log fÃ¼r jeden Studiengang
 $error_log=array();
 $missing_lehrfaecher=array();
 $missing_lehrveranstaltungen=array();
@@ -62,22 +62,22 @@ function validate($row)
 	}
 	if ($row->semester>8 || $row->semester<1)
 	{
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Semester bei '.$row->semester.$row->verband.$row->gruppe.' größer als 8';
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Semester bei '.$row->semester.$row->verband.$row->gruppe.' grÃ¶ÃŸer als 8';
 		$valid=false;
 	}
 	if (!(is_null($row->verband) || $row->verband==null || $row->verband=='' || $row->verband=='A' || $row->verband=='B' || $row->verband=='C' || $row->verband=='D'))
 	{
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Verband bei '.$row->semester.$row->verband.$row->gruppe.' außerhalb des gültigen Bereichs (A bis D)';
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Verband bei '.$row->semester.$row->verband.$row->gruppe.' auÃŸerhalb des gÃ¼ltigen Bereichs (A bis D)';
 		//print_r($row);
 		$valid=false;
 	}
 	if (!(is_null($row->gruppe) || $row->gruppe==null || $row->gruppe=='' || $row->gruppe=='1' || $row->gruppe=='2' || $row->gruppe=='3' || $row->gruppe=='4'))
 	{
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Gruppe bei '.$row->semester.$row->verband.$row->gruppe.' außerhalb des gültigen Bereichs (1 bis 4)';
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Gruppe bei '.$row->semester.$row->verband.$row->gruppe.' auÃŸerhalb des gÃ¼ltigen Bereichs (1 bis 4)';
 		$valid=false;
 	}
 	if (!$row->stundenblockung>0) {
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Stundenblockung ist nicht größer 0';
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Stundenblockung ist nicht grÃ¶ÃŸer 0';
 		$valid=false;
 	}
 	if (!($row->semesterstunden>=0)) {
@@ -86,12 +86,12 @@ function validate($row)
 	}
 	if (!$row->wochenrythmus>0)
 	{
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Wochenrythmus ist nicht größer 0';
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Wochenrythmus ist nicht grÃ¶ÃŸer 0';
 		$valid=false;
 	}
 	if ($row->start_kw<=0 || $row->start_kw>53)
 	{
-		$error_log[$row->studiengang_kz][]=printLVA($row).': Start-KW außerhalb des gültigen Bereichs (1 bis 53)';
+		$error_log[$row->studiengang_kz][]=printLVA($row).': Start-KW auÃŸerhalb des gÃ¼ltigen Bereichs (1 bis 53)';
 		$valid=false;
 	}
 	if (strlen($row->einheit_kurzbz)>0 && !isset($einheit[$row->einheit_kurzbz]) && !isset($missing_einheit[$row->einheit_kurzbz]))
@@ -133,7 +133,7 @@ function validate($row)
 }
 
 /**
- * FAS-Lehrfach auf interne Lehrfach-Nr übersetzen
+ * FAS-Lehrfach auf interne Lehrfach-Nr Ã¼bersetzen
  */
 function getLehrfachId($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, $fachbereich_id, $conn)
 {
@@ -180,7 +180,7 @@ function getLehrfachId($kurzbz,$studiengang_kz,$semester,$lehrfach_bezeichnung, 
 }
 
 /**
- * FAS-LV auf interne LV-id übersetzen
+ * FAS-LV auf interne LV-id Ã¼bersetzen
  */
 function getLvId($kurzbz,$studiengang_kz,$semester,$lv_bezeichnung, $ects, $conn)
 {
@@ -242,7 +242,7 @@ function getLvId($kurzbz,$studiengang_kz,$semester,$lv_bezeichnung, $ects, $conn
  * FAS-Synchronisation
  */
 
-// E-Mails der Studiengänge
+// E-Mails der StudiengÃ¤nge
 $stg_mail=array();
 $qry="select studiengang_kz,email,upper(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang";
 $result=pg_query($conn, $qry);
@@ -259,7 +259,7 @@ $result=pg_query($conn, $sql_query);
 $row=pg_fetch_object($result);
 $vil_anz_lva = $row->anz;
 
-// Lehrfächer holen und in Array speichern (Key ist kurzbz + '/' + lehform_kurzbz)
+// LehrfÃ¤cher holen und in Array speichern (Key ist kurzbz + '/' + lehform_kurzbz)
 $sql_query="SELECT lehrfach_id, tbl_lehrfach.kurzbz, tbl_lehrfach.studiengang_kz, tbl_lehrfach.semester, tbl_lehrfach.bezeichnung, tbl_fachbereich.ext_id as fachbereich_id, tbl_fachbereich.fachbereich_kurzbz FROM lehre.tbl_lehrfach JOIN public.tbl_fachbereich using(fachbereich_kurzbz)";
 $result=pg_query($conn, $sql_query);
 while ($row=pg_fetch_object($result))
@@ -310,7 +310,7 @@ echo $sql_query."</i><br>";
 $result=pg_query($conn_fas, $sql_query);
 $num_rows=pg_num_rows($result);
 $text="Dies ist eine automatische eMail!\r\r";
-$text.="Es wurde eine Synchronisation mit FAS durchgeführt.($ss_where)\r";
+$text.="Es wurde eine Synchronisation mit FAS durchgefÃ¼hrt.($ss_where)\r";
 $text.="Anzahl der LE vom FAS-Import: $num_rows \r";
 $text.="Anzahl der LE in der VileSci: $vil_anz_lva \r\r";
 $plausi_error=0;
@@ -332,7 +332,7 @@ for ($i=0;$i<$num_rows;$i++)
 	// Kennzahl der Studiengangs bei ehemaligen bTec auf TW aendern.
 	if ($row->studiengang_kz==203)
 		$row->studiengang_kz=0;
-	// Lehrfach-Nr übersetzen (-1 wenn nicht vorhanden)
+	// Lehrfach-Nr Ã¼bersetzen (-1 wenn nicht vorhanden)
 	$row->lehrfach_id=getLehrfachid($row->lehrfach_kurzbz,$row->studiengang_kz,$row->semester, $row->lehrfach_bezeichnung, $row->fachbereich_id, $conn);
 	$row->lehrveranstaltung_id=getLvId($row->lv_kurzbz,$row->studiengang_kz,$row->semester, $row->lv_bezeichnung, $row->ects, $conn);
 	// Einheit vollstaendiger Name
@@ -738,15 +738,15 @@ $text.="$anz_update LE wurden upgedatet.\n";
 $text.="$anz_insert LE wurden neu angelegt.\n\n";
 $text.="\nEND OF SYNCHRONISATION\n";
 
-// Validation error hinzufügen
+// Validation error hinzufÃ¼gen
 while(list($k,$v)=each($error_log))
 {
 	$text.="\n\nStudiengang $k:\n";
 	foreach($v as $txt)
 		$text.="  $txt\n";
 }
-// fehlende lehrfächer
-$text.="\n\nFehlende Lehrfächer: \n";
+// fehlende lehrfÃ¤cher
+$text.="\n\nFehlende LehrfÃ¤cher: \n";
 while(list($k,$v)=each($missing_lehrfaecher))
 {
 	$text.="  $k\n";
@@ -782,7 +782,7 @@ else
 
 //print "debug: ";print_r($stg_mail);
 
-// Einzelnen Mails an Studiengänge verschicken
+// Einzelnen Mails an StudiengÃ¤nge verschicken
 reset($error_log);
 while(list($k,$v)=each($error_log))
 {
@@ -801,7 +801,7 @@ while(list($k,$v)=each($error_log))
 
 }
 
-// Doppelte IDs im FAS prüfen
+// Doppelte IDs im FAS prÃ¼fen
 $sql_query="SELECT count(*) AS anzahl, fas_id FROM fas_view_alle_lehreinheiten_vilesci
 			GROUP BY fas_id HAVING count(*)>1";
 //echo $sql_query."</i><br>";
@@ -812,7 +812,7 @@ $mail_text_false='';
 if ($num_rows>0)
 	while ($row=pg_fetch_object($result))
 		$mail_text_false.=$row->fas_id.'->'.$row->anzahl."x\n";
-$mail_text.=$mail_text_false."\n\nBitte überprüfen die Daten im FAS!!!";
+$mail_text.=$mail_text_false."\n\nBitte Ã¼berprÃ¼fen die Daten im FAS!!!";
 if ($mail_text_false!='')
 	if (!mail($adress_fas,'FAS-Sync (Lehreinheiten) von '.$_SERVER['HTTP_HOST'],$mail_text,"From: vilesci@technikum-wien.at"))
 		echo "Mail an '".$adress_fas."' konnte nicht verschickt werden!<br>";
@@ -824,7 +824,7 @@ if ($mail_text_false!='')
 <html>
 <head>
 <title>FAS-Synchro mit PORTAL</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php

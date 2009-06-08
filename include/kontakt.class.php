@@ -56,7 +56,7 @@ class kontakt
 	function kontakt($conn,$kontakt_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -69,6 +69,7 @@ class kontakt
 				return false;
 			}
 		}
+*/	
 		if($kontakt_id != null)
 			$this->load($kontakt_id);
 	}
@@ -131,17 +132,17 @@ class kontakt
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->kontakttyp)>32)
 		{
-			$this->errormsg = 'kontakttyp darf nicht länger als 32 Zeichen sein  - firma_id: '.$row->email_id;
+			$this->errormsg = 'kontakttyp darf nicht lÃ¤nger als 32 Zeichen sein  - firma_id: '.$row->email_id;
 			return false;
 		}
 		if(strlen($this->anmerkung)>64)
 		{
-			$this->errormsg = 'anmerkung darf nicht länger als 64 Zeichen sein - firma_id: '.$row->email_id;
+			$this->errormsg = 'anmerkung darf nicht lÃ¤nger als 64 Zeichen sein - firma_id: '.$row->email_id;
 			return false;
 		}
 		if(strlen($this->kontakt)>128)
 		{
-			$this->errormsg = 'kontakt darf nicht länger als 128 Zeichen sein - firma_id: '.$row->email_id;
+			$this->errormsg = 'kontakt darf nicht lÃ¤nger als 128 Zeichen sein - firma_id: '.$row->email_id;
 			return false;
 		}
 		$this->errormsg = '';

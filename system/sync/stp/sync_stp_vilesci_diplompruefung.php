@@ -8,7 +8,7 @@
  */
 
 //*
-//* Synchronisiert Diplomprüfungsdatensaetze von FAS DB in PORTAL DB
+//* Synchronisiert DiplomprÃ¼fungsdatensaetze von FAS DB in PORTAL DB
 //*
 //*
 //* setzt voraus: tbl_akadgrad, tbl_abschlussbeurteilung
@@ -45,7 +45,7 @@ if (!@pg_query($conn,'SELECT * FROM sync.tbl_syncperson LIMIT 1;'))
 //tbl_pruefungstyp  checken
 if(pg_num_rows(pg_query($conn,"SELECT * FROM lehre.tbl_pruefungstyp where pruefungstyp_kurzbz='Diplom'"))==0)
 {
-	$qry="INSERT INTO lehre.tbl_pruefungstyp (pruefungstyp_kurzbz, beschreibung) VALUES ('Diplom', 'Diplomprüfung')";
+	$qry="INSERT INTO lehre.tbl_pruefungstyp (pruefungstyp_kurzbz, beschreibung) VALUES ('Diplom', 'DiplomprÃ¼fung')";
 	if (!pg_query($conn, $qry))
 	{
 		die(pg_last_error($conn));
@@ -53,7 +53,7 @@ if(pg_num_rows(pg_query($conn,"SELECT * FROM lehre.tbl_pruefungstyp where pruefu
 }
 if(pg_num_rows(pg_query($conn,"SELECT * FROM lehre.tbl_pruefungstyp where pruefungstyp_kurzbz='Bachelor'"))==0)
 {
-	$qry="INSERT INTO lehre.tbl_pruefungstyp (pruefungstyp_kurzbz, beschreibung) VALUES ('Bachelor', 'Bachelorprüfung')";
+	$qry="INSERT INTO lehre.tbl_pruefungstyp (pruefungstyp_kurzbz, beschreibung) VALUES ('Bachelor', 'BachelorprÃ¼fung')";
 	if (!pg_query($conn, $qry))
 	{
 		die(pg_last_error($conn));
@@ -94,7 +94,7 @@ $staat=array();
 <html>
 <head>
 <title>Synchro - StPoelten -> Vilesci - Abschlusspruefung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -107,13 +107,13 @@ $qry="SELECT _vorsitzender, _cxbeurteilungsstufegesamt,_gegenstandtech, _gegenst
 	WHERE __Person IN (SELECT __person FROM sync.tbl_syncperson) AND (_cxPersonTyp='1' OR _cxPersonTyp='2') 
 		AND NOT (_vorsitzender IS NULL AND _pruefertech IS NULL AND _pruefernichttech IS NULL)
 		AND COALESCE(dapruefungsdat,dapruefteil1dat) IS NOT NULL;";
-//$error_log="Überprüfung Abschlusspruefungsdaten in EXT-DB:\n\n";
+//$error_log="ÃœberprÃ¼fung Abschlusspruefungsdaten in EXT-DB:\n\n";
 $start=date("d.m.Y H:i:s");
 echo $start."<br>";
 if($result = pg_query($conn, $qry))
 {
 	$anzahl_person_gesamt=pg_num_rows($result);
-	$error_log_ext.="Anzahl der Datensätze: ".$anzahl_person_gesamt."\n";
+	$error_log_ext.="Anzahl der DatensÃ¤tze: ".$anzahl_person_gesamt."\n";
 	echo nl2br($error_log_ext);
 	while($row=pg_fetch_object($result))
 	{
@@ -212,14 +212,14 @@ if($result = pg_query($conn, $qry))
 					{
 						if($row_err=pg_fetch_object($result_err))
 						{
-							$error_log3.="\nTechn. Prüfer ".$row->_pruefertech.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
+							$error_log3.="\nTechn. PrÃ¼fer ".$row->_pruefertech.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
 						}
 						else 
 						{
-							$error_log3.="\nTechn. Prüfer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";						
+							$error_log3.="\nTechn. PrÃ¼fer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";						
 						}
 					}
-					//$error_log3.="\nTechn. Prüfer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";
+					//$error_log3.="\nTechn. PrÃ¼fer ".$row->_pruefertech." in tbl_syncperson nicht gefunden!";
 					$fehler++;
 					continue;
 				}
@@ -246,14 +246,14 @@ if($result = pg_query($conn, $qry))
 					{
 						if($row_err=pg_fetch_object($result_err))
 						{
-							$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
+							$error_log4.="\nNicht-Techn. PrÃ¼fer ".$row->_pruefernichttech.", ".trim($row_err->chtitel)." ".trim($row_err->chnachname).", ".trim($row_err->chvorname)." in tbl_syncperson nicht gefunden!";
 						}
 						else 
 						{
-							$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";						
+							$error_log4.="\nNicht-Techn. PrÃ¼fer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";						
 						}
 					}
-					//$error_log4.="\nNicht-Techn. Prüfer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";
+					//$error_log4.="\nNicht-Techn. PrÃ¼fer ".$row->_pruefernichttech." in tbl_syncperson nicht gefunden!";
 					$fehler++;
 					continue;
 				}
@@ -275,7 +275,7 @@ if($result = pg_query($conn, $qry))
 					}
 					else 
 					{
-						//Diplomstudiengang hat zwei Einträge
+						//Diplomstudiengang hat zwei EintrÃ¤ge
 						if($row->_cxgeschlecht==1 && $row_synk->geschlecht=='m')
 						{
 							$akadgrad_id=$row_synk->akadgrad_id;
@@ -291,7 +291,7 @@ if($result = pg_query($conn, $qry))
 			}
 			else 
 			{
-				$error_log5.="\nAkad.Grad für Stg ".$row->studiengang_kz." nicht gefunden!";
+				$error_log5.="\nAkad.Grad fÃ¼r Stg ".$row->studiengang_kz." nicht gefunden!";
 				$fehler++;
 				continue;
 			}
@@ -311,7 +311,7 @@ if($result = pg_query($conn, $qry))
 		{
 			if (pg_num_rows($result_dubel)==0)
 			{
-				//Neue Abschlussprüfung anlegen
+				//Neue AbschlussprÃ¼fung anlegen
 				$sql="INSERT INTO lehre.tbl_abschlusspruefung
 					(student_uid, vorsitz, pruefer1, pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, pruefungstyp_kurzbz, datum, sponsion, anmerkung, note, 
 					insertamum,insertvon,updateamum,updatevon, ext_id)
@@ -344,8 +344,8 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
-					$ausgabe.="\n------------------------------------\nÜbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
-					$ausgabe.="\n---Abschlussprüfung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", Prüfer: ".$pruefertech." / ".$pruefernichttech.", Note: ".$row->_cxbeurteilungsstufekommipruef;
+					$ausgabe.="\n------------------------------------\nÃœbertragen: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+					$ausgabe.="\n---AbschlussprÃ¼fung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", PrÃ¼fer: ".$pruefertech." / ".$pruefernichttech.", Note: ".$row->_cxbeurteilungsstufekommipruef;
 					$eingefuegt++;
 					pg_query($conn, "COMMIT");
 				}
@@ -414,7 +414,7 @@ if($result = pg_query($conn, $qry))
 					
 					if(strlen(trim($sql))>0)
 					{
-						//update nur mit änderungen bei vorsitz,prüfer oder noten
+						//update nur mit Ã¤nderungen bei vorsitz,prÃ¼fer oder noten
 						$sql="UPDATE lehre.tbl_abschlusspruefung SET ".$sql." 
 						WHERE student_uid='".$uid."' AND datum='".$row->pruefdat."';";
 						if(!$result_neu = pg_query($conn, $sql))
@@ -425,8 +425,8 @@ if($result = pg_query($conn, $qry))
 						}
 						else
 						{
-							$ausgabe.="\n------------------------------------\nGeändert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
-							$ausgabe.="\n---Abschlussprüfung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", Prüfer: ".$pruefertech." / ".$pruefernichttech.", Note: ".$row->_cxbeurteilungsstufekommipruef;
+							$ausgabe.="\n------------------------------------\nGeÃ¤ndert: ".$row->__person." - ".trim($row->chtitel)." ".trim($row->chnachname).", ".trim($row->chvorname);
+							$ausgabe.="\n---AbschlussprÃ¼fung (".$row->typ."): am ".$row->pruefdat.", Vorsitz:".trim($vorsitzender).", PrÃ¼fer: ".$pruefertech." / ".$pruefernichttech.", Note: ".$row->_cxbeurteilungsstufekommipruef;
 							$updates++;
 							pg_query($conn, "COMMIT");
 						}
@@ -453,8 +453,8 @@ else
 	echo "<br>".$qry."<br><strong>".pg_last_error($conn)." </strong><br>";
 }
 
-echo "Datensätze ohne Prüfungsdatum werden nicht berücksichtigt.";
-echo "<br><br>Eingefügt: ".$eingefuegt;
+echo "DatensÃ¤tze ohne PrÃ¼fungsdatum werden nicht berÃ¼cksichtigt.";
+echo "<br><br>EingefÃ¼gt: ".$eingefuegt;
 echo "<br>Updates: ".$updates;
 echo "<br>Bereits vorhanden:      ".$dublette;
 echo "<br>Fehler: ".$fehler;
@@ -472,8 +472,8 @@ echo nl2br($ausgabe);
 
 mail($adress, 'SYNC-Fehler StP-Abschlusspruefung von '.$_SERVER['HTTP_HOST'], $error_log,"From: nsc@fhstp.ac.at");
 
-mail($adress, 'SYNC StP-Abschlusspruefung  von '.$_SERVER['HTTP_HOST'], "Sync Abschlussprüfung\n---------------------\n\n"
-."Abschlussprüfung: Gesamt: ".$anzahl_person_gesamt." / Eingefügt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Bereits vorhanden: ".$dublette
+mail($adress, 'SYNC StP-Abschlusspruefung  von '.$_SERVER['HTTP_HOST'], "Sync AbschlussprÃ¼fung\n---------------------\n\n"
+."AbschlussprÃ¼fung: Gesamt: ".$anzahl_person_gesamt." / EingefÃ¼gt: ".$eingefuegt." / Updates: ".$updates." / Fehler: ".$fehler." / Bereits vorhanden: ".$dublette
 ."\n\nBeginn: ".$start."\nEnde:   ".date("d.m.Y H:i:s")."\n\n".$ausgabe, "From: nsc@fhstp.ac.at");
 
 

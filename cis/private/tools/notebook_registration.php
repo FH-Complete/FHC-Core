@@ -6,8 +6,8 @@
 	 * date-modified: ?? by ??
 	 *		  15.9.2004  by max schremser
 	 *
-	 * manual: es wurden keine neuen einträge in der dhcp.dat eingetragen
-	 *	   seit der letzten änderung, ich wurde von ferdinand esberger
+	 * manual: es wurden keine neuen eintrÃ¤ge in der dhcp.dat eingetragen
+	 *	   seit der letzten Ã¤nderung, ich wurde von ferdinand esberger
 	 * 	   gebeten dies wieder in ordnung zu bringen
 	 */
 	require_once('../../config.inc.php');
@@ -17,7 +17,7 @@
 
     //Connection Herstellen
     if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
+       die('Fehler beim Ã¶ffnen der Datenbankverbindung');
 
 	$user = get_uid();
 
@@ -49,7 +49,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
@@ -70,7 +70,7 @@
 
 			if (!$txtUID)
 				$txtUID = $user;
-			// wenn die übergebene UID nicht gleich dem
+			// wenn die Ã¼bergebene UID nicht gleich dem
 			// angemeldetem Benutzer ist, muss das Passwort
 			// angegeben werden
 			if ($txtUID != $user && !$txtPassword)
@@ -97,7 +97,7 @@
 				$error =0;
 			}
 
-			// ändern oder eintragen einer mac adresse
+			// Ã¤ndern oder eintragen einer mac adresse
 			if (!$error)
 			{
 
@@ -138,7 +138,7 @@
 				$fuser = $fuser[0];
 
 
-				//hier könnte man noch eine email schicken oder dgl.
+				//hier kÃ¶nnte man noch eine email schicken oder dgl.
 				if ($fuser != $txtUID)
 					$error = 3;
 			}
@@ -164,7 +164,7 @@
 				{
 					$mfiles->doSearch();
 
-					// neuen eintrag erzeugen und ip hochzählen
+					// neuen eintrag erzeugen und ip hochzÃ¤hlen
 					if($mfiles->occurences == 0)
 					{
 						//$content = file($filename_dat, "r");
@@ -244,7 +244,7 @@
   	      </form>
 		  <?php
 		  	if ($error == 1)
-				echo '<h3>Es muss ein Passwort eingegeben werden, wenn die UID geändert wird.</h3>';
+				echo '<h3>Es muss ein Passwort eingegeben werden, wenn die UID geÃ¤ndert wird.</h3>';
 			else if ($error == 2)
 				echo '<h3>Geben Sie das Passwort bitte erneut ein.</h3>';
 			else if ($error == 3)

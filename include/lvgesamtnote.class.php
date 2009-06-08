@@ -59,7 +59,7 @@ class lvgesamtnote
 	function lvgesamtnote($conn, $lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null , $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -73,7 +73,7 @@ class lvgesamtnote
 				return false;
 			}
 		}
-		
+	*/	
 		if($lehrveranstaltung_id!=null && $student_uid!=null && $studiensemester_kurzbz!=null)
 			$this->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
 	}

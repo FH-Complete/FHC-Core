@@ -1,3 +1,4 @@
+@charset "utf-8"
 /* ::::: datepicker ::::: */
 /* :::: declarations :::: */
 /*@IMPORT url("../spinbutton/spinbutton.css");*/
@@ -23,7 +24,7 @@ datepicker-calendar {
 datepicker-month {
 	color:black;
 }
-/* affichage des années */
+/* affichage des annÃ©es */
 datepicker-year {
 	color:black;
 }
@@ -49,7 +50,7 @@ datepicker-button.next-month {
 	-moz-image-region:rect(0px 32px 16px 16px); 
 }
 
-/* jour selectionné */
+/* jour selectionnÃ© */
 datepicker-calendar[isyear][ismonth][currentday="1"] datepicker-day[value="1"],
 datepicker-calendar[isyear][ismonth][currentday="2"] datepicker-day[value="2"],
 datepicker-calendar[isyear][ismonth][currentday="3"] datepicker-day[value="3"],
@@ -127,7 +128,7 @@ datepicker-view[isyear][ismonth][today="30"] datepicker-day[value="30"],
 datepicker-view[isyear][ismonth][today="31"] datepicker-day[value="31"] {
 	color:#E85C0B;
 }
-/* jour d'aujourd'hui selectionné */
+/* jour d'aujourd'hui selectionnÃ© */
 datepicker-view[isyear][ismonth][today="1"]  datepicker-calendar[isyear][ismonth][currentday="1"]  datepicker-day[value="1"],
 datepicker-view[isyear][ismonth][today="2"]  datepicker-calendar[isyear][ismonth][currentday="2"]  datepicker-day[value="2"],
 datepicker-view[isyear][ismonth][today="3"]  datepicker-calendar[isyear][ismonth][currentday="3"]  datepicker-day[value="3"],
@@ -168,7 +169,7 @@ datepicker-view[isyear][ismonth][today="31"] datepicker-calendar[isyear][ismonth
 datepicker-view[isyear][ismonth] datepicker-month {
 	font-weight:bold;
 }
-/* année courante */
+/* annÃ©e courante */
 datepicker-view[isyear] datepicker-year {
 	font-weight:bold;
 }
@@ -232,7 +233,7 @@ rows[anonid="datepicker-rows"] row:first-child {
 	height:25px;
 	padding-top:3px;
 }
-/* mois affiché */
+/* mois affichÃ© */
 datepicker-view[currentmonth="0"] spacer:first-child + datepicker-month, 
 datepicker-view[currentmonth="1"] spacer:first-child + datepicker-month + datepicker-month,
 datepicker-view[currentmonth="2"] spacer:first-child + datepicker-month + datepicker-month + datepicker-month, 

@@ -46,7 +46,7 @@ foreach ($studiengang->result as $stg)
 	if(count($preinteressent->result)>0)
 	{
 		$message="Dies ist eine automatische Mail!\n\n";
-		$message.="Die folgenden Preinteressenten wurden zur Übernahme, für den Studiengang $stg->kuerzel, freigegeben aber noch nicht übernommen:\n\n";
+		$message.="Die folgenden Preinteressenten wurden zur Ãœbernahme, fÃ¼r den Studiengang $stg->kuerzel, freigegeben aber noch nicht Ã¼bernommen:\n\n";
 		
 		foreach ($preinteressent->result as $row)
 		{
@@ -55,12 +55,12 @@ foreach ($studiengang->result as $stg)
 			$message.="- $person->nachname $person->vorname ".($person->gebdatum!=''?"(Geburtsdatum: ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y').')':'')."\n";
 		}
 		
-		$message.="\nSie können die Personen im FAS unter 'Extras->Preinteressenten übernehmen' oder unter folgendem Link:\n";
+		$message.="\nSie kÃ¶nnen die Personen im FAS unter 'Extras->Preinteressenten Ã¼bernehmen' oder unter folgendem Link:\n";
 		$message.=APP_ROOT."vilesci/personen/preinteressent_uebernahme.php?studiengang_kz=$stg->studiengang_kz";
-		$message.="\nins FAS übertragen";
+		$message.="\nins FAS Ã¼bertragen";
 		$to = $stg->email;
 		//Mail versenden
-		if(mail($to, 'Preinteressent Übernahme - Erinnerungsmail', $message, 'FROM: vilesci@'.DOMAIN))
+		if(mail($to, 'Preinteressent Ãœbernahme - Erinnerungsmail', $message, 'FROM: vilesci@'.DOMAIN))
 			$message_sync.="Studiengang: $stg->kuerzel EMail-Versand an $stg->email ... ok\n";
 		else 
 			$message_sync.="Studiengang: $stg->kuerzel EMail-Versand an $stg->email ... FEHLER BEIM SENDEN !!!\n";
@@ -69,9 +69,9 @@ foreach ($studiengang->result as $stg)
 if($message_sync!='')
 {
 	//Mail an Administration
-	$message_sync = "Dies ist eine automatische Mail!\n\nEs wurden folgende Benachrichtungen zur Preinteressentenübernahme verschickt:\n\n".$message_sync;
+	$message_sync = "Dies ist eine automatische Mail!\n\nEs wurden folgende Benachrichtungen zur PreinteressentenÃ¼bernahme verschickt:\n\n".$message_sync;
 	$to = MAIL_ADMIN;
-	if(mail($to, 'Preinteressent Übernahme - Erinnerungsmail', $message_sync, 'FROM: vilesci@'.DOMAIN))
+	if(mail($to, 'Preinteressent Ãœbernahme - Erinnerungsmail', $message_sync, 'FROM: vilesci@'.DOMAIN))
 		echo "<br><b>Erinnerungsmails wurden versendet</b>";
 	else 
 		echo "<br><b>Fehler beim Versenden der Mails</b>";

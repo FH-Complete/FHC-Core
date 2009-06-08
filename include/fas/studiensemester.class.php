@@ -25,12 +25,14 @@ class studiensemester
 	function studiensemester($conn, $stsem_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		if($stsem_id != null)
 			$this->load($stsem_id);
 	}

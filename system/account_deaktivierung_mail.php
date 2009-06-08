@@ -37,7 +37,7 @@ echo '
 		<head>
 		<title>Check</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		</head>
 		<body class="Background_main">
 		<h2>Check</h2>';
@@ -57,9 +57,9 @@ if($result = pg_query($conn, $qry))
 			$message .= " - $row->titelpre $row->vorname $row->nachname $row->titelpost ( $row->uid )\n";
 		}
 
-		$message .= "\nMit freundlichen Grüßen,\n";
+		$message .= "\nMit freundlichen GrÃ¼ÃŸen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
-		$message .= "Höchstädtplatz 5\n";
+		$message .= "HÃ¶chstÃ¤dtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 
 		//$to = 'oesi@technikum-wien.at';
@@ -77,12 +77,12 @@ if($result = pg_query($conn, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
-		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
-		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
-		$message .= "Wenn der Datensatz in den nächsten Wochen/Monaten nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
-		$message .= "- Ihr Account wird gelöscht.\n";
-		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
-		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
+		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun fÃ¼r Sie?\n\n";
+		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelÃ¶scht.\n";
+		$message .= "Wenn der Datensatz in den nÃ¤chsten Wochen/Monaten nicht mehr aktiviert wird, fÃ¼hrt das System automatisch folgende Aktionen durch:\n";
+		$message .= "- Ihr Account wird gelÃ¶scht.\n";
+		$message .= "- Ihre Mailbox mit sÃ¤mtlichen Mails wird gelÃ¶scht.\n";
+		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelÃ¶scht.\n\n";
 		$message .= "Folgende Fristen gelten derzeit an der FH:\n";
 		$message .= "- Mitarbeiter: 12 Monate nach Deaktivierung.\n";
 		$message .= "- Student:      6 Monate nach Deaktivierung.\n";
@@ -99,9 +99,9 @@ if($result = pg_query($conn, $qry))
 			//Student
 			$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.\n";
 		}
-		$message .= "Mit freundlichen Grüßen,\n";
+		$message .= "Mit freundlichen GrÃ¼ÃŸen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
-		$message .= "Höchstädtplatz 5\n";
+		$message .= "HÃ¶chstÃ¤dtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 
 		//$to = 'oesi@technikum-wien.at';
@@ -121,16 +121,16 @@ if($result = pg_query($conn, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
-		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
-		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
-		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
-		$message .= "- Ihr Account wird gelöscht.\n";
-		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
-		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
+		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun fÃ¼r Sie?\n\n";
+		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelÃ¶scht.\n";
+		$message .= "Wenn der Datensatz in den nÃ¤chsten Tagen nicht mehr aktiviert wird, fÃ¼hrt das System automatisch folgende Aktionen durch:\n";
+		$message .= "- Ihr Account wird gelÃ¶scht.\n";
+		$message .= "- Ihre Mailbox mit sÃ¤mtlichen Mails wird gelÃ¶scht.\n";
+		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelÃ¶scht.\n\n";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.\n";
-		$message .= "Mit freundlichen Grüßen,\n";
+		$message .= "Mit freundlichen GrÃ¼ÃŸen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
-		$message .= "Höchstädtplatz 5\n";
+		$message .= "HÃ¶chstÃ¤dtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 
 		//$to = 'oesi@technikum-wien.at';
@@ -149,16 +149,16 @@ if($result = pg_query($conn, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
-		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
-		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
-		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
-		$message .= "- Ihr Account wird gelöscht.\n";
-		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
-		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
+		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun fÃ¼r Sie?\n\n";
+		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelÃ¶scht.\n";
+		$message .= "Wenn der Datensatz in den nÃ¤chsten Tagen nicht mehr aktiviert wird, fÃ¼hrt das System automatisch folgende Aktionen durch:\n";
+		$message .= "- Ihr Account wird gelÃ¶scht.\n";
+		$message .= "- Ihre Mailbox mit sÃ¤mtlichen Mails wird gelÃ¶scht.\n";
+		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelÃ¶scht.\n\n";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.\n";
-		$message .= "Mit freundlichen Grüßen,\n";
+		$message .= "Mit freundlichen GrÃ¼ÃŸen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
-		$message .= "Höchstädtplatz 5\n";
+		$message .= "HÃ¶chstÃ¤dtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 
 		//$to = 'oesi@technikum-wien.at';
@@ -176,18 +176,18 @@ if($result = pg_query($conn, $qry))
 	while($row = pg_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
-		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
-		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
-		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
-		$message .= "- Ihr Account wird gelöscht.\n";
-		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
-		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
+		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun fÃ¼r Sie?\n\n";
+		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelÃ¶scht.\n";
+		$message .= "Wenn der Datensatz in den nÃ¤chsten Tagen nicht mehr aktiviert wird, fÃ¼hrt das System automatisch folgende Aktionen durch:\n";
+		$message .= "- Ihr Account wird gelÃ¶scht.\n";
+		$message .= "- Ihre Mailbox mit sÃ¤mtlichen Mails wird gelÃ¶scht.\n";
+		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelÃ¶scht.\n\n";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an die Mitarbeiter unserer Personalabteillung.\n";
 		$message .= "Adelheit Schaaf  - schaaf@technikum-wien.at\n";
 		$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
-		$message .= "Mit freundlichen Grüßen,\n";
+		$message .= "Mit freundlichen GrÃ¼ÃŸen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
-		$message .= "Höchstädtplatz 5\n";
+		$message .= "HÃ¶chstÃ¤dtplatz 5\n";
 		$message .= "A-1200 Wien \n";
 
 		//$to = 'oesi@technikum-wien.at';

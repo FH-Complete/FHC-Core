@@ -23,7 +23,7 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenseite des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			f&uuml;r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../config.inc.php');
@@ -135,12 +135,12 @@ $htmlstr='';
 		<title>Mehrfachtermin PA-Abgabe</title>
 		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 		</head>
 		<body class="Background_main"  style="background-color:#eeeeee;">
 		<h3>Eingabe eines Termins f&uuml;r mehrere Personen</h3>';
-		//Eingabezeile für neuen Termin
+		//Eingabezeile f&uuml;r neuen Termin
 		$htmlstr .= "<br><b>Abgabetermin:</b>\n";
 		$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='multitermin'>\n";

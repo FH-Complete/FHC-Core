@@ -98,7 +98,7 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 $vorname=array();
 $nachname=array();
 	
-$umlaute = array('ö','Ö','ü','Ü','ä','Ä');
+$umlaute = array('Ã¶','Ã–','Ã¼','Ãœ','Ã¤','Ã„');
 $umlauterep = array('o','O','u','U','a','A');
 foreach ($mitarbeiterDAO->result as $key=>$foo)
 {

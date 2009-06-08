@@ -32,7 +32,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>BIS-Meldung - Funktionen</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -88,7 +88,7 @@ if($result = pg_query($conn, $qry))
 					}				
 					//$ausgabe1.='$stundensumme['.$row_erg->mitarbeiter_uid.']['.$row_erg->studiengang_kz.'] '.$stundensumme[$row_erg->mitarbeiter_uid][$row_erg->studiengang_kz][$row_erg->studiensemester_kurzbz]."\n";			
 				}
-				//schleife über alle stg, in denen stunden vorhanden sind
+				//schleife Ã¼ber alle stg, in denen stunden vorhanden sind
 				$qry_stg="SELECT studiengang_kz FROM public.tbl_studiengang WHERE studiengang_kz>1 AND studiengang_kz<999;";
 				if($result_stg = pg_query($conn, $qry_stg))
 				{

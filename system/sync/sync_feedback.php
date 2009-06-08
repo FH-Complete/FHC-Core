@@ -2,7 +2,7 @@
 
    include("../../vilesci/config.inc.php");
 
-   //Connection öffnen
+   //Connection Ã¶ffnen
    if(!$conn = pg_pconnect(CONN_STRING))
       die("Fehler beim oeffnen der DB Connection");
 

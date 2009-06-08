@@ -126,7 +126,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		}
 		else
 		{
-			$msg = "Die Änderung konnte nicht durchgeführt werden!";
+			$msg = "Die Ã„nderung konnte nicht durchgefÃ¼hrt werden!";
 			pg_query($conn,"ROLLBACK;");
 			$msg.= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
@@ -136,14 +136,14 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 }
 if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) || ($radio_1<0 || $radio_2<0))
 {
-	$msg="Es muß je ein Radio-Button pro Tabelle angeklickt werden";
+	$msg="Es muÃŸ je ein Radio-Button pro Tabelle angeklickt werden";
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 
 <title>Personen-Zusammenlegung</title>
@@ -170,7 +170,7 @@ echo "</form>";
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
 
-	echo "<td valign='top'>Der wird gelöscht:";
+	echo "<td valign='top'>Der wird gelÃ¶scht:";
 
 	 //Tabelle 1
 	 echo "<table class='liste'><tr class='liste'>";

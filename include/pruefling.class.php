@@ -46,7 +46,7 @@ class pruefling
 	function pruefling($conn, $pruefling_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else 
@@ -57,7 +57,7 @@ class pruefling
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+*/		
 		if($pruefling_id != null)
 			$this->load($pruefling_id);
 	}

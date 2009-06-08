@@ -47,6 +47,12 @@ ini_set('display_errors','1');
 if (!$conn = @pg_pconnect(CONN_STRING))
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
+	$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	if(!pg_query($conn,$qry))
+	{
+		die("Encoding konnte nicht gesetzt werden");
+	}	
+	
 $getuid=get_uid();
 $datum_obj = new datum();
 $htmlstr = "";

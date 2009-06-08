@@ -44,10 +44,10 @@ if(isset($_GET['prestudent_id']))
 else 
 	$prestudent_id='';
 	
-if(isset($_GET['rolle_kurzbz']))
-	$rolle_kurzbz=$_GET['rolle_kurzbz'];
+if(isset($_GET['status_kurzbz']))
+	$status_kurzbz=$_GET['status_kurzbz'];
 else 
-	$rolle_kurzbz='';
+	$status_kurzbz='';
 	
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
@@ -74,7 +74,7 @@ if($prestudent_id!='')
 
 <window id="student-rolle-dialog" title="Status"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="StudentRolleInit(<?php echo "'$prestudent_id','$rolle_kurzbz','$studiensemester_kurzbz','$ausbildungssemester'";?>)"
+        onload="StudentRolleInit(<?php echo "'$prestudent_id','$status_kurzbz','$studiensemester_kurzbz','$ausbildungssemester'";?>)"
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/studentrolledialog.js.php" />
@@ -92,11 +92,11 @@ if($prestudent_id!='')
 			<rows>
 				<row id="student-rolle-grid-row-textbox" hidden="false">
 					<label value="Rolle"/>
-					<textbox disabled="true" id="student-rolle-textbox-rolle_kurzbz" />
+					<textbox disabled="true" id="student-rolle-textbox-status_kurzbz" />
 				</row>
 				<row id="student-rolle-grid-row-menulist" hidden="true">
 					<label value="Rolle"/>
-					<menulist id="student-rolle-menulist-rolle_kurzbz" disabled="false">
+					<menulist id="student-rolle-menulist-status_kurzbz" disabled="false">
 						<menupopup>
 							<menuitem value="Interessent" label="Interessent"/>
 							<menuitem value="Bewerber" label="Bewerber"/>

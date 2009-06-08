@@ -39,7 +39,7 @@
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 			<html>
 			<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 				<title>Zahlungen</title>
 				<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 			</head>
@@ -79,7 +79,7 @@
 	{
 		echo '<br><br><table>';
 		echo '<tr class="liste">';
-		echo '<td>Datum</td><td>Typ</td><td>Stg</td><td>Studiensemester</td><td>Buchungstext</td><td>Betrag</td><td>Zahlungsbest�tigung</td>';
+		echo '<td>Datum</td><td>Typ</td><td>Stg</td><td>Studiensemester</td><td>Buchungstext</td><td>Betrag</td><td>Zahlungsbestätigung</td>';
 		echo '</tr>';
 		$i=0;
 		foreach ($konto->result as $row)
@@ -111,7 +111,7 @@
 			echo '<td>'.$row['parent']->studiensemester_kurzbz.'</td>';			
 			
 			echo '<td>'.$row['parent']->buchungstext.'</td>';
-			echo '<td align="right">'.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).' &euro;</td>';
+			echo '<td align="right">'.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).' €</td>';
 			echo '<td align="center">';
 			if($betrag==0 && $row['parent']->betrag<0)
 				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="Bestaetigung drucken"><img src="../../../skin/images/pdfpic.gif" alt="Bestaetigung drucken"></a>';

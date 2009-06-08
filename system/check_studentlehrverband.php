@@ -87,18 +87,18 @@ $qry = "SELECT
 			student_uid,
 			tbl_student.studiengang_kz,
 			tbl_prestudent.prestudent_id,
-			rolle_kurzbz,
+			status_kurzbz,
 			studiensemester_kurzbz
 		FROM
 			public.tbl_student,
 			public.tbl_prestudent,
-			public.tbl_prestudentrolle
+			public.tbl_prestudentstatus
 		WHERE
 			tbl_student.prestudent_id=tbl_prestudent.prestudent_id AND
-			tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND
+			tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id AND
 			(
-				tbl_prestudentrolle.rolle_kurzbz='Unterbrecher' OR 
-				tbl_prestudentrolle.rolle_kurzbz='Abbrecher'
+				tbl_prestudentstatus.status_kurzbz='Unterbrecher' OR 
+				tbl_prestudentstatus.status_kurzbz='Abbrecher'
 			)
 			AND
 			EXISTS (SELECT 
@@ -107,7 +107,7 @@ $qry = "SELECT
 						public.tbl_studentlehrverband 
 					WHERE 
 			        	student_uid=tbl_student.student_uid AND 
-			        	studiensemester_kurzbz=tbl_prestudentrolle.studiensemester_kurzbz AND 
+			        	studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz AND 
 			        	semester<>0
 			        )
 		";
@@ -120,7 +120,7 @@ if($result = pg_query($conn, $qry))
 		$prestd = new prestudent($conn);
 		$prestd->getLastStatus($row->prestudent_id, $row->studiensemester_kurzbz);
 		
-		if($prestd->rolle_kurzbz=='Unterbrecher' || $prestd->rolle_kurzbz=='Abbrecher')
+		if($prestd->status_kurzbz=='Unterbrecher' || $prestd->status_kurzbz=='Abbrecher')
 		{
 			//Studentlehrverbandeintrag aktualisieren
 			$student = new student($conn);
@@ -137,7 +137,7 @@ if($result = pg_query($conn, $qry))
 			$student->studiensemester_kurzbz=$row->studiensemester_kurzbz;
 			$student->studiengang_kz = $row->studiengang_kz;
 			$student->semester = '0';
-			$student->verband = ($prestd->rolle_kurzbz=='Unterbrecher'?'B':'A');
+			$student->verband = ($prestd->status_kurzbz=='Unterbrecher'?'B':'A');
 			$student->gruppe = ' ';
 			$student->updateamum = date('Y-m-d H:i:s');
 			$student->updatevon = 'chkstudentlvb';

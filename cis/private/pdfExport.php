@@ -37,7 +37,9 @@ if (!$conn = pg_pconnect(CONN_STRING))
    	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $user = get_uid();
-loadVariables($conn, $user);
+#gss loadVariables($conn, $user);
+loadVariables($user);
+
 
 $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
@@ -116,7 +118,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	
 	$buffer = $proc->transformToXml($xml_doc);
 	//in $buffer steht nun das xsl-fo file mit den daten
-	$buffer = '<?xml version="1.0" encoding="ISO-8859-15" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
+	$buffer = '<?xml version="1.0" encoding="utf-8" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
 	//$buffer = html_entity_decode($buffer);
 	//echo "buffer: $buffer";
 	

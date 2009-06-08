@@ -46,7 +46,7 @@ class schluesseltyp
 	function schluesseltyp($conn, $code=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry 			= "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -57,6 +57,7 @@ class schluesseltyp
 			$this->errormsg	= 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
+*/
 	}
 
 

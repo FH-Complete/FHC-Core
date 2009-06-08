@@ -60,7 +60,7 @@ class stundenplan
 	function stundenplan($conn, $stundenplantabelle, $stundenplan_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -71,7 +71,7 @@ class stundenplan
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		$this->stpl_table = $stundenplantabelle;
 		
 		if($stundenplan_id!=null)

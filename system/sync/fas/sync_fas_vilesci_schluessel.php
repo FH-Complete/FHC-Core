@@ -7,9 +7,9 @@
  */
 
 //*
-//* Synchronisiert Schlüsseldatensaetze von FAS DB in PORTAL DB
+//* Synchronisiert SchlÃ¼sseldatensaetze von FAS DB in PORTAL DB
 //*
-//*benötigt: tbl_betriebsmitteltyp, tbl_ort
+//*benÃ¶tigt: tbl_betriebsmitteltyp, tbl_ort
 
 include('../../../vilesci/config.inc.php');
 include('../../../include/betriebsmittel.class.php');
@@ -37,8 +37,8 @@ function validate($row)
 
 <html>
 <head>
-<title>Synchro - FAS -> Portal - Schlüssel</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Synchro - FAS -> Portal - SchlÃ¼ssel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -51,8 +51,8 @@ $qry = "SELECT * FROM person_schluessel ORDER BY person_fk;";
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo nl2br("Schlüssel Sync\n--------------\n");
-	echo nl2br("=====Hinweis: Es werden keine bestehenden Datensätze verändert (update).=====");
+	echo nl2br("SchlÃ¼ssel Sync\n--------------\n");
+	echo nl2br("=====Hinweis: Es werden keine bestehenden DatensÃ¤tze verÃ¤ndert (update).=====");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
@@ -93,7 +93,7 @@ if($result = pg_query($conn_fas, $qry))
 				if($row1=pg_fetch_object($result1))
 				{
 					$betriebsmittelperson->person_id=$row1->person_portal;
-					//Schlüsseltyp feststellen
+					//SchlÃ¼sseltyp feststellen
 					$qry2="SELECT * FROM sync.tbl_syncschluesseltyp WHERE fas_typ='".$row->schluessel_fk."';";
 					if($result2 = pg_query($conn, $qry2))
 					{
@@ -208,7 +208,7 @@ if($result = pg_query($conn_fas, $qry))
 						}
 						else
 						{
-							//es werden keine Datensätze über das Synchro verändert !
+							//es werden keine DatensÃ¤tze Ã¼ber das Synchro verÃ¤ndert !
 							pg_query($conn, "ROLLBACK");
 						}
 					}
@@ -220,7 +220,7 @@ if($result = pg_query($conn_fas, $qry))
 			}
 			else
 			{
-				//es werden keine Datensätze über das Synchro verändert !
+				//es werden keine DatensÃ¤tze Ã¼ber das Synchro verÃ¤ndert !
 				pg_query($conn, "ROLLBACK");
 			}
 		}
@@ -232,10 +232,10 @@ if($result = pg_query($conn_fas, $qry))
 //echo nl2br($text);
 echo nl2br("\n\n".$error_log);
 echo nl2br("\n"."Betriebsmittel:");
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 echo nl2br("\n"."Betriebsmittelperson:");
-echo nl2br("\nGesamt: $anzahl_eingefuegt / Eingefügt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2");
-$error_log="\nBetriebsmittel: \nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\nBetriebsmittelperson: \nGesamt: $anzahl_eingefuegt / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n".$error_log;
+echo nl2br("\nGesamt: $anzahl_eingefuegt / EingefÃ¼gt: $anzahl_eingefuegt2 / Fehler: $anzahl_fehler2");
+$error_log="\nBetriebsmittel: \nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\nBetriebsmittelperson: \nGesamt: $anzahl_eingefuegt / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n".$error_log;
 mail($adress, 'SYNC Schluessel', $error_log,"From: vilesci@technikum-wien.at");
 ?>
 </body>

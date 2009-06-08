@@ -3,7 +3,7 @@ require('../../../config.inc.php');
 
 // Mail Headers festlegen
 $headers= "MIME-Version: 1.0\r\n";
-$headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
+$headers.="Content-Type: text/html; charset=UTF-8\r\n";
 
 
 $sipass=array();
@@ -146,13 +146,13 @@ if($result = pg_query($conn, $qry))
 		{
 			continue;
 		}
-		//überprüfen, ob bereits vorhanden
+		//Ã¼berprÃ¼fen, ob bereits vorhanden
 		for($j=0;$j<$i;$j++)
 		{
 			if($sipass[$j]->card_no==$row->cardnumber)
 			{
 				$upd=FALSE;
-				if($sipass[$j]->last_name!=trim($row->lastname) && !strchr($row->lastname,'ß'))
+				if($sipass[$j]->last_name!=trim($row->lastname) && !strchr($row->lastname,'ÃŸ'))
 				{
 					$sipass[$j]->last_name_old=$sipass[$j]->last_name;
 					$sipass[$j]->last_name=trim($row->lastname);
@@ -216,7 +216,7 @@ if($result = pg_query($conn, $qry))
 				}
 				else
 				{
-					$sipass[$j]->command="V"; //kein update, wird auch nicht gelöscht
+					$sipass[$j]->command="V"; //kein update, wird auch nicht gelÃ¶scht
 				}
 				$update=true;
 				break;

@@ -49,7 +49,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 $hier='';
 if(isset($_GET['xmlformat']))
 {
-	echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes"?>';
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$xmlformat=$_GET['xmlformat'];
 }
 else

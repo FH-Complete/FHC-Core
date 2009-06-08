@@ -6,7 +6,7 @@
 <html>
 <head>
 <title>Stundenplan Check</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 </head>
 <body>
@@ -51,7 +51,7 @@
 	$num_rows_res=pg_numrows($result_res);
 	if ($num_rows_res>0)
 	{
-		echo $num_rows_res.' Einträge werden überprüft .';
+		echo $num_rows_res.' EintrÃ¤ge werden Ã¼berprÃ¼ft .';
 		$foo = 0;
 		for ($r=0;$r<$num_rows_res;$r++)
 		{

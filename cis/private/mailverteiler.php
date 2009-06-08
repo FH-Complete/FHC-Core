@@ -50,7 +50,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Mailverteiler</title>
 <script language="JavaScript" type="text/javascript">
@@ -278,7 +278,7 @@
 
 
 		  	//StudentenListe Rausschreiben
-		  	if($row->studiengang_kz!=0) //0 ist für ganzes TW
+		  	if($row->studiengang_kz!=0) //0 ist fÃ¼r ganzes TW
 		  	{
 				// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
 				$std_obj = new student($conn, $user);

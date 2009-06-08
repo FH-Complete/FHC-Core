@@ -4,13 +4,13 @@
 #                           htaccess-Generator                            #
 ###########################################################################
 #                                                                         #
-#  Copyright © 2000+2001 by Alexander Mieland (DMA147.ThW.N)              #
+#  Copyright Â© 2000+2001 by Alexander Mieland (DMA147.ThW.N)              #
 #  Contact: dma147@gamesweb.com / http://www.apboard.de                   #
 #                                                                         #
 ###########################################################################
-#  Dieses Script ist vollkommen frei und kostenlos erhältlich.            #
+#  Dieses Script ist vollkommen frei und kostenlos erhÃ¤ltlich.            #
 #  Dieses Script darf an Dritte weitergegeben werden, Vorraussetzung      #
-#  ist, dass der Code unverändert bleibt und diese Text-Datei             #
+#  ist, dass der Code unverÃ¤ndert bleibt und diese Text-Datei             #
 #  !!! WICHTIG !!!.txt mit weitergegeben wird.                            #
 #  Dieses Script ist herunterzuladen unter:  http://www.apboard.de        #
 ###########################################################################
@@ -134,7 +134,7 @@ elseif ($auswahl == "neu"):
                          </center>
                             <div align="center"><font face="Geneva, Arial, Helvetica, san-serif" size="2" color="#666666"><b><br>
                              <br>
-                              Vergib einen Namen für den Bereich (max. 30 Zeichen):<br>
+                              Vergib einen Namen fÃ¼r den Bereich (max. 30 Zeichen):<br>
                              <input type="text" name="realm" maxsize=30>
                              <br>
                              <br>
@@ -184,7 +184,7 @@ elseif ($auswahl == "neu"):
                              <hr><br>
                              Denken Sie daran, dass man versteckte Dateien auf einem Server mit einem FTP-Programm manchmal nicht sieht!<br>
                              Da die Datei &quot;.htpasswd&quot; eine versteckte Datei ist (in Unix ist alles, mit Punkt vorne, versteckt),
-                             Kann es sein, dass sie sie nicht sehen. Sie können sie sich aber dennoch runterladen, indem sie in die FTP-Console
+                             Kann es sein, dass sie sie nicht sehen. Sie kÃ¶nnen sie sich aber dennoch runterladen, indem sie in die FTP-Console
                              Ihres FTP-Clients folgendes eingeben:&nbsp;&nbsp;&nbsp;get .htpasswd<br><br></font>";
                          } else {
                              echo "<br><br><br>";
@@ -211,7 +211,7 @@ elseif ($auswahl == "neu"):
                          </center>
                             <div align="center"><font face="Geneva, Arial, Helvetica, san-serif" size="2" color="#666666"><b><br>
                              <br>
-                              Vergib einen Namen für den Bereich (max. 30 Zeichen):<br>
+                              Vergib einen Namen fÃ¼r den Bereich (max. 30 Zeichen):<br>
                              <input type="text" name="realm" maxsize=30>
                              <br>
                              <br>
@@ -253,11 +253,11 @@ elseif ($auswahl == "neu"):
                                     </center>
                                     <div align="center"><font face="Geneva, Arial, Helvetica, san-serif" size="2" color="#666666"><b><br>
                                     <br>
-                                    Gib den nächsten Usernamen ein:<br>
+                                    Gib den nÃ¤chsten Usernamen ein:<br>
                                     <input type="text" name="name">
                                     <br>
                                     <br>
-                                    Gib das nächste Passwort zweimal ein:<br>
+                                    Gib das nÃ¤chste Passwort zweimal ein:<br>
                                     <input type="password" name="pwd1">
                                     <br>
                                     <input type="password" name="pwd2">
@@ -269,7 +269,7 @@ elseif ($auswahl == "neu"):
                                     <br>
                                     <br>
                                     <input type="submit" name="submit" value="weitere User">&nbsp;&nbsp;
-                                    <input type="submit" name="submit" value="endgültig speichern">
+                                    <input type="submit" name="submit" value="endgÃ¼ltig speichern">
                                     </b></font></div>
                                     <font face="Geneva, Arial, Helvetica, san-serif" size="2" color="#666666"><b> 
                                     </b></font> 
@@ -280,7 +280,7 @@ elseif ($auswahl == "neu"):
                                         error("Die beiden Passwort-Eingaben unterscheiden sich voneinander!");
                                     }
                          }
-                                elseif ($submit == "endgültig speichern"):
+                                elseif ($submit == "endgÃ¼ltig speichern"):
                         if ($name == "" || $name == " " || $pwd1 == "" || $pwd2 == "")
                         {
                              error("Da fehlt doch was???!!!");
@@ -308,7 +308,7 @@ elseif ($auswahl == "neu"):
                                     <hr><br>
                                     Denken Sie daran, dass man versteckte Dateien auf einem Server mit einem FTP-Programm manchmal nicht sieht!<br>
                                     Da die Datei &quot;.htpasswd&quot; eine versteckte Datei ist (in Unix ist alles, mit Punkt vorne, versteckt),
-                                    Kann es sein, dass sie sie nicht sehen. Sie können sie sich aber dennoch runterladen, indem sie in die FTP-Console
+                                    Kann es sein, dass sie sie nicht sehen. Sie kÃ¶nnen sie sich aber dennoch runterladen, indem sie in die FTP-Console
                                     Ihres FTP-Clients folgendes eingeben:&nbsp;&nbsp;&nbsp;get .htpasswd<br><br></font>";
                                     } else {
                                         echo "<br><br><br>";
@@ -329,7 +329,7 @@ elseif ($auswahl == "change"):
 ?>
             <br>
             <div align="center"> <font face="Geneva, Arial, Helvetica, san-serif" size="2" color="#666666"><b> 
-              <font size="3">Admin-Bereich ändern</font><br>
+              <font size="3">Admin-Bereich Ã¤ndern</font><br>
               <font size="2" color="#333333"><br>
               <font color=#ff0000><b>VORSICHT!</b><br>
               Dies sollten nur Leute machen, die auch wirklich wissen, was sie tun!<br><br></font>
@@ -338,7 +338,7 @@ elseif ($auswahl == "change"):
        if (!isset($pwdatei)):
        ?>
               <form method=post action=access.php>
-              Folgende Datei ändern:<br>
+              Folgende Datei Ã¤ndern:<br>
               <?php
               echo "<select name=pwdatei>";
               $handle=opendir('.');
@@ -352,16 +352,16 @@ elseif ($auswahl == "change"):
               ?>
               <br><br>
               <input type="hidden" name="auswahl" value="change">
-              <input type="submit" name="submit" value="ändern">&nbsp;&nbsp;&nbsp;
-              <input type="submit" name="submit" value="löschen">
+              <input type="submit" name="submit" value="Ã¤ndern">&nbsp;&nbsp;&nbsp;
+              <input type="submit" name="submit" value="lÃ¶schen">
               </form>
        <?php
        elseif (isset($pwdatei)):
-        if ($submit == "ändern"):
+        if ($submit == "Ã¤ndern"):
             if (!isset($save)):
             ?>
               <form method=post action=access.php>
-              Folgende Datei ändern:<br>
+              Folgende Datei Ã¤ndern:<br>
               <?php
               echo $pwdatei."<br>";
               $fp = fopen ("./".$pwdatei, "r");
@@ -385,16 +385,16 @@ elseif ($auswahl == "change"):
                 }
               fclose ($fp);
             endif;
-         elseif ($submit == "löschen"):
+         elseif ($submit == "lÃ¶schen"):
                 if (!isset($del)):
-                    echo "Die Datei ".$pwdatei." wirklich löschen?<br><br>";
-                    echo "[ - <a href=\"./access.php?auswahl=change&pwdatei=".$pwdatei."&submit=löschen&del=JA\">JA</a> - <a href=\"./access.php\">NEIN!</a> - ]";
+                    echo "Die Datei ".$pwdatei." wirklich lÃ¶schen?<br><br>";
+                    echo "[ - <a href=\"./access.php?auswahl=change&pwdatei=".$pwdatei."&submit=lÃ¶schen&del=JA\">JA</a> - <a href=\"./access.php\">NEIN!</a> - ]";
                 elseif ($del == "JA"):
                     if(file_exists("./".$pwdatei)) {
                         if (!unlink("./".$pwdatei)) { 
-                            error($pwdatei." konnte nicht gelöscht werden! Bitte manuell, per FTP löschen."); 
+                            error($pwdatei." konnte nicht gelÃ¶scht werden! Bitte manuell, per FTP lÃ¶schen."); 
                         } else {
-                            echo "<br>Datei ".$pwdatei." wurde erfolgreich gelöscht!<br>[<a href=access.php>Index</a>]<br><br>";
+                            echo "<br>Datei ".$pwdatei." wurde erfolgreich gelÃ¶scht!<br>[<a href=access.php>Index</a>]<br><br>";
                         }
                     } else {
                         error("Diese Datei ist nicht vorhanden!!??");
@@ -415,21 +415,21 @@ elseif ($auswahl == "open"):
 ?>
             <br>
             <div align="center"> <font face="Geneva, Arial, Helvetica, san-serif" size="2" color="#666666"><b> 
-              <font size="3">Admin-Bereich wieder öffnen</font><br>
+              <font size="3">Admin-Bereich wieder Ã¶ffnen</font><br>
               <font size="2" color="#333333"><br>
               <?php
                 if (!isset($del)):
-                    echo "Den geschützen Bereich wirklich wieder für alle freigeben?<br>(Datei .htaccess wirklich löschen?)<br><br>";
+                    echo "Den geschÃ¼tzen Bereich wirklich wieder fÃ¼r alle freigeben?<br>(Datei .htaccess wirklich lÃ¶schen?)<br><br>";
                     echo "[ - <a href=\"./access.php?auswahl=open&del=JA\">JA</a> - <a href=\"./access.php\">NEIN!</a> - ]";
                 elseif ($del == "JA"):
                     if(file_exists("./.htaccess")) {
                         if (!unlink("./.htaccess")) { 
-                            error(".htaccess konnte nicht gelöscht werden! Bitte manuell, per FTP löschen."); 
+                            error(".htaccess konnte nicht gelÃ¶scht werden! Bitte manuell, per FTP lÃ¶schen."); 
                         } else {
-                            echo "<br>Datei .htaccess wurde erfolgreich gelöscht!<br>[<a href=access.php>Index</a>]<br><br>";
+                            echo "<br>Datei .htaccess wurde erfolgreich gelÃ¶scht!<br>[<a href=access.php>Index</a>]<br><br>";
                         }
                     } else {
-                        error("Keine .htaccess - Datei zum löschen vorhanden!!??");
+                        error("Keine .htaccess - Datei zum lÃ¶schen vorhanden!!??");
                     }
                 endif;
               ?>

@@ -27,7 +27,7 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../vilesci/config.inc.php');
-echo '<?xml version="1.0" encoding="ISO-8859-15" standalone="yes" ?>';
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentzeugnisoverlay.xul.php"?>';
@@ -67,7 +67,7 @@ else
 					<menuseparator />
 					<menuitem label="Personendetails anzeigen" oncommand="StudentShowPersonendetails();" id="student-tree-popup-personendetails" hidden="false"/>
 					<!--					
-					<menuitem label="Interessenten löschen" oncommand="StudentDeleteInteressent();" id="student-tree-popup-deleteinteressent" hidden="false"/>
+					<menuitem label="Interessenten lÃ¶schen" oncommand="StudentDeleteInteressent();" id="student-tree-popup-deleteinteressent" hidden="false"/>
 					-->
 				</menupopup>
 			</popupset>
@@ -82,7 +82,7 @@ else
 
 							<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 							
-							<toolbarbutton label="Status ändern " id="student-toolbar-status" type="menu">							
+							<toolbarbutton label="Status Ã€ndern " id="student-toolbar-status" type="menu">							
 						      <menupopup id="student-status-menu-popup" >
 								    <menuitem id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher','0')" disabled="false" tooltiptext="Student zum Abbrecher machen" hidden="true"/>
 									<menuitem id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher','0')" disabled="false" tooltiptext="Student zum Unterbrecher machen" hidden="true"/>
@@ -319,8 +319,8 @@ else
 							<tab id="student-tab-io" label="In/Out" />
 							<tab id="student-tab-noten" label="Noten" />
 							<tab id="student-tab-zeugnis" label="Zeugnis" />
-							<tab id="student-tab-pruefung" label="Prüfung" />
-							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
+							<tab id="student-tab-pruefung" label="PrÃŒfung" />
+							<tab id="student-tab-abschlusspruefung" label="AbschlussPrÃŒfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
 							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>

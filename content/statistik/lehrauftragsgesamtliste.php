@@ -112,7 +112,7 @@ while($row = pg_fetch_object($result))
 	$maxlength[$spalte]=7;
 	$worksheet->write($zeile+1, $spalte++,'Stunden', $format_bold_border);
 	$maxlength[$spalte]=5;
-	$worksheet->write($zeile+1, $spalte++,'Sätze', $format_bold_border);
+	$worksheet->write($zeile+1, $spalte++,'SÃ¤tze', $format_bold_border);
 	$maxlength[$spalte]=6;
 	$worksheet->write($zeile+1, $spalte++,'Faktor', $format_bold_border);
 	$maxlength[$spalte]=6;

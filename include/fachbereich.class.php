@@ -145,8 +145,8 @@ class fachbereich
 	 */
 	function checkvars()
 	{
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->fachbereich_kurzbz = str_replace("'",'´',$this->fachbereich_kurzbz);
+		$this->bezeichnung = str_replace("'",'Â´',$this->bezeichnung);
+		$this->fachbereich_kurzbz = str_replace("'",'Â´',$this->fachbereich_kurzbz);
 
 
 		//Laenge Pruefen

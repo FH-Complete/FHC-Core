@@ -173,7 +173,7 @@ $stsemdatumbis = $stsem_obj->ende;
 $qry = "SELECT 
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
 			tbl_zeugnisnote.note 
 		FROM 
@@ -229,8 +229,8 @@ $qry = "SELECT
 	}
 	
 	//Notenschluessel
-	$worksheet->write(++$lines,0,'Notenschlüssel: 1-Sehr Gut, 2-Gut, 3-Befriedigend, 4-Genügend,');
-	$worksheet->write(++$lines,0,'5-Nicht Genügend, 6-Angerechnet, 7-nicht beurteilt,');
+	$worksheet->write(++$lines,0,'NotenschlÃ¼ssel: 1-Sehr Gut, 2-Gut, 3-Befriedigend, 4-GenÃ¼gend,');
+	$worksheet->write(++$lines,0,'5-Nicht GenÃ¼gend, 6-Angerechnet, 7-nicht beurteilt,');
 	$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
 	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert');	
 	$lines++;

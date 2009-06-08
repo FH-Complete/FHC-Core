@@ -84,7 +84,7 @@
    echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
    <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -133,7 +133,7 @@ echo "
 echo '<br><br>
 <table border=1>
 	<thead>
-		<tr><th>Hörer/Name</th><th>Kennzeichen</th><th>Gruppe</th><th>Foto</th></tr>
+		<tr><th>HÃ¶rer/Name</th><th>Kennzeichen</th><th>Gruppe</th><th>Foto</th></tr>
 	</thead>
 	<tbody>';
 
@@ -144,7 +144,7 @@ $stsemdatumbis = $stsem_obj->ende;
 $qry = "SELECT 
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-			(SELECT rolle_kurzbz FROM public.tbl_prestudentrolle WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
+			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
 			tbl_zeugnisnote.note 
 		FROM 

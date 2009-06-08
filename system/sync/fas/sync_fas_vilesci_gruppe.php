@@ -45,7 +45,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Gruppe</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -292,10 +292,10 @@ if($result = pg_query($conn_fas, $qry))
 			
 
 //echo nl2br($text);
-echo nl2br("\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / geändert: $anzahl_update / Fehler: $anzahl_fehler\n\n");
+echo nl2br("\nGruppe\nGruppe: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / geÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler\n\n");
 echo nl2br($error_log_fas."\n\n");
 echo nl2br ($ausgabe_all);
-$ausgabe="\nGruppe\nGruppe: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / geändert: $anzahl_update / Fehler: $anzahl_fehler."
+$ausgabe="\nGruppe\nGruppe: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / geÃ¤ndert: $anzahl_update / Fehler: $anzahl_fehler."
 ."\n\n".$ausgabe_all;
  
 

@@ -50,7 +50,7 @@ var LehreinheitenAusbildungssemesterMenulistObserver = {
 	  };
 
 /**
- * Laedt die Daten der ausgewählten Lehreinheit
+ * Laedt die Daten der ausgewÃ¤hlten Lehreinheit
  * und schreibt diese in die Formularfelder
  */
 function LehreinheitenTreeAuswahl()
@@ -940,7 +940,7 @@ function gettimestamp()
 }
 
 /**
- * Setzt die Datasource für die Gruppen Menulist
+ * Setzt die Datasource fÃ¼r die Gruppen Menulist
  */
 function LehreinheitenDetailsetGruppenMenulistDatasource()
 {
@@ -1057,7 +1057,7 @@ function LehreinheitenDelete()
 	col = tree.columns ? tree.columns["tree-liste-lehreinheiten-col-lehreinheit_id"] : "tree-liste-lehreinheiten-col-lehreinheit_id";
 	lehreinheit_id = tree.view.getCellText(i,col);
 	
-	if(confirm('Wollen Sie diese Lehreinheit wirklich löschen?'))
+	if(confirm('Wollen Sie diese Lehreinheit wirklich lÃ¶schen?'))
 	{		
 		// Request absetzen
 		var httpRequest = new XMLHttpRequest();
@@ -1109,7 +1109,7 @@ function LehreinheitenDelete()
 			//Tree Refreshen
 			RefreshLehreinheitenTree();
 			//Statusbar Text setzen
-			//window.setTimeout("setStatusBarText('Datensatz wurde gelöscht')",sleep_time);
+			//window.setTimeout("setStatusBarText('Datensatz wurde gelÃ¶scht')",sleep_time);
 			//Felder Leeren und Disablen
 			LehreinheitenDetailDisable(true);
 		}

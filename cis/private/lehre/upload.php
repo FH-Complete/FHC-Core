@@ -42,8 +42,8 @@
 		$short = $_GET['short'];
 
 
-	$rechte = new benutzerberechtigung($sql_conn);
-	$rechte->benutzerberechtigung($sql_conn);
+	$rechte = new benutzerberechtigung();
+#	$rechte->benutzerberechtigung($sql_conn);
 	$rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))
@@ -86,9 +86,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 	function MM_jumpMenu(targ, selObj, restore)
 	{
 		eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
@@ -177,7 +177,7 @@ A:hover {
 
 				   echo '<tr>';
 		            echo '<td align="middle" class="MarkLine" colSpan="5" height="49">';
-					  echo '<form method="post" action="" enctype="multipart/form-data">';
+					  echo '<form accept-charset=\"UTF-8\" method="post" action="" enctype="multipart/form-data">';
 
 					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre') && !$rechte->isBerechtigt('assistenz'))
 					   {
@@ -543,7 +543,7 @@ A:hover {
 						if(!($num_rows_path_elements > 0))
 						{
 							echo "<tr><td>";
-							die('<p align="center"><strong>Sie haben keine Berechtigung für diesen Bereich</td></tr></table>');
+							die('<p align="center"><strong>Sie haben keine Berechtigung fÃ¼r diesen Bereich</td></tr></table>');
 						}
 					}
 					$row = pg_fetch_object($result_path_elements, 0);
@@ -713,33 +713,33 @@ A:hover {
 						  {
 							  if(isset($subdir) && $subdir != "")
 							  {
-								  echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\">";
+								  echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\">";
 							  }
 							  else
 							  {
-								  echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\">";
+								  echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\">";
 							  }
 						  }
 						  else if(isset($short))
 						  {
 						  	  if(isset($subdir) && $subdir != "")
 							  {
-								  echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\">";
+								  echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\">";
 							  }
 							  else
 							  {
-								  echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\">";
+								  echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\">";
 							  }
 						  }
 						  else
 						  {
 						  	  if(isset($subdir) && $subdir != "")
 							  {
-								  echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\">";
+								  echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\">";
 							  }
 							  else
 							  {
-								  echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\">";
+								  echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\">";
 							  }
 						  }
 
@@ -767,7 +767,7 @@ A:hover {
                   echo "<table class='tabcontent'>";
                   echo "  <tr>";
 			      echo "    <td align=\"right\" width=\"59%\">";
-			      echo "<span style='font-size:8pt;'>Max. Uploadgröße (alle Dateien): <b>15 MB</b></span>";
+			      echo "<span style='font-size:8pt;'>Max. UploadgrÃ¶ÃŸe (alle Dateien): <b>15 MB</b></span>";
 			      echo "      <input id=\"btnupload\" type=\"submit\" name=\"upload\" value=\"Upload\">";
 			      echo "    </td>";
 			      echo "    <td width=\"41%\">&nbsp;</td>";
@@ -838,33 +838,33 @@ A:hover {
 					{
 						if(isset($subdir) && $subdir != "")
 						{
-							echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\">";
+							echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\">";
 						}
 						else
 						{
-							echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\">";
+							echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\">";
 						}
 					}
 					else if(isset($short))
 					{
 						if(isset($subdir) && $subdir != "")
 						{
-							echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\">";
+							echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\">";
 						}
 						else
 						{
-							echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\">";
+							echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\">";
 						}
 					}
 					else
 					{
 						if(isset($subdir) && $subdir != "")
 						{
-							echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\">";
+							echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\">";
 						}
 						else
 						{
-							echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\">";
+							echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\">";
 						}
 					}
 
@@ -962,33 +962,33 @@ A:hover {
 							{
 								if(isset($subdir) && $subdir != "")
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 								}
 								else
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 								}
 							}
 							else if(isset($short))
 							{
 								if(isset($subdir) && $subdir != "")
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 								}
 								else
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 								}
 							}
 							else
 							{
 								if(isset($subdir) && $subdir != "")
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 								}
 								else
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 								}
 							}
 
@@ -1227,33 +1227,33 @@ A:hover {
 							{
 								if(isset($subdir) && $subdir != "")
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
 								}
 								else
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
 								}
 							}
 							else if($short)
 							{
 								if(isset($subdir) && $subdir != "")
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
 								}
 								else
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
 								}
 							}
 							else
 							{
 								if(isset($subdir) && $subdir != "")
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
 								}
 								else
 								{
-									echo "<form method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
+									echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"upload.php?course_id=$course_id&term_id=$term_id\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmFile(this);\">";
 								}
 							}
 
@@ -1410,7 +1410,7 @@ A:hover {
 					if(isset($no_overwrite_error) && $no_overwrite_error == true)
 					{
 						unset($no_overwrite_error);
-						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">Fehler: Die Datei existiert bereits! Bitte verwenden Sie die Option "Dateien automatisch überschreiben"</font></td>';
+						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">Fehler: Die Datei existiert bereits! Bitte verwenden Sie die Option "Dateien automatisch Ã¼berschreiben"</font></td>';
 					}
 
 				?>

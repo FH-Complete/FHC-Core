@@ -1,6 +1,6 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Stundenplan-Check (stpldev-le)</title>
 </head>
 <body>
@@ -26,7 +26,7 @@ $message='';
 
 // Mail Headers festlegen
 $headers= "MIME-Version: 1.0\r\n";
-$headers.="Content-Type: text/html; charset=iso-8859-1\r\n";
+$headers.="Content-Type: text/html; charset=UTF-8\r\n";
 
 
 $message_begin='Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem Stundenplan ergeben:<BR>';

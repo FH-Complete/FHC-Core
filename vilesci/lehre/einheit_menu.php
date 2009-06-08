@@ -49,12 +49,12 @@ else
 <html>
 <head>
 <title>Gruppe-Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 function conf_del()
 {
-	return confirm('Diese Gruppe wirklich löschen?');
+	return confirm('Diese Gruppe wirklich lÃ¶schen?');
 }
 </script>
 </head>
@@ -151,7 +151,7 @@ function doEdit($conn,$kurzbz,$new=false)
 		$e = new gruppe($conn);
 	?>
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-  		<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
+  		<p><b>Gruppe <?php echo ($new?'hinzufÃ¼gen':'bearbeiten'); ?></b>:
   			<table border="0">
   			<tr>
   				<td><i>Kurzbezeichnung</i></td>
@@ -175,7 +175,7 @@ function doEdit($conn,$kurzbz,$new=false)
 				<td><i>Studiengang</i><t/td>
 				<td>
 					<SELECT name="studiengang_kz">
-      					<option value="-1">- auswählen -</option>
+      					<option value="-1">- auswÃ¤hlen -</option>
 						<?php
 							// Auswahl des Studiengangs
 							$stg=new studiengang($conn);

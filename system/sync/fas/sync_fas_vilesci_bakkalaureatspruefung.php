@@ -7,7 +7,7 @@
  */
 
 //*
-//* Synchronisiert Diplomprüfungsdatensätze von FAS DB in PORTAL DB
+//* Synchronisiert DiplomprÃ¼fungsdatensÃ¤tze von FAS DB in PORTAL DB
 //*
 //*
 
@@ -43,8 +43,8 @@ function myaddslashes($var)
 
 <html>
 <head>
-<title>Synchro - FAS -> Vilesci - Bachelorprüfung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Synchro - FAS -> Vilesci - BachelorprÃ¼fung</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -52,8 +52,8 @@ $qry_main = "SELECT * FROM bakkalaureatspruefung;";
 
 if($result = pg_query($conn_fas, $qry_main))
 {
-	echo nl2br("Bachelorprüfung Sync\n----------------------\n");
-	echo nl2br("Bachelorprüfungsynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+	echo nl2br("BachelorprÃ¼fung Sync\n----------------------\n");
+	echo nl2br("BachelorprÃ¼fungsynchro Beginn: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
 	$anzahl_quelle=pg_num_rows($result);
 	while($row = pg_fetch_object($result))
 	{
@@ -123,7 +123,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		{
 			$vorsitz=NULL;
 		}	
-		//prüfer1 ermitteln
+		//prÃ¼fer1 ermitteln
 		if($row->pruefer1_fk>'-1')
 		{
 			$qry="SELECT person_id FROM public.tbl_mitarbeiter, public.tbl_benutzer WHERE tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_mitarbeiter.ext_id='".$row->pruefer1_fk."';";
@@ -136,7 +136,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$error=true;
-					$error_log.="Prüfer1 mit mitarbeiter_fk: $row->pruefer1_fk konnte nicht gefunden werden.\n";
+					$error_log.="PrÃ¼fer1 mit mitarbeiter_fk: $row->pruefer1_fk konnte nicht gefunden werden.\n";
 				}
 			}
 		}
@@ -144,7 +144,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		{
 			$pruefer1=NULL;
 		}
-		//prüfer2 ermitteln
+		//prÃ¼fer2 ermitteln
 		if($row->pruefer2_fk>'-1')
 		{
 			$qry="SELECT person_id FROM public.tbl_mitarbeiter, public.tbl_benutzer WHERE tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_mitarbeiter.ext_id='".$row->pruefer2_fk."';";
@@ -157,7 +157,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$error=true;
-					$error_log.="Prüfer2 mit mitarbeiter_fk: $row->pruefer2_fk konnte nicht gefunden werden.\n";
+					$error_log.="PrÃ¼fer2 mit mitarbeiter_fk: $row->pruefer2_fk konnte nicht gefunden werden.\n";
 				}
 			}
 		}
@@ -165,7 +165,7 @@ if($result = pg_query($conn_fas, $qry_main))
 		{
 			$pruefer2=NULL;
 		}	
-		//prüfer3 ermitteln, wenn an prüfung teilgenommen
+		//prÃ¼fer3 ermitteln, wenn an prÃ¼fung teilgenommen
 		if($row->pruefer3_fk>'-1')
 		{
 			$qry="SELECT person_id FROM public.tbl_mitarbeiter, public.tbl_benutzer WHERE tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_mitarbeiter.ext_id='".$row->pruefer3_fk."';";
@@ -178,7 +178,7 @@ if($result = pg_query($conn_fas, $qry_main))
 				else 
 				{
 					$error=true;
-					$error_log.="Prüfer3 mit mitarbeiter_fk: $row->pruefer3_fk konnte nicht gefunden werden.\n";
+					$error_log.="PrÃ¼fer3 mit mitarbeiter_fk: $row->pruefer3_fk konnte nicht gefunden werden.\n";
 				}
 			}
 		}
@@ -242,11 +242,11 @@ if($result = pg_query($conn_fas, $qry_main))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
+							$ausgabe1.=", PrÃ¼fer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
+							$ausgabe1="PrÃ¼fer1: '".$pruefer1."' (statt '".$rowo->pruefer1."')";
 						}
 					}
 					if($rowo->pruefer2!=$pruefer2) 
@@ -254,11 +254,11 @@ if($result = pg_query($conn_fas, $qry_main))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
+							$ausgabe1.=", PrÃ¼fer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
+							$ausgabe1="PrÃ¼fer2: '".$pruefer2."' (statt '".$rowo->pruefer2."')";
 						}
 					}
 					if($rowo->pruefer3!=$pruefer3) 
@@ -266,11 +266,11 @@ if($result = pg_query($conn_fas, $qry_main))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfer3: '".$pruefer3."' (statt '".$rowo->pruefer3."')";
+							$ausgabe1.=", PrÃ¼fer3: '".$pruefer3."' (statt '".$rowo->pruefer3."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfer3: '".$pruefer3."' (statt '".$rowo->pruefer3."')";
+							$ausgabe1="PrÃ¼fer3: '".$pruefer3."' (statt '".$rowo->pruefer3."')";
 						}
 					}
 					if($rowo->abschlussbeurteilung_kurzbz!=$abschlussbeurteilung_kurzbz) 
@@ -302,11 +302,11 @@ if($result = pg_query($conn_fas, $qry_main))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfungsdatum: '".$datum."' (statt '".$rowo->datum."')";
+							$ausgabe1.=", PrÃ¼fungsdatum: '".$datum."' (statt '".$rowo->datum."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfungsdatum: '".$datum."' (statt '".$rowo->datum."')";
+							$ausgabe1="PrÃ¼fungsdatum: '".$datum."' (statt '".$rowo->datum."')";
 						}
 					}
 					if($rowo->sponsion!=$sponsion) 
@@ -326,11 +326,11 @@ if($result = pg_query($conn_fas, $qry_main))
 						$update=true;
 						if(strlen(trim($ausgabe1))>0)
 						{
-							$ausgabe1.=", Prüfungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
+							$ausgabe1.=", PrÃ¼fungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
 						}
 						else
 						{
-							$ausgabe1="Prüfungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
+							$ausgabe1="PrÃ¼fungstyp: '".$pruefungstyp_kurzbz."' (statt '".$rowo->pruefungstyp_kurzbz."')";
 						}
 					}
 					if($rowo->anmerkung!=$anmerkung) 
@@ -390,7 +390,7 @@ if($result = pg_query($conn_fas, $qry_main))
 							"updateamum= now(), ".
 							"ext_id=".myaddslashes($ext_id).
 							";";
-							$ausgabe.="Abschlussprüfung von Student mit UID '".$student_uid."' geändert: ".$ausgabe1."\n;";
+							$ausgabe.="AbschlussprÃ¼fung von Student mit UID '".$student_uid."' geÃ¤ndert: ".$ausgabe1."\n;";
 							$anzahl_geaendert++;
 					}
 					else 
@@ -420,7 +420,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						"now(), ".
 						myaddslashes($ext_id).
 						");";
-						$ausgabe.="Abschlussprüfung von Student mit UID '".$student_uid."' am '".$datum."' eingetragen.\n";
+						$ausgabe.="AbschlussprÃ¼fung von Student mit UID '".$student_uid."' am '".$datum."' eingetragen.\n";
 						$anzahl_eingefuegt++;
 				}
 			}
@@ -432,7 +432,7 @@ if($result = pg_query($conn_fas, $qry_main))
 			if(!pg_query($conn,$qry))
 			{	
 				$anzahl_fehler++;		
-				$error_log.='Fehler beim Speichern des Bachelorprüfung-Datensatzes von Student:'.$student_uid." \n".$qry."\n";
+				$error_log.='Fehler beim Speichern des BachelorprÃ¼fung-Datensatzes von Student:'.$student_uid." \n".$qry."\n";
 				$ausgabe1='';
 			}
 		}
@@ -441,13 +441,13 @@ if($result = pg_query($conn_fas, $qry_main))
 			$anzahl_fehler++;
 		}
 	}
-	$error_log="Sync Bachelorprüfung\n-----------------------\n\n".$error_log."\n";
-	echo nl2br("Bachelorprüfungsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
-	echo nl2br("Gesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt++." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\n\n");
+	$error_log="Sync BachelorprÃ¼fung\n-----------------------\n\n".$error_log."\n";
+	echo nl2br("BachelorprÃ¼fungsynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."\n\n");
+	echo nl2br("Gesamt: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt++." / GeÃ¤ndert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\n\n");
 	echo nl2br($error_log. "\n------------------------------------------------------------------------\n".$ausgabe);
 	
-	mail($adress, 'SYNC-Fehler Bachelorprüfung  von '.$_SERVER['HTTP_HOST'], $error_log, "From: vilesci@technikum-wien.at");
-	mail($adress, 'SYNC Bachelorprüfung von '.$_SERVER['HTTP_HOST'], "Sync Bachelorprüfung\n-----------------------\n\nGesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt++." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC-Fehler BachelorprÃ¼fung  von '.$_SERVER['HTTP_HOST'], $error_log, "From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC BachelorprÃ¼fung von '.$_SERVER['HTTP_HOST'], "Sync BachelorprÃ¼fung\n-----------------------\n\nGesamt: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt++." / GeÃ¤ndert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\n\n".$ausgabe, "From: vilesci@technikum-wien.at");
 }
 ?>
 </body>

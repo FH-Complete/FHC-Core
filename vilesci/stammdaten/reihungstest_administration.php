@@ -44,14 +44,14 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<title>Reihungstest ADMIN</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
 	<body class="Background_main">
 	<h2>Reihungstest - Admin</h2>';
 
 if(!$rechte->isBerechtigt('admin', 0, 'suid'))
-	die('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung fÃ¼r diese Seite');
 
 //Anzeigen der kommenden Reihungstesttermine:
 echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen der kommenden Reihungstests</a>';
@@ -93,16 +93,16 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 	}
 }
 
-echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" onclick="return confirm(\'Dummyanworten wirklich löschen?\');">Antworten des Dummy Studenten löschen</a>';
+echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" onclick="return confirm(\'Dummyanworten wirklich lÃ¶schen?\');">Antworten des Dummy Studenten lÃ¶schen</a>';
 
 if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 {
 	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841;
 			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=841;";
 	if(pg_query($conn, $qry))
-		echo ' <b>Antworten wurden gelöscht</b>';
+		echo ' <b>Antworten wurden gelÃ¶scht</b>';
 	else 
-		echo ' <b>Fehler beim Löschen der Antworten</b>';
+		echo ' <b>Fehler beim LÃ¶schen der Antworten</b>';
 }
 
 //$prestudent_id=null;
@@ -112,8 +112,8 @@ $ps->getPrestudentRT($datum,true);
 if ($ps->num_rows==0)
 	$ps->getPrestudentRT($datum);
 	
-echo '<hr><br>Antworten eines Gebietes einer Person löschen<br>';
-echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post" onsubmit="return confirm(\'Antworten dieses Gebietes wirklich löschen?\')">
+echo '<hr><br>Antworten eines Gebietes einer Person lÃ¶schen<br>';
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post" onsubmit="return confirm(\'Antworten dieses Gebietes wirklich lÃ¶schen?\')">
 		Person: <SELECT name="prestudent">';
 foreach($ps->result as $prestd)
 {
@@ -161,10 +161,10 @@ if(isset($_POST['deleteteilgebiet']))
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');";
 		if($result = pg_query($conn, $qry))
 		{
-			echo '<b>'.pg_affected_rows($result).' Antworten wurden gelöscht</b>';
+			echo '<b>'.pg_affected_rows($result).' Antworten wurden gelÃ¶scht</b>';
 		}
 		else 
-			echo '<b>Fehler beim Löschen der Daten</b>';
+			echo '<b>Fehler beim LÃ¶schen der Daten</b>';
 	}
 }
 
@@ -224,9 +224,9 @@ if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';
 	UPDATE testtool.tbl_pruefling SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';";	
 	if(pg_query($conn, $qry))
-		echo '<b>Studiengang geändert!</b><br>';
+		echo '<b>Studiengang geÃ¤ndert!</b><br>';
 	else 
-		echo '<b>Fehler beim Ändern des Studienganges!</b><br>';
+		echo '<b>Fehler beim Ã„ndern des Studienganges!</b><br>';
 }
 $name='';
 $dummystg='';
@@ -239,7 +239,7 @@ if($result = pg_query($conn, $qry))
 		$dummystg=$row->studiengang_kz;
 	}
 }
-echo "Prestudent Studiengang von $name ändern";
+echo "Prestudent Studiengang von $name Ã¤ndern";
 echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
 	<SELECT name="stg">';
 $stg_obj = new studiengang($conn);

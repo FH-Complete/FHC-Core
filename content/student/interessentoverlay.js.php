@@ -83,7 +83,7 @@ function InteressentzuBewerber()
 	req.add('type', 'addrolle');
 
 	req.add('prestudent_id', paramList);
-	req.add('rolle_kurzbz', 'Bewerber');
+	req.add('status_kurzbz', 'Bewerber');
 
 	var response = req.executePOST();
 
@@ -208,7 +208,7 @@ function InteressentAddRolle(rolle)
 		req.add('type', 'addrolle');
 
 		req.add('prestudent_id', paramList);
-		req.add('rolle_kurzbz', rolle);
+		req.add('status_kurzbz', rolle);
 
 		var response = req.executePOST();
 

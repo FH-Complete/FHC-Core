@@ -47,7 +47,7 @@ class prestudent extends person
 	var $ext_id_prestudent;
 	var $dual;
 	
-	var $rolle_kurzbz;
+	var $status_kurzbz;
 	var $studiensemester_kurzbz;
 	var $ausbildungssemester;
 	var $datum;
@@ -74,7 +74,7 @@ class prestudent extends person
 	function prestudent($conn, $prestudent_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -88,7 +88,7 @@ class prestudent extends person
 				return false;
 			}
 		}
-		
+*/		
 		if($prestudent_id != null)
 			$this->load($prestudent_id);
 	}
@@ -373,7 +373,7 @@ class prestudent extends person
 	// ********
 	// * Laedt die Rolle(n) eines Prestudenten
 	// ********
-	function getPrestudentRolle($prestudent_id, $rolle_kurzbz=null, $studiensemester_kurzbz=null, $order="datum, insertamum", $ausbildungssemester=null)
+	function getPrestudentRolle($prestudent_id, $status_kurzbz=null, $studiensemester_kurzbz=null, $order="datum, insertamum", $ausbildungssemester=null)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -381,9 +381,9 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id'";	
-		if($rolle_kurzbz!=null)
-			$qry.= " AND rolle_kurzbz='".addslashes($rolle_kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'";	
+		if($status_kurzbz!=null)
+			$qry.= " AND status_kurzbz='".addslashes($status_kurzbz)."'";
 		if($studiensemester_kurzbz!=null)
 			$qry.= " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		if($ausbildungssemester!=null)
@@ -397,7 +397,7 @@ class prestudent extends person
 				$rolle = new prestudent($this->conn, null, null);
 				
 				$rolle->prestudent_id = $row->prestudent_id;
-				$rolle->rolle_kurzbz = $row->rolle_kurzbz;
+				$rolle->status_kurzbz = $row->status_kurzbz;
 				$rolle->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$rolle->ausbildungssemester = $row->ausbildungssemester;
 				$rolle->datum = $row->datum;
@@ -421,7 +421,7 @@ class prestudent extends person
 	// ********
 	// * Laedt die Rolle(n) eines Prestudenten
 	// ********
-	function load_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
+	function load_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		if(!is_numeric($prestudent_id) || $prestudent_id=='')
 		{
@@ -429,8 +429,8 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id'".
-			   " AND rolle_kurzbz='".addslashes($rolle_kurzbz)."'".
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'".
+			   " AND status_kurzbz='".addslashes($status_kurzbz)."'".
 			   " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'".
 			   " AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
 		
@@ -439,7 +439,7 @@ class prestudent extends person
 			if($row = pg_fetch_object($result))
 			{								
 				$this->prestudent_id = $row->prestudent_id;
-				$this->rolle_kurzbz = $row->rolle_kurzbz;
+				$this->status_kurzbz = $row->status_kurzbz;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->ausbildungssemester = $row->ausbildungssemester;
 				$this->datum = $row->datum;
@@ -476,14 +476,14 @@ class prestudent extends person
 				FROM 
 					(
 						SELECT 
-							*, (SELECT rolle_kurzbz FROM tbl_prestudentrolle 
+							*, (SELECT status_kurzbz FROM tbl_prestudentstatus 
 							    WHERE prestudent_id=prestudent.prestudent_id 
 							    ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle 
 						FROM tbl_prestudent prestudent ORDER BY prestudent_id
-					) a, tbl_prestudentrolle, tbl_person
-				WHERE a.rolle=tbl_prestudentrolle.rolle_kurzbz AND 
+					) a, tbl_prestudentstatus, tbl_person
+				WHERE a.rolle=tbl_prestudentstatus.status_kurzbz AND 
 					a.person_id=tbl_person.person_id AND
-					a.prestudent_id = tbl_prestudentrolle.prestudent_id AND
+					a.prestudent_id = tbl_prestudentstatus.prestudent_id AND
 					a.studiengang_kz='$studiengang_kz'";
 						
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
@@ -492,7 +492,7 @@ class prestudent extends person
 		if($semester!=null)
 			$qry.=" AND ausbildungssemester='$semester'";
 		if($orgform!=null && $orgform!='')
-			$qry.=" AND tbl_prestudentrolle.orgform_kurzbz='$orgform'";
+			$qry.=" AND tbl_prestudentstatus.orgform_kurzbz='$orgform'";
 		
 		switch ($typ)
 		{
@@ -522,7 +522,7 @@ class prestudent extends person
 				break;
 			case "prestudent":
 				if($studiensemester_kurzbz=='' || is_null($studiensemester_kurzbz))
-					$qry = "SELECT *, '' as rolle_kurzbz, '' as studiensemester_kurzbz, '' as ausbildungssemester, '' as datum FROM public.tbl_prestudent prestudent, public.tbl_person WHERE NOT EXISTS (select * from tbl_prestudentrolle WHERE prestudent_id=prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."' AND prestudent.person_id=tbl_person.person_id";
+					$qry = "SELECT *, '' as status_kurzbz, '' as studiensemester_kurzbz, '' as ausbildungssemester, '' as datum FROM public.tbl_prestudent prestudent, public.tbl_person WHERE NOT EXISTS (select * from tbl_prestudentstatus WHERE prestudent_id=prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."' AND prestudent.person_id=tbl_person.person_id";
 				else 
 					$qry .= " AND a.rolle IN('Interessent', 'Bewerber', 'Aufgenommener', 'Wartender', 'Abgewiesener')";
 				break;
@@ -583,7 +583,7 @@ class prestudent extends person
 				$ps->anmerkung = $row->anmerkung;
 				$ps->dual = ($row->dual=='t'?true:false);
 				
-				$ps->rolle_kurzbz = $row->rolle_kurzbz;
+				$ps->status_kurzbz = $row->status_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$ps->ausbildungssemester = $row->ausbildungssemester;
 				$ps->datum = $row->datum;
@@ -661,15 +661,15 @@ class prestudent extends person
 		if($this->new)
 		{
 			//pruefen ob die Rolle schon vorhanden ist
-			if($this->load_rolle($this->prestudent_id, $this->rolle_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
+			if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 			{
 				$this->errormsg = 'Diese Rolle existiert bereits';
 				return false;
 			}
 
-			$qry = 'INSERT INTO public.tbl_prestudentrolle (prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
+			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
 			       $this->addslashes($this->prestudent_id).",".
-			       $this->addslashes($this->rolle_kurzbz).",".
+			       $this->addslashes($this->status_kurzbz).",".
 			       $this->addslashes($this->studiensemester_kurzbz).",".
 			       $this->addslashes($this->ausbildungssemester).",".
 			       $this->addslashes($this->datum).",".
@@ -690,18 +690,18 @@ class prestudent extends person
 			//wenn der PrimaryKey geaendert wird, schauen ob schon ein Eintrag mit diesem Key vorhanden ist
 			if($this->studiensemester_old!=$this->studiensemester_kurzbz || $this->ausbildungssemester_old!=$this->ausbildungssemester)
 			{
-				if($this->load_rolle($this->prestudent_id, $this->rolle_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
+				if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 				{
 					$this->errormsg = 'Diese Rolle existiert bereits';
 					return false;
 				}
 			}
-			$qry = 'UPDATE public.tbl_prestudentrolle SET'.
+			$qry = 'UPDATE public.tbl_prestudentstatus SET'.
 			       ' ausbildungssemester='.$this->addslashes($this->ausbildungssemester).",".
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).",".
 			       ' datum='.$this->addslashes($this->datum).",".
 			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
-			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND rolle_kurzbz='".addslashes($this->rolle_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_old)."' AND ausbildungssemester='".addslashes($this->ausbildungssemester_old)."';";
+			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND status_kurzbz='".addslashes($this->status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_old)."' AND ausbildungssemester='".addslashes($this->ausbildungssemester_old)."';";
 		}
 		
 		if(pg_query($this->conn,$qry))
@@ -719,11 +719,11 @@ class prestudent extends person
 	// ******************************************
 	// * Loescht eine Rolle
 	// * @param $prestudent_id
-	// *        $rolle_kurzbz
+	// *        $status_kurzbz
 	// *        $studiensemester_kurzbz
 	// * @return true wenn ok, false wenn Fehler
 	// ******************************************
-	function delete_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
+	function delete_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -731,21 +731,21 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "DELETE FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id' AND rolle_kurzbz='".addslashes($rolle_kurzbz)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
-		if($this->load_rolle($prestudent_id, $rolle_kurzbz, $studiensemester_kurzbz, $ausbildungssemester))
+		$qry = "DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id' AND status_kurzbz='".addslashes($status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
+		if($this->load_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester))
 		{
 			pg_query($this->conn, 'BEGIN;');
 			
 			$log = new log($this->conn, null, null);
 			
 			$log->executetime = date('Y-m-d H:i:s');
-			$log->beschreibung = 'Loeschen der Rolle '.$rolle_kurzbz.' bei '.$prestudent_id;
+			$log->beschreibung = 'Loeschen der Rolle '.$status_kurzbz.' bei '.$prestudent_id;
 			$log->mitarbeiter_uid = get_uid();
 			$log->sql = $qry;
-			$log->sqlundo = 'INSERT INTO public.tbl_prestudentrolle(prestudent_id, rolle_kurzbz, studiensemester_kurzbz,'.
+			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'.
 							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
 							$this->addslashes($this->prestudent_id).','.
-							$this->addslashes($this->rolle_kurzbz).','.
+							$this->addslashes($this->status_kurzbz).','.
 							$this->addslashes($this->studiensemester_kurzbz).','.
 							$this->addslashes($this->ausbildungssemester).','.
 							$this->addslashes($this->datum).','.
@@ -791,7 +791,7 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentrolle WHERE prestudent_id='$prestudent_id'";
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'";
 
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
@@ -802,7 +802,7 @@ class prestudent extends person
 			if($row = pg_fetch_object($result))
 			{				
 				$this->prestudent_id = $row->prestudent_id;
-				$this->rolle_kurzbz = $row->rolle_kurzbz;
+				$this->status_kurzbz = $row->status_kurzbz;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->ausbildungssemester = $row->ausbildungssemester;
 				$this->datum = $row->datum;

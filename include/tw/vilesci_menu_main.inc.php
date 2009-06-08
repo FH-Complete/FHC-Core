@@ -64,7 +64,7 @@ $menu=array
 			'name'=>'Freifach', 'permissions'=>array('admin','lv-plan','support', 'lehre'),
 			'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/freifach.php', 'target'=>'main'),
 			'Lektoren'=>array('name'=>'Lektoren', 'link'=>'lehre/freifach_lektoren.php', 'target'=>'main'),
-			'Studenten Vorrücken'=>array('name'=>'Studenten Vorrücken', 'link'=>'lehre/freifach_studentenvorrueckung.php', 'target'=>'main')
+			'Studenten VorrÃ¼cken'=>array('name'=>'Studenten VorrÃ¼cken', 'link'=>'lehre/freifach_studentenvorrueckung.php', 'target'=>'main')
 		),
 		'LV-Planung'=>array
 		(
@@ -73,7 +73,7 @@ $menu=array
 			'Check'=>array('name'=>'Checken', 'link'=>'lehre/check/index.html', 'target'=>'main'),
 			'Kollision'=>array('name'=>'Kollision Student', 'link'=>'lehre/stpl_benutzer_kollision_frameset.html', 'target'=>'main'),
 			'Stundenplan'=>array('name'=>'Stundenplan', 'link'=>'../cis/private/lvplan/index.html', 'target'=>'main'),
-			'Zeitwuensche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
+			'Zeitwuensche'=>array('name'=>'ZeitwÃ¼nsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
 			//'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
 			//'Insert'=>array('name'=>'Insert', 'link'=>'lehre/stdplan_insert.php', 'target'=>'main'),
 			//'Delete'=>array('name'=>'Delete', 'link'=>'lehre/stdplan_delete.php', 'target'=>'main'),
@@ -89,7 +89,7 @@ $menu=array
 		'Gruppen'=>array
 		(
 			'name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support'),
-			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'lehre/einheit_menu.php', 'target'=>'main'),
+			'Ãœbersicht'=>array('name'=>'Ãœbersicht', 'link'=>'lehre/einheit_menu.php', 'target'=>'main'),
 			'Neu'=>array('name'=>'Neu', 'link'=>'lehre/einheit_menu.php?newFrm=true', 'target'=>'main')
 		),
 		'Benutzer'=>array
@@ -101,7 +101,7 @@ $menu=array
 		'Mitarbeiter'=>array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
-			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
+			'Ãœbersicht'=>array('name'=>'Ãœbersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
 			'Neu'=>array('name'=>'Neu', 'link'=>'personen/lektor_edit.php?new=1', 'target'=>'main'),
 			'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
 			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main'),
@@ -110,9 +110,9 @@ $menu=array
 		'Studenten'=>array
 		(
 			'name'=>'Studenten','permissions'=>array('admin','lv-plan','support'),
-			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/studenten_uebersicht.php', 'target'=>'main'),
+			'Ãœbersicht'=>array('name'=>'Ãœbersicht', 'link'=>'personen/studenten_uebersicht.php', 'target'=>'main'),
 			'Neu'=>array('name'=>'Neu', 'link'=>'personen/student_edit.php?new=1', 'target'=>'main'),
-			'Vorrückung'=>array('name'=>'Vorrückung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
+			'VorrÃ¼ckung'=>array('name'=>'VorrÃ¼ckung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
 		),
 		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
 		'Preinteressenten'=>array('name'=>'Preinteressenten', 'link'=>'personen/preinteressent_frameset.html', 'target'=>'_blank','permissions'=>array('admin','lv-plan','support','preinteressent'))
@@ -150,7 +150,7 @@ $menu=array
 	(
 		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
 		'Raumauslastung'=>array('name'=>'Raumauslastung', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
-		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main')
+		'ZeitwÃ¼nsche'=>array('name'=>'ZeitwÃ¼nsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main')
 	)
 );
 ?>

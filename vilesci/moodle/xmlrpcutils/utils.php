@@ -167,8 +167,8 @@ function find_and_decode_xml($buf, $debug) {
  *                  recognized to mean respond in whichever version the request came
  *                  in. default = auto (when applicable), xmlrpc
  *     encoding:    the encoding that the data is in. Since PHP defaults to
- *                  iso-8859-1 you will usually want to use that. Change it if you know
- *                  what you are doing. default=iso-8859-1
+ *                  UTF-8 you will usually want to use that. Change it if you know
+ *                  what you are doing. default=UTF-8
  *
  *   example usage
  *

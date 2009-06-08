@@ -130,7 +130,7 @@ function onMenuMitarbeiterSelect(id)
 	//Falls Daten geaendert wurden aber noch nicht gespeichert
 	if(treeMitarbeiterDetailChanged)
 	{
-		if(confirm("Wollen Sie die geänderten Daten speichern?"))
+		if(confirm("Wollen Sie die geÃ¤nderten Daten speichern?"))
 			saveMitarbeiter();
 		else
 			treeMitarbeiterDetailChanged=false;

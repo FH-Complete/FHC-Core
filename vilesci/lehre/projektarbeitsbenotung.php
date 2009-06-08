@@ -44,7 +44,7 @@ $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid'))
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+	die('Sie haben keine Berechtigung fÃ¼r diesen Studiengang');
 
 if($stsem=='')
 {
@@ -58,7 +58,7 @@ if($stg_kz=='')
 echo '<html>
 	<head>
 	<title>Lehrveranstaltung Verwaltung</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>

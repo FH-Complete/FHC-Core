@@ -34,7 +34,7 @@
 		<html>
 		<head>
 			<title>STP - VILESCI (Noten)</title>
-			<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		</head>
 		<body>';
 	
@@ -255,7 +255,7 @@
 				{
 					if($zeugnisnote->new)
 					{
-						$text.="Es wurde eine neue Note: ".$noten_arr[$row_ext->_cxbeurteilungsstufe]." für Lehrveranstaltung: $lehrveranstaltung_id Student: $student_uid Studiensemester: $stsem  angelegt\n";
+						$text.="Es wurde eine neue Note: ".$noten_arr[$row_ext->_cxbeurteilungsstufe]." fÃ¼r Lehrveranstaltung: $lehrveranstaltung_id Student: $student_uid Studiensemester: $stsem  angelegt\n";
 						$anz_insert++;
 					}
 					else 

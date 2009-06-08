@@ -26,11 +26,11 @@ echo '<h2>Studenten LAND</h2>';
 $qry = "SELECT 
 			studiengang_kz, studiensemester_kurzbz, kurztext as geburtsnation, geschlecht, count(*) as anzahl
 		FROM 
-			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle, bis.tbl_nation 
+			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentstatus, bis.tbl_nation 
 		WHERE
 			tbl_person.person_id=tbl_prestudent.person_id AND
-			tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND
-			tbl_prestudentrolle.rolle_kurzbz='Student' AND
+			tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id AND
+			tbl_prestudentstatus.status_kurzbz='Student' AND
 			tbl_nation.nation_code=tbl_person.geburtsnation
 		GROUP BY studiengang_kz, studiensemester_kurzbz, kurztext, geschlecht";
 
@@ -58,11 +58,11 @@ echo '<br><br><h2>Bewerber LAND</h2>';
 $qry = "SELECT 
 			studiengang_kz, studiensemester_kurzbz, kurztext as geburtsnation, geschlecht, count(*) as anzahl
 		FROM 
-			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle, bis.tbl_nation 
+			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentstatus, bis.tbl_nation 
 		WHERE
 			tbl_person.person_id=tbl_prestudent.person_id AND
-			tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND
-			tbl_prestudentrolle.rolle_kurzbz='Bewerber' AND
+			tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id AND
+			tbl_prestudentstatus.status_kurzbz='Bewerber' AND
 			tbl_nation.nation_code=tbl_person.geburtsnation
 		GROUP BY studiengang_kz, studiensemester_kurzbz, kurztext, geschlecht";
 
@@ -91,11 +91,11 @@ echo '<br><br><h2>Studenten Bundesland</h2>';
 $qry = "SELECT 
 			studiengang_kz, studiensemester_kurzbz, bulabez, geschlecht, count(*) as anzahl
 		FROM 
-			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle, public.tbl_adresse, bis.tbl_gemeinde
+			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentstatus, public.tbl_adresse, bis.tbl_gemeinde
 		WHERE
 			tbl_person.person_id=tbl_prestudent.person_id AND
-			tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND
-			tbl_prestudentrolle.rolle_kurzbz='Student' AND
+			tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id AND
+			tbl_prestudentstatus.status_kurzbz='Student' AND
 			tbl_adresse.person_id=tbl_person.person_id AND
 			tbl_adresse.plz=tbl_gemeinde.plz AND
 			tbl_person.geburtsnation='A'
@@ -125,11 +125,11 @@ echo '<br><br><h2>Bewerber Bundesland</h2>';
 $qry = "SELECT 
 			studiengang_kz, studiensemester_kurzbz, bulabez, geschlecht, count(*) as anzahl
 		FROM 
-			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentrolle, public.tbl_adresse, bis.tbl_gemeinde
+			public.tbl_person, public.tbl_prestudent, public.tbl_prestudentstatus, public.tbl_adresse, bis.tbl_gemeinde
 		WHERE
 			tbl_person.person_id=tbl_prestudent.person_id AND
-			tbl_prestudent.prestudent_id=tbl_prestudentrolle.prestudent_id AND
-			tbl_prestudentrolle.rolle_kurzbz='Bewerber' AND
+			tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id AND
+			tbl_prestudentstatus.status_kurzbz='Bewerber' AND
 			tbl_adresse.person_id=tbl_person.person_id AND
 			tbl_adresse.plz=tbl_gemeinde.plz AND
 			tbl_person.geburtsnation='A'

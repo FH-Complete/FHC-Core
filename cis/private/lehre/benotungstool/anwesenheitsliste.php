@@ -136,7 +136,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		
 		
 		
-		$worksheet->write(0,0,'Gesamtübersicht '.$lv_obj->bezeichnung.' vom '.date('d.m.Y'), $format_bold);
+		$worksheet->write(0,0,'GesamtÃŒbersicht '.$lv_obj->bezeichnung.' vom '.date('d.m.Y'), $format_bold);
 		$maxlength = array();
 		
 		//Ueberschrift
@@ -530,7 +530,7 @@ else
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="Javascript">
@@ -793,7 +793,7 @@ function addUser(student_uid)
 	}
 	
 	echo '</table>';
-	echo "<br><br><table width='100%'><tr><td align='right'><input type='submit' name='submit' value='Änderungen Speichern'></td></tr></table>";
+	echo "<br><br><table width='100%'><tr><td align='right'><input type='submit' name='submit' value='Ãnderungen Speichern'></td></tr></table>";
 	echo '</form>'
 	?>
 </body>

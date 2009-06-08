@@ -18418,8 +18418,8 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 			'{6819DDAC-AF81-4F1D-A71B-EC91E2CEA7AA}' => array
 			(
 				"id" => "{6819DDAC-AF81-4F1D-A71B-EC91E2CEA7AA}" ,
-				"name" => "rolle_kurzbz" ,
-				"caption" => "rolle_kurzbz" ,
+				"name" => "status_kurzbz" ,
+				"caption" => "status_kurzbz" ,
 				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -25914,7 +25914,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	(
 	    	"id" => "{BC5BCBDF-1501-4D46-9181-3E925D438CB1}" ,
 	    	"name" => "Prestudentrolle" ,
-	    	"caption" => "tbl_prestudentrolle" ,
+	    	"caption" => "tbl_prestudentstatus" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
@@ -26137,8 +26137,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{83F80B1F-9FD9-4739-97F2-BD01A4EBEF94}' => array
 			(
 				"id" => "{83F80B1F-9FD9-4739-97F2-BD01A4EBEF94}" ,
-				"name" => "pk_tbl_prestudentrolle" ,
-				"caption" => "pk_tbl_prestudentrolle" ,
+				"name" => "pk_tbl_prestudentstatus" ,
+				"caption" => "pk_tbl_prestudentstatus" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
@@ -26661,8 +26661,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{1DF69B26-C16D-4D9D-A7C3-5C0C46053791}' => array
 			(
 				"id" => "{1DF69B26-C16D-4D9D-A7C3-5C0C46053791}" ,
-				"name" => "pk_tbl_rolle" ,
-				"caption" => "pk_tbl_rolle" ,
+				"name" => "pk_tbl_status" ,
+				"caption" => "pk_tbl_status" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
@@ -31797,7 +31797,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	(
 	    	"id" => "{33596DA9-8CA8-4BA6-AC21-3272C8393644}" ,
 	    	"name" => "Rolle" ,
-	    	"caption" => "tbl_rolle" ,
+	    	"caption" => "tbl_status" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "" ,
@@ -31807,8 +31807,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{515C08AF-E15D-415E-BEB7-850353D6DA68}' => array
 			(
 				"id" => "{515C08AF-E15D-415E-BEB7-850353D6DA68}" ,
-				"name" => "rolle_kurzbz" ,
-				"caption" => "rolle_kurzbz" ,
+				"name" => "status_kurzbz" ,
+				"caption" => "status_kurzbz" ,
 				"ordinal" => "0" ,
 				"pk" => "{6E67C426-45D1-4732-B0B3-8154D31E5F0F}" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -31859,7 +31859,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			   		'{9F9DDFD5-61FA-4208-9A4B-BBD9FF6EF1D5}' => array
 			   		(
 		   				"id" => "{9F9DDFD5-61FA-4208-9A4B-BBD9FF6EF1D5}" ,
-		   				"name" => "rolle_kurzbz" ,
+		   				"name" => "status_kurzbz" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
@@ -31884,7 +31884,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	(
 	    	"id" => "{2C38E634-CB71-4F05-BF42-9BAA7540A7A3}" ,
 	    	"name" => "RolleBerechtigung" ,
-	    	"caption" => "tbl_rolleberechtigung" ,
+	    	"caption" => "tbl_statusberechtigung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "" ,
@@ -31913,8 +31913,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{B3EC9202-9754-4F20-A2B6-6C1F3D28F1BD}' => array
 			(
 				"id" => "{B3EC9202-9754-4F20-A2B6-6C1F3D28F1BD}" ,
-				"name" => "rolle_kurzbz" ,
-				"caption" => "rolle_kurzbz" ,
+				"name" => "status_kurzbz" ,
+				"caption" => "status_kurzbz" ,
 				"ordinal" => "0" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -31964,7 +31964,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			   		'{CFC90AB6-3BBC-44F5-97F0-28A0AFA7C01A}' => array
 			   		(
 		   				"id" => "{CFC90AB6-3BBC-44F5-97F0-28A0AFA7C01A}" ,
-		   				"name" => "rolle_kurzbz" ,
+		   				"name" => "status_kurzbz" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
@@ -45482,7 +45482,7 @@ $relations=array
 			'{6E67C426-45D1-4732-B0B3-8154D31E5F0F}' => array
 			(
 				"id" => "{6E67C426-45D1-4732-B0B3-8154D31E5F0F}",
-				"name" => "FK rolle_kurzbz - rolle_kurzbz",
+				"name" => "FK status_kurzbz - status_kurzbz",
 				"comments" => "",
 				"notes" => "",
 				"deferred" => "",
@@ -45531,7 +45531,7 @@ $relations=array
 			'{F7F9D55B-3857-409B-B922-090657026392}' => array
 			(
 				"id" => "{F7F9D55B-3857-409B-B922-090657026392}",
-				"name" => "FK rolle_kurzbz - rolle_kurzbz",
+				"name" => "FK status_kurzbz - status_kurzbz",
 				"comments" => "",
 				"notes" => "",
 				"deferred" => "",

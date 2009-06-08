@@ -9,7 +9,7 @@
 //*
 //* Synchronisiert Zutrittskartendatensaetze von FAS DB in PORTAL DB
 //*
-//*benötigt: tbl_betriebsmitteltyp, tbl_ort
+//*benÃ¶tigt: tbl_betriebsmitteltyp, tbl_ort
 
 include('../../../vilesci/config.inc.php');
 
@@ -4116,7 +4116,7 @@ $qry[4082]="Insert into public.tbl_betriebsmittel (betriebsmittel_id, beschreibu
 <html>
 <head>
 <title>Synchro - EXCEL - Vilesci - Zutrittskarten</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -4128,9 +4128,9 @@ for($x=3346;$x<4083;$x++)
 	{
 		if($result = @pg_query($conn, $qry2[$x]))
 		{
-			$ausgabe1.="\n*Betriebsmittel eingefügt: ".$qry[$x];
-			$ausgabe2.="\n*Betriebsmittelperson eingefügt: ".$qry2[$x];
-			echo nl2br("\n*Betriebsmittel eingefügt: ".$qry[$x]."\n*Betriebsmittelperson eingefügt: ".$qry2[$x]."\n");
+			$ausgabe1.="\n*Betriebsmittel eingefÃ¼gt: ".$qry[$x];
+			$ausgabe2.="\n*Betriebsmittelperson eingefÃ¼gt: ".$qry2[$x];
+			echo nl2br("\n*Betriebsmittel eingefÃ¼gt: ".$qry[$x]."\n*Betriebsmittelperson eingefÃ¼gt: ".$qry2[$x]."\n");
 			pg_query($conn, "COMMIT");
 		}
 		else

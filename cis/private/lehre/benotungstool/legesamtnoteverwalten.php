@@ -38,10 +38,10 @@ require_once('../../../../include/legesamtnote.class.php');
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -54,7 +54,7 @@ require_once('../../../../include/legesamtnote.class.php');
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('Wollen Sie die markierten EintrÃ€ge wirklich lÃ¶schen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
   //-->
   
@@ -289,14 +289,14 @@ include("menue.inc.php");
 /*
 echo "\n<!--Menue-->\n";
 echo "<br><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Ãbersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
 <br><br>
 <!--Menue Ende-->\n";
 */
 
-// legesamtnote für studenten speichern
+// legesamtnote fÃŒr studenten speichern
 if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 	
 	$jetzt = date("Y-m-d H:i:s");	

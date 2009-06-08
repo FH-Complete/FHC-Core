@@ -43,7 +43,7 @@ class antwort
 	function antwort($conn, $antwort_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-		
+/*		
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else 
@@ -54,7 +54,7 @@ class antwort
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-		
+*/		
 		if($antwort_id != null)
 			$this->load($antwort_id);
 	}
@@ -169,7 +169,7 @@ class antwort
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Löschen der Antwort';
+			$this->errormsg = 'Fehler beim LÃ¶schen der Antwort';
 			return false;
 		}
 	}

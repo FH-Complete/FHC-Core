@@ -38,7 +38,7 @@ function closeWindow()
   //Wenn Daten geaendert wurden
   if(treeMitarbeiterDetailChanged)
   {
-     if(confirm("Wollen Sie die ge‰nderten Daten speichern?"))
+     if(confirm("Wollen Sie die ge√§nderten Daten speichern?"))
 		if(!saveMitarbeiter())
 		{
 			//Falls beim Speichern ein Fehler auftritt bleibt das Fenster offen!
@@ -131,7 +131,7 @@ function studiensemesterChange()
    	if(dbdml_return=='true')
    	{
    		//Statusbar setzen
-   		setStatusBarText("Studiensemester erfolgreich ge‰ndert");
+   		setStatusBarText("Studiensemester erfolgreich ge√§ndert");
    		document.getElementById("tree-liste-funktionen").builder.refresh();
    		document.getElementById("statusbarpanel-semester").label = stsem;
    		MitarbeiterDetailStudiensemester_id = dbdml_errormsg;

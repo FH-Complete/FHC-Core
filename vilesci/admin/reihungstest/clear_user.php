@@ -9,7 +9,7 @@
 	$result = mysql_query($query, $dbh);
 	$query  = "delete from rt_pruefling where 1";
 	$result = mysql_query($query, $dbh);
-	echo 'Daten wurden gelöscht!';
+	echo 'Daten wurden gelÃ¶scht!';
 	mysql_close($dbh);
 ?>
 

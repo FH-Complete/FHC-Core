@@ -38,12 +38,14 @@ class mitarbeiter extends person
 	function mitarbeiter($conn, $person_id=null)
 	{
 		$this->conn = $conn;
+		/*
 		$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		if(!pg_query($conn,$qry))
 		{
 			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
 			return false;
 		}
+		*/
 		//Mitarbeiter laden
 		if($person_id!=null)
 			$this->load($person_id);

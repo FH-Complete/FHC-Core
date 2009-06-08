@@ -34,11 +34,11 @@ var ausbildungssemester_old;
 // ****
 // * Laedt die Rolle
 // ****
-function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, ausbildungssemester)
+function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	if(rolle_kurzbz!='')
+	if(status_kurzbz!='')
 	{
 		document.getElementById('student-rolle-grid-row-textbox').hidden=false;
 		document.getElementById('student-rolle-grid-row-menulist').hidden=true;
@@ -47,14 +47,14 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 		ausbildungssemester_old=ausbildungssemester;
 		
 		//Daten holen
-		var url = '<?php echo APP_ROOT ?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+'&rolle_kurzbz='+rolle_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester+'&'+gettimestamp();
+		var url = '<?php echo APP_ROOT ?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester+'&'+gettimestamp();
 			
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 	                   getService(Components.interfaces.nsIRDFService);
 	    
 	    var dsource = rdfService.GetDataSourceBlocking(url);
 	    
-		var subject = rdfService.GetResource("http://www.technikum-wien.at/prestudentrolle/" + prestudent_id+"/"+rolle_kurzbz+"/"+studiensemester_kurzbz+"/"+ausbildungssemester);
+		var subject = rdfService.GetResource("http://www.technikum-wien.at/prestudentrolle/" + prestudent_id+"/"+status_kurzbz+"/"+studiensemester_kurzbz+"/"+ausbildungssemester);
 	
 		var predicateNS = "http://www.technikum-wien.at/prestudentrolle/rdf";
 	
@@ -72,7 +72,7 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 		document.getElementById('student-rolle-grid-row-menulist').hidden=false;
 
 		//Defaultwerte bei Neuem Datensatz
-		rolle_kurzbz = 'Interessent';
+		status_kurzbz = 'Interessent';
 		studiensemester_kurzbz=window.opener.getStudiensemester();
 		ausbildungssemester='1';
 		datum = '<?php echo date('d.m.Y') ?>';
@@ -80,7 +80,7 @@ function StudentRolleInit(prestudent_id, rolle_kurzbz, studiensemester_kurzbz, a
 	}		
 	
 	document.getElementById('student-rolle-textbox-prestudent_id').value=prestudent_id;
-	document.getElementById('student-rolle-textbox-rolle_kurzbz').value=rolle_kurzbz;
+	document.getElementById('student-rolle-textbox-status_kurzbz').value=status_kurzbz;
 	document.getElementById('student-rolle-menulist-studiensemester').value=studiensemester_kurzbz;
 	document.getElementById('student-rolle-menulist-ausbildungssemester').value=ausbildungssemester;
 	document.getElementById('student-rolle-datum-datum').value=datum;

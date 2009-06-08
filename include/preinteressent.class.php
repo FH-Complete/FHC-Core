@@ -59,6 +59,7 @@ class preinteressent
 	function preinteressent($conn, $preinteressent_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+/*		
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -72,7 +73,7 @@ class preinteressent
 				return false;
 			}
 		}
-		
+*/		
 		if($preinteressent_id != null)
 			$this->load($preinteressent_id);
 	}

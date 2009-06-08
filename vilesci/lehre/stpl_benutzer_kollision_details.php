@@ -34,12 +34,14 @@ $datum = (isset($_GET['datum'])?$_GET['datum']:'');
 $stunde = (isset($_GET['stunde'])?$_GET['stunde']:'');
 
 $user = get_uid();
-loadVariables($conn, $user);
+#gss loadVariables($conn, $user);
+loadVariables($user);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <title>Kollision Student</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css" />
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -128,7 +130,7 @@ if($student_uid!='')
 }
 else 
 {
-	echo "<h2>Stundenplaneinträge - $db_stpl_table</h2>";
+	echo "<h2>StundenplaneintrÃ¤ge - $db_stpl_table</h2>";
 	
 	
 	$qry = "SELECT * FROM lehre.tbl_$db_stpl_table WHERE datum='$datum' AND stunde='$stunde'";

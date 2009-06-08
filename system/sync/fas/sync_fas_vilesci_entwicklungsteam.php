@@ -40,7 +40,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - E-Team</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -149,7 +149,7 @@ if($result = pg_query($conn_fas, $qry))
 			{
 				if(!pg_num_rows($result2)>0) 
 				{
-					//einfügen
+					//einfÃ¼gen
 					$qry="INSERT INTO bis.tbl_entwicklungsteam (mitarbeiter_uid, studiengang_kz, besqualcode, 
 						beginn, ende, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES(".
 						myaddslashes($mitarbeiter_uid).", ".
@@ -163,7 +163,7 @@ if($result = pg_query($conn_fas, $qry))
 						myaddslashes($insertvon).", ".
 						myaddslashes($ext_id)." ".
 						");";
-						$ausgabe.="Mitarbeiter '".$mitarbeiter_uid."' zu Entwicklungsteam von Studiengang: '".$studiengang_kz."' hinzugefügt.\n";
+						$ausgabe.="Mitarbeiter '".$mitarbeiter_uid."' zu Entwicklungsteam von Studiengang: '".$studiengang_kz."' hinzugefÃ¼gt.\n";
 					if(!pg_query($conn,$qry))
 					{
 						$error_log.= "*****\nFehler beim Speichern des E-Team-Datensatzes von Mitarbeiter '".$mitarbeiter_uid."'\n   ".$qry."\n";
@@ -185,8 +185,8 @@ echo nl2br("E-Team-Synchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HO
 
 //echo nl2br($text);
 echo nl2br("\n".$error_log);
-echo nl2br("\n\nE-Team-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n".$ausgabe);
-$ausgabe="E-Team-Sync:\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n\n".$ausgabe;
+echo nl2br("\n\nE-Team-Sync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n".$ausgabe);
+$ausgabe="E-Team-Sync:\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler\n\n".$ausgabe;
 if(strlen(trim($error_log))>0)
 {
 	mail($adress, 'SYNC-Fehler E-Team von '.$_SERVER['HTTP_HOST'], $error_log,"From: vilesci@technikum-wien.at");

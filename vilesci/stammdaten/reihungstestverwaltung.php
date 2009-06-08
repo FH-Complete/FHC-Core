@@ -162,7 +162,7 @@
 				<title>Reihungstest</title>
 				<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 				<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-				<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+				<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 				<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 				</head>
 				<body class="Background_main">
@@ -404,7 +404,7 @@
 		echo '<tr><td>Datum</td><td><input type="input" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
 		echo '<tr><td>Uhrzeit</td><td><input type="input" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"> (Format: HH:MM:SS)</td></tr>';
 		if(!$neu)
-			$val = 'Änderung Speichern';
+			$val = 'Ã„nderung Speichern';
 		else 
 			$val = 'Neu anlegen';
 		

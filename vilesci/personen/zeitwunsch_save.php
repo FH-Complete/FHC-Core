@@ -39,7 +39,7 @@
 <html>
 <head>
 <title>Profil</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../include/styles.css" type="text/css">
 <META http-equiv="refresh" content="2;URL=zeitwunsch.php?lkid=<?php echo $lkid.'&vornamen='.$vornamen.'&nachname='.$nachname.'&titel='.$titel; ?>">
 </head>

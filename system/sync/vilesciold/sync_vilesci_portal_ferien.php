@@ -113,14 +113,14 @@ else
 <html>
 <head>
 <title>Synchro - Vilesci -> Portal - Ferien</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
 
 //echo nl2br($text);
 echo nl2br($error_log);
-echo nl2br("\nGesamt: $anzahl_quelle / Eingefügt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
+echo nl2br("\nGesamt: $anzahl_quelle / EingefÃ¼gt: $anzahl_eingefuegt / Fehler: $anzahl_fehler");
 
 ?>
 </body>

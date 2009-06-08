@@ -51,7 +51,7 @@ class lehreinheitgruppe
 	function lehreinheitgruppe($conn, $lehreinheitgruppe_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -65,7 +65,7 @@ class lehreinheitgruppe
 				return false;
 			}
 		}
-			
+	*/		
 		if($lehreinheitgruppe_id!=null)
 			$this->load($lehreinheitgruppe_id);
 	}

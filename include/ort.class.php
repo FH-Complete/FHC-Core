@@ -179,9 +179,9 @@ class ort
 	 */
 	function checkvars()
 	{
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->ort_kurzbz = str_replace("'",'´',$this->ort_kurzbz);
-		$this->planbezeichnung = str_replace("'",'´',$this->planbezeichnung);
+		$this->bezeichnung = str_replace("'",'Â´',$this->bezeichnung);
+		$this->ort_kurzbz = str_replace("'",'Â´',$this->ort_kurzbz);
+		$this->planbezeichnung = str_replace("'",'Â´',$this->planbezeichnung);
 
 
 		//Laenge Pruefen

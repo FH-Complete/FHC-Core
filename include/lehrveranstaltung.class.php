@@ -64,7 +64,7 @@ class lehrveranstaltung
 	function lehrveranstaltung($conn, $lehrveranstaltung_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -78,7 +78,7 @@ class lehrveranstaltung
 				return false;
 			}
 		}
-
+*/
 		if($lehrveranstaltung_id != null)
 			$this->load($lehrveranstaltung_id);
 	}

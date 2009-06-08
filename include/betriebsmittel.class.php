@@ -53,6 +53,7 @@ class betriebsmittel
 	function betriebsmittel($conn,$betriebsmittel_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
+		/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -69,7 +70,9 @@ class betriebsmittel
 				return false;
 			}
 		}
+		*/
 	}
+	
 	
 	// **************************************************************
 	// * Laedt das Betriebsmittel mit der ID $betriebsmittel_id

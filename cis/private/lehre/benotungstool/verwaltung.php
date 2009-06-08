@@ -41,10 +41,10 @@ $time = microtime_float();
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
 	{
@@ -57,7 +57,7 @@ $time = microtime_float();
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('Wollen Sie die markierten EintrÃ€ge wirklich lÃ¶schen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
 	}
 	
 	//Aus- und Einblenden der Listen
@@ -281,7 +281,7 @@ include("menue.inc.php");
 echo "\n<!--Menue-->\n";
 echo "<br>
 <a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Verwaltung</font>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Übersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Anwesenheits- und Ãbersichtstabelle</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Studentenpunkte verwalten</font></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'>&nbsp;Statistik</font></a>
 <br><br>
@@ -291,7 +291,7 @@ echo "<br>
 //echo "studiensemester: $stsem<br>";
 //echo "lehrveranstaltung: $lvid<br>";
 //echo "lehreinheit: $lehreinheit_id<br>";
-//Übung in andere LE kopieren
+//Ãbung in andere LE kopieren
 
 if (isset($_REQUEST["copy_uebung"]))
 {
@@ -302,7 +302,7 @@ if (isset($_REQUEST["copy_uebung"]))
 	$uebung_id_source = $_REQUEST["uebung_id_source"];
 	$lehreinheit_id_target = $_REQUEST["lehreinheit_id_target"];
 	if (!is_numeric($uebung_id_source) or !is_numeric($lehreinheit_id_target))
-		echo "<span class='error'>Übung und Lehreinheit muss ausgewählt sein!</span>";
+		echo "<span class='error'>Ãbung und Lehreinheit muss ausgewÃ€hlt sein!</span>";
 	else
 	{
 		$ueb_1 = new uebung($conn, $uebung_id_source);
@@ -354,12 +354,12 @@ if (isset($_REQUEST["copy_uebung"]))
 			if (!$ueb_1_target->save($new))
 			{
 				$error = 1;
-				echo "<span class='error'>Hauptübung konnte nicht kopiert werden!</span>";
+				echo "<span class='error'>HauptÃŒbung konnte nicht kopiert werden!</span>";
 			}
 				
 			else
 			{
-				// Subübungen durchlaufen			
+				// SubÃŒbungen durchlaufen			
 				$error = 0;
 				$ueb_2 = new uebung($conn);
 				$ueb_2->load_uebung($lehreinheit_id,2,$uebung_id_source);
@@ -417,7 +417,7 @@ if (isset($_REQUEST["copy_uebung"]))
 						if (!$ueb_2_target->save($new))
 						{
 							$error = 1;
-							echo "<span class='error'>Übung konnte nicht kopiert werden!</span>";
+							echo "<span class='error'>Ãbung konnte nicht kopiert werden!</span>";
 						}
 						
 						//angabedatei syncen
@@ -477,7 +477,7 @@ if (isset($_REQUEST["copy_uebung"]))
 									echo "<span class='error'>Beispiele konnten nicht angelegt werden</span>";							
 								}
 								
-								//Notenschlüssel synchronisieren
+								//NotenschlÃŒssel synchronisieren
 								$clear = "delete from campus.tbl_notenschluesseluebung where uebung_id = '".$ueb_1_target->uebung_id."'";
 								pg_query($conn, $clear);
 								
@@ -501,13 +501,13 @@ if (isset($_REQUEST["copy_uebung"]))
 			echo "<span class='error'>Fehler beim Datenbankzugriff!</span>";
 			
 		if ($error == 0)
-			echo "Übung erfolgreich kopiert! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
+			echo "Ãbung erfolgreich kopiert! (Ã: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
 	}
 }
 
 
 
-echo "<h3>Übungen anlegen und verwalten</h3>";
+echo "<h3>Ãbungen anlegen und verwalten</h3>";
 echo "</tr></table>";
 
 //Anlegen einer neuen Uebung
@@ -568,7 +568,7 @@ if(isset($_POST['uebung_neu']))
 
 	}
 	else
-		echo "<span class='error'>Übung konnte nicht angelegt werden!</span><br>";
+		echo "<span class='error'>Ãbung konnte nicht angelegt werden!</span><br>";
 }
 
 
@@ -736,7 +736,7 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "<table><tr><td valign='top'>";
 	//Bearbeiten der ausgewaehlten Uebung
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
-	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Übung bearbeiten</td><td>&nbsp;</td></tr>\n";
+	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Ãbung bearbeiten</td><td>&nbsp;</td></tr>\n";
 	echo "<tr><td>&nbsp;</td><td></td></tr>";
 
 	$uebung_obj = new uebung($conn);
@@ -768,7 +768,7 @@ else
 	
 	echo "<table><tr><td valign='top'>";
 	echo "<form name='del' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'>";
-	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen bearbeiten</td></tr>";
+	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Ãbungen bearbeiten</td></tr>";
 
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load_uebung($lehreinheit_id,$level=1,$uebung_id=null);
@@ -865,21 +865,21 @@ else
 			echo "</table>";
 			echo "</td></tr>";
 		}
-		echo "<tr><td colspan='3' align='right'><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td><td></td></tr>";
+		echo "<tr><td colspan='3' align='right'><input type='Submit' value='Auswahl lÃ¶schen' name='delete_uebung' onclick='return confirmdelete();'></td><td></td></tr>";
 		echo "</form>";
 		if ($copy_dropdown != '')
 		{		
 			echo "<tr><td colspan='3'>&nbsp;</td></tr>";
-			echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen kopieren</td></tr>";
+			echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Ãbungen kopieren</td></tr>";
 			
 			$uebung_id_source_dropdown .= "</select>";
 			echo "<tr><td colspan='3'>";
-			echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>Übung</td><td></td><td>Lehreinheit</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='kopieren'></td></tr></table></form>";
+			echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>Ãbung</td><td></td><td>Lehreinheit</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='kopieren'></td></tr></table></form>";
 			echo "</td></tr>";
 		}
 	}
 	else
-		echo "<tr><td colspan='3'>Derzeit sind keine Übungen angelegt</td><td></td></tr>";
+		echo "<tr><td colspan='3'>Derzeit sind keine Ãbungen angelegt</td><td></td></tr>";
 
 	echo "</table>
 	<br><br>";
@@ -908,7 +908,7 @@ else
 	echo "
 	<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>
 	<table >
-	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Übung anlegen</td><td></td></tr>
+	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Ãbung anlegen</td><td></td></tr>
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema' maxlength='32' value='$thema'></td><td><span class='error'>$error_thema</td></tr>
 	<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='1'></td><td>$error_gewicht</td></tr>
 		<tr><td>Positiv </td><td><input type='checkbox' name='positiv'></td></tr>

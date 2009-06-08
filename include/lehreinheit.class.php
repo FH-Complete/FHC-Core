@@ -72,7 +72,7 @@ class lehreinheit
 	function lehreinheit($conn, $lehreinheit_id=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if($unicode)
@@ -86,7 +86,7 @@ class lehreinheit
 				return false;
 			}
 		}
-
+*/
 		if($lehreinheit_id!=null)
 			$this->load($lehreinheit_id);
 	}

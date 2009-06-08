@@ -84,7 +84,7 @@ class raumtyp
 	{
 		if($raumtyp_kurzbz == '')
 		{
-			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
+			$this->errormsg = 'Kein gÃ¼ltiger SchlÃ¼ssel vorhanden';
 			return false;
 		}
 
@@ -131,8 +131,8 @@ class raumtyp
 	 */
 	function checkvars()
 	{
-		$this->beschreibung = str_replace("'",'´',$this->beschreibung);
-		$this->raumtyp_kurzbz = str_replace("'",'´',$this->raumtyp_kurzbz);
+		$this->beschreibung = str_replace("'",'Â´',$this->beschreibung);
+		$this->raumtyp_kurzbz = str_replace("'",'Â´',$this->raumtyp_kurzbz);
 
 
 		//Laenge Pruefen
@@ -161,10 +161,10 @@ class raumtyp
 
 		if($this->new)
 		{
-			//Pruefen ob id gültig ist
+			//Pruefen ob id gÃ¼ltig ist
 			if($this->raumtyp_kurzbz == '')
 			{
-				$this->errormsg = 'Keine gültige ID';
+				$this->errormsg = 'Keine gÃ¼ltige ID';
 				return false;
 			}
 			//Neuen Datensatz anlegen
@@ -180,7 +180,7 @@ class raumtyp
 			//Pruefen ob id gueltig ist
 			if($this->raumtyp_kurzbz == '')
 			{
-				$this->errormsg = 'Keine gültige ID';
+				$this->errormsg = 'Keine gÃ¼ltige ID';
 				return false;
 			}
 

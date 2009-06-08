@@ -42,7 +42,7 @@ class lehrform
 	function lehrform($conn, $lehrform_kurzbz=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -53,7 +53,7 @@ class lehrform
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($lehrform_kurzbz != null)
 			$this->load($lehrform_kurzbz);
 	}

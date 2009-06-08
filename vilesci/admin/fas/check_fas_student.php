@@ -30,7 +30,7 @@ $qry2='';
 <html>
 <head>
 <title>Studentendatenkorrektur</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -471,7 +471,7 @@ AND (trim(p1.familienname)<>trim(p2.familienname) OR trim(p1.vorname)<>trim(p2.v
 
 if($result = pg_query($conn_fas, $qry))
 {
-	echo "<table class='liste'><tr><th></th><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbürgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th>
+	echo "<table class='liste'><tr><th></th><th>person_pk</th><th>familienname</th><th>vorname</th><th>vornamen</th><th>anrede</th><th>geschlecht</th><th>gebdat</th><th>gebort</th><th>gebnation</th><th>staatsbÃ¼rgerschaft</th><th>familienstand</th><th>svnr</th><th>anzahlderkinder</th><th>ersatzkennzeichen</th><th>titel</th><th>postnomentitel</th>
 		<th>student_pk</th><th>studiengang</th><th>zgv</th><th>zgvdatum</th><th>zgvort</th><th>zgvmagister</th><th>zgvmagisterdatum</th><th>zgvmagisterort</th><th>punkte</th><th>perskz</th><th>aufgenommenam</th><th>beendigungsdatum</th><th>aufmerksamdurch</th><th>aufnahmeschluessel</th><th>aufnahmeschluessel_fk</th><th>berufstaetigkeit</th><th>angetreten</th><th></th></tr>";
 	while($row = pg_fetch_object($result))
 	{

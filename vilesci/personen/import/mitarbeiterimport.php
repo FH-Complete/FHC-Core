@@ -37,28 +37,29 @@ if(!$conn=pg_pconnect(CONN_STRING))
 $user=get_uid();
 $datum_obj = new datum();
 
-loadVariables($conn, $user);
+#gss loadVariables($conn, $user);
+loadVariables($user);
 
 // Clean stuff from a string
  function clean_string($string)
  {
- 	$trans = array("ä" => "ae",
- 				   "Ä" => "Ae",
- 				   "ö" => "oe",
- 				   "Ö" => "Oe",
- 				   "ü" => "ue",
- 				   "Ü" => "Ue",
- 				   "á" => "a",
- 				   "à" => "a",
- 				   "é" => "e",
- 				   "è" => "e",
- 				   "ó" => "o",
- 				   "ò" => "o",
- 				   "ì" => "i",
- 				   "í" => "i",
- 				   "ú" => "u",
- 				   "ù" => "u",
- 				   "ß" => "ss");
+ 	$trans = array("Ã¤" => "ae",
+ 				   "Ã„" => "Ae",
+ 				   "Ã¶" => "oe",
+ 				   "Ã–" => "Oe",
+ 				   "Ã¼" => "ue",
+ 				   "Ãœ" => "Ue",
+ 				   "Ã¡" => "a",
+ 				   "Ã " => "a",
+ 				   "Ã©" => "e",
+ 				   "Ã¨" => "e",
+ 				   "Ã³" => "o",
+ 				   "Ã²" => "o",
+ 				   "Ã¬" => "i",
+ 				   "Ã­" => "i",
+ 				   "Ãº" => "u",
+ 				   "Ã¹" => "u",
+ 				   "ÃŸ" => "ss");
 	$string = strtr($string, $trans);
     return ereg_replace("[^a-zA-Z0-9]", "", $string);
     //[:space:]
@@ -67,7 +68,7 @@ loadVariables($conn, $user);
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
 <script language="Javascript">
 function disablefields(obj)
@@ -505,7 +506,7 @@ echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" na
 echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
 echo '<tr><td>Ort</td><td><input type="text" id="ort" maxlength="256" name="ort" value="'.$ort.'" /></td></tr>';
 echo '</table>';
-echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" checked>Bestehende Adresse überschreiben</div>';
+echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" checked>Bestehende Adresse Ã¼berschreiben</div>';
 echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein">Adresse neu anlegen</div>';
 echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="">Adresse nicht anlegen</div>';
 echo '</fieldset></td></tr>';
@@ -539,7 +540,7 @@ else
 echo '
 </table>
 <br><br>
-Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
+Felder die mit einem * gekennzeichnet sind mÃ¼ssen ausgefÃ¼llt werden!
 </td>
 
 <td valign="top">
@@ -584,7 +585,7 @@ if($where!='')
 				}
 			}
 			$status = substr($status, 0, strlen($status)-2);
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'mÃ¤nnlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = pg_query($conn, $qry_adr))
 				while($row_adr=pg_fetch_object($result_adr))

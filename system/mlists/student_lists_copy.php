@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 <TITLE>Copy mLists</TITLE>
-<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </HEAD>
 
 <BODY class="background_main">

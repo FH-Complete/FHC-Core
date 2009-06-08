@@ -40,13 +40,13 @@ echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 <title>Aufbaukurs - Checkliste</title>
 </head>
 <body>
 <h2>Aufbaukurs - Checkliste</h2>
-Die folgenden Personen sind als dual markiert, wurden aber noch nicht in den Aufbaukurs übernommen:<br><br>
+Die folgenden Personen sind als dual markiert, wurden aber noch nicht in den Aufbaukurs Ã¼bernommen:<br><br>
 ';
 
 $qry = "SELECT 

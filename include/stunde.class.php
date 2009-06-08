@@ -42,7 +42,7 @@ class stunde
 	function stunde($conn, $stunde=null, $unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode)
 			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
 		else
@@ -53,7 +53,7 @@ class stunde
 			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
 			return false;
 		}
-
+*/
 		if($stunde!=null)
 			$this->load($stunde);
 	}

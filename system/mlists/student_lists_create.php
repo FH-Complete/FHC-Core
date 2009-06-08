@@ -13,7 +13,7 @@
 <HTML>
 <HEAD>
 <TITLE>Mailinglisten</TITLE>
-<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <LINK rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </HEAD>
 

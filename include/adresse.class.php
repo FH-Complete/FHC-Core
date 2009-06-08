@@ -62,7 +62,7 @@ class adresse
 	function adresse($conn,$adresse_id=null,$unicode=false)
 	{
 		$this->conn = $conn;
-
+/*
 		if($unicode!=null)
 		{
 			if ($unicode)
@@ -76,7 +76,7 @@ class adresse
 				return false;
 			}
 		}
-
+*/
 		if($adresse_id != null)
 			$this->load($adresse_id);
 	}
@@ -248,32 +248,32 @@ class adresse
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>255)
 		{
-			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein  - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Name darf nicht lÃ¤nger als 255 Zeichen sein  - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->strasse)>255)
 		{
-			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Strasse darf nicht lÃ¤nger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->plz)>10)
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Plz darf nicht lÃ¤nger als 10 Zeichen sein - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->ort)>255)
 		{
-			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Ort darf nicht lÃ¤nger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->nation)>3)
 		{
-			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Nation darf nicht lÃ¤nger als 3 Zeichen sein - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
 		if(strlen($this->gemeinde)>255)
 		{
-			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Gemeinde darf nicht lÃ¤nger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
 			return false;
 		}
 

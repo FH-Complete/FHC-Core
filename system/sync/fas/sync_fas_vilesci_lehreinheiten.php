@@ -7,7 +7,7 @@
  */
 
 //*
-//* Synchronisiert Lehreinheitendatensätze von FAS DB in PORTAL DB
+//* Synchronisiert LehreinheitendatensÃ¤tze von FAS DB in PORTAL DB
 //*
 //*
 
@@ -70,7 +70,7 @@ function myaddslashes($var)
 <html>
 <head>
 <title>Synchro - FAS -> Vilesci - Lehreinheiten</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
 <?php
@@ -798,7 +798,7 @@ if($result = pg_query($conn_fas, $qry_main))
 											}
 										//}
 									//}
-									$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verändert: ".$ausgabe_le.".\n";
+									$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verÃ¤ndert: ".$ausgabe_le.".\n";
 									$anzahl_geaendert++;
 
 								}
@@ -870,12 +870,12 @@ if($result = pg_query($conn_fas, $qry_main))
 									}
 								//}
 							//}
-							$ausgabe.="Lehreinheit lvnr='".$lvnr." eingefügt.\n";
+							$ausgabe.="Lehreinheit lvnr='".$lvnr." eingefÃ¼gt.\n";
 							$anzahl_eingefuegt++;
 						}
 						else
 						{
-							$anzahl_eingefuegt++; //bei fehler wird später 1 abgezogen
+							$anzahl_eingefuegt++; //bei fehler wird spÃ¤ter 1 abgezogen
 							$error=true;
 							$error_log.="Fehler beim Speichern in tbl_lehreinheit mit lehrveranstaltung_id='".$lehrveranstaltung_id."', studiensemester_kurzbz='".$studiensemester_kurzbz."', lehrform_kurzbz='".$lehrform_kurzbz."' und lvnr='".$lvnr."'!";
 							$anzahl_fehler++;
@@ -1091,7 +1091,7 @@ if($result = pg_query($conn_fas, $qry_main))
 										}
 									}
 								}
-								$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verändert: ".$ausgabe_le.".\n";
+								$ausgabe.="Lehreinheit lvnr='".$lvnr." Studiensemester='".$studiensemester_kurzbz."' verÃ¤ndert: ".$ausgabe_le.".\n";
 								$anzahl_geaendert++;
 
 							}
@@ -1294,13 +1294,13 @@ if($result = pg_query($conn_fas, $qry_main))
 						if(pg_query($conn, $qry))
 						{
 							$anzahl_eingefuegt_lm++;
-							$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' mit Lehreinheit='".$lehreinheit_id."' eingefügt.\n";
+							$ausgabe.="Lehreinheitmitarbeiter '".$m_uid."' mit Lehreinheit='".$lehreinheit_id."' eingefÃ¼gt.\n";
 						}
 						else
 						{
 							$anzahl_fehler_lm++;
 							$error=true;
-							$error_log.="Lehreinheitmitarbeiter '".$m_uid."' konnte nicht eingefügt werden!\n";
+							$error_log.="Lehreinheitmitarbeiter '".$m_uid."' konnte nicht eingefÃ¼gt werden!\n";
 						}
 					}
 				}
@@ -1513,14 +1513,14 @@ if($result = pg_query($conn_fas, $qry_main))
 							if(pg_query($conn, $qry))
 							{
 								$anzahl_eingefuegt_lg++;
-								$ausgabe.="Lehreinheitgruppe mit Lehreinheit='".$lehreinheit_id."' und Studiengang '".$studiengang_kz."'eingefügt.\n";
+								$ausgabe.="Lehreinheitgruppe mit Lehreinheit='".$lehreinheit_id."' und Studiengang '".$studiengang_kz."'eingefÃ¼gt.\n";
 							}
 							else
 							{
 								$anzahl_fehler_lg++;
 								//echo $qry."<br>";
 								$error=true;
-								$error_log.="Lehreinheitgruppe mit LE '".$lehreinheit_id."' in Studiengang '".$studiengang_kz."' konnte nicht eingefügt werden!\n";
+								$error_log.="Lehreinheitgruppe mit LE '".$lehreinheit_id."' in Studiengang '".$studiengang_kz."' konnte nicht eingefÃ¼gt werden!\n";
 							}
 						}
 					}
@@ -1714,9 +1714,9 @@ if($result = pg_query($conn_fas, $qry_main))
 							}
 							else
 							{
-								$ausgabe.="Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') partizipierend eingefügt.\n";
+								$ausgabe.="Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') partizipierend eingefÃ¼gt.\n";
 								$anzahl_part++;
-								//ext_id für gruppe zusammenstellen
+								//ext_id fÃ¼r gruppe zusammenstellen
 								$qry="SELECT *, tbl_lehreinheitmitarbeiter.ext_id as lg_ext_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE lehreinheit_id=".myaddslashes($row5->lehreinheit_id)." ORDER BY tbl_lehreinheitmitarbeiter.ext_id ASC;";
 								if($result6 = pg_query($conn, $qry))
 								{
@@ -1736,7 +1736,7 @@ if($result = pg_query($conn_fas, $qry_main))
 						{
 							//$ausgabe.="Partizipierende Lehreinheit lvnr='".$lvnr."' (Lehreinheit id/pk .'".$row5->lehreinheit_id."'/'".$ext_id."') in synclehreinheit gefunden.\n";
 							$anzahl_part2++;
-							//ext_id für gruppe zusammenstellen
+							//ext_id fÃ¼r gruppe zusammenstellen
 							$qry="SELECT *, tbl_lehreinheitmitarbeiter.ext_id as lg_ext_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE lehreinheit_id=".myaddslashes($row5->lehreinheit_id)." ORDER BY tbl_lehreinheitmitarbeiter.ext_id ASC;";
 							if($result6 = pg_query($conn, $qry))
 							{
@@ -1982,13 +1982,13 @@ if($result = pg_query($conn_fas, $qry_main))
 									if(pg_query($conn, $qry))
 									{
 										$anzahl_eingefuegt_lg++;
-										$ausgabe.="Lehreinheitgruppe (part.) mit Lehreinheit='".$lehreinheit_id."' und Studiengang='".$studiengang_kz."' eingefügt.\n";
+										$ausgabe.="Lehreinheitgruppe (part.) mit Lehreinheit='".$lehreinheit_id."' und Studiengang='".$studiengang_kz."' eingefÃ¼gt.\n";
 									}
 									else
 									{
 										$anzahl_part_fehler++;
 										$error=true;
-										$error_log.="Lehreinheitgruppe (part.) '".$row3->lehreinheitgruppe_id."' mit LE '".$lehreinheit_id."' konnte nicht eingefügt werden!\n";
+										$error_log.="Lehreinheitgruppe (part.) '".$row3->lehreinheitgruppe_id."' mit LE '".$lehreinheit_id."' konnte nicht eingefÃ¼gt werden!\n";
 									}
 								}
 							}
@@ -2160,15 +2160,15 @@ if($result = pg_query($conn_fas, $qry_main))
 
 	$error_log="Sync Lehreinheiten\n-----------------------\n\n".$error_log."\n";
 	echo "Lehreinheitensynchro Ende: ".date("d.m.Y H:i:s")." von ".$_SERVER['HTTP_HOST']."<br><br>";
-	echo "Gesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."<br>";
-	echo "Partizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part." / bereits vorhanden: ".$anzahl_part2." / Fehler: ".$anzahl_part_fehler."<br><br>";
-	echo "Lehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."<br>";
-	echo "Lehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."<br>";
-	echo "Lehrfächer eingefügt: ".$anzahl_lehrfaecher.".<br><br>";
+	echo "Gesamt: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt." / GeÃ¤ndert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."<br>";
+	echo "Partizipierende LEs Gesamt: ".$anzahl_part_gesamt." / EingefÃ¼gt: ".$anzahl_part." / bereits vorhanden: ".$anzahl_part2." / Fehler: ".$anzahl_part_fehler."<br><br>";
+	echo "Lehreinheit-Mitarbeiter: EingefÃ¼gt:".$anzahl_eingefuegt_lm." / GeÃ¤ndert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."<br>";
+	echo "Lehreinheit-Gruppen: EingefÃ¼gt:".$anzahl_eingefuegt_lg." / GeÃ¤ndert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."<br>";
+	echo "LehrfÃ¤cher eingefÃ¼gt: ".$anzahl_lehrfaecher.".<br><br>";
 	echo nl2br($error_log. "\n------------------------------------------------------------------------\n".$ausgabe_all);
 
 	mail($adress, 'SYNC-Fehler Lehreinheiten  von '.$_SERVER['HTTP_HOST'], $error_log, "From: vilesci@technikum-wien.at");
-	mail($adress, 'SYNC Lehreinheiten von '.$_SERVER['HTTP_HOST'], "Sync Lehreinheiten\n-----------------------\n\nGesamt: ".$anzahl_quelle." / Eingefügt: ".$anzahl_eingefuegt." / Geändert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\nPartizipierende LEs Gesamt: ".$anzahl_part_gesamt." / Eingefügt: ".$anzahl_part." / bereits vorhanden: ".$anzahl_part2."\n\nLehreinheit-Mitarbeiter: Eingefügt:".$anzahl_eingefuegt_lm." / Geändert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."\nLehreinheit-Gruppen: Eingefügt:".$anzahl_eingefuegt_lg." / Geändert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."\nLehrfächer eingefügt: ".$anzahl_lehrfaecher."\n\n".$ausgabe_all, "From: vilesci@technikum-wien.at");
+	mail($adress, 'SYNC Lehreinheiten von '.$_SERVER['HTTP_HOST'], "Sync Lehreinheiten\n-----------------------\n\nGesamt: ".$anzahl_quelle." / EingefÃ¼gt: ".$anzahl_eingefuegt." / GeÃ¤ndert: ".$anzahl_geaendert." / Fehler: ".$anzahl_fehler."\nPartizipierende LEs Gesamt: ".$anzahl_part_gesamt." / EingefÃ¼gt: ".$anzahl_part." / bereits vorhanden: ".$anzahl_part2."\n\nLehreinheit-Mitarbeiter: EingefÃ¼gt:".$anzahl_eingefuegt_lm." / GeÃ¤ndert:".$anzahl_geaendert_lm." / Fehler:".$anzahl_fehler_lm."\nLehreinheit-Gruppen: EingefÃ¼gt:".$anzahl_eingefuegt_lg." / GeÃ¤ndert:".$anzahl_geaendert_lg." / Fehler:".$anzahl_fehler_lg."\nLehrfÃ¤cher eingefÃ¼gt: ".$anzahl_lehrfaecher."\n\n".$ausgabe_all, "From: vilesci@technikum-wien.at");
 //fclose($dateiausgabe);
 }
 ?>

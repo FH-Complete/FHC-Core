@@ -40,7 +40,7 @@
 	
 	
 	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Rechte für diese Seite');
+		die('Sie haben keine Rechte fÃ¼r diese Seite');
 	
 	$reloadstr = "";  // neuladen der liste im oberen frame
 	$htmlstr = "";
