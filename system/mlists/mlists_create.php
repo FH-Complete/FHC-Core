@@ -50,7 +50,7 @@
 				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
 				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
 				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
-					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$ss_nearest') ORDER BY nachname;";
+					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$ss_nearest') AND aktiv ORDER BY nachname;";
 			//echo $sql_query;
 			if(!($result_person=pg_query($conn, $sql_query)))
 				die(pg_errormessage($conn));
@@ -85,7 +85,7 @@
 	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
 	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN public.tbl_student on(uid=student_uid)
 	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null)
-	        ORDER BY nachname, vorname";
+	        tbl_benutzer.aktiv ORDER BY nachname, vorname";
 
 	if($result = pg_query($conn, $qry))
 	{
