@@ -21,12 +21,11 @@
 	if(isset($_FILES['datei']['tmp_name']))
 	{
 		//Extension herausfiltern
-    	$ext = explode('.',$_FILES['datei']['name']);
-        $ext = strtolower($ext[count($ext)-1]);
-
-        //--check if csv or txt
-        if ($ext=='csv' || $ext=='txt')
-        {
+   	$ext = explode('.',$_FILES['datei']['name']);
+    $ext = mb_strtolower($ext[count($ext)-1],'UTF-8');
+    //--check if csv or txt
+    if ($ext=='csv' || $ext=='txt')
+    {
 			$filename = $_FILES['datei']['tmp_name'];
 			//File oeffnen
 			$fp = file($filename);
@@ -107,11 +106,11 @@
 				$result=pg_exec($conn, $sql_query);
 				//echo $sql_query;
 				if(!$result)
-					die(pg_errormessage().'<BR>'.$i.'<BR>'.$sql_query);
+						die(pg_errormessage().'<BR>'.$i.'<BR>'.$sql_query);
 			}
 		}
 		else
-			echo "<b>File ist keine gueltige Textdatei</b><br />";
+			echo "<h3>File ist keine gueltige Textdatei</h3>";
 	}
 
 ?>
