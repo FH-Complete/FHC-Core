@@ -182,8 +182,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		if($pruefling->getPruefling($prestudent_id))
 		{
 		
-			echo '<FORM METHOD="POST">';
-			echo '<input accept-charset="UTF-8" type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
+			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
+			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
 			echo '<table>';
 			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'"></td></tr>';
 			echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
