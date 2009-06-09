@@ -133,9 +133,9 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td title="<?php echo $ort->bezeichnung;?>"><?php echo $ortkurzbz.' '.$ort->planbezeichnung.' '.$ort->standort_kurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
-        <td><A class="Item" title="<?php echo $anzahl_lvb.' Studierende';?>" href="mailto:<?php echo $stgkurzbz.$semester.strtolower($verband).$gruppe.'@'.DOMAIN; ?>">
+        <td><A class="Item" title="<?php echo $anzahl_lvb.' Studierende';?>" href="mailto:<?php echo $stgkurzbz.$semester.mb_strtolower($verband,'UTF-8').$gruppe.'@'.DOMAIN; ?>">
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
-        <td><A class="Item" title="<?php echo $anzahl_grp.' Studierende';?>" href="mailto:<?php echo strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
+        <td><A class="Item" title="<?php echo $anzahl_grp.' Studierende';?>" href="mailto:<?php echo mb_strtolower($gruppe_kurzbz,'UTF-8').'@'.DOMAIN; ?>">
         <?php echo $gruppe_kurzbz; ?></A></td>
         
     </tr>
