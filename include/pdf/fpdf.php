@@ -6,8 +6,8 @@
 * Date:    2008-08-03                                                          *
 * Author:  Olivier PLATHEY                                                     *
 *******************************************************************************/
-
-define('FPDF_VERSION','1.6');
+if (!defined('FPDF_VERSION'))   
+	define('FPDF_VERSION','1.6');
 
 class FPDF
 {
@@ -1005,6 +1005,7 @@ function Output($name='', $dest='')
 		else
 			$dest='F';
 	}
+	ob_clean();
 	switch($dest)
 	{
 		case 'I':
