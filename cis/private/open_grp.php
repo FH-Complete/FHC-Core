@@ -18,7 +18,7 @@ function mail_id_generator()
     	//$valid_charset .= '!@_-';
     }
 
-    $charset_length = strlen($valid_charset);
+    $charset_length = mb_strlen($valid_charset,'UTF-8');
 
     if ($charset_length == 0) return false;
 
@@ -78,7 +78,7 @@ if(!check_lektor($_SERVER["REMOTE_USER"],$conn))
 		$message= date("F j G:i:s") . " mailgroup: [" . $_REQUEST['grp'] . "] (using " . $mail_id . ") requested by [" . $_SERVER['PHP_AUTH_USER'] . "]\n";
 
 		$filet = fopen(LOG_PATH.'.htmlistopen.log', "a");
-	   	fwrite($filet, $message, strlen($message));
+	   	fwrite($filet, $message, mb_strlen($message,'UTF-8'));
 	    fclose($filet);
 
 		// for the users
