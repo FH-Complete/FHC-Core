@@ -20,6 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
+ 
+ 
 require_once('../config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -34,9 +36,11 @@ require_once('../../include/firma.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/mail.class.php');
 
+
+
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
-
+   
 $user = get_uid();
 
 $rechte = new benutzerberechtigung($conn);
@@ -450,6 +454,7 @@ if(isset($_POST['freigabe']))
 		echo '<b>Es muss ein Studiensemester eingetragen sein damit diese Person freigegeben werden kann</b>';
 	}
 }
+
 if(isset($_POST['freigabe_rueckgaengig']))
 {
 	//studiengangsfreigabe zurueckziehen
@@ -508,6 +513,7 @@ echo '<a id="personendaten_label" href="javascript: changeTo(\'personendaten\');
 // ----- PERSON -----
 echo "<div id='personendaten' style='display: ".($selection=='personendaten'?'block':'none')."'>";
 
+
 $disabled=true;
 $qry = "SELECT count(*) as anzahl FROM (
 		SELECT 1 FROM public.tbl_prestudent WHERE person_id='$person->person_id' UNION 
@@ -550,7 +556,7 @@ echo "<td>Geburtsdatum:</td><td><input type='text' name='gebdatum' ".($disabled?
 //Geburtsort
 echo "<td>Geburtsort:</td><td><input type='text' name='gebort' ".($disabled?'disabled':'')." value='".$person->gebort."'></td>";
 //Geburtszeit
-echo "<td>Geburtszeit:</td><td><input type='text' name='gebzeit' size='5' ".($disabled?'disabled':'')." value='".$person->gebzeit,."'></td>";
+echo "<td>Geburtszeit:</td><td><input type='text' name='gebzeit' size='5' ".($disabled?'disabled':'')." value='".$person->gebzeit."'></td>";
 echo '</tr><tr>';
 //Staatsbuergerschaft
 echo "<td>Staatsb&uuml;rgerschaft:</td><td><SELECT ".($disabled?'disabled':'')." name='staatsbuergerschaft'>";
@@ -742,11 +748,12 @@ $qry = "SELECT plz, ort, strasse, tbl_firma.name, firma_id
 		FROM public.tbl_firma LEFT JOIN public.tbl_adresse USING(firma_id) 
 		WHERE schule ORDER BY plz, name";
 echo "<option value='' >-- keine Angabe --</option>";
+
 function shortname($name)
 {
 	if(strlen($name)>40)
 	{
-		return substr($name, 0, 20).' ... '.substr($name, strlen($name)-20);
+		return mb_substr($name, 0, 20,'UTF-8').' ... '.mb_substr($name, mb_strlen($name,'UTF-8')-20,mb_strlen($name,'UTF-8'),'UTF-8');
 	}
 	else 
 		return $name;
@@ -902,4 +909,6 @@ echo '</div>';
 
 echo '</body>';
 echo '</html>';
+
+
 ?>
