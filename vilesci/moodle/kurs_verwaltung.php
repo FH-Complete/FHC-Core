@@ -57,6 +57,11 @@
 	$studiengang_kz=(isset($_REQUEST['studiengang_kz'])?trim($_REQUEST['studiengang_kz']):'');
 // @$semester Semester des Studienganges 
 	$semester=(isset($_REQUEST['semester'])?trim($_REQUEST['semester']):'');
+
+// @$semester Semester des Studienganges 
+	$kursid=(isset($_REQUEST['kursid'])?trim($_REQUEST['kursid']):'');
+
+
 // @$mdl_course_id Moodle Kurs ID
 	$mdl_course_id= (isset($_REQUEST['mdl_course_id'])?$_REQUEST['mdl_course_id']:'');
 // @$moodle_id Moodle SubKurs (Unterkat.) ID zu Moodle Kurs ID (mdl_course_id)
@@ -198,6 +203,9 @@
 			}	
 		}
 		$content.='</select></td>';
+
+		$content.='<td>Kurs ID</td><td><input size="4" maxlength="8" name="kursid" value="'.$kursid.'">';			
+
 		$content.='
 			<td><input name="anzeige" type="submit" value=" anzeigen "><input style="display:none" type="text" name="debug" value="'.$debug_switch.'" /></td>
 	</tr></table>
@@ -207,7 +215,6 @@
 // ***********************************************************************************************
 //	HTML Listenanzeige (Teil 2)
 // ***********************************************************************************************
-
 	// Bedingung zur Listenanzeige : Anzeige und Datengefunden
 	if ($bAnzeige && $objMoodle && $objMoodle->getAllVariant('',$studiensemester_kurzbz,$studiengang_kz,$semester,true))
 	{
@@ -245,6 +252,10 @@
 			else
 				$showCSS=' style="text-align: left;border: 1px outset #F7F7F7;padding: 1px 5px 1px 5px; background:#FCFCFC"  ';			
 
+			if (!empty($kursid) && $kursid!=$objMoodle->result[$i]->mdl_course_id)
+				continue;
+	
+				
 			// Listenzeile
 			$content.='<tr '.$showCSS.' align="center">';
 				$content.='<td '.$showCSS.'>'.$objMoodle->result[$i]->lehrveranstaltung_bezeichnung.'</td>';
