@@ -264,7 +264,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 		if($zeitsperre->save())
 		{
-			echo "Daten wurden erfolgreich gespeichert";
+			echo "<h3>Daten wurden erfolgreich gespeichert</h3>";
 			if(URLAUB_TOOLS)
 			{
 				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
@@ -275,8 +275,14 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 					{
 						$to='';
 						foreach($ma->vorgesetzte as $vg)
-							$to.=$vg.'@'.DOMAIN.',';
-						$to = substr($to, 0, strlen($to)-1);
+						{
+							if (!empty($to))
+								$to.=',';
+							$to.=trim($vg.'@'.DOMAIN);
+						}
+						$to_len=mb_strlen($to,'UTF-8')-1;
+						$to = mb_substr($to, 0,$to_len,'UTF-8');
+
 						//$to = 'oesi@technikum-wien.at';
 						$benutzer = new benutzer($conn);
 						$benutzer->load($uid);
