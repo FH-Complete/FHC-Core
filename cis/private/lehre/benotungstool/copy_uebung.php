@@ -187,7 +187,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						{	
 							$angabedatei_source = $subrow->angabedatei;
 							$angabedatei_target = makeUploadName($conn, 'angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
-							$angabedatei_target .= ".".substr($angabedatei_source, strrpos($angabedatei_source, '.') + 1);
+							$angabedatei_target .= ".".substr($angabedatei_source, mb_strrpos($angabedatei_source, '.',0,'UTF-8') + 1);
 							echo $angabedatei_source."->".$angabedatei_target."<br>";
 							exec("cp ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_source." ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_target);
 							$angabeupdate = "update campus.tbl_uebung set angabedatei = '".$angabedatei_target."' where uebung_id = '".$ueb_2_target->uebung_id."'";
