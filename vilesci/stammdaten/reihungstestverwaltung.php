@@ -103,23 +103,23 @@
 					
 					$worksheet->write($zeile,$i, $row->vorname);
 					if(strlen($row->vorname)>$maxlength[$i])
-						$maxlength[$i] = strlen($row->vorname);
+						$maxlength[$i] = mb_strlen($row->vorname,'UTF-8');
 					
 					$worksheet->write($zeile,++$i,$row->nachname);
 					if(strlen($row->nachname)>$maxlength[$i])
-						$maxlength[$i] = strlen($row->nachname);
+						$maxlength[$i] = mb_strlen($row->nachname,'UTF-8');
 					
 					$worksheet->write($zeile,++$i,$datum_obj->convertISODate($row->gebdatum));
 					if(strlen($row->gebdatum)>$maxlength[$i])
-						$maxlength[$i] = strlen($row->gebdatum);
+						$maxlength[$i] = mb_strlen($row->gebdatum,'UTF-8');
 					
 					$worksheet->write($zeile,++$i,$stg_arr[$row->studiengang_kz]);
 					if(strlen($stg_arr[$row->studiengang_kz])>$maxlength[$i])
-						$maxlength[$i] = strlen($stg_arr[$row->studiengang_kz]);
+						$maxlength[$i] = mb_strlen($stg_arr[$row->studiengang_kz]);
 					
 					$worksheet->write($zeile,++$i,$row->email);
 					if(strlen($row->email)>$maxlength[$i])
-						$maxlength[$i] = strlen($row->email);
+						$maxlength[$i] = mb_strlen($row->email,'UTF-8');
 					
 					$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
 					if($result_adresse = pg_query($conn, $qry))
@@ -128,15 +128,15 @@
 						{
 							$worksheet->write($zeile,++$i,$row_adresse->strasse);
 							if(strlen($row_adresse->strasse)>$maxlength[$i])
-								$maxlength[$i] = strlen($row_adresse->strasse);
+								$maxlength[$i] = mb_strlen($row_adresse->strasse,'UTF-8');
 								
 							$worksheet->write($zeile,++$i,$row_adresse->plz);
 							if(strlen($row_adresse->plz)>$maxlength[$i])
-								$maxlength[$i] = strlen($row_adresse->plz);
+								$maxlength[$i] = mb_strlen($row_adresse->plz,'UTF-8');
 							
 							$worksheet->write($zeile,++$i,$row_adresse->ort);
 							if(strlen($row_adresse->ort)>$maxlength[$i])
-								$maxlength[$i] = strlen($row_adresse->ort);						
+								$maxlength[$i] = mb_strlen($row_adresse->ort,'UTF-8');						
 						}
 					}
 					$zeile++;					
