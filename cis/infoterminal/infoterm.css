@@ -1,11 +1,13 @@
+@charset "utf-8";
+
 		/* Standart Einstellungen */
 		body{	font-size:  larger;	letter-spacing : 1px; font-family: Verdana,  "Times New Roman", Times, serif MS Courier New,Tahoma,Arial, Helvetica, sans-serif,Trebuchet MS;}
 		form {display:inline;border:0;}
 	
-	    table.content { height:100%;}
+    table.content { height:100%;}
 
 		
-	    table.news { background-color: #CCC;width:100%;border: 0px inset #FFF;font-size: small;}
+    table.news { background-color: #CCC;width:100%;border: 0px inset #FFF;font-size: small;}
 		tr.news_row_0  {background:#FEFFEC;vertical-align: top;}
 		tr.news_row_1  {background:#F7F7F7;vertical-align: top;}
 		
