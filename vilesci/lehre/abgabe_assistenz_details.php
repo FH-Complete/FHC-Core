@@ -284,10 +284,16 @@ if(isset($_POST["del"]))
 	}
 	unset($_POST["del"]);
 }
+$qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='$uid'";
+$result_nam=@pg_query($conn, $qry_nam);
+while ($row_nam=@pg_fetch_object($result_nam))
+{
+	$studentenname=$row_nam->studnam;
+}
 
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
-$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td></tr>";
+$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td></tr>";
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
