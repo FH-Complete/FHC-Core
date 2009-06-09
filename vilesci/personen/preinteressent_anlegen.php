@@ -754,7 +754,7 @@ function shortname($name)
 {
 	if(strlen($name)>40)
 	{
-		return substr($name, 0, 20).' ... '.substr($name, strlen($name)-20);
+		return mb_substr($name, 0, 20,'UTF-8').' ... '.mb_substr($name, mb_strlen($name,'UTF-8')-20,'UTF-8');
 	}
 	else 
 		return $name;
@@ -847,10 +847,12 @@ if($where!='')
 			{
 				while($row_stati=pg_fetch_object($result_stati))
 				{
-					$status.=$row_stati->rolle.', ';
+					if (!empty($status))
+							$status.=', ';
+					$status.=trim($row_stati->rolle);
 				}
 			}
-			$status = substr($status, 0, strlen($status)-2);
+			$status = mb_substr($status, 0, mb_strlen($status,'UTF-8')-2,'UTF-8');
 			
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
