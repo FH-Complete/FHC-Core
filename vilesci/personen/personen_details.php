@@ -296,29 +296,29 @@ if(!$error_person_save)
 echo "<table><tr><td>
 <fieldset>
 <legend>Person</legend>
-<form action='".$_SERVER['PHP_SELF']."?uid=$uid&person_id=$person_id' method='POST'>
+<form accept-charset='UTF-8' accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?uid=$uid&person_id=$person_id' method='POST'>
 <table>
 <tr>
 	<td>Anrede</td>
-	<td><input type='text' name='anrede' value='".htmlentities($anrede)."'/></td>
+	<td><input type='text' name='anrede' value='".$anrede."'/></td>
 	<td>Titelpre</td>
-	<td><input type='text' name='titelpre' value='".htmlentities($titelpre)."'/></td>
+	<td><input type='text' name='titelpre' value='".$titelpre."'/></td>
 	<td>Titelpost</td>
-	<td><input type='text' name='titelpost' value='".htmlentities($titelpost)."'/></td>
+	<td><input type='text' name='titelpost' value='".$titelpost."'/></td>
 </tr>
 <tr>
 	<td>Nachname</td>
-	<td><input type='text' name='nachname' value='".htmlentities($nachname)."'/></td>
+	<td><input type='text' name='nachname' value='".$nachname."'/></td>
 	<td>Vorname</td>
-	<td><input type='text' name='vorname' value='".htmlentities($vorname)."'/></td>
+	<td><input type='text' name='vorname' value='".$vorname."'/></td>
 	<td>Vornamen</td>
-	<td><input type='text' name='vornamen' value='".htmlentities($vornamen)."'/></td>
+	<td><input type='text' name='vornamen' value='".$vornamen."'/></td>
 </tr>
 <tr>
 	<td>Geburtsdatum</td>
-	<td><input type='text' name='geburtsdatum' value='".htmlentities($geburtsdatum)."'/></td>
+	<td><input type='text' name='geburtsdatum' value='".$geburtsdatum."'/></td>
 	<td>Geburtsort</td>
-	<td><input type='text' name='geburtsort' value='".htmlentities($geburtsort)."'/></td>
+	<td><input type='text' name='geburtsort' value='".$geburtsort."'/></td>
 	<td>Geburtsnation</td>
 	<td><SELECT name='geburtsnation'>
 			<option value=''>-- keine Auswahl --</option>";
@@ -339,11 +339,11 @@ echo "</SELECT>
 </tr>
 <tr>
 	<td>SVNR</td>
-	<td><input type='text' name='svnr' value='".htmlentities($svnr)."'/></td>
+	<td><input type='text' name='svnr' value='".$svnr."'/></td>
 	<td>Ersatzkennzeichen</td>
-	<td><input type='text' name='ersatzkennzeichen' value='".htmlentities($ersatzkennzeichen)."'/></td>
+	<td><input type='text' name='ersatzkennzeichen' value='".$ersatzkennzeichen."'/></td>
 	<td>Geburtszeit</td>
-	<td><input type='text' name='geburtszeit' value='".htmlentities($geburtszeit)."'/></td>
+	<td><input type='text' name='geburtszeit' value='".$geburtszeit."'/></td>
 </tr>
 <tr>
 	<td>Staatsbuergerschaft</td>
@@ -384,7 +384,7 @@ echo "
 	</SELECT>
 	</td>
 	<td valign='top'>Homepage</td>
-	<td valign='top'><input type='text' name='homepage' value='".htmlentities($homepage)."'/></td>
+	<td valign='top'><input type='text' name='homepage' value='".$homepage."'/></td>
 </tr>
 <tr>
 	<td>Geschlecht</td>
@@ -404,11 +404,11 @@ echo "
 		</SELECT>
 	</td>
 	<td>Anzahl der Kinder</td>
-	<td><input type='text' name='anzahlderkinder' value='".htmlentities($anzahlderkinder)."' /></td>
+	<td><input type='text' name='anzahlderkinder' value='".$anzahlderkinder."' /></td>
 </tr>
 <tr>
 	<td valign='top'>Anmerkungen</td>
-	<td valign='top'><textarea name='anmerkungen'>".htmlentities($anmerkungen)."</textarea></td>
+	<td valign='top'><textarea name='anmerkungen'>".$anmerkungen."</textarea></td>
 	<td></td>
 	<td><img id='personimage' src='../../content/bild.php?src=person&person_id=$person_id' height='100'></td>
 	<td>
@@ -467,7 +467,7 @@ if(isset($uid) && $uid!='')
 		<td style='padding-right: 15px'>Aktiv</td>
 		<td style='padding-right: 15px'><input type='checkbox' name='aktiv' ".($row_benutzer->aktiv=='t'?'checked':'')."></td>
 		<td style='padding-right: 15px'>Alias</td>
-		<td style='padding-right: 15px'><input type='text' name='alias' value='".htmlentities($row_benutzer->alias)."'></td>
+		<td style='padding-right: 15px'><input type='text' name='alias' value='".$row_benutzer->alias."'></td>
 		<td style='padding-right: 15px'><input type='submit' name='savebenutzer' value='Speichern'></td>
 	</tr>
 	</table>
@@ -509,17 +509,17 @@ if(isset($uid) && $uid!='')
 			<table>
 			<tr>
 				<td>Personalnummer</td>
-				<td><input type='text' name='personalnummer' value='".htmlentities($personalnummer)."'></td>
+				<td><input type='text' name='personalnummer' value='".$personalnummer."'></td>
 				<td>Kurzbezeichnung</td>
-				<td><input type='text' name='kurzbz' value='".htmlentities($kurzbz)."'></td>
+				<td><input type='text' name='kurzbz' value='".$kurzbz."'></td>
 				<td>Lektor</td>
 				<td><input type='checkbox' name='lektor' ".(($lektor || $lektor!='')?'checked':'')."></td>
 			</tr>
 			<tr>
 				<td>Stundensatz</td>
-				<td><input type='text' name='stundensatz' value='".htmlentities($stundensatz)."'></td>
+				<td><input type='text' name='stundensatz' value='".$stundensatz."'></td>
 				<td>Telefonklappe</td>
-				<td><input type='text' name='telefonklappe' value='".htmlentities($telefonklappe)."'></td>
+				<td><input type='text' name='telefonklappe' value='".$telefonklappe."'></td>
 				<td>Fixangestellt</td>
 				<td><input type='checkbox' name='fixangestellt' ".(($fixangestellt || $fixangestellt!='')?'checked':'')."></td>
 			</tr>
@@ -563,7 +563,7 @@ if(isset($uid) && $uid!='')
 			</tr>
 			<tr>
 				<td valign='top'>Anmerkungen</td>
-				<td><textarea name='anmerkung'>".htmlentities($anmerkung)."</textarea></td>
+				<td><textarea name='anmerkung'>".$anmerkung."</textarea></td>
 				<td valign='top'>Ausbildung</td>
 				<td valign='top'><SELECT name='ausbildungcode'><option value=''>-- keine Auswahl --</option>";
 		$qry = "SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungcode";
@@ -611,15 +611,15 @@ if(isset($uid) && $uid!='')
 			<table>
 			<tr>
 				<td>Semester</td>
-				<td><input type='text' size='3' name='semester' value='".htmlentities($semester)."'></td>
+				<td><input type='text' size='3' name='semester' value='".$semester."'></td>
 				<td>Verband</td>
-				<td><input type='text' size='3' name='verband' value='".htmlentities($verband)."'></td>
+				<td><input type='text' size='3' name='verband' value='".$verband."'></td>
 				<td>Gruppe</td>
-				<td><input type='text' size='3' name='gruppe' value='".htmlentities($gruppe)."'></td>
+				<td><input type='text' size='3' name='gruppe' value='".$gruppe."'></td>
 			</tr>
 			<tr>
 				<td>Matrikelnummer</td>
-				<td colspan='3'><input type='text' name='matrikelnummer' value='".htmlentities($matrikelnummer)."'></td>
+				<td colspan='3'><input type='text' name='matrikelnummer' value='".$matrikelnummer."'></td>
 				<td></td>
 				<td></td>
 				<td><input type='submit' value='Speichern' name='savestudent'></td>

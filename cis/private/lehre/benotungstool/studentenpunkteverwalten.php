@@ -604,7 +604,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		<form accept-charset='UTF-8' method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
 		Anmerkungen:<br>
-		<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
+		<textarea name='anmerkung' cols=50 rows=5>".$anmerkung."</textarea>
 		<br><br>
 		<table border='1'>
 		<tr>
@@ -795,7 +795,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		<form accept-charset='UTF-8' method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid'>
 		<table width='100%'><tr><td valign='top'>
 		Anmerkungen:<br>
-		<textarea name='anmerkung' cols=50 rows=5>".htmlentities($anmerkung)."</textarea>
+		<textarea name='anmerkung' cols=50 rows=5>".$anmerkung."</textarea>
 		</td><td>
 		<table border='1'>
 		<tr>

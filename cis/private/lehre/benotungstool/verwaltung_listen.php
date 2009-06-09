@@ -951,7 +951,7 @@ echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2'
 			echo "<tr><th>Beispiel</th><th>Punkte</th><th>Auswahl</th></tr>\n";
 			foreach ($beispiel_obj->beispiele as $row)
 			{
-				echo "<tr><td><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$row->beispiel_id&liste_id=$liste_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td>
+				echo "<tr><td><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$row->beispiel_id&liste_id=$liste_id' class='Item'><u>".$row->bezeichnung."</u></a></td>
 				<td align='center'>$row->punkte</td>
 				<td align='center'><input type='Checkbox' name='beispiel[]' value='$row->beispiel_id'></td>";
 			}
@@ -1078,7 +1078,7 @@ else
 		foreach ($uebung_obj->uebungen as $row)
 		{
 			$has_option_content=false;
-			echo "<tr height=23><td align='left'><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&liste_id=$liste_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
+			echo "<tr height=23><td align='left'><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&liste_id=$liste_id' class='Item'><u>".$row->bezeichnung."</u></a></td><td align='center'>";
 
 			if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))
 				echo 'Ja';

@@ -239,7 +239,7 @@ function confdel()
 			
 	echo "	<tr>\n";
 	echo "		<td>Name: </td>";
-	echo "		<td colspan='3'><input type='text' name='name' value='".htmlentities($firma->name)."' size='80' maxlength='128' /></td>\n";
+	echo "		<td colspan='3'><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
 	echo "		<td>Typ: </td>";		
 	echo "		<td><select name='typ'>\n";
 
@@ -289,7 +289,7 @@ function confdel()
 
 	// Formular fuer die Adressdaten
 	//echo "<h3>Adressen:</h3>";
-	echo "<form action='".$_SERVER['PHP_SELF']."?firma_id=$firma_id' method='POST' />";
+	echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?firma_id=$firma_id' method='POST' />";
 	echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th><font size='0'>Heimatadr.</font></th><th><font size='0'>Zustelladr.</font></th></tr>";
 	$adresse_obj = new adresse($conn);
 	$adresse_obj->load_firma($firma_id);
@@ -302,7 +302,7 @@ function confdel()
 		echo "<td>$row->plz</td>";
 		echo "<td>$row->ort</td>";
 		echo "<td>$row->gemeinde</td>";
-		echo "<td>".$nation_arr[$row->nation]."</td>";
+		echo "<td>".(isset($nation_arr[$row->nation])?$nation_arr[$row->nation]:'')."</td>";
 		echo "<td>".$adresstyp_arr[$row->typ]."</td>";
 		echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 		echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
@@ -345,10 +345,10 @@ function confdel()
 	
 	echo "<input type='hidden' name='adresse_id' value='".$adresse_id."' />";
 	echo '<tr class="liste1">';
-	echo "<td><input type='text' name='strasse' value='".htmlentities($strasse)."' /></td>";
-	echo "<td><input type='text' name='plz' size='4' value='".htmlentities($plz)."' /></td>";
-	echo "<td><input type='text' name='ort' value='".htmlentities($ort)."' /></td>";
-	echo "<td><input type='text' name='gemeinde' value='".htmlentities($gemeinde)."' /></td>";
+	echo "<td><input type='text' name='strasse' value='".$strasse."' /></td>";
+	echo "<td><input type='text' name='plz' size='4' value='".$plz."' /></td>";
+	echo "<td><input type='text' name='ort' value='".$ort."' /></td>";
+	echo "<td><input type='text' name='gemeinde' value='".$gemeinde."' /></td>";
 	echo "<td><SELECT name='nation'>";
 	foreach ($nation_arr as $code=>$kurzbz)
 	{

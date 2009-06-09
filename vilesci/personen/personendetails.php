@@ -176,7 +176,7 @@ if(count($preinteressent->result)>0)
 		echo "<td>$row->preinteressent_id</td>";
 		echo "<td>$row->studiensemester_kurzbz</td>";
 		echo "<td>".$datum_obj->formatDatum($row->erfassungsdatum, 'd.m.Y')."</td>";
-		echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 50),ENT_QUOTES)."</td>";
+		echo "<td title='".$row->anmerkung."'>".CutString($row->anmerkung, 50)."</td>";
 		echo "<td>".$row->aufmerksamdurch_kurzbz."</td>";
 		echo "<td>".$row->kontaktmedium_kurzbz."</td>";
 		echo '<td>';

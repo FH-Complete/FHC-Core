@@ -111,8 +111,8 @@
 			if(isset($edit_feedback))
 			{
 				$fb_obj = new feedback($conn);
-				$fb_obj->betreff = htmlentities($feedback_subject);
-				$fb_obj->text = htmlentities($feedback_message);
+				$fb_obj->betreff = $feedback_subject;
+				$fb_obj->text = $feedback_message;
 				$fb_obj->feedback_id = $edit_id;
 				$fb_obj->datum = date('Y-m-d');
 				$fb_obj->uid = $user;
@@ -128,8 +128,8 @@
 			if(!isset($edit_id) && !isset($edit_break) && !isset($edit_feedback))
 			{
 				$fb_obj = new feedback($conn);
-				$fb_obj->betreff = htmlentities($feedback_subject);
-				$fb_obj->text = htmlentities($feedback_message);
+				$fb_obj->betreff = $feedback_subject;
+				$fb_obj->text = $feedback_message;
 				$fb_obj->datum = date('Y-m-d');
 				$fb_obj->uid = $user;
 				$fb_obj->lehrveranstaltung_id = $lvid;

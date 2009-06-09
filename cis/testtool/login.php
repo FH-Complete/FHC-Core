@@ -183,10 +183,10 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		{
 		
 			echo '<FORM METHOD="POST">';
-			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
+			echo '<input accept-charset="UTF-8" type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
 			echo '<table>';
-			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.htmlentities($pruefling->semester).'"></td></tr>';
-			echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.htmlentities($pruefling->idnachweis).'"></td></tr>';
+			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'"></td></tr>';
+			echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
 			echo '<tr><td></td><td><input type="submit" name="save" value="OK"></td>';
 			echo '</table>';
 			echo '</FORM><br><br>';

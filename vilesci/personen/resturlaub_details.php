@@ -139,7 +139,7 @@
 			$zs->mitarbeiter_uid=$_REQUEST['uid'];
 		}
 		$htmlstr .= "<br><div class='kopf'>Zeitsperre ".(!isset($zs->zeitsperre_id)?'':$zs->zeitsperre_id)."</div>\n";
-		$htmlstr .= "<form action='resturlaub_details.php' method='POST'>\n";
+		$htmlstr .= "<form accept-charset='UTF-8' action='resturlaub_details.php' method='POST'>\n";
 		$htmlstr .= "<input type='hidden' name='zeitsperre_id' value='".$zs->zeitsperre_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='".$zs->mitarbeiter_uid."'>\n";
 		$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
@@ -159,7 +159,7 @@
 		}
 		$htmlstr .= "		</select></td>";
 		$htmlstr .= "		<td>Bezeichnung</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($zs->bezeichnung, ENT_QUOTES)."' size='32' maxlength='32'></td>\n";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".$zs->bezeichnung."' size='32' maxlength='32'></td>\n";
 		$htmlstr .= "	</select></td>";
 		$htmlstr .= "</tr>";
 		$htmlstr .= "<tr>";

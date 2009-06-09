@@ -346,11 +346,11 @@ else
 }
 
 echo "
-<form method='POST' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id'>
+<form accept-charset='UTF-8' method='POST' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id'>
 <table width='100%'>
 	<tr>
 		<td valign='top'><div style='width: 70%;'>
-		".($anmerkung!=''?'<b>Anmerkungen:</b> '.htmlentities($anmerkung).'<br><br>':'')."
+		".($anmerkung!=''?'<b>Anmerkungen:</b> '.$anmerkung.'<br><br>':'')."
 		</div>
 			<table border='1'>
 			<tr>

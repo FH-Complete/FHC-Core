@@ -767,7 +767,7 @@ else
 	//Gesamtuebersicht ueber alle Uebungen
 	
 	echo "<table><tr><td valign='top'>";
-	echo "<form name='del' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'>";
+	echo "<form accept-charset='UTF-8' name='del' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'>";
 	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen bearbeiten</td></tr>";
 
 	$uebung_obj = new uebung($conn);
@@ -835,7 +835,7 @@ else
 			$uebung_id_source_dropdown .= "<option value='$row->uebung_id'>$row->bezeichnung</option>";
 			$has_option_content=false;
 			echo "<tr height=23><td align='left'>";
-			echo "<a onClick='return(js_toggle_container(\"submenu_$row->uebung_id\"));' class='MenuItem'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'></a>&nbsp;<a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a>";
+			echo "<a onClick='return(js_toggle_container(\"submenu_$row->uebung_id\"));' class='MenuItem'><img src='../../../../skin/images/menu_item.gif' width='7' height='9'></a>&nbsp;<a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$row->uebung_id' class='Item'><u>".$row->bezeichnung."</u></a>";
 			echo "</td><td align='center'>";
 
 			//if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))

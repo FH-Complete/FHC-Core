@@ -152,7 +152,7 @@
 	// FormName erzeugen
 	$cFormName='searchMoodleCurse'.$studiensemester_kurzbz.$studiengang_kz.$semester;
 	$content.='
-		<form name="'.$cFormName.'" method="GET">	
+		<form accept-charset="UTF-8" name="'.$cFormName.'" method="GET">	
 			<table><tr>';
 
 	// Studiensemester public.tbl_studiensemester_kurzbz
@@ -199,7 +199,7 @@
 		}
 		$content.='</select></td>';
 		$content.='
-			<td><input name="anzeige" type="submit" value=" anzeigen "><input style="display:none" type="text" name="debug" value="'.htmlentities($debug_switch).'" /></td>
+			<td><input name="anzeige" type="submit" value=" anzeigen "><input style="display:none" type="text" name="debug" value="'.$debug_switch.'" /></td>
 	</tr></table>
 	</form>
 	<hr>';
