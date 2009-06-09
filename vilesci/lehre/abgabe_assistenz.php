@@ -81,6 +81,7 @@ else
 	$htmlstr .= "<thead><tr class='liste'>\n";
 	$htmlstr .= "<th></th><th class='table-sortable:default'>UID</th>
 				<th>Email</th>
+				<th class='table-sortable:default'>Sem.</th>
 				<th class='table-sortable:default'>Vorname</th>
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
 	$htmlstr .= "<th>Typ</th>
@@ -124,6 +125,7 @@ else
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
 		$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
+		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
 		$htmlstr .= "       <td>".$row->projekttyp_kurzbz."</td>\n";
