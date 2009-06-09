@@ -3,7 +3,8 @@
 <html>
 <head>
 	<title>Keyboard Test</title>
-
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	
 <style type="text/css">
 <!--
 div.weiter {
@@ -163,9 +164,6 @@ td.keyboardFunkTasteON {
 			document.getElementById(inputUID).focus();
 		}
 	}
-
-	
-	
 	
 	function setEnterFeld() {
 		document.getElementById('tastatur').submit();
@@ -265,7 +263,7 @@ td.keyboardFunkTasteON {
 </script>	
 </head>
 <body>
-<form id="tastatur"  target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data"  >
+<form accept-charset="UTF-8" id="tastatur" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data"  >
 
 <table border="0" cellpadding="1" cellspacing="1">
 	<tr>
