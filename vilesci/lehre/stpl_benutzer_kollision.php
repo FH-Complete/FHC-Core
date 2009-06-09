@@ -38,6 +38,8 @@ $dontloadcontent=false;
 $user = get_uid();
 #gss loadVariables($conn, $user);
 loadVariables($user);
+if (empty($db_stpl_table))
+	die("Bitte die Variablenwarten! db_stpl_table ist leer");
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
