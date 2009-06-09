@@ -117,7 +117,7 @@
 				else
 					die('Fehler beim ermitteln der UID');
 
-			$mac = str_replace(":", "", str_replace("-", "", strtoupper($txtMAC)));
+			$mac = str_replace(":", "", str_replace("-", "", mb_strtoupper($txtMAC,'UTF-8')));
 
 			$filename_dat = '../../../../system/dhcp.dat';
 			$filename_ip  = '../../../../system/dhcp.ip';
@@ -136,8 +136,6 @@
 				$fuser = $mfiles->match[2];
 				$fuser = split(" ", $fuser);
 				$fuser = $fuser[0];
-
-
 				//hier könnte man noch eine email schicken oder dgl.
 				if ($fuser != $txtUID)
 					$error = 3;
@@ -160,7 +158,7 @@
 
 				$mfiles->setSearchFunction('preg');
 
-				if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && strlen($mac) == 12)
+				if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && mb_strlen($mac,'UTF-8') == 12)
 				{
 					$mfiles->doSearch();
 
