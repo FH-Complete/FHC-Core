@@ -54,7 +54,7 @@ $rechte = new benutzerberechtigung($conn);
 $rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
-	die('Sie haben keine Berechtigung fÃ¼r diesen Studiengang');
+	die('Sie haben keine Berechtigung für diesen Studiengang');
 	
 $sql_query = "SELECT * 
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit  
@@ -92,17 +92,21 @@ else
 	$i = 0;
 	while($row=pg_fetch_object($erg))
 	{
+		$erstbegutachter='';
+		$zweitbegutachter='';
 		//Betreuer suchen
-		$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first, '' as second 
-		FROM public.tbl_person, lehre.tbl_projektbetreuer
+		$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, public.tbl_mitarbeiter.mitarbeiter_uid
+		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
+		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
+		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
 		WHERE projektarbeit_id='$row->projektarbeit_id'  
-		AND lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
 		UNION
-		SELECT '' as first,trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as second 
-		FROM public.tbl_person, lehre.tbl_projektbetreuer
+		SELECT '' as first,trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as second, public.tbl_mitarbeiter.mitarbeiter_uid
+		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
+		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
+		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
 		WHERE projektarbeit_id='$row->projektarbeit_id' 
-		AND lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id
 		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
 		";
 
@@ -115,10 +119,24 @@ else
 			while($row_betr=pg_fetch_object($betr))
 			{
 				if($row_betr->first!='')
-					$erstbegutachter=$row_betr->first;
+				{
+					if(trim($erstbegutachter==''))
+					{
+						$erstbegutachter=$row_betr->first;
+						$muid=$row_betr->mitarbeiter_uid."@".DOMAIN;
+					}
+					else 
+					{
+						$erstbegutachter.=", ".$row_betr->first;
+						$muid.=", ".$row_betr->mitarbeiter_uid."@".DOMAIN;
+					}
+				}
 				if($row_betr->second!='')
+				{
 					$zweitbegutachter=$row_betr->second;
-					
+					$muid=$row_betr->mitarbeiter_uid;
+				}
+									
 			}
 		}
 		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
@@ -130,8 +148,26 @@ else
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
 		$htmlstr .= "       <td>".$row->projekttyp_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".$row->titel."</td>\n";
-		$htmlstr .= "       <td>".$erstbegutachter."</td>\n";
-		$htmlstr .= "       <td>".$zweitbegutachter."</td>\n";
+		
+		//$htmlstr.="<a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>
+		//<img src='../../../skin/images/email.png' alt='email' title='Email an Betreuer schreiben'></a>";
+	
+		if($muid != NULL && $muid !='')
+		{
+			$htmlstr .= "       <td><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>".$erstbegutachter."</a></td>\n";
+		}
+		else
+		{
+			$htmlstr .= "       <td>".$erstbegutachter."</td>\n";
+		}
+		if($muid != NULL && $muid !='')
+		{
+			$htmlstr .= "       <td><a href='mailto:$muid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>".$zweitbegutachter."</a></td>\n";
+		}
+		else
+		{
+			$htmlstr .= "       <td>".$zweitbegutachter."</td>\n";
+		}
 		$htmlstr .= "   </tr>\n";
 		$i++;
 	}
