@@ -418,7 +418,7 @@ if($where!='')
 					$status.=$row_stati->rolle.', ';
 				}
 			}
-			$status = substr($status, 0, strlen($status)-2);
+			$status = mb_substr($status, 0, mb_strlen($status,'UTF-8')-2,'UTF-8');
 					
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
