@@ -135,11 +135,10 @@ if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim oeffnen der Datenbankverbindung');
 
 $user = get_uid();
-
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
@@ -172,7 +171,7 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 //Kopfzeile
-echo '<table class="tabcontent" height="100%">';
+echo '<table class="tabcontent">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
@@ -214,17 +213,16 @@ else
 			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
 
 }
-
 if($result = pg_query($conn, $qry))
 {
-	if(pg_num_rows($result)>1)
+	if(pg_num_rows($result)>0)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		while($row = pg_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
-				$lehreinheit_id=$row->lehreinheit_id;
+					$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
 			if($result_lektoren = pg_query($conn, $qry_lektoren))
@@ -276,7 +274,8 @@ else
 }
 echo $stsem_content;
 echo '</td><tr></table>';
-echo '<table width="100%"><tr>';
+
+echo '<table  class="tabcontent"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
@@ -333,9 +332,7 @@ echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 echo "
 <table>
 ";
-
 //$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
-
 //if($result_grp = pg_query($conn, $qry))
 //{
 //	while($row_grp = pg_fetch_object($result_grp))
@@ -395,23 +392,21 @@ echo "
 */
 		// studentenquery		
 		$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."' ORDER BY nachname, vorname";
-        if($result_stud = pg_query($conn, $qry_stud))
+    if($result_stud = pg_query($conn, $qry_stud))
 		{
 			$i=1;
 			while($row_stud = pg_fetch_object($result_stud))
 			{
-    				
 				$studentnote = new studentnote($conn);
 				$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->uid);
 				//echo $studentnote->debug;
-    			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
-    			
-    			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
+   			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+   			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
 				{    				
     				$note = null;
-    			}
-    			else
-    			{
+   			}
+   			else
+   			{
     				$note = $legesamtnote->note;
 				} 
 				
@@ -448,12 +443,11 @@ echo "
 							$note_final = null;
 					}
 				}
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
+				echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
 				if ($note == 5)
 					$negmarkier = " style='color:red; font-weight:bold;'";
 				else
 					$negmarkier = "";	
-					
 				echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";				
 				echo "</tr>";
 				$i++;

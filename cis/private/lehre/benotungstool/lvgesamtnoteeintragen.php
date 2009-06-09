@@ -172,9 +172,9 @@ if (isset($_REQUEST["submit"]))
 	{
 		foreach ($_POST as $row=>$val)
 		{
-			if(strstr($row, 'matrikelnr_'))
+			if(mb_strstr(mb_strtolower($row,'UTF-8'), 'matrikelnr_','UTF-8'))
 			{
-				$id=substr($row, strlen('matrikelnr_'));
+				$id=substr($row, mb_strlen('matrikelnr_','UTF-8'));
 				if(isset($_POST['matrikelnr_'.$id]) && isset($_POST['note_'.$id]))
 				{
 					$matrikelnummer = $_POST['matrikelnr_'.$id];
