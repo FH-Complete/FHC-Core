@@ -84,8 +84,8 @@ if(!$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 //Formular zur Eingabe der UID
-echo '<form action="'.$_SERVER['PHP_SELF'].'" mehtod="GET">';
-echo 'Zeitsperren des Mitarbeiters mit der UID <input type="text" name="uid" value="'.htmlentities($uid, ENT_QUOTES).'">';
+echo '<form  accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'" mehtod="GET">';
+echo 'Zeitsperren des Mitarbeiters mit der UID <input type="text" name="uid" value="'.$uid.'">';
 echo '<input type="submit" name="submit" value="Anzeigen">';
 echo '</form>';
 
@@ -209,7 +209,7 @@ if($uid!='')
 	else 
 		echo "<h3>Neue Zeitsperre:</h3>";
 	
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'" method="POST">';
+	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'" method="POST">';
 	echo '<input type="hidden" name="zeitsperre_id" value="'.$zeitsperre->zeitsperre_id.'">';
 	echo '<table>';
 	echo '<tr>';

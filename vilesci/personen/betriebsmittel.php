@@ -77,8 +77,8 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 }
 
 echo '<table width="100%"><tr><td>
-	  <form method="POST">
-		Nummer/Uid: <input type="text" name="search" value="'.htmlentities($search).'">&nbsp;
+	  <form method="POST"  enctype="multipart/form-data" accept-charset="UTF-8"  action="'. $_SERVER['PHP_SELF'].'">
+		Nummer/Uid: <input type="text" name="search" value="'.$search.'">&nbsp;
 		<input type="submit" value="Suchen" name="suche">
 	  </form></td><td align="right"><a href="betriebsmitteldetail.php" target="detail">NEU</a></td></tr></table><br><br>';
 

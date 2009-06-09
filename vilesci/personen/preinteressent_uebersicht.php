@@ -191,7 +191,7 @@ echo '</table>';
 //echo '</form>';
 echo '</td><td>';
 //echo "<form action='".$_SERVER['PHP_SELF']."' method='GET'>";
-echo "<input type='text' value='".htmlentities($filter,ENT_QUOTES)."' name='filter'>&nbsp;";
+echo "<input type='text' value='".$filter."' name='filter'>&nbsp;";
 echo "<input type='submit' size='10' name='suchen' value='Suchen'>";
 echo '</form></td>';
 echo '<td align="right"><a href="preinteressent_anlegen.php" target="_blank">neuen Preinteressenten anlegen</a></td></tr></table>';
@@ -440,7 +440,7 @@ foreach ($preinteressent->result as $row)
 	
 	echo "<td>$freigabe</td>";
 	echo "<td>$uebernahme</td>";
-	echo "<td title='".htmlentities($row->anmerkung,ENT_QUOTES)."'>".htmlentities(CutString($row->anmerkung, 20),ENT_QUOTES)."</td>";
+	echo "<td title='".$row->anmerkung."'>".CutString($row->anmerkung, 20)."</td>";
 	echo '<td>';
 	echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
 	echo " <input style='padding:0px;' type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";

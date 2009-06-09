@@ -73,7 +73,7 @@ $stud = new studiengang($conn);
 if(!$stud->getAll('typ, kurzbzlang'))
 	echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
 
-echo '<form name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
+echo '<form accept-charset="UTF-8" name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
 
 foreach($stud->result as $row)

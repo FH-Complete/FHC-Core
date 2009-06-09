@@ -192,7 +192,7 @@ $retouram = ($bm->retouram!=''?date('d.m.Y', $datum_obj->mktime_fromdate($bm->re
 
 
 //Formular
-echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'?betriebsmittel_id='.$betriebsmittel_id.'&person_id='.$person_id.'">';
+echo '<form accept-charset="UTF-8" method="POST" action="'.$_SERVER['PHP_SELF'].'?betriebsmittel_id='.$betriebsmittel_id.'&person_id='.$person_id.'">';
 echo '<input type="hidden" name="new" value="'.$new.'">';
 echo '<table><tr><td valign="top">';
 echo '<table>';
@@ -230,20 +230,20 @@ if($result = pg_query($conn, $qry))
 echo '</SELECT></td></tr>';
 //</table></td><td valign="top"><table>';
 //Nummer
-echo '<tr><td>Nummer</td><td><input type="text" name="nummer" value="'.htmlentities($nummer).'"><input type="hidden" name="nummerold" value="'.htmlentities($nummer).'"></td></tr>';
+echo '<tr><td>Nummer</td><td><input type="text" name="nummer" value="'.$nummer.'"><input type="hidden" name="nummerold" value="'.$nummer.'"></td></tr>';
 //Beschreibung
-echo '<tr><td>Beschreibung</td><td><textarea name="beschreibung">'.htmlentities($beschreibung).'</textarea></td></tr>';
+echo '<tr><td>Beschreibung</td><td><textarea name="beschreibung">'.$beschreibung.'</textarea></td></tr>';
 echo '</table>';
 echo '</td><td valign="top">';
 //Kaution
-echo '<table><tr><td>Kaution</td><td><input type="text" name="kaution" value="'.htmlentities($kaution).'"></td></tr>';
+echo '<table><tr><td>Kaution</td><td><input type="text" name="kaution" value="'.$kaution.'"></td></tr>';
 //Anmerkung
-echo '<tr><td>Anmerkung</td><td><textarea name="anmerkung">'.htmlentities($anmerkung).'</textarea></td></tr>';
+echo '<tr><td>Anmerkung</td><td><textarea name="anmerkung">'.$anmerkung.'</textarea></td></tr>';
 //echo '</table></td><td valign="top"><table>';
 //Ausgegeben am
-echo '<tr><td>Ausgegeben am</td><td><input type="text" name="ausgegebenam" value="'.htmlentities($ausgegebenam).'"></td></tr>';
+echo '<tr><td>Ausgegeben am</td><td><input type="text" name="ausgegebenam" value="'.$ausgegebenam.'"></td></tr>';
 //Retour am
-echo '<tr><td>Retour am</td><td><input type="text" name="retouram" value="'.htmlentities($retouram).'"></td></tr>';
+echo '<tr><td>Retour am</td><td><input type="text" name="retouram" value="'.$retouram.'"></td></tr>';
 echo '</table>';
 echo '</td></tr>';
 echo '<tr><td></td><td></td><td></td><td align="right"><input type="submit" name="save" value="Speichern"></td></tr>';

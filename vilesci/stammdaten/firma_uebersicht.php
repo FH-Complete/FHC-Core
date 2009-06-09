@@ -63,7 +63,7 @@
 	        $htmlstr .= "       <td>$row->email</td>\n";
 	        $htmlstr .= "       <td>$row->telefon</td>\n";
 	        $htmlstr .= "       <td>$row->fax</td>\n";
-	        $htmlstr .= "       <td title='".htmlentities($row->anmerkung, ENT_QUOTES)."'>".(strlen($row->anmerkung)>30?substr($row->anmerkung,0,27).'...':$row->anmerkung)."</td>\n";
+	        $htmlstr .= "       <td title='".$row->anmerkung."'>".(strlen($row->anmerkung)>30?substr($row->anmerkung,0,27).'...':$row->anmerkung)."</td>\n";
 	        $htmlstr .= "       <td>$row->firmentyp_kurzbz</td>\n";
 			$htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
 	        $htmlstr .= "   </tr>\n";
@@ -83,8 +83,8 @@
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 <!--
-var firmentypfilter='<?php echo htmlentities($firmentypfilter)?>';
-var filter = '<?php echo htmlentities($filter)?>';
+var firmentypfilter='<?php echo $firmentypfilter; ?>';
+var filter = '<?php echo $filter; ?>';
 -->
 </script>
 

@@ -179,7 +179,7 @@ class funktion
 	function checkvars()
 	{
 		//Hochkomma und HTML Tags ersetzen
-		//$this->name = htmlentities($this->name, ENT_QUOTES);
+		//$this->name = $this->name;
 		
 		//Maximallaenge pruefen
 		$this->errormsg = 'Die Maximallaenge eines Feldes wurde ueberschritten';

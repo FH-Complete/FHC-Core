@@ -163,8 +163,8 @@ class telefonnummer
 	function checkvars()
 	{
 		//Hochkomma und HTML Tags ersetzen
-		//$this->name   = htmlentities($this->name, ENT_QUOTES);
-		//$this->nummer = htmlentities($this->nummer, ENT_QUOTES);
+		//$this->name   = $this->name;
+		//$this->nummer = $this->nummer;
 		
 		//Laenge pruefen
 		$this->errormsg = 'Eine der Gesamtlaengen wurde ueberschritten';

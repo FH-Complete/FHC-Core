@@ -660,7 +660,7 @@ if(isset($uebung_id) && $uebung_id!='')
 		echo "<tr><th>Beispiel</th><th>Punkte</th><th>Auswahl</th></tr>\n";
 		foreach ($beispiel_obj->beispiele as $row)
 		{
-			echo "<tr><td><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$row->beispiel_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td>
+			echo "<tr><td><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&beispiel_id=$row->beispiel_id' class='Item'><u>".$row->bezeichnung."</u></a></td>
 			<td align='center'>$row->punkte</td>
 			<td align='center'><input type='Checkbox' name='beispiel[]' value='$row->beispiel_id'></td>";
 		}
@@ -701,7 +701,7 @@ else
 {
 	//Gesamtuebersicht ueber alle Uebungen
 	echo "<table><tr><td class='tdvertical'>";
-	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>";
+	echo "<form accept-charset='UTF-8' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'>";
 	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Kreuzerllisten bearbeiten</td></tr>";
 
 	$uebung_obj = new uebung($conn);
@@ -766,7 +766,7 @@ else
 		foreach ($uebung_obj->uebungen as $row)
 		{
 			$has_option_content=false;
-			echo "<tr height=23><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".htmlentities($row->bezeichnung)."</u></a></td><td align='center'>";
+			echo "<tr height=23><td align='left'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' class='Item'><u>".$row->bezeichnung."</u></a></td><td align='center'>";
 
 			if((strtotime(strftime($row->freigabevon))<=time()) && (strtotime(strftime($row->freigabebis))>=time()))
 				echo 'Ja';

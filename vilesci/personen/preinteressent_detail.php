@@ -71,7 +71,7 @@ echo '<html>
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script language="Javascript">
 		<!--
-		var selection = "'.htmlentities($selection).'";
+		var selection = "'.$selection.'";
 		
 		function checkschulid(schuleid)
 		{
@@ -521,23 +521,23 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-echo "<form action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=personendaten' method='POST'>";
+echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=personendaten' method='POST'>";
 echo "<table><tr>";
 
 //Anrede
-echo "<td>Anrede:</td><td><input type='text' name='anrede' ".($disabled?'disabled':'')." value='".htmlentities($person->anrede, ENT_QUOTES)."'></td>";
+echo "<td>Anrede:</td><td><input type='text' name='anrede' ".($disabled?'disabled':'')." value='".$person->anrede."'></td>";
 //Titelpre
-echo "<td>Titelpre:</td><td><input type='text' name='titelpre' ".($disabled?'disabled':'')." value='".htmlentities($person->titelpre, ENT_QUOTES)."'></td>";
+echo "<td>Titelpre:</td><td><input type='text' name='titelpre' ".($disabled?'disabled':'')." value='".$person->titelpre."'></td>";
 //Titelpost
-echo "<td>Titelpost:</td><td><input type='text' name='titelpost' ".($disabled?'disabled':'')." value='".htmlentities($person->titelpost, ENT_QUOTES)."'></td>";
+echo "<td>Titelpost:</td><td><input type='text' name='titelpost' ".($disabled?'disabled':'')." value='".$person->titelpost."'></td>";
 echo '<td width="100%" align="right"><a href="personendetails.php?id='.$person->person_id.'" target="_blank">Gesamtübersicht über diese Person</a></td>';
 echo '</tr><tr>';
 //Nachname
-echo "<td>Nachname*:</td><td><input type='text' name='nachname' ".($disabled?'disabled':'')." value='".htmlentities($person->nachname, ENT_QUOTES)."'></td>";
+echo "<td>Nachname*:</td><td><input type='text' name='nachname' ".($disabled?'disabled':'')." value='".$person->nachname."'></td>";
 //Vorname
-echo "<td>Vorname:</td><td><input type='text' name='vorname' ".($disabled?'disabled':'')." value='".htmlentities($person->vorname, ENT_QUOTES)."'></td>";
+echo "<td>Vorname:</td><td><input type='text' name='vorname' ".($disabled?'disabled':'')." value='".$person->vorname."'></td>";
 //Vornamen
-echo "<td>2. Vorname:</td><td><input type='text' name='vornamen' ".($disabled?'disabled':'')." value='".htmlentities($person->vornamen, ENT_QUOTES)."'></td>";
+echo "<td>2. Vorname:</td><td><input type='text' name='vornamen' ".($disabled?'disabled':'')." value='".$person->vornamen."'></td>";
 echo '<td width="100%" align="right">';
 if(!$disabled)
 	echo "<a href='kontaktdaten_edit.php?person_id=$person->person_id' target='_blank'>Kontaktdaten bearbeiten</a>";
@@ -546,11 +546,11 @@ else
 echo '</td>';
 echo '</tr><tr>';
 //Geburtsdatum
-echo "<td>Geburtsdatum:</td><td><input type='text' name='gebdatum' ".($disabled?'disabled':'')." value='".htmlentities($datum_obj->formatDatum($person->gebdatum, 'd.m.Y'), ENT_QUOTES)."'></td>";
+echo "<td>Geburtsdatum:</td><td><input type='text' name='gebdatum' ".($disabled?'disabled':'')." value='".$datum_obj->formatDatum($person->gebdatum, 'd.m.Y')."'></td>";
 //Geburtsort
-echo "<td>Geburtsort:</td><td><input type='text' name='gebort' ".($disabled?'disabled':'')." value='".htmlentities($person->gebort, ENT_QUOTES)."'></td>";
+echo "<td>Geburtsort:</td><td><input type='text' name='gebort' ".($disabled?'disabled':'')." value='".$person->gebort."'></td>";
 //Geburtszeit
-echo "<td>Geburtszeit:</td><td><input type='text' name='gebzeit' size='5' ".($disabled?'disabled':'')." value='".htmlentities($person->gebzeit, ENT_QUOTES)."'></td>";
+echo "<td>Geburtszeit:</td><td><input type='text' name='gebzeit' size='5' ".($disabled?'disabled':'')." value='".$person->gebzeit,."'></td>";
 echo '</tr><tr>';
 //Staatsbuergerschaft
 echo "<td>Staatsb&uuml;rgerschaft:</td><td><SELECT ".($disabled?'disabled':'')." name='staatsbuergerschaft'>";
@@ -605,9 +605,9 @@ if($result = pg_query($conn, $qry))
 echo '</SELECT></td>';
 echo '</tr><tr>';
 //SVNR
-echo "<td>SVNR:</td><td><input type='text' name='svnr' ".($disabled?'disabled':'')." value='".htmlentities($person->svnr, ENT_QUOTES)."'></td>";
+echo "<td>SVNR:</td><td><input type='text' name='svnr' ".($disabled?'disabled':'')." value='".$person->svnr."'></td>";
 //Ersatzkennzeichen
-echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' ".($disabled?'disabled':'')." value='".htmlentities($person->ersatzkennzeichen, ENT_QUOTES)."'></td>";
+echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' ".($disabled?'disabled':'')." value='".$person->ersatzkennzeichen."'></td>";
 //Geschlecht
 echo "<td>Geschlecht*</td><td><SELECT ".($disabled?'disabled':'')." name='geschlecht'>";
 echo '<option value="m" '.($person->geschlecht=='m'?'selected':'').'>männlich</option>';
@@ -617,14 +617,14 @@ echo '</SELECT></td>';
 echo '</tr><tr>';
 
 //Anzahlkinder
-echo "<td>Anzahl der Kinder</td><td><input type='text' name='anzahlkinder' ".($disabled?'disabled':'')." value='".htmlentities($person->anzahlkinder, ENT_QUOTES)."'></td>";
+echo "<td>Anzahl der Kinder</td><td><input type='text' name='anzahlkinder' ".($disabled?'disabled':'')." value='".$person->anzahlkinder."'></td>";
 //Aktiv
 echo "<td>Aktiv:</td><td><input type='checkbox' ".($disabled?'disabled':'')." name='aktiv' ".($person->aktiv==false?'':'checked')."></td>";
 echo '</tr><tr valign="top">';
 //Anmerkung
-echo "<td>Anmerkung:</td><td><textarea ".($disabled?'disabled':'')." name='anmerkungen'>".htmlentities($person->anmerkungen)."</textarea></td>";
+echo "<td>Anmerkung:</td><td><textarea ".($disabled?'disabled':'')." name='anmerkungen'>".$person->anmerkungen."</textarea></td>";
 //Homepage
-echo "<td>Homepage:</td><td><input type='text' name='homepage' ".($disabled?'disabled':'')." value='".htmlentities($person->homepage, ENT_QUOTES)."'></td>";
+echo "<td>Homepage:</td><td><input type='text' name='homepage' ".($disabled?'disabled':'')." value='".$person->homepage."'></td>";
 //Familienstand
 echo "<td>Familienstand:</td><td><SELECT ".($disabled?'disabled':'')." name='familienstand'>";
 echo '<option value="l" '.($person->familienstand=='l'?'selected':'').'>ledig</option>';
@@ -638,7 +638,7 @@ echo "</div>";
 
 // ----- PREINTERESSENT -----
 echo "<div id='preinteressent' style='display: ".($selection=='preinteressent'?'block':'none')."'>";
-echo "<form action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=preinteressent' method='POST'>";
+echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=preinteressent' method='POST'>";
 
 echo '<table width="100%" ><tr>';
 
@@ -771,7 +771,7 @@ echo '</tr><tr>';
 //Anmerkung
 echo '<td>Anmerkungen:</td>';
 echo '<td colspan="7">';
-echo "<textarea rows='4' style='width: 100%' name='anmerkung'>".htmlentities($preinteressent->anmerkung)."</textarea>";
+echo "<textarea rows='4' style='width: 100%' name='anmerkung'>".$preinteressent->anmerkung."</textarea>";
 echo '</td>';
 
 echo '</tr><tr>';
@@ -798,7 +798,7 @@ $zuordnung->loadZuordnungen($preinteressent->preinteressent_id);
 
 foreach ($zuordnung->result as $row)
 {
-	echo "<form action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&studiengang_kz=$row->studiengang_kz&selection=studiengangszuordnung' method='POST'>";
+	echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&studiengang_kz=$row->studiengang_kz&selection=studiengangszuordnung' method='POST'>";
 	echo '<tr>';
 	echo '<td>';
 	$studiengang = new studiengang($conn);
@@ -862,7 +862,7 @@ foreach ($zuordnung->result as $row)
 }
 
 //Neuer Eintrag
-echo "<form action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=studiengangszuordnung&action=neuezuordnung' method='POST'>";	
+echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&selection=studiengangszuordnung&action=neuezuordnung' method='POST'>";	
 echo '<tr>';
 echo '<td>';
 echo '<SELECT name="studiengang_kz">';

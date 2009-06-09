@@ -135,7 +135,7 @@
 		}
 
 		$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung</div>\n";
-		$htmlstr .= "<form action='lehrveranstaltung_details.php' method='POST'>\n";
+		$htmlstr .= "<form accept-charset='UTF-8' action='lehrveranstaltung_details.php' method='POST'>\n";
 		$htmlstr .= "<input type='hidden' name='lv_id' value='".$lv->lehrveranstaltung_id."'>\n";
 
 		$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
@@ -145,7 +145,7 @@
 		$htmlstr .= "		<td>Kurzbz</td>";
 		$htmlstr .= "		<td><input type='text' name='kurzbz' value='$lv->kurzbz'\n</td>";
 		$htmlstr .= "		<td>Bezeichnung</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($lv->bezeichnung, ENT_QUOTES)."' size='60' maxlength='128'></td>\n";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".$lv->bezeichnung."' size='60' maxlength='128'></td>\n";
 
 		$htmlstr .= "</tr>";
 		$htmlstr .= "<tr>";
@@ -162,7 +162,7 @@
 		}
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td>Bezeichnung English</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung_english' value='".htmlentities($lv->bezeichnung_english, ENT_QUOTES)."' size='60' maxlength='256'></td>\n";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung_english' value='".$lv->bezeichnung_english."' size='60' maxlength='256'></td>\n";
 
 		$htmlstr .= "</tr>";
 		$htmlstr .= "<tr>";

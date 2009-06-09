@@ -128,21 +128,21 @@ if($gebiet_id!='')
 	$gebiet = new gebiet($conn, $gebiet_id);
 
 	echo "<hr />";
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?gebiet_id='.$gebiet_id.'" method="POST">';
+	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?gebiet_id='.$gebiet_id.'" method="POST">';
 	echo '<table>';
 	
 	echo '<tr>';
 	//Kurzbz
-	echo '<td>Kurzbz</td><td><input type="text" maxlength="10" size="10" name="kurzbz" value="'.htmlentities($gebiet->kurzbz).'"></td>';
+	echo '<td>Kurzbz</td><td><input type="text" maxlength="10" size="10" name="kurzbz" value="'.$gebiet->kurzbz.'"></td>';
 	echo '</tr><tr>';
 	//Bezeichnung
-	echo '<td>Bezeichnung</td><td><input type="text" maxlength="50" name="bezeichnung" value="'.htmlentities($gebiet->bezeichnung).'"></td>';
+	echo '<td>Bezeichnung</td><td><input type="text" maxlength="50" name="bezeichnung" value="'.$gebiet->bezeichnung.'"></td>';
 	echo '</tr><tr>';
 	//Beschreibung
-	echo '<td>Beschreibung</td><td><textarea name="beschreibung">'.htmlentities($gebiet->beschreibung).'</textarea></td>';
+	echo '<td>Beschreibung</td><td><textarea name="beschreibung">'.$gebiet->beschreibung.'</textarea></td>';
 	echo '</tr><tr>';
 	//Zeit
-	echo '<td>Zeit</td><td><input type="text" name="zeit" size="8" maxlength="8" value="'.htmlentities($gebiet->zeit).'"> hh:mm:ss</td>';
+	echo '<td>Zeit</td><td><input type="text" name="zeit" size="8" maxlength="8" value="'.$gebiet->zeit.'"> hh:mm:ss</td>';
 	echo '</tr><tr>';
 	echo '<td>Multiple Response</td><td><input type="checkbox" name="multipleresponse" '.($gebiet->multipleresponse?'checked="checked"':'').'></td>';
 	echo '</tr><tr>';
@@ -160,17 +160,17 @@ if($gebiet_id!='')
 		$hinweis = '<span class="error">empfohlene Maximalpunkteanzahl: '.$maximalpunkte.'</span>';
 	else 
 		$hinweis ='';
-	echo '<td>Maximale Punkteanzahl</td><td><input type="text" size="5" maxlength="5" name="maxpunkte" value="'.htmlentities($gebiet->maxpunkte).'">'.$hinweis.'</td>';
+	echo '<td>Maximale Punkteanzahl</td><td><input type="text" size="5" maxlength="5" name="maxpunkte" value="'.$gebiet->maxpunkte.'">'.$hinweis.'</td>';
 	echo '</tr><tr>';
-	echo '<td>Maximale Fragenanzahl</td><td><input type="text" size="5" maxlength="5" name="maxfragen" value="'.htmlentities($gebiet->maxfragen).'"></td>';
+	echo '<td>Maximale Fragenanzahl</td><td><input type="text" size="5" maxlength="5" name="maxfragen" value="'.$gebiet->maxfragen.'"></td>';
 	echo '</tr><tr>';
-	echo '<td>Antworten pro Zeile</td><td><input type="text" size="5" maxlength="5" name="antwortenprozeile" value="'.htmlentities($gebiet->antwortenprozeile).'"></td>';
+	echo '<td>Antworten pro Zeile</td><td><input type="text" size="5" maxlength="5" name="antwortenprozeile" value="'.$gebiet->antwortenprozeile.'"></td>';
 	echo '</tr><tr>';
-	echo '<td>Start Level</td><td><input type="text" size="5" maxlength="5" name="level_start" value="'.htmlentities($gebiet->level_start).'"></td>';
+	echo '<td>Start Level</td><td><input type="text" size="5" maxlength="5" name="level_start" value="'.$gebiet->level_start.'"></td>';
 	echo '</tr><tr>';
-	echo '<td>Richtige Fragen bis Levelaufstieg</td><td><input type="text" size="5" maxlength="5" name="level_sprung_auf" value="'.htmlentities($gebiet->level_sprung_auf).'"></td>';
+	echo '<td>Richtige Fragen bis Levelaufstieg</td><td><input type="text" size="5" maxlength="5" name="level_sprung_auf" value="'.$gebiet->level_sprung_auf.'"></td>';
 	echo '</tr><tr>';
-	echo '<td>Falsche Fragen bis Levelabstieg</td><td><input type="text" size="5" maxlength="5" name="level_sprung_ab" value="'.htmlentities($gebiet->level_sprung_ab).'"></td>';
+	echo '<td>Falsche Fragen bis Levelabstieg</td><td><input type="text" size="5" maxlength="5" name="level_sprung_ab" value="'.$gebiet->level_sprung_ab.'"></td>';
 	echo '</tr><tr>';
 	echo '<td></td><td><input type="submit" name="speichern" value="Speichern"></td>';
 	echo '</tr></table>';

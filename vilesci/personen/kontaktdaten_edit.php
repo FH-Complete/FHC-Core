@@ -249,7 +249,7 @@ echo $errormsg.'<br>';
 
 // *** ADRESSEN ***
 echo "<h3>Adressen:</h3>";
-echo "<form action='".$_SERVER['PHP_SELF']."?person_id=$person_id' method='POST' />";
+echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?person_id=$person_id' method='POST' />";
 echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th>HEIMAT</th><th>ZUSTELLUNG</th><th>FIRMA</th></tr>";
 $adresse_obj = new adresse($conn);
 $adresse_obj->load_pers($person_id);
@@ -303,10 +303,10 @@ else
 }
 	echo "<input type='hidden' name='adresse_id' value='".$adresse_id."' />";
 	echo '<tr class="liste1">';
-	echo "<td><input type='text' name='strasse' value='".htmlentities($strasse)."' /></td>";
-	echo "<td><input type='text' name='plz' size='4' value='".htmlentities($plz)."' /></td>";
-	echo "<td><input type='text' name='ort' value='".htmlentities($ort)."' /></td>";
-	echo "<td><input type='text' name='gemeinde' value='".htmlentities($gemeinde)."' /></td>";
+	echo "<td><input type='text' name='strasse' value='".$strasse."' /></td>";
+	echo "<td><input type='text' name='plz' size='4' value='".$plz."' /></td>";
+	echo "<td><input type='text' name='ort' value='".$ort."' /></td>";
+	echo "<td><input type='text' name='gemeinde' value='".$gemeinde."' /></td>";
 	echo "<td><SELECT name='nation'>";
 	foreach ($nation_arr as $code=>$kurzbz)
 	{
@@ -408,9 +408,9 @@ else
 	}
 	echo "</SELECT></td>";
 
-	echo "<td><input type='text' name='kontakt' value='".htmlentities($kontakt)."' /></td>";
+	echo "<td><input type='text' name='kontakt' value='".$kontakt."' /></td>";
 	echo "<td><input type='checkbox' name='zustellung' ".($zustellung?'checked':'')." /></td>";
-	echo "<td><input type='text' name='anmerkung' value='".htmlentities($anmerkung)."' /></td>";
+	echo "<td><input type='text' name='anmerkung' value='".$anmerkung."' /></td>";
 	echo "<td><SELECT name='firma'>";
 	echo "<OPTION value=''>-- keine Auswahl --</OPTION>";
 	foreach ($firma_arr as $id=>$kurzbz)

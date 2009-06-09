@@ -601,7 +601,7 @@ if (!isset($_GET["notenuebersicht"]))
 			$mitarbeit = 0;
 			$note = null;
 		}
-		$anmerkung = ereg_replace("\n","<br>",htmlentities($anmerkung));
+		$anmerkung = ereg_replace("\n","<br>",$anmerkung);
 		
 		if ($uebung_obj->beispiele)
 		{
