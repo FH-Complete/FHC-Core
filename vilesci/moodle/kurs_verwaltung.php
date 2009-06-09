@@ -262,11 +262,11 @@
 			// Bearbeitung Submit 				
 				$content.= '<td style="cursor: pointer;" onclick="if (!window.confirm(\'L&ouml;schen Moodlekurs '.$objMoodle->result[$i]->mdl_course_id.', '.$objMoodle->result[$i]->lehrveranstaltung_bezeichnung.' ? \')) {return false;}; document.'.$cFormName.'_'.$i.'.submit();">';
 					$content.='<form style="display: inline;border:0px;" name="'.$cFormName.'_'.$i.'" method="GET" target="_self" action="'.$_SERVER["PHP_SELF"].'">';
-					  	$content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.htmlentities($objMoodle->result[$i]->mdl_course_id).'" />';
-						$content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.htmlentities($studiensemester_kurzbz).'" />';
-						$content.= '<input style="display:none" type="text" name="studiengang_kz" value="'.htmlentities($studiengang_kz).'" />';
-						$content.= '<input style="display:none" type="text" name="semester" value="'.htmlentities($semester).'" />';
-						$content.= '<input style="display:none" type="text" name="debug" value="'.htmlentities($debug_switch).'" />';
+					  	$content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$objMoodle->result[$i]->mdl_course_id.'" />';
+						$content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.$studiensemester_kurzbz.'" />';
+						$content.= '<input style="display:none" type="text" name="studiengang_kz" value="'.$studiengang_kz.'" />';
+						$content.= '<input style="display:none" type="text" name="semester" value="'.$semester.'" />';
+						$content.= '<input style="display:none" type="text" name="debug" value="'.$debug_switch.'" />';
 						$content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';					
 						$content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
 						$content.= 'entfernen';					
