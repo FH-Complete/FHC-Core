@@ -146,7 +146,7 @@
 							$content.= '<td '.$showCSS.'>'.$row->nachname.'</td>';
 							$content.= '<td '.$showCSS.'>'.$row->vorname.'</td>';
 							$content.= '<td '.$showCSS.'>'.$row->uid.'</td>';
-							$content.= '<td '.$showCSS.'>'.(strtoupper($row->aktiv)=='T' || strtoupper($row->aktiv)=='TRUE' ?'aktiv':'deaktiviert').'</td>';
+							$content.= '<td '.$showCSS.'>'.(mb_strtoupper($row->aktiv)=='T' || mb_strtoupper($row->aktiv)=='TRUE' ?'aktiv':'deaktiviert').'</td>';
 							$arrMoodleUser=array();	
 							$objMoodle->errormsg='';
 							$objMoodle->mdl_user_id='';
