@@ -132,28 +132,20 @@ if(isset($_POST['commit']))
 $obj=array();
 $obj['']=array();
 $obj['']['error']=false;
-$schemas['']=array
-	(
-    		"id" => "" ,
-    		"name" => "" ,
-    		"caption" => "" ,
-    		"comments" => "" ,
-    		"ordinal" => "0"
-	);
 
 //Schema pruefen
 foreach ($schemas as $schema)
 {
-	$obj[$schema['caption']]=array();
-	$obj[$schema['caption']]['error']=false;
+	$obj[$schema['name']]=array();
+	$obj[$schema['name']]['error']=false;
 	
-	$qry = "SELECT nspname FROM pg_namespace WHERE nspname='".$schema['caption']."'";
+	$qry = "SELECT nspname FROM pg_namespace WHERE nspname='".$schema['name']."'";
 	if($result = pg_query($conn, $qry))
 	{
 		if(!pg_num_rows($result)>0)
 		{
-			$obj[$schema['caption']]['qry']='CREATE SCHEMA '.$schema['caption'].';';
-			$obj[$schema['caption']]['error']=true;
+			$obj[$schema['name']]['qry']='CREATE SCHEMA '.$schema['name'].';';
+			$obj[$schema['name']]['error']=true;
 		}
 	}
 }
@@ -166,28 +158,28 @@ $tabs=array_keys($tabellen);
 $i=0;
 foreach ($tabellen AS $tabelle)
 {
-	$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]=array();
+	$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]=array();
 	$sql_query2='';
 	$pk='';
 	// Tabelle pruefen
 	//var_dump($tabelle);
-	$sql_query="SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname='".$schemas[$tabelle['schemaid']]['caption']."' AND tablename='".$tabelle['caption']."';";
+	$sql_query="SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname='".$schemas[$tabelle['schemaid']]['name']."' AND tablename='".$tabelle['name']."';";
 	if (!$result=pg_query($conn,$sql_query))
 		echo '<BR><strong>'.$tabs[$i].': '.pg_last_error($conn).' </strong><BR>';
 	else
 	{
 		if (pg_num_rows($result)==0)
 		{
-			$sql_query= 'CREATE TABLE '.$schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption']." (";
+			$sql_query= 'CREATE TABLE '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name']." (";
 			foreach ($tabelle['attribute'] AS $attribut)
 			{
-				if ($datatypes[$attribut['datatypeid']]['caption']!='geometry')
+				if ($datatypes[$attribut['datatypeid']]['name']!='geometry')
 				{
-					//echo $datatypes[$attribut['datatypeid']]['caption'];
-					$sql_query.= $attribut['caption'].' ';
+					//echo $datatypes[$attribut['datatypeid']]['name'];
+					$sql_query.= $attribut['name'].' ';
 					if ($attribut['pk'])
-						$pk.=$attribut['caption'].',';
-					$sql_query.=$datatypes[$attribut['datatypeid']]['caption'];
+						$pk.=$attribut['name'].',';
+					$sql_query.=$datatypes[$attribut['datatypeid']]['name'];
 					if ($datatypes[$attribut['datatypeid']]['length']==1)
 						$sql_query.='('.$attribut['datatypeparam1'].')';
 					if ($datatypes[$attribut['datatypeid']]['length']==2)
@@ -203,50 +195,50 @@ foreach ($tabellen AS $tabelle)
 					$sql_query.=', ';
 				}
 				else
-					$sql_query2.="SELECT AddGeometryColumn('','".$tabelle['caption']."','".$attribut['caption']."',-1,'POINT',2);";
+					$sql_query2.="SELECT AddGeometryColumn('','".$tabelle['name']."','".$attribut['name']."',-1,'POINT',2);";
 			}
 			$sql_query=substr($sql_query,0,-2);
 			if ($pk!="")
-				$sql_query.=', CONSTRAINT "pk_'.$schemas[$tabelle['schemaid']]['caption'].'_'.$tabelle['caption'].'" PRIMARY KEY ('.substr($pk,0,-1).')';
+				$sql_query.=', CONSTRAINT "pk_'.$schemas[$tabelle['schemaid']]['name'].'_'.$tabelle['name'].'" PRIMARY KEY ('.substr($pk,0,-1).')';
 			$sql_query.=');';
 			//echo $sql_query.'<BR>'.$sql_query2;
 			//if (!$res_attr=pg_query($conn,$sql_query.$sql_query2))
-			//	echo '<BR><strong>'.$schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].': '.pg_last_error($conn).' </strong><BR>'.$sql_query.'<BR>'.$sql_query_nn.'<BR>';
+			//	echo '<BR><strong>'.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].': '.pg_last_error($conn).' </strong><BR>'.$sql_query.'<BR>'.$sql_query_nn.'<BR>';
 			//else
-			//	echo 'Tabelle '.$schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].' wurde erfolgreich angelegt!<BR>';
+			//	echo 'Tabelle '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].' wurde erfolgreich angelegt!<BR>';
 			
-			$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['qry']=$sql_query;
-			$obj[$schemas[$tabelle['schemaid']]['caption']]['error']=true;
+			$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['qry']=$sql_query;
+			$obj[$schemas[$tabelle['schemaid']]['name']]['error']=true;
 		}
 		else
 		{
 			// Attribute pruefen
 			foreach ($tabelle['attribute'] AS $attribut)
 			{
-				$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]=array();
+				$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['attribute'][$attribut['name']]=array();
 				
 				//var_dump($attribut);
 				$sql_query="SELECT nspname AS schemaname, relname AS tablename, pg_get_userbyid(relowner) AS tableowner, attname AS attribute
 						FROM pg_catalog.pg_attribute JOIN pg_catalog.pg_class ON (attrelid=relfilenode) JOIN pg_namespace ON (oid=relnamespace)
-						WHERE relkind='r' AND nspname='".$schemas[$tabelle['schemaid']]['caption']."' AND relname='".$tabelle['caption']."'
-							AND attname='".$attribut['caption']."'; ";
+						WHERE relkind='r' AND nspname='".$schemas[$tabelle['schemaid']]['name']."' AND relname='".$tabelle['name']."'
+							AND attname='".$attribut['name']."'; ";
 				if (!$res_attr=pg_query($conn,$sql_query))
 				{
-					//echo '<BR><strong>'.$attribut['caption'].': '.pg_last_error($conn).' </strong><BR>';
+					//echo '<BR><strong>'.$attribut['name'].': '.pg_last_error($conn).' </strong><BR>';
 				}
 				else
 				{
 					if (pg_num_rows($res_attr)==1)
 					{
-						//echo $schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].'.'.$attribut['caption'].': OK - ';
+						//echo $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'.'.$attribut['name'].': OK - ';
 					}
 					else if (pg_num_rows($res_attr)==0)
 					{
 						$sql_query_nn='';
-						//echo $schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].'.'.$attribut['caption'].' ist nicht angelegt!<BR>';
-						$sql_query='ALTER TABLE '.$schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].'
-							ADD COLUMN '.$attribut['caption'].' ';
-						$sql_query.=$datatypes[$attribut['datatypeid']]['caption'];
+						//echo $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'.'.$attribut['name'].' ist nicht angelegt!<BR>';
+						$sql_query='ALTER TABLE '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'
+							ADD COLUMN '.$attribut['name'].' ';
+						$sql_query.=$datatypes[$attribut['datatypeid']]['name'];
 						if ($datatypes[$attribut['datatypeid']]['length']==1)
 							$sql_query.='('.$attribut['datatypeparam1'].')';
 						if ($datatypes[$attribut['datatypeid']]['length']==2)
@@ -261,23 +253,23 @@ foreach ($tabellen AS $tabelle)
 							$sql_query.=' CHECK ('.$attribut['checkconstraint'].')';
 						if ($attribut['notnull'])
 						{
-							$sql_query_nn.='UPDATE '.$schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].' 
-								SET '.$attribut['caption'].'='.$attribut['defaultvalue'].';';
-							$sql_query_nn.='ALTER TABLE '.$schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].' 
-								ALTER COLUMN '.$attribut['caption'].' SET NOT NULL;';
+							$sql_query_nn.='UPDATE '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].' 
+								SET '.$attribut['name'].'='.$attribut['defaultvalue'].';';
+							$sql_query_nn.='ALTER TABLE '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].' 
+								ALTER COLUMN '.$attribut['name'].' SET NOT NULL;';
 						}
 						$sql_query.=';';
 						//echo $sql_query;
 						//if (!$res_attr=pg_query($conn,$sql_query.$sql_query_nn))
-						//	echo '<BR><strong>'.$attribut['caption'].': '.pg_last_error($conn).' </strong><BR>'.$sql_query.'<BR>'.$sql_query_nn.'<BR>';
+						//	echo '<BR><strong>'.$attribut['name'].': '.pg_last_error($conn).' </strong><BR>'.$sql_query.'<BR>'.$sql_query_nn.'<BR>';
 						//else
-						//	echo $schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'].'.'.$attribut['caption'].' wurde erfolgreich hinzugefuegt!<BR>';
-						$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]['qry']=$sql_query;
-						$obj[$schemas[$tabelle['schemaid']]['caption']]['error']=true;
-						$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['error']=true;
+						//	echo $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'.'.$attribut['name'].' wurde erfolgreich hinzugefuegt!<BR>';
+						$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['attribute'][$attribut['name']]['qry']=$sql_query;
+						$obj[$schemas[$tabelle['schemaid']]['name']]['error']=true;
+						$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['error']=true;
 					}
-					$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]['datatype']=$datatypes[$attribut['datatypeid']]['caption'];
-					$obj[$schemas[$tabelle['schemaid']]['caption']]['tables'][$tabelle['caption']]['attribute'][$attribut['caption']]['attribute']=$attribut;
+					$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['attribute'][$attribut['name']]['datatype']=$datatypes[$attribut['datatypeid']]['name'];
+					$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['attribute'][$attribut['name']]['attribute']=$attribut;
 				}
 			}
 		}
@@ -299,7 +291,7 @@ function getTablenameFromAttributIDs($attr)
 	foreach ($tabellen AS $tabelle)
 		foreach ($tabelle['attribute'] AS $attribut)
 			if ($attribut['id']==$attributid)
-				return $schemas[$tabelle['schemaid']]['caption'].'.'.$tabelle['caption'];
+				return $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'];
 	return false;
 }
 function getAttributesnameFromAttributIDs($attr)
@@ -311,7 +303,7 @@ function getAttributesnameFromAttributIDs($attr)
 		foreach ($tabellen AS $tabelle)
 			foreach ($tabelle['attribute'] AS $attribute)
 				if ($attribute['id']==$attributid)
-					$attributes.=$attribute['caption'].', ';
+					$attributes.=$attribute['name'].', ';
 	return substr($attributes,0,-2);
 }
 
@@ -339,12 +331,12 @@ foreach ($relations AS $relation)
 			$qry = "SELECT * FROM pg_constraint WHERE contype='f' AND conrelid=(
 						SELECT oid FROM pg_class WHERE relname='".$tablename."' AND relnamespace=(
 							SELECT oid FROM pg_namespace WHERE nspname='".$schema."'))
-						AND conname='".$relation['caption']."'";
+						AND conname='".$relation['name']."'";
 			if($result = pg_query($conn, $qry))
 			{
 				if(pg_num_rows($result)==0)
 				{
-					$sql_query='ALTER TABLE '.$childtable.' ADD CONSTRAINT '.$relation['caption'].' FOREIGN KEY ('.$childattr.') REFERENCES '.$parenttable.' ('.$parentattr.') ';
+					$sql_query='ALTER TABLE '.$childtable.' ADD CONSTRAINT '.$relation['name'].' FOREIGN KEY ('.$childattr.') REFERENCES '.$parenttable.' ('.$parentattr.') ';
 					$sql_query.='ON UPDATE CASCADE ON DELETE RESTRICT;';
 					
 					if(isset($obj[$schema]) && 
