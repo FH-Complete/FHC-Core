@@ -1,8 +1,8 @@
 <?php
 
 $datatypes=array
-(
-
+(	
+	
 	'{B0AA6162-F612-46E0-B58F-64E0CFE8C816}'  => array
 	(
     		"id" => "{B0AA6162-F612-46E0-B58F-64E0CFE8C816}" ,
@@ -13,12 +13,12 @@ $datatypes=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 );
 
 $schemas=array
-(
-
+(	
+	
 	'{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}'  => array
 	(
     		"id" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
@@ -27,14 +27,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-	'{3A7F9B8D-001E-4D33-8FD0-0558492DBD41}'  => array
-	(
-    		"id" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD41}" ,
-    		"name" => "foo" ,
-    		"caption" => "foo" ,
-    		"comments" => "" ,
-    		"ordinal" => "0"
-	),
+    
 	'{A0178E89-8366-4582-834F-E124208C684D}'  => array
 	(
     		"id" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
@@ -43,7 +36,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 	'{23913C1C-6059-46CC-A763-615C35B6687A}'  => array
 	(
     		"id" => "{23913C1C-6059-46CC-A763-615C35B6687A}" ,
@@ -52,7 +45,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 	'{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}'  => array
 	(
     		"id" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
@@ -61,7 +54,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 	'{665A865D-A845-48F9-AC5C-C6533F3D34BF}'  => array
 	(
     		"id" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
@@ -70,7 +63,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 	'{A042B101-957A-4776-86EB-BD484ED22749}'  => array
 	(
     		"id" => "{A042B101-957A-4776-86EB-BD484ED22749}" ,
@@ -79,7 +72,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 	'{951DEB7C-0566-4FDB-9767-BBA35A843199}'  => array
 	(
     		"id" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
@@ -88,7 +81,7 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
 	'{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}'  => array
 	(
     		"id" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
@@ -97,12 +90,21 @@ $schemas=array
     		"comments" => "" ,
     		"ordinal" => "0"
 	),
-
+    
+	'{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}'  => array
+	(
+    		"id" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
+    		"name" => "system" ,
+    		"caption" => "system" ,
+    		"comments" => "" ,
+    		"ordinal" => "0"
+	),
+    
 );
 
 $tabellen=array
-(
-
+(	
+	
 	'{B4FB16F6-5756-411C-9145-4B2DEE9427BB}'  => array
 	(
 	    	"id" => "{B4FB16F6-5756-411C-9145-4B2DEE9427BB}" ,
@@ -113,7 +115,7 @@ $tabellen=array
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{A4532A4F-19C2-4A22-A4C3-894FE924E23B}' => array
 			(
 				"id" => "{A4532A4F-19C2-4A22-A4C3-894FE924E23B}" ,
@@ -132,7 +134,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D60EECF2-1552-4A0F-8DDE-97D488AE1AF9}' => array
 			(
 				"id" => "{D60EECF2-1552-4A0F-8DDE-97D488AE1AF9}" ,
@@ -151,7 +153,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B6A3EAF8-F3B9-481D-A226-FC28336680DA}' => array
 			(
 				"id" => "{B6A3EAF8-F3B9-481D-A226-FC28336680DA}" ,
@@ -170,21 +172,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2B7123CE-194C-4738-8E43-BABB85F7AC9B}' => array
 			(
 				"id" => "{2B7123CE-194C-4738-8E43-BABB85F7AC9B}" ,
-				"name" => "pk_tbl_ausbildung" ,
+				"name" => "pk_ausbildung" ,
 				"caption" => "pk_tbl_ausbildung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{145E5ED8-7E17-41DF-8C50-4AA17B321915}' => array
 			   		(
 		   				"id" => "{145E5ED8-7E17-41DF-8C50-4AA17B321915}" ,
@@ -202,24 +204,24 @@ $tabellen=array
 							"id" => "{1E56AD33-C9CB-4979-AC14-1A0341A6A4CD}","id" => "{4428AF2C-BAED-4CBD-BCAB-3145252B8E82}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{25962EDB-DB87-4439-AB73-5020AA41E07E}'  => array
 	(
 	    	"id" => "{25962EDB-DB87-4439-AB73-5020AA41E07E}" ,
-	    	"name" => "Berufstaetigkeit" ,
+	    	"name" => "tbl_berufstaetigkeit" ,
 	    	"caption" => "tbl_berufstaetigkeit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{EEE09CFF-02B3-40F2-AFBC-E7E590A01D4D}' => array
 			(
 				"id" => "{EEE09CFF-02B3-40F2-AFBC-E7E590A01D4D}" ,
@@ -238,7 +240,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C901E98A-98CC-4113-8769-EEB27E88F9DB}' => array
 			(
 				"id" => "{C901E98A-98CC-4113-8769-EEB27E88F9DB}" ,
@@ -257,7 +259,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4ABD2C6B-95F4-49FF-BD45-336EFD4EFF58}' => array
 			(
 				"id" => "{4ABD2C6B-95F4-49FF-BD45-336EFD4EFF58}" ,
@@ -276,21 +278,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{04EB4BE8-BA40-49BB-A893-49FD40CCE24E}' => array
 			(
 				"id" => "{04EB4BE8-BA40-49BB-A893-49FD40CCE24E}" ,
-				"name" => "pk_tbl_berufstaetigkeit" ,
+				"name" => "pk_berufstaetigkeit" ,
 				"caption" => "pk_tbl_berufstaetigkeit" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{CE0713EC-2AB3-4AEF-B4D2-96D4BF853C4A}' => array
 			   		(
 		   				"id" => "{CE0713EC-2AB3-4AEF-B4D2-96D4BF853C4A}" ,
@@ -308,24 +310,24 @@ $tabellen=array
 							"id" => "{2E6DD02C-D22A-4B17-88E3-186C93B0BAB0}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{144676B8-1631-49F5-B480-7D0CEFD16325}'  => array
 	(
 	    	"id" => "{144676B8-1631-49F5-B480-7D0CEFD16325}" ,
-	    	"name" => "Beschaeftigungsart1" ,
+	    	"name" => "tbl_beschaeftigungsart1" ,
 	    	"caption" => "tbl_beschaeftigungsart1" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E0BCFCA6-2AE9-4081-9906-2D2116045104}' => array
 			(
 				"id" => "{E0BCFCA6-2AE9-4081-9906-2D2116045104}" ,
@@ -344,7 +346,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B78191B3-D01B-44D9-A853-CA38F2889335}' => array
 			(
 				"id" => "{B78191B3-D01B-44D9-A853-CA38F2889335}" ,
@@ -363,7 +365,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FFAC4373-03B8-4E52-95C1-D4AB72AC46C5}' => array
 			(
 				"id" => "{FFAC4373-03B8-4E52-95C1-D4AB72AC46C5}" ,
@@ -382,21 +384,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{1B79ADC3-052B-4F98-AC9B-DA2FE57E4CBF}' => array
 			(
 				"id" => "{1B79ADC3-052B-4F98-AC9B-DA2FE57E4CBF}" ,
-				"name" => "pk_tbl_beschaeftigungsart1" ,
+				"name" => "pk_beschaeftigungsart1" ,
 				"caption" => "pk_tbl_beschaeftigungsart1" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{2D999D0C-672D-4F4B-B5E3-7D05EDF404C9}' => array
 			   		(
 		   				"id" => "{2D999D0C-672D-4F4B-B5E3-7D05EDF404C9}" ,
@@ -414,24 +416,24 @@ $tabellen=array
 							"id" => "{60EF3048-6C75-47B6-AEC5-1664B9A1DEC7}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{215F5273-DF8C-4D07-AB9A-6C399D4DC804}'  => array
 	(
 	    	"id" => "{215F5273-DF8C-4D07-AB9A-6C399D4DC804}" ,
-	    	"name" => "Beschaeftigungsart2" ,
+	    	"name" => "tbl_beschaeftigungsart2" ,
 	    	"caption" => "tbl_beschaeftigungsart2" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1875C270-7D06-4F70-80A9-859215275D78}' => array
 			(
 				"id" => "{1875C270-7D06-4F70-80A9-859215275D78}" ,
@@ -450,7 +452,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{245EDB08-2794-4A02-B110-9EB47BC96C38}' => array
 			(
 				"id" => "{245EDB08-2794-4A02-B110-9EB47BC96C38}" ,
@@ -469,21 +471,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F68EC943-1677-4185-8F8E-C235F16EF22B}' => array
 			(
 				"id" => "{F68EC943-1677-4185-8F8E-C235F16EF22B}" ,
-				"name" => "pk_tbl_beschaeftigungsart2" ,
+				"name" => "pk_beschaeftigungsart2" ,
 				"caption" => "pk_tbl_beschaeftigungsart2" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{0454BA56-1658-4B4D-88F3-D01914508357}' => array
 			   		(
 		   				"id" => "{0454BA56-1658-4B4D-88F3-D01914508357}" ,
@@ -501,24 +503,24 @@ $tabellen=array
 							"id" => "{42025991-4414-42F7-B0F0-D4EFB2E55222}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{7D5294D6-0EDE-4FBF-930A-DAFF1857F8D9}'  => array
 	(
 	    	"id" => "{7D5294D6-0EDE-4FBF-930A-DAFF1857F8D9}" ,
-	    	"name" => "Beschaeftigungsausmass" ,
+	    	"name" => "tbl_beschaeftigungsausmass" ,
 	    	"caption" => "tbl_beschaeftigungsausmass" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{50E77110-17DD-475C-B803-8AC5EBFF3B42}' => array
 			(
 				"id" => "{50E77110-17DD-475C-B803-8AC5EBFF3B42}" ,
@@ -537,7 +539,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{21E42F9A-1BD6-4BC2-930E-FCD52BFB7BEC}' => array
 			(
 				"id" => "{21E42F9A-1BD6-4BC2-930E-FCD52BFB7BEC}" ,
@@ -556,7 +558,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{397AFB9D-A5B9-4F8D-81E4-22072570D1D5}' => array
 			(
 				"id" => "{397AFB9D-A5B9-4F8D-81E4-22072570D1D5}" ,
@@ -575,7 +577,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2923CCAD-585E-4C83-8797-88E4C03F6064}' => array
 			(
 				"id" => "{2923CCAD-585E-4C83-8797-88E4C03F6064}" ,
@@ -594,21 +596,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{186EFD8B-A9C5-4052-88AD-62059CBBEE32}' => array
 			(
 				"id" => "{186EFD8B-A9C5-4052-88AD-62059CBBEE32}" ,
-				"name" => "pk_tbl_beschaeftigungsausmass" ,
+				"name" => "pk_beschaeftigungsausmass" ,
 				"caption" => "pk_tbl_beschaeftigungsausmass" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{397C39C3-E83C-41B4-A2C0-A93EF9F8AF25}' => array
 			   		(
 		   				"id" => "{397C39C3-E83C-41B4-A2C0-A93EF9F8AF25}" ,
@@ -626,24 +628,24 @@ $tabellen=array
 							"id" => "{8E530D71-843D-4FCE-9B2A-199BA8561425}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{0ED17B8B-722E-459F-AA09-B8BA5AF66110}'  => array
 	(
 	    	"id" => "{0ED17B8B-722E-459F-AA09-B8BA5AF66110}" ,
-	    	"name" => "Besqual" ,
+	    	"name" => "tbl_besqual" ,
 	    	"caption" => "tbl_besqual" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F44AD63B-33AD-4221-A2E0-5B7E45046614}' => array
 			(
 				"id" => "{F44AD63B-33AD-4221-A2E0-5B7E45046614}" ,
@@ -662,7 +664,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{45255835-61CC-4CF7-A961-F23525C96732}' => array
 			(
 				"id" => "{45255835-61CC-4CF7-A961-F23525C96732}" ,
@@ -681,21 +683,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5D810215-556A-44B8-AE89-8A0359D30B61}' => array
 			(
 				"id" => "{5D810215-556A-44B8-AE89-8A0359D30B61}" ,
-				"name" => "pk_tbl_besqual" ,
+				"name" => "pk_besqual" ,
 				"caption" => "pk_tbl_besqual" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{2B9759C4-8417-4A66-95AB-FA69272BF584}' => array
 			   		(
 		   				"id" => "{2B9759C4-8417-4A66-95AB-FA69272BF584}" ,
@@ -713,24 +715,24 @@ $tabellen=array
 							"id" => "{7381BEE7-5E7C-4D45-97DE-CCFC5A45B33C}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{71792C22-84E6-425D-96F0-FD40F3061281}'  => array
 	(
 	    	"id" => "{71792C22-84E6-425D-96F0-FD40F3061281}" ,
-	    	"name" => "Bisfunktion" ,
+	    	"name" => "tbl_bisfunktion" ,
 	    	"caption" => "tbl_bisfunktion" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1D427A4E-E42A-457E-8EE3-4B509F682365}' => array
 			(
 				"id" => "{1D427A4E-E42A-457E-8EE3-4B509F682365}" ,
@@ -749,7 +751,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{343C5F7C-24EE-4FBA-90E4-2F8C5F3FF073}' => array
 			(
 				"id" => "{343C5F7C-24EE-4FBA-90E4-2F8C5F3FF073}" ,
@@ -768,7 +770,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E5393368-83EC-4945-A58B-9A1B55CAAA54}' => array
 			(
 				"id" => "{E5393368-83EC-4945-A58B-9A1B55CAAA54}" ,
@@ -787,7 +789,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4814A4F5-523E-4AD5-A129-5256BF1C3472}' => array
 			(
 				"id" => "{4814A4F5-523E-4AD5-A129-5256BF1C3472}" ,
@@ -806,7 +808,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AD493396-C167-4E4F-8D31-C618F6E73C39}' => array
 			(
 				"id" => "{AD493396-C167-4E4F-8D31-C618F6E73C39}" ,
@@ -825,7 +827,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9AD7CB81-80BD-4C06-8EF2-C82BA2999DDE}' => array
 			(
 				"id" => "{9AD7CB81-80BD-4C06-8EF2-C82BA2999DDE}" ,
@@ -844,7 +846,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B9E952A9-289F-493C-8BF5-06F1F6B48DB5}' => array
 			(
 				"id" => "{B9E952A9-289F-493C-8BF5-06F1F6B48DB5}" ,
@@ -863,7 +865,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C2524D44-00A8-4BAD-B682-A6F5E3E2D1D1}' => array
 			(
 				"id" => "{C2524D44-00A8-4BAD-B682-A6F5E3E2D1D1}" ,
@@ -882,21 +884,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{6662E7EB-AD82-4680-B129-031A23B570AF}' => array
 			(
 				"id" => "{6662E7EB-AD82-4680-B129-031A23B570AF}" ,
-				"name" => "pk_tbl_bisfunktion" ,
+				"name" => "pk_bisfunktion" ,
 				"caption" => "pk_tbl_bisfunktion" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A14C4037-11BA-4197-81C3-7964B31B631C}' => array
 			   		(
 		   				"id" => "{A14C4037-11BA-4197-81C3-7964B31B631C}" ,
@@ -911,10 +913,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{B0E4B254-3C73-4BCE-B6A0-ADA8291B29E8}' => array
 			   		(
 		   				"id" => "{B0E4B254-3C73-4BCE-B6A0-ADA8291B29E8}" ,
@@ -929,27 +931,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{C55E92A1-94FD-41F4-878F-44E406F57DE7}'  => array
 	(
 	    	"id" => "{C55E92A1-94FD-41F4-878F-44E406F57DE7}" ,
-	    	"name" => "Bisio" ,
+	    	"name" => "tbl_bisio" ,
 	    	"caption" => "tbl_bisio" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{61592ACC-B12D-4BCA-AD4C-912D05B3573C}' => array
 			(
 				"id" => "{61592ACC-B12D-4BCA-AD4C-912D05B3573C}" ,
@@ -963,12 +965,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('bis.tbl_bisio_bisio_id_seq'::regclass)",
+				"defaultvalue" => "nextval('bis.seq_bisio_bisio_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{88070EDA-62CA-4D9D-B970-9C0CC97AEBBA}' => array
 			(
 				"id" => "{88070EDA-62CA-4D9D-B970-9C0CC97AEBBA}" ,
@@ -987,7 +989,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{577255FA-A6AD-470E-9E3F-87D65E37A8AF}' => array
 			(
 				"id" => "{577255FA-A6AD-470E-9E3F-87D65E37A8AF}" ,
@@ -1006,7 +1008,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8C2F42B4-792A-4BDC-82DF-BE52519B21AB}' => array
 			(
 				"id" => "{8C2F42B4-792A-4BDC-82DF-BE52519B21AB}" ,
@@ -1025,7 +1027,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2AFCA070-A0B5-4B29-A4C2-E2AD4DFA1611}' => array
 			(
 				"id" => "{2AFCA070-A0B5-4B29-A4C2-E2AD4DFA1611}" ,
@@ -1044,7 +1046,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6085C4B3-4D3D-4BEB-9904-F6F368BA3407}' => array
 			(
 				"id" => "{6085C4B3-4D3D-4BEB-9904-F6F368BA3407}" ,
@@ -1063,7 +1065,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AE270CD0-89C1-4163-9919-85030C3522FA}' => array
 			(
 				"id" => "{AE270CD0-89C1-4163-9919-85030C3522FA}" ,
@@ -1082,7 +1084,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A4C37498-F314-4093-897A-5009B1F39914}' => array
 			(
 				"id" => "{A4C37498-F314-4093-897A-5009B1F39914}" ,
@@ -1101,7 +1103,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB43A9CB-303B-417A-A534-EFBFEFD58EDC}' => array
 			(
 				"id" => "{DB43A9CB-303B-417A-A534-EFBFEFD58EDC}" ,
@@ -1120,7 +1122,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8619C36F-CB70-4D90-8807-F686BCE83EB3}' => array
 			(
 				"id" => "{8619C36F-CB70-4D90-8807-F686BCE83EB3}" ,
@@ -1139,7 +1141,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{104CF387-201C-4A87-AFB9-53DAB28EE0B5}' => array
 			(
 				"id" => "{104CF387-201C-4A87-AFB9-53DAB28EE0B5}" ,
@@ -1158,7 +1160,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1FF7AB74-F991-4482-BDAD-A83FE4CAB4F2}' => array
 			(
 				"id" => "{1FF7AB74-F991-4482-BDAD-A83FE4CAB4F2}" ,
@@ -1177,7 +1179,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B53F4F66-606B-42C2-94F2-2566A67E30FA}' => array
 			(
 				"id" => "{B53F4F66-606B-42C2-94F2-2566A67E30FA}" ,
@@ -1196,7 +1198,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F5488AD1-FB78-4B5F-BEF5-64A912679534}' => array
 			(
 				"id" => "{F5488AD1-FB78-4B5F-BEF5-64A912679534}" ,
@@ -1215,7 +1217,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5FA59059-0DE8-4C8F-ADD0-9543F44CFF67}' => array
 			(
 				"id" => "{5FA59059-0DE8-4C8F-ADD0-9543F44CFF67}" ,
@@ -1234,21 +1236,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{8D214043-B769-497E-B88A-B017B849B806}' => array
 			(
 				"id" => "{8D214043-B769-497E-B88A-B017B849B806}" ,
-				"name" => "pk_tbl_bisio" ,
+				"name" => "pk_bisio" ,
 				"caption" => "pk_tbl_bisio" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A8394F4F-372F-4328-BC69-64A4B113B5FF}' => array
 			   		(
 		   				"id" => "{A8394F4F-372F-4328-BC69-64A4B113B5FF}" ,
@@ -1263,27 +1265,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{2C5E9622-2DC6-404F-996F-BDE7AD95AA78}'  => array
 	(
 	    	"id" => "{2C5E9622-2DC6-404F-996F-BDE7AD95AA78}" ,
-	    	"name" => "Bisverwendung" ,
+	    	"name" => "tbl_bisverwendung" ,
 	    	"caption" => "tbl_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{34060B38-88CE-4AB8-ABDF-2C49D49D51BA}' => array
 			(
 				"id" => "{34060B38-88CE-4AB8-ABDF-2C49D49D51BA}" ,
@@ -1297,12 +1299,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('bis.tbl_bisverwendung_bisverwendung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('bis.seq_bisverwendung_bisverwendung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB320763-EEE7-4F10-93DE-1A184972B8EB}' => array
 			(
 				"id" => "{DB320763-EEE7-4F10-93DE-1A184972B8EB}" ,
@@ -1321,7 +1323,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3CEFC316-B89A-4930-94A1-E6DF14172C8F}' => array
 			(
 				"id" => "{3CEFC316-B89A-4930-94A1-E6DF14172C8F}" ,
@@ -1340,7 +1342,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{04645F49-6A3F-47F8-A94B-F6A31B2C31D1}' => array
 			(
 				"id" => "{04645F49-6A3F-47F8-A94B-F6A31B2C31D1}" ,
@@ -1359,7 +1361,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DCB7837F-3325-4F8E-8AF7-CF7C79353E61}' => array
 			(
 				"id" => "{DCB7837F-3325-4F8E-8AF7-CF7C79353E61}" ,
@@ -1378,7 +1380,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C7AF8323-4DE5-435D-A1D9-1D3C265AB219}' => array
 			(
 				"id" => "{C7AF8323-4DE5-435D-A1D9-1D3C265AB219}" ,
@@ -1397,7 +1399,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CCC44B93-DACD-4F15-A6B6-8DA38298A862}' => array
 			(
 				"id" => "{CCC44B93-DACD-4F15-A6B6-8DA38298A862}" ,
@@ -1416,7 +1418,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{271D7CA3-D111-4A4C-96AF-AC8B1DEF169F}' => array
 			(
 				"id" => "{271D7CA3-D111-4A4C-96AF-AC8B1DEF169F}" ,
@@ -1435,7 +1437,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5944AF15-D7C9-47BC-A529-4C2CF17657AD}' => array
 			(
 				"id" => "{5944AF15-D7C9-47BC-A529-4C2CF17657AD}" ,
@@ -1454,7 +1456,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CC6A01DC-9FDB-4087-8328-14D46310D952}' => array
 			(
 				"id" => "{CC6A01DC-9FDB-4087-8328-14D46310D952}" ,
@@ -1473,7 +1475,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0FB50FB0-C15B-40DF-A640-F4458AB5331D}' => array
 			(
 				"id" => "{0FB50FB0-C15B-40DF-A640-F4458AB5331D}" ,
@@ -1492,7 +1494,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F6EC3ECA-ACE6-4616-818E-08A45E18DCD3}' => array
 			(
 				"id" => "{F6EC3ECA-ACE6-4616-818E-08A45E18DCD3}" ,
@@ -1511,7 +1513,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5F109662-CC7C-4207-9114-3D23B7E160CD}' => array
 			(
 				"id" => "{5F109662-CC7C-4207-9114-3D23B7E160CD}" ,
@@ -1530,7 +1532,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB8FF184-7A36-47EE-B10C-D86D56FB8FB5}' => array
 			(
 				"id" => "{DB8FF184-7A36-47EE-B10C-D86D56FB8FB5}" ,
@@ -1549,7 +1551,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6355BE4B-4E45-4D20-8AD6-3FEAC6F8FACC}' => array
 			(
 				"id" => "{6355BE4B-4E45-4D20-8AD6-3FEAC6F8FACC}" ,
@@ -1568,7 +1570,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B8051268-EC34-48FE-9C9A-7074FAF77F8E}' => array
 			(
 				"id" => "{B8051268-EC34-48FE-9C9A-7074FAF77F8E}" ,
@@ -1587,7 +1589,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FAD2AE59-5EB4-4C36-B7B0-5D7A431AF06A}' => array
 			(
 				"id" => "{FAD2AE59-5EB4-4C36-B7B0-5D7A431AF06A}" ,
@@ -1606,21 +1608,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{15248555-8ED5-465E-97D5-EEA32627849E}' => array
 			(
 				"id" => "{15248555-8ED5-465E-97D5-EEA32627849E}" ,
-				"name" => "pk_tbl_bisverwendung" ,
+				"name" => "pk_bisverwendung" ,
 				"caption" => "pk_tbl_bisverwendung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{6EF483DC-7662-4466-ABC2-7DCACF529BC9}' => array
 			   		(
 		   				"id" => "{6EF483DC-7662-4466-ABC2-7DCACF529BC9}" ,
@@ -1638,24 +1640,24 @@ $tabellen=array
 							"id" => "{FB62B11B-39DE-43EF-9456-69123E243295}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EEF800D3-0D71-46AE-A93B-F6A4CD60E017}'  => array
 	(
 	    	"id" => "{EEF800D3-0D71-46AE-A93B-F6A4CD60E017}" ,
-	    	"name" => "Bundesland" ,
+	    	"name" => "tbl_bundesland" ,
 	    	"caption" => "tbl_bundesland" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4ACAABFF-15E8-4638-B81F-0544995AE031}' => array
 			(
 				"id" => "{4ACAABFF-15E8-4638-B81F-0544995AE031}" ,
@@ -1674,7 +1676,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{00515D37-B90F-402C-9934-45C510FF6D92}' => array
 			(
 				"id" => "{00515D37-B90F-402C-9934-45C510FF6D92}" ,
@@ -1693,7 +1695,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7E294131-D13F-4243-B282-C3E72869E879}' => array
 			(
 				"id" => "{7E294131-D13F-4243-B282-C3E72869E879}" ,
@@ -1712,21 +1714,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{841C9927-A5BE-49CD-B3C8-5B52734FA659}' => array
 			(
 				"id" => "{841C9927-A5BE-49CD-B3C8-5B52734FA659}" ,
-				"name" => "pk_tbl_bundesland" ,
+				"name" => "pk_bundesland" ,
 				"caption" => "pk_tbl_bundesland" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8775BE85-BAE4-4477-BE2D-8DA1DA1BEB1E}' => array
 			   		(
 		   				"id" => "{8775BE85-BAE4-4477-BE2D-8DA1DA1BEB1E}" ,
@@ -1744,20 +1746,20 @@ $tabellen=array
 							"id" => "{E46BC5FB-D111-4003-891B-2D1FF523A24D}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{28264E86-D6D3-4CB0-9B3F-E0B30778CC92}' => array
 			(
 				"id" => "{28264E86-D6D3-4CB0-9B3F-E0B30778CC92}" ,
-				"name" => "Bundesland_kurzbz_key" ,
+				"name" => "tbl_bundesland_kurzbz_key" ,
 				"caption" => "tbl_bundesland_kurzbz_key" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A740AA87-FCA9-4AFB-820D-3329A1690A36}' => array
 			   		(
 		   				"id" => "{A740AA87-FCA9-4AFB-820D-3329A1690A36}" ,
@@ -1772,27 +1774,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{DDE79A5E-369F-4329-AC14-591628947AC4}'  => array
 	(
 	    	"id" => "{DDE79A5E-369F-4329-AC14-591628947AC4}" ,
-	    	"name" => "Entwicklungsteam" ,
+	    	"name" => "tbl_entwicklungsteam" ,
 	    	"caption" => "tbl_entwicklungsteam" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9E2D5E32-4AE4-42CD-85CF-D8E3EA2EA4B1}' => array
 			(
 				"id" => "{9E2D5E32-4AE4-42CD-85CF-D8E3EA2EA4B1}" ,
@@ -1811,7 +1813,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9D4D1079-8C71-4028-9300-EC8F75B5BED9}' => array
 			(
 				"id" => "{9D4D1079-8C71-4028-9300-EC8F75B5BED9}" ,
@@ -1830,7 +1832,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4848B203-B92B-4C01-A4FA-1410E8C758D0}' => array
 			(
 				"id" => "{4848B203-B92B-4C01-A4FA-1410E8C758D0}" ,
@@ -1849,7 +1851,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AFE205BE-4546-4376-B764-3FCB364448E8}' => array
 			(
 				"id" => "{AFE205BE-4546-4376-B764-3FCB364448E8}" ,
@@ -1868,7 +1870,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D6386C1B-00EC-49AF-924A-A75C4E7490E9}' => array
 			(
 				"id" => "{D6386C1B-00EC-49AF-924A-A75C4E7490E9}" ,
@@ -1887,7 +1889,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{395A8414-E6C3-417E-A67D-DF02C4F0C429}' => array
 			(
 				"id" => "{395A8414-E6C3-417E-A67D-DF02C4F0C429}" ,
@@ -1906,7 +1908,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0CEB8B3F-B7E4-47D1-A824-F99AF37E73C8}' => array
 			(
 				"id" => "{0CEB8B3F-B7E4-47D1-A824-F99AF37E73C8}" ,
@@ -1925,7 +1927,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E3F9E183-785F-4416-B3F2-94CE548431D1}' => array
 			(
 				"id" => "{E3F9E183-785F-4416-B3F2-94CE548431D1}" ,
@@ -1944,7 +1946,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DF401E20-43FE-4FC5-8178-38384ED444D1}' => array
 			(
 				"id" => "{DF401E20-43FE-4FC5-8178-38384ED444D1}" ,
@@ -1963,7 +1965,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E4542679-1F2D-4D3E-AD50-9A477AA77221}' => array
 			(
 				"id" => "{E4542679-1F2D-4D3E-AD50-9A477AA77221}" ,
@@ -1982,21 +1984,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{EBB599A6-2DAE-40F1-AC23-596752562E67}' => array
 			(
 				"id" => "{EBB599A6-2DAE-40F1-AC23-596752562E67}" ,
-				"name" => "pk_tbl_entwicklungsteam" ,
+				"name" => "pk_entwicklungsteam" ,
 				"caption" => "pk_tbl_entwicklungsteam" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{00371CB8-7E6B-4BEA-946C-5B1DD0800458}' => array
 			   		(
 		   				"id" => "{00371CB8-7E6B-4BEA-946C-5B1DD0800458}" ,
@@ -2011,10 +2013,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{E8755704-D2FB-43BA-AB71-7D4FEB16C268}' => array
 			   		(
 		   				"id" => "{E8755704-D2FB-43BA-AB71-7D4FEB16C268}" ,
@@ -2029,27 +2031,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EC4A3ACE-B5E1-4B7E-8CE6-595F13FEB1CD}'  => array
 	(
 	    	"id" => "{EC4A3ACE-B5E1-4B7E-8CE6-595F13FEB1CD}" ,
-	    	"name" => "Gemeinde" ,
+	    	"name" => "tbl_gemeinde" ,
 	    	"caption" => "tbl_gemeinde" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{BAA84129-5BC6-403B-AC21-CCF20A1F59C0}' => array
 			(
 				"id" => "{BAA84129-5BC6-403B-AC21-CCF20A1F59C0}" ,
@@ -2063,12 +2065,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('bis.tbl_gemeinde_gemeinde_id_seq'::regclass)",
+				"defaultvalue" => "nextval('bis.seq_gemeinde_gemeinde_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{570FBA27-2CD1-419F-85A4-1608048E27C6}' => array
 			(
 				"id" => "{570FBA27-2CD1-419F-85A4-1608048E27C6}" ,
@@ -2087,7 +2089,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3E717569-E241-4485-B3B3-E07FDBF7CB36}' => array
 			(
 				"id" => "{3E717569-E241-4485-B3B3-E07FDBF7CB36}" ,
@@ -2106,7 +2108,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{21BA7302-DECE-4338-B746-940DB3DEC626}' => array
 			(
 				"id" => "{21BA7302-DECE-4338-B746-940DB3DEC626}" ,
@@ -2125,7 +2127,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B3CF0B5D-0589-4E08-A550-E3646DA78BA7}' => array
 			(
 				"id" => "{B3CF0B5D-0589-4E08-A550-E3646DA78BA7}" ,
@@ -2144,7 +2146,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D428CF91-78A0-4117-8843-F2DA98882B14}' => array
 			(
 				"id" => "{D428CF91-78A0-4117-8843-F2DA98882B14}" ,
@@ -2163,7 +2165,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F1918103-9D27-44E9-91C5-A0051172A6ED}' => array
 			(
 				"id" => "{F1918103-9D27-44E9-91C5-A0051172A6ED}" ,
@@ -2182,7 +2184,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{56177C5B-D1FE-4131-B75C-A882079FD6F1}' => array
 			(
 				"id" => "{56177C5B-D1FE-4131-B75C-A882079FD6F1}" ,
@@ -2201,21 +2203,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{4AF58FE2-2A52-4483-BFAD-07610599604B}' => array
 			(
 				"id" => "{4AF58FE2-2A52-4483-BFAD-07610599604B}" ,
-				"name" => "pk_tbl_gemeinde" ,
+				"name" => "pk_gemeinde" ,
 				"caption" => "pk_tbl_gemeinde" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D7280086-D98C-468F-B5DF-805EACE59359}' => array
 			   		(
 		   				"id" => "{D7280086-D98C-468F-B5DF-805EACE59359}" ,
@@ -2230,27 +2232,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{42FF7B67-6F6E-45F8-A652-9F71DDEF0867}'  => array
 	(
 	    	"id" => "{42FF7B67-6F6E-45F8-A652-9F71DDEF0867}" ,
-	    	"name" => "Hauptberuf" ,
+	    	"name" => "tbl_hauptberuf" ,
 	    	"caption" => "tbl_hauptberuf" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{C46950DA-4E57-43DA-BFCE-A67DC47C54AD}' => array
 			(
 				"id" => "{C46950DA-4E57-43DA-BFCE-A67DC47C54AD}" ,
@@ -2269,7 +2271,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{939BD007-FFCF-4174-A0C0-03C270E6A15E}' => array
 			(
 				"id" => "{939BD007-FFCF-4174-A0C0-03C270E6A15E}" ,
@@ -2288,21 +2290,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5F06A1AB-B175-4CC0-ADF1-7B4D2F9761F9}' => array
 			(
 				"id" => "{5F06A1AB-B175-4CC0-ADF1-7B4D2F9761F9}" ,
-				"name" => "pk_tbl_hauptberuf" ,
+				"name" => "pk_hauptberuf" ,
 				"caption" => "pk_tbl_hauptberuf" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{20C386EC-4857-478B-A81D-054A7D5E1784}' => array
 			   		(
 		   				"id" => "{20C386EC-4857-478B-A81D-054A7D5E1784}" ,
@@ -2320,24 +2322,24 @@ $tabellen=array
 							"id" => "{9A5482E2-6C6D-4D67-B213-CA7213500653}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{7103E176-C1A1-4328-A87A-CFCCABF44C16}'  => array
 	(
 	    	"id" => "{7103E176-C1A1-4328-A87A-CFCCABF44C16}" ,
-	    	"name" => "Mobilitaetsprogramm" ,
+	    	"name" => "tbl_mobilitaetsprogramm" ,
 	    	"caption" => "tbl_mobilitaetsprogramm" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{DDAA5870-1AE8-4B92-B0B8-E25D975EE256}' => array
 			(
 				"id" => "{DDAA5870-1AE8-4B92-B0B8-E25D975EE256}" ,
@@ -2356,7 +2358,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{482DC7CB-26B1-4857-93B6-E92BD3484A36}' => array
 			(
 				"id" => "{482DC7CB-26B1-4857-93B6-E92BD3484A36}" ,
@@ -2375,7 +2377,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EB2BAFAB-D5A9-425D-9DDB-D764379CB336}' => array
 			(
 				"id" => "{EB2BAFAB-D5A9-425D-9DDB-D764379CB336}" ,
@@ -2394,21 +2396,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{4F675612-A64D-4A58-BF43-AB2916560326}' => array
 			(
 				"id" => "{4F675612-A64D-4A58-BF43-AB2916560326}" ,
-				"name" => "pk_tbl_mobilitaetsprogramm" ,
+				"name" => "pk_mobilitaetsprogramm" ,
 				"caption" => "pk_tbl_mobilitaetsprogramm" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8AD6472E-DA66-4FED-AE6D-060837A9DE20}' => array
 			   		(
 		   				"id" => "{8AD6472E-DA66-4FED-AE6D-060837A9DE20}" ,
@@ -2426,10 +2428,10 @@ $tabellen=array
 							"id" => "{F65EF5CC-3B02-46A9-9267-01DA143B63D9}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{92970EE0-9195-4F07-9D05-F0E0729EFFF2}' => array
 			(
 				"id" => "{92970EE0-9195-4F07-9D05-F0E0729EFFF2}" ,
@@ -2439,7 +2441,7 @@ $tabellen=array
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{EE3C0C60-3A8E-448C-B554-1C14F437CE9B}' => array
 			   		(
 		   				"id" => "{EE3C0C60-3A8E-448C-B554-1C14F437CE9B}" ,
@@ -2454,27 +2456,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{23C0AC32-C742-4460-B95D-9CCA3B822276}'  => array
 	(
 	    	"id" => "{23C0AC32-C742-4460-B95D-9CCA3B822276}" ,
-	    	"name" => "Nation" ,
+	    	"name" => "tbl_nation" ,
 	    	"caption" => "tbl_nation" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1B158B4C-5319-47B9-9472-07D5BE8D45A5}' => array
 			(
 				"id" => "{1B158B4C-5319-47B9-9472-07D5BE8D45A5}" ,
@@ -2493,7 +2495,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C2053EFE-F5E6-48C5-A3E7-6517948CD96A}' => array
 			(
 				"id" => "{C2053EFE-F5E6-48C5-A3E7-6517948CD96A}" ,
@@ -2512,7 +2514,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AA262D88-BBBC-464B-9B10-1302200A6047}' => array
 			(
 				"id" => "{AA262D88-BBBC-464B-9B10-1302200A6047}" ,
@@ -2531,7 +2533,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8ADE736E-2440-4E3A-9529-B85FA65C058E}' => array
 			(
 				"id" => "{8ADE736E-2440-4E3A-9529-B85FA65C058E}" ,
@@ -2550,7 +2552,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{45E8EE42-A6BD-4875-A718-61EBCC6E71F7}' => array
 			(
 				"id" => "{45E8EE42-A6BD-4875-A718-61EBCC6E71F7}" ,
@@ -2569,7 +2571,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A596B14D-38A3-45BB-8003-C82CC5B552CA}' => array
 			(
 				"id" => "{A596B14D-38A3-45BB-8003-C82CC5B552CA}" ,
@@ -2588,7 +2590,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{49952455-1F91-4034-99C1-FD7C79601A4E}' => array
 			(
 				"id" => "{49952455-1F91-4034-99C1-FD7C79601A4E}" ,
@@ -2607,7 +2609,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C5B35689-6113-42AE-A2C8-73DCD24E983E}' => array
 			(
 				"id" => "{C5B35689-6113-42AE-A2C8-73DCD24E983E}" ,
@@ -2626,7 +2628,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D36991D7-D133-4712-8134-420441720F90}' => array
 			(
 				"id" => "{D36991D7-D133-4712-8134-420441720F90}" ,
@@ -2645,21 +2647,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{6764E8B4-B475-43F1-AE18-9E4262DE495A}' => array
 			(
 				"id" => "{6764E8B4-B475-43F1-AE18-9E4262DE495A}" ,
-				"name" => "pk_tbl_nation" ,
+				"name" => "pk_nation" ,
 				"caption" => "pk_tbl_nation" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{0EE635E6-C94F-4F62-8381-38AC891279E3}' => array
 			   		(
 		   				"id" => "{0EE635E6-C94F-4F62-8381-38AC891279E3}" ,
@@ -2677,24 +2679,24 @@ $tabellen=array
 							"id" => "{E6C34671-A267-4E33-B790-E051C4A416CC}","id" => "{01CE52AD-8C31-4779-802B-1D8387148857}","id" => "{67D01707-9CD4-4C27-BC6D-4F8E2626B40B}","id" => "{4D5C7F66-366B-485C-BFAD-97F9D07266E0}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EA32F10A-838E-4F10-AD70-45B2B8E5D534}'  => array
 	(
 	    	"id" => "{EA32F10A-838E-4F10-AD70-45B2B8E5D534}" ,
-	    	"name" => "Orgform" ,
+	    	"name" => "tbl_orgform" ,
 	    	"caption" => "tbl_orgform" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{92472ACD-3B59-449A-8371-1AC676B2CBB4}' => array
 			(
 				"id" => "{92472ACD-3B59-449A-8371-1AC676B2CBB4}" ,
@@ -2713,7 +2715,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C70D9346-2F99-4E8E-8B53-90CE43E683F7}' => array
 			(
 				"id" => "{C70D9346-2F99-4E8E-8B53-90CE43E683F7}" ,
@@ -2732,7 +2734,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FE6F9445-94B1-4325-9CF7-8B7593676B4D}' => array
 			(
 				"id" => "{FE6F9445-94B1-4325-9CF7-8B7593676B4D}" ,
@@ -2751,7 +2753,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5BD05AD3-1B6A-4360-86B2-4B407F71C9BD}' => array
 			(
 				"id" => "{5BD05AD3-1B6A-4360-86B2-4B407F71C9BD}" ,
@@ -2770,21 +2772,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{A3535A82-32E9-4E84-891D-1E1188D222A4}' => array
 			(
 				"id" => "{A3535A82-32E9-4E84-891D-1E1188D222A4}" ,
-				"name" => "pk_tbl_orgform" ,
+				"name" => "pk_orgform" ,
 				"caption" => "pk_tbl_orgform" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}' => array
 			   		(
 		   				"id" => "{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}" ,
@@ -2802,10 +2804,10 @@ $tabellen=array
 							"id" => "{7FBD2E4C-54F3-49E8-B0EF-5D402DA7FF33}","id" => "{0EB30C61-91EB-4C1D-B5FD-08E22DB4971C}","id" => "{D25C5BBD-FD27-402A-B573-D2C007DC9AC8}","id" => "{10696812-735C-43EA-A897-DB83275899D2}","id" => "{E4F6079D-6131-4527-BA3A-CB09A3FE4EB5}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{778099B3-750B-4FF7-8335-7E941DEF430A}' => array
 			(
 				"id" => "{778099B3-750B-4FF7-8335-7E941DEF430A}" ,
@@ -2815,7 +2817,7 @@ $tabellen=array
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{41898E00-C71A-4137-88CC-FB7E7C86B58A}' => array
 			   		(
 		   				"id" => "{41898E00-C71A-4137-88CC-FB7E7C86B58A}" ,
@@ -2830,27 +2832,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{755219AF-7526-43D3-8B5C-6F488D07CBD7}'  => array
 	(
 	    	"id" => "{755219AF-7526-43D3-8B5C-6F488D07CBD7}" ,
-	    	"name" => "Verwendung" ,
+	    	"name" => "tbl_verwendung" ,
 	    	"caption" => "tbl_verwendung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7FDD176D-954A-48F1-B66E-5F0DE707EDB4}' => array
 			(
 				"id" => "{7FDD176D-954A-48F1-B66E-5F0DE707EDB4}" ,
@@ -2869,7 +2871,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B68B6345-1A7F-46B1-BD62-F4CF03D5ADED}' => array
 			(
 				"id" => "{B68B6345-1A7F-46B1-BD62-F4CF03D5ADED}" ,
@@ -2888,21 +2890,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{291D984B-5577-453B-BF5B-8C5192A9F8EC}' => array
 			(
 				"id" => "{291D984B-5577-453B-BF5B-8C5192A9F8EC}" ,
-				"name" => "pk_tbl_verwendung" ,
+				"name" => "pk_verwendung" ,
 				"caption" => "pk_tbl_verwendung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{CC3193EA-51C9-413C-B734-D6E30B2C64D4}' => array
 			   		(
 		   				"id" => "{CC3193EA-51C9-413C-B734-D6E30B2C64D4}" ,
@@ -2920,24 +2922,24 @@ $tabellen=array
 							"id" => "{2FC70A73-3258-4DDA-9C72-D1A9D78F5206}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9A1D47E6-3066-4D73-93EB-7B5C95AF590A}'  => array
 	(
 	    	"id" => "{9A1D47E6-3066-4D73-93EB-7B5C95AF590A}" ,
-	    	"name" => "Zgv" ,
+	    	"name" => "tbl_zgv" ,
 	    	"caption" => "tbl_zgv" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{AD4595DF-A130-493B-B421-E69AC72E29BD}' => array
 			(
 				"id" => "{AD4595DF-A130-493B-B421-E69AC72E29BD}" ,
@@ -2956,7 +2958,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A5A35826-1983-4C20-B589-EB8776CDC2C7}' => array
 			(
 				"id" => "{A5A35826-1983-4C20-B589-EB8776CDC2C7}" ,
@@ -2975,7 +2977,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B9246A1A-A4E1-41FE-B150-ACE64923E8AE}' => array
 			(
 				"id" => "{B9246A1A-A4E1-41FE-B150-ACE64923E8AE}" ,
@@ -2994,21 +2996,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{241BA25D-87E3-4E7C-9263-EA7B8E3E2606}' => array
 			(
 				"id" => "{241BA25D-87E3-4E7C-9263-EA7B8E3E2606}" ,
-				"name" => "pk_tbl_zgv" ,
+				"name" => "pk_zgv" ,
 				"caption" => "pk_tbl_zgv" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9F9EBFDE-AA03-49F0-894D-C04CDC2E2A19}' => array
 			   		(
 		   				"id" => "{9F9EBFDE-AA03-49F0-894D-C04CDC2E2A19}" ,
@@ -3026,24 +3028,24 @@ $tabellen=array
 							"id" => "{29111A97-D509-4148-91AA-E7F9D1597158}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4A23793F-2F70-47B3-929A-C764710267A5}'  => array
 	(
 	    	"id" => "{4A23793F-2F70-47B3-929A-C764710267A5}" ,
-	    	"name" => "Zgvmaster" ,
+	    	"name" => "tbl_zgvmaster" ,
 	    	"caption" => "tbl_zgvmaster" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{090C2E01-CA64-43A4-B3C8-18C64D5A09B7}' => array
 			(
 				"id" => "{090C2E01-CA64-43A4-B3C8-18C64D5A09B7}" ,
@@ -3062,7 +3064,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D26B158E-7D5C-43EA-963A-269C9274B95C}' => array
 			(
 				"id" => "{D26B158E-7D5C-43EA-963A-269C9274B95C}" ,
@@ -3081,7 +3083,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7213ADAA-04BA-4AAB-B1D6-4CBD45EA8A44}' => array
 			(
 				"id" => "{7213ADAA-04BA-4AAB-B1D6-4CBD45EA8A44}" ,
@@ -3100,21 +3102,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{CE05AAA1-0B71-49AC-B838-46EC47C269C3}' => array
 			(
 				"id" => "{CE05AAA1-0B71-49AC-B838-46EC47C269C3}" ,
-				"name" => "pk_tbl_zgvmaster" ,
+				"name" => "pk_zgvmaster" ,
 				"caption" => "pk_tbl_zgvmaster" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{588D2E3F-CF58-4768-A929-ABAC5BF9757E}' => array
 			   		(
 		   				"id" => "{588D2E3F-CF58-4768-A929-ABAC5BF9757E}" ,
@@ -3132,24 +3134,24 @@ $tabellen=array
 							"id" => "{9B50B35B-73D0-40E7-BF72-15A91605D364}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{ECB4157F-6909-4853-B7F3-7B454A50679F}'  => array
 	(
 	    	"id" => "{ECB4157F-6909-4853-B7F3-7B454A50679F}" ,
-	    	"name" => "Zweck" ,
+	    	"name" => "tbl_zweck" ,
 	    	"caption" => "tbl_zweck" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{58D02B6C-A792-4D33-BFE7-B1EEFE0D7507}' => array
 			(
 				"id" => "{58D02B6C-A792-4D33-BFE7-B1EEFE0D7507}" ,
@@ -3168,7 +3170,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A40A7B70-F9C4-4E14-BF21-BC049A80A6D7}' => array
 			(
 				"id" => "{A40A7B70-F9C4-4E14-BF21-BC049A80A6D7}" ,
@@ -3187,7 +3189,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DD0B278A-E052-4B92-B306-7DCD729A0C6B}' => array
 			(
 				"id" => "{DD0B278A-E052-4B92-B306-7DCD729A0C6B}" ,
@@ -3206,21 +3208,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{6AA29602-7960-415B-A494-85417C8B5A6B}' => array
 			(
 				"id" => "{6AA29602-7960-415B-A494-85417C8B5A6B}" ,
-				"name" => "pk_tbl_zweck" ,
+				"name" => "pk_zweck" ,
 				"caption" => "pk_tbl_zweck" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8A043546-4279-4A46-858F-3EFCFA70894F}' => array
 			   		(
 		   				"id" => "{8A043546-4279-4A46-858F-3EFCFA70894F}" ,
@@ -3238,10 +3240,10 @@ $tabellen=array
 							"id" => "{4DB643A4-2D32-4ACA-8CC6-35C3BC7795E7}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{F608C96E-E6A1-457E-9AC4-BE016202502F}' => array
 			(
 				"id" => "{F608C96E-E6A1-457E-9AC4-BE016202502F}" ,
@@ -3251,7 +3253,7 @@ $tabellen=array
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A7236D41-7633-438B-8B3F-7F095A98F237}' => array
 			   		(
 		   				"id" => "{A7236D41-7633-438B-8B3F-7F095A98F237}" ,
@@ -3266,16 +3268,16 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4924CA20-0C94-4E5D-AE3D-4CC20CD950F4}'  => array
 	(
 	    	"id" => "{4924CA20-0C94-4E5D-AE3D-4CC20CD950F4}" ,
@@ -3286,7 +3288,7 @@ $tabellen=array
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{6958D46A-ED29-4BE9-8768-DEDB2D358E32}' => array
 			(
 				"id" => "{6958D46A-ED29-4BE9-8768-DEDB2D358E32}" ,
@@ -3300,12 +3302,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_abgabe_abgabe_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_abgabe_abgabe_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BEE3AF27-1B66-4CB8-86E7-BBDD97311BAF}' => array
 			(
 				"id" => "{BEE3AF27-1B66-4CB8-86E7-BBDD97311BAF}" ,
@@ -3324,7 +3326,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BECC186E-8D3D-4E5E-8186-8BA511BD7052}' => array
 			(
 				"id" => "{BECC186E-8D3D-4E5E-8186-8BA511BD7052}" ,
@@ -3343,7 +3345,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5014C42E-BB29-4FCB-8B0F-CBAD2FC93A70}' => array
 			(
 				"id" => "{5014C42E-BB29-4FCB-8B0F-CBAD2FC93A70}" ,
@@ -3362,21 +3364,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2004921A-6871-4348-8E3E-FBF40907E9C6}' => array
 			(
 				"id" => "{2004921A-6871-4348-8E3E-FBF40907E9C6}" ,
-				"name" => "pk_tbl_abgabe" ,
+				"name" => "pk_abgabe" ,
 				"caption" => "pk_tbl_abgabe" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A57BD7F9-22E2-490F-AF1E-321F756F48CE}' => array
 			   		(
 		   				"id" => "{A57BD7F9-22E2-490F-AF1E-321F756F48CE}" ,
@@ -3394,13 +3396,13 @@ $tabellen=array
 							"id" => "{16FAC960-9E8C-45EE-8B98-E39C35A27DFD}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4D3BFAE6-ED77-40D0-A873-64819F79B77C}'  => array
 	(
 	    	"id" => "{4D3BFAE6-ED77-40D0-A873-64819F79B77C}" ,
@@ -3411,7 +3413,7 @@ $tabellen=array
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{C69CD7FC-2DF5-4D96-A1AE-01591FABC5D7}' => array
 			(
 				"id" => "{C69CD7FC-2DF5-4D96-A1AE-01591FABC5D7}" ,
@@ -3425,12 +3427,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_beispiel_beispiel_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_beispiel_beispiel_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A872A00E-2C05-43DE-ABAD-B209469DD2D4}' => array
 			(
 				"id" => "{A872A00E-2C05-43DE-ABAD-B209469DD2D4}" ,
@@ -3449,7 +3451,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C73514D-158F-4939-A7B8-07A055069E3E}' => array
 			(
 				"id" => "{2C73514D-158F-4939-A7B8-07A055069E3E}" ,
@@ -3468,7 +3470,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E567D882-1593-49A0-90F5-3EA342EA406B}' => array
 			(
 				"id" => "{E567D882-1593-49A0-90F5-3EA342EA406B}" ,
@@ -3487,7 +3489,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AAC1869C-78AF-4F7B-B676-84EA3FBED767}' => array
 			(
 				"id" => "{AAC1869C-78AF-4F7B-B676-84EA3FBED767}" ,
@@ -3506,7 +3508,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ABA2384C-A486-4AD8-A88D-2128337D685E}' => array
 			(
 				"id" => "{ABA2384C-A486-4AD8-A88D-2128337D685E}" ,
@@ -3525,7 +3527,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0B790897-F70A-4BA1-9E50-9695900ADA93}' => array
 			(
 				"id" => "{0B790897-F70A-4BA1-9E50-9695900ADA93}" ,
@@ -3544,7 +3546,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4CED5C44-0787-4A44-9968-996896007874}' => array
 			(
 				"id" => "{4CED5C44-0787-4A44-9968-996896007874}" ,
@@ -3563,7 +3565,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A2809EB1-37F2-43F3-BEFB-042887984633}' => array
 			(
 				"id" => "{A2809EB1-37F2-43F3-BEFB-042887984633}" ,
@@ -3582,21 +3584,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{D03A381F-2B9E-4D30-977E-0EAF076158B5}' => array
 			(
 				"id" => "{D03A381F-2B9E-4D30-977E-0EAF076158B5}" ,
-				"name" => "pk_tbl_beispiel" ,
+				"name" => "pk_beispiel" ,
 				"caption" => "pk_tbl_beispiel" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{03B2620D-8C36-43D2-A166-221CD04B2322}' => array
 			   		(
 		   				"id" => "{03B2620D-8C36-43D2-A166-221CD04B2322}" ,
@@ -3614,24 +3616,24 @@ $tabellen=array
 							"id" => "{4E3A1C7B-91BB-41D3-81E7-7C2F4918F596}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4DEE1844-AEF6-4F9C-81F4-DDD6A5F37F7F}'  => array
 	(
 	    	"id" => "{4DEE1844-AEF6-4F9C-81F4-DDD6A5F37F7F}" ,
-	    	"name" => "Benutzerlvstudiensemester" ,
+	    	"name" => "tbl_benutzerlvstudiensemester" ,
 	    	"caption" => "tbl_benutzerlvstudiensemester" ,
 	    	"comments" => "Zur Anmeldung fuer die Freifaecher." ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{46A1C049-3EC9-4CDE-AAC2-05A20E06FBC8}' => array
 			(
 				"id" => "{46A1C049-3EC9-4CDE-AAC2-05A20E06FBC8}" ,
@@ -3650,7 +3652,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F7BAB5BC-12C9-49C4-A6C5-0753080D3D76}' => array
 			(
 				"id" => "{F7BAB5BC-12C9-49C4-A6C5-0753080D3D76}" ,
@@ -3669,7 +3671,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EB46F25B-EE83-46D3-970B-F64E9973CB9A}' => array
 			(
 				"id" => "{EB46F25B-EE83-46D3-970B-F64E9973CB9A}" ,
@@ -3688,21 +3690,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{7435C967-84E7-490D-8C63-7572417BA5BC}' => array
 			(
 				"id" => "{7435C967-84E7-490D-8C63-7572417BA5BC}" ,
-				"name" => "pk_tbl_benutzerlvstudiensemester" ,
+				"name" => "pk_benutzerlvstudiensemester" ,
 				"caption" => "pk_tbl_benutzerlvstudiensemester" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{01B90205-6421-4050-9F51-D5A57282F0A5}' => array
 			   		(
 		   				"id" => "{01B90205-6421-4050-9F51-D5A57282F0A5}" ,
@@ -3717,10 +3719,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{5C2B2DFC-4F92-4F4D-A550-F294FA4D82FB}' => array
 			   		(
 		   				"id" => "{5C2B2DFC-4F92-4F4D-A550-F294FA4D82FB}" ,
@@ -3735,10 +3737,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{365CBDD4-8EDE-49F9-8917-FF6B92D098B8}' => array
 			   		(
 		   				"id" => "{365CBDD4-8EDE-49F9-8917-FF6B92D098B8}" ,
@@ -3753,27 +3755,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9875E5BA-5331-4409-AFA8-84A1F9209472}'  => array
 	(
 	    	"id" => "{9875E5BA-5331-4409-AFA8-84A1F9209472}" ,
-	    	"name" => "Bmreservierung" ,
+	    	"name" => "tbl_bmreservierung" ,
 	    	"caption" => "tbl_bmreservierung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4AF05AC0-AF41-48C9-9A27-55DD8E5A2FE6}' => array
 			(
 				"id" => "{4AF05AC0-AF41-48C9-9A27-55DD8E5A2FE6}" ,
@@ -3787,12 +3789,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_bmreservierung_bmreservierung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_bmreservierung_bmreservierung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8137ADE1-FA96-47EA-B8C0-029E53D09F96}' => array
 			(
 				"id" => "{8137ADE1-FA96-47EA-B8C0-029E53D09F96}" ,
@@ -3811,7 +3813,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{628A9C68-9884-4AB7-87B2-F74672A0778B}' => array
 			(
 				"id" => "{628A9C68-9884-4AB7-87B2-F74672A0778B}" ,
@@ -3830,7 +3832,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A45A2EB3-8F0E-43BD-A3FC-12E669E0CE20}' => array
 			(
 				"id" => "{A45A2EB3-8F0E-43BD-A3FC-12E669E0CE20}" ,
@@ -3849,7 +3851,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D7489558-C7A0-47E5-9992-7CDE2E78F127}' => array
 			(
 				"id" => "{D7489558-C7A0-47E5-9992-7CDE2E78F127}" ,
@@ -3868,7 +3870,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{549737F9-1C0C-478C-8D46-7C67EF5FB667}' => array
 			(
 				"id" => "{549737F9-1C0C-478C-8D46-7C67EF5FB667}" ,
@@ -3887,7 +3889,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0634FF51-0C6C-4630-9A12-C0914AAA4B32}' => array
 			(
 				"id" => "{0634FF51-0C6C-4630-9A12-C0914AAA4B32}" ,
@@ -3906,7 +3908,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{536F1BD7-D77D-4713-9755-4C6C9342837E}' => array
 			(
 				"id" => "{536F1BD7-D77D-4713-9755-4C6C9342837E}" ,
@@ -3925,7 +3927,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{055B4A49-074E-4C09-BB5C-F4A361EC3624}' => array
 			(
 				"id" => "{055B4A49-074E-4C09-BB5C-F4A361EC3624}" ,
@@ -3944,7 +3946,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F2103B96-82CB-4E8C-9D1B-3BC74B285CAA}' => array
 			(
 				"id" => "{F2103B96-82CB-4E8C-9D1B-3BC74B285CAA}" ,
@@ -3963,7 +3965,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{516C0EFA-76CD-449B-A065-5D20E9E8476D}' => array
 			(
 				"id" => "{516C0EFA-76CD-449B-A065-5D20E9E8476D}" ,
@@ -3982,7 +3984,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{054274E8-0C9B-46BE-9961-1949F744EFF1}' => array
 			(
 				"id" => "{054274E8-0C9B-46BE-9961-1949F744EFF1}" ,
@@ -4001,21 +4003,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{C6AE07B1-ECC0-4F7D-9548-8A19444C7BB4}' => array
 			(
 				"id" => "{C6AE07B1-ECC0-4F7D-9548-8A19444C7BB4}" ,
-				"name" => "pk_tbl_bmreservierung" ,
+				"name" => "pk_bmreservierung" ,
 				"caption" => "pk_tbl_bmreservierung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F0E1DA73-6B93-42B8-AF42-090BC01251F4}' => array
 			   		(
 		   				"id" => "{F0E1DA73-6B93-42B8-AF42-090BC01251F4}" ,
@@ -4030,27 +4032,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{A7BEE74A-E2DF-402F-B209-C25B5635D4D7}'  => array
 	(
 	    	"id" => "{A7BEE74A-E2DF-402F-B209-C25B5635D4D7}" ,
-	    	"name" => "Erreichbarkeit" ,
+	    	"name" => "tbl_erreichbarkeit" ,
 	    	"caption" => "tbl_erreichbarkeit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{45AC9587-A10A-4EBE-A791-5010F903B8DB}' => array
 			(
 				"id" => "{45AC9587-A10A-4EBE-A791-5010F903B8DB}" ,
@@ -4069,7 +4071,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{97758363-FA70-423D-B44B-70023AF5398E}' => array
 			(
 				"id" => "{97758363-FA70-423D-B44B-70023AF5398E}" ,
@@ -4088,7 +4090,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BB7DE776-F5F5-4C6A-A920-DF250D95BCF7}' => array
 			(
 				"id" => "{BB7DE776-F5F5-4C6A-A920-DF250D95BCF7}" ,
@@ -4107,21 +4109,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E9B40CA8-E87E-461F-AE13-DF347B0A9269}' => array
 			(
 				"id" => "{E9B40CA8-E87E-461F-AE13-DF347B0A9269}" ,
-				"name" => "pk_tbl_erreichbarkeit" ,
+				"name" => "pk_erreichbarkeit" ,
 				"caption" => "pk_tbl_erreichbarkeit" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{23452634-23E1-40D1-BB4F-4D5353D9596E}' => array
 			   		(
 		   				"id" => "{23452634-23E1-40D1-BB4F-4D5353D9596E}" ,
@@ -4139,24 +4141,24 @@ $tabellen=array
 							"id" => "{948AE920-0BFA-4D9F-AD87-0379D53C2E41}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{E6BE04DD-52DB-40D5-AA9B-08EF749A68CA}'  => array
 	(
 	    	"id" => "{E6BE04DD-52DB-40D5-AA9B-08EF749A68CA}" ,
-	    	"name" => "Feedback" ,
+	    	"name" => "tbl_feedback" ,
 	    	"caption" => "tbl_feedback" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{BB256BCA-3A66-4A75-8D7B-51FD53BE4452}' => array
 			(
 				"id" => "{BB256BCA-3A66-4A75-8D7B-51FD53BE4452}" ,
@@ -4170,12 +4172,12 @@ $tabellen=array
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_feedback_feedback_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_feedback_feedback_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{891B62F9-7EEB-4B49-83D3-85C6E9BDFB7F}' => array
 			(
 				"id" => "{891B62F9-7EEB-4B49-83D3-85C6E9BDFB7F}" ,
@@ -4194,7 +4196,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4DBF2685-7FEB-403D-B6E9-488FB2FD6C82}' => array
 			(
 				"id" => "{4DBF2685-7FEB-403D-B6E9-488FB2FD6C82}" ,
@@ -4213,7 +4215,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D5BA30BD-1BCF-42D2-B357-FBA8268EC350}' => array
 			(
 				"id" => "{D5BA30BD-1BCF-42D2-B357-FBA8268EC350}" ,
@@ -4232,7 +4234,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{04690DC3-1150-41DD-8A50-E899CE6E16FA}' => array
 			(
 				"id" => "{04690DC3-1150-41DD-8A50-E899CE6E16FA}" ,
@@ -4251,7 +4253,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BD095F25-5F97-408F-9FF1-A5E887413273}' => array
 			(
 				"id" => "{BD095F25-5F97-408F-9FF1-A5E887413273}" ,
@@ -4270,7 +4272,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{96898CB4-DFC3-48C1-B1FD-7ED91422FECF}' => array
 			(
 				"id" => "{96898CB4-DFC3-48C1-B1FD-7ED91422FECF}" ,
@@ -4289,7 +4291,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E73DF5EF-4663-4D72-808B-412B6EBF02E1}' => array
 			(
 				"id" => "{E73DF5EF-4663-4D72-808B-412B6EBF02E1}" ,
@@ -4308,7 +4310,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0AC73C8E-D483-4F58-B806-30D3FD1C5A47}' => array
 			(
 				"id" => "{0AC73C8E-D483-4F58-B806-30D3FD1C5A47}" ,
@@ -4327,7 +4329,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0C33941B-D0C1-4D78-92EC-41F0B3224731}' => array
 			(
 				"id" => "{0C33941B-D0C1-4D78-92EC-41F0B3224731}" ,
@@ -4346,21 +4348,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{7E3BDF0B-EE78-41DB-B4F1-0BA306654492}' => array
 			(
 				"id" => "{7E3BDF0B-EE78-41DB-B4F1-0BA306654492}" ,
-				"name" => "pk_tbl_feedback" ,
+				"name" => "pk_feedback" ,
 				"caption" => "pk_tbl_feedback" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{7D72E6B1-AE51-47DC-BB88-99F63FF49FDD}' => array
 			   		(
 		   				"id" => "{7D72E6B1-AE51-47DC-BB88-99F63FF49FDD}" ,
@@ -4375,27 +4377,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D1828BA0-FC91-47BF-B53F-8C94BFFC204F}'  => array
 	(
 	    	"id" => "{D1828BA0-FC91-47BF-B53F-8C94BFFC204F}" ,
-	    	"name" => "Legesamtnote" ,
+	    	"name" => "tbl_legesamtnote" ,
 	    	"caption" => "tbl_legesamtnote" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E2F7A0DD-ECDA-46B4-B611-CE45F9286273}' => array
 			(
 				"id" => "{E2F7A0DD-ECDA-46B4-B611-CE45F9286273}" ,
@@ -4414,7 +4416,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9F433187-484C-4E13-9E73-3F629FCC6295}' => array
 			(
 				"id" => "{9F433187-484C-4E13-9E73-3F629FCC6295}" ,
@@ -4433,7 +4435,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AE366CB5-E2F6-4EA9-879F-9F1E6FDF98FE}' => array
 			(
 				"id" => "{AE366CB5-E2F6-4EA9-879F-9F1E6FDF98FE}" ,
@@ -4452,7 +4454,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{294227C0-756F-44BD-B45B-F41217B4DF39}' => array
 			(
 				"id" => "{294227C0-756F-44BD-B45B-F41217B4DF39}" ,
@@ -4471,7 +4473,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{916E3BC0-207A-4C07-BE13-24AAD53BC3D3}' => array
 			(
 				"id" => "{916E3BC0-207A-4C07-BE13-24AAD53BC3D3}" ,
@@ -4490,7 +4492,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8E4F8A75-A572-4DA1-A4E2-8F95A80AE102}' => array
 			(
 				"id" => "{8E4F8A75-A572-4DA1-A4E2-8F95A80AE102}" ,
@@ -4509,7 +4511,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13A164A1-CA84-434C-84FF-550BD18E2765}' => array
 			(
 				"id" => "{13A164A1-CA84-434C-84FF-550BD18E2765}" ,
@@ -4528,7 +4530,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{87B437F3-96F9-4A85-BFA1-2740960CF3C3}' => array
 			(
 				"id" => "{87B437F3-96F9-4A85-BFA1-2740960CF3C3}" ,
@@ -4547,21 +4549,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{4C0401D3-7C22-4ECA-B42A-D27B1FDF3DC3}' => array
 			(
 				"id" => "{4C0401D3-7C22-4ECA-B42A-D27B1FDF3DC3}" ,
-				"name" => "pk_tbl_legesamtnote" ,
+				"name" => "pk_legesamtnote" ,
 				"caption" => "pk_tbl_legesamtnote" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A2F85803-10E5-4B98-B9C1-303A8524A3A2}' => array
 			   		(
 		   				"id" => "{A2F85803-10E5-4B98-B9C1-303A8524A3A2}" ,
@@ -4576,10 +4578,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{7279B568-C93C-4B76-B5E5-707938F91CE5}' => array
 			   		(
 		   				"id" => "{7279B568-C93C-4B76-B5E5-707938F91CE5}" ,
@@ -4594,27 +4596,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{C874DF51-ABB7-4566-ADED-174A7048D950}'  => array
 	(
 	    	"id" => "{C874DF51-ABB7-4566-ADED-174A7048D950}" ,
-	    	"name" => "Lvgesamtnote" ,
+	    	"name" => "tbl_lvgesamtnote" ,
 	    	"caption" => "tbl_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F687F2CB-0445-4641-BBBE-AB3F30209B98}' => array
 			(
 				"id" => "{F687F2CB-0445-4641-BBBE-AB3F30209B98}" ,
@@ -4633,7 +4635,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C3B81C1E-869B-44CB-B86D-B0B294FAD205}' => array
 			(
 				"id" => "{C3B81C1E-869B-44CB-B86D-B0B294FAD205}" ,
@@ -4652,7 +4654,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{24061ADF-3823-4605-82F5-EE5132429862}' => array
 			(
 				"id" => "{24061ADF-3823-4605-82F5-EE5132429862}" ,
@@ -4671,7 +4673,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3AB771D1-5A73-4CA8-9594-443122D67808}' => array
 			(
 				"id" => "{3AB771D1-5A73-4CA8-9594-443122D67808}" ,
@@ -4690,7 +4692,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F8E5AEF9-E7F1-4B38-8349-25BD2EC56D9E}' => array
 			(
 				"id" => "{F8E5AEF9-E7F1-4B38-8349-25BD2EC56D9E}" ,
@@ -4709,7 +4711,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F9D7FB64-CF36-475F-ABF1-CA41CA8FCA0D}' => array
 			(
 				"id" => "{F9D7FB64-CF36-475F-ABF1-CA41CA8FCA0D}" ,
@@ -4728,7 +4730,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{15BDCBD8-5756-4936-A3EA-3891810B84F0}' => array
 			(
 				"id" => "{15BDCBD8-5756-4936-A3EA-3891810B84F0}" ,
@@ -4747,7 +4749,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{92E1CF51-A3BF-45BA-96AF-A226F2F4A663}' => array
 			(
 				"id" => "{92E1CF51-A3BF-45BA-96AF-A226F2F4A663}" ,
@@ -4766,7 +4768,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C25AE64C-0DF4-4367-99CC-679BF35810A2}' => array
 			(
 				"id" => "{C25AE64C-0DF4-4367-99CC-679BF35810A2}" ,
@@ -4785,7 +4787,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D214EA52-4768-4A5D-8A68-3C15ADEE3D37}' => array
 			(
 				"id" => "{D214EA52-4768-4A5D-8A68-3C15ADEE3D37}" ,
@@ -4804,7 +4806,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E05165C1-E03E-4380-9B54-23D1973710D3}' => array
 			(
 				"id" => "{E05165C1-E03E-4380-9B54-23D1973710D3}" ,
@@ -4823,7 +4825,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0F4A83B8-A993-4726-9667-088BF3BE0EAC}' => array
 			(
 				"id" => "{0F4A83B8-A993-4726-9667-088BF3BE0EAC}" ,
@@ -4842,7 +4844,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7A35FF5D-95F0-4E68-9F90-FF812893A4D8}' => array
 			(
 				"id" => "{7A35FF5D-95F0-4E68-9F90-FF812893A4D8}" ,
@@ -4861,21 +4863,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{864CB4AD-E714-4D0B-AC3D-DCD237A8238F}' => array
 			(
 				"id" => "{864CB4AD-E714-4D0B-AC3D-DCD237A8238F}" ,
-				"name" => "pk_tbl_lvgesamtnote" ,
+				"name" => "pk_lvgesamtnote" ,
 				"caption" => "pk_tbl_lvgesamtnote" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{29C622FB-5506-4C95-AB67-262CCE005CA8}' => array
 			   		(
 		   				"id" => "{29C622FB-5506-4C95-AB67-262CCE005CA8}" ,
@@ -4890,10 +4892,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{95F799AD-9878-4C2A-A150-6DDB6E7F8383}' => array
 			   		(
 		   				"id" => "{95F799AD-9878-4C2A-A150-6DDB6E7F8383}" ,
@@ -4908,10 +4910,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{6709CD7C-FF97-4FA2-B40F-CEC34F9F5173}' => array
 			   		(
 		   				"id" => "{6709CD7C-FF97-4FA2-B40F-CEC34F9F5173}" ,
@@ -4926,27 +4928,27 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EF37CDB1-4795-4FAE-B448-79A5C447AAFB}'  => array
 	(
 	    	"id" => "{EF37CDB1-4795-4FAE-B448-79A5C447AAFB}" ,
-	    	"name" => "Lvinfo" ,
+	    	"name" => "tbl_lvinfo" ,
 	    	"caption" => "tbl_lvinfo" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F63B84E5-16B9-47D1-967D-E246353ADD15}' => array
 			(
 				"id" => "{F63B84E5-16B9-47D1-967D-E246353ADD15}" ,
@@ -4965,7 +4967,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{75D9AED8-2E35-44CF-8565-432EDDF6F2DE}' => array
 			(
 				"id" => "{75D9AED8-2E35-44CF-8565-432EDDF6F2DE}" ,
@@ -4984,7 +4986,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FA53B35B-8AE2-4742-BBF6-5C46DF33D932}' => array
 			(
 				"id" => "{FA53B35B-8AE2-4742-BBF6-5C46DF33D932}" ,
@@ -5003,7 +5005,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7F35F667-4D2E-4756-BBC0-51F249A2A64F}' => array
 			(
 				"id" => "{7F35F667-4D2E-4756-BBC0-51F249A2A64F}" ,
@@ -5022,7 +5024,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E64E1A00-E36E-4AB9-82A5-1A8D32DB4305}' => array
 			(
 				"id" => "{E64E1A00-E36E-4AB9-82A5-1A8D32DB4305}" ,
@@ -5041,7 +5043,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A26FB2F1-543F-46ED-BA3F-229B51F3C36D}' => array
 			(
 				"id" => "{A26FB2F1-543F-46ED-BA3F-229B51F3C36D}" ,
@@ -5060,7 +5062,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AC721145-FAA4-4ABF-A295-97313609B028}' => array
 			(
 				"id" => "{AC721145-FAA4-4ABF-A295-97313609B028}" ,
@@ -5079,7 +5081,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6C256B97-C6F4-408E-8226-B05CC878697B}' => array
 			(
 				"id" => "{6C256B97-C6F4-408E-8226-B05CC878697B}" ,
@@ -5098,7 +5100,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{63AD3EFD-C877-4439-86CC-0E3066ED65EC}' => array
 			(
 				"id" => "{63AD3EFD-C877-4439-86CC-0E3066ED65EC}" ,
@@ -5117,7 +5119,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3517BB64-38F9-4ACF-9DC7-283035CC6DB3}' => array
 			(
 				"id" => "{3517BB64-38F9-4ACF-9DC7-283035CC6DB3}" ,
@@ -5136,7 +5138,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{557E0A68-92BB-4D46-8C17-2D9E89D2D873}' => array
 			(
 				"id" => "{557E0A68-92BB-4D46-8C17-2D9E89D2D873}" ,
@@ -5155,7 +5157,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{67ED0597-D4EE-4033-A159-0099C150E5EE}' => array
 			(
 				"id" => "{67ED0597-D4EE-4033-A159-0099C150E5EE}" ,
@@ -5174,7 +5176,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0079BB02-4A82-42A4-B6EA-4FA323F62BB0}' => array
 			(
 				"id" => "{0079BB02-4A82-42A4-B6EA-4FA323F62BB0}" ,
@@ -5193,7 +5195,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{499041E5-82B6-40D3-AAFB-0E49DE499F33}' => array
 			(
 				"id" => "{499041E5-82B6-40D3-AAFB-0E49DE499F33}" ,
@@ -5212,7 +5214,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{91C5B9A5-7975-4555-BA16-690AD81ADF7D}' => array
 			(
 				"id" => "{91C5B9A5-7975-4555-BA16-690AD81ADF7D}" ,
@@ -5231,7 +5233,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{249A5BEF-7A96-4049-90ED-577D691A733A}' => array
 			(
 				"id" => "{249A5BEF-7A96-4049-90ED-577D691A733A}" ,
@@ -5250,7 +5252,7 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{44E04F4A-93EA-4D55-83B4-4C58946EEA8A}' => array
 			(
 				"id" => "{44E04F4A-93EA-4D55-83B4-4C58946EEA8A}" ,
@@ -5269,21 +5271,21 @@ $tabellen=array
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{50050B91-3835-460E-AEFB-F5DFD7288281}' => array
 			(
 				"id" => "{50050B91-3835-460E-AEFB-F5DFD7288281}" ,
-				"name" => "pk_tbl_lvinfo" ,
+				"name" => "pk_lvinfo" ,
 				"caption" => "pk_tbl_lvinfo" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{105B9168-0352-426E-8345-9347A36C7937}' => array
 			   		(
 		   				"id" => "{105B9168-0352-426E-8345-9347A36C7937}" ,
@@ -5298,10 +5300,10 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{5C3D52EB-FD94-42D1-80FC-CD6540AA2BA0}' => array
 			   		(
 		   				"id" => "{5C3D52EB-FD94-42D1-80FC-CD6540AA2BA0}" ,
@@ -5316,20 +5318,20 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{AE5B431B-762E-4DBF-B17E-B55966876B07}'  => array
 	(
 	    	"id" => "{AE5B431B-762E-4DBF-B17E-B55966876B07}" ,
-	    	"name" => "News" ,
+	    	"name" => "tbl_news" ,
 	    	"caption" => "tbl_news" ,
 	    	"comments" => "Studiengang=0 und Semester=NULL -> allgemeine News
 Studiengang=0 und Semester=0 -> Freifaecher
@@ -5340,7 +5342,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{38C48EDC-1122-4ECB-9B6C-076B84345453}' => array
 			(
 				"id" => "{38C48EDC-1122-4ECB-9B6C-076B84345453}" ,
@@ -5354,12 +5356,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_news_news_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_news_news_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E102164C-F4F6-47BF-9585-9439D2871F42}' => array
 			(
 				"id" => "{E102164C-F4F6-47BF-9585-9439D2871F42}" ,
@@ -5378,7 +5380,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E5781AC3-E2F5-4548-898F-02AD1A7810FB}' => array
 			(
 				"id" => "{E5781AC3-E2F5-4548-898F-02AD1A7810FB}" ,
@@ -5397,7 +5399,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AD50AC42-BCAF-4B4F-983C-59B7FC5114F2}' => array
 			(
 				"id" => "{AD50AC42-BCAF-4B4F-983C-59B7FC5114F2}" ,
@@ -5416,7 +5418,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9C77ABB2-506F-4EA5-BACE-E019B5318B64}' => array
 			(
 				"id" => "{9C77ABB2-506F-4EA5-BACE-E019B5318B64}" ,
@@ -5435,7 +5437,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C963952-A72F-4CB6-81DD-11BE02DCCDC2}' => array
 			(
 				"id" => "{2C963952-A72F-4CB6-81DD-11BE02DCCDC2}" ,
@@ -5454,7 +5456,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C89A599D-DD93-4289-AB69-35B72F1D182E}' => array
 			(
 				"id" => "{C89A599D-DD93-4289-AB69-35B72F1D182E}" ,
@@ -5473,7 +5475,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{202FD856-220A-47AF-B52A-57B428DBE50C}' => array
 			(
 				"id" => "{202FD856-220A-47AF-B52A-57B428DBE50C}" ,
@@ -5492,7 +5494,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{91A6A788-9290-40A2-A5F2-F8F1315B6137}' => array
 			(
 				"id" => "{91A6A788-9290-40A2-A5F2-F8F1315B6137}" ,
@@ -5511,7 +5513,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{44BA1BB0-A677-4203-83CC-1793DA9DBD4A}' => array
 			(
 				"id" => "{44BA1BB0-A677-4203-83CC-1793DA9DBD4A}" ,
@@ -5530,7 +5532,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9AF160B9-8C78-4C82-ADFF-A483BAB7EEB1}' => array
 			(
 				"id" => "{9AF160B9-8C78-4C82-ADFF-A483BAB7EEB1}" ,
@@ -5549,7 +5551,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{20A99293-275A-468D-8DB7-5EFD473EB15A}' => array
 			(
 				"id" => "{20A99293-275A-468D-8DB7-5EFD473EB15A}" ,
@@ -5568,7 +5570,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A652548B-5E53-4957-8078-6377BCBBBCA0}' => array
 			(
 				"id" => "{A652548B-5E53-4957-8078-6377BCBBBCA0}" ,
@@ -5587,7 +5589,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{285D25A2-D18E-477F-B229-56F04416676C}' => array
 			(
 				"id" => "{285D25A2-D18E-477F-B229-56F04416676C}" ,
@@ -5606,21 +5608,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E2FE4998-A252-479F-A829-58D6DB42B809}' => array
 			(
 				"id" => "{E2FE4998-A252-479F-A829-58D6DB42B809}" ,
-				"name" => "pk_tbl_news" ,
+				"name" => "pk_news" ,
 				"caption" => "pk_tbl_news" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{12C41DCA-A9CF-4861-B3CC-E268FB084B4C}' => array
 			   		(
 		   				"id" => "{12C41DCA-A9CF-4861-B3CC-E268FB084B4C}" ,
@@ -5638,24 +5640,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{4FCAF8F9-B613-4CAA-B9C1-2C39336F4DA9}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{FE337F90-11F8-48EE-85C9-DD17CAEC671A}'  => array
 	(
 	    	"id" => "{FE337F90-11F8-48EE-85C9-DD17CAEC671A}" ,
-	    	"name" => "Newssprache" ,
+	    	"name" => "tbl_newssprache" ,
 	    	"caption" => "tbl_newssprache" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4597B573-2203-41F4-8A6F-267C7E4BEA5C}' => array
 			(
 				"id" => "{4597B573-2203-41F4-8A6F-267C7E4BEA5C}" ,
@@ -5674,7 +5676,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{946118B1-7514-4B5C-A492-E969E6EF29AB}' => array
 			(
 				"id" => "{946118B1-7514-4B5C-A492-E969E6EF29AB}" ,
@@ -5693,7 +5695,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BDD1B563-2857-413A-9BDD-624F0FEF23AA}' => array
 			(
 				"id" => "{BDD1B563-2857-413A-9BDD-624F0FEF23AA}" ,
@@ -5712,7 +5714,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13A27B9D-0C63-4982-AD0E-9041BE4F84B6}' => array
 			(
 				"id" => "{13A27B9D-0C63-4982-AD0E-9041BE4F84B6}" ,
@@ -5731,7 +5733,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C75DEA35-4B4E-41E2-A6AD-A95469A18395}' => array
 			(
 				"id" => "{C75DEA35-4B4E-41E2-A6AD-A95469A18395}" ,
@@ -5750,7 +5752,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{631C3684-9B44-416D-925C-05ADBE88DE70}' => array
 			(
 				"id" => "{631C3684-9B44-416D-925C-05ADBE88DE70}" ,
@@ -5769,7 +5771,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{01CDE420-6B44-4B37-91AC-6046CF4FBAF4}' => array
 			(
 				"id" => "{01CDE420-6B44-4B37-91AC-6046CF4FBAF4}" ,
@@ -5788,7 +5790,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A40E5E45-5586-4444-A014-DD34CA29A46E}' => array
 			(
 				"id" => "{A40E5E45-5586-4444-A014-DD34CA29A46E}" ,
@@ -5807,21 +5809,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{66A7D58A-1460-4A38-B0CF-3BCD49ED664A}' => array
 			(
 				"id" => "{66A7D58A-1460-4A38-B0CF-3BCD49ED664A}" ,
-				"name" => "pk_tbl_newssprache" ,
+				"name" => "pk_newssprache" ,
 				"caption" => "pk_tbl_newssprache" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A4792489-14DE-4599-9823-229771DEA916}' => array
 			   		(
 		   				"id" => "{A4792489-14DE-4599-9823-229771DEA916}" ,
@@ -5836,10 +5838,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{D5B2C653-DA2C-4ACA-85F0-23162DC6E896}' => array
 			   		(
 		   				"id" => "{D5B2C653-DA2C-4ACA-85F0-23162DC6E896}" ,
@@ -5854,27 +5856,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{30380BE8-4AD1-4954-BC45-1A0B71598A76}'  => array
 	(
 	    	"id" => "{30380BE8-4AD1-4954-BC45-1A0B71598A76}" ,
-	    	"name" => "Notenschluessel" ,
+	    	"name" => "tbl_notenschluessel" ,
 	    	"caption" => "tbl_notenschluessel" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{38A0FF4C-3346-4B90-8F1C-EE039A92028E}' => array
 			(
 				"id" => "{38A0FF4C-3346-4B90-8F1C-EE039A92028E}" ,
@@ -5893,7 +5895,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8A2CA3DC-EC31-43D6-A27D-A9F0B95975EB}' => array
 			(
 				"id" => "{8A2CA3DC-EC31-43D6-A27D-A9F0B95975EB}" ,
@@ -5912,7 +5914,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6813E94-D299-453F-87F3-6239DE23BF7D}' => array
 			(
 				"id" => "{C6813E94-D299-453F-87F3-6239DE23BF7D}" ,
@@ -5931,21 +5933,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{C9212FC6-5D8C-426D-8ABA-64D6CD7B8687}' => array
 			(
 				"id" => "{C9212FC6-5D8C-426D-8ABA-64D6CD7B8687}" ,
-				"name" => "pk_tbl_notenschluessel" ,
+				"name" => "pk_notenschluessel" ,
 				"caption" => "pk_tbl_notenschluessel" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{81A94002-D44E-4AA1-ABEE-624C64F14041}' => array
 			   		(
 		   				"id" => "{81A94002-D44E-4AA1-ABEE-624C64F14041}" ,
@@ -5960,10 +5962,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{AD5D9A73-3B29-49F3-AE36-EC77FB62F6D3}' => array
 			   		(
 		   				"id" => "{AD5D9A73-3B29-49F3-AE36-EC77FB62F6D3}" ,
@@ -5978,27 +5980,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{0A336099-BC75-459C-B15E-4FA054C65ED6}'  => array
 	(
 	    	"id" => "{0A336099-BC75-459C-B15E-4FA054C65ED6}" ,
-	    	"name" => "Notenschluesseluebung" ,
+	    	"name" => "tbl_notenschluesseluebung" ,
 	    	"caption" => "tbl_notenschluesseluebung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{D16510FF-8240-4F47-8E72-49C1E590EDB7}' => array
 			(
 				"id" => "{D16510FF-8240-4F47-8E72-49C1E590EDB7}" ,
@@ -6017,7 +6019,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FD1B398C-6CC7-4005-B744-123EBB3E68C1}' => array
 			(
 				"id" => "{FD1B398C-6CC7-4005-B744-123EBB3E68C1}" ,
@@ -6036,7 +6038,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5157C3AA-36EF-4D76-AAD3-F1FE35277F01}' => array
 			(
 				"id" => "{5157C3AA-36EF-4D76-AAD3-F1FE35277F01}" ,
@@ -6055,21 +6057,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{0CBA5E03-8D71-4CA9-A7F1-2E7A87F0D68E}' => array
 			(
 				"id" => "{0CBA5E03-8D71-4CA9-A7F1-2E7A87F0D68E}" ,
-				"name" => "pk_tbl_notenschluesseluebung" ,
+				"name" => "pk_notenschluesseluebung" ,
 				"caption" => "pk_tbl_notenschluesseluebung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{FA2D68BD-60B8-48B9-81C3-CD770E0C5022}' => array
 			   		(
 		   				"id" => "{FA2D68BD-60B8-48B9-81C3-CD770E0C5022}" ,
@@ -6084,10 +6086,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{9EFAB746-26D6-4F1F-BED4-008B1FEDFE96}' => array
 			   		(
 		   				"id" => "{9EFAB746-26D6-4F1F-BED4-008B1FEDFE96}" ,
@@ -6102,27 +6104,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{A99B42E5-E7D3-4396-98DB-D4A5C5BE71BD}'  => array
 	(
 	    	"id" => "{A99B42E5-E7D3-4396-98DB-D4A5C5BE71BD}" ,
-	    	"name" => "Reservierung" ,
+	    	"name" => "tbl_reservierung" ,
 	    	"caption" => "tbl_reservierung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{EF51E398-FFC8-46DF-A1AF-727D53845D0F}' => array
 			(
 				"id" => "{EF51E398-FFC8-46DF-A1AF-727D53845D0F}" ,
@@ -6136,12 +6138,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_reservierung_reservierung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_reservierung_reservierung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB469A68-F551-4B45-B1AF-B338824947DF}' => array
 			(
 				"id" => "{DB469A68-F551-4B45-B1AF-B338824947DF}" ,
@@ -6160,7 +6162,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{439D286A-02E8-49AE-B7EA-818A98ECD8EC}' => array
 			(
 				"id" => "{439D286A-02E8-49AE-B7EA-818A98ECD8EC}" ,
@@ -6179,7 +6181,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6DB80A99-5315-4774-AC66-FA02FC630D4E}' => array
 			(
 				"id" => "{6DB80A99-5315-4774-AC66-FA02FC630D4E}" ,
@@ -6198,7 +6200,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4494C09E-B054-4F23-A60F-8765A8A9D1E2}' => array
 			(
 				"id" => "{4494C09E-B054-4F23-A60F-8765A8A9D1E2}" ,
@@ -6217,7 +6219,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BAB09513-19A0-4465-B33B-7AB1A972F6C3}' => array
 			(
 				"id" => "{BAB09513-19A0-4465-B33B-7AB1A972F6C3}" ,
@@ -6236,7 +6238,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{221B003B-432F-4A5A-ACD8-F2100DAF27D0}' => array
 			(
 				"id" => "{221B003B-432F-4A5A-ACD8-F2100DAF27D0}" ,
@@ -6255,7 +6257,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A52B5E6F-05CC-49A5-A5BF-48AC07D017C2}' => array
 			(
 				"id" => "{A52B5E6F-05CC-49A5-A5BF-48AC07D017C2}" ,
@@ -6274,7 +6276,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1EE75A8E-9918-4F62-9A7C-CD2EDAAFC18B}' => array
 			(
 				"id" => "{1EE75A8E-9918-4F62-9A7C-CD2EDAAFC18B}" ,
@@ -6293,7 +6295,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EBFB3759-BB4E-4C2F-BE02-CDE865A80992}' => array
 			(
 				"id" => "{EBFB3759-BB4E-4C2F-BE02-CDE865A80992}" ,
@@ -6312,7 +6314,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{046DB015-61F4-4DF3-9B8E-0AF5F8389597}' => array
 			(
 				"id" => "{046DB015-61F4-4DF3-9B8E-0AF5F8389597}" ,
@@ -6331,7 +6333,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0665D409-BE60-47FB-A58C-D34BDA8996FB}' => array
 			(
 				"id" => "{0665D409-BE60-47FB-A58C-D34BDA8996FB}" ,
@@ -6350,7 +6352,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C261B173-0FCC-45DC-8B2E-5A08C7DF6F11}' => array
 			(
 				"id" => "{C261B173-0FCC-45DC-8B2E-5A08C7DF6F11}" ,
@@ -6369,21 +6371,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{06A8DB53-4118-41E6-8BFA-496C0EEE4860}' => array
 			(
 				"id" => "{06A8DB53-4118-41E6-8BFA-496C0EEE4860}" ,
-				"name" => "pk_tbl_reservierung" ,
+				"name" => "pk_reservierung" ,
 				"caption" => "pk_tbl_reservierung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{19B96CEA-1162-4A1A-A755-C30BCBC1D416}' => array
 			   		(
 		   				"id" => "{19B96CEA-1162-4A1A-A755-C30BCBC1D416}" ,
@@ -6398,27 +6400,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{BB4D5B5B-76DF-4808-8D6D-81FC1CC7EEF1}'  => array
 	(
 	    	"id" => "{BB4D5B5B-76DF-4808-8D6D-81FC1CC7EEF1}" ,
-	    	"name" => "Resturlaub" ,
+	    	"name" => "tbl_resturlaub" ,
 	    	"caption" => "tbl_resturlaub" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7A0C4042-0C08-48AC-BB35-549E9258593F}' => array
 			(
 				"id" => "{7A0C4042-0C08-48AC-BB35-549E9258593F}" ,
@@ -6437,7 +6439,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C7AA091B-6E4A-43EC-96A8-CA696520403B}' => array
 			(
 				"id" => "{C7AA091B-6E4A-43EC-96A8-CA696520403B}" ,
@@ -6456,7 +6458,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E413A25F-A55A-46F9-A113-02A68312CACD}' => array
 			(
 				"id" => "{E413A25F-A55A-46F9-A113-02A68312CACD}" ,
@@ -6475,7 +6477,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3E1AFAA9-0DF6-48CA-90CB-59DB4ED6B8D2}' => array
 			(
 				"id" => "{3E1AFAA9-0DF6-48CA-90CB-59DB4ED6B8D2}" ,
@@ -6494,7 +6496,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2170AE40-CCE3-4828-8E05-FABD11A775DF}' => array
 			(
 				"id" => "{2170AE40-CCE3-4828-8E05-FABD11A775DF}" ,
@@ -6513,7 +6515,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C7C4B5D8-FF45-4EBE-A9BE-E5964F5475FE}' => array
 			(
 				"id" => "{C7C4B5D8-FF45-4EBE-A9BE-E5964F5475FE}" ,
@@ -6532,7 +6534,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EAAAC205-EEAD-47B8-8B8E-E9521C385E6D}' => array
 			(
 				"id" => "{EAAAC205-EEAD-47B8-8B8E-E9521C385E6D}" ,
@@ -6551,7 +6553,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2E844633-46A9-4D10-BAF1-A7F35FF1F7AC}' => array
 			(
 				"id" => "{2E844633-46A9-4D10-BAF1-A7F35FF1F7AC}" ,
@@ -6570,21 +6572,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{9E5A2D88-B147-4BA5-BD2A-862702BCADA9}' => array
 			(
 				"id" => "{9E5A2D88-B147-4BA5-BD2A-862702BCADA9}" ,
-				"name" => "pk_tbl_resturlaub" ,
+				"name" => "pk_resturlaub" ,
 				"caption" => "pk_tbl_resturlaub" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B871B421-D602-4BA6-9002-81741A600074}' => array
 			   		(
 		   				"id" => "{B871B421-D602-4BA6-9002-81741A600074}" ,
@@ -6599,27 +6601,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{C56DAEF5-1ACD-4673-ABE4-BFD63B436B20}'  => array
 	(
 	    	"id" => "{C56DAEF5-1ACD-4673-ABE4-BFD63B436B20}" ,
-	    	"name" => "Studentbeispiel" ,
+	    	"name" => "tbl_studentbeispiel" ,
 	    	"caption" => "tbl_studentbeispiel" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1C57ABF2-78FC-4CB1-B6A1-3A7588890FE0}' => array
 			(
 				"id" => "{1C57ABF2-78FC-4CB1-B6A1-3A7588890FE0}" ,
@@ -6638,7 +6640,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6BA1863C-16A7-4235-B15E-67F07B083A25}' => array
 			(
 				"id" => "{6BA1863C-16A7-4235-B15E-67F07B083A25}" ,
@@ -6657,7 +6659,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8D1DD089-34D6-4F42-9203-E15A909DBE12}' => array
 			(
 				"id" => "{8D1DD089-34D6-4F42-9203-E15A909DBE12}" ,
@@ -6676,7 +6678,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{802E86FB-9C6A-4997-B0B5-B10E589E0DC0}' => array
 			(
 				"id" => "{802E86FB-9C6A-4997-B0B5-B10E589E0DC0}" ,
@@ -6695,7 +6697,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FCA122B9-92B5-4D12-BF71-FF30AAA19C83}' => array
 			(
 				"id" => "{FCA122B9-92B5-4D12-BF71-FF30AAA19C83}" ,
@@ -6714,7 +6716,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C0EB4143-0C2C-487D-9B13-1C98010753BF}' => array
 			(
 				"id" => "{C0EB4143-0C2C-487D-9B13-1C98010753BF}" ,
@@ -6733,7 +6735,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FF5A50CF-4079-4DA8-8402-F7601E7C8796}' => array
 			(
 				"id" => "{FF5A50CF-4079-4DA8-8402-F7601E7C8796}" ,
@@ -6752,7 +6754,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{151F6DA5-7818-40AB-A2D5-E492F618FE0A}' => array
 			(
 				"id" => "{151F6DA5-7818-40AB-A2D5-E492F618FE0A}" ,
@@ -6771,21 +6773,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{FCD3446E-3A33-48A2-8064-A1BAEA0AEA07}' => array
 			(
 				"id" => "{FCD3446E-3A33-48A2-8064-A1BAEA0AEA07}" ,
-				"name" => "pk_tbl_studentbeispiel" ,
+				"name" => "pk_studentbeispiel" ,
 				"caption" => "pk_tbl_studentbeispiel" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9D95AB5A-DDBD-4AA3-825D-14ABC3C04C9A}' => array
 			   		(
 		   				"id" => "{9D95AB5A-DDBD-4AA3-825D-14ABC3C04C9A}" ,
@@ -6800,10 +6802,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{F21DD7AF-8EBE-420B-96EE-6D0FAF9B6A07}' => array
 			   		(
 		   				"id" => "{F21DD7AF-8EBE-420B-96EE-6D0FAF9B6A07}" ,
@@ -6818,27 +6820,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EF50585C-29D3-4102-8C7C-637E3985F2C5}'  => array
 	(
 	    	"id" => "{EF50585C-29D3-4102-8C7C-637E3985F2C5}" ,
-	    	"name" => "Studentuebung" ,
+	    	"name" => "tbl_studentuebung" ,
 	    	"caption" => "tbl_studentuebung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{8269368B-2028-4662-92A2-1BF0BD258364}' => array
 			(
 				"id" => "{8269368B-2028-4662-92A2-1BF0BD258364}" ,
@@ -6857,7 +6859,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{622CCA8B-2409-4F7E-849E-6A4184E6B1AC}' => array
 			(
 				"id" => "{622CCA8B-2409-4F7E-849E-6A4184E6B1AC}" ,
@@ -6876,7 +6878,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4B15FB9D-F829-446D-AEF5-20170F9FE259}' => array
 			(
 				"id" => "{4B15FB9D-F829-446D-AEF5-20170F9FE259}" ,
@@ -6895,7 +6897,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AE9CC994-66D0-4968-B14B-B5F313E8FDBB}' => array
 			(
 				"id" => "{AE9CC994-66D0-4968-B14B-B5F313E8FDBB}" ,
@@ -6914,7 +6916,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{20ED0570-0031-47DB-AF98-5D6F03C195E1}' => array
 			(
 				"id" => "{20ED0570-0031-47DB-AF98-5D6F03C195E1}" ,
@@ -6933,7 +6935,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8ED2C55B-4508-4555-85C0-6B1B566A2542}' => array
 			(
 				"id" => "{8ED2C55B-4508-4555-85C0-6B1B566A2542}" ,
@@ -6952,7 +6954,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D9C029E-7823-48E8-86D3-E666A8A9CF0A}' => array
 			(
 				"id" => "{5D9C029E-7823-48E8-86D3-E666A8A9CF0A}" ,
@@ -6971,7 +6973,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{92C23748-7276-4B7D-81EE-D14E56436C1A}' => array
 			(
 				"id" => "{92C23748-7276-4B7D-81EE-D14E56436C1A}" ,
@@ -6990,7 +6992,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E4692BE0-9D3C-4B5A-AB47-E16129AA3228}' => array
 			(
 				"id" => "{E4692BE0-9D3C-4B5A-AB47-E16129AA3228}" ,
@@ -7009,7 +7011,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{69DFA62A-EC58-4091-B884-C47DA36360C3}' => array
 			(
 				"id" => "{69DFA62A-EC58-4091-B884-C47DA36360C3}" ,
@@ -7028,7 +7030,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{43F920BE-52D8-45DF-BED9-69427EA377A2}' => array
 			(
 				"id" => "{43F920BE-52D8-45DF-BED9-69427EA377A2}" ,
@@ -7047,7 +7049,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB1FF84A-73F9-443C-8C79-E1B284469D91}' => array
 			(
 				"id" => "{DB1FF84A-73F9-443C-8C79-E1B284469D91}" ,
@@ -7066,7 +7068,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A99B3DAC-B1DE-4DCB-BCC2-5E39176F863F}' => array
 			(
 				"id" => "{A99B3DAC-B1DE-4DCB-BCC2-5E39176F863F}" ,
@@ -7085,21 +7087,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E576EA83-AC2E-4641-8C8A-10CF2CD4F93E}' => array
 			(
 				"id" => "{E576EA83-AC2E-4641-8C8A-10CF2CD4F93E}" ,
-				"name" => "pk_tbl_studentuebung" ,
+				"name" => "pk_studentuebung" ,
 				"caption" => "pk_tbl_studentuebung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{0793A740-B3BB-4444-945E-0AF2721FE12B}' => array
 			   		(
 		   				"id" => "{0793A740-B3BB-4444-945E-0AF2721FE12B}" ,
@@ -7114,10 +7116,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{315D9573-7492-4A08-B966-0E0328CC51E1}' => array
 			   		(
 		   				"id" => "{315D9573-7492-4A08-B966-0E0328CC51E1}" ,
@@ -7132,27 +7134,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3577D61B-7FBA-4B72-99A9-371863D92142}'  => array
 	(
 	    	"id" => "{3577D61B-7FBA-4B72-99A9-371863D92142}" ,
-	    	"name" => "Uebung" ,
+	    	"name" => "tbl_uebung" ,
 	    	"caption" => "tbl_uebung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{2BECBADB-6E97-4D7F-A383-1DA4968C1692}' => array
 			(
 				"id" => "{2BECBADB-6E97-4D7F-A383-1DA4968C1692}" ,
@@ -7166,12 +7168,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_uebung_uebung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_uebung_uebung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B0637C76-53C8-46E9-85A9-8C39D7C67650}' => array
 			(
 				"id" => "{B0637C76-53C8-46E9-85A9-8C39D7C67650}" ,
@@ -7190,7 +7192,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{136052B5-9B41-4D91-8E9C-A9BA6EE408DC}' => array
 			(
 				"id" => "{136052B5-9B41-4D91-8E9C-A9BA6EE408DC}" ,
@@ -7209,7 +7211,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5723F3AD-D08D-4C27-B360-420FEA94A241}' => array
 			(
 				"id" => "{5723F3AD-D08D-4C27-B360-420FEA94A241}" ,
@@ -7228,7 +7230,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1DBF6678-0A10-4B72-B02A-D98FA8081CCF}' => array
 			(
 				"id" => "{1DBF6678-0A10-4B72-B02A-D98FA8081CCF}" ,
@@ -7247,7 +7249,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2D0D25BE-06FE-4082-8684-74783C6305FE}' => array
 			(
 				"id" => "{2D0D25BE-06FE-4082-8684-74783C6305FE}" ,
@@ -7266,7 +7268,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AA01E2D0-6B22-4CCD-9E21-6E07D2AD7BF7}' => array
 			(
 				"id" => "{AA01E2D0-6B22-4CCD-9E21-6E07D2AD7BF7}" ,
@@ -7285,7 +7287,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D0974A1B-7B6E-4F8B-9225-11D751CB96B0}' => array
 			(
 				"id" => "{D0974A1B-7B6E-4F8B-9225-11D751CB96B0}" ,
@@ -7304,7 +7306,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B24E8961-8901-4DBB-BFAE-FA5F609C588D}' => array
 			(
 				"id" => "{B24E8961-8901-4DBB-BFAE-FA5F609C588D}" ,
@@ -7323,7 +7325,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3D7BD999-DE93-435C-A200-09E0A9A91535}' => array
 			(
 				"id" => "{3D7BD999-DE93-435C-A200-09E0A9A91535}" ,
@@ -7342,7 +7344,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB070E9A-083E-4B99-B7A9-2C903A36975A}' => array
 			(
 				"id" => "{DB070E9A-083E-4B99-B7A9-2C903A36975A}" ,
@@ -7361,7 +7363,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EECBB197-5823-4988-B48C-C8726CD57C3B}' => array
 			(
 				"id" => "{EECBB197-5823-4988-B48C-C8726CD57C3B}" ,
@@ -7380,7 +7382,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8DB98650-936E-429C-8E19-ED080F10B910}' => array
 			(
 				"id" => "{8DB98650-936E-429C-8E19-ED080F10B910}" ,
@@ -7399,7 +7401,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A26EC86D-823E-41BE-8F2E-EA6FE9EF11CB}' => array
 			(
 				"id" => "{A26EC86D-823E-41BE-8F2E-EA6FE9EF11CB}" ,
@@ -7418,7 +7420,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CAB1A333-C9BF-488A-B14B-B39E8A42897A}' => array
 			(
 				"id" => "{CAB1A333-C9BF-488A-B14B-B39E8A42897A}" ,
@@ -7437,7 +7439,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E446CB73-238D-4FA8-97BA-BDBBD873A17E}' => array
 			(
 				"id" => "{E446CB73-238D-4FA8-97BA-BDBBD873A17E}" ,
@@ -7456,7 +7458,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E1F67F8A-CB41-4197-870C-1FDF28ABC430}' => array
 			(
 				"id" => "{E1F67F8A-CB41-4197-870C-1FDF28ABC430}" ,
@@ -7475,7 +7477,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BAE70944-61CF-43DF-887B-AE8D4C47AA6A}' => array
 			(
 				"id" => "{BAE70944-61CF-43DF-887B-AE8D4C47AA6A}" ,
@@ -7494,7 +7496,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{965CA363-CC2B-4A89-B99A-9F36C7BFD85B}' => array
 			(
 				"id" => "{965CA363-CC2B-4A89-B99A-9F36C7BFD85B}" ,
@@ -7513,7 +7515,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{499E7206-49A1-490E-A686-EE39434460B1}' => array
 			(
 				"id" => "{499E7206-49A1-490E-A686-EE39434460B1}" ,
@@ -7532,7 +7534,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3FB0827C-FFAF-4573-8A6D-FF3B88AB56C0}' => array
 			(
 				"id" => "{3FB0827C-FFAF-4573-8A6D-FF3B88AB56C0}" ,
@@ -7551,7 +7553,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{86DD194F-121A-4BFA-A6EA-76C008A97FC5}' => array
 			(
 				"id" => "{86DD194F-121A-4BFA-A6EA-76C008A97FC5}" ,
@@ -7570,21 +7572,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{8A300FD6-D1B0-41A8-9C93-F758D1197790}' => array
 			(
 				"id" => "{8A300FD6-D1B0-41A8-9C93-F758D1197790}" ,
-				"name" => "pk_tbl_uebung" ,
+				"name" => "pk_uebung" ,
 				"caption" => "pk_tbl_uebung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F3013F08-CCA8-4D15-A2E4-87223D4289C5}' => array
 			   		(
 		   				"id" => "{F3013F08-CCA8-4D15-A2E4-87223D4289C5}" ,
@@ -7602,24 +7604,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{58FB1476-3A8D-4E48-AAD3-B055071E1CA8}","id" => "{3DD19118-7CB0-434D-82AE-A6D6B84641A5}","id" => "{4FB129C7-4810-4716-8B0A-F09EACDF8D9A}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D5E64255-B890-46AA-9C00-C86BDA65178C}'  => array
 	(
 	    	"id" => "{D5E64255-B890-46AA-9C00-C86BDA65178C}" ,
-	    	"name" => "Veranstaltung" ,
+	    	"name" => "tbl_veranstaltung" ,
 	    	"caption" => "tbl_veranstaltung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9E48408D-4B14-4B43-9F01-459136EDD3BA}' => array
 			(
 				"id" => "{9E48408D-4B14-4B43-9F01-459136EDD3BA}" ,
@@ -7633,12 +7635,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_veranstaltung_veranstaltung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_veranstaltung_veranstaltung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D6E3686F-943A-44E1-926F-C6E2953FD83C}' => array
 			(
 				"id" => "{D6E3686F-943A-44E1-926F-C6E2953FD83C}" ,
@@ -7657,7 +7659,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3B227251-03AF-46D4-9670-C605DF0832AA}' => array
 			(
 				"id" => "{3B227251-03AF-46D4-9670-C605DF0832AA}" ,
@@ -7676,7 +7678,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E4BD6585-3163-492F-9BF4-0BF27C511876}' => array
 			(
 				"id" => "{E4BD6585-3163-492F-9BF4-0BF27C511876}" ,
@@ -7695,7 +7697,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{90B1C40B-82A4-46B0-87FF-E84733A73F23}' => array
 			(
 				"id" => "{90B1C40B-82A4-46B0-87FF-E84733A73F23}" ,
@@ -7714,7 +7716,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{35F7DBDE-F284-4D0E-88FD-535CE0310AF3}' => array
 			(
 				"id" => "{35F7DBDE-F284-4D0E-88FD-535CE0310AF3}" ,
@@ -7733,7 +7735,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5AD40AFA-AB5C-4285-A267-D82807190957}' => array
 			(
 				"id" => "{5AD40AFA-AB5C-4285-A267-D82807190957}" ,
@@ -7752,7 +7754,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9359BD4A-7495-47C7-B04D-9C7F73C88510}' => array
 			(
 				"id" => "{9359BD4A-7495-47C7-B04D-9C7F73C88510}" ,
@@ -7771,7 +7773,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{52CAE222-494B-4E8F-A8AB-D50AAD2DE176}' => array
 			(
 				"id" => "{52CAE222-494B-4E8F-A8AB-D50AAD2DE176}" ,
@@ -7790,7 +7792,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E7F528E2-96CF-40B4-901F-07BE6F62EAD0}' => array
 			(
 				"id" => "{E7F528E2-96CF-40B4-901F-07BE6F62EAD0}" ,
@@ -7809,7 +7811,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F797FCD7-E505-4DD5-A043-6809C9770C17}' => array
 			(
 				"id" => "{F797FCD7-E505-4DD5-A043-6809C9770C17}" ,
@@ -7828,7 +7830,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{29E4C4A7-FC96-405D-8806-3538E4876295}' => array
 			(
 				"id" => "{29E4C4A7-FC96-405D-8806-3538E4876295}" ,
@@ -7847,7 +7849,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{509B558F-1299-4DB4-9FA1-DFC754BFBE40}' => array
 			(
 				"id" => "{509B558F-1299-4DB4-9FA1-DFC754BFBE40}" ,
@@ -7866,21 +7868,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{A8DD1B65-02B7-41BB-9BFC-7A521E661701}' => array
 			(
 				"id" => "{A8DD1B65-02B7-41BB-9BFC-7A521E661701}" ,
-				"name" => "pk_tbl_veranstaltung" ,
+				"name" => "pk_veranstaltung" ,
 				"caption" => "pk_tbl_veranstaltung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{62D5E94D-C55E-4E93-8931-E6FED9F28A93}' => array
 			   		(
 		   				"id" => "{62D5E94D-C55E-4E93-8931-E6FED9F28A93}" ,
@@ -7898,24 +7900,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{12FA6987-C5E7-4133-B758-657D93A0E0A2}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3AEB1191-DEA9-4C2D-8424-E415B42C14C4}'  => array
 	(
 	    	"id" => "{3AEB1191-DEA9-4C2D-8424-E415B42C14C4}" ,
-	    	"name" => "Veranstaltungskategorie" ,
+	    	"name" => "tbl_veranstaltungskategorie" ,
 	    	"caption" => "tbl_veranstaltungskategorie" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{6D81C798-9A2D-470A-B0EB-7464312E56DE}' => array
 			(
 				"id" => "{6D81C798-9A2D-470A-B0EB-7464312E56DE}" ,
@@ -7934,7 +7936,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{58F63F20-5EA5-423F-9B71-B82DC5E71933}' => array
 			(
 				"id" => "{58F63F20-5EA5-423F-9B71-B82DC5E71933}" ,
@@ -7953,7 +7955,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B5D00853-BF34-4FA2-B9DE-6D4EF05FCAC6}' => array
 			(
 				"id" => "{B5D00853-BF34-4FA2-B9DE-6D4EF05FCAC6}" ,
@@ -7972,7 +7974,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D6FC1F2E-205C-44D3-A5EC-5864B8EDE6BD}' => array
 			(
 				"id" => "{D6FC1F2E-205C-44D3-A5EC-5864B8EDE6BD}" ,
@@ -7991,21 +7993,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E9C3D8D1-DE91-45F6-ABFF-8564808BA662}' => array
 			(
 				"id" => "{E9C3D8D1-DE91-45F6-ABFF-8564808BA662}" ,
-				"name" => "pk_tbl_veranstaltungskategorie" ,
+				"name" => "pk_veranstaltungskategorie" ,
 				"caption" => "pk_tbl_veranstaltungskategorie" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{3A16B5E4-0092-413B-86B5-AFF6EEFA4884}' => array
 			   		(
 		   				"id" => "{3A16B5E4-0092-413B-86B5-AFF6EEFA4884}" ,
@@ -8023,24 +8025,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{4D15C352-126F-4EC3-A87C-C7F311253D10}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{77732D47-692A-4EE3-9C88-EBAB8B9B85B4}'  => array
 	(
 	    	"id" => "{77732D47-692A-4EE3-9C88-EBAB8B9B85B4}" ,
-	    	"name" => "Zeitaufzeichnung" ,
+	    	"name" => "tbl_zeitaufzeichnung" ,
 	    	"caption" => "tbl_zeitaufzeichnung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E4012763-A933-4A57-963E-3BD5C15F5B5F}' => array
 			(
 				"id" => "{E4012763-A933-4A57-963E-3BD5C15F5B5F}" ,
@@ -8054,12 +8056,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_zeitaufzeichnung_zeitaufzeichnung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D250804D-2A27-4F07-931B-816FD9B231DF}' => array
 			(
 				"id" => "{D250804D-2A27-4F07-931B-816FD9B231DF}" ,
@@ -8078,7 +8080,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FD9684F5-AFD1-403E-A6FC-C278157A378C}' => array
 			(
 				"id" => "{FD9684F5-AFD1-403E-A6FC-C278157A378C}" ,
@@ -8097,7 +8099,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C1501162-5424-4B7C-BAE9-62F3EBD7939B}' => array
 			(
 				"id" => "{C1501162-5424-4B7C-BAE9-62F3EBD7939B}" ,
@@ -8116,7 +8118,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5B13C93A-6AF9-4F2E-B6D4-BB7F151F8AE6}' => array
 			(
 				"id" => "{5B13C93A-6AF9-4F2E-B6D4-BB7F151F8AE6}" ,
@@ -8135,7 +8137,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{057E06CC-C191-4192-A27C-E64EC4CF6160}' => array
 			(
 				"id" => "{057E06CC-C191-4192-A27C-E64EC4CF6160}" ,
@@ -8154,7 +8156,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{83A4EF89-6784-4D09-8AAC-2666845AFBE8}' => array
 			(
 				"id" => "{83A4EF89-6784-4D09-8AAC-2666845AFBE8}" ,
@@ -8173,7 +8175,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DE7D34AD-E081-42A6-89B2-FA64984FF0E3}' => array
 			(
 				"id" => "{DE7D34AD-E081-42A6-89B2-FA64984FF0E3}" ,
@@ -8192,7 +8194,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F24EFC2F-4BDB-4AB0-84E0-9465BA4162D1}' => array
 			(
 				"id" => "{F24EFC2F-4BDB-4AB0-84E0-9465BA4162D1}" ,
@@ -8211,7 +8213,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5754D78D-3FB1-4933-AC50-A19DADB0BCAA}' => array
 			(
 				"id" => "{5754D78D-3FB1-4933-AC50-A19DADB0BCAA}" ,
@@ -8230,7 +8232,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4E0A2557-BFB0-49FE-B169-F2C2ADB7A274}' => array
 			(
 				"id" => "{4E0A2557-BFB0-49FE-B169-F2C2ADB7A274}" ,
@@ -8249,7 +8251,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BE30FC9C-4B47-4B9E-BAD4-5F8E2EB32477}' => array
 			(
 				"id" => "{BE30FC9C-4B47-4B9E-BAD4-5F8E2EB32477}" ,
@@ -8268,7 +8270,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{30C2AEE6-099C-402D-9EF6-6297177488FF}' => array
 			(
 				"id" => "{30C2AEE6-099C-402D-9EF6-6297177488FF}" ,
@@ -8287,21 +8289,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{9CFAF12A-068C-4148-ABDE-403C29E0B6CC}' => array
 			(
 				"id" => "{9CFAF12A-068C-4148-ABDE-403C29E0B6CC}" ,
-				"name" => "pk_tbl_zeitaufzeichnung" ,
+				"name" => "pk_zeitaufzeichnung" ,
 				"caption" => "pk_tbl_zeitaufzeichnung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8C707137-8224-4B79-A7D1-7EE9B514EDEF}' => array
 			   		(
 		   				"id" => "{8C707137-8224-4B79-A7D1-7EE9B514EDEF}" ,
@@ -8316,27 +8318,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3C1A6B39-BC0D-4BC7-8618-46C8DA9DB33C}'  => array
 	(
 	    	"id" => "{3C1A6B39-BC0D-4BC7-8618-46C8DA9DB33C}" ,
-	    	"name" => "Zeitsperre" ,
+	    	"name" => "tbl_zeitsperre" ,
 	    	"caption" => "tbl_zeitsperre" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{8E45E727-427D-43C5-AA2B-8F721FECB8B5}' => array
 			(
 				"id" => "{8E45E727-427D-43C5-AA2B-8F721FECB8B5}" ,
@@ -8350,12 +8352,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.tbl_zeitsperre_zeitsperre_id_seq'::regclass)",
+				"defaultvalue" => "nextval('campus.seq_zeitsperre_zeitsperre_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A49E3A97-FED6-4BC9-8674-3969DC360FFD}' => array
 			(
 				"id" => "{A49E3A97-FED6-4BC9-8674-3969DC360FFD}" ,
@@ -8374,7 +8376,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{64C8AC18-1281-47D9-922E-8E643427BF6F}' => array
 			(
 				"id" => "{64C8AC18-1281-47D9-922E-8E643427BF6F}" ,
@@ -8393,7 +8395,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E43840DD-3CF7-4970-A586-D1F7BB1643ED}' => array
 			(
 				"id" => "{E43840DD-3CF7-4970-A586-D1F7BB1643ED}" ,
@@ -8412,7 +8414,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AD3BA560-C09A-44F1-B9C1-675A86985595}' => array
 			(
 				"id" => "{AD3BA560-C09A-44F1-B9C1-675A86985595}" ,
@@ -8431,7 +8433,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{30EF1BE4-3A59-4ED5-9272-B8EAF3F171E1}' => array
 			(
 				"id" => "{30EF1BE4-3A59-4ED5-9272-B8EAF3F171E1}" ,
@@ -8450,7 +8452,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{98A769A6-A90F-49FD-A0E6-6A6C1D2012E1}' => array
 			(
 				"id" => "{98A769A6-A90F-49FD-A0E6-6A6C1D2012E1}" ,
@@ -8469,7 +8471,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B1C46BDE-41D4-4BDD-AAD1-0D705184557C}' => array
 			(
 				"id" => "{B1C46BDE-41D4-4BDD-AAD1-0D705184557C}" ,
@@ -8488,7 +8490,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D8121F6B-1EFA-4F2C-8518-2D8E9F5C4187}' => array
 			(
 				"id" => "{D8121F6B-1EFA-4F2C-8518-2D8E9F5C4187}" ,
@@ -8507,7 +8509,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D230A772-931C-4629-BD08-F89EDE39496E}' => array
 			(
 				"id" => "{D230A772-931C-4629-BD08-F89EDE39496E}" ,
@@ -8526,7 +8528,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{31D960C1-9C33-442E-8647-57AC61C81DD9}' => array
 			(
 				"id" => "{31D960C1-9C33-442E-8647-57AC61C81DD9}" ,
@@ -8545,7 +8547,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CA69DBB4-FD1A-440D-819F-F3741C818C80}' => array
 			(
 				"id" => "{CA69DBB4-FD1A-440D-819F-F3741C818C80}" ,
@@ -8564,7 +8566,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A98CEA10-EC01-45A1-995C-F93B38502BD3}' => array
 			(
 				"id" => "{A98CEA10-EC01-45A1-995C-F93B38502BD3}" ,
@@ -8583,7 +8585,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{87E44853-3520-4DA8-8A48-0197D36487FE}' => array
 			(
 				"id" => "{87E44853-3520-4DA8-8A48-0197D36487FE}" ,
@@ -8602,7 +8604,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C9779BB-0180-4345-A78E-9C0400E8D059}' => array
 			(
 				"id" => "{2C9779BB-0180-4345-A78E-9C0400E8D059}" ,
@@ -8621,7 +8623,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C0F61EC-972B-4631-87A6-BA67D28D5E4C}' => array
 			(
 				"id" => "{2C0F61EC-972B-4631-87A6-BA67D28D5E4C}" ,
@@ -8640,21 +8642,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{513B3060-95E8-494F-B9C7-624197C6B7ED}' => array
 			(
 				"id" => "{513B3060-95E8-494F-B9C7-624197C6B7ED}" ,
-				"name" => "pk_tbl_zeitsperre" ,
+				"name" => "pk_zeitsperre" ,
 				"caption" => "pk_tbl_zeitsperre" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{33875962-67DA-45B8-817E-2B808B675FB7}' => array
 			   		(
 		   				"id" => "{33875962-67DA-45B8-817E-2B808B675FB7}" ,
@@ -8669,27 +8671,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9DA1C798-DC5D-438F-A019-5F7DD7D04326}'  => array
 	(
 	    	"id" => "{9DA1C798-DC5D-438F-A019-5F7DD7D04326}" ,
-	    	"name" => "Zeitsperretyp" ,
+	    	"name" => "tbl_zeitsperretyp" ,
 	    	"caption" => "tbl_zeitsperretyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{385283FF-1465-4897-894C-E9E121BC048C}' => array
 			(
 				"id" => "{385283FF-1465-4897-894C-E9E121BC048C}" ,
@@ -8708,7 +8710,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7113BD51-3C05-41D1-A24D-53F769A642A4}' => array
 			(
 				"id" => "{7113BD51-3C05-41D1-A24D-53F769A642A4}" ,
@@ -8727,7 +8729,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D604B595-3679-4EAC-9C49-A391FC91C30B}' => array
 			(
 				"id" => "{D604B595-3679-4EAC-9C49-A391FC91C30B}" ,
@@ -8746,21 +8748,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{DD3CB459-C2C7-4D97-9A1D-9FD0E129DA48}' => array
 			(
 				"id" => "{DD3CB459-C2C7-4D97-9A1D-9FD0E129DA48}" ,
-				"name" => "pk_tbl_zeitsperretyp" ,
+				"name" => "pk_zeitsperretyp" ,
 				"caption" => "pk_tbl_zeitsperretyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{940829A1-B8B3-4F22-BBAA-AB3D2C68A69A}' => array
 			   		(
 		   				"id" => "{940829A1-B8B3-4F22-BBAA-AB3D2C68A69A}" ,
@@ -8778,24 +8780,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{94BC94FA-BA39-4623-96AD-44D2D1AF84DA}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{8B06979E-AE85-49B6-BA02-F7CD7D18C8C9}'  => array
 	(
 	    	"id" => "{8B06979E-AE85-49B6-BA02-F7CD7D18C8C9}" ,
-	    	"name" => "Zeitwunsch" ,
+	    	"name" => "tbl_zeitwunsch" ,
 	    	"caption" => "tbl_zeitwunsch" ,
 	    	"comments" => "Zeitwuensche der Lektoren" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F7026438-B369-4964-B092-48D9FB7A90E2}' => array
 			(
 				"id" => "{F7026438-B369-4964-B092-48D9FB7A90E2}" ,
@@ -8814,7 +8816,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{12BF1542-9242-49FA-A49E-320F6AB5596F}' => array
 			(
 				"id" => "{12BF1542-9242-49FA-A49E-320F6AB5596F}" ,
@@ -8833,7 +8835,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CBABF454-CD1D-4BE3-86EB-FC3912C6EC2F}' => array
 			(
 				"id" => "{CBABF454-CD1D-4BE3-86EB-FC3912C6EC2F}" ,
@@ -8852,7 +8854,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2FF85C8F-855F-4CC4-B989-EA70D46C6A55}' => array
 			(
 				"id" => "{2FF85C8F-855F-4CC4-B989-EA70D46C6A55}" ,
@@ -8871,7 +8873,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C945E1A-ED14-4B9D-B9FB-EBF22BF1B8F0}' => array
 			(
 				"id" => "{2C945E1A-ED14-4B9D-B9FB-EBF22BF1B8F0}" ,
@@ -8890,7 +8892,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2087E85B-E615-425F-821D-3A1B5E1ACF25}' => array
 			(
 				"id" => "{2087E85B-E615-425F-821D-3A1B5E1ACF25}" ,
@@ -8909,7 +8911,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{00316A03-FAAD-4D2F-A263-8D0E1AC76073}' => array
 			(
 				"id" => "{00316A03-FAAD-4D2F-A263-8D0E1AC76073}" ,
@@ -8928,7 +8930,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0219556E-E34E-4693-8C35-E8FB4A6EA28B}' => array
 			(
 				"id" => "{0219556E-E34E-4693-8C35-E8FB4A6EA28B}" ,
@@ -8947,21 +8949,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{202F9CA0-B71D-4852-A2C1-6E638B2D46AE}' => array
 			(
 				"id" => "{202F9CA0-B71D-4852-A2C1-6E638B2D46AE}" ,
-				"name" => "pk_tbl_zeitwunsch" ,
+				"name" => "pk_zeitwunsch" ,
 				"caption" => "pk_tbl_zeitwunsch" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D9DE4DE1-F41E-4AAC-8B64-C923AD96FD6F}' => array
 			   		(
 		   				"id" => "{D9DE4DE1-F41E-4AAC-8B64-C923AD96FD6F}" ,
@@ -8976,10 +8978,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{63050350-73E1-4772-9236-2A32965F452C}' => array
 			   		(
 		   				"id" => "{63050350-73E1-4772-9236-2A32965F452C}" ,
@@ -8994,10 +8996,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{246BD5F9-8D30-4DA3-A80B-048E2D5FA6C7}' => array
 			   		(
 		   				"id" => "{246BD5F9-8D30-4DA3-A80B-048E2D5FA6C7}" ,
@@ -9012,16 +9014,16 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{66763D6D-18EE-4D9E-81D6-383A386428BA}'  => array
 	(
 	    	"id" => "{66763D6D-18EE-4D9E-81D6-383A386428BA}" ,
@@ -9032,7 +9034,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{23913C1C-6059-46CC-A763-615C35B6687A}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7E76EECC-3FE5-424B-AEA1-C0BE123FF7AB}' => array
 			(
 				"id" => "{7E76EECC-3FE5-424B-AEA1-C0BE123FF7AB}" ,
@@ -9051,7 +9053,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{061CB025-7142-4205-880B-5D03DB2AAB46}' => array
 			(
 				"id" => "{061CB025-7142-4205-880B-5D03DB2AAB46}" ,
@@ -9070,21 +9072,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{662BE9B7-7D4F-43DC-8CC4-CFAC585EA605}' => array
 			(
 				"id" => "{662BE9B7-7D4F-43DC-8CC4-CFAC585EA605}" ,
-				"name" => "pk_tbl_aktivitaet" ,
+				"name" => "pk_aktivitaet" ,
 				"caption" => "pk_tbl_aktivitaet" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{349387A7-2454-4733-AA45-599FBC5F57D9}' => array
 			   		(
 		   				"id" => "{349387A7-2454-4733-AA45-599FBC5F57D9}" ,
@@ -9102,24 +9104,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{2594233A-5509-434E-B368-5B5951894B3D}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4D39CCFB-84BC-4F12-A922-B781943C31B3}'  => array
 	(
 	    	"id" => "{4D39CCFB-84BC-4F12-A922-B781943C31B3}" ,
-	    	"name" => "Projekt" ,
+	    	"name" => "tbl_projekt" ,
 	    	"caption" => "tbl_projekt" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{23913C1C-6059-46CC-A763-615C35B6687A}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{A7574311-DA3D-40C1-9E68-5E5EB743DC26}' => array
 			(
 				"id" => "{A7574311-DA3D-40C1-9E68-5E5EB743DC26}" ,
@@ -9138,7 +9140,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7EA4D2D5-EE3B-4F88-BD67-1E8FDECCBF3F}' => array
 			(
 				"id" => "{7EA4D2D5-EE3B-4F88-BD67-1E8FDECCBF3F}" ,
@@ -9157,7 +9159,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FE594232-7F10-461F-B76D-85B05A1324D0}' => array
 			(
 				"id" => "{FE594232-7F10-461F-B76D-85B05A1324D0}" ,
@@ -9176,7 +9178,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{85BE6565-80CE-44CC-B760-B345502E4A11}' => array
 			(
 				"id" => "{85BE6565-80CE-44CC-B760-B345502E4A11}" ,
@@ -9195,7 +9197,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{41A3A88A-D18B-43B3-A359-9857C6110784}' => array
 			(
 				"id" => "{41A3A88A-D18B-43B3-A359-9857C6110784}" ,
@@ -9214,7 +9216,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F9FB0446-9A4E-48DF-8898-2B7D5CC1811F}' => array
 			(
 				"id" => "{F9FB0446-9A4E-48DF-8898-2B7D5CC1811F}" ,
@@ -9233,21 +9235,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2EA6597E-160F-4A49-A381-2EAB32B42057}' => array
 			(
 				"id" => "{2EA6597E-160F-4A49-A381-2EAB32B42057}" ,
-				"name" => "pk_tbl_projekt" ,
+				"name" => "pk_projekt" ,
 				"caption" => "pk_tbl_projekt" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}' => array
 			   		(
 		   				"id" => "{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}" ,
@@ -9265,24 +9267,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{6D474BB4-B542-468F-8E66-A2DAAD9C0080}","id" => "{C34CC8D9-1155-462F-8FFB-16CD6684B08B}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{FBC37B6D-3088-4C52-948C-539A1CA75796}'  => array
 	(
 	    	"id" => "{FBC37B6D-3088-4C52-948C-539A1CA75796}" ,
-	    	"name" => "Projektbenutzer" ,
+	    	"name" => "tbl_projektbenutzer" ,
 	    	"caption" => "tbl_projektbenutzer" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{23913C1C-6059-46CC-A763-615C35B6687A}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{C05CE625-378D-4AFE-ADFF-93F08F3D3403}' => array
 			(
 				"id" => "{C05CE625-378D-4AFE-ADFF-93F08F3D3403}" ,
@@ -9296,12 +9298,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('fue.tbl_projektbenutzer_projektbenutzer_id_seq'::regclass)",
+				"defaultvalue" => "nextval('fue.seq_projektbenutzer_projektbenutzer_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FA4B8BF6-EA4C-495E-98A2-11429758AD44}' => array
 			(
 				"id" => "{FA4B8BF6-EA4C-495E-98A2-11429758AD44}" ,
@@ -9320,7 +9322,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2F6FA39F-0650-4408-BA99-F3D585111EEE}' => array
 			(
 				"id" => "{2F6FA39F-0650-4408-BA99-F3D585111EEE}" ,
@@ -9339,7 +9341,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{49CBEBB9-6CE7-4AE1-9077-E3740B0BF053}' => array
 			(
 				"id" => "{49CBEBB9-6CE7-4AE1-9077-E3740B0BF053}" ,
@@ -9358,21 +9360,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E53EDB9E-F05D-4CCC-9C06-AFB4900ABE70}' => array
 			(
 				"id" => "{E53EDB9E-F05D-4CCC-9C06-AFB4900ABE70}" ,
-				"name" => "pk_tbl_projektbenutzer" ,
+				"name" => "pk_projektbenutzer" ,
 				"caption" => "pk_tbl_projektbenutzer" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{98F0BBC0-D6E4-49E3-9ECC-300A99BE2952}' => array
 			   		(
 		   				"id" => "{98F0BBC0-D6E4-49E3-9ECC-300A99BE2952}" ,
@@ -9387,27 +9389,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3489159B-EF5D-4900-A23E-33E0087EE55B}'  => array
 	(
 	    	"id" => "{3489159B-EF5D-4900-A23E-33E0087EE55B}" ,
-	    	"name" => "Match" ,
+	    	"name" => "tbl_match" ,
 	    	"caption" => "tbl_match" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{146A219D-3FEF-4057-AA69-CFBBA64CED8D}' => array
 			(
 				"id" => "{146A219D-3FEF-4057-AA69-CFBBA64CED8D}" ,
@@ -9426,7 +9428,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AAE36EE2-38ED-4BC3-8F51-C56BBF756E67}' => array
 			(
 				"id" => "{AAE36EE2-38ED-4BC3-8F51-C56BBF756E67}" ,
@@ -9445,7 +9447,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1386F0EC-F529-435B-8A09-F430836A3A49}' => array
 			(
 				"id" => "{1386F0EC-F529-435B-8A09-F430836A3A49}" ,
@@ -9464,7 +9466,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{11475317-C9EF-43DD-837D-816AA0BF3F2A}' => array
 			(
 				"id" => "{11475317-C9EF-43DD-837D-816AA0BF3F2A}" ,
@@ -9483,7 +9485,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4B1728EB-9660-4800-B92C-7E7F2E36E7A0}' => array
 			(
 				"id" => "{4B1728EB-9660-4800-B92C-7E7F2E36E7A0}" ,
@@ -9502,7 +9504,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{56E6FB92-F8D2-49A2-A099-00920E09B6BF}' => array
 			(
 				"id" => "{56E6FB92-F8D2-49A2-A099-00920E09B6BF}" ,
@@ -9521,7 +9523,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5BAEEA56-E420-4322-AC29-FD27239BFFC4}' => array
 			(
 				"id" => "{5BAEEA56-E420-4322-AC29-FD27239BFFC4}" ,
@@ -9540,7 +9542,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{00E18E3A-EAEE-47E1-A32D-8682DEC8B08D}' => array
 			(
 				"id" => "{00E18E3A-EAEE-47E1-A32D-8682DEC8B08D}" ,
@@ -9559,7 +9561,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7FAE97DB-9BCC-4CF6-85CE-B42550E1AA6C}' => array
 			(
 				"id" => "{7FAE97DB-9BCC-4CF6-85CE-B42550E1AA6C}" ,
@@ -9578,7 +9580,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{95F07381-A35C-4C6E-A60F-2C9C0431660A}' => array
 			(
 				"id" => "{95F07381-A35C-4C6E-A60F-2C9C0431660A}" ,
@@ -9597,7 +9599,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EFCB0E13-62A4-42A9-AC09-76A40DB2D409}' => array
 			(
 				"id" => "{EFCB0E13-62A4-42A9-AC09-76A40DB2D409}" ,
@@ -9611,12 +9613,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('kommune.tbl_match_match_id_seq'::regclass)",
+				"defaultvalue" => "nextval('kommune.seq_match_match_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9564CA77-7390-42CD-B48B-8DB8824E937E}' => array
 			(
 				"id" => "{9564CA77-7390-42CD-B48B-8DB8824E937E}" ,
@@ -9635,7 +9637,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9988303F-C8B0-421F-B556-3856CE81D267}' => array
 			(
 				"id" => "{9988303F-C8B0-421F-B556-3856CE81D267}" ,
@@ -9654,7 +9656,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3BECE6BE-D3BC-4FF7-9188-AB6DF692E24D}' => array
 			(
 				"id" => "{3BECE6BE-D3BC-4FF7-9188-AB6DF692E24D}" ,
@@ -9673,21 +9675,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{7F8B12E9-1A68-4B70-B6CC-3944350E39A7}' => array
 			(
 				"id" => "{7F8B12E9-1A68-4B70-B6CC-3944350E39A7}" ,
-				"name" => "pk_tbl_match" ,
+				"name" => "pk_match" ,
 				"caption" => "pk_tbl_match" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{56E339D4-E8A8-40DE-88C8-0FD94D66319B}' => array
 			   		(
 		   				"id" => "{56E339D4-E8A8-40DE-88C8-0FD94D66319B}" ,
@@ -9702,27 +9704,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{99838102-1057-4536-99D2-7A1DB6136C11}'  => array
 	(
 	    	"id" => "{99838102-1057-4536-99D2-7A1DB6136C11}" ,
-	    	"name" => "Team" ,
+	    	"name" => "tbl_team" ,
 	    	"caption" => "tbl_team" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9B49CB08-DAF7-4035-90DD-A509F35B23E7}' => array
 			(
 				"id" => "{9B49CB08-DAF7-4035-90DD-A509F35B23E7}" ,
@@ -9741,7 +9743,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{746BBFD4-3C47-41DE-94A7-73DE2A2D57D6}' => array
 			(
 				"id" => "{746BBFD4-3C47-41DE-94A7-73DE2A2D57D6}" ,
@@ -9760,7 +9762,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8283825C-2165-4E1E-9768-3293604496EE}' => array
 			(
 				"id" => "{8283825C-2165-4E1E-9768-3293604496EE}" ,
@@ -9779,7 +9781,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{66BA243C-FE37-4C2D-8A60-AC2BD863010D}' => array
 			(
 				"id" => "{66BA243C-FE37-4C2D-8A60-AC2BD863010D}" ,
@@ -9798,21 +9800,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{53E9A7C0-865A-49E1-9003-E8089E0B2D97}' => array
 			(
 				"id" => "{53E9A7C0-865A-49E1-9003-E8089E0B2D97}" ,
-				"name" => "pk_tbl_team" ,
+				"name" => "pk_team" ,
 				"caption" => "pk_tbl_team" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{609E1312-E27E-4BD9-B2AA-5E6800837E19}' => array
 			   		(
 		   				"id" => "{609E1312-E27E-4BD9-B2AA-5E6800837E19}" ,
@@ -9830,24 +9832,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{BD9E35FC-2CC2-48FA-8FFE-5141F90ED41E}","id" => "{85279CEB-A33D-4AB0-BD80-63E9651726EA}","id" => "{A406911B-FA59-4650-98FA-18583AD61E8A}","id" => "{1B2986BE-49EE-4E88-BBFA-3F8D184B8BB6}","id" => "{63360770-20E9-4144-ADE1-FE97C1CF4808}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{E0FC92D0-D6DA-44A2-863E-EBE4D64BDAC9}'  => array
 	(
 	    	"id" => "{E0FC92D0-D6DA-44A2-863E-EBE4D64BDAC9}" ,
-	    	"name" => "Teambenutzer" ,
+	    	"name" => "tbl_teambenutzer" ,
 	    	"caption" => "tbl_teambenutzer" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F3D86B27-3299-42DB-A833-D9E84F45D92B}' => array
 			(
 				"id" => "{F3D86B27-3299-42DB-A833-D9E84F45D92B}" ,
@@ -9866,7 +9868,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{586B3B4E-57F5-4636-9229-CDCCD81C057A}' => array
 			(
 				"id" => "{586B3B4E-57F5-4636-9229-CDCCD81C057A}" ,
@@ -9885,21 +9887,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B1870A6D-4F1F-432A-B3C9-74D6782B7A2D}' => array
 			(
 				"id" => "{B1870A6D-4F1F-432A-B3C9-74D6782B7A2D}" ,
-				"name" => "pk_tbl_teambenutzer" ,
+				"name" => "pk_teambenutzer" ,
 				"caption" => "pk_tbl_teambenutzer" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{6A932F80-E1F9-41C9-BA4A-A1B3FD3177C3}' => array
 			   		(
 		   				"id" => "{6A932F80-E1F9-41C9-BA4A-A1B3FD3177C3}" ,
@@ -9914,10 +9916,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{B88084D0-111B-47D7-A919-FB895B93BFB1}' => array
 			   		(
 		   				"id" => "{B88084D0-111B-47D7-A919-FB895B93BFB1}" ,
@@ -9932,27 +9934,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{C62F44EB-B129-4999-85BE-4E3314C159FF}'  => array
 	(
 	    	"id" => "{C62F44EB-B129-4999-85BE-4E3314C159FF}" ,
-	    	"name" => "Wettbewerb" ,
+	    	"name" => "tbl_wettbewerb" ,
 	    	"caption" => "tbl_wettbewerb" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F45180D3-FD1F-413B-B14C-65819C51990E}' => array
 			(
 				"id" => "{F45180D3-FD1F-413B-B14C-65819C51990E}" ,
@@ -9971,7 +9973,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8785F1EA-9B0B-41C6-844C-C74A0D157D09}' => array
 			(
 				"id" => "{8785F1EA-9B0B-41C6-844C-C74A0D157D09}" ,
@@ -9990,7 +9992,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D584BE5C-23A9-40A2-ACC7-0F491D31B583}' => array
 			(
 				"id" => "{D584BE5C-23A9-40A2-ACC7-0F491D31B583}" ,
@@ -10009,7 +10011,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AEF1993D-F699-4D76-973E-DC67D5F675E9}' => array
 			(
 				"id" => "{AEF1993D-F699-4D76-973E-DC67D5F675E9}" ,
@@ -10028,7 +10030,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{78552289-7027-4891-BBA6-33751A970C9B}' => array
 			(
 				"id" => "{78552289-7027-4891-BBA6-33751A970C9B}" ,
@@ -10047,7 +10049,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3ADE39E0-1A27-4C98-BD4D-C398A8211F54}' => array
 			(
 				"id" => "{3ADE39E0-1A27-4C98-BD4D-C398A8211F54}" ,
@@ -10066,7 +10068,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3F1A3859-76E2-47E8-9141-5828AE5C6639}' => array
 			(
 				"id" => "{3F1A3859-76E2-47E8-9141-5828AE5C6639}" ,
@@ -10085,21 +10087,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{286EC454-63C1-418F-892C-05281CEBB1BD}' => array
 			(
 				"id" => "{286EC454-63C1-418F-892C-05281CEBB1BD}" ,
-				"name" => "pk_tbl_wettbewerb" ,
+				"name" => "pk_wettbewerb" ,
 				"caption" => "pk_tbl_wettbewerb" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{39A2E26E-C299-4913-BC7A-252540DCBD83}' => array
 			   		(
 		   				"id" => "{39A2E26E-C299-4913-BC7A-252540DCBD83}" ,
@@ -10117,24 +10119,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{0414E50F-606D-4A39-A7E9-4787466369F6}","id" => "{678387D7-9BD6-4927-BE7E-65AA582D7FF9}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{6BC97CF0-7D4E-416F-8B6D-33F6B6067E48}'  => array
 	(
 	    	"id" => "{6BC97CF0-7D4E-416F-8B6D-33F6B6067E48}" ,
-	    	"name" => "Wettbewerbteam" ,
+	    	"name" => "tbl_wettbewerbteam" ,
 	    	"caption" => "tbl_wettbewerbteam" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{41B3F260-0E5E-44B8-88BB-7117BF623FC2}' => array
 			(
 				"id" => "{41B3F260-0E5E-44B8-88BB-7117BF623FC2}" ,
@@ -10153,7 +10155,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F19095DA-91E7-499B-A933-AAD449F71742}' => array
 			(
 				"id" => "{F19095DA-91E7-499B-A933-AAD449F71742}" ,
@@ -10172,7 +10174,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{43A822E2-1639-4000-BBEB-9C23620994B3}' => array
 			(
 				"id" => "{43A822E2-1639-4000-BBEB-9C23620994B3}" ,
@@ -10191,7 +10193,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9D8FEFF1-367F-4283-AD81-61A8C87DDDD6}' => array
 			(
 				"id" => "{9D8FEFF1-367F-4283-AD81-61A8C87DDDD6}" ,
@@ -10210,21 +10212,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{91190344-753B-47CA-AE93-F67B557CC627}' => array
 			(
 				"id" => "{91190344-753B-47CA-AE93-F67B557CC627}" ,
-				"name" => "pk_tbl_wettbewerbteam" ,
+				"name" => "pk_wettbewerbteam" ,
 				"caption" => "pk_tbl_wettbewerbteam" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{67CD36ED-B287-40B5-B42F-911F6868939E}' => array
 			   		(
 		   				"id" => "{67CD36ED-B287-40B5-B42F-911F6868939E}" ,
@@ -10239,10 +10241,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{7D0B2851-5DC2-4543-B2C4-5CDF965D6607}' => array
 			   		(
 		   				"id" => "{7D0B2851-5DC2-4543-B2C4-5CDF965D6607}" ,
@@ -10257,27 +10259,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{97424491-86AF-46A5-BBC6-4DACB9FB52B3}'  => array
 	(
 	    	"id" => "{97424491-86AF-46A5-BBC6-4DACB9FB52B3}" ,
-	    	"name" => "Wettbewerbtyp" ,
+	    	"name" => "tbl_wettbewerbtyp" ,
 	    	"caption" => "tbl_wettbewerbtyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{10EE3A7C-9BEC-4E9B-AD36-2FB36B903606}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{24EBFC95-A530-4B72-9A0E-2E4138E896AA}' => array
 			(
 				"id" => "{24EBFC95-A530-4B72-9A0E-2E4138E896AA}" ,
@@ -10296,7 +10298,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{29F46C62-A8F1-4731-AFCB-40FB0553633F}' => array
 			(
 				"id" => "{29F46C62-A8F1-4731-AFCB-40FB0553633F}" ,
@@ -10315,7 +10317,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F37DA60B-81C8-400B-8CFA-BAE471B62ABD}' => array
 			(
 				"id" => "{F37DA60B-81C8-400B-8CFA-BAE471B62ABD}" ,
@@ -10334,21 +10336,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F59E97D9-C74F-41D0-B0E4-79DD2932213F}' => array
 			(
 				"id" => "{F59E97D9-C74F-41D0-B0E4-79DD2932213F}" ,
-				"name" => "pk_tbl_wettbewerbtyp" ,
+				"name" => "pk_wettbewerbtyp" ,
 				"caption" => "pk_tbl_wettbewerbtyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{12C41347-B32D-4CFE-AF68-2281EE5E7FB9}' => array
 			   		(
 		   				"id" => "{12C41347-B32D-4CFE-AF68-2281EE5E7FB9}" ,
@@ -10366,13 +10368,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{C64F4E41-56DC-4F7E-87E3-6017D1684D09}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{018514EE-BF55-494B-B6F4-51997127321E}'  => array
 	(
 	    	"id" => "{018514EE-BF55-494B-B6F4-51997127321E}" ,
@@ -10383,7 +10385,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{00D93BC9-7F2B-4EE1-AFB0-C19AB34EEAE8}' => array
 			(
 				"id" => "{00D93BC9-7F2B-4EE1-AFB0-C19AB34EEAE8}" ,
@@ -10402,7 +10404,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1A63EDF4-FB8A-4706-9DD1-0848A6BCFD8E}' => array
 			(
 				"id" => "{1A63EDF4-FB8A-4706-9DD1-0848A6BCFD8E}" ,
@@ -10421,21 +10423,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{4F83440E-A934-4AD1-8BCC-36F4B5B7600A}' => array
 			(
 				"id" => "{4F83440E-A934-4AD1-8BCC-36F4B5B7600A}" ,
-				"name" => "pk_tbl_abschlussbeurteilung" ,
+				"name" => "pk_abschlussbeurteilung" ,
 				"caption" => "pk_tbl_abschlussbeurteilung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{04EE03FB-F92C-43F1-9DFE-233A103D306C}' => array
 			   		(
 		   				"id" => "{04EE03FB-F92C-43F1-9DFE-233A103D306C}" ,
@@ -10453,13 +10455,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{ABF28BF0-80DC-4DAB-A4F0-9E72D12B635E}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{340AE5EA-45BA-4A80-9339-0BFFFBA2D79E}'  => array
 	(
 	    	"id" => "{340AE5EA-45BA-4A80-9339-0BFFFBA2D79E}" ,
@@ -10470,7 +10472,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E0255313-25E9-41ED-8B1C-BC48FFEAC892}' => array
 			(
 				"id" => "{E0255313-25E9-41ED-8B1C-BC48FFEAC892}" ,
@@ -10489,7 +10491,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{37699AA3-CE0D-4C26-B364-2A253287308C}' => array
 			(
 				"id" => "{37699AA3-CE0D-4C26-B364-2A253287308C}" ,
@@ -10508,7 +10510,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{64033CEE-81C8-4175-80DD-9492029677C8}' => array
 			(
 				"id" => "{64033CEE-81C8-4175-80DD-9492029677C8}" ,
@@ -10527,7 +10529,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FBABF927-BEDB-4D8B-A69E-B669C46C0430}' => array
 			(
 				"id" => "{FBABF927-BEDB-4D8B-A69E-B669C46C0430}" ,
@@ -10546,7 +10548,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8D8CB291-60FB-4DA8-9AA8-860BE6EE3A42}' => array
 			(
 				"id" => "{8D8CB291-60FB-4DA8-9AA8-860BE6EE3A42}" ,
@@ -10565,7 +10567,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{604BD1CF-FC95-40C9-8F87-C3E022A0972C}' => array
 			(
 				"id" => "{604BD1CF-FC95-40C9-8F87-C3E022A0972C}" ,
@@ -10584,7 +10586,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ECB30472-9878-47A7-B7E3-19374C1A8C33}' => array
 			(
 				"id" => "{ECB30472-9878-47A7-B7E3-19374C1A8C33}" ,
@@ -10603,7 +10605,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6070B9AE-DD3C-49A1-B9FF-BD9EA1DFDBC2}' => array
 			(
 				"id" => "{6070B9AE-DD3C-49A1-B9FF-BD9EA1DFDBC2}" ,
@@ -10622,7 +10624,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{99D173DF-8043-4A76-9CB6-31CA534ACC8C}' => array
 			(
 				"id" => "{99D173DF-8043-4A76-9CB6-31CA534ACC8C}" ,
@@ -10641,7 +10643,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DFC5DA50-404A-4ECE-B945-229C94FCD7ED}' => array
 			(
 				"id" => "{DFC5DA50-404A-4ECE-B945-229C94FCD7ED}" ,
@@ -10660,7 +10662,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F007E384-CEF0-4E35-BBB0-144A63BB4AE5}' => array
 			(
 				"id" => "{F007E384-CEF0-4E35-BBB0-144A63BB4AE5}" ,
@@ -10679,7 +10681,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E9B2C2E9-F17B-4AB8-A81D-D3F8F375AFB0}' => array
 			(
 				"id" => "{E9B2C2E9-F17B-4AB8-A81D-D3F8F375AFB0}" ,
@@ -10698,7 +10700,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3EB8481C-254D-4FF3-B0D0-B869DA9C6F18}' => array
 			(
 				"id" => "{3EB8481C-254D-4FF3-B0D0-B869DA9C6F18}" ,
@@ -10717,7 +10719,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{75D2B416-C7E4-4F3E-B9E2-7DF3FB3E9D68}' => array
 			(
 				"id" => "{75D2B416-C7E4-4F3E-B9E2-7DF3FB3E9D68}" ,
@@ -10736,7 +10738,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8AD57350-527F-45A3-A895-66321ED85ED2}' => array
 			(
 				"id" => "{8AD57350-527F-45A3-A895-66321ED85ED2}" ,
@@ -10755,7 +10757,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E3BA7696-5362-46E0-BA55-ECAEBBA22D5E}' => array
 			(
 				"id" => "{E3BA7696-5362-46E0-BA55-ECAEBBA22D5E}" ,
@@ -10774,7 +10776,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3BD270CF-322C-4B8A-A8A5-A1E584F99524}' => array
 			(
 				"id" => "{3BD270CF-322C-4B8A-A8A5-A1E584F99524}" ,
@@ -10793,7 +10795,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A75241C5-F812-41D8-B41A-25B459B54427}' => array
 			(
 				"id" => "{A75241C5-F812-41D8-B41A-25B459B54427}" ,
@@ -10812,11 +10814,11 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B6916933-7FE4-4FAF-83E6-41506C6CAE0F}' => array
 			(
 				"id" => "{B6916933-7FE4-4FAF-83E6-41506C6CAE0F}" ,
@@ -10826,7 +10828,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{3410955B-98FD-4371-9080-67AECEC77759}' => array
 			   		(
 		   				"id" => "{3410955B-98FD-4371-9080-67AECEC77759}" ,
@@ -10841,16 +10843,16 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D13874C8-DFC2-47BA-B45D-A87D01D89FEF}'  => array
 	(
 	    	"id" => "{D13874C8-DFC2-47BA-B45D-A87D01D89FEF}" ,
@@ -10861,7 +10863,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{0A447B8C-922B-4690-90B3-EF427CC7B323}' => array
 			(
 				"id" => "{0A447B8C-922B-4690-90B3-EF427CC7B323}" ,
@@ -10875,12 +10877,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_akadgrad_akadgrad_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_akadgrad_akadgrad_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B13EDC4F-C341-4D48-A638-91660F7109E0}' => array
 			(
 				"id" => "{B13EDC4F-C341-4D48-A638-91660F7109E0}" ,
@@ -10899,7 +10901,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8AC329B5-2CE8-453F-99B4-7F27892A4D84}' => array
 			(
 				"id" => "{8AC329B5-2CE8-453F-99B4-7F27892A4D84}" ,
@@ -10918,7 +10920,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{468362BF-1DBD-452B-8283-E0DD43BC41FB}' => array
 			(
 				"id" => "{468362BF-1DBD-452B-8283-E0DD43BC41FB}" ,
@@ -10937,7 +10939,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3A43601B-7772-49AC-AF83-7E4D028EF225}' => array
 			(
 				"id" => "{3A43601B-7772-49AC-AF83-7E4D028EF225}" ,
@@ -10956,21 +10958,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{BF31C307-38F7-4319-B18A-DFAE4D7D061C}' => array
 			(
 				"id" => "{BF31C307-38F7-4319-B18A-DFAE4D7D061C}" ,
-				"name" => "pk_tbl_akadgrad" ,
+				"name" => "pk_akadgrad" ,
 				"caption" => "pk_tbl_akadgrad" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{E67D042D-B817-4510-BB00-DD367892B007}' => array
 			   		(
 		   				"id" => "{E67D042D-B817-4510-BB00-DD367892B007}" ,
@@ -10988,24 +10990,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{CD2564EE-E459-4664-8141-3E77A6104070}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{764171EB-3C48-479C-9620-C6383D94A032}'  => array
 	(
 	    	"id" => "{764171EB-3C48-479C-9620-C6383D94A032}" ,
-	    	"name" => "Betreuerart" ,
+	    	"name" => "tbl_betreuerart" ,
 	    	"caption" => "tbl_betreuerart" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{90311BCD-FBD9-4F0E-8EF4-14522818BB18}' => array
 			(
 				"id" => "{90311BCD-FBD9-4F0E-8EF4-14522818BB18}" ,
@@ -11024,7 +11026,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C0B12313-4C40-4EBE-98C1-9DF72E40DDAB}' => array
 			(
 				"id" => "{C0B12313-4C40-4EBE-98C1-9DF72E40DDAB}" ,
@@ -11043,21 +11045,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{25D0FBA2-7AF6-4574-90A6-F5E721C84B19}' => array
 			(
 				"id" => "{25D0FBA2-7AF6-4574-90A6-F5E721C84B19}" ,
-				"name" => "pk_tbl_betreuerart" ,
+				"name" => "pk_betreuerart" ,
 				"caption" => "pk_tbl_betreuerart" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{FCD391A8-A97A-41DF-8B2F-9973213F4B7A}' => array
 			   		(
 		   				"id" => "{FCD391A8-A97A-41DF-8B2F-9973213F4B7A}" ,
@@ -11075,24 +11077,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{D260D4B1-B351-4B01-928E-9C2BA9B00042}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4ABD469F-A630-4A60-99F4-ABB0C2A276C2}'  => array
 	(
 	    	"id" => "{4ABD469F-A630-4A60-99F4-ABB0C2A276C2}" ,
-	    	"name" => "Ferien" ,
+	    	"name" => "tbl_ferien" ,
 	    	"caption" => "tbl_ferien" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4B462B2C-D8C1-4121-B7DD-A1C9CFEC2254}' => array
 			(
 				"id" => "{4B462B2C-D8C1-4121-B7DD-A1C9CFEC2254}" ,
@@ -11111,7 +11113,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{86A88083-D76E-4374-9030-694B4013C0F1}' => array
 			(
 				"id" => "{86A88083-D76E-4374-9030-694B4013C0F1}" ,
@@ -11130,7 +11132,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7F9F3FBE-E91D-4627-9188-830DF6562063}' => array
 			(
 				"id" => "{7F9F3FBE-E91D-4627-9188-830DF6562063}" ,
@@ -11149,7 +11151,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1F89527B-60C8-4D07-900E-9228D42B5A71}' => array
 			(
 				"id" => "{1F89527B-60C8-4D07-900E-9228D42B5A71}" ,
@@ -11168,21 +11170,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{93B49273-F6A3-4A48-8628-162F7D440AF2}' => array
 			(
 				"id" => "{93B49273-F6A3-4A48-8628-162F7D440AF2}" ,
-				"name" => "pk_tbl_ferien" ,
+				"name" => "pk_ferien" ,
 				"caption" => "pk_tbl_ferien" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{00AC629E-F45F-4824-A0FF-F75B8D564AEE}' => array
 			   		(
 		   				"id" => "{00AC629E-F45F-4824-A0FF-F75B8D564AEE}" ,
@@ -11197,10 +11199,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{7F70845D-D519-49B0-8744-D16E28A5F58C}' => array
 			   		(
 		   				"id" => "{7F70845D-D519-49B0-8744-D16E28A5F58C}" ,
@@ -11215,27 +11217,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{5D14BF84-0B1E-440C-9479-CF5FB4D162F6}'  => array
 	(
 	    	"id" => "{5D14BF84-0B1E-440C-9479-CF5FB4D162F6}" ,
-	    	"name" => "Lehreinheit" ,
+	    	"name" => "tbl_lehreinheit" ,
 	    	"caption" => "tbl_lehreinheit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{49B9E536-016E-4C60-BCD7-D693EC4AADE0}' => array
 			(
 				"id" => "{49B9E536-016E-4C60-BCD7-D693EC4AADE0}" ,
@@ -11249,12 +11251,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_lehreinheit_lehreinheit_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_lehreinheit_lehreinheit_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5685EF3C-BC73-45CB-98D1-E299834F55E4}' => array
 			(
 				"id" => "{5685EF3C-BC73-45CB-98D1-E299834F55E4}" ,
@@ -11273,7 +11275,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{43A49B3E-079F-4ECA-AD9F-D69CCF5AC4B0}' => array
 			(
 				"id" => "{43A49B3E-079F-4ECA-AD9F-D69CCF5AC4B0}" ,
@@ -11292,7 +11294,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0D9C71E3-D8E9-4CC4-A9C2-0BBF3EDD3C62}' => array
 			(
 				"id" => "{0D9C71E3-D8E9-4CC4-A9C2-0BBF3EDD3C62}" ,
@@ -11311,7 +11313,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2DA3A3AE-4700-42F6-BD1B-62436F972831}' => array
 			(
 				"id" => "{2DA3A3AE-4700-42F6-BD1B-62436F972831}" ,
@@ -11330,7 +11332,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{73BAC6B4-56B1-4A7A-9399-F3744739102D}' => array
 			(
 				"id" => "{73BAC6B4-56B1-4A7A-9399-F3744739102D}" ,
@@ -11349,7 +11351,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{374DE6D8-E00E-4E26-A35D-06CC5DCF3B00}' => array
 			(
 				"id" => "{374DE6D8-E00E-4E26-A35D-06CC5DCF3B00}" ,
@@ -11368,7 +11370,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1752929C-1C75-4754-9F6F-3A6DF7014298}' => array
 			(
 				"id" => "{1752929C-1C75-4754-9F6F-3A6DF7014298}" ,
@@ -11387,7 +11389,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0B7F4ADA-904D-4FD6-8A34-F14C9A303990}' => array
 			(
 				"id" => "{0B7F4ADA-904D-4FD6-8A34-F14C9A303990}" ,
@@ -11406,7 +11408,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E4E43A30-DB00-4EE1-8EC7-FF13B5DBF31E}' => array
 			(
 				"id" => "{E4E43A30-DB00-4EE1-8EC7-FF13B5DBF31E}" ,
@@ -11425,7 +11427,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7519CE09-13F7-4541-95FD-734C29F4618D}' => array
 			(
 				"id" => "{7519CE09-13F7-4541-95FD-734C29F4618D}" ,
@@ -11444,7 +11446,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6507BE2B-9D3B-4FAF-86BE-A62BFA61ED78}' => array
 			(
 				"id" => "{6507BE2B-9D3B-4FAF-86BE-A62BFA61ED78}" ,
@@ -11463,7 +11465,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{84248648-234D-4505-AF6C-48B11402E0FF}' => array
 			(
 				"id" => "{84248648-234D-4505-AF6C-48B11402E0FF}" ,
@@ -11482,7 +11484,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F21EC6CF-A7D6-415E-9550-3827880506C9}' => array
 			(
 				"id" => "{F21EC6CF-A7D6-415E-9550-3827880506C9}" ,
@@ -11501,7 +11503,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F7543E75-9AEE-414C-AC8F-D42E9112F213}' => array
 			(
 				"id" => "{F7543E75-9AEE-414C-AC8F-D42E9112F213}" ,
@@ -11520,7 +11522,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5E78D2E8-A77C-4BAE-B9BF-A9DFDD848C54}' => array
 			(
 				"id" => "{5E78D2E8-A77C-4BAE-B9BF-A9DFDD848C54}" ,
@@ -11539,7 +11541,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{21C31E6B-7F81-440A-BB69-9BB4E722AC35}' => array
 			(
 				"id" => "{21C31E6B-7F81-440A-BB69-9BB4E722AC35}" ,
@@ -11558,7 +11560,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2F18AE7D-4BAB-4FC0-879F-AE96AEB50D91}' => array
 			(
 				"id" => "{2F18AE7D-4BAB-4FC0-879F-AE96AEB50D91}" ,
@@ -11577,7 +11579,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BE60F120-5AD2-4356-B293-788C14EA9832}' => array
 			(
 				"id" => "{BE60F120-5AD2-4356-B293-788C14EA9832}" ,
@@ -11596,7 +11598,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6970238D-30E1-4368-8D6A-6AA52C3835E4}' => array
 			(
 				"id" => "{6970238D-30E1-4368-8D6A-6AA52C3835E4}" ,
@@ -11615,21 +11617,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{1774942F-11D3-4D29-AD23-4A7D29C9B4F8}' => array
 			(
 				"id" => "{1774942F-11D3-4D29-AD23-4A7D29C9B4F8}" ,
-				"name" => "pk_tbl_lehreinheit" ,
+				"name" => "pk_lehreinheit" ,
 				"caption" => "pk_tbl_lehreinheit" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{45A6708D-9ED5-4C7B-9143-65935D21CC06}' => array
 			   		(
 		   				"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}" ,
@@ -11647,24 +11649,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{4A582792-FD9F-4006-BCE7-45CFDC4525AA}","id" => "{105D5EDF-655D-4F3F-B640-1B5CCCFAEC93}","id" => "{289149BC-0E73-4E8D-BA1F-2D5BC6824780}","id" => "{F6B97486-000B-4647-92B4-4828B3118D80}","id" => "{79B2A1E8-B375-4897-8E52-024C895987BA}","id" => "{CCC1F019-57CA-45A9-AD3A-A014F07D733B}","id" => "{4A0FFA91-1FAC-4CDF-AA6E-2DDC610932EA}","id" => "{606898F0-64C6-4CF8-B2DB-6CC743BB9CBB}","id" => "{B76935DC-41FF-4D5E-9408-7D0A7555ADAB}","id" => "{8417A8EB-C27A-403C-9C6D-2ED8782DA545}","id" => "{95FFD3FF-CBC5-48C8-A586-728A1ACA6A84}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{1688620D-70F0-4263-8603-89E5D1909F1B}'  => array
 	(
 	    	"id" => "{1688620D-70F0-4263-8603-89E5D1909F1B}" ,
-	    	"name" => "Lehreinheitgruppe" ,
+	    	"name" => "tbl_lehreinheitgruppe" ,
 	    	"caption" => "tbl_lehreinheitgruppe" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{006486E5-C94C-4A3A-9487-24E7F395A347}' => array
 			(
 				"id" => "{006486E5-C94C-4A3A-9487-24E7F395A347}" ,
@@ -11678,12 +11680,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_lehreinheitgruppe_lehreinheitgruppe_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5EB02431-CB61-4A9D-86BB-18806FDA2A12}' => array
 			(
 				"id" => "{5EB02431-CB61-4A9D-86BB-18806FDA2A12}" ,
@@ -11702,7 +11704,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5290C727-6EE8-48AA-B7C6-3930D1C934AF}' => array
 			(
 				"id" => "{5290C727-6EE8-48AA-B7C6-3930D1C934AF}" ,
@@ -11721,7 +11723,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{07F9A9AF-ADC0-4072-86B6-64202CBA8790}' => array
 			(
 				"id" => "{07F9A9AF-ADC0-4072-86B6-64202CBA8790}" ,
@@ -11740,7 +11742,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3EE19DA5-A277-4F74-87EC-36BE66A760BA}' => array
 			(
 				"id" => "{3EE19DA5-A277-4F74-87EC-36BE66A760BA}" ,
@@ -11759,7 +11761,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{71786879-79D8-42F9-BFE2-E4B8D9DB6553}' => array
 			(
 				"id" => "{71786879-79D8-42F9-BFE2-E4B8D9DB6553}" ,
@@ -11778,7 +11780,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4EDD1640-17C3-40EB-9A12-853F7418359E}' => array
 			(
 				"id" => "{4EDD1640-17C3-40EB-9A12-853F7418359E}" ,
@@ -11797,7 +11799,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8F3468DA-CC33-439E-8572-42C7E8293AA4}' => array
 			(
 				"id" => "{8F3468DA-CC33-439E-8572-42C7E8293AA4}" ,
@@ -11816,7 +11818,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13021E1D-9EE9-4F07-B501-4137CC3907C4}' => array
 			(
 				"id" => "{13021E1D-9EE9-4F07-B501-4137CC3907C4}" ,
@@ -11835,7 +11837,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8B2D0B0C-A3B6-4F8F-9E3F-E7ED37A7D6D1}' => array
 			(
 				"id" => "{8B2D0B0C-A3B6-4F8F-9E3F-E7ED37A7D6D1}" ,
@@ -11854,7 +11856,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7E36903F-CF3F-4B42-9A6B-9958451F0A5C}' => array
 			(
 				"id" => "{7E36903F-CF3F-4B42-9A6B-9958451F0A5C}" ,
@@ -11873,7 +11875,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1B3785E1-BDD6-45C5-820F-D8B39633FB90}' => array
 			(
 				"id" => "{1B3785E1-BDD6-45C5-820F-D8B39633FB90}" ,
@@ -11892,21 +11894,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{C6810591-2346-4981-ABA6-346E19415A9E}' => array
 			(
 				"id" => "{C6810591-2346-4981-ABA6-346E19415A9E}" ,
-				"name" => "pk_tbl_lehreinheitgruppe" ,
+				"name" => "pk_lehreinheitgruppe" ,
 				"caption" => "pk_tbl_lehreinheitgruppe" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{E6930D4B-A3EA-484F-8844-48F8DF58928E}' => array
 			   		(
 		   				"id" => "{E6930D4B-A3EA-484F-8844-48F8DF58928E}" ,
@@ -11921,27 +11923,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{49C45A9E-51FF-450D-BC3A-7C09E119486E}'  => array
 	(
 	    	"id" => "{49C45A9E-51FF-450D-BC3A-7C09E119486E}" ,
-	    	"name" => "Lehreinheitmitarbeiter" ,
+	    	"name" => "tbl_lehreinheitmitarbeiter" ,
 	    	"caption" => "tbl_lehreinheitmitarbeiter" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{37815F05-9334-4F47-9B02-509D008D07B3}' => array
 			(
 				"id" => "{37815F05-9334-4F47-9B02-509D008D07B3}" ,
@@ -11960,7 +11962,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C45B833F-F531-4B62-9F08-8A4E2A2E730B}' => array
 			(
 				"id" => "{C45B833F-F531-4B62-9F08-8A4E2A2E730B}" ,
@@ -11979,7 +11981,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{04984ACF-EC3A-4141-9E57-843FEC5E2604}' => array
 			(
 				"id" => "{04984ACF-EC3A-4141-9E57-843FEC5E2604}" ,
@@ -11998,7 +12000,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C9A4D525-EBA5-43C3-A5C4-A1A529B4104B}' => array
 			(
 				"id" => "{C9A4D525-EBA5-43C3-A5C4-A1A529B4104B}" ,
@@ -12017,7 +12019,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5FFD80B9-B391-4D04-928B-1574DE098C90}' => array
 			(
 				"id" => "{5FFD80B9-B391-4D04-928B-1574DE098C90}" ,
@@ -12036,7 +12038,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C25CBC07-7521-464C-8B26-B5974FE23D8F}' => array
 			(
 				"id" => "{C25CBC07-7521-464C-8B26-B5974FE23D8F}" ,
@@ -12055,7 +12057,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4718FDB8-1DB7-44D8-972F-DA6B5BC20823}' => array
 			(
 				"id" => "{4718FDB8-1DB7-44D8-972F-DA6B5BC20823}" ,
@@ -12074,7 +12076,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B19CED63-9246-4185-B0BD-434411835EE8}' => array
 			(
 				"id" => "{B19CED63-9246-4185-B0BD-434411835EE8}" ,
@@ -12093,7 +12095,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2A7216C7-58E5-4D14-83F9-AFF1A057A0AF}' => array
 			(
 				"id" => "{2A7216C7-58E5-4D14-83F9-AFF1A057A0AF}" ,
@@ -12112,7 +12114,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6AA4D460-A6DD-47F5-8777-9334FCD60590}' => array
 			(
 				"id" => "{6AA4D460-A6DD-47F5-8777-9334FCD60590}" ,
@@ -12131,7 +12133,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2A0273FB-27A5-482F-BF08-805E02560980}' => array
 			(
 				"id" => "{2A0273FB-27A5-482F-BF08-805E02560980}" ,
@@ -12150,7 +12152,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CB27D93D-0482-4B08-BD78-921CC74D2B34}' => array
 			(
 				"id" => "{CB27D93D-0482-4B08-BD78-921CC74D2B34}" ,
@@ -12169,7 +12171,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3E6E178F-A161-43D4-B4D9-D52AAB33BD1B}' => array
 			(
 				"id" => "{3E6E178F-A161-43D4-B4D9-D52AAB33BD1B}" ,
@@ -12188,7 +12190,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2B2B1797-C242-4572-9EA5-2741D7026685}' => array
 			(
 				"id" => "{2B2B1797-C242-4572-9EA5-2741D7026685}" ,
@@ -12207,21 +12209,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2AAEF75D-E3B6-464A-BA58-DFCE12831A2A}' => array
 			(
 				"id" => "{2AAEF75D-E3B6-464A-BA58-DFCE12831A2A}" ,
-				"name" => "pk_tbl_lehreinheitmitarbeiter" ,
+				"name" => "pk_lehreinheitmitarbeiter" ,
 				"caption" => "pk_tbl_lehreinheitmitarbeiter" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D4A50D00-2E84-4CE2-888A-792D70A352AB}' => array
 			   		(
 		   				"id" => "{D4A50D00-2E84-4CE2-888A-792D70A352AB}" ,
@@ -12236,10 +12238,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{AC788BF6-2251-47DE-B196-441AF941E9A1}' => array
 			   		(
 		   				"id" => "{AC788BF6-2251-47DE-B196-441AF941E9A1}" ,
@@ -12254,27 +12256,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{0C409B02-28FD-48C3-8111-CE6FF8FF2160}'  => array
 	(
 	    	"id" => "{0C409B02-28FD-48C3-8111-CE6FF8FF2160}" ,
-	    	"name" => "Lehrfach" ,
+	    	"name" => "tbl_lehrfach" ,
 	    	"caption" => "tbl_lehrfach" ,
 	    	"comments" => "Lehrfachverteilung" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{184C6458-4EEA-4D93-A008-D638D864D1B7}' => array
 			(
 				"id" => "{184C6458-4EEA-4D93-A008-D638D864D1B7}" ,
@@ -12288,12 +12290,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_lehrfach_lehrfach_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_lehrfach_lehrfach_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BC44CCA8-44D6-446A-BD14-89E7A1654DD9}' => array
 			(
 				"id" => "{BC44CCA8-44D6-446A-BD14-89E7A1654DD9}" ,
@@ -12312,7 +12314,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A48B6B2E-B2F0-415F-871B-953485018E4F}' => array
 			(
 				"id" => "{A48B6B2E-B2F0-415F-871B-953485018E4F}" ,
@@ -12331,7 +12333,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6EEE0D35-639D-43C5-96CA-19572F0EA7F1}' => array
 			(
 				"id" => "{6EEE0D35-639D-43C5-96CA-19572F0EA7F1}" ,
@@ -12350,7 +12352,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8BCAC52B-192A-4EAD-A8D1-0FD5DC3E924F}' => array
 			(
 				"id" => "{8BCAC52B-192A-4EAD-A8D1-0FD5DC3E924F}" ,
@@ -12369,7 +12371,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7AF8AE30-1CCE-4D9C-8513-8511367184F5}' => array
 			(
 				"id" => "{7AF8AE30-1CCE-4D9C-8513-8511367184F5}" ,
@@ -12388,7 +12390,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A09DC6D5-AF59-485A-B98E-D7D6B9FE044A}' => array
 			(
 				"id" => "{A09DC6D5-AF59-485A-B98E-D7D6B9FE044A}" ,
@@ -12407,7 +12409,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DECED070-91D2-4348-BE6C-E0CD8B61B6A7}' => array
 			(
 				"id" => "{DECED070-91D2-4348-BE6C-E0CD8B61B6A7}" ,
@@ -12426,7 +12428,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A96ACD43-10EC-4E5E-8A2C-44EB28AA2AC6}' => array
 			(
 				"id" => "{A96ACD43-10EC-4E5E-8A2C-44EB28AA2AC6}" ,
@@ -12445,7 +12447,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BAF5B16B-79AF-4EC0-9296-1D2FB5EDE26F}' => array
 			(
 				"id" => "{BAF5B16B-79AF-4EC0-9296-1D2FB5EDE26F}" ,
@@ -12464,7 +12466,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DBB2C92D-ACBA-4017-8F32-F5EA0B992AA8}' => array
 			(
 				"id" => "{DBB2C92D-ACBA-4017-8F32-F5EA0B992AA8}" ,
@@ -12483,7 +12485,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{91714C0F-F963-4B5D-A585-827FDC1958B8}' => array
 			(
 				"id" => "{91714C0F-F963-4B5D-A585-827FDC1958B8}" ,
@@ -12502,7 +12504,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B35C0BE8-82DA-440C-AFA3-11CF57732D5D}' => array
 			(
 				"id" => "{B35C0BE8-82DA-440C-AFA3-11CF57732D5D}" ,
@@ -12521,7 +12523,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{240C3301-1946-40C4-A880-03DBAF4EE3BE}' => array
 			(
 				"id" => "{240C3301-1946-40C4-A880-03DBAF4EE3BE}" ,
@@ -12540,21 +12542,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{EAF77B0F-67B5-49C4-B7B8-DA26E5A28D26}' => array
 			(
 				"id" => "{EAF77B0F-67B5-49C4-B7B8-DA26E5A28D26}" ,
-				"name" => "pk_tbl_lehrfach" ,
+				"name" => "pk_lehrfach" ,
 				"caption" => "pk_tbl_lehrfach" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{7B4B041D-19F7-49A9-82B4-4B4D5E07A020}' => array
 			   		(
 		   				"id" => "{7B4B041D-19F7-49A9-82B4-4B4D5E07A020}" ,
@@ -12572,24 +12574,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{B460159C-34A9-43EA-8CD0-AA4FAEB9CAFF}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{902CBFB0-EE53-4FF3-8BB0-459F1175A1D5}'  => array
 	(
 	    	"id" => "{902CBFB0-EE53-4FF3-8BB0-459F1175A1D5}" ,
-	    	"name" => "Lehrform" ,
+	    	"name" => "tbl_lehrform" ,
 	    	"caption" => "tbl_lehrform" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{35BC276F-AE9C-4CB2-94D7-EADEBAA483DD}' => array
 			(
 				"id" => "{35BC276F-AE9C-4CB2-94D7-EADEBAA483DD}" ,
@@ -12608,7 +12610,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E375F2D4-6369-47C0-9CAD-A45EB32F0469}' => array
 			(
 				"id" => "{E375F2D4-6369-47C0-9CAD-A45EB32F0469}" ,
@@ -12627,7 +12629,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D088DE58-0345-49C8-954C-7164772EC09C}' => array
 			(
 				"id" => "{D088DE58-0345-49C8-954C-7164772EC09C}" ,
@@ -12646,21 +12648,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F3D9E72C-E94F-42EC-A834-493746B862D8}' => array
 			(
 				"id" => "{F3D9E72C-E94F-42EC-A834-493746B862D8}" ,
-				"name" => "pk_tbl_lehrform" ,
+				"name" => "pk_lehrform" ,
 				"caption" => "pk_tbl_lehrform" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B045A95E-1995-48E1-B1CE-8BA0F2340CF3}' => array
 			   		(
 		   				"id" => "{B045A95E-1995-48E1-B1CE-8BA0F2340CF3}" ,
@@ -12678,24 +12680,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{585C9CE3-CAB6-4743-82C4-76F65E119D37}","id" => "{39B3E1F0-A51D-4878-A7E9-183C6F05FA46}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{06976A48-3B4B-4CA3-83B0-5EDDB61E541E}'  => array
 	(
 	    	"id" => "{06976A48-3B4B-4CA3-83B0-5EDDB61E541E}" ,
-	    	"name" => "Lehrfunktion" ,
+	    	"name" => "tbl_lehrfunktion" ,
 	    	"caption" => "tbl_lehrfunktion" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1385478C-FB2A-4D38-873C-EDFFFD781B2B}' => array
 			(
 				"id" => "{1385478C-FB2A-4D38-873C-EDFFFD781B2B}" ,
@@ -12714,7 +12716,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4CFC5444-CB3C-41B5-AFF3-F969DA274513}' => array
 			(
 				"id" => "{4CFC5444-CB3C-41B5-AFF3-F969DA274513}" ,
@@ -12733,7 +12735,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{18C30293-55B3-4C1E-A651-DCA43F2A9AB5}' => array
 			(
 				"id" => "{18C30293-55B3-4C1E-A651-DCA43F2A9AB5}" ,
@@ -12752,21 +12754,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{9B0E290E-BA7C-4BD0-8281-F7415A763DEF}' => array
 			(
 				"id" => "{9B0E290E-BA7C-4BD0-8281-F7415A763DEF}" ,
-				"name" => "pk_tbl_lehrfunktion" ,
+				"name" => "pk_lehrfunktion" ,
 				"caption" => "pk_tbl_lehrfunktion" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{6E2E8AB2-59DE-4980-BB18-71F35093A626}' => array
 			   		(
 		   				"id" => "{6E2E8AB2-59DE-4980-BB18-71F35093A626}" ,
@@ -12784,24 +12786,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{7EADA421-ACB0-4FCC-9F0C-961757EA6B2E}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EA30552B-6742-459F-9E1A-5BCC00CE5209}'  => array
 	(
 	    	"id" => "{EA30552B-6742-459F-9E1A-5BCC00CE5209}" ,
-	    	"name" => "Lehrmittel" ,
+	    	"name" => "tbl_lehrmittel" ,
 	    	"caption" => "tbl_lehrmittel" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{0A796FCE-B637-48D3-B0EE-1E6EC3DF4A34}' => array
 			(
 				"id" => "{0A796FCE-B637-48D3-B0EE-1E6EC3DF4A34}" ,
@@ -12820,7 +12822,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8670F557-C4BB-44E5-B4AC-99101BB33875}' => array
 			(
 				"id" => "{8670F557-C4BB-44E5-B4AC-99101BB33875}" ,
@@ -12839,7 +12841,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9A223348-BB6F-48F9-BA29-6FC79986DBCB}' => array
 			(
 				"id" => "{9A223348-BB6F-48F9-BA29-6FC79986DBCB}" ,
@@ -12858,21 +12860,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{05AE70AE-094C-45B6-BFA0-C5C21F07E8E2}' => array
 			(
 				"id" => "{05AE70AE-094C-45B6-BFA0-C5C21F07E8E2}" ,
-				"name" => "pk_tbl_lehrmittel" ,
+				"name" => "pk_lehrmittel" ,
 				"caption" => "pk_tbl_lehrmittel" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{7F28FFB3-0453-43CE-919D-091D20A5D824}' => array
 			   		(
 		   				"id" => "{7F28FFB3-0453-43CE-919D-091D20A5D824}" ,
@@ -12887,27 +12889,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{79E74644-59FF-4C5E-B089-BFE8FCFBB831}'  => array
 	(
 	    	"id" => "{79E74644-59FF-4C5E-B089-BFE8FCFBB831}" ,
-	    	"name" => "Lehrveranstaltung" ,
+	    	"name" => "tbl_lehrveranstaltung" ,
 	    	"caption" => "tbl_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{5B697829-8440-4069-A969-4AB1FC3A0347}' => array
 			(
 				"id" => "{5B697829-8440-4069-A969-4AB1FC3A0347}" ,
@@ -12921,12 +12923,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_lehrveranstaltung_lehrveranstaltung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_lehrveranstaltung_lehrveranstaltung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E555245A-473F-40CE-AD2B-FBE0C675AF5A}' => array
 			(
 				"id" => "{E555245A-473F-40CE-AD2B-FBE0C675AF5A}" ,
@@ -12945,7 +12947,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0A42047E-BDFD-496E-9802-EBAD150AB4E6}' => array
 			(
 				"id" => "{0A42047E-BDFD-496E-9802-EBAD150AB4E6}" ,
@@ -12964,7 +12966,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CE3DBFE0-3B79-4DDC-AEF8-FC3269B5CFA3}' => array
 			(
 				"id" => "{CE3DBFE0-3B79-4DDC-AEF8-FC3269B5CFA3}" ,
@@ -12983,7 +12985,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB1AED14-1276-452C-95D7-D1C2109F0BF6}' => array
 			(
 				"id" => "{DB1AED14-1276-452C-95D7-D1C2109F0BF6}" ,
@@ -13002,7 +13004,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6B49CF1-2EB5-434D-8FE8-9D09EE750877}' => array
 			(
 				"id" => "{C6B49CF1-2EB5-434D-8FE8-9D09EE750877}" ,
@@ -13021,7 +13023,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{367BFC38-F12D-44E9-A970-96E39F007124}' => array
 			(
 				"id" => "{367BFC38-F12D-44E9-A970-96E39F007124}" ,
@@ -13040,7 +13042,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2DAE4DD4-C334-4B03-B001-9D3A57BB31A0}' => array
 			(
 				"id" => "{2DAE4DD4-C334-4B03-B001-9D3A57BB31A0}" ,
@@ -13059,7 +13061,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0702D31D-02D7-4856-BEDD-BC20A6667791}' => array
 			(
 				"id" => "{0702D31D-02D7-4856-BEDD-BC20A6667791}" ,
@@ -13078,7 +13080,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3CF9477F-AC1F-44A0-B805-7EE8F8060448}' => array
 			(
 				"id" => "{3CF9477F-AC1F-44A0-B805-7EE8F8060448}" ,
@@ -13097,7 +13099,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4A1DEE41-05AC-45EB-BBCC-DE9A33482142}' => array
 			(
 				"id" => "{4A1DEE41-05AC-45EB-BBCC-DE9A33482142}" ,
@@ -13116,7 +13118,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{46183700-BE91-462A-A740-BDA37D68E6C3}' => array
 			(
 				"id" => "{46183700-BE91-462A-A740-BDA37D68E6C3}" ,
@@ -13135,7 +13137,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EFDD6640-110D-4382-AA16-B11D833AF76B}' => array
 			(
 				"id" => "{EFDD6640-110D-4382-AA16-B11D833AF76B}" ,
@@ -13154,7 +13156,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6BDE4B32-2A2D-4262-A0DD-224CFBAB5935}' => array
 			(
 				"id" => "{6BDE4B32-2A2D-4262-A0DD-224CFBAB5935}" ,
@@ -13173,7 +13175,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{68475FBE-7A39-4871-8A4C-570951E3C44F}' => array
 			(
 				"id" => "{68475FBE-7A39-4871-8A4C-570951E3C44F}" ,
@@ -13192,7 +13194,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7E05BF20-2D5F-4B64-B9E8-910CBDF22865}' => array
 			(
 				"id" => "{7E05BF20-2D5F-4B64-B9E8-910CBDF22865}" ,
@@ -13211,7 +13213,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FF3A2BB2-A5EB-40C4-8D0B-26E30C13E3FA}' => array
 			(
 				"id" => "{FF3A2BB2-A5EB-40C4-8D0B-26E30C13E3FA}" ,
@@ -13230,7 +13232,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A70C1815-FDB9-42F1-9A06-8F5CCB12F6B2}' => array
 			(
 				"id" => "{A70C1815-FDB9-42F1-9A06-8F5CCB12F6B2}" ,
@@ -13249,7 +13251,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F806A273-2B7A-4C9B-B54D-60BB0435714E}' => array
 			(
 				"id" => "{F806A273-2B7A-4C9B-B54D-60BB0435714E}" ,
@@ -13268,7 +13270,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1B3BBE8B-69D1-441D-9DF6-940C83623CF7}' => array
 			(
 				"id" => "{1B3BBE8B-69D1-441D-9DF6-940C83623CF7}" ,
@@ -13287,7 +13289,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2AA500C8-686A-4B99-958F-BE635441755C}' => array
 			(
 				"id" => "{2AA500C8-686A-4B99-958F-BE635441755C}" ,
@@ -13306,7 +13308,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E99A69D7-01C3-434B-9048-960CBACDC896}' => array
 			(
 				"id" => "{E99A69D7-01C3-434B-9048-960CBACDC896}" ,
@@ -13325,7 +13327,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E7B8FBC7-DFD3-456B-9D9E-45139B0AB3CA}' => array
 			(
 				"id" => "{E7B8FBC7-DFD3-456B-9D9E-45139B0AB3CA}" ,
@@ -13344,7 +13346,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3559A142-3059-4E1D-96F0-B47A6CFAFB27}' => array
 			(
 				"id" => "{3559A142-3059-4E1D-96F0-B47A6CFAFB27}" ,
@@ -13363,7 +13365,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BCD1A27E-53E4-420F-94F4-501A6309DE69}' => array
 			(
 				"id" => "{BCD1A27E-53E4-420F-94F4-501A6309DE69}" ,
@@ -13382,7 +13384,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6D3A8BA-5F04-4DBB-B3BE-59ACCB385417}' => array
 			(
 				"id" => "{C6D3A8BA-5F04-4DBB-B3BE-59ACCB385417}" ,
@@ -13401,7 +13403,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3698B853-9B74-4805-BA9A-2E8A3D8D807C}' => array
 			(
 				"id" => "{3698B853-9B74-4805-BA9A-2E8A3D8D807C}" ,
@@ -13420,7 +13422,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2EE8E069-EC61-4141-ACB6-0ACB14C939C8}' => array
 			(
 				"id" => "{2EE8E069-EC61-4141-ACB6-0ACB14C939C8}" ,
@@ -13439,21 +13441,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{98A17A8E-EC74-49C0-8CAB-145890D22399}' => array
 			(
 				"id" => "{98A17A8E-EC74-49C0-8CAB-145890D22399}" ,
-				"name" => "pk_tbl_lehrveranstaltung" ,
+				"name" => "pk_lehrveranstaltung" ,
 				"caption" => "pk_tbl_lehrveranstaltung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}' => array
 			   		(
 		   				"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}" ,
@@ -13471,24 +13473,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{DBF16663-DA89-4C5C-8CE1-30018FA765FE}","id" => "{9DD76DA1-77B6-42C8-9A7B-D951BC42E7CC}","id" => "{67ACFB41-4383-464D-8535-39218E13EEFA}","id" => "{E99C26C5-D6FB-4477-B802-64C8F44D5019}","id" => "{95DE5158-7895-4F08-A84C-8B114E5B38EA}","id" => "{431EB7BB-BBD8-4DCB-A63D-8AF938C10BFD}","id" => "{7E1A7746-B178-40EF-8497-BD191846C9FD}","id" => "{E9114B7C-6657-4FBF-BD85-4A435F263BF8}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{607296B3-31E0-4CC3-8FBF-5A9E894F2B30}'  => array
 	(
 	    	"id" => "{607296B3-31E0-4CC3-8FBF-5A9E894F2B30}" ,
-	    	"name" => "Moodle" ,
+	    	"name" => "tbl_moodle" ,
 	    	"caption" => "tbl_moodle" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4ED1918A-5481-47B5-9F78-5DB8C891A014}' => array
 			(
 				"id" => "{4ED1918A-5481-47B5-9F78-5DB8C891A014}" ,
@@ -13502,12 +13504,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_moodle_moodle_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_moodle_moodle_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{77739879-3C20-464E-A83D-E526690DAB8C}' => array
 			(
 				"id" => "{77739879-3C20-464E-A83D-E526690DAB8C}" ,
@@ -13526,7 +13528,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B0AEF5AC-CED1-484D-AD3E-C6E073CA3D9A}' => array
 			(
 				"id" => "{B0AEF5AC-CED1-484D-AD3E-C6E073CA3D9A}" ,
@@ -13545,7 +13547,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BB51CBED-A41A-42ED-ADC6-A85FEA841AB8}' => array
 			(
 				"id" => "{BB51CBED-A41A-42ED-ADC6-A85FEA841AB8}" ,
@@ -13564,7 +13566,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{67183381-45DC-44C7-859E-C1CAF96AFAB5}' => array
 			(
 				"id" => "{67183381-45DC-44C7-859E-C1CAF96AFAB5}" ,
@@ -13583,7 +13585,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{450468F3-4FFE-4D58-BF2B-E629B21CEF7F}' => array
 			(
 				"id" => "{450468F3-4FFE-4D58-BF2B-E629B21CEF7F}" ,
@@ -13602,7 +13604,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{68B4C114-F591-4808-911A-23D9EDDBA493}' => array
 			(
 				"id" => "{68B4C114-F591-4808-911A-23D9EDDBA493}" ,
@@ -13621,7 +13623,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6E2AA6BC-3606-4DFE-B37C-410C8EFE9C70}' => array
 			(
 				"id" => "{6E2AA6BC-3606-4DFE-B37C-410C8EFE9C70}" ,
@@ -13640,21 +13642,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5846CF02-0C2D-4E74-9E3E-53566CE1B34A}' => array
 			(
 				"id" => "{5846CF02-0C2D-4E74-9E3E-53566CE1B34A}" ,
-				"name" => "pk_tbl_moodle" ,
+				"name" => "pk_moodle" ,
 				"caption" => "pk_tbl_moodle" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{2D63470A-FC1D-4837-BCED-6F8B84F14800}' => array
 			   		(
 		   				"id" => "{2D63470A-FC1D-4837-BCED-6F8B84F14800}" ,
@@ -13669,27 +13671,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D39F8CE0-E360-49CF-B100-AA054D74246A}'  => array
 	(
 	    	"id" => "{D39F8CE0-E360-49CF-B100-AA054D74246A}" ,
-	    	"name" => "Note" ,
+	    	"name" => "tbl_note" ,
 	    	"caption" => "tbl_note" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{BFFE0B0C-CEE1-4BDC-80D8-34F7CAAF292A}' => array
 			(
 				"id" => "{BFFE0B0C-CEE1-4BDC-80D8-34F7CAAF292A}" ,
@@ -13708,7 +13710,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{17552BB2-E738-496A-982B-CCCA92883F75}' => array
 			(
 				"id" => "{17552BB2-E738-496A-982B-CCCA92883F75}" ,
@@ -13727,7 +13729,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A56706DE-AFFC-4482-AD10-96F4C487B4A6}' => array
 			(
 				"id" => "{A56706DE-AFFC-4482-AD10-96F4C487B4A6}" ,
@@ -13746,7 +13748,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3E674CE9-4D9D-4448-B073-F4F9AA8A5BC2}' => array
 			(
 				"id" => "{3E674CE9-4D9D-4448-B073-F4F9AA8A5BC2}" ,
@@ -13765,21 +13767,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F329B8FB-E782-41CF-8BF1-0DD6C9BDFD79}' => array
 			(
 				"id" => "{F329B8FB-E782-41CF-8BF1-0DD6C9BDFD79}" ,
-				"name" => "pk_tbl_note" ,
+				"name" => "pk_note" ,
 				"caption" => "pk_tbl_note" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D2049F05-AC60-458E-9AF4-AFA607624B3F}' => array
 			   		(
 		   				"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}" ,
@@ -13797,24 +13799,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{30271D50-D304-41CE-836D-02E8116A8027}","id" => "{DDE9903D-BF30-4A3C-A1C9-F83EF0060B7D}","id" => "{394483DE-948E-46F2-B172-0FC8E6730493}","id" => "{CA37FF03-F60D-46CC-B08B-44BD362C7245}","id" => "{44ED6FA1-9424-4B27-9FEE-1516BAE5EC70}","id" => "{C95E2034-1F7D-49B7-B406-866997E24ABA}","id" => "{136BDD48-7E6D-475A-A905-045E8D972959}","id" => "{80F5F9F9-4F56-40F8-BF7B-FE45769B81F3}","id" => "{15B4BB47-89EF-4037-B303-1D89068A0D4A}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D4A38715-34EE-48E3-91D7-11026A4555EA}'  => array
 	(
 	    	"id" => "{D4A38715-34EE-48E3-91D7-11026A4555EA}" ,
-	    	"name" => "Projektarbeit" ,
-	    	"caption" => "tbl_projektarbeit" ,
+	    	"name" => "tbl_projektarbeit" ,
+	    	"caption" => "Projektarbeit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{69ECDCD5-B855-4077-8063-B561D1222298}' => array
 			(
 				"id" => "{69ECDCD5-B855-4077-8063-B561D1222298}" ,
@@ -13828,12 +13830,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_projektarbeit_projektarbeit_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_projektarbeit_projektarbeit_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{17BF8633-5590-472F-A121-66E7E8F56FDB}' => array
 			(
 				"id" => "{17BF8633-5590-472F-A121-66E7E8F56FDB}" ,
@@ -13852,7 +13854,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B6D365DA-6DE7-40B3-BE4E-E4D5C43390F7}' => array
 			(
 				"id" => "{B6D365DA-6DE7-40B3-BE4E-E4D5C43390F7}" ,
@@ -13871,13 +13873,32 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
+			'{3A7F1989-29C0-42D0-96D8-B215FBFB7AEF}' => array
+			(
+				"id" => "{3A7F1989-29C0-42D0-96D8-B215FBFB7AEF}" ,
+				"name" => "sprache" ,
+				"caption" => "sprache" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{EF9AF9C2-ACB2-4DD1-8D40-135158534DC2}' => array
 			(
 				"id" => "{EF9AF9C2-ACB2-4DD1-8D40-135158534DC2}" ,
 				"name" => "lehreinheit_id" ,
 				"caption" => "lehreinheit_id" ,
-				"ordinal" => "4" ,
+				"ordinal" => "5" ,
 				"pk" => "" ,
 				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
 				"datatypeparam1" => "" ,
@@ -13890,13 +13911,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{78741B4C-25AA-45B6-B74D-CB6613FBEF0B}' => array
 			(
 				"id" => "{78741B4C-25AA-45B6-B74D-CB6613FBEF0B}" ,
 				"name" => "student_uid" ,
 				"caption" => "student_uid" ,
-				"ordinal" => "5" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -13909,13 +13930,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{91F9F62C-2801-4907-B94A-C329D4A88040}' => array
 			(
 				"id" => "{91F9F62C-2801-4907-B94A-C329D4A88040}" ,
 				"name" => "firma_id" ,
 				"caption" => "firma_id" ,
-				"ordinal" => "6" ,
+				"ordinal" => "7" ,
 				"pk" => "" ,
 				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
 				"datatypeparam1" => "" ,
@@ -13928,13 +13949,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D725E935-786F-4083-97AB-8143138E67A3}' => array
 			(
 				"id" => "{D725E935-786F-4083-97AB-8143138E67A3}" ,
 				"name" => "note" ,
 				"caption" => "note" ,
-				"ordinal" => "7" ,
+				"ordinal" => "8" ,
 				"pk" => "" ,
 				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
 				"datatypeparam1" => "" ,
@@ -13947,13 +13968,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C5F90358-C724-4618-8F4A-08A0398D4D89}' => array
 			(
 				"id" => "{C5F90358-C724-4618-8F4A-08A0398D4D89}" ,
 				"name" => "punkte" ,
 				"caption" => "punkte" ,
-				"ordinal" => "8" ,
+				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
 				"datatypeparam1" => "6" ,
@@ -13966,31 +13987,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C54DED3B-CEFD-4ADC-88A8-6FE7AB742A11}' => array
 			(
 				"id" => "{C54DED3B-CEFD-4ADC-88A8-6FE7AB742A11}" ,
 				"name" => "beginn" ,
 				"caption" => "beginn" ,
-				"ordinal" => "9" ,
-				"pk" => "" ,
-				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-
-			'{BDE980C1-455E-484D-A934-B0652DFC8E4E}' => array
-			(
-				"id" => "{BDE980C1-455E-484D-A934-B0652DFC8E4E}" ,
-				"name" => "ende" ,
-				"caption" => "ende" ,
 				"ordinal" => "10" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
@@ -14004,51 +14006,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
-			'{D1F818F1-69FC-4A17-AFFE-4A1B438A88D6}' => array
+			
+			'{BDE980C1-455E-484D-A934-B0652DFC8E4E}' => array
 			(
-				"id" => "{D1F818F1-69FC-4A17-AFFE-4A1B438A88D6}" ,
-				"name" => "faktor" ,
-				"caption" => "faktor" ,
+				"id" => "{BDE980C1-455E-484D-A934-B0652DFC8E4E}" ,
+				"name" => "ende" ,
+				"caption" => "ende" ,
 				"ordinal" => "11" ,
-				"pk" => "" ,
-				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
-				"datatypeparam1" => "3" ,
-				"datatypeparam2" => "2" ,
-				"length" => "3",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-
-			'{69C220E9-479E-4160-848B-D136A81F8379}' => array
-			(
-				"id" => "{69C220E9-479E-4160-848B-D136A81F8379}" ,
-				"name" => "freigegeben" ,
-				"caption" => "freigegeben" ,
-				"ordinal" => "12" ,
-				"pk" => "" ,
-				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-
-			'{2FF93BEB-F7BB-4CB3-889D-E1E05D69940D}' => array
-			(
-				"id" => "{2FF93BEB-F7BB-4CB3-889D-E1E05D69940D}" ,
-				"name" => "gesperrtbis" ,
-				"caption" => "gesperrtbis" ,
-				"ordinal" => "13" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -14061,13 +14025,70 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
+			'{D1F818F1-69FC-4A17-AFFE-4A1B438A88D6}' => array
+			(
+				"id" => "{D1F818F1-69FC-4A17-AFFE-4A1B438A88D6}" ,
+				"name" => "faktor" ,
+				"caption" => "faktor" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "3" ,
+				"datatypeparam2" => "2" ,
+				"length" => "3",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{69C220E9-479E-4160-848B-D136A81F8379}' => array
+			(
+				"id" => "{69C220E9-479E-4160-848B-D136A81F8379}" ,
+				"name" => "freigegeben" ,
+				"caption" => "freigegeben" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2FF93BEB-F7BB-4CB3-889D-E1E05D69940D}' => array
+			(
+				"id" => "{2FF93BEB-F7BB-4CB3-889D-E1E05D69940D}" ,
+				"name" => "gesperrtbis" ,
+				"caption" => "gesperrtbis" ,
+				"ordinal" => "14" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{3612F9F9-5E1A-4F98-99F0-DFBA472CFBCF}' => array
 			(
 				"id" => "{3612F9F9-5E1A-4F98-99F0-DFBA472CFBCF}" ,
 				"name" => "stundensatz" ,
 				"caption" => "stundensatz" ,
-				"ordinal" => "14" ,
+				"ordinal" => "15" ,
 				"pk" => "" ,
 				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
 				"datatypeparam1" => "6" ,
@@ -14080,13 +14101,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F56CE4E8-E571-4652-96C9-0B9AD6510794}' => array
 			(
 				"id" => "{F56CE4E8-E571-4652-96C9-0B9AD6510794}" ,
 				"name" => "themenbereich" ,
 				"caption" => "themenbereich" ,
-				"ordinal" => "15" ,
+				"ordinal" => "16" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "64" ,
@@ -14099,13 +14120,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8B495520-D52D-4ABB-82A9-37CE9DCA60A2}' => array
 			(
 				"id" => "{8B495520-D52D-4ABB-82A9-37CE9DCA60A2}" ,
 				"name" => "anmerkung" ,
 				"caption" => "anmerkung" ,
-				"ordinal" => "16" ,
+				"ordinal" => "17" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -14118,13 +14139,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{28E44A45-86B8-440D-A668-9215F203222A}' => array
 			(
 				"id" => "{28E44A45-86B8-440D-A668-9215F203222A}" ,
 				"name" => "updateamum" ,
 				"caption" => "updateamum" ,
-				"ordinal" => "17" ,
+				"ordinal" => "18" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -14137,13 +14158,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{53C642DD-62C5-4386-AD20-FFC1EFADFFA9}' => array
 			(
 				"id" => "{53C642DD-62C5-4386-AD20-FFC1EFADFFA9}" ,
 				"name" => "updatevon" ,
 				"caption" => "updatevon" ,
-				"ordinal" => "18" ,
+				"ordinal" => "19" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -14156,13 +14177,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D654C923-1C4A-4D73-896F-211A72A409E5}' => array
 			(
 				"id" => "{D654C923-1C4A-4D73-896F-211A72A409E5}" ,
 				"name" => "insertamum" ,
 				"caption" => "insertamum" ,
-				"ordinal" => "19" ,
+				"ordinal" => "20" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -14175,13 +14196,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FE7AAA32-55AD-4FA1-8253-895C4CAA66CD}' => array
 			(
 				"id" => "{FE7AAA32-55AD-4FA1-8253-895C4CAA66CD}" ,
 				"name" => "insertvon" ,
 				"caption" => "insertvon" ,
-				"ordinal" => "20" ,
+				"ordinal" => "21" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -14194,13 +14215,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3951A3ED-BE8F-4614-9DD0-58C6F16302E3}' => array
 			(
 				"id" => "{3951A3ED-BE8F-4614-9DD0-58C6F16302E3}" ,
 				"name" => "ext_id" ,
 				"caption" => "ext_id" ,
-				"ordinal" => "21" ,
+				"ordinal" => "22" ,
 				"pk" => "" ,
 				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
 				"datatypeparam1" => "" ,
@@ -14213,13 +14234,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1CED5ADF-4F37-48D6-9655-6F17C87908F9}' => array
 			(
 				"id" => "{1CED5ADF-4F37-48D6-9655-6F17C87908F9}" ,
 				"name" => "gesamtstunden" ,
 				"caption" => "gesamtstunden" ,
-				"ordinal" => "22" ,
+				"ordinal" => "23" ,
 				"pk" => "" ,
 				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
 				"datatypeparam1" => "8" ,
@@ -14232,13 +14253,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{55BA0CCA-78CE-4447-BB2A-2358EB1CDE57}' => array
 			(
 				"id" => "{55BA0CCA-78CE-4447-BB2A-2358EB1CDE57}" ,
 				"name" => "titel_english" ,
 				"caption" => "titel_english" ,
-				"ordinal" => "23" ,
+				"ordinal" => "24" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -14251,21 +14272,154 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
+			'{12679D3F-7624-4019-9E40-708B18026D52}' => array
+			(
+				"id" => "{12679D3F-7624-4019-9E40-708B18026D52}" ,
+				"name" => "seitenanzahl" ,
+				"caption" => "seitenanzahl" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4666553D-E241-48DB-AA29-859CB673E0EF}' => array
+			(
+				"id" => "{4666553D-E241-48DB-AA29-859CB673E0EF}" ,
+				"name" => "abgabedatum" ,
+				"caption" => "abgabedatum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{94D06780-B31B-4F01-B031-9301C79A2A8E}' => array
+			(
+				"id" => "{94D06780-B31B-4F01-B031-9301C79A2A8E}" ,
+				"name" => "kontrollschlagwoerter" ,
+				"caption" => "kontrollschlagwoerter" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "150" ,
+				"datatypeparam2" => "" ,
+				"length" => "150",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FC52FD04-E623-4205-895B-DAA3B7055C48}' => array
+			(
+				"id" => "{FC52FD04-E623-4205-895B-DAA3B7055C48}" ,
+				"name" => "schlagwoerter" ,
+				"caption" => "schlagwoerter" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "150" ,
+				"datatypeparam2" => "" ,
+				"length" => "150",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B7757EAB-A48D-4D55-9972-7AE6E0599BA1}' => array
+			(
+				"id" => "{B7757EAB-A48D-4D55-9972-7AE6E0599BA1}" ,
+				"name" => "schlagwoerter_en" ,
+				"caption" => "schlagwoerter_en" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "150" ,
+				"datatypeparam2" => "" ,
+				"length" => "150",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F9814AE3-3126-40F3-9D7A-B710180B71E0}' => array
+			(
+				"id" => "{F9814AE3-3126-40F3-9D7A-B710180B71E0}" ,
+				"name" => "abstract" ,
+				"caption" => "abstract" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{770958E2-CF21-422D-995B-804B7F1DDCE7}' => array
+			(
+				"id" => "{770958E2-CF21-422D-995B-804B7F1DDCE7}" ,
+				"name" => "abstract_en" ,
+				"caption" => "abstract_en" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{446141FF-277C-49AC-8DB4-9C1CCC1B3953}' => array
 			(
 				"id" => "{446141FF-277C-49AC-8DB4-9C1CCC1B3953}" ,
-				"name" => "pk_tbl_projektarbeit" ,
+				"name" => "pk_projektarbeit" ,
 				"caption" => "pk_tbl_projektarbeit" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{253EEF90-43AB-4AD5-BF58-BEDF5A799EB0}' => array
 			   		(
 		   				"id" => "{253EEF90-43AB-4AD5-BF58-BEDF5A799EB0}" ,
@@ -14280,27 +14434,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{B3FD19FC-91D5-4F14-8E87-98BEE1CCE118}",
+							"id" => "{B3FD19FC-91D5-4F14-8E87-98BEE1CCE118}","id" => "{D0EDFDA3-2FBA-4B8D-B1AB-272B62B3C962}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{585B4F72-9CA3-4918-A4BD-7D386043EA73}'  => array
 	(
 	    	"id" => "{585B4F72-9CA3-4918-A4BD-7D386043EA73}" ,
-	    	"name" => "Projektbetreuer" ,
+	    	"name" => "tbl_projektbetreuer" ,
 	    	"caption" => "tbl_projektbetreuer" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{AF0F3E3A-A73D-44D6-B471-C3C4A5C9A31F}' => array
 			(
 				"id" => "{AF0F3E3A-A73D-44D6-B471-C3C4A5C9A31F}" ,
@@ -14319,7 +14473,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A17D7CBD-F3F7-4AD9-B393-A35B184A98C0}' => array
 			(
 				"id" => "{A17D7CBD-F3F7-4AD9-B393-A35B184A98C0}" ,
@@ -14338,7 +14492,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D0D1F732-10DF-4C06-9535-26539B6EF481}' => array
 			(
 				"id" => "{D0D1F732-10DF-4C06-9535-26539B6EF481}" ,
@@ -14357,7 +14511,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{27F2B44E-50D6-4979-B81A-3C16A9BF9653}' => array
 			(
 				"id" => "{27F2B44E-50D6-4979-B81A-3C16A9BF9653}" ,
@@ -14376,7 +14530,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9FFE600F-45D5-4E7F-88F9-7693A871A0C9}' => array
 			(
 				"id" => "{9FFE600F-45D5-4E7F-88F9-7693A871A0C9}" ,
@@ -14395,7 +14549,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{71908B95-F75B-4E17-BE49-7D3B433B4A4B}' => array
 			(
 				"id" => "{71908B95-F75B-4E17-BE49-7D3B433B4A4B}" ,
@@ -14414,7 +14568,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{59C9F150-B38A-4421-A642-580C87DBD94B}' => array
 			(
 				"id" => "{59C9F150-B38A-4421-A642-580C87DBD94B}" ,
@@ -14433,7 +14587,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{279D83A8-6B7F-4A5C-BA6B-167CB5AC7A7A}' => array
 			(
 				"id" => "{279D83A8-6B7F-4A5C-BA6B-167CB5AC7A7A}" ,
@@ -14452,7 +14606,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0928EF7A-188F-4B19-A820-EBE113806E6E}' => array
 			(
 				"id" => "{0928EF7A-188F-4B19-A820-EBE113806E6E}" ,
@@ -14471,7 +14625,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1435EB8E-154F-4D35-8D58-E59AF0C02C1A}' => array
 			(
 				"id" => "{1435EB8E-154F-4D35-8D58-E59AF0C02C1A}" ,
@@ -14490,7 +14644,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{794803AB-D4A5-48B5-93DB-7772570BDD8B}' => array
 			(
 				"id" => "{794803AB-D4A5-48B5-93DB-7772570BDD8B}" ,
@@ -14509,7 +14663,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5B0B08C4-75E5-46AA-A9AB-4A88C40607C5}' => array
 			(
 				"id" => "{5B0B08C4-75E5-46AA-A9AB-4A88C40607C5}" ,
@@ -14528,7 +14682,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B98EDA27-6264-4CF7-A728-CC82D71A8880}' => array
 			(
 				"id" => "{B98EDA27-6264-4CF7-A728-CC82D71A8880}" ,
@@ -14547,7 +14701,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9D42378C-FF37-4E2A-AE31-DE109665687D}' => array
 			(
 				"id" => "{9D42378C-FF37-4E2A-AE31-DE109665687D}" ,
@@ -14566,11 +14720,11 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{61FA256D-B82E-4B94-9B60-025964E5E6E0}' => array
 			(
 				"id" => "{61FA256D-B82E-4B94-9B60-025964E5E6E0}" ,
@@ -14580,7 +14734,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{33924CF9-F146-4F63-886A-C7204D1BBC1F}' => array
 			   		(
 		   				"id" => "{33924CF9-F146-4F63-886A-C7204D1BBC1F}" ,
@@ -14595,10 +14749,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{7737ED37-886A-4642-BEBE-48E025EF1F50}' => array
 			   		(
 		   				"id" => "{7737ED37-886A-4642-BEBE-48E025EF1F50}" ,
@@ -14613,10 +14767,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{A4906787-0745-4D7A-A209-428EFFF3E492}' => array
 			   		(
 		   				"id" => "{A4906787-0745-4D7A-A209-428EFFF3E492}" ,
@@ -14631,27 +14785,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{28133EB4-32B6-453B-88B5-1160555EE8B5}'  => array
 	(
 	    	"id" => "{28133EB4-32B6-453B-88B5-1160555EE8B5}" ,
-	    	"name" => "Projekttyp" ,
+	    	"name" => "tbl_projekttyp" ,
 	    	"caption" => "tbl_projekttyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{440C7AE4-339B-46EC-A012-E4DAC8E63CA2}' => array
 			(
 				"id" => "{440C7AE4-339B-46EC-A012-E4DAC8E63CA2}" ,
@@ -14670,7 +14824,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D17193EB-5A75-4782-A7EF-C85E323218AD}' => array
 			(
 				"id" => "{D17193EB-5A75-4782-A7EF-C85E323218AD}" ,
@@ -14689,21 +14843,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B05B1EED-5FAE-4C0C-9AD6-68A039D7932B}' => array
 			(
 				"id" => "{B05B1EED-5FAE-4C0C-9AD6-68A039D7932B}" ,
-				"name" => "pk_tbl_projekttyp" ,
+				"name" => "pk_projekttyp" ,
 				"caption" => "pk_tbl_projekttyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{3EBCD2F4-FFE1-4D78-8742-9F84E2104885}' => array
 			   		(
 		   				"id" => "{3EBCD2F4-FFE1-4D78-8742-9F84E2104885}" ,
@@ -14721,24 +14875,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{7AC5B867-8B54-4162-99FA-5FBCACB9EEEE}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{210E76FB-7EF7-454D-801A-8891CCAB8612}'  => array
 	(
 	    	"id" => "{210E76FB-7EF7-454D-801A-8891CCAB8612}" ,
-	    	"name" => "Pruefung" ,
+	    	"name" => "tbl_pruefung" ,
 	    	"caption" => "tbl_pruefung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1BCF428F-C05E-497D-BF67-E4973DE7EBDA}' => array
 			(
 				"id" => "{1BCF428F-C05E-497D-BF67-E4973DE7EBDA}" ,
@@ -14752,12 +14906,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_pruefung_pruefung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_pruefung_pruefung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6F922A10-A795-4DC0-9C02-5070CE839331}' => array
 			(
 				"id" => "{6F922A10-A795-4DC0-9C02-5070CE839331}" ,
@@ -14776,7 +14930,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E59BD5E1-8B77-4989-B3E1-DC6C25399177}' => array
 			(
 				"id" => "{E59BD5E1-8B77-4989-B3E1-DC6C25399177}" ,
@@ -14795,7 +14949,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E88B7A48-213E-4804-BF4D-6D86A6AE4B6E}' => array
 			(
 				"id" => "{E88B7A48-213E-4804-BF4D-6D86A6AE4B6E}" ,
@@ -14814,7 +14968,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A9535A95-5FDD-4AFB-B86E-48AD00BD1D22}' => array
 			(
 				"id" => "{A9535A95-5FDD-4AFB-B86E-48AD00BD1D22}" ,
@@ -14833,7 +14987,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1066CCD3-0D0E-4206-9B3D-B94D2DFA3759}' => array
 			(
 				"id" => "{1066CCD3-0D0E-4206-9B3D-B94D2DFA3759}" ,
@@ -14852,7 +15006,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9B04FAD9-32EF-4750-B9AB-31685B820169}' => array
 			(
 				"id" => "{9B04FAD9-32EF-4750-B9AB-31685B820169}" ,
@@ -14871,7 +15025,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13007BD3-7E41-4473-96B2-9E50A7A10E3B}' => array
 			(
 				"id" => "{13007BD3-7E41-4473-96B2-9E50A7A10E3B}" ,
@@ -14890,7 +15044,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5A6EA51F-31C3-49E7-BD2C-355A585D639D}' => array
 			(
 				"id" => "{5A6EA51F-31C3-49E7-BD2C-355A585D639D}" ,
@@ -14909,7 +15063,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0119D556-65AA-4F3A-87F9-641176EC3CFE}' => array
 			(
 				"id" => "{0119D556-65AA-4F3A-87F9-641176EC3CFE}" ,
@@ -14928,7 +15082,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CB4041ED-BF40-4B1B-88AD-71349A6872A7}' => array
 			(
 				"id" => "{CB4041ED-BF40-4B1B-88AD-71349A6872A7}" ,
@@ -14947,7 +15101,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C69949FF-1495-4502-888F-669D402504C0}' => array
 			(
 				"id" => "{C69949FF-1495-4502-888F-669D402504C0}" ,
@@ -14966,7 +15120,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EA861F2F-FCC9-4808-B37D-55017DC88A31}' => array
 			(
 				"id" => "{EA861F2F-FCC9-4808-B37D-55017DC88A31}" ,
@@ -14985,21 +15139,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{EA625EC3-EBAC-4C42-91F6-65377DDAB914}' => array
 			(
 				"id" => "{EA625EC3-EBAC-4C42-91F6-65377DDAB914}" ,
-				"name" => "pk_tbl_pruefung" ,
+				"name" => "pk_pruefung" ,
 				"caption" => "pk_tbl_pruefung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{E138F85F-139D-4864-A7FD-029AFE252523}' => array
 			   		(
 		   				"id" => "{E138F85F-139D-4864-A7FD-029AFE252523}" ,
@@ -15014,27 +15168,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{5DA782E5-D095-40D1-912F-AF918F242D32}'  => array
 	(
 	    	"id" => "{5DA782E5-D095-40D1-912F-AF918F242D32}" ,
-	    	"name" => "Pruefungstyp" ,
+	    	"name" => "tbl_pruefungstyp" ,
 	    	"caption" => "tbl_pruefungstyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7D16D008-9AEC-424E-9202-D638D04AF53A}' => array
 			(
 				"id" => "{7D16D008-9AEC-424E-9202-D638D04AF53A}" ,
@@ -15053,7 +15207,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E3FA0BAA-73D8-4688-A753-C04D53F7DC79}' => array
 			(
 				"id" => "{E3FA0BAA-73D8-4688-A753-C04D53F7DC79}" ,
@@ -15072,7 +15226,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F8F10B51-194F-483E-BE19-95FCF8615F04}' => array
 			(
 				"id" => "{F8F10B51-194F-483E-BE19-95FCF8615F04}" ,
@@ -15091,21 +15245,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{968C19D3-5A60-41A8-8279-1C3D75655760}' => array
 			(
 				"id" => "{968C19D3-5A60-41A8-8279-1C3D75655760}" ,
-				"name" => "pk_tbl_pruefungstyp" ,
+				"name" => "pk_pruefungstyp" ,
 				"caption" => "pk_tbl_pruefungstyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{C3546154-CCC6-4525-85C4-D65E52E55F70}' => array
 			   		(
 		   				"id" => "{C3546154-CCC6-4525-85C4-D65E52E55F70}" ,
@@ -15123,24 +15277,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{D1459429-AAB5-46C9-B2F5-F22A9018E1E2}","id" => "{9E72B709-6C34-4A50-835F-5F82C27F9BC0}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{DACCE71F-9D5E-491C-BF69-C59E0467787E}'  => array
 	(
 	    	"id" => "{DACCE71F-9D5E-491C-BF69-C59E0467787E}" ,
-	    	"name" => "Stunde" ,
+	    	"name" => "tbl_stunde" ,
 	    	"caption" => "tbl_stunde" ,
 	    	"comments" => "Stundentafel" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4EF43CDF-2A24-4A05-A94E-2809CA546469}' => array
 			(
 				"id" => "{4EF43CDF-2A24-4A05-A94E-2809CA546469}" ,
@@ -15159,7 +15313,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C7978411-40E4-4B0F-893E-6FBCD29E7B11}' => array
 			(
 				"id" => "{C7978411-40E4-4B0F-893E-6FBCD29E7B11}" ,
@@ -15178,7 +15332,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{50232379-A834-40BE-BA8A-E40E5F0D1B5A}' => array
 			(
 				"id" => "{50232379-A834-40BE-BA8A-E40E5F0D1B5A}" ,
@@ -15197,21 +15351,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{CF40A7D9-369B-47B2-9D12-F7D3CD850342}' => array
 			(
 				"id" => "{CF40A7D9-369B-47B2-9D12-F7D3CD850342}" ,
-				"name" => "pk_tbl_stunde" ,
+				"name" => "pk_stunde" ,
 				"caption" => "pk_tbl_stunde" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}' => array
 			   		(
 		   				"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}" ,
@@ -15229,24 +15383,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{59A1D61A-1334-4CC5-AABB-7C7059F9DC28}","id" => "{1FF75F90-6B10-49CD-A774-BAF3A481D7B4}","id" => "{EBC5C1D1-0676-4E1E-AD41-E4C3757F999E}","id" => "{FD4FECFA-2045-4A48-9074-24EEFD832955}","id" => "{DBF132B5-BFF3-44A2-A75D-1C6AD57D51B3}","id" => "{DEA253C7-F5FC-4A52-9BDD-A953627DC7FE}","id" => "{DA7FC945-0468-49B4-B744-B922A092A7C1}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{C6E4467D-596C-4C3C-90B1-B8CF8708A5AC}'  => array
 	(
 	    	"id" => "{C6E4467D-596C-4C3C-90B1-B8CF8708A5AC}" ,
-	    	"name" => "Stundenplan" ,
+	    	"name" => "tbl_stundenplan" ,
 	    	"caption" => "tbl_stundenplan" ,
 	    	"comments" => "Abbildung des Stundenplans in Kalenderform. Einheitenplan wird hier nicht abgebildet -> extra Tabelle" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7B044BDA-3E9A-463C-87CC-805D7A23D171}' => array
 			(
 				"id" => "{7B044BDA-3E9A-463C-87CC-805D7A23D171}" ,
@@ -15260,12 +15414,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_stundenplan_stundenplan_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_stundenplan_stundenplan_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9629A92D-B8C5-45F6-AFC2-E6D838529D55}' => array
 			(
 				"id" => "{9629A92D-B8C5-45F6-AFC2-E6D838529D55}" ,
@@ -15284,7 +15438,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FA215251-B035-4629-B62C-D0D26266FFB0}' => array
 			(
 				"id" => "{FA215251-B035-4629-B62C-D0D26266FFB0}" ,
@@ -15303,7 +15457,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{997DCD7A-C07C-4421-9451-F6585CB25FFA}' => array
 			(
 				"id" => "{997DCD7A-C07C-4421-9451-F6585CB25FFA}" ,
@@ -15322,7 +15476,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{445DE805-8F36-4DB4-80E9-387A3960730A}' => array
 			(
 				"id" => "{445DE805-8F36-4DB4-80E9-387A3960730A}" ,
@@ -15341,7 +15495,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4161C21C-C146-4D39-A9F2-CE5A38A32E1A}' => array
 			(
 				"id" => "{4161C21C-C146-4D39-A9F2-CE5A38A32E1A}" ,
@@ -15360,7 +15514,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BA41E1C0-CB89-498F-A82D-7568886A0211}' => array
 			(
 				"id" => "{BA41E1C0-CB89-498F-A82D-7568886A0211}" ,
@@ -15379,7 +15533,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9E61081A-1662-4276-A9FC-0BFCAD0CE0E1}' => array
 			(
 				"id" => "{9E61081A-1662-4276-A9FC-0BFCAD0CE0E1}" ,
@@ -15398,7 +15552,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{84E3B5CD-2080-4C5A-BA45-FC750DFE0C5B}' => array
 			(
 				"id" => "{84E3B5CD-2080-4C5A-BA45-FC750DFE0C5B}" ,
@@ -15417,7 +15571,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DDF4E831-430C-44B7-9C0E-823D17CF8EB8}' => array
 			(
 				"id" => "{DDF4E831-430C-44B7-9C0E-823D17CF8EB8}" ,
@@ -15436,7 +15590,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13F6D050-207C-4F62-A72E-6C558A34FAD4}' => array
 			(
 				"id" => "{13F6D050-207C-4F62-A72E-6C558A34FAD4}" ,
@@ -15455,7 +15609,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F2C8EBC9-D53A-481B-9343-93883FFB2B88}' => array
 			(
 				"id" => "{F2C8EBC9-D53A-481B-9343-93883FFB2B88}" ,
@@ -15474,7 +15628,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9EC8850E-B685-4400-A43F-BC1CB2C591D0}' => array
 			(
 				"id" => "{9EC8850E-B685-4400-A43F-BC1CB2C591D0}" ,
@@ -15493,7 +15647,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7A5B7007-DE5B-4CA7-B2C8-7D6E8CB11158}' => array
 			(
 				"id" => "{7A5B7007-DE5B-4CA7-B2C8-7D6E8CB11158}" ,
@@ -15512,7 +15666,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B6AE218F-009A-4AE0-AC0E-146702968DC8}' => array
 			(
 				"id" => "{B6AE218F-009A-4AE0-AC0E-146702968DC8}" ,
@@ -15531,7 +15685,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{08D70959-7F08-444F-BE24-ACAF291AAF06}' => array
 			(
 				"id" => "{08D70959-7F08-444F-BE24-ACAF291AAF06}" ,
@@ -15550,7 +15704,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{23C03407-06FD-456D-BC01-89F3CE16F317}' => array
 			(
 				"id" => "{23C03407-06FD-456D-BC01-89F3CE16F317}" ,
@@ -15569,7 +15723,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6514961-3D4B-42A3-8C1A-90D5524FB8C0}' => array
 			(
 				"id" => "{C6514961-3D4B-42A3-8C1A-90D5524FB8C0}" ,
@@ -15588,7 +15742,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4F508EC9-2077-485B-927D-867F94DE9A12}' => array
 			(
 				"id" => "{4F508EC9-2077-485B-927D-867F94DE9A12}" ,
@@ -15607,21 +15761,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{512DF74B-7E85-4BEA-A880-C8C9C30F793C}' => array
 			(
 				"id" => "{512DF74B-7E85-4BEA-A880-C8C9C30F793C}" ,
-				"name" => "pk_tbl_stundenplan" ,
+				"name" => "pk_stundenplan" ,
 				"caption" => "pk_tbl_stundenplan" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{5DB360D3-858E-45A4-B1CB-D395080989B2}' => array
 			   		(
 		   				"id" => "{5DB360D3-858E-45A4-B1CB-D395080989B2}" ,
@@ -15636,27 +15790,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3BA1E0FF-FD0A-42CA-9428-AF78C1AB8DD1}'  => array
 	(
 	    	"id" => "{3BA1E0FF-FD0A-42CA-9428-AF78C1AB8DD1}" ,
-	    	"name" => "Stundenplandev" ,
+	    	"name" => "tbl_stundenplandev" ,
 	    	"caption" => "tbl_stundenplandev" ,
 	    	"comments" => "Abbildung des Stundenplans in Kalenderform. Einheitenplan wird hier nicht abgebildet -> extra Tabelle" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{09F07E60-E845-4412-A968-BA5A0DC92635}' => array
 			(
 				"id" => "{09F07E60-E845-4412-A968-BA5A0DC92635}" ,
@@ -15670,12 +15824,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_stundenplandev_stundenplandev_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_stundenplandev_stundenplandev_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A3E5DC89-96E1-4268-848A-1EE37039AE86}' => array
 			(
 				"id" => "{A3E5DC89-96E1-4268-848A-1EE37039AE86}" ,
@@ -15694,7 +15848,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D8C5F27E-7658-48C6-813D-59579F932FA0}' => array
 			(
 				"id" => "{D8C5F27E-7658-48C6-813D-59579F932FA0}" ,
@@ -15713,7 +15867,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2F2420F9-3896-431B-9560-336C3BCFDF5B}' => array
 			(
 				"id" => "{2F2420F9-3896-431B-9560-336C3BCFDF5B}" ,
@@ -15732,7 +15886,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{655C818F-8F28-4725-BEB3-615BFDD8BF0D}' => array
 			(
 				"id" => "{655C818F-8F28-4725-BEB3-615BFDD8BF0D}" ,
@@ -15751,7 +15905,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4333B541-6CD7-4042-9651-7276516FDF5C}' => array
 			(
 				"id" => "{4333B541-6CD7-4042-9651-7276516FDF5C}" ,
@@ -15770,7 +15924,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1573E54D-825E-4E78-B631-09D016A408CC}' => array
 			(
 				"id" => "{1573E54D-825E-4E78-B631-09D016A408CC}" ,
@@ -15789,7 +15943,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{905A2B97-F9B2-4BF3-A309-37D558F58D59}' => array
 			(
 				"id" => "{905A2B97-F9B2-4BF3-A309-37D558F58D59}" ,
@@ -15808,7 +15962,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2188EBE2-E1D3-4E3E-A328-E76F191CF41F}' => array
 			(
 				"id" => "{2188EBE2-E1D3-4E3E-A328-E76F191CF41F}" ,
@@ -15827,7 +15981,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BBB7B61B-44E9-490A-BA25-19CD5726E8F0}' => array
 			(
 				"id" => "{BBB7B61B-44E9-490A-BA25-19CD5726E8F0}" ,
@@ -15846,7 +16000,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0F4EE360-48A2-4E6F-B3C1-F5C957207431}' => array
 			(
 				"id" => "{0F4EE360-48A2-4E6F-B3C1-F5C957207431}" ,
@@ -15865,7 +16019,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DC53A3B3-BCC4-49EA-BB09-4ECE689D578B}' => array
 			(
 				"id" => "{DC53A3B3-BCC4-49EA-BB09-4ECE689D578B}" ,
@@ -15884,7 +16038,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{654DC26B-D285-46CB-820A-D49A0447F148}' => array
 			(
 				"id" => "{654DC26B-D285-46CB-820A-D49A0447F148}" ,
@@ -15903,7 +16057,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{388B233A-982C-4438-A171-23655B415604}' => array
 			(
 				"id" => "{388B233A-982C-4438-A171-23655B415604}" ,
@@ -15922,7 +16076,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{23DBFA2C-1D28-4827-A8A6-87997935BF5B}' => array
 			(
 				"id" => "{23DBFA2C-1D28-4827-A8A6-87997935BF5B}" ,
@@ -15941,7 +16095,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E45693F9-F5BF-419B-AC53-7C3602934655}' => array
 			(
 				"id" => "{E45693F9-F5BF-419B-AC53-7C3602934655}" ,
@@ -15960,7 +16114,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5C13D1E7-C76F-4357-8A20-E99A7094CA2F}' => array
 			(
 				"id" => "{5C13D1E7-C76F-4357-8A20-E99A7094CA2F}" ,
@@ -15979,7 +16133,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AC1C57EE-8B4B-4C68-B55F-A1DEA90E4AD6}' => array
 			(
 				"id" => "{AC1C57EE-8B4B-4C68-B55F-A1DEA90E4AD6}" ,
@@ -15998,7 +16152,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{62AE9F8E-0F13-4A27-8AF9-2CD58D9C4903}' => array
 			(
 				"id" => "{62AE9F8E-0F13-4A27-8AF9-2CD58D9C4903}" ,
@@ -16017,21 +16171,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B27B3AB5-CDA4-48E7-AFA9-5934A5407E49}' => array
 			(
 				"id" => "{B27B3AB5-CDA4-48E7-AFA9-5934A5407E49}" ,
-				"name" => "pk_tbl_stundenplandev" ,
+				"name" => "pk_stundenplandev" ,
 				"caption" => "pk_tbl_stundenplandev" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{DF6C470F-CF9A-4C0F-B87F-3A8A0A5DB963}' => array
 			   		(
 		   				"id" => "{DF6C470F-CF9A-4C0F-B87F-3A8A0A5DB963}" ,
@@ -16046,27 +16200,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{0D8C4E13-C77C-423D-A8CF-8F45459F2129}'  => array
 	(
 	    	"id" => "{0D8C4E13-C77C-423D-A8CF-8F45459F2129}" ,
-	    	"name" => "Zeitfenster" ,
+	    	"name" => "tbl_zeitfenster" ,
 	    	"caption" => "tbl_zeitfenster" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{2589D16E-934A-4394-9FA0-A9E6AA6A7FF6}' => array
 			(
 				"id" => "{2589D16E-934A-4394-9FA0-A9E6AA6A7FF6}" ,
@@ -16085,7 +16239,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{52B01F66-523A-4D82-B9CC-D932E76B5165}' => array
 			(
 				"id" => "{52B01F66-523A-4D82-B9CC-D932E76B5165}" ,
@@ -16104,7 +16258,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BF20823D-2A85-4329-BAAE-429198957890}' => array
 			(
 				"id" => "{BF20823D-2A85-4329-BAAE-429198957890}" ,
@@ -16123,7 +16277,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3FE813E1-C3FD-4DB4-8B8D-92AFECE18483}' => array
 			(
 				"id" => "{3FE813E1-C3FD-4DB4-8B8D-92AFECE18483}" ,
@@ -16142,7 +16296,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D05C5E38-F363-4A65-AB08-3A07FE90EF52}' => array
 			(
 				"id" => "{D05C5E38-F363-4A65-AB08-3A07FE90EF52}" ,
@@ -16161,21 +16315,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{051C5C26-7408-4B76-ABEC-44C7E51BA0F4}' => array
 			(
 				"id" => "{051C5C26-7408-4B76-ABEC-44C7E51BA0F4}" ,
-				"name" => "pk_tbl_zeitfenster" ,
+				"name" => "pk_zeitfenster" ,
 				"caption" => "pk_tbl_zeitfenster" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F3FB5D6A-2E07-4C8C-9C5F-FB0E32AF492F}' => array
 			   		(
 		   				"id" => "{F3FB5D6A-2E07-4C8C-9C5F-FB0E32AF492F}" ,
@@ -16190,10 +16344,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{D36DDBCE-C43F-4010-8E52-A11D9282C928}' => array
 			   		(
 		   				"id" => "{D36DDBCE-C43F-4010-8E52-A11D9282C928}" ,
@@ -16208,10 +16362,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{E48B8C2B-23AA-459E-9E11-04CBAB49DA6B}' => array
 			   		(
 		   				"id" => "{E48B8C2B-23AA-459E-9E11-04CBAB49DA6B}" ,
@@ -16226,10 +16380,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{9224F5A9-8921-4F4D-8AF3-65E2C03682D8}' => array
 			   		(
 		   				"id" => "{9224F5A9-8921-4F4D-8AF3-65E2C03682D8}" ,
@@ -16244,27 +16398,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{E91D2870-6936-4CA3-A86E-345644FBEB9D}'  => array
 	(
 	    	"id" => "{E91D2870-6936-4CA3-A86E-345644FBEB9D}" ,
-	    	"name" => "Zeugnis" ,
+	    	"name" => "tbl_zeugnis" ,
 	    	"caption" => "tbl_zeugnis" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{CD661B94-DF6B-4894-A0B1-BECAB520B34F}' => array
 			(
 				"id" => "{CD661B94-DF6B-4894-A0B1-BECAB520B34F}" ,
@@ -16278,12 +16432,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('lehre.tbl_zeugnis_zeugnis_id_seq'::regclass)",
+				"defaultvalue" => "nextval('lehre.seq_zeugnis_zeugnis_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E1C73756-CA57-45FB-9736-5E109E82D31B}' => array
 			(
 				"id" => "{E1C73756-CA57-45FB-9736-5E109E82D31B}" ,
@@ -16302,7 +16456,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3C049078-B189-469D-876C-7BA2631333F2}' => array
 			(
 				"id" => "{3C049078-B189-469D-876C-7BA2631333F2}" ,
@@ -16321,7 +16475,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{58793D5C-541B-4A72-A6C8-DC05E99F4D03}' => array
 			(
 				"id" => "{58793D5C-541B-4A72-A6C8-DC05E99F4D03}" ,
@@ -16340,7 +16494,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{84634F5C-B794-4C62-B7EC-F236288A5A72}' => array
 			(
 				"id" => "{84634F5C-B794-4C62-B7EC-F236288A5A72}" ,
@@ -16359,7 +16513,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{50D25E28-638B-4534-B5B1-7F196A6BAF2A}' => array
 			(
 				"id" => "{50D25E28-638B-4534-B5B1-7F196A6BAF2A}" ,
@@ -16378,7 +16532,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FED50429-7CD7-47DE-BC7B-A05DDF1D0054}' => array
 			(
 				"id" => "{FED50429-7CD7-47DE-BC7B-A05DDF1D0054}" ,
@@ -16397,7 +16551,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E0340E07-6C7A-4882-A743-D40308ECD6F2}' => array
 			(
 				"id" => "{E0340E07-6C7A-4882-A743-D40308ECD6F2}" ,
@@ -16416,7 +16570,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{71984699-8D09-425F-BACD-D7B2DF9498E7}' => array
 			(
 				"id" => "{71984699-8D09-425F-BACD-D7B2DF9498E7}" ,
@@ -16435,7 +16589,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FA0FC48E-FE5D-46EB-BBE6-6E1715121FD6}' => array
 			(
 				"id" => "{FA0FC48E-FE5D-46EB-BBE6-6E1715121FD6}" ,
@@ -16454,7 +16608,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E8AB29CA-61F8-4153-A51D-FD75F2CF00FC}' => array
 			(
 				"id" => "{E8AB29CA-61F8-4153-A51D-FD75F2CF00FC}" ,
@@ -16473,7 +16627,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3EF52842-87FB-4F2A-8732-D8EDED5C508F}' => array
 			(
 				"id" => "{3EF52842-87FB-4F2A-8732-D8EDED5C508F}" ,
@@ -16492,21 +16646,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{287A1A61-4E71-45E1-BCD4-BA7635DF3344}' => array
 			(
 				"id" => "{287A1A61-4E71-45E1-BCD4-BA7635DF3344}" ,
-				"name" => "pk_tbl_zeugnis" ,
+				"name" => "pk_zeugnis" ,
 				"caption" => "pk_tbl_zeugnis" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{61BDBDC6-15BD-4457-9719-57C6A8514D93}' => array
 			   		(
 		   				"id" => "{61BDBDC6-15BD-4457-9719-57C6A8514D93}" ,
@@ -16521,27 +16675,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{AC2DDB17-D52A-4405-88BB-C37AAA92BA9F}'  => array
 	(
 	    	"id" => "{AC2DDB17-D52A-4405-88BB-C37AAA92BA9F}" ,
-	    	"name" => "Zeugnisnote" ,
+	    	"name" => "tbl_zeugnisnote" ,
 	    	"caption" => "tbl_zeugnisnote" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{665A865D-A845-48F9-AC5C-C6533F3D34BF}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{6308F4BE-AE43-48CE-9699-4BEE94A3FCC5}' => array
 			(
 				"id" => "{6308F4BE-AE43-48CE-9699-4BEE94A3FCC5}" ,
@@ -16560,7 +16714,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6B4CAFA6-CA52-40D5-A185-0B87045BC12D}' => array
 			(
 				"id" => "{6B4CAFA6-CA52-40D5-A185-0B87045BC12D}" ,
@@ -16579,7 +16733,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F202242E-59D0-4D5C-98AD-775AD39F00C3}' => array
 			(
 				"id" => "{F202242E-59D0-4D5C-98AD-775AD39F00C3}" ,
@@ -16598,7 +16752,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5905285C-0377-4B92-9C91-40927B7B60AB}' => array
 			(
 				"id" => "{5905285C-0377-4B92-9C91-40927B7B60AB}" ,
@@ -16617,7 +16771,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DF36F75C-9980-4E15-8F5F-3B62A8E5C061}' => array
 			(
 				"id" => "{DF36F75C-9980-4E15-8F5F-3B62A8E5C061}" ,
@@ -16636,7 +16790,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1979AFDD-5680-417C-8BE7-BFE00358E3F9}' => array
 			(
 				"id" => "{1979AFDD-5680-417C-8BE7-BFE00358E3F9}" ,
@@ -16655,7 +16809,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9C8A6ABB-6FB3-486E-92DC-447D18E8E4B8}' => array
 			(
 				"id" => "{9C8A6ABB-6FB3-486E-92DC-447D18E8E4B8}" ,
@@ -16674,7 +16828,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6D760A96-8A66-434E-A08E-66255BA4A972}' => array
 			(
 				"id" => "{6D760A96-8A66-434E-A08E-66255BA4A972}" ,
@@ -16693,7 +16847,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{29E7AF6D-3E3E-4AF4-B533-E0DADE85FCC3}' => array
 			(
 				"id" => "{29E7AF6D-3E3E-4AF4-B533-E0DADE85FCC3}" ,
@@ -16712,7 +16866,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F4C5AE74-9E5A-4909-A7F0-F04D6F9D2B85}' => array
 			(
 				"id" => "{F4C5AE74-9E5A-4909-A7F0-F04D6F9D2B85}" ,
@@ -16731,7 +16885,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F8408175-C380-46EF-A05D-C29D8300B28E}' => array
 			(
 				"id" => "{F8408175-C380-46EF-A05D-C29D8300B28E}" ,
@@ -16750,7 +16904,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5E0629FE-411B-4D7F-BF0A-458964D28276}' => array
 			(
 				"id" => "{5E0629FE-411B-4D7F-BF0A-458964D28276}" ,
@@ -16769,21 +16923,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{56091A66-BBE9-48F7-873F-73CDE2A41618}' => array
 			(
 				"id" => "{56091A66-BBE9-48F7-873F-73CDE2A41618}" ,
-				"name" => "pk_tbl_zeugnisnote" ,
+				"name" => "pk_zeugnisnote" ,
 				"caption" => "pk_tbl_zeugnisnote" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9CB7551A-5C37-496E-860C-AB49F928F8F5}' => array
 			   		(
 		   				"id" => "{9CB7551A-5C37-496E-860C-AB49F928F8F5}" ,
@@ -16798,10 +16952,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{314BB11D-7E02-4AA6-94CE-35194A56E788}' => array
 			   		(
 		   				"id" => "{314BB11D-7E02-4AA6-94CE-35194A56E788}" ,
@@ -16816,10 +16970,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{A898300F-7003-4085-9608-3E316712FC82}' => array
 			   		(
 		   				"id" => "{A898300F-7003-4085-9608-3E316712FC82}" ,
@@ -16834,16 +16988,16 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{45C3EC53-E9C5-40EF-B740-F40AB11B143C}'  => array
 	(
 	    	"id" => "{45C3EC53-E9C5-40EF-B740-F40AB11B143C}" ,
@@ -16854,7 +17008,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{71324FE7-BF91-405B-9B7E-1E15E477E907}' => array
 			(
 				"id" => "{71324FE7-BF91-405B-9B7E-1E15E477E907}" ,
@@ -16868,12 +17022,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_adresse_adresse_id_seq'::regclass)",
+				"defaultvalue" => "nextval('public.seq_adresse_adresse_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A694825D-9AAC-4696-B042-0BF200486425}' => array
 			(
 				"id" => "{A694825D-9AAC-4696-B042-0BF200486425}" ,
@@ -16892,7 +17046,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5EEE291E-11E4-4821-9456-FB24867FEAE3}' => array
 			(
 				"id" => "{5EEE291E-11E4-4821-9456-FB24867FEAE3}" ,
@@ -16911,7 +17065,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8D2EFD4F-94E5-445B-9076-9EAD33B6A2BF}' => array
 			(
 				"id" => "{8D2EFD4F-94E5-445B-9076-9EAD33B6A2BF}" ,
@@ -16930,7 +17084,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{511A03C2-B004-4CB3-AC23-8A8D3A018D72}' => array
 			(
 				"id" => "{511A03C2-B004-4CB3-AC23-8A8D3A018D72}" ,
@@ -16949,7 +17103,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9715FD0C-581C-41D2-9350-7B54CB3D74DD}' => array
 			(
 				"id" => "{9715FD0C-581C-41D2-9350-7B54CB3D74DD}" ,
@@ -16968,7 +17122,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{64520C27-7FB4-48F1-99BB-90C0E73F995B}' => array
 			(
 				"id" => "{64520C27-7FB4-48F1-99BB-90C0E73F995B}" ,
@@ -16987,7 +17141,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1D2D430A-ED4B-4522-9A2E-0AB33F07191F}' => array
 			(
 				"id" => "{1D2D430A-ED4B-4522-9A2E-0AB33F07191F}" ,
@@ -17006,7 +17160,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{883C7760-6119-4B62-A398-CBA0A70102D7}' => array
 			(
 				"id" => "{883C7760-6119-4B62-A398-CBA0A70102D7}" ,
@@ -17025,7 +17179,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6144DDF-44C5-4125-BFD6-F038CA0B3604}' => array
 			(
 				"id" => "{C6144DDF-44C5-4125-BFD6-F038CA0B3604}" ,
@@ -17044,7 +17198,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{014394F7-0D8A-459D-8F5A-20AF4423F694}' => array
 			(
 				"id" => "{014394F7-0D8A-459D-8F5A-20AF4423F694}" ,
@@ -17063,7 +17217,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}' => array
 			(
 				"id" => "{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}" ,
@@ -17082,7 +17236,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D502AD8-09EC-4869-8956-24DE03BEB3B4}' => array
 			(
 				"id" => "{5D502AD8-09EC-4869-8956-24DE03BEB3B4}" ,
@@ -17101,7 +17255,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8D3E96D7-27BA-4B3C-A682-AA331217A8F1}' => array
 			(
 				"id" => "{8D3E96D7-27BA-4B3C-A682-AA331217A8F1}" ,
@@ -17120,7 +17274,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{731A0E1A-0A4E-4D77-B96C-E52B0A5917C9}' => array
 			(
 				"id" => "{731A0E1A-0A4E-4D77-B96C-E52B0A5917C9}" ,
@@ -17139,7 +17293,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E24A58FE-FBB2-4CB5-8069-D5BCAE772502}' => array
 			(
 				"id" => "{E24A58FE-FBB2-4CB5-8069-D5BCAE772502}" ,
@@ -17158,7 +17312,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{96B2369E-657B-40D8-A7FD-8C64C276BC6D}' => array
 			(
 				"id" => "{96B2369E-657B-40D8-A7FD-8C64C276BC6D}" ,
@@ -17177,21 +17331,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{7800A5EB-A565-49D7-A7EA-2D0D11D64BC9}' => array
 			(
 				"id" => "{7800A5EB-A565-49D7-A7EA-2D0D11D64BC9}" ,
-				"name" => "pk_tbl_adresse" ,
+				"name" => "pk_adresse" ,
 				"caption" => "pk_tbl_adresse" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{ECE2E8E7-2B21-4E9E-B0EB-4671B0A4223E}' => array
 			   		(
 		   				"id" => "{ECE2E8E7-2B21-4E9E-B0EB-4671B0A4223E}" ,
@@ -17209,13 +17363,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{C297EC1F-90A9-4209-8FEA-8E0681A76FA1}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{256C2DDD-B460-4624-BCCA-B9A89DBFD531}'  => array
 	(
 	    	"id" => "{256C2DDD-B460-4624-BCCA-B9A89DBFD531}" ,
@@ -17226,7 +17380,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{93BB551C-6274-4023-BC0E-53C7B44E1766}' => array
 			(
 				"id" => "{93BB551C-6274-4023-BC0E-53C7B44E1766}" ,
@@ -17240,12 +17394,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_akte_akte_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_akte_akte_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E18C0584-3E36-4E45-82EB-C617FA6AF4D1}' => array
 			(
 				"id" => "{E18C0584-3E36-4E45-82EB-C617FA6AF4D1}" ,
@@ -17264,7 +17418,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{957EBC77-4BA4-4588-B784-4C69BD063C97}' => array
 			(
 				"id" => "{957EBC77-4BA4-4588-B784-4C69BD063C97}" ,
@@ -17283,7 +17437,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6496AA9A-DEC9-4033-9010-8EE88148DFE5}' => array
 			(
 				"id" => "{6496AA9A-DEC9-4033-9010-8EE88148DFE5}" ,
@@ -17302,7 +17456,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DBD788AF-5DCD-4D60-A4B7-49F4F87350CD}' => array
 			(
 				"id" => "{DBD788AF-5DCD-4D60-A4B7-49F4F87350CD}" ,
@@ -17321,7 +17475,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0DC3F500-7E8B-435C-974B-77F03DFF861F}' => array
 			(
 				"id" => "{0DC3F500-7E8B-435C-974B-77F03DFF861F}" ,
@@ -17340,7 +17494,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A4C911C5-E07A-429F-BA33-342857A6182E}' => array
 			(
 				"id" => "{A4C911C5-E07A-429F-BA33-342857A6182E}" ,
@@ -17359,7 +17513,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DF7474E7-435E-4678-BFA3-5F33032A7BDE}' => array
 			(
 				"id" => "{DF7474E7-435E-4678-BFA3-5F33032A7BDE}" ,
@@ -17378,7 +17532,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{216C57C3-76D8-48DE-8E11-9DCFBFB4B250}' => array
 			(
 				"id" => "{216C57C3-76D8-48DE-8E11-9DCFBFB4B250}" ,
@@ -17397,7 +17551,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1A90DD0E-8F1E-42FA-BECF-CAAA5EF7ECA4}' => array
 			(
 				"id" => "{1A90DD0E-8F1E-42FA-BECF-CAAA5EF7ECA4}" ,
@@ -17416,7 +17570,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C90F6F12-82E8-4905-8DE4-A2C3E63E0D20}' => array
 			(
 				"id" => "{C90F6F12-82E8-4905-8DE4-A2C3E63E0D20}" ,
@@ -17435,7 +17589,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9335CD95-91FF-47D0-BB97-2803D802EBBE}' => array
 			(
 				"id" => "{9335CD95-91FF-47D0-BB97-2803D802EBBE}" ,
@@ -17454,7 +17608,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{566B8EE7-D59E-4BBE-B951-6803FA1E1BCF}' => array
 			(
 				"id" => "{566B8EE7-D59E-4BBE-B951-6803FA1E1BCF}" ,
@@ -17473,7 +17627,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D7D9E39-6571-4941-8FA8-688F07EA93EB}' => array
 			(
 				"id" => "{5D7D9E39-6571-4941-8FA8-688F07EA93EB}" ,
@@ -17492,7 +17646,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{87185172-B117-4AA7-9C11-ADFE16C8A153}' => array
 			(
 				"id" => "{87185172-B117-4AA7-9C11-ADFE16C8A153}" ,
@@ -17511,21 +17665,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{DE88BA39-BEAB-4AD6-8641-6D0239500DDF}' => array
 			(
 				"id" => "{DE88BA39-BEAB-4AD6-8641-6D0239500DDF}" ,
-				"name" => "pk_tbl_akte" ,
+				"name" => "pk_akte" ,
 				"caption" => "pk_tbl_akte" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{AC67B1FA-9133-43DE-9E7A-AAFE37DEBB36}' => array
 			   		(
 		   				"id" => "{AC67B1FA-9133-43DE-9E7A-AAFE37DEBB36}" ,
@@ -17540,16 +17694,16 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{15BA5025-A110-4A90-A154-13D06C38EF43}'  => array
 	(
 	    	"id" => "{15BA5025-A110-4A90-A154-13D06C38EF43}" ,
@@ -17560,7 +17714,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{DE7ADCD5-CE6F-4DAC-B3DA-644B69E1CF37}' => array
 			(
 				"id" => "{DE7ADCD5-CE6F-4DAC-B3DA-644B69E1CF37}" ,
@@ -17579,7 +17733,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1210A156-F3A8-40C3-A536-85B9E62A1A94}' => array
 			(
 				"id" => "{1210A156-F3A8-40C3-A536-85B9E62A1A94}" ,
@@ -17598,7 +17752,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C01EC50C-9132-425A-A2DD-A3065376D341}' => array
 			(
 				"id" => "{C01EC50C-9132-425A-A2DD-A3065376D341}" ,
@@ -17617,21 +17771,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{AE85C856-9D1E-4094-8717-2913C98A79EA}' => array
 			(
 				"id" => "{AE85C856-9D1E-4094-8717-2913C98A79EA}" ,
-				"name" => "pk_tbl_aufmerksamdurch" ,
+				"name" => "pk_aufmerksamdurch" ,
 				"caption" => "pk_tbl_aufmerksamdurch" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{479BB2E6-08EE-4236-B06D-034DBD50806D}' => array
 			   		(
 		   				"id" => "{479BB2E6-08EE-4236-B06D-034DBD50806D}" ,
@@ -17649,13 +17803,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{9AA28657-D726-4BC2-84A0-A28FFE8C6004}","id" => "{BCD00155-7F7E-4839-A410-1556F569AD7D}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{F047271F-77FE-48FB-B534-29772A964D50}'  => array
 	(
 	    	"id" => "{F047271F-77FE-48FB-B534-29772A964D50}" ,
@@ -17666,7 +17820,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{32A29FE7-363A-4DFE-8958-5ABD9C85C9A3}' => array
 			(
 				"id" => "{32A29FE7-363A-4DFE-8958-5ABD9C85C9A3}" ,
@@ -17685,21 +17839,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{21518BD2-A1B2-4214-924F-F1F660EC97B8}' => array
 			(
 				"id" => "{21518BD2-A1B2-4214-924F-F1F660EC97B8}" ,
-				"name" => "pk_tbl_aufnahmeschluessel" ,
+				"name" => "pk_aufnahmeschluessel" ,
 				"caption" => "pk_tbl_aufnahmeschluessel" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{88696140-B5B8-4A9E-82CF-B617D107BAE4}' => array
 			   		(
 		   				"id" => "{88696140-B5B8-4A9E-82CF-B617D107BAE4}" ,
@@ -17717,13 +17871,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{0A2C109B-1F34-4DC3-A02B-77D315A829E7}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{63B7F195-4F0B-46D5-8B90-16CB7214DF51}'  => array
 	(
 	    	"id" => "{63B7F195-4F0B-46D5-8B90-16CB7214DF51}" ,
@@ -17734,7 +17888,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{C1D87EED-AE07-4049-A527-88E3DE55E9C5}' => array
 			(
 				"id" => "{C1D87EED-AE07-4049-A527-88E3DE55E9C5}" ,
@@ -17748,12 +17902,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_bankverbindung_bankverbindung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_bankverbindung_bankverbindung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{754DBB0A-FD75-40C6-99BE-3F4ACF83E546}' => array
 			(
 				"id" => "{754DBB0A-FD75-40C6-99BE-3F4ACF83E546}" ,
@@ -17772,7 +17926,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{058D63F9-1B01-4E85-B61F-6DC020766B61}' => array
 			(
 				"id" => "{058D63F9-1B01-4E85-B61F-6DC020766B61}" ,
@@ -17791,7 +17945,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{326B7151-DE8F-46E6-BDDC-D095FF666263}' => array
 			(
 				"id" => "{326B7151-DE8F-46E6-BDDC-D095FF666263}" ,
@@ -17810,7 +17964,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FC3B6BD2-3B0C-4962-A6C6-8A4AFF1C1E60}' => array
 			(
 				"id" => "{FC3B6BD2-3B0C-4962-A6C6-8A4AFF1C1E60}" ,
@@ -17829,7 +17983,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F394C4CF-04A1-4B40-87F7-267BEEB5D6B7}' => array
 			(
 				"id" => "{F394C4CF-04A1-4B40-87F7-267BEEB5D6B7}" ,
@@ -17848,7 +18002,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E7A5BF13-E0B9-4CA4-A45F-16C66B6DF231}' => array
 			(
 				"id" => "{E7A5BF13-E0B9-4CA4-A45F-16C66B6DF231}" ,
@@ -17867,7 +18021,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5B5324D9-A6A4-436B-A3D9-B3BFA555362D}' => array
 			(
 				"id" => "{5B5324D9-A6A4-436B-A3D9-B3BFA555362D}" ,
@@ -17886,7 +18040,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13D1026C-1C17-425A-9E49-1DA543F25D76}' => array
 			(
 				"id" => "{13D1026C-1C17-425A-9E49-1DA543F25D76}" ,
@@ -17905,7 +18059,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4AD32A37-4107-4BAE-997E-563361E444E0}' => array
 			(
 				"id" => "{4AD32A37-4107-4BAE-997E-563361E444E0}" ,
@@ -17924,7 +18078,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C794265E-A418-4E0D-9ED8-88FA78E924C3}' => array
 			(
 				"id" => "{C794265E-A418-4E0D-9ED8-88FA78E924C3}" ,
@@ -17943,7 +18097,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B58625B1-1609-4930-A3B1-08769A53E729}' => array
 			(
 				"id" => "{B58625B1-1609-4930-A3B1-08769A53E729}" ,
@@ -17962,7 +18116,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{436115ED-C796-4093-9297-37812C10F852}' => array
 			(
 				"id" => "{436115ED-C796-4093-9297-37812C10F852}" ,
@@ -17981,7 +18135,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C2374FDF-9196-4388-90D1-6ABD5D4897CC}' => array
 			(
 				"id" => "{C2374FDF-9196-4388-90D1-6ABD5D4897CC}" ,
@@ -18000,7 +18154,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A3CCEBCD-ADEB-4C46-A4C2-0948901CE52D}' => array
 			(
 				"id" => "{A3CCEBCD-ADEB-4C46-A4C2-0948901CE52D}" ,
@@ -18019,21 +18173,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{1BBC8177-5A11-47D0-AC86-CEB98EC3D8F8}' => array
 			(
 				"id" => "{1BBC8177-5A11-47D0-AC86-CEB98EC3D8F8}" ,
-				"name" => "pk_tbl_bankverbindung" ,
+				"name" => "pk_bankverbindung" ,
 				"caption" => "pk_tbl_bankverbindung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{38371042-B7CE-4492-B76D-1686687B80C2}' => array
 			   		(
 		   				"id" => "{38371042-B7CE-4492-B76D-1686687B80C2}" ,
@@ -18048,27 +18202,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{20863D57-4A76-4276-B1E9-1FF7E0B4C0BB}'  => array
 	(
 	    	"id" => "{20863D57-4A76-4276-B1E9-1FF7E0B4C0BB}" ,
-	    	"name" => "Benutzer" ,
-	    	"caption" => "tbl_benutzer" ,
+	    	"name" => "tbl_benutzer" ,
+	    	"caption" => "Benutzer" ,
 	    	"comments" => "Tabelle aller internen Personen mit Account." ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}' => array
 			(
 				"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}" ,
@@ -18087,7 +18241,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{96EBB1A7-7746-450C-8147-36C32FBEAF45}' => array
 			(
 				"id" => "{96EBB1A7-7746-450C-8147-36C32FBEAF45}" ,
@@ -18106,7 +18260,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3B23AEA0-1199-493B-93CA-EBB3C4750BE9}' => array
 			(
 				"id" => "{3B23AEA0-1199-493B-93CA-EBB3C4750BE9}" ,
@@ -18125,7 +18279,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DEF76929-5B48-4985-AEDD-9872A8194157}' => array
 			(
 				"id" => "{DEF76929-5B48-4985-AEDD-9872A8194157}" ,
@@ -18144,7 +18298,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1579F412-888E-4C0D-BF16-83231C7C156C}' => array
 			(
 				"id" => "{1579F412-888E-4C0D-BF16-83231C7C156C}" ,
@@ -18163,7 +18317,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{04FBA91B-664F-443F-BEC0-467164370613}' => array
 			(
 				"id" => "{04FBA91B-664F-443F-BEC0-467164370613}" ,
@@ -18182,7 +18336,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C3776C1C-0B4D-4C01-8338-A2128166C640}' => array
 			(
 				"id" => "{C3776C1C-0B4D-4C01-8338-A2128166C640}" ,
@@ -18201,7 +18355,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{598743B7-5009-4B13-A085-E9BDECE10EC4}' => array
 			(
 				"id" => "{598743B7-5009-4B13-A085-E9BDECE10EC4}" ,
@@ -18220,7 +18374,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A0EECCF2-BA69-47EB-9930-91ABD4DB9C25}' => array
 			(
 				"id" => "{A0EECCF2-BA69-47EB-9930-91ABD4DB9C25}" ,
@@ -18239,7 +18393,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4BF13F06-8A24-4B7C-966B-B30FF5244AF0}' => array
 			(
 				"id" => "{4BF13F06-8A24-4B7C-966B-B30FF5244AF0}" ,
@@ -18258,7 +18412,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DA221314-FD5F-4C2C-AD3A-15DB5C2651F6}' => array
 			(
 				"id" => "{DA221314-FD5F-4C2C-AD3A-15DB5C2651F6}" ,
@@ -18277,21 +18431,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}' => array
 			(
 				"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}" ,
-				"name" => "pk_tbl_benutzer" ,
+				"name" => "pk_benutzer" ,
 				"caption" => "pk_tbl_benutzer" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{AA8ACCF4-983D-47F3-B631-844DA7380947}' => array
 			   		(
 		   				"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}" ,
@@ -18309,10 +18463,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}","id" => "{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}","id" => "{B5CDBA7C-C418-4369-880D-F395732719F6}","id" => "{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}","id" => "{4B442C0C-6000-4003-97C8-40640D73C52B}","id" => "{A9109C87-859C-4D7C-8933-511A7231B1E8}","id" => "{71F8271B-B5B2-4002-8EC5-74639660E463}","id" => "{BF6217E2-57AB-4D99-B40D-7CBEF0466622}","id" => "{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}","id" => "{30BEDA69-44AE-49C6-9687-18D9FB5A720B}","id" => "{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}","id" => "{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}","id" => "{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}","id" => "{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}","id" => "{97064858-CA15-40E8-AE55-98B6BD1BE753}","id" => "{087640DB-A402-4657-A79B-79B6C539C027}","id" => "{3A452E95-98F0-4764-A775-011B729C69A9}","id" => "{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{DC573758-A83D-4A28-9AD8-5FE05832F345}' => array
 			(
 				"id" => "{DC573758-A83D-4A28-9AD8-5FE05832F345}" ,
@@ -18322,7 +18476,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{C20AB4D9-7B51-436D-B3F8-DDCD6E9DAC09}' => array
 			   		(
 		   				"id" => "{C20AB4D9-7B51-436D-B3F8-DDCD6E9DAC09}" ,
@@ -18337,27 +18491,29 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{7F5A359F-45E8-4B99-A6F5-8C4EFBBC2F73}'  => array
 	(
 	    	"id" => "{7F5A359F-45E8-4B99-A6F5-8C4EFBBC2F73}" ,
-	    	"name" => "BenutzerRolle" ,
-	    	"caption" => "tbl_benutzerrolle" ,
-	    	"comments" => "" ,
+	    	"name" => "tbl_benutzerrolle" ,
+	    	"caption" => "BenutzerRolle" ,
+	    	"comments" => "uid XOR funktion_kurzbz
+funktion_kurzbz XOR oe_kurzbz
+rolle_kurzbz XOR berechtigung_kurzbz" ,
 	    	"storage" => "" ,
-	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"schemaid" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9D4EB793-DBD1-4D05-AA2A-94633556B856}' => array
 			(
 				"id" => "{9D4EB793-DBD1-4D05-AA2A-94633556B856}" ,
@@ -18371,23 +18527,23 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_benutzerberechtigung_benutzerberechtigung_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_benutzerberechtigung_benutzerberechtigung_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
-			'{7677AF09-1658-40E7-95A2-5BDC39D40BA6}' => array
+			
+			'{6819DDAC-AF81-4F1D-A71B-EC91E2CEA7AA}' => array
 			(
-				"id" => "{7677AF09-1658-40E7-95A2-5BDC39D40BA6}" ,
-				"name" => "uid" ,
-				"caption" => "uid" ,
+				"id" => "{6819DDAC-AF81-4F1D-A71B-EC91E2CEA7AA}" ,
+				"name" => "rolle_kurzbz" ,
+				"caption" => "rolle_kurzbz" ,
 				"ordinal" => "2" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "16" ,
+				"datatypeparam1" => "32" ,
 				"datatypeparam2" => "" ,
-				"length" => "16",
+				"length" => "32",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -18395,12 +18551,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
-			'{C3B8CD4F-B155-4E40-8499-98C264C2C4E0}' => array
+			
+			'{BB99A59C-5E79-4378-A4F2-35663C44905E}' => array
 			(
-				"id" => "{C3B8CD4F-B155-4E40-8499-98C264C2C4E0}" ,
-				"name" => "funktion_kurzbz" ,
-				"caption" => "funktion_kurzbz" ,
+				"id" => "{BB99A59C-5E79-4378-A4F2-35663C44905E}" ,
+				"name" => "berechtigung_kurzbz" ,
+				"caption" => "berechtigung_kurzbz" ,
 				"ordinal" => "3" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -18414,18 +18570,18 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
-			'{6819DDAC-AF81-4F1D-A71B-EC91E2CEA7AA}' => array
+			
+			'{7677AF09-1658-40E7-95A2-5BDC39D40BA6}' => array
 			(
-				"id" => "{6819DDAC-AF81-4F1D-A71B-EC91E2CEA7AA}" ,
-				"name" => "status_kurzbz" ,
-				"caption" => "status_kurzbz" ,
+				"id" => "{7677AF09-1658-40E7-95A2-5BDC39D40BA6}" ,
+				"name" => "uid" ,
+				"caption" => "uid" ,
 				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "32" ,
+				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
-				"length" => "32",
+				"length" => "16",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -18433,12 +18589,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
-			'{BB99A59C-5E79-4378-A4F2-35663C44905E}' => array
+			
+			'{C3B8CD4F-B155-4E40-8499-98C264C2C4E0}' => array
 			(
-				"id" => "{BB99A59C-5E79-4378-A4F2-35663C44905E}" ,
-				"name" => "berechtigung_kurzbz" ,
-				"caption" => "berechtigung_kurzbz" ,
+				"id" => "{C3B8CD4F-B155-4E40-8499-98C264C2C4E0}" ,
+				"name" => "funktion_kurzbz" ,
+				"caption" => "funktion_kurzbz" ,
 				"ordinal" => "5" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -18452,32 +18608,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
-			'{45192F27-72E1-4E23-9C82-D8BDD60BA590}' => array
-			(
-				"id" => "{45192F27-72E1-4E23-9C82-D8BDD60BA590}" ,
-				"name" => "art" ,
-				"caption" => "art" ,
-				"ordinal" => "6" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "5" ,
-				"datatypeparam2" => "" ,
-				"length" => "5",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "'r'::character varying",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-
+			
 			'{ED55DAE2-4A0C-40DA-AB11-66A576E21330}' => array
 			(
 				"id" => "{ED55DAE2-4A0C-40DA-AB11-66A576E21330}" ,
 				"name" => "oe_kurzbz" ,
 				"caption" => "oe_kurzbz" ,
-				"ordinal" => "7" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -18490,7 +18627,26 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
+			'{45192F27-72E1-4E23-9C82-D8BDD60BA590}' => array
+			(
+				"id" => "{45192F27-72E1-4E23-9C82-D8BDD60BA590}" ,
+				"name" => "art" ,
+				"caption" => "art" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "5" ,
+				"datatypeparam2" => "" ,
+				"length" => "5",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "'r'::character varying",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{02005B36-1FDE-402C-854E-F19451B1FEEC}' => array
 			(
 				"id" => "{02005B36-1FDE-402C-854E-F19451B1FEEC}" ,
@@ -18509,7 +18665,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1024D2BB-BA2D-4FD8-A71F-A5D8CC7911EE}' => array
 			(
 				"id" => "{1024D2BB-BA2D-4FD8-A71F-A5D8CC7911EE}" ,
@@ -18528,7 +18684,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ED07B35F-BC01-4369-9064-86CECC61C1BD}' => array
 			(
 				"id" => "{ED07B35F-BC01-4369-9064-86CECC61C1BD}" ,
@@ -18547,7 +18703,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B4598576-AE64-4340-9A1D-B70AA07FB4F4}' => array
 			(
 				"id" => "{B4598576-AE64-4340-9A1D-B70AA07FB4F4}" ,
@@ -18566,7 +18722,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1EF4FE03-81F2-4704-BD32-8C8D655421E3}' => array
 			(
 				"id" => "{1EF4FE03-81F2-4704-BD32-8C8D655421E3}" ,
@@ -18585,7 +18741,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A68F600B-C739-43C6-AE46-460F80767B0A}' => array
 			(
 				"id" => "{A68F600B-C739-43C6-AE46-460F80767B0A}" ,
@@ -18604,7 +18760,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CC129A53-47ED-44E0-A324-0371673611A1}' => array
 			(
 				"id" => "{CC129A53-47ED-44E0-A324-0371673611A1}" ,
@@ -18623,7 +18779,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5637EF22-7102-4FE1-A542-A7E4C0642048}' => array
 			(
 				"id" => "{5637EF22-7102-4FE1-A542-A7E4C0642048}" ,
@@ -18642,21 +18798,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{3FDB3E1C-0591-471C-9943-EB443C44A898}' => array
 			(
 				"id" => "{3FDB3E1C-0591-471C-9943-EB443C44A898}" ,
-				"name" => "pk_tbl_benutzerberechtigung" ,
+				"name" => "pk_benutzerberechtigung" ,
 				"caption" => "pk_tbl_benutzerberechtigung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{79098659-30B4-44A7-BDB1-D844B8D451AB}' => array
 			   		(
 		   				"id" => "{79098659-30B4-44A7-BDB1-D844B8D451AB}" ,
@@ -18671,27 +18827,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9B4D1AC0-D201-4CE4-BE24-691937FC1A9A}'  => array
 	(
 	    	"id" => "{9B4D1AC0-D201-4CE4-BE24-691937FC1A9A}" ,
-	    	"name" => "Benutzerfunktion" ,
-	    	"caption" => "tbl_benutzerfunktion" ,
+	    	"name" => "tbl_benutzerfunktion" ,
+	    	"caption" => "Benutzerfunktion" ,
 	    	"comments" => "Hier werden Personen nach ihren Funktionen eingeteilt." ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{D9D0596F-660E-447C-AD32-27783A880646}' => array
 			(
 				"id" => "{D9D0596F-660E-447C-AD32-27783A880646}" ,
@@ -18705,12 +18861,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_benutzerfunktion_benutzerfunktion_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_benutzerfunktion_benutzerfunktion_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{900C92E2-018B-4623-9A41-70292CCD1C20}' => array
 			(
 				"id" => "{900C92E2-018B-4623-9A41-70292CCD1C20}" ,
@@ -18729,7 +18885,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8A1BCDF8-B35D-4EB4-AF05-8743598C7737}' => array
 			(
 				"id" => "{8A1BCDF8-B35D-4EB4-AF05-8743598C7737}" ,
@@ -18748,7 +18904,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E5C0F9CD-8FC3-4829-B283-B5A6C3903BB0}' => array
 			(
 				"id" => "{E5C0F9CD-8FC3-4829-B283-B5A6C3903BB0}" ,
@@ -18767,7 +18923,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C3EA274-4871-4CA3-B4B6-1F30816FAD44}' => array
 			(
 				"id" => "{2C3EA274-4871-4CA3-B4B6-1F30816FAD44}" ,
@@ -18786,7 +18942,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7819173D-EB02-4B77-8416-9FFACD85BFE2}' => array
 			(
 				"id" => "{7819173D-EB02-4B77-8416-9FFACD85BFE2}" ,
@@ -18805,7 +18961,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C4CFF0FA-E7F9-41E9-A164-DF3AD2BF2D8C}' => array
 			(
 				"id" => "{C4CFF0FA-E7F9-41E9-A164-DF3AD2BF2D8C}" ,
@@ -18824,7 +18980,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{82CC8360-5AD1-4EC6-961E-8088B3ED2344}' => array
 			(
 				"id" => "{82CC8360-5AD1-4EC6-961E-8088B3ED2344}" ,
@@ -18843,7 +18999,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5EF5072D-C99E-4D6A-A2A1-B2505045631C}' => array
 			(
 				"id" => "{5EF5072D-C99E-4D6A-A2A1-B2505045631C}" ,
@@ -18862,7 +19018,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ED56F691-57DB-4264-8813-D21F758E499D}' => array
 			(
 				"id" => "{ED56F691-57DB-4264-8813-D21F758E499D}" ,
@@ -18881,7 +19037,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2258BC7E-734F-4FB7-A556-B9798497C9A5}' => array
 			(
 				"id" => "{2258BC7E-734F-4FB7-A556-B9798497C9A5}" ,
@@ -18900,21 +19056,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{DF8DEB35-DAE2-4DD5-8CBB-B260F99B499B}' => array
 			(
 				"id" => "{DF8DEB35-DAE2-4DD5-8CBB-B260F99B499B}" ,
-				"name" => "pk_tbl_benutzerfunktion" ,
+				"name" => "pk_benutzerfunktion" ,
 				"caption" => "pk_tbl_benutzerfunktion" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{4B78CF64-3AD3-495D-AA2C-C58E0562D1A4}' => array
 			   		(
 		   				"id" => "{4B78CF64-3AD3-495D-AA2C-C58E0562D1A4}" ,
@@ -18929,27 +19085,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9228FEBD-52F8-492E-8A2B-4DF1C6D7A962}'  => array
 	(
 	    	"id" => "{9228FEBD-52F8-492E-8A2B-4DF1C6D7A962}" ,
-	    	"name" => "Benutzergruppe" ,
+	    	"name" => "tbl_benutzergruppe" ,
 	    	"caption" => "tbl_benutzergruppe" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{68C284F5-0011-489A-8FA1-CE6EB41499EF}' => array
 			(
 				"id" => "{68C284F5-0011-489A-8FA1-CE6EB41499EF}" ,
@@ -18968,7 +19124,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BEC4C4E8-F1B3-48F5-B47C-7C4FF26F45CF}' => array
 			(
 				"id" => "{BEC4C4E8-F1B3-48F5-B47C-7C4FF26F45CF}" ,
@@ -18987,7 +19143,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8FC71C74-BE65-4F0A-B850-C94EC9A8F846}' => array
 			(
 				"id" => "{8FC71C74-BE65-4F0A-B850-C94EC9A8F846}" ,
@@ -19006,7 +19162,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3A447873-1E57-4AFF-BF4B-3FEC297C9B3D}' => array
 			(
 				"id" => "{3A447873-1E57-4AFF-BF4B-3FEC297C9B3D}" ,
@@ -19025,7 +19181,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D91C8DE4-192C-4FDB-AC4E-70E9FDC68836}' => array
 			(
 				"id" => "{D91C8DE4-192C-4FDB-AC4E-70E9FDC68836}" ,
@@ -19044,7 +19200,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D203D8EE-019E-4003-90E3-267CCFE83A21}' => array
 			(
 				"id" => "{D203D8EE-019E-4003-90E3-267CCFE83A21}" ,
@@ -19063,7 +19219,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9E53ABDC-7AE9-4236-8D96-64E529684B10}' => array
 			(
 				"id" => "{9E53ABDC-7AE9-4236-8D96-64E529684B10}" ,
@@ -19082,7 +19238,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F408BC40-F008-420B-AFDA-ABD6BB18C545}' => array
 			(
 				"id" => "{F408BC40-F008-420B-AFDA-ABD6BB18C545}" ,
@@ -19101,21 +19257,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{1083A939-77A2-4DAE-803B-BB1B3E935ACF}' => array
 			(
 				"id" => "{1083A939-77A2-4DAE-803B-BB1B3E935ACF}" ,
-				"name" => "pk_tbl_benutzergruppe" ,
+				"name" => "pk_benutzergruppe" ,
 				"caption" => "pk_tbl_benutzergruppe" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D0AC61C8-299F-418F-B5C2-898BEA652A96}' => array
 			   		(
 		   				"id" => "{D0AC61C8-299F-418F-B5C2-898BEA652A96}" ,
@@ -19130,10 +19286,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{75692C4F-3C8B-439B-A8CA-6706CF70F785}' => array
 			   		(
 		   				"id" => "{75692C4F-3C8B-439B-A8CA-6706CF70F785}" ,
@@ -19148,27 +19304,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{8DCF65AE-C2D7-4B83-A063-B0FA2BC82FBA}'  => array
 	(
 	    	"id" => "{8DCF65AE-C2D7-4B83-A063-B0FA2BC82FBA}" ,
-	    	"name" => "Berechtigung" ,
-	    	"caption" => "tbl_berechtigung" ,
+	    	"name" => "tbl_berechtigung" ,
+	    	"caption" => "Berechtigung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
-	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"schemaid" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{26293B40-27C5-4A09-9CE2-D04631C60468}' => array
 			(
 				"id" => "{26293B40-27C5-4A09-9CE2-D04631C60468}" ,
@@ -19187,7 +19343,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4D88B011-5640-42A8-8E8C-DB1B3F2D4B57}' => array
 			(
 				"id" => "{4D88B011-5640-42A8-8E8C-DB1B3F2D4B57}" ,
@@ -19206,21 +19362,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E35F527E-70CE-4E2D-9AC0-F0811A6423D9}' => array
 			(
 				"id" => "{E35F527E-70CE-4E2D-9AC0-F0811A6423D9}" ,
-				"name" => "pk_tbl_berechtigung" ,
+				"name" => "pk_berechtigung" ,
 				"caption" => "pk_tbl_berechtigung" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{67DAAC44-0FEC-4BD6-AF65-51EC1A2243BC}' => array
 			   		(
 		   				"id" => "{67DAAC44-0FEC-4BD6-AF65-51EC1A2243BC}" ,
@@ -19238,24 +19394,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{EBEB54AB-1B3A-4FE2-A0A9-C86182A788F4}","id" => "{702AEF40-5817-43C4-93DF-6774F0C499A3}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{15F85B08-AD47-4E02-9EB2-AD1CB7AB6EB3}'  => array
 	(
 	    	"id" => "{15F85B08-AD47-4E02-9EB2-AD1CB7AB6EB3}" ,
-	    	"name" => "Betriebsmittel" ,
+	    	"name" => "tbl_betriebsmittel" ,
 	    	"caption" => "tbl_betriebsmittel" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{07ED98B0-2A82-4276-BF4C-943084A0A653}' => array
 			(
 				"id" => "{07ED98B0-2A82-4276-BF4C-943084A0A653}" ,
@@ -19269,12 +19425,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_betriebsmittel_betriebsmittel_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_betriebsmittel_betriebsmittel_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8F1B6C33-45A8-424D-88A6-F3D0D865A408}' => array
 			(
 				"id" => "{8F1B6C33-45A8-424D-88A6-F3D0D865A408}" ,
@@ -19293,7 +19449,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3FDBF757-C3AA-44D1-95FE-68B7D7929A0D}' => array
 			(
 				"id" => "{3FDBF757-C3AA-44D1-95FE-68B7D7929A0D}" ,
@@ -19312,7 +19468,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{80746FDF-BBF9-442B-B7A1-057E4B55E222}' => array
 			(
 				"id" => "{80746FDF-BBF9-442B-B7A1-057E4B55E222}" ,
@@ -19331,7 +19487,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{13D54EB1-D2DF-4ACD-877D-3BBF0AE76A3C}' => array
 			(
 				"id" => "{13D54EB1-D2DF-4ACD-877D-3BBF0AE76A3C}" ,
@@ -19350,7 +19506,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ADDF4DCD-C3BF-4806-9E48-78E66B29892D}' => array
 			(
 				"id" => "{ADDF4DCD-C3BF-4806-9E48-78E66B29892D}" ,
@@ -19369,7 +19525,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DFE70F6A-FFA8-4DFB-BB3C-46C7D59D81E3}' => array
 			(
 				"id" => "{DFE70F6A-FFA8-4DFB-BB3C-46C7D59D81E3}" ,
@@ -19388,7 +19544,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{73EAA780-6174-4FB6-847B-AD150B9CEE6B}' => array
 			(
 				"id" => "{73EAA780-6174-4FB6-847B-AD150B9CEE6B}" ,
@@ -19407,7 +19563,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9F677199-EF4A-4D3C-B8C2-121DFD6F55A5}' => array
 			(
 				"id" => "{9F677199-EF4A-4D3C-B8C2-121DFD6F55A5}" ,
@@ -19426,7 +19582,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3C270385-B478-4710-BCB6-0535A70C21CE}' => array
 			(
 				"id" => "{3C270385-B478-4710-BCB6-0535A70C21CE}" ,
@@ -19445,7 +19601,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{60CE67C2-B280-474B-8B10-639EDF4C32A8}' => array
 			(
 				"id" => "{60CE67C2-B280-474B-8B10-639EDF4C32A8}" ,
@@ -19464,7 +19620,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3D6E5E3B-D186-48F9-910F-9F0EEE6836F4}' => array
 			(
 				"id" => "{3D6E5E3B-D186-48F9-910F-9F0EEE6836F4}" ,
@@ -19483,21 +19639,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{7499E6E7-640A-4F9D-BD1F-A25FC747F738}' => array
 			(
 				"id" => "{7499E6E7-640A-4F9D-BD1F-A25FC747F738}" ,
-				"name" => "pk_tbl_betriebsmittel" ,
+				"name" => "pk_betriebsmittel" ,
 				"caption" => "pk_tbl_betriebsmittel" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F76D2CF3-FA9E-4E61-BA58-4EA8818639A2}' => array
 			   		(
 		   				"id" => "{F76D2CF3-FA9E-4E61-BA58-4EA8818639A2}" ,
@@ -19515,24 +19671,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{F77283EA-37F6-4B41-AB09-417E372C432F}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{E767FE12-DD71-441F-BF90-832F321B7F4B}'  => array
 	(
 	    	"id" => "{E767FE12-DD71-441F-BF90-832F321B7F4B}" ,
-	    	"name" => "Betriebsmittelperson" ,
+	    	"name" => "tbl_betriebsmittelperson" ,
 	    	"caption" => "tbl_betriebsmittelperson" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{911EB4DB-E021-47E1-A99F-606A18971F4C}' => array
 			(
 				"id" => "{911EB4DB-E021-47E1-A99F-606A18971F4C}" ,
@@ -19551,7 +19707,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0D6A1C4D-A44A-45EF-B0DB-B50CB7575745}' => array
 			(
 				"id" => "{0D6A1C4D-A44A-45EF-B0DB-B50CB7575745}" ,
@@ -19570,7 +19726,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{56BA3881-5D65-4E74-A774-453581583AFE}' => array
 			(
 				"id" => "{56BA3881-5D65-4E74-A774-453581583AFE}" ,
@@ -19589,7 +19745,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{99CF0BA6-ABE8-4E77-9F7C-9CD028A319C0}' => array
 			(
 				"id" => "{99CF0BA6-ABE8-4E77-9F7C-9CD028A319C0}" ,
@@ -19608,7 +19764,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{80C2CF95-856C-49B4-93E0-0B44F5F1D625}' => array
 			(
 				"id" => "{80C2CF95-856C-49B4-93E0-0B44F5F1D625}" ,
@@ -19627,7 +19783,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{66547A20-A243-48DA-8A5E-62BEBD6F64D3}' => array
 			(
 				"id" => "{66547A20-A243-48DA-8A5E-62BEBD6F64D3}" ,
@@ -19646,7 +19802,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BE463A75-FA93-4447-86C0-DB5D52BAF859}' => array
 			(
 				"id" => "{BE463A75-FA93-4447-86C0-DB5D52BAF859}" ,
@@ -19665,7 +19821,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3575DCF5-7C46-493D-8826-A79747B3CE38}' => array
 			(
 				"id" => "{3575DCF5-7C46-493D-8826-A79747B3CE38}" ,
@@ -19684,7 +19840,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{175647EE-6993-403A-A487-32A005CF16DC}' => array
 			(
 				"id" => "{175647EE-6993-403A-A487-32A005CF16DC}" ,
@@ -19703,7 +19859,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DA3785EA-363B-4508-88B8-04C0030A9161}' => array
 			(
 				"id" => "{DA3785EA-363B-4508-88B8-04C0030A9161}" ,
@@ -19722,7 +19878,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DC35FCF6-E063-4E53-AE7A-6187BCB6D1BD}' => array
 			(
 				"id" => "{DC35FCF6-E063-4E53-AE7A-6187BCB6D1BD}" ,
@@ -19741,21 +19897,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{4A21C209-8B96-46B1-AFC9-0F6008429C95}' => array
 			(
 				"id" => "{4A21C209-8B96-46B1-AFC9-0F6008429C95}" ,
-				"name" => "pk_tbl_betriebsmittelperson" ,
+				"name" => "pk_betriebsmittelperson" ,
 				"caption" => "pk_tbl_betriebsmittelperson" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{5273E9A4-22B7-41E7-89CD-91397829EE46}' => array
 			   		(
 		   				"id" => "{5273E9A4-22B7-41E7-89CD-91397829EE46}" ,
@@ -19773,7 +19929,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{1DFE2288-8D1A-493F-9A37-9385E71A8E09}",
 				   		)
 		   			),
-
+		   			
 			   		'{07175BBE-185F-4CFD-AD0B-1E0D2D2B474D}' => array
 			   		(
 		   				"id" => "{07175BBE-185F-4CFD-AD0B-1E0D2D2B474D}" ,
@@ -19791,24 +19947,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{FDE0D0A5-3852-42CA-8340-2A4F066A38B8}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{048BE8E6-A6DC-4A66-AC4A-54234DE85DEE}'  => array
 	(
 	    	"id" => "{048BE8E6-A6DC-4A66-AC4A-54234DE85DEE}" ,
-	    	"name" => "Betriebsmitteltyp" ,
+	    	"name" => "tbl_betriebsmitteltyp" ,
 	    	"caption" => "tbl_betriebsmitteltyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E9F7A11F-5B4C-4FB0-B7C7-A6423A638DD3}' => array
 			(
 				"id" => "{E9F7A11F-5B4C-4FB0-B7C7-A6423A638DD3}" ,
@@ -19827,7 +19983,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FD757A47-9A72-4444-9193-829FB9DE43C6}' => array
 			(
 				"id" => "{FD757A47-9A72-4444-9193-829FB9DE43C6}" ,
@@ -19846,7 +20002,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7A3956AC-6646-4842-8B8D-8A03390FB398}' => array
 			(
 				"id" => "{7A3956AC-6646-4842-8B8D-8A03390FB398}" ,
@@ -19865,7 +20021,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E2BA2D62-1BAF-45CB-9DE7-8A25C84B8F03}' => array
 			(
 				"id" => "{E2BA2D62-1BAF-45CB-9DE7-8A25C84B8F03}" ,
@@ -19884,21 +20040,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{A2415FD8-ADD6-4469-8C2F-203DBCBB57D3}' => array
 			(
 				"id" => "{A2415FD8-ADD6-4469-8C2F-203DBCBB57D3}" ,
-				"name" => "pk_tbl_betriebsmitteltyp" ,
+				"name" => "pk_betriebsmitteltyp" ,
 				"caption" => "pk_tbl_betriebsmitteltyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{971E5588-BD32-456D-BB00-C632F98C5B13}' => array
 			   		(
 		   				"id" => "{971E5588-BD32-456D-BB00-C632F98C5B13}" ,
@@ -19916,24 +20072,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{032D2D26-F109-498F-B98A-F898CDF39088}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{A2659324-2AA8-4B2B-AC09-5EDA4D2C4325}'  => array
 	(
 	    	"id" => "{A2659324-2AA8-4B2B-AC09-5EDA4D2C4325}" ,
-	    	"name" => "Buchungstyp" ,
+	    	"name" => "tbl_buchungstyp" ,
 	    	"caption" => "tbl_buchungstyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{EF3B13CD-3FF5-45AE-89D2-ADE6B30CC371}' => array
 			(
 				"id" => "{EF3B13CD-3FF5-45AE-89D2-ADE6B30CC371}" ,
@@ -19952,7 +20108,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{86E36888-6727-4C73-8838-F9AFB96815C9}' => array
 			(
 				"id" => "{86E36888-6727-4C73-8838-F9AFB96815C9}" ,
@@ -19971,7 +20127,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C47B170-6B96-4F41-88D4-35A41F3FB16D}' => array
 			(
 				"id" => "{2C47B170-6B96-4F41-88D4-35A41F3FB16D}" ,
@@ -19990,7 +20146,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BBE0DBCD-B76F-417F-91D5-01624B655BB3}' => array
 			(
 				"id" => "{BBE0DBCD-B76F-417F-91D5-01624B655BB3}" ,
@@ -20009,21 +20165,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{C623AA91-ABF4-495F-90B8-D10BDEAE6AEB}' => array
 			(
 				"id" => "{C623AA91-ABF4-495F-90B8-D10BDEAE6AEB}" ,
-				"name" => "pk_tbl_buchungstyp" ,
+				"name" => "pk_buchungstyp" ,
 				"caption" => "pk_tbl_buchungstyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{72E25D2B-FD76-4157-9EE6-7CA3A316DAC5}' => array
 			   		(
 		   				"id" => "{72E25D2B-FD76-4157-9EE6-7CA3A316DAC5}" ,
@@ -20041,24 +20197,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{FD4B5FCB-F3DA-49DC-91D8-C1183CE0E284}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{CC53C3E5-82D4-431B-BC51-B3566EBB4CEB}'  => array
 	(
 	    	"id" => "{CC53C3E5-82D4-431B-BC51-B3566EBB4CEB}" ,
-	    	"name" => "Dokument" ,
+	    	"name" => "tbl_dokument" ,
 	    	"caption" => "tbl_dokument" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{EA13F305-F43B-4F8D-81F6-9D337E0ED59B}' => array
 			(
 				"id" => "{EA13F305-F43B-4F8D-81F6-9D337E0ED59B}" ,
@@ -20077,7 +20233,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D0AB0E53-FD06-4457-AF10-47BB500BC805}' => array
 			(
 				"id" => "{D0AB0E53-FD06-4457-AF10-47BB500BC805}" ,
@@ -20096,7 +20252,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1F4424AA-3651-44DA-9750-7637AD5FDDF2}' => array
 			(
 				"id" => "{1F4424AA-3651-44DA-9750-7637AD5FDDF2}" ,
@@ -20115,21 +20271,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{EE361D18-23A4-457B-86E5-9E95C83C5F57}' => array
 			(
 				"id" => "{EE361D18-23A4-457B-86E5-9E95C83C5F57}" ,
-				"name" => "pk_tbl_dokument" ,
+				"name" => "pk_dokument" ,
 				"caption" => "pk_tbl_dokument" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{40238FFD-41C1-48D2-AD6B-F3DD75DCB623}' => array
 			   		(
 		   				"id" => "{40238FFD-41C1-48D2-AD6B-F3DD75DCB623}" ,
@@ -20147,24 +20303,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{C0ACDDA6-AB4E-4F43-A319-0290C1F664C5}","id" => "{CC1A1816-CF05-40C5-BA61-84297A6DD34D}","id" => "{E5A357B0-35BD-4269-B0D4-6E02F9CA4BF5}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{5D3938E8-FECA-4AC9-B184-135B52136913}'  => array
 	(
 	    	"id" => "{5D3938E8-FECA-4AC9-B184-135B52136913}" ,
-	    	"name" => "Dokumentprestudent" ,
+	    	"name" => "tbl_dokumentprestudent" ,
 	    	"caption" => "tbl_dokumentprestudent" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{06F1CD62-5B97-4AAD-A7F1-B2F215A10EF6}' => array
 			(
 				"id" => "{06F1CD62-5B97-4AAD-A7F1-B2F215A10EF6}" ,
@@ -20183,7 +20339,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{124263E2-A6BF-43EF-B69E-166372F0488F}' => array
 			(
 				"id" => "{124263E2-A6BF-43EF-B69E-166372F0488F}" ,
@@ -20202,7 +20358,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D950A492-F782-4FF8-A9F0-A326560FE6D6}' => array
 			(
 				"id" => "{D950A492-F782-4FF8-A9F0-A326560FE6D6}" ,
@@ -20221,7 +20377,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6FDDC666-B7CF-48AF-9A07-CC77B1C543CB}' => array
 			(
 				"id" => "{6FDDC666-B7CF-48AF-9A07-CC77B1C543CB}" ,
@@ -20240,7 +20396,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CC7BBEA7-1ED5-44DF-9FFC-054CF0DA7E36}' => array
 			(
 				"id" => "{CC7BBEA7-1ED5-44DF-9FFC-054CF0DA7E36}" ,
@@ -20259,7 +20415,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7DA2072B-234D-4413-80A6-E472CBA451DE}' => array
 			(
 				"id" => "{7DA2072B-234D-4413-80A6-E472CBA451DE}" ,
@@ -20278,7 +20434,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C55502C4-0173-4B9C-9C06-0C5F9309D68F}' => array
 			(
 				"id" => "{C55502C4-0173-4B9C-9C06-0C5F9309D68F}" ,
@@ -20297,7 +20453,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8F8BA528-0E9E-437C-A981-74AB179C2882}' => array
 			(
 				"id" => "{8F8BA528-0E9E-437C-A981-74AB179C2882}" ,
@@ -20316,7 +20472,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A5D25E10-21C5-4A22-9A32-824EE858CC3B}' => array
 			(
 				"id" => "{A5D25E10-21C5-4A22-9A32-824EE858CC3B}" ,
@@ -20335,21 +20491,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{1E4D89B5-1CAE-4E95-B141-56F582070009}' => array
 			(
 				"id" => "{1E4D89B5-1CAE-4E95-B141-56F582070009}" ,
-				"name" => "pk_tbl_dokumentprestudent" ,
+				"name" => "pk_dokumentprestudent" ,
 				"caption" => "pk_tbl_dokumentprestudent" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D5D7CB74-D3A0-4D45-A6A6-69F222BB2CBB}' => array
 			   		(
 		   				"id" => "{D5D7CB74-D3A0-4D45-A6A6-69F222BB2CBB}" ,
@@ -20364,10 +20520,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{E37C6D48-E02C-4C19-9288-A02A1E3205A3}' => array
 			   		(
 		   				"id" => "{E37C6D48-E02C-4C19-9288-A02A1E3205A3}" ,
@@ -20382,27 +20538,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{A90507F3-370F-4D26-BD7B-34257ABE6E13}'  => array
 	(
 	    	"id" => "{A90507F3-370F-4D26-BD7B-34257ABE6E13}" ,
-	    	"name" => "Dokumentstudiengang" ,
+	    	"name" => "tbl_dokumentstudiengang" ,
 	    	"caption" => "tbl_dokumentstudiengang" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{587EC670-5FDB-48A0-A572-DCF1BC1935B7}' => array
 			(
 				"id" => "{587EC670-5FDB-48A0-A572-DCF1BC1935B7}" ,
@@ -20421,7 +20577,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A02D89ED-B4BF-4124-A6A7-395CD614792F}' => array
 			(
 				"id" => "{A02D89ED-B4BF-4124-A6A7-395CD614792F}" ,
@@ -20440,7 +20596,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E59FA248-6855-4A6B-B81D-304F5C453B50}' => array
 			(
 				"id" => "{E59FA248-6855-4A6B-B81D-304F5C453B50}" ,
@@ -20459,21 +20615,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{D0F29730-289C-49D4-8130-8A8B4A5AA806}' => array
 			(
 				"id" => "{D0F29730-289C-49D4-8130-8A8B4A5AA806}" ,
-				"name" => "pk_tbl_dokumentstudiengang" ,
+				"name" => "pk_dokumentstudiengang" ,
 				"caption" => "pk_tbl_dokumentstudiengang" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{EFD356D8-B278-4144-8C39-590D2B16ECC6}' => array
 			   		(
 		   				"id" => "{EFD356D8-B278-4144-8C39-590D2B16ECC6}" ,
@@ -20488,10 +20644,10 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{F1917B6B-8B17-4FAA-9095-1FDD89DFB8B4}' => array
 			   		(
 		   				"id" => "{F1917B6B-8B17-4FAA-9095-1FDD89DFB8B4}" ,
@@ -20506,27 +20662,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{68B3823F-3CCD-49CA-BECB-9DB305585F4D}'  => array
 	(
 	    	"id" => "{68B3823F-3CCD-49CA-BECB-9DB305585F4D}" ,
-	    	"name" => "Erhalter" ,
+	    	"name" => "tbl_erhalter" ,
 	    	"caption" => "tbl_erhalter" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E36CA912-D02A-4CEF-A753-A32F62BD8938}' => array
 			(
 				"id" => "{E36CA912-D02A-4CEF-A753-A32F62BD8938}" ,
@@ -20545,7 +20701,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{17CDD525-C7C7-4A05-B3A2-794065B3EA8E}' => array
 			(
 				"id" => "{17CDD525-C7C7-4A05-B3A2-794065B3EA8E}" ,
@@ -20564,7 +20720,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{534CEACA-5DFA-4D54-A0E7-4FB57B38E2EA}' => array
 			(
 				"id" => "{534CEACA-5DFA-4D54-A0E7-4FB57B38E2EA}" ,
@@ -20583,7 +20739,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FE9D52DB-0C88-4670-80EC-598780580A10}' => array
 			(
 				"id" => "{FE9D52DB-0C88-4670-80EC-598780580A10}" ,
@@ -20602,7 +20758,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9B46D729-092C-4E34-B9F4-FD43D98ACDF2}' => array
 			(
 				"id" => "{9B46D729-092C-4E34-B9F4-FD43D98ACDF2}" ,
@@ -20621,7 +20777,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{017DAC9B-4F90-40C8-8745-FAF90900F1E6}' => array
 			(
 				"id" => "{017DAC9B-4F90-40C8-8745-FAF90900F1E6}" ,
@@ -20640,21 +20796,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{8CFA1B1B-7465-4C7C-B174-D2473AD4343B}' => array
 			(
 				"id" => "{8CFA1B1B-7465-4C7C-B174-D2473AD4343B}" ,
-				"name" => "pk_tbl_erhalter" ,
+				"name" => "pk_erhalter" ,
 				"caption" => "pk_tbl_erhalter" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{DD8373B7-B788-4A2D-83A8-C46D02FB9DF2}' => array
 			   		(
 		   				"id" => "{DD8373B7-B788-4A2D-83A8-C46D02FB9DF2}" ,
@@ -20672,13 +20828,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{F273144C-4A2B-4816-81F9-13D4688B639F}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{BE587CFC-0514-4F9E-9098-6F7BAA8BC876}'  => array
 	(
 	    	"id" => "{BE587CFC-0514-4F9E-9098-6F7BAA8BC876}" ,
@@ -20689,7 +20845,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9B4BF7F1-48C5-4EAF-8F0F-4BD409F27CFC}' => array
 			(
 				"id" => "{9B4BF7F1-48C5-4EAF-8F0F-4BD409F27CFC}" ,
@@ -20708,7 +20864,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9C781666-E699-4D53-BB07-34BEB47551C0}' => array
 			(
 				"id" => "{9C781666-E699-4D53-BB07-34BEB47551C0}" ,
@@ -20727,7 +20883,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{21009272-8B07-415D-AE72-4A2046860625}' => array
 			(
 				"id" => "{21009272-8B07-415D-AE72-4A2046860625}" ,
@@ -20746,7 +20902,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7F8EA01F-D72E-4E9A-8C52-0038AF1BB0E2}' => array
 			(
 				"id" => "{7F8EA01F-D72E-4E9A-8C52-0038AF1BB0E2}" ,
@@ -20765,7 +20921,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{367DD024-7DF4-4366-BD87-0F1E0F6E598A}' => array
 			(
 				"id" => "{367DD024-7DF4-4366-BD87-0F1E0F6E598A}" ,
@@ -20784,7 +20940,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A5FD624F-D642-4B9B-AE78-AF8E76C8B9D8}' => array
 			(
 				"id" => "{A5FD624F-D642-4B9B-AE78-AF8E76C8B9D8}" ,
@@ -20803,21 +20959,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{3FF37507-FA11-478B-9735-8D4D433BC059}' => array
 			(
 				"id" => "{3FF37507-FA11-478B-9735-8D4D433BC059}" ,
-				"name" => "pk_tbl_fachbereich" ,
+				"name" => "pk_fachbereich" ,
 				"caption" => "pk_tbl_fachbereich" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{5256091A-3BD0-4E26-857A-615720BE3D5F}' => array
 			   		(
 		   				"id" => "{5256091A-3BD0-4E26-857A-615720BE3D5F}" ,
@@ -20835,24 +20991,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{916403F6-9910-4C65-B4F3-876F9507D4E8}","id" => "{B412864E-CEA6-4D5E-ACFC-9F9B6DFC5563}","id" => "{F4F851AE-21B5-408A-8AD0-4594824DB1CF}","id" => "{5ED34F51-10B3-4441-B36D-674AABE3E39A}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{FA081EA3-52D4-4B0B-9111-6F271A501D7C}'  => array
 	(
 	    	"id" => "{FA081EA3-52D4-4B0B-9111-6F271A501D7C}" ,
-	    	"name" => "Firma" ,
+	    	"name" => "tbl_firma" ,
 	    	"caption" => "tbl_firma" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{EC7F872F-B08A-449D-A17D-348E3FB75228}' => array
 			(
 				"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}" ,
@@ -20866,12 +21022,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_firma_firma_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7F60DBBD-3646-4439-AA48-11B804B6A754}' => array
 			(
 				"id" => "{7F60DBBD-3646-4439-AA48-11B804B6A754}" ,
@@ -20890,7 +21046,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0D338D61-8486-4AD3-B23A-E0818E6C7A53}' => array
 			(
 				"id" => "{0D338D61-8486-4AD3-B23A-E0818E6C7A53}" ,
@@ -20909,7 +21065,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4AE829B0-9E81-4FDC-8D69-54A9D8E62DD5}' => array
 			(
 				"id" => "{4AE829B0-9E81-4FDC-8D69-54A9D8E62DD5}" ,
@@ -20928,7 +21084,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9FCD8E1C-0990-4FC7-9DC6-40DF620EE4FC}' => array
 			(
 				"id" => "{9FCD8E1C-0990-4FC7-9DC6-40DF620EE4FC}" ,
@@ -20947,7 +21103,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8BEB3727-4B74-4E7F-9406-3D67C7C047F1}' => array
 			(
 				"id" => "{8BEB3727-4B74-4E7F-9406-3D67C7C047F1}" ,
@@ -20966,7 +21122,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{57D3D7E1-F059-407D-9DF1-DAD779D77719}' => array
 			(
 				"id" => "{57D3D7E1-F059-407D-9DF1-DAD779D77719}" ,
@@ -20985,7 +21141,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8F214C8E-0D95-468F-8D6B-AF62E6D6A032}' => array
 			(
 				"id" => "{8F214C8E-0D95-468F-8D6B-AF62E6D6A032}" ,
@@ -21004,7 +21160,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{92B8329B-239E-4FD8-88F6-04D502C0ADFA}' => array
 			(
 				"id" => "{92B8329B-239E-4FD8-88F6-04D502C0ADFA}" ,
@@ -21023,7 +21179,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D457AE4-3EFF-4555-B82A-99A03E64A1AC}' => array
 			(
 				"id" => "{5D457AE4-3EFF-4555-B82A-99A03E64A1AC}" ,
@@ -21042,7 +21198,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{72C54CA8-8872-45C9-8F38-8F0AFD3EA9E7}' => array
 			(
 				"id" => "{72C54CA8-8872-45C9-8F38-8F0AFD3EA9E7}" ,
@@ -21061,7 +21217,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9B71F709-DCBC-4D7F-B3A1-A8EA7816D433}' => array
 			(
 				"id" => "{9B71F709-DCBC-4D7F-B3A1-A8EA7816D433}" ,
@@ -21080,7 +21236,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8F20C372-1110-4F31-BB40-87CFAF31C481}' => array
 			(
 				"id" => "{8F20C372-1110-4F31-BB40-87CFAF31C481}" ,
@@ -21099,7 +21255,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9E36E6CA-A059-4C5B-A8F6-73F27361E3D1}' => array
 			(
 				"id" => "{9E36E6CA-A059-4C5B-A8F6-73F27361E3D1}" ,
@@ -21118,21 +21274,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}' => array
 			(
 				"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}" ,
-				"name" => "pk_tbl_firma" ,
+				"name" => "pk_firma" ,
 				"caption" => "pk_tbl_firma" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F57E3618-9931-4302-AFA7-B1DA23F1C590}' => array
 			   		(
 		   				"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}" ,
@@ -21150,24 +21306,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}","id" => "{20C6EDC1-2A13-4BD1-89EF-1C6E89ECB97B}","id" => "{EDB6FA36-36CF-43F8-A165-743B70304BED}","id" => "{5E64D00F-BF30-45AA-8171-0C3FCC183903}","id" => "{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D271C47C-E336-42E1-AE2A-147CD3AB75F9}'  => array
 	(
 	    	"id" => "{D271C47C-E336-42E1-AE2A-147CD3AB75F9}" ,
-	    	"name" => "Firmentyp" ,
+	    	"name" => "tbl_firmentyp" ,
 	    	"caption" => "tbl_firmentyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{11ED120D-5DAA-4B5B-BACF-3DB667EF7154}' => array
 			(
 				"id" => "{11ED120D-5DAA-4B5B-BACF-3DB667EF7154}" ,
@@ -21186,7 +21342,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{24EE1CC9-95CD-4DE1-B75C-A33DA0C608A4}' => array
 			(
 				"id" => "{24EE1CC9-95CD-4DE1-B75C-A33DA0C608A4}" ,
@@ -21205,21 +21361,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B49FFC30-D637-4511-97D2-FFE05F12C82E}' => array
 			(
 				"id" => "{B49FFC30-D637-4511-97D2-FFE05F12C82E}" ,
-				"name" => "pk_tbl_firmentyp" ,
+				"name" => "pk_firmentyp" ,
 				"caption" => "pk_tbl_firmentyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B9AFEE61-E865-45D0-B0E7-347D2B0E615D}' => array
 			   		(
 		   				"id" => "{B9AFEE61-E865-45D0-B0E7-347D2B0E615D}" ,
@@ -21237,24 +21393,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{98C7858B-AD55-4820-AC3C-1D0BA70C7B59}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{38CAFA7D-3BC2-4D05-8C6A-D52AA440D48E}'  => array
 	(
 	    	"id" => "{38CAFA7D-3BC2-4D05-8C6A-D52AA440D48E}" ,
-	    	"name" => "Funktion" ,
-	    	"caption" => "tbl_funktion" ,
+	    	"name" => "tbl_funktion" ,
+	    	"caption" => "Funktion" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9F3264AE-2924-4642-A3DB-6970780DCDAE}' => array
 			(
 				"id" => "{9F3264AE-2924-4642-A3DB-6970780DCDAE}" ,
@@ -21273,7 +21429,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AC4E57DD-9824-478F-99B4-74BA5B262AFC}' => array
 			(
 				"id" => "{AC4E57DD-9824-478F-99B4-74BA5B262AFC}" ,
@@ -21292,7 +21448,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FFD7A0BB-F00B-45A5-B22B-E264C76B3E59}' => array
 			(
 				"id" => "{FFD7A0BB-F00B-45A5-B22B-E264C76B3E59}" ,
@@ -21311,21 +21467,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{84280A17-6126-4488-969E-5E648C566C07}' => array
 			(
 				"id" => "{84280A17-6126-4488-969E-5E648C566C07}" ,
-				"name" => "pk_tbl_funktion" ,
+				"name" => "pk_funktion" ,
 				"caption" => "pk_tbl_funktion" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{038BDEBE-F3A3-42D7-976B-0AC820BD7365}' => array
 			   		(
 		   				"id" => "{038BDEBE-F3A3-42D7-976B-0AC820BD7365}" ,
@@ -21343,24 +21499,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{A3CC46AC-33AA-4963-BF7C-770401887EF3}","id" => "{0D39C3A3-7B72-4BC6-ACB3-5A49D530F6B8}","id" => "{F9D10FB2-0EAE-4F87-BFFC-DB9CAA64330B}","id" => "{69314C08-52BB-4C70-BEA3-7BF48D863008}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{6F701DBB-50D2-4B3F-A20C-1436E6C30DA4}'  => array
 	(
 	    	"id" => "{6F701DBB-50D2-4B3F-A20C-1436E6C30DA4}" ,
-	    	"name" => "Gruppe" ,
+	    	"name" => "tbl_gruppe" ,
 	    	"caption" => "tbl_gruppe" ,
 	    	"comments" => "Beschreibung der Gruppen von Personen (optional auch MailGruppen)" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{213D815F-CB32-4930-94F9-993B3D7AE47B}' => array
 			(
 				"id" => "{213D815F-CB32-4930-94F9-993B3D7AE47B}" ,
@@ -21379,7 +21535,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1F96C2CC-3B85-4759-8935-4AFE204167BC}' => array
 			(
 				"id" => "{1F96C2CC-3B85-4759-8935-4AFE204167BC}" ,
@@ -21398,7 +21554,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BB31FCCF-F716-474A-AE1D-549241FC5AC4}' => array
 			(
 				"id" => "{BB31FCCF-F716-474A-AE1D-549241FC5AC4}" ,
@@ -21417,7 +21573,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{82B66AD5-89C7-4C40-B530-E11950A020EA}' => array
 			(
 				"id" => "{82B66AD5-89C7-4C40-B530-E11950A020EA}" ,
@@ -21436,7 +21592,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D7ED606B-DA76-4A23-A33A-394B4A10D4B2}' => array
 			(
 				"id" => "{D7ED606B-DA76-4A23-A33A-394B4A10D4B2}" ,
@@ -21455,7 +21611,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8C89BF1B-1EBA-439B-8698-234BFBD2A33A}' => array
 			(
 				"id" => "{8C89BF1B-1EBA-439B-8698-234BFBD2A33A}" ,
@@ -21474,7 +21630,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1D2652C1-BEFF-4B5D-B701-3BF32B4ACAA7}' => array
 			(
 				"id" => "{1D2652C1-BEFF-4B5D-B701-3BF32B4ACAA7}" ,
@@ -21493,7 +21649,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EBE9E1A4-81AE-4DD5-A758-09C1CF4AC34E}' => array
 			(
 				"id" => "{EBE9E1A4-81AE-4DD5-A758-09C1CF4AC34E}" ,
@@ -21512,7 +21668,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D76B2F9-2F54-4C53-B1A7-3F9D76F10A01}' => array
 			(
 				"id" => "{5D76B2F9-2F54-4C53-B1A7-3F9D76F10A01}" ,
@@ -21531,7 +21687,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4AE18DE0-4727-47E3-92AF-3608160CD6E7}' => array
 			(
 				"id" => "{4AE18DE0-4727-47E3-92AF-3608160CD6E7}" ,
@@ -21550,7 +21706,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E0A03968-2742-4A61-BE0B-04A172234F81}' => array
 			(
 				"id" => "{E0A03968-2742-4A61-BE0B-04A172234F81}" ,
@@ -21569,7 +21725,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1A729919-A62C-421B-BCF5-50012F9249CA}' => array
 			(
 				"id" => "{1A729919-A62C-421B-BCF5-50012F9249CA}" ,
@@ -21588,7 +21744,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EBA77B2B-D1AF-43D1-A778-B85EBC8BA1AD}' => array
 			(
 				"id" => "{EBA77B2B-D1AF-43D1-A778-B85EBC8BA1AD}" ,
@@ -21607,7 +21763,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{267ADEFF-FEFE-4384-A8D6-40B4CB0B85A1}' => array
 			(
 				"id" => "{267ADEFF-FEFE-4384-A8D6-40B4CB0B85A1}" ,
@@ -21626,7 +21782,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{63F84739-B6AA-46C7-B17D-2C3EE68F123C}' => array
 			(
 				"id" => "{63F84739-B6AA-46C7-B17D-2C3EE68F123C}" ,
@@ -21645,7 +21801,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{31614979-6DE5-4D14-9E46-6A2AD3360496}' => array
 			(
 				"id" => "{31614979-6DE5-4D14-9E46-6A2AD3360496}" ,
@@ -21664,7 +21820,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{69DFFE29-DB51-4799-87CB-A7ED92E8854A}' => array
 			(
 				"id" => "{69DFFE29-DB51-4799-87CB-A7ED92E8854A}" ,
@@ -21683,21 +21839,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{FE1E6CC3-0C5C-4D7C-8C72-EB6B61006929}' => array
 			(
 				"id" => "{FE1E6CC3-0C5C-4D7C-8C72-EB6B61006929}" ,
-				"name" => "pk_tbl_gruppe" ,
+				"name" => "pk_gruppe" ,
 				"caption" => "pk_tbl_gruppe" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{E62A7880-E097-4032-A803-7DF6634292EB}' => array
 			   		(
 		   				"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}" ,
@@ -21715,24 +21871,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{3229E124-B6D4-461E-B4A4-D56D63A627E9}","id" => "{C0D45455-D62E-4976-8A81-8F779C91F41B}","id" => "{4A6EFE0B-68CC-4573-AC43-C168310F9A0E}","id" => "{2F376168-E84F-4287-8A24-7C30108CD3EB}","id" => "{2E07FD73-BB4C-4AEE-9B45-C3A961B2E8D2}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3BF8B59D-25C5-4E4B-845E-881E369D21F4}'  => array
 	(
 	    	"id" => "{3BF8B59D-25C5-4E4B-845E-881E369D21F4}" ,
-	    	"name" => "Kontakt" ,
+	    	"name" => "tbl_kontakt" ,
 	    	"caption" => "tbl_kontakt" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{82324EAF-7A10-4F42-ACB9-34EE9D0BB021}' => array
 			(
 				"id" => "{82324EAF-7A10-4F42-ACB9-34EE9D0BB021}" ,
@@ -21746,12 +21902,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_kontakt_kontakt_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_kontakt_kontakt_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7F47A454-76E6-4E05-BA12-903A5AC61FF6}' => array
 			(
 				"id" => "{7F47A454-76E6-4E05-BA12-903A5AC61FF6}" ,
@@ -21770,7 +21926,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7D9B8942-0811-484F-8903-FCAB8F51A0B3}' => array
 			(
 				"id" => "{7D9B8942-0811-484F-8903-FCAB8F51A0B3}" ,
@@ -21789,7 +21945,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B533D5E3-6A93-4D14-81EA-1EB82F5CAA48}' => array
 			(
 				"id" => "{B533D5E3-6A93-4D14-81EA-1EB82F5CAA48}" ,
@@ -21808,7 +21964,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1674D28E-DEA0-4386-A548-792A37074EB5}' => array
 			(
 				"id" => "{1674D28E-DEA0-4386-A548-792A37074EB5}" ,
@@ -21827,7 +21983,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1E71A4B9-FE34-427B-853E-967C6A1F9C3B}' => array
 			(
 				"id" => "{1E71A4B9-FE34-427B-853E-967C6A1F9C3B}" ,
@@ -21846,7 +22002,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C06E6EF-504B-4AF5-92B4-F4D30CE054A1}' => array
 			(
 				"id" => "{2C06E6EF-504B-4AF5-92B4-F4D30CE054A1}" ,
@@ -21865,7 +22021,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4571CF8E-B860-4E57-A433-9BD1BDB9C251}' => array
 			(
 				"id" => "{4571CF8E-B860-4E57-A433-9BD1BDB9C251}" ,
@@ -21884,7 +22040,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B9EF4F60-1E6C-48B5-BA59-739EAB224CFF}' => array
 			(
 				"id" => "{B9EF4F60-1E6C-48B5-BA59-739EAB224CFF}" ,
@@ -21903,7 +22059,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7DECCEAE-A6AA-4427-BE45-2A8FA88920BC}' => array
 			(
 				"id" => "{7DECCEAE-A6AA-4427-BE45-2A8FA88920BC}" ,
@@ -21922,7 +22078,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C4D0EED8-F4C8-4CCB-8929-90FA43F84281}' => array
 			(
 				"id" => "{C4D0EED8-F4C8-4CCB-8929-90FA43F84281}" ,
@@ -21941,7 +22097,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9FDA644B-D97A-4F0F-9480-9B90F22801E0}' => array
 			(
 				"id" => "{9FDA644B-D97A-4F0F-9480-9B90F22801E0}" ,
@@ -21960,21 +22116,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B4B8E2E4-0196-4B43-8EC6-09A4E115AA50}' => array
 			(
 				"id" => "{B4B8E2E4-0196-4B43-8EC6-09A4E115AA50}" ,
-				"name" => "pk_tbl_kontakt" ,
+				"name" => "pk_kontakt" ,
 				"caption" => "pk_tbl_kontakt" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{6CB9B3FF-F385-488C-BB2D-41A787216BD9}' => array
 			   		(
 		   				"id" => "{6CB9B3FF-F385-488C-BB2D-41A787216BD9}" ,
@@ -21989,27 +22145,27 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{C1035B96-3A1D-4F1A-B919-A624409F2941}'  => array
 	(
 	    	"id" => "{C1035B96-3A1D-4F1A-B919-A624409F2941}" ,
-	    	"name" => "Kontaktmedium" ,
+	    	"name" => "tbl_kontaktmedium" ,
 	    	"caption" => "tbl_kontaktmedium" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F267A633-DA52-4C21-A75C-2CEABA603735}' => array
 			(
 				"id" => "{F267A633-DA52-4C21-A75C-2CEABA603735}" ,
@@ -22028,7 +22184,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{519A08AB-614C-40EB-8E6B-1D4E7D01EF3B}' => array
 			(
 				"id" => "{519A08AB-614C-40EB-8E6B-1D4E7D01EF3B}" ,
@@ -22047,21 +22203,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5B642E7D-D664-4E4A-97CE-326F0CA9A693}' => array
 			(
 				"id" => "{5B642E7D-D664-4E4A-97CE-326F0CA9A693}" ,
-				"name" => "pk_tbl_kontaktmedium" ,
+				"name" => "pk_kontaktmedium" ,
 				"caption" => "pk_tbl_kontaktmedium" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{AA2520E7-6961-46C7-B714-D1074C462566}' => array
 			   		(
 		   				"id" => "{AA2520E7-6961-46C7-B714-D1074C462566}" ,
@@ -22079,24 +22235,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{93E9BEC1-2435-4DF3-8800-B0BAC19466D6}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{03C310A8-0C08-4965-BAD3-85DA9B73FE9D}'  => array
 	(
 	    	"id" => "{03C310A8-0C08-4965-BAD3-85DA9B73FE9D}" ,
-	    	"name" => "Kontakttyp" ,
+	    	"name" => "tbl_kontakttyp" ,
 	    	"caption" => "tbl_kontakttyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{9533F03E-6827-4657-96E6-10921C1A7C7E}' => array
 			(
 				"id" => "{9533F03E-6827-4657-96E6-10921C1A7C7E}" ,
@@ -22115,7 +22271,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BB01A0A9-69C4-4CCE-A292-39C3AA611527}' => array
 			(
 				"id" => "{BB01A0A9-69C4-4CCE-A292-39C3AA611527}" ,
@@ -22134,21 +22290,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{97E6694E-E85B-4D5D-97BE-D89F4FF17C98}' => array
 			(
 				"id" => "{97E6694E-E85B-4D5D-97BE-D89F4FF17C98}" ,
-				"name" => "pk_tbl_kontakttyp" ,
+				"name" => "pk_kontakttyp" ,
 				"caption" => "pk_tbl_kontakttyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{4186E1B2-842C-433D-A8FA-8D1DE083C28B}' => array
 			   		(
 		   				"id" => "{4186E1B2-842C-433D-A8FA-8D1DE083C28B}" ,
@@ -22166,24 +22322,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{A228D82F-BBD8-4DCA-9B1B-8A486250F3A4}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4BCA9F4F-863C-4C0D-9DA4-A841BC9A5493}'  => array
 	(
 	    	"id" => "{4BCA9F4F-863C-4C0D-9DA4-A841BC9A5493}" ,
-	    	"name" => "Konto" ,
+	    	"name" => "tbl_konto" ,
 	    	"caption" => "tbl_konto" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{1DC02AF8-A872-4AE4-AA7E-1B6D23E115D6}' => array
 			(
 				"id" => "{1DC02AF8-A872-4AE4-AA7E-1B6D23E115D6}" ,
@@ -22197,12 +22353,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_konto_buchungsnr_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_konto_buchungsnr'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EC347D85-368C-409D-A08E-7C0F013CD779}' => array
 			(
 				"id" => "{EC347D85-368C-409D-A08E-7C0F013CD779}" ,
@@ -22221,7 +22377,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2AF5524D-2D92-4B41-8B33-379108069826}' => array
 			(
 				"id" => "{2AF5524D-2D92-4B41-8B33-379108069826}" ,
@@ -22240,7 +22396,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{40FB15CA-63BB-48C8-AEA9-F88267822759}' => array
 			(
 				"id" => "{40FB15CA-63BB-48C8-AEA9-F88267822759}" ,
@@ -22259,7 +22415,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D8281C5-46FE-44C1-B8DF-DA99C9B652BA}' => array
 			(
 				"id" => "{5D8281C5-46FE-44C1-B8DF-DA99C9B652BA}" ,
@@ -22278,7 +22434,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3938AFA8-B723-41CE-9341-1B2221E68EB8}' => array
 			(
 				"id" => "{3938AFA8-B723-41CE-9341-1B2221E68EB8}" ,
@@ -22297,7 +22453,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{85820894-8069-45FB-A214-0CEB7B4A804C}' => array
 			(
 				"id" => "{85820894-8069-45FB-A214-0CEB7B4A804C}" ,
@@ -22316,7 +22472,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{059582A3-6EFC-4D53-AA7E-A5955B07E4DA}' => array
 			(
 				"id" => "{059582A3-6EFC-4D53-AA7E-A5955B07E4DA}" ,
@@ -22335,7 +22491,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2AED5A02-9965-4B1C-BD78-FE51CEAF3CC4}' => array
 			(
 				"id" => "{2AED5A02-9965-4B1C-BD78-FE51CEAF3CC4}" ,
@@ -22354,7 +22510,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0F3D25B7-84D1-4A52-8CCC-F104404E9722}' => array
 			(
 				"id" => "{0F3D25B7-84D1-4A52-8CCC-F104404E9722}" ,
@@ -22373,7 +22529,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{86D32241-C924-44D6-B0AD-278F60C9CDA2}' => array
 			(
 				"id" => "{86D32241-C924-44D6-B0AD-278F60C9CDA2}" ,
@@ -22392,7 +22548,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ECCB6D29-FBE3-462B-89DC-E3F03C3CA67B}' => array
 			(
 				"id" => "{ECCB6D29-FBE3-462B-89DC-E3F03C3CA67B}" ,
@@ -22411,7 +22567,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1456D9F0-9929-4ECB-8598-14BA85A1C13B}' => array
 			(
 				"id" => "{1456D9F0-9929-4ECB-8598-14BA85A1C13B}" ,
@@ -22430,7 +22586,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1195D6E0-971E-4C27-BA3A-754A9E807711}' => array
 			(
 				"id" => "{1195D6E0-971E-4C27-BA3A-754A9E807711}" ,
@@ -22449,7 +22605,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{80F13070-0161-4BAB-B0C4-D7930EB4CB02}' => array
 			(
 				"id" => "{80F13070-0161-4BAB-B0C4-D7930EB4CB02}" ,
@@ -22468,21 +22624,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{21DE4451-9FB3-4557-91A9-23AF7D8FF39A}' => array
 			(
 				"id" => "{21DE4451-9FB3-4557-91A9-23AF7D8FF39A}" ,
-				"name" => "pk_tbl_konto" ,
+				"name" => "pk_konto" ,
 				"caption" => "pk_tbl_konto" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8F07F68D-36BA-4E9F-85D3-8F8B61AF0260}' => array
 			   		(
 		   				"id" => "{8F07F68D-36BA-4E9F-85D3-8F8B61AF0260}" ,
@@ -22500,24 +22656,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{B9E06053-8A61-4E8F-9F7C-2A750F5F5437}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{20EE23DE-5BA8-4592-97CF-24F1B9AFDB21}'  => array
 	(
 	    	"id" => "{20EE23DE-5BA8-4592-97CF-24F1B9AFDB21}" ,
-	    	"name" => "Lehrverband" ,
+	    	"name" => "tbl_lehrverband" ,
 	    	"caption" => "tbl_lehrverband" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{389909D4-5F47-4647-AF17-F64CED9217EE}' => array
 			(
 				"id" => "{389909D4-5F47-4647-AF17-F64CED9217EE}" ,
@@ -22536,7 +22692,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{79923B4A-1F19-43C6-A78A-F29B65F49F23}' => array
 			(
 				"id" => "{79923B4A-1F19-43C6-A78A-F29B65F49F23}" ,
@@ -22555,7 +22711,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BC6F2F8D-353E-459C-B301-257690F90D98}' => array
 			(
 				"id" => "{BC6F2F8D-353E-459C-B301-257690F90D98}" ,
@@ -22574,7 +22730,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4E3BA2A0-9581-4F54-83B0-CD83A460A175}' => array
 			(
 				"id" => "{4E3BA2A0-9581-4F54-83B0-CD83A460A175}" ,
@@ -22593,7 +22749,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{309BDD07-319F-4615-91ED-EC4BC367278E}' => array
 			(
 				"id" => "{309BDD07-319F-4615-91ED-EC4BC367278E}" ,
@@ -22612,7 +22768,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E4A9871A-C68C-430A-A62F-F10A54CF91EB}' => array
 			(
 				"id" => "{E4A9871A-C68C-430A-A62F-F10A54CF91EB}" ,
@@ -22631,7 +22787,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4FAF0CB6-481E-4229-8391-A2C94510CD56}' => array
 			(
 				"id" => "{4FAF0CB6-481E-4229-8391-A2C94510CD56}" ,
@@ -22650,7 +22806,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F374FB6D-270F-463C-BE72-0D9A08AC6568}' => array
 			(
 				"id" => "{F374FB6D-270F-463C-BE72-0D9A08AC6568}" ,
@@ -22669,21 +22825,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{977728B8-9628-41C7-92A9-7F2A1609B146}' => array
 			(
 				"id" => "{977728B8-9628-41C7-92A9-7F2A1609B146}" ,
-				"name" => "pk_tbl_lehrverband" ,
+				"name" => "pk_lehrverband" ,
 				"caption" => "pk_tbl_lehrverband" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{03A5BA98-DB34-41E3-B5E9-959C2371A050}' => array
 			   		(
 		   				"id" => "{03A5BA98-DB34-41E3-B5E9-959C2371A050}" ,
@@ -22701,7 +22857,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{6C64F542-1699-4268-A918-EB9C81AE3C69}","id" => "{538377A3-3B0B-4907-A020-DDC9F40308F3}","id" => "{492F5B0C-3116-47A2-9EC8-9041B5C626DE}","id" => "{BECE6511-58C5-44B4-9C11-E5D209830439}","id" => "{3130E85B-369F-410E-93E4-A1F835FF0E4A}",
 				   		)
 		   			),
-
+		   			
 			   		'{7CA9054F-F656-4CF7-B770-19DB0590026E}' => array
 			   		(
 		   				"id" => "{7CA9054F-F656-4CF7-B770-19DB0590026E}" ,
@@ -22719,7 +22875,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{A2DE1A80-74BE-4FE7-860E-48B43386D908}","id" => "{FDA5B86D-9BAA-4998-8926-7A1C0B686087}","id" => "{51DF8B64-71C1-41CC-A424-6038072E7246}","id" => "{944AFE34-5A1F-4D17-97B5-684640740BE2}","id" => "{4EE1A1E3-05F0-4480-AADF-8478D24E83C4}",
 				   		)
 		   			),
-
+		   			
 			   		'{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}' => array
 			   		(
 		   				"id" => "{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}" ,
@@ -22737,7 +22893,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{FD91B054-E62C-4334-AB5D-E6749038A2A8}","id" => "{81718592-2431-4FDA-A966-31AC0CD5216F}","id" => "{0B410CEF-3EB8-45C5-BDB6-439F8D209F66}","id" => "{A798BFD6-0AB0-4728-A2B9-FD5D37503466}","id" => "{E100A71F-594B-4B85-A507-41FFC28744A5}",
 				   		)
 		   			),
-
+		   			
 			   		'{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}' => array
 			   		(
 		   				"id" => "{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}" ,
@@ -22755,24 +22911,24 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 							"id" => "{D7D183AA-F885-4557-A5F4-908E00C1A851}","id" => "{7FE4B36E-E9BB-4217-8392-F8EF847AF590}","id" => "{6670C52E-4B7D-4887-9E90-D07964E2881A}","id" => "{C7C33A82-6A84-4AC1-B98A-A38EBD584E62}","id" => "{F0535E2C-D8E7-4596-A124-9F88247A02CD}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{7083CE88-23C4-47DA-969C-93BF42702D75}'  => array
 	(
 	    	"id" => "{7083CE88-23C4-47DA-969C-93BF42702D75}" ,
-	    	"name" => "Log" ,
+	    	"name" => "tbl_log" ,
 	    	"caption" => "tbl_log" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{13B5A4C2-BA13-492A-A429-CA4AC093A293}' => array
 			(
 				"id" => "{13B5A4C2-BA13-492A-A429-CA4AC093A293}" ,
@@ -22786,12 +22942,12 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_log_log_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_log_log_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7B31001A-EE5B-400D-AC60-D14AA5A53C3D}' => array
 			(
 				"id" => "{7B31001A-EE5B-400D-AC60-D14AA5A53C3D}" ,
@@ -22810,7 +22966,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1D71E353-775D-479B-B626-7D8925F88E2D}' => array
 			(
 				"id" => "{1D71E353-775D-479B-B626-7D8925F88E2D}" ,
@@ -22829,7 +22985,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{44ED4666-1D81-4202-8F18-3A0C0B34768F}' => array
 			(
 				"id" => "{44ED4666-1D81-4202-8F18-3A0C0B34768F}" ,
@@ -22848,7 +23004,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E0D1977D-3315-4A87-9E1A-3A5F5FA47F97}' => array
 			(
 				"id" => "{E0D1977D-3315-4A87-9E1A-3A5F5FA47F97}" ,
@@ -22867,7 +23023,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2805058D-D9A6-4D72-80EB-8614A416A302}' => array
 			(
 				"id" => "{2805058D-D9A6-4D72-80EB-8614A416A302}" ,
@@ -22886,21 +23042,21 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{C4F33C2C-9345-42E7-8BD9-A1ED0AEA172A}' => array
 			(
 				"id" => "{C4F33C2C-9345-42E7-8BD9-A1ED0AEA172A}" ,
-				"name" => "pk_tbl_log" ,
+				"name" => "pk_log" ,
 				"caption" => "pk_tbl_log" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{7B55E2B0-62D9-4488-A702-870F78D00E2B}' => array
 			   		(
 		   				"id" => "{7B55E2B0-62D9-4488-A702-870F78D00E2B}" ,
@@ -22915,20 +23071,20 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{F7F044FB-C24D-48B4-B122-E7F868E59D50}'  => array
 	(
 	    	"id" => "{F7F044FB-C24D-48B4-B122-E7F868E59D50}" ,
-	    	"name" => "Mitarbeiter" ,
+	    	"name" => "tbl_mitarbeiter" ,
 	    	"caption" => "tbl_mitarbeiter" ,
 	    	"comments" => "Alle Mitarbeiter des Technikum;
 ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
@@ -22936,7 +23092,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{83640902-B736-4E64-881F-30EC95C427D5}' => array
 			(
 				"id" => "{83640902-B736-4E64-881F-30EC95C427D5}" ,
@@ -22955,7 +23111,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A6862686-F19E-44BB-8741-0137B0CC4244}' => array
 			(
 				"id" => "{A6862686-F19E-44BB-8741-0137B0CC4244}" ,
@@ -22969,12 +23125,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "0",
-				"defaultvalue" => "nextval('tbl_mitarbeiter_personalnummer_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_mitarbeiter_personalnummer'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{953D7A5A-A168-4615-8E58-B2921467F80F}' => array
 			(
 				"id" => "{953D7A5A-A168-4615-8E58-B2921467F80F}" ,
@@ -22993,7 +23149,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0BCEC38A-EA42-4C1C-B25F-4B200A394760}' => array
 			(
 				"id" => "{0BCEC38A-EA42-4C1C-B25F-4B200A394760}" ,
@@ -23012,7 +23168,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EBAA301A-7627-4A29-8DD6-00DDBA7E0747}' => array
 			(
 				"id" => "{EBAA301A-7627-4A29-8DD6-00DDBA7E0747}" ,
@@ -23031,7 +23187,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B54C8ADE-BE65-43B3-A1C8-0FFC09175ABF}' => array
 			(
 				"id" => "{B54C8ADE-BE65-43B3-A1C8-0FFC09175ABF}" ,
@@ -23050,7 +23206,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{55DC6DD8-0455-4DE2-9E59-3C18C026CE91}' => array
 			(
 				"id" => "{55DC6DD8-0455-4DE2-9E59-3C18C026CE91}" ,
@@ -23069,7 +23225,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{53ABB9B7-EACF-4089-99AE-7FF14FD2E71C}' => array
 			(
 				"id" => "{53ABB9B7-EACF-4089-99AE-7FF14FD2E71C}" ,
@@ -23088,7 +23244,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4CC76C54-D098-472C-8CAD-5C68ABF68514}' => array
 			(
 				"id" => "{4CC76C54-D098-472C-8CAD-5C68ABF68514}" ,
@@ -23107,7 +23263,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8AFD24EF-738B-4C32-B7DE-57BC3C21D143}' => array
 			(
 				"id" => "{8AFD24EF-738B-4C32-B7DE-57BC3C21D143}" ,
@@ -23126,7 +23282,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{26DE4483-019E-4C3F-B7D8-86D9584B2716}' => array
 			(
 				"id" => "{26DE4483-019E-4C3F-B7D8-86D9584B2716}" ,
@@ -23145,7 +23301,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C4032117-EB4E-4EF5-AF1B-276A6ED0985E}' => array
 			(
 				"id" => "{C4032117-EB4E-4EF5-AF1B-276A6ED0985E}" ,
@@ -23164,7 +23320,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{29D0518E-48CF-4C6F-8453-33417E30F621}' => array
 			(
 				"id" => "{29D0518E-48CF-4C6F-8453-33417E30F621}" ,
@@ -23183,7 +23339,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D3C2E2FE-91FD-4712-A751-9F9AC4B9F10C}' => array
 			(
 				"id" => "{D3C2E2FE-91FD-4712-A751-9F9AC4B9F10C}" ,
@@ -23202,7 +23358,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F6A79886-6356-45A8-A0A8-2AD965D0E6C8}' => array
 			(
 				"id" => "{F6A79886-6356-45A8-A0A8-2AD965D0E6C8}" ,
@@ -23221,7 +23377,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5214641A-11C4-4AF1-9F15-E52ABF2D83D4}' => array
 			(
 				"id" => "{5214641A-11C4-4AF1-9F15-E52ABF2D83D4}" ,
@@ -23240,7 +23396,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AB623607-822B-462A-B448-B088DED2DA64}' => array
 			(
 				"id" => "{AB623607-822B-462A-B448-B088DED2DA64}" ,
@@ -23259,21 +23415,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{71C4794C-7167-4114-8B8E-BBCEFE2F90BE}' => array
 			(
 				"id" => "{71C4794C-7167-4114-8B8E-BBCEFE2F90BE}" ,
-				"name" => "pk_tbl_mitarbeiter" ,
+				"name" => "pk_mitarbeiter" ,
 				"caption" => "pk_tbl_mitarbeiter" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}' => array
 			   		(
 		   				"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}" ,
@@ -23291,10 +23447,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{6FE0B9E9-01E7-4EA2-B9E0-08A00A0D6CCD}","id" => "{27A65605-0129-430C-9F00-52828F8B03BC}","id" => "{D5162449-3FBF-4674-8948-A637D3CEA086}","id" => "{226D56B9-0BB2-4E9D-8039-134850385AB1}","id" => "{F747262A-EAF9-40DF-B1F8-8830FCF158D7}","id" => "{A0AE905E-257F-4447-9F19-609A3B751BB9}","id" => "{267087F1-EFB0-4D16-B06E-19580BA7937D}","id" => "{37D10613-61D9-4801-A1F3-E0154B80334C}","id" => "{7A6F3EA4-F854-44E4-AE44-A2E231501616}","id" => "{32D6A2F8-49D8-4B15-96B7-BF9F2EDF956C}","id" => "{4B711108-0BC7-4DEB-B08F-9CB309FAC71A}","id" => "{617D31E7-4F4C-4EB0-9265-6C5E670823CB}","id" => "{6B0C9577-5600-46A8-A484-49CB259D12EE}","id" => "{B35AF5A7-2375-4122-9230-DA4C39BC2C6B}","id" => "{710CE321-5754-4B4C-949C-12C5D48BE9BB}","id" => "{A5AA866F-4CF2-40CF-A988-7EDAE7306265}","id" => "{63D26360-F3F9-4DC7-9EFC-E0E34C4910A3}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{8372A65C-6966-4958-BB6A-67C37302B136}' => array
 			(
 				"id" => "{8372A65C-6966-4958-BB6A-67C37302B136}" ,
@@ -23304,7 +23460,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{E52A73C7-A379-4DB2-BCFC-FC1F86C71B99}' => array
 			   		(
 		   				"id" => "{E52A73C7-A379-4DB2-BCFC-FC1F86C71B99}" ,
@@ -23319,13 +23475,13 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{59776407-B674-4A07-BBE2-5B8684275F10}' => array
 			(
 				"id" => "{59776407-B674-4A07-BBE2-5B8684275F10}" ,
@@ -23335,7 +23491,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8E3FA7E3-E53B-471E-AB28-480B380CACC3}' => array
 			   		(
 		   				"id" => "{8E3FA7E3-E53B-471E-AB28-480B380CACC3}" ,
@@ -23350,27 +23506,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{04908758-A69E-4567-9BCA-69420A749BE3}'  => array
 	(
 	    	"id" => "{04908758-A69E-4567-9BCA-69420A749BE3}" ,
-	    	"name" => "Ort" ,
+	    	"name" => "tbl_ort" ,
 	    	"caption" => "tbl_ort" ,
 	    	"comments" => "Orte des Technikum" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{D7C0C377-5E16-4939-B1D6-3B6694D54E2A}' => array
 			(
 				"id" => "{D7C0C377-5E16-4939-B1D6-3B6694D54E2A}" ,
@@ -23389,7 +23545,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0FF2EF68-C502-4B23-8A59-2875659AECD3}' => array
 			(
 				"id" => "{0FF2EF68-C502-4B23-8A59-2875659AECD3}" ,
@@ -23408,7 +23564,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F94AED94-8515-4193-920E-7D3A5B960913}' => array
 			(
 				"id" => "{F94AED94-8515-4193-920E-7D3A5B960913}" ,
@@ -23427,7 +23583,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2C5E0374-6525-4E4E-B2AF-D66CBF6DBE2E}' => array
 			(
 				"id" => "{2C5E0374-6525-4E4E-B2AF-D66CBF6DBE2E}" ,
@@ -23446,7 +23602,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3641C130-FD99-4C30-9F78-6220BB91E8FA}' => array
 			(
 				"id" => "{3641C130-FD99-4C30-9F78-6220BB91E8FA}" ,
@@ -23465,7 +23621,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{92594675-74BE-4847-830D-0EB5C16AA1D5}' => array
 			(
 				"id" => "{92594675-74BE-4847-830D-0EB5C16AA1D5}" ,
@@ -23484,7 +23640,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3B05748B-A9A1-43D4-AE67-6D17C10954BB}' => array
 			(
 				"id" => "{3B05748B-A9A1-43D4-AE67-6D17C10954BB}" ,
@@ -23503,7 +23659,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C8AE9F09-E5C4-4C7B-9AAA-78672CCF4882}' => array
 			(
 				"id" => "{C8AE9F09-E5C4-4C7B-9AAA-78672CCF4882}" ,
@@ -23522,7 +23678,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8B9A9988-22A6-4CCF-BF7F-9A66E372C321}' => array
 			(
 				"id" => "{8B9A9988-22A6-4CCF-BF7F-9A66E372C321}" ,
@@ -23541,7 +23697,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{30A20B88-4197-469E-9DFE-E349C2826C42}' => array
 			(
 				"id" => "{30A20B88-4197-469E-9DFE-E349C2826C42}" ,
@@ -23560,7 +23716,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B9B056C1-F580-4D75-8A60-06EEEF623C85}' => array
 			(
 				"id" => "{B9B056C1-F580-4D75-8A60-06EEEF623C85}" ,
@@ -23579,7 +23735,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2934687C-D739-489B-9E9B-193768AC3341}' => array
 			(
 				"id" => "{2934687C-D739-489B-9E9B-193768AC3341}" ,
@@ -23598,7 +23754,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{932AF993-3EA5-48B0-8609-D13F744C4D14}' => array
 			(
 				"id" => "{932AF993-3EA5-48B0-8609-D13F744C4D14}" ,
@@ -23617,7 +23773,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{07DC31E2-0728-45D3-BA64-34D7062C0EE3}' => array
 			(
 				"id" => "{07DC31E2-0728-45D3-BA64-34D7062C0EE3}" ,
@@ -23636,7 +23792,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D92B37DD-BD6D-4490-8E4F-581FD1A76B09}' => array
 			(
 				"id" => "{D92B37DD-BD6D-4490-8E4F-581FD1A76B09}" ,
@@ -23655,7 +23811,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1B162963-5FAF-4213-A203-D198CCA9669D}' => array
 			(
 				"id" => "{1B162963-5FAF-4213-A203-D198CCA9669D}" ,
@@ -23674,7 +23830,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6EF22A90-4E54-4F1C-A92B-2ADC8D30EB91}' => array
 			(
 				"id" => "{6EF22A90-4E54-4F1C-A92B-2ADC8D30EB91}" ,
@@ -23693,7 +23849,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D42D051E-0F08-4C06-9935-A3763B8D8C29}' => array
 			(
 				"id" => "{D42D051E-0F08-4C06-9935-A3763B8D8C29}" ,
@@ -23712,7 +23868,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F52BEC0D-FECF-4891-94F7-5041022F5251}' => array
 			(
 				"id" => "{F52BEC0D-FECF-4891-94F7-5041022F5251}" ,
@@ -23731,21 +23887,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{0B987B06-A919-4045-B6D3-4D2790E912C7}' => array
 			(
 				"id" => "{0B987B06-A919-4045-B6D3-4D2790E912C7}" ,
-				"name" => "pk_tbl_ort" ,
+				"name" => "pk_ort" ,
 				"caption" => "pk_tbl_ort" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{596188FD-A730-4304-9A9A-12E2D8A73E94}' => array
 			   		(
 		   				"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}" ,
@@ -23763,24 +23919,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{80613C83-0AC5-4809-ADF8-2FC134E390D2}","id" => "{433FC6C0-6E36-4675-8986-35FBF8913058}","id" => "{4DB011D6-F4FF-47B1-8DD2-A891E2D1F2DB}","id" => "{617F8ECB-2F77-4165-96A6-B6956D670D68}","id" => "{473740AD-EAD7-4479-9C13-E1F45251ED30}","id" => "{373D88F9-21CF-4DEF-9AB0-F4BE066A0D1D}","id" => "{4D8A56E6-FA99-4115-9286-12C0FCD3D357}","id" => "{4892A55C-2CE8-489D-A540-C655B1D6CCE0}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{F409375F-34B4-4E93-9F7A-C25EE9DB2B24}'  => array
 	(
 	    	"id" => "{F409375F-34B4-4E93-9F7A-C25EE9DB2B24}" ,
-	    	"name" => "Ortraumtyp" ,
+	    	"name" => "tbl_ortraumtyp" ,
 	    	"caption" => "tbl_ortraumtyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{97F3A83C-1F73-41DE-B376-E501B4778744}' => array
 			(
 				"id" => "{97F3A83C-1F73-41DE-B376-E501B4778744}" ,
@@ -23799,7 +23955,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7CED171B-8B09-4DA5-80A8-0321CB10CB01}' => array
 			(
 				"id" => "{7CED171B-8B09-4DA5-80A8-0321CB10CB01}" ,
@@ -23818,7 +23974,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A95A40EC-443D-4441-86F8-5F28C25BFC0A}' => array
 			(
 				"id" => "{A95A40EC-443D-4441-86F8-5F28C25BFC0A}" ,
@@ -23837,21 +23993,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{553515AB-61B0-47BE-BC45-B9A269FE01A4}' => array
 			(
 				"id" => "{553515AB-61B0-47BE-BC45-B9A269FE01A4}" ,
-				"name" => "pk_tbl_ortraumtyp" ,
+				"name" => "pk_ortraumtyp" ,
 				"caption" => "pk_tbl_ortraumtyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{00D0A5A4-AD7F-4923-823F-3C45C59A2620}' => array
 			   		(
 		   				"id" => "{00D0A5A4-AD7F-4923-823F-3C45C59A2620}" ,
@@ -23866,10 +24022,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{AA97984B-8F25-4DCC-94C2-E364CC567752}' => array
 			   		(
 		   				"id" => "{AA97984B-8F25-4DCC-94C2-E364CC567752}" ,
@@ -23884,27 +24040,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{3B83C8AD-A650-438B-92D4-D8ED68E90FFF}'  => array
 	(
 	    	"id" => "{3B83C8AD-A650-438B-92D4-D8ED68E90FFF}" ,
-	    	"name" => "Person" ,
+	    	"name" => "tbl_person" ,
 	    	"caption" => "tbl_person" ,
 	    	"comments" => "Supertabelle aller Personen" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}' => array
 			(
 				"id" => "{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}" ,
@@ -23918,12 +24074,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_person_person_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_person_person_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BE3B2207-6BDE-4765-9BA8-8A80853B1938}' => array
 			(
 				"id" => "{BE3B2207-6BDE-4765-9BA8-8A80853B1938}" ,
@@ -23942,7 +24098,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{387814B0-1055-4AFD-9567-4A638429E6A0}' => array
 			(
 				"id" => "{387814B0-1055-4AFD-9567-4A638429E6A0}" ,
@@ -23961,7 +24117,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0404B9C2-C62B-4212-BCAA-A9B5FEF0A050}' => array
 			(
 				"id" => "{0404B9C2-C62B-4212-BCAA-A9B5FEF0A050}" ,
@@ -23980,7 +24136,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9B4E3B21-FA38-47C4-B5D4-EB0760A324DC}' => array
 			(
 				"id" => "{9B4E3B21-FA38-47C4-B5D4-EB0760A324DC}" ,
@@ -23999,7 +24155,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8722598F-59AC-4036-8AF6-3FD6D99F28A4}' => array
 			(
 				"id" => "{8722598F-59AC-4036-8AF6-3FD6D99F28A4}" ,
@@ -24018,7 +24174,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B5A37876-7631-4BE1-AFA4-3955C3476EAE}' => array
 			(
 				"id" => "{B5A37876-7631-4BE1-AFA4-3955C3476EAE}" ,
@@ -24037,7 +24193,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6F9717F5-185F-47B4-ACBF-7EC9096153E3}' => array
 			(
 				"id" => "{6F9717F5-185F-47B4-ACBF-7EC9096153E3}" ,
@@ -24056,7 +24212,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EC087DFA-1A2D-4F9C-8C7C-9F4466A927E2}' => array
 			(
 				"id" => "{EC087DFA-1A2D-4F9C-8C7C-9F4466A927E2}" ,
@@ -24075,7 +24231,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{74742F50-F54C-41C5-9507-8F957D1A8FCB}' => array
 			(
 				"id" => "{74742F50-F54C-41C5-9507-8F957D1A8FCB}" ,
@@ -24094,7 +24250,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D1CBA635-3F92-41A1-8EA6-307E869AEFE1}' => array
 			(
 				"id" => "{D1CBA635-3F92-41A1-8EA6-307E869AEFE1}" ,
@@ -24113,7 +24269,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4640D41A-A3ED-464B-A81E-76E804B8D92F}' => array
 			(
 				"id" => "{4640D41A-A3ED-464B-A81E-76E804B8D92F}" ,
@@ -24132,7 +24288,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BD8E362F-2B37-4BA5-80A6-7DD01E507BF1}' => array
 			(
 				"id" => "{BD8E362F-2B37-4BA5-80A6-7DD01E507BF1}" ,
@@ -24151,7 +24307,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9308AD20-E8D0-475B-8CCE-C8A6A4CB5CE8}' => array
 			(
 				"id" => "{9308AD20-E8D0-475B-8CCE-C8A6A4CB5CE8}" ,
@@ -24170,7 +24326,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B7AE7872-0B86-4993-B01A-8B295504C2AF}' => array
 			(
 				"id" => "{B7AE7872-0B86-4993-B01A-8B295504C2AF}" ,
@@ -24189,7 +24345,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1E4C2B72-AE09-408E-83DA-4A020E3DAF97}' => array
 			(
 				"id" => "{1E4C2B72-AE09-408E-83DA-4A020E3DAF97}" ,
@@ -24208,7 +24364,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CD6D3A6E-BFAB-43EB-B286-443EDD3B3ABA}' => array
 			(
 				"id" => "{CD6D3A6E-BFAB-43EB-B286-443EDD3B3ABA}" ,
@@ -24227,7 +24383,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8225B617-DFD5-4BF9-BCF6-CB30C5BF1A97}' => array
 			(
 				"id" => "{8225B617-DFD5-4BF9-BCF6-CB30C5BF1A97}" ,
@@ -24246,7 +24402,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B82C6C9B-2196-409E-877C-297E6ED56DAC}' => array
 			(
 				"id" => "{B82C6C9B-2196-409E-877C-297E6ED56DAC}" ,
@@ -24265,7 +24421,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{53A950AE-B595-4C04-93A2-CEE3CBFFE684}' => array
 			(
 				"id" => "{53A950AE-B595-4C04-93A2-CEE3CBFFE684}" ,
@@ -24284,7 +24440,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AB5152CE-A0B5-4907-8D7E-3111FFEADA6A}' => array
 			(
 				"id" => "{AB5152CE-A0B5-4907-8D7E-3111FFEADA6A}" ,
@@ -24303,7 +24459,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C496B7C4-1689-490D-8266-84D2CCA3610D}' => array
 			(
 				"id" => "{C496B7C4-1689-490D-8266-84D2CCA3610D}" ,
@@ -24322,7 +24478,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{004BE420-2AB3-4EF1-A833-2C9D764FBBC7}' => array
 			(
 				"id" => "{004BE420-2AB3-4EF1-A833-2C9D764FBBC7}" ,
@@ -24341,7 +24497,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8582A8B8-2224-4515-954F-E91CEC58FD39}' => array
 			(
 				"id" => "{8582A8B8-2224-4515-954F-E91CEC58FD39}" ,
@@ -24360,7 +24516,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{44848E1A-ED90-44D5-A059-451CA7F10624}' => array
 			(
 				"id" => "{44848E1A-ED90-44D5-A059-451CA7F10624}" ,
@@ -24379,7 +24535,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EB1431A4-65AF-45A9-9A28-E5FA4EF48034}' => array
 			(
 				"id" => "{EB1431A4-65AF-45A9-9A28-E5FA4EF48034}" ,
@@ -24398,7 +24554,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EC16AB61-F308-4A3B-A337-139C7A4C586C}' => array
 			(
 				"id" => "{EC16AB61-F308-4A3B-A337-139C7A4C586C}" ,
@@ -24417,7 +24573,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6FB2CE4-E6FE-4A72-A1CE-7666F13907E1}' => array
 			(
 				"id" => "{C6FB2CE4-E6FE-4A72-A1CE-7666F13907E1}" ,
@@ -24436,7 +24592,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F0F9F5FE-9F06-4BFB-95AD-4CF6C7DE2EA8}' => array
 			(
 				"id" => "{F0F9F5FE-9F06-4BFB-95AD-4CF6C7DE2EA8}" ,
@@ -24455,7 +24611,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B5DC5E07-0FB7-426D-AD4F-06D043AA55B6}' => array
 			(
 				"id" => "{B5DC5E07-0FB7-426D-AD4F-06D043AA55B6}" ,
@@ -24474,21 +24630,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}' => array
 			(
 				"id" => "{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}" ,
-				"name" => "pk_tbl_person" ,
+				"name" => "pk_person" ,
 				"caption" => "pk_tbl_person" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}' => array
 			   		(
 		   				"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}" ,
@@ -24506,10 +24662,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{FD7372C4-E1DD-4F12-918D-3A4DA8CF7036}","id" => "{8E80C392-058E-403F-9AA5-7845D311968F}","id" => "{023E2197-E937-4783-9D09-FE606DC41519}","id" => "{C1CD45D1-395A-4B39-B59F-2E89E13A750D}","id" => "{F36F7395-6885-42A5-8902-97D40342AF16}","id" => "{E1F532C1-966E-4469-B905-A8A10A375423}","id" => "{406CED68-48C4-4CDC-8D82-896F84060C81}","id" => "{4457750C-FBAD-4C70-8477-416716D7AD5D}","id" => "{8118FF48-4119-4321-B571-CE0EB46E568A}","id" => "{4390E05A-55A3-4B0F-B0B3-6E564D9018F9}","id" => "{DF4C72CD-C7D2-4F64-A891-3953B0BD2E52}","id" => "{7930DCF1-5FCE-4DCD-B50A-58773226C53F}","id" => "{D02765C1-84FD-4450-8298-39F1DF521C4C}","id" => "{F7D74494-70BA-4832-A0E4-5F36FAFF10BA}","id" => "{B552BF61-80BD-42BB-B53A-04A0EBE09FE3}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{C5467B19-673D-48B7-A39F-5326A3784716}' => array
 			(
 				"id" => "{C5467B19-673D-48B7-A39F-5326A3784716}" ,
@@ -24519,7 +24675,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{A28D9B06-DA44-41BE-A065-FB1FB1ED5B48}' => array
 			   		(
 		   				"id" => "{A28D9B06-DA44-41BE-A065-FB1FB1ED5B48}" ,
@@ -24534,13 +24690,13 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{1FEC2DF1-0375-4BB7-9DF2-3834D3E7EE8A}' => array
 			(
 				"id" => "{1FEC2DF1-0375-4BB7-9DF2-3834D3E7EE8A}" ,
@@ -24550,7 +24706,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{6765B7F9-FA6D-4411-A31E-F2CE1E12C7C2}' => array
 			   		(
 		   				"id" => "{6765B7F9-FA6D-4411-A31E-F2CE1E12C7C2}" ,
@@ -24565,27 +24721,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{370D251A-1CF0-4A53-9B67-2AB455F02731}'  => array
 	(
 	    	"id" => "{370D251A-1CF0-4A53-9B67-2AB455F02731}" ,
-	    	"name" => "Personfunktionfirma" ,
+	    	"name" => "tbl_personfunktionfirma" ,
 	    	"caption" => "tbl_personfunktionfirma" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{72F011E9-F56E-4CF4-92DA-3682E8FE1DC6}' => array
 			(
 				"id" => "{72F011E9-F56E-4CF4-92DA-3682E8FE1DC6}" ,
@@ -24599,12 +24755,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_personfunktionfirma_personfunktionfirma_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_personfunktionfirma_personfunktionfirma_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{03078537-F29B-42E0-970A-87102FB5FD29}' => array
 			(
 				"id" => "{03078537-F29B-42E0-970A-87102FB5FD29}" ,
@@ -24623,7 +24779,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C5025EEA-4EF3-4717-95A5-58324D35D0A6}' => array
 			(
 				"id" => "{C5025EEA-4EF3-4717-95A5-58324D35D0A6}" ,
@@ -24642,7 +24798,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DB466955-FC5A-443C-A656-42E8077CC824}' => array
 			(
 				"id" => "{DB466955-FC5A-443C-A656-42E8077CC824}" ,
@@ -24661,7 +24817,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7D94873B-D5AA-43E5-B13F-5789D049FFE3}' => array
 			(
 				"id" => "{7D94873B-D5AA-43E5-B13F-5789D049FFE3}" ,
@@ -24680,7 +24836,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6C9FFF3E-C662-457E-A437-9DD2D9EA07E4}' => array
 			(
 				"id" => "{6C9FFF3E-C662-457E-A437-9DD2D9EA07E4}" ,
@@ -24699,21 +24855,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{220DAC87-CC63-434C-ADE8-EC137725C724}' => array
 			(
 				"id" => "{220DAC87-CC63-434C-ADE8-EC137725C724}" ,
-				"name" => "pk_tbl_personfunktionfirma" ,
+				"name" => "pk_personfunktionfirma" ,
 				"caption" => "pk_tbl_personfunktionfirma" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{77EABBEE-F435-4EBE-9F5D-9FCAD3CB705E}' => array
 			   		(
 		   				"id" => "{77EABBEE-F435-4EBE-9F5D-9FCAD3CB705E}" ,
@@ -24728,27 +24884,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{210D8196-2E87-488B-A931-2E3A9D1593A7}'  => array
 	(
 	    	"id" => "{210D8196-2E87-488B-A931-2E3A9D1593A7}" ,
-	    	"name" => "Preinteressent" ,
+	    	"name" => "tbl_preinteressent" ,
 	    	"caption" => "tbl_preinteressent" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4DBFDBAF-7E2A-4B86-B9B3-AE9256A0DA9A}' => array
 			(
 				"id" => "{4DBFDBAF-7E2A-4B86-B9B3-AE9256A0DA9A}" ,
@@ -24762,12 +24918,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_preinteressent_preinteressent_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_preinteressent_preinteressent_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2AE8D4E0-5563-403A-AC2C-BED52FAA2383}' => array
 			(
 				"id" => "{2AE8D4E0-5563-403A-AC2C-BED52FAA2383}" ,
@@ -24786,7 +24942,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6F34B25F-CE35-4BDE-A243-2B0D234DAB80}' => array
 			(
 				"id" => "{6F34B25F-CE35-4BDE-A243-2B0D234DAB80}" ,
@@ -24805,7 +24961,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{95916076-C4C0-4801-9478-F1199EC33A87}' => array
 			(
 				"id" => "{95916076-C4C0-4801-9478-F1199EC33A87}" ,
@@ -24824,7 +24980,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{023FF973-76CA-4DC6-82ED-753BDD303ECE}' => array
 			(
 				"id" => "{023FF973-76CA-4DC6-82ED-753BDD303ECE}" ,
@@ -24843,7 +24999,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{57E42096-143C-44B4-8370-24A8A2779099}' => array
 			(
 				"id" => "{57E42096-143C-44B4-8370-24A8A2779099}" ,
@@ -24862,7 +25018,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{53BFBA3C-A1A7-4AA9-9D94-D8D7E03CA333}' => array
 			(
 				"id" => "{53BFBA3C-A1A7-4AA9-9D94-D8D7E03CA333}" ,
@@ -24881,7 +25037,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8E216F3D-9830-4DBE-B693-158690D51A3A}' => array
 			(
 				"id" => "{8E216F3D-9830-4DBE-B693-158690D51A3A}" ,
@@ -24900,7 +25056,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A02C070C-B230-4716-A582-9D6A289C3296}' => array
 			(
 				"id" => "{A02C070C-B230-4716-A582-9D6A289C3296}" ,
@@ -24919,7 +25075,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B54F6551-66BA-46C9-8EA6-2B78BFC4960B}' => array
 			(
 				"id" => "{B54F6551-66BA-46C9-8EA6-2B78BFC4960B}" ,
@@ -24938,7 +25094,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F3AAE236-9C32-4683-9A29-FFCAFBC725C8}' => array
 			(
 				"id" => "{F3AAE236-9C32-4683-9A29-FFCAFBC725C8}" ,
@@ -24957,7 +25113,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6C004880-15B6-4F1B-A7E0-0F38AC030825}' => array
 			(
 				"id" => "{6C004880-15B6-4F1B-A7E0-0F38AC030825}" ,
@@ -24976,7 +25132,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A751954A-4B27-413C-B6D8-A32DB33B92D0}' => array
 			(
 				"id" => "{A751954A-4B27-413C-B6D8-A32DB33B92D0}" ,
@@ -24995,7 +25151,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6685A3C0-8BB4-4B5D-A664-330E4AAB426C}' => array
 			(
 				"id" => "{6685A3C0-8BB4-4B5D-A664-330E4AAB426C}" ,
@@ -25014,7 +25170,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DD7CFD8D-C202-4764-834D-87C304974306}' => array
 			(
 				"id" => "{DD7CFD8D-C202-4764-834D-87C304974306}" ,
@@ -25033,7 +25189,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{86D6CF72-052C-47D0-904E-E94B42F58827}' => array
 			(
 				"id" => "{86D6CF72-052C-47D0-904E-E94B42F58827}" ,
@@ -25052,21 +25208,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{B92BC354-1A94-40E8-AA7A-FE99D6BBF83A}' => array
 			(
 				"id" => "{B92BC354-1A94-40E8-AA7A-FE99D6BBF83A}" ,
-				"name" => "pk_tbl_preinteressent" ,
+				"name" => "pk_preinteressent" ,
 				"caption" => "pk_tbl_preinteressent" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{AEB7BF2B-1FB4-4F21-8E22-DC549DC170F4}' => array
 			   		(
 		   				"id" => "{AEB7BF2B-1FB4-4F21-8E22-DC549DC170F4}" ,
@@ -25084,24 +25240,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{7C0F8617-9581-4898-9CF9-A8CEC5484A69}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{11C1B6BA-AF74-474E-8E66-E76B1CABBD13}'  => array
 	(
 	    	"id" => "{11C1B6BA-AF74-474E-8E66-E76B1CABBD13}" ,
-	    	"name" => "Preinteressentstudiengang" ,
+	    	"name" => "tbl_preinteressentstudiengang" ,
 	    	"caption" => "tbl_preinteressentstudiengang" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{8404FAD5-0821-49D7-A07E-BDD6DCA44D24}' => array
 			(
 				"id" => "{8404FAD5-0821-49D7-A07E-BDD6DCA44D24}" ,
@@ -25120,7 +25276,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{86A44E80-0396-42DC-B861-D672480AA5D6}' => array
 			(
 				"id" => "{86A44E80-0396-42DC-B861-D672480AA5D6}" ,
@@ -25139,7 +25295,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5F0DDA4C-0AA3-461B-B541-1FF20C8C9ECD}' => array
 			(
 				"id" => "{5F0DDA4C-0AA3-461B-B541-1FF20C8C9ECD}" ,
@@ -25158,7 +25314,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E13231A7-02A8-46FA-AF6F-03512F06C301}' => array
 			(
 				"id" => "{E13231A7-02A8-46FA-AF6F-03512F06C301}" ,
@@ -25177,7 +25333,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A5ED4915-15F9-423A-8417-B93C47D1AB00}' => array
 			(
 				"id" => "{A5ED4915-15F9-423A-8417-B93C47D1AB00}" ,
@@ -25196,7 +25352,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3C873A4A-2CAD-402B-9A70-978203A180FF}' => array
 			(
 				"id" => "{3C873A4A-2CAD-402B-9A70-978203A180FF}" ,
@@ -25215,7 +25371,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0947361A-1D41-4244-85AD-4D052EE12403}' => array
 			(
 				"id" => "{0947361A-1D41-4244-85AD-4D052EE12403}" ,
@@ -25234,7 +25390,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8BF5EC1D-E0E2-4676-9DA4-E1ECF75BDB2A}' => array
 			(
 				"id" => "{8BF5EC1D-E0E2-4676-9DA4-E1ECF75BDB2A}" ,
@@ -25253,7 +25409,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A21FE443-C4CB-45AB-A00A-A3F4789A80EB}' => array
 			(
 				"id" => "{A21FE443-C4CB-45AB-A00A-A3F4789A80EB}" ,
@@ -25272,21 +25428,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5158C928-36C3-4B4C-AB92-42A82140E575}' => array
 			(
 				"id" => "{5158C928-36C3-4B4C-AB92-42A82140E575}" ,
-				"name" => "pk_tbl_preinteressentstudiengang" ,
+				"name" => "pk_preinteressentstudiengang" ,
 				"caption" => "pk_tbl_preinteressentstudiengang" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{CCB42F52-D3C3-4AC2-B131-356FAF63B01D}' => array
 			   		(
 		   				"id" => "{CCB42F52-D3C3-4AC2-B131-356FAF63B01D}" ,
@@ -25301,10 +25457,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{521800F5-F15D-419A-BEAF-C4FCA37B9628}' => array
 			   		(
 		   				"id" => "{521800F5-F15D-419A-BEAF-C4FCA37B9628}" ,
@@ -25319,27 +25475,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{E95EB236-324C-4DCA-B730-4AB4B9603D68}'  => array
 	(
 	    	"id" => "{E95EB236-324C-4DCA-B730-4AB4B9603D68}" ,
-	    	"name" => "Prestudent" ,
+	    	"name" => "tbl_prestudent" ,
 	    	"caption" => "tbl_prestudent" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{256A4E7F-24F0-4524-8F51-050BFA7D98D5}' => array
 			(
 				"id" => "{256A4E7F-24F0-4524-8F51-050BFA7D98D5}" ,
@@ -25353,12 +25509,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_prestudent_prestudent_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_prestudent_prestudent_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D446420A-C3A8-4013-8F92-087F664B9D39}' => array
 			(
 				"id" => "{D446420A-C3A8-4013-8F92-087F664B9D39}" ,
@@ -25377,7 +25533,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AB459131-02EA-480B-8C64-37AD120C0D8D}' => array
 			(
 				"id" => "{AB459131-02EA-480B-8C64-37AD120C0D8D}" ,
@@ -25396,7 +25552,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FBA33654-BAFD-42F3-9649-D044FE347C26}' => array
 			(
 				"id" => "{FBA33654-BAFD-42F3-9649-D044FE347C26}" ,
@@ -25415,7 +25571,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B23183E7-470A-466A-A943-B017249A1AA5}' => array
 			(
 				"id" => "{B23183E7-470A-466A-A943-B017249A1AA5}" ,
@@ -25434,7 +25590,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9B694C7E-B565-4DFA-8151-AC5794E90EB3}' => array
 			(
 				"id" => "{9B694C7E-B565-4DFA-8151-AC5794E90EB3}" ,
@@ -25453,7 +25609,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D4DC4F5-339E-4F97-B513-6207AECBC023}' => array
 			(
 				"id" => "{5D4DC4F5-339E-4F97-B513-6207AECBC023}" ,
@@ -25472,7 +25628,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{10F1E403-802A-4188-A2BC-B37074EBD52D}' => array
 			(
 				"id" => "{10F1E403-802A-4188-A2BC-B37074EBD52D}" ,
@@ -25491,7 +25647,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{67CAFA0A-CEE6-4C65-8BA4-D9FB0C4B785F}' => array
 			(
 				"id" => "{67CAFA0A-CEE6-4C65-8BA4-D9FB0C4B785F}" ,
@@ -25510,7 +25666,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FAD3B337-BAF2-4A0B-BF76-F83CDC2303FD}' => array
 			(
 				"id" => "{FAD3B337-BAF2-4A0B-BF76-F83CDC2303FD}" ,
@@ -25529,7 +25685,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1D3BE61C-9C5D-40A0-A4E4-A3505B54B57C}' => array
 			(
 				"id" => "{1D3BE61C-9C5D-40A0-A4E4-A3505B54B57C}" ,
@@ -25548,7 +25704,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D55746C9-29A8-458D-9635-A323E387C277}' => array
 			(
 				"id" => "{D55746C9-29A8-458D-9635-A323E387C277}" ,
@@ -25567,7 +25723,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B44BF3F0-5A0F-49F1-B4B1-2A7DDDFFC278}' => array
 			(
 				"id" => "{B44BF3F0-5A0F-49F1-B4B1-2A7DDDFFC278}" ,
@@ -25586,7 +25742,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9B64F08E-8D1B-4E6C-8DB7-7167C2B9E25D}' => array
 			(
 				"id" => "{9B64F08E-8D1B-4E6C-8DB7-7167C2B9E25D}" ,
@@ -25605,7 +25761,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4F35FDD3-E7A1-4C30-9A21-04F673095B94}' => array
 			(
 				"id" => "{4F35FDD3-E7A1-4C30-9A21-04F673095B94}" ,
@@ -25624,7 +25780,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7BEAC3FF-1CEB-4FE1-A19E-44E9160742F7}' => array
 			(
 				"id" => "{7BEAC3FF-1CEB-4FE1-A19E-44E9160742F7}" ,
@@ -25643,7 +25799,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A5C28605-07EB-4281-A21E-1F01849775BA}' => array
 			(
 				"id" => "{A5C28605-07EB-4281-A21E-1F01849775BA}" ,
@@ -25662,7 +25818,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C829E170-CD31-4946-985E-06B5A9D09D67}' => array
 			(
 				"id" => "{C829E170-CD31-4946-985E-06B5A9D09D67}" ,
@@ -25681,7 +25837,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F65A08D1-B579-4884-A9CE-858E84578A01}' => array
 			(
 				"id" => "{F65A08D1-B579-4884-A9CE-858E84578A01}" ,
@@ -25700,7 +25856,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{AD18B966-3C29-44CF-9553-0B7EEEB54957}' => array
 			(
 				"id" => "{AD18B966-3C29-44CF-9553-0B7EEEB54957}" ,
@@ -25719,7 +25875,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{05E172C9-2929-43CF-AE96-FF65BC892DCE}' => array
 			(
 				"id" => "{05E172C9-2929-43CF-AE96-FF65BC892DCE}" ,
@@ -25738,7 +25894,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{07201F47-5FF1-48BB-914B-5C70C34A1A5E}' => array
 			(
 				"id" => "{07201F47-5FF1-48BB-914B-5C70C34A1A5E}" ,
@@ -25757,7 +25913,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1320F668-B58C-4DA8-9823-E3B40F4BEFFA}' => array
 			(
 				"id" => "{1320F668-B58C-4DA8-9823-E3B40F4BEFFA}" ,
@@ -25776,7 +25932,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4A066870-785A-434B-A0DC-3BA56E1CBBCF}' => array
 			(
 				"id" => "{4A066870-785A-434B-A0DC-3BA56E1CBBCF}" ,
@@ -25795,7 +25951,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C9CA41C2-70C7-4AFB-8210-634DE1D5B54A}' => array
 			(
 				"id" => "{C9CA41C2-70C7-4AFB-8210-634DE1D5B54A}" ,
@@ -25814,7 +25970,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BB9553A1-D945-4C44-B39F-680432AAC6CD}' => array
 			(
 				"id" => "{BB9553A1-D945-4C44-B39F-680432AAC6CD}" ,
@@ -25833,7 +25989,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{11A68A73-CBBC-44FC-A29B-EF49974A44D6}' => array
 			(
 				"id" => "{11A68A73-CBBC-44FC-A29B-EF49974A44D6}" ,
@@ -25852,7 +26008,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{054944AE-06E6-4B88-A1D7-A70E831CDACE}' => array
 			(
 				"id" => "{054944AE-06E6-4B88-A1D7-A70E831CDACE}" ,
@@ -25871,21 +26027,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{9A90C061-59B6-48A5-A355-68B2557322D7}' => array
 			(
 				"id" => "{9A90C061-59B6-48A5-A355-68B2557322D7}" ,
-				"name" => "pk_tbl_prestudent" ,
+				"name" => "pk_prestudent" ,
 				"caption" => "pk_tbl_prestudent" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{68456598-CEAF-4256-8EAE-7C65CBFC101E}' => array
 			   		(
 		   				"id" => "{68456598-CEAF-4256-8EAE-7C65CBFC101E}" ,
@@ -25903,24 +26059,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{E6F28A4B-135D-4B21-BFEB-A0B04DE07211}","id" => "{ECF5114E-27D0-4B59-A700-6B31E7145974}","id" => "{51328EC1-919B-4C5A-8951-5AF6E496497A}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{BC5BCBDF-1501-4D46-9181-3E925D438CB1}'  => array
 	(
 	    	"id" => "{BC5BCBDF-1501-4D46-9181-3E925D438CB1}" ,
-	    	"name" => "Prestudentrolle" ,
-	    	"caption" => "tbl_prestudentstatus" ,
+	    	"name" => "tbl_prestudentrolle" ,
+	    	"caption" => "tbl_prestudentrolle" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{4E12B8F8-78E5-4542-AF5A-E7706A9C8CFD}' => array
 			(
 				"id" => "{4E12B8F8-78E5-4542-AF5A-E7706A9C8CFD}" ,
@@ -25939,7 +26095,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{248C711F-9ED6-4570-A554-65A46FA74435}' => array
 			(
 				"id" => "{248C711F-9ED6-4570-A554-65A46FA74435}" ,
@@ -25958,7 +26114,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{60DFB06A-BBF9-48DE-9AC7-74AFF83BE27E}' => array
 			(
 				"id" => "{60DFB06A-BBF9-48DE-9AC7-74AFF83BE27E}" ,
@@ -25977,7 +26133,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B63D114B-D99D-470D-A026-DD7229FD6BFC}' => array
 			(
 				"id" => "{B63D114B-D99D-470D-A026-DD7229FD6BFC}" ,
@@ -25996,7 +26152,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1DDBC002-525B-439E-B544-03CA719869B2}' => array
 			(
 				"id" => "{1DDBC002-525B-439E-B544-03CA719869B2}" ,
@@ -26015,7 +26171,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B3A823E1-22DD-4410-84F8-2E4A311ED914}' => array
 			(
 				"id" => "{B3A823E1-22DD-4410-84F8-2E4A311ED914}" ,
@@ -26034,7 +26190,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BF012129-DCB5-4935-A237-CB4FEEDCD42D}' => array
 			(
 				"id" => "{BF012129-DCB5-4935-A237-CB4FEEDCD42D}" ,
@@ -26053,7 +26209,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8D5DE518-5CB0-4678-A5A8-0EED99D07CC7}' => array
 			(
 				"id" => "{8D5DE518-5CB0-4678-A5A8-0EED99D07CC7}" ,
@@ -26072,7 +26228,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A048ADE5-0D81-437A-8F87-8702BB62D593}' => array
 			(
 				"id" => "{A048ADE5-0D81-437A-8F87-8702BB62D593}" ,
@@ -26091,7 +26247,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{06FED149-6AF1-48E0-A07F-60E9A37CCE62}' => array
 			(
 				"id" => "{06FED149-6AF1-48E0-A07F-60E9A37CCE62}" ,
@@ -26110,7 +26266,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{60566111-FFE2-4FC3-9C91-D1B58EB22503}' => array
 			(
 				"id" => "{60566111-FFE2-4FC3-9C91-D1B58EB22503}" ,
@@ -26129,21 +26285,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{83F80B1F-9FD9-4739-97F2-BD01A4EBEF94}' => array
 			(
 				"id" => "{83F80B1F-9FD9-4739-97F2-BD01A4EBEF94}" ,
-				"name" => "pk_tbl_prestudentstatus" ,
-				"caption" => "pk_tbl_prestudentstatus" ,
+				"name" => "pk_prestudentrolle" ,
+				"caption" => "pk_tbl_prestudentrolle" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B0AF2556-106B-47FD-B4E2-FF505EDA8210}' => array
 			   		(
 		   				"id" => "{B0AF2556-106B-47FD-B4E2-FF505EDA8210}" ,
@@ -26158,10 +26314,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{F1C2192E-FBC0-402E-B65C-AB29129AF6BC}' => array
 			   		(
 		   				"id" => "{F1C2192E-FBC0-402E-B65C-AB29129AF6BC}" ,
@@ -26176,10 +26332,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{EC71F07F-476A-44D2-884F-90D94C2BE2B6}' => array
 			   		(
 		   				"id" => "{EC71F07F-476A-44D2-884F-90D94C2BE2B6}" ,
@@ -26194,10 +26350,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{E2A20418-27C1-4BE1-8361-14B6E1F624D7}' => array
 			   		(
 		   				"id" => "{E2A20418-27C1-4BE1-8361-14B6E1F624D7}" ,
@@ -26212,27 +26368,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{832B9A52-E15D-4A93-9D75-E8A5A5084ABD}'  => array
 	(
 	    	"id" => "{832B9A52-E15D-4A93-9D75-E8A5A5084ABD}" ,
-	    	"name" => "Raumtyp" ,
+	    	"name" => "tbl_raumtyp" ,
 	    	"caption" => "tbl_raumtyp" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{CB563D77-30D4-45EC-96F3-91457B534909}' => array
 			(
 				"id" => "{CB563D77-30D4-45EC-96F3-91457B534909}" ,
@@ -26251,7 +26407,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0B8A4010-118D-414B-92B5-424FB25AA9B8}' => array
 			(
 				"id" => "{0B8A4010-118D-414B-92B5-424FB25AA9B8}" ,
@@ -26270,21 +26426,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2A188599-3AA2-477F-9B84-3F3693D00CF0}' => array
 			(
 				"id" => "{2A188599-3AA2-477F-9B84-3F3693D00CF0}" ,
-				"name" => "pk_tbl_raumtyp" ,
+				"name" => "pk_raumtyp" ,
 				"caption" => "pk_tbl_raumtyp" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{CC5026F9-40CC-4E78-BD48-883E91CC283C}' => array
 			   		(
 		   				"id" => "{CC5026F9-40CC-4E78-BD48-883E91CC283C}" ,
@@ -26302,24 +26458,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{68DD7D49-58B0-4824-A759-479C35966529}","id" => "{08064576-6982-4B03-B143-5FA5927B21FC}","id" => "{C0F5251B-4E5D-432E-909D-66BB353AEC9F}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{6A21EEEC-BA35-4A1A-86F8-47A4E462D9D8}'  => array
 	(
 	    	"id" => "{6A21EEEC-BA35-4A1A-86F8-47A4E462D9D8}" ,
-	    	"name" => "Reihungstest" ,
+	    	"name" => "tbl_reihungstest" ,
 	    	"caption" => "tbl_reihungstest" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7EDF2EF7-8CCA-40CF-A724-D120F77879EE}' => array
 			(
 				"id" => "{7EDF2EF7-8CCA-40CF-A724-D120F77879EE}" ,
@@ -26333,12 +26489,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('tbl_reihungstest_reihungstest_id_seq'::regclass)",
+				"defaultvalue" => "nextval('seq_reihungstest_reihungstest_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{08312E43-505E-4A04-9194-C8455E3597A5}' => array
 			(
 				"id" => "{08312E43-505E-4A04-9194-C8455E3597A5}" ,
@@ -26357,7 +26513,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DDD9A369-5C7F-4EDA-9FDD-1BA47A35E1D4}' => array
 			(
 				"id" => "{DDD9A369-5C7F-4EDA-9FDD-1BA47A35E1D4}" ,
@@ -26376,7 +26532,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A612C467-438E-4DFA-970E-5F86AB44A74D}' => array
 			(
 				"id" => "{A612C467-438E-4DFA-970E-5F86AB44A74D}" ,
@@ -26395,7 +26551,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C7A1C4EF-4418-4129-98F0-5BF6824DBBBC}' => array
 			(
 				"id" => "{C7A1C4EF-4418-4129-98F0-5BF6824DBBBC}" ,
@@ -26414,7 +26570,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{17495C12-922F-48E7-8C7A-B8FA7141FE00}' => array
 			(
 				"id" => "{17495C12-922F-48E7-8C7A-B8FA7141FE00}" ,
@@ -26433,7 +26589,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{10B8FF26-7FDD-402A-B832-93F00A238885}' => array
 			(
 				"id" => "{10B8FF26-7FDD-402A-B832-93F00A238885}" ,
@@ -26452,7 +26608,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D0E88C5C-BA1A-4188-AA9D-25F6F3F43293}' => array
 			(
 				"id" => "{D0E88C5C-BA1A-4188-AA9D-25F6F3F43293}" ,
@@ -26471,7 +26627,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{896754D9-70D7-456A-81C2-638525A219D7}' => array
 			(
 				"id" => "{896754D9-70D7-456A-81C2-638525A219D7}" ,
@@ -26490,7 +26646,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0ED250A2-854A-4279-A1C8-2718A212998C}' => array
 			(
 				"id" => "{0ED250A2-854A-4279-A1C8-2718A212998C}" ,
@@ -26509,7 +26665,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B0A8F005-F670-48B7-AFC9-1D7239F22F7B}' => array
 			(
 				"id" => "{B0A8F005-F670-48B7-AFC9-1D7239F22F7B}" ,
@@ -26528,21 +26684,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{A5266115-5D9C-4742-B761-9BD9A29CD57C}' => array
 			(
 				"id" => "{A5266115-5D9C-4742-B761-9BD9A29CD57C}" ,
-				"name" => "pk_tbl_reihungstest" ,
+				"name" => "pk_reihungstest" ,
 				"caption" => "pk_tbl_reihungstest" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F2088867-CE4E-4BA6-BD64-F07DD6B8D406}' => array
 			   		(
 		   				"id" => "{F2088867-CE4E-4BA6-BD64-F07DD6B8D406}" ,
@@ -26560,24 +26716,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{04481D2D-E715-4738-A8BE-2B3E0C1B09B6}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{163C0181-2530-4C27-9310-B254FF653CD9}'  => array
 	(
 	    	"id" => "{163C0181-2530-4C27-9310-B254FF653CD9}" ,
-	    	"name" => "Status" ,
+	    	"name" => "tbl_status" ,
 	    	"caption" => "tbl_status" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{B2AB8919-807C-45FA-BA1D-5463F8B91E4F}' => array
 			(
 				"id" => "{B2AB8919-807C-45FA-BA1D-5463F8B91E4F}" ,
@@ -26596,7 +26752,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B5DBDCCE-EEB1-4279-A26C-4545CE045ADF}' => array
 			(
 				"id" => "{B5DBDCCE-EEB1-4279-A26C-4545CE045ADF}" ,
@@ -26615,7 +26771,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{62E05E0D-03B1-4788-90A1-6254BCD90284}' => array
 			(
 				"id" => "{62E05E0D-03B1-4788-90A1-6254BCD90284}" ,
@@ -26634,7 +26790,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{97CB10C8-EE84-4E55-8BF0-33EEFECE3975}' => array
 			(
 				"id" => "{97CB10C8-EE84-4E55-8BF0-33EEFECE3975}" ,
@@ -26653,21 +26809,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{1DF69B26-C16D-4D9D-A7C3-5C0C46053791}' => array
 			(
 				"id" => "{1DF69B26-C16D-4D9D-A7C3-5C0C46053791}" ,
-				"name" => "pk_tbl_status" ,
-				"caption" => "pk_tbl_status" ,
+				"name" => "pk_rolle" ,
+				"caption" => "pk_tbl_rolle" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{FBB4C290-7DB9-4981-90C9-DE0A95D00703}' => array
 			   		(
 		   				"id" => "{FBB4C290-7DB9-4981-90C9-DE0A95D00703}" ,
@@ -26685,24 +26841,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{4429724D-A612-40AD-B4BC-1715BA5D8DA3}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{538400C8-7FEA-43E9-841B-C02609C1A86E}'  => array
 	(
 	    	"id" => "{538400C8-7FEA-43E9-841B-C02609C1A86E}" ,
-	    	"name" => "Semesterwochen" ,
+	    	"name" => "tbl_semesterwochen" ,
 	    	"caption" => "tbl_semesterwochen" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{CDD1C692-7194-4B75-9FAD-EB44F3C27A9F}' => array
 			(
 				"id" => "{CDD1C692-7194-4B75-9FAD-EB44F3C27A9F}" ,
@@ -26721,7 +26877,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C959254F-673C-4CDD-9571-D3960B143815}' => array
 			(
 				"id" => "{C959254F-673C-4CDD-9571-D3960B143815}" ,
@@ -26740,7 +26896,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{30C05214-8C63-4139-BD22-6D4EDD4E1793}' => array
 			(
 				"id" => "{30C05214-8C63-4139-BD22-6D4EDD4E1793}" ,
@@ -26759,21 +26915,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{2E3D7DDE-A76E-4127-B148-1491D2A6411A}' => array
 			(
 				"id" => "{2E3D7DDE-A76E-4127-B148-1491D2A6411A}" ,
-				"name" => "pk_tbl_semesterwochen" ,
+				"name" => "pk_semesterwochen" ,
 				"caption" => "pk_tbl_semesterwochen" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{4B6EA40A-F39A-42E1-8B6C-C1EDACBEE795}' => array
 			   		(
 		   				"id" => "{4B6EA40A-F39A-42E1-8B6C-C1EDACBEE795}" ,
@@ -26788,10 +26944,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{5CBC9885-1A15-448D-86D8-2743949F60A6}' => array
 			   		(
 		   				"id" => "{5CBC9885-1A15-448D-86D8-2743949F60A6}" ,
@@ -26806,27 +26962,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{452E9780-7375-4B66-9A50-6969381681EA}'  => array
 	(
 	    	"id" => "{452E9780-7375-4B66-9A50-6969381681EA}" ,
-	    	"name" => "Sprache" ,
-	    	"caption" => "tbl_sprache" ,
+	    	"name" => "tbl_sprache" ,
+	    	"caption" => "Sprache" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{84D8B91C-7360-40E7-A49B-DAA60B56100B}' => array
 			(
 				"id" => "{84D8B91C-7360-40E7-A49B-DAA60B56100B}" ,
@@ -26845,21 +27001,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F6BEBF65-0503-4C0F-B9FF-99D94CEB22B2}' => array
 			(
 				"id" => "{F6BEBF65-0503-4C0F-B9FF-99D94CEB22B2}" ,
-				"name" => "pk_tbl_sprache" ,
+				"name" => "pk_sprache" ,
 				"caption" => "pk_tbl_sprache" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{46D40AB0-DB14-441E-B0ED-F06414D05136}' => array
 			   		(
 		   				"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}" ,
@@ -26874,27 +27030,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{BE3059FD-3FA7-4669-8A46-9A5D3943C836}","id" => "{2DD0C47B-CC2B-4A6E-83CF-CD573FF5EF36}","id" => "{0FF63A76-E599-44A2-BFCF-BDD876D04DCF}","id" => "{A77718EA-7338-4F04-B21D-497D49FF6EEC}","id" => "{8D8EE04D-0B2D-4D60-9AC7-28FDD5E259BD}","id" => "{08771D92-AE4A-485F-8F08-870B667B99CA}","id" => "{6C2773B9-37DA-4846-8E29-823971F3D59B}","id" => "{24D6C2EE-7B51-4538-8454-FB1068CC801D}","id" => "{2638BFC0-E92D-4C23-AA7B-EC87F1446B18}",
+							"id" => "{BE3059FD-3FA7-4669-8A46-9A5D3943C836}","id" => "{2DD0C47B-CC2B-4A6E-83CF-CD573FF5EF36}","id" => "{0FF63A76-E599-44A2-BFCF-BDD876D04DCF}","id" => "{A77718EA-7338-4F04-B21D-497D49FF6EEC}","id" => "{8D8EE04D-0B2D-4D60-9AC7-28FDD5E259BD}","id" => "{08771D92-AE4A-485F-8F08-870B667B99CA}","id" => "{6C2773B9-37DA-4846-8E29-823971F3D59B}","id" => "{24D6C2EE-7B51-4538-8454-FB1068CC801D}","id" => "{2638BFC0-E92D-4C23-AA7B-EC87F1446B18}","id" => "{41FD15C8-58B7-41BC-ABA5-8F969A1FE7F7}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{FB3DB36E-A1A3-42A6-B49F-7D59A335F4EA}'  => array
 	(
 	    	"id" => "{FB3DB36E-A1A3-42A6-B49F-7D59A335F4EA}" ,
-	    	"name" => "Standort" ,
+	    	"name" => "tbl_standort" ,
 	    	"caption" => "tbl_standort" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{45143BA7-5943-49EE-A4DD-4780F358DAED}' => array
 			(
 				"id" => "{45143BA7-5943-49EE-A4DD-4780F358DAED}" ,
@@ -26913,7 +27069,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{667D3112-625B-48D1-907B-1F10FC3727ED}' => array
 			(
 				"id" => "{667D3112-625B-48D1-907B-1F10FC3727ED}" ,
@@ -26932,21 +27088,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}' => array
 			(
 				"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}" ,
-				"name" => "pk_tbl_standort" ,
+				"name" => "pk_standort" ,
 				"caption" => "pk_tbl_standort" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B4E27FAF-82E5-4996-BAAB-89281700F085}' => array
 			   		(
 		   				"id" => "{B4E27FAF-82E5-4996-BAAB-89281700F085}" ,
@@ -26964,24 +27120,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{83853692-8BBC-4526-9BFD-C5540BAF2D39}","id" => "{0CF1AA47-4C16-4AE6-A5B6-15D14FB82EB7}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{5D31B217-A37C-4CAE-A599-382E465442B8}'  => array
 	(
 	    	"id" => "{5D31B217-A37C-4CAE-A599-382E465442B8}" ,
-	    	"name" => "Student" ,
+	    	"name" => "tbl_student" ,
 	    	"caption" => "tbl_student" ,
 	    	"comments" => "Tabelle aller Studenten" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{FE57811E-9379-45FE-BF6A-600BA099193F}' => array
 			(
 				"id" => "{FE57811E-9379-45FE-BF6A-600BA099193F}" ,
@@ -27000,7 +27156,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C87EC7C9-0127-4D5D-A5F0-DAF88F494401}' => array
 			(
 				"id" => "{C87EC7C9-0127-4D5D-A5F0-DAF88F494401}" ,
@@ -27019,7 +27175,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EBF78044-7EEB-4225-8EAB-0285C15B84A8}' => array
 			(
 				"id" => "{EBF78044-7EEB-4225-8EAB-0285C15B84A8}" ,
@@ -27038,7 +27194,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{42D2D626-F858-4C04-A419-DA9431EC0576}' => array
 			(
 				"id" => "{42D2D626-F858-4C04-A419-DA9431EC0576}" ,
@@ -27057,7 +27213,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{17331FD0-486C-4140-B07E-E842C94D1339}' => array
 			(
 				"id" => "{17331FD0-486C-4140-B07E-E842C94D1339}" ,
@@ -27076,7 +27232,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BF989DCB-EF7C-44B6-ABF0-8DA274638586}' => array
 			(
 				"id" => "{BF989DCB-EF7C-44B6-ABF0-8DA274638586}" ,
@@ -27095,7 +27251,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B1BDD26F-B568-4754-8A2F-C94713FB15C0}' => array
 			(
 				"id" => "{B1BDD26F-B568-4754-8A2F-C94713FB15C0}" ,
@@ -27114,7 +27270,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{65807E0F-7A6A-4BB2-B84F-75968DAB7C34}' => array
 			(
 				"id" => "{65807E0F-7A6A-4BB2-B84F-75968DAB7C34}" ,
@@ -27133,7 +27289,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ECFEBFF5-7232-4F5E-974B-EEE5964AB6B3}' => array
 			(
 				"id" => "{ECFEBFF5-7232-4F5E-974B-EEE5964AB6B3}" ,
@@ -27152,7 +27308,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{94062BD5-3CD7-4D93-90BD-D400830EA012}' => array
 			(
 				"id" => "{94062BD5-3CD7-4D93-90BD-D400830EA012}" ,
@@ -27171,7 +27327,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B48D09F3-B889-4F3A-AED8-2E844D4FD54C}' => array
 			(
 				"id" => "{B48D09F3-B889-4F3A-AED8-2E844D4FD54C}" ,
@@ -27190,7 +27346,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{211323D8-EB5C-4EA6-9CD6-1A4BF2B70A11}' => array
 			(
 				"id" => "{211323D8-EB5C-4EA6-9CD6-1A4BF2B70A11}" ,
@@ -27209,21 +27365,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{89002400-A377-467B-9B3D-ED97760ED02B}' => array
 			(
 				"id" => "{89002400-A377-467B-9B3D-ED97760ED02B}" ,
-				"name" => "pk_tbl_student" ,
+				"name" => "pk_student" ,
 				"caption" => "pk_tbl_student" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{23871CC3-6C38-4934-83F0-A08FEA8FE26F}' => array
 			   		(
 		   				"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}" ,
@@ -27241,10 +27397,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{4A1276FF-B0C2-4680-A15F-8514A9F4713B}","id" => "{0E829232-39E7-408F-9AA5-49CA655EC546}","id" => "{F2A3BC97-7939-4CB9-B911-6BB1883D2EA0}","id" => "{2AABA5EC-2799-42C5-A25D-D70DDAE6E73E}","id" => "{42D4CD78-8BA7-4E9E-9A23-785E82D1C490}","id" => "{D56DA557-AD85-4497-BA9F-DFD133A20538}","id" => "{A060464F-B681-44C4-AAD7-D3CCAC3DF210}","id" => "{672722EC-5185-4051-BF8B-00D37B208CC5}","id" => "{39A9062C-797F-4F32-88E0-B0DD5D941D8B}","id" => "{96CE8FF4-1BD3-4DBC-8756-0481030C7075}","id" => "{38031557-D4C7-4472-B5FF-A23A71E9238E}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{30DC6E6E-D664-4395-8C2B-9B2FA56F28B1}' => array
 			(
 				"id" => "{30DC6E6E-D664-4395-8C2B-9B2FA56F28B1}" ,
@@ -27254,7 +27410,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{C0A9E9E0-7E78-4639-AD8F-D90DC4F29E42}' => array
 			   		(
 		   				"id" => "{C0A9E9E0-7E78-4639-AD8F-D90DC4F29E42}" ,
@@ -27269,27 +27425,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{D0A7D722-B929-4E64-8842-A624740F70D6}'  => array
 	(
 	    	"id" => "{D0A7D722-B929-4E64-8842-A624740F70D6}" ,
-	    	"name" => "Studentlehrverband" ,
+	    	"name" => "tbl_studentlehrverband" ,
 	    	"caption" => "tbl_studentlehrverband" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{220C71E1-6280-45CE-8835-06FC9EFCF26A}' => array
 			(
 				"id" => "{220C71E1-6280-45CE-8835-06FC9EFCF26A}" ,
@@ -27308,7 +27464,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{66E35B1A-6713-4868-82E6-B60AF8A60C5E}' => array
 			(
 				"id" => "{66E35B1A-6713-4868-82E6-B60AF8A60C5E}" ,
@@ -27327,7 +27483,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CB7ED272-BE58-4A1C-A93A-85C2FB256950}' => array
 			(
 				"id" => "{CB7ED272-BE58-4A1C-A93A-85C2FB256950}" ,
@@ -27346,7 +27502,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A64A2AF5-70AC-4229-93AE-D6D06CD3A782}' => array
 			(
 				"id" => "{A64A2AF5-70AC-4229-93AE-D6D06CD3A782}" ,
@@ -27365,7 +27521,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{67C210F0-539F-452B-9203-DEEFEF33876B}' => array
 			(
 				"id" => "{67C210F0-539F-452B-9203-DEEFEF33876B}" ,
@@ -27384,7 +27540,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{534A09EE-1D30-4DD4-B2AB-8C8100C580C3}' => array
 			(
 				"id" => "{534A09EE-1D30-4DD4-B2AB-8C8100C580C3}" ,
@@ -27403,7 +27559,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4B0EC27F-5376-4403-A46D-9E7200836113}' => array
 			(
 				"id" => "{4B0EC27F-5376-4403-A46D-9E7200836113}" ,
@@ -27422,7 +27578,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DF1D698E-B855-41C8-8347-DAFF3D9BA3D7}' => array
 			(
 				"id" => "{DF1D698E-B855-41C8-8347-DAFF3D9BA3D7}" ,
@@ -27441,7 +27597,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{08CDB5B6-7276-4FBC-A6DD-A00AD3024C12}' => array
 			(
 				"id" => "{08CDB5B6-7276-4FBC-A6DD-A00AD3024C12}" ,
@@ -27460,7 +27616,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B273A028-A38E-4FE9-BDFF-7A9E28C198F4}' => array
 			(
 				"id" => "{B273A028-A38E-4FE9-BDFF-7A9E28C198F4}" ,
@@ -27479,7 +27635,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{30E216D2-56FD-4E97-A938-AA3C3CA579C6}' => array
 			(
 				"id" => "{30E216D2-56FD-4E97-A938-AA3C3CA579C6}" ,
@@ -27498,21 +27654,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{BA9BFC4E-DDE9-46D6-8ACD-933B4B43E018}' => array
 			(
 				"id" => "{BA9BFC4E-DDE9-46D6-8ACD-933B4B43E018}" ,
-				"name" => "pk_tbl_studentlehrverband" ,
+				"name" => "pk_studentlehrverband" ,
 				"caption" => "pk_tbl_studentlehrverband" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{8F71C15B-4CE2-4D15-8C18-B416EF3956A5}' => array
 			   		(
 		   				"id" => "{8F71C15B-4CE2-4D15-8C18-B416EF3956A5}" ,
@@ -27527,10 +27683,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{E77E1E87-5451-4CCF-8687-D89B3F1604C3}' => array
 			   		(
 		   				"id" => "{E77E1E87-5451-4CCF-8687-D89B3F1604C3}" ,
@@ -27545,27 +27701,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9EE28C51-2F05-4F7C-AE9E-7FBDB815500A}'  => array
 	(
 	    	"id" => "{9EE28C51-2F05-4F7C-AE9E-7FBDB815500A}" ,
-	    	"name" => "Studiengang" ,
+	    	"name" => "tbl_studiengang" ,
 	    	"caption" => "tbl_studiengang" ,
 	    	"comments" => "Informationen zu den Studiengaengen" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F2FAF7AE-0CB7-4FE9-8A55-FED44682049E}' => array
 			(
 				"id" => "{F2FAF7AE-0CB7-4FE9-8A55-FED44682049E}" ,
@@ -27584,7 +27740,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5769AFDE-9CD4-402C-B96A-BE7D4F31A6BA}' => array
 			(
 				"id" => "{5769AFDE-9CD4-402C-B96A-BE7D4F31A6BA}" ,
@@ -27603,7 +27759,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{782B91C4-B58A-435C-81F5-B8EB7009318E}' => array
 			(
 				"id" => "{782B91C4-B58A-435C-81F5-B8EB7009318E}" ,
@@ -27622,7 +27778,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C6A146FE-DACD-46A7-B228-BFED733D10A5}' => array
 			(
 				"id" => "{C6A146FE-DACD-46A7-B228-BFED733D10A5}" ,
@@ -27641,7 +27797,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ADCA7B0A-38EB-4A4B-942E-E14333206714}' => array
 			(
 				"id" => "{ADCA7B0A-38EB-4A4B-942E-E14333206714}" ,
@@ -27660,7 +27816,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1DB03C2B-B543-4F2C-958F-3F839C9DDDF8}' => array
 			(
 				"id" => "{1DB03C2B-B543-4F2C-958F-3F839C9DDDF8}" ,
@@ -27679,7 +27835,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{553DB711-5D7D-41B9-B3A0-2638DEF1913F}' => array
 			(
 				"id" => "{553DB711-5D7D-41B9-B3A0-2638DEF1913F}" ,
@@ -27698,7 +27854,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A88FE4CE-0538-40F4-BB85-E8E9408E39DD}' => array
 			(
 				"id" => "{A88FE4CE-0538-40F4-BB85-E8E9408E39DD}" ,
@@ -27717,7 +27873,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{701FD5B5-ECA2-46CF-B50D-B2303661CB09}' => array
 			(
 				"id" => "{701FD5B5-ECA2-46CF-B50D-B2303661CB09}" ,
@@ -27736,7 +27892,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E330890A-A91C-4E37-BA95-346AAC065434}' => array
 			(
 				"id" => "{E330890A-A91C-4E37-BA95-346AAC065434}" ,
@@ -27755,7 +27911,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{96CD4233-EC52-40DC-8509-BD3209FE2447}' => array
 			(
 				"id" => "{96CD4233-EC52-40DC-8509-BD3209FE2447}" ,
@@ -27774,7 +27930,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{ED72A78D-1742-48E8-A45A-3996AE273F83}' => array
 			(
 				"id" => "{ED72A78D-1742-48E8-A45A-3996AE273F83}" ,
@@ -27793,7 +27949,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1020201B-8797-4DEB-B57B-5F964ACEF2FC}' => array
 			(
 				"id" => "{1020201B-8797-4DEB-B57B-5F964ACEF2FC}" ,
@@ -27812,7 +27968,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3D0BF70F-1E7E-4751-B722-4E38E828222C}' => array
 			(
 				"id" => "{3D0BF70F-1E7E-4751-B722-4E38E828222C}" ,
@@ -27831,7 +27987,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D6113D56-B9C7-4468-85D4-62A3FFCCF488}' => array
 			(
 				"id" => "{D6113D56-B9C7-4468-85D4-62A3FFCCF488}" ,
@@ -27850,7 +28006,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{38358543-9738-4E97-8C70-4B509FEBF0CC}' => array
 			(
 				"id" => "{38358543-9738-4E97-8C70-4B509FEBF0CC}" ,
@@ -27869,7 +28025,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EB07A0FE-0BB4-47B0-9771-A5836D621E78}' => array
 			(
 				"id" => "{EB07A0FE-0BB4-47B0-9771-A5836D621E78}" ,
@@ -27888,7 +28044,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E203F00A-8D7E-49EC-AD7F-9B959A424138}' => array
 			(
 				"id" => "{E203F00A-8D7E-49EC-AD7F-9B959A424138}" ,
@@ -27907,7 +28063,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3E484EFE-3C40-4442-AA12-51AA56E1FE5F}' => array
 			(
 				"id" => "{3E484EFE-3C40-4442-AA12-51AA56E1FE5F}" ,
@@ -27926,7 +28082,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3FDA30B7-95F7-4362-BAAF-4744878EC11F}' => array
 			(
 				"id" => "{3FDA30B7-95F7-4362-BAAF-4744878EC11F}" ,
@@ -27945,7 +28101,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{47A40052-8899-4F88-9DE3-D88141EF3779}' => array
 			(
 				"id" => "{47A40052-8899-4F88-9DE3-D88141EF3779}" ,
@@ -27964,7 +28120,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CC755670-0CFE-4B7B-AF8F-98F56A65130E}' => array
 			(
 				"id" => "{CC755670-0CFE-4B7B-AF8F-98F56A65130E}" ,
@@ -27983,7 +28139,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{994FC0A4-CB3A-449D-A054-047A746F6181}' => array
 			(
 				"id" => "{994FC0A4-CB3A-449D-A054-047A746F6181}" ,
@@ -28002,7 +28158,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E4E44965-36C8-47CC-B897-0E7D40A0C1D6}' => array
 			(
 				"id" => "{E4E44965-36C8-47CC-B897-0E7D40A0C1D6}" ,
@@ -28021,7 +28177,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{35E1160E-8F64-4148-A045-EAF34A4618D2}' => array
 			(
 				"id" => "{35E1160E-8F64-4148-A045-EAF34A4618D2}" ,
@@ -28040,7 +28196,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2CB3D6B4-82FC-456C-A738-C20201472A91}' => array
 			(
 				"id" => "{2CB3D6B4-82FC-456C-A738-C20201472A91}" ,
@@ -28059,7 +28215,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FBE39AEE-FB5C-4A1D-80C5-D1D3173CD20F}' => array
 			(
 				"id" => "{FBE39AEE-FB5C-4A1D-80C5-D1D3173CD20F}" ,
@@ -28078,21 +28234,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{C3F57DE1-8035-402C-9511-039AD1BEECBC}' => array
 			(
 				"id" => "{C3F57DE1-8035-402C-9511-039AD1BEECBC}" ,
-				"name" => "pk_tbl_studiengang" ,
+				"name" => "pk_studiengang" ,
 				"caption" => "pk_tbl_studiengang" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{AED0477E-FF31-4244-87BA-2EFF14758BD8}' => array
 			   		(
 		   				"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}" ,
@@ -28110,10 +28266,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{9A3D92DF-7BB1-4A99-B975-6BFB561CA054}","id" => "{E01A51F0-9817-4B9E-87B4-AD88511A7484}","id" => "{84834544-7C0B-4D5D-BE60-EEBBC571180A}","id" => "{03EA6ECB-3E16-4CD8-9721-33746A3D596D}","id" => "{A813A643-CDDE-440B-AF63-D9D1D6FF5779}","id" => "{76147385-7A16-4F69-A739-4A2D9945FF9F}","id" => "{1495EAA9-176B-40E1-B643-1C9128FF0F63}","id" => "{7740E93D-E105-4ABD-B5B6-BC28CE2F0C4D}","id" => "{4E67F4E3-E295-4730-9A80-D4FE6B1AAB72}","id" => "{1AA18910-AA6E-452D-98CA-AAA803D850A8}","id" => "{C36A18CB-C28D-41A0-9CCF-9A58569DA5CF}","id" => "{ADC16795-15B2-452F-9A30-8872127A5766}","id" => "{5869536B-FF07-4D5C-9192-823F468C2CF2}","id" => "{41FE7305-F8C5-453C-8EF0-675AC38B527C}","id" => "{827054A0-6110-438A-AA44-C6428E580707}","id" => "{B6D48515-C259-433D-8B83-97BB33CEF2BA}","id" => "{3CD424D6-3156-498A-B66B-5FC918CB1F44}","id" => "{36567C3B-646F-43F9-9AAB-149A263CA201}","id" => "{C7895818-115A-490E-A495-4B596DDB1000}","id" => "{F2E327C3-8E59-4D11-868A-15B5B2B2C5BB}","id" => "{23F28CA9-8BD7-472C-AAC5-39BB29ED0B5C}","id" => "{0C19F66B-7692-433D-8F78-C95A346216D2}","id" => "{6DF31221-E54A-4458-81EA-4370B5822C58}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{1B128A8F-EB2C-47C9-B205-6E9C8093AC0F}' => array
 			(
 				"id" => "{1B128A8F-EB2C-47C9-B205-6E9C8093AC0F}" ,
@@ -28123,7 +28279,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9A2192B5-59AA-4D5C-A9F1-1272EC065CE6}' => array
 			   		(
 		   				"id" => "{9A2192B5-59AA-4D5C-A9F1-1272EC065CE6}" ,
@@ -28138,27 +28294,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{2053D456-2B60-496F-AB67-0AA651F1DE74}'  => array
 	(
 	    	"id" => "{2053D456-2B60-496F-AB67-0AA651F1DE74}" ,
-	    	"name" => "Studiensemester" ,
-	    	"caption" => "tbl_studiensemester" ,
+	    	"name" => "tbl_studiensemester" ,
+	    	"caption" => "Studiensemester" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{BDBC9475-3D5E-4E25-B51B-0965A2906DD5}' => array
 			(
 				"id" => "{BDBC9475-3D5E-4E25-B51B-0965A2906DD5}" ,
@@ -28177,7 +28333,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6C6E30D6-C6EE-4767-A4D1-EFE5D32703C9}' => array
 			(
 				"id" => "{6C6E30D6-C6EE-4767-A4D1-EFE5D32703C9}" ,
@@ -28196,7 +28352,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4A053F64-ADF0-4CD4-A9E6-F663BAD720E7}' => array
 			(
 				"id" => "{4A053F64-ADF0-4CD4-A9E6-F663BAD720E7}" ,
@@ -28215,7 +28371,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{661E1DD1-1013-418E-A0E7-416693C1DF5B}' => array
 			(
 				"id" => "{661E1DD1-1013-418E-A0E7-416693C1DF5B}" ,
@@ -28234,7 +28390,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{48FB6722-311D-422B-AAA7-ACC7A9EFA787}' => array
 			(
 				"id" => "{48FB6722-311D-422B-AAA7-ACC7A9EFA787}" ,
@@ -28253,21 +28409,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{7BEA40CF-6F63-41BD-B77C-52F31AE00BD5}' => array
 			(
 				"id" => "{7BEA40CF-6F63-41BD-B77C-52F31AE00BD5}" ,
-				"name" => "pk_tbl_studiensemester" ,
+				"name" => "pk_studiensemester" ,
 				"caption" => "pk_tbl_studiensemester" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}' => array
 			   		(
 		   				"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}" ,
@@ -28285,24 +28441,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{0AA16E3D-9307-482D-84C7-F053EFCD2DED}","id" => "{B798EA13-98CC-4AE0-9ADB-F43E2F47045B}","id" => "{A80794D6-194C-4D81-8A13-EA6765A58D70}","id" => "{3BFC3B34-776B-434B-BFCC-E3D5B83433A6}","id" => "{12A0CC00-2954-454E-AE2B-0300D6DEBD0D}","id" => "{5C596600-88D3-47C8-B390-BFD8428C7F8A}","id" => "{9D5BE4B8-AA53-417E-AFCF-3BFC6CA3FB24}","id" => "{93F24147-9791-4A9B-91C8-BD067DE40393}","id" => "{8586CBC2-1A5A-4506-9239-A487DC6CD74A}","id" => "{97AFE943-5864-4CBF-995A-C4C0567C9150}","id" => "{6E9DD39D-E001-40C9-96A5-2434563EAE54}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EA681F59-1D87-4333-ABC6-EB9E16F60329}'  => array
 	(
 	    	"id" => "{EA681F59-1D87-4333-ABC6-EB9E16F60329}" ,
-	    	"name" => "Synclehreinheit" ,
+	    	"name" => "tbl_synclehreinheit" ,
 	    	"caption" => "tbl_synclehreinheit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E7315E99-0A92-42A6-92C9-C89B30FD138C}' => array
 			(
 				"id" => "{E7315E99-0A92-42A6-92C9-C89B30FD138C}" ,
@@ -28321,7 +28477,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E8E2888C-8A5C-48EE-9B0E-3A278188329D}' => array
 			(
 				"id" => "{E8E2888C-8A5C-48EE-9B0E-3A278188329D}" ,
@@ -28340,21 +28496,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{FEB04B9B-7CEF-44F5-BB9C-860420606417}' => array
 			(
 				"id" => "{FEB04B9B-7CEF-44F5-BB9C-860420606417}" ,
-				"name" => "Synclehreinheit_pkey" ,
-				"caption" => "tbl_synclehreinheit_pkey" ,
+				"name" => "pk_synclehreinheit" ,
+				"caption" => "pk_synclehreinheit" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{12680476-7BAC-42ED-ADEE-61DC432CD80D}' => array
 			   		(
 		   				"id" => "{12680476-7BAC-42ED-ADEE-61DC432CD80D}" ,
@@ -28369,10 +28525,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{A47FA37E-8C8D-4AD4-8340-68E91CB14222}' => array
 			   		(
 		   				"id" => "{A47FA37E-8C8D-4AD4-8340-68E91CB14222}" ,
@@ -28387,27 +28543,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{F01DDC2F-C5F7-4E07-8C7F-2955B2C658FC}'  => array
 	(
 	    	"id" => "{F01DDC2F-C5F7-4E07-8C7F-2955B2C658FC}" ,
-	    	"name" => "Variable" ,
+	    	"name" => "tbl_variable" ,
 	    	"caption" => "tbl_variable" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{C99112D2-F472-499D-982A-938F852B6500}' => array
 			(
 				"id" => "{C99112D2-F472-499D-982A-938F852B6500}" ,
@@ -28426,7 +28582,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6D8B4B21-F995-4AE4-8C06-786EF2EC7DAE}' => array
 			(
 				"id" => "{6D8B4B21-F995-4AE4-8C06-786EF2EC7DAE}" ,
@@ -28445,7 +28601,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F911B2E7-50E4-4D76-8FF6-6F49ACE8EA85}' => array
 			(
 				"id" => "{F911B2E7-50E4-4D76-8FF6-6F49ACE8EA85}" ,
@@ -28464,21 +28620,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{BAADA342-13EB-4564-AE83-B1BC7177FAC3}' => array
 			(
 				"id" => "{BAADA342-13EB-4564-AE83-B1BC7177FAC3}" ,
-				"name" => "pk_tbl_variable" ,
+				"name" => "pk_variable" ,
 				"caption" => "pk_tbl_variable" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B948D358-D688-4FBC-97F9-0A1B9BCAE5A6}' => array
 			   		(
 		   				"id" => "{B948D358-D688-4FBC-97F9-0A1B9BCAE5A6}" ,
@@ -28493,10 +28649,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{42698D54-D20D-415B-88B2-AC86A1A9948E}' => array
 			   		(
 		   				"id" => "{42698D54-D20D-415B-88B2-AC86A1A9948E}" ,
@@ -28511,27 +28667,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{CB21FEDF-2FF5-478C-9FBF-D40E7A8E1804}'  => array
 	(
 	    	"id" => "{CB21FEDF-2FF5-478C-9FBF-D40E7A8E1804}" ,
-	    	"name" => "Vorlage" ,
+	    	"name" => "tbl_vorlage" ,
 	    	"caption" => "tbl_vorlage" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{A2B14F7A-B90D-4A77-948F-AD84C825AA7B}' => array
 			(
 				"id" => "{A2B14F7A-B90D-4A77-948F-AD84C825AA7B}" ,
@@ -28550,7 +28706,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{597A026D-5E48-4570-BD5A-73387BAE8899}' => array
 			(
 				"id" => "{597A026D-5E48-4570-BD5A-73387BAE8899}" ,
@@ -28569,7 +28725,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{337C976C-C48B-4375-836B-4047E6995540}' => array
 			(
 				"id" => "{337C976C-C48B-4375-836B-4047E6995540}" ,
@@ -28588,21 +28744,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{4D203A5B-DB94-465E-8528-29EAA787E4A7}' => array
 			(
 				"id" => "{4D203A5B-DB94-465E-8528-29EAA787E4A7}" ,
-				"name" => "pk_tbl_vorlage" ,
+				"name" => "pk_vorlage" ,
 				"caption" => "pk_tbl_vorlage" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{10BD9638-9F81-4E0C-918E-29202D07498E}' => array
 			   		(
 		   				"id" => "{10BD9638-9F81-4E0C-918E-29202D07498E}" ,
@@ -28620,24 +28776,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{88215737-6BE5-40B3-ACD2-DCCC0F780454}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{519982B4-5586-495B-8B9D-597A24A35852}'  => array
 	(
 	    	"id" => "{519982B4-5586-495B-8B9D-597A24A35852}" ,
-	    	"name" => "Vorlagestudiengang" ,
+	    	"name" => "tbl_vorlagestudiengang" ,
 	    	"caption" => "tbl_vorlagestudiengang" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{862EDDBF-35B6-4AA1-B567-44AA5B127F96}' => array
 			(
 				"id" => "{862EDDBF-35B6-4AA1-B567-44AA5B127F96}" ,
@@ -28656,7 +28812,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CFE4EA0B-05EF-4CBD-BAF1-34A664176AA9}' => array
 			(
 				"id" => "{CFE4EA0B-05EF-4CBD-BAF1-34A664176AA9}" ,
@@ -28675,7 +28831,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EAB427A8-738F-43D2-852D-1A6DF1391459}' => array
 			(
 				"id" => "{EAB427A8-738F-43D2-852D-1A6DF1391459}" ,
@@ -28694,7 +28850,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{49F6BFF7-0EBE-4212-9873-7C2F60609DA5}' => array
 			(
 				"id" => "{49F6BFF7-0EBE-4212-9873-7C2F60609DA5}" ,
@@ -28713,21 +28869,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{25315433-8F39-4EFE-86F1-998AE36B4067}' => array
 			(
 				"id" => "{25315433-8F39-4EFE-86F1-998AE36B4067}" ,
-				"name" => "pk_tbl_vorlagestudiengang" ,
+				"name" => "pk_vorlagestudiengang" ,
 				"caption" => "pk_tbl_vorlagestudiengang" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{E837C90F-27F5-4A0D-82DC-18DBCADD29C0}' => array
 			   		(
 		   				"id" => "{E837C90F-27F5-4A0D-82DC-18DBCADD29C0}" ,
@@ -28742,10 +28898,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{E498A745-7BE6-4D1B-97DC-EF84FB69A74C}' => array
 			   		(
 		   				"id" => "{E498A745-7BE6-4D1B-97DC-EF84FB69A74C}" ,
@@ -28760,10 +28916,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{61FC3AA5-3AFA-4C6B-B230-32CC8ABA3F19}' => array
 			   		(
 		   				"id" => "{61FC3AA5-3AFA-4C6B-B230-32CC8ABA3F19}" ,
@@ -28778,27 +28934,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{0B316019-FBD8-483F-B304-2902D1653770}'  => array
 	(
 	    	"id" => "{0B316019-FBD8-483F-B304-2902D1653770}" ,
-	    	"name" => "Syncgruppe" ,
+	    	"name" => "tbl_syncgruppe" ,
 	    	"caption" => "tbl_syncgruppe" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A042B101-957A-4776-86EB-BD484ED22749}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{E6F2B093-7BC1-40AC-9E83-07CCF72260B0}' => array
 			(
 				"id" => "{E6F2B093-7BC1-40AC-9E83-07CCF72260B0}" ,
@@ -28817,7 +28973,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B1B7861B-9959-41F7-83AF-5E41829D74C6}' => array
 			(
 				"id" => "{B1B7861B-9959-41F7-83AF-5E41829D74C6}" ,
@@ -28836,11 +28992,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{6F87B698-E560-407B-8015-266CAC6D7D00}' => array
 			(
 				"id" => "{6F87B698-E560-407B-8015-266CAC6D7D00}" ,
@@ -28850,24 +29006,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{393FA673-E403-4092-B3E3-810A6C74A837}'  => array
 	(
 	    	"id" => "{393FA673-E403-4092-B3E3-810A6C74A837}" ,
-	    	"name" => "Synclehreinheit" ,
+	    	"name" => "tbl_synclehreinheit" ,
 	    	"caption" => "tbl_synclehreinheit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A042B101-957A-4776-86EB-BD484ED22749}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{BEBFB733-F5AD-48F0-882E-8EEA375D4272}' => array
 			(
 				"id" => "{BEBFB733-F5AD-48F0-882E-8EEA375D4272}" ,
@@ -28886,7 +29042,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{54F90635-107B-4250-94AC-419E743BDBDA}' => array
 			(
 				"id" => "{54F90635-107B-4250-94AC-419E743BDBDA}" ,
@@ -28905,21 +29061,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{59508710-A97D-4E51-AF9A-DB6B3DF58B19}' => array
 			(
 				"id" => "{59508710-A97D-4E51-AF9A-DB6B3DF58B19}" ,
-				"name" => "synclehreinheit_pk" ,
+				"name" => "pk_synclehreinheit" ,
 				"caption" => "synclehreinheit_pk" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{807A0CBA-E340-4C60-9493-3CB51D151637}' => array
 			   		(
 		   				"id" => "{807A0CBA-E340-4C60-9493-3CB51D151637}" ,
@@ -28934,10 +29090,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{D73C6C9E-1733-485B-8D4C-7F21E3C36D62}' => array
 			   		(
 		   				"id" => "{D73C6C9E-1733-485B-8D4C-7F21E3C36D62}" ,
@@ -28952,27 +29108,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9E25B214-7191-4BAE-BBC4-46AA41E6CD45}'  => array
 	(
 	    	"id" => "{9E25B214-7191-4BAE-BBC4-46AA41E6CD45}" ,
-	    	"name" => "Synclehrveranstaltung" ,
+	    	"name" => "tbl_synclehrveranstaltung" ,
 	    	"caption" => "tbl_synclehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A042B101-957A-4776-86EB-BD484ED22749}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{180D5E4A-A1BE-4152-9B54-CE72EDB2918F}' => array
 			(
 				"id" => "{180D5E4A-A1BE-4152-9B54-CE72EDB2918F}" ,
@@ -28991,7 +29147,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{888CC1FE-AEF4-4DAF-8D5B-9BAB38213F04}' => array
 			(
 				"id" => "{888CC1FE-AEF4-4DAF-8D5B-9BAB38213F04}" ,
@@ -29010,11 +29166,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{61DBFDBB-C133-48C5-99A6-C50D96293B75}' => array
 			(
 				"id" => "{61DBFDBB-C133-48C5-99A6-C50D96293B75}" ,
@@ -29024,24 +29180,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{CE524360-3E8D-4A9A-BA3B-EACED162D691}'  => array
 	(
 	    	"id" => "{CE524360-3E8D-4A9A-BA3B-EACED162D691}" ,
-	    	"name" => "Syncperson" ,
+	    	"name" => "tbl_syncperson" ,
 	    	"caption" => "tbl_syncperson" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A042B101-957A-4776-86EB-BD484ED22749}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{73283C3E-C3EE-4CFF-B520-370AAD5DBD2C}' => array
 			(
 				"id" => "{73283C3E-C3EE-4CFF-B520-370AAD5DBD2C}" ,
@@ -29060,7 +29216,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{91A9A49C-BF33-4745-B805-095EFD07EF55}' => array
 			(
 				"id" => "{91A9A49C-BF33-4745-B805-095EFD07EF55}" ,
@@ -29079,11 +29235,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{CCE4AEF4-8847-4882-ABDB-3F07EBF3FB7B}' => array
 			(
 				"id" => "{CCE4AEF4-8847-4882-ABDB-3F07EBF3FB7B}" ,
@@ -29093,24 +29249,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{857724FE-72FB-4AEC-A870-0A16CDDBC1C7}'  => array
 	(
 	    	"id" => "{857724FE-72FB-4AEC-A870-0A16CDDBC1C7}" ,
-	    	"name" => "Zutrittskarte" ,
+	    	"name" => "tbl_zutrittskarte" ,
 	    	"caption" => "tbl_zutrittskarte" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{A042B101-957A-4776-86EB-BD484ED22749}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{47766788-4A28-418A-9E84-A0AF034480AE}' => array
 			(
 				"id" => "{47766788-4A28-418A-9E84-A0AF034480AE}" ,
@@ -29129,7 +29285,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1D99AC89-A672-49AC-B4CF-F7C5A5F3A22B}' => array
 			(
 				"id" => "{1D99AC89-A672-49AC-B4CF-F7C5A5F3A22B}" ,
@@ -29148,7 +29304,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{18BB487E-7E47-47F2-9E22-D759FDECD9BE}' => array
 			(
 				"id" => "{18BB487E-7E47-47F2-9E22-D759FDECD9BE}" ,
@@ -29167,7 +29323,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B72C6581-3DE9-49B2-907C-EAE2DC00D291}' => array
 			(
 				"id" => "{B72C6581-3DE9-49B2-907C-EAE2DC00D291}" ,
@@ -29186,7 +29342,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7B223E39-77DD-4DE2-93C9-390411502496}' => array
 			(
 				"id" => "{7B223E39-77DD-4DE2-93C9-390411502496}" ,
@@ -29205,7 +29361,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{397CFA09-CCC7-40E5-A5DD-F1C52D7C5630}' => array
 			(
 				"id" => "{397CFA09-CCC7-40E5-A5DD-F1C52D7C5630}" ,
@@ -29224,7 +29380,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D4BC3187-0057-4854-B17D-1D260EACA501}' => array
 			(
 				"id" => "{D4BC3187-0057-4854-B17D-1D260EACA501}" ,
@@ -29243,7 +29399,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B3780DC6-BB59-449B-962E-5DD59505AFDE}' => array
 			(
 				"id" => "{B3780DC6-BB59-449B-962E-5DD59505AFDE}" ,
@@ -29262,7 +29418,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{06D96612-0F7D-4508-A289-330768151D7E}' => array
 			(
 				"id" => "{06D96612-0F7D-4508-A289-330768151D7E}" ,
@@ -29281,7 +29437,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{73DD79DB-30A1-4510-9F70-A970C09C192C}' => array
 			(
 				"id" => "{73DD79DB-30A1-4510-9F70-A970C09C192C}" ,
@@ -29300,7 +29456,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{17E5D399-1D95-4F2B-9CD6-B6E22CBDD577}' => array
 			(
 				"id" => "{17E5D399-1D95-4F2B-9CD6-B6E22CBDD577}" ,
@@ -29319,7 +29475,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B38D9A11-6EBD-4B2A-8066-2B4EC47A3F77}' => array
 			(
 				"id" => "{B38D9A11-6EBD-4B2A-8066-2B4EC47A3F77}" ,
@@ -29338,7 +29494,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5AB53F06-DE15-4764-ACFF-2AE0F847F254}' => array
 			(
 				"id" => "{5AB53F06-DE15-4764-ACFF-2AE0F847F254}" ,
@@ -29357,7 +29513,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BD8C4260-31AE-4089-A04F-79A462AC6BD8}' => array
 			(
 				"id" => "{BD8C4260-31AE-4089-A04F-79A462AC6BD8}" ,
@@ -29376,7 +29532,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{CCB2ED0B-B862-4F0C-95B5-97E6644DAC77}' => array
 			(
 				"id" => "{CCB2ED0B-B862-4F0C-95B5-97E6644DAC77}" ,
@@ -29395,21 +29551,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F28E9060-B61C-4B35-B2BA-E7A6DB5EE4D3}' => array
 			(
 				"id" => "{F28E9060-B61C-4B35-B2BA-E7A6DB5EE4D3}" ,
-				"name" => "Zutrittskarte_pkey" ,
-				"caption" => "tbl_zutrittskarte_pkey" ,
+				"name" => "pk_Zutrittskarte" ,
+				"caption" => "pk_zutrittskarte" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9C42BC00-B859-4C76-AFBF-B21D92F6A54D}' => array
 			   		(
 		   				"id" => "{9C42BC00-B859-4C76-AFBF-B21D92F6A54D}" ,
@@ -29424,16 +29580,16 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{16744DD3-68CE-430F-819C-331B5B8A09AB}'  => array
 	(
 	    	"id" => "{16744DD3-68CE-430F-819C-331B5B8A09AB}" ,
@@ -29444,7 +29600,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{8D2B5B30-D9C0-4AF4-A4FB-2887B3BC6421}' => array
 			(
 				"id" => "{8D2B5B30-D9C0-4AF4-A4FB-2887B3BC6421}" ,
@@ -29463,7 +29619,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E661AF9D-092E-4669-AB4B-2653CB9ECC61}' => array
 			(
 				"id" => "{E661AF9D-092E-4669-AB4B-2653CB9ECC61}" ,
@@ -29482,7 +29638,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{530783B4-1342-49BC-AC46-A554E9B64C1C}' => array
 			(
 				"id" => "{530783B4-1342-49BC-AC46-A554E9B64C1C}" ,
@@ -29501,7 +29657,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{53457D64-233D-411E-ADC5-3BB48156CF5C}' => array
 			(
 				"id" => "{53457D64-233D-411E-ADC5-3BB48156CF5C}" ,
@@ -29520,7 +29676,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{25F093DF-DD01-40FB-AA61-3A49D312209F}' => array
 			(
 				"id" => "{25F093DF-DD01-40FB-AA61-3A49D312209F}" ,
@@ -29534,12 +29690,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_ablauf_ablauf_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_ablauf_ablauf_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5461D564-B4F5-459C-81BD-CEA1409D6A15}' => array
 			(
 				"id" => "{5461D564-B4F5-459C-81BD-CEA1409D6A15}" ,
@@ -29558,7 +29714,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{20B061B0-8C94-4062-9403-EC7E15E99971}' => array
 			(
 				"id" => "{20B061B0-8C94-4062-9403-EC7E15E99971}" ,
@@ -29577,7 +29733,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7FE9AE5B-DFCD-4D3B-BD84-EB27DEF291DA}' => array
 			(
 				"id" => "{7FE9AE5B-DFCD-4D3B-BD84-EB27DEF291DA}" ,
@@ -29596,7 +29752,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{98FD9FBB-6554-46AE-988B-BB3169BECE41}' => array
 			(
 				"id" => "{98FD9FBB-6554-46AE-988B-BB3169BECE41}" ,
@@ -29615,7 +29771,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9A686F37-A9C7-4487-978A-219524AFC0E1}' => array
 			(
 				"id" => "{9A686F37-A9C7-4487-978A-219524AFC0E1}" ,
@@ -29634,21 +29790,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{3D48D85D-4C97-455E-895F-1F014177589A}' => array
 			(
 				"id" => "{3D48D85D-4C97-455E-895F-1F014177589A}" ,
-				"name" => "tbl_ablauf_pkey" ,
-				"caption" => "tbl_ablauf_pkey" ,
+				"name" => "pk_ablauf" ,
+				"caption" => "pk_ablauf" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{12BE8B38-19D7-462B-AF02-DD7712EB2444}' => array
 			   		(
 		   				"id" => "{12BE8B38-19D7-462B-AF02-DD7712EB2444}" ,
@@ -29663,16 +29819,16 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{EA1A263E-4A0D-4803-B4DF-1BBB798C26AC}'  => array
 	(
 	    	"id" => "{EA1A263E-4A0D-4803-B4DF-1BBB798C26AC}" ,
@@ -29683,7 +29839,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{2EB1FFE4-79FF-45E4-945B-8B995AFE91FA}' => array
 			(
 				"id" => "{2EB1FFE4-79FF-45E4-945B-8B995AFE91FA}" ,
@@ -29697,12 +29853,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_antwort_antwort_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_antwort_antwort_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7B515D37-EBD2-4F11-9AE4-8A6A93C52499}' => array
 			(
 				"id" => "{7B515D37-EBD2-4F11-9AE4-8A6A93C52499}" ,
@@ -29721,7 +29877,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C0CA9E65-75D1-4269-A625-04C198520520}' => array
 			(
 				"id" => "{C0CA9E65-75D1-4269-A625-04C198520520}" ,
@@ -29740,21 +29896,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{8FAF7836-77B6-43EF-A808-8D4D4093BB4A}' => array
 			(
 				"id" => "{8FAF7836-77B6-43EF-A808-8D4D4093BB4A}" ,
-				"name" => "tbl_antwort_pkey" ,
-				"caption" => "tbl_antwort_pkey" ,
+				"name" => "pk_antwort" ,
+				"caption" => "pk_antwort" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{B62A7194-2831-4C0F-A2DB-51AE016700A9}' => array
 			   		(
 		   				"id" => "{B62A7194-2831-4C0F-A2DB-51AE016700A9}" ,
@@ -29769,27 +29925,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{4E87F49C-3859-40BD-BB3C-53CC729147C7}'  => array
 	(
 	    	"id" => "{4E87F49C-3859-40BD-BB3C-53CC729147C7}" ,
-	    	"name" => "Frage" ,
+	    	"name" => "tbl_frage" ,
 	    	"caption" => "tbl_frage" ,
 	    	"comments" => "Fragen zu den Wissengebieten" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{CCC3F4C9-4AA4-4497-99A4-6F049D1CFB04}' => array
 			(
 				"id" => "{CCC3F4C9-4AA4-4497-99A4-6F049D1CFB04}" ,
@@ -29803,12 +29959,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_frage_frage_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_frage_frage_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3C92ECAC-1D3D-49A5-A514-9820DAB671E2}' => array
 			(
 				"id" => "{3C92ECAC-1D3D-49A5-A514-9820DAB671E2}" ,
@@ -29827,7 +29983,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FEFE684A-CB46-4FB7-ABE2-124091170F45}' => array
 			(
 				"id" => "{FEFE684A-CB46-4FB7-ABE2-124091170F45}" ,
@@ -29846,7 +30002,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{72D91627-0619-42C2-883A-033F848559BA}' => array
 			(
 				"id" => "{72D91627-0619-42C2-883A-033F848559BA}" ,
@@ -29865,7 +30021,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C56ECB3F-3625-42DE-8A07-02294A9752A2}' => array
 			(
 				"id" => "{C56ECB3F-3625-42DE-8A07-02294A9752A2}" ,
@@ -29884,7 +30040,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{25E88FEB-6BFB-4F95-AB25-E34C42382DCE}' => array
 			(
 				"id" => "{25E88FEB-6BFB-4F95-AB25-E34C42382DCE}" ,
@@ -29903,7 +30059,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DA50DCB7-36FF-41EB-B5A3-CE93549622BF}' => array
 			(
 				"id" => "{DA50DCB7-36FF-41EB-B5A3-CE93549622BF}" ,
@@ -29922,7 +30078,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{05ADE1E1-5850-4A89-A382-C9F6E6F9F965}' => array
 			(
 				"id" => "{05ADE1E1-5850-4A89-A382-C9F6E6F9F965}" ,
@@ -29941,7 +30097,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FF31C7C1-35D9-4970-B665-2D49FDF75D9F}' => array
 			(
 				"id" => "{FF31C7C1-35D9-4970-B665-2D49FDF75D9F}" ,
@@ -29960,7 +30116,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{635FD109-4C48-46AC-99E7-67124B40E3BD}' => array
 			(
 				"id" => "{635FD109-4C48-46AC-99E7-67124B40E3BD}" ,
@@ -29979,21 +30135,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{053AA88D-9D10-4C31-8F86-E25C57063B66}' => array
 			(
 				"id" => "{053AA88D-9D10-4C31-8F86-E25C57063B66}" ,
-				"name" => "Frage_pkey" ,
-				"caption" => "tbl_frage_pkey" ,
+				"name" => "pk_frage" ,
+				"caption" => "pk_frage" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{EB2C71D7-1A40-4F85-AE71-182F2B97A1F2}' => array
 			   		(
 		   				"id" => "{EB2C71D7-1A40-4F85-AE71-182F2B97A1F2}" ,
@@ -30011,24 +30167,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{F2A9E238-6857-437C-A6A0-EC587A642B86}","id" => "{BAF05D60-88E9-4017-B152-39F3E0EBFD1D}","id" => "{5EE34A81-C763-4946-8604-03E657E696C5}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{843B7C91-4811-457C-91C9-D4E7D16D037D}'  => array
 	(
 	    	"id" => "{843B7C91-4811-457C-91C9-D4E7D16D037D}" ,
-	    	"name" => "Frage_sprache" ,
+	    	"name" => "tbl_frage_sprache" ,
 	    	"caption" => "tbl_frage_sprache" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{493BE4DC-EA34-4946-8C7C-79ABAEC1D08A}' => array
 			(
 				"id" => "{493BE4DC-EA34-4946-8C7C-79ABAEC1D08A}" ,
@@ -30047,7 +30203,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6C60F810-C60A-45C3-9223-861C1A2B4FF3}' => array
 			(
 				"id" => "{6C60F810-C60A-45C3-9223-861C1A2B4FF3}" ,
@@ -30066,7 +30222,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2048034D-3372-4960-9AC0-656A338236C0}' => array
 			(
 				"id" => "{2048034D-3372-4960-9AC0-656A338236C0}" ,
@@ -30085,7 +30241,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5980EC4D-03AA-44BC-B24B-4A304E5771AA}' => array
 			(
 				"id" => "{5980EC4D-03AA-44BC-B24B-4A304E5771AA}" ,
@@ -30104,7 +30260,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A982BBF6-45FF-4948-85CA-CA7CABF260E3}' => array
 			(
 				"id" => "{A982BBF6-45FF-4948-85CA-CA7CABF260E3}" ,
@@ -30123,7 +30279,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{30BCC164-9FC9-4D2E-A685-03C4B39501E2}' => array
 			(
 				"id" => "{30BCC164-9FC9-4D2E-A685-03C4B39501E2}" ,
@@ -30142,7 +30298,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9A6947FF-EFEF-428B-A313-6F30AD565567}' => array
 			(
 				"id" => "{9A6947FF-EFEF-428B-A313-6F30AD565567}" ,
@@ -30161,7 +30317,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3662A6F3-F6AE-4CD6-BCA3-8821609D41C8}' => array
 			(
 				"id" => "{3662A6F3-F6AE-4CD6-BCA3-8821609D41C8}" ,
@@ -30180,7 +30336,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FCD18D9F-0390-4CF0-AB59-2EC5842D86E5}' => array
 			(
 				"id" => "{FCD18D9F-0390-4CF0-AB59-2EC5842D86E5}" ,
@@ -30199,21 +30355,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5DFC707F-CC9C-4F21-BA6C-F2EFFF35A434}' => array
 			(
 				"id" => "{5DFC707F-CC9C-4F21-BA6C-F2EFFF35A434}" ,
-				"name" => "pk_tbl_frage_sprache" ,
+				"name" => "pk_frage_sprache" ,
 				"caption" => "pk_tbl_frage_sprache" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{130DEA5F-E636-4F30-806B-435D57B9444D}' => array
 			   		(
 		   				"id" => "{130DEA5F-E636-4F30-806B-435D57B9444D}" ,
@@ -30228,10 +30384,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{F6E9F968-9394-4B2F-BF4E-C753DEB93B0F}' => array
 			   		(
 		   				"id" => "{F6E9F968-9394-4B2F-BF4E-C753DEB93B0F}" ,
@@ -30246,27 +30402,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{A2F41D1E-3205-47FA-9C20-F03B8FFD5764}'  => array
 	(
 	    	"id" => "{A2F41D1E-3205-47FA-9C20-F03B8FFD5764}" ,
-	    	"name" => "Gebiet" ,
+	    	"name" => "tbl_gebiet" ,
 	    	"caption" => "tbl_gebiet" ,
 	    	"comments" => "Die verschiedenen Wissensgebiete" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{01E21B8C-691E-4C65-B889-9D93662247AF}' => array
 			(
 				"id" => "{01E21B8C-691E-4C65-B889-9D93662247AF}" ,
@@ -30280,12 +30436,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_gebiet_gebiet_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_gebiet_gebiet_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C1F67A6A-4E25-4C8F-88B3-B29C76BB39C4}' => array
 			(
 				"id" => "{C1F67A6A-4E25-4C8F-88B3-B29C76BB39C4}" ,
@@ -30304,7 +30460,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5C5318C1-F528-4444-8E4B-523E6FBF568B}' => array
 			(
 				"id" => "{5C5318C1-F528-4444-8E4B-523E6FBF568B}" ,
@@ -30323,7 +30479,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BD26B125-91C8-40CD-B0B7-91F7B7DDE79A}' => array
 			(
 				"id" => "{BD26B125-91C8-40CD-B0B7-91F7B7DDE79A}" ,
@@ -30342,7 +30498,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5B05FEE4-AFC5-4F42-82EA-A6A9D78D3C02}' => array
 			(
 				"id" => "{5B05FEE4-AFC5-4F42-82EA-A6A9D78D3C02}" ,
@@ -30361,7 +30517,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6DC43C6A-3886-4484-8E50-AA6D81322FEC}' => array
 			(
 				"id" => "{6DC43C6A-3886-4484-8E50-AA6D81322FEC}" ,
@@ -30380,7 +30536,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{167A2219-F392-4775-A106-2E4417C9500C}' => array
 			(
 				"id" => "{167A2219-F392-4775-A106-2E4417C9500C}" ,
@@ -30399,7 +30555,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{FE20E646-6F5F-4644-BA48-25DD2675E94A}' => array
 			(
 				"id" => "{FE20E646-6F5F-4644-BA48-25DD2675E94A}" ,
@@ -30418,7 +30574,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{7DDB4C76-F1E2-4307-879C-1BBB2BA2F9E1}' => array
 			(
 				"id" => "{7DDB4C76-F1E2-4307-879C-1BBB2BA2F9E1}" ,
@@ -30437,7 +30593,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B4F807B9-5E4B-4805-844F-23148D57E6B1}' => array
 			(
 				"id" => "{B4F807B9-5E4B-4805-844F-23148D57E6B1}" ,
@@ -30456,7 +30612,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DCB2D21E-8562-4832-B24D-2343DE469BC1}' => array
 			(
 				"id" => "{DCB2D21E-8562-4832-B24D-2343DE469BC1}" ,
@@ -30475,7 +30631,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2D3AF80E-1C11-46F3-9021-36CED414BA65}' => array
 			(
 				"id" => "{2D3AF80E-1C11-46F3-9021-36CED414BA65}" ,
@@ -30494,7 +30650,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{718A2DDB-ED41-4A43-ACD6-34C311ADC4AD}' => array
 			(
 				"id" => "{718A2DDB-ED41-4A43-ACD6-34C311ADC4AD}" ,
@@ -30513,7 +30669,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{5D252E61-C76E-484D-B2FE-5872A12BBB07}' => array
 			(
 				"id" => "{5D252E61-C76E-484D-B2FE-5872A12BBB07}" ,
@@ -30532,7 +30688,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{77A18EE2-6DA1-434C-80D0-4090A1B505F4}' => array
 			(
 				"id" => "{77A18EE2-6DA1-434C-80D0-4090A1B505F4}" ,
@@ -30551,7 +30707,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{8936B05E-5D3A-4D9A-BB99-F3DF9260F63A}' => array
 			(
 				"id" => "{8936B05E-5D3A-4D9A-BB99-F3DF9260F63A}" ,
@@ -30570,7 +30726,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{E34CF011-D42F-4A52-AEA8-56712528B0D1}' => array
 			(
 				"id" => "{E34CF011-D42F-4A52-AEA8-56712528B0D1}" ,
@@ -30589,7 +30745,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{103F7D6C-AE56-4699-8AC0-89957A4F2FA9}' => array
 			(
 				"id" => "{103F7D6C-AE56-4699-8AC0-89957A4F2FA9}" ,
@@ -30608,7 +30764,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{181BB5C1-E7E1-4E68-9541-685A70BC346B}' => array
 			(
 				"id" => "{181BB5C1-E7E1-4E68-9541-685A70BC346B}" ,
@@ -30627,21 +30783,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{90AEF6A8-3EEE-4A32-80D7-CF2EE85055EA}' => array
 			(
 				"id" => "{90AEF6A8-3EEE-4A32-80D7-CF2EE85055EA}" ,
-				"name" => "Gebiet_pkey" ,
-				"caption" => "tbl_gebiet_pkey" ,
+				"name" => "pk_gebiet" ,
+				"caption" => "pk_gebiet" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{BA19F314-BCE6-4F12-8250-2213AD366F23}' => array
 			   		(
 		   				"id" => "{BA19F314-BCE6-4F12-8250-2213AD366F23}" ,
@@ -30659,10 +30815,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{A9D772A8-0B47-43CA-BD2C-5D6E748C7098}","id" => "{6C127962-B205-4BC8-95D6-38D1AC068581}","id" => "{78866A65-5CDA-4463-8BFC-D684B187777F}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{C1D1E8DB-4B30-436F-B666-28841C3DB662}' => array
 			(
 				"id" => "{C1D1E8DB-4B30-436F-B666-28841C3DB662}" ,
@@ -30672,7 +30828,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{F6710E2C-B813-4732-8EC9-7A08C2997A51}' => array
 			   		(
 		   				"id" => "{F6710E2C-B813-4732-8EC9-7A08C2997A51}" ,
@@ -30687,27 +30843,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{FC7D4C29-700A-4056-BA36-55DA96BBC109}'  => array
 	(
 	    	"id" => "{FC7D4C29-700A-4056-BA36-55DA96BBC109}" ,
-	    	"name" => "Kategorie" ,
+	    	"name" => "tbl_kategorie" ,
 	    	"caption" => "tbl_kategorie" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{64AC6BC4-A4AE-4880-B868-F22CB6000A8B}' => array
 			(
 				"id" => "{64AC6BC4-A4AE-4880-B868-F22CB6000A8B}" ,
@@ -30726,7 +30882,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2723ED84-56F1-43A6-A6F5-FECA478A3D88}' => array
 			(
 				"id" => "{2723ED84-56F1-43A6-A6F5-FECA478A3D88}" ,
@@ -30745,21 +30901,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{D8C988CF-F106-4B5E-855F-520016178E00}' => array
 			(
 				"id" => "{D8C988CF-F106-4B5E-855F-520016178E00}" ,
-				"name" => "Kategorie_pkey" ,
-				"caption" => "tbl_kategorie_pkey" ,
+				"name" => "pk_kategorie" ,
+				"caption" => "pk_kategorie" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{1455684A-E436-4498-8DA0-DE7875942E99}' => array
 			   		(
 		   				"id" => "{1455684A-E436-4498-8DA0-DE7875942E99}" ,
@@ -30777,24 +30933,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{D8324689-0336-4121-86EC-41C059D981CF}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9C086DE5-DE76-4BBA-88DC-839322B653E5}'  => array
 	(
 	    	"id" => "{9C086DE5-DE76-4BBA-88DC-839322B653E5}" ,
-	    	"name" => "Kriterien" ,
+	    	"name" => "tbl_kriterien" ,
 	    	"caption" => "tbl_kriterien" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{B4FF4B0F-DAF3-4EC5-A57E-B2F90E3681EF}' => array
 			(
 				"id" => "{B4FF4B0F-DAF3-4EC5-A57E-B2F90E3681EF}" ,
@@ -30813,7 +30969,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B6516508-9077-4466-99AF-590135CA2F86}' => array
 			(
 				"id" => "{B6516508-9077-4466-99AF-590135CA2F86}" ,
@@ -30832,7 +30988,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{D99FBAB2-4588-43AA-8B5A-0B1501C4DD83}' => array
 			(
 				"id" => "{D99FBAB2-4588-43AA-8B5A-0B1501C4DD83}" ,
@@ -30851,7 +31007,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{97FE39DA-BE46-4017-8266-55C593659F0E}' => array
 			(
 				"id" => "{97FE39DA-BE46-4017-8266-55C593659F0E}" ,
@@ -30870,11 +31026,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{547BD573-42AD-4805-8B2F-6A6CA60E031F}' => array
 			(
 				"id" => "{547BD573-42AD-4805-8B2F-6A6CA60E031F}" ,
@@ -30884,24 +31040,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{1C4CF017-F861-4C1C-ADE9-2078BB2EAF44}'  => array
 	(
 	    	"id" => "{1C4CF017-F861-4C1C-ADE9-2078BB2EAF44}" ,
-	    	"name" => "Pruefling" ,
+	    	"name" => "tbl_pruefling" ,
 	    	"caption" => "tbl_pruefling" ,
 	    	"comments" => "Personen die zur Pruefung antreten" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{973E944B-FC21-4D75-8FA9-EAAB2D12514D}' => array
 			(
 				"id" => "{973E944B-FC21-4D75-8FA9-EAAB2D12514D}" ,
@@ -30915,12 +31071,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_pruefling_pruefling_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_pruefling_pruefling_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A3BEB934-5CD2-4235-A654-E70E04ABAC11}' => array
 			(
 				"id" => "{A3BEB934-5CD2-4235-A654-E70E04ABAC11}" ,
@@ -30939,7 +31095,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{81BA4973-8315-40D4-B8AA-650A20D514D0}' => array
 			(
 				"id" => "{81BA4973-8315-40D4-B8AA-650A20D514D0}" ,
@@ -30958,7 +31114,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6696EC15-22B4-4FC1-A373-12955C9E42ED}' => array
 			(
 				"id" => "{6696EC15-22B4-4FC1-A373-12955C9E42ED}" ,
@@ -30977,7 +31133,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{6231E97A-ABB9-4387-93B8-ED7F9C5CB826}' => array
 			(
 				"id" => "{6231E97A-ABB9-4387-93B8-ED7F9C5CB826}" ,
@@ -30996,7 +31152,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{BBB9F51C-3462-4498-804F-ACD2E7CD32DB}' => array
 			(
 				"id" => "{BBB9F51C-3462-4498-804F-ACD2E7CD32DB}" ,
@@ -31015,21 +31171,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{57BEFA90-2D51-4B25-8BC2-D5330B3D614D}' => array
 			(
 				"id" => "{57BEFA90-2D51-4B25-8BC2-D5330B3D614D}" ,
-				"name" => "Pruefling_pkey" ,
-				"caption" => "tbl_pruefling_pkey" ,
+				"name" => "pk_pruefling" ,
+				"caption" => "pk_pruefling" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{D73DB902-FACA-425E-85BC-FE9947FB88DB}' => array
 			   		(
 		   				"id" => "{D73DB902-FACA-425E-85BC-FE9947FB88DB}" ,
@@ -31047,10 +31203,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{2FCEEF98-E153-4824-9411-B4AB9AE98EA0}","id" => "{05699831-9F02-48DF-BB86-80EF8E9A3F1E}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 			'{48EB90AB-4930-46E6-8A65-4EE80CBC4CE8}' => array
 			(
 				"id" => "{48EB90AB-4930-46E6-8A65-4EE80CBC4CE8}" ,
@@ -31060,7 +31216,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{7E825884-5629-4BDE-90E9-E2916F3AD356}' => array
 			   		(
 		   				"id" => "{7E825884-5629-4BDE-90E9-E2916F3AD356}" ,
@@ -31075,27 +31231,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{27E69CBE-FFE2-4B91-8D16-F70702BA2E56}'  => array
 	(
 	    	"id" => "{27E69CBE-FFE2-4B91-8D16-F70702BA2E56}" ,
-	    	"name" => "Pruefling_frage" ,
+	    	"name" => "tbl_pruefling_frage" ,
 	    	"caption" => "tbl_pruefling_frage" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{F9805CCA-FEDA-436F-8C13-0CAC280B7105}' => array
 			(
 				"id" => "{F9805CCA-FEDA-436F-8C13-0CAC280B7105}" ,
@@ -31109,12 +31265,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_pruefling_frage_prueflingfrage_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_pruefling_frage_prueflingfrage_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DF21FA95-16C2-4B1D-B255-1BE7E6562524}' => array
 			(
 				"id" => "{DF21FA95-16C2-4B1D-B255-1BE7E6562524}" ,
@@ -31133,7 +31289,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{2213BF3C-0D86-4FC0-840C-7C4063E95961}' => array
 			(
 				"id" => "{2213BF3C-0D86-4FC0-840C-7C4063E95961}" ,
@@ -31152,7 +31308,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{22DBE17F-235B-450A-B300-A384D2E3121C}' => array
 			(
 				"id" => "{22DBE17F-235B-450A-B300-A384D2E3121C}" ,
@@ -31171,7 +31327,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{4B693510-E30B-474E-B7D8-E760C9F09267}' => array
 			(
 				"id" => "{4B693510-E30B-474E-B7D8-E760C9F09267}" ,
@@ -31190,7 +31346,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{DA295260-9DCF-4EBF-975E-7168A6AB7280}' => array
 			(
 				"id" => "{DA295260-9DCF-4EBF-975E-7168A6AB7280}" ,
@@ -31209,21 +31365,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{F027BD24-3F7A-424F-9F44-71B9BD194610}' => array
 			(
 				"id" => "{F027BD24-3F7A-424F-9F44-71B9BD194610}" ,
-				"name" => "pk_tbl_pruefling_frage" ,
+				"name" => "pk_pruefling_frage" ,
 				"caption" => "pk_tbl_pruefling_frage" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{119D8817-A7B5-4B5D-9256-EEEFB51CA604}' => array
 			   		(
 		   				"id" => "{119D8817-A7B5-4B5D-9256-EEEFB51CA604}" ,
@@ -31238,46 +31394,46 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{9A2C83BA-9711-4264-9307-C64CF6D2AEE0}'  => array
 	(
 	    	"id" => "{9A2C83BA-9711-4264-9307-C64CF6D2AEE0}" ,
-	    	"name" => "Vorschlag" ,
+	    	"name" => "tbl_vorschlag" ,
 	    	"caption" => "tbl_vorschlag" ,
 	    	"comments" => "Alle moglichen Antworten zu einer Frage" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{C841C6F7-563B-4C8A-B0F3-F3491AC90752}' => array
 			(
 				"id" => "{C841C6F7-563B-4C8A-B0F3-F3491AC90752}" ,
 				"name" => "vorschlag_id" ,
 				"caption" => "vorschlag_id" ,
 				"ordinal" => "1" ,
-				"pk" => "{B4E174D5-655B-4510-82FB-D38BDC444FE0}" ,
+				"pk" => "{AB5BD25B-6C6F-4436-9EEA-6F95FC796FD2}" ,
 				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "nextval('testtool.tbl_vorschlag_vorschlag_id_seq'::regclass)",
+				"defaultvalue" => "nextval('testtool.seq_vorschlag_vorschlag_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{0943E86A-F043-4FC9-867D-A0B4E1BF777E}' => array
 			(
 				"id" => "{0943E86A-F043-4FC9-867D-A0B4E1BF777E}" ,
@@ -31296,7 +31452,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{957993C6-32EF-4A58-A430-0E37CD0AF8DB}' => array
 			(
 				"id" => "{957993C6-32EF-4A58-A430-0E37CD0AF8DB}" ,
@@ -31315,7 +31471,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{00E538E0-A6EC-4ED8-9FFF-6891B5801EFC}' => array
 			(
 				"id" => "{00E538E0-A6EC-4ED8-9FFF-6891B5801EFC}" ,
@@ -31334,7 +31490,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{F88DC1A1-545F-401C-A286-02106A16F767}' => array
 			(
 				"id" => "{F88DC1A1-545F-401C-A286-02106A16F767}" ,
@@ -31353,7 +31509,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{3AA42A40-0BD7-43E1-B52F-40E49BF5618F}' => array
 			(
 				"id" => "{3AA42A40-0BD7-43E1-B52F-40E49BF5618F}" ,
@@ -31372,7 +31528,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{1ECCD00A-7E88-4DEF-84E0-E7C55C251A44}' => array
 			(
 				"id" => "{1ECCD00A-7E88-4DEF-84E0-E7C55C251A44}" ,
@@ -31391,7 +31547,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{C62BB386-BE24-4E44-9C6E-C657B9DD229B}' => array
 			(
 				"id" => "{C62BB386-BE24-4E44-9C6E-C657B9DD229B}" ,
@@ -31410,21 +31566,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{D79DE5D8-84C6-44F0-A28E-DBDE5CF2E605}' => array
 			(
 				"id" => "{D79DE5D8-84C6-44F0-A28E-DBDE5CF2E605}" ,
-				"name" => "Vorschlag_pkey" ,
-				"caption" => "tbl_vorschlag_pkey" ,
+				"name" => "pk_vorschlag" ,
+				"caption" => "pk_vorschlag" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{546435BE-B982-4E4C-BB4E-3CBE57F5E7EB}' => array
 			   		(
 		   				"id" => "{546435BE-B982-4E4C-BB4E-3CBE57F5E7EB}" ,
@@ -31439,27 +31595,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{B4E174D5-655B-4510-82FB-D38BDC444FE0}","id" => "{AB5BD25B-6C6F-4436-9EEA-6F95FC796FD2}","id" => "{42DE0CFB-0415-4947-AE9D-9E6F861CB8BF}",
+							"id" => "{AB5BD25B-6C6F-4436-9EEA-6F95FC796FD2}","id" => "{42DE0CFB-0415-4947-AE9D-9E6F861CB8BF}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{B72D6C57-76B6-45B6-84A6-F51C8D522E61}'  => array
 	(
 	    	"id" => "{B72D6C57-76B6-45B6-84A6-F51C8D522E61}" ,
-	    	"name" => "Vorschlag_sprache" ,
+	    	"name" => "tbl_vorschlag_sprache" ,
 	    	"caption" => "tbl_vorschlag_sprache" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{951DEB7C-0566-4FDB-9767-BBA35A843199}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{7D2A24FE-138D-45D0-AC4E-200D211BC1E2}' => array
 			(
 				"id" => "{7D2A24FE-138D-45D0-AC4E-200D211BC1E2}" ,
@@ -31478,7 +31634,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B774CBF5-36DF-4317-B7EE-E5604322F22F}' => array
 			(
 				"id" => "{B774CBF5-36DF-4317-B7EE-E5604322F22F}" ,
@@ -31497,7 +31653,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{40160F55-28B7-429D-92F1-0D3EE0F78E2B}' => array
 			(
 				"id" => "{40160F55-28B7-429D-92F1-0D3EE0F78E2B}" ,
@@ -31516,7 +31672,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A8FB65A9-6BE0-46E6-A4AB-1B3344CA8F2D}' => array
 			(
 				"id" => "{A8FB65A9-6BE0-46E6-A4AB-1B3344CA8F2D}" ,
@@ -31535,7 +31691,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{456904AA-4673-40C2-840D-D20B374110DD}' => array
 			(
 				"id" => "{456904AA-4673-40C2-840D-D20B374110DD}" ,
@@ -31554,7 +31710,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{EA0F441E-8782-4017-8B17-A95CA1463FE6}' => array
 			(
 				"id" => "{EA0F441E-8782-4017-8B17-A95CA1463FE6}" ,
@@ -31573,7 +31729,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{A817946B-846A-46D1-A701-3C85200D8B45}' => array
 			(
 				"id" => "{A817946B-846A-46D1-A701-3C85200D8B45}" ,
@@ -31592,7 +31748,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{041DD19E-1475-49E5-A6B0-C062F38CCE34}' => array
 			(
 				"id" => "{041DD19E-1475-49E5-A6B0-C062F38CCE34}" ,
@@ -31611,7 +31767,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{37EE5E92-61AB-4828-9451-EBA6C229D0F9}' => array
 			(
 				"id" => "{37EE5E92-61AB-4828-9451-EBA6C229D0F9}" ,
@@ -31630,21 +31786,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{E0AE48AE-8B6D-4336-8466-2B51A4205697}' => array
 			(
 				"id" => "{E0AE48AE-8B6D-4336-8466-2B51A4205697}" ,
-				"name" => "pk_tbl_vorschlag_sprache" ,
+				"name" => "pk_vorschlag_sprache" ,
 				"caption" => "pk_tbl_vorschlag_sprache" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{23FDEFEA-0400-4A67-9952-EC856B90B3FF}' => array
 			   		(
 		   				"id" => "{23FDEFEA-0400-4A67-9952-EC856B90B3FF}" ,
@@ -31659,10 +31815,10 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{01B2659B-2478-40B2-837A-19BFF907AEE9}' => array
 			   		(
 		   				"id" => "{01B2659B-2478-40B2-837A-19BFF907AEE9}" ,
@@ -31677,27 +31833,27 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{87D92DA8-9051-4CA6-93ED-5DCD69C85DA0}'  => array
 	(
 	    	"id" => "{87D92DA8-9051-4CA6-93ED-5DCD69C85DA0}" ,
-	    	"name" => "Organisationseinheit" ,
-	    	"caption" => "tbl_organisationseinheit" ,
+	    	"name" => "tbl_organisationseinheit" ,
+	    	"caption" => "Organisationseinheit" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{99B1972B-487E-4C1F-86F3-B15419DE291D}' => array
 			(
 				"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}" ,
@@ -31716,7 +31872,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{03653515-D040-4DAD-AC9C-F1A0E6C2B31E}' => array
 			(
 				"id" => "{03653515-D040-4DAD-AC9C-F1A0E6C2B31E}" ,
@@ -31735,7 +31891,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{073FB865-BC93-489E-86D0-31E1F4D68EF6}' => array
 			(
 				"id" => "{073FB865-BC93-489E-86D0-31E1F4D68EF6}" ,
@@ -31754,11 +31910,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}' => array
 			(
 				"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}" ,
@@ -31768,7 +31924,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}' => array
 			   		(
 		   				"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}" ,
@@ -31786,29 +31942,29 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{8C907027-ADCA-4E9E-B7F6-9172E40276CE}","id" => "{A34D7372-82C3-4FB5-BCE6-178F395E2480}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{33596DA9-8CA8-4BA6-AC21-3272C8393644}'  => array
 	(
 	    	"id" => "{33596DA9-8CA8-4BA6-AC21-3272C8393644}" ,
-	    	"name" => "Rolle" ,
-	    	"caption" => "tbl_status" ,
+	    	"name" => "tbl_rolle" ,
+	    	"caption" => "Rolle" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
-	    	"schemaid" => "" ,
+	    	"schemaid" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{515C08AF-E15D-415E-BEB7-850353D6DA68}' => array
 			(
 				"id" => "{515C08AF-E15D-415E-BEB7-850353D6DA68}" ,
-				"name" => "status_kurzbz" ,
-				"caption" => "status_kurzbz" ,
+				"name" => "rolle_kurzbz" ,
+				"caption" => "rolle_kurzbz" ,
 				"ordinal" => "0" ,
 				"pk" => "{6E67C426-45D1-4732-B0B3-8154D31E5F0F}" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -31822,7 +31978,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{9ABFC7E2-A873-47D2-8205-4626DBE43F2C}' => array
 			(
 				"id" => "{9ABFC7E2-A873-47D2-8205-4626DBE43F2C}" ,
@@ -31841,11 +31997,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{6B6C1CDF-D265-47E4-8558-6D312F189555}' => array
 			(
 				"id" => "{6B6C1CDF-D265-47E4-8558-6D312F189555}" ,
@@ -31855,11 +32011,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{9F9DDFD5-61FA-4208-9A4B-BBD9FF6EF1D5}' => array
 			   		(
 		   				"id" => "{9F9DDFD5-61FA-4208-9A4B-BBD9FF6EF1D5}" ,
-		   				"name" => "status_kurzbz" ,
+		   				"name" => "rolle_kurzbz" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
@@ -31873,24 +32029,24 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 							"id" => "{6E67C426-45D1-4732-B0B3-8154D31E5F0F}","id" => "{F7F9D55B-3857-409B-B922-090657026392}",
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
 	'{2C38E634-CB71-4F05-BF42-9BAA7540A7A3}'  => array
 	(
 	    	"id" => "{2C38E634-CB71-4F05-BF42-9BAA7540A7A3}" ,
-	    	"name" => "RolleBerechtigung" ,
-	    	"caption" => "tbl_statusberechtigung" ,
+	    	"name" => "tbl_rolleberechtigung" ,
+	    	"caption" => "RolleBerechtigung" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
-	    	"schemaid" => "" ,
+	    	"schemaid" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
 	    	"attribute"  => array
 	    	(
-
+			
 			'{B7C71617-6C47-4B77-A0B8-BE2DFB8D9A30}' => array
 			(
 				"id" => "{B7C71617-6C47-4B77-A0B8-BE2DFB8D9A30}" ,
@@ -31909,12 +32065,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 			'{B3EC9202-9754-4F20-A2B6-6C1F3D28F1BD}' => array
 			(
 				"id" => "{B3EC9202-9754-4F20-A2B6-6C1F3D28F1BD}" ,
-				"name" => "status_kurzbz" ,
-				"caption" => "status_kurzbz" ,
+				"name" => "rolle_kurzbz" ,
+				"caption" => "rolle_kurzbz" ,
 				"ordinal" => "0" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -31928,11 +32084,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"checkconstraint" => "",
 				"description" => ""
 			),
-
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
-
+			
 			'{CA574F83-69B0-4C6D-87A2-A0560E9CE16E}' => array
 			(
 				"id" => "{CA574F83-69B0-4C6D-87A2-A0560E9CE16E}" ,
@@ -31942,7 +32098,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
 			    	(
-
+					
 			   		'{7CAA03AE-0EB5-4FFF-B18E-E3221EB125C6}' => array
 			   		(
 		   				"id" => "{7CAA03AE-0EB5-4FFF-B18E-E3221EB125C6}" ,
@@ -31957,14 +32113,14 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 			   		'{CFC90AB6-3BBC-44F5-97F0-28A0AFA7C01A}' => array
 			   		(
 		   				"id" => "{CFC90AB6-3BBC-44F5-97F0-28A0AFA7C01A}" ,
-		   				"name" => "status_kurzbz" ,
+		   				"name" => "rolle_kurzbz" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
@@ -31975,26 +32131,371 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-
+							
 				   		)
 		   			),
-
+		   			
 		   		),
 			),
-
+			
 		),
    	),
-
+    	
+	'{FE9DF257-6EA9-448F-B38B-F3DC13540924}'  => array
+	(
+	    	"id" => "{FE9DF257-6EA9-448F-B38B-F3DC13540924}" ,
+	    	"name" => "tbl_paabgabetyp" ,
+	    	"caption" => "PAabgabetyp" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{446F72CE-3E9D-4911-B6D0-7380912CFC6E}' => array
+			(
+				"id" => "{446F72CE-3E9D-4911-B6D0-7380912CFC6E}" ,
+				"name" => "paabgabetyp_kurzbz" ,
+				"caption" => "paabgabetyp_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{FA5559CA-61BD-4160-A249-F19FCDEEA0C6}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1FC232B2-4BA2-474F-A3F2-1C1E00A55A9D}' => array
+			(
+				"id" => "{1FC232B2-4BA2-474F-A3F2-1C1E00A55A9D}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{DDE0ACB2-6861-4747-816F-40F415A0DB24}' => array
+			(
+				"id" => "{DDE0ACB2-6861-4747-816F-40F415A0DB24}" ,
+				"name" => "pk_paabgabetyp" ,
+				"caption" => "pk_paabgabetyp" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{9D4A9049-38ED-435C-89FE-453AF873E7F3}' => array
+			   		(
+		   				"id" => "{9D4A9049-38ED-435C-89FE-453AF873E7F3}" ,
+		   				"name" => "paabgabetyp_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{446F72CE-3E9D-4911-B6D0-7380912CFC6E}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{FA5559CA-61BD-4160-A249-F19FCDEEA0C6}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{00827CE6-F07D-4D48-910A-843024C3638D}'  => array
+	(
+	    	"id" => "{00827CE6-F07D-4D48-910A-843024C3638D}" ,
+	    	"name" => "tbl_paabgabe" ,
+	    	"caption" => "Paabgabe" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{E3EB64BE-1460-48C8-B135-7D8FF229B3EE}' => array
+			(
+				"id" => "{E3EB64BE-1460-48C8-B135-7D8FF229B3EE}" ,
+				"name" => "paabgabe_id" ,
+				"caption" => "paabgabe_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4567DEA4-95F8-4AA6-81E8-D67F4D21D8DA}' => array
+			(
+				"id" => "{4567DEA4-95F8-4AA6-81E8-D67F4D21D8DA}" ,
+				"name" => "fixtermin" ,
+				"caption" => "fixtermin" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "false",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{36F21619-68D6-4A2D-9356-7B25BA9B5AB1}' => array
+			(
+				"id" => "{36F21619-68D6-4A2D-9356-7B25BA9B5AB1}" ,
+				"name" => "datum" ,
+				"caption" => "datum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A6A33B81-C00E-4FA9-8D8A-0436CBECB7B3}' => array
+			(
+				"id" => "{A6A33B81-C00E-4FA9-8D8A-0436CBECB7B3}" ,
+				"name" => "kurzbz" ,
+				"caption" => "kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8158DF08-F607-4B91-A862-69647964BAFB}' => array
+			(
+				"id" => "{8158DF08-F607-4B91-A862-69647964BAFB}" ,
+				"name" => "abgabedatum" ,
+				"caption" => "abgabedatum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0EC22521-EBAE-4B3D-92B0-438D6379F9BD}' => array
+			(
+				"id" => "{0EC22521-EBAE-4B3D-92B0-438D6379F9BD}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F99B5C68-5E49-4DFD-9EEF-436737FE7E37}' => array
+			(
+				"id" => "{F99B5C68-5E49-4DFD-9EEF-436737FE7E37}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E88A35A2-5E91-40B0-906E-85F7A394531C}' => array
+			(
+				"id" => "{E88A35A2-5E91-40B0-906E-85F7A394531C}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F7634A7B-0D2D-4D2C-9DB0-867376503057}' => array
+			(
+				"id" => "{F7634A7B-0D2D-4D2C-9DB0-867376503057}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CD738339-AE30-431A-AFAE-0DDFC4EC0BD8}' => array
+			(
+				"id" => "{CD738339-AE30-431A-AFAE-0DDFC4EC0BD8}" ,
+				"name" => "paabgabetyp_kurzbz" ,
+				"caption" => "paabgabetyp_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D4379036-0B1F-4C24-889B-D13F455F5711}' => array
+			(
+				"id" => "{D4379036-0B1F-4C24-889B-D13F455F5711}" ,
+				"name" => "projektarbeit_id" ,
+				"caption" => "projektarbeit_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('lehre.seq_projektarbeit_projektarbeit_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{B5397BD0-C038-4DAB-9BDC-8363BB388E6D}' => array
+			(
+				"id" => "{B5397BD0-C038-4DAB-9BDC-8363BB388E6D}" ,
+				"name" => "pk_paabgabe" ,
+				"caption" => "pk_paabgabe" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{5ADA1B9E-08D1-4BD2-B028-B42DBFEE2404}' => array
+			   		(
+		   				"id" => "{5ADA1B9E-08D1-4BD2-B028-B42DBFEE2404}" ,
+		   				"name" => "paabgabe_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{E3EB64BE-1460-48C8-B135-7D8FF229B3EE}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
 );
 
 $relations=array
-(
-
+(	
+	
 	'{BA643C8B-FFD0-4F07-9B78-00886B65836F}'  => array
 	(
 	    	"id" => "{BA643C8B-FFD0-4F07-9B78-00886B65836F}" ,
-	    	"name" => "Relationship1" ,
-	    	"caption" => "Relationship1" ,
+	    	"name" => "fk_benutzer_akte" ,
+	    	"caption" => "benutzer_akte" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -32011,7 +32512,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}' => array
 			(
 				"id" => "{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}",
@@ -32035,10 +32536,10 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BFAA21D1-F6A2-4F0E-8A40-EAE4910E260E}'  => array
 	(
 	    	"id" => "{BFAA21D1-F6A2-4F0E-8A40-EAE4910E260E}" ,
@@ -32060,7 +32561,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F2A9E238-6857-437C-A6A0-EC587A642B86}' => array
 			(
 				"id" => "{F2A9E238-6857-437C-A6A0-EC587A642B86}",
@@ -32084,10 +32585,10 @@ $relations=array
 					"id" => "{EB2C71D7-1A40-4F85-AE71-182F2B97A1F2}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{398D8239-EC46-4ADE-9B92-11D0C342236C}'  => array
 	(
 	    	"id" => "{398D8239-EC46-4ADE-9B92-11D0C342236C}" ,
@@ -32109,7 +32610,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A9D772A8-0B47-43CA-BD2C-5D6E748C7098}' => array
 			(
 				"id" => "{A9D772A8-0B47-43CA-BD2C-5D6E748C7098}",
@@ -32133,10 +32634,10 @@ $relations=array
 					"id" => "{BA19F314-BCE6-4F12-8250-2213AD366F23}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{EC05C7E6-DC89-47E2-BFC5-8A4F4CAD25F8}'  => array
 	(
 	    	"id" => "{EC05C7E6-DC89-47E2-BFC5-8A4F4CAD25F8}" ,
@@ -32158,7 +32659,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6C127962-B205-4BC8-95D6-38D1AC068581}' => array
 			(
 				"id" => "{6C127962-B205-4BC8-95D6-38D1AC068581}",
@@ -32182,10 +32683,10 @@ $relations=array
 					"id" => "{BA19F314-BCE6-4F12-8250-2213AD366F23}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1B004899-4BAE-49FA-840C-31C82F4229DC}'  => array
 	(
 	    	"id" => "{1B004899-4BAE-49FA-840C-31C82F4229DC}" ,
@@ -32207,7 +32708,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{BE3059FD-3FA7-4669-8A46-9A5D3943C836}' => array
 			(
 				"id" => "{BE3059FD-3FA7-4669-8A46-9A5D3943C836}",
@@ -32231,14 +32732,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2D91F634-F261-4375-BECE-6AAE4653A7BB}'  => array
 	(
 	    	"id" => "{2D91F634-F261-4375-BECE-6AAE4653A7BB}" ,
-	    	"name" => "abgabe_studentuebung" ,
+	    	"name" => "fk_abgabe_studentuebung" ,
 	    	"caption" => "abgabe_studentuebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32256,7 +32757,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{16FAC960-9E8C-45EE-8B98-E39C35A27DFD}' => array
 			(
 				"id" => "{16FAC960-9E8C-45EE-8B98-E39C35A27DFD}",
@@ -32280,14 +32781,14 @@ $relations=array
 					"id" => "{A57BD7F9-22E2-490F-AF1E-321F756F48CE}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{85289217-22B1-4690-9382-9A4532E70F5C}'  => array
 	(
 	    	"id" => "{85289217-22B1-4690-9382-9A4532E70F5C}" ,
-	    	"name" => "abschlussbeurteilung_abschlusspruefung" ,
+	    	"name" => "fk_abschlussbeurteilung_abschlusspruefung" ,
 	    	"caption" => "abschlussbeurteilung_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32305,7 +32806,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{ABF28BF0-80DC-4DAB-A4F0-9E72D12B635E}' => array
 			(
 				"id" => "{ABF28BF0-80DC-4DAB-A4F0-9E72D12B635E}",
@@ -32329,14 +32830,14 @@ $relations=array
 					"id" => "{04EE03FB-F92C-43F1-9DFE-233A103D306C}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{DCB91043-2534-42E9-820D-C71DB784A821}'  => array
 	(
 	    	"id" => "{DCB91043-2534-42E9-820D-C71DB784A821}" ,
-	    	"name" => "adresse_standort" ,
+	    	"name" => "fk_adresse_standort" ,
 	    	"caption" => "adresse_standort" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32354,7 +32855,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C297EC1F-90A9-4209-8FEA-8E0681A76FA1}' => array
 			(
 				"id" => "{C297EC1F-90A9-4209-8FEA-8E0681A76FA1}",
@@ -32378,14 +32879,14 @@ $relations=array
 					"id" => "{ECE2E8E7-2B21-4E9E-B0EB-4671B0A4223E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{64416B9F-82A9-4805-A076-125E229C88CA}'  => array
 	(
 	    	"id" => "{64416B9F-82A9-4805-A076-125E229C88CA}" ,
-	    	"name" => "akadgrad_abschlusspruefung" ,
+	    	"name" => "fk_akadgrad_abschlusspruefung" ,
 	    	"caption" => "akadgrad_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32403,7 +32904,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{CD2564EE-E459-4664-8141-3E77A6104070}' => array
 			(
 				"id" => "{CD2564EE-E459-4664-8141-3E77A6104070}",
@@ -32427,14 +32928,14 @@ $relations=array
 					"id" => "{E67D042D-B817-4510-BB00-DD367892B007}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C445B417-4820-4740-A5E1-200A363DAB7A}'  => array
 	(
 	    	"id" => "{C445B417-4820-4740-A5E1-200A363DAB7A}" ,
-	    	"name" => "aktivitaet_zeitaufzeichnung" ,
+	    	"name" => "fk_aktivitaet_zeitaufzeichnung" ,
 	    	"caption" => "aktivitaet_zeitaufzeichnung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32452,7 +32953,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2594233A-5509-434E-B368-5B5951894B3D}' => array
 			(
 				"id" => "{2594233A-5509-434E-B368-5B5951894B3D}",
@@ -32476,14 +32977,14 @@ $relations=array
 					"id" => "{349387A7-2454-4733-AA45-599FBC5F57D9}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{67862238-C393-49DE-A2EF-D53AF52DC415}'  => array
 	(
 	    	"id" => "{67862238-C393-49DE-A2EF-D53AF52DC415}" ,
-	    	"name" => "aubildung_prestudent" ,
+	    	"name" => "fk_ausbildung_prestudent" ,
 	    	"caption" => "aubildung_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32501,7 +33002,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{1E56AD33-C9CB-4979-AC14-1A0341A6A4CD}' => array
 			(
 				"id" => "{1E56AD33-C9CB-4979-AC14-1A0341A6A4CD}",
@@ -32525,14 +33026,14 @@ $relations=array
 					"id" => "{145E5ED8-7E17-41DF-8C50-4AA17B321915}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A2522DD1-8EF9-4B55-A93D-CDCE209EAEF2}'  => array
 	(
 	    	"id" => "{A2522DD1-8EF9-4B55-A93D-CDCE209EAEF2}" ,
-	    	"name" => "studiensemester_benutzerrolle" ,
+	    	"name" => "fk_studiensemester_benutzerrolle" ,
 	    	"caption" => "studiensemester_benutzerrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32550,7 +33051,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0AA16E3D-9307-482D-84C7-F053EFCD2DED}' => array
 			(
 				"id" => "{0AA16E3D-9307-482D-84C7-F053EFCD2DED}",
@@ -32574,14 +33075,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1A007D38-6A84-4C3D-8560-E7957CF8E088}'  => array
 	(
 	    	"id" => "{1A007D38-6A84-4C3D-8560-E7957CF8E088}" ,
-	    	"name" => "aufmerksamdurch_preinteressent" ,
+	    	"name" => "fk_aufmerksamdurch_preinteressent" ,
 	    	"caption" => "aufmerksamdurch_preinteressent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32599,7 +33100,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9AA28657-D726-4BC2-84A0-A28FFE8C6004}' => array
 			(
 				"id" => "{9AA28657-D726-4BC2-84A0-A28FFE8C6004}",
@@ -32623,14 +33124,14 @@ $relations=array
 					"id" => "{479BB2E6-08EE-4236-B06D-034DBD50806D}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FF49897F-8D33-4FFE-A9DE-79A55E3975F2}'  => array
 	(
 	    	"id" => "{FF49897F-8D33-4FFE-A9DE-79A55E3975F2}" ,
-	    	"name" => "aufmerksamdurch_prestudent" ,
+	    	"name" => "fk_aufmerksamdurch_prestudent" ,
 	    	"caption" => "aufmerksamdurch_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32648,7 +33149,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{BCD00155-7F7E-4839-A410-1556F569AD7D}' => array
 			(
 				"id" => "{BCD00155-7F7E-4839-A410-1556F569AD7D}",
@@ -32672,14 +33173,14 @@ $relations=array
 					"id" => "{479BB2E6-08EE-4236-B06D-034DBD50806D}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7416A765-C0C8-4A8F-8CD1-96AF4238C0BD}'  => array
 	(
 	    	"id" => "{7416A765-C0C8-4A8F-8CD1-96AF4238C0BD}" ,
-	    	"name" => "aufnahmeschluessel_prestudent" ,
+	    	"name" => "fk_aufnahmeschluessel_prestudent" ,
 	    	"caption" => "aufnahmeschluessel_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32697,7 +33198,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0A2C109B-1F34-4DC3-A02B-77D315A829E7}' => array
 			(
 				"id" => "{0A2C109B-1F34-4DC3-A02B-77D315A829E7}",
@@ -32721,14 +33222,14 @@ $relations=array
 					"id" => "{88696140-B5B8-4A9E-82CF-B617D107BAE4}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0AF5F8E6-6B2B-42EC-A473-8263C9C5EEC4}'  => array
 	(
 	    	"id" => "{0AF5F8E6-6B2B-42EC-A473-8263C9C5EEC4}" ,
-	    	"name" => "ausbildung_mitarbeiter" ,
+	    	"name" => "fk_ausbildung_mitarbeiter" ,
 	    	"caption" => "ausbildung_mitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32746,7 +33247,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4428AF2C-BAED-4CBD-BCAB-3145252B8E82}' => array
 			(
 				"id" => "{4428AF2C-BAED-4CBD-BCAB-3145252B8E82}",
@@ -32770,14 +33271,14 @@ $relations=array
 					"id" => "{145E5ED8-7E17-41DF-8C50-4AA17B321915}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6D4B175E-3131-4198-B691-6A80D871736C}'  => array
 	(
 	    	"id" => "{6D4B175E-3131-4198-B691-6A80D871736C}" ,
-	    	"name" => "beispiel_studentbeispiel" ,
+	    	"name" => "fk_beispiel_studentbeispiel" ,
 	    	"caption" => "beispiel_studentbeispiel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32795,7 +33296,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4E3A1C7B-91BB-41D3-81E7-7C2F4918F596}' => array
 			(
 				"id" => "{4E3A1C7B-91BB-41D3-81E7-7C2F4918F596}",
@@ -32819,14 +33320,14 @@ $relations=array
 					"id" => "{03B2620D-8C36-43D2-A166-221CD04B2322}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0EC20015-F3FE-49FD-B337-70DBF527F87D}'  => array
 	(
 	    	"id" => "{0EC20015-F3FE-49FD-B337-70DBF527F87D}" ,
-	    	"name" => "benutzer_benutzerfunktion" ,
+	    	"name" => "fk_benutzer_benutzerfunktion" ,
 	    	"caption" => "benutzer_benutzerfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32844,7 +33345,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}' => array
 			(
 				"id" => "{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}",
@@ -32868,14 +33369,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{86695C08-CF35-4E10-84C3-B6BF16E93AE8}'  => array
 	(
 	    	"id" => "{86695C08-CF35-4E10-84C3-B6BF16E93AE8}" ,
-	    	"name" => "benutzer_benutzerlvstudiensemester" ,
+	    	"name" => "fk_benutzer_benutzerlvstudiensemester" ,
 	    	"caption" => "benutzer_benutzerlvstudiensemester" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32893,7 +33394,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B5CDBA7C-C418-4369-880D-F395732719F6}' => array
 			(
 				"id" => "{B5CDBA7C-C418-4369-880D-F395732719F6}",
@@ -32917,14 +33418,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1E6D05C5-7EB4-48D5-9C06-139DE2E4DF27}'  => array
 	(
 	    	"id" => "{1E6D05C5-7EB4-48D5-9C06-139DE2E4DF27}" ,
-	    	"name" => "benutzer_feedback" ,
+	    	"name" => "fk_benutzer_feedback" ,
 	    	"caption" => "benutzer_feedback" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32942,7 +33443,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}' => array
 			(
 				"id" => "{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}",
@@ -32966,14 +33467,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{DC721692-DA78-4F8F-9EEF-72DC33D65CED}'  => array
 	(
 	    	"id" => "{DC721692-DA78-4F8F-9EEF-72DC33D65CED}" ,
-	    	"name" => "benutzer_match-bestaetigtvon" ,
+	    	"name" => "fk_benutzer_match-bestaetigtvon" ,
 	    	"caption" => "benutzer_match-bestaetigtvon" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -32991,7 +33492,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4B442C0C-6000-4003-97C8-40640D73C52B}' => array
 			(
 				"id" => "{4B442C0C-6000-4003-97C8-40640D73C52B}",
@@ -33015,14 +33516,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1521BDBD-AC0F-48D8-AE0F-3C9854700C17}'  => array
 	(
 	    	"id" => "{1521BDBD-AC0F-48D8-AE0F-3C9854700C17}" ,
-	    	"name" => "benutzer_match-gefordertvon" ,
+	    	"name" => "fk_benutzer_match-gefordertvon" ,
 	    	"caption" => "benutzer_match-gefordertvon" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33040,7 +33541,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A9109C87-859C-4D7C-8933-511A7231B1E8}' => array
 			(
 				"id" => "{A9109C87-859C-4D7C-8933-511A7231B1E8}",
@@ -33064,14 +33565,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{84F6B3AA-5DB0-4CBC-B051-22D732255248}'  => array
 	(
 	    	"id" => "{84F6B3AA-5DB0-4CBC-B051-22D732255248}" ,
-	    	"name" => "benutzer_match_matchbestaetigtvon" ,
+	    	"name" => "fk_benutzer_match_matchbestaetigtvon" ,
 	    	"caption" => "benutzer_match_matchbestaetigtvon" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33089,7 +33590,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{71F8271B-B5B2-4002-8EC5-74639660E463}' => array
 			(
 				"id" => "{71F8271B-B5B2-4002-8EC5-74639660E463}",
@@ -33113,14 +33614,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9262CED8-13C6-4581-A999-595F80882BDF}'  => array
 	(
 	    	"id" => "{9262CED8-13C6-4581-A999-595F80882BDF}" ,
-	    	"name" => "benutzer_personmailgrp" ,
+	    	"name" => "fk_benutzer_personmailgrp" ,
 	    	"caption" => "benutzer_personmailgrp" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33138,7 +33639,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{BF6217E2-57AB-4D99-B40D-7CBEF0466622}' => array
 			(
 				"id" => "{BF6217E2-57AB-4D99-B40D-7CBEF0466622}",
@@ -33162,14 +33663,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5FAF1C30-CA5F-413B-89C0-BB96413D03A8}'  => array
 	(
 	    	"id" => "{5FAF1C30-CA5F-413B-89C0-BB96413D03A8}" ,
-	    	"name" => "benutzer_projektbenutzer" ,
+	    	"name" => "fk_benutzer_projektbenutzer" ,
 	    	"caption" => "benutzer_projektbenutzer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33187,7 +33688,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}' => array
 			(
 				"id" => "{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}",
@@ -33211,14 +33712,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A80BE599-3CAF-4616-AF5B-29650AB78786}'  => array
 	(
 	    	"id" => "{A80BE599-3CAF-4616-AF5B-29650AB78786}" ,
-	    	"name" => "benutzer_reservierung" ,
+	    	"name" => "fk_benutzer_reservierung" ,
 	    	"caption" => "benutzer_reservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33236,7 +33737,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{30BEDA69-44AE-49C6-9687-18D9FB5A720B}' => array
 			(
 				"id" => "{30BEDA69-44AE-49C6-9687-18D9FB5A720B}",
@@ -33260,14 +33761,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5523F764-2A49-474A-AD22-9255C24D10BD}'  => array
 	(
 	    	"id" => "{5523F764-2A49-474A-AD22-9255C24D10BD}" ,
-	    	"name" => "benutzer_student" ,
+	    	"name" => "fk_benutzer_student" ,
 	    	"caption" => "benutzer_student" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33285,7 +33786,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}' => array
 			(
 				"id" => "{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}",
@@ -33309,14 +33810,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{35F1FF63-BE9C-4DE7-A419-2A1D1F3EAF6A}'  => array
 	(
 	    	"id" => "{35F1FF63-BE9C-4DE7-A419-2A1D1F3EAF6A}" ,
-	    	"name" => "benutzer_teambenutzer" ,
+	    	"name" => "fk_benutzer_teambenutzer" ,
 	    	"caption" => "benutzer_teambenutzer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33334,7 +33835,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}' => array
 			(
 				"id" => "{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}",
@@ -33358,14 +33859,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{189966DE-9D75-41B9-B6FA-7DA53ECD78F0}'  => array
 	(
 	    	"id" => "{189966DE-9D75-41B9-B6FA-7DA53ECD78F0}" ,
-	    	"name" => "benutzer_benutzerrolle" ,
+	    	"name" => "fk_benutzer_benutzerrolle" ,
 	    	"caption" => "benutzer_benutzerrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33383,7 +33884,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}' => array
 			(
 				"id" => "{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}",
@@ -33407,14 +33908,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{457075D8-3BBA-4689-BD54-3525DB4DB3E8}'  => array
 	(
 	    	"id" => "{457075D8-3BBA-4689-BD54-3525DB4DB3E8}" ,
-	    	"name" => "benutzer_variable" ,
+	    	"name" => "fk_benutzer_variable" ,
 	    	"caption" => "benutzer_variable" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33432,7 +33933,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}' => array
 			(
 				"id" => "{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}",
@@ -33456,14 +33957,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{696AF5AA-9130-47D0-8F01-273613E8F3D9}'  => array
 	(
 	    	"id" => "{696AF5AA-9130-47D0-8F01-273613E8F3D9}" ,
-	    	"name" => "benutzer_veranstaltung" ,
+	    	"name" => "fk_benutzer_veranstaltung" ,
 	    	"caption" => "benutzer_veranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33481,7 +33982,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{97064858-CA15-40E8-AE55-98B6BD1BE753}' => array
 			(
 				"id" => "{97064858-CA15-40E8-AE55-98B6BD1BE753}",
@@ -33505,14 +34006,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5C3E0514-5939-440F-B473-18228774AAC8}'  => array
 	(
 	    	"id" => "{5C3E0514-5939-440F-B473-18228774AAC8}" ,
-	    	"name" => "benutzer_zeitaufzeichnung" ,
+	    	"name" => "fk_benutzer_zeitaufzeichnung" ,
 	    	"caption" => "benutzer_zeitaufzeichnung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33530,7 +34031,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{087640DB-A402-4657-A79B-79B6C539C027}' => array
 			(
 				"id" => "{087640DB-A402-4657-A79B-79B6C539C027}",
@@ -33554,14 +34055,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C557E700-98C7-4E9D-AFA6-32A79F3A5F0A}'  => array
 	(
 	    	"id" => "{C557E700-98C7-4E9D-AFA6-32A79F3A5F0A}" ,
-	    	"name" => "berufstaetigkeit_prestudent" ,
+	    	"name" => "fk_berufstaetigkeit_prestudent" ,
 	    	"caption" => "berufstaetigkeit_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33579,7 +34080,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2E6DD02C-D22A-4B17-88E3-186C93B0BAB0}' => array
 			(
 				"id" => "{2E6DD02C-D22A-4B17-88E3-186C93B0BAB0}",
@@ -33603,14 +34104,14 @@ $relations=array
 					"id" => "{CE0713EC-2AB3-4AEF-B4D2-96D4BF853C4A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{17AA40E8-6EEA-4ACF-9503-6C0F28954FFF}'  => array
 	(
 	    	"id" => "{17AA40E8-6EEA-4ACF-9503-6C0F28954FFF}" ,
-	    	"name" => "beschaeftigungsart1_bisverwendung" ,
+	    	"name" => "fk_beschaeftigungsart1_bisverwendung" ,
 	    	"caption" => "beschaeftigungsart1_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33628,7 +34129,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{60EF3048-6C75-47B6-AEC5-1664B9A1DEC7}' => array
 			(
 				"id" => "{60EF3048-6C75-47B6-AEC5-1664B9A1DEC7}",
@@ -33652,14 +34153,14 @@ $relations=array
 					"id" => "{2D999D0C-672D-4F4B-B5E3-7D05EDF404C9}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{12C287B3-AE1D-47DC-B1C7-1DD8AFB6B211}'  => array
 	(
 	    	"id" => "{12C287B3-AE1D-47DC-B1C7-1DD8AFB6B211}" ,
-	    	"name" => "beschaeftigungsart2_bisverwendung" ,
+	    	"name" => "fk_beschaeftigungsart2_bisverwendung" ,
 	    	"caption" => "beschaeftigungsart2_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33677,7 +34178,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{42025991-4414-42F7-B0F0-D4EFB2E55222}' => array
 			(
 				"id" => "{42025991-4414-42F7-B0F0-D4EFB2E55222}",
@@ -33701,14 +34202,14 @@ $relations=array
 					"id" => "{0454BA56-1658-4B4D-88F3-D01914508357}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F4BDEC0D-A0C3-4074-B7CF-5B49ACF6C232}'  => array
 	(
 	    	"id" => "{F4BDEC0D-A0C3-4074-B7CF-5B49ACF6C232}" ,
-	    	"name" => "beschaeftigungsausmass_bisverwendung" ,
+	    	"name" => "fk_beschaeftigungsausmass_bisverwendung" ,
 	    	"caption" => "beschaeftigungsausmass_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33726,7 +34227,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8E530D71-843D-4FCE-9B2A-199BA8561425}' => array
 			(
 				"id" => "{8E530D71-843D-4FCE-9B2A-199BA8561425}",
@@ -33750,14 +34251,14 @@ $relations=array
 					"id" => "{397C39C3-E83C-41B4-A2C0-A93EF9F8AF25}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8189CA29-1999-4AC8-8E88-10F7364D8E06}'  => array
 	(
 	    	"id" => "{8189CA29-1999-4AC8-8E88-10F7364D8E06}" ,
-	    	"name" => "besqual_entwicklungsteam" ,
+	    	"name" => "fk_besqual_entwicklungsteam" ,
 	    	"caption" => "besqual_entwicklungsteam" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33775,7 +34276,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7381BEE7-5E7C-4D45-97DE-CCFC5A45B33C}' => array
 			(
 				"id" => "{7381BEE7-5E7C-4D45-97DE-CCFC5A45B33C}",
@@ -33799,14 +34300,14 @@ $relations=array
 					"id" => "{2B9759C4-8417-4A66-95AB-FA69272BF584}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{720FF69C-B05A-4A09-92C6-A30546F658B5}'  => array
 	(
 	    	"id" => "{720FF69C-B05A-4A09-92C6-A30546F658B5}" ,
-	    	"name" => "betriebsmittel_betriebsmittelperson" ,
+	    	"name" => "fk_betriebsmittel_betriebsmittelperson" ,
 	    	"caption" => "betriebsmittel_betriebsmittelperson" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33824,7 +34325,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F77283EA-37F6-4B41-AB09-417E372C432F}' => array
 			(
 				"id" => "{F77283EA-37F6-4B41-AB09-417E372C432F}",
@@ -33848,14 +34349,14 @@ $relations=array
 					"id" => "{F76D2CF3-FA9E-4E61-BA58-4EA8818639A2}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7B7E0B90-3A1F-4FFC-A03B-05A681C6C6D1}'  => array
 	(
 	    	"id" => "{7B7E0B90-3A1F-4FFC-A03B-05A681C6C6D1}" ,
-	    	"name" => "betriebsmittel_bmreservierung" ,
+	    	"name" => "fk_betriebsmittel_bmreservierung" ,
 	    	"caption" => "betriebsmittel_bmreservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33873,7 +34374,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{1DFE2288-8D1A-493F-9A37-9385E71A8E09}' => array
 			(
 				"id" => "{1DFE2288-8D1A-493F-9A37-9385E71A8E09}",
@@ -33897,7 +34398,7 @@ $relations=array
 					"id" => "{5273E9A4-22B7-41E7-89CD-91397829EE46}",
 		   		)
 			),
-
+			
 			'{FDE0D0A5-3852-42CA-8340-2A4F066A38B8}' => array
 			(
 				"id" => "{FDE0D0A5-3852-42CA-8340-2A4F066A38B8}",
@@ -33921,14 +34422,14 @@ $relations=array
 					"id" => "{07175BBE-185F-4CFD-AD0B-1E0D2D2B474D}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{DF30585D-F6C1-4DD3-A492-3486C14B5510}'  => array
 	(
 	    	"id" => "{DF30585D-F6C1-4DD3-A492-3486C14B5510}" ,
-	    	"name" => "betriebsmitteltyp_betriebsmittel" ,
+	    	"name" => "fk_betriebsmitteltyp_betriebsmittel" ,
 	    	"caption" => "betriebsmitteltyp_betriebsmittel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33946,7 +34447,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{032D2D26-F109-498F-B98A-F898CDF39088}' => array
 			(
 				"id" => "{032D2D26-F109-498F-B98A-F898CDF39088}",
@@ -33970,14 +34471,14 @@ $relations=array
 					"id" => "{971E5588-BD32-456D-BB00-C632F98C5B13}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{199E6767-9F22-4BA9-9A22-B401031A4F2A}'  => array
 	(
 	    	"id" => "{199E6767-9F22-4BA9-9A22-B401031A4F2A}" ,
-	    	"name" => "bisverwendung_bisfunktion" ,
+	    	"name" => "fk_bisverwendung_bisfunktion" ,
 	    	"caption" => "bisverwendung_bisfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -33995,7 +34496,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{FB62B11B-39DE-43EF-9456-69123E243295}' => array
 			(
 				"id" => "{FB62B11B-39DE-43EF-9456-69123E243295}",
@@ -34019,14 +34520,14 @@ $relations=array
 					"id" => "{6EF483DC-7662-4466-ABC2-7DCACF529BC9}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3EE4AE33-433C-4ACF-B58F-33ABB10953AB}'  => array
 	(
 	    	"id" => "{3EE4AE33-433C-4ACF-B58F-33ABB10953AB}" ,
-	    	"name" => "buchungstyp_konto" ,
+	    	"name" => "fk_buchungstyp_konto" ,
 	    	"caption" => "buchungstyp_konto" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34044,7 +34545,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{FD4B5FCB-F3DA-49DC-91D8-C1183CE0E284}' => array
 			(
 				"id" => "{FD4B5FCB-F3DA-49DC-91D8-C1183CE0E284}",
@@ -34068,14 +34569,14 @@ $relations=array
 					"id" => "{72E25D2B-FD76-4157-9EE6-7CA3A316DAC5}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9EF16425-0D0E-4038-8653-C26DD77DB939}'  => array
 	(
 	    	"id" => "{9EF16425-0D0E-4038-8653-C26DD77DB939}" ,
-	    	"name" => "bundesland_person" ,
+	    	"name" => "fk_bundesland_person" ,
 	    	"caption" => "bundesland_person" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34093,7 +34594,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E46BC5FB-D111-4003-891B-2D1FF523A24D}' => array
 			(
 				"id" => "{E46BC5FB-D111-4003-891B-2D1FF523A24D}",
@@ -34117,14 +34618,14 @@ $relations=array
 					"id" => "{8775BE85-BAE4-4477-BE2D-8DA1DA1BEB1E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D6FF9871-DDCC-4165-B6A5-15C78E12EAC6}'  => array
 	(
 	    	"id" => "{D6FF9871-DDCC-4165-B6A5-15C78E12EAC6}" ,
-	    	"name" => "dokument_akte" ,
+	    	"name" => "fk_dokument_akte" ,
 	    	"caption" => "dokument_akte" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34142,7 +34643,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C0ACDDA6-AB4E-4F43-A319-0290C1F664C5}' => array
 			(
 				"id" => "{C0ACDDA6-AB4E-4F43-A319-0290C1F664C5}",
@@ -34166,14 +34667,14 @@ $relations=array
 					"id" => "{40238FFD-41C1-48D2-AD6B-F3DD75DCB623}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BD3A665A-A33A-482B-82A5-8FD504350DD3}'  => array
 	(
 	    	"id" => "{BD3A665A-A33A-482B-82A5-8FD504350DD3}" ,
-	    	"name" => "dokument_dokumentprestudent" ,
+	    	"name" => "fk_dokument_dokumentprestudent" ,
 	    	"caption" => "dokument_dokumentprestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34191,7 +34692,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{CC1A1816-CF05-40C5-BA61-84297A6DD34D}' => array
 			(
 				"id" => "{CC1A1816-CF05-40C5-BA61-84297A6DD34D}",
@@ -34215,14 +34716,14 @@ $relations=array
 					"id" => "{40238FFD-41C1-48D2-AD6B-F3DD75DCB623}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E87E5130-25DF-46D4-B688-2F541D18253E}'  => array
 	(
 	    	"id" => "{E87E5130-25DF-46D4-B688-2F541D18253E}" ,
-	    	"name" => "dokument_dokumentstudiengang" ,
+	    	"name" => "fk_dokument_dokumentstudiengang" ,
 	    	"caption" => "dokument_dokumentstudiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34240,7 +34741,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E5A357B0-35BD-4269-B0D4-6E02F9CA4BF5}' => array
 			(
 				"id" => "{E5A357B0-35BD-4269-B0D4-6E02F9CA4BF5}",
@@ -34264,14 +34765,14 @@ $relations=array
 					"id" => "{40238FFD-41C1-48D2-AD6B-F3DD75DCB623}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1D83D23A-7BC2-4B33-9948-4FE5AB7CA590}'  => array
 	(
 	    	"id" => "{1D83D23A-7BC2-4B33-9948-4FE5AB7CA590}" ,
-	    	"name" => "erhalter_studiengang" ,
+	    	"name" => "fk_erhalter_studiengang" ,
 	    	"caption" => "erhalter_studiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34289,7 +34790,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F273144C-4A2B-4816-81F9-13D4688B639F}' => array
 			(
 				"id" => "{F273144C-4A2B-4816-81F9-13D4688B639F}",
@@ -34313,14 +34814,14 @@ $relations=array
 					"id" => "{DD8373B7-B788-4A2D-83A8-C46D02FB9DF2}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5A9CEB1E-FB3D-4370-B9A7-2AEC27BB1F1D}'  => array
 	(
 	    	"id" => "{5A9CEB1E-FB3D-4370-B9A7-2AEC27BB1F1D}" ,
-	    	"name" => "erreichbarkeit_zeitsperre" ,
+	    	"name" => "fk_erreichbarkeit_zeitsperre" ,
 	    	"caption" => "erreichbarkeit_zeitsperre" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34338,7 +34839,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{948AE920-0BFA-4D9F-AD87-0379D53C2E41}' => array
 			(
 				"id" => "{948AE920-0BFA-4D9F-AD87-0379D53C2E41}",
@@ -34362,14 +34863,14 @@ $relations=array
 					"id" => "{23452634-23E1-40D1-BB4F-4D5353D9596E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{23033EA9-C176-4EF8-8189-7B9446EE161C}'  => array
 	(
 	    	"id" => "{23033EA9-C176-4EF8-8189-7B9446EE161C}" ,
-	    	"name" => "fachbereich_lehrfach" ,
+	    	"name" => "fk_fachbereich_lehrfach" ,
 	    	"caption" => "fachbereich_lehrfach" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34387,7 +34888,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{916403F6-9910-4C65-B4F3-876F9507D4E8}' => array
 			(
 				"id" => "{916403F6-9910-4C65-B4F3-876F9507D4E8}",
@@ -34411,14 +34912,14 @@ $relations=array
 					"id" => "{5256091A-3BD0-4E26-857A-615720BE3D5F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F596345C-47AD-4892-95C5-49272F88F505}'  => array
 	(
 	    	"id" => "{F596345C-47AD-4892-95C5-49272F88F505}" ,
-	    	"name" => "fachbereich_news" ,
+	    	"name" => "fk_fachbereich_news" ,
 	    	"caption" => "fachbereich_news" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34436,7 +34937,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B412864E-CEA6-4D5E-ACFC-9F9B6DFC5563}' => array
 			(
 				"id" => "{B412864E-CEA6-4D5E-ACFC-9F9B6DFC5563}",
@@ -34460,14 +34961,14 @@ $relations=array
 					"id" => "{5256091A-3BD0-4E26-857A-615720BE3D5F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6435B469-0023-4687-B5C7-277312ED0A60}'  => array
 	(
 	    	"id" => "{6435B469-0023-4687-B5C7-277312ED0A60}" ,
-	    	"name" => "fachbereich_personfunktion" ,
+	    	"name" => "fk_fachbereich_personfunktion" ,
 	    	"caption" => "fachbereich_personfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34485,7 +34986,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F4F851AE-21B5-408A-8AD0-4594824DB1CF}' => array
 			(
 				"id" => "{F4F851AE-21B5-408A-8AD0-4594824DB1CF}",
@@ -34509,14 +35010,14 @@ $relations=array
 					"id" => "{5256091A-3BD0-4E26-857A-615720BE3D5F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{280FDC0F-CFA2-4436-903E-469E6CD9993B}'  => array
 	(
 	    	"id" => "{280FDC0F-CFA2-4436-903E-469E6CD9993B}" ,
-	    	"name" => "fachbereich_zeitaufzeichnung" ,
+	    	"name" => "fk_fachbereich_zeitaufzeichnung" ,
 	    	"caption" => "fachbereich_zeitaufzeichnung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34534,7 +35035,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{5ED34F51-10B3-4441-B36D-674AABE3E39A}' => array
 			(
 				"id" => "{5ED34F51-10B3-4441-B36D-674AABE3E39A}",
@@ -34558,14 +35059,14 @@ $relations=array
 					"id" => "{5256091A-3BD0-4E26-857A-615720BE3D5F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2A3BE117-6A2A-4834-8310-3757DEEBC5A8}'  => array
 	(
 	    	"id" => "{2A3BE117-6A2A-4834-8310-3757DEEBC5A8}" ,
-	    	"name" => "firma_adresse" ,
+	    	"name" => "fk_firma_adresse" ,
 	    	"caption" => "firma_adresse" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34583,7 +35084,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7BAFC3D3-245A-443F-8205-E032B5A9928E}' => array
 			(
 				"id" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}",
@@ -34607,14 +35108,14 @@ $relations=array
 					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{715A0D28-973F-4C3B-8330-1DC54C3D7A97}'  => array
 	(
 	    	"id" => "{715A0D28-973F-4C3B-8330-1DC54C3D7A97}" ,
-	    	"name" => "firma_kontakt" ,
+	    	"name" => "fk_firma_kontakt" ,
 	    	"caption" => "firma_kontakt" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34632,7 +35133,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{20C6EDC1-2A13-4BD1-89EF-1C6E89ECB97B}' => array
 			(
 				"id" => "{20C6EDC1-2A13-4BD1-89EF-1C6E89ECB97B}",
@@ -34656,14 +35157,14 @@ $relations=array
 					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C0B4C2C2-86D6-43F4-9B2F-DBBD3355B99C}'  => array
 	(
 	    	"id" => "{C0B4C2C2-86D6-43F4-9B2F-DBBD3355B99C}" ,
-	    	"name" => "firma_personfunktionfirma" ,
+	    	"name" => "fk_firma_personfunktionfirma" ,
 	    	"caption" => "firma_personfunktionfirma" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34681,7 +35182,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{EDB6FA36-36CF-43F8-A165-743B70304BED}' => array
 			(
 				"id" => "{EDB6FA36-36CF-43F8-A165-743B70304BED}",
@@ -34705,14 +35206,14 @@ $relations=array
 					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8F79A1D1-B20E-4352-837B-7E522CC47F15}'  => array
 	(
 	    	"id" => "{8F79A1D1-B20E-4352-837B-7E522CC47F15}" ,
-	    	"name" => "firma_preinteressent" ,
+	    	"name" => "fk_firma_preinteressent" ,
 	    	"caption" => "firma_preinteressent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34730,7 +35231,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{5E64D00F-BF30-45AA-8171-0C3FCC183903}' => array
 			(
 				"id" => "{5E64D00F-BF30-45AA-8171-0C3FCC183903}",
@@ -34754,14 +35255,14 @@ $relations=array
 					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6E2CDF7D-E521-4A62-92DA-EA26B525BC77}'  => array
 	(
 	    	"id" => "{6E2CDF7D-E521-4A62-92DA-EA26B525BC77}" ,
-	    	"name" => "firma_projektarbeit" ,
+	    	"name" => "fk_firma_projektarbeit" ,
 	    	"caption" => "firma_projektarbeit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34779,7 +35280,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}' => array
 			(
 				"id" => "{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}",
@@ -34803,14 +35304,14 @@ $relations=array
 					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E77E75D0-AFC8-4038-92C8-0E6445C40785}'  => array
 	(
 	    	"id" => "{E77E75D0-AFC8-4038-92C8-0E6445C40785}" ,
-	    	"name" => "firmentyp_firma" ,
+	    	"name" => "fk_firmentyp_firma" ,
 	    	"caption" => "firmentyp_firma" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -34828,7 +35329,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{98C7858B-AD55-4820-AC3C-1D0BA70C7B59}' => array
 			(
 				"id" => "{98C7858B-AD55-4820-AC3C-1D0BA70C7B59}",
@@ -34852,10 +35353,10 @@ $relations=array
 					"id" => "{B9AFEE61-E865-45D0-B0E7-347D2B0E615D}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BBE3F18D-1364-4FD0-84E3-1B762E04CAF7}'  => array
 	(
 	    	"id" => "{BBE3F18D-1364-4FD0-84E3-1B762E04CAF7}" ,
@@ -34877,7 +35378,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9A3D92DF-7BB1-4A99-B975-6BFB561CA054}' => array
 			(
 				"id" => "{9A3D92DF-7BB1-4A99-B975-6BFB561CA054}",
@@ -34901,10 +35402,10 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E6F30B9F-74D9-4D09-971C-AC3D0667230A}'  => array
 	(
 	    	"id" => "{E6F30B9F-74D9-4D09-971C-AC3D0667230A}" ,
@@ -34926,7 +35427,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2FCEEF98-E153-4824-9411-B4AB9AE98EA0}' => array
 			(
 				"id" => "{2FCEEF98-E153-4824-9411-B4AB9AE98EA0}",
@@ -34950,10 +35451,10 @@ $relations=array
 					"id" => "{D73DB902-FACA-425E-85BC-FE9947FB88DB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2A9FBD8B-4F43-443E-B64D-0C02E3985CA3}'  => array
 	(
 	    	"id" => "{2A9FBD8B-4F43-443E-B64D-0C02E3985CA3}" ,
@@ -34975,7 +35476,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D8324689-0336-4121-86EC-41C059D981CF}' => array
 			(
 				"id" => "{D8324689-0336-4121-86EC-41C059D981CF}",
@@ -34999,10 +35500,10 @@ $relations=array
 					"id" => "{1455684A-E436-4498-8DA0-DE7875942E99}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2B6AC164-A8B2-4A05-8C96-9F7BA48B8368}'  => array
 	(
 	    	"id" => "{2B6AC164-A8B2-4A05-8C96-9F7BA48B8368}" ,
@@ -35024,7 +35525,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{78866A65-5CDA-4463-8BFC-D684B187777F}' => array
 			(
 				"id" => "{78866A65-5CDA-4463-8BFC-D684B187777F}",
@@ -35048,10 +35549,10 @@ $relations=array
 					"id" => "{BA19F314-BCE6-4F12-8250-2213AD366F23}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7DBEB009-EFDB-4272-B202-0DB4A5613532}'  => array
 	(
 	    	"id" => "{7DBEB009-EFDB-4272-B202-0DB4A5613532}" ,
@@ -35073,7 +35574,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D260D4B1-B351-4B01-928E-9C2BA9B00042}' => array
 			(
 				"id" => "{D260D4B1-B351-4B01-928E-9C2BA9B00042}",
@@ -35097,10 +35598,10 @@ $relations=array
 					"id" => "{FCD391A8-A97A-41DF-8B2F-9973213F4B7A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{89296DFF-3E41-467B-8C47-75E11B10A53F}'  => array
 	(
 	    	"id" => "{89296DFF-3E41-467B-8C47-75E11B10A53F}" ,
@@ -35122,7 +35623,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E01A51F0-9817-4B9E-87B4-AD88511A7484}' => array
 			(
 				"id" => "{E01A51F0-9817-4B9E-87B4-AD88511A7484}",
@@ -35146,10 +35647,10 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9920D547-DF29-4441-9B39-EACEAE960617}'  => array
 	(
 	    	"id" => "{9920D547-DF29-4441-9B39-EACEAE960617}" ,
@@ -35171,7 +35672,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B798EA13-98CC-4AE0-9ADB-F43E2F47045B}' => array
 			(
 				"id" => "{B798EA13-98CC-4AE0-9ADB-F43E2F47045B}",
@@ -35195,10 +35696,10 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{CD739B5E-EC23-420C-93EA-7914802B8D44}'  => array
 	(
 	    	"id" => "{CD739B5E-EC23-420C-93EA-7914802B8D44}" ,
@@ -35220,7 +35721,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{DBF16663-DA89-4C5C-8CE1-30018FA765FE}' => array
 			(
 				"id" => "{DBF16663-DA89-4C5C-8CE1-30018FA765FE}",
@@ -35244,10 +35745,10 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{692EE789-37FF-47D1-B95D-FA25D1E6CFBC}'  => array
 	(
 	    	"id" => "{692EE789-37FF-47D1-B95D-FA25D1E6CFBC}" ,
@@ -35269,7 +35770,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{FD7372C4-E1DD-4F12-918D-3A4DA8CF7036}' => array
 			(
 				"id" => "{FD7372C4-E1DD-4F12-918D-3A4DA8CF7036}",
@@ -35293,14 +35794,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{EAFC5787-3D43-43ED-9470-E7590B1DB3D4}'  => array
 	(
 	    	"id" => "{EAFC5787-3D43-43ED-9470-E7590B1DB3D4}" ,
-	    	"name" => "frage_fragesprache" ,
+	    	"name" => "fk_frage_fragesprache" ,
 	    	"caption" => "frage_fragesprache" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35318,7 +35819,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{BAF05D60-88E9-4017-B152-39F3E0EBFD1D}' => array
 			(
 				"id" => "{BAF05D60-88E9-4017-B152-39F3E0EBFD1D}",
@@ -35342,14 +35843,14 @@ $relations=array
 					"id" => "{EB2C71D7-1A40-4F85-AE71-182F2B97A1F2}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4D9AC52F-DE16-444F-B8C2-CD318BF8F270}'  => array
 	(
 	    	"id" => "{4D9AC52F-DE16-444F-B8C2-CD318BF8F270}" ,
-	    	"name" => "frage_prueflingfrage" ,
+	    	"name" => "fk_frage_prueflingfrage" ,
 	    	"caption" => "frage_prueflingfrage" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35367,7 +35868,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{5EE34A81-C763-4946-8604-03E657E696C5}' => array
 			(
 				"id" => "{5EE34A81-C763-4946-8604-03E657E696C5}",
@@ -35391,14 +35892,14 @@ $relations=array
 					"id" => "{EB2C71D7-1A40-4F85-AE71-182F2B97A1F2}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{553C2525-2AD6-4B8B-B35D-D51C8B2808FF}'  => array
 	(
 	    	"id" => "{553C2525-2AD6-4B8B-B35D-D51C8B2808FF}" ,
-	    	"name" => "freigabevon_lvgesamtnote" ,
+	    	"name" => "fk_freigabevon_lvgesamtnote" ,
 	    	"caption" => "freigabevon_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35416,7 +35917,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6FE0B9E9-01E7-4EA2-B9E0-08A00A0D6CCD}' => array
 			(
 				"id" => "{6FE0B9E9-01E7-4EA2-B9E0-08A00A0D6CCD}",
@@ -35440,14 +35941,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BFF8DC01-7A00-4048-BCF0-B960B4F5BDE0}'  => array
 	(
 	    	"id" => "{BFF8DC01-7A00-4048-BCF0-B960B4F5BDE0}" ,
-	    	"name" => "funktion_personfunktion" ,
+	    	"name" => "fk_funktion_personfunktion" ,
 	    	"caption" => "funktion_personfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35465,7 +35966,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A3CC46AC-33AA-4963-BF7C-770401887EF3}' => array
 			(
 				"id" => "{A3CC46AC-33AA-4963-BF7C-770401887EF3}",
@@ -35489,14 +35990,14 @@ $relations=array
 					"id" => "{038BDEBE-F3A3-42D7-976B-0AC820BD7365}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6921DD6F-8C19-470D-A999-1E187CB4A53B}'  => array
 	(
 	    	"id" => "{6921DD6F-8C19-470D-A999-1E187CB4A53B}" ,
-	    	"name" => "funktion_personfunktionfirma" ,
+	    	"name" => "fk_funktion_personfunktionfirma" ,
 	    	"caption" => "funktion_personfunktionfirma" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35514,7 +36015,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0D39C3A3-7B72-4BC6-ACB3-5A49D530F6B8}' => array
 			(
 				"id" => "{0D39C3A3-7B72-4BC6-ACB3-5A49D530F6B8}",
@@ -35538,14 +36039,14 @@ $relations=array
 					"id" => "{038BDEBE-F3A3-42D7-976B-0AC820BD7365}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7FFA13A8-995D-4B08-A1AF-08CCD793A3F9}'  => array
 	(
 	    	"id" => "{7FFA13A8-995D-4B08-A1AF-08CCD793A3F9}" ,
-	    	"name" => "funktion_projektbenutzer" ,
+	    	"name" => "fk_funktion_projektbenutzer" ,
 	    	"caption" => "funktion_projektbenutzer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35563,7 +36064,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F9D10FB2-0EAE-4F87-BFFC-DB9CAA64330B}' => array
 			(
 				"id" => "{F9D10FB2-0EAE-4F87-BFFC-DB9CAA64330B}",
@@ -35587,14 +36088,14 @@ $relations=array
 					"id" => "{038BDEBE-F3A3-42D7-976B-0AC820BD7365}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5A849CAA-405B-4F5A-966E-144D3EB823C0}'  => array
 	(
 	    	"id" => "{5A849CAA-405B-4F5A-966E-144D3EB823C0}" ,
-	    	"name" => "gruppe_lehreinheitgruppe" ,
+	    	"name" => "fk_gruppe_lehreinheitgruppe" ,
 	    	"caption" => "gruppe_lehreinheitgruppe" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35612,7 +36113,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3229E124-B6D4-461E-B4A4-D56D63A627E9}' => array
 			(
 				"id" => "{3229E124-B6D4-461E-B4A4-D56D63A627E9}",
@@ -35636,14 +36137,14 @@ $relations=array
 					"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{35095338-F6AC-467A-9925-5BED66CD2401}'  => array
 	(
 	    	"id" => "{35095338-F6AC-467A-9925-5BED66CD2401}" ,
-	    	"name" => "gruppe_persongruppe" ,
+	    	"name" => "fk_gruppe_persongruppe" ,
 	    	"caption" => "gruppe_persongruppe" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35661,7 +36162,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C0D45455-D62E-4976-8A81-8F779C91F41B}' => array
 			(
 				"id" => "{C0D45455-D62E-4976-8A81-8F779C91F41B}",
@@ -35685,14 +36186,14 @@ $relations=array
 					"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{98DC61F2-64A5-4FB6-9BF0-B9035C720900}'  => array
 	(
 	    	"id" => "{98DC61F2-64A5-4FB6-9BF0-B9035C720900}" ,
-	    	"name" => "gruppe_reservierung" ,
+	    	"name" => "fk_gruppe_reservierung" ,
 	    	"caption" => "gruppe_reservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35710,7 +36211,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4A6EFE0B-68CC-4573-AC43-C168310F9A0E}' => array
 			(
 				"id" => "{4A6EFE0B-68CC-4573-AC43-C168310F9A0E}",
@@ -35734,14 +36235,14 @@ $relations=array
 					"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4CD4C8E4-2B81-4DC0-B61A-18C0A15308C1}'  => array
 	(
 	    	"id" => "{4CD4C8E4-2B81-4DC0-B61A-18C0A15308C1}" ,
-	    	"name" => "gruppe_stundenplan" ,
+	    	"name" => "fk_gruppe_stundenplan" ,
 	    	"caption" => "gruppe_stundenplan" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35759,7 +36260,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2F376168-E84F-4287-8A24-7C30108CD3EB}' => array
 			(
 				"id" => "{2F376168-E84F-4287-8A24-7C30108CD3EB}",
@@ -35783,14 +36284,14 @@ $relations=array
 					"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D9760950-DF99-4D6F-B7C5-D99C1BE5AAF9}'  => array
 	(
 	    	"id" => "{D9760950-DF99-4D6F-B7C5-D99C1BE5AAF9}" ,
-	    	"name" => "gruppe_stundenplandev" ,
+	    	"name" => "fk_gruppe_stundenplandev" ,
 	    	"caption" => "gruppe_stundenplandev" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35808,7 +36309,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2E07FD73-BB4C-4AEE-9B45-C3A961B2E8D2}' => array
 			(
 				"id" => "{2E07FD73-BB4C-4AEE-9B45-C3A961B2E8D2}",
@@ -35832,14 +36333,14 @@ $relations=array
 					"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E2EB7DC8-126D-48E7-91D3-424B8E614711}'  => array
 	(
 	    	"id" => "{E2EB7DC8-126D-48E7-91D3-424B8E614711}" ,
-	    	"name" => "hauptberuf_bisverwendung" ,
+	    	"name" => "fk_hauptberuf_bisverwendung" ,
 	    	"caption" => "hauptberuf_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35857,7 +36358,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9A5482E2-6C6D-4D67-B213-CA7213500653}' => array
 			(
 				"id" => "{9A5482E2-6C6D-4D67-B213-CA7213500653}",
@@ -35881,14 +36382,14 @@ $relations=array
 					"id" => "{20C386EC-4857-478B-A81D-054A7D5E1784}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C4210D18-B28B-432A-B1E2-9D40B1672948}'  => array
 	(
 	    	"id" => "{C4210D18-B28B-432A-B1E2-9D40B1672948}" ,
-	    	"name" => "kontaktmedium_preinteressent" ,
+	    	"name" => "fk_kontaktmedium_preinteressent" ,
 	    	"caption" => "kontaktmedium_preinteressent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35906,7 +36407,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{93E9BEC1-2435-4DF3-8800-B0BAC19466D6}' => array
 			(
 				"id" => "{93E9BEC1-2435-4DF3-8800-B0BAC19466D6}",
@@ -35930,14 +36431,14 @@ $relations=array
 					"id" => "{AA2520E7-6961-46C7-B714-D1074C462566}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E7D635FC-FB9A-42EA-92D8-7659769CFBF4}'  => array
 	(
 	    	"id" => "{E7D635FC-FB9A-42EA-92D8-7659769CFBF4}" ,
-	    	"name" => "kontakttyp_kontakt" ,
+	    	"name" => "fk_kontakttyp_kontakt" ,
 	    	"caption" => "kontakttyp_kontakt" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -35955,7 +36456,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A228D82F-BBD8-4DCA-9B1B-8A486250F3A4}' => array
 			(
 				"id" => "{A228D82F-BBD8-4DCA-9B1B-8A486250F3A4}",
@@ -35979,14 +36480,14 @@ $relations=array
 					"id" => "{4186E1B2-842C-433D-A8FA-8D1DE083C28B}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{14FF2371-B3D2-4136-B60C-2D7B73CF5A4E}'  => array
 	(
 	    	"id" => "{14FF2371-B3D2-4136-B60C-2D7B73CF5A4E}" ,
-	    	"name" => "konto_konto" ,
+	    	"name" => "fk_konto_konto" ,
 	    	"caption" => "konto_konto" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36004,7 +36505,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B9E06053-8A61-4E8F-9F7C-2A750F5F5437}' => array
 			(
 				"id" => "{B9E06053-8A61-4E8F-9F7C-2A750F5F5437}",
@@ -36028,14 +36529,14 @@ $relations=array
 					"id" => "{8F07F68D-36BA-4E9F-85D3-8F8B61AF0260}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A6ECE935-D075-4BE5-AC6F-CA35E2F90603}'  => array
 	(
 	    	"id" => "{A6ECE935-D075-4BE5-AC6F-CA35E2F90603}" ,
-	    	"name" => "lehreinheit_bisio" ,
+	    	"name" => "fk_lehreinheit_bisio" ,
 	    	"caption" => "lehreinheit_bisio" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36053,7 +36554,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4A582792-FD9F-4006-BCE7-45CFDC4525AA}' => array
 			(
 				"id" => "{4A582792-FD9F-4006-BCE7-45CFDC4525AA}",
@@ -36077,14 +36578,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C6C3C543-F8A1-4086-8D5E-58F32685D023}'  => array
 	(
 	    	"id" => "{C6C3C543-F8A1-4086-8D5E-58F32685D023}" ,
-	    	"name" => "lehreinheit_gruppelehreinheit" ,
+	    	"name" => "fk_lehreinheit_gruppelehreinheit" ,
 	    	"caption" => "lehreinheit_gruppelehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36102,7 +36603,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{105D5EDF-655D-4F3F-B640-1B5CCCFAEC93}' => array
 			(
 				"id" => "{105D5EDF-655D-4F3F-B640-1B5CCCFAEC93}",
@@ -36126,14 +36627,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{313A5656-E822-49E5-9164-A9A554B0711E}'  => array
 	(
 	    	"id" => "{313A5656-E822-49E5-9164-A9A554B0711E}" ,
-	    	"name" => "lehreinheit_legesamtnote" ,
+	    	"name" => "fk_lehreinheit_legesamtnote" ,
 	    	"caption" => "lehreinheit_legesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36151,7 +36652,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{289149BC-0E73-4E8D-BA1F-2D5BC6824780}' => array
 			(
 				"id" => "{289149BC-0E73-4E8D-BA1F-2D5BC6824780}",
@@ -36175,14 +36676,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9E4695B1-98B9-4A1F-82D4-426D44F964FF}'  => array
 	(
 	    	"id" => "{9E4695B1-98B9-4A1F-82D4-426D44F964FF}" ,
-	    	"name" => "lehreinheit_lehreinheitmitarbeiter" ,
+	    	"name" => "fk_lehreinheit_lehreinheitmitarbeiter" ,
 	    	"caption" => "lehreinheit_lehreinheitmitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36200,7 +36701,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F6B97486-000B-4647-92B4-4828B3118D80}' => array
 			(
 				"id" => "{F6B97486-000B-4647-92B4-4828B3118D80}",
@@ -36224,14 +36725,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5F296560-73C1-4DE4-8468-428B269F4C50}'  => array
 	(
 	    	"id" => "{5F296560-73C1-4DE4-8468-428B269F4C50}" ,
-	    	"name" => "lehreinheit_moodle" ,
+	    	"name" => "fk_lehreinheit_moodle" ,
 	    	"caption" => "lehreinheit_moodle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36249,7 +36750,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{79B2A1E8-B375-4897-8E52-024C895987BA}' => array
 			(
 				"id" => "{79B2A1E8-B375-4897-8E52-024C895987BA}",
@@ -36273,14 +36774,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{B0AD6C74-0E13-40BF-A682-1D12B622AE80}'  => array
 	(
 	    	"id" => "{B0AD6C74-0E13-40BF-A682-1D12B622AE80}" ,
-	    	"name" => "lehreinheit_notenschluessel" ,
+	    	"name" => "fk_lehreinheit_notenschluessel" ,
 	    	"caption" => "lehreinheit_notenschluessel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36298,7 +36799,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{CCC1F019-57CA-45A9-AD3A-A014F07D733B}' => array
 			(
 				"id" => "{CCC1F019-57CA-45A9-AD3A-A014F07D733B}",
@@ -36322,14 +36823,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{50D6E601-8B58-4EC1-8B4A-FAD4714A6D71}'  => array
 	(
 	    	"id" => "{50D6E601-8B58-4EC1-8B4A-FAD4714A6D71}" ,
-	    	"name" => "lehreinheit_projektarbeit" ,
+	    	"name" => "fk_lehreinheit_projektarbeit" ,
 	    	"caption" => "lehreinheit_projektarbeit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36347,7 +36848,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4A0FFA91-1FAC-4CDF-AA6E-2DDC610932EA}' => array
 			(
 				"id" => "{4A0FFA91-1FAC-4CDF-AA6E-2DDC610932EA}",
@@ -36371,14 +36872,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BD0C7C75-BD75-4911-A1AB-E06E853D4834}'  => array
 	(
 	    	"id" => "{BD0C7C75-BD75-4911-A1AB-E06E853D4834}" ,
-	    	"name" => "lehreinheit_pruefung" ,
+	    	"name" => "fk_lehreinheit_pruefung" ,
 	    	"caption" => "lehreinheit_pruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36396,7 +36897,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{606898F0-64C6-4CF8-B2DB-6CC743BB9CBB}' => array
 			(
 				"id" => "{606898F0-64C6-4CF8-B2DB-6CC743BB9CBB}",
@@ -36420,14 +36921,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{40E8F797-B0DA-4034-B6B7-22FE14F40BDB}'  => array
 	(
 	    	"id" => "{40E8F797-B0DA-4034-B6B7-22FE14F40BDB}" ,
-	    	"name" => "lehreinheit_stundenplan" ,
+	    	"name" => "fk_lehreinheit_stundenplan" ,
 	    	"caption" => "lehreinheit_stundenplan" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36445,7 +36946,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B76935DC-41FF-4D5E-9408-7D0A7555ADAB}' => array
 			(
 				"id" => "{B76935DC-41FF-4D5E-9408-7D0A7555ADAB}",
@@ -36469,14 +36970,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3AE6530B-0881-40BE-ACB2-83383CBFCBC2}'  => array
 	(
 	    	"id" => "{3AE6530B-0881-40BE-ACB2-83383CBFCBC2}" ,
-	    	"name" => "lehreinheit_stundenplandev" ,
+	    	"name" => "fk_lehreinheit_stundenplandev" ,
 	    	"caption" => "lehreinheit_stundenplandev" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36494,7 +36995,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8417A8EB-C27A-403C-9C6D-2ED8782DA545}' => array
 			(
 				"id" => "{8417A8EB-C27A-403C-9C6D-2ED8782DA545}",
@@ -36518,14 +37019,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{42B6AE81-E8DE-403F-B3C7-550A035E1505}'  => array
 	(
 	    	"id" => "{42B6AE81-E8DE-403F-B3C7-550A035E1505}" ,
-	    	"name" => "lehreinheit_uebung" ,
+	    	"name" => "fk_lehreinheit_uebung" ,
 	    	"caption" => "lehreinheit_uebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36543,7 +37044,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{95FFD3FF-CBC5-48C8-A586-728A1ACA6A84}' => array
 			(
 				"id" => "{95FFD3FF-CBC5-48C8-A586-728A1ACA6A84}",
@@ -36567,14 +37068,14 @@ $relations=array
 					"id" => "{45A6708D-9ED5-4C7B-9143-65935D21CC06}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{31DF4694-53C7-451C-8325-6F4D66DCC8EE}'  => array
 	(
 	    	"id" => "{31DF4694-53C7-451C-8325-6F4D66DCC8EE}" ,
-	    	"name" => "lehrfach_lehreinheit" ,
+	    	"name" => "fk_lehrfach_lehreinheit" ,
 	    	"caption" => "lehrfach_lehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36592,7 +37093,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B460159C-34A9-43EA-8CD0-AA4FAEB9CAFF}' => array
 			(
 				"id" => "{B460159C-34A9-43EA-8CD0-AA4FAEB9CAFF}",
@@ -36616,14 +37117,14 @@ $relations=array
 					"id" => "{7B4B041D-19F7-49A9-82B4-4B4D5E07A020}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E13A6BA0-47AA-42FC-B9C6-7F50C7B570B6}'  => array
 	(
 	    	"id" => "{E13A6BA0-47AA-42FC-B9C6-7F50C7B570B6}" ,
-	    	"name" => "lehrform_lehreinheit" ,
+	    	"name" => "fk_lehrform_lehreinheit" ,
 	    	"caption" => "lehrform_lehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36641,7 +37142,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{585C9CE3-CAB6-4743-82C4-76F65E119D37}' => array
 			(
 				"id" => "{585C9CE3-CAB6-4743-82C4-76F65E119D37}",
@@ -36665,14 +37166,14 @@ $relations=array
 					"id" => "{B045A95E-1995-48E1-B1CE-8BA0F2340CF3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{EB8DB5AF-2BD5-4150-B5FF-DC12B140DA1B}'  => array
 	(
 	    	"id" => "{EB8DB5AF-2BD5-4150-B5FF-DC12B140DA1B}" ,
-	    	"name" => "lehrform_lehrveranstaltung" ,
+	    	"name" => "fk_lehrform_lehrveranstaltung" ,
 	    	"caption" => "lehrform_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36690,7 +37191,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{39B3E1F0-A51D-4878-A7E9-183C6F05FA46}' => array
 			(
 				"id" => "{39B3E1F0-A51D-4878-A7E9-183C6F05FA46}",
@@ -36714,14 +37215,14 @@ $relations=array
 					"id" => "{B045A95E-1995-48E1-B1CE-8BA0F2340CF3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D7FB93B6-CAFB-4768-9598-AA681E3F2143}'  => array
 	(
 	    	"id" => "{D7FB93B6-CAFB-4768-9598-AA681E3F2143}" ,
-	    	"name" => "lehrfunktion_lehreinheitmitarbeiter" ,
+	    	"name" => "fk_lehrfunktion_lehreinheitmitarbeiter" ,
 	    	"caption" => "lehrfunktion_lehreinheitmitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36739,7 +37240,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7EADA421-ACB0-4FCC-9F0C-961757EA6B2E}' => array
 			(
 				"id" => "{7EADA421-ACB0-4FCC-9F0C-961757EA6B2E}",
@@ -36763,14 +37264,14 @@ $relations=array
 					"id" => "{6E2E8AB2-59DE-4980-BB18-71F35093A626}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F831C3AE-7866-476A-BEF6-E198CC878BA6}'  => array
 	(
 	    	"id" => "{F831C3AE-7866-476A-BEF6-E198CC878BA6}" ,
-	    	"name" => "lehrveranstaltung_benutzerlvstudiensemester" ,
+	    	"name" => "fk_lehrveranstaltung_benutzerlvstudiensemester" ,
 	    	"caption" => "lehrveranstaltung_benutzerlvstudiensemester" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36788,7 +37289,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9DD76DA1-77B6-42C8-9A7B-D951BC42E7CC}' => array
 			(
 				"id" => "{9DD76DA1-77B6-42C8-9A7B-D951BC42E7CC}",
@@ -36812,14 +37313,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E5B13CEC-7F73-4265-843C-9DC3C9C99AAA}'  => array
 	(
 	    	"id" => "{E5B13CEC-7F73-4265-843C-9DC3C9C99AAA}" ,
-	    	"name" => "lehrveranstaltung_feedback" ,
+	    	"name" => "fk_lehrveranstaltung_feedback" ,
 	    	"caption" => "lehrveranstaltung_feedback" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36837,7 +37338,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{67ACFB41-4383-464D-8535-39218E13EEFA}' => array
 			(
 				"id" => "{67ACFB41-4383-464D-8535-39218E13EEFA}",
@@ -36861,14 +37362,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8E789B72-C4FD-4046-8D62-9E3B3DD35C43}'  => array
 	(
 	    	"id" => "{8E789B72-C4FD-4046-8D62-9E3B3DD35C43}" ,
-	    	"name" => "lehrveranstaltung_lehreinheit" ,
+	    	"name" => "fk_lehrveranstaltung_lehreinheit" ,
 	    	"caption" => "lehrveranstaltung_lehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36886,7 +37387,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E99C26C5-D6FB-4477-B802-64C8F44D5019}' => array
 			(
 				"id" => "{E99C26C5-D6FB-4477-B802-64C8F44D5019}",
@@ -36910,14 +37411,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{37F70E10-A263-4D67-B913-50E90379C374}'  => array
 	(
 	    	"id" => "{37F70E10-A263-4D67-B913-50E90379C374}" ,
-	    	"name" => "lehrveranstaltung_lvgesamtnote" ,
+	    	"name" => "fk_lehrveranstaltung_lvgesamtnote" ,
 	    	"caption" => "lehrveranstaltung_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36935,7 +37436,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{95DE5158-7895-4F08-A84C-8B114E5B38EA}' => array
 			(
 				"id" => "{95DE5158-7895-4F08-A84C-8B114E5B38EA}",
@@ -36959,14 +37460,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7C32655B-DA02-4388-8C4C-9C80C53A87ED}'  => array
 	(
 	    	"id" => "{7C32655B-DA02-4388-8C4C-9C80C53A87ED}" ,
-	    	"name" => "lehrveranstaltung_lvinfo" ,
+	    	"name" => "fk_lehrveranstaltung_lvinfo" ,
 	    	"caption" => "lehrveranstaltung_lvinfo" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -36984,7 +37485,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{431EB7BB-BBD8-4DCB-A63D-8AF938C10BFD}' => array
 			(
 				"id" => "{431EB7BB-BBD8-4DCB-A63D-8AF938C10BFD}",
@@ -37008,14 +37509,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3E626440-120A-42C6-912F-1F3D1FB3990E}'  => array
 	(
 	    	"id" => "{3E626440-120A-42C6-912F-1F3D1FB3990E}" ,
-	    	"name" => "lehrveranstaltung_moodle" ,
+	    	"name" => "fk_lehrveranstaltung_moodle" ,
 	    	"caption" => "lehrveranstaltung_moodle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37033,7 +37534,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7E1A7746-B178-40EF-8497-BD191846C9FD}' => array
 			(
 				"id" => "{7E1A7746-B178-40EF-8497-BD191846C9FD}",
@@ -37057,14 +37558,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D32E94B3-16C2-46ED-BC4C-3978D488C91B}'  => array
 	(
 	    	"id" => "{D32E94B3-16C2-46ED-BC4C-3978D488C91B}" ,
-	    	"name" => "lehrveranstaltung_zeugnisnote" ,
+	    	"name" => "fk_lehrveranstaltung_zeugnisnote" ,
 	    	"caption" => "lehrveranstaltung_zeugnisnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37082,7 +37583,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E9114B7C-6657-4FBF-BD85-4A435F263BF8}' => array
 			(
 				"id" => "{E9114B7C-6657-4FBF-BD85-4A435F263BF8}",
@@ -37106,14 +37607,14 @@ $relations=array
 					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D000A8CB-2013-48CF-A9BF-3302B4B1CA07}'  => array
 	(
 	    	"id" => "{D000A8CB-2013-48CF-A9BF-3302B4B1CA07}" ,
-	    	"name" => "lehrverband_gruppelehreinheit" ,
+	    	"name" => "fk_lehrverband_gruppelehreinheit" ,
 	    	"caption" => "lehrverband_gruppelehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37131,7 +37632,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6C64F542-1699-4268-A918-EB9C81AE3C69}' => array
 			(
 				"id" => "{6C64F542-1699-4268-A918-EB9C81AE3C69}",
@@ -37155,7 +37656,7 @@ $relations=array
 					"id" => "{03A5BA98-DB34-41E3-B5E9-959C2371A050}",
 		   		)
 			),
-
+			
 			'{A2DE1A80-74BE-4FE7-860E-48B43386D908}' => array
 			(
 				"id" => "{A2DE1A80-74BE-4FE7-860E-48B43386D908}",
@@ -37179,7 +37680,7 @@ $relations=array
 					"id" => "{7CA9054F-F656-4CF7-B770-19DB0590026E}",
 		   		)
 			),
-
+			
 			'{FD91B054-E62C-4334-AB5D-E6749038A2A8}' => array
 			(
 				"id" => "{FD91B054-E62C-4334-AB5D-E6749038A2A8}",
@@ -37203,7 +37704,7 @@ $relations=array
 					"id" => "{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}",
 		   		)
 			),
-
+			
 			'{D7D183AA-F885-4557-A5F4-908E00C1A851}' => array
 			(
 				"id" => "{D7D183AA-F885-4557-A5F4-908E00C1A851}",
@@ -37227,14 +37728,14 @@ $relations=array
 					"id" => "{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9A9F1649-DD2D-4B73-A6D3-49DD9CA343B7}'  => array
 	(
 	    	"id" => "{9A9F1649-DD2D-4B73-A6D3-49DD9CA343B7}" ,
-	    	"name" => "lehrverband_student" ,
+	    	"name" => "fk_lehrverband_student" ,
 	    	"caption" => "lehrverband_student" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37252,7 +37753,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{538377A3-3B0B-4907-A020-DDC9F40308F3}' => array
 			(
 				"id" => "{538377A3-3B0B-4907-A020-DDC9F40308F3}",
@@ -37276,7 +37777,7 @@ $relations=array
 					"id" => "{03A5BA98-DB34-41E3-B5E9-959C2371A050}",
 		   		)
 			),
-
+			
 			'{FDA5B86D-9BAA-4998-8926-7A1C0B686087}' => array
 			(
 				"id" => "{FDA5B86D-9BAA-4998-8926-7A1C0B686087}",
@@ -37300,7 +37801,7 @@ $relations=array
 					"id" => "{7CA9054F-F656-4CF7-B770-19DB0590026E}",
 		   		)
 			),
-
+			
 			'{81718592-2431-4FDA-A966-31AC0CD5216F}' => array
 			(
 				"id" => "{81718592-2431-4FDA-A966-31AC0CD5216F}",
@@ -37324,7 +37825,7 @@ $relations=array
 					"id" => "{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}",
 		   		)
 			),
-
+			
 			'{7FE4B36E-E9BB-4217-8392-F8EF847AF590}' => array
 			(
 				"id" => "{7FE4B36E-E9BB-4217-8392-F8EF847AF590}",
@@ -37348,14 +37849,14 @@ $relations=array
 					"id" => "{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5C1D83C9-4205-4D2B-8AB6-C6BF902C0E9F}'  => array
 	(
 	    	"id" => "{5C1D83C9-4205-4D2B-8AB6-C6BF902C0E9F}" ,
-	    	"name" => "lehrverband_studentlehrverband" ,
+	    	"name" => "fk_lehrverband_studentlehrverband" ,
 	    	"caption" => "lehrverband_studentlehrverband" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37373,7 +37874,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{492F5B0C-3116-47A2-9EC8-9041B5C626DE}' => array
 			(
 				"id" => "{492F5B0C-3116-47A2-9EC8-9041B5C626DE}",
@@ -37397,7 +37898,7 @@ $relations=array
 					"id" => "{03A5BA98-DB34-41E3-B5E9-959C2371A050}",
 		   		)
 			),
-
+			
 			'{51DF8B64-71C1-41CC-A424-6038072E7246}' => array
 			(
 				"id" => "{51DF8B64-71C1-41CC-A424-6038072E7246}",
@@ -37421,7 +37922,7 @@ $relations=array
 					"id" => "{7CA9054F-F656-4CF7-B770-19DB0590026E}",
 		   		)
 			),
-
+			
 			'{0B410CEF-3EB8-45C5-BDB6-439F8D209F66}' => array
 			(
 				"id" => "{0B410CEF-3EB8-45C5-BDB6-439F8D209F66}",
@@ -37445,7 +37946,7 @@ $relations=array
 					"id" => "{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}",
 		   		)
 			),
-
+			
 			'{6670C52E-4B7D-4887-9E90-D07964E2881A}' => array
 			(
 				"id" => "{6670C52E-4B7D-4887-9E90-D07964E2881A}",
@@ -37469,14 +37970,14 @@ $relations=array
 					"id" => "{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D8C53844-C3A9-4152-B940-91D845480C30}'  => array
 	(
 	    	"id" => "{D8C53844-C3A9-4152-B940-91D845480C30}" ,
-	    	"name" => "lehrverband_stundenplan" ,
+	    	"name" => "fk_lehrverband_stundenplan" ,
 	    	"caption" => "lehrverband_stundenplan" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37494,7 +37995,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{BECE6511-58C5-44B4-9C11-E5D209830439}' => array
 			(
 				"id" => "{BECE6511-58C5-44B4-9C11-E5D209830439}",
@@ -37518,7 +38019,7 @@ $relations=array
 					"id" => "{03A5BA98-DB34-41E3-B5E9-959C2371A050}",
 		   		)
 			),
-
+			
 			'{944AFE34-5A1F-4D17-97B5-684640740BE2}' => array
 			(
 				"id" => "{944AFE34-5A1F-4D17-97B5-684640740BE2}",
@@ -37542,7 +38043,7 @@ $relations=array
 					"id" => "{7CA9054F-F656-4CF7-B770-19DB0590026E}",
 		   		)
 			),
-
+			
 			'{A798BFD6-0AB0-4728-A2B9-FD5D37503466}' => array
 			(
 				"id" => "{A798BFD6-0AB0-4728-A2B9-FD5D37503466}",
@@ -37566,7 +38067,7 @@ $relations=array
 					"id" => "{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}",
 		   		)
 			),
-
+			
 			'{C7C33A82-6A84-4AC1-B98A-A38EBD584E62}' => array
 			(
 				"id" => "{C7C33A82-6A84-4AC1-B98A-A38EBD584E62}",
@@ -37590,14 +38091,14 @@ $relations=array
 					"id" => "{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{22F03F5F-6F6E-4068-866F-0F5570D37BAF}'  => array
 	(
 	    	"id" => "{22F03F5F-6F6E-4068-866F-0F5570D37BAF}" ,
-	    	"name" => "lehrverband_stundenplandev" ,
+	    	"name" => "fk_lehrverband_stundenplandev" ,
 	    	"caption" => "lehrverband_stundenplandev" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37615,7 +38116,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3130E85B-369F-410E-93E4-A1F835FF0E4A}' => array
 			(
 				"id" => "{3130E85B-369F-410E-93E4-A1F835FF0E4A}",
@@ -37639,7 +38140,7 @@ $relations=array
 					"id" => "{03A5BA98-DB34-41E3-B5E9-959C2371A050}",
 		   		)
 			),
-
+			
 			'{4EE1A1E3-05F0-4480-AADF-8478D24E83C4}' => array
 			(
 				"id" => "{4EE1A1E3-05F0-4480-AADF-8478D24E83C4}",
@@ -37663,7 +38164,7 @@ $relations=array
 					"id" => "{7CA9054F-F656-4CF7-B770-19DB0590026E}",
 		   		)
 			),
-
+			
 			'{E100A71F-594B-4B85-A507-41FFC28744A5}' => array
 			(
 				"id" => "{E100A71F-594B-4B85-A507-41FFC28744A5}",
@@ -37687,7 +38188,7 @@ $relations=array
 					"id" => "{5912B2BA-9E68-4E23-974B-C79D1D87C6B9}",
 		   		)
 			),
-
+			
 			'{F0535E2C-D8E7-4596-A124-9F88247A02CD}' => array
 			(
 				"id" => "{F0535E2C-D8E7-4596-A124-9F88247A02CD}",
@@ -37711,14 +38212,14 @@ $relations=array
 					"id" => "{7C532AB7-053B-42DB-8CB8-CCFDADBB39F3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FBD55CAC-BD4C-44CD-A5FB-17C6EC95CDA6}'  => array
 	(
 	    	"id" => "{FBD55CAC-BD4C-44CD-A5FB-17C6EC95CDA6}" ,
-	    	"name" => "lektor_stundenplan" ,
+	    	"name" => "fk_lektor_stundenplan" ,
 	    	"caption" => "lektor_stundenplan" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37736,7 +38237,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{27A65605-0129-430C-9F00-52828F8B03BC}' => array
 			(
 				"id" => "{27A65605-0129-430C-9F00-52828F8B03BC}",
@@ -37760,14 +38261,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6B29A46A-E6F6-4B30-A55E-40DA9FC57BCD}'  => array
 	(
 	    	"id" => "{6B29A46A-E6F6-4B30-A55E-40DA9FC57BCD}" ,
-	    	"name" => "lektor_zeitsperre" ,
+	    	"name" => "fk_lektor_zeitsperre" ,
 	    	"caption" => "lektor_zeitsperre" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37785,7 +38286,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D5162449-3FBF-4674-8948-A637D3CEA086}' => array
 			(
 				"id" => "{D5162449-3FBF-4674-8948-A637D3CEA086}",
@@ -37809,14 +38310,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FC0567B2-5733-4376-BF0B-71D063FD7375}'  => array
 	(
 	    	"id" => "{FC0567B2-5733-4376-BF0B-71D063FD7375}" ,
-	    	"name" => "lektor_zeitwunsch" ,
+	    	"name" => "fk_lektor_zeitwunsch" ,
 	    	"caption" => "lektor_zeitwunsch" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37834,7 +38335,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{226D56B9-0BB2-4E9D-8039-134850385AB1}' => array
 			(
 				"id" => "{226D56B9-0BB2-4E9D-8039-134850385AB1}",
@@ -37858,14 +38359,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{CA575C8B-2B29-452D-8654-165E4D99351D}'  => array
 	(
 	    	"id" => "{CA575C8B-2B29-452D-8654-165E4D99351D}" ,
-	    	"name" => "mitarbeiter_bisverwendung" ,
+	    	"name" => "fk_mitarbeiter_bisverwendung" ,
 	    	"caption" => "mitarbeiter_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37883,7 +38384,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F747262A-EAF9-40DF-B1F8-8830FCF158D7}' => array
 			(
 				"id" => "{F747262A-EAF9-40DF-B1F8-8830FCF158D7}",
@@ -37907,14 +38408,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BE243FD2-0BE5-41DC-8E40-2877C170561A}'  => array
 	(
 	    	"id" => "{BE243FD2-0BE5-41DC-8E40-2877C170561A}" ,
-	    	"name" => "mitarbeiter_dokumentprestudent" ,
+	    	"name" => "fk_mitarbeiter_dokumentprestudent" ,
 	    	"caption" => "mitarbeiter_dokumentprestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37932,7 +38433,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A0AE905E-257F-4447-9F19-609A3B751BB9}' => array
 			(
 				"id" => "{A0AE905E-257F-4447-9F19-609A3B751BB9}",
@@ -37956,14 +38457,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{ED34DC55-026A-4F5B-87E0-A8534EBB1D81}'  => array
 	(
 	    	"id" => "{ED34DC55-026A-4F5B-87E0-A8534EBB1D81}" ,
-	    	"name" => "mitarbeiter_entwickungsteam" ,
+	    	"name" => "fk_mitarbeiter_entwickungsteam" ,
 	    	"caption" => "mitarbeiter_entwickungsteam" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -37981,7 +38482,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{267087F1-EFB0-4D16-B06E-19580BA7937D}' => array
 			(
 				"id" => "{267087F1-EFB0-4D16-B06E-19580BA7937D}",
@@ -38005,14 +38506,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BC96D733-6FC2-495B-9F2C-DB751329C05B}'  => array
 	(
 	    	"id" => "{BC96D733-6FC2-495B-9F2C-DB751329C05B}" ,
-	    	"name" => "mitarbeiter_lehreinheitmitarbeiter" ,
+	    	"name" => "fk_mitarbeiter_lehreinheitmitarbeiter" ,
 	    	"caption" => "mitarbeiter_lehreinheitmitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38030,7 +38531,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{37D10613-61D9-4801-A1F3-E0154B80334C}' => array
 			(
 				"id" => "{37D10613-61D9-4801-A1F3-E0154B80334C}",
@@ -38054,14 +38555,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{743C8036-610D-4B5D-A212-6881BBCAD5A1}'  => array
 	(
 	    	"id" => "{743C8036-610D-4B5D-A212-6881BBCAD5A1}" ,
-	    	"name" => "mitarbeiter_lehrveranstaltung" ,
+	    	"name" => "fk_mitarbeiter_lehrveranstaltung" ,
 	    	"caption" => "mitarbeiter_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38079,7 +38580,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7A6F3EA4-F854-44E4-AE44-A2E231501616}' => array
 			(
 				"id" => "{7A6F3EA4-F854-44E4-AE44-A2E231501616}",
@@ -38103,14 +38604,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{18D8135A-1461-4C00-895D-D5C8899818BF}'  => array
 	(
 	    	"id" => "{18D8135A-1461-4C00-895D-D5C8899818BF}" ,
-	    	"name" => "mitarbeiter_log" ,
+	    	"name" => "fk_mitarbeiter_log" ,
 	    	"caption" => "mitarbeiter_log" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38128,7 +38629,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{32D6A2F8-49D8-4B15-96B7-BF9F2EDF956C}' => array
 			(
 				"id" => "{32D6A2F8-49D8-4B15-96B7-BF9F2EDF956C}",
@@ -38152,14 +38653,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6B2DF18D-7B74-494D-B443-D6E14D0B4232}'  => array
 	(
 	    	"id" => "{6B2DF18D-7B74-494D-B443-D6E14D0B4232}" ,
-	    	"name" => "mitarbeiter_lvgesamtnote" ,
+	    	"name" => "fk_mitarbeiter_lvgesamtnote" ,
 	    	"caption" => "mitarbeiter_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38177,7 +38678,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4B711108-0BC7-4DEB-B08F-9CB309FAC71A}' => array
 			(
 				"id" => "{4B711108-0BC7-4DEB-B08F-9CB309FAC71A}",
@@ -38201,14 +38702,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8853CDFB-4A98-4943-9D01-526B3057C9C6}'  => array
 	(
 	    	"id" => "{8853CDFB-4A98-4943-9D01-526B3057C9C6}" ,
-	    	"name" => "mitarbeiter_pruefung" ,
+	    	"name" => "fk_mitarbeiter_pruefung" ,
 	    	"caption" => "mitarbeiter_pruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38226,7 +38727,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{617D31E7-4F4C-4EB0-9265-6C5E670823CB}' => array
 			(
 				"id" => "{617D31E7-4F4C-4EB0-9265-6C5E670823CB}",
@@ -38250,14 +38751,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{B7720BEE-AE5D-4419-A4B5-501826FE622E}'  => array
 	(
 	    	"id" => "{B7720BEE-AE5D-4419-A4B5-501826FE622E}" ,
-	    	"name" => "mitarbeiter_resturlaub" ,
+	    	"name" => "fk_mitarbeiter_resturlaub" ,
 	    	"caption" => "mitarbeiter_resturlaub" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38275,7 +38776,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6B0C9577-5600-46A8-A484-49CB259D12EE}' => array
 			(
 				"id" => "{6B0C9577-5600-46A8-A484-49CB259D12EE}",
@@ -38299,14 +38800,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A85C8F46-A63A-4906-8889-24D548D76526}'  => array
 	(
 	    	"id" => "{A85C8F46-A63A-4906-8889-24D548D76526}" ,
-	    	"name" => "mitarbeiter_studentuebung" ,
+	    	"name" => "fk_mitarbeiter_studentuebung" ,
 	    	"caption" => "mitarbeiter_studentuebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38324,7 +38825,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B35AF5A7-2375-4122-9230-DA4C39BC2C6B}' => array
 			(
 				"id" => "{B35AF5A7-2375-4122-9230-DA4C39BC2C6B}",
@@ -38348,14 +38849,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{81344121-60AF-4A05-8745-90ABBE72E71B}'  => array
 	(
 	    	"id" => "{81344121-60AF-4A05-8745-90ABBE72E71B}" ,
-	    	"name" => "mitarbeiter_stundenplandev" ,
+	    	"name" => "fk_mitarbeiter_stundenplandev" ,
 	    	"caption" => "mitarbeiter_stundenplandev" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38373,7 +38874,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{710CE321-5754-4B4C-949C-12C5D48BE9BB}' => array
 			(
 				"id" => "{710CE321-5754-4B4C-949C-12C5D48BE9BB}",
@@ -38397,14 +38898,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{AE188DC6-8006-41EE-9EC3-CDEFAEF71789}'  => array
 	(
 	    	"id" => "{AE188DC6-8006-41EE-9EC3-CDEFAEF71789}" ,
-	    	"name" => "mitarbeitervorsitz_abschlusspruefung" ,
+	    	"name" => "fk_mitarbeitervorsitz_abschlusspruefung" ,
 	    	"caption" => "mitarbeitervorsitz_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38422,7 +38923,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A5AA866F-4CF2-40CF-A988-7EDAE7306265}' => array
 			(
 				"id" => "{A5AA866F-4CF2-40CF-A988-7EDAE7306265}",
@@ -38446,14 +38947,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{AC89AE45-B0D0-42CB-B893-0EFC43C97497}'  => array
 	(
 	    	"id" => "{AC89AE45-B0D0-42CB-B893-0EFC43C97497}" ,
-	    	"name" => "mobilitaetsprogramm_bisio" ,
+	    	"name" => "fk_mobilitaetsprogramm_bisio" ,
 	    	"caption" => "mobilitaetsprogramm_bisio" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38471,7 +38972,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F65EF5CC-3B02-46A9-9267-01DA143B63D9}' => array
 			(
 				"id" => "{F65EF5CC-3B02-46A9-9267-01DA143B63D9}",
@@ -38495,14 +38996,14 @@ $relations=array
 					"id" => "{8AD6472E-DA66-4FED-AE6D-060837A9DE20}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E1AD8839-AB34-4BF2-93FC-B4EDC87665F3}'  => array
 	(
 	    	"id" => "{E1AD8839-AB34-4BF2-93FC-B4EDC87665F3}" ,
-	    	"name" => "nation_adresse" ,
+	    	"name" => "fk_nation_adresse" ,
 	    	"caption" => "nation_adresse" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38520,7 +39021,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E6C34671-A267-4E33-B790-E051C4A416CC}' => array
 			(
 				"id" => "{E6C34671-A267-4E33-B790-E051C4A416CC}",
@@ -38544,14 +39045,14 @@ $relations=array
 					"id" => "{0EE635E6-C94F-4F62-8381-38AC891279E3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E8B48F89-A9DC-48B4-AEFA-ADEF6D7067C5}'  => array
 	(
 	    	"id" => "{E8B48F89-A9DC-48B4-AEFA-ADEF6D7067C5}" ,
-	    	"name" => "nation_bisio" ,
+	    	"name" => "fk_nation_bisio" ,
 	    	"caption" => "nation_bisio" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38569,7 +39070,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{01CE52AD-8C31-4779-802B-1D8387148857}' => array
 			(
 				"id" => "{01CE52AD-8C31-4779-802B-1D8387148857}",
@@ -38593,14 +39094,14 @@ $relations=array
 					"id" => "{0EE635E6-C94F-4F62-8381-38AC891279E3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FC152048-83B0-40B6-9487-C616A91E8BA6}'  => array
 	(
 	    	"id" => "{FC152048-83B0-40B6-9487-C616A91E8BA6}" ,
-	    	"name" => "nation_person" ,
+	    	"name" => "fk_nation_person" ,
 	    	"caption" => "nation_person" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38618,7 +39119,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{67D01707-9CD4-4C27-BC6D-4F8E2626B40B}' => array
 			(
 				"id" => "{67D01707-9CD4-4C27-BC6D-4F8E2626B40B}",
@@ -38642,14 +39143,14 @@ $relations=array
 					"id" => "{0EE635E6-C94F-4F62-8381-38AC891279E3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0F3359C7-A49F-40C2-99C2-521CE8AE9E55}'  => array
 	(
 	    	"id" => "{0F3359C7-A49F-40C2-99C2-521CE8AE9E55}" ,
-	    	"name" => "nationgeburt_person" ,
+	    	"name" => "fk_nationgeburt_person" ,
 	    	"caption" => "nationgeburt_person" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38667,7 +39168,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4D5C7F66-366B-485C-BFAD-97F9D07266E0}' => array
 			(
 				"id" => "{4D5C7F66-366B-485C-BFAD-97F9D07266E0}",
@@ -38691,14 +39192,14 @@ $relations=array
 					"id" => "{0EE635E6-C94F-4F62-8381-38AC891279E3}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D6C4D8A5-BF05-41AF-9C40-B6B0C3361D05}'  => array
 	(
 	    	"id" => "{D6C4D8A5-BF05-41AF-9C40-B6B0C3361D05}" ,
-	    	"name" => "news_newssprache" ,
+	    	"name" => "fk_news_newssprache" ,
 	    	"caption" => "news_newssprache" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38716,7 +39217,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4FCAF8F9-B613-4CAA-B9C1-2C39336F4DA9}' => array
 			(
 				"id" => "{4FCAF8F9-B613-4CAA-B9C1-2C39336F4DA9}",
@@ -38740,14 +39241,14 @@ $relations=array
 					"id" => "{12C41DCA-A9CF-4861-B3CC-E268FB084B4C}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6FC12D4E-BBAF-4866-81C6-AA80A8F9F5E4}'  => array
 	(
 	    	"id" => "{6FC12D4E-BBAF-4866-81C6-AA80A8F9F5E4}" ,
-	    	"name" => "note_abschlusspruefung" ,
+	    	"name" => "fk_note_abschlusspruefung" ,
 	    	"caption" => "note_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38765,7 +39266,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{30271D50-D304-41CE-836D-02E8116A8027}' => array
 			(
 				"id" => "{30271D50-D304-41CE-836D-02E8116A8027}",
@@ -38789,14 +39290,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9FF8E34D-7539-48F9-89D5-61B1171AF9DA}'  => array
 	(
 	    	"id" => "{9FF8E34D-7539-48F9-89D5-61B1171AF9DA}" ,
-	    	"name" => "note_legesamtnote" ,
+	    	"name" => "fk_note_legesamtnote" ,
 	    	"caption" => "note_legesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38814,7 +39315,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{DDE9903D-BF30-4A3C-A1C9-F83EF0060B7D}' => array
 			(
 				"id" => "{DDE9903D-BF30-4A3C-A1C9-F83EF0060B7D}",
@@ -38838,14 +39339,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FF434D69-DFFF-4802-88AA-3AF03AD583B4}'  => array
 	(
 	    	"id" => "{FF434D69-DFFF-4802-88AA-3AF03AD583B4}" ,
-	    	"name" => "note_lvgesamtnote" ,
+	    	"name" => "fk_note_lvgesamtnote" ,
 	    	"caption" => "note_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38863,7 +39364,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{394483DE-948E-46F2-B172-0FC8E6730493}' => array
 			(
 				"id" => "{394483DE-948E-46F2-B172-0FC8E6730493}",
@@ -38887,14 +39388,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{CAE74C54-83D2-45B7-A5E1-651EC60D581E}'  => array
 	(
 	    	"id" => "{CAE74C54-83D2-45B7-A5E1-651EC60D581E}" ,
-	    	"name" => "note_notenschluessel" ,
+	    	"name" => "fk_note_notenschluessel" ,
 	    	"caption" => "note_notenschluessel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38912,7 +39413,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{CA37FF03-F60D-46CC-B08B-44BD362C7245}' => array
 			(
 				"id" => "{CA37FF03-F60D-46CC-B08B-44BD362C7245}",
@@ -38936,14 +39437,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A1554E70-5C92-47CB-8B62-8045F507F56D}'  => array
 	(
 	    	"id" => "{A1554E70-5C92-47CB-8B62-8045F507F56D}" ,
-	    	"name" => "note_projektbetreuer" ,
+	    	"name" => "fk_note_projektbetreuer" ,
 	    	"caption" => "note_projektbetreuer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -38961,7 +39462,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{44ED6FA1-9424-4B27-9FEE-1516BAE5EC70}' => array
 			(
 				"id" => "{44ED6FA1-9424-4B27-9FEE-1516BAE5EC70}",
@@ -38985,14 +39486,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4D6E93AB-3D73-4735-8D10-758B9D4F033E}'  => array
 	(
 	    	"id" => "{4D6E93AB-3D73-4735-8D10-758B9D4F033E}" ,
-	    	"name" => "note_pruefung" ,
+	    	"name" => "fk_note_pruefung" ,
 	    	"caption" => "note_pruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39010,7 +39511,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C95E2034-1F7D-49B7-B406-866997E24ABA}' => array
 			(
 				"id" => "{C95E2034-1F7D-49B7-B406-866997E24ABA}",
@@ -39034,14 +39535,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0DF8F706-FBCF-4DA5-9BAD-9E2CFAC7585B}'  => array
 	(
 	    	"id" => "{0DF8F706-FBCF-4DA5-9BAD-9E2CFAC7585B}" ,
-	    	"name" => "note_studentuebung" ,
+	    	"name" => "fk_note_studentuebung" ,
 	    	"caption" => "note_studentuebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39059,7 +39560,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{136BDD48-7E6D-475A-A905-045E8D972959}' => array
 			(
 				"id" => "{136BDD48-7E6D-475A-A905-045E8D972959}",
@@ -39083,14 +39584,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{39CB415B-3939-4ABE-AAB6-559313C78EC3}'  => array
 	(
 	    	"id" => "{39CB415B-3939-4ABE-AAB6-559313C78EC3}" ,
-	    	"name" => "note_zeugnisnote" ,
+	    	"name" => "fk_note_zeugnisnote" ,
 	    	"caption" => "note_zeugnisnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39108,7 +39609,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{80F5F9F9-4F56-40F8-BF7B-FE45769B81F3}' => array
 			(
 				"id" => "{80F5F9F9-4F56-40F8-BF7B-FE45769B81F3}",
@@ -39132,14 +39633,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9EE4B332-CF93-47F6-A1C3-AD5E5AE20206}'  => array
 	(
 	    	"id" => "{9EE4B332-CF93-47F6-A1C3-AD5E5AE20206}" ,
-	    	"name" => "orgform_gruppe" ,
+	    	"name" => "fk_orgform_gruppe" ,
 	    	"caption" => "orgform_gruppe" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39157,7 +39658,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7FBD2E4C-54F3-49E8-B0EF-5D402DA7FF33}' => array
 			(
 				"id" => "{7FBD2E4C-54F3-49E8-B0EF-5D402DA7FF33}",
@@ -39181,14 +39682,14 @@ $relations=array
 					"id" => "{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{62AC714C-8D15-437B-9E5B-BBCB0209485C}'  => array
 	(
 	    	"id" => "{62AC714C-8D15-437B-9E5B-BBCB0209485C}" ,
-	    	"name" => "orgform_lehrveranstaltung" ,
+	    	"name" => "fk_orgform_lehrveranstaltung" ,
 	    	"caption" => "orgform_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39206,7 +39707,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0EB30C61-91EB-4C1D-B5FD-08E22DB4971C}' => array
 			(
 				"id" => "{0EB30C61-91EB-4C1D-B5FD-08E22DB4971C}",
@@ -39230,14 +39731,14 @@ $relations=array
 					"id" => "{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F8D070B2-0147-4DCB-B646-A6805EC8922E}'  => array
 	(
 	    	"id" => "{F8D070B2-0147-4DCB-B646-A6805EC8922E}" ,
-	    	"name" => "orgform_lehrverband" ,
+	    	"name" => "fk_orgform_lehrverband" ,
 	    	"caption" => "orgform_lehrverband" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39255,7 +39756,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D25C5BBD-FD27-402A-B573-D2C007DC9AC8}' => array
 			(
 				"id" => "{D25C5BBD-FD27-402A-B573-D2C007DC9AC8}",
@@ -39279,14 +39780,14 @@ $relations=array
 					"id" => "{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A2E91773-5922-448B-93CA-491CF7F5D536}'  => array
 	(
 	    	"id" => "{A2E91773-5922-448B-93CA-491CF7F5D536}" ,
-	    	"name" => "orgform_prestudentrolle" ,
+	    	"name" => "fk_orgform_prestudentrolle" ,
 	    	"caption" => "orgform_prestudentrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39304,7 +39805,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{10696812-735C-43EA-A897-DB83275899D2}' => array
 			(
 				"id" => "{10696812-735C-43EA-A897-DB83275899D2}",
@@ -39328,14 +39829,14 @@ $relations=array
 					"id" => "{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3067334A-A3A6-40C6-8442-E32A05D426F9}'  => array
 	(
 	    	"id" => "{3067334A-A3A6-40C6-8442-E32A05D426F9}" ,
-	    	"name" => "orgform_studiengang" ,
+	    	"name" => "fk_orgform_studiengang" ,
 	    	"caption" => "orgform_studiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39353,7 +39854,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E4F6079D-6131-4527-BA3A-CB09A3FE4EB5}' => array
 			(
 				"id" => "{E4F6079D-6131-4527-BA3A-CB09A3FE4EB5}",
@@ -39377,14 +39878,14 @@ $relations=array
 					"id" => "{966124E9-D984-4AB7-9E7D-C7B5A38B2FEB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{154761FB-BAA8-4723-B838-5755EA9E765F}'  => array
 	(
 	    	"id" => "{154761FB-BAA8-4723-B838-5755EA9E765F}" ,
-	    	"name" => "ort_lehrmittel" ,
+	    	"name" => "fk_ort_lehrmittel" ,
 	    	"caption" => "ort_lehrmittel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39402,7 +39903,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{80613C83-0AC5-4809-ADF8-2FC134E390D2}' => array
 			(
 				"id" => "{80613C83-0AC5-4809-ADF8-2FC134E390D2}",
@@ -39426,14 +39927,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{42B42C62-1C22-4765-8B70-8ADC0F36FB08}'  => array
 	(
 	    	"id" => "{42B42C62-1C22-4765-8B70-8ADC0F36FB08}" ,
-	    	"name" => "ort_mitarbeiter" ,
+	    	"name" => "fk_ort_mitarbeiter" ,
 	    	"caption" => "ort_mitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39451,7 +39952,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{433FC6C0-6E36-4675-8986-35FBF8913058}' => array
 			(
 				"id" => "{433FC6C0-6E36-4675-8986-35FBF8913058}",
@@ -39475,14 +39976,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{694E5EB7-9D0F-406C-A4AD-8904CFE4451C}'  => array
 	(
 	    	"id" => "{694E5EB7-9D0F-406C-A4AD-8904CFE4451C}" ,
-	    	"name" => "ort_ortraumtyp" ,
+	    	"name" => "fk_ort_ortraumtyp" ,
 	    	"caption" => "ort_ortraumtyp" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39500,7 +40001,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4DB011D6-F4FF-47B1-8DD2-A891E2D1F2DB}' => array
 			(
 				"id" => "{4DB011D6-F4FF-47B1-8DD2-A891E2D1F2DB}",
@@ -39524,14 +40025,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D6E99568-5F42-4913-9E19-26DCD3B59C2F}'  => array
 	(
 	    	"id" => "{D6E99568-5F42-4913-9E19-26DCD3B59C2F}" ,
-	    	"name" => "ort_reihungstest" ,
+	    	"name" => "fk_ort_reihungstest" ,
 	    	"caption" => "ort_reihungstest" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39549,7 +40050,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{617F8ECB-2F77-4165-96A6-B6956D670D68}' => array
 			(
 				"id" => "{617F8ECB-2F77-4165-96A6-B6956D670D68}",
@@ -39573,14 +40074,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{ACD42FB5-F485-4BFD-8FE7-BADD630539CF}'  => array
 	(
 	    	"id" => "{ACD42FB5-F485-4BFD-8FE7-BADD630539CF}" ,
-	    	"name" => "ort_reservierung" ,
+	    	"name" => "fk_ort_reservierung" ,
 	    	"caption" => "ort_reservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39598,7 +40099,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{473740AD-EAD7-4479-9C13-E1F45251ED30}' => array
 			(
 				"id" => "{473740AD-EAD7-4479-9C13-E1F45251ED30}",
@@ -39622,14 +40123,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{688F911E-E7DE-4B48-8460-97B41ECF46B5}'  => array
 	(
 	    	"id" => "{688F911E-E7DE-4B48-8460-97B41ECF46B5}" ,
-	    	"name" => "ort_stundenplan" ,
+	    	"name" => "fk_ort_stundenplan" ,
 	    	"caption" => "ort_stundenplan" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39647,7 +40148,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{373D88F9-21CF-4DEF-9AB0-F4BE066A0D1D}' => array
 			(
 				"id" => "{373D88F9-21CF-4DEF-9AB0-F4BE066A0D1D}",
@@ -39671,14 +40172,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1E772E3D-51F7-410E-B436-7AC58A6CB8EA}'  => array
 	(
 	    	"id" => "{1E772E3D-51F7-410E-B436-7AC58A6CB8EA}" ,
-	    	"name" => "ort_stundenplandev" ,
+	    	"name" => "fk_ort_stundenplandev" ,
 	    	"caption" => "ort_stundenplandev" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39696,7 +40197,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4D8A56E6-FA99-4115-9286-12C0FCD3D357}' => array
 			(
 				"id" => "{4D8A56E6-FA99-4115-9286-12C0FCD3D357}",
@@ -39720,14 +40221,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2DF1A773-EEDB-42A1-8B20-E4CCE2E25B29}'  => array
 	(
 	    	"id" => "{2DF1A773-EEDB-42A1-8B20-E4CCE2E25B29}" ,
-	    	"name" => "ort_zeitfenster" ,
+	    	"name" => "fk_ort_zeitfenster" ,
 	    	"caption" => "ort_zeitfenster" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39745,7 +40246,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4892A55C-2CE8-489D-A540-C655B1D6CCE0}' => array
 			(
 				"id" => "{4892A55C-2CE8-489D-A540-C655B1D6CCE0}",
@@ -39769,14 +40270,14 @@ $relations=array
 					"id" => "{596188FD-A730-4304-9A9A-12E2D8A73E94}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A0603811-2716-41A0-91AB-5CCB2804FBEA}'  => array
 	(
 	    	"id" => "{A0603811-2716-41A0-91AB-5CCB2804FBEA}" ,
-	    	"name" => "person1_abschlusspruefung" ,
+	    	"name" => "fk_person1_abschlusspruefung" ,
 	    	"caption" => "person1_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39794,7 +40295,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8E80C392-058E-403F-9AA5-7845D311968F}' => array
 			(
 				"id" => "{8E80C392-058E-403F-9AA5-7845D311968F}",
@@ -39818,14 +40319,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FA28F689-6987-4D4B-B278-D5537577CD94}'  => array
 	(
 	    	"id" => "{FA28F689-6987-4D4B-B278-D5537577CD94}" ,
-	    	"name" => "person2_abschlusspruefung" ,
+	    	"name" => "fk_person2_abschlusspruefung" ,
 	    	"caption" => "person2_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39843,7 +40344,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{023E2197-E937-4783-9D09-FE606DC41519}' => array
 			(
 				"id" => "{023E2197-E937-4783-9D09-FE606DC41519}",
@@ -39867,14 +40368,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7C926B8B-9074-481C-9CD3-6DA6ED93D231}'  => array
 	(
 	    	"id" => "{7C926B8B-9074-481C-9CD3-6DA6ED93D231}" ,
-	    	"name" => "person3_abschlusspruefung" ,
+	    	"name" => "fk_person3_abschlusspruefung" ,
 	    	"caption" => "person3_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39892,7 +40393,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C1CD45D1-395A-4B39-B59F-2E89E13A750D}' => array
 			(
 				"id" => "{C1CD45D1-395A-4B39-B59F-2E89E13A750D}",
@@ -39916,14 +40417,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2A92E533-C73B-4133-9023-8662F20CB1B1}'  => array
 	(
 	    	"id" => "{2A92E533-C73B-4133-9023-8662F20CB1B1}" ,
-	    	"name" => "person_adresse" ,
+	    	"name" => "fk_person_adresse" ,
 	    	"caption" => "person_adresse" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39941,7 +40442,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F36F7395-6885-42A5-8902-97D40342AF16}' => array
 			(
 				"id" => "{F36F7395-6885-42A5-8902-97D40342AF16}",
@@ -39965,14 +40466,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5F7706D0-170C-47AE-8288-CEDB45777051}'  => array
 	(
 	    	"id" => "{5F7706D0-170C-47AE-8288-CEDB45777051}" ,
-	    	"name" => "person_akte" ,
+	    	"name" => "fk_person_akte" ,
 	    	"caption" => "person_akte" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -39990,7 +40491,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E1F532C1-966E-4469-B905-A8A10A375423}' => array
 			(
 				"id" => "{E1F532C1-966E-4469-B905-A8A10A375423}",
@@ -40014,14 +40515,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8C7DFB99-7E1C-448A-9566-D119A21053EB}'  => array
 	(
 	    	"id" => "{8C7DFB99-7E1C-448A-9566-D119A21053EB}" ,
-	    	"name" => "person_bankverbindung" ,
+	    	"name" => "fk_person_bankverbindung" ,
 	    	"caption" => "person_bankverbindung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40039,7 +40540,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{406CED68-48C4-4CDC-8D82-896F84060C81}' => array
 			(
 				"id" => "{406CED68-48C4-4CDC-8D82-896F84060C81}",
@@ -40063,14 +40564,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4515AD66-C120-4237-8686-A50148DDAAEA}'  => array
 	(
 	    	"id" => "{4515AD66-C120-4237-8686-A50148DDAAEA}" ,
-	    	"name" => "person_betriebsmittelperson" ,
+	    	"name" => "fk_person_betriebsmittelperson" ,
 	    	"caption" => "person_betriebsmittelperson" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40088,7 +40589,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4457750C-FBAD-4C70-8477-416716D7AD5D}' => array
 			(
 				"id" => "{4457750C-FBAD-4C70-8477-416716D7AD5D}",
@@ -40112,14 +40613,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4E488B2D-3142-49CC-9C64-031A7AB6EF9D}'  => array
 	(
 	    	"id" => "{4E488B2D-3142-49CC-9C64-031A7AB6EF9D}" ,
-	    	"name" => "person_kontakt" ,
+	    	"name" => "fk_person_kontakt" ,
 	    	"caption" => "person_kontakt" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40137,7 +40638,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8118FF48-4119-4321-B571-CE0EB46E568A}' => array
 			(
 				"id" => "{8118FF48-4119-4321-B571-CE0EB46E568A}",
@@ -40161,14 +40662,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0FFAE566-EBB2-497F-A240-C440FCF72688}'  => array
 	(
 	    	"id" => "{0FFAE566-EBB2-497F-A240-C440FCF72688}" ,
-	    	"name" => "person_konto" ,
+	    	"name" => "fk_person_konto" ,
 	    	"caption" => "person_konto" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40186,7 +40687,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4390E05A-55A3-4B0F-B0B3-6E564D9018F9}' => array
 			(
 				"id" => "{4390E05A-55A3-4B0F-B0B3-6E564D9018F9}",
@@ -40210,14 +40711,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{365C7B18-80C6-4A1D-B655-BE923146227F}'  => array
 	(
 	    	"id" => "{365C7B18-80C6-4A1D-B655-BE923146227F}" ,
-	    	"name" => "person_mitarbeiter" ,
+	    	"name" => "fk_person_mitarbeiter" ,
 	    	"caption" => "person_mitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40235,7 +40736,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3A452E95-98F0-4764-A775-011B729C69A9}' => array
 			(
 				"id" => "{3A452E95-98F0-4764-A775-011B729C69A9}",
@@ -40259,14 +40760,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C3329788-7169-4B35-9B96-5E4C4A7AF18E}'  => array
 	(
 	    	"id" => "{C3329788-7169-4B35-9B96-5E4C4A7AF18E}" ,
-	    	"name" => "person_news" ,
+	    	"name" => "fk_person_news" ,
 	    	"caption" => "person_news" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40284,7 +40785,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}' => array
 			(
 				"id" => "{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}",
@@ -40308,14 +40809,14 @@ $relations=array
 					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{81FC0D07-FBB9-4BCF-9DA8-F8523CE5E6FE}'  => array
 	(
 	    	"id" => "{81FC0D07-FBB9-4BCF-9DA8-F8523CE5E6FE}" ,
-	    	"name" => "person_person" ,
+	    	"name" => "fk_person_person" ,
 	    	"caption" => "person_person" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40333,7 +40834,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{DF4C72CD-C7D2-4F64-A891-3953B0BD2E52}' => array
 			(
 				"id" => "{DF4C72CD-C7D2-4F64-A891-3953B0BD2E52}",
@@ -40357,14 +40858,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{EE4C6976-0A6B-44F7-8A28-BE3B7F1A21C8}'  => array
 	(
 	    	"id" => "{EE4C6976-0A6B-44F7-8A28-BE3B7F1A21C8}" ,
-	    	"name" => "person_personfunktionfirma" ,
+	    	"name" => "fk_person_personfunktionfirma" ,
 	    	"caption" => "person_personfunktionfirma" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40382,7 +40883,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7930DCF1-5FCE-4DCD-B50A-58773226C53F}' => array
 			(
 				"id" => "{7930DCF1-5FCE-4DCD-B50A-58773226C53F}",
@@ -40406,14 +40907,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{76624118-24B9-43B8-A060-DD89566215C4}'  => array
 	(
 	    	"id" => "{76624118-24B9-43B8-A060-DD89566215C4}" ,
-	    	"name" => "person_preinteressent" ,
+	    	"name" => "fk_person_preinteressent" ,
 	    	"caption" => "person_preinteressent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40431,7 +40932,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D02765C1-84FD-4450-8298-39F1DF521C4C}' => array
 			(
 				"id" => "{D02765C1-84FD-4450-8298-39F1DF521C4C}",
@@ -40455,14 +40956,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C8E5F56A-7351-474A-ADDD-810A2F58B080}'  => array
 	(
 	    	"id" => "{C8E5F56A-7351-474A-ADDD-810A2F58B080}" ,
-	    	"name" => "person_prestudent" ,
+	    	"name" => "fk_person_prestudent" ,
 	    	"caption" => "person_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40480,7 +40981,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F7D74494-70BA-4832-A0E4-5F36FAFF10BA}' => array
 			(
 				"id" => "{F7D74494-70BA-4832-A0E4-5F36FAFF10BA}",
@@ -40504,14 +41005,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{80976B2D-AE2E-4983-A9DE-8ECE062EBFD3}'  => array
 	(
 	    	"id" => "{80976B2D-AE2E-4983-A9DE-8ECE062EBFD3}" ,
-	    	"name" => "person_projektbetreuer" ,
+	    	"name" => "fk_person_projektbetreuer" ,
 	    	"caption" => "person_projektbetreuer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40529,7 +41030,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B552BF61-80BD-42BB-B53A-04A0EBE09FE3}' => array
 			(
 				"id" => "{B552BF61-80BD-42BB-B53A-04A0EBE09FE3}",
@@ -40553,14 +41054,14 @@ $relations=array
 					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{873AF555-2C02-44FD-8484-DC3021B0F02E}'  => array
 	(
 	    	"id" => "{873AF555-2C02-44FD-8484-DC3021B0F02E}" ,
-	    	"name" => "preinteressent_preinteressentstudiengang" ,
+	    	"name" => "fk_preinteressent_preinteressentstudiengang" ,
 	    	"caption" => "preinteressent_preinteressentstudiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40578,7 +41079,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7C0F8617-9581-4898-9CF9-A8CEC5484A69}' => array
 			(
 				"id" => "{7C0F8617-9581-4898-9CF9-A8CEC5484A69}",
@@ -40602,14 +41103,14 @@ $relations=array
 					"id" => "{AEB7BF2B-1FB4-4F21-8E22-DC549DC170F4}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E2EC8355-6197-410C-ADFC-3000FA63EB9F}'  => array
 	(
 	    	"id" => "{E2EC8355-6197-410C-ADFC-3000FA63EB9F}" ,
-	    	"name" => "prestudent_dokumentprestudent" ,
+	    	"name" => "fk_prestudent_dokumentprestudent" ,
 	    	"caption" => "prestudent_dokumentprestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40627,7 +41128,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{E6F28A4B-135D-4B21-BFEB-A0B04DE07211}' => array
 			(
 				"id" => "{E6F28A4B-135D-4B21-BFEB-A0B04DE07211}",
@@ -40651,14 +41152,14 @@ $relations=array
 					"id" => "{68456598-CEAF-4256-8EAE-7C65CBFC101E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2B620627-7073-46C5-A6B1-2D97CF44665B}'  => array
 	(
 	    	"id" => "{2B620627-7073-46C5-A6B1-2D97CF44665B}" ,
-	    	"name" => "prestudent_prestudentrolle" ,
+	    	"name" => "fk_prestudent_prestudentrolle" ,
 	    	"caption" => "prestudent_prestudentrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40676,7 +41177,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{ECF5114E-27D0-4B59-A700-6B31E7145974}' => array
 			(
 				"id" => "{ECF5114E-27D0-4B59-A700-6B31E7145974}",
@@ -40700,14 +41201,14 @@ $relations=array
 					"id" => "{68456598-CEAF-4256-8EAE-7C65CBFC101E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BA7CFB38-E070-4FA4-B3CE-4D6E0CD26F7D}'  => array
 	(
 	    	"id" => "{BA7CFB38-E070-4FA4-B3CE-4D6E0CD26F7D}" ,
-	    	"name" => "prestudent_student" ,
+	    	"name" => "fk_prestudent_student" ,
 	    	"caption" => "prestudent_student" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40725,7 +41226,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{51328EC1-919B-4C5A-8951-5AF6E496497A}' => array
 			(
 				"id" => "{51328EC1-919B-4C5A-8951-5AF6E496497A}",
@@ -40749,14 +41250,14 @@ $relations=array
 					"id" => "{68456598-CEAF-4256-8EAE-7C65CBFC101E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8DF29086-F4AF-48DC-A397-5753E8CE3897}'  => array
 	(
 	    	"id" => "{8DF29086-F4AF-48DC-A397-5753E8CE3897}" ,
-	    	"name" => "projekt_projektbenutzer" ,
+	    	"name" => "fk_projekt_projektbenutzer" ,
 	    	"caption" => "projekt_projektbenutzer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40774,7 +41275,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6D474BB4-B542-468F-8E66-A2DAAD9C0080}' => array
 			(
 				"id" => "{6D474BB4-B542-468F-8E66-A2DAAD9C0080}",
@@ -40798,14 +41299,14 @@ $relations=array
 					"id" => "{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{572E3BCA-4AEB-409B-9B85-F1F150C3614B}'  => array
 	(
 	    	"id" => "{572E3BCA-4AEB-409B-9B85-F1F150C3614B}" ,
-	    	"name" => "projekt_zeitaufzeichnung" ,
+	    	"name" => "fk_projekt_zeitaufzeichnung" ,
 	    	"caption" => "projekt_zeitaufzeichnung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40823,7 +41324,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C34CC8D9-1155-462F-8FFB-16CD6684B08B}' => array
 			(
 				"id" => "{C34CC8D9-1155-462F-8FFB-16CD6684B08B}",
@@ -40847,14 +41348,14 @@ $relations=array
 					"id" => "{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8BF0B9EB-E25C-4FF7-ADCD-CC883179CDD2}'  => array
 	(
 	    	"id" => "{8BF0B9EB-E25C-4FF7-ADCD-CC883179CDD2}" ,
-	    	"name" => "projektarbeit_note" ,
+	    	"name" => "fk_projektarbeit_note" ,
 	    	"caption" => "projektarbeit_note" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40872,7 +41373,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{15B4BB47-89EF-4037-B303-1D89068A0D4A}' => array
 			(
 				"id" => "{15B4BB47-89EF-4037-B303-1D89068A0D4A}",
@@ -40896,14 +41397,14 @@ $relations=array
 					"id" => "{D2049F05-AC60-458E-9AF4-AFA607624B3F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{093D11B4-F9B2-43FA-AE48-B1096640039B}'  => array
 	(
 	    	"id" => "{093D11B4-F9B2-43FA-AE48-B1096640039B}" ,
-	    	"name" => "projektarbeit_projektbetreuer" ,
+	    	"name" => "fk_projektarbeit_projektbetreuer" ,
 	    	"caption" => "projektarbeit_projektbetreuer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40921,7 +41422,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B3FD19FC-91D5-4F14-8E87-98BEE1CCE118}' => array
 			(
 				"id" => "{B3FD19FC-91D5-4F14-8E87-98BEE1CCE118}",
@@ -40945,14 +41446,14 @@ $relations=array
 					"id" => "{253EEF90-43AB-4AD5-BF58-BEDF5A799EB0}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1156D299-61F0-4A2E-867E-8A2D7B078802}'  => array
 	(
 	    	"id" => "{1156D299-61F0-4A2E-867E-8A2D7B078802}" ,
-	    	"name" => "projekttyp_projektarbeit" ,
+	    	"name" => "fk_projekttyp_projektarbeit" ,
 	    	"caption" => "projekttyp_projektarbeit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -40970,7 +41471,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7AC5B867-8B54-4162-99FA-5FBCACB9EEEE}' => array
 			(
 				"id" => "{7AC5B867-8B54-4162-99FA-5FBCACB9EEEE}",
@@ -40994,14 +41495,14 @@ $relations=array
 					"id" => "{3EBCD2F4-FFE1-4D78-8742-9F84E2104885}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D77858E7-9547-492F-B429-88B7258E811A}'  => array
 	(
 	    	"id" => "{D77858E7-9547-492F-B429-88B7258E811A}" ,
-	    	"name" => "pruefling_prueflingfrage" ,
+	    	"name" => "fk_pruefling_prueflingfrage" ,
 	    	"caption" => "pruefling_prueflingfrage" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41019,7 +41520,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{05699831-9F02-48DF-BB86-80EF8E9A3F1E}' => array
 			(
 				"id" => "{05699831-9F02-48DF-BB86-80EF8E9A3F1E}",
@@ -41043,14 +41544,14 @@ $relations=array
 					"id" => "{D73DB902-FACA-425E-85BC-FE9947FB88DB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9CEDC591-4E3B-4DF4-B8F1-F5D613915D7C}'  => array
 	(
 	    	"id" => "{9CEDC591-4E3B-4DF4-B8F1-F5D613915D7C}" ,
-	    	"name" => "pruefungstyp_abschlusspruefung" ,
+	    	"name" => "fk_pruefungstyp_abschlusspruefung" ,
 	    	"caption" => "pruefungstyp_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41068,7 +41569,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D1459429-AAB5-46C9-B2F5-F22A9018E1E2}' => array
 			(
 				"id" => "{D1459429-AAB5-46C9-B2F5-F22A9018E1E2}",
@@ -41092,14 +41593,14 @@ $relations=array
 					"id" => "{C3546154-CCC6-4525-85C4-D65E52E55F70}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4683BAC8-7BFC-4033-B9A0-DAD32E74B59F}'  => array
 	(
 	    	"id" => "{4683BAC8-7BFC-4033-B9A0-DAD32E74B59F}" ,
-	    	"name" => "pruefungstyp_pruefung" ,
+	    	"name" => "fk_pruefungstyp_pruefung" ,
 	    	"caption" => "pruefungstyp_pruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41117,7 +41618,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9E72B709-6C34-4A50-835F-5F82C27F9BC0}' => array
 			(
 				"id" => "{9E72B709-6C34-4A50-835F-5F82C27F9BC0}",
@@ -41141,14 +41642,14 @@ $relations=array
 					"id" => "{C3546154-CCC6-4525-85C4-D65E52E55F70}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{CAB5A66B-2C77-4F99-BFBC-B5922B03AB3B}'  => array
 	(
 	    	"id" => "{CAB5A66B-2C77-4F99-BFBC-B5922B03AB3B}" ,
-	    	"name" => "raumtyp_lehrveranstaltung" ,
+	    	"name" => "fk_raumtyp_lehrveranstaltung" ,
 	    	"caption" => "raumtyp_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41166,7 +41667,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{68DD7D49-58B0-4824-A759-479C35966529}' => array
 			(
 				"id" => "{68DD7D49-58B0-4824-A759-479C35966529}",
@@ -41190,14 +41691,14 @@ $relations=array
 					"id" => "{CC5026F9-40CC-4E78-BD48-883E91CC283C}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C2FB35D3-498E-492E-AABE-8DA8FB187B20}'  => array
 	(
 	    	"id" => "{C2FB35D3-498E-492E-AABE-8DA8FB187B20}" ,
-	    	"name" => "raumtypalternativ_lehrveranstaltung" ,
+	    	"name" => "fk_raumtypalternativ_lehrveranstaltung" ,
 	    	"caption" => "raumtypalternativ_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41215,7 +41716,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{08064576-6982-4B03-B143-5FA5927B21FC}' => array
 			(
 				"id" => "{08064576-6982-4B03-B143-5FA5927B21FC}",
@@ -41239,14 +41740,14 @@ $relations=array
 					"id" => "{CC5026F9-40CC-4E78-BD48-883E91CC283C}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3021C8A6-5885-45F0-8213-D439D0BB248B}'  => array
 	(
 	    	"id" => "{3021C8A6-5885-45F0-8213-D439D0BB248B}" ,
-	    	"name" => "raumtype_ortraumtyp" ,
+	    	"name" => "fk_raumtype_ortraumtyp" ,
 	    	"caption" => "raumtype_ortraumtyp" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41264,7 +41765,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C0F5251B-4E5D-432E-909D-66BB353AEC9F}' => array
 			(
 				"id" => "{C0F5251B-4E5D-432E-909D-66BB353AEC9F}",
@@ -41288,14 +41789,14 @@ $relations=array
 					"id" => "{CC5026F9-40CC-4E78-BD48-883E91CC283C}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A40983E6-68CA-479E-B924-A605C6E2C6E3}'  => array
 	(
 	    	"id" => "{A40983E6-68CA-479E-B924-A605C6E2C6E3}" ,
-	    	"name" => "reihungstest_prestudent" ,
+	    	"name" => "fk_reihungstest_prestudent" ,
 	    	"caption" => "reihungstest_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41313,7 +41814,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{04481D2D-E715-4738-A8BE-2B3E0C1B09B6}' => array
 			(
 				"id" => "{04481D2D-E715-4738-A8BE-2B3E0C1B09B6}",
@@ -41337,14 +41838,14 @@ $relations=array
 					"id" => "{F2088867-CE4E-4BA6-BD64-F07DD6B8D406}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{FBEDE14F-D1A9-4223-9215-160AA257DA1F}'  => array
 	(
 	    	"id" => "{FBEDE14F-D1A9-4223-9215-160AA257DA1F}" ,
-	    	"name" => "status_prestudentstatus" ,
+	    	"name" => "fk_status_prestudentstatus" ,
 	    	"caption" => "status_prestudentstatus" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41362,7 +41863,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4429724D-A612-40AD-B4BC-1715BA5D8DA3}' => array
 			(
 				"id" => "{4429724D-A612-40AD-B4BC-1715BA5D8DA3}",
@@ -41386,14 +41887,14 @@ $relations=array
 					"id" => "{FBB4C290-7DB9-4981-90C9-DE0A95D00703}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{33DB8BB1-293C-4E17-8295-1643103EEF2F}'  => array
 	(
 	    	"id" => "{33DB8BB1-293C-4E17-8295-1643103EEF2F}" ,
-	    	"name" => "sprache_fragesprache" ,
+	    	"name" => "fk_sprache_fragesprache" ,
 	    	"caption" => "sprache_fragesprache" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41411,7 +41912,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2DD0C47B-CC2B-4A6E-83CF-CD573FF5EF36}' => array
 			(
 				"id" => "{2DD0C47B-CC2B-4A6E-83CF-CD573FF5EF36}",
@@ -41435,14 +41936,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0B05C0EE-0402-49EF-BFA8-46C180B922E8}'  => array
 	(
 	    	"id" => "{0B05C0EE-0402-49EF-BFA8-46C180B922E8}" ,
-	    	"name" => "sprache_lehreinheit" ,
+	    	"name" => "fk_sprache_lehreinheit" ,
 	    	"caption" => "sprache_lehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41460,7 +41961,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0FF63A76-E599-44A2-BFCF-BDD876D04DCF}' => array
 			(
 				"id" => "{0FF63A76-E599-44A2-BFCF-BDD876D04DCF}",
@@ -41484,14 +41985,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{84398A8D-945C-4EAE-A8B6-9EBF2F09F2C0}'  => array
 	(
 	    	"id" => "{84398A8D-945C-4EAE-A8B6-9EBF2F09F2C0}" ,
-	    	"name" => "sprache_lehrfach" ,
+	    	"name" => "fk_sprache_lehrfach" ,
 	    	"caption" => "sprache_lehrfach" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41509,7 +42010,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A77718EA-7338-4F04-B21D-497D49FF6EEC}' => array
 			(
 				"id" => "{A77718EA-7338-4F04-B21D-497D49FF6EEC}",
@@ -41533,14 +42034,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4D9B5676-F563-4BAA-B082-4324B01CFA67}'  => array
 	(
 	    	"id" => "{4D9B5676-F563-4BAA-B082-4324B01CFA67}" ,
-	    	"name" => "sprache_lvinfo" ,
+	    	"name" => "fk_sprache_lvinfo" ,
 	    	"caption" => "sprache_lvinfo" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41558,7 +42059,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8D8EE04D-0B2D-4D60-9AC7-28FDD5E259BD}' => array
 			(
 				"id" => "{8D8EE04D-0B2D-4D60-9AC7-28FDD5E259BD}",
@@ -41582,14 +42083,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{87870572-D8F2-4A1B-9888-DC18FCBC2664}'  => array
 	(
 	    	"id" => "{87870572-D8F2-4A1B-9888-DC18FCBC2664}" ,
-	    	"name" => "sprache_newssprache" ,
+	    	"name" => "fk_sprache_newssprache" ,
 	    	"caption" => "sprache_newssprache" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41607,7 +42108,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{08771D92-AE4A-485F-8F08-870B667B99CA}' => array
 			(
 				"id" => "{08771D92-AE4A-485F-8F08-870B667B99CA}",
@@ -41631,14 +42132,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{155EA027-E79A-4E08-808E-A5DF36CAEA61}'  => array
 	(
 	    	"id" => "{155EA027-E79A-4E08-808E-A5DF36CAEA61}" ,
-	    	"name" => "sprache_person" ,
+	    	"name" => "fk_sprache_person" ,
 	    	"caption" => "sprache_person" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41656,7 +42157,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6C2773B9-37DA-4846-8E29-823971F3D59B}' => array
 			(
 				"id" => "{6C2773B9-37DA-4846-8E29-823971F3D59B}",
@@ -41680,14 +42181,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{431879FA-EDF2-4ED0-8F32-D2FC0E99F9C3}'  => array
 	(
 	    	"id" => "{431879FA-EDF2-4ED0-8F32-D2FC0E99F9C3}" ,
-	    	"name" => "sprache_vorschlagsprache" ,
+	    	"name" => "fk_sprache_vorschlagsprache" ,
 	    	"caption" => "sprache_vorschlagsprache" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41705,7 +42206,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{24D6C2EE-7B51-4538-8454-FB1068CC801D}' => array
 			(
 				"id" => "{24D6C2EE-7B51-4538-8454-FB1068CC801D}",
@@ -41729,14 +42230,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8DE5DAE3-5587-486F-9818-A5C8F53ED0DA}'  => array
 	(
 	    	"id" => "{8DE5DAE3-5587-486F-9818-A5C8F53ED0DA}" ,
-	    	"name" => "standort_mitarbeiter" ,
+	    	"name" => "fk_standort_mitarbeiter" ,
 	    	"caption" => "standort_mitarbeiter" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41754,7 +42255,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{83853692-8BBC-4526-9BFD-C5540BAF2D39}' => array
 			(
 				"id" => "{83853692-8BBC-4526-9BFD-C5540BAF2D39}",
@@ -41778,14 +42279,14 @@ $relations=array
 					"id" => "{B4E27FAF-82E5-4996-BAAB-89281700F085}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6339FAD2-8775-4FED-85A7-8058CC95A4D3}'  => array
 	(
 	    	"id" => "{6339FAD2-8775-4FED-85A7-8058CC95A4D3}" ,
-	    	"name" => "standort_ort" ,
+	    	"name" => "fk_standort_ort" ,
 	    	"caption" => "standort_ort" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41803,7 +42304,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0CF1AA47-4C16-4AE6-A5B6-15D14FB82EB7}' => array
 			(
 				"id" => "{0CF1AA47-4C16-4AE6-A5B6-15D14FB82EB7}",
@@ -41827,14 +42328,14 @@ $relations=array
 					"id" => "{B4E27FAF-82E5-4996-BAAB-89281700F085}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C6E9991A-F703-4E8F-8EE8-D45954AFF4AE}'  => array
 	(
 	    	"id" => "{C6E9991A-F703-4E8F-8EE8-D45954AFF4AE}" ,
-	    	"name" => "student _studentbeispiel" ,
+	    	"name" => "fk_student _studentbeispiel" ,
 	    	"caption" => "student _studentbeispiel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41852,7 +42353,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4A1276FF-B0C2-4680-A15F-8514A9F4713B}' => array
 			(
 				"id" => "{4A1276FF-B0C2-4680-A15F-8514A9F4713B}",
@@ -41876,14 +42377,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{76FD40ED-48EF-488B-9B81-D947FCF77B73}'  => array
 	(
 	    	"id" => "{76FD40ED-48EF-488B-9B81-D947FCF77B73}" ,
-	    	"name" => "student_abschlusspruefung" ,
+	    	"name" => "fk_student_abschlusspruefung" ,
 	    	"caption" => "student_abschlusspruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41901,7 +42402,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0E829232-39E7-408F-9AA5-49CA655EC546}' => array
 			(
 				"id" => "{0E829232-39E7-408F-9AA5-49CA655EC546}",
@@ -41925,14 +42426,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0A2C3935-8AD9-4F6C-A2D1-9C35214313A3}'  => array
 	(
 	    	"id" => "{0A2C3935-8AD9-4F6C-A2D1-9C35214313A3}" ,
-	    	"name" => "student_bisio" ,
+	    	"name" => "fk_student_bisio" ,
 	    	"caption" => "student_bisio" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41950,7 +42451,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F2A3BC97-7939-4CB9-B911-6BB1883D2EA0}' => array
 			(
 				"id" => "{F2A3BC97-7939-4CB9-B911-6BB1883D2EA0}",
@@ -41974,14 +42475,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BB15F5BD-BC5C-4A7B-B0F4-48B643C6E093}'  => array
 	(
 	    	"id" => "{BB15F5BD-BC5C-4A7B-B0F4-48B643C6E093}" ,
-	    	"name" => "student_legesamtnote" ,
+	    	"name" => "fk_student_legesamtnote" ,
 	    	"caption" => "student_legesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -41999,7 +42500,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2AABA5EC-2799-42C5-A25D-D70DDAE6E73E}' => array
 			(
 				"id" => "{2AABA5EC-2799-42C5-A25D-D70DDAE6E73E}",
@@ -42023,14 +42524,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{81EAE746-01C4-4F2D-9096-4A57E0F32C33}'  => array
 	(
 	    	"id" => "{81EAE746-01C4-4F2D-9096-4A57E0F32C33}" ,
-	    	"name" => "student_lvgesamtnote" ,
+	    	"name" => "fk_student_lvgesamtnote" ,
 	    	"caption" => "student_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42048,7 +42549,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{42D4CD78-8BA7-4E9E-9A23-785E82D1C490}' => array
 			(
 				"id" => "{42D4CD78-8BA7-4E9E-9A23-785E82D1C490}",
@@ -42072,14 +42573,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{078CFF59-0261-4A10-810B-6D95FCF3B440}'  => array
 	(
 	    	"id" => "{078CFF59-0261-4A10-810B-6D95FCF3B440}" ,
-	    	"name" => "student_projektarbeit" ,
+	    	"name" => "fk_student_projektarbeit" ,
 	    	"caption" => "student_projektarbeit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42097,7 +42598,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{D56DA557-AD85-4497-BA9F-DFD133A20538}' => array
 			(
 				"id" => "{D56DA557-AD85-4497-BA9F-DFD133A20538}",
@@ -42121,14 +42622,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C47A57BE-5440-4BA6-BC3F-72030E2E2A9B}'  => array
 	(
 	    	"id" => "{C47A57BE-5440-4BA6-BC3F-72030E2E2A9B}" ,
-	    	"name" => "student_pruefung" ,
+	    	"name" => "fk_student_pruefung" ,
 	    	"caption" => "student_pruefung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42146,7 +42647,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A060464F-B681-44C4-AAD7-D3CCAC3DF210}' => array
 			(
 				"id" => "{A060464F-B681-44C4-AAD7-D3CCAC3DF210}",
@@ -42170,14 +42671,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{B7BDB255-0CFC-4E47-BCE0-6DCF245F55BC}'  => array
 	(
 	    	"id" => "{B7BDB255-0CFC-4E47-BCE0-6DCF245F55BC}" ,
-	    	"name" => "student_studentlehrverband" ,
+	    	"name" => "fk_student_studentlehrverband" ,
 	    	"caption" => "student_studentlehrverband" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42195,7 +42696,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{672722EC-5185-4051-BF8B-00D37B208CC5}' => array
 			(
 				"id" => "{672722EC-5185-4051-BF8B-00D37B208CC5}",
@@ -42219,14 +42720,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{DC4D0140-9CDE-41C8-86A1-E40F9287DBE2}'  => array
 	(
 	    	"id" => "{DC4D0140-9CDE-41C8-86A1-E40F9287DBE2}" ,
-	    	"name" => "student_studentuebung" ,
+	    	"name" => "fk_student_studentuebung" ,
 	    	"caption" => "student_studentuebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42244,7 +42745,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{39A9062C-797F-4F32-88E0-B0DD5D941D8B}' => array
 			(
 				"id" => "{39A9062C-797F-4F32-88E0-B0DD5D941D8B}",
@@ -42268,14 +42769,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F0EDEE96-7B14-49EE-9056-7B8E5033142D}'  => array
 	(
 	    	"id" => "{F0EDEE96-7B14-49EE-9056-7B8E5033142D}" ,
-	    	"name" => "student_zeugnis" ,
+	    	"name" => "fk_student_zeugnis" ,
 	    	"caption" => "student_zeugnis" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42293,7 +42794,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{96CE8FF4-1BD3-4DBC-8756-0481030C7075}' => array
 			(
 				"id" => "{96CE8FF4-1BD3-4DBC-8756-0481030C7075}",
@@ -42317,14 +42818,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{B913A8E8-2B37-4B80-8F2D-B40B250188E7}'  => array
 	(
 	    	"id" => "{B913A8E8-2B37-4B80-8F2D-B40B250188E7}" ,
-	    	"name" => "student_zeugnisnote" ,
+	    	"name" => "fk_student_zeugnisnote" ,
 	    	"caption" => "student_zeugnisnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42342,7 +42843,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{38031557-D4C7-4472-B5FF-A23A71E9238E}' => array
 			(
 				"id" => "{38031557-D4C7-4472-B5FF-A23A71E9238E}",
@@ -42366,14 +42867,14 @@ $relations=array
 					"id" => "{23871CC3-6C38-4934-83F0-A08FEA8FE26F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{93AB5E8D-335A-4293-B112-2B9E8BEAC072}'  => array
 	(
 	    	"id" => "{93AB5E8D-335A-4293-B112-2B9E8BEAC072}" ,
-	    	"name" => "studiengang_akadgrad" ,
+	    	"name" => "fk_studiengang_akadgrad" ,
 	    	"caption" => "studiengang_akadgrad" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42391,7 +42892,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{84834544-7C0B-4D5D-BE60-EEBBC571180A}' => array
 			(
 				"id" => "{84834544-7C0B-4D5D-BE60-EEBBC571180A}",
@@ -42415,14 +42916,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{81D444C5-C4D6-4298-9DDB-FF31686AA1F7}'  => array
 	(
 	    	"id" => "{81D444C5-C4D6-4298-9DDB-FF31686AA1F7}" ,
-	    	"name" => "studiengang_bisfunktion" ,
+	    	"name" => "fk_studiengang_bisfunktion" ,
 	    	"caption" => "studiengang_bisfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42440,7 +42941,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{03EA6ECB-3E16-4CD8-9721-33746A3D596D}' => array
 			(
 				"id" => "{03EA6ECB-3E16-4CD8-9721-33746A3D596D}",
@@ -42464,14 +42965,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{B5114794-5AF1-4B0C-87C7-8409687F30A6}'  => array
 	(
 	    	"id" => "{B5114794-5AF1-4B0C-87C7-8409687F30A6}" ,
-	    	"name" => "studiengang_dokumentstudiengang" ,
+	    	"name" => "fk_studiengang_dokumentstudiengang" ,
 	    	"caption" => "studiengang_dokumentstudiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42489,7 +42990,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A813A643-CDDE-440B-AF63-D9D1D6FF5779}' => array
 			(
 				"id" => "{A813A643-CDDE-440B-AF63-D9D1D6FF5779}",
@@ -42513,14 +43014,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{B6DF8850-C623-4EA1-A9BA-FEDFC1B677BE}'  => array
 	(
 	    	"id" => "{B6DF8850-C623-4EA1-A9BA-FEDFC1B677BE}" ,
-	    	"name" => "studiengang_entwicklungsteam" ,
+	    	"name" => "fk_studiengang_entwicklungsteam" ,
 	    	"caption" => "studiengang_entwicklungsteam" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42538,7 +43039,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{76147385-7A16-4F69-A739-4A2D9945FF9F}' => array
 			(
 				"id" => "{76147385-7A16-4F69-A739-4A2D9945FF9F}",
@@ -42562,14 +43063,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{2244D0C2-3257-4A10-8BEA-08B5E27F0A92}'  => array
 	(
 	    	"id" => "{2244D0C2-3257-4A10-8BEA-08B5E27F0A92}" ,
-	    	"name" => "studiengang_fachbereich" ,
+	    	"name" => "fk_studiengang_fachbereich" ,
 	    	"caption" => "studiengang_fachbereich" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42587,7 +43088,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{1495EAA9-176B-40E1-B643-1C9128FF0F63}' => array
 			(
 				"id" => "{1495EAA9-176B-40E1-B643-1C9128FF0F63}",
@@ -42611,14 +43112,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F0D13DA5-6754-4E64-A1CC-98D173AE6DE2}'  => array
 	(
 	    	"id" => "{F0D13DA5-6754-4E64-A1CC-98D173AE6DE2}" ,
-	    	"name" => "studiengang_ferien" ,
+	    	"name" => "fk_studiengang_ferien" ,
 	    	"caption" => "studiengang_ferien" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42636,7 +43137,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{7740E93D-E105-4ABD-B5B6-BC28CE2F0C4D}' => array
 			(
 				"id" => "{7740E93D-E105-4ABD-B5B6-BC28CE2F0C4D}",
@@ -42660,14 +43161,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{C5E8AB3D-E7D1-43FE-8EF8-9EF81B3075FC}'  => array
 	(
 	    	"id" => "{C5E8AB3D-E7D1-43FE-8EF8-9EF81B3075FC}" ,
-	    	"name" => "studiengang_gruppe" ,
+	    	"name" => "fk_studiengang_gruppe" ,
 	    	"caption" => "studiengang_gruppe" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42685,7 +43186,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4E67F4E3-E295-4730-9A80-D4FE6B1AAB72}' => array
 			(
 				"id" => "{4E67F4E3-E295-4730-9A80-D4FE6B1AAB72}",
@@ -42709,14 +43210,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6EA9595D-AFD6-4803-A883-E86114F51558}'  => array
 	(
 	    	"id" => "{6EA9595D-AFD6-4803-A883-E86114F51558}" ,
-	    	"name" => "studiengang_konto" ,
+	    	"name" => "fk_studiengang_konto" ,
 	    	"caption" => "studiengang_konto" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42734,7 +43235,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{1AA18910-AA6E-452D-98CA-AAA803D850A8}' => array
 			(
 				"id" => "{1AA18910-AA6E-452D-98CA-AAA803D850A8}",
@@ -42758,14 +43259,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{048203D7-7301-43A9-BFE7-8FCC53E48791}'  => array
 	(
 	    	"id" => "{048203D7-7301-43A9-BFE7-8FCC53E48791}" ,
-	    	"name" => "studiengang_lehrfach" ,
+	    	"name" => "fk_studiengang_lehrfach" ,
 	    	"caption" => "studiengang_lehrfach" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42783,7 +43284,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C36A18CB-C28D-41A0-9CCF-9A58569DA5CF}' => array
 			(
 				"id" => "{C36A18CB-C28D-41A0-9CCF-9A58569DA5CF}",
@@ -42807,14 +43308,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4BDA68C2-06A4-4A43-B3D2-B25816105A82}'  => array
 	(
 	    	"id" => "{4BDA68C2-06A4-4A43-B3D2-B25816105A82}" ,
-	    	"name" => "studiengang_lehrveranstaltung" ,
+	    	"name" => "fk_studiengang_lehrveranstaltung" ,
 	    	"caption" => "studiengang_lehrveranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42832,7 +43333,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{ADC16795-15B2-452F-9A30-8872127A5766}' => array
 			(
 				"id" => "{ADC16795-15B2-452F-9A30-8872127A5766}",
@@ -42856,14 +43357,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F81468B3-5146-4C64-A476-42D2F88901CC}'  => array
 	(
 	    	"id" => "{F81468B3-5146-4C64-A476-42D2F88901CC}" ,
-	    	"name" => "studiengang_lehrverband" ,
+	    	"name" => "fk_studiengang_lehrverband" ,
 	    	"caption" => "studiengang_lehrverband" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42881,7 +43382,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{5869536B-FF07-4D5C-9192-823F468C2CF2}' => array
 			(
 				"id" => "{5869536B-FF07-4D5C-9192-823F468C2CF2}",
@@ -42905,14 +43406,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3FDDF08B-D377-4F66-9EE0-1E0742F1185B}'  => array
 	(
 	    	"id" => "{3FDDF08B-D377-4F66-9EE0-1E0742F1185B}" ,
-	    	"name" => "studiengang_news" ,
+	    	"name" => "fk_studiengang_news" ,
 	    	"caption" => "studiengang_news" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42930,7 +43431,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{41FE7305-F8C5-453C-8EF0-675AC38B527C}' => array
 			(
 				"id" => "{41FE7305-F8C5-453C-8EF0-675AC38B527C}",
@@ -42954,14 +43455,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8D678E3A-956E-497B-95CA-BC66A2D9A716}'  => array
 	(
 	    	"id" => "{8D678E3A-956E-497B-95CA-BC66A2D9A716}" ,
-	    	"name" => "studiengang_personfunktion" ,
+	    	"name" => "fk_studiengang_personfunktion" ,
 	    	"caption" => "studiengang_personfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -42979,7 +43480,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{827054A0-6110-438A-AA44-C6428E580707}' => array
 			(
 				"id" => "{827054A0-6110-438A-AA44-C6428E580707}",
@@ -43003,14 +43504,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3AB7BF3C-9C31-4F7F-B33B-27CE3FF00BA8}'  => array
 	(
 	    	"id" => "{3AB7BF3C-9C31-4F7F-B33B-27CE3FF00BA8}" ,
-	    	"name" => "studiengang_preinteressentstudiengang" ,
+	    	"name" => "fk_studiengang_preinteressentstudiengang" ,
 	    	"caption" => "studiengang_preinteressentstudiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43028,7 +43529,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{B6D48515-C259-433D-8B83-97BB33CEF2BA}' => array
 			(
 				"id" => "{B6D48515-C259-433D-8B83-97BB33CEF2BA}",
@@ -43052,14 +43553,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{626E3E7D-D159-42C6-BA5E-B0EE0E48528F}'  => array
 	(
 	    	"id" => "{626E3E7D-D159-42C6-BA5E-B0EE0E48528F}" ,
-	    	"name" => "studiengang_prestudent" ,
+	    	"name" => "fk_studiengang_prestudent" ,
 	    	"caption" => "studiengang_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43077,7 +43578,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3CD424D6-3156-498A-B66B-5FC918CB1F44}' => array
 			(
 				"id" => "{3CD424D6-3156-498A-B66B-5FC918CB1F44}",
@@ -43101,14 +43602,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{74E9762E-7EF7-426B-8A27-07AD92D9EF7F}'  => array
 	(
 	    	"id" => "{74E9762E-7EF7-426B-8A27-07AD92D9EF7F}" ,
-	    	"name" => "studiengang_reihungstest" ,
+	    	"name" => "fk_studiengang_reihungstest" ,
 	    	"caption" => "studiengang_reihungstest" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43126,7 +43627,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{36567C3B-646F-43F9-9AAB-149A263CA201}' => array
 			(
 				"id" => "{36567C3B-646F-43F9-9AAB-149A263CA201}",
@@ -43150,14 +43651,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5DA5E226-881B-4D94-8690-081CF88C8633}'  => array
 	(
 	    	"id" => "{5DA5E226-881B-4D94-8690-081CF88C8633}" ,
-	    	"name" => "studiengang_reservierung" ,
+	    	"name" => "fk_studiengang_reservierung" ,
 	    	"caption" => "studiengang_reservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43175,7 +43676,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C7895818-115A-490E-A495-4B596DDB1000}' => array
 			(
 				"id" => "{C7895818-115A-490E-A495-4B596DDB1000}",
@@ -43199,14 +43700,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{DED217CA-36CE-48AD-959B-3FB210120DAC}'  => array
 	(
 	    	"id" => "{DED217CA-36CE-48AD-959B-3FB210120DAC}" ,
-	    	"name" => "studiengang_semesterwochen" ,
+	    	"name" => "fk_studiengang_semesterwochen" ,
 	    	"caption" => "studiengang_semesterwochen" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43224,7 +43725,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F2E327C3-8E59-4D11-868A-15B5B2B2C5BB}' => array
 			(
 				"id" => "{F2E327C3-8E59-4D11-868A-15B5B2B2C5BB}",
@@ -43248,14 +43749,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D01FCD3A-6C37-4C45-9278-8FA8BA3FFB07}'  => array
 	(
 	    	"id" => "{D01FCD3A-6C37-4C45-9278-8FA8BA3FFB07}" ,
-	    	"name" => "studiengang_vorlagestudiengang" ,
+	    	"name" => "fk_studiengang_vorlagestudiengang" ,
 	    	"caption" => "studiengang_vorlagestudiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43273,7 +43774,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{23F28CA9-8BD7-472C-AAC5-39BB29ED0B5C}' => array
 			(
 				"id" => "{23F28CA9-8BD7-472C-AAC5-39BB29ED0B5C}",
@@ -43297,14 +43798,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E21FEF89-176B-4B47-8670-D17654186F13}'  => array
 	(
 	    	"id" => "{E21FEF89-176B-4B47-8670-D17654186F13}" ,
-	    	"name" => "studiengang_zeitaufzeichnung" ,
+	    	"name" => "fk_studiengang_zeitaufzeichnung" ,
 	    	"caption" => "studiengang_zeitaufzeichnung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43322,7 +43823,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0C19F66B-7692-433D-8F78-C95A346216D2}' => array
 			(
 				"id" => "{0C19F66B-7692-433D-8F78-C95A346216D2}",
@@ -43346,14 +43847,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{82C42F6C-8DD7-49FC-8730-19B08B0DCA89}'  => array
 	(
 	    	"id" => "{82C42F6C-8DD7-49FC-8730-19B08B0DCA89}" ,
-	    	"name" => "studiengang_zeitfenster" ,
+	    	"name" => "fk_studiengang_zeitfenster" ,
 	    	"caption" => "studiengang_zeitfenster" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43371,7 +43872,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6DF31221-E54A-4458-81EA-4370B5822C58}' => array
 			(
 				"id" => "{6DF31221-E54A-4458-81EA-4370B5822C58}",
@@ -43395,14 +43896,14 @@ $relations=array
 					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0BFBB3D3-0EE5-402C-8B9A-FC4DACC0BCBF}'  => array
 	(
 	    	"id" => "{0BFBB3D3-0EE5-402C-8B9A-FC4DACC0BCBF}" ,
-	    	"name" => "studiensemester_benutzerlvstudiensemester" ,
+	    	"name" => "fk_studiensemester_benutzerlvstudiensemester" ,
 	    	"caption" => "studiensemester_benutzerlvstudiensemester" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43420,7 +43921,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A80794D6-194C-4D81-8A13-EA6765A58D70}' => array
 			(
 				"id" => "{A80794D6-194C-4D81-8A13-EA6765A58D70}",
@@ -43444,14 +43945,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{00950875-1221-4AF9-93BF-E91603C435D9}'  => array
 	(
 	    	"id" => "{00950875-1221-4AF9-93BF-E91603C435D9}" ,
-	    	"name" => "studiensemester_konto" ,
+	    	"name" => "fk_studiensemester_konto" ,
 	    	"caption" => "studiensemester_konto" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43469,7 +43970,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3BFC3B34-776B-434B-BFCC-E3D5B83433A6}' => array
 			(
 				"id" => "{3BFC3B34-776B-434B-BFCC-E3D5B83433A6}",
@@ -43493,14 +43994,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{D3B01DBA-C886-4938-8DA1-A02C9C911204}'  => array
 	(
 	    	"id" => "{D3B01DBA-C886-4938-8DA1-A02C9C911204}" ,
-	    	"name" => "studiensemester_lehreinheit" ,
+	    	"name" => "fk_studiensemester_lehreinheit" ,
 	    	"caption" => "studiensemester_lehreinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43518,7 +44019,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{12A0CC00-2954-454E-AE2B-0300D6DEBD0D}' => array
 			(
 				"id" => "{12A0CC00-2954-454E-AE2B-0300D6DEBD0D}",
@@ -43542,14 +44043,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{37AB120A-DB2B-482F-8EF3-C6990B8263BC}'  => array
 	(
 	    	"id" => "{37AB120A-DB2B-482F-8EF3-C6990B8263BC}" ,
-	    	"name" => "studiensemester_lvgesamtnote" ,
+	    	"name" => "fk_studiensemester_lvgesamtnote" ,
 	    	"caption" => "studiensemester_lvgesamtnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43567,7 +44068,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{5C596600-88D3-47C8-B390-BFD8428C7F8A}' => array
 			(
 				"id" => "{5C596600-88D3-47C8-B390-BFD8428C7F8A}",
@@ -43591,14 +44092,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{6EB3809C-ACBC-496D-8162-F219FB0E6FDE}'  => array
 	(
 	    	"id" => "{6EB3809C-ACBC-496D-8162-F219FB0E6FDE}" ,
-	    	"name" => "studiensemester_moodle" ,
+	    	"name" => "fk_studiensemester_moodle" ,
 	    	"caption" => "studiensemester_moodle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43616,7 +44117,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9D5BE4B8-AA53-417E-AFCF-3BFC6CA3FB24}' => array
 			(
 				"id" => "{9D5BE4B8-AA53-417E-AFCF-3BFC6CA3FB24}",
@@ -43640,14 +44141,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{296C2548-94A4-4BE6-86E0-C55C649BC877}'  => array
 	(
 	    	"id" => "{296C2548-94A4-4BE6-86E0-C55C649BC877}" ,
-	    	"name" => "studiensemester_preinteressent" ,
+	    	"name" => "fk_studiensemester_preinteressent" ,
 	    	"caption" => "studiensemester_preinteressent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43665,7 +44166,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{93F24147-9791-4A9B-91C8-BD067DE40393}' => array
 			(
 				"id" => "{93F24147-9791-4A9B-91C8-BD067DE40393}",
@@ -43689,14 +44190,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3B56E079-D202-4218-B892-22B4316C464B}'  => array
 	(
 	    	"id" => "{3B56E079-D202-4218-B892-22B4316C464B}" ,
-	    	"name" => "studiensemester_prestudentrolle" ,
+	    	"name" => "fk_studiensemester_prestudentrolle" ,
 	    	"caption" => "studiensemester_prestudentrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43714,7 +44215,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8586CBC2-1A5A-4506-9239-A487DC6CD74A}' => array
 			(
 				"id" => "{8586CBC2-1A5A-4506-9239-A487DC6CD74A}",
@@ -43738,14 +44239,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{15741AD6-9523-4DB3-8449-DA481A04B584}'  => array
 	(
 	    	"id" => "{15741AD6-9523-4DB3-8449-DA481A04B584}" ,
-	    	"name" => "studiensemester_studentlehrverband" ,
+	    	"name" => "fk_studiensemester_studentlehrverband" ,
 	    	"caption" => "studiensemester_studentlehrverband" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43763,7 +44264,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{97AFE943-5864-4CBF-995A-C4C0567C9150}' => array
 			(
 				"id" => "{97AFE943-5864-4CBF-995A-C4C0567C9150}",
@@ -43787,14 +44288,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{89418D4A-8C0D-41CB-9D38-FDE680DC6BF8}'  => array
 	(
 	    	"id" => "{89418D4A-8C0D-41CB-9D38-FDE680DC6BF8}" ,
-	    	"name" => "studiensemester_zeugnisnote" ,
+	    	"name" => "fk_studiensemester_zeugnisnote" ,
 	    	"caption" => "studiensemester_zeugnisnote" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43812,7 +44313,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6E9DD39D-E001-40C9-96A5-2434563EAE54}' => array
 			(
 				"id" => "{6E9DD39D-E001-40C9-96A5-2434563EAE54}",
@@ -43836,14 +44337,14 @@ $relations=array
 					"id" => "{9B1BECFD-2554-4F77-8AF8-AEFECBB2AD90}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4D82E3B4-DF55-4B48-B30E-D3B6571D5736}'  => array
 	(
 	    	"id" => "{4D82E3B4-DF55-4B48-B30E-D3B6571D5736}" ,
-	    	"name" => "stunde_reservierung" ,
+	    	"name" => "fk_stunde_reservierung" ,
 	    	"caption" => "stunde_reservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43861,7 +44362,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{59A1D61A-1334-4CC5-AABB-7C7059F9DC28}' => array
 			(
 				"id" => "{59A1D61A-1334-4CC5-AABB-7C7059F9DC28}",
@@ -43885,14 +44386,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8D3A5BF6-E62E-49A1-87FC-5C54618381A6}'  => array
 	(
 	    	"id" => "{8D3A5BF6-E62E-49A1-87FC-5C54618381A6}" ,
-	    	"name" => "stunde_stundenplan" ,
+	    	"name" => "fk_stunde_stundenplan" ,
 	    	"caption" => "stunde_stundenplan" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43910,7 +44411,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{1FF75F90-6B10-49CD-A774-BAF3A481D7B4}' => array
 			(
 				"id" => "{1FF75F90-6B10-49CD-A774-BAF3A481D7B4}",
@@ -43934,14 +44435,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{358357B3-0219-4749-94DB-79776038106E}'  => array
 	(
 	    	"id" => "{358357B3-0219-4749-94DB-79776038106E}" ,
-	    	"name" => "stunde_stundenplandev" ,
+	    	"name" => "fk_stunde_stundenplandev" ,
 	    	"caption" => "stunde_stundenplandev" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -43959,7 +44460,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{EBC5C1D1-0676-4E1E-AD41-E4C3757F999E}' => array
 			(
 				"id" => "{EBC5C1D1-0676-4E1E-AD41-E4C3757F999E}",
@@ -43983,14 +44484,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E3BD0F3B-3716-47A0-B474-587E53AB9FAC}'  => array
 	(
 	    	"id" => "{E3BD0F3B-3716-47A0-B474-587E53AB9FAC}" ,
-	    	"name" => "stunde_zeitfenster" ,
+	    	"name" => "fk_stunde_zeitfenster" ,
 	    	"caption" => "stunde_zeitfenster" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44008,7 +44509,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{FD4FECFA-2045-4A48-9074-24EEFD832955}' => array
 			(
 				"id" => "{FD4FECFA-2045-4A48-9074-24EEFD832955}",
@@ -44032,14 +44533,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E43F3E02-0E16-4708-9480-7B01ADB906BF}'  => array
 	(
 	    	"id" => "{E43F3E02-0E16-4708-9480-7B01ADB906BF}" ,
-	    	"name" => "stunde_zeitsperre_bis" ,
+	    	"name" => "fk_stunde_zeitsperre_bis" ,
 	    	"caption" => "stunde_zeitsperre_bis" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44057,7 +44558,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{DBF132B5-BFF3-44A2-A75D-1C6AD57D51B3}' => array
 			(
 				"id" => "{DBF132B5-BFF3-44A2-A75D-1C6AD57D51B3}",
@@ -44081,14 +44582,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E54E22C5-EA8B-4416-95FC-85F73BD12A54}'  => array
 	(
 	    	"id" => "{E54E22C5-EA8B-4416-95FC-85F73BD12A54}" ,
-	    	"name" => "stunde_zeitsperre_von" ,
+	    	"name" => "fk_stunde_zeitsperre_von" ,
 	    	"caption" => "stunde_zeitsperre_von" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44106,7 +44607,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{DEA253C7-F5FC-4A52-9BDD-A953627DC7FE}' => array
 			(
 				"id" => "{DEA253C7-F5FC-4A52-9BDD-A953627DC7FE}",
@@ -44130,14 +44631,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{1CAFB335-4AC9-4490-9F0B-81D69B23740D}'  => array
 	(
 	    	"id" => "{1CAFB335-4AC9-4490-9F0B-81D69B23740D}" ,
-	    	"name" => "stunde_zeitwunsch" ,
+	    	"name" => "fk_stunde_zeitwunsch" ,
 	    	"caption" => "stunde_zeitwunsch" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44155,7 +44656,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{DA7FC945-0468-49B4-B744-B922A092A7C1}' => array
 			(
 				"id" => "{DA7FC945-0468-49B4-B744-B922A092A7C1}",
@@ -44179,63 +44680,14 @@ $relations=array
 					"id" => "{37D4C67A-5EBE-445C-87AB-ABBDF08A4D82}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
-	'{2C6B1779-6635-4CFF-9AEF-61009B428460}'  => array
-	(
-	    	"id" => "{2C6B1779-6635-4CFF-9AEF-61009B428460}" ,
-	    	"name" => "tbl_antwort_vorschlag_id_fkey" ,
-	    	"caption" => "tbl_antwort_vorschlag_id_fkey" ,
-	    	"comments" => "" ,
-	    	"notes" => "",
-	    	"identifying" => "0",
-	    	"mandatoryparent" => "1",
-	    	"mandatorychild" => "0",
-	    	"cardinalitychild" => "-1",
-	    	"refintegrityparentupdate" => "0" ,
-	    	"refintegrityparentdelete" => "0" ,
-	    	"refintegritychildupdate" => "0" ,
-	    	"refintegritychildinsert" => "0" ,
-		"key"  => array
-	    	(
-			"id" => "{D79DE5D8-84C6-44F0-A28E-DBDE5CF2E605}",
-   		),
-	    	"foreignkeys"  => array
-	    	(
-
-			'{B4E174D5-655B-4510-82FB-D38BDC444FE0}' => array
-			(
-				"id" => "{B4E174D5-655B-4510-82FB-D38BDC444FE0}",
-				"name" => "FK vorschlag_id - vorschlag_id",
-				"comments" => "",
-				"notes" => "",
-				"deferred" => "",
-				"deferrable" => "",
-				"matchtype" => "",
-				"createindextofk" => "",
-				"attrparent"  => array
-			    	(
-					"id" => "{C841C6F7-563B-4C8A-B0F3-F3491AC90752}",
-		   		),
-				"attrchild"  => array
-			    	(
-					"id" => "{C0CA9E65-75D1-4269-A625-04C198520520}",
-		   		),
-				"KeyConstraintItem"  => array
-			    	(
-					"id" => "{546435BE-B982-4E4C-BB4E-3CBE57F5E7EB}",
-		   		)
-			),
-
-	   	)
-   	),
-
+    	
 	'{8EFD68C4-177B-4FB2-B7FE-265F00C2DD36}'  => array
 	(
 	    	"id" => "{8EFD68C4-177B-4FB2-B7FE-265F00C2DD36}" ,
-	    	"name" => "Studiengang_sprache_fkey" ,
+	    	"name" => "fk_Studiengang_sprache_fkey" ,
 	    	"caption" => "tbl_studiengang_sprache_fkey" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44253,7 +44705,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2638BFC0-E92D-4C23-AA7B-EC87F1446B18}' => array
 			(
 				"id" => "{2638BFC0-E92D-4C23-AA7B-EC87F1446B18}",
@@ -44277,14 +44729,14 @@ $relations=array
 					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A44CE58E-CCEE-4019-8C08-590368734F30}'  => array
 	(
 	    	"id" => "{A44CE58E-CCEE-4019-8C08-590368734F30}" ,
-	    	"name" => "team_match-forderer" ,
+	    	"name" => "fk_team_match-forderer" ,
 	    	"caption" => "team_match-forderer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44302,7 +44754,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{BD9E35FC-2CC2-48FA-8FFE-5141F90ED41E}' => array
 			(
 				"id" => "{BD9E35FC-2CC2-48FA-8FFE-5141F90ED41E}",
@@ -44326,14 +44778,14 @@ $relations=array
 					"id" => "{609E1312-E27E-4BD9-B2AA-5E6800837E19}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E46C9D7A-7CE5-4B11-87AC-0E8478CB0DBF}'  => array
 	(
 	    	"id" => "{E46C9D7A-7CE5-4B11-87AC-0E8478CB0DBF}" ,
-	    	"name" => "team_match-gefordert" ,
+	    	"name" => "fk_team_match-gefordert" ,
 	    	"caption" => "team_match-gefordert" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44351,7 +44803,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{85279CEB-A33D-4AB0-BD80-63E9651726EA}' => array
 			(
 				"id" => "{85279CEB-A33D-4AB0-BD80-63E9651726EA}",
@@ -44375,14 +44827,14 @@ $relations=array
 					"id" => "{609E1312-E27E-4BD9-B2AA-5E6800837E19}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7D73BE79-80F4-4C0F-8CC9-53D0A5B757C1}'  => array
 	(
 	    	"id" => "{7D73BE79-80F4-4C0F-8CC9-53D0A5B757C1}" ,
-	    	"name" => "team_match-sieger" ,
+	    	"name" => "fk_team_match-sieger" ,
 	    	"caption" => "team_match-sieger" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44400,7 +44852,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A406911B-FA59-4650-98FA-18583AD61E8A}' => array
 			(
 				"id" => "{A406911B-FA59-4650-98FA-18583AD61E8A}",
@@ -44424,14 +44876,14 @@ $relations=array
 					"id" => "{609E1312-E27E-4BD9-B2AA-5E6800837E19}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{906890D8-F5F8-4705-9EBD-39B9EF7209EA}'  => array
 	(
 	    	"id" => "{906890D8-F5F8-4705-9EBD-39B9EF7209EA}" ,
-	    	"name" => "team_teambenutzer" ,
+	    	"name" => "fk_team_teambenutzer" ,
 	    	"caption" => "team_teambenutzer" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44449,7 +44901,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{1B2986BE-49EE-4E88-BBFA-3F8D184B8BB6}' => array
 			(
 				"id" => "{1B2986BE-49EE-4E88-BBFA-3F8D184B8BB6}",
@@ -44473,14 +44925,14 @@ $relations=array
 					"id" => "{609E1312-E27E-4BD9-B2AA-5E6800837E19}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5186C1DD-FE7A-4BE5-8C44-E3319A2BDB0D}'  => array
 	(
 	    	"id" => "{5186C1DD-FE7A-4BE5-8C44-E3319A2BDB0D}" ,
-	    	"name" => "team_wettbewerbteam" ,
+	    	"name" => "fk_team_wettbewerbteam" ,
 	    	"caption" => "team_wettbewerbteam" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44498,7 +44950,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{63360770-20E9-4144-ADE1-FE97C1CF4808}' => array
 			(
 				"id" => "{63360770-20E9-4144-ADE1-FE97C1CF4808}",
@@ -44522,14 +44974,14 @@ $relations=array
 					"id" => "{609E1312-E27E-4BD9-B2AA-5E6800837E19}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0E2C0FED-22B8-4856-B1CB-BF60C4FFB6D6}'  => array
 	(
 	    	"id" => "{0E2C0FED-22B8-4856-B1CB-BF60C4FFB6D6}" ,
-	    	"name" => "uebung_beispiel" ,
+	    	"name" => "fk_uebung_beispiel" ,
 	    	"caption" => "uebung_beispiel" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44547,7 +44999,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{58FB1476-3A8D-4E48-AAD3-B055071E1CA8}' => array
 			(
 				"id" => "{58FB1476-3A8D-4E48-AAD3-B055071E1CA8}",
@@ -44571,14 +45023,14 @@ $relations=array
 					"id" => "{F3013F08-CCA8-4D15-A2E4-87223D4289C5}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7545BEE3-7971-4061-BE13-BBA49621167D}'  => array
 	(
 	    	"id" => "{7545BEE3-7971-4061-BE13-BBA49621167D}" ,
-	    	"name" => "uebung_studentuebung" ,
+	    	"name" => "fk_uebung_studentuebung" ,
 	    	"caption" => "uebung_studentuebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44596,7 +45048,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{3DD19118-7CB0-434D-82AE-A6D6B84641A5}' => array
 			(
 				"id" => "{3DD19118-7CB0-434D-82AE-A6D6B84641A5}",
@@ -44620,14 +45072,14 @@ $relations=array
 					"id" => "{F3013F08-CCA8-4D15-A2E4-87223D4289C5}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{E982F8B8-0BA6-45DE-8538-F9A42FF68FEC}'  => array
 	(
 	    	"id" => "{E982F8B8-0BA6-45DE-8538-F9A42FF68FEC}" ,
-	    	"name" => "uebung_uebung" ,
+	    	"name" => "fk_uebung_uebung" ,
 	    	"caption" => "uebung_uebung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44645,7 +45097,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4FB129C7-4810-4716-8B0A-F09EACDF8D9A}' => array
 			(
 				"id" => "{4FB129C7-4810-4716-8B0A-F09EACDF8D9A}",
@@ -44669,14 +45121,14 @@ $relations=array
 					"id" => "{F3013F08-CCA8-4D15-A2E4-87223D4289C5}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{89B1CD4E-CFB3-48B5-865D-990E80E7CF54}'  => array
 	(
 	    	"id" => "{89B1CD4E-CFB3-48B5-865D-990E80E7CF54}" ,
-	    	"name" => "veranstaltung_reservierung" ,
+	    	"name" => "fk_veranstaltung_reservierung" ,
 	    	"caption" => "veranstaltung_reservierung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44694,7 +45146,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{12FA6987-C5E7-4133-B758-657D93A0E0A2}' => array
 			(
 				"id" => "{12FA6987-C5E7-4133-B758-657D93A0E0A2}",
@@ -44718,14 +45170,14 @@ $relations=array
 					"id" => "{62D5E94D-C55E-4E93-8931-E6FED9F28A93}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{639F088F-E060-4F04-BE8B-9A9772A56D3D}'  => array
 	(
 	    	"id" => "{639F088F-E060-4F04-BE8B-9A9772A56D3D}" ,
-	    	"name" => "veranstaltungskategorie_veranstaltung" ,
+	    	"name" => "fk_veranstaltungskategorie_veranstaltung" ,
 	    	"caption" => "veranstaltungskategorie_veranstaltung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44743,7 +45195,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4D15C352-126F-4EC3-A87C-C7F311253D10}' => array
 			(
 				"id" => "{4D15C352-126F-4EC3-A87C-C7F311253D10}",
@@ -44767,14 +45219,14 @@ $relations=array
 					"id" => "{3A16B5E4-0092-413B-86B5-AFF6EEFA4884}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{480D0ECA-B726-462A-9A4D-EC958264B755}'  => array
 	(
 	    	"id" => "{480D0ECA-B726-462A-9A4D-EC958264B755}" ,
-	    	"name" => "vertretung_zeitsperre" ,
+	    	"name" => "fk_vertretung_zeitsperre" ,
 	    	"caption" => "vertretung_zeitsperre" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44792,7 +45244,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{63D26360-F3F9-4DC7-9EFC-E0E34C4910A3}' => array
 			(
 				"id" => "{63D26360-F3F9-4DC7-9EFC-E0E34C4910A3}",
@@ -44816,14 +45268,14 @@ $relations=array
 					"id" => "{A5F74E7F-1DC0-4ACC-9CED-185475B973DC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{3F5B8375-DCE4-4A0A-BE08-2937D85E5144}'  => array
 	(
 	    	"id" => "{3F5B8375-DCE4-4A0A-BE08-2937D85E5144}" ,
-	    	"name" => "verwendungscode_bisverwendung" ,
+	    	"name" => "fk_verwendungscode_bisverwendung" ,
 	    	"caption" => "verwendungscode_bisverwendung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44841,7 +45293,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{2FC70A73-3258-4DDA-9C72-D1A9D78F5206}' => array
 			(
 				"id" => "{2FC70A73-3258-4DDA-9C72-D1A9D78F5206}",
@@ -44865,14 +45317,14 @@ $relations=array
 					"id" => "{CC3193EA-51C9-413C-B734-D6E30B2C64D4}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{886C70A2-759F-43D9-9664-1198EB32E193}'  => array
 	(
 	    	"id" => "{886C70A2-759F-43D9-9664-1198EB32E193}" ,
-	    	"name" => "vorlage_vorlagestudiengang" ,
+	    	"name" => "fk_vorlage_vorlagestudiengang" ,
 	    	"caption" => "vorlage_vorlagestudiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44890,7 +45342,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{88215737-6BE5-40B3-ACD2-DCCC0F780454}' => array
 			(
 				"id" => "{88215737-6BE5-40B3-ACD2-DCCC0F780454}",
@@ -44914,14 +45366,14 @@ $relations=array
 					"id" => "{10BD9638-9F81-4E0C-918E-29202D07498E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BDDE1013-77D1-4F4C-B7D1-55C544760785}'  => array
 	(
 	    	"id" => "{BDDE1013-77D1-4F4C-B7D1-55C544760785}" ,
-	    	"name" => "vorschlag_antwort" ,
+	    	"name" => "fk_vorschlag_antwort" ,
 	    	"caption" => "vorschlag_antwort" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44939,7 +45391,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{AB5BD25B-6C6F-4436-9EEA-6F95FC796FD2}' => array
 			(
 				"id" => "{AB5BD25B-6C6F-4436-9EEA-6F95FC796FD2}",
@@ -44963,14 +45415,14 @@ $relations=array
 					"id" => "{546435BE-B982-4E4C-BB4E-3CBE57F5E7EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{AFE02E9F-A3B4-47D5-A849-45C9E694CA51}'  => array
 	(
 	    	"id" => "{AFE02E9F-A3B4-47D5-A849-45C9E694CA51}" ,
-	    	"name" => "vorschlage_vorschlagsprache" ,
+	    	"name" => "fk_vorschlage_vorschlagsprache" ,
 	    	"caption" => "vorschlage_vorschlagsprache" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -44988,7 +45440,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{42DE0CFB-0415-4947-AE9D-9E6F861CB8BF}' => array
 			(
 				"id" => "{42DE0CFB-0415-4947-AE9D-9E6F861CB8BF}",
@@ -45012,14 +45464,14 @@ $relations=array
 					"id" => "{546435BE-B982-4E4C-BB4E-3CBE57F5E7EB}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{A557A1BD-7749-48FF-B151-C80DB1CE0314}'  => array
 	(
 	    	"id" => "{A557A1BD-7749-48FF-B151-C80DB1CE0314}" ,
-	    	"name" => "wettbewerb_match" ,
+	    	"name" => "fk_wettbewerb_match" ,
 	    	"caption" => "wettbewerb_match" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45037,7 +45489,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{0414E50F-606D-4A39-A7E9-4787466369F6}' => array
 			(
 				"id" => "{0414E50F-606D-4A39-A7E9-4787466369F6}",
@@ -45061,14 +45513,14 @@ $relations=array
 					"id" => "{39A2E26E-C299-4913-BC7A-252540DCBD83}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0EFE12D2-28CE-44DA-8D06-347D33F6EE08}'  => array
 	(
 	    	"id" => "{0EFE12D2-28CE-44DA-8D06-347D33F6EE08}" ,
-	    	"name" => "wettbewerb_wettbewerbteam" ,
+	    	"name" => "fk_wettbewerb_wettbewerbteam" ,
 	    	"caption" => "wettbewerb_wettbewerbteam" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45086,7 +45538,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{678387D7-9BD6-4927-BE7E-65AA582D7FF9}' => array
 			(
 				"id" => "{678387D7-9BD6-4927-BE7E-65AA582D7FF9}",
@@ -45110,14 +45562,14 @@ $relations=array
 					"id" => "{39A2E26E-C299-4913-BC7A-252540DCBD83}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{0F55F94D-2B83-4126-B7B7-02D0BDCD0E1D}'  => array
 	(
 	    	"id" => "{0F55F94D-2B83-4126-B7B7-02D0BDCD0E1D}" ,
-	    	"name" => "wettbewerbtyp_wettbewerb" ,
+	    	"name" => "fk_wettbewerbtyp_wettbewerb" ,
 	    	"caption" => "wettbewerbtyp_wettbewerb" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45135,7 +45587,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{C64F4E41-56DC-4F7E-87E3-6017D1684D09}' => array
 			(
 				"id" => "{C64F4E41-56DC-4F7E-87E3-6017D1684D09}",
@@ -45159,14 +45611,14 @@ $relations=array
 					"id" => "{12C41347-B32D-4CFE-AF68-2281EE5E7FB9}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7BA62FFC-3E5C-43AA-A184-416BB2AAB9CE}'  => array
 	(
 	    	"id" => "{7BA62FFC-3E5C-43AA-A184-416BB2AAB9CE}" ,
-	    	"name" => "zeitsperretyp_zeitsperre" ,
+	    	"name" => "fk_zeitsperretyp_zeitsperre" ,
 	    	"caption" => "zeitsperretyp_zeitsperre" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45184,7 +45636,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{94BC94FA-BA39-4623-96AD-44D2D1AF84DA}' => array
 			(
 				"id" => "{94BC94FA-BA39-4623-96AD-44D2D1AF84DA}",
@@ -45208,14 +45660,14 @@ $relations=array
 					"id" => "{940829A1-B8B3-4F22-BBAA-AB3D2C68A69A}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{9E173F30-F6AE-4699-BC42-D679329223EC}'  => array
 	(
 	    	"id" => "{9E173F30-F6AE-4699-BC42-D679329223EC}" ,
-	    	"name" => "zgv_prestudent" ,
+	    	"name" => "fk_zgv_prestudent" ,
 	    	"caption" => "zgv_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45233,7 +45685,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{29111A97-D509-4148-91AA-E7F9D1597158}' => array
 			(
 				"id" => "{29111A97-D509-4148-91AA-E7F9D1597158}",
@@ -45257,14 +45709,14 @@ $relations=array
 					"id" => "{9F9EBFDE-AA03-49F0-894D-C04CDC2E2A19}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7BFD0C8F-A890-454C-8AAC-72BF97397ADF}'  => array
 	(
 	    	"id" => "{7BFD0C8F-A890-454C-8AAC-72BF97397ADF}" ,
-	    	"name" => "zgvmaster_prestudent" ,
+	    	"name" => "fk_zgvmaster_prestudent" ,
 	    	"caption" => "zgvmaster_prestudent" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45282,7 +45734,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{9B50B35B-73D0-40E7-BF72-15A91605D364}' => array
 			(
 				"id" => "{9B50B35B-73D0-40E7-BF72-15A91605D364}",
@@ -45306,14 +45758,14 @@ $relations=array
 					"id" => "{588D2E3F-CF58-4768-A929-ABAC5BF9757E}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{4A98B68B-D25C-485E-A221-0CE2A8BEA613}'  => array
 	(
 	    	"id" => "{4A98B68B-D25C-485E-A221-0CE2A8BEA613}" ,
-	    	"name" => "zweck_bisio" ,
+	    	"name" => "fk_zweck_bisio" ,
 	    	"caption" => "zweck_bisio" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45331,7 +45783,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{4DB643A4-2D32-4ACA-8CC6-35C3BC7795E7}' => array
 			(
 				"id" => "{4DB643A4-2D32-4ACA-8CC6-35C3BC7795E7}",
@@ -45355,14 +45807,14 @@ $relations=array
 					"id" => "{8A043546-4279-4A46-858F-3EFCFA70894F}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{F303477E-6A24-47BD-A669-02A3BF35185E}'  => array
 	(
 	    	"id" => "{F303477E-6A24-47BD-A669-02A3BF35185E}" ,
-	    	"name" => "oe_parent_oe" ,
+	    	"name" => "fk_oe_parent_oe" ,
 	    	"caption" => "oe_parent_oe" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45380,7 +45832,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{8C907027-ADCA-4E9E-B7F6-9172E40276CE}' => array
 			(
 				"id" => "{8C907027-ADCA-4E9E-B7F6-9172E40276CE}",
@@ -45404,14 +45856,14 @@ $relations=array
 					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{8BCD8370-DEBA-4727-B1BE-2BC155A3C93D}'  => array
 	(
 	    	"id" => "{8BCD8370-DEBA-4727-B1BE-2BC155A3C93D}" ,
-	    	"name" => "organisationseinheit_benutzerrolle" ,
+	    	"name" => "fk_organisationseinheit_benutzerrolle" ,
 	    	"caption" => "organisationseinheit_benutzerrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45429,7 +45881,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{A34D7372-82C3-4FB5-BCE6-178F395E2480}' => array
 			(
 				"id" => "{A34D7372-82C3-4FB5-BCE6-178F395E2480}",
@@ -45453,14 +45905,14 @@ $relations=array
 					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{7705294B-7420-4B99-9EE7-B7E47D799026}'  => array
 	(
 	    	"id" => "{7705294B-7420-4B99-9EE7-B7E47D799026}" ,
-	    	"name" => "rolle_benutzerrolle" ,
+	    	"name" => "fk_rolle_benutzerrolle" ,
 	    	"caption" => "rolle_benutzerrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45478,11 +45930,11 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{6E67C426-45D1-4732-B0B3-8154D31E5F0F}' => array
 			(
 				"id" => "{6E67C426-45D1-4732-B0B3-8154D31E5F0F}",
-				"name" => "FK status_kurzbz - status_kurzbz",
+				"name" => "FK rolle_kurzbz - rolle_kurzbz",
 				"comments" => "",
 				"notes" => "",
 				"deferred" => "",
@@ -45502,14 +45954,14 @@ $relations=array
 					"id" => "{9F9DDFD5-61FA-4208-9A4B-BBD9FF6EF1D5}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{BF593C90-D450-4261-AFC4-8E182BF801F3}'  => array
 	(
 	    	"id" => "{BF593C90-D450-4261-AFC4-8E182BF801F3}" ,
-	    	"name" => "rolle_rolleberechtigung" ,
+	    	"name" => "fk_rolle_rolleberechtigung" ,
 	    	"caption" => "rolle_rolleberechtigung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45527,11 +45979,11 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{F7F9D55B-3857-409B-B922-090657026392}' => array
 			(
 				"id" => "{F7F9D55B-3857-409B-B922-090657026392}",
-				"name" => "FK status_kurzbz - status_kurzbz",
+				"name" => "FK rolle_kurzbz - rolle_kurzbz",
 				"comments" => "",
 				"notes" => "",
 				"deferred" => "",
@@ -45551,14 +46003,14 @@ $relations=array
 					"id" => "{9F9DDFD5-61FA-4208-9A4B-BBD9FF6EF1D5}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{AB682B98-8F4B-48B0-A7EC-E06E0F0140CB}'  => array
 	(
 	    	"id" => "{AB682B98-8F4B-48B0-A7EC-E06E0F0140CB}" ,
-	    	"name" => "berechtigung_rolleberechtigung" ,
+	    	"name" => "fk_berechtigung_rolleberechtigung" ,
 	    	"caption" => "berechtigung_rolleberechtigung" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45576,7 +46028,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{EBEB54AB-1B3A-4FE2-A0A9-C86182A788F4}' => array
 			(
 				"id" => "{EBEB54AB-1B3A-4FE2-A0A9-C86182A788F4}",
@@ -45600,14 +46052,14 @@ $relations=array
 					"id" => "{67DAAC44-0FEC-4BD6-AF65-51EC1A2243BC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{99DDD3DF-C579-402B-B10A-5A9EECF717FE}'  => array
 	(
 	    	"id" => "{99DDD3DF-C579-402B-B10A-5A9EECF717FE}" ,
-	    	"name" => "berechtigung_benutzerrolle" ,
+	    	"name" => "fk_berechtigung_benutzerrolle" ,
 	    	"caption" => "berechtigung_benutzerrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45625,7 +46077,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{702AEF40-5817-43C4-93DF-6774F0C499A3}' => array
 			(
 				"id" => "{702AEF40-5817-43C4-93DF-6774F0C499A3}",
@@ -45649,14 +46101,14 @@ $relations=array
 					"id" => "{67DAAC44-0FEC-4BD6-AF65-51EC1A2243BC}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
 	'{5C7D1E4F-53CF-43F1-8617-F3D78009EF9E}'  => array
 	(
 	    	"id" => "{5C7D1E4F-53CF-43F1-8617-F3D78009EF9E}" ,
-	    	"name" => "funktion_benutzerrolle" ,
+	    	"name" => "fk_funktion_benutzerrolle" ,
 	    	"caption" => "funktion_benutzerrolle" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
@@ -45674,7 +46126,7 @@ $relations=array
    		),
 	    	"foreignkeys"  => array
 	    	(
-
+			
 			'{69314C08-52BB-4C70-BEA3-7BF48D863008}' => array
 			(
 				"id" => "{69314C08-52BB-4C70-BEA3-7BF48D863008}",
@@ -45698,10 +46150,157 @@ $relations=array
 					"id" => "{038BDEBE-F3A3-42D7-976B-0AC820BD7365}",
 		   		)
 			),
-
+			
 	   	)
    	),
-
+    	
+	'{9C0D7384-B1B0-4C3C-863F-F082451BB02B}'  => array
+	(
+	    	"id" => "{9C0D7384-B1B0-4C3C-863F-F082451BB02B}" ,
+	    	"name" => "fk_sprache_projektarbeit" ,
+	    	"caption" => "sprache_projektarbeit" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F6BEBF65-0503-4C0F-B9FF-99D94CEB22B2}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{41FD15C8-58B7-41BC-ABA5-8F969A1FE7F7}' => array
+			(
+				"id" => "{41FD15C8-58B7-41BC-ABA5-8F969A1FE7F7}",
+				"name" => "FK sprache - sprache",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{84D8B91C-7360-40E7-A49B-DAA60B56100B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3A7F1989-29C0-42D0-96D8-B215FBFB7AEF}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{F95863EA-2C6A-48B2-BD26-A68D0CB984F6}'  => array
+	(
+	    	"id" => "{F95863EA-2C6A-48B2-BD26-A68D0CB984F6}" ,
+	    	"name" => "fk_paabgabetyp_paabgabe" ,
+	    	"caption" => "paabgabetyp_paabgabe" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{DDE0ACB2-6861-4747-816F-40F415A0DB24}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{FA5559CA-61BD-4160-A249-F19FCDEEA0C6}' => array
+			(
+				"id" => "{FA5559CA-61BD-4160-A249-F19FCDEEA0C6}",
+				"name" => "FK paabgabetyp_kurzbz - paabgabetyp_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{446F72CE-3E9D-4911-B6D0-7380912CFC6E}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{CD738339-AE30-431A-AFAE-0DDFC4EC0BD8}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9D4A9049-38ED-435C-89FE-453AF873E7F3}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{1631BBE5-2DE6-45A8-841E-FC2AB6DF6C4B}'  => array
+	(
+	    	"id" => "{1631BBE5-2DE6-45A8-841E-FC2AB6DF6C4B}" ,
+	    	"name" => "fk_projektarbeit_paabgabe" ,
+	    	"caption" => "projektarbeit_paabgabe" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{446141FF-277C-49AC-8DB4-9C1CCC1B3953}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{D0EDFDA3-2FBA-4B8D-B1AB-272B62B3C962}' => array
+			(
+				"id" => "{D0EDFDA3-2FBA-4B8D-B1AB-272B62B3C962}",
+				"name" => "FK projektarbeit_id - projektarbeit_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{69ECDCD5-B855-4077-8063-B561D1222298}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{D4379036-0B1F-4C24-889B-D13F455F5711}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{253EEF90-43AB-4AD5-BF58-BEDF5A799EB0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
 );
 
 $datatypes['{ECB8F02F-B683-4252-8508-ED9D064C9AF3}']=array
@@ -45834,8 +46433,6 @@ $datatypes['{36A9DD5B-49C4-4BB7-86DB-2D4BCCAF58AF}']=array
     	"comments" => "",
     	"ordinal" => "0"
 );
-
-
 $datatypes['']=array
 (
     	"id" => "",
