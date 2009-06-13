@@ -19,6 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+mb_internal_encoding("UTF-8");
+mb_regex_encoding("UTF-8");
+
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/news.class.php');
@@ -226,7 +229,7 @@
 	
 	  <tr>
 	  	<td>
-			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $text); ?></textarea></td>
+			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo mb_ereg_replace("<br>", "\r\n", $text); ?></textarea></td>
 	  </tr>
 	  <tr>
 	  	<td nowrap>
