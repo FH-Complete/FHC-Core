@@ -59,7 +59,7 @@
 
 <?php
 	$language='';
-
+	
 	if(isset($_GET['language']))
 		$language=$_GET['language'];
 
@@ -153,6 +153,10 @@
 	$titel_de = $lv_obj->bezeichnung;
 	$titel_en = $lv_obj->bezeichnung_english;
 
+	if (!isset($lv))
+			$lv=0;
+		
+	
 	//Zugeteilte Fachbereiche auslesen
 	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz
 			FROM public.tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
