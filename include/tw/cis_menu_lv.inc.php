@@ -68,7 +68,8 @@
 		</td>
 	    <td class="tdvertical" align="center">
 		  <?php
-		  
+		  if (!isset($GLOBALS["DOCUMENT_ROOT"]))
+					$GLOBALS["DOCUMENT_ROOT"]='../../..';
 
 		  //SEMESTERPLAN
 		  	$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/semesterplan');
