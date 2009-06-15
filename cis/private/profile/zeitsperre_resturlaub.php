@@ -112,25 +112,24 @@ function checkdatum()
       var Datum, Tag, Monat,Jahr,vonDatum,bisDatum; 
 	  
 	  Datum=document.getElementById('vondatum').value;
-      Tag=parseInt(Datum.substring(0,2),10); 
-      Monat=parseInt(Datum.substring(3,5),10); 
-      Jahr=parseInt(Datum.substring(6,10),10); 
+      Tag=Datum.substring(0,2); 
+      Monat=Datum.substring(3,5); 
+      Jahr=Datum.substring(6,10); 
 	  
-	  vonDatum=Jahr+Monat+Tag;
+	  vonDatum=Jahr+''+Monat+''+Tag;
 	  
 	  Datum=document.getElementById('bisdatum').value;
-      Tag=parseInt(Datum.substring(0,2),10); 
-      Monat=parseInt(Datum.substring(3,5),10); 
-      Jahr=parseInt(Datum.substring(6,10),10); 
+      Tag=Datum.substring(0,2); 
+      Monat=Datum.substring(3,5); 
+      Jahr=Datum.substring(6,10); 
 	  
-	  bisDatum=Jahr+Monat+Tag;	  	
+	  bisDatum=Jahr+''+Monat+''+Tag;	  	
 	
 	  if (vonDatum>bisDatum)  {
 		alert('Von-Datum '+ document.getElementById('vondatum').value+ ' ist groesser als das Bis-Datum '+document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 	  	return false;
 	  }
-	
 	
 	return true;
 }
@@ -169,13 +168,13 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	$error=false;
 	$error_msg='';
 	//von-datum pruefen
-	if(!ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['vondatum']))
+	if(isset($_POST['vondatum']) && !ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['vondatum']))
 	{
 		$error=true;
 		$error_msg .= 'Von-Datum ist ung&uuml;ltig ';
 	}
 	//bis-datum pruefen
-	if(!ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['bisdatum']))
+	if(isset($_POST['bisdatum']) && !ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['bisdatum']))
 	{
 		$error=true;
 		$error_msg .= 'Bis-Datum ist ung&uuml;ltig ';
@@ -183,29 +182,43 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 	//von - bis-datum pruefen von darf nicht groesser als bis sein
 	// 09.02.2009 simane
-	$date=explode('.',$_POST['vondatum']);
 	$vondatum=0;
-	if (@checkdate($date[1], $date[0], $date[2]))
+	if(isset($_POST['vondatum']))
 	{
-		 $vondatum=$date[2].$date[1].$date[0];	
-	}	 
-	else
-	{
-		$error=true;
-		$error_msg .= 'kein g&uuml;ltiges VON-Datum ';
-	}			 	
-
-	$bisdatum=0;
-	$date=explode('.',$_POST['bisdatum']);
-	if (@checkdate($date[1], $date[0], $date[2]))
-	{
-		 $bisdatum=$date[2].$date[1].$date[0];		
-	}	 
-	else
-	{
-		$error=true;
-		$error_msg .= 'kein g&uuml;ltiges BIS-Datum ';
+		$date=explode('.',$_POST['vondatum']);
+		if (@checkdate($date[1], $date[0], $date[2]))
+		{
+			 $vondatum=$date[2].$date[1].$date[0];	
+		}	 
+		else
+		{
+			$error=true;
+			$error_msg .= 'kein g&uuml;ltiges VON-Datum ';
+		}			 	
 	}
+	else
+	{
+		$error=true;
+	}		
+	
+	$bisdatum=0;
+	if(isset($_POST['bisdatum']))
+	{
+		$date=explode('.',$_POST['bisdatum']);
+		if (@checkdate($date[1], $date[0], $date[2]))
+		{
+			 $bisdatum=$date[2].$date[1].$date[0];		
+		}	 
+		else
+		{
+			$error=true;
+			$error_msg .= 'kein g&uuml;ltiges BIS-Datum ';
+		}
+	}
+	else
+	{
+		$error=true;
+	}	
 	
 	if($vondatum > $bisdatum)
 	{
