@@ -17,25 +17,27 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *
  */
 	require_once('../../config.inc.php');
-    require_once('../../../include/functions.inc.php');
-    require_once('../../../include/benutzerberechtigung.class.php');
-    require_once('../../../include/lehrveranstaltung.class.php');
+  require_once('../../../include/functions.inc.php');
+  require_once('../../../include/benutzerberechtigung.class.php');
+  require_once('../../../include/lehrveranstaltung.class.php');
 
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim oeffnen der Datenbankverbindung");
+  //Connection Herstellen
+  if(!$sql_conn = pg_pconnect(CONN_STRING))
+     die("Fehler beim oeffnen der Datenbankverbindung");
 
 	$user = get_uid();
 
-    $rechte= new benutzerberechtigung($sql_conn);
-    $rechte->getBerechtigungen($user);
+  $rechte= new benutzerberechtigung($sql_conn);
+  $rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
-    else
+  else
        $is_lector=false;
 
 	function CutString($strVal, $limit)
@@ -92,7 +94,7 @@
 
 <?php
 	echo '<script language="JavaScript" type="text/javascript">';
-	echo '	parent.content.location.href="pinboard.php"';
+		echo '	parent.content.location.href="pinboard.php"';
 	echo '</script>';
 ?>
 </head>

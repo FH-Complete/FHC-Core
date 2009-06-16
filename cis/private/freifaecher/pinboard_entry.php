@@ -17,11 +17,10 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *
  */
-mb_internal_encoding("UTF-8");
-mb_regex_encoding("UTF-8");
-
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/news.class.php');
@@ -30,70 +29,94 @@ mb_regex_encoding("UTF-8");
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
 
-	$user = get_uid();
-
-	if(check_lektor($user,$sql_conn))
+		$user = get_uid();
+		if(check_lektor($user,$sql_conn))
        $is_lector=true;
-    else
-    	die('Sie haben keine Berechtigung fuer diesen Bereich');
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<?php
-	if(isset($news_submit) && (!isset($message_sent) || $message_sent == "no"))
+	  else
+  	  	die('Sie haben keine Berechtigung fuer diesen Bereich');
+
+
+// POST/GET Parameter uebernehmen 
+	if (isset($_GET))
+	{
+		while (list ($tmp_key, $tmp_val) = each($_GET)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}
+	if (isset($_POST))
+	{
+		while (list ($tmp_key, $tmp_val) = each($_POST)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}			
+
+	if(isset($btnCancel))
+	{
+			echo "<script language=\"JavaScript\">";
+				echo "	document.location.href = 'pinboard_entry.php?message_sent=no';";
+			echo "</script>";
+			exit;
+	}
+	
+	if(isset($btnSend))
 	{
 		$author = chop($_POST['txtAuthor']);
 		$title = chop($_POST['txtTitle']);
 		$datum = $_POST['datum'];
-		$news_message = chop(str_replace("\r\n", "<br>", $txtNewsMessage));
-
+		$news_message = chop($_POST['txtNewsMessage']);
 		if($author != "" && $title != "" && $news_message != "")
 		{
-			$news_obj = new news($sql_conn);
+					$news_message = mb_ereg_replace("\r\n", "<br>", $news_message);
 
-			$news_obj->verfasser = $author;
-			$news_obj->uid = $user;
-			$news_obj->studiengang_kz = '0';
+					$news_obj = new news($sql_conn);
+		
+					$news_obj->verfasser = $author;
+					$news_obj->uid = $user;
+					$news_obj->studiengang_kz = '0';
+		
+					$news_obj->semester = '0';
+					$news_obj->betreff = $title;
+					$news_obj->text = $news_message;
+					$news_obj->datum = $datum;
+					$news_obj->datum_bis = $datum_bis;
+					$news_obj->updatevon = $user;
+		
+					if(isset($news_id) && $news_id != "")
+					{
+						$news_obj->new=false;
+						$news_obj->news_id = $news_id;
+					}
+					else
+						$news_obj->new=true;
+		
+					if(!$news_obj->save())
+							exit($news_obj->errormsg);
 
-			$news_obj->semester = '0';
-			$news_obj->betreff = $title;
-			$news_obj->text = $news_message;
-			$news_obj->datum = $datum;
-			$news_obj->datum_bis = $datum_bis;
-			$news_obj->updatevon = $user;
-
-			if(isset($news_id) && $news_id != "")
-			{
-				$news_obj->new=false;
-				$news_obj->news_id = $news_id;
-			}
-			else
-				$news_obj->new=true;
-
-			if($news_obj->save())
-			{
-				echo '<script language="JavaScript" type="text/javascript">';
-				echo "	document.location.href = 'pinboard_entry.php?&message_sent=yes';";
-				echo '</script>';
-			}
-			else
-			{
-				echo $news_obj->errormsg;
-				//echo "<script language=\"JavaScript\">";
-				//echo "	document.location.href = 'pinboard_entry.php?&message_sent=no';";
-				//echo "</script>";
-			}
+					echo "<script language=\"JavaScript\">";
+						echo "	parent.news_window.location.href = 'pinboard_show.php'";
+					echo "</script>";
+					
+					if(!$news_obj->new)
+					{
+						echo " <h3>Die Nachricht wurde erfolgreich ge&auml;ndert!</h3>";
+					}
+					else
+					{
+						echo "  <h3>Die Neuigkeit wurde erfolgreich eingetragen!</h3>";
+					}
+					#exit;
 		}
 		else
 		{
-			echo "<script language=\"JavaScript\">";
-			echo "	document.location.href = 'pinboard_entry.php?message_sent=no';";
-			echo "</script>";
+				$message_sent="no";
 		}
-
-		exit;
+		
 	}
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
@@ -109,20 +132,16 @@ mb_regex_encoding("UTF-8");
 	}
 
 </script>
-
-<?php
-	echo "<script language=\"JavaScript\">";
-	echo "	parent.news_window.location.href = 'pinboard_show.php'";
-	echo "</script>";
-?>
 </head>
-
 <body onLoad="focusFirstElement();">
 <table class="tabcontent" id="inhalt">
   <tr>
     <td class="tdwidth10">&nbsp;</td>
-    <td><form method="post" name="NewsEntry">
-	<table class="tabcontent">
+    <td>
+
+		<form method="post" name="NewsEntry" accept-charset="UTF-8" action="<?php echo $_SERVER['PHP_SELF'];?>" enctype="application/x-www-form-urlencoded">
+
+			<table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Lektorenbereich - Pinboardverwaltung</font></td>
       </tr>
@@ -131,73 +150,46 @@ mb_regex_encoding("UTF-8");
       </tr>
 	  <tr>
 	  	<?php
-
-			if(isset($message_sent) && $message_sent == "yes")
-			{
-				if(isset($changed) && $changed == "yes")
-				{
-					echo "  <td>";
-					echo "<script language=\"JavaScript\">";
-					echo "	parent.news_window.location.href = 'pinboard_show.php'";
-					echo "</script>";
-					echo "</td>";
-					echo "</tr>";
-					echo "  <td>&nbsp;</td>";
-					echo "</tr>";
-					echo "<tr>";
-					echo "  <td><font class=\"h3\">Die Nachricht wurde erfolgreich ge&auml;ndert!</font></td>";
-					echo "</tr>";
-				}
-				else
-				{
-					echo "  <td>";
-					echo "<script language=\"JavaScript\">";
-					echo "	parent.news_window.location.href = 'pinboard_show.php'";
-					echo "</script>";
-					echo "</td>";
-					echo "</tr>";
-					echo "  <td>&nbsp;</td>";
-					echo "</tr>";
-					echo "<tr>";
-					echo "  <td><font class=\"h3\">Die Neuigkeit wurde erfolgreich eingetragen!</font></td>";
-					echo "</tr>";
-				}
-
-				exit;
-			}
-			else if(isset($message_sent) && $message_sent == "no")
-			{
-				echo "<td>&nbsp;</td>";
-				echo "</tr>";
-				echo "  <td><font class=\"h3\">Die Neuigkeit wurde nicht eingetragen!</font><br>";
-				echo "<font class=\"h3\">Es wurden nicht alle erforderlichen Felder ausgef&uuml;llt.</font></td>";
-				echo "</tr>";
-
-				exit;
-			}
-
 			echo '<td class="ContentHeader2">&nbsp;';
-
 			if(isset($news_id) && $news_id != "")
 			{
 				$news_obj = new news($sql_conn, $news_id);
-
 				$verfasser = $news_obj->verfasser;
 				$betreff = $news_obj->betreff;
 				$text = $news_obj->text;
-				$datum = $news_obj->datum;
-				$datum_bis = $news_obj->datum_bis;
+				$text=mb_ereg_replace("<br>","\r\n", $text);
 
+				$datum = $news_obj->datum;
+				$datum = date('d.m.Y',strtotime(strftime($datum)));
+
+				$datum_bis = $news_obj->datum_bis;
+				if ($datum_bis!='')
+					 $datum_bis=date('d.m.Y',strtotime(strftime($datum_bis)));				
 				echo 'Eintrag &auml;ndern';
 			}
 			else
 			{
 				echo 'Neuen Eintrag erstellen';
+				$verfasser = '';
+				$betreff = '';
+				$text = '';
+				$datum = date('d.m.Y');
+				$datum_bis = '';
 			}
-
 			echo '</td>';
 		?>
 	  </tr>
+			<?php
+				if (isset($message_sent) && $message_sent=="no")
+				{
+					echo '<tr><td>Es wurden nicht alle Felder eingegeben!</td></tr>';
+					$verfasser = (isset($_POST['txtAuthor'])?$_POST['txtAuthor']:'');
+					$betreff = (isset($_POST['txtTitle'])?$_POST['txtTitle']:'');
+					$text = (isset($_POST['txtNewsMessage'])?$_POST['txtNewsMessage']:'');
+					$datum = (isset($_POST['datum'])?$_POST['datum']:date('d.m.Y'));
+					$datum_bis = (isset($_POST['datum_bis'])?$_POST['datum_bis']:'');
+				}
+			?>
 	  <tr>
 	    <td>&nbsp;</td>
 	  </tr>
@@ -206,16 +198,16 @@ mb_regex_encoding("UTF-8");
 		  <table class="tabcontent">
 		    <tr>
 			  <td width="65">Verfasser:</td>
-			  <td width="218"><input type="text" class="TextBox" name="txtAuthor" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$verfasser.'"'; ?>>
+			  <td width="218"><input type="text" class="TextBox" name="txtAuthor" size="30" value="<?php echo $verfasser; ?>">
 			  </td>
 			  <td width="80">Sichtbar ab</td>
-			  <td><input type="text" class="TextBox" name="datum" size="10" value="<?php if(isset($news_id) && $news_id != "") echo date('d.m.Y',strtotime(strftime($datum))); else echo date('d.m.Y'); ?>"></td>
+			  <td><input type="text" class="TextBox" name="datum" size="10" value="<?php echo $datum; ?>"></td>
 		    </tr>
 			<tr>
 			  <td>Titel:</td>
-			  <td><input type="text" class="TextBox" name="txtTitle" size="30"<?php if(isset($news_id) && $news_id != "") echo ' value="'.$betreff.'"'; ?>></td>
+			  <td><input type="text" class="TextBox" name="txtTitle" size="30" value="<?php echo $betreff; ?>"></td>
 			  <td width="80">Sichtbar bis</td>
-			  <td><input type="text" class="TextBox" name="datum_bis" size="10" value="<?php if(isset($news_id) && $news_id != "" && $datum_bis!='') echo date('d.m.Y',strtotime(strftime($datum_bis))); else echo ''; ?>"></td>
+			  <td><input type="text" class="TextBox" name="datum_bis" size="10" value="<?php echo $datum_bis; ?>"></td>
 		    </tr>
 		    <tr>
 			  	<td colspan='2'>Bitte geben Sie hier Ihre Nachricht ein:</td>
@@ -229,11 +221,12 @@ mb_regex_encoding("UTF-8");
 	
 	  <tr>
 	  	<td>
-			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo mb_ereg_replace("<br>", "\r\n", $text); ?></textarea></td>
+			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php echo $text; ?></textarea></td>
 	  </tr>
 	  <tr>
 	  	<td nowrap>
-		  <input type="hidden" name="news_submit">
+		  	<input type="hidden" name="news_id" value="<?php echo (isset($news_id)?$news_id:'');?>" >
+		  	<input type="hidden" name="news_submit" value="1" >
 	      <input type="submit" name="btnSend" value="Abschicken">&nbsp;
 		  <?php
 		  if(isset($news_id) && $news_id != "")

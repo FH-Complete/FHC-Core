@@ -17,15 +17,17 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *
  */
 	require_once('../../config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/news.class.php');
 
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim oeffnen der Datenbankverbindung");
+   //Connection Herstellen
+  if(!$sql_conn = pg_pconnect(CONN_STRING))
+      die("Fehler beim oeffnen der Datenbankverbindung");
 
 
 	function print_news($sql_conn)
@@ -58,7 +60,7 @@
 				</table>
 			</div>
 			<div class="text" style="display: '.($open?'block':'none').';" id="'.$zaehler.'Text">
-			'.str_replace("../../skin","../../../skin","$row->text").'
+				'.mb_ereg_replace("../../skin","../../../skin","$row->text").'
 			</div>
 			</div>
 			<br>

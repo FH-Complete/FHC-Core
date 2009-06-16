@@ -17,9 +17,11 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *
  */
-	require_once('../../config.inc.php');
+		require_once('../../config.inc.php');
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/news.class.php');
 
@@ -27,30 +29,45 @@
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
 
+			 
 	$user = get_uid();
-
+  $is_lector=false;
 	if(check_lektor($user,$sql_conn))
-       $is_lector=true;
+      $is_lector=true;
+	else
+			die('Sie haben keine Berechtigung fuer diesen Bereich');
 
-	if($is_lector)
+// POST/GET Parameter uebernehmen 
+	if (isset($_GET))
 	{
-		if(isset($remove_id) && $remove_id != "")
+		while (list ($tmp_key, $tmp_val) = each ($_GET)) 
 		{
+			$$tmp_key=$tmp_val;
+		}	
+			
+	}
+	else if (isset($_POST))
+	{
+		while (list ($tmp_key, $tmp_val) = each ($_POST)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}			
+	
+	if(isset($remove_id) && $remove_id != "")
+	{
 			$news_obj = new news($sql_conn);
 			if($news_obj->delete($remove_id))
 			{
 				writeCISlog('DELETE PINBOARD','');
 				echo "<script language=\"JavaScript\">";
-				echo "	document.location.href = 'pinboard_show.php'";
+					echo "	document.location.href = 'pinboard_show.php'";
 				echo "</script>";
 			}
 			else
-				echo 'Fehler beim loeschen'.$news_obj->errormsg;
+					echo 'Fehler beim loeschen'.$news_obj->errormsg;
 			exit;
-		}
 	}
-	else
-		die('Sie haben keine Berechtigung fuer diesen Bereich');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -67,7 +84,6 @@
 			document.location.href = 'pinboard_show.php?remove_id=' + id;
 		}
 	}
-
 	function editEntry(id)
 	{
 		parent.news_entry.location.href = 'pinboard_entry.php?news_id=' + id;
@@ -94,7 +110,7 @@
 				{
 					$i++;
 					$zaehler++;
-					echo "<tr>";
+					echo '<tr>';
 
 					if($i % 2 != 0)
 						echo '<td class="MarkLine">';
@@ -102,10 +118,9 @@
 						echo '<td>';
 
 					if($row->datum!='')
-						$datum = date('d.m.Y',strtotime(strftime($row->datum)));
+							$datum = date('d.m.Y',strtotime(strftime($row->datum)));
 					else
-						$datum='';
-
+							$datum='';
 					echo '  <table class="tabcontent">';
 					echo '    <tr>';
 					echo '      <td class="tdwrap">';
@@ -126,7 +141,7 @@
 					echo '</tr>';
 				}
 				if($zaehler==0)
-					echo 'Zur Zeit gibt es keine aktuellen News!';
+						echo 'Zur Zeit gibt es keine aktuellen News!';
 			  ?>
 			</table>
 		  </td>
