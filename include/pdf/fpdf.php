@@ -1005,7 +1005,6 @@ function Output($name='', $dest='')
 		else
 			$dest='F';
 	}
-	ob_clean();
 	switch($dest)
 	{
 		case 'I':
