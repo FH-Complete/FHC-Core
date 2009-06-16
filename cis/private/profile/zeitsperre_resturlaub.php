@@ -114,6 +114,13 @@ function checkdatum()
 	  Datum=document.getElementById('vondatum').value;
       Tag=Datum.substring(0,2); 
       Monat=Datum.substring(3,5); 
+	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
+	  {	
+		alert('Von-Datum Monat'+ document.getElementById('vondatum').value+ ' ist nicht richtig.);
+		document.getElementById('vondatum').focus();
+	  	return false;
+	  }
+
       Jahr=Datum.substring(6,10); 
 	  
 	  vonDatum=Jahr+''+Monat+''+Tag;
@@ -121,11 +128,19 @@ function checkdatum()
 	  Datum=document.getElementById('bisdatum').value;
       Tag=Datum.substring(0,2); 
       Monat=Datum.substring(3,5); 
+	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
+	  {	
+		alert('Bis-Datum Monat'+ document.getElementById('bisdatum').value+ ' ist nicht richtig.);
+		document.getElementById('bisdatum').focus();
+	  	return false;
+	  }
+	  	
       Jahr=Datum.substring(6,10); 
 	  
 	  bisDatum=Jahr+''+Monat+''+Tag;	  	
 	
-	  if (vonDatum>bisDatum)  {
+	  if (vonDatum>bisDatum)  
+	  {
 		alert('Von-Datum '+ document.getElementById('vondatum').value+ ' ist groesser als das Bis-Datum '+document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 	  	return false;
