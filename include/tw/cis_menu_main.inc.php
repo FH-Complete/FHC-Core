@@ -41,26 +41,6 @@
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/fh/aktuelles/news/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Newsletter</a></td>
 		  		</tr>
-<!--		  		<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="content" href="private/lehre/pinboard.php?fachbereich_kurzbz=Senat"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Senatsbeschl&uuml;sse</a></td>
-		  		</tr>
-		  		<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.technikum-wien.at/service/termine/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Veranstaltungen</a></td>
-		  		</tr>
--->
-<!--
-		  		<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="content" href="private/jahresplan/index.php"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Eventkalender</a></td>
-		  		</tr>
-
-		  		<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="content" href="/documents/fotos/"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
-		  		</tr>
--->
 	  			<tr>
 	          		<td class="tdwrap"></td>
 					<td><a target="content" href="private/jahresplan/index.php" class="MenuItem" onClick="js_toggle_container('jahresplan');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Eventkalender</a>
@@ -84,16 +64,6 @@
 	-->
 		  			<td class="tdwrap"></td>
 					<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;&Ouml;H-Mandate 2009</a>
-				  	<!--<table class="tabcontent" id="oehwahl" style="display: visible;">
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/oeh/bewerber.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Kandidaturen</a></td>
-						</tr>
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/oeh/Wahlergebnisse Bekanntgabe2009.doc" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Wahlergebnisse</a></td>
-						</tr>
-					</table>-->
 					</td>
 		  		</tr>
 		  		<tr>
@@ -195,9 +165,6 @@
 					</table>
 					</td>
 				</tr>	
-
-				
-				
 				</table>
 				&nbsp;
 		  	</td>
@@ -222,10 +189,6 @@
 		<tr>
 			<td class="tdwrap"><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Weiterbildung</a>
 		  	<table class="tabcontent" id="Weiterbildung" style="display: none">
-				<!--<tr>
-					<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="campus/weiterbildung/info.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Info und Kontakt</a></td>
-				</tr>-->
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/info.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Aktuell</a></td>
@@ -341,7 +304,6 @@
 			</tr>
 	    	<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<!--<td class="tdwrap"><a class="Item" href="http://bug.technikum-wien.at/otrs/customer.pl" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bug Tracking</a></td>-->
  				<td class="tdwrap"><a class="Item" href="https://bug.technikum-wien.at/" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bug Tracking</a></td>
 			</tr>
 			<tr>
@@ -419,11 +381,6 @@
 					</table>
 				</td>
 			</tr>
-			<!--<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="campus/download_cisumfrage.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;CIS Umfrage</a></td>
-			</tr>-->
-
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 			  	<td class="tdwrap"><a href="?Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('Verwaltungstools'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Verwaltungstools</a>
@@ -584,41 +541,6 @@
 			</table>
 		  	</td>
   		</tr>
-		
-		<!-- QM OLD 
-  		<tr>
-
-			<td class="tdwrap">
-				<a href="private/info/qm/info.html" target="content" class="MenuItem" onClick="js_toggle_container('QM');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Qualit&auml;tsmanagement</a>
-				<table class="tabcontent" id="QM" style="display: none">
-		  		<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/qm/Qualitaetsmanagementsystem.pdf" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;QM-Handbuch</a></td>
-		  		</tr>
-				<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Organigramm</a></td>
-		  		</tr>
-				<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/qm/prozesse/prozessmodell.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Prozesse</a></td>
-		  		</tr>
-
-				<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/dokumente.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Dokumente</a></td>
-		  		</tr>
-		  		<tr>
-		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/qm/vorlagen/Ground_Rules.pdf" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Ground Rules</a></td>
-		  		</tr>
-				</table>
-			</td>
-		</tr>
-		-->
-		
-		
-		
 		<!-- Hauptmenue Rektor -->
 		<tr>
           <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Rektorat</a></td>
@@ -630,39 +552,6 @@
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="public/rektortw.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Rektor Technikum Wien</a></td>
 			</tr>
-		<?php
-		$check=date('Y').date('m'); 
-		if ($check <'200909')  		
-		{ 
-		?>
-			<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
-			    <td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="?Jahresplan" class="MenuItem" onClick="return(js_toggle_container('Jahresplan'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Jahresplan</a>
-				  	<table class="tabcontent" id="Jahresplan" style="display: none">
-					<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WS 2008</td>
-<!--
-						<td class="tdwrap"><a class="Item" href="private/info/jahresplan_WS2008.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;WS 2008</a></td>
--->
-					</tr>
-					<tr onclick="alert('Den Jahresplan finden sie unter News -> Eventkalender');">
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SS 2009</td>
-<!--
-						<td class="tdwrap"><a class="Item" href="private/info/jahresplan_SS2009.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;SS 2009</a></td>
--->
-					</tr>
-
-					</table>
-				</td>
-			</tr>
-		<?php } ?>	
-<!--			<tr>
-        		<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="public/linkliste.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Links</a></td>
-  			</tr>
--->
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a href="../documents/management/umgang_vielfalt" class="Item" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Umgang mit Vielfalt</a></td>
@@ -767,38 +656,6 @@
   		<tr>
 			<td class="tdwrap"><a class="MenuItem" href="private/menu.php" ><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mein CIS</a></td>
 		</tr>
-
-<!--		<tr>
-	       	<td class="tdwrap">
-		  	<table class="tabcontent" id="MeineCIS" style="display: visible;">
-		  	<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/profile/index.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Profil</a></td>
-			</tr>
-		  	<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/lvplan/stpl_week.php" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;LV-Plan</a></td>
-			</tr>
--->
-<!--			<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-		        <td class="tdwrap"><a href="?Location" class="MenuItem" onClick="return(js_toggle_container('MeineLVs'));"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Location</a></td>
-			</tr>
-			<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-		        <td class="tdwrap">
-				  	<table class="tabcontent" id="MeineLVs" style="display: none">
-					<tr>
-						<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/location.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Standort</a></td>
-					</tr>
-					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/tw_building.html" target="content"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;Geb&auml;udeplan</a></td>
-					</tr>
-					</table>
-				</td>
-			</tr>-->
 			</table>
 			</td>
   		</tr>
