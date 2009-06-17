@@ -182,7 +182,7 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 3.2 \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Regelstudienzeit (gesetzliche Studiendauer) \n Official length of program</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="semester" /> Semester/<xsl:value-of select="jahre" /> Jahr(e)\n<xsl:value-of select="semester" /> semester/<xsl:value-of select="jahre" /> year(s)</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="semester" /> Semester / <xsl:value-of select="jahre" /> Jahr(e)\n<xsl:value-of select="semester" /> semester(s) / <xsl:value-of select="jahre" /> year(s)</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 3.3 \n \n \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
