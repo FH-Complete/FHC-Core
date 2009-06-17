@@ -226,7 +226,7 @@ echo "<h3>Studentenpunkte verwalten</h3>";
 if(isset($_POST['submit']))
 {
 	$error=false;
-	$punkte = (isset($_POST['punkte'])?str_replace(',','.',$_POST['punkte']):'');
+	$punkte = (isset($_POST['punkte'])?mb_ereg_replace(',','.',$_POST['punkte']):'');
 	if(isset($punkte) && is_numeric($punkte))
 	{
 		$ueb_obj = new uebung($conn);

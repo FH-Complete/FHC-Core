@@ -417,7 +417,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 
 			$paramURL=constKommuneParmSetWork.'='.constKommuneEinladenTEAM.'&amp;team_kurzbz='.trim($oWettbewerb->team_kurzbz_einladung).'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz);
 			$paramURL=''; // ohne Parameter
-			$cTmpURL=str_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
+			$cTmpURL=mb_ereg_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
 
 			$iTmpAnzahlTeam=1;
 			if (isset($oWettbewerb->Team[trim($oWettbewerb->team_kurzbz_einladung)][0]['team_kurzbz']))
@@ -579,7 +579,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 				
 			$paramURL=constKommuneParmSetWork.'='.constKommuneEinladenTEAM.'&amp;team_kurzbz='.trim($oWettbewerb->team_kurzbz_einladung).'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz);
 			$paramURL=''; // ohne Parameter
-			$cTmpURL=str_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
+			$cTmpURL=mb_ereg_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
 			
 			$betreff='Das Ergebnis im Wettbewerb '.$oWettbewerb->wettbewerb_kurzbz;
 			

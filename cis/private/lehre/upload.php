@@ -513,7 +513,7 @@ A:hover {
 							$short_short = $row_lesson->kuerzel;
 					   }
 
-					   $uploaddir =mb_strtolower ($course_short,'UTF-8').'/'.$term_id.'/'.strtolower($short_short).'/download';
+					   $uploaddir =mb_strtolower($course_short).'/'.$term_id.'/'.mb_strtolower($short_short).'/download';
 
 					   echo "\n</select>\n";
 					 echo '</form>';
@@ -547,7 +547,7 @@ A:hover {
 						}
 					}
 					$row = pg_fetch_object($result_path_elements, 0);
-					$uploaddir = mb_strtolower($row->kurzbz,'UTF-8').'/'.$term_id.'/'.mb_strtolower($row->lehreverzeichnis,'UTF-8').'/upload';
+					$uploaddir = mb_strtolower($row->kurzbz).'/'.$term_id.'/'.mb_strtolower($row->lehreverzeichnis).'/upload';
 				}
 			  ?>
 			  <tr>
@@ -560,7 +560,7 @@ A:hover {
 						  {
 						  	if(!isset($link_cut))
 						  		$link_cut = '';
-						  	$link_path = substr(substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut,'UTF-8')), 0, mb_strlen(substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut,'UTF-8')),'UTF-8') - mb_strlen('download','UTF-8')).'upload';
+						  	$link_path = mb_substr(mb_substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut)), 0, mb_strlen(mb_substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut))) - mb_strlen('download')).'upload';
 						  }
 
 						  $numoffile = 5;
@@ -889,11 +889,11 @@ A:hover {
 
 						if(isset($short))
 						{
-							echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0,'UTF-8')).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
+							echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'&subdir='.mb_substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
 						}
 						else
 						{
-							echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$row_lesson->kuerzel.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0,'UTF-8')).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
+							echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$row_lesson->kuerzel.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
 						}
 					}
 				}
@@ -1169,11 +1169,11 @@ A:hover {
 
 																																							if(isset($short))
 																																							{
-																																								echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0,'UTF-8')).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
+																																								echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
 																																							}
 																																							else
 																																							{
-																																								echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$row_lesson->kuerzel.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0,'UTF-8')).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
+																																								echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$row_lesson->kuerzel.'&subdir='.mb_substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
 																																							}
 																																						}
 																																					}
@@ -1270,7 +1270,7 @@ A:hover {
 									}
 									if(!isset($link_cut))
 										$link_cut='';
-									$link_path = substr($dest_dir->path, mb_strlen($link_cut,'UTF-8')).'/'.urlencode($entry);
+									$link_path = mb_substr($dest_dir->path, mb_strlen($link_cut)).'/'.urlencode($entry);
 									//+ durch %20 ersetzten damit Files mit leerzeichen geoeffnet werden koennen
 									$link_path = str_replace("+","%20",$link_path);
 									echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"$link_path\" target=\"_blank\">&nbsp;<img src=\"../../../skin/images/file.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";

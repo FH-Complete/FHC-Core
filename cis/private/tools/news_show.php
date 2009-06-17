@@ -54,7 +54,23 @@
        die('Fehler beim öffnen der Datenbankverbindung');
 
 	$user = get_uid();
-
+// POST/GET Parameter uebernehmen 
+	if (isset($_GET))
+	{
+		while (list ($tmp_key, $tmp_val) = each($_GET)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}
+	if (isset($_POST))
+	{
+		while (list ($tmp_key, $tmp_val) = each($_POST)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}		
+	
+	
     $rechte = new benutzerberechtigung($sql_conn);
     $rechte->getBerechtigungen($user);
 
@@ -70,7 +86,7 @@
 	{
 		if(isset($remove_id) && $remove_id != "")
 		{
-			$news = new news($sql_conn);
+			$news = new news();
 			if($news->delete($remove_id))
 			{
 				writeCISlog('DELETE NEWS','');
@@ -97,7 +113,7 @@
 		  	<table class="tabcontent">
 			  <?php
 
-				$news = new news($sql_conn);
+				$news = new news();
 				$news->getnews(0,0,null, true, '*', 0);
 
 				$zaehler=0;

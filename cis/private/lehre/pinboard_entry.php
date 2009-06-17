@@ -29,14 +29,29 @@
        die('Fehler beim Oeffnen der Datenbankverbindung');
 
 	$user = get_uid();
-
+// POST/GET Parameter uebernehmen 
+	if (isset($_GET))
+	{
+		while (list ($tmp_key, $tmp_val) = each($_GET)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}
+	if (isset($_POST))
+	{
+		while (list ($tmp_key, $tmp_val) = each($_POST)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}			
+	
 	if(check_lektor($user,$conn))
 		$is_lector=true;
     else
     	$is_lector=false;
 
 	if((!isset($_GET['course_id']) || !isset($_GET['term_id'])))
-		die('Fehlerhafte Parameteruebergabe');
+			die('Fehlerhafte Parameteruebergabe');
 	else
 	{
 		$course_id = $_GET['course_id'];
@@ -57,13 +72,13 @@
 	{
 		$author = chop($_POST['txtAuthor']);
 		$title = chop($_POST['txtTitle']);
-		$news_message = chop(str_replace("\r\n", "<br>", $_POST['txtNewsMessage']));
-
+		$news_message = chop($_POST['txtNewsMessage']);
 		if($author != "" && $title != "" && $news_message != "" && isset($course_id) && isset($term_id))
 		{
+			$news_message = mb_ereg_replace("\r\n", "<br>", $news_message);
 			if(isset($news_id) && $news_id != "")
 			{
-				$news_obj = new news($conn);
+				$news_obj = new news();
 
 				$news_obj->verfasser = $author;
 				$news_obj->uid = $user;
@@ -88,13 +103,13 @@
 				else
 				{
 					echo "<script language=\"JavaScript\">";
-					echo "	document.location.href = 'pinboard_entry.php?course_id=$course_id&term_id=$term_id' + \"&message_sent=no\";";
+					echo " document.location.href = 'pinboard_entry.php?course_id=$course_id&term_id=$term_id' + \"&message_sent=no\";";
 					echo "</script>";
 				}
 			}
 			else
 			{
-				$news_obj = new news($conn);
+				$news_obj = new news();
 
 				$news_obj->verfasser = $author;
 				$news_obj->uid = $user;
@@ -128,7 +143,6 @@
 			echo "	document.location.href = 'pinboard_entry.php?course_id=$course_id&term_id=$term_id' + \"&message_sent=no\";";
 			echo "</script>";
 		}
-
 		exit;
 	}
 ?>
@@ -257,8 +271,7 @@
 					echo "  <td><font class=\"headline\">Die Neuigkeit wurde erfolgreich eingetragen!</font></td>";
 					echo "</tr>";
 				}
-
-				exit;
+				#exit;
 			}
 			else if(isset($message_sent) && $message_sent == "no")
 			{
@@ -281,7 +294,7 @@
 
 			if(isset($news_id) && $news_id != "")
 			{
-				$news_obj = new news($conn, $news_id);
+				$news_obj = new news($news_id);
 				$verfasser = $news_obj->verfasser;
 				$betreff = $news_obj->betreff;
 				$text = $news_obj->text;
@@ -411,11 +424,11 @@
 	  	<td>Bitte geben Sie hier Ihre Nachricht ein:<br>
 	  	<?php
 			  if (isset($txt) AND $txt!="")
-			     $value=str_replace("<br>","\r\n",$txt);
+			     $value=mb_ereg_replace("<br>","\r\n",$txt);
 			  else
 			  {
 			    if(isset($news_id) && $news_id != "")
-			        $value=str_replace("<br>", "\r\n", $text);
+			        $value=mb_ereg_replace("<br>", "\r\n", $text);
 			    else
 			        $value='';
 			  }

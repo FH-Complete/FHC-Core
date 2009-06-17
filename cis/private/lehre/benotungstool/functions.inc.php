@@ -25,7 +25,7 @@ function makeUploadName($conn, $which, $lehreinheit_id=null, $uebung_id=null, $s
 		
 		$name .= "_".$uebung_id."_".$date;	
 	}
-	$name = str_replace(":","-",$name);
+	$name = mb_ereg_replace(":","-",$name);
 	return $name;
 }
 ?>

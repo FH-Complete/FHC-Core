@@ -589,7 +589,7 @@ function kommune_funk_show_wettbewerb($arrWettbewerb,$oWettbewerb,$cSeitenKey=""
 
 			// Moderator PopUp Aufruf
 			$intKey='moderator_'.$cSeitenKey.'_'.time().'_'.$arrTempWettbewerb[$iTmpZehler]['wettbewerb_kurzbz'].'_'.$arrTempWettbewerb[$iTmpZehler]['uid'];
-			$intKey=str_replace(' ','_',$intKey);
+			$intKey=mb_ereg_replace(' ','_',$intKey);
 			$pers=kommune_funk_benutzerperson($arrTempWettbewerb[$iTmpZehler]['uid'],$oWettbewerb);
 
 			$showHTML.='<tr><td style="vertical-align: top;">
@@ -947,7 +947,7 @@ function kommune_funk_show_wettbewerbteam($arrWettbewerbTeam,$oWettbewerb,$cSeit
 						<tr style="vertical-align: top;">
 							<td style="white-space : nowrap;">';
 							$intKey='mitgl_'.$cSeitenKey;
-							$intKey=str_replace('\\','_',str_replace(' ','_',$intKey)).$iTmpZehler;
+							$intKey=mb_ereg_replace('\\','_',mb_ereg_replace(' ','_',$intKey)).$iTmpZehler;
 							$showHTML.=kommune_funk_show_wettbewerbteam_mitglied($oWettbewerb->TeamBenutzer[trim($arrTempWettbewerb[$iTmpZehler]["team_kurzbz"])],$oWettbewerb,$intKey);  
 
 							if (count($oWettbewerb->TeamBenutzer[trim($arrTempWettbewerb[$iTmpZehler]["team_kurzbz"])])==1 )
@@ -996,7 +996,7 @@ function kommune_funk_show_wettbewerbteam_mitglied($arrWettbewerbTeam,$oWettbewe
 			
 		// User PopUp
 		$intKey='benutzer_'.$cSeitenKey.'_'.time().'_kommune_funk_show_wettbewerbteam_mitglied_'.$arrWettbewerbTeam[$iTmpZehler]["uid"];
-		$cTmpTeamPopUpID=str_replace('\\','_',str_replace(' ','_',$intKey));
+		$cTmpTeamPopUpID=mb_ereg_replace('\\','_',mb_ereg_replace(' ','_',$intKey));
 		$cTmpTeamPopUp=' onmouseover="show_layer(\''.$cTmpTeamPopUpID.'\');" onmouseout="hide_layer(\''.$cTmpTeamPopUpID.'\');" ';
 		
 		$showHTML.='<tr style="vertical-align: top;" '.$cTmpTeamPopUp.'>';
@@ -2129,7 +2129,7 @@ function kommune_funk_sendmail($empf='',$betreff='',$text='',$abs='',$oWettbewer
 		$abs=$oWettbewerb->userUID;
 	$abs=trim($abs);
 			
-	$cTmpName=str_replace(stristr($abs,"@"),'',$abs); // Es wurde eine eMailadresse uebergeben, wir brauchen die UID
+	$cTmpName=mb_ereg_replace(stristr($abs,"@"),'',$abs); // Es wurde eine eMailadresse uebergeben, wir brauchen die UID
 	$cTmpName=trim($cTmpName);
 
 	$pers=kommune_funk_benutzerperson(trim($cTmpName),$oWettbewerb);
@@ -2174,7 +2174,7 @@ function kommune_funk_create_emailaccount($cUID)
 	if (!defined('DOMAIN')) die('Die Konstante DOMAIN wurde nicht gefunden! Bitte config pruefen.' );
 	if (!stristr($cUID,'@')) // Domainkonstante nur dazufuegen wenn noch keine Domain im Namen ist
 		$cUID=$cUID.(stristr(DOMAIN,'@')?DOMAIN:'@'.DOMAIN); // Pruefen ob in der Konstant der Klammeraffe ist
-	$cUID=str_replace(' ','',$cUID);
+	$cUID=mb_ereg_replace(' ','',$cUID);
    	return strtolower($cUID);
 }
 

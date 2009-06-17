@@ -140,7 +140,7 @@ $thema = (isset($_POST['thema'])?$_POST['thema']:'');
 $liste_id = (isset($_REQUEST['liste_id'])?$_REQUEST['liste_id']:'');
 $anzahlderbeispiele = (isset($_POST['anzahlderbeispiele'])?$_POST['anzahlderbeispiele']:'');
 $punkteprobeispiel = (isset($_POST['punkteprobeispiel'])?$_POST['punkteprobeispiel']:'');
-$punkteprobeispiel = str_replace(',','.',$punkteprobeispiel);
+$punkteprobeispiel = mb_ereg_replace(',','.',$punkteprobeispiel);
 $freigabebis = (isset($_POST['freigabebis'])?$_POST['freigabebis']:'');
 $freigabevon = (isset($_POST['freigabevon'])?$_POST['freigabevon']:'');
 $maxstd = (isset($_POST['maxstd'])?$_POST['maxstd']:'');
@@ -787,7 +787,7 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 		if(isset($uebung_id) && $uebung_id!='' && is_numeric($uebung_id))
 		{
 			$punkte = (isset($_POST['punkte'])?$_POST['punkte']:'');
-			$punkte = str_replace(',','.',$punkte);
+			$punkte = mb_ereg_replace(',','.',$punkte);
 			$bezeichnung = $_REQUEST["bezeichnung"];
 			if(is_numeric($punkte) && $punkte!='')
 			{
@@ -846,7 +846,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 
 	$uebung_obj = new uebung($conn);
 	$uebung_obj->load($uebung_id);
-	$downloadname = str_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
+	$downloadname = mb_ereg_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
 	
 	echo "
 	<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='$uebung_obj->bezeichnung'></td><td>$error_thema</td></tr>

@@ -79,26 +79,26 @@
 		$lehrveranstaltung_id = $_POST['lv'];
 
 		// german content variables
-		//$titel_de = str_replace("\r\n","<br>",stripslashes($_POST['titel_de']));
-		$methodik_de = str_replace("\r\n","<br>",stripslashes($_POST['methodik_de']));
-		$kurzbeschreibung_de = str_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_de']));
-		$lehrziele_de = str_replace("\r\n","<br>",stripslashes($_POST['lehrziele_de']));
-		$lehrinhalte_de = str_replace("\r\n","<br>",stripslashes($_POST['lehrinhalte_de']));
-		$voraussetzungen_de = str_replace("\r\n","<br>",stripslashes($_POST['voraussetzungen_de']));
-		$unterlagen_de = str_replace("\r\n","<br>",stripslashes($_POST['unterlagen_de']));
-		$pruefungsordnung_de = str_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_de']));
-		$anmerkungen_de = str_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_de']));
+		//$titel_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['titel_de']));
+		$methodik_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['methodik_de']));
+		$kurzbeschreibung_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_de']));
+		$lehrziele_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrziele_de']));
+		$lehrinhalte_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrinhalte_de']));
+		$voraussetzungen_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['voraussetzungen_de']));
+		$unterlagen_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['unterlagen_de']));
+		$pruefungsordnung_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_de']));
+		$anmerkungen_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_de']));
 
 		// Englisch content variables
-		//$titel_en = str_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
-		$methodik_en = str_replace("\r\n","<br>",stripslashes($_POST['methodik_en']));
-		$kurzbeschreibung_en = str_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_en']));
-		$lehrziele_en = str_replace("\r\n","<br>",stripslashes($_POST['lehrziele_en']));
-		$lehrinhalte_en = str_replace("\r\n","<br>",stripslashes($_POST['lehrinhalte_en']));
-		$voraussetzungen_en = str_replace("\r\n","<br>",stripslashes($_POST['voraussetzungen_en']));
-		$unterlagen_en = str_replace("\r\n","<br>",stripslashes($_POST['unterlagen_en']));
-		$pruefungsordnung_en = str_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_en']));
-		$anmerkungen_en = str_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_en']));
+		//$titel_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
+		$methodik_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['methodik_en']));
+		$kurzbeschreibung_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_en']));
+		$lehrziele_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrziele_en']));
+		$lehrinhalte_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrinhalte_en']));
+		$voraussetzungen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['voraussetzungen_en']));
+		$unterlagen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['unterlagen_en']));
+		$pruefungsordnung_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_en']));
+		$anmerkungen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_en']));
 	}
 	elseif(isset($_GET['lv'])) //LV Id wird uebergeben (zB bei Ansicht fuer alle von lesson.php)
 	{

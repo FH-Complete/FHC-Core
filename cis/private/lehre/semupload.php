@@ -81,7 +81,7 @@ function ConfirmFile(handle)
 	{
 		if($inhalt!="____Ordnerinhalt____")
 		{
-			if(!strstr($inhalt,'..'))
+			if(!mb_strstr($inhalt,'..'))
 			{
 				if(is_file($openpath . $inhalt))
 				{

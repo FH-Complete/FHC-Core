@@ -161,21 +161,21 @@
 			$save_error=false;
 			$save_log_error=false;
 			//Deutsch
-			$lv_obj_sav->lehrziele=str_replace("", "<br>", str_replace("\r\n", "<br>", $lehrziele_de));
-			$lv_obj_sav->lehrinhalte=str_replace("", "<br>",str_replace("\r\n", "<br>", $lehrinhalte_de));
-			$lv_obj_sav->voraussetzungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $voraussetzungen_de));
-			$lv_obj_sav->unterlagen=str_replace("", "<br>",str_replace("\r\n", "<br>", $unterlagen_de));
-			$lv_obj_sav->pruefungsordnung=str_replace("", "<br>",str_replace("\r\n", "<br>", $pruefungsordnung_de));
-			$lv_obj_sav->anmerkungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $anmerkungen_de));
-			$lv_obj_sav->kurzbeschreibung=str_replace("", "<br>",str_replace("\r\n", "<br>", $kurzbeschreibung_de));
+			$lv_obj_sav->lehrziele=mb_eregi_replace(".", "<br>", mb_eregi_replace("\r\n", "<br>", $lehrziele_de));
+			$lv_obj_sav->lehrinhalte=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrinhalte_de));
+			$lv_obj_sav->voraussetzungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $voraussetzungen_de));
+			$lv_obj_sav->unterlagen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $unterlagen_de));
+			$lv_obj_sav->pruefungsordnung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_de));
+			$lv_obj_sav->anmerkungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $anmerkungen_de));
+			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de));
 			$lv_obj_sav->genehmigt = ($freig_de?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->sprache=ATTR_SPRACHE_DE;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
-			$lv_obj_sav->methodik = str_replace("", "<br>",str_replace("\r\n", "<br>", $methodik_de));
-			//$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_de));
+			$lv_obj_sav->methodik = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_de));
+			//$lv_obj_sav->titel = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_de));
 
 			$lv_obj1 = new lvinfo($conn);
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
@@ -192,21 +192,21 @@
 					$save_log_error=true;
 
 			//Englisch
-			$lv_obj_sav->lehrziele=str_replace("", "<br>",str_replace("\r\n", "<br>", $lehrziele_en));
-			$lv_obj_sav->lehrinhalte=str_replace("", "<br>",str_replace("\r\n", "<br>", $lehrinhalte_en));
-			$lv_obj_sav->voraussetzungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $voraussetzungen_en));
-			$lv_obj_sav->unterlagen=str_replace("", "<br>",str_replace("\r\n", "<br>", $unterlagen_en));
-			$lv_obj_sav->pruefungsordnung=str_replace("", "<br>",str_replace("\r\n", "<br>", $pruefungsordnung_en));
-			$lv_obj_sav->anmerkungen=str_replace("", "<br>",str_replace("\r\n", "<br>", $anmerkungen_en));
-			$lv_obj_sav->kurzbeschreibung=str_replace("", "<br>",str_replace("\r\n", "<br>", $kurzbeschreibung_en));
+			$lv_obj_sav->lehrziele=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrziele_en));
+			$lv_obj_sav->lehrinhalte=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrinhalte_en));
+			$lv_obj_sav->voraussetzungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $voraussetzungen_en));
+			$lv_obj_sav->unterlagen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $unterlagen_en));
+			$lv_obj_sav->pruefungsordnung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_en));
+			$lv_obj_sav->anmerkungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $anmerkungen_en));
+			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en));
 			$lv_obj_sav->genehmigt = ($freig_en?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->sprache=ATTR_SPRACHE_EN;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
-			$lv_obj_sav->methodik = str_replace("", "<br>",str_replace("\r\n", "<br>", $methodik_en));
-			//$lv_obj_sav->titel = str_replace("", "<br>",str_replace("\r\n", "<br>", $titel_en));
+			$lv_obj_sav->methodik = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_en));
+			//$lv_obj_sav->titel = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_en));
 
 			$lv_obj1 = new lvinfo($conn);
 			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
@@ -232,7 +232,7 @@
 	$output .= "\n";
 	$output .= "<table class='tabcontent'><tr>";
 	$output .= "<td width='85%'>";
-	$output .= "<form action='$PHP_SELF' name='auswahlFrm' method='POST'>";
+	$output .= "<form action='".$_SERVER['PHP_SELF']."' name='auswahlFrm' method='POST'>";
 	$stg_obj = new studiengang($conn);
 
 	//Anzeigen des DropDown Menues mit Stg
@@ -427,7 +427,7 @@
 		$lv_obj = new lehrveranstaltung($conn);
 		$lv_obj->load($lv);
 		echo "<br><br>";
-		echo "<Form name='editFrm' action='$PHP_SELF' method='POST'>";
+		echo "<Form name='editFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
 
 		echo "<table class='tabcontent'>";
 		echo "<tr><td width='200'><b>ECTS - Credits</b></td><td width='200'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>Bei Fehlern in den Fixfeldern bitte an die <a class='Item' href='mailto:$stg_obj1->email'>zust&auml;ndige Assistentin</a> wenden.</td></tr>";
@@ -519,62 +519,62 @@
 	   /* 28.01.2008 - Titel kommt jetzt aus tbl_lehrveranstaltung
 	   <tr class="liste1">
          <td><i>Lehrveranstaltungstitel</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="titel_de">'. (isset($titel_de)?stripslashes(str_replace("<br>","\r\n", $titel_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="titel_de">'. (isset($titel_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $titel_de)):'').'</textarea></td>
          <td><i>Course Title</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="titel_en">'. (isset($titel_en)?stripslashes(str_replace("<br>","\r\n",$titel_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="titel_en">'. (isset($titel_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$titel_en)):'').'</textarea></td>
        </tr>
        */
        echo '
        <tr class="liste0">
          <td><i>Kurzbeschreibung</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(str_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
          <td><i>Course Description</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(str_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
          <td><i>Methodik / Didaktik</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="methodik_de">'. (isset($methodik_de)?stripslashes(str_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="methodik_de">'. (isset($methodik_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
          <td><i>Teaching Methods</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(str_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste0">
          <td><i>Kompetenzerwerb</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(str_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
          <td><i>Learning outcome</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(str_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
          <td><i>Lehrinhalte</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(str_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
          <td><i>Course Contents</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(str_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
          <td><i>Vorkenntnisse</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(str_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
          <td><i>Prerequisites</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(str_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste1">
          <td><i>Literatur</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="unterlagen_de">'. (isset($unterlagen_de)?stripslashes(str_replace("<br>","\r\n",$unterlagen_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="unterlagen_de">'. (isset($unterlagen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_de)):'').'</textarea></td>
          <td><i>Recommended Reading and Material</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="unterlagen_en">'. (isset($unterlagen_en)?stripslashes(str_replace("<br>","\r\n",$unterlagen_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="unterlagen_en">'. (isset($unterlagen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
          <td><i>Leistungsbeurteilung</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_de">'. (isset($pruefungsordnung_de)?stripslashes(str_replace("<br>","\r\n",$pruefungsordnung_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_de">'. (isset($pruefungsordnung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_de)):'').'</textarea></td>
          <td><i>Assessment Methods</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_en">'. (isset($pruefungsordnung_en)?stripslashes(str_replace("<br>","\r\n",$pruefungsordnung_en)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_en">'. (isset($pruefungsordnung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
          <td><i>Anmerkungen</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(str_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
+         <td align="right"><textarea rows="5" cols="40" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
          <td><i>Comments
 
          </i></td>
          <td align="right">
-           <textarea rows="5" cols="40" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(str_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea>
+           <textarea rows="5" cols="40" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea>
          </td>
        </tr>
        <tr class="liste0">

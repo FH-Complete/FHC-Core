@@ -74,7 +74,7 @@
 				echo '<tr><td class="ContentHeader2"><p><small>'.$datum.' - '.$row->verfasser.' - </small><br><b>'.$row->betreff.'</b><br></td></tr>';
 			}
 
-			echo "<tr><td class='MarkLine'>".str_replace("../../skin","../../../skin","$row->text")."</p></td></tr>";*/
+			echo "<tr><td class='MarkLine'>".mb_ereg_replace("../../skin","../../../skin","$row->text")."</p></td></tr>";*/
 		}
 		echo "</div>";
 		if($zaehler==0)

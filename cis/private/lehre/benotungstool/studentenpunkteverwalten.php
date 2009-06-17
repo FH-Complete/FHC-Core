@@ -319,7 +319,7 @@ echo "<h3>Studentenaufgaben verwalten</h3>";
 if(isset($_POST['submit']))
 {
 	$error=false;
-	$punkte = (isset($_POST['punkte'])?str_replace(',','.',$_POST['punkte']):'');
+	$punkte = (isset($_POST['punkte'])?mb_ereg_replace(',','.',$_POST['punkte']):'');
 	if(isset($punkte) && is_numeric($punkte) && !isset($_POST['abgabe']))
 	{
 		$ueb_obj = new uebung($conn);
@@ -899,7 +899,7 @@ else
 		{
 		   $date = date('Y-m-d_H:i:s');
 			$downloadname = makeUploadName($conn, $which="zip", $lehreinheit_id, $uebung_id, $stsem, $uid=null, $date);
-			$downloadname = str_replace($uebung_id, ereg_replace(" ","_",$abgabe_obj->bezeichnung), $downloadname);
+			$downloadname = mb_ereg_replace($uebung_id, ereg_replace(" ","_",$abgabe_obj->bezeichnung), $downloadname);
 			echo "<a href='zipdownload_benotungstool.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&downloadname=$downloadname'> [Abgaben downloaden]</a>";
 		}
 		else

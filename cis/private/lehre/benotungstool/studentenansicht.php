@@ -59,7 +59,10 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
+$uid = (isset($_GET['uid'])?$_GET['uid']:''); //Uid
 
+	
+	
 if(check_lektor($user, $conn) && (isset($_GET['uid']) && $_GET["uid"] != ""))
 {
 	$rights = new benutzerberechtigung($conn);
@@ -482,10 +485,14 @@ if (!isset($_GET["notenuebersicht"]))
 	}
 	else
 	{
-		header("Location:studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user");	
+		$callURL="studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user";
+		#header("Location:$callURL");	
+	echo "<script language=\"JavaScript\">";
+	echo "window.location.href  ='$callURL'";
+	echo "</script>";
+	exit;		
 		//echo "Derzeit sind keine Kreuzerllisten oder Abgaben angelegt";	
 	}
-	
 	
 	
 	
@@ -581,7 +588,7 @@ if (!isset($_GET["notenuebersicht"]))
 	{	
 		$uebung_obj = new uebung($conn);
 		$uebung_obj->load($uebung_id);
-		$downloadname = str_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
+		$downloadname = mb_ereg_replace($uebung_id,mb_ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
 		echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
 		echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
 		if ($uebung_obj->angabedatei)

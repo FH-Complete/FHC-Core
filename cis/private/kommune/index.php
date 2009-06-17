@@ -73,8 +73,6 @@
 	// Initialisieren Anzeige-Variable
 	$showHTML='';
 		 
-		 
-		 
 // Kommunen - Wettbewerb - Datenobjekt -----------------------------------------------------------------------------------------------------------
 	// Datenobjekt - Alle Daten je Parameter werden gesammelt fuer die neachste Funktionn
 	$oWettbewerb= new stdClass;
@@ -103,6 +101,7 @@
 #	$userUID='kindlm';
 	
 	$oWettbewerb->userUID=$userUID;
+	
 	$pers=kommune_funk_benutzerperson($oWettbewerb->userUID,$oWettbewerb);
 	if (isset($pers->nachname)) $oWettbewerb->PersonenBenutzer[$oWettbewerb->userUID]=$pers;
 	
@@ -183,26 +182,19 @@
 			exit('<noInfo>Keine Daten </noInfo>');
 		exit( (isset($pers->nachname)?$pers->nachname:"$userUID falsch!"));
 	}		
-#exit($_SERVER["HTTP_REFERER"].kommune_Test($_SERVER).(isset($_SERVER["HTTP_REFERER"])? str_replace(strstr($_SERVER["HTTP_REFERER"],'?'),'?userSel='.constKommuneUserXML,$_SERVER["HTTP_REFERER"]):''));	
-	
+
+	$callURL=(isset($_SERVER["HTTP_REFERER"])?mb_eregi_replace(mb_strstr($_SERVER["HTTP_REFERER"],"?"),"",$_SERVER["HTTP_REFERER"]):"");
+#exit(kommune_Test($_SERVER));			
 // -------------------------------------------------------------------------------------------------------------------------
 // HTML Ausgabe Datenstrom Teil I Header
-
-	$cTmpCharSet=(defined('HTML_HEADER_CHARSET')?HTML_HEADER_CHARSET:'UTF-8');
-	if (stristr($oWettbewerb->clientENCODE,"UTF8"))
-		$cTmpCharSet="UTF-8";
-	elseif (stristr($oWettbewerb->clientENCODE,"UTF16"))
-		$cTmpCharSet="UTF-16";
-
-	
-	$showHTML='<?xml version="1.0" encoding="'.$cTmpCharSet.'" standalone="yes"?>
+	$showHTML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="'.(defined('HTML_HEADER_LANGUAGE_ISO')?HTML_HEADER_LANGUAGE_ISO:'DE').'" lang="'.(defined('HTML_HEADER_LANGUAGE_ISO')?HTML_HEADER_LANGUAGE_ISO:'DE').'">
+	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="DE" lang="DE">
 	<head>
 		<title>Kommune '.$oWettbewerb->workSITE.'</title>
 		<meta name="description" content="Kommune - Wettbewerbe '.$oWettbewerb->workSITE.'" />
 		<meta name="keywords" content="Kommune,Wettbewerbe,'.$oWettbewerb->workSITE.'" />
-		<meta http-equiv="Content-Type" content="text/html;charset='.$cTmpCharSet.'" />
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 		
 		<meta http-equiv="expires" content="-1" />
 		<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
@@ -385,7 +377,7 @@ function doIt(userUID,nameID)
                   
        //anfrage erstellen (GET, url ist localhost, request ist asynchron      
 
-	var callURL=\''.(isset($_SERVER["HTTP_REFERER"])?str_replace(strstr($_SERVER["HTTP_REFERER"],'?'),'',$_SERVER["HTTP_REFERER"]):'').'\';       
+	var callURL=\''.$callURL.'\';       
 	callURL=callURL+\'?userSel='.constKommuneUserXML.'&client_encode=UTF8&userUID=\'+userUID;
 	req.open("GET", callURL , true);
 
@@ -471,98 +463,5 @@ if (!window.Weite && document.body && document.body.offsetWidth)
 	$showHTML.='</div>';
 
 	$showHTML.='</body></html>';
-	
-	$iTmpCompress=0;
-	echo $encode = getenv("HTTP_ACCEPT_ENCODING");
-	if(ereg("gzip",$encode) || ereg("x-gzip",$encode)) { 
-			//zlib.output_compression = 1 , zlib.output_compression_level = 9
-			if (@ini_get( 'zlib.output_compression' )) 
-			{
-				@ini_set('zlib.output_compression_level',5);
-				@ob_end_clean();
-				@ob_start();
-				@ob_implicit_flush(0);
-				$iTmpCompress=3;	
-			}
-			//   ob_gzhandler() requires the zlib extension,output_handler =	,output_buffering=On		
-		 	If (empty($iTmpCompress) && extension_loaded("zlib") && @ini_get('output_buffering')) 
-			{
-				@ob_end_clean();
-				If (@ob_start('ob_gzhandler')) 
-				{
-					$iTmpCompress=2;
-				}
-			} 
-		} // Ende If HTTP_ACCEPT_ENCODING"
-	// output_buffering=On	and not  zlib extension
-	if (empty($iTmpCompress) && @ob_start()) 
-	{
-		@ob_end_clean();
-		$iTmpCompress=1;
-	}		
-	
-	if ($iTmpCompress==1) 
-	{
- 		@ob_end_flush();
-	}	
-	elseif ($iTmpCompress==2) 
-	{
-		@ob_end_clean();
-		header("Content-Encoding: gzip");
-		$str = ob_gzhandler ( $showHTML, 5 );
-		if($str===false)
-		    exit('ob_gzhandler() returns false.');
-		else
-		    exit("$str");
-	}
-	else if ($iTmpCompress==4) 
-	{
-		print_r($showHTML);
-		$gzip_size= @ob_get_length(); 
-   		$gzip_contents = @ob_get_clean(); // PHP < 4.3 use ob_get_contents() + ob_end_clean() 
-		@ob_end_clean();
-		@header('Content-length: '.$gzip_size);
-		if(strpos(' '.$_SERVER['HTTP_ACCEPT_ENCODING'], 'x-gzip') !== false) {
-			@header('Content-Encoding: x-gzip');
-		} else if(strpos(' '.$_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) {
-			@header('Content-Encoding: gzip');
-			}	
-		echo "\x1f\x8b\x08\x00\x00\x00\x00\x00", 
-   		substr(gzcompress($gzip_contents, $iTmpCompressLevel), 0, - 4), // substr -4 isn't needed 
-		pack('V', crc32($gzip_contents)),    // crc32 and 
-   		pack('V', $gzip_size);              // size are ignored by all the browsers i have tested 
-		@flush();
-	}
-	else if ($iTmpCompress==3) 
-	{
-		print_r($showHTML);
-		$gzip_size= @ob_get_length(); 
-   		$gzip_contents = @ob_get_clean(); // PHP < 4.3 use ob_get_contents() + ob_end_clean() 
-		@ob_end_clean();
-		@header('Content-length: '.$gzip_size);
-		if(strpos(' '.$_SERVER['HTTP_ACCEPT_ENCODING'], 'x-gzip') !== false) {
-			@header('Content-Encoding: x-gzip');
-		} else if(strpos(' '.$_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) {
-			@header('Content-Encoding: gzip');
-			}	
-		// open file for writing with maximum compression
-		$filename="erp_". time().".gz" ;
-		$zp = gzopen($filename, "w9");
-		// write string to file
-		gzwrite($zp, $gzip_contents);
-		// close file
-		gzclose($zp);
-		// open file for reading
-		$zp = gzopen($filename, "r");
-		// read 3 char
-		echo gzread($zp, $gzip_size);
-		// output until end of the file and close it.
-		gzpassthru($zp);
-		gzclose($zp);
-		echo "\n";
-		unlink($filename);
-		@flush();
-	} 
-	else
-		exit($showHTML);
+	exit($showHTML);
 ?>

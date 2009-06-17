@@ -308,8 +308,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								$to.=',';
 							$to.=trim($vg.'@'.DOMAIN);
 						}
-						$to_len=mb_strlen($to,'UTF-8')-1;
-						$to = mb_substr($to, 0,$to_len,'UTF-8');
+						$to_len=mb_strlen($to)-1;
+						$to = mb_substr($to, 0,$to_len);
 
 						//$to = 'oesi@technikum-wien.at';
 						$benutzer = new benutzer($conn);
@@ -538,7 +538,7 @@ $anspruch = '25';
 /*
 if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
 {
-	$_POST['mehrarbeitsstunden'] = str_replace(',','.',$_POST['mehrarbeitsstunden']);
+	$_POST['mehrarbeitsstunden'] = mb_eregi_replace(',','.',$_POST['mehrarbeitsstunden']);
 
 	$resturlaub = new resturlaub($conn);
 	if($resturlaub->load($uid))
