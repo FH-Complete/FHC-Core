@@ -48,14 +48,14 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 
 	$ausgabe = "<H2>Master-Studiengänge: ($studiensemester_kurzbz)</H2>";
 
-	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='m' ORDER by studiengang_kz";
+	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='m' ORDER by bezeichnung, studiengang_kz";
 	$result_stg=pg_query($conn, $qry_stg);
 	while ($row_stg=pg_fetch_object($result_stg))
 	{
 		$summe=0;
 		$rest=0; 
 		
-		//StudiengÃ¤nge, die zuvor abgeschlossen wurden
+		//StudiengÃƒÂ¤nge, die zuvor abgeschlossen wurden
 		$qry_master="SELECT DISTINCT count(*)as count ,studiengang_kz, typ, tbl_studiengang.bezeichnung as bez 
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
@@ -70,7 +70,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 			AND ausbildungssemester='1') 
 		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung ORDER BY tbl_studiengang.bezeichnung, studiengang_kz"; 
 		
-		//Anzahl der Studenten ohne AbschluÃŸ auf der FHTW
+		//Anzahl der Studenten ohne AbschluÃƒÅ¸ auf der FHTW
 		/*$qry_rest="SELECT count(*) as rest FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=tbl_prestudent.person_id) 
 			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
@@ -145,14 +145,14 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 	}
 	
 	$ausgabe .= "<H2>Bachelor-Studiengänge: (SS".substr($studiensemester_kurzbz,-4)."/$studiensemester_kurzbz)</H2>";
-	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='b' ORDER by studiengang_kz";
+	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='b' ORDER by bezeichnung,studiengang_kz";
 	$result_stg=pg_query($conn, $qry_stg);
 	while ($row_stg=pg_fetch_object($result_stg))
 	{
 		$summe=0;
 		$rest=0; 
 		
-		//Master-StudiengÃ¤nge, die noch besucht wurden
+		//Master-StudiengÃƒÂ¤nge, die noch besucht wurden
 		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, bezeichnung as bez FROM 
 		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ, tbl_studiengang.bezeichnung  
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
@@ -251,7 +251,7 @@ echo '
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
 <h2>Studentenströme</h2>
-Wählen Sie bitte nachfolgend ein Wintersemester aus.';
+WÃ¤hlen Sie bitte nachfolgend ein Wintersemester aus.';
 
 $htmlstr .= "<form action='$PHP_SELF' method='POST' name='strom'>\n";
 $htmlstr .= "<select name='studiensemester_kurzbz'>\n";
@@ -276,5 +276,5 @@ $htmlstr .= "</form>\n";
 	echo $htmlstr;
 	echo $ausgabe;
 	
-echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden führt zu Verfaelschungen bei der Anzahl der 'Externen':<br>- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
+echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden fÃ¼hrt zu Verfaelschungen bei der Anzahl der 'Externen':<br>- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
 ?>
