@@ -125,7 +125,7 @@ if(isset($_POST['submitbild']))
 	{
 		//Extension herausfiltern
     	$ext = explode('.',$_FILES['bild']['name']);
-        $ext = mb_strtolower($ext[count($ext)-1],'UTF-8');
+        $ext = mb_strtolower($ext[count($ext)-1]);
 
         //--check that it's a jpeg or gif or png
         if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg')
@@ -164,7 +164,7 @@ if(isset($_POST['submitaudio']))
 	{
 		//Extension herausfiltern
     	$ext = explode('.',$_FILES['audio']['name']);
-        $ext = mb_strtolower($ext[count($ext)-1],'UTF-8');
+        $ext = mb_strtolower($ext[count($ext)-1]);
 
         //--check that it's a mp3
         if ($ext=='mp3' || $ext=='ogg')
@@ -241,7 +241,7 @@ if(isset($_POST['submitvorschlag']))
 	{
 		//Extension herausfiltern
     	$ext = explode('.',$_FILES['bild']['name']);
-        $ext = mb_strtolower($ext[count($ext)-1],'UTF-8');
+        $ext = mb_strtolower($ext[count($ext)-1]);
 
         //--check that it's a jpeg or gif or png
         if ($ext=='gif' || $ext=='png' || $ext=='jpg' || $ext=='jpeg')
@@ -264,7 +264,7 @@ if(isset($_POST['submitvorschlag']))
 	{
 		//Extension herausfiltern
     	$ext = explode('.',$_FILES['audio']['name']);
-        $ext = mb_strtolower($ext[count($ext)-1],'UTF-8');
+        $ext = mb_strtolower($ext[count($ext)-1]);
 
         //--check that it's a jpeg or gif or png
         if ($ext=='mp3')
