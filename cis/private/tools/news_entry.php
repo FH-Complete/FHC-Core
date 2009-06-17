@@ -31,7 +31,7 @@
 	$user = get_uid();
 
 	$rechte = new benutzerberechtigung($sql_conn);
-    $rechte->getBerechtigungen($user);
+  $rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
@@ -45,6 +45,9 @@
 		$news_id=$_GET['news_id'];
 	if(isset($_GET['message_sent']))
 		$message_sent=$_GET['message_sent'];
+	if(isset($_POST['message_sent']))
+		$message_sent=$_POST['message_sent'];
+
 	if(isset($_GET['changed']))
 		$changed=$_GET['changed'];
 	if(isset($_POST['news_id']))
@@ -63,6 +66,8 @@
 		$txtTitle=$_POST['txtTitle'];
 	if(isset($_POST['btnSend']))
 		$btnSend=$_POST['btnSend'];
+	if(isset($_POST['news_submit']))
+		$news_submit=$_POST['news_submit'];
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -71,17 +76,18 @@
 	//var_dump($_POST);
 	//echo '<BR>';
 	//var_dump($_GET);
-	if($berechtigt && isset($news_submit) && (!isset($message_sent) || $message_sent == "no"))
+	if($berechtigt && isset($btnSend) && (!isset($message_sent) || $message_sent == "no"))
 	{
 		$author = chop($txtAuthor);
 		$title = chop($txtTitle);
-		$news_message = chop(str_replace("\r\n", "<br>", $txtNewsMessage));
-
+		$news_message = chop($txtNewsMessage);
 		if($author != "" && $title != "" && $news_message != "")
 		{
+			$news_message = mb_eregi_replace("\r\n", "<br>", $news_message);
+
 			if(isset($news_id) && $news_id != "")
 			{
-				$news = new news($sql_conn);
+				$news = new news();
 
 				$news->news_id = $news_id;
 				$news->betreff = $title;
@@ -116,7 +122,7 @@
 			}
 			else
 			{
-				$news = new news($sql_conn);
+				$news = new news();
 
 				$news->betreff = $title;
 				$news->verfasser = $author;
@@ -137,7 +143,7 @@
 				if($news->save())
 				{
 					echo "<script language=\"JavaScript\">";
-					echo "	document.location.href = 'news_entry.php' + \"?message_sent=yes&changed=yes\";";
+					echo "	document.location.href = 'news_entry.php' + \"?message_sent=yes&changed=no\";";
 					echo "</script>";
 				}
 				else
@@ -226,8 +232,7 @@
 					echo "  <td><h3>Die Neuigkeit wurde erfolgreich eingetragen!</h3></td>";
 					echo "</tr>";
 				}
-
-				exit;
+				#exit;
 			}
 			else if(isset($message_sent) && $message_sent == "no")
 			{
@@ -244,7 +249,7 @@
 
 			if(isset($news_id) && $news_id != "")
 			{
-				$news = new news($sql_conn, $news_id);
+				$news = new news($news_id);
 				echo 'Eintrag &auml;ndern';
 			}
 			else
@@ -294,16 +299,17 @@
 	  </tr>-->
 	  <tr>
 	  	<td><!--Bitte geben Sie hier Ihre Nachricht ein:<br>-->
-			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $news->text); ?></textarea></td>
+			<textarea class="TextBox" style="width: 99%; heigth: 166px" name="txtNewsMessage" rows="10" cols="70" maxlength="2000"><?php if(isset($news_id) && $news_id != "") echo mb_eregi_replace("<br>", "\r\n", $news->text); ?></textarea></td>
 	  </tr>
 	  <tr>
 	  	<td nowrap>
-		  <input type="hidden" name="news_submit" value="true">
+				<input type="hidden" name="message_sent" value="no">
+		 		 <input type="hidden" name="news_submit" value="true">
 	      <input type="submit" name="btnSend" value="Abschicken">&nbsp;
 		  <?php
 		  if(isset($news_id) && $news_id != "")
 		  {
-		  	echo "<input type='hidden' name='news_id' value='$news_id'>
+		  		echo "<input type='hidden' name='news_id' value='$news_id'>
 		  		<input type=\"reset\" name=\"btnCancel\" value=\"Abbrechen\" onClick=\"document.location.href='news_entry.php';\"></td>";
 		  }
 		  else

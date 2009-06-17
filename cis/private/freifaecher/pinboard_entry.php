@@ -70,7 +70,7 @@
 		{
 					$news_message = mb_ereg_replace("\r\n", "<br>", $news_message);
 
-					$news_obj = new news($sql_conn);
+					$news_obj = new news();
 		
 					$news_obj->verfasser = $author;
 					$news_obj->uid = $user;
@@ -153,7 +153,7 @@
 			echo '<td class="ContentHeader2">&nbsp;';
 			if(isset($news_id) && $news_id != "")
 			{
-				$news_obj = new news($sql_conn, $news_id);
+				$news_obj = new news($news_id);
 				$verfasser = $news_obj->verfasser;
 				$betreff = $news_obj->betreff;
 				$text = $news_obj->text;

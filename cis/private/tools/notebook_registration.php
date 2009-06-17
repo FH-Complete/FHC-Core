@@ -117,7 +117,7 @@
 				else
 					die('Fehler beim ermitteln der UID');
 
-			$mac = str_replace(":", "", str_replace("-", "", mb_strtoupper($txtMAC,'UTF-8')));
+			$mac = mb_eregi_replace(":", "", mb_eregi_replace("-", "", mb_strtoupper($txtMAC)));
 
 			$filename_dat = '../../../../system/dhcp.dat';
 			$filename_ip  = '../../../../system/dhcp.ip';
@@ -158,7 +158,7 @@
 
 				$mfiles->setSearchFunction('preg');
 
-				if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && mb_strlen($mac,'UTF-8') == 12)
+				if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && mb_strlen($mac) == 12)
 				{
 					$mfiles->doSearch();
 

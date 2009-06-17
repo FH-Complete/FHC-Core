@@ -46,7 +46,7 @@
    		die('Fehler bei der Parameteruebergabe');
    }
    		
-   if(!isset($_GET['short']) || mb_strstr("..",$_GET['short'],false,'UTF-8'))
+   if(!isset($_GET['short']) || mb_strstr("..",$_GET['short'],false))
    {
    		die("Fehler bei der Parameteruebergabe");
    }
@@ -59,7 +59,7 @@
    $stg_obj = new studiengang($conn);
    $stg_obj->load($stg);
 
-   $kurzbz = mb_strtolower($stg_obj->kuerzel,'UTF-8');
+   $kurzbz = mb_strtolower($stg_obj->kuerzel);
 
    //Pfade bauen
    $pfad = '../../../documents/'.$kurzbz.'/'.$sem.'/'.$short.'/download/';

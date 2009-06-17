@@ -986,10 +986,9 @@ function jahresplan_date_to_timestamp($string="")
 {
 
 	$cTmpWert=$string;
-
 	if (!empty($cTmpWert) && !is_numeric($cTmpWert)) // Start wurde als Datum Zeit uebergeben
 	{	
-			$cTmpWert=str_replace('.','-',$cTmpWert);
+			$cTmpWert=mb_ereg_replace('.','-',$cTmpWert);
 			$dateparam=explode(' ',$cTmpWert);
 			$date=explode('-',$dateparam[0]);
 			if (!isset($dateparam[1])) $dateparam[1]='00:01:00';

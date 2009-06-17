@@ -56,7 +56,7 @@
 	
 	if(isset($remove_id) && $remove_id != "")
 	{
-			$news_obj = new news($sql_conn);
+			$news_obj = new news();
 			if($news_obj->delete($remove_id))
 			{
 				writeCISlog('DELETE PINBOARD','');

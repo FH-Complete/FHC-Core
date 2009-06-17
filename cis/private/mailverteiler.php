@@ -239,7 +239,7 @@
 				if(!$row1->aktiv && MAILVERTEILER_SPERRE)
 				{
 					//Studentenvertreter duerfen den Verteiler fuer alle Studenten oeffnen
-					if($is_lector || ($is_stdv && mb_strtolower($row1->gruppe_kurzbz,'UTF-8')=='tw_std'))
+					if($is_lector || ($is_stdv && mb_strtolower($row1->gruppe_kurzbz)=='tw_std'))
 					{
 						/* open a popup containing the final dispatcher address */
 						if(MAILVERTEILER_SPERRE)
@@ -352,7 +352,7 @@
 									}
 								
 				  					$param = "kz=".$row->studiengang_kz."&amp;sem=".$row1->semester;
-				  					$strhelp = mb_strtolower($row->kuerzel.trim($row1->semester,'UTF-8').trim($row1->verband).trim($row1->gruppe));
+				  					$strhelp = mb_strtolower($row->kuerzel.trim($row1->semester).trim($row1->verband).trim($row1->gruppe));
 						  			echo "<tr ".$class.">\n";
 						  			echo "  <td width=\"420\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
 						  			if(trim($row1->verband)!='')

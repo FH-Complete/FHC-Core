@@ -337,7 +337,8 @@
 		$Jahresplan->setFreigabe(false);
 	$Jahresplan->setVeranstaltungskategorie_kurzbz($veranstaltungskategorie_kurzbz);
 	$Jahresplan->setVeranstaltung_id($veranstaltung_id);
-	$Jahresplan->setSuchtext(str_replace('*','%',$Suchtext));
+	$Suchtext_korr=(!empty($Suchtext)?mb_ereg_replace("*","%",$Suchtext):'');
+	$Jahresplan->setSuchtext($Suchtext_korr);
 
 	//  Datum setzen ausser wenn eine eindeutige ID selektiert wurde. Diese soll in allen Perioden gesucht werden
 	if (empty($veranstaltung_id)) 

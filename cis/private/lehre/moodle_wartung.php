@@ -129,7 +129,7 @@ if(isset($_POST['neu']))
 		$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
 		foreach ($_POST as $key=>$value)
 		{
-			if(strstr($key, 'lehreinheit_'))
+			if(mb_strstr($key, 'lehreinheit_'))
 			{
 				$shortname.='/'.$value;
 			}
@@ -170,7 +170,7 @@ if(isset($_POST['neu']))
 			
 			foreach ($_POST as $key=>$value)
 			{
-				if(strstr($key, 'lehreinheit_'))
+				if(mb_strstr($key, 'lehreinheit_'))
 				{
 					$lehreinheiten[]=$value;
 				}

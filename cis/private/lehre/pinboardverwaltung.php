@@ -26,13 +26,17 @@
     if(!$sql_conn = pg_pconnect(CONN_STRING))
        die('Fehler beim oeffnen der Datenbankverbindung');
 
+	// Init Variable
 	$user = get_uid();
+	$course_id=(isset($_GET['course_id'])?$_GET['course_id']:(isset($_POST['course_id'])?$_POST['course_id']:0));
+	$term_id=(isset($_GET['term_id'])?$_GET['term_id']:(isset($_POST['term_id'])?$_POST['term_id']:0));
+	$news_id=(isset($_GET['news_id'])?$_GET['news_id']:(isset($_POST['news_id'])?$_POST['news_id']:0));
 
+	
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;
 
 	$sql_query = "SELECT DISTINCT kurzbzlang FROM public.tbl_studiengang WHERE studiengang_kz='$course_id'";
-
 	$result = pg_query($sql_conn, $sql_query);
 	$row_stg_short = pg_fetch_object($result, 0);
 ?>
@@ -42,7 +46,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
-
 <frameset rows="375,*" cols="*" framespacing="0"" frameborder="NO" border="0">
   <frame src="pinboard_entry.php?course_id=<?php echo $course_id; ?>&term_id=<?php echo $term_id; ?>" name="news_entry">
   <frame src="pinboard_show.php" name="news_window">

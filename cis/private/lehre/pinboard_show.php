@@ -28,17 +28,34 @@
        die('Fehler beim oeffnen der Datenbankverbindung');
 
 	$user = get_uid();
+	
+	if (isset($_GET))
+	{
+		while (list ($tmp_key, $tmp_val) = each ($_GET)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+			
+	}
+	if (isset($_POST))
+	{
+		while (list ($tmp_key, $tmp_val) = each ($_POST)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}
 
+	
 	if(check_lektor($user,$conn))
 		$is_lector=true;
-    else
-    	$is_lector=false;
+  else
+   	$is_lector=false;
 
 	if($is_lector)
 	{
 		if(isset($remove_id) && $remove_id != "")
 		{
-			$news_obj = new news($conn);
+			$news_obj = new news();
 			if($news_obj->delete($remove_id))
 			{
 				writeCISlog('DELETE PINBOARD','');
@@ -84,13 +101,13 @@
         <tr>
 	  	  <?php
 		  	if(!$is_lector || !isset($course_id) || !isset($term_id))
-				exit;
+						exit;
 		  ?>
           <td>
 		  	<table class="tabcontent">
 			<?php
 
-			$news_obj = new news($conn);
+			$news_obj = new news();
 			$news_obj->getnews(MAXNEWSALTER,$course_id, $term_id, true, null, MAXNEWS);
 
 			$i=0;

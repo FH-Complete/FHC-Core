@@ -203,7 +203,7 @@ function RefreshImage()
       		<td align="right">';
         //Foto anzeigen oder Upload Button
         if($foto!='')
-        	echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$person_id.'" height="100px">';
+        	echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$person_id.'" alt="'.$person_id.'" height="100px">';
         else
         {
         	if(!$ansicht)
@@ -237,7 +237,7 @@ function RefreshImage()
   			{
   				if($row->kompetenzen!='')
   				{
-  					echo "<b>Kompetenzen</b><br>".str_replace(';','<br>', $row->kompetenzen);
+  					echo "<b>Kompetenzen</b><br>".mb_eregi_replace(';','<br>', $row->kompetenzen);
   				}
   			}
   		}

@@ -110,7 +110,7 @@ $error_freigabevon='';
 $thema = (isset($_POST['thema'])?$_POST['thema']:'');
 $anzahlderbeispiele = (isset($_POST['anzahlderbeispiele'])?$_POST['anzahlderbeispiele']:'');
 $punkteprobeispiel = (isset($_POST['punkteprobeispiel'])?$_POST['punkteprobeispiel']:'');
-$punkteprobeispiel = str_replace(',','.',$punkteprobeispiel);
+$punkteprobeispiel = mb_ereg_replace(',','.',$punkteprobeispiel);
 $freigabebis = (isset($_POST['freigabebis'])?$_POST['freigabebis']:'');
 $freigabevon = (isset($_POST['freigabevon'])?$_POST['freigabevon']:'');
 
@@ -472,7 +472,7 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 		if(isset($uebung_id) && $uebung_id!='' && is_numeric($uebung_id))
 		{
 			$punkte = (isset($_POST['punkte'])?$_POST['punkte']:'');
-			$punkte = str_replace(',','.',$punkte);
+			$punkte = mb_ereg_replace(',','.',$punkte);
 			if(is_numeric($punkte) && $punkte!='')
 			{
 				if($bezeichnung!='')
