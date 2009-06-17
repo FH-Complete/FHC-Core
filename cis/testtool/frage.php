@@ -83,7 +83,7 @@ else
 		if(zeit<=0)
 		{
 			document.location.href='gebietfertig.php';
-			//alert('finish');
+			parent.menu.location.reload();
 		}
 		else
 		{
@@ -387,11 +387,11 @@ if($frage->frage_id!='')
 	echo '<br/><br/><center>';
 	//Bild und Text der Frage anzeigen
 	if($frage->bild!='')
-		echo "<img class='testtoolfrage' src='bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=".$sprache."' /><br/><br/>\n";
+		echo "<img class='testtoolfrage' src='bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=".$_SESSION['sprache']."' /><br/><br/>\n";
 		
 	//Sound einbinden
 	if($frage->audio!='')
-		echo '<embed autostart="false" src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'" height="20" width="250"/><br />';
+		echo '<embed autostart="false" src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="250"/><br />';
 	echo "$frage->text<br/><br/>\n";
 
 	//Vorschlaege laden
@@ -452,7 +452,7 @@ if($frage->frage_id!='')
 	if(!$gebiet->multipleresponse && !$levelgebiet && count($vs->result)>0)
 	{
 		echo "<td align='center' valign='top'>";
-		echo '<input type="radio" name="vorschlag_id[]" value="" /><br />keine Antwort</td>';
+		echo '<input type="radio" name="vorschlag_id[]" value="" /><br /><font color="gray">keine Antwort</font></td>';
 	}
 	echo '</tr></table>';
 	
@@ -492,8 +492,25 @@ if($frage->frage_id!='')
 		}
 		else
 		{
-			//Wenns der letzte Eintrag ist, wieder zum ersten springen
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+			if($demo)
+			{
+				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
+						WHERE tbl_frage.gebiet_id='".addslashes($gebiet_id)."' 
+						AND demo ";
+				if($row = pg_fetch_object(pg_query($conn, $qry)))
+				{
+					if($row->anzahl>1)
+					{
+						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
+						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+					}
+				}
+			}
+			else
+			{
+				//Wenns der letzte Eintrag ist, wieder zum ersten springen
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+			}
 		}
 	}
 
