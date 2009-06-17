@@ -19,29 +19,28 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class news
+class news extends basis_db 
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 			// @var string
-	var $result = array(); 	// @var news Objekt 
+	public $new;     			// boolean
+	public $result = array(); 	// news Objekt 
 	
 	//Tabellenspalten
-	var $news_id;			// @var serial
-	var $betreff;			// @var varchar(128)
-	var $text;				// @var string
-	var $semester;			// @var smallint
-	var $fachbereich_kurzbz;// @var varchar(16)
-	var $uid;				// @var varchar(16)
-	var $studiengang_kz;	// @var integer
-	var $verfasser;			// @var varchar(64)
-	var $datum;				// @date
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
-	var $datum_bis;			// @date
+	public $news_id;			// serial
+	public $betreff;			// varchar(128)
+	public $text;				// string
+	public $semester;			// smallint
+	public $fachbereich_kurzbz;// varchar(16)
+	public $uid;				// varchar(16)
+	public $studiengang_kz;	// integer
+	public $verfasser;			// varchar(64)
+	public $datum;				// @date
+	public $updateamum;		// timestamp
+	public $updatevon=0;		// string
+	public $insertamum;		// timestamp
+	public $insertvon=0;		// string
+	public $datum_bis;			// @date
 	
 	
 	/**
@@ -49,30 +48,32 @@ class news
 	 * @param $conn Connection zur DB
 	 *        $news_id ID der zu ladenden Funktion
 	 */
-	function news($conn, $news_id=null)
+	public function __construct($news_id=null)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		
 		if($news_id != null)
 			$this->load($news_id);
 	}
 	
 	/**
-	 * Laedt alle verfuegbaren Benutzerfunktionen
+	 * Laedt alle verfuegbaren News
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
-		$qry = 'SELECT * FROM campus.tbl_news order by news_id;';
+		$qry = 'SELECT * FROM campus.tbl_news ORDER BY news_id;';
 		
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 		
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$news_obj = new news($this->conn);
+			$news_obj = new news();
+			
 			$news_obj->news_id = $row->news_id;
 			$news_obj->betreff = $row->betreff;
 			$news_obj->text = $row->text;
@@ -93,18 +94,13 @@ class news
 		return true;
 	}
 	
-	// **********************************
-	// * Laedt alle News die nicht aelter
-	// * als $maxalter Tage sind
-	// * @param $maxalter
-	// **********************************
-	function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null, $maxnews)
+	/**
+	 * Laedt alle News die nicht aelter
+	 * als $maxalter Tage sind
+	 * @param $maxalter
+	 */
+	public function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null, $maxnews)
 	{
-		//if(!is_numeric($maxalter) || !is_numeric($studiengang_kz) || ($semester!='' && !is_numeric($semester)))
-		//{
-		//	$this->errormsg = 'Maxalter, Studiengang und Semester muessen gueltige Zahlen sein';
-		//	return false;
-		//}
 		$qry = "SELECT * FROM campus.tbl_news WHERE true";
 		
 		if($maxalter!=0)
@@ -117,7 +113,7 @@ class news
 			
 		if($fachbereich_kurzbz!='*')
 		{
-			if(is_null($fachbereich_kurzbz) OR $fachbereich_kurzbz=='')
+			if(is_null($fachbereich_kurzbz) || $fachbereich_kurzbz=='')
 				$qry.=' AND fachbereich_kurzbz is null';	
 			else 
 				$qry.=" AND fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
@@ -125,7 +121,7 @@ class news
 				
 		if($studiengang_kz=='0')
 			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".($semester!=''?($semester=='0'?' AND semester=0':''):'AND semester is null');
-		else if($studiengang_kz=='')
+		elseif($studiengang_kz=='')
 			$qry.='';
 		else
 			$qry.=" AND ((studiengang_kz='$studiengang_kz' AND semester='$semester') OR (studiengang_kz='$studiengang_kz' AND semester=0) OR (studiengang_kz=0 AND semester='$semester') OR (studiengang_kz=0 and semester is null))";
@@ -135,11 +131,12 @@ class news
 			$qry.= " LIMIT $maxnews";
 		
 		//echo $qry;
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$newsobj = new news($this->conn);
+				$newsobj = new news();
+				
 				$newsobj->news_id = $row->news_id;
 				$newsobj->uid = $row->uid;
 				$newsobj->studiengang_kz = $row->studiengang_kz;
@@ -166,18 +163,26 @@ class news
 		}
 	}
 	
-	function getFBNews($fachbereich_kurzbz, $datum)
+	/**
+	 * Liefert die News fuer einen Fachbereich
+	 *
+	 * @param $fachbereich_kurzbz
+	 * @param $datum
+	 * @return boolean
+	 */
+	public function getFBNews($fachbereich_kurzbz, $datum)
 	{
 		$qry = "SELECT * FROM campus.tbl_news WHERE fachbereich_kurzbz='$fachbereich_kurzbz'";
 		if($datum!='')
 			$qry.=" AND datum='$datum'";
 		$qry.=" ORDER BY datum";
-		//echo $qry;
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$newsobj = new news($this->conn);
+				$newsobj = new news();
+				
 				$newsobj->news_id = $row->news_id;
 				$newsobj->uid = $row->uid;
 				$newsobj->studiengang_kz = $row->studiengang_kz;
@@ -209,9 +214,8 @@ class news
 	 * @param $news_id ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($news_id)
-	{
-		
+	public function load($news_id)
+	{		
 		if(!is_numeric($news_id))
 		{
 			$this->errormsg = 'news_id muß eine gültige Zahl sein';
@@ -220,13 +224,13 @@ class news
 		
 		$qry = "SELECT * FROM campus.tbl_news WHERE news_id = '$news_id';";
 		
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 		
-		if($row=pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->news_id		= $row->news_id;
 			$this->betreff			= $row->betreff;
@@ -257,7 +261,7 @@ class news
 	 * @param $news_id id des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($news_id)
+	public function delete($news_id)
 	{
 		if(!is_numeric($news_id))
 		{
@@ -267,40 +271,30 @@ class news
 		
 		$qry = "DELETE FROM campus.tbl_news WHERE news_id='$news_id'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim L&ouml;schen';
+			$this->errormsg = 'Fehler beim Löschen';
 			return false;
 		}		
-	}
-	
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	public function validate()
 	{	
-		$this->betreff 	= str_replace("'",'´',$this->betreff);
-		$this->text 		= str_replace("'",'´',$this->text);
-		$this->verfasser 	= str_replace("'",'´',$this->verfasser);
-
-		
 		//Laenge Pruefen
 		if(strlen($this->betreff)>128)           
 		{
-			$this->errormsg = "Betreff darf nicht laenger als 128 Zeichen sein bei <b>$this->news_id</b> - $this->betreff";
+			$this->errormsg = 'Betreff darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}		
 		if(strlen($this->verfasser)>64)
 		{
-			$this->errormsg = "Verfasser darf nicht laenger als 64 Zeichen sein bei <b>$this->news_id</b> - $this->verfasser";
+			$this->errormsg = 'Verfasser darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}	
 		$this->errormsg = '';
@@ -311,10 +305,10 @@ class news
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */	
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 			
 		if($this->new)
@@ -366,30 +360,13 @@ class news
 				'WHERE news_id = '.$this->addslashes($this->news_id).';';
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.$this->uid;
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}		
 	}
