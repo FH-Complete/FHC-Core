@@ -91,7 +91,7 @@ if($result = pg_query($conn, $qry))
 		{
 			//Mitarbeiter
 			$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an die Mitarbeiter unserer Personalabteillung.\n";
-			$message .= "Adelheit Schaaf  - schaaf@technikum-wien.at\n";
+			$message .= "Nicole Sagmeister  - sagmeister@technikum-wien.at\n";
 			$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
 		}
 		else
