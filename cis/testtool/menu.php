@@ -60,10 +60,49 @@ if (isset($_SESSION['pruefling_id']))
 			$gebiet = new gebiet($db_conn);
 			if($gebiet->check_gebiet($row->gebiet_id))
 			{
+				//Status der Gebiete Pruefen
+				$gebiet->load($row->gebiet_id);
+				
+				$qry = "SELECT extract('epoch' from '$gebiet->zeit'-(now()-min(begintime))) as time
+						FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
+						WHERE gebiet_id='".addslashes($row->gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
+				if($result_time = pg_query($db_conn, $qry))
+				{
+					if($row_time = pg_fetch_object($result_time))
+					{
+						if($row_time->time>0)
+						{
+							//Gebiet gestartet aber noch nicht zu ende
+							$style='text-decoration: underline;';
+						}
+						else
+						{
+							if($row_time->time=='')
+							{
+								//Gebiet noch nicht gestartet
+								$style='';
+							}
+							else
+							{
+								//Gebiet ist zu Ende
+								$style='text-decoration:line-through;';
+							}
+						}
+					}
+					else
+					{
+						$style='';
+					}
+				}
+				else
+				{
+					$style='';
+				}
+				
 				echo '<tr>
 							<td width="10" nowrap>&nbsp;</td>
 					   		<td nowrap>
-					   			<a class="Item" href="frage.php?gebiet_id='.$row->gebiet_id.'" target="content"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
+					   			<a class="Item" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
 					   		</td>
 					   	</tr>';
 			}
