@@ -36,9 +36,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         >
 <vbox>
-	<hbox>
+	<hbox style="margin-top: 20px">
 		<spacer flex="1"/>
-		<image src='<?php echo APP_ROOT; ?>skin/images/fhcomplete.png' width="290" height="160"/>
+		<image src='<?php echo APP_ROOT; ?>skin/images/fh_complete_logo.png' width="392" height="60"/>
 		<spacer flex="1"/>
 	</hbox>
 	<hbox>
@@ -67,8 +67,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 			 
 	Authors: Christian Paminger &lt;christian.paminger@technikum-wien.at&gt;,
 			 Andreas Oesterreicher &lt;andreas.oesterreicher@technikum-wien.at&gt;,
-			 Rudolf Hangl &lt;rudolf.hangl@technikum-wien.at&gt; and
-			 Gerald Raab &lt;gerald.raab@technikum-wien.at&gt;.
+			 Rudolf Hangl &lt;rudolf.hangl@technikum-wien.at&gt;,
+			 Gerald Raab &lt;gerald.raab@technikum-wien.at&gt; and
+			 Gerald Simane-Sequens &lt;gerald.simane-sequence@technikum-wien.at&gt;
 		   	</description>
 		</groupbox>
 		<spacer flex="1"/>

@@ -1007,6 +1007,19 @@ function StatistikPrintMitarbeiterstatistik()
 	window.open('<?php echo APP_ROOT ?>content/statistik/mitarbeiterstatistik.php?stsem='+stsem,'Mitarbeiterstatistik');
 }
 
+// ****
+// * Liefert eine Stromanalyse der Studenten
+// ****
+function StatistikPrintStromanalyse()
+{
+	var stsem = getStudiensemester();
+	if(stsem.startsWith('WS'))
+		param = "?studiensemester_kurzbz="+stsem;
+	else
+		param ='';
+	window.open('<?php echo APP_ROOT ?>content/statistik/stromanalyse.php'+param,'Stromanalyse');
+}
+
 function StatistikPrintStudentExportExtended()
 {
 	var tree = document.getElementById('student-tree');

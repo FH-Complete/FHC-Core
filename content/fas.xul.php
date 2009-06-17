@@ -97,6 +97,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-statistic-mitarbeiterstatistik:command" oncommand="StatistikPrintMitarbeiterstatistik();"/>
   <command id="menu-statistic-studentendetails:command" oncommand="StatistikPrintStudentExportExtended();"/>
   <command id="menu-statistic-lektorenstatistik:command" oncommand="StatistikPrintLektorenstatistik();"/>
+  <command id="menu-statistic-stromanalyse:command" oncommand="StatistikPrintStromanalyse();"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis');"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng');"/>
@@ -404,6 +405,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 		               label     = "&menu-statistic-mitarbeiterstatistik.label;"
 		               command   =  "menu-statistic-mitarbeiterstatistik:command"
 		               accesskey = "&menu-statistic-mitarbeiterstatistik.accesskey;"/>
+		               <menuitem
+		               id        =  "menu-statistic-stromanalyse"
+		               key       =  "menu-statistic-stromanalyse:key"
+		               label     = "&menu-statistic-stromanalyse.label;"
+		               command   =  "menu-statistic-stromanalyse:command"
+		               accesskey = "&menu-statistic-stromanalyse.accesskey;"/>
 				</menupopup>
 			</menu>
           </menupopup>

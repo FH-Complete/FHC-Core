@@ -239,3 +239,9 @@ function getTreeCellText(tree, col, idx)
 String.prototype.trim = function() {
 	return this.replace(/^\s+|\s+$/g,"");
 }
+
+// ****
+// * StartsWidth Member Function fuer Strings
+// ****
+String.prototype.startsWith = function(str)
+{return (this.match("^"+str)==str)}

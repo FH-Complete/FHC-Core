@@ -168,6 +168,10 @@
 <!ENTITY menu-statistic-studentendetails.label		"Personendetails Excel">
 <!ENTITY menu-statistic-studentendetails.accesskey	"P">
 
+<!ENTITY menu-statistic-stromanalyse.key		"S">
+<!ENTITY menu-statistic-stromanalyse.label		"Stromanalyse">
+<!ENTITY menu-statistic-stromanalyse.accesskey	"S">
+
 <!-- Dokumente -->
 <!ENTITY menu-dokumente.label		"Dokumente">
 <!ENTITY menu-dokumente.accesskey	"D">
