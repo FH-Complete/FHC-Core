@@ -42,8 +42,8 @@ $rest=0;
 
 $studiensemester_kurzbz='';
 
-$studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:'-1');
-if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
+$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'-1');
+if($studiensemester_kurzbz != -1)
 {
 
 	$ausgabe = "<H2>Master-Studiengänge: ($studiensemester_kurzbz)</H2>";
