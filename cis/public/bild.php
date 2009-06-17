@@ -40,19 +40,10 @@ if(!$conn = pg_pconnect(CONN_STRING))
 //default bild (ein weisser pixel)
 $cTmpHEX='ffd8ffe000104a46494600010101004800480000ffe100164578696600004d4d002a00000008000000000000fffe0017437265617465642077697468205468652047494d50ffdb0043000503040404030504040405050506070c08070707070f0b0b090c110f1212110f111113161c1713141a1511111821181a1d1d1f1f1f13172224221e241c1e1f1effdb0043010505050706070e08080e1e1411141e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1effc00011080001000103012200021101031101ffc4001500010100000000000000000000000000000008ffc40014100100000000000000000000000000000000ffc40014010100000000000000000000000000000000ffc40014110100000000000000000000000000000000ffda000c03010002110311003f00b2c007ffd9';
 //Hex Dump aus der DB holen
-$qry = '';
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 {
 	//$qry = "SELECT foto FROM public.tbl_person WHERE person_id='".addslashes($_GET['person_id'])."'";
 	$qry = "SELECT inhalt as foto FROM public.tbl_akte WHERE person_id='".addslashes($_GET['person_id'])."' AND dokument_kurzbz='Lichtbil'";
-}
-else
-{
-	exit;
-}
-
-if($qry!='')
-{
 	if($result = pg_query($conn, $qry))
 	{
 		if($row = pg_fetch_object($result))
@@ -62,20 +53,22 @@ if($qry!='')
 		}
 	}
 }
-
-ob_clean();
-header("Content-type: image/jpeg");
+		
 //die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
 //von pdfs kommen kann.
-$im = @imagecreatefromstring (hexstr($cTmpHEX));
+$im = @imagecreatefromstring(hexstr($cTmpHEX));
 if($im!==false)
 {
+	@ob_clean();
+	header("Content-type: image/jpeg");
 	exit(imagejpeg($im));
 }
 else
 {
 	//bei manchen Bildern funktioniert die konvertierung nicht
 	//diese werden dann einfach so angezeigt.
+	@ob_clean();
+   	header("Content-type: image/gif");
 	echo hexstr($cTmpHEX);
 }
 ?>
