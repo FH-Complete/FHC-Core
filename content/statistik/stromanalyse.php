@@ -253,7 +253,7 @@ echo '
 <h2>Studentenströme</h2>
 WÃ¤hlen Sie bitte nachfolgend ein Wintersemester aus.';
 
-$htmlstr .= "<form action='$PHP_SELF' method='POST' name='strom'>\n";
+$htmlstr .= "<form action='".$_SERVER['PHP_SELF']." method='POST' name='strom'>\n";
 $htmlstr .= "<select name='studiensemester_kurzbz'>\n";
 $qry_sem = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz LIKE 'WS%' ORDER BY start";
 $result_sem=pg_query($conn, $qry_sem);
