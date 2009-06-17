@@ -55,7 +55,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 		$summe=0;
 		$rest=0; 
 		
-		//Studiengänge, die zuvor abgeschlossen wurden
+		//StudiengÃ¤nge, die zuvor abgeschlossen wurden
 		$qry_master="SELECT DISTINCT count(*)as count ,studiengang_kz, typ, tbl_studiengang.bezeichnung as bez 
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
@@ -70,7 +70,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 			AND ausbildungssemester='1') 
 		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung ORDER BY tbl_studiengang.bezeichnung, studiengang_kz"; 
 		
-		//Anzahl der Studenten ohne Abschluß auf der FHTW
+		//Anzahl der Studenten ohne AbschluÃŸ auf der FHTW
 		/*$qry_rest="SELECT count(*) as rest FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=tbl_prestudent.person_id) 
 			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
@@ -129,7 +129,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 		}
 		//$rest=$row_rest->rest;
 		$rest=$row_anzahl->anzahl-$summe;
-		if($summe>0)
+		if($rest>0)
 		{
 			$color=(($i%2==0)?"#F3F3E9":"#EFEFDD");
 			$ausgabe .= "<TR style='background-color:$color;'>";
@@ -152,7 +152,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 		$summe=0;
 		$rest=0; 
 		
-		//Master-Studiengänge, die noch besucht wurden
+		//Master-StudiengÃ¤nge, die noch besucht wurden
 		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, bezeichnung as bez FROM 
 		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ, tbl_studiengang.bezeichnung  
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
@@ -224,7 +224,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 		//$rest=$row_rest->rest;
 		$rest=$row_anzahl->anzahl-$summe;
 		//echo "-->".$rest."<--";
-		if($summe>0)
+		if($rest>0)
 		{
 			$color=(($i%2==0)?"#F3F3E9":"#EFEFDD");
 			$ausgabe .= "<TR style='background-color:$color;'>";
@@ -250,7 +250,7 @@ echo '
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
-<h3>Studentenströme</h3>
+<h2>Studentenströme</h2>
 Wählen Sie bitte nachfolgend ein Wintersemester aus.';
 
 $htmlstr .= "<form action='$PHP_SELF' method='POST' name='strom'>\n";
@@ -275,4 +275,6 @@ $htmlstr .= "</form>\n";
 
 	echo $htmlstr;
 	echo $ausgabe;
+	
+echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden führt zu Verfaelschungen bei der Anzahl der 'Externen':<br>- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
 ?>
