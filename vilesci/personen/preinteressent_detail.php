@@ -753,7 +753,7 @@ function shortname($name)
 {
 	if(strlen($name)>40)
 	{
-		return mb_substr($name, 0, 20,'UTF-8').' ... '.mb_substr($name, mb_strlen($name,'UTF-8')-20,mb_strlen($name,'UTF-8'),'UTF-8');
+		return mb_substr($name, 0, 20).' ... '.mb_substr($name, mb_strlen($name)-20,mb_strlen($name));
 	}
 	else 
 		return $name;

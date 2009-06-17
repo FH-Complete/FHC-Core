@@ -172,13 +172,13 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		{
 			$msg = "Daten Erfolgreich gespeichert<br>";
 			pg_query($conn,"COMMIT;");
-			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+			$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 		}
 		else
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
 			pg_query($conn,"ROLLBACK;");
-			$msg .= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
+			$msg .= "<br>".mb_eregi_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
 
 

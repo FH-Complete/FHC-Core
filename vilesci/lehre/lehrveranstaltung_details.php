@@ -70,7 +70,7 @@
 		$lv->studiengang_kz = $_POST['studiengang_kz'];
 		$lv->semester = $_POST['semester'];
 		$lv->sprache = $_POST['sprache'];
-		$lv->ects  = str_replace(',','.',$_POST['ects']);
+		$lv->ects  = mb_eregi_replace(',','.',$_POST['ects']);
 		$lv->semesterstunden = $_POST['semesterstunden'];
 		$lv->anmerkung = $_POST['anmerkung'];
 		$lv->lehre = isset($_POST['lehre']);

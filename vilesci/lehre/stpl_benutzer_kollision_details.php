@@ -115,7 +115,7 @@ if($student_uid!='')
 				}
 			}
 			//letzten Beistrich wieder entfernen
-			$gruppen = mb_substr($gruppen, 0, mb_strlen($gruppen,'UTF-8')-2,'UTF-8');
+			$gruppen = mb_substr($gruppen, 0, mb_strlen($gruppen)-2);
 			
 			echo "<tr>";
 			echo "<td class='table-sortable:default' align='center'>$row->unr</td>";

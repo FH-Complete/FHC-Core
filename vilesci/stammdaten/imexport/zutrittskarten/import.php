@@ -22,7 +22,7 @@
 	{
 		//Extension herausfiltern
    	$ext = explode('.',$_FILES['datei']['name']);
-    $ext = mb_strtolower($ext[count($ext)-1],'UTF-8');
+    $ext = mb_strtolower($ext[count($ext)-1]);
     //--check if csv or txt
     if ($ext=='csv' || $ext=='txt')
     {
