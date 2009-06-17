@@ -28,137 +28,142 @@ require_once('../../include/studiensemester.class.php');
 if(!$conn=pg_pconnect(CONN_STRING))
    die("Konnte Verbindung zur Datenbank nicht herstellen");
 
-// Variablen checken
-		if (isset($_GET['studiengang_kz']))
-			$studiengang_kz=$_GET['studiengang_kz'];
-		if (isset($_GET['semester']))
-			$semester=$_GET['semester'];
-		if (isset($_GET['verband']))
-			$verband=$_GET['verband'];
-		else
-			$verband=' ';
-		if ($verband=='')
-			$verband=' ';
-		if (isset($_GET['gruppe']))
-			$gruppe=$_GET['gruppe'];
-		else
-			$gruppe=' ';
-		if ($gruppe=='')
-			$gruppe=' ';
-		if (isset($_GET['gruppe_kurzbz']))
-			$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
-		else
-			$gruppe_kurzbz='';
-		if (isset($_GET['leid']))
-			$leid=$_GET['leid'];
-		else
-			$leid=0;
+// Variablen Initialisieren
+	$studiengang_kz=0;
+	$lektor_uid=0;
+	$unr=0;
+	$semester=0;
+	$verband=' ';
+	$gruppe=' ';
+	$gruppe_kurzbz='';
+	$leid=0;
 
-$s=new studiengang($conn);
-$s->getAll('typ, kurzbz', false);
-$studiengang=$s->result;
-
-$user = get_uid();
-// Benutzerdefinierte Variablen laden
-#gss echo loadVariables($conn,$user);
-echo loadVariables($user);
-
-// Bezeichnungen fuer Tabellen und Views
-$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
-$stpl_table=TABLE_BEGIN.$db_stpl_table;
-
-if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
-	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
-else
 	$stg_kz=0;
-if (isset($_GET['sem']) || isset($_POST['sem']))
-	$sem=(isset($_GET['sem'])?$_GET['sem']:$_POST['sem']);
-else
 	$sem=0;
 
-//*************** im Stundenplan hinzufuegen *************************
-if (isset($_GET['insert']))
-	if ($_GET['insert']=='true')
+	$insert=false;
+	
+// POST/GET Parameter uebernehmen 
+	if (isset($_GET))
 	{
+		while (list ($tmp_key, $tmp_val) = each ($_GET)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+			
+	}
+	else if (isset($_POST))
+	{
+		while (list ($tmp_key, $tmp_val) = each ($_POST)) 
+		{
+			$$tmp_key=$tmp_val;
+		}	
+	}
+// Plausib der Variablen
+	if ($verband=='')
+		$verband=' ';
+	if ($gruppe=='')
+		$gruppe=' ';
+	
+	if(!is_numeric($stg_kz))
+		$stg_kz=0;
+	if(!is_numeric($semester))
+		$semester=0;
+		
+	$insert=trim($insert);
+		$insert=(empty($insert)?false:true);
+			
+			
+//	Studiengang lesen 
+	$s=new studiengang($conn);
+	$s->getAll('typ, kurzbz', false);
+	$studiengang=$s->result;
 
+// Benutzerdefinierte Variablen laden
+	$user = get_uid();
+	loadVariables($user);
+
+
+// Bezeichnungen fuer Tabellen und Views
+	$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
+	$stpl_table=TABLE_BEGIN.$db_stpl_table;
+
+
+//*************** im Stundenplan hinzufuegen *************************
+	if ($insert)
+	{
 		// Termine holen
-		$qry = "SELECT DISTINCT datum, stunde FROM lehre.$stpl_table WHERE lehreinheit_id=$leid";
+		$qry = "SELECT DISTINCT datum, stunde FROM lehre.$stpl_table WHERE lehreinheit_id=".$leid;
 		//echo $qry.'<BR>';
 		if(!$result=pg_query($conn, $qry))
 			die ($qry);
 		while ($row=pg_fetch_object($result))
 		{
-			$qry = "SELECT DISTINCT ort_kurzbz FROM lehre.$stpl_table
+			$qry = "SELECT DISTINCT ort_kurzbz FROM lehre.".$stpl_table."
 					WHERE lehreinheit_id=$leid AND datum='$row->datum' AND stunde=$row->stunde;";
 			if(!$result_ort=pg_query($conn, $qry))
-				die ($qry);
+				die ("DB Fehler $qry");
 			while ($row_ort=pg_fetch_object($result_ort))
 			{
 				$qry="INSERT INTO lehre.$stpl_table (datum,stunde,ort_kurzbz,unr,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id, insertvon)
-						VALUES ('$row->datum', $row->stunde,'$row_ort->ort_kurzbz',$unr,'$lektor_uid',$studiengang_kz,$semester,'$verband','$gruppe',";
+						VALUES ('".$row->datum."', $row->stunde,'$row_ort->ort_kurzbz',$unr,'".$lektor_uid."',$studiengang_kz,$semester,'$verband','$gruppe',";
 				if ($gruppe_kurzbz!='')
 					$qry.="'$gruppe_kurzbz',$leid,'LVPlanCheck');";
 				else
 					$qry.="NULL,$leid,'LVPlanCheck');";
-				echo $qry.'<BR>';
 				if(!$result_insert=pg_query($conn, $qry))
-					die ($qry);
+					die ("DB Fehler $qry");
 			}
 		}
 	}
 
-$stsem_obj = new studiensemester($conn);
-$studiensemester = $stsem_obj->getNearest();
-$where=" studiensemester_kurzbz='".$studiensemester."'";
-if (isset($semester) && $semester>0)
-	$where.=" AND semester=$semester";
-if ($stg_kz>0)
-	$where.=" AND studiengang_kz='$stg_kz'";
+	$stsem_obj = new studiensemester($conn);
+	$studiensemester = $stsem_obj->getNearest();
+	$where=" studiensemester_kurzbz='".$studiensemester."'";
+	if (!empty($semester))
+		$where.=" AND semester=$semester";
+	if (!empty($stg_kz))
+		$where.=" AND studiengang_kz='$stg_kz'";
 
-if(!is_numeric($stg_kz))
-	$stg_kz=0;
-if(!isset($semester) || !is_numeric($semester))
-	$semester=0;
-
-
-if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
-{
-
-	//Lehrevz Speichern
-	if(isset($_POST['lehrevz']))
+		
+	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
-			echo "Fehler beim Speichern!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-}
+		//Lehrevz Speichern
+		if(isset($_POST['lehrevz']))
+		{
+			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
+			if(!pg_query($conn, $qry))
+				echo "Fehler beim Speichern!";
+			else
+				echo "Erfolgreich gespeichert";
+		}
+	} 
 
-$sql_query="SELECT *, planstunden-verplant::smallint AS offenestunden
+	$sql_query="SELECT *, planstunden-verplant::smallint AS offenestunden
 			FROM lehre.$lva_stpl_view JOIN lehre.tbl_lehrform ON $lva_stpl_view.lehrform=tbl_lehrform.lehrform_kurzbz
 			WHERE $where AND verplant=0 AND planstunden>0 AND lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.$stpl_table)
 			ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;";
-//echo $sql_query;
-if(!$result_lv=pg_query($conn, $sql_query))
-	die ($sql_query);
-if(!$result_lv) error("Lehrveranstaltung not found!");
-$outp='';
-$s=array();
-$outp.="<SELECT name='stg_kz'>";
-foreach ($studiengang as $stg)
-{
-	$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->bezeichnung</OPTION>";
-	//$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg->studiengang_kz.'&sem='.$semester.'">'.$stg->kuerzel.'</A> - ';
-	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
-	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
-}
-$outp.='</SELECT>';
-$outp.= '<BR> -- ';
-for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
-	$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
+	//echo $sql_query;
+	if(!$result_lv=pg_query($conn, $sql_query))
+		die ("DB Fehler $sql_query");
+	if(!$result_lv) 
+		error("Lehrveranstaltung not found!");
+		
+	$outp='';
+	$s=array();
+	$outp.="<SELECT name='stg_kz'>";
+	foreach ($studiengang as $stg)
+	{
+		$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->bezeichnung</OPTION>";
+		//$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg->studiengang_kz.'&sem='.$semester.'">'.$stg->kuerzel.'</A> - ';
+		$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
+		$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
+	}
+	$outp.='</SELECT>';
+	$outp.= '<BR> -- ';
+	for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
+		$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
 ?>
-
 <html>
 <head>
 <title>Lehrveranstaltung Verwaltung</title>

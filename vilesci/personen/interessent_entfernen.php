@@ -79,7 +79,7 @@ if($person!='' && $prestudent!='')
 							$del="DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";";
 							if(pg_query($conn, $del))
 							{
-								$msg="Prestudent mit ID ".$prestudent." und Prestudentrolle Interessent entfernt.<br>".str_replace(";DELETE",";<br>DELETE",$del);
+								$msg="Prestudent mit ID ".$prestudent." und Prestudentrolle Interessent entfernt.<br>".mb_eregi_replace(";DELETE",";<br>DELETE",$del);
 							}
 							else 
 							{
@@ -110,7 +110,7 @@ if($person!='' && $prestudent!='')
 							$del="DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";DELETE FROM public.tbl_adresse WHERE person_id=".$person.";DELETE FROM public.tbl_kontakt WHERE person_id=".$person.";DELETE FROM public.tbl_person WHERE person_id=".$person.";";
 							if(pg_query($conn, $del))
 							{
-								$msg="Prestudent mit ID ".$prestudent." und Person mit ID ".$person." entfernt.<br>".str_replace(";DELETE",";<br>DELETE",$del);	
+								$msg="Prestudent mit ID ".$prestudent." und Person mit ID ".$person." entfernt.<br>".mb_eregi_replace(";DELETE",";<br>DELETE",$del);	
 							}
 							else 
 							{

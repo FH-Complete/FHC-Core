@@ -109,11 +109,11 @@ if(isset($_POST['uebertragen']))
 	$anzahl_uebernommen=0;
 	foreach ($_POST as $param=>$val)
 	{
-		if(strstr($param, 'chk_'))
+		if(mb_strstr($param, 'chk_'))
 		{
 			pg_query($conn, 'BEGIN;');
 			
-			$id = substr($param, 4);
+			$id = mb_substr($param, 4);
 			$preinteressent = new preinteressent($conn);
 			if($preinteressent->load($id))
 			{

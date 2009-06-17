@@ -75,9 +75,9 @@ if(isset($_POST['savedata']))
 	$errormsg = '';
 	foreach($_POST as $key=>$data)
 	{
-		if(strstr($key, 'note_'))
+		if(mb_strstr($key, 'note_'))
 		{
-			$id = substr($key, 5);
+			$id = mb_substr($key, 5);
 			$prj = new projektarbeit($conn);
 			if($prj->load($id))
 			{

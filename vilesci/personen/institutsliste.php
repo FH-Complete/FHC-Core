@@ -154,7 +154,7 @@ if($result = pg_query($conn, $qry))
 		if($result_stg = pg_query($conn, $qry))
 			while($row_stg = pg_fetch_object($result_stg))
 				$text.= $stg_obj->kuerzel_arr[$row_stg->studiengang_kz].', ';
-		echo mb_substr($text, 0, mb_strlen($text,'UTF-8')-2,'UTF-8');
+		echo mb_substr($text, 0, mb_strlen($text)-2);
 		echo '</td>';
 		echo "<td>".(isset($fb_obj->bezeichnung_arr[$row->hauptzuteilung])?$fb_obj->bezeichnung_arr[$row->hauptzuteilung]:'')."</td>";
 		echo "<td>";
@@ -163,7 +163,7 @@ if($result = pg_query($conn, $qry))
 		if($result_fb = pg_query($conn, $qry))
 			while($row_fb = pg_fetch_object($result_fb))
 				$text.= $fb_obj->bezeichnung_arr[$row_fb->fachbereich_kurzbz].', ';
-		echo mb_substr($text, 0, mb_strlen($text,'UTF-8')-2,'UTF-8');
+		echo mb_substr($text, 0, mb_strlen($text)-2);
 		echo "</td>";
 		echo '</tr>';
 	}

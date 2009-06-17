@@ -35,12 +35,12 @@ $nichtmelden = array(11,91,92,94,999,203);
 
 $datumobj=new datum();
 
-if(strstr($ssem,"WS"))
+if(mb_strstr($ssem,"WS"))
 {
 	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
 	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
 }
-/*elseif(strstr($ssem,"SS"))
+/*elseif(mb_strstr($ssem,"SS"))
 {
 	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
 	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")-1));

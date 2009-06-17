@@ -144,7 +144,7 @@ if(isset($_POST['save']))
 			$bmp->person_id = $_POST['person_id'];
 			$bmp->betriebsmittel_id=$betriebsmittel_id;
 			$bmp->anmerkung = $_POST['anmerkung'];
-			$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
+			$bmp->kaution = trim(mb_eregi_replace(',','.',$_POST['kaution']));
 			$bmp->ausgegebenam = $_POST['ausgegebenam'];
 			$bmp->retouram = $_POST['retouram'];
 			

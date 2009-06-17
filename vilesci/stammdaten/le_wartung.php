@@ -152,7 +152,7 @@
 						//Mitarbeiter loeschen die nicht uebernommen werden
 						foreach($_POST as $key=>$wert)
 						{
-							if(strstr($key, 'check_'))
+							if(mb_strstr($key, 'check_'))
 							{
 								$arr = split('_',$key);
 								$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$arr[1]' AND mitarbeiter_uid='$arr[2]'";

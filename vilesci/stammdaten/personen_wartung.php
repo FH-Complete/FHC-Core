@@ -107,28 +107,28 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		if(pg_query($conn,$sql_query_upd1))
 		{
 			$msg = "Daten erfolgreich gespeichert<br>";
-			$msg .= "<br>".str_replace(';',';<br>',$sql_query_upd1);
+			$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1);
 			pg_query($conn,"COMMIT;");
 			if(@pg_query($conn,'SELECT person_portal FROM sync.tbl_syncperson LIMIT 1'))
 			{
 				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
 				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
 				pg_query($conn,$sql_query_upd1);
-				$msg.= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 			}
 			if(@pg_query($conn,'SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
 			{
 				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
 				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
 				pg_query($conn,$sql_query_upd1);
-				$msg.= "<br>".str_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 			}
 		}
 		else
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
 			pg_query($conn,"ROLLBACK;");
-			$msg.= "<br>".str_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
+			$msg.= "<br>".mb_eregi_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
 		$radio_1=0;
 		$radio_2=0;

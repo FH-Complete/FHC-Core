@@ -94,16 +94,21 @@
 	    // Aktuellen Moodle Server ermitteln.
 		if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
 		{
-			$host = str_replace('https://','',str_replace('http://','',str_replace('/moodle','',str_replace('/moodle/','',MOODLE_PATH))));
+			$host = mb_eregi_replace('https://','',mb_eregi_replace('http://','',mb_eregi_replace('/moodle','',mb_eregi_replace('/moodle/','',MOODLE_PATH))));
 		}
 		elseif ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" ) // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
 		{
 			$host = 'dav.technikum-wien.at';
 		}	
+		elseif ($_SERVER["HTTP_HOST"]=="calva.technikum-wien.at" ) // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
+		{
+			$host = 'calva.technikum-wien.at';
+		}	
 		else // Produktivessystem
 		{
 			$host = 'cis.technikum-wien.at';
 		}	
+#exit($host);
 
 	// Variable Daten Initialisieren
 		$uri = "/moodle/xmlrpc/xmlrpc.php";
