@@ -212,7 +212,7 @@ if(isset($_POST["speichern"]) && $studiensemester_kurzbz != -1)
 		{
 				$color=(($i%2==0)?"#F3F3E9":"#EFEFDD");
 				$ausgabe .= "<TR style='background-color:$color;'>";
-				$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>$row_bachelor->studiengang_kz</TD";
+				$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>$row_bachelor->studiengang_kz</TD>";
 				$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>$row_bachelor->typ</TD>";
 				$ausgabe .= "<TD style='border:1px solid #D3DCE3;'>$row_bachelor->bez</TD>";
 				$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>$row_bachelor->count</TD>";
