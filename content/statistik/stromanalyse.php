@@ -251,7 +251,7 @@ echo '
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
 <h2>Studentenströme</h2>
-WÃ¤hlen Sie bitte nachfolgend ein Wintersemester aus.';
+Wählen Sie bitte nachfolgend ein Wintersemester aus.';
 
 $htmlstr .= "<form action='".$_SERVER['PHP_SELF']." method='POST' name='strom'>\n";
 $htmlstr .= "<select name='studiensemester_kurzbz'>\n";
@@ -276,5 +276,5 @@ $htmlstr .= "</form>\n";
 	echo $htmlstr;
 	echo $ausgabe;
 	
-echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden fÃ¼hrt zu Verfaelschungen bei der Anzahl der 'Externen':<br>- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
+echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden fuehrt zu Verfaelschungen bei der Anzahl der 'Externen':<br>- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
 ?>
