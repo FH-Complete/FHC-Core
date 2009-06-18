@@ -103,7 +103,7 @@ function disablefields2(val)
 <h1>Person Anlegen</h1>
 <?php
 //Berechtigung pruefen
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz'))

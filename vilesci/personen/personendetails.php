@@ -38,7 +38,7 @@ if(!$conn=pg_pconnect(CONN_STRING))
 
 $user = get_uid();
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $datum_obj = new datum();

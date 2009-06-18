@@ -46,7 +46,7 @@
 		$start = $_POST["start"];
 		$ende = $_POST["ende"];
 		
-		$ber = new benutzerberechtigung($conn);
+		$ber = new benutzerberechtigung();
 		if(!$ber->delete($benutzerberechtigung_id))
 			$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
 		
@@ -68,7 +68,7 @@
 		$start = $_POST["start"];
 		$ende = $_POST["ende"];
 		
-		$ber = new benutzerberechtigung($conn);
+		$ber = new benutzerberechtigung();
 		if (isset($_POST["neu"]))
 			$ber->new = true;
 		
@@ -125,12 +125,12 @@
 	{
 		$uid = $_REQUEST["uid"];
 		
-		$ben = new benutzer($conn);
+		$ben = new benutzer();
 		if (!$ben->load($uid))
 			$htmlstr .= "<br><div class='kopf'>Benutzer <b>".$uid."</b> existiert nicht</div>";
 		else
 		{
-			$rights = new benutzerberechtigung($conn);
+			$rights = new benutzerberechtigung();
 			$rights->getberechtigungen($uid,$all=true);
 	
 			$htmlstr .= "<br><div class='kopf'>Berechtigungen <b>".$uid."</b></div>\n";

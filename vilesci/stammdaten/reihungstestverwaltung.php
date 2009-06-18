@@ -46,7 +46,7 @@
 	$stg_arr = array();
 	$error = false;
 	
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
 	if(isset($_GET['excel']))

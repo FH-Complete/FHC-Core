@@ -315,7 +315,7 @@ function setOrtData()
 <h1>Preinteressent Anlegen</h1>
 <?php
 //Berechtigung pruefen
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('preinteressent'))

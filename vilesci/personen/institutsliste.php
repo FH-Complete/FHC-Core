@@ -36,7 +36,7 @@ $stg_obj->getAll('typ, kurzbz', false);
 $fb_obj = new fachbereich($conn);
 $fb_obj->getAll();
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen(get_uid());
 
 echo '

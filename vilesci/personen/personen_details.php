@@ -181,7 +181,7 @@ if(isset($_POST['saveperson']))
 
 if(isset($_POST['savebenutzer']))
 {
-	$benutzer = new benutzer($conn);
+	$benutzer = new benutzer();
 	$benutzer->load($uid);
 	
 	if(checkalias($alias) || $alias=='')

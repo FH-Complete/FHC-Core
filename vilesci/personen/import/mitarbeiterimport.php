@@ -126,7 +126,7 @@ function GeburtsdatumEintragen()
 <h1>Mitarbeiter Anlegen</h1>
 <?php
 //Berechtigung pruefen
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
@@ -226,7 +226,7 @@ if(isset($_POST['save']))
 		
 		$uid = generateMitarbeiterUID($conn, $vorname_clean, $nachname_clean, $lektor);
 			
-		$bn = new benutzer($conn);
+		$bn = new benutzer();
 		
 		if($bn->uid_exists($uid))
 		{
@@ -264,7 +264,7 @@ if(isset($_POST['save']))
 	{
 		$nachname_clean = strtolower(clean_string($nachname));
 		$vorname_clean = strtolower(clean_string($vorname));
-		$bn = new benutzer($conn);
+		$bn = new benutzer();
 		
 		if(!$bn->alias_exists($vorname_clean.'.'.$nachname_clean))
 			$alias = $vorname_clean.'.'.$nachname_clean;
@@ -275,7 +275,7 @@ if(isset($_POST['save']))
 	//Benutzer anlegen
 	if(!$error)
 	{
-		$benutzer = new benutzer($conn);
+		$benutzer = new benutzer();
 		
 		$benutzer->uid = $uid;
 		$benutzer->person_id = $person->person_id;

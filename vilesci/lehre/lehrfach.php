@@ -39,7 +39,7 @@ $studiengang=$s->result;
 
 $user = get_uid();
 
-$rechte =  new benutzerberechtigung($conn);
+$rechte =  new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if (isset($_GET['filter_stg_kz']) || isset($_POST['filter_stg_kz']))

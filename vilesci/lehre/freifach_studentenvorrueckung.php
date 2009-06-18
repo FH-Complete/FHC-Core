@@ -35,7 +35,7 @@ if(!$conn=pg_pconnect(CONN_STRING))
 
 $user = get_uid();
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))

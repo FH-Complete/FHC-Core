@@ -37,7 +37,7 @@
 	$user = get_uid();
 	
 	//Zugriffsrechte pruefen
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('preinteressent') && !$rechte->isBerechtigt('assistenz'))
