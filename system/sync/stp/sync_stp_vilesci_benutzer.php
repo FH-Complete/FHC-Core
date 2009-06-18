@@ -102,7 +102,7 @@
 				}
 			}
 			
-			$benutzer = new benutzer($conn);
+			$benutzer = new benutzer();
 			
 			if($uid!='')
 			{
