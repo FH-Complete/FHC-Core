@@ -29,13 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/bisverwendung.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -49,7 +45,7 @@ else
 
 $datum = new datum();
 
-$verwendung_obj = new bisverwendung($conn, null, true);
+$verwendung_obj = new bisverwendung();
 
 $rdf_url='http://www.technikum-wien.at/bisverwendung';
 

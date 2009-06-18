@@ -22,7 +22,7 @@ class basis_db extends db
 	{
 		//echo $sql.'<BR/>';
 		if ($this->db_result=@pg_query(basis_db::$db_conn,$sql))
-			return true;
+			return $this->db_result;
 		else
 		{
 			$this->errormsg.='Abfrage in Datenbank fehlgeschlagen! '.$this->db_last_error();

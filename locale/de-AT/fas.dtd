@@ -59,11 +59,11 @@
 <!ENTITY menu-statistic-student.accesskey	"S">
 
 <!ENTITY menu-statistic-oehbeitraege.key		"O">
-<!ENTITY menu-statistic-oehbeitraege.label		"OEH-Beitraege">
+<!ENTITY menu-statistic-oehbeitraege.label		"ÖH-Beiträge">
 <!ENTITY menu-statistic-oehbeitraege.accesskey	"O">
 
 <!ENTITY menu-statistic-lehrauftraege.key		"L">
-<!ENTITY menu-statistic-lehrauftraege.label		"Lehrauftraege">
+<!ENTITY menu-statistic-lehrauftraege.label		"Lehraufträge">
 <!ENTITY menu-statistic-lehrauftraege.accesskey	"L">
 
 <!ENTITY menu-statistic-sublvplanung.key		"V">
@@ -87,7 +87,7 @@
 <!ENTITY menu-statistic-projektarbeit.accesskey	"P">
 
 <!ENTITY menu-statistic-abschlusspruefung.key		"B">
-<!ENTITY menu-statistic-abschlusspruefung.label		"Abschlusspruefung">
+<!ENTITY menu-statistic-abschlusspruefung.label		"Abschlussprüfung">
 <!ENTITY menu-statistic-abschlusspruefung.accesskey	"B">
 
 <!ENTITY menu-statistic-fehlendedokumente.key		"D">
@@ -145,7 +145,7 @@
 <!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey	"E">
 
 <!ENTITY menu-statistic-abgaengerstatistik.key			"A">
-<!ENTITY menu-statistic-abgaengerstatistik.label		"Abgaengerstatistik">
+<!ENTITY menu-statistic-abgaengerstatistik.label		"Abgängerstatistik">
 <!ENTITY menu-statistic-abgaengerstatistik.accesskey	"A">
 
 <!ENTITY menu-statistic-absolventenstatistik.key		"B">
@@ -177,7 +177,7 @@
 <!ENTITY menu-dokumente.accesskey	"D">
 
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.key		"I">
-<!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestaetigung">
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestätigung">
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">
 
 <!ENTITY menu-dokumente-zeugnis.key		"Z">
@@ -212,10 +212,10 @@
 <!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
 <!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 
-<!ENTITY menu-dokumente-pruefungsprotokoll.label		"Pruefungsprotokoll">
+<!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll">
 <!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
 
-<!ENTITY menu-dokumente-pruefungszeugnis.label		"Pruefungszeugnis">
+<!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis">
 <!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
 
 <!ENTITY menu-dokumente-urkunde_deutsch.label		"Urkunde Deutsch">
@@ -257,7 +257,7 @@
 <!ENTITY menu-extras-lektorenzuordnunginstitute.accesskey	"L">
 
 <!ENTITY menu-extras-preinteressentenuebernahme.key			"I">
-<!ENTITY menu-extras-preinteressentenuebernahme.label		"Preinteressenten uebernehmen">
+<!ENTITY menu-extras-preinteressentenuebernahme.label		"Preinteressenten übernehmen">
 <!ENTITY menu-extras-preinteressentenuebernahme.accesskey	"I">
 
 <!ENTITY menu-extras-projektarbeitsabgaben.key			"A">
@@ -294,7 +294,7 @@
 <!ENTITY menu-bis-studenten.accesskey	"S">
 
 <!ENTITY menu-bis-studenten-plausibilitaetspruefung.key			"P">
-<!ENTITY menu-bis-studenten-plausibilitaetspruefung.label		"Plausibilitaetspruefung">
+<!ENTITY menu-bis-studenten-plausibilitaetspruefung.label		"Plausibilitätsprüfung">
 <!ENTITY menu-bis-studenten-plausibilitaetspruefung.accesskey	"P">
 
 <!ENTITY menu-bis-studenten-export.key		"E">
@@ -306,7 +306,7 @@
 <!ENTITY menu-help.accesskey          	"H">
 
 <!ENTITY menu-help-close.key          	"U">
-<!ENTITY menu-help-close.label        	"Ueber">
+<!ENTITY menu-help-close.label        	"Über FHComplete">
 <!ENTITY menu-help-close.accesskey    	"U">
 
 <!ENTITY menu-help-manual.key          	"H">

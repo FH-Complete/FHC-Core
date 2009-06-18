@@ -1,9 +1,27 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /*
  * Created on 02.12.2004
  *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 // header fuer no cache
 header("Cache-Control: no-cache");
@@ -11,11 +29,11 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
 require_once('../include/lehrstunde.class.php');
@@ -25,7 +43,7 @@ $datumObj=new datum();
 function checkID($needle)
 {
 	global $id_list;
-	//echo "checkID $needle \n";
+
 	reset($id_list);
 	foreach($id_list as $v)
 		if ($v==$needle)
@@ -40,8 +58,6 @@ if (isset($stundenplan_id0))
 		if (strpos($k,'stundenplan_id')!==false)
 			$idList[]=$v;
 }
-
-//print_r($idList);
 
 $uid=get_uid();
 
@@ -98,14 +114,9 @@ else
 	$idList=null;
 
 $error_msg='';
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg.='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$uid);
+$error_msg.=loadVariables($uid);
 
-//if (!isset($datum_bis))
-//	$datum_bis=date('Y-m-d',(mktime(0,0,1,substr($datum,5,2),substr($datum,8),substr($datum,0,4))+86400));
-
-$lehrstunden=new lehrstunde($conn);
+$lehrstunden=new lehrstunde();
 $anz=$lehrstunden->load_lehrstunden($type,$datum,$datum_bis,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$einheit,$db_stpl_table,$idList);
 if ($anz<0)
 {
@@ -127,11 +138,7 @@ $rdf_url='http://www.technikum-wien.at/lehrstunde';
 if (is_array($lehrstunden->lehrstunden))
 	foreach ($lehrstunden->lehrstunden as $ls)
 	{
-		//var_dump($ls);
-		//echo $ls->stunde.";";
-		//if ($ls->stunde == $stunde  && checkID($ls->stundenplan_id))
-		//{
-			?>
+		?>
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
   		      	<LEHRSTUNDE:id><?php echo $ls->stundenplan_id  ?></LEHRSTUNDE:id>

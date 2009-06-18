@@ -27,7 +27,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lvgesamtnote.class.php');
 require_once('../include/datum.class.php');
@@ -35,16 +35,12 @@ require_once('../include/studiengang.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 $datum = new datum();
 
 $stg_arr = array();
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
 
 foreach ($stg_obj->result as $stg) 
@@ -71,9 +67,10 @@ echo '
 ';
    
 //Daten holen
-$obj = new lvgesamtnote($conn,null, null, null, true);
+$obj = new lvgesamtnote();
 
 $obj->getLvGesamtNoten($lehrveranstaltung_id, $uid, $semester_aktuell);
+$db = new basis_db();
 
 foreach ($obj->result as $row)	
 {
@@ -82,9 +79,9 @@ foreach ($obj->result as $row)
 		$vorname = '';
 		$nachname = '';
 		$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$row->student_uid'";
-		if($result_name = pg_query($conn, $qry_name))
+		if($db->db_query($qry_name))
 		{
-			if($row_name = pg_fetch_object($result_name))
+			if($row_name = $db->db_fetch_object())
 			{
 				$vorname = $row_name->vorname;
 				$nachname = $row_name->nachname;

@@ -291,7 +291,7 @@ class zeugnisnote extends basis_db
 					JOIN lehre.tbl_note USING(note)
 				WHERE true $where2
 				ORDER BY sort";
-		//echo $qry;
+		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

@@ -22,8 +22,6 @@
 /*
  * Created on 02.12.2004
  *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 // header fuer no cache
 header("Cache-Control: no-cache, must-revalidate");
@@ -31,30 +29,17 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/functions.inc.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-//ini_set('display_errors','0');
 $user = get_uid();
-
-/*
-// test
-$einheit_kurzbz='';
-$grp='1';
-$ver='A';
-$sem=6;
-$stg_kz=257;
-*/
 
 $hier='';
 $einheit_kurzbz=(isset($_GET['einheit'])?$_GET['einheit']:'');
@@ -66,10 +51,10 @@ $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 $fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
 $orgform=(isset($_GET['orgform'])?$_GET['orgform']:'');
 
-loadVariables($conn, $user);
+loadVariables($user);
 
 $stg_arr = array();
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbzlang', false);
 foreach ($stg_obj->result as $row)
 {
@@ -77,7 +62,7 @@ foreach ($stg_obj->result as $row)
 }
 
 // LVAs holen
-$lvaDAO=new lehrveranstaltung($conn, null, true);
+$lvaDAO=new lehrveranstaltung();
 if($uid!='' && $stg_kz!=-1) // Alle LVs eines Mitarbeiters
 {
 	//$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
@@ -128,11 +113,11 @@ else
 		$qry.=" AND (orgform_kurzbz='".addslashes($orgform)."' OR orgform_kurzbz is null)";
 }
 
-//echo $qry;
-
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
-if(!$result = pg_query($conn, $qry))
-	die(pg_last_error($conn).'<BR>'.$qry);
+$db = new basis_db();
+
+if(!$result = $db->db_query($qry))
+	die($db->db_last_error().'<BR>'.$qry);
 ?>
 
 <RDF:RDF
@@ -143,7 +128,7 @@ if(!$result = pg_query($conn, $qry))
 <?php
 
 	//foreach ($lvaDAO->lehrveranstaltungen as $row_lva)
-	while($row_lva = pg_fetch_object($result))
+	while($row_lva = $db->db_fetch_object($result))
 	{
 		//Fachbereichskoordinatoren laden
 		$qry_fbk = "SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid =
@@ -161,9 +146,11 @@ if(!$result = pg_query($conn, $qry))
 							tbl_lehreinheit.studiensemester_kurzbz=tbl_studiensemester.studiensemester_kurzbz AND
 							tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz ORDER BY tbl_studiensemester.ende DESC LIMIT 1 ) ";
 		
-		$result_fbk = pg_query($conn, $qry_fbk);
+		if(!$result_fbk = $db->db_query($qry_fbk))
+			die('Fehlerhafte Abfrage');
+		
 		$fbk='';
-		while($row_fbk = pg_fetch_object($result_fbk))
+		while($row_fbk = $db->db_fetch_object($result_fbk))
 		{
 			$fbk.=$row_fbk->kurzbz.' ';
 		}
@@ -210,7 +197,7 @@ if(!$result = pg_query($conn, $qry))
       		<RDF:Seq about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >";
 
 		//zugehoerige LE holen
-		$le = new lehreinheit($conn, null, true);
+		$le = new lehreinheit();
 
 		if(!$le->load_lehreinheiten($row_lva->lehrveranstaltung_id, $semester_aktuell, $uid, $fachbereich_kurzbz))
 			echo "Fehler: $le->errormsg";
@@ -219,14 +206,14 @@ if(!$result = pg_query($conn, $qry))
 		{
 			//Lehrfach holen
 			$qry = "SELECT kurzbz, bezeichnung FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row_le->lehrfach_id'";
-			$result_lf = pg_query($conn, $qry);
-			$row_lf = pg_fetch_object($result_lf);
+			$result_lf = $db->db_query($qry);
+			$row_lf = $db->db_fetch_object($result_lf);
 
 			//Gruppen holen
 			$qry = "SELECT upper(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, * FROM lehre.tbl_lehreinheitgruppe LEFT JOIN public.tbl_studiengang USING(studiengang_kz) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
-			$result_grp = pg_query($conn, $qry);
+			$result_grp = $db->db_query($qry);
 			$grp='';
-			while($row_grp=pg_fetch_object($result_grp))
+			while($row_grp = $db->db_fetch_object($result_grp))
 			{
 				if($row_grp->gruppe_kurzbz=='')
 					$grp.=' '.$row_grp->kuerzel.trim($row_grp->semester).trim($row_grp->verband).trim($row_grp->gruppe);
@@ -235,11 +222,11 @@ if(!$result = pg_query($conn, $qry))
 			}
 			//Lektoren und Stunden holen
 			$qry = "SELECT kurzbz, semesterstunden, planstunden FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
-			$result_lkt = pg_query($conn, $qry);
+			$result_lkt = $db->db_query($qry);
 			$lkt='';
 			$semesterstunden='';
 			$planstunden='';
-			while($row_lkt = pg_fetch_object($result_lkt))
+			while($row_lkt = $db->db_fetch_object($result_lkt))
 			{
 				$lkt.=$row_lkt->kurzbz.' ';
 				$semesterstunden.=$row_lkt->semesterstunden.' ';
@@ -247,8 +234,8 @@ if(!$result = pg_query($conn, $qry))
 			}
 			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id='$row_le->lehreinheit_id'";
 			$fachbereich='';
-			if($result_fb = pg_query($conn, $qry))
-				if($row_fb = pg_fetch_object($result_fb))
+			if($result_fb = $db->db_query($qry))
+				if($row_fb = $db->db_fetch_object($result_fb))
 					$fachbereich = $row_fb->bezeichnung;
 			
 			echo "

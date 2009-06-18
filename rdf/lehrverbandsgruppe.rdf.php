@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
@@ -99,7 +99,7 @@ $stsem_obj->getAll();
 //getrennt aufgelistet
 function draw_orgformpart($stg_kz)
 {
-	global $conn, $orgform_sequence;
+	global $orgform_sequence;
 	$stg_obj = new studiengang($stg_kz);
 	
 	//Zusatzfilterung nur bei Mischformen anzeigen
@@ -120,7 +120,7 @@ function draw_orgformpart($stg_kz)
 
 function draw_orgformsubmenu($stg_kz, $orgform)
 {
-	global $conn, $stsem_obj, $rdf_url, $orgform_sequence;
+	global $stsem_obj, $rdf_url, $orgform_sequence;
 	
 	$stg_obj = new studiengang($stg_kz);
 	$stg_kurzbz = $stg_obj->kuerzel;
@@ -280,9 +280,9 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 	$sem='';
 	$ver='';
 	//echo $qry;
-	if($stg_obj->db_query($qry))
+	if($result = $stg_obj->db_query($qry))
 	{
-		while($row = $stg_obj->db_fetch_object())
+		while($row = $stg_obj->db_fetch_object($result))
 		{
 			if ($sem!=$row->semester)
 		   	{
@@ -310,8 +310,8 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 				$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$sem\">\n";
 				$qry_bez = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND trim(verband)='' AND trim(gruppe)=''";
 				$bezeichnung = '';
-				if($result_bez = pg_query($conn, $qry_bez))
-					if($row_bez = pg_fetch_object($result_bez))
+				if($result_bez = $stg_obj->db_query($qry_bez))
+					if($row_bez = $stg_obj->db_fetch_object($result_bez))
 						$bezeichnung = ($row_bez->bezeichnung!=''?'('.$row_bez->bezeichnung.')':'');
 				
 				echo '		

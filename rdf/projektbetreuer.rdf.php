@@ -29,14 +29,10 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/projektbetreuer.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/person.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 	
 $rdf_url='http://www.technikum-wien.at/projektbetreuer';
 
@@ -50,7 +46,7 @@ echo '
 ';
 
 $datum_obj = new datum();
-$projektbetreuer = new projektbetreuer($conn, null, null, true);
+$projektbetreuer = new projektbetreuer();
 
 if(isset($_GET['projektarbeit_id']) && !isset($_GET['person_id']))
 {
@@ -71,8 +67,8 @@ else
 	
 function draw_content($row)
 {
-	global $conn, $rdf_url, $datum_obj;
-	$person=new person($conn, $row->person_id, null);
+	global $rdf_url, $datum_obj;
+	$person=new person($row->person_id);
 	echo '
       <RDF:li>
          <RDF:Description id="'.$row->person_id.'/'.$row->projektarbeit_id.'/'.$row->betreuerart_kurzbz.'"  about="'.$rdf_url.'/'.$row->person_id.'/'.$row->projektarbeit_id.'/'.$row->betreuerart_kurzbz.'" >

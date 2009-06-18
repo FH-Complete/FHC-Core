@@ -19,12 +19,6 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/*
- * Created on 02.12.2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
- */
 // header fuer no cache
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0",false);
@@ -32,19 +26,13 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
 
-// DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/konto.class.php');
 require_once('../include/person.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $hier='';
 if(isset($_GET['xmlformat']))
@@ -87,15 +75,12 @@ else
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'');
 	
 $datum = new datum();
-if($xmlformat=='rdf')
-	$konto = new konto($conn, null, true);
-else
-	$konto = new konto($conn, null, false);
+$konto = new konto();
 
 if(isset($_SERVER['REMOTE_USER']))
 {
 	$user = get_uid();
-	loadVariables($conn, $user);
+	loadVariables($user);
 	if($kontofilterstg=='false')
 		$studiengang_kz='';
 }
@@ -200,7 +185,7 @@ elseif ($xmlformat=='xml')
 	echo "<konto>\n";
 	function drawrow_xml($row)
 	{
-		global $datum, $btyp, $conn;
+		global $datum, $btyp;
 		$rueckerstattung=false;
 		
 		echo "
@@ -213,7 +198,7 @@ elseif ($xmlformat=='xml')
 			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>";
 		if($row->buchungsnr_verweis!='')
 		{
-			$parent = new konto($conn);
+			$parent = new konto();
 			$parent->load($row->buchungsnr_verweis);
 			if($parent->betrag>0)
 				$rueckerstattung=true;
@@ -240,11 +225,11 @@ elseif ($xmlformat=='xml')
 	function drawperson_xml($row)
 	{
 		global $conn, $datum;
-		$pers = new person($conn, null, null);
+		$pers = new person();
 		
 		$pers->load($row->person_id);
 		
-		$stg = new studiengang($conn, $row->studiengang_kz, null);
+		$stg = new studiengang($row->studiengang_kz);
 		
 		echo "
   		<person>
@@ -265,7 +250,7 @@ elseif ($xmlformat=='xml')
 		</person>";
 	}
 
-	$buchungstyp = new konto($conn);
+	$buchungstyp = new konto();
 	$buchungstyp->getBuchungstyp();
 	$btyp = array();
 	

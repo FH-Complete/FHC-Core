@@ -28,7 +28,7 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/abschlusspruefung.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
@@ -42,51 +42,46 @@ require_once('../include/akadgrad.class.php');
 $xmlformat='rdf';
 if(isset($_GET['xmlformat']))
 	$xmlformat=$_GET['xmlformat'];
-if($xmlformat=='xml')
-	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-else
-	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 $datum_obj = new datum();
+$db = new basis_db();
 
 $abschlussbeurteilung_arr = array();
 $qry = "SELECT * FROM lehre.tbl_abschlussbeurteilung";
-if($result = pg_query($conn, $qry))
-	while($row = pg_fetch_object($result))
+if($db->db_query($qry))
+	while($row = $db->db_fetch_object())
 		$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung;
 
 $note_arr = array();
 $qry = "SELECT * FROM lehre.tbl_note";
-if($result = pg_query($conn, $qry))
-	while($row = pg_fetch_object($result))
+if($db->db_query($qry))
+	while($row = $db->db_fetch_object())
 		$note_arr[$row->note]=$row->anmerkung;
 		
 	function draw_content_xml($row)
 	{
-		global $conn, $rdf_url, $datum_obj, $abschlussbeurteilung_arr, $note_arr;
+		global $rdf_url, $datum_obj, $abschlussbeurteilung_arr, $note_arr;
 		$vorsitz = '';
 		$pruefer1= '';
 		$pruefer2= '';
 		$pruefer3= '';
 
 		//Nachnamen der Pruefer holden
-		$person = new person($conn,null,false);
-		$mitarbeiter = new mitarbeiter($conn,null,false);
-		$student= new student($conn,$row->student_uid,false);
+		$person = new person();
+		$mitarbeiter = new mitarbeiter();
+		$student= new student($row->student_uid);
 
-		$nation=new nation($conn,$student->geburtsnation,false);
+		$nation=new nation($student->geburtsnation);
 		$geburtsnation=$nation->kurztext;
 		$geburtsnation_engl=$nation->engltext;
 		$nation->load($student->staatsbuergerschaft);
 		$staatsbuergerschaft=$nation->kurztext;
 		$staatsbuergerschaft_engl=$nation->engltext;
 
-		$studiengang = new studiengang($conn, $student->studiengang_kz, false);
-		$akadgrad = new akadgrad($conn, $row->akadgrad_id, false);
+		$studiengang = new studiengang($student->studiengang_kz);
+		$akadgrad = new akadgrad($row->akadgrad_id);
 		
 		if($mitarbeiter->load($row->vorsitz))
 			$vorsitz = $mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost;
@@ -99,8 +94,10 @@ if($result = pg_query($conn, $qry))
 			
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='rek'";
 		$rektor = '';
-		if($result_rek = pg_query($conn, $qry))
-			if($row_rek = pg_fetch_object($result_rek))
+		$db = new basis_db();
+		$db2 = new basis_db();
+		if($db->db_query($qry))
+			if($row_rek = $db->db_fetch_object())
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
 		$qry = "SELECT titel as themenbereich, ende, projektarbeit_id, note FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
 		$themenbereich='';
@@ -110,13 +107,13 @@ if($result = pg_query($conn, $qry))
 		$themenbereich_2 = '';
 		$note = '';
 		
-		if($result_proj = pg_query($conn, $qry))
-		{
-			if($row_proj = pg_fetch_object($result_proj))
+		if($result_proj = $db->db_query($qry))
+		{			
+			if($row_proj = $db->db_fetch_object($result_proj))
 			{
 				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' AND (betreuerart_kurzbz in('Erstbegutachter', 'Erstbetreuer', 'Betreuer', 'Begutacher')) LIMIT 1";
-				if($result_bet = pg_query($conn, $qry_bet))
-					if($row_bet = pg_fetch_object($result_bet))
+				if($db2->db_query($qry_bet))
+					if($row_bet = $db2->db_fetch_object())
 						$betreuer = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
 
 				$themenbereich = $row_proj->themenbereich;
@@ -124,11 +121,11 @@ if($result = pg_query($conn, $qry))
 				$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
 			}
 			
-			if($row_proj = pg_fetch_object($result_proj))
+			if($row_proj = $db->db_fetch_object($result_proj))
 			{
 				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' AND (betreuerart_kurzbz in('Erstbegutachter', 'Erstbetreuer', 'Betreuer', 'Begutacher')) LIMIT 1";
-					if($result_bet = pg_query($conn, $qry_bet))
-						if($row_bet = pg_fetch_object($result_bet))
+					if($db2->db_query($qry_bet))
+						if($row_bet = $db2->db_fetch_object())
 							$betreuer_2 = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
 
 				$themenbereich_2 = $row_proj->themenbereich;
@@ -232,19 +229,19 @@ if($result = pg_query($conn, $qry))
 // ----------------------------------- RDF --------------------------------------
 if ($xmlformat=='rdf')
 {
-	$pruefung = new abschlusspruefung($conn, null, true);
+	$pruefung = new abschlusspruefung();
 	$rdf_url='http://www.technikum-wien.at/abschlusspruefung';
 	function draw_content($row)
 	{
-		global $conn, $rdf_url, $datum_obj;
+		global $rdf_url, $datum_obj;
 		$vorsitz = '';
 		$pruefer1= '';
 		$pruefer2= '';
 		$pruefer3= '';
 
 		//Nachnamen der Pruefer holden
-		$person = new person($conn, null, true);
-		$mitarbeiter = new mitarbeiter($conn, null, true);
+		$person = new person();
+		$mitarbeiter = new mitarbeiter();
 
 		if($mitarbeiter->load($row->vorsitz))
 			$vorsitz = $mitarbeiter->nachname;
@@ -314,7 +311,7 @@ if ($xmlformat=='rdf')
 // ----------------------------------- XML --------------------------------------
 elseif ($xmlformat=='xml')
 {
-	$pruefung = new abschlusspruefung($conn, null, false);
+	$pruefung = new abschlusspruefung();
 	echo "\n<abschlusspruefung>\n";
 
 	if(isset($_GET['uid']))
@@ -325,7 +322,7 @@ elseif ($xmlformat=='xml')
 		{
 			if($uid!='')
 			{
-				$pruefung = new abschlusspruefung($conn, null, false);
+				$pruefung = new abschlusspruefung();
 				if($pruefung->getAbschlusspruefungen($uid))
 				{
 					foreach ($pruefung->result as $row)
@@ -353,3 +350,4 @@ elseif ($xmlformat=='xml')
 
 	echo "\n</abschlusspruefung>";
 }	//endof xmlformat==xml
+?>

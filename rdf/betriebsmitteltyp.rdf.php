@@ -29,12 +29,8 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/betriebsmitteltyp.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $rdf_url='http://www.technikum-wien.at/betriebsmitteltyp';
 ?>
@@ -48,7 +44,7 @@ $rdf_url='http://www.technikum-wien.at/betriebsmitteltyp';
 
 <?php
 
-$btm = new betriebsmitteltyp($conn, null, null, true);
+$btm = new betriebsmitteltyp();
 if(!$btm->getAll())
 	die($btm->errormsg);
 

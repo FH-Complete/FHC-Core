@@ -29,11 +29,8 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../cis/config.inc.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+require_once('../config/cis.config.inc.php');
+require_once('../include/basis_db.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lvinfo';
 
@@ -58,7 +55,7 @@ if(isset($_GET['semester']))
 else 
 	unset($sem);
 
-$qry = "SET CLIENT_ENCODING to 'UNICODE'; 
+$qry = "
 SELECT 
 tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id, 
 tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
@@ -81,17 +78,18 @@ tbl_lvinfo.aktiv=true AND
 tbl_lvinfo.genehmigt=true ";
 
 if(isset($stg_kz))
-	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz='$stg_kz'";
+	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($stg_kz)."'";
 
 if(isset($sem))
-	$qry .= " AND tbl_lehrveranstaltung.semester='$sem'";
+	$qry .= " AND tbl_lehrveranstaltung.semester='".addslashes($sem)."'";
 
 $qry .= "ORDER BY lv_studiengang_kz, lv_semester, lv_kurzbz, sprache";
+$db = new basis_db();
 
-if($result = pg_query($conn, $qry))
+if($db->db_query($qry))
 {
 	$arr = array();
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
 ?>
       	<RDF:Description  id="<?php echo $row->lv_lehrveranstaltung_id.'/'.$row->sprache; ?>"  about="<?php echo $rdf_url.'/'.$row->lv_lehrveranstaltung_id.'/'.$row->sprache; ?>" >

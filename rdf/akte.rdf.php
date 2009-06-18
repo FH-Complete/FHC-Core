@@ -29,13 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/akte.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
@@ -47,14 +43,9 @@ if(isset($_GET['dokument_kurzbz']))
 else 
 	$dokument_kurzbz = '';
 	
-if(isset($_GET['uid']))
-	$uid = $_GET['uid'];
-else 
-	$uid = '';
-	
 $datum = new datum();
 
-$akten = new akte($conn);
+$akten = new akte();
 if(!$akten->getAkten($person_id, $dokument_kurzbz))
 	die($akten->errormsg);
 $rdf_url='http://www.technikum-wien.at/akte';

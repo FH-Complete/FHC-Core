@@ -25,19 +25,14 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-//header("Content-type: application/vnd.mozilla.xul+xml");
 header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $rdf_url='http://www.technikum-wien.at/prestudent';
 
@@ -56,8 +51,7 @@ $datum = new datum();
 <?php
 if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 {
-	$prestd = new prestudent($conn, null, true);
-	//$prestd->load($_GET['prestudent_id']);
+	$prestd = new prestudent();
 	if($prestd->load($_GET['prestudent_id']))
 	{
 ?>

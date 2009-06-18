@@ -25,40 +25,37 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/fachbereich.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $fb = $rechte->getFbKz();
-
-// fachbereiche holen
-//$fachbereichDAO=new fachbereich($conn);
-//$fb = $fachbereiche=$fachbereichDAO->getAll();
 
 $qry = "SELECT * FROM public.tbl_fachbereich";
 
 if(count($fb)>0 && !in_array('0',$fb))
 {
+	$in='';
 	foreach($fb as $fbbz)
-		$in = ", '".addslashes($fbbz)."'";
-	$qry.=" WHERE fachbereich_kurzbz in (1$in)";
+	{
+		if($in=='')
+			$in = "'".addslashes($fbbz)."'";
+		else
+			$in.= ", '".addslashes($fbbz)."'";
+	}
+	$qry.=" WHERE fachbereich_kurzbz in ($in)";
 }
 
 $qry.=" ORDER BY bezeichnung";
-$result = pg_query($conn, $qry);
 
 $rdf_url='http://www.technikum-wien.at/fachbereich';
 
@@ -85,20 +82,25 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
   </RDF:li>
 	  <?php
 }
-
-while ($row = pg_fetch_object($result))
+$db = new basis_db();
+if($db->db_query($qry))
 {
-	?>
-  <RDF:li>
-      	<RDF:Description  id="<?php echo $row->fachbereich_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$row->fachbereich_kurzbz; ?>" >
-    		<FACHBEREICH:kurzbz><?php echo $row->fachbereich_kurzbz  ?></FACHBEREICH:kurzbz>
-    		<FACHBEREICH:bezeichnung><?php echo $row->bezeichnung  ?></FACHBEREICH:bezeichnung>
-    		<FACHBEREICH:farbe><?php echo $row->farbe  ?></FACHBEREICH:farbe>
-    		<FACHBEREICH:studiengang_kz><?php echo $row->studiengang_kz  ?></FACHBEREICH:studiengang_kz>
-      	</RDF:Description>
-  </RDF:li>
-	  <?php
+	while ($row = $db->db_fetch_object())
+	{
+		?>
+	  <RDF:li>
+	      	<RDF:Description  id="<?php echo $row->fachbereich_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$row->fachbereich_kurzbz; ?>" >
+	    		<FACHBEREICH:kurzbz><?php echo $row->fachbereich_kurzbz  ?></FACHBEREICH:kurzbz>
+	    		<FACHBEREICH:bezeichnung><?php echo $row->bezeichnung  ?></FACHBEREICH:bezeichnung>
+	    		<FACHBEREICH:farbe><?php echo $row->farbe  ?></FACHBEREICH:farbe>
+	    		<FACHBEREICH:studiengang_kz><?php echo $row->studiengang_kz  ?></FACHBEREICH:studiengang_kz>
+	      	</RDF:Description>
+	  </RDF:li>
+		  <?php
+	}
 }
+else 
+	die('Fehlerhafte qry'.$qry);
 ?>
   </RDF:Seq>
 </RDF:RDF>

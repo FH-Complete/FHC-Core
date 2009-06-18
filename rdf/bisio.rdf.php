@@ -27,15 +27,11 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/bisio.class.php');
 require_once('../include/datum.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -60,7 +56,7 @@ echo '
 ';
    
 //Daten holen
-$ioobj = new bisio($conn, null, true);
+$ioobj = new bisio();
 
 //Wenn die UID uebergeben wurde, dann werden alle
 //Eintraege dieser Person geladen

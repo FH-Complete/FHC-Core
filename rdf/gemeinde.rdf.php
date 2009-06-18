@@ -29,11 +29,8 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 
 if(isset($_GET['plz']))
 {
@@ -42,7 +39,7 @@ if(isset($_GET['plz']))
 else 
 	die('Plz muss uebergeben werden');
 
-$gemeinde = isset($_GET['gemeinde'])?utf8_decode($_GET['gemeinde']):'';
+$gemeinde = isset($_GET['gemeinde'])?$_GET['gemeinde']:'';
 
 $rdf_url='http://www.technikum-wien.at/gemeinde';
 
@@ -55,13 +52,14 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 if($gemeinde=='')
-	$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT distinct on (name) * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' ORDER BY name";
+	$qry = "SELECT distinct on (name) * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' ORDER BY name";
 else 
-	$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' AND name='".addslashes($gemeinde)."' ORDER BY name";
-	
-if($result = pg_query($conn, $qry))
+	$qry = "SELECT * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' AND name='".addslashes($gemeinde)."' ORDER BY name";
+$db = new basis_db();
+
+if($db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
 		
 		echo '

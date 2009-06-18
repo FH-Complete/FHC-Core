@@ -29,14 +29,10 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/projektarbeit.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/lehreinheit.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 	
 $rdf_url='http://www.technikum-wien.at/projektarbeit';
 
@@ -50,7 +46,7 @@ echo '
 ';
 
 $datum_obj = new datum();
-$projektarbeit = new projektarbeit($conn, null, true);
+$projektarbeit = new projektarbeit();
 
 if(isset($_GET['student_uid']))
 {
@@ -72,8 +68,8 @@ else
 	
 function draw_content($row)
 {
-	global $conn, $rdf_url, $datum_obj;
-	$lehreinheit = new lehreinheit($conn, $row->lehreinheit_id);
+	global $rdf_url, $datum_obj;
+	$lehreinheit = new lehreinheit($row->lehreinheit_id);
 	echo '
       <RDF:li>
          <RDF:Description id="'.$row->projektarbeit_id.'"  about="'.$rdf_url.'/'.$row->projektarbeit_id.'" >

@@ -26,14 +26,10 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-// DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 $rdf_url='http://www.technikum-wien.at/verwendung';
 
@@ -46,10 +42,12 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM bis.tbl_verwendung ORDER BY verwendung_code";
-if($result = pg_query($conn, $qry))
+$qry = 'SELECT * FROM bis.tbl_verwendung ORDER BY verwendung_code';
+$db = new basis_db();
+
+if($db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{	
 		echo '
 	      <RDF:li>

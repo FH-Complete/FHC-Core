@@ -20,23 +20,15 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Raab <gerald.raab@technikum-wien.at>.
  */
-
-// header für no cache
-//header("Cache-Control: no-cache");
-//header("Cache-Control: post-check=0, pre-check=0",false);
-//header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
-//header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+require_once('../include/basis_db.class.php');
 
 $datum = new datum();
+$db = new basis_db();
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
@@ -62,9 +54,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		          WHERE 
 						uid = '".$uid_arr[$i]."'";
 		
-		if($result = pg_query($conn, $query))
+		if($db->db_query($query))
 		{
-				if(!$row = pg_fetch_object($result))
+				if(!$row = $db->db_fetch_object())
 					die('Student not found'.$uid_arr[$i]);
 		}
 		else
@@ -132,9 +124,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		
 		$qry = "SELECT bezeichnung, akadgrad_id FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
-		if($result1 = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row1 = pg_fetch_object($result1))
+			if($row1 = $db->db_fetch_object())
 			{
 				echo "		<beurteilung>$row1->bezeichnung</beurteilung>";
 				$akadgrad_id = $row1->akadgrad_id;
@@ -144,9 +136,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id='$akadgrad_id'";
 		$titel = '';
 		$titel_kurzbz = '';
-		if($result_titel = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row_titel = pg_fetch_object($result_titel))
+			if($row_titel = $db->db_fetch_object())
 			{
 				$titel = $row_titel->titel;
 				$titel_kurzbz = $row_titel->akadgrad_kurzbz;
@@ -156,36 +148,36 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<titel_kurzbz>'.$titel_kurzbz.'</titel_kurzbz>';
 	
 		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid='".$uid_arr[$i]."' AND (projekttyp_kurzbz='Praxis' OR projekttyp_kurzbz='Praktikum')";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row1 = pg_fetch_object($result))
+			if($row1 = $db->db_fetch_object())
 			{
 				echo "		<praktikum>Berufspraktikum/Internship: absolviert/completed</praktikum>";
 			}
 		}
 		
 		$qry = "SELECT von, bis FROM bis.tbl_bisio WHERE student_uid='".$uid_arr[$i]."'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row1 = pg_fetch_object($result))
+			if($row1 = $db->db_fetch_object())
 			{
 				echo "		<auslandssemester>Auslandssemester/International semester ".$datum->convertISODate($row1->von)." - ".$datum->convertISODate($row1->bis)."</auslandssemester>";
 			}
 		}
 		
 		$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) WHERE studiengang_kz='$row->studiengang_kz' AND funktion_kurzbz='stgl'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row1 = pg_fetch_object($result))
+			if($row1 = $db->db_fetch_object())
 			{
 				echo "		<stgl>$row1->titelpre $row1->vorname $row1->nachname $row1->titelpost</stgl>";
 			}
 		}
 		
 		$qry = "SELECT telefonklappe FROM public.tbl_mitarbeiter JOIN tbl_benutzerfunktion ON(uid=mitarbeiter_uid) WHERE funktion_kurzbz='ass' AND studiengang_kz='$row->studiengang_kz'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row1 = pg_fetch_object($result))
+			if($row1 = $db->db_fetch_object())
 			{
 				echo "		<telefonklappe>$row1->telefonklappe</telefonklappe>";
 			}

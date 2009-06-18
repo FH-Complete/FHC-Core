@@ -29,14 +29,10 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/funktion.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
-	
 $rdf_url='http://www.technikum-wien.at/bnfunktion';
 
 echo '
@@ -52,13 +48,13 @@ $benutzerfunktion_id = (isset($_GET['benutzerfunktion_id'])?$_GET['benutzerfunkt
 $stg_arr = array();
 $fkt_arr = array();
 
-$stg = new studiengang($conn);
+$stg = new studiengang();
 $stg->getAll(null, false);
 
 foreach ($stg->result as $row) 
 	$stg_arr[$row->studiengang_kz]=$row->kuerzel;	
 
-$fkt = new funktion($conn);
+$fkt = new funktion();
 $fkt->getAll();
 
 foreach ($fkt->result as $row) 
@@ -66,16 +62,17 @@ foreach ($fkt->result as $row)
 
 if($uid!='')
 {
-	$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' ORDER BY funktion_kurzbz";
+	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' ORDER BY funktion_kurzbz";
 }
 else 
 {
-	$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='".addslashes($benutzerfunktion_id)."'";
+	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='".addslashes($benutzerfunktion_id)."'";
 }
 
-if($result = pg_query($conn, $qry))
+$db = new basis_db();
+if($db->db_query($qry))
 {	
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
 		echo '
 	      <RDF:li>
