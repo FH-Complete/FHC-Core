@@ -100,7 +100,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 				</tr>
 			</table>
 		  </form>';
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	if($rechte->isBerechtigt('admin', '0', 'suid'))
 	{

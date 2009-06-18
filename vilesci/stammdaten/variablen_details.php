@@ -32,7 +32,7 @@
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$user = get_uid();
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
 	if(!$rechte->isBerechtigt('admin'))
@@ -130,7 +130,7 @@
 	if ($uid!='')
 	{
 				
-		$ben = new benutzer($conn);
+		$ben = new benutzer();
 		if (!$ben->load($uid))
 			$htmlstr .= "<br><div class='kopf'>Benutzer <b>".$uid."</b> existiert nicht</div>";
 		else

@@ -40,7 +40,7 @@ if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 else
 	$stg_kz=0;
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
 	die('Sie haben keine Berechtigung für diese Seite');

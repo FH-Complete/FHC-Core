@@ -34,7 +34,7 @@
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$user = get_uid();
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
 	

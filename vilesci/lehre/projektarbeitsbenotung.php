@@ -40,7 +40,7 @@ $user = get_uid();
 $stg_kz = (isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
 $stsem = (isset($_REQUEST['stsem'])?$_REQUEST['stsem']:'');
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid'))

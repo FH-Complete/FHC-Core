@@ -65,7 +65,7 @@ $gruppe_kurzbz = (isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:'');
 if(!$conn = pg_pconnect(CONN_STRING))
 	die('Es konnte keine Verbindung zur Datenbank hergestellt werden');
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 //Studiengang Drop Down anzeigen

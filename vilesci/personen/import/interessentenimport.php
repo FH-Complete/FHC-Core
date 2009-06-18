@@ -324,7 +324,7 @@ function setOrtData()
 <h1>Interessent Anlegen</h1>
 <?php
 //Berechtigung pruefen
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
@@ -772,7 +772,7 @@ if(isset($_POST['save']))
 		$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
 						
 		//Benutzerdatensatz anlegen
-		$benutzer = new benutzer($conn);
+		$benutzer = new benutzer();
 		$benutzer->uid = $uid;
 		$benutzer->person_id = $person->person_id;
 		$benutzer->aktiv = true;

@@ -77,7 +77,7 @@ echo '<html>
 	';
 
 //Rechte Pruefen
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin'))

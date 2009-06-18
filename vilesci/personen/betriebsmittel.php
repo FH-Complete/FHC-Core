@@ -32,7 +32,7 @@ if(!$conn=pg_pconnect(CONN_STRING))
 $user = get_uid();
 
 //Berechtigung pruefen
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('support'))
