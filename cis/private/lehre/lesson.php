@@ -63,7 +63,7 @@
 	//$fachbereich_id = $row->fachbereich_id;
 	$short_short_name = $lv->lehreverzeichnis;
 
-	$rechte = new benutzerberechtigung($sql_conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 
 	//Handbuch ausliefern

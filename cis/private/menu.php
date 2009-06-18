@@ -35,7 +35,7 @@ if(!$db_conn = pg_pconnect(CONN_STRING))
 $user=get_uid();
 
 $cutlength=10;
-$rechte=new benutzerberechtigung($db_conn);
+$rechte=new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $fkt=new funktion($db_conn);

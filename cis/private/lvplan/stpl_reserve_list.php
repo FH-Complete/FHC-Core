@@ -32,7 +32,7 @@
 	if (!$conn = pg_pconnect(CONN_STRING))
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 	
 	// Datums Format und search_path

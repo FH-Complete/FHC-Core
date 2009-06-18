@@ -43,7 +43,7 @@
 
 
 	$rechte = new benutzerberechtigung();
-#	$rechte->benutzerberechtigung($sql_conn);
+
 	$rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))

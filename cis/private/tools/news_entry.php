@@ -30,8 +30,8 @@
 
 	$user = get_uid();
 
-	$rechte = new benutzerberechtigung($sql_conn);
-  $rechte->getBerechtigungen($user);
+	$rechte = new benutzerberechtigung();
+ 	 $rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))
        $is_lector=true;

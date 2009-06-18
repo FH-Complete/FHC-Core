@@ -81,7 +81,7 @@ $qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeite
 if(!$result = pg_query($conn, $qry))
 	die('Fehler beim laden der Berechtigung');
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!(pg_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz)))

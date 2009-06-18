@@ -213,7 +213,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 {
 	if(pg_num_rows($result_projekt)>0)
 	{
-		$bn = new benutzer($conn);
+		$bn = new benutzer();
 		if(!$bn->load($user))
 			die("Benutzer $user wurde nicht gefunden");
 			

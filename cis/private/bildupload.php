@@ -79,7 +79,7 @@ $user = get_uid();
 
 if(isset($_GET['person_id']))
 {
-	$benutzer = new benutzer($conn);
+	$benutzer = new benutzer();
 	$benutzer->load($user);
 		
 	if($benutzer->person_id!=$_GET['person_id'])

@@ -35,7 +35,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 
 $user = get_uid();
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(isset($_GET['year']) && is_numeric($_GET['year']))

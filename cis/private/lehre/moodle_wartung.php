@@ -65,7 +65,7 @@ if($result = pg_query($conn, $qry))
 	}
 }
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if($rechte->isBerechtigt('admin'))
