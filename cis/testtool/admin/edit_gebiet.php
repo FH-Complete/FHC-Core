@@ -33,7 +33,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 	die('Fehler beim Connecten zur DB');
 
 $user = get_uid();
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 echo '
