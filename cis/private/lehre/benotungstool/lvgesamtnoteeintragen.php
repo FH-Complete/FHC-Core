@@ -46,7 +46,7 @@ $user = get_uid();
 if(!check_lektor($user, $conn))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id

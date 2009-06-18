@@ -52,7 +52,7 @@
 	foreach ($studiengang->result as $row)
 		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 	
-	$benutzer = new benutzer($conn);
+	$benutzer = new benutzer();
 	if(!$benutzer->load($uid))
 		die('Benutzer wurde nicht gefunden');
 	

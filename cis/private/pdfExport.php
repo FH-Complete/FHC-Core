@@ -41,7 +41,7 @@ $user = get_uid();
 loadVariables($user);
 
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 //Parameter holen

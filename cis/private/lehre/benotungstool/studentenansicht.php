@@ -47,9 +47,6 @@ $user = get_uid();
 //$user = 'if06b144';
 $lektorenansicht = 0;
 
-#$rechte = new benutzerberechtigung($conn);
-#$rechte->getBerechtigungen($user);
-
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
@@ -65,7 +62,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:''); //Uid
 	
 if(check_lektor($user, $conn) && (isset($_GET['uid']) && $_GET["uid"] != ""))
 {
-	$rights = new benutzerberechtigung($conn);
+	$rights = new benutzerberechtigung();
 	$rights->getBerechtigungen($user); 
 	//if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
 	$lehreinheit=new lehreinheit($conn, $_GET["lehreinheit_id"]);

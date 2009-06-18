@@ -39,7 +39,7 @@
 	if (isset($_GET['term_id']))
 		$term_id=$_GET['term_id'];
 
-	$rechte=new benutzerberechtigung($sql_conn);
+	$rechte=new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))

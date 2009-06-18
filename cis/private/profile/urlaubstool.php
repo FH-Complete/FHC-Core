@@ -229,7 +229,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 			}
 		}
 		//$to = 'oesi@technikum-wien.at';
-		$benutzer = new benutzer($conn);
+		$benutzer = new benutzer();
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
 				   "$benutzer->nachname $benutzer->vorname hat neuen Urlaub eingetragen:\n";

@@ -48,7 +48,7 @@
 	//des uebergebenen Users anzeigen
 	if(isset($_GET['uid']))
 	{
-		$rechte = new benutzerberechtigung($conn);
+		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($uid);
 		if($rechte->isBerechtigt('admin'))
 		{
@@ -312,7 +312,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$to = mb_substr($to, 0,$to_len);
 
 						//$to = 'oesi@technikum-wien.at';
-						$benutzer = new benutzer($conn);
+						$benutzer = new benutzer();
 						$benutzer->load($uid);
 						$message = "Dies ist eine automatische Mail! \n".
 								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".

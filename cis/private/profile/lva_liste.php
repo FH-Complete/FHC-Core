@@ -169,7 +169,7 @@
 		
 	//Betreuungen
 
-	$mitarbeiter = new benutzer($conn);
+	$mitarbeiter = new benutzer();
 	$mitarbeiter->load($uid);
 	
 	$qry = "SELECT 

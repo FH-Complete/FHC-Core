@@ -88,7 +88,7 @@ $error='';
 $neu = (isset($_GET['neu'])?true:false);
 $stg_arr = array();
 $error = false;
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $htmlstr='';
 

@@ -32,7 +32,7 @@
 
 	$user = get_uid();
 
-  $rechte= new benutzerberechtigung($sql_conn);
+  $rechte= new benutzerberechtigung();
   $rechte->getBerechtigungen($user);
 
 	if(check_lektor($user,$sql_conn))

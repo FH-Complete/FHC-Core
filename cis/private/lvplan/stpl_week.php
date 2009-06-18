@@ -124,7 +124,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 }
 
-$berechtigung=new benutzerberechtigung($conn);
+$berechtigung=new benutzerberechtigung();
 $berechtigung->getBerechtigungen($uid);
 if ($berechtigung->isBerechtigt('raumres'))
 	$raumres=true;
