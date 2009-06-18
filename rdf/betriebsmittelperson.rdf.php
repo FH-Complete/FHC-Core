@@ -29,13 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/betriebsmittelperson.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
@@ -65,7 +61,7 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">';
 
 
-$betriebsmittel = new betriebsmittelperson($conn, null, null, true);
+$betriebsmittel = new betriebsmittelperson();
 if($betriebsmittel_id=='')
 	if($betriebsmittel->getBetriebsmittelPerson($person_id, $betriebsmitteltyp))
 		foreach ($betriebsmittel->result as $row)

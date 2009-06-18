@@ -28,7 +28,7 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 
 // DAO
-include('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/mitarbeiter.class.php');
@@ -36,13 +36,10 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
 
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
 $datum = new datum();
 
-loadVariables($conn, $user);
+loadVariables($user);
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -97,7 +94,7 @@ echo '
 ';
 
 // Mitarbeiter holen
-$mitarbeiterDAO=new mitarbeiter($conn, null, true);
+$mitarbeiterDAO=new mitarbeiter();
 
 if($uid==null)
 {

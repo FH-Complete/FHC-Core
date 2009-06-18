@@ -29,21 +29,21 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-include('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 // Orte holen
 $sql_query="SELECT * FROM (public.tbl_ort JOIN public.tbl_ortraumtyp USING (ort_kurzbz)) JOIN public.tbl_raumtyp USING (raumtyp_kurzbz)
 				WHERE aktiv	AND raumtyp_kurzbz!='LM' ORDER BY raumtyp_kurzbz, hierarchie,ort_kurzbz";
-if(!$result=pg_query($conn, $sql_query))
-	$error_msg.=pg_errormessage($conn);
+$db = new basis_db();
+if(!$result = $db->db_query($sql_query))
+	$error_msg.=$db->db_last_error();
 else
-	$num_rows=@pg_numrows($result);
+	$num_rows=$db->db_num_rows($result);
 
 $rdf_url='http://www.technikum-wien.at/ort/';
 ?>
@@ -59,18 +59,18 @@ $sequenz='';
 
 for ($i=0;$i<$num_rows;$i++)
 {
-    $ortLAST=($i>0?pg_fetch_object($result,$i-1):null);
-	$ort=pg_fetch_object($result,$i);
-	$ortNEXT=(($i<$num_rows-1)?pg_fetch_object($result,$i+1):null);
+    $ortLAST=($i>0?$db->db_fetch_object($result,$i-1):null);
+	$ort=$db->db_fetch_object($result,$i);
+	$ortNEXT=(($i<$num_rows-1)?$db->db_fetch_object($result,$i+1):null);
 	$currentTYP=$ort->raumtyp_kurzbz;
 	$lastTYP=($i>0?$ortLAST->raumtyp_kurzbz:null);
 	$nextTYP=(($i<$num_rows-1)?$ortNEXT->raumtyp_kurzbz:null);
 	//echo "current:$currentTYP last:$lastTYP next:$nextTYP";
 	$raumtypen='';
 	$qry = "SELECT raumtyp_kurzbz FROM public.tbl_ortraumtyp WHERE ort_kurzbz='$ort->ort_kurzbz'";
-	if($result_rt = pg_query($conn, $qry))
+	if($result_rt = $db->db_query($qry))
 	{
-		while($row_rt = pg_fetch_object($result_rt))
+		while($row_rt = $db->db_fetch_object($result_rt))
 		{
 			if($raumtypen!='')
 				$raumtypen.=', ';

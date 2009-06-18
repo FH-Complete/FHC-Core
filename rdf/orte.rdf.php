@@ -27,14 +27,10 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/ort.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 	
 $rdf_url='http://www.technikum-wien.at/ort';
 
@@ -67,7 +63,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
       </RDF:li>';
 }
 //Daten holen
-$ortobj = new ort($conn, null, true);
+$ortobj = new ort();
 
 $ortobj->getAll();
 foreach ($ortobj->result as $row)

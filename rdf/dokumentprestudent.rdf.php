@@ -29,13 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/dokument.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $rdf_url='http://www.technikum-wien.at/dokumentprestudent';
 	
@@ -49,7 +45,7 @@ if(isset($_GET['prestudent_id']))
 else 
 	die('Fehlerhafte Parameteruebergabe');
 	
-$dok = new dokument($conn, null, null, true);
+$dok = new dokument();
 if(!$dok->getPrestudentDokumente($prestudent_id))
 	die($dok->errormsg);
 	

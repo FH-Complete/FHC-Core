@@ -27,19 +27,15 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 
-// DAO
-include('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
 
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
 $datum = new datum();
 
-loadVariables($conn, $user);
+loadVariables($user);
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
@@ -59,16 +55,17 @@ echo '
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT distinct person_id, vorname, nachname, titelpre, titelpost FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*'";
+$qry = "SELECT distinct person_id, vorname, nachname, titelpre, titelpost FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*' ORDER BY nachname, vorname, titelpre, titelpost";
 
 if(isset($_GET['nurmittitel']))
 {
 	$qry.=" AND (titelpre<>'' OR titelpost<>'')";
 }
+$db = new basis_db();
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '
 		  <RDF:li>

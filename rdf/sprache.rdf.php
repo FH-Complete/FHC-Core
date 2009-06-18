@@ -25,19 +25,17 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-include('../vilesci/config.inc.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 
 // sprachen holen
-$qry = "SELECT * FROM public.tbl_sprache order by sprache";
-$result = pg_query($conn, $qry);
+$qry = 'SELECT * FROM public.tbl_sprache ORDER BY sprache';
+$db = new basis_db();
+
 $rdf_url='http://www.technikum-wien.at/sprachen';
 
 echo '
@@ -60,16 +58,21 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
   </RDF:li>
   ';
 }
-while($row=pg_fetch_object($result))
+if($db->db_query($qry))
 {
-	echo '
-  <RDF:li>
-      	<RDF:Description id="'.$row->sprache.'"  about="'.$rdf_url.'/'.$row->sprache.'" >
-        	<SPRACHE:bezeichnung><![CDATA['.$row->sprache.']]></SPRACHE:bezeichnung>
-        	<SPRACHE:anzeigename><![CDATA['.$row->sprache.']]></SPRACHE:anzeigename>
-      	</RDF:Description>
-  </RDF:li>';
+	while($row = $db->db_fetch_object())
+	{
+		echo '
+	  <RDF:li>
+	      	<RDF:Description id="'.$row->sprache.'"  about="'.$rdf_url.'/'.$row->sprache.'" >
+	        	<SPRACHE:bezeichnung><![CDATA['.$row->sprache.']]></SPRACHE:bezeichnung>
+	        	<SPRACHE:anzeigename><![CDATA['.$row->sprache.']]></SPRACHE:anzeigename>
+	      	</RDF:Description>
+	  </RDF:li>';
+	}
 }
+else 
+	die('Fehlerhafte Qry');
 ?>
   </RDF:Seq>
 </RDF:RDF>

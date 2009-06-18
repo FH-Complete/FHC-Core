@@ -20,28 +20,17 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Raab <gerald.raab@technikum-wien.at>.
  */
-
-// header für no cache
-//header("Cache-Control: no-cache");
-//header("Cache-Control: post-check=0, pre-check=0",false);
-//header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
-//header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiensemester.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
-//$user = get_uid();
-//loadVariables($conn, $user);
 $datum = new datum();
+$db = new basis_db();
 $projektarbeit=array();
 $fussnotenzeichen=array('¹)','²)','³)');
 $anzahl_fussnoten=0;
@@ -85,7 +74,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	}
 	
 	$note_arr = array();
-	$note = new note($conn);
+	$note = new note();
 	$note->getAll();
 	foreach ($note->result as $n){
 		$note_arr[$n->note] = $n->anmerkung;
@@ -95,14 +84,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
 	else 
-		$studiensemester_kurzbz = $semester_aktuell;
+		die('Studiensemester muss uebergeben werden');
 
 	if(isset($_GET['lvid']))
 		$lehrveranstaltung_id = $_GET['lvid'];
 	else 
 		$lehrveranstaltung_id = 0;
-	
-	//$rdf_url='http://www.technikum-wien.at/zeugnisnote';
 	
 	//Daten holen
 
@@ -118,20 +105,24 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 										lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 									WHERE 
 										tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-										tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lehrveranstaltung_id."' AND
-										tbl_lehreinheit.studiensemester_kurzbz='$studiensemester_kurzbz'
+										tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."' AND
+										tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 									ORDER BY tbl_lehrfunktion.standardfaktor desc limit 1)";
-	if($lres = pg_query($conn, $lqry)){
-		if ($lrow = pg_fetch_object($lres)){	
+	if($db->db_query($lqry))
+	{
+		if ($lrow = $db->db_fetch_object())
+		{
 			$leiter_titel = $lrow->titelpre;			
 			$leiter_vorname = $lrow->vorname;
 			$leiter_nachname = $lrow->nachname;			
 		}		
 	}	
 	
-	$lvqry = "SELECT * from lehre.tbl_lehrveranstaltung where lehrveranstaltung_id = '".$lehrveranstaltung_id."'";
-	if($lvres = pg_query($conn, $lvqry)){
-		if ($lvrow = pg_fetch_object($lvres)){
+	$lvqry = "SELECT * from lehre.tbl_lehrveranstaltung where lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."'";
+	if($db->db_query($lvqry))
+	{
+		if ($lvrow = $db->db_fetch_object())
+		{
 			$sws = $lvrow->semesterstunden;
 			$ects = $lvrow->ects;
 			$lvbezeichnung = $lvrow->bezeichnung;			
@@ -139,10 +130,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	}
 	
 	$lehrinhalte = '';
-	$infoqry = "SELECT * from campus.tbl_lvinfo where sprache='German' and lehrveranstaltung_id = '".$lehrveranstaltung_id."'";
-	if($infores = pg_query($conn, $infoqry)){
-		if ($inforow = pg_fetch_object($infores)){
-			//$lehrinhalte = ereg_replace("<br>","<line lineafter='1' />",$inforow->lehrinhalte);	
+	$infoqry = "SELECT * FROM campus.tbl_lvinfo WHERE sprache='German' AND lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."'";
+	if($db->db_query($infoqry))
+	{
+		if ($inforow = $db->db_fetch_object())
+		{
 			$lehrinhalte_arr = explode("<br>",$inforow->lehrinhalte);			
 			for ($i = 0; $i < sizeof($lehrinhalte_arr); $i++)
 			{
@@ -154,10 +146,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	$xml .= "<zertifikate>";
 	
-	$studiensemester = new studiensemester($conn);
+	$studiensemester = new studiensemester();
 	$studiensemester->load($studiensemester_kurzbz);
-		
-		
+			
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
 	{	
 		$anzahl_fussnoten=0;
@@ -165,52 +156,26 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml_fussnote='';
 		
 		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."'";
-		//echo $query;
-		if($result = pg_query($conn, $query))
+
+		if($db->db_query($query))
 		{
-				if(!$row = pg_fetch_object($result))
+				if(!$row = $db->db_fetch_object())
 					die('Student not found');
 		}
 		else
 			die('Student not found');
 		
-		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion WHERE tbl_person.person_id = tbl_benutzer.person_id and tbl_benutzer.uid = tbl_benutzerfunktion.uid and tbl_benutzerfunktion.funktion_kurzbz = 'stgl' and tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
-		if($stgl_result = pg_query($conn, $stgl_query))
-				$stgl_row = pg_fetch_object($stgl_result);
+		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion 
+						WHERE tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_benutzerfunktion.uid 
+						AND tbl_benutzerfunktion.funktion_kurzbz = 'stgl' 
+						AND tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
+		if($db->db_query($stgl_query))
+			$stgl_row = $db->db_fetch_object();
 		else
 			die('Stgl not found');
-		/*
-		$sem_qry = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='".$row->studiengang_kz."' AND semester = '".$row->semester."'";
-		if($result_sem = pg_query($conn, $sem_qry))
-		{
-			if($row_sem = pg_fetch_object($result_sem))
-			{
-				$bezeichnung = $row_sem->bezeichnung;
-			}
-		}
-		
-		if($bezeichnung=='')
-			$bezeichnung = $row->semester.'. Semester';
-		*/
-			
 		
 		$xml .= "\n	<zertifikat>";
 		$xml .= "		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
-		//$xml .=	"		<semester>".$row->semester."</semester>";
-		//$xml .=	"		<semester_bezeichnung>".$bezeichnung."</semester_bezeichnung>";
-		//$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
-		/*if($row->typ=='b')
-			$bezeichnung='Bachelor-Studiengang';
-		elseif($row->typ=='m')
-			$bezeichnung='Master-Studiengang';
-		elseif($row->typ=='d')
-			$bezeichnung='Diplom-Studiengang';
-		else 
-			$bezeichnung='Studiengang';
-		$studiengang_typ=$row->typ;
-		*/
-		//$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
-		//$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
 		$xml .= "		<name>".trim($row->titelpre.' '.$row->vorname.' '.strtoupper($row->nachname).' '.$row->titelpost)."</name>";
@@ -222,7 +187,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		
 		
-		$obj = new zeugnisnote($conn, null, null, null, false);
+		$obj = new zeugnisnote();
 		$obj->load($lehrveranstaltung_id, $uid_arr[$i], $studiensemester_kurzbz);
 
 		if ($obj->note)

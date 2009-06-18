@@ -135,7 +135,7 @@ class adresse extends basis_db
 			return false;
 		}
 
-		while($row = $this->db_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
 			$adr_obj = new adresse();
 

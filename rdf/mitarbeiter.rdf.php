@@ -27,7 +27,6 @@ header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
 
-// DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');

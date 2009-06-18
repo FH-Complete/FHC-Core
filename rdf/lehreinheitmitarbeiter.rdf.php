@@ -25,16 +25,12 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehreinheitmitarbeiter.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -47,7 +43,7 @@ else
 	$mitarbeiter_uid = null;
 
 //Mitarbeiter holen
-$DAO_obj = new lehreinheitmitarbeiter($conn, null, null, true);
+$DAO_obj = new lehreinheitmitarbeiter();
 $DAO_obj->getLehreinheitmitarbeiter($lehreinheit_id, $mitarbeiter_uid);
 
 $rdf_url='http://www.technikum-wien.at/lehreinheitmitarbeiter';
@@ -65,10 +61,11 @@ foreach ($DAO_obj->lehreinheitmitarbeiter as $row)
 {
 	$vorname='unbekannt';
 	$nachname='unbekannt';
+	$db = new basis_db();
 	$qry = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='".addslashes($row->mitarbeiter_uid)."'";
-	if($result_lkt = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		if($row_lkt = pg_fetch_object($result_lkt))
+		if($row_lkt = $db->db_fetch_object())
 		{
 			$vorname = $row_lkt->vorname;
 			$nachname = $row_lkt->nachname;

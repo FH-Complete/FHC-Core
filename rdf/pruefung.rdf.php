@@ -29,13 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/pruefung.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['student_uid']))
 	$student_uid = $_GET['student_uid'];
@@ -49,8 +45,8 @@ else
 	
 $datum_obj = new datum();
 
-$pruefung = new pruefung($conn, null, true);
-	
+$pruefung = new pruefung();
+
 $rdf_url='http://www.technikum-wien.at/pruefung';
 
 echo '

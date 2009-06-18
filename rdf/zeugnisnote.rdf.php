@@ -27,7 +27,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
@@ -39,16 +39,12 @@ require_once('../include/lehrveranstaltung.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 $datum = new datum();
 
 $stg_arr = array();
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
 
 foreach ($stg_obj->result as $stg) 
@@ -80,15 +76,15 @@ echo '
 ';
    
 //Daten holen
-$obj = new zeugnisnote($conn, null, null, null, true);
+$obj = new zeugnisnote();
 
 $obj->getZeugnisnoten($lehrveranstaltung_id, $uid, $studiensemester_kurzbz);
-$benutzer = new student($conn, null, null);
+$benutzer = new student();
 
 foreach ($obj->result as $row)	
 {
 	$benutzer->load($row->student_uid);
-	$lv_obj = new lehrveranstaltung($conn);
+	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($row->lehrveranstaltung_id);
 	
 	echo '

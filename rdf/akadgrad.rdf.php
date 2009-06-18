@@ -29,11 +29,8 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 	
 $rdf_url='http://www.technikum-wien.at/akadgrad';
 
@@ -50,7 +47,10 @@ if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 else 
 	die('Studiengang_kz muss uebergeben werden');
 
-$qry = "SET CLIENT_ENCODING TO 'UNICODE'; SELECT * FROM lehre.tbl_akadgrad WHERE studiengang_kz='$studiengang_kz' ORDER BY titel";
+if(!is_numeric($studiengang_kz))
+	die('Studiengang_kz ist ungueltig');
+
+$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE studiengang_kz='$studiengang_kz' ORDER BY titel";
 
 if(isset($_GET['optional']) && $_GET['optional']=='true')
 {
@@ -67,9 +67,10 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 
 }
 
-if($result = pg_query($conn, $qry))
+$db = new basis_db();
+if($db->db_query($qry))
 {	
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
 		echo '
 	      <RDF:li>

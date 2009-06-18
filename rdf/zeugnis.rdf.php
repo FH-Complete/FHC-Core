@@ -20,29 +20,22 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Raab <gerald.raab@technikum-wien.at>.
  */
-
-// header für no cache
 //header("Cache-Control: no-cache");
 //header("Cache-Control: post-check=0, pre-check=0",false);
 //header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 //header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
-//$user = get_uid();
-//loadVariables($conn, $user);
 $datum = new datum();
+$db = new basis_db();
 $projektarbeit=array();
-$fussnotenzeichen=array('¹)','²)','³)');
+$fussnotenzeichen=array('Â¹)','Â²)','Â³)');
 $anzahl_fussnoten=0;
 $studiengang_typ='';
 $xml_fussnote='';
@@ -84,7 +77,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	}
 	
 	$note_arr = array();
-	$note = new note($conn);
+	$note = new note();
 	$note->getAll();
 	foreach ($note->result as $n)
 		$note_arr[$n->note] = $n->anmerkung;
@@ -94,11 +87,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	else 
 		$studiensemester_kurzbz = $semester_aktuell;
 	
-	//$rdf_url='http://www.technikum-wien.at/zeugnisnote';
-	
 	//Daten holen
 	
-	$xml = "<?xml version='1.0' encoding='ISO-8859-15' standalone='yes'?>";
+	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	$xml .= "<zeugnisse>";
 	
 	for ($i = 0; $i < sizeof($uid_arr); $i++)
@@ -108,33 +99,38 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml_fussnote='';
 		$projektarbeit=array();
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung, tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."' and tbl_studentlehrverband.student_uid=tbl_student.student_uid and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
-		//echo $query;
-		if($result = pg_query($conn, $query))
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, 
+					tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, 
+					tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, 
+					tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung, 
+					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id 
+				FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester 
+				WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
+				AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id 
+				AND tbl_student.student_uid = '".addslashes($uid_arr[$i])."' 
+				AND tbl_studentlehrverband.student_uid=tbl_student.student_uid 
+				AND tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
+				AND tbl_studentlehrverband.studiensemester_kurzbz = '".addslashes($studiensemester_kurzbz)."'";
+		
+		if($result = $db->db_query($query))
 		{
-				if(!$row = pg_fetch_object($result))
+				if(!$row = $db->db_fetch_object($result))
 					die('Student not found');
 		}
 		else
 			die('Student not found');
 		
-		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion WHERE tbl_person.person_id = tbl_benutzer.person_id and tbl_benutzer.uid = tbl_benutzerfunktion.uid and tbl_benutzerfunktion.funktion_kurzbz = 'stgl' and tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
-		if($stgl_result = pg_query($conn, $stgl_query))
-				$stgl_row = pg_fetch_object($stgl_result);
+		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname 
+						FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion 
+						WHERE tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_benutzerfunktion.uid 
+						AND tbl_benutzerfunktion.funktion_kurzbz = 'stgl' 
+						AND tbl_benutzerfunktion.studiengang_kz = '".addslashes($row->studiengang_kz)."'";
+		
+		if($stgl_result = $db->db_query($stgl_query))
+				$stgl_row = $db->db_fetch_object($stgl_result);
 		else
 			die('Stgl not found');
-		
-		/* Bezeichnung des Lehrverbandes
-		$sem_qry = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='".$row->studiengang_kz."' AND semester = '".$row->semester."'";
-		if($result_sem = pg_query($conn, $sem_qry))
-		{
-			if($row_sem = pg_fetch_object($result_sem))
-			{
-				$bezeichnung = $row_sem->bezeichnung;
-			}
-		}
-		*/
-		
+						
 		if($row->semester!=0)
 			$bezeichnung = $row->semester.'. Semester';
 		else 
@@ -146,9 +142,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					prestudent_id='".addslashes($row->prestudent_id)."' AND 
 					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 					status_kurzbz!='Incoming' LIMIT 1";
-			if($result_sem = pg_query($conn, $qry))
+			if($result_sem = $db->db_query($qry))
 			{
-				if($row_sem = pg_fetch_object($result_sem))
+				if($row_sem = $db->db_fetch_object($result_sem))
 				{
 					$row->semester = $row_sem->semester;
 					$bezeichnung = $row_sem->semester.'. Semester';
@@ -190,10 +186,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
 		
-		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".$uid_arr[$i]."' AND studiensemester_kurzbz='$studiensemester_kurzbz' AND projekttyp_kurzbz in('Bachelor', 'Diplom')";
-		if($result_proj = pg_query($conn, $qry_proj))
+		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".addslashes($uid_arr[$i])."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND projekttyp_kurzbz in('Bachelor', 'Diplom')";
+		if($result_proj = $db->db_query($qry_proj))
 		{
-			while($row_proj = pg_fetch_object($result_proj))
+			while($row_proj = $db->db_fetch_object($result_proj))
 			{
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['titel']=$row_proj->titel;
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['themenbereich']=$row_proj->themenbereich;
@@ -201,7 +197,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 		}
 				
-		$obj = new zeugnisnote($conn, null, null, null, false);
+		$obj = new zeugnisnote();
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
 
@@ -223,14 +219,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 							tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 							tbl_projektarbeit.firma_id = tbl_firma.firma_id AND
-							tbl_projektarbeit.student_uid='".$uid_arr[$i]."' AND 
-							tbl_lehreinheit.studiensemester_kurzbz='$studiensemester_kurzbz' AND 
-							tbl_lehrveranstaltung.lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+							tbl_projektarbeit.student_uid='".addslashes($uid_arr[$i])."' AND 
+							tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
+							tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($row->lehrveranstaltung_id)."'";
 				
 				$firma = '';
-				if($result_firma = pg_query($conn, $qry))
+				if($result_firma = $db->db_query($qry))
 				{
-					if($row_firma = pg_fetch_object($result_firma))
+					if($row_firma = $db->db_fetch_object($result_firma))
 					{
 						if($row_firma->name!='')
 							$firma = " bei Firma: $row_firma->name";
@@ -293,12 +289,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$bisio_universitaet = '';
 				$auslandssemester=false;
 				
-				$qry = "SELECT tbl_bisio.* FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id' AND student_uid='".$uid_arr[$i]."'";
-				if($result_bisio = pg_query($conn, $qry))
+				$qry = "SELECT tbl_bisio.* FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+						WHERE tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id' 
+						AND student_uid='".addslashes($uid_arr[$i])."'";
+				if($result_bisio = $db->db_query($qry))
 				{
-					if($row_bisio = pg_fetch_object($result_bisio))
+					if($row_bisio = $db->db_fetch_object($result_bisio))
 					{
-						//$bezeichnung = "Auslandsaufenthalt: $row_bisio->von-$row_bisio->bis, $row_bisio->ort, $row_bisio->universitaet\nDie im Ausland absolvierten Lehrveranstaltungen werden für das $semester. Semester des Studiums n der Fachhochschule Technikum Wien angerechnet (Details siehe Transcript of Records der Gasthochschule).";
 						$bisio_von = $row_bisio->von;
 						$bisio_bis = $row_bisio->bis;
 						$bisio_ort = $row_bisio->ort;
@@ -308,11 +305,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 				}
 				
-				$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE (studiengang_kz, semester) in (SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=$row->lehrveranstaltung_id)";
+				$qry = "SELECT wochen FROM public.tbl_semesterwochen 
+						WHERE (studiengang_kz, semester) in (SELECT studiengang_kz, semester 
+						FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=$row->lehrveranstaltung_id)";
 				$wochen = 15;
-				if($result_wochen = pg_query($conn, $qry))
+				if($result_wochen = $db->db_query($qry))
 				{
-					if($row_wochen = pg_fetch_object($result_wochen))
+					if($row_wochen = $db->db_fetch_object($result_wochen))
 					{
 						$wochen = $row_wochen->wochen;
 					}

@@ -25,19 +25,15 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehreinheitgruppe.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/gruppe.class.php');
 require_once('../include/lehrverband.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -45,10 +41,10 @@ else
 	$lehreinheit_id = null;
 
 //Gruppen holen
-$DAO_obj = new lehreinheitgruppe($conn);
+$DAO_obj = new lehreinheitgruppe();
 $DAO_obj->getLehreinheitgruppe($lehreinheit_id);
 
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll();
 $stg = array();
 foreach ($stg_obj->result as $row)
@@ -70,7 +66,7 @@ foreach ($DAO_obj->lehreinheitgruppe as $row)
 	if($row->gruppe_kurzbz!='')
 	{
 		$bezeichnung = $row->gruppe_kurzbz;
-		$gruppe = new gruppe($conn);
+		$gruppe = new gruppe();
 		$gruppe->load($row->gruppe_kurzbz);
 		$beschreibung = $gruppe->bezeichnung;
 		
@@ -78,7 +74,7 @@ foreach ($DAO_obj->lehreinheitgruppe as $row)
 	else
 	{
 		$bezeichnung = $stg[$row->studiengang_kz].$row->semester.$row->verband.$row->gruppe;
-		$gruppe = new lehrverband($conn);
+		$gruppe = new lehrverband();
 		$gruppe->load($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe);
 		$beschreibung = $gruppe->bezeichnung;
 	}

@@ -29,12 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
+require_once('../include/basis_db.class.php');
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -60,10 +57,12 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SET CLIENT_ENCODING TO 'UNICODE';SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
-if($result = pg_query($conn, $qry))
+$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
+$db = new basis_db();
+
+if($db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
 		
 		echo '

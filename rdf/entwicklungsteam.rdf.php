@@ -29,14 +29,10 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/entwicklungsteam.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['mitarbeiter_uid']))
 	$mitarbeiter_uid = $_GET['mitarbeiter_uid'];
@@ -49,14 +45,14 @@ else
 	$studiengang_kz = '';
 	
 $datum = new datum();
-$stg = new studiengang($conn, null, null, true);
+$stg = new studiengang();
 $stg->getAll(null, false);
 $stg_arr = array();
 
 foreach ($stg->result as $row)
 	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 
-$entwicklungsteam = new entwicklungsteam($conn, null, null, true);
+$entwicklungsteam = new entwicklungsteam();
 if(!$entwicklungsteam->getEntwicklungsteam($mitarbeiter_uid, $studiengang_kz))
 	die($entwicklungsteam->errormsg);
 $rdf_url='http://www.technikum-wien.at/entwicklungsteam';

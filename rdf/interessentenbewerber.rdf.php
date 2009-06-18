@@ -30,19 +30,15 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/datum.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $rdf_url='http://www.technikum-wien.at/interessent';
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 $datum = new datum();
 
 echo '
@@ -81,7 +77,7 @@ if(isset($_GET['typ']))
 else 
 	$typ=null;
 
-$prestd = new prestudent($conn, null, true);
+$prestd = new prestudent();
 
 if($studiengang_kz!=null)
 {
@@ -107,10 +103,10 @@ else
 
 function DrawInteressent($row)
 {
-		global $rdf_url, $conn, $datum;
-		$ps = new prestudent($conn);
+		global $rdf_url, $datum;
+		$ps = new prestudent();
 		$ps->getLastStatus($row->prestudent_id);
-
+		//<PRESTD:foto><![CDATA['.$row->foto.']]></PRESTD:foto>
 		echo '
 		  <RDF:li>
 	      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -131,7 +127,7 @@ function DrawInteressent($row)
 	    		<PRESTD:aktiv><![CDATA['.($row->aktiv?'true':'false').']]></PRESTD:aktiv>
 	    		<PRESTD:gebort><![CDATA['.$row->gebort.']]></PRESTD:gebort>
 	    		<PRESTD:gebzeit><![CDATA['.$row->gebzeit.']]></PRESTD:gebzeit>
-	    		<PRESTD:foto><![CDATA['.$row->foto.']]></PRESTD:foto>
+	    		
 	    		<PRESTD:anmerkungen><![CDATA['.$row->anmerkungen.']]></PRESTD:anmerkungen>
 	    		<PRESTD:svnr><![CDATA['.$row->svnr.']]></PRESTD:svnr>
 	    		<PRESTD:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></PRESTD:ersatzkennzeichen>

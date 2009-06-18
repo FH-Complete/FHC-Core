@@ -25,16 +25,12 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehrfach.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 if(isset($_GET['studiengang_kz']))
 	$stg = $_GET['studiengang_kz'];
@@ -45,20 +41,26 @@ if(isset($_GET['semester']))
 	$sem = $_GET['semester'];
 else
 	$sem = '';
+$db = new basis_db();
 
 if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
 {
 	$lvid = $_GET['lehrveranstaltung_id'];
 
 	$qry = "SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$lvid'";
-
-	$result = pg_query($conn, $qry);
-	if($row = pg_fetch_object($result))
+	
+	
+	if($db->db_query($qry))
 	{
-		$stg = $row->studiengang_kz;
-		$sem = $row->semester;
+		if($row = $db->db_fetch_object())
+		{
+			$stg = $row->studiengang_kz;
+			$sem = $row->semester;
+		}
+		else
+			die('Fehler beim Laden der Daten');
 	}
-	else
+	else 
 		die('Fehler beim Laden der Daten');
 }
 
@@ -96,9 +98,9 @@ if($sem!='')
 	
 $qry.=$where;
 $qry.=" ORDER BY bezeichnung";
-if($result = pg_query($conn, $qry))
+if($db->db_query($qry))
 {
-	while($lehrfach = pg_fetch_object($result))
+	while($lehrfach = $db->db_fetch_object())
 	{
 		echo '
       <RDF:li>

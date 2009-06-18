@@ -29,13 +29,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/adresse.class.php');
 require_once('../include/datum.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
@@ -49,7 +45,7 @@ else
 	
 $datum = new datum();
 
-$adresse = new adresse($conn, null, true);
+$adresse = new adresse();
 	
 $rdf_url='http://www.technikum-wien.at/adresse';
 
@@ -76,7 +72,8 @@ else
 
 function draw_rdf($row)
 {
-	global $rdf_url, $conn;
+	global $rdf_url;
+	$db = new basis_db();
 	
 	$typ='';
 	switch ($row->typ)
@@ -90,9 +87,9 @@ function draw_rdf($row)
 	if($row->firma_id!='')
 	{
 		$qry="SELECT * FROM public.tbl_firma WHERE firma_id='".addslashes($row->firma_id)."'";
-		if($result_firma=pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row_firma = pg_fetch_object($result_firma))
+			if($row_firma = $db->db_fetch_object())
 			{
 				$firma_name = $row_firma->name;
 			}

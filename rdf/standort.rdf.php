@@ -27,13 +27,10 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 	
 $rdf_url='http://www.technikum-wien.at/standort';
 
@@ -58,8 +55,9 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 }
 
 $qry = "SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz";
-if($result = pg_query($conn, $qry))
-	while($row = pg_fetch_object($result))
+$db = new basis_db();
+if($db->db_query($qry))
+	while($row = $db->db_fetch_object())
 		draw_content($row);
 
 function draw_content($row)

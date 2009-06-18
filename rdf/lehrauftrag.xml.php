@@ -23,7 +23,7 @@
  *
  * Erstellt ein XML File fuer den Lehrauftrag
  */
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiengang.class.php');
@@ -37,10 +37,6 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 //Parameter holen
 if(isset($_GET['uid']))
@@ -72,32 +68,33 @@ function CutString($strVal, $limit)
 // GENERATE XML
 $xml = '<?xml version="1.0" encoding="UTF-8" ?><lehrauftraege>';
 $stg_arr = array();
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll();
 
 foreach ($studiengang->result as $row)
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
 
 //Studiengang laden
-$studiengang = new studiengang($conn, $studiengang_kz);
+$studiengang = new studiengang($studiengang_kz);
 
 //Fachbereiche laden
 $fb_arr = array();
-	$fachbereich_obj = new fachbereich($conn);
+	$fachbereich_obj = new fachbereich();
 	$fachbereich_obj->getAll();
 	foreach ($fachbereich_obj->result as $fb)
 		$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
 		
 //Studiengangsleiter holen
 $stgl='';
+$db = new basis_db();
 if($studiengang_kz!='')
 {
 	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
 			funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
 			AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object())
 		{
 			$stgl = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
 		}
@@ -137,9 +134,9 @@ if($uid==null)
 						tbl_projektbetreuer.stunden!='0' AND tbl_projektbetreuer.faktor!='0' AND tbl_projektbetreuer.stundensatz!='0'
 					) as mitarbeiter";
 	
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			drawLehrauftrag($row->mitarbeiter_uid);
 		}
@@ -155,7 +152,6 @@ function drawLehrauftrag($uid)
 	global $stg_arr;
 	global $ss;
 	global $xml;
-	global $conn;
 	global $stgl;
 	global $ANZAHL_ZEILEN_PRO_SEITE;
 	
@@ -183,19 +179,20 @@ function drawLehrauftrag($uid)
 	//Lektor
 	$qry = "SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) WHERE uid='".addslashes($uid)."'
 			ORDER BY zustelladresse DESC, firma_id LIMIT 1";
+	$db = new basis_db();
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 		{
 			$firmenanschrift=false;
 			if($row->firma_id!='')
 			{
 				$qry ="SELECT tbl_firma.name, tbl_adresse.strasse, tbl_adresse.plz, tbl_adresse.ort FROM public.tbl_firma JOIN public.tbl_adresse USING(firma_id) 
 						WHERE tbl_firma.firma_id='$row->firma_id' AND person_id='$row->person_id' LIMIT 1";
-				if($result_firma = pg_query($conn, $qry))
+				if($result_firma = $db->db_query($qry))
 				{
-					if($row_firma = pg_fetch_object($result_firma))
+					if($row_firma = $db->db_fetch_object($result_firma))
 					{
 						$name_gesamt = $row_firma->name;
 						$strasse = $row_firma->strasse;
@@ -240,14 +237,14 @@ function drawLehrauftrag($uid)
 	$qry.=" ORDER BY lehreinheit_id";
 	$lv = array();
 	$anzahl_lvs=0;
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$last_le='';
 		$gesamtkosten = 0;
 		$gesamtstunden = 0;
 		$gruppen = array();
 		$grp='';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($last_le!=$row->lehreinheit_id && $last_le!='')
 			{
@@ -349,9 +346,9 @@ function drawLehrauftrag($uid)
 	              tbl_lehreinheit.studiensemester_kurzbz='$ss' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id ";
 	if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$brutto = $row->stunden*$row->stundensatz*$row->faktor;
 			if($brutto!=0)

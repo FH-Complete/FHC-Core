@@ -166,6 +166,8 @@ if(isset($_GET['start']))
 	$prueflingfrage->begintime = date('Y-m-d H:i:s');
 	if(!$prueflingfrage->save_prueflingfrage(false))
 		die('Fehler beim Startvorgang');
+		
+	echo '<script language="Javascript">parent.menu.location.reload();</script>';
 }
 
 //Speichern einer Antwort
@@ -452,7 +454,7 @@ if($frage->frage_id!='')
 	if(!$gebiet->multipleresponse && !$levelgebiet && count($vs->result)>0)
 	{
 		echo "<td align='center' valign='top'>";
-		echo '<input type="radio" name="vorschlag_id[]" value="" /><br /><font color="gray">keine Antwort</font></td>';
+		echo '<input type="radio" name="vorschlag_id[]" value="" /><br /><font color="#acacac">CLEAR</font></td>';
 	}
 	echo '</tr></table>';
 	

@@ -25,25 +25,21 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/fachbereich.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 
 $studiensemester_kurzbz=$semester_aktuell;
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $fb = $rechte->getFbKz();
 
@@ -61,7 +57,7 @@ if(count($fb)>0 && !in_array('0',$fb))
 }
 
 $qry.=" ORDER BY bezeichnung";
-$result = pg_query($conn, $qry);
+
 
 $rdf_url='http://www.technikum-wien.at/fachbereich';
 
@@ -76,49 +72,54 @@ echo '
 $hier = '';
 $lektoren = '';
 $lkt = array();
-while ($row = pg_fetch_object($result))
+$db = new basis_db();
+
+if($result = $db->db_query($qry))
 {
-	echo ' 
-      	<RDF:Description  id="'.$row->fachbereich_kurzbz.'"  about="'.$rdf_url.'/'.$row->fachbereich_kurzbz.'" >
-    		<FACHBEREICH:kurzbz>'.$row->fachbereich_kurzbz.'</FACHBEREICH:kurzbz>
-    		<FACHBEREICH:bezeichnung><![CDATA['.$row->bezeichnung.']]></FACHBEREICH:bezeichnung>
-    		<FACHBEREICH:farbe>'.$row->farbe.'</FACHBEREICH:farbe>
-    		<FACHBEREICH:studiengang_kz>'.$row->studiengang_kz.'</FACHBEREICH:studiengang_kz>
-    		<FACHBEREICH:uid></FACHBEREICH:uid>
-      	</RDF:Description>
-      	';
-  $hier .= "\n<RDF:li>";
-  $hier .= "\n".'   <RDF:Seq about="'.$rdf_url.'/'.$row->fachbereich_kurzbz.'">'."\n";
-  
-  $qry = "SELECT 
-			distinct mitarbeiter_uid as uid, tbl_mitarbeiter.kurzbz, vorname, nachname, titelpre, titelpost 
-		FROM 
-			campus.vw_lehreinheit JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) 
-			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
-		WHERE 
-			fachbereich_kurzbz='".addslashes($row->fachbereich_kurzbz)."' AND
-			studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-  //echo $qry;
-  if($result_lkt = pg_query($conn, $qry))
-  {
-  	while($row_lkt = pg_fetch_object($result_lkt))
-  	{
-  		$hier .='      <RDF:li resource="'.$rdf_url.'/'.$row_lkt->uid.'" />'."\n";
-  		if(!in_array($row_lkt->uid, $lkt))
-  		{
-  			$lkt[]=$row_lkt->uid;
-  			$lektoren .='<RDF:Description  id="'.$row_lkt->uid.'"  about="'.$rdf_url.'/'.$row_lkt->uid.'" >
-				    		<FACHBEREICH:kurzbz>'.$row_lkt->kurzbz.'</FACHBEREICH:kurzbz>
-				    		<FACHBEREICH:bezeichnung><![CDATA['.trim($row_lkt->titelpre.' '.$row_lkt->vorname.' '.$row_lkt->nachname.' '.$row_lkt->titelpost).']]></FACHBEREICH:bezeichnung>
-				    		<FACHBEREICH:farbe></FACHBEREICH:farbe>
-				    		<FACHBEREICH:studiengang_kz></FACHBEREICH:studiengang_kz>
-				    		<FACHBEREICH:uid><![CDATA['.$row_lkt->uid.']]></FACHBEREICH:uid>
-				      	</RDF:Description>';
-  		}
-  	}
-  }
-  $hier .= "\n   </RDF:Seq>";
-  $hier .= "\n</RDF:li>";
+	while ($row = $db->db_fetch_object($result))
+	{
+		echo ' 
+	      	<RDF:Description  id="'.$row->fachbereich_kurzbz.'"  about="'.$rdf_url.'/'.$row->fachbereich_kurzbz.'" >
+	    		<FACHBEREICH:kurzbz>'.$row->fachbereich_kurzbz.'</FACHBEREICH:kurzbz>
+	    		<FACHBEREICH:bezeichnung><![CDATA['.$row->bezeichnung.']]></FACHBEREICH:bezeichnung>
+	    		<FACHBEREICH:farbe>'.$row->farbe.'</FACHBEREICH:farbe>
+	    		<FACHBEREICH:studiengang_kz>'.$row->studiengang_kz.'</FACHBEREICH:studiengang_kz>
+	    		<FACHBEREICH:uid></FACHBEREICH:uid>
+	      	</RDF:Description>
+	      	';
+	  $hier .= "\n<RDF:li>";
+	  $hier .= "\n".'   <RDF:Seq about="'.$rdf_url.'/'.$row->fachbereich_kurzbz.'">'."\n";
+	  
+	  $qry = "SELECT 
+				distinct mitarbeiter_uid as uid, tbl_mitarbeiter.kurzbz, vorname, nachname, titelpre, titelpost 
+			FROM 
+				campus.vw_lehreinheit JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) 
+				JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
+			WHERE 
+				fachbereich_kurzbz='".addslashes($row->fachbereich_kurzbz)."' AND
+				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	  //echo $qry;
+	  if($result_lkt = $db->db_query($qry))
+	  {
+	  	while($row_lkt = $db->db_fetch_object($result_lkt))
+	  	{
+	  		$hier .='      <RDF:li resource="'.$rdf_url.'/'.$row_lkt->uid.'" />'."\n";
+	  		if(!in_array($row_lkt->uid, $lkt))
+	  		{
+	  			$lkt[]=$row_lkt->uid;
+	  			$lektoren .='<RDF:Description  id="'.$row_lkt->uid.'"  about="'.$rdf_url.'/'.$row_lkt->uid.'" >
+					    		<FACHBEREICH:kurzbz>'.$row_lkt->kurzbz.'</FACHBEREICH:kurzbz>
+					    		<FACHBEREICH:bezeichnung><![CDATA['.trim($row_lkt->titelpre.' '.$row_lkt->vorname.' '.$row_lkt->nachname.' '.$row_lkt->titelpost).']]></FACHBEREICH:bezeichnung>
+					    		<FACHBEREICH:farbe></FACHBEREICH:farbe>
+					    		<FACHBEREICH:studiengang_kz></FACHBEREICH:studiengang_kz>
+					    		<FACHBEREICH:uid><![CDATA['.$row_lkt->uid.']]></FACHBEREICH:uid>
+					      	</RDF:Description>';
+	  		}
+	  	}
+	  }
+	  $hier .= "\n   </RDF:Seq>";
+	  $hier .= "\n</RDF:li>";
+	}
 }
 
 echo $lektoren;

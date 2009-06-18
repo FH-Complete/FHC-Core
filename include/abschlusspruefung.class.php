@@ -52,7 +52,7 @@ class abschlusspruefung extends basis_db
 	 */
 	public function __construct($abschlusspruefung_id=null)
 	{
-		parent::__constuct();
+		parent::__construct();
 		
 		if(!is_null($abschlusspruefung_id))
 			$this->load($abschlusspruefung_id);

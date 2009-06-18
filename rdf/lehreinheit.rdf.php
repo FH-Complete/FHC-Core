@@ -30,20 +30,16 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/lehreinheitgruppe.class.php');
 require_once('../include/lehrfach.class.php');
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $lehreinheit_id = (isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:'');
 $lehrveranstaltung_id = (isset($_GET['lehrveranstaltung_id'])?$_GET['lehrveranstaltung_id']:'');
 $studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:'');
 
-$lehreinheit=new lehreinheit($conn, null, true);
+$lehreinheit=new lehreinheit();
 
 $rdf_url='http://www.technikum-wien.at/lehreinheit';
 
@@ -101,9 +97,9 @@ else
 
 function draw_row($row)
 {
-	global $rdf_url, $conn;
+	global $rdf_url;
 	
-	$legrp = new lehreinheitgruppe($conn, null, true);	
+	$legrp = new lehreinheitgruppe();
 	$legrp->getLehreinheitgruppe($row->lehreinheit_id);
 	
 	$grp='';
@@ -119,20 +115,22 @@ function draw_row($row)
 			lehreinheit_id='$row->lehreinheit_id'";
 
 	$mitarbeiter='';
-	if($result = pg_query($conn, $qry))
+	$db = new basis_db();
+	
+	if($db->db_query($qry))
 	{
-		while($row_ma = pg_fetch_object($result))
+		while($row_ma = $db->db_fetch_object())
 			$mitarbeiter .=' '.$row_ma->kurzbz;
 	}
 	$mitarbeiter = '('.$mitarbeiter.')';
 	
 	$anzahl_studenten=0;		
 	$qry = "SELECT count(*) as anz FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
-	if($result_std = pg_query($conn, $qry))
-		if($row_std = pg_fetch_object($result_std))
+	if($db->db_query($qry))
+		if($row_std = $db->db_fetch_object())
 			$anzahl_studenten = $row_std->anz;
 	
-	$lehrfach = new lehrfach($conn, null, true);
+	$lehrfach = new lehrfach();
 	$lehrfach->load($row->lehrfach_id);
 	
 	echo '
