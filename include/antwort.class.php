@@ -19,57 +19,43 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class antwort
+class antwort extends basis_db
 {
 	//Tabellenspalten
-	var $antwort_id;
-	var $pruefling_id;
-	var $vorschlag_id;
+	public $antwort_id;
+	public $pruefling_id;
+	public $vorschlag_id;
 		
 	// ErgebnisArray
-	var $result=array();
-	var $num_rows=0;
-	var $errormsg;
-	var $new;
+	public $result=array();
+	public $num_rows=0;
+	public $new;
 		
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Antwort
-	// * @param $conn        	Datenbank-Connection
-	// *        $frage_id       Frage die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function antwort($conn, $antwort_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional eine Antwort
+	 * @param $frage_id       Frage die geladen werden soll (default=null)
+	 */
+	public function __construct($antwort_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/		
-		if($antwort_id != null)
+		parent::__construct();
+		
+		if(!is_null(antwort_id))
 			$this->load($antwort_id);
 	}
 	
-	// ***********************************************************
-	// * Laedt antwort mit der uebergebenen ID
-	// * @param $antwort_id ID der Frage die geladen werden soll
-	// ***********************************************************
-	function load($antwort_id)
+	/**
+	 * Laedt Antwort mit der uebergebenen ID
+	 * @param $antwort_id ID der Frage die geladen werden soll
+	 */
+	public function load($antwort_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_antwort WHERE antwort_id='".addslashes($antwort_id)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->antwort_id = $row->antwort_id;
 				$this->pruefling_id = $row->pruefling_id;
@@ -78,45 +64,34 @@ class antwort
 			}
 			else 
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $antwort_id";
+				$this->errormsg = 'Kein Eintrag gefunden';
 				return false;
-			}				
+			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Fehler beim Laden der Antwort";
 			return false;
-		}		
+		}
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+			
+	/**
+	 * Prueft die Variablen vor dem Speichern 
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		return true;
 	}
 	
-	// ******************************************************************
-	// * Speichert die Daten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
-	function save()
+	/**
+	 * Speichert die Daten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -132,18 +107,18 @@ class antwort
 		{			
 			$qry = 'UPDATE testtool.tbl_antwort SET'.
 			       ' vorschlag_id='.$this->addslashes($this->vorschlag_id).','.
-			       " pruefling_id='".$this->pruefling_id."'".
+			       ' pruefling_id='.$this->addslashes($this->pruefling_id).','.
 			       " WHERE antwort_id='".addslashes($this->antwort_id)."'";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
 		else 
 		{	
-			$this->errormsg = 'Fehler beim Speichern der Antwort:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Antwort';
 			return false;
 		}
 	}
@@ -163,7 +138,7 @@ class antwort
 		}
 		
 		$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id='".addslashes($antwort_id)."'";
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -174,7 +149,14 @@ class antwort
 		}
 	}
 	
-	function getAntwort($pruefling_id, $frage_id)
+	/**
+	 * Liefert die Antwort eines Pruefling zu einer Frage
+	 *
+	 * @param $pruefling_id
+	 * @param $frage_id
+	 * @return boolean
+	 */
+	public function getAntwort($pruefling_id, $frage_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_antwort JOIN testtool.tbl_pruefling_frage USING(pruefling_id) 
 				JOIN testtool.tbl_vorschlag USING(vorschlag_id) 
@@ -182,11 +164,12 @@ class antwort
 					tbl_vorschlag.frage_id=tbl_pruefling_frage.frage_id AND 
 					pruefling_id='".addslashes($pruefling_id)."' AND 
 					tbl_vorschlag.frage_id='".addslashes($frage_id)."'";
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new antwort($this->conn, null, null);
+				$obj = new antwort();
 				
 				$obj->antwort_id = $row->antwort_id;
 				$obj->frage_id = $row->frage_id;

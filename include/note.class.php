@@ -24,59 +24,41 @@
  * Klasse Note
  * @create 2007-06-06
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class note
+class note extends basis_db
 {
-	var $conn;     			// resource DB-Handle
-	var $new;       		// boolean
-	var $errormsg;  		// string
-	var $result=array();
+	public $new;       		// boolean
+	public $result=array();
 
 	//Tabellenspalten
-	var $note;		// smallint
-	var $bezeichnung;				// varchar(32)
-	var $anmerkung;	// varchar(256)
-	var $farbe;
+	public $note;				// smallint
+	public $bezeichnung;		// varchar(32)
+	public $anmerkung;			// varchar(256)
+	public $farbe;
 
-
-
-	// *********************************************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// *********************************************************************
-	function note($conn, $note = null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 */
+	public function __construct($note = null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg= "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/
 		if($note != null)
 			$this->load($note);
 	}
 
-	// **************************************************************
-	// * Laedt eine Zeugnisnote
-	// * @param  $lehrveranstaltung_id
-	// *         $student_uid
-	// *         $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// ***************************************************************
-	function load($note)
+	/**
+	 * Laedt eine Note
+	 * @param  $lehrveranstaltung_id
+	 *         $student_uid
+	 *         $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($note)
 	{
 		if(!is_numeric($note))
 		{
@@ -86,9 +68,9 @@ class note
 
 		$qry = "SELECT * FROM lehre.tbl_note WHERE note='".$note."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->note = $row->note;
 				$this->bezeichnung = $row->bezeichnung;
@@ -109,37 +91,27 @@ class note
 		}
 	}
 
-	// *************************************
-	// * Prueft die Daten vor dem Speichern
-	// * auf Gueltigkeit
-	// *************************************
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern
+	 * auf Gueltigkeit
+	 */
+	public function validate()
 	{
 		if(!is_numeric($this->note))
 		{
 			$this->errormsg = 'Note ist ungueltig';
 			return false;
 		}
+		return true;
 	}	
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************************************************
-	function save($new=null)
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if($new==null)
 			$new=$this->new;
@@ -164,7 +136,7 @@ class note
 				'WHERE note='.$this->addslashes($this->note).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -174,36 +146,20 @@ class note
 			return false;
 		}
 	}
-
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
 	
-	function delete($note)
+	/**
+	 * Laedt alle Noten
+	 * @return true wenn ok, false wenn Fehler
+	 */	
+	public function getAll()
 	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-
-	// *********************************************
-	// * Laed alle Noten
-	// * @return true wenn ok, false wenn Fehler
-	// *********************************************
-	
-	function getAll()
-	{
-
-		$qry = "select * from lehre.tbl_note order by note";
+		$qry = "SELECT * FROM lehre.tbl_note ORDER BY note";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$n = new note($this->conn, null, null);
+				$n = new note();
 
 				$n->note = $row->note;
 				$n->bezeichnung = $row->bezeichnung;
@@ -216,7 +172,7 @@ class note
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

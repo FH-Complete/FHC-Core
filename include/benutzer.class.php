@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('person.class.php');
+require_once(dirname(__FILE__).'/person.class.php');
 
 class benutzer extends person
 {
@@ -29,10 +29,10 @@ class benutzer extends person
 	public $alias;			// varchar(256)
 	public $bn_ext_id;
 		
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
-	// * @param $uid            Benutzer der geladen werden soll (default=null)
-	// *************************************************************************
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
+	 * @param $uid            Benutzer der geladen werden soll (default=null)
+	 */
 	public function __construct($uid=null)
 	{
 		parent::__construct();
@@ -41,10 +41,10 @@ class benutzer extends person
 			$this->load($uid);
 	}
 	
-	// ***********************************************************
-	// * Laedt Benutzer mit der uebergebenen ID
-	// * @param $uid ID der Person die geladen werden soll
-	// ***********************************************************
+	/**
+	 * Laedt Benutzer mit der uebergebenen ID
+	 * @param $uid ID der Person die geladen werden soll
+	 */
 	public function load($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
@@ -74,11 +74,11 @@ class benutzer extends person
 		}		
 	}
 	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
+	/**
+	 * Prueft die Variablen vor dem Speichern 
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	protected function validate()
 	{
 		if(strlen($this->uid)>32)
@@ -127,12 +127,12 @@ class benutzer extends person
 		return true;
 	}
 	
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
+	/**
+	 * Speichert die Benutzerdaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten der Datensatz mit $uid upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	public function save($new=null, $saveperson=true)
 	{
 		if($saveperson)
@@ -199,9 +199,10 @@ class benutzer extends person
 		}
 	}
 	
-	// ****
-	// * Prueft ob die UID bereits existiert
-	// ****
+	/**
+	 * Prueft ob die UID bereits existiert
+	 * @param uid
+	 */
 	public function uid_exists($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
@@ -228,9 +229,10 @@ class benutzer extends person
 		
 	}
 	
-	// ****
-	// * Prueft ob der alias bereits existiert
-	// ****
+	/**
+	 * Prueft ob der alias bereits existiert
+	 * @param $alias
+	 */
 	public function alias_exists($alias)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='".addslashes($alias)."'";

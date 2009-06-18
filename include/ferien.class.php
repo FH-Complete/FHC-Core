@@ -23,53 +23,59 @@
  * Klasse ferien (FAS-Online)
  * @create 07-12-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class ferien
+class ferien extends basis_db 
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 			// @var string
-	var $ferien = array(); 	// @var ferien Objekt
+	public $new;     			// boolean
+	public $ferien = array(); 	// ferien Objekt
 
 	//Tabellenspalten
-	var $bezeichnung;		// @var varchar(64)
-	var $studiengang_kz;	// @var integer
-	var $vondatum;			// @var date
-	var $bisdatum;			// @var date
-	var $vontimestamp;
-	var $bistimestamp;
+	public $bezeichnung;		// varchar(64)
+	public $studiengang_kz;		// integer
+	public $vondatum;			// date
+	public $bisdatum;			// date
+	public $vontimestamp;
+	public $bistimestamp;
 
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $bezeichnung und studiengang_kz ID der zu ladenden Ferien
+	 * @param $bezeichnung und studiengang_kz ID der zu ladenden Ferien
 	 */
-	function ferien($conn, $bezeichnung=null, $studiengang_kz=null)
+	public function _construct($bezeichnung=null, $studiengang_kz=null)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		
 		if($bezeichnung!=null && $studiengang_kz!=null && is_numeric($studiengang_kz))
 			$this->load($bezeichnung, studiengang_kz);
 	}
 
 	/**
 	 * Laedt alle verfuegbaren Feriendaten
+	 * @param $stg_kz default = 0
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll($stg_kz=0)
+	public function getAll($stg_kz=0)
 	{
-		$sql_query="SELECT * FROM lehre.tbl_ferien WHERE studiengang_kz=0 OR studiengang_kz=$stg_kz ORDER BY vondatum";
-		if (!$result=pg_query($this->conn, $sql_query))
+		if(!is_numeric($stg_kz))
 		{
-			$this->errormsg = pg_errormessage($this->conn);
+			$this->errormsg = 'Studiengang_kz ist ungültig';
 			return false;
 		}
-		//$num_rows=pg_numrows($result);
-		//for ($i=0; $i<$num_rows; $i++)
-		while ($row=pg_fetch_object($result))
+		
+		$sql_query="SELECT * FROM lehre.tbl_ferien WHERE studiengang_kz=0 OR studiengang_kz='$stg_kz' ORDER BY vondatum";
+		
+		if (!$this->db_query($sql_query))
+		{
+			$this->errormsg = $this->db_last_error();
+			return false;
+		}
+		
+		while ($row = $this->db_fetch_object())
 		{
 			// Record holen
 			// Instanz erzeugen
-			$f = new ferien($this->conn);
+			$f = new ferien();
 			$f->bezeichnung=$row->bezeichnung;
 			$f->studiengang_kz = $row->studiengang_kz;
 			$f->vondatum=$row->vondatum;
@@ -87,7 +93,7 @@ class ferien
 	 * @param $bezeichnung, studiengang_kz ID der zu ladenden Ferien
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($bezeichnung, $studiengang_kz)
+	public function load($bezeichnung, $studiengang_kz)
 	{
 		if($studiengang_kz == '' || !is_numeric($studiengang_kz) || $bezeichnung=='')
 		{
@@ -95,15 +101,16 @@ class ferien
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_ferien WHERE bezeichnung = '$this->bezeichnung' AND studiengang_kz = '$this->studiengang_kz';";
+		$qry = "SELECT * FROM lehre.tbl_ferien WHERE bezeichnung = '".addslashes($this->bezeichnung)."' 
+				AND studiengang_kz = '$this->studiengang_kz';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row=pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->bezeichnung		= $row->bezeichnung;
 			$this->studiengang_kz	= $row->studiengang_kz;
@@ -118,57 +125,47 @@ class ferien
 
 		return true;
 	}
-
-	/**
-	 * Loescht einen Datensatz
-	 * @param $bezeichnung, studiengang_kz id des Datensatzes der geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($bezeichnung, $studiengang_kz)
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
+	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>64)
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 64 Zeichen sein bei <b>$this->studiengang_kz</b> - $this->bezeichnung";
+			$this->errormsg = 'Bezeichnung darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
+		if($this->studiengang_kz!='')
+		{
+			$this->errormsg = 'Studiengang_kz muss eingetragen werden';
+			return false;
+		}
+		if($this->bezeichnung=='')
+		{
+			$this->errormsg = 'Bezeichnung muss eingetragen werden';
+			return false;
+		}
+		
 		$this->errormsg = '';
 		return true;
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($this->new)
 		{
 			//Neuen Datensatz anlegen
-
-			if($this->studiengang_kz == '' || !is_numeric($this->studiengang_kz) || $this->bezeichnung=='')
-			{
-				$this->errormsg = 'ID ungültig';
-				return false;
-			}
 			$qry = 'INSERT INTO lehre.tbl_ferien (bezeichnung, studiengang_kz, vondatum, bisdatum) VALUES ('.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->studiengang_kz).', '.
@@ -178,49 +175,30 @@ class ferien
 		else
 		{
 			//bestehenden Datensatz akualisieren
-
-			if($this->studiengang_kz == '' || !is_numeric($this->studiengang_kz) || $this->bezeichnung=='')
-			{
-				$this->errormsg = 'ID der Ferien ungültig';
-				return false;
-			}
-
 			$qry = 'UPDATE lehre.tbl_ferien SET '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'vondatum='.$this->addslashes($this->vondatum).', '.
-				'bisdatum='.$this->addslashes($this->bisdatum).';';
+				'bisdatum='.$this->addslashes($this->bisdatum).
+				"WHERE studiengang_kz='".addslashes($this->studiengang_kz)."' AND bezeichnung='".addslashes($this->bezeichnung)."';";
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.$this->uid;
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
 	}
 
-	function isferien($timestamp)
+	/**
+	 * Prueft ob der uebergebene Timestamp in der Ferienzeit liegt
+	 *
+	 * @param $timestamp
+	 * @return boolean
+	 */
+	public function isferien($timestamp)
 	{
 		foreach ($this->ferien AS $f)
 			if ($timestamp>=$f->vontimestamp && $timestamp<=$f->bistimestamp)

@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
+// header fuer no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -32,7 +32,7 @@ if(isset($_GET['xmlformat']) && $_GET['xmlformat']=='xml')
 else
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
@@ -43,7 +43,7 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/studiengang.class.php');
 
-// *********** Funktionen *************************++
+// *********** Funktionen *************************
 function convdate($date)
 {
 	list($d,$m,$y) = explode('.',$date);
@@ -52,7 +52,8 @@ function convdate($date)
 
 function checkfilter($row, $filter2)
 {
-	global $conn, $studiensemester_kurzbz, $kontofilterstg;
+	global $studiensemester_kurzbz, $kontofilterstg;
+	$db = new basis_db();
 
 	if($filter2=='dokumente')
 	{
@@ -61,8 +62,8 @@ function checkfilter($row, $filter2)
 				dokument_kurzbz NOT IN(
 					SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id='$row->prestudent_id')
 				AND studiengang_kz='$row->studiengang_kz'";
-		if($result_filter = pg_query($conn, $qry))
-			if($row_filter = pg_fetch_object($result_filter))
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
 				if($row_filter->anzahl==0)
 					return false;
 	}
@@ -73,8 +74,8 @@ function checkfilter($row, $filter2)
 		if($kontofilterstg=='true')
 			$qry.=" AND studiengang_kz='$row->studiengang_kz'";
 		//echo $qry;
-		if($result_filter = pg_query($conn, $qry))
-			if($row_filter = pg_fetch_object($result_filter))
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
 				if($row_filter->summe=='0.00' || $row_filter->summe=='' || $row_filter->summe=='0')
 					return false;
 	}
@@ -82,15 +83,15 @@ function checkfilter($row, $filter2)
 	{
 		// Alle Personen die keine Studiengebuehrbelastung haben 
 		// Incoming werden nicht beruecksichtigt
-		$prestudent = new prestudent($conn, null, null);
+		$prestudent = new prestudent();
 		$prestudent->getLastStatus($row->prestudent_id);
 		
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
 					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
 					person_id='".addslashes($row->person_id)."' AND 
 					buchungstyp_kurzbz='Studiengebuehr'";
-		if($result_filter = pg_query($conn, $qry))
-			if($row_filter = pg_fetch_object($result_filter))
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
 				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
 					return false;
 	}
@@ -99,15 +100,15 @@ function checkfilter($row, $filter2)
 		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben 
 		// Incoming werden nicht beruecksichtigt
 		list($filter, $buchungstyp) = split(';',$filter2);
-		$prestudent = new prestudent($conn, null, null);
+		$prestudent = new prestudent();
 		$prestudent->getLastStatus($row->prestudent_id);
 		
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
 					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
 					person_id='".addslashes($row->person_id)."' AND 
 					buchungstyp_kurzbz='$buchungstyp'";
-		if($result_filter = pg_query($conn, $qry))
-			if($row_filter = pg_fetch_object($result_filter))
+		if($db->db_query($qry))
+			if($row_filter = $db->db_fetch_object())
 				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
 					return false;
 	}
@@ -115,9 +116,9 @@ function checkfilter($row, $filter2)
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
 		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum FROM public.tbl_prestudent WHERE prestudent_id='$row->prestudent_id'";
-		if($result_filter = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row_filter = pg_fetch_object($result_filter))
+			if($row_filter = $db->db_fetch_object())
 			{
 				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='') ||
 				   ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
@@ -132,20 +133,10 @@ function checkfilter($row, $filter2)
 
 function draw_content_liste($row)
 {
-	global $rdf_url, $datum_obj, $conn, $stg_arr;
+	global $rdf_url, $datum_obj, $stg_arr;
 	$status='';
 
-	/*$mail_privat = '';
-	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
-	if($result_mail = pg_query($conn, $qry_mail))
-	{
-		if($row_mail = pg_fetch_object($result_mail))
-		{
-			$mail_privat = $row_mail->kontakt;
-		}
-	}*/
-
-	$prestudent = new prestudent($conn, null, null);
+	$prestudent = new prestudent();
 	$prestudent->getLastStatus($row->prestudent_id);
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
@@ -189,14 +180,15 @@ function draw_content_liste($row)
 
 function draw_content($row)
 {
-	global $rdf_url, $datum_obj, $conn;
+	global $rdf_url, $datum_obj;
+	$db = new basis_db();
 	$status='';
 
 	$mail_privat = '';
 	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
-	if($result_mail = pg_query($conn, $qry_mail))
+	if($db->db_query($qry_mail))
 	{
-		if($row_mail = pg_fetch_object($result_mail))
+		if($row_mail = $db->db_fetch_object())
 		{
 			$mail_privat = $row_mail->kontakt;
 		}
@@ -204,7 +196,7 @@ function draw_content($row)
 
 	if($row->prestudent_id!='')
 	{
-		$prestudent = new prestudent($conn, null, null);
+		$prestudent = new prestudent();
 		$prestudent->getLastStatus($row->prestudent_id);
 		$status = $prestudent->status_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
@@ -293,15 +285,12 @@ function draw_prestudent($row)
 }
 
 // ******* Init **************************
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 
 if(isset($_SERVER['REMOTE_USER']))
 {
 	$user = get_uid();
-	loadVariables($conn, $user);
+	loadVariables($user);
 }
 
 $gruppe_kurzbz=(isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:null);
@@ -318,6 +307,8 @@ $ss = (isset($_GET['ss'])?$_GET['ss']:null);
 $filter2 = (isset($_GET['filter2'])?$_GET['filter2']:null);
 $orgform = (isset($_GET['orgform'])?$_GET['orgform']:null);
 
+$db = new basis_db();
+
 if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
 
@@ -333,7 +324,7 @@ $datum_obj = new datum();
 if($xmlformat=='rdf')
 {
 	$stg_arr = array();
-	$stg_obj = new studiengang($conn, null, null);
+	$stg_obj = new studiengang();
 	$stg_obj->getAll(null, false);
 	foreach ($stg_obj->result as $row)
 		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
@@ -352,9 +343,9 @@ if($xmlformat=='rdf')
 
 	if(isset($uid))
 	{
-		$student=new student($conn,null,true);
+		$student=new student();
 		$student->load($uid, $studiensemester_kurzbz);
-		$prestd = new prestudent($conn, null, true);
+		$prestd = new prestudent();
 
 		draw_content($student);
 		$prestd->load($student->prestudent_id);
@@ -414,22 +405,25 @@ if($xmlformat=='rdf')
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
 		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.student_uid=tbl_student.student_uid AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
 		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
-		//echo $sql_query;
-		if($result = pg_query($conn, $sql_query))
-			while($row = pg_fetch_object($result))
+		
+		
+		if($db->db_query($sql_query))
+		{
+			while($row = $db->db_fetch_object())
 			{
 				if(checkfilter($row, $filter2))
 					draw_content_liste($row);
 			}
+		}
 	}
 	elseif($typ=='incoming')
 	{
 		$qry = "SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object())
 			{
-				$student=new student($conn,null,true);
+				$student=new student();
 				if($uid = $student->getUid($row->prestudent_id))
 				{
 					//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
@@ -437,7 +431,7 @@ if($xmlformat=='rdf')
 					if(!$student->load($uid, $studiensemester_kurzbz))
 						$student->load($uid);
 				}
-				$prestd = new prestudent($conn, null, true);
+				$prestd = new prestudent();
 				$prestd->load($row->prestudent_id);
 				if($uid!='')
 				{
@@ -456,7 +450,7 @@ if($xmlformat=='rdf')
 	                      'warteliste','absage','zgv','reihungstestangemeldet',
 	                      'reihungstestnichtangemeldet')))
 	{
-		$prestd = new prestudent($conn, null, true);
+		$prestd = new prestudent();
 
 		if($studiengang_kz!=null)
 		{
@@ -466,7 +460,7 @@ if($xmlformat=='rdf')
 				{
 					if(checkfilter($row, $filter2))
 					{
-						$student=new student($conn,null,true);
+						$student=new student();
 						if($uid = $student->getUid($row->prestudent_id))
 						{
 							if(!$student->load($uid, $studiensemester_kurzbz))
@@ -499,7 +493,7 @@ if($xmlformat=='rdf')
 	{
 		if($filter!='')
 		{
-			$filter = utf8_decode($filter);
+			//$filter = utf8_decode($filter);
 			$qry = "SELECT prestudent_id 
 					FROM 
 						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
@@ -508,11 +502,11 @@ if($xmlformat=='rdf')
 						vorname ~* '".addslashes($filter)."' OR
 						student_uid ~* '".addslashes($filter)."' OR
 						matrikelnr = '".addslashes($filter)."';";
-			if($result = pg_query($conn, $qry))
+			if($db->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object())
 				{
-					$student=new student($conn,null,true);
+					$student=new student();
 					if($uid = $student->getUid($row->prestudent_id))
 					{
 						//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
@@ -520,7 +514,7 @@ if($xmlformat=='rdf')
 						if(!$student->load($uid, $studiensemester_kurzbz))
 							$student->load($uid);
 					}
-					$prestd = new prestudent($conn, null, true);
+					$prestd = new prestudent();
 					$prestd->load($row->prestudent_id);
 					if($uid!='')
 					{
@@ -537,7 +531,7 @@ if($xmlformat=='rdf')
 		}
 		elseif(isset($prestudent_id))
 		{
-			$student=new student($conn,null,true);
+			$student=new student();
 			if($uid = $student->getUid($prestudent_id))
 			{
 				//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
@@ -545,7 +539,7 @@ if($xmlformat=='rdf')
 				if(!$student->load($uid, $studiensemester_kurzbz))
 					$student->load($uid);
 			}
-			$prestd = new prestudent($conn, null, true);
+			$prestd = new prestudent();
 			$prestd->load($prestudent_id);
 			if($uid!='')
 			{
@@ -574,10 +568,10 @@ else
 	{
 		if($uid!='')
 		{
-			$student = new student($conn);
+			$student = new student();
 			$student->load($uid);
 
-			$studiengang = new studiengang($conn);
+			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
 
 			$typ='';
@@ -594,9 +588,9 @@ else
 
 			$qry = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion USING(uid) WHERE funktion_kurzbz='rek'";
 			$rektor = '';
-			if($result = pg_query($conn, $qry))
+			if($db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object())
 				{
 					$rektor = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;
 				}
@@ -606,25 +600,25 @@ else
 			$studiensemester_kurzbz='';
 			$qry = "SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 					WHERE prestudent_id='$student->prestudent_id' AND status_kurzbz in('Student','Incoming') ORDER BY datum LIMIT 1";
-			if($result = pg_query($conn, $qry))
+			if($db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object())
 				{
 					$studienbeginn = $row->start;
 					$studiensemester = $row->studiensemester_kurzbz;
 				}
 			}
 
-			$stsem = new studiensemester($conn);
+			$stsem = new studiensemester();
 			//$aktstsem = $stsem->getaktorNext();
 
 			$stsem->load($ss);
 
 			$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss' ORDER BY datum DESC";
 			$semester=0;
-			if($result = pg_query($conn, $qry))
+			if($db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object())
 				{
 					$semester = $row->ausbildungssemester;
 				}

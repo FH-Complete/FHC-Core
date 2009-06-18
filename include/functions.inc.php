@@ -20,14 +20,6 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-function db_query($conn, $sql_query)
-{
-	if (!$result=pg_query($conn, $sql_query))
-		return pg_last_error($conn);
-	else
-		return '';
-}
-
 // Auth: Benutzer des Webportals
 function get_uid()
 {
@@ -52,68 +44,101 @@ function crlf()
 	return $crlf;
 }
 
-function check_lektor($uid, $conn)
+function check_lektor($uid)
 {
+	$db = new basis_db();
+	
 	// uid von View 'Lektor' holen
 	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
 	//echo $sql_query;
-	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
-	$num_rows=pg_num_rows($result);
-	// Wenn kein ergebnis return 0 sonst ID
-	if ($num_rows>0)
+	if($db->db_query($sql_query))
 	{
-		$row=pg_fetch_object($result);
-		return $row->mitarbeiter_uid;
+		$num_rows=$db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst ID
+		if ($num_rows>0)
+		{
+			$row = $db->db_fetch_object();
+			return $row->mitarbeiter_uid;
+		}
+		else
+			return 0;
 	}
-	else
+	else 
 		return 0;
 }
 
-function check_lektor_lehreinheit($conn, $uid, $lehreinheit_id)
+function check_lektor_lehreinheit($uid, $lehreinheit_id)
 {
+	$db = new basis_db();
+	
 	// uid von View 'Lektor' holen
-	$sql_query="SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid='$uid' AND lehreinheit_id = '$lehreinheit_id'";
+	$sql_query="SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter 
+				WHERE mitarbeiter_uid='".addslashes($uid)."' AND lehreinheit_id = '".addslashes($lehreinheit_id)."'";
 	//echo $sql_query;
-	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
-	$num_rows=pg_num_rows($result);
-	// Wenn kein ergebnis return 0 sonst ID
-	if ($num_rows>0)
+	if($db->db_query($sql_query))
 	{
-		$row=pg_fetch_object($result);
-		return $row->mitarbeiter_uid;
+		
+		$num_rows = $db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst ID
+		if ($num_rows>0)
+		{
+			$row = $db->db_fetch_object();
+			return $row->mitarbeiter_uid;
+		}
+		else
+			return 0;
 	}
-	else
+	else 
 		return 0;
 }
 
-function check_lektor_lehrveranstaltung($conn, $uid, $lehrveranstaltung_id, $studiensemester_kurzbz)
+function check_lektor_lehrveranstaltung($uid, $lehrveranstaltung_id, $studiensemester_kurzbz)
 {
+	$db = new basis_db();
+	
 	// uid von View 'Lektor' holen
-	$sql_query="SELECT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE mitarbeiter_uid='$uid' AND lehrveranstaltung_id = '$lehrveranstaltung_id' AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+	$sql_query="SELECT mitarbeiter_uid FROM campus.vw_lehreinheit
+				WHERE mitarbeiter_uid='".addslashes($uid)."' AND 
+				lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."' AND 
+				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	
 	//echo $sql_query;
-	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
-	$num_rows=pg_num_rows($result);
-	// Wenn kein ergebnis return 0 sonst ID
-	if ($num_rows>0)
+	if($db->db_query($sql_query))
 	{
-		$row=pg_fetch_object($result);
-		return $row->mitarbeiter_uid;
+		$num_rows = $db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst ID
+		if ($num_rows>0)
+		{
+			$row = $db>db_fetch_object();
+			return $row->mitarbeiter_uid;
+		}
+		else
+			return 0;
 	}
-	else
+	else 
 		return 0;
 }
 
-function check_student($uid, $conn)
+function check_student($uid)
 {
+	$db = new basis_db();
+	
 	// uid von Tabelle 'Student' holen
-	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid='$uid'";
+	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
 	//echo $sql_query;
-	$result=pg_query($conn, $sql_query) or die(pg_last_error($conn));
-	$num_rows=pg_numrows($result);
-	// Wenn kein ergebnis return 0 sonst ID
-	if ($num_rows>0)
-		return pg_result($result,0,'student_uid');
-	else
+	if($db->db_query($sql_query))
+	{
+		$num_rows = $db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst ID
+		if ($num_rows>0)
+		{
+			$row = $db->db_fetch_object();
+			return $row->student_uid;
+		}
+		else
+			return 0;
+	}
+	else 
 		return 0;
 }
 
@@ -270,20 +295,21 @@ function writeCISlog($stat, $rm = '')
 // * und $naechstes=true dann wird das naechste StSem geliefert
 // * wenn $naechstes=false dann wird das vorherige StSem geliefert
 // ***************************************************************
-function getStudiensemesterFromDatum($conn, $datum, $naechstes=true)
+function getStudiensemesterFromDatum($datum, $naechstes=true)
 {
+	$db = new basis_db();
 	$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE";
 
 	if($naechstes)
-		$qry.= " ende>'$datum' ORDER BY ende ASC ";
+		$qry.= " ende>'".addslashes($datum)."' ORDER BY ende ASC ";
 	else
-		$qry.= " start<'$datum' ORDER BY ende DESC ";
+		$qry.= " start<'".addslashes($datum)."' ORDER BY ende DESC ";
 
 	$qry.= "LIMIT 1";
 
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object())
 			return $row->studiensemester_kurzbz;
 		else
 			return false;
@@ -323,7 +349,7 @@ function strtoupperFULL($str)
 // ****************************************************************
 function checkalias($alias)
 {
-	if($anz = preg_match("/^[-a-z0-9]*[a-z0-9]{1,}\.[-a-z0-9]{1,}$/",$alias))
+	if(preg_match("/^[-a-z0-9]*[a-z0-9]{1,}\.[-a-z0-9]{1,}$/",$alias))
 		return true;
 	else
 		return false;
@@ -375,8 +401,8 @@ function checkldapuser($username,$password)
 			return false;
 	    }
 
+	    @ldap_close($connect);
 		return true;
-		@ldap_close($connect);
 	}
 	else
 	{

@@ -19,67 +19,51 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class akadgrad
+class akadgrad extends basis_db
 {
-	var $conn;    // @var resource DB-Handle
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $result = array(); // @var email Objekt
+	public $new;
+	public $result = array();
 	
 	//Tabellenspalten
-	var $akadgrad_id;
-	var $akadgrad_kurzbz;
-	var $studiengang_kz;
-	var $titel;
-	var $geschlecht;
+	public $akadgrad_id;
+	public $akadgrad_kurzbz;
+	public $studiengang_kz;
+	public $titel;
+	public $geschlecht;
 	
-	// ***********************************************
-	// * Konstruktor
-	// * @param conn    Connection zur Datenbank
-	// *        akadgrad_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function akadgrad($conn, $akadgrad_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param akadgrad_id ID des zu ladenden Datensatzes
+	 */
+	public function __construct($akadgrad_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/		
-		if($akadgrad_id != null)
+		parent::__construct();
+
+		if(!is_null($akadgrad_id))
 			$this->load($akadgrad_id);
 	}
 	
-	// ***********************************************
-	// * Laedt einen Datensatz
-	// * @param akadgrad_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function load($akadgrad_id)
+	/**
+	 * Laedt einen Datensatz
+	 * @param akadgrad_id ID des zu ladenden Datensatzes
+	 */
+	public function load($akadgrad_id)
 	{
 		//akadgrad_id auf gueltigkeit pruefen
 		if(!is_numeric($akadgrad_id) || $akadgrad_id == '')
 		{
-			$this->errormsg = 'akadgrad_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'akadgrad_id muss eine gültige Zahl sein';
 			return false;
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id='$akadgrad_id';";
+		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id='".addslashes($akadgrad_id)."';";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->akadgrad_id = $row->akadgrad_id;
 				$this->akadgrad_kurzbz = $row->akadgrad_kurzbz;

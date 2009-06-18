@@ -19,68 +19,53 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class gruppe
+class gruppe extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $result = array(); // gruppen Objekt
+	public $new;      				// boolean
+	public $result = array(); 		// gruppen Objekt
 
 	//Tabellenspalten
-	var $gruppe_kurzbz;			// varchar(16)
-	var $studiengang_kz;		// integer
-	var $bezeichnung;			// varchar(32)
-	var $semester;				// smallint
-	var $sort;					// smallint
-	var $lehre=true;			//boolean
-	var $mailgrp;				// boolean
-	var $beschreibung;			// varchar(128)
-	var $generiert;				// boolean
-	var $sichtbar;				// boolean
-	var $aktiv;					// boolean
-	var $updateamum;			// timestamp
-	var $updatevon;				// varchar(16)
-	var $insertamum;			// timestamp
-	var $insertvon;				// varchar(16)
-	var $orgform_kurzbz;
+	public $gruppe_kurzbz;			// varchar(16)
+	public $studiengang_kz;			// integer
+	public $bezeichnung;			// varchar(32)
+	public $semester;				// smallint
+	public $sort;					// smallint
+	public $lehre=true;				//boolean
+	public $mailgrp;				// boolean
+	public $beschreibung;			// varchar(128)
+	public $generiert;				// boolean
+	public $sichtbar;				// boolean
+	public $aktiv;					// boolean
+	public $updateamum;				// timestamp
+	public $updatevon;				// varchar(16)
+	public $insertamum;				// timestamp
+	public $insertvon;				// varchar(16)
+	public $orgform_kurzbz;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Gruppe
-	// * @param $conn        	Datenbank-Connection
-	// *        $gruppe_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function gruppe($conn, $gruppe_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional eine Gruppe
+	 * @param $gruppe_kurzbz
+	 */
+	public function __construct($gruppe_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
-*/
-		if($gruppe_kurzbz!=null)
+		parent::__construct();
+		
+		if(!is_null($gruppe_kurzbz))
 			$this->load($gruppe_kurzbz);
 	}
 
-	// *************************
-	// * Loescht eine Gruppe
-	// *************************
-	function delete($gruppe_kurzbz)
+	/**
+	 * Loescht eine Gruppe
+	 * @param gruppe_kurzbz
+	 * @return boolean
+	 */
+	public function delete($gruppe_kurzbz)
 	{
 		$qry ="DELETE FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
-		if(pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 			return true;
 		else
 		{
@@ -89,39 +74,48 @@ class gruppe
 		}
 	}
 
-	// ****************************************
-	// * Prueft ob bereits eine Gruppe mit der
-	// * uebergebenen Kurzbezeichnung existiert
-	// * @param gruppe_kurzbz
-	// ****************************************
-	function exists($gruppe_kurzbz)
+	/**
+	 * Prueft ob bereits eine Gruppe mit der
+	 * uebergebenen Kurzbezeichnung existiert
+	 * @param gruppe_kurzbz
+	 */
+	public function exists($gruppe_kurzbz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes(strtoupper($gruppe_kurzbz))."'";
 
-		if($row = pg_fetch_object(pg_query($this->conn,$qry)))
+		if($this->db_query($qry))
 		{
-			if($row->anzahl>0)
-				return true;
+			if($row = $this->db_fetch_object())
+			{
+				if($row->anzahl>0)
+					return true;
+				else
+					return false;
+			}
 			else
+			{
+				$this->errormsg = 'Fehler bei einer Abfrage: '.$qry;
 				return false;
+			}
 		}
-		else
+		else 
 		{
-			$this->errormsg = 'Fehler bei einer Abfrage: '.$qry;
+			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
 		}
 	}
 
-	// *********************************************************
-	// * Laedt die Gruppe
-	// * @param gruppe_kurzbz
-	// *********************************************************
-	function load($gruppe_kurzbz)
+	/**
+	 * Laedt die Gruppe
+	 * @param gruppe_kurzbz
+	 */
+	public function load($gruppe_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_gruppe where gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
-		if($result = pg_query($this->conn, $qry))
+		$qry = "SELECT * FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$this->studiengang_kz = $row->studiengang_kz;
@@ -154,15 +148,21 @@ class gruppe
 		}
 	}
 
-	function getAll()
+	/**
+	 * Laedt alle Gruppen
+	 *
+	 * @return boolean
+	 */
+	public function getAll()
 	{
 		$qry = "SELECT * FROM public.tbl_gruppe ORDER BY gruppe_kurzbz";
 
-		if( $result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$grp_obj = new gruppe($this->conn, null, null);
+				$grp_obj = new gruppe();
+				
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -191,12 +191,20 @@ class gruppe
 		}
 	}
 
-	function countStudenten($gruppe_kurzbz)
+	/**
+	 * Liefert die Anzahl der Personen in dieser Gruppe
+	 *
+	 * @param $gruppe_kurzbz
+	 * @return anzahl der Personen
+	 */
+	public function countStudenten($gruppe_kurzbz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
-		if($result = pg_query($this->conn, $qry))
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe 
+				WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 				return $row->anzahl;
 			else
 			{
@@ -211,23 +219,33 @@ class gruppe
 		}
 	}
 
-	function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
+	/**
+	 * Laedt die Gruppen die den Parametern ensprechen
+	 *
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @param $mailgrp
+	 * @param $sichtbar
+	 * @return boolean
+	 */
+	public function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_gruppe WHERE 1=1';
 		if(!is_null($studiengang_kz) && $studiengang_kz!='')
-			$qry .= " AND studiengang_kz='$studiengang_kz'";
+			$qry .= " AND studiengang_kz='".addslashes($studiengang_kz)."'";
 		if(!is_null($semester) && $semester!='')
-			$qry .= " AND semester='$semester'";
+			$qry .= " AND semester='".addslashes($semester)."'";
 		if(!is_null($mailgrp) && $mailgrp!='')
 			$qry .= " AND mailgrp=".($mailgrp?'true':'false');
 		if(!is_null($sichtbar))
 			$qry .= " AND sichtbar=".($sichtbar?'true':'false');
 		$qry.=" ORDER BY beschreibung";
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$grp_obj = new gruppe($this->conn, null, null);
+				$grp_obj = new gruppe();
+				
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -256,12 +274,12 @@ class gruppe
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->gruppe_kurzbz)>16)
 		{
@@ -326,25 +344,14 @@ class gruppe
 
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Gruppe in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null, $upper=true)
+	
+	/**
+	 * Speichert Gruppe in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null, $upper=true)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -399,7 +406,7 @@ class gruppe
 			       " WHERE gruppe_kurzbz=".$this->addslashes(strtoupper($this->gruppe_kurzbz)).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;

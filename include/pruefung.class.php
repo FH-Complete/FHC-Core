@@ -20,69 +20,51 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class pruefung
+class pruefung extends basis_db
 {
-	var $conn;    					// resource DB-Handle
-	var $new;      					// boolean
-	var $errormsg;					// string
-	var $result = array();			// pruefung Objekt
+	public $new;      				// boolean
+	public $result = array();		// pruefung Objekt
 
-	var $pruefung_id;
-	var $lehreinheit_id;			// integer
-	var $student_uid;				// varchar(16)
-	var $mitarbeiter_uid;			// varchar(16)
-	var $note;						// smallint
-	var $pruefungstyp_kurzbz;		// varchar(16)
-	var $datum;						// Date
-	var $anmerkung;					// varchar(256)
-	var $insertamum;				// timestamp)
-	var $insertvon;					// varchar(16)
-	var $updateamum;				// timestamp
-	var $updatevon;					// varchar(16)
-	var $ext_id;					// bigint
+	public $pruefung_id;
+	public $lehreinheit_id;			// integer
+	public $student_uid;			// varchar(16)
+	public $mitarbeiter_uid;		// varchar(16)
+	public $note;					// smallint
+	public $pruefungstyp_kurzbz;	// varchar(16)
+	public $datum;					// Date
+	public $anmerkung;				// varchar(256)
+	public $insertamum;				// timestamp)
+	public $insertvon;				// varchar(16)
+	public $updateamum;				// timestamp
+	public $updatevon;				// varchar(16)
+	public $ext_id;					// bigint
 
-	var $lehrveranstaltung_bezeichnung;
-	var $lehrveranstaltung_id;
-	var $note_bezeichnung;
-	var $pruefungstyp_beschreibung;
-	var $studiensemester_kurzbz;
+	public $lehrveranstaltung_bezeichnung;
+	public $lehrveranstaltung_id;
+	public $note_bezeichnung;
+	public $pruefungstyp_beschreibung;
+	public $studiensemester_kurzbz;
 
-	// **************************************************************
-	// * Konstruktor
-	// * @param conn Connection zur Datenbank
-	// *        pruefung_id ID der zu ladenden Pruefung
-	// *        unicode Wenn true, dann wird das Encoding auf UNICODE
-	// *                gesetzt wenn false dann auf LATIN9
-	// **************************************************************
-	function pruefung($conn, $pruefung_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param pruefung_id ID der zu ladenden Pruefung
+	 */
+	public function __construct($pruefung_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/
 		if($pruefung_id!=null)
 			$this->load($pruefung_id);
 	}
 
-	// *****************************************************
-	// * Laedt einen Pr&uuml;fungsdatensatz
-	// * @param pruefung_id ID
-	// * @return true wenn ok, false im Fehlerfall
-	// *****************************************************
-	function load($pruefung_id)
+	/**
+	 * Laedt einen Pr&uuml;fungsdatensatz
+	 * @param pruefung_id ID
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($pruefung_id)
 	{
 		if(!is_numeric($pruefung_id))
 		{
@@ -93,9 +75,9 @@ class pruefung
 		$qry = "SELECT tbl_pruefung.*, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
 				FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=$pruefung_id";
 
-		if($res = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($res))
+			if($row = $this->db_fetch_object())
 			{
 				$this->pruefung_id = $row->pruefung_id;
 				$this->lehreinheit_id=$row->lehreinheit_id;
@@ -123,28 +105,28 @@ class pruefung
 		return true;
 	}
 
-	// *******************************************
-	// * Liefert alle Studiengaenge
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function getAll($order=null, $student=null)
+	/**
+	 * Liefert alle Pruefungen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAll($order=null, $student=null)
 	{
 		$qry = 'SELECT * FROM lehre.tbl_pruefung';
 		if ($student)
-			$qry.=' WHERE student ="'.$student.'"';
+			$qry.=' WHERE student ="'.addslashes($student).'"';
 
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$pruef_obj = new pruefung($this->conn);
+			$pruef_obj = new pruefung();
 			$pruef_obj->lehreinheit_id=$row->lehreinheit_id;
 			$pruef_obj->student_uid=$row->student_uid;
 			$pruef_obj->mitarbeiter_uid=$row->mitarbeiter_uid;
@@ -164,12 +146,12 @@ class pruefung
 		return true;
 	}
 
-	// ****************************************************
-	// * Loescht eine Pruefung
-	// * @param $preufung_id ID der zu loeschenden Pruefung
-	// * @return true wenn ok, false im Fehlerfall
-	// ****************************************************
-	function delete($pruefung_id)
+	/**
+	 * Loescht eine Pruefung
+	 * @param $preufung_id ID der zu loeschenden Pruefung
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($pruefung_id)
 	{
 		if(!is_numeric($pruefung_id))
 		{
@@ -179,7 +161,7 @@ class pruefung
 
 		$qry = "DELETE FROM lehre.tbl_pruefung WHERE pruefung_id='$pruefung_id'";
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -190,45 +172,30 @@ class pruefung
 		}
 	}
 
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************
-	// * Prueft die Gueltigkeit der Variablen
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function checkvars()
+	/**
+	 * Prueft die Gueltigkeit der Variablen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function validate()
 	{
 		//Laenge Pruefen
 		if(strlen($this->anmerkung)>256)
 		{
-			$this->errormsg = "Anmerkung darf nicht laenger als 256 Zeichen sein bei <b>$this->ext_id</b> - $this->anmerkung";
-			return false;
-		}
-		if(strlen($this->insertvon)>16)
-		{
-			$this->errormsg = "Insertvon darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->insertvon";
-			return false;
-		}
-		if(strlen($this->updatevon)>10)
-		{
-			$this->errormsg = "Updatevon darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->updatevon";
+			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
 		$this->errormsg = '';
 		return true;
 	}
 
-	// *******************************************
-	// * Speichert den aktuellen Datensatz
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function save()
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 		{
 			return false;
 		}
@@ -276,32 +243,32 @@ class pruefung
 				'ext_id='.$this->addslashes($this->ext_id).' '.
 				'WHERE pruefung_id='.$this->addslashes($this->pruefung_id).';';
 		}
-		//echo $qry;
-		if(pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				//Sequence auslesen
 				$qry = "SELECT currval('lehre.tbl_pruefung_pruefung_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->pruefung_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -309,18 +276,18 @@ class pruefung
 		}
 		else
 		{
-			pg_query($this->conn, 'ROLLBACK');
-			$this->errormsg = 'Fehler beim Speichern der Pruefung (Class pruefung->save()):'.pg_last_error($this->conn);
+			$this->db_query('ROLLBACK');
+			$this->errormsg = 'Fehler beim Speichern der Pruefung:'.$this->db_last_error();
 			return false;
 		}
 	}
 
-	// *****************************************
-	// * Liefert alle Pruefungen eines Studenten
-	// * @param student_uid
-	// * @return true wenn ok, false wenn Fehler
-	// *****************************************
-	function getPruefungen($student_uid, $pruefungstyp=null,$lv_id=null,$stsem=null)
+	/**
+	 * Liefert alle Pruefungen eines Studenten
+	 * @param student_uid
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getPruefungen($student_uid, $pruefungstyp=null,$lv_id=null,$stsem=null)
 	{
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
@@ -331,18 +298,18 @@ class pruefung
 				AND tbl_pruefung.note = tbl_note.note
 				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
 		if ($pruefungstyp != null)
-			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".$pruefungstyp."'";
+			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".addslashes(pruefungstyp)."'";
 		if ($lv_id != null)
-			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lv_id."'";
+			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lv_id)."'";
 		if ($stsem != null)
-			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."'";
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
 					
 		$qry .= " ORDER BY datum DESC";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new pruefung($this->conn, null, null);
+				$obj = new pruefung();
 
 				$obj->pruefung_id = $row->pruefung_id;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
@@ -373,7 +340,15 @@ class pruefung
 		}
 	}
 	
-	function getPruefungenLV($lv_id, $pruefungstyp=null, $stsem=null)
+	/**
+	 * Laedt die Pruefungen zu einer Lehrveranstaltung
+	 *
+	 * @param $lv_id
+	 * @param $pruefungstyp
+	 * @param $stsem
+	 * @return boolean
+	 */	
+	public function getPruefungenLV($lv_id, $pruefungstyp=null, $stsem=null)
 	{
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
@@ -383,18 +358,18 @@ class pruefung
 				AND tbl_pruefung.note = tbl_note.note
 				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
 		if ($pruefungstyp != null)
-			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".$pruefungstyp."'";
+			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".addslashes($pruefungstyp)."'";
 		if ($lv_id != null)
-			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".$lv_id."'";
+			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lv_id)."'";
 		if ($stsem != null)
-			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."'";
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
 			
 		$qry .= " ORDER BY datum DESC";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new pruefung($this->conn, null, null);
+				$obj = new pruefung();
 
 				$obj->pruefung_id = $row->pruefung_id;
 				$obj->lehreinheit_id = $row->lehreinheit_id;

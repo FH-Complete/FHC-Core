@@ -23,79 +23,59 @@
  * Klasse Betriebsmittelperson 
  * @create 13-01-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class betriebsmittelperson
+class betriebsmittelperson extends basis_db
 {
-	var $conn;     			// @var resource DB-Handle
-	var $new;       		// @var boolean
-	var $errormsg;  		// @var string
-	var $result = array();
-	var $done=false;		// @var boolean
+	public $new;       			// boolean
+	public $result = array();
 	
 	//Tabellenspalten
-	var $betriebsmittel_id;	// @var integer
-	var $person_id;			// @var integer
-	var $betriebsmittel_id_old;	// @var integer
-	var $person_id_old;			// @var integer
-	var $anmerkung;			// @var string
-	var $kaution;			// @var numeric(5,2)
-	var $ausgegebenam;		// @var date
-	var $retouram;			// @var date
-	var $ext_id;			// @var integer
-	var $insertamum;		// @var timestamp
-	var $insertvon;			// @var bigint
-	var $updateamum;		// @var timestamp
-	var $updatevon;			// @var bigint
+	public $betriebsmittel_id;	//  integer
+	public $person_id;			//  integer
+	public $betriebsmittel_id_old;	//  integer
+	public $person_id_old;			//  integer
+	public $anmerkung;			//  string
+	public $kaution;			//  numeric(5,2)
+	public $ausgegebenam;		//  date
+	public $retouram;			//  date
+	public $ext_id;				//  integer
+	public $insertamum;			//  timestamp
+	public $insertvon;			//  bigint
+	public $updateamum;			//  timestamp
+	public $updatevon;			//  bigint
 	
-	var $nummer;
-	var $betriebsmitteltyp;
-	var $beschreibung;
+	public $nummer;
+	public $betriebsmitteltyp;
+	public $beschreibung;
 	
-	// ************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $betriebsmittel_id
-	// *        $person_id
-	// *        $unicode
-	// ************************************
-	function betriebsmittelperson($conn,$betriebsmittel_id=null,$person_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $betriebsmittel_id
+	 *        $person_id
+	 */
+	public function __construct($betriebsmittel_id=null,$person_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else 
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-		*/
-		if($betriebsmittel_id!=null && $person_id!=null)
+		parent::__construct();
+		
+		if(!is_null($betriebsmittel_id) && !is_null($person_id))
 			$this->load($betriebsmittel_id, $person_id);
 	}
 	
-	// *********************************************************************
-	// * Laedt das Betriebsmittel mit der ID $betriebsmittel_id, person_id
-	// * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittels
-	// *         $person_id ID der zu ladenden Person
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************************
-	function load($betriebsmittel_id, $person_id)
+	/**
+	 * Laedt das Betriebsmittel mit der ID $betriebsmittel_id, person_id
+	 * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittels
+	 *         $person_id ID der zu ladenden Person
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($betriebsmittel_id, $person_id)
 	{
 		if(!is_numeric($betriebsmittel_id))
 		{
 			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
 			return false;
 		}
+		
 		if(!is_numeric($person_id))
 		{
 			$this->errormsg = 'Person_id ist ungueltig';
@@ -103,10 +83,11 @@ class betriebsmittelperson
 		}
 		
 		$qry = "SELECT * FROM public.tbl_betriebsmittel JOIN public.tbl_betriebsmittelperson USING(betriebsmittel_id) 
-				WHERE betriebsmittel_id='$betriebsmittel_id' AND person_id='$person_id'";
-		if($result = pg_query($this->conn, $qry))
+				WHERE betriebsmittel_id='".addslashes($betriebsmittel_id)."' AND person_id='".addslashes($person_id)."'";
+		
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->betriebsmittel_id = $row->betriebsmittel_id;
 				$this->beschreibung = $row->beschreibung;
@@ -140,7 +121,12 @@ class betriebsmittelperson
 		}		
 	}
 	
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 *
+	 * @return true wenn ok, sonst false
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->kaution))
 		{
@@ -176,26 +162,15 @@ class betriebsmittelperson
 		
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// ******************************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank	 
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id, $person_id aktualisiert
-	// * @param $new
-	// * @return true wenn ok, false im Fehlerfall
-	// ******************************************************************************************
-	function save($new=null)
+		
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id, $person_id aktualisiert
+	 * @param $new
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!$this->validate())
 			return false;
@@ -209,9 +184,10 @@ class betriebsmittelperson
 			$qry = "SELECT 1 FROM public.tbl_betriebsmittelperson 
 					WHERE person_id='".addslashes($this->person_id)."' AND 
 						betriebsmittel_id='".addslashes($this->betriebsmittel_id)."'";
-			if($result = pg_query($this->conn, $qry))
+			
+			if($this->db_query($qry))
 			{
-				if(pg_num_rows($result)>0)
+				if($this->db_num_rows()>0)
 				{
 					$this->errormsg = 'Dieses Betriebsmittel ist der Person bereits zugeordnet';
 					return false;
@@ -236,7 +212,7 @@ class betriebsmittelperson
 			//Pruefen ob betriebsmittel_id eine gueltige Zahl ist
 			if(!is_numeric($this->betriebsmittel_id) || !is_numeric($this->person_id))
 			{
-				$this->errormsg = "betriebsmittel_id und Person_id muessen gueltige Zahlen sein: ".$this->betriebsmittel_id." (".$this->person_id.")\n";
+				$this->errormsg = 'betriebsmittel_id und Person_id muessen gueltige Zahlen sein';
 				return false;
 			}
 			if($this->betriebsmittel_id_old=='')
@@ -258,7 +234,7 @@ class betriebsmittelperson
 				' AND person_id='.$this->addslashes($this->person_id_old).";";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{			
 			return true;		
 		}
@@ -269,13 +245,13 @@ class betriebsmittelperson
 		}
 	}
 	
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param $betriebsmittel_id ID die geloescht werden soll
-	// * @param $person_id ID die geloescht werden soll
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
-	function delete($betriebsmittel_id, $person_id)
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $betriebsmittel_id ID die geloescht werden soll
+	 * @param $person_id ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($betriebsmittel_id, $person_id)
 	{
 		if(!is_numeric($betriebsmittel_id))
 		{
@@ -289,23 +265,24 @@ class betriebsmittelperson
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_betriebsmittelperson WHERE betriebsmittel_id='$betriebsmittel_id' AND person_id='$person_id'";
+		$qry = "DELETE FROM public.tbl_betriebsmittelperson 
+				WHERE betriebsmittel_id='".addslashes($betriebsmittel_id)."' AND person_id='".addslashes($person_id)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
 	
-	// *****************************************
-	// * Laedt alle Betriebsmittel einer Person
-	// * @param person_id, $betriebsmittel_id
-	// * @return true wenn ok, false wenn Fehler
-	// *****************************************
-	function getBetriebsmittelPerson($person_id, $betriebsmitteltyp=null)
+	/**
+	 * Laedt alle Betriebsmittel einer Person
+	 * @param person_id, $betriebsmittel_id
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getBetriebsmittelPerson($person_id, $betriebsmitteltyp=null)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -313,16 +290,17 @@ class betriebsmittelperson
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_betriebsmittel JOIN public.tbl_betriebsmittelperson USING(betriebsmittel_id) WHERE person_id='".addslashes($person_id)."'";
+		$qry = "SELECT * FROM public.tbl_betriebsmittel JOIN public.tbl_betriebsmittelperson USING(betriebsmittel_id) 
+				WHERE person_id='".addslashes($person_id)."'";
 		if(!is_null($betriebsmitteltyp))
 			$qry.=" AND betriebsmitteltyp='".addslashes($betriebsmitteltyp)."'";
 		$qry.=" ORDER BY betriebsmitteltyp, nummer";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$bm = new betriebsmittelperson($this->conn, null, null, null);
+				$bm = new betriebsmittelperson();
 				
 				$bm->betriebsmittel_id = $row->betriebsmittel_id;
 				$bm->beschreibung = $row->beschreibung;

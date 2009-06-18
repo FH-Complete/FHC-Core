@@ -19,71 +19,55 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bisverwendung
+class bisverwendung extends basis_db 
 {
-	var $conn;    // @var resource DB-Handle
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $result = array(); // @var email Objekt
+	public $new;
+	public $result = array();
 	
 	//Tabellenspalten
-	var $bisverwendung_id;
-	var $ba1code;
-	var $ba2code;
-	var $beschausmasscode;
-	var $verwendung_code;
-	var $mitarbeiter_uid;
-	var $hauptberufcode;
-	var $hauptberuflich;
-	var $habilitation;
-	var $beginn;
-	var $ende;
-	var $vertragsstunden;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
-	var $ext_id;	
+	public $bisverwendung_id;
+	public $ba1code;
+	public $ba2code;
+	public $beschausmasscode;
+	public $verwendung_code;
+	public $mitarbeiter_uid;
+	public $hauptberufcode;
+	public $hauptberuflich;
+	public $habilitation;
+	public $beginn;
+	public $ende;
+	public $vertragsstunden;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $ext_id;	
 	
-	var $ba1bez;
-	var $ba2bez;
-	var $beschausmass;
-	var $verwendung;
-	var $hauptberuf;
+	public $ba1bez;
+	public $ba2bez;
+	public $beschausmass;
+	public $verwendung;
+	public $hauptberuf;
 	
-	// ***********************************************
-	// * Konstruktor
-	// * @param conn    Connection zur Datenbank
-	// *        bisverwendung_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function bisverwendung($conn, $bisverwendung_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param bisverwendung_id ID des zu ladenden Datensatzes
+	 */
+	public function __construct($bisverwendung_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-		*/
-		if($bisverwendung_id != null)
+		parent::__construct();
+		
+		if(!is_null($bisverwendung_id))
 			$this->load($bisverwendung_id);
 	}
 	
-	// ***********************************************
-	// * Laedt einen Datensatz
-	// * @param bisverwendung_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function load($bisverwendung_id)
+	/**
+	 * Laedt einen Datensatz
+	 * @param bisverwendung_id ID des zu ladenden Datensatzes
+	 */
+	public function load($bisverwendung_id)
 	{
 		//bisverwendung_id auf gueltigkeit pruefen
 		if(!is_numeric($bisverwendung_id) || $bisverwendung_id == '')
@@ -93,17 +77,22 @@ class bisverwendung
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
-				bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) WHERE 
-				tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
-				tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
-				tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
-				tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
-				bisverwendung_id='$bisverwendung_id';";
+		$qry = "SELECT 
+					* 
+				FROM 
+					bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
+					bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung 
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) 
+				WHERE 
+					tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
+					tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
+					tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
+					tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
+					bisverwendung_id='$bisverwendung_id';";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->bisverwendung_id = $row->bisverwendung_id;
 				$this->ba1code = $row->ba1code;
@@ -148,12 +137,12 @@ class bisverwendung
 		}
 	}
 			
-	// **************************************************
-	// * Loescht einen Datensatz
-	// * @param bisverwendung_id ID des zu loeschenden Datensatzes
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************
-	function delete($bisverwendung_id)
+	/**
+	 * Loescht einen Datensatz
+	 * @param bisverwendung_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($bisverwendung_id)
 	{
 		//akte_id auf gueltigkeit pruefen
 		if(!is_numeric($bisverwendung_id) || $bisverwendung_id == '')
@@ -162,9 +151,9 @@ class bisverwendung
 			return false;
 		}
 		$qry = "SELECT count(*) as anzahl FROM bis.tbl_bisfunktion WHERE bisverwendung_id='$bisverwendung_id'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
 				{
@@ -173,10 +162,10 @@ class bisverwendung
 				}
 			}
 		}
-				
+		
 		$qry = "DELETE FROM bis.tbl_bisverwendung WHERE bisverwendung_id = '$bisverwendung_id';";
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -188,7 +177,12 @@ class bisverwendung
 		}
 	}
 	
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern
+	 *
+	 * @return true wenn ok, sonst false
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->vertragsstunden) && $this->vertragsstunden!='')
 		{
@@ -197,25 +191,14 @@ class bisverwendung
 		}
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *********************************************************************
-	// * Speichert den aktuellen Datensatz
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************************
-	function save($new=null)
+		
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!$this->validate())
 			return false;
@@ -273,30 +256,30 @@ class bisverwendung
 				  " WHERE bisverwendung_id='".addslashes($this->bisverwendung_id)."'";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('bis.tbl_bisverwendung_bisverwendung_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->bisverwendung_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -310,27 +293,32 @@ class bisverwendung
 		}
 	}
 	
-	// ********************************************
-	// * Laedt alle Verwendungen eines Mitarbeiters
-	// * @param $uid UID des Mitarbeiters
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function getVerwendung($uid)
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters
+	 * @param $uid UID des Mitarbeiters
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getVerwendung($uid)
 	{
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
-				bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) WHERE 
-				tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
-				tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
-				tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
-				tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
-				mitarbeiter_uid='".addslashes($uid)."' ORDER BY beginn;";
-		//echo $qry;
-		if($result = pg_query($this->conn,$qry))
+		$qry = "SELECT 
+					* 
+				FROM 
+					bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
+					bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung 
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) 
+				WHERE 
+					tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
+					tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
+					tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
+					tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
+					mitarbeiter_uid='".addslashes($uid)."' ORDER BY beginn;";
+
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new bisverwendung($this->conn, null, null);
+				$obj = new bisverwendung();
 				
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->ba1code = $row->ba1code;
@@ -370,6 +358,5 @@ class bisverwendung
 			return false;
 		}			
 	}
-	
 }
 ?>

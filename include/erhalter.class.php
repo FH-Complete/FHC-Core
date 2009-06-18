@@ -19,52 +19,40 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class erhalter
+class erhalter extends basis_db
 {
-	var $conn;    				// resource DB-Handle
-	var $new;      				// boolean
-	var $errormsg;			// string
-	var $result = array();			// erhalter Objekt
+	public $new;				// boolean
+	public $result = array();	// erhalter Objekt
 	
-	var $erhalter_kz;		// integer
-	var $kurzbz;				// varchar(5)
-	var $bezeichnung;			// varchar(255)
-	var $dvr;				// varchar(8)
-	var $logo;				// ctext
-	var $zvr;				// char(16)
+	public $erhalter_kz;		// integer
+	public $kurzbz;			// varchar(5)
+	public $bezeichnung;		// varchar(255)
+	public $dvr;				// varchar(8)
+	public $logo;				// text
+	public $zvr;				// char(16)
 
 	
-	// **************************************************************
-	// * Konstruktor
-	// * @param conn Connection zur Datenbank
-	// *        
-	// **************************************************************
-	function erhalter($conn, $erhalter_kz=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param conn Connection zur Datenbank
+	 *        
+	 */
+	public function __construct($erhalter_kz=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-			return false;
-		}
-		*/
-		if($erhalter_kz != null)
+		parent::__construct();
+		
+		if(!is_null($erhalter_kz))
 			$this->load($erhalter_kz);
 	}
 		
-	// *****************************************************
-	// * Laedt einen Erhalter
-	// * @param stg_id ID des Studienganges der zu laden ist
-	// * @return true wenn ok, false im Fehlerfall
-	// *****************************************************
-	function load($erhalter_kz)
+	/**
+	 * Laedt einen Erhalter
+	 * @param stg_id ID des Studienganges der zu laden ist
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($erhalter_kz)
 	{
 		if(!is_numeric($erhalter_kz))
 		{
@@ -74,9 +62,9 @@ class erhalter
 		
 		$qry = "SELECT * FROM public.tbl_erhalter WHERE erhalter_kz='$erhalter_kz'";
 		
-		if($res = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($res))
+			if($row = $this->db_fetch_object())
 			{			
 				$this->erhalter_kz=$row->erhalter_kz;
 				$this->kurzbz=$row->kurzbz;
@@ -95,26 +83,26 @@ class erhalter
 		return true;		
 	}
 		
-	// *******************************************
-	// * Liefert alle Erhalter
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function getAll($order=null)
+	/**
+	 * Liefert alle Erhalter
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAll($order=null)
 	{
 		$qry = "SELECT * FROM public.tbl_erhalter";
 		
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";
 		
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 		
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$stg_obj = new erhalter($this->conn);
+			$stg_obj = new erhalter();
 			
 			$stg_obj->erhalter_kz=$row->erhalter_kz;
 			$stg_obj->kurzbz=$row->kurzbz;
@@ -125,67 +113,48 @@ class erhalter
 			
 			$this->result[] = $stg_obj;
 		}
-		//return $this->result;
+		
 		return true;
 	}
 	
 	/**
-	 * Loescht einen Erhalter
-	 * @param $stg_id ID des zu loeschenden Studienganges
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($stg_id)
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{	
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->kurzbz = str_replace("'",'´',$this->kurzbz);
-		
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>255)           
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 255 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
+			$this->errormsg = 'Bezeichnung darf nicht laenger als 255 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->kurzbz)>5)
 		{
-			$this->errormsg = "Kurzbez darf nicht laenger als 5 Zeichen sein bei <b>$this->ext_id</b> - $this->kurzbz";
+			$this->errormsg = 'Kurzbez darf nicht laenger als 5 Zeichen sein';
 			return false;
-		}	
+		}
+		if(!is_numeric($this->erhalter_kz))
+		{
+			$this->errormsg = 'erhalter_kz ungueltig!';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;		
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars()) 
-		{
+		if(!$this->validate()) 
 			return false;
-		}
 			
 		if($this->new)
 		{
-			//Pruefen ob erhalter_kz gueltig ist
-			if(!is_numeric($this->erhalter_kz))
-			{
-				$this->errormsg = 'erhalter_kz ungueltig! ('.$this->erhalter_kz.')';
-				return false;
-			}
 			//Neuen Datensatz anlegen		
 			$qry = 'INSERT INTO public.tbl_erhalter (erhalter_kz, kurzbz, bezeichnung, dvr, logo, zvr) VALUES ('.
 				$this->addslashes($this->erhalter_kz).', '.
@@ -199,13 +168,6 @@ class erhalter
 		{
 			//bestehenden Datensatz akualisieren
 			
-			//Pruefen ob studiengang_kz gueltig ist
-			if(!is_numeric($this->erhalter_kz))
-			{
-				$this->errormsg = 'erhalter_kz ungueltig.';
-				return false;
-			}
-			
 			$qry = 'UPDATE public.tbl_studiengang SET '. 
 				'erhalter_kz='.$this->addslashes($this->erhalter_kz).', '.
 				'kurzbz='.$this->addslashes($this->kurzbz).', '.
@@ -215,26 +177,9 @@ class erhalter
 				'zvr='.$this->addslashes($this->zvr).' '.
 				'WHERE erhalter_kz='.$this->addslashes($this->erhalter_kz).';';
 		}
-		//echo $qry;
-		if(pg_query($this->conn, $qry))
+
+		if($this->db_query($qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-						
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else

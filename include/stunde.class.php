@@ -19,60 +19,33 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class stunde
+class stunde extends basis_db 
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $stunden = array(); // stunde Objekt
+	public $new;      // boolean
+	public $stunden = array(); // stunde Objekt
 
 	//Tabellenspalten
-	var $stunde;	// smalint
-	var $beginn;	// time without timezone
-	var $ende;		// time without timezone
+	public $stunde;	// smalint
+	public $beginn;	// time without timezone
+	public $ende;	// time without timezone
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Stunde
-	// * @param $conn        	Datenbank-Connection
-	// *        $stunde			Stunde die geladen werden soll
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function stunde($conn, $stunde=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 */
+	public function __construct()
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($stunde!=null)
-			$this->load($stunde);
+		parent::__construct();
 	}
 
-	// *********************************************************
-	// * Laedt eine Stunde
-	// * @param $stunde
-	// *********************************************************
-	function load($stunde)
-	{
-		return true;
-	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->stunde))
 		{
@@ -82,24 +55,13 @@ class stunde
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert eine Stunde in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	/**
+	 * Speichert eine Stunde in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -120,9 +82,8 @@ class stunde
 			       " WHERE stunde=".$this->stunde;
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			//Log schreiben
 			return true;
 		}
 		else

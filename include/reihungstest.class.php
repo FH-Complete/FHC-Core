@@ -23,54 +23,37 @@
  * Klasse Reihungstest 
  * @create 10-01-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class reihungstest
+class reihungstest extends basis_db 
 {
-	var $conn;     // @var resource DB-Handle
-	var $new;       // @var boolean
-	var $errormsg;  // @var string
-	var $done=false;	// @var boolean
-	var $result = array();
+	public $new;			//  boolean
+	public $done=false;		//  boolean
+	public $result = array();
 	
 	//Tabellenspalten
-	Var $reihungstest_id;	// @var integer
-	var $studiengang_kz;	// @var integer
-	var $ort_kurzbz;		// @var string
-	var $anmerkung;		// @var string
-	var $datum;			// @var date
-	var $uhrzeit;			// @var time without time zone
-	var $ext_id;			// @var integer
-	var $insertamum;		// @var timestamp
-	var $insertvon;		// @var bigint
-	var $updateamum;		// @var timestamp
-	var $updatevon;		// @var bigint
+	public $reihungstest_id;//  integer
+	public $studiengang_kz;	//  integer
+	public $ort_kurzbz;		//  string
+	public $anmerkung;		//  string
+	public $datum;			//  date
+	public $uhrzeit;		//  time without time zone
+	public $ext_id;			//  integer
+	public $insertamum;		//  timestamp
+	public $insertvon;		//  bigint
+	public $updateamum;		//  timestamp
+	public $updatevon;		//  bigint
 	
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $kontakt_id ID der Adresse die geladen werden soll (Default=null)
+	 * @param $reihungstest_id ID der Adresse die geladen werden soll (Default=null)
 	 */
-	function reihungstest($conn,$reihungstest_id=null, $unicode=false)
+	public function __construct($reihungstest_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else 
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/		
+		parent::__construct();
+		
+		if(!is_null($reihungstest_id))
+			$this->load($reihungstest_id);
 	}
 	
 	/**
@@ -78,7 +61,7 @@ class reihungstest
 	 * @param  $sreihungstest_id ID des zu ladenden Reihungstests
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($reihungstest_id)
+	public function load($reihungstest_id)
 	{
 		if(!is_numeric($reihungstest_id))
 		{
@@ -86,11 +69,12 @@ class reihungstest
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id='$reihungstest_id'";
-		if($result = pg_query($this->conn, $qry))
+		$qry = "SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id='".addslashes($reihungstest_id)."'";
+		
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
-			{								
+			if($row = $this->db_fetch_object())
+			{
 				$this->reihungstest_id = $row->reihungstest_id;
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->ort_kurzbz = $row->ort_kurzbz;
@@ -117,22 +101,23 @@ class reihungstest
 		}
 	}
 	
-	// ****
-	// * Liefert alle Reihungstests
-	// * wenn ein Datum uebergeben wird, dann werden alle Reihungstests ab diesem 
-	// * Datum zurueckgeliefert
-	// ****
-	function getAll($datum=null)
+	/**
+	 * Liefert alle Reihungstests
+	 * wenn ein Datum uebergeben wird, dann werden alle Reihungstests ab diesem 
+	 * Datum zurueckgeliefert
+	 */
+	public function getAll($datum=null)
 	{
 		$qry = "SELECT * FROM public.tbl_reihungstest ";
 		if($datum!=null)
-			$qry.=" WHERE datum>='$datum'";
+			$qry.=" WHERE datum>='".addslashes($datum)."'";
 		$qry.=" ORDER BY datum DESC, uhrzeit";
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new reihungstest($this->conn, null, null);
+				$obj = new reihungstest();
 				
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
@@ -156,39 +141,28 @@ class reihungstest
 			return false;
 		}
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
+		
 	/**
-	 * Prueft die Variablen auf gueltigkeit
+	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	private function validate()
 	{		
 		//Zahlenfelder pruefen
 		if(!is_numeric($this->studiengang_kz))
 		{
-			$this->errormsg='studiengang_kz enthaelt ungueltige Zeichen:'.$this->reihungstest_id.' - Studiengang: '.$row->studiengang_kz;
+			$this->errormsg='studiengang_kz enthaelt ungueltige Zeichen';
 			return false;
 		}
 		//Gesamtlaenge pruefen
-		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->ort_kurzbz)>8)
 		{
-			$this->errormsg = 'Ort_kurzbz darf nicht länger als 8 Zeichen sein  - Studiengang: '.$row->studiengang_kz;
+			$this->errormsg = 'Ort_kurzbz darf nicht länger als 8 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->anmerkung)>64)
 		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 64 Zeichen sein - Studiengang: '.$row->studiengang_kz;
+			$this->errormsg = 'Anmerkung darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
 				
@@ -202,10 +176,11 @@ class reihungstest
 	 * andernfalls wird der Datensatz mit der ID in $reihungstest_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
-		$this->done=false;
-			
+		if(!$this->validate())
+			return false;
+		
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
@@ -220,105 +195,72 @@ class reihungstest
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
 			     $this->addslashes($this->updatevon).');';
-			 $this->done=true;			
 		}
 		else
 		{			
-			$qry="SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id='$this->reihungstest_id';";
-			if($resultz = pg_query($this->conn, $qry))
-			{
-				while($rowz = pg_fetch_object($resultz))
-				{
-					$update=false;			
-					if($rowz->studiengang_kz!=$this->studiengang_kz)		$update=true;
-					if($rowz->ort_kurzbz!=$this->ort_kurzbz)				$update=true;
-					if($rowz->anmerkung!=$this->anmerkung)			$update=true;
-					if($rowz->datum!=$this->datum)					$update=true;
-					if($rowz->uhrzeit!=$this->uhrzeit)					$update=true;
-					if($rowz->ext_id!=$this->ext_id)	 				$update=true;
-				
-					if($update)
-					{
-						$qry='UPDATE public.tbl_reihungstest SET '.
-							'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '. 
-							'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '. 
-							'anmerkung='.$this->addslashes($this->anmerkung).', '.  
-							'datum='.$this->addslashes($this->datum).', '. 
-							'uhrzeit='.$this->addslashes($this->uhrzeit).', '.
-							'ext_id='.$this->addslashes($this->ext_id).', '. 
-						     	'updateamum= now(), '.
-						     	'updatevon='.$this->addslashes($this->updatevon).' '.
-							'WHERE reihungstest_id='.$this->addslashes($this->reihungstest_id).';';
-							$this->done=true;
-					}
-				}
-			}
-			else 
-			{
-				return false;
-			}
+			$qry='UPDATE public.tbl_reihungstest SET '.
+				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '. 
+				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '. 
+				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
+				'datum='.$this->addslashes($this->datum).', '. 
+				'uhrzeit='.$this->addslashes($this->uhrzeit).', '.
+				'ext_id='.$this->addslashes($this->ext_id).', '. 
+		     	'updateamum= now(), '.
+		     	'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE reihungstest_id='.$this->addslashes($this->reihungstest_id).';';					
 		}
-		if ($this->done)
+		
+		if($this->db_query($qry))
 		{
-			if(pg_query($this->conn, $qry))
+			if($this->new)
 			{
-				if($this->new)
+				$qry = "SELECT currval('public.tbl_reihungstest_reihungstest_id_seq') as id";
+				if($this->db_query($qry))
 				{
-					$qry = "SELECT currval('public.tbl_reihungstest_reihungstest_id_seq') as id";
-					if($result = pg_query($this->conn, $qry))
+					if($row = $this->db_fetch_object())
 					{
-						if($row = pg_fetch_object($result))
-						{
-							$this->reihungstest_id = $row->id;
-							pg_query($this->conn, 'COMMIT');
-							return true;
-						}
-						else 
-						{
-							$this->errormsg = 'Fehler beim Auslesen der Sequence';
-							pg_query($this->conn, 'ROLLBACK');
-							return false;
-						}
+						$this->reihungstest_id = $row->id;
+						$this->db_query('COMMIT');
+						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
-					}							
+					}
 				}
-				return true;		
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK');
+					return false;
+				}
 			}
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern der Daten: '.$this->reihungstest_id.'/'.$qry;
-				return false;
-			}
-		}
-		else 
-		{
 			return true;
 		}
-	}
-	
-	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $reihungstest_id ID die geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($reihungstest_id)
-	{
-		//noch nicht implementiert!	
-	}
-	
-	function getReihungstest($studiengang_kz)
-	{
-		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz='$studiengang_kz'";
-		if($result = pg_query($this->conn, $qry))
+		else
 		{
-			while($row = pg_fetch_object($result))
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+		
+	/**
+	 * Liefert die Reihungstests eines Studienganges
+	 *
+	 * @param $studiengang_kz
+	 * @return true wenn ok, sonst false
+	 */
+	public function getReihungstest($studiengang_kz)
+	{
+		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz='".addslashes($studiengang_kz)."'";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new reihungstest($this->conn, null, null);
+				$obj = new reihungstest();
 				
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->studiengang_kz = $row->studiengang_kz;

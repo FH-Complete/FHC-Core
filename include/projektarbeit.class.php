@@ -23,66 +23,47 @@
  * Klasse projektarbeit
  * @create 08-02-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class projektarbeit
+class projektarbeit extends basis_db
 {
-	var $conn;     			// @var resource DB-Handle
-	var $new;       		// @var boolean
-	var $errormsg;  		// @var string
-	var $result = array(); 	// @var adresse Objekt
+	public $new;       		// boolean
+	public $result = array(); 	// adresse Objekt
 
 	//Tabellenspalten
-	var $projektarbeit_id;	// @var integer
-	var $projekttyp_kurzbz;	// @var string
-	var $titel;				// @var string
-	var $titel_english;		// @var string
-	var $lehreinheit_id;	// @var integer
-	var $student_uid;		// @var integer
-	var $firma_id;			// @var integer
-	var $note;				// @var integer
-	var $punkte;			// @var numeric(6,2)
-	var $beginn;			// @var date
-	var $ende;				// @var date
-	var $faktor;			// @var numeric(3,2)
-	var $freigegeben;		// @var boolean
-	var $gesperrtbis;		// @var date
-	var $stundensatz;		// @var numeric(6,2)
-	var $gesamtstunden;		// @var numeric(8,2)
-	var $themenbereich;		// @var sting
-	var $anmerkung;			// @var string
-	var $ext_id;			// @var integer
-	var $insertamum;		// @var timestamp
-	var $insertvon;			// @var bigint
-	var $updateamum;		// @var timestamp
-	var $updatevon;			// @var bigint
+	public $projektarbeit_id;	// integer
+	public $projekttyp_kurzbz;	// string
+	public $titel;				// string
+	public $titel_english;		// string
+	public $lehreinheit_id;		// integer
+	public $student_uid;		// integer
+	public $firma_id;			// integer
+	public $note;				// integer
+	public $punkte;				// numeric(6,2)
+	public $beginn;				// date
+	public $ende;				// date
+	public $faktor;				// numeric(3,2)
+	public $freigegeben;		// boolean
+	public $gesperrtbis;		// date
+	public $stundensatz;		// numeric(6,2)
+	public $gesamtstunden;		// numeric(8,2)
+	public $themenbereich;		// sting
+	public $anmerkung;			// string
+	public $ext_id;				// integer
+	public $insertamum;			// timestamp
+	public $insertvon;			// bigint
+	public $updateamum;			// timestamp
+	public $updatevon;			// bigint
 
 
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $projektarbeit_id ID der Projektarbeit, die geladen werden soll (Default=null)
+	 * @param $projektarbeit_id ID der Projektarbeit, die geladen werden soll (Default=null)
 	 */
-	function projektarbeit($conn,$projektarbeit_id=null, $unicode=false)
+	public function __construct($projektarbeit_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/	
+		parent::__construct();
+
 		if($projektarbeit_id != null) 	
 			$this->load($projektarbeit_id);
 	}
@@ -92,7 +73,7 @@ class projektarbeit
 	 * @param  $projektarbeit_id ID der zu ladenden Projektarbeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($projektarbeit_id)
+	public function load($projektarbeit_id)
 	{
 		if(!is_numeric($projektarbeit_id))
 		{
@@ -102,9 +83,9 @@ class projektarbeit
 		
 		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='$projektarbeit_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->projektarbeit_id = $row->projektarbeit_id;
 				$this->projekttyp_kurzbz = $row->projekttyp_kurzbz;
@@ -145,14 +126,13 @@ class projektarbeit
 	}
 
 	/**
-	 * Prueft die Variablen auf gueltigkeit
+	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{
 
 		//Gesamtlaenge pruefen
-		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if ($this->projekttyp_kurzbz==null)
 		{
 			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein!';
@@ -220,26 +200,17 @@ class projektarbeit
 		$this->errormsg = '';
 		return true;
 	}
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $projektarbeit_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save($new=null)
+	public function save($new=null)
 	{
 		//Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($new==null)
@@ -307,31 +278,31 @@ class projektarbeit
 				'WHERE projektarbeit_id='.$this->addslashes($this->projektarbeit_id).';';
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				//Sequence auslesen
 				$qry = "SELECT currval('lehre.tbl_projektarbeit_projektarbeit_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->projektarbeit_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK;');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -350,7 +321,7 @@ class projektarbeit
 	 * @param $projektarbeit_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($projektarbeit_id)
+	public function delete($projektarbeit_id)
 	{
 		if(!is_numeric($projektarbeit_id))
 		{
@@ -360,7 +331,7 @@ class projektarbeit
 		
 		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='$projektarbeit_id'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -371,20 +342,20 @@ class projektarbeit
 		}		
 	}
 	
-	// ********************************************
-	// * Laedt alle Projektarbeiten eines Studenten
-	// * @param student_uid
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function getProjektarbeit($student_uid)
+	/**
+	 * Laedt alle Projektarbeiten eines Studenten
+	 * @param student_uid
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getProjektarbeit($student_uid)
 	{
 		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($student_uid)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new projektarbeit($this->conn, null, null);
+				$obj = new projektarbeit();
 				
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
@@ -412,7 +383,7 @@ class projektarbeit
 				
 				$this->result[] = $obj;
 			}
-
+			return true;
 		}
 		else 
 		{
@@ -421,12 +392,12 @@ class projektarbeit
 		}
 	}
 	
-	// ********************************************
-	// * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
-	// * @param studiengang_kz, studiensemester_kurzbz
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
+	/**
+	 * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
+	 * @param studiengang_kz, studiensemester_kurzbz
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT 
 					tbl_projektarbeit.* 
@@ -438,11 +409,11 @@ class projektarbeit
 					tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
 					tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new projektarbeit($this->conn, null, null);
+				$obj = new projektarbeit();
 				
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
@@ -470,7 +441,7 @@ class projektarbeit
 				
 				$this->result[] = $obj;
 			}
-
+			return true;
 		}
 		else 
 		{

@@ -23,70 +23,50 @@
  * Klasse Zeitaufzeichnung
  * @create 06-11-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class zeitaufzeichnung
+class zeitaufzeichnung extends basis_db
 {
-	var $conn;		// resource DB-Handle
-	var $new;		// boolean
-	var $errormsg;	// string
-	var $result = array();	// zeitaufzeichnung Objekt
-	var $done=false;		// boolean
+	public $new;		// boolean
+	public $result = array();	// zeitaufzeichnung Objekt
+	public $done=false;		// boolean
 
 	//Tabellenspalten
-	var $zeitaufzeichnung_id;	// serial
-	var $uid;					// varchar(16)
-	var $aktivitaet_kurzbz;		// varchar(16)
-	var $start;					// timestamp
-	var $ende;					// timestamp
-	var $beschreibung;			// varchar(256)
-	var $studiengang_kz;		// integer
-	var $fachbereich_kurzbz;	// varchar(16)
-	var $insertamum;			// timestamp
-	var $insertvon;				// varchar(16)
-	var $updateamum;			// timestamp
-	var $updatevon;				// varchar(16)
-	var $projekt_kurzbz;		// varchar(16)
+	public $zeitaufzeichnung_id;	// serial
+	public $uid;					// varchar(16)
+	public $aktivitaet_kurzbz;		// varchar(16)
+	public $start;					// timestamp
+	public $ende;					// timestamp
+	public $beschreibung;			// varchar(256)
+	public $studiengang_kz;			// integer
+	public $fachbereich_kurzbz;		// varchar(16)
+	public $insertamum;				// timestamp
+	public $insertvon;				// varchar(16)
+	public $updateamum;				// timestamp
+	public $updatevon;				// varchar(16)
+	public $projekt_kurzbz;			// varchar(16)
 	
 	
 
-	// *************************************************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $zeitaufzeichnung_id ID der Zeitaufzeichnung die geladen werden soll (Default=null)
-	// *        $unicode   wenn false dann wird das Encoding auf LATIN9 gesetzt
-	// *                   wenn true dann auf UNICODE
-	// *                   wenn null dann wird das Encoding nicht veraendert
-	// *************************************************************************
-	function zeitaufzeichnung($conn, $zeitaufzeichnung_id=null,$unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $zeitaufzeichnung_id ID der Zeitaufzeichnung die geladen werden soll (Default=null)
+	 */
+	public function __construct($zeitaufzeichnung_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/
 		if($zeitaufzeichnung_id != null)
 			$this->load($zeitaufzeichnung_id);
 	}
 
-	// ***********************************************
-	// * Laedt die Zeitaufzeichnung mit der ID $zeitaufzeichnung_id
-	// * @param  $adress_id ID der zu ladenden Adresse
-	// * @return true wenn ok, false im Fehlerfall
-	// ***********************************************
-	function load($zeitaufzeichnung_id)
+	/**
+	 * Laedt die Zeitaufzeichnung mit der ID $zeitaufzeichnung_id
+	 * @param  $adress_id ID der zu ladenden Adresse
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($zeitaufzeichnung_id)
 	{
-
 		//Pruefen ob zeitaufzeichnung_id eine gueltige Zahl ist
 		if(!is_numeric($zeitaufzeichnung_id) || $zeitaufzeichnung_id == '')
 		{
@@ -97,13 +77,13 @@ class zeitaufzeichnung
 		//Daten aus der Datenbank lesen
 		$qry = "SELECT * FROM campus.tbl_zeitaufzeichnung WHERE zeitaufzeichnung_id='$zeitaufzeichnung_id'";
 
-		if(!$result = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		if($row = pg_fetch_object($result))
+		if($row = $this->db_fetch_object())
 		{
 			$this->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
 			$this->uid = $row->uid;
@@ -128,34 +108,23 @@ class zeitaufzeichnung
 		return true;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen auf Gueltigkeit
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen auf Gueltigkeit
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		$this->errormsg = '';
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ***********************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// ***********************************************************************
-	function save()
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen pruefen
 		if(!$this->validate())
@@ -204,30 +173,30 @@ class zeitaufzeichnung
 		      	'WHERE zeitaufzeichnung_id='.$this->zeitaufzeichnung_id.';';
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				//naechste ID aus der Sequence holen
 				$qry="SELECT currval('campus.tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->zeitaufzeichnung_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else
 					{
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						$this->errormsg = "Fehler beim Auslesen der Sequence";
 						return false;
 					}
 				}
 				else
 				{
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					return false;
 				}
@@ -241,12 +210,12 @@ class zeitaufzeichnung
 		return true;
 	}
 
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param $zeitaufzeichnnung_id ID die geloescht werden soll
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
-	function delete($zeitaufzeichnung_id)
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $zeitaufzeichnnung_id ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($zeitaufzeichnung_id)
 	{
 		//Pruefen ob zeitaufzeichnung_id eine gueltige Zahl ist
 		if(!is_numeric($zeitaufzeichnung_id) || $zeitaufzeichnung_id == '')
@@ -258,7 +227,7 @@ class zeitaufzeichnung
 		//loeschen des Datensatzes
 		$qry="DELETE FROM campus.tbl_zeitaufzeichnung WHERE zeitaufzeichnung_id='$zeitaufzeichnung_id';";
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}

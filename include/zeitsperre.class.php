@@ -19,50 +19,49 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class zeitsperre
+class zeitsperre extends basis_db
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var news Objekt
+	public $new;     			// boolean
+	public $result = array(); 	// news Objekt
 
 	//Tabellenspalten
-	var $zeitsperre_id;		// serial
-	var $zeitsperretyp_kurzbz;	// varchar(8)
-	var $mitarbeiter_uid;		// varchar(16)
-	var $bezeichnung;		// varchar(32)
-	var $vondatum;		// date
-	var $vonstunde;		// smallint
-	var $bisdatum;		// date
-	var $bisstunde;		// smallint
-	var $erreichbarkeit_kurzbz;		// varchar(5)
-	var $vertretung_uid;		// varchar(16)
-	var $updateamum;		// timestamp
-	var $updatevon;		// string
-	var $insertamum;		// timestamp
-	var $insertvon;		// string
-	var $freigabeamum;
-	var $freigabevon;
+	public $zeitsperre_id;		// serial
+	public $zeitsperretyp_kurzbz;	// varchar(8)
+	public $mitarbeiter_uid;		// varchar(16)
+	public $bezeichnung;		// varchar(32)
+	public $vondatum;			// date
+	public $vonstunde;			// smallint
+	public $bisdatum;			// date
+	public $bisstunde;			// smallint
+	public $erreichbarkeit_kurzbz;		// varchar(5)
+	public $vertretung_uid;		// varchar(16)
+	public $updateamum;			// timestamp
+	public $updatevon;			// string
+	public $insertamum;			// timestamp
+	public $insertvon;			// string
+	public $freigabeamum;
+	public $freigabevon;
 
 
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $zeitsperre_id ID der zu ladenden Funktion
+	 * @param $zeitsperre_id ID der zu ladenden Funktion
 	 */
-	function zeitsperre($conn, $zeitsperre_id=null)
+	public function __construct($zeitsperre_id=null)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		
 		if($zeitsperre_id != null)
 			$this->load($zeitsperre_id);
 	}
 
-	// **********************************
-	// * Laedt alle Zeitsperren bei denen
-	// * ende>=now() ist und uid=$uid
-	// **********************************
-	function getzeitsperren($uid, $bisgrenze=true)
+	/**
+	 * Laedt alle Zeitsperren bei denen
+	 * ende>=now() ist und uid=$uid
+	 */
+	public function getzeitsperren($uid, $bisgrenze=true)
 	{
 		unset($this->result);
 		$this->result=array();
@@ -72,22 +71,23 @@ class zeitsperre
 				WHERE mitarbeiter_uid='".addslashes($uid)."'";
 
 		if($bisgrenze)
+		{
 			$qry.=" AND (
 							(date_part('month',vondatum)>=9 AND date_part('year', vondatum)>='".(date('Y')-1)."')
 							OR
 							(date_part('month',vondatum)<9 AND date_part('year', vondatum)>='".(date('Y'))."')
 						)";
-			//$qry.=" AND bisdatum>=now()::date";
-
+		}
+		
 		$qry.= " ORDER BY vondatum DESC";
-		//echo $qry;
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
 
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
 
-				$obj = new zeitsperre($this->conn);
+				$obj = new zeitsperre();
 
 				$obj->zeitsperre_id = $row->zeitsperre_id;
 				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
@@ -117,7 +117,7 @@ class zeitsperre
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Zeitsperren';
+			$this->errormsg = 'Fehler beim Laden der Zeitsperren';
 			return false;
 		}
 	}
@@ -127,9 +127,8 @@ class zeitsperre
 	 * @param $zeitsperre_id ID der zu laden ist
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($zeitsperre_id)
+	public function load($zeitsperre_id)
 	{
-
 		if(!is_numeric($zeitsperre_id))
 		{
 			$this->errormsg = 'zeitsperre_id muß eine gültige Zahl sein';
@@ -138,13 +137,13 @@ class zeitsperre
 
 		$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperre_id = '$zeitsperre_id';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row=pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->zeitsperre_id = $row->zeitsperre_id;
 			$this->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
@@ -177,7 +176,7 @@ class zeitsperre
 	 * @param $zeitsperre_id id des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($zeitsperre_id)
+	public function delete($zeitsperre_id)
 	{
 		if(!is_numeric($zeitsperre_id))
 		{
@@ -187,25 +186,20 @@ class zeitsperre
 
 		$qry = "DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id='$zeitsperre_id'";
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim L&ouml;schen';
+			$this->errormsg = 'Fehler beim Löschen';
 			return false;
 		}
-	}
-
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{
 		if(strlen($this->bezeichnung)>32)
 		{
@@ -236,10 +230,10 @@ class zeitsperre
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save($new = null)
+	public function save($new = null)
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if(!is_null($new))
@@ -298,7 +292,7 @@ class zeitsperre
 				'WHERE zeitsperre_id = '.$this->addslashes($this->zeitsperre_id).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -313,7 +307,7 @@ class zeitsperre
 	 * Liefert ZeitsperreTypen eines Tages
 	 * @return string wenn ok, false im Fehlerfall
 	 */
-	function getTyp($datum)
+	public function getTyp($datum)
 	{
 		$datum_obj=new datum();
 		$typ='';
@@ -332,7 +326,7 @@ class zeitsperre
 	 * Liefert Erreichbarkeit der Zeitsperre eines Tages
 	 * @return string wenn ok, false im Fehlerfall
 	 */
-	function getErreichbarkeit($datum)
+	public function getErreichbarkeit($datum)
 	{
 		$datum_obj=new datum();
 		$erbk='';

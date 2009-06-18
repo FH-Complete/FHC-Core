@@ -24,7 +24,7 @@
  * Klasse Organisationseinheit
  * 
  */
-require_once('basis_db.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class organisationseinheit extends basis_db
 {
@@ -111,6 +111,11 @@ class organisationseinheit extends basis_db
 				$this->result[] = $obj;
 			}
 			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei Abfrage';
+			return false;
 		}
 	}
 	

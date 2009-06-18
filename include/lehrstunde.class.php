@@ -1,12 +1,24 @@
 <?php
-/*
-	$Header: /include/lehrstunde.class.php,v 1.2 2004/10/16 17:05:38 pam Exp $
-	$Log: lehrstunde.class.php,v $
-	Revision 1.2 2004/10/16 17:05:38 pam
-	Anpassung an neue DB-Struktur.
-*/
-
-
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /****************************************************************************
  * @class 			Lehrstunde
  * @author	 		Christian Paminger
@@ -14,66 +26,60 @@
  * @version			$Revision: 1.2 $
  * Update: 			21.10.2004 von Christian Paminger
  * @brief  			Beschreibung einer Unterrichts-Stunde der Tabelle tbl_stundenplan
- * Abhaengig:	 	von ?
- *****************************************************************************/
+  *****************************************************************************/
+require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/studiensemester.class.php');
 
-// include_once('mitarbeiter.class.php');
-require_once('studiensemester.class.php');
-
-
-class lehrstunde
+class lehrstunde extends basis_db
 {
-	var $conn;			// @brief Connection zur Datenbank
+	public $stundenplan_id;	// @brief id in der Datenbank
+	public $lehreinheit_id;	// @brief id der Lehreinheit in der DB
+	public $unr;			// @brief Unterrichtsnummer
+	public $lektor_uid;		// @brief UID des Lektors
+	public $lektor_kurzbz; 	// @brief Kurzbezeichnung des Lektors
+	public $datum;			// @brief Datum
+	public $stunde;			// @brief Unterrichts-Stunde des Tages
+	public $ort_kurzbz;		// @brief Ort in dem der Unterricht stattfindet
+	public $lehrfach_id;	// @brief Nummer des Lehrfachs
+	public $lehrfach;		// @brief Name des Lehrfachs
+	public $lehrfach_bez;	// @brief Voller Name des Lehrfachs
+	public $lehrform;		// @brief Lehrform des Lehrfachs (Vorlesung, ...)
+	public $studiengang_kz;	// @brief Kennzahl des Studiengangs
+	public $studiengang;	// @brief Kurzbezeichnung des Studiengangs
+	public $sem;			// @brief Semester
+	public $ver;			// @brief Verband
+	public $grp;			// @brief Gruppe
+	public $gruppe_kurzbz;	// @brief Kurzbezeichnung der Gruppe
+	public $titel;			// @brief Titel der Unterrichtsstunde
+	public $anmerkung;		// @brief Anmerkungen zur Unterrichtsstunde
+	public $fix;			// @brief true wenn diese Stunde nicht mehr verschoben wird
+	public $updateamum;		// @brief letztes Update
+	public $updatevon;		// @brief Update von wem?
+	public $new;			// @brief true wenns ein neuer Datensatz ist
+	public $reservierung;	// @brief true wenns eine Reservierung ist
 
-	var $stundenplan_id;// @brief id in der Datenbank
-	var $lehreinheit_id;// @brief id der Lehreinheit in der DB
-	var $unr;			// @brief Unterrichtsnummer
-	var $lektor_uid;	// @brief UID des Lektors
-	var $lektor_kurzbz; // @brief Kurzbezeichnung des Lektors
-	var $datum;			// @brief Datum
-	var $stunde;		// @brief Unterrichts-Stunde des Tages
-	var $ort_kurzbz;	// @brief Ort in dem der Unterricht stattfindet
-	var $lehrfach_id;	// @brief Nummer des Lehrfachs
-	var $lehrfach;		// @brief Name des Lehrfachs
-	var $lehrfach_bez;	// @brief Voller Name des Lehrfachs
-	var $lehrform;		// @brief Lehrform des Lehrfachs (Vorlesung, ...)
-	var $studiengang_kz;// @brief Kennzahl des Studiengangs
-	var $studiengang;	// @brief Kurzbezeichnung des Studiengangs
-	var $sem;			// @brief Semester
-	var $ver;			// @brief Verband
-	var $grp;			// @brief Gruppe
-	var $gruppe_kurzbz;	// @brief Kurzbezeichnung der Gruppe
-	var $titel;			// @brief Titel der Unterrichtsstunde
-	var $anmerkung;		// @brief Anmerkungen zur Unterrichtsstunde
-	var $fix;			// @brief true wenn diese Stunde nicht mehr verschoben wird
-	var $updateamum;	// @brief letztes Update
-	var $updatevon;		// @brief Update von wem?
-	var $errormsg;		// @brief String fuer die Fehlermeldung
-	var $new;			// @brief true wenns ein neuer Datensatz ist
-	var $reservierung;	// @brief true wenns eine Reservierung ist
-
-	var $lehrstunden=array();	// @brief Objekt der eigenen Klasse
-	var $anzahl;		// @brief Gesamte Anzahl der Stunden im Array
-	var $ss=null;			// @brief Studiensemester
+	public $lehrstunden=array(); // @brief Objekt der eigenen Klasse
+	public $anzahl;			// @brief Gesamte Anzahl der Stunden im Array
+	public $ss=null;		// @brief Studiensemester
 
 
-	/** Konstruktor
-	 *
+	/** 
+	 * Konstruktor
 	 *
 	 */
-	function lehrstunde($conn)
+	public function __construct()
 	{
-		// Startvariablen setzen
-		$this->conn=$conn;
+		parent::__construct();
+		
 		$this->new=TRUE;
 	}
 
-
 	/**
-	 *	Einen Datensatz laden
-	 *
+	 * Einen Datensatz laden
+	 * @param stundenplan_id
+	 * @param stpl_table
 	 */
-	function load($stundenplan_id,$stpl_table='stundenplandev')
+	public function load($stundenplan_id,$stpl_table='stundenplandev')
 	{
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
@@ -83,17 +89,16 @@ class lehrstunde
 		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
 
 		$sql_query="SELECT * FROM $stpl_view WHERE $stpl_id=$stundenplan_id;";
-		//echo $sql_query.'<br>';
-
-
+		
 		//Datenbankabfrage
-		if (! $stpl_tbl=pg_query($this->conn, $sql_query))
+		if (!$this->db_query($sql_query))
 		{
-			$this->errormsg=$sql_query.pg_last_error($this->conn);
-			//echo $this->errormsg;
+			$this->errormsg=$sql_query.$this->db_last_error();
 			return false;
 		}
-		$this->anzahl=pg_numrows($stpl_tbl);
+		
+		$this->anzahl = $this->db_num_rows();
+		
 		//Daten uebernehmen
 		if ($this->anzahl!=1)
 		{
@@ -102,7 +107,7 @@ class lehrstunde
 		}
 		else
 		{
-			$row=pg_fetch_object ($stpl_tbl);
+			$row=$this->db_fetch_object();
 			$this->stundenplan_id=$row->{$stpl_id};
 			$this->unr=$row->unr;
 			$this->lektor_uid=$row->uid;
@@ -133,7 +138,7 @@ class lehrstunde
 	 *	Datensatz in DB speichern
 	 *
 	 */
-	function save($uid, $stpl_table='stundenplandev')
+	public function save($uid, $stpl_table='stundenplandev')
 	{
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
@@ -154,13 +159,11 @@ class lehrstunde
 			//echo $sql_query."<br>";
 
 			//Datenbankabfrage
-			if (! pg_query($this->conn, $sql_query))
+			if (!$this->db_query($sql_query))
 			{
-				$this->errormsg=$sql_query.pg_last_error($this->conn);
-				//echo $this->errormsg;
+				$this->errormsg=$sql_query.$this->db_last_error();
 				return false;
 			}
-			//$this->errormsg.=$sql_query;
 		}
 
 		return true;
@@ -172,7 +175,7 @@ class lehrstunde
 	 * @param stpl_table Name der Tabelle
 	 *
 	 */
-	function delete($id, $stpl_table='stundenplandev')
+	public function delete($id, $stpl_table='stundenplandev')
 	{
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
@@ -181,13 +184,11 @@ class lehrstunde
 		// Delete SQL vorbereiten
 		$sql_query='DELETE FROM '.$stpl_table;
 		$sql_query.=" WHERE $stpl_id=$id";
-		//echo $sql_query."<br>";
-
+		
 		//Datenbankrequest
-		if (! pg_query($this->conn, $sql_query))
+		if (!$this->db_query($sql_query))
 		{
-			$this->errormsg=$sql_query.pg_last_error($this->conn);
-			//echo $this->errormsg;
+			$this->errormsg=$sql_query.$this->db_last_error();
 			return false;
 		}
 		else
@@ -195,6 +196,8 @@ class lehrstunde
 	}
 
 	/**
+	 * Laedt Lehrstunden
+	 * 
 	 * @param type (student, lektor, lehrverband, gruppe, ort, ....)
 	 * @param datum_von (inklusive) Startdatum der Abfrage
 	 * @param datum_bis (exklusive) Enddatum der Abfrage
@@ -207,14 +210,13 @@ class lehrstunde
 	 * @param gruppe_kurzbz
 	 *
 	 */
-	function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null)
+	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null)
 	{
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_view.TABLE_ID;
 		$stpl_view='lehre.'.VIEW_BEGIN.$stpl_view;
-		$num_rows_einheit=0;
 
 		// Datum im Format YYYY-MM-TT ?
 		if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_von) )
@@ -269,16 +271,16 @@ class lehrstunde
 		if ($type=='student')
 		{
 			// Lehrverband ermitteln
-			$sql_query="SELECT studiengang_kz, semester, verband, gruppe FROM public.tbl_student WHERE student_uid='$uid'";
-			//echo $sql_query;
-			if (! $result=pg_query($this->conn, $sql_query) )
+			$sql_query="SELECT studiengang_kz, semester, verband, gruppe FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
+			
+			if (!$this->db_query($sql_query) )
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg=$this->db_last_error();
 				return -2;
 			}
-			$num_rows=pg_num_rows($result);
+			$num_rows=$this->db_num_rows();
 			if ($num_rows>0)
-				$row=pg_fetch_object($result);
+				$row=$this->db_fetch_object();
 			else
 			{
 				$this->errormsg='Fehler: Student ('.$uid.') wurde nicht gefunden!';
@@ -292,15 +294,17 @@ class lehrstunde
 			// Gruppen ermitteln
 			if (is_null($this->ss))
 				$this->ss=studiensemester::getNearest();
-			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='$uid' AND (studiensemester_kurzbz='$this->ss' OR studiensemester_kurzbz IS NULL)";
-			//echo $sql_query;
-			if (! $result_einheit=pg_query($this->conn, $sql_query) )
+			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($this->ss)."' OR studiensemester_kurzbz IS NULL)";
+
+			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg=pg_last_error($this->conn);
 				return false;
 			}
 			else
-				$num_rows_einheit=pg_num_rows($result_einheit);
+			{
+				$result_einheit = $this->db_result;
+			}				
 		}
 
 		///////////////////////////////////////////////////////////////////////
@@ -333,16 +337,15 @@ class lehrstunde
 				if ($type=='student')
 					$sql_query.=' AND gruppe_kurzbz IS NULL';
 				$sql_query.=' )';
-				for ($i=0;$i<$num_rows_einheit;$i++)
+				
+				while($row=$this->db_fetch_object($result_einheit))
 				{
-					$row=pg_fetch_object($result_einheit,$i);
 					$sql_query.=" OR gruppe_kurzbz='$row->gruppe_kurzbz'";
 				}
 				$sql_query.=')';
 			}
 			$sql_query.=' ORDER BY  datum, stunde, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, uid';
 			$sql_query_stdplan.=$sql_query;
-			//echo '<label>'.htmlspecialchars($sql_query_stdplan).'</label>';
 		}
 		else
 		{
@@ -354,19 +357,20 @@ class lehrstunde
 		}
 		//echo $sql_query_stdplan;
 		//Datenbankabfrage
-		if (! $stpl_tbl=pg_query($this->conn, $sql_query_stdplan))
+		if (!$this->db_query($sql_query_stdplan))
 		{
-			$this->errormsg=pg_last_error($this->conn);
-			//echo $this->errormsg;
+			$this->errormsg = $this->db_last_error();
 			return -2;
 		}
-		$num_rows=pg_numrows($stpl_tbl);
+		$stpl_tbl = $this->db_result;
+		$num_rows = $this->db_num_rows($stpl_tbl);
 		$this->anzahl=$num_rows;
 		//Daten uebernehmen
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($stpl_tbl, $i);
-			$stunde=new lehrstunde($this->conn);
+			$row=$this->db_fetch_object($stpl_tbl, $i);
+			
+			$stunde=new lehrstunde();
 			$stunde->stundenplan_id=$row->{$stpl_id};
 			$stunde->lehreinheit_id=$row->lehreinheit_id;
 			$stunde->unr=$row->unr;
@@ -406,18 +410,20 @@ class lehrstunde
 			$sql_query_reservierung.=$sql_query;
 			//echo $sql_query_reservierung;
 			//Datenbankabfrage
-			if (! $stpl_tbl=pg_query($this->conn, $sql_query_reservierung))
+			if (!$this->db_query($sql_query_reservierung))
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg = $this->db_last_error();
 				return -2;
 			}
-			$num_rows=pg_numrows($stpl_tbl);
+			$stpl_tbl = $this->db_result;
+			$num_rows=$this->db_num_rows($stpl_tbl);
 			$this->anzahl+=$num_rows;
 
 			//Daten uebernehmen
 			for ($i=0;$i<$num_rows;$i++)
 			{
-				$row=pg_fetch_object ($stpl_tbl, $i);
+				$row = $this->db_fetch_object($stpl_tbl, $i);
+				
 				$stunde=new lehrstunde($this->conn);
 				$stunde->reservierung=true;
 				$stunde->stundenplan_id=$row->reservierung_id;
@@ -440,10 +446,8 @@ class lehrstunde
 				$stunde->anmerkung=$row->beschreibung;
 				$stunde->farbe='';
 				$this->lehrstunden[]=$stunde;
-				//var_dump($stunde);
 			}
 		}
-		//echo $this->anzahl;
 		return $this->anzahl;
 	}
 
@@ -452,7 +456,7 @@ class lehrstunde
 	 * @param uid (mitarbeiter)
 	 *
 	 */
-	function load_lehrstunden_le($lehreinheit_id, $uid=null, $stpl_table='stundenplandev')
+	public function load_lehrstunden_le($lehreinheit_id, $uid=null, $stpl_table='stundenplandev')
 	{
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
@@ -463,24 +467,24 @@ class lehrstunde
 		///////////////////////////////////////////////////////////////////////
 		// Stundenplandaten ermitteln
 		// Abfrage generieren
-		$sql="SELECT * FROM ".$stpl_table." WHERE lehreinheit_id=$lehreinheit_id";
+		$sql="SELECT * FROM ".$stpl_table." WHERE lehreinheit_id='".addslashes($lehreinheit_id)."'";
 		if ($uid!=null && !is_null($uid))
-			$sql.=" AND mitarbeiter_uid='$uid'";
-		//echo $sql;
+			$sql.=" AND mitarbeiter_uid='".addslashes($uid)."'";
+		
 		//Datenbankabfrage
-		if (!$result=pg_query($this->conn, $sql))
+		if (!$this->db_query($sql))
 		{
-			$this->errormsg=pg_last_error($this->conn);
-			//echo $this->errormsg;
+			$this->errormsg=$this->db_last_error();
 			return -1;
 		}
-		$num_rows=pg_numrows($result);
+		$num_rows=$this->db_num_rows();
 		$this->anzahl=$num_rows;
 		//Daten uebernehmen
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($result, $i);
-			$stunde=new lehrstunde($this->conn);
+			$row=$this->db_fetch_object(null, $i);
+			
+			$stunde=new lehrstunde();
 			$stunde->stundenplan_id=$row->{$stpl_id};
 			$stunde->lehreinheit_id=$row->lehreinheit_id;
 			$stunde->unr=$row->unr;
@@ -507,7 +511,7 @@ class lehrstunde
 	}
 
 
-	/*************************************************************************
+	/**
 	 * Prueft die geladene Lehrveranstaltung auf Kollisionen im Stundenplan.
 	 * Rueckgabewert 'false' und die Fehlermeldung steht in '$this->errormsg'.
 	 * @param string	datum	gewuenschtes Datum YYYY-MM-TT
@@ -515,8 +519,8 @@ class lehrstunde
 	 * @param string	ort		gewuenschter Ort
 	 * @param string	db_stpl_table	Tabllenname des Stundenplans im DBMS
 	 * @return boolean true=ok, false=fehler
-	 *************************************************************************/
-	function kollision($stpl_table='stundenplandev')
+	 */
+	public function kollision($stpl_table='stundenplandev')
 	{
 		$ignore_reservation=false;
 		// Parameter Checken
@@ -537,14 +541,14 @@ class lehrstunde
 		if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
 			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
 		$sql_query.=")) AND unr!=$this->unr";
-
-		//(echo $sql_query.'<br>';
-		if (! $erg_stpl=pg_query($this->conn, $sql_query))
+		
+		if (!$this->db_query($sql_query))
 		{
-			$this->errormsg=$sql_query.pg_last_error($this->conn);
+			$this->errormsg=$sql_query.$this->db_last_error();
 			return true;
 		}
-		$anz=pg_numrows($erg_stpl);
+		$erg_stpl = $this->db_result;
+		$anz=$this->db_num_rows($erg_stpl);
 		//Check
 		if ($anz==0)
 		{
@@ -558,16 +562,17 @@ class lehrstunde
 								AND (vondatum<'$this->datum' OR (vondatum='$this->datum' AND (vonstunde<=$this->stunde OR vonstunde IS NULL)))
 								AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR bisstunde IS NULL)));";
 				//echo $sql_query.'<br>';
-				if (! $erg_zs=pg_query($this->conn, $sql_query))
+				if (!$this->db_query($sql_query))
 				{
-					$this->errormsg=$sql_query.pg_last_error($this->conn);
+					$this->errormsg=$sql_query.$this->db_last_error();
 					return true;
 				}
-				$anz_zs=pg_numrows($erg_zs);
+				$erg_zs = $this->db_result;
+				$anz_zs=$this->db_num_rows($erg_zs);
 				//Check
 				if ($anz_zs!=0)
 				{
-					$row=pg_fetch_object($erg_zs);
+					$row = $this->db_fetch_object($erg_zs);
 					$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
 					return true;
 				}
@@ -590,12 +595,13 @@ class lehrstunde
 					$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
 				$sql_query.="))";
 				//echo $sql_query.'<br>';
-				if (! $erg_res=pg_query($this->conn, $sql_query))
+				if (!$this->db_query($sql_query))
 				{
-					$this->errormsg=$sql_query.pg_last_error($this->conn);
+					$this->errormsg=$sql_query.$this->db_last_error();
 					return true;
 				}
-				$anz_res=pg_numrows($erg_res);
+				$erg_res = $this->db_result;
+				$anz_res = $this->db_num_rows($erg_res);
 				//Check
 				if ($anz_res==0)
 				{
@@ -603,7 +609,7 @@ class lehrstunde
 				}
 				else
 				{
-					$row=pg_fetch_object($erg_res);
+					$row = $this->db_fetch_object($erg_res);
 					$this->errormsg="Kollision (Reservierung): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
 					return true;
 				}
@@ -612,7 +618,7 @@ class lehrstunde
 		}
 		else
 		{
-			$row=pg_fetch_object($erg_stpl);
+			$row = $this->db_fetch_object($erg_stpl);
 			$this->errormsg="Kollision ($stpl_table): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde"; //\n".$sql_query
 			return true;
 		}

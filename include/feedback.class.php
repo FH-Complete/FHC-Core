@@ -19,53 +19,38 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class feedback
+class feedback extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $result = array(); // feedback Objekt
+	public $new;				// boolean
+	public $result = array(); 	// feedback Objekt
 
 	//Tabellenspalten
-	var $feedback_id;	// integer
-	var $betreff;		// varchar(128)
-	var $text;			// text
-	var $datum;			// date
-	var $uid;			// varchar(32)
-	var $lehrveranstaltung_id; // integer
+	public $feedback_id;	// integer
+	public $betreff;		// varchar(128)
+	public $text;			// text
+	public $datum;			// date
+	public $uid;			// varchar(32)
+	public $lehrveranstaltung_id; // integer
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
-	// * @param $conn        	Datenbank-Connection
-	// *        $feedback_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function feedback($conn, $feedback_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional ein Feeedback
+	 * @param $feedback_id
+	 */
+	public function __construct($feedback_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-	*/
-		if($feedback_id!=null)
+		parent::__construct();
+		
+		if(!is_null($feedback_id))
 			$this->load($feedback_id);
 	}
 
-	// *********************************************************
-	// * Laedt ein Feedback
-	// * @param
-	// *********************************************************
-	function load($feedback_id)
+	/**
+	 * Laedt ein Feedback
+	 * @param
+	 */
+	public function load($feedback_id)
 	{
 		if(!is_numeric($feedback_id))
 		{
@@ -75,28 +60,38 @@ class feedback
 
 		$qry = "SELECT * FROM campus.tbl_feedback WHERE feedback_id='$feedback_id'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			$this->feedback_id=$row->feedback_id;
-			$this->betreff=$row->betreff;
-			$this->text=$row->text;
-			$this->datum=$row->datum;
-			$this->uid=$row->uid;
-			$this->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			if($row = $this->db_fetch_object())
+			{
+				$this->feedback_id=$row->feedback_id;
+				$this->betreff=$row->betreff;
+				$this->text=$row->text;
+				$this->datum=$row->datum;
+				$this->uid=$row->uid;
+				$this->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+							
+				return true;
+			}
+			else 
+			{
+				$this->errormsg  = 'Kein Feedback mit dieser ID vorhanden';
+				return false;
+			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Lehrveranstaltungen';
+			$this->errormsg = 'Fehler beim Laden der Lehrveranstaltungen';
 			return false;
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->betreff)>128)
 		{
@@ -111,19 +106,14 @@ class feedback
 
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	function load_feedback($lehrveranstaltung_id)
+	
+	/**
+	 * Laedt die Feedbacks einer Lehrveranstaltung
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return true wenn ok, sonst false
+	 */
+	public function load_feedback($lehrveranstaltung_id)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -133,11 +123,11 @@ class feedback
 
 		$qry = "SELECT * FROM campus.tbl_feedback WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$fb_obj = new feedback($this->conn);
+				$fb_obj = new feedback();
 
 				$fb_obj->feedback_id=$row->feedback_id;
 				$fb_obj->betreff=$row->betreff;
@@ -152,18 +142,18 @@ class feedback
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Lehrveranstaltungen';
+			$this->errormsg = 'Fehler beim Laden der Lehrveranstaltungen';
 			return false;
 		}
 	}
 
-	// ************************************************************
-	// * Speichert Feedback in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	/**
+	 * Speichert Feedback in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -171,7 +161,6 @@ class feedback
 
 		if($this->new)
 		{
-			//ToDo: Feedback_ID wieder entfernen und per Seq fuellen
 			$qry = 'INSERT INTO campus.tbl_feedback (betreff, text, datum, uid, lehrveranstaltung_id)
 			        VALUES('.$this->addslashes($this->betreff).','.
 					$this->addslashes($this->text).','.
@@ -189,14 +178,13 @@ class feedback
 			       " WHERE feedback_id='".addslashes($this->feedback_id)."'";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			//Log schreiben
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Feedbacks:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Feedbacks';
 			return false;
 		}
 	}

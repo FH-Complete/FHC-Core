@@ -19,72 +19,56 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class preinteressent
+class preinteressent extends basis_db
 {
-	var $conn;    	// resource DB-Handle
-	var $new;		// boolean
-	var $errormsg;	// string
-	var $result = array();
+	public $new;		// boolean
+	public $result = array();
 	
 	//Tabellenspalten
-	var $preinteressent_id;			// serial
-	var $person_id;
-	var $studiensemester_kurzbz;	// varchar(16)
-	var $aufmerksamdurch_kurzbz;	// varchar(16)
-	var $firma_id;					// integer
-	var $anmerkung;					// text
-	var $erfassungsdatum;			// date
-	var $einverstaendnis;			// boolean
-	var $absagedatum;				// timestamp
-	var $insertamum;				// timestamp
-	var $insertvon;					// varchar(16)
-	var $updateamum;				// timestamp
-	var $updatevon;					// varchar(16)
-	var $maturajahr;				// numeric(4,0)
-	var $infozusendung;				// date
-	var $kontaktmedium_kurzbz;		// varchar(32)
+	public $preinteressent_id;			// serial
+	public $person_id;
+	public $studiensemester_kurzbz;	// varchar(16)
+	public $aufmerksamdurch_kurzbz;	// varchar(16)
+	public $firma_id;					// integer
+	public $anmerkung;					// text
+	public $erfassungsdatum;			// date
+	public $einverstaendnis;			// boolean
+	public $absagedatum;				// timestamp
+	public $insertamum;				// timestamp
+	public $insertvon;					// varchar(16)
+	public $updateamum;				// timestamp
+	public $updatevon;					// varchar(16)
+	public $maturajahr;				// numeric(4,0)
+	public $infozusendung;				// date
+	public $kontaktmedium_kurzbz;		// varchar(32)
 		
-	var $studiengang_kz;
-	var $prioritaet;		// smallint
-	var $prioritaet_arr = array('1'=>'niedrg', '2'=>'mittel', '3'=>'hoch');
-	var $freigabedatum;		// timestamp
-	var $uebernahmedatum;	// timestamp
+	public $studiengang_kz;
+	public $prioritaet;		// smallint
+	public $prioritaet_arr = array('1'=>'niedrg', '2'=>'mittel', '3'=>'hoch');
+	public $freigabedatum;		// timestamp
+	public $uebernahmedatum;	// timestamp
 		
-	// ***********************************************
-	// * Konstruktor
-	// * @param conn    Connection zur Datenbank
-	// *        preinteressent_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function preinteressent($conn, $preinteressent_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param preinteressent_id ID des zu ladenden Datensatzes
+	 */
+	public function __construct($preinteressent_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/		
+		parent::__construct();
+		
 		if($preinteressent_id != null)
 			$this->load($preinteressent_id);
 	}
 	
-	// ***********************************************
-	// * Laedt einen Datensatz
-	// * @param preinteressent_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function load($preinteressent_id)
+	/**
+	 * Laedt einen Datensatz
+	 * @param preinteressent_id ID des zu ladenden Datensatzes
+	 */
+	public function load($preinteressent_id)
 	{
-		//id auf gueltigkeit pruefen
+		//id auf Gueltigkeit pruefen
 		if(!is_numeric($preinteressent_id) || $preinteressent_id == '')
 		{
 			$this->errormsg = 'preinteressent_id muss eine gueltige Zahl sein';
@@ -94,9 +78,9 @@ class preinteressent
 		//laden des Datensatzes
 		$qry = "SELECT * FROM public.tbl_preinteressent WHERE preinteressent_id='$preinteressent_id';";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->preinteressent_id = $row->preinteressent_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -129,13 +113,13 @@ class preinteressent
 		}
 	}
 			
-	// **************************************************
-	// * Loescht einen Datensatz, erstellt einen UNDO Befehl
-	// * und einen LOG Eintrag
-	// * @param preinteressent_id ID des zu loeschenden Datensatzes
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************
-	function delete($preinteressent_id)
+	/**
+	 * Loescht einen Datensatz, erstellt einen UNDO Befehl
+	 * und einen LOG Eintrag
+	 * @param preinteressent_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($preinteressent_id)
 	{
 		//id auf Gueltigkeit pruefen
 		if(!is_numeric($preinteressent_id) || $preinteressent_id == '')
@@ -145,12 +129,12 @@ class preinteressent
 		}
 		$undo='';
 		//UNDO Befehl zusammenbauen
-		pg_query($this->conn, 'BEGIN;');
+		$this->db_query('BEGIN;');
 		
 		$qry = "SELECT * FROM public.tbl_preinteressent WHERE preinteressent_id = '$preinteressent_id'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$undo.=" INSERT INTO public.tbl_preinteressent(preinteressent_id, person_id, studiensemester_kurzbz, 
 						aufmerksamdurch_kurzbz, firma_id, erfassungsdatum, einverstaendnis, absagedatum, anmerkung, 
@@ -176,15 +160,15 @@ class preinteressent
 		else 
 		{
 			$this->errormsg = 'Fehler beim Erstellen des UNDO Befehls';
-			pg_query($this->conn, 'ROLLBACK');
+			$this->db_query('ROLLBACK');
 			return false;
 		}
 		
 		
 		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
 				$undo.=" INSERT INTO public.tbl_preinteressentstudiengang(studiengang_kz, preinteressent_id, prioritaet, 
 						freigabedatum, uebernahmedatum, insertamum, insertvon, updateamum, updatevon) VALUES(".
@@ -202,17 +186,17 @@ class preinteressent
 		else 
 		{
 			$this->errormsg = 'Fehler beim Erstellen des UNDO Befehls';
-			pg_query($this->conn, 'ROLLBACK');
+			$this->db_query('ROLLBACK');
 			return false;
 		}
 		
 		$qry = "DELETE FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id';
 				DELETE FROM public.tbl_preinteressent WHERE preinteressent_id = '$preinteressent_id';";
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
-			$log = new log($this->conn);
+			$log = new log();
 			
 			$log->new = true;
 			$log->sql = $qry;
@@ -224,72 +208,49 @@ class preinteressent
 			if(!$log->save())
 			{
 				$this->errormsg = 'Fehler beim Schreiben des Log-Eintrages';
-				pg_query($this->conn, 'ROLLBACK');
+				$this->db_query('ROLLBACK');
 				return false;
 			}
 			
-			pg_query($this->conn, 'COMMIT;');
+			$this->db_query('COMMIT;');
 			return true;
 		}
 		else 
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
-			pg_query($this->conn, 'ROLLBACK');
+			$this->db_query('ROLLBACK');
 			return false;
 		}
 	}
 	
-	// ******************************************
-	// * Prueft die Daten vor dem Speichern
-	// * @return true wenn ok, false wenn fehler
-	// ******************************************
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern
+	 * @return true wenn ok, false wenn fehler
+	 */
+	protected function validate()
 	{
 		if($this->person_id=='')
 		{
 			$this->errormsg = 'Person_id muss angegeben werden';
 			return false;
 		}
-		/*
-		if($this->studiensemester_kurzbz=='')
-		{
-			$this->errormsg = 'Studiensemester_kurzbz muss angegeben werden';
-			return false;
-		}
-		*/
+		
 		if($this->aufmerksamdurch_kurzbz=='')
 		{
 			$this->errormsg = 'Aufmerksamdurch muss angegeben werden';
 			return false;
 		}
-		/*
-		if($this->firma_id=='')
-		{
-			$this->errormsg = 'Es muss eine Schule angegeben werden';
-			return false;
-		}
-		*/
+		
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *********************************************************************
-	// * Speichert den aktuellen Datensatz
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $preinteressent_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************************
-	function save($new=null)
+		
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $preinteressent_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!$this->validate())
 			return false;
@@ -338,30 +299,30 @@ class preinteressent
 				  " WHERE preinteressent_id='".addslashes($this->preinteressent_id)."'";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('public.tbl_preinteressent_preinteressent_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->preinteressent_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -375,27 +336,27 @@ class preinteressent
 		}
 	}
 	
-	// *******************************************
-	// * Laedt die Freigegebenen Preinteressenten
-	// * eines Studienganges welche noch nicht
-	// * uebernommen wurden
-	// * @param $studiengang_kz
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function loadFreigegebene($studiengang_kz, $studiensemester_kurzbz='')
+	/**
+	 * Laedt die Freigegebenen Preinteressenten
+	 * eines Studienganges welche noch nicht
+	 * uebernommen wurden
+	 * @param $studiengang_kz
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadFreigegebene($studiengang_kz, $studiensemester_kurzbz='')
 	{
 		$qry = "SELECT tbl_preinteressent.*, tbl_preinteressentstudiengang.* FROM public.tbl_preinteressent JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) JOIN public.tbl_person USING(person_id) WHERE
 				(studiengang_kz, person_id) NOT IN (SELECT studiengang_kz, person_id FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id) AND freigabedatum is not null AND
 				tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
 		if($studiensemester_kurzbz!='')
-			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='$studiensemester_kurzbz'";
+			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new preinteressent($this->conn, null, null);
+				$obj = new preinteressent();
 				
 				$obj->preinteressent_id = $row->preinteressent_id;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -428,27 +389,30 @@ class preinteressent
 		}
 	}
 	
-	// *******************************************
-	// * Laedt die Preinteressenten
-	// * eines Studienganges welche noch nicht
-	// * uebernommen wurden
-	// * @param $studiengang_kz
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null)
+	/**
+	 * Laedt die Preinteressenten
+	 * eines Studienganges welche noch nicht
+	 * uebernommen wurden
+	 * @param $studiengang_kz
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null)
 	{
-		$qry = "SELECT distinct tbl_preinteressent.* FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
+		$qry = "SELECT distinct tbl_preinteressent.* 
+				FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) 
+					LEFT JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) 
+					LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
 				
 		if($studiengang_kz!='')
-			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
+			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz='".addslashes($studiengang_kz)."'";
 		
 		if(!is_null($studiensemester_kurzbz))
 		{
 			if($studiensemester_kurzbz=='')
 				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz is null";
 			else
-				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='$studiensemester_kurzbz'";
+				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		}
 		
 		if($filter!='')
@@ -473,11 +437,11 @@ class preinteressent
 		else 
 			$qry.=" AND absagedatum is null";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new preinteressent($this->conn, null, null);
+				$obj = new preinteressent();
 				
 				$obj->preinteressent_id = $row->preinteressent_id;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -506,7 +470,13 @@ class preinteressent
 		}
 	}
 	
-	function loadZuordnungen($preinteressent_id)
+	/**
+	 * Laedt die Zuordnung von Preinteressenten zu Studiengaengen
+	 *
+	 * @param $preinteressent_id
+	 * @return booelan
+	 */
+	public function loadZuordnungen($preinteressent_id)
 	{
 		if(!is_numeric($preinteressent_id) || $preinteressent_id=='')
 		{
@@ -514,13 +484,14 @@ class preinteressent
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id' ORDER BY studiengang_kz";
+		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
+				WHERE preinteressent_id='$preinteressent_id' ORDER BY studiengang_kz";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new preinteressent($this->conn, null, null);
+				$obj = new preinteressent();
 				
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->preinteressent_id = $row->preinteressent_id;
@@ -543,11 +514,11 @@ class preinteressent
 		}
 	}
 	
-	// *****************************************
-	// * Laedt eine Zuordnung
-	// * @return true wenn ok, false wenn Fehler
-	// *****************************************
-	function loadZuordnung($preinteressent_id, $studiengang_kz)
+	/**
+	 * Laedt eine Zuordnung
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function loadZuordnung($preinteressent_id, $studiengang_kz)
 	{
 		if(!is_numeric($preinteressent_id) || $preinteressent_id=='')
 		{
@@ -561,11 +532,12 @@ class preinteressent
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
+				WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='$studiengang_kz'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->preinteressent_id = $row->preinteressent_id;
@@ -591,12 +563,12 @@ class preinteressent
 		}
 	}
 	
-	// ********************************************
-	// * Speichert die Studiengangszuordnung eines 
-	// * Preinteressent
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function saveZuordnung($new=null)
+	/**
+	 * Speichert die Studiengangszuordnung eines 
+	 * Preinteressent
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function saveZuordnung($new=null)
 	{
 		if($new==null)
 			$new = $this->new;
@@ -628,7 +600,7 @@ class preinteressent
 				  " WHERE preinteressent_id='".addslashes($this->preinteressent_id)."' AND studiengang_kz='".addslashes($this->studiengang_kz)."'";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -639,11 +611,11 @@ class preinteressent
 		}
 	}
 	
-	// *****************************************
-	// * Loescht eine Zuordnung
-	// * @return true wenn ok, false wenn Fehler
-	// *****************************************
-	function deleteZuordnung($preinteressent_id, $studiengang_kz)
+	/**
+	 * Loescht eine Zuordnung
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function deleteZuordnung($preinteressent_id, $studiengang_kz)
 	{
 		if(!is_numeric($preinteressent_id) || $preinteressent_id=='')
 		{
@@ -657,9 +629,10 @@ class preinteressent
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='$studiengang_kz'";
+		$qry = "DELETE FROM public.tbl_preinteressentstudiengang 
+				WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='$studiengang_kz'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -670,11 +643,11 @@ class preinteressent
 		}
 	}
 	
-	// ******************************************
-	// * Laedt alle Preinteressenten einer Person
-	// * @return true wenn ok, false wenn Fehler
-	// ******************************************
-	function getPreinteressenten($person_id)
+	/**
+	 * Laedt alle Preinteressenten einer Person
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getPreinteressenten($person_id)
 	{
 		if(!is_numeric($person_id) || $person_id=='')
 		{
@@ -684,11 +657,11 @@ class preinteressent
 		
 		$qry = "SELECT * FROM public.tbl_preinteressent WHERE person_id='$person_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new preinteressent($this->conn, null, null);
+				$obj = new preinteressent();
 				
 				$obj->preinteressent_id = $row->preinteressent_id;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;

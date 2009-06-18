@@ -19,67 +19,53 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class vorschlag
+class vorschlag extends basis_db
 {
 	//Tabellenspalten
-	var $vorschlag_id;
-	var $frage_id;
-	var $nummer;
-	var $punkte;
+	public $vorschlag_id;
+	public $frage_id;
+	public $nummer;
+	public $punkte;
 	
-	var $text;
-	var $bild;
-	var $audio;
+	public $text;
+	public $bild;
+	public $audio;
 	
-	var $insertamum;
-	var $insertvon;
-	var $updateamum;
-	var $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $updateamum;
+	public $updatevon;
 	
 	// ErgebnisArray
-	var $result=array();
-	var $num_rows=0;
-	var $errormsg;
-	var $new;
+	public $result=array();
+	public $num_rows=0;
+	public $new;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen vorschlag
-	// * @param $conn        	Datenbank-Connection
-	// *        $frage_id       Frage die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function vorschlag($conn, $vorschlag_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional einen vorschlag
+	 * @param $frage_id       Frage die geladen werden soll (default=null)
+	 */
+	public function __construct($vorschlag_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
 		if($vorschlag_id != null)
 			$this->load($vorschlag_id);
 	}
 
-	// ***********************************************************
-	// * Laedt Vorschlag mit der uebergebenen ID
-	// * @param $vorschlag_id ID des Vorschlages der geladen werden soll
-	// ***********************************************************
-	function load($vorschlag_id, $sprache='German')
+	/**
+	 * Laedt Vorschlag mit der uebergebenen ID
+	 * @param $vorschlag_id ID des Vorschlages der geladen werden soll
+	 */
+	public function load($vorschlag_id, $sprache='German')
 	{
 		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->vorschlag_id = $row->vorschlag_id;
 				$this->frage_id = $row->frage_id;
@@ -101,13 +87,19 @@ class vorschlag
 		}
 	}
 	
-	function loadVorschlagSprache($vorschlag_id, $sprache)
+	/**
+	 * Laedt die Vorschlaege in einer Sprache
+	 *
+	 * @param $vorschlag_id
+	 * @param $sprache
+	 */
+	public function loadVorschlagSprache($vorschlag_id, $sprache)
 	{
 		$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
 						WHERE vorschlag_id='".addslashes($vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
-		if($result_sprache = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row_sprache = pg_fetch_object($result_sprache))
+			if($row_sprache = $this->db_fetch_object())
 			{				
 				$this->text = $row_sprache->text;
 				$this->bild = $row_sprache->bild;
@@ -116,34 +108,23 @@ class vorschlag
 		}
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		return true;
 	}
 
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
-	function save()
+	/**
+	 * Speichert die Benutzerdaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten der Datensatz mit $uid upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -171,30 +152,30 @@ class vorschlag
 					" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."';";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				$qry = "SELECT currval('testtool.tbl_vorschlag_vorschlag_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->vorschlag_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -215,7 +196,7 @@ class vorschlag
 	 *
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	function validate_vorschlagsprache()
+	protected function validate_vorschlagsprache()
 	{
 		return true;	
 	}
@@ -225,7 +206,7 @@ class vorschlag
 	 *
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	function save_vorschlagsprache()
+	public function save_vorschlagsprache()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate_vorschlagsprache())
@@ -234,9 +215,9 @@ class vorschlag
 		$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
 				WHERE vorschlag_id='".addslashes($this->vorschlag_id)."' AND
 				sprache='".addslashes($this->sprache)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				$this->new=false;
 			else 
 				$this->new=true;
@@ -270,7 +251,7 @@ class vorschlag
 					" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."' AND sprache='".addslashes($this->sprache)."';";
 		}
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -281,7 +262,7 @@ class vorschlag
 		}
 	}
 
-	function getVorschlag($frage_id, $sprache, $random)
+	public function getVorschlag($frage_id, $sprache, $random)
 	{
 		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE frage_id='".addslashes($frage_id)."'";
 		if($random)
@@ -289,11 +270,11 @@ class vorschlag
 		else 
 			$qry.=" ORDER BY nummer";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$vs = new vorschlag($this->conn);
+				$vs = new vorschlag();
 				$vs->vorschlag_id = $row->vorschlag_id;
 				$vs->frage_id = $row->frage_id;
 				$vs->nummer = $row->nummer;
@@ -301,9 +282,9 @@ class vorschlag
 			
 				$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
 						WHERE vorschlag_id='".addslashes($row->vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
-				if($result_sprache = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row_sprache = pg_fetch_object($result_sprache))
+					if($row_sprache = $this->db_fetch_object())
 					{				
 						$vs->text = $row_sprache->text;
 						$vs->bild = $row_sprache->bild;
@@ -318,19 +299,25 @@ class vorschlag
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
 	
-	function delete($vorschlag_id)
+	/**
+	 * Loescht einen Vorschlag
+	 *
+	 * @param $vorschlag_id
+	 * @return boolean
+	 */
+	public function delete($vorschlag_id)
 	{
 		$qry = "DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim loeschen';
+			$this->errormsg = 'Fehler beim Löschen';
 			return false;
 		}
 	}

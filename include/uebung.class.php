@@ -19,84 +19,69 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class uebung
+class uebung extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $uebungen = array(); // lehreinheit Objekt
+	public $new;      // boolean
+	public $uebungen = array(); // lehreinheit Objekt
 
 	//Tabellenspalten
-	var $uebung_id;		// serial
-	var $gewicht;		// smalint
-	var $punkte;		// Real
-	var $angabedatei;	// oid
-	var $freigabevon;	// timestamp
-	var $freigabebis;	// timestamp
-	var $abgabe;		// boolean
-	var $beispiele;		// boolean
-	var $bezeichnung;	// varchar(32)
-	var $positiv;		// boolean
-	var $defaultbemerkung;	// text
-	var $lehreinheit_id;	// integer
-	var $updateamum;		// timestamp
-	var $updatevon;			// varchar(16)
-	var $insertamum;		// timestamp
-	var $insertvon;			// varchar(16)
-	var $statistik;			// boolean
-	var $liste_id;			//integer
-	var $maxbsp;			//smallint
-	var $maxstd;			//smallint
-	var $nummer;			//smallint
-	var $prozent;
+	public $uebung_id;		// serial
+	public $gewicht;		// smalint
+	public $punkte;			// Real
+	public $angabedatei;	// oid
+	public $freigabevon;	// timestamp
+	public $freigabebis;	// timestamp
+	public $abgabe;			// boolean
+	public $beispiele;		// boolean
+	public $bezeichnung;	// varchar(32)
+	public $positiv;		// boolean
+	public $defaultbemerkung;	// text
+	public $lehreinheit_id;	// integer
+	public $updateamum;		// timestamp
+	public $updatevon;		// varchar(16)
+	public $insertamum;		// timestamp
+	public $insertvon;		// varchar(16)
+	public $statistik;		// boolean
+	public $liste_id;		//integer
+	public $maxbsp;			//smallint
+	public $maxstd;			//smallint
+	public $nummer;			//smallint
+	public $prozent;
 
 	//Studentuebung
-	var $student_uid;		// varchar(16)
-	var $mitarbeiter_uid;	// varchar(16)
-	var $abgabe_id;			// integer
-	var $note;				// smalint
-	var $mitarbeitspunkte;	// smalint
-	var $anmerkung;			// text
-	var $benotungsdatum;	// timestamp
+	public $student_uid;		// varchar(16)
+	public $mitarbeiter_uid;	// varchar(16)
+	public $abgabe_id;			// integer
+	public $note;				// smalint
+	public $mitarbeitspunkte;	// smalint
+	public $anmerkung;			// text
+	public $benotungsdatum;		// timestamp
 	
 	//Abgabe
-	var $abgabe_abgabe_id;	// integer
-	var $abgabedatei;	// varchar(64)
-	var $abgabezeit;		// timestamp
-	var $abgabe_anmerkung;			// text
+	public $abgabe_abgabe_id;	// integer
+	public $abgabedatei;		// varchar(64)
+	public $abgabezeit;			// timestamp
+	public $abgabe_anmerkung;	// text
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Uebung
-	// * @param $conn        	Datenbank-Connection
-	// * 		$uebung_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function uebung($conn, $uebung_id=null, $unicode=false)
+	/**
+	 * Konstruktor - laedt optional eine Uebung
+	 * @param $uebung_id
+	 */
+	public function __construct($uebung_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($this->conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
+		parent::__construct();
+		
 		if($uebung_id!=null)
 			$this->load($uebung_id);
 	}
 
-	// *********************************************************
-	// * Laedt die Uebung
-	// * @param uebung_id
-	// *********************************************************
-	function load($uebung_id)
+	/**
+	 * Laedt die Uebung
+	 * @param uebung_id
+	 */
+	public function load($uebung_id)
 	{
 		if(!is_numeric($uebung_id))
 		{
@@ -105,9 +90,9 @@ class uebung
 		}
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->uebung_id = $row->uebung_id;
 				$this->gewicht = $row->gewicht;
@@ -146,25 +131,38 @@ class uebung
 		}
 	}
 
-	function toggle_prozent_punkte($uebung_id)
+	/**
+	 * Aendert den Status des Boolean Prozent
+	 *
+	 * @param $uebung_id
+	 * @return true wenn geaendert, sonst false
+	 */
+	public function toggle_prozent_punkte($uebung_id)
 	{
-		$qry = "update campus.tbl_uebung set prozent = not prozent where uebung_id = '".$uebung_id."'";
-		if(pg_query($this->conn, $qry))
+		$qry = "UPDATE campus.tbl_uebung SET prozent = not prozent WHERE uebung_id = '".$uebung_id."'";
+		if($this->db_query($qry))
 			return true;
 		else
 		{
-			return false;
 			$this->errormsg = "toggle misslungen";
+			return false;
 		}		
 	}	
 	
-	function load_studentuebung($student_uid, $uebung_id)
+	/**
+	 * Laedt eine Studentuebung Zuordnung
+	 *
+	 * @param $student_uid
+	 * @param $uebung_id
+	 * @return boolean
+	 */
+	public function load_studentuebung($student_uid, $uebung_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid='$student_uid' AND uebung_id='$uebung_id'";
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid='".addslashes($student_uid)."' AND uebung_id='".addslashes($uebung_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->student_uid = $row->student_uid;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
@@ -189,18 +187,24 @@ class uebung
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden des eintrages';
+			$this->errormsg = 'Fehler beim Laden des eintrages';
 			return false;
 		}
 	}
 
-	function load_abgabe($abgabe_id)
+	/**
+	 * Laedt eine Abgabe
+	 *
+	 * @param $abgabe_id
+	 * @return boolean
+	 */
+	public function load_abgabe($abgabe_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
+		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '".addslashes($abgabe_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->abgabe_id = $row->abgabe_id;
 				$this->abgabedatei = $row->abgabedatei;
@@ -221,13 +225,19 @@ class uebung
 		}
 	}
 	
-	function check_studentuebung($uebung_id)
+	/**
+	 * Prueft ob zu einer Uebung bereits Studenten zugeordnet sind
+	 *
+	 * @param $uebung_id
+	 * @return true wenn ja, sonst false
+	 */
+	public function check_studentuebung($uebung_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id'";
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE uebung_id='".addslashes($uebung_id)."'";
 
-		if($result = pg_query($this->conn, $qry))	
+		if($this->db_query($qry))	
 		{
-			if (pg_num_rows($result) >0)			
+			if($this->db_num_rows() >0)			
 				return true;
 			else
 				return false;
@@ -236,16 +246,43 @@ class uebung
 			return false;	
 	}
 
-	function get_next_nummer()
+	/**
+	 * Liefert die naechste Nummer einer uebung
+	 * @return boolean, naechste nummer steht in this->next_nummer
+	 */
+	public function get_next_nummer()
 	{
 		$qry = "SELECT max(nummer) FROM campus.tbl_uebung";
-		$result = pg_query($this->conn, $qry);
-		$row = pg_fetch_object($result);
-		$next = $row->max + 1;
-		$this->next_nummer = $next;
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$next = $row->max + 1;
+				$this->next_nummer = $next;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der naechsten Nummer';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
 	}
 	
-	function load_uebung($lehreinheit_id, $level=null, $uebung_id=null)
+	/**
+	 * Laedt eine Uebung
+	 *
+	 * @param $lehreinheit_id
+	 * @param $level
+	 * @param $uebung_id
+	 * @return boolean
+	 */
+	public function load_uebung($lehreinheit_id, $level=null, $uebung_id=null)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -260,11 +297,11 @@ class uebung
 			$qry .= " and liste_id = '".$uebung_id."'";
 		$qry .= " ORDER BY bezeichnung";
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$uebung_obj = new uebung($this->conn);
+				$uebung_obj = new uebung();
 				
 				$uebung_obj->uebung_id = $row->uebung_id;
 				$uebung_obj->gewicht = $row->gewicht;
@@ -295,17 +332,17 @@ class uebung
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Uebung';
+			$this->errormsg = 'Fehler beim Laden der Uebung';
 			return false;
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->lehreinheit_id))
 		{
@@ -319,25 +356,14 @@ class uebung
 		}
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Uebung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	
+	/**
+	 * Speichert Uebung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -396,30 +422,30 @@ class uebung
 			       " WHERE uebung_id=".$this->addslashes($this->uebung_id).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('campus.tbl_uebung_uebung_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row=pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->uebung_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn,'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn,'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -433,12 +459,12 @@ class uebung
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate_studentuebung()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function validate_studentuebung()
 	{
 		if(!is_numeric($this->uebung_id))
 		{
@@ -453,13 +479,13 @@ class uebung
 		return true;
 	}
 
-	// ************************************************************
-	// * Speichert StudentUebung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function studentuebung_save($new=null)
+	/**
+	 * Speichert StudentUebung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function studentuebung_save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -503,9 +529,9 @@ class uebung
 			       " WHERE uebung_id=".$this->addslashes($this->uebung_id)." AND student_uid=".$this->addslashes($this->student_uid).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-				return true;
+			return true;
 		}
 		else
 		{
@@ -514,7 +540,13 @@ class uebung
 		}
 	}
 
-function abgabe_save($new=null)
+	/**
+	 * Speichert eine Abgabe
+	 *
+	 * @param $new
+	 * @return boolean
+	 */
+	public function abgabe_save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -537,30 +569,30 @@ function abgabe_save($new=null)
 			       " WHERE abgabe_id=".$this->addslashes($this->abgabe_id).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('campus.tbl_abgabe_abgabe_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row=pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->abgabe_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn,'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn,'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -574,12 +606,11 @@ function abgabe_save($new=null)
 		}
 	}
 
-
-	// ************************************************************
-	// * Loescht eine Uebung plus die abhaengigen eintraege in den
-	// * Tabellen studentuebung, studentbeispiel, und beispiel
-	// ************************************************************
-	function delete($uebung_id)
+	/**
+	 * Loescht eine Uebung plus die abhaengigen eintraege in den
+	 * Tabellen studentuebung, studentbeispiel, und beispiel
+	 */
+	public function delete($uebung_id)
 	{
 		if(!is_numeric($uebung_id))
 		{
@@ -589,28 +620,27 @@ function abgabe_save($new=null)
 		
 		// subuebungen wegraeumen
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE liste_id = '".$uebung_id."'";
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
-			{
-				
-					foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$row->uebung_id.".*") as $angabe)
-					{
-							if(file_exists($angabe))
-								unlink($angabe);
-					}
-					$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id');
-							DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id');
-							DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id';
-							DELETE FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id';
-							DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$row->uebung_id';
-							DELETE FROM campus.tbl_uebung WHERE uebung_id='$row->uebung_id';";
+			while($row = $this->db_fetch_object())
+			{			
+				foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$row->uebung_id.".*") as $angabe)
+				{
+					if(file_exists($angabe))
+						unlink($angabe);
+				}
+				$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id');
+						DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id');
+						DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id';
+						DELETE FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id';
+						DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$row->uebung_id';
+						DELETE FROM campus.tbl_uebung WHERE uebung_id='$row->uebung_id';";
 			
-					if(!pg_query($qry))
-					{
-						$this->errormsg = 'Fehler beim Loeschen der Daten';
-						return false;
-					}								
+				if(!$this->db_query($qry))
+				{
+					$this->errormsg = 'Fehler beim Loeschen der Daten';
+					return false;
+				}								
 			}
 		}		
 		
@@ -627,23 +657,20 @@ function abgabe_save($new=null)
 				DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$uebung_id';
 				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id';";
 
-		if(pg_query($qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
-		}
-		
-		
-		
+		}		
 	}
 
-	// ************************************************************
-	// * Loescht eine Uebung plus die abhaengigen eintraege in den
-	// * Tabellen studentuebung, studentbeispiel, und beispiel
-	// ************************************************************
-	function delete_abgabe($abgabe_id)
+	/**
+	 * Loescht eine Uebung plus die abhaengigen eintraege in den
+	 * Tabellen studentuebung, studentbeispiel, und beispiel
+	 */
+	public function delete_abgabe($abgabe_id)
 	{
 		if(!is_numeric($abgabe_id))
 		{
@@ -653,29 +680,35 @@ function abgabe_save($new=null)
 		
 		// subuebungen wegraeumen
 		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '".$abgabe_id."'";
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
-				
-														
-					if(file_exists(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei))
-						unlink(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei);
+				if(file_exists(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei))
+					unlink(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei);
 
-					$qry = "UPDATE campus.tbl_studentuebung set abgabe_id = null where abgabe_id = '$abgabe_id';
-							DELETE FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
+				$qry = "UPDATE campus.tbl_studentuebung set abgabe_id = null where abgabe_id = '$abgabe_id';
+						DELETE FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
 			
-					if(!pg_query($qry))
-					{
-						$this->errormsg = 'Fehler beim Loeschen der Daten';
-						return false;
-					}
-					else
-						return true;							
+				if(!$this->db_query($qry))
+				{
+					$this->errormsg = 'Fehler beim Loeschen der Daten';
+					return false;
+				}
+				else
+					return true;							
+			}
+			else 
+			{
+				$this->errormsg='Keine Abgabe mit dieser ID vorhanden';
+				return false;
 			}
 		}
-		
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}	
 	}
-
 }
 ?>

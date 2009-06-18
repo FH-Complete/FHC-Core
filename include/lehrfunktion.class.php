@@ -19,38 +19,27 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-class lehrfunktion
+require_once(dirname(__FILE__).'/basis_db.class.php');
+
+class lehrfunktion extends basis_db 
 {
-	var $conn;     // @var resource DB-Connection
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $lehrfunktionen = array(); // @var lehrfunktion Objekt
+	public $new;      // @var boolean
+	public $lehrfunktionen = array(); // @var lehrfunktion Objekt
 
-	var $lehrfunktion_kurzbz; // @var varchar(16)
-	var $beschreibung;        // @var varchar(256)
-	var $standardfaktor;      // @var numeric(3,2)
+	public $lehrfunktion_kurzbz; // @var varchar(16)
+	public $beschreibung;        // @var varchar(256)
+	public $standardfaktor;      // @var numeric(3,2)
 
-	// **
-	// * Konstruktor
-	// * @param conn Connection zur DB
-	// *        lehrfunktion_kurzbz kurzbezeichnung der zu ladenden Funktion
-	// *
-	function lehrfunktion($conn, $lehrfunktion_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param conn Connection zur DB
+	 *        lehrfunktion_kurzbz kurzbezeichnung der zu ladenden Funktion
+	 */
+	public function __construct($lehrfunktion_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($lehrfunktion_kurzbz!=null)
+		if(!is_null($lehrfunktion_kurzbz))
 			$this->load($lehrfunktion_kurzbz);
 	}
 
@@ -59,17 +48,17 @@ class lehrfunktion
 	 * @param lehrfunktion_kurzbz ID des Datensatzes der zu laden ist
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($lehrfunktion_kurzbz)
+	public function load($lehrfunktion_kurzbz)
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrfunktion WHERE lehrfunktion_kurzbz = '".addslashes($lehrfunktion_kurzbz)."';";
 
-		if(!$result = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row = pg_fetch_object($result))
+		if($row = $this->db_fetch_object())
 		{
 			$this->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
 			$this->beschreibung = $row->beschreibung;
@@ -87,19 +76,19 @@ class lehrfunktion
 	 * Laedt alle Lehrfunktionen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrfunktion ORDER BY lehrfunktion_kurzbz;";
 
-		if(!$result = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim laden der Datensaetze';
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 
-		while($row = pg_fetch_object($result))
+		while($row = $this->db_fetch_object())
 		{
-			$lehrfkt_obj = new lehrfunktion($this->conn);
+			$lehrfkt_obj = new lehrfunktion();
 
 			$lehrfkt_obj->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
 			$lehrfkt_obj->beschreibung = $row->beschreibung;
@@ -108,27 +97,6 @@ class lehrfunktion
 			$this->lehrfunktionen[] = $lehrfkt_obj;
 		}
 		return true;
-	}
-
-	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function save()
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-
-	/**
-	 * Loescht den Datensatz mit der ID die uebergeben wird
-	 * @param lehrfunktion_kurzbz ID des zu loeschenden Datensatzes
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($lehrfunktion_kurzbz)
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
 	}
 }
 ?>

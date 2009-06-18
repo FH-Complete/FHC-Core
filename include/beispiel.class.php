@@ -19,71 +19,56 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class beispiel
+class beispiel extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $beispiele = array(); // lehreinheit Objekt
+	public $new;					// boolean
+	public $beispiele = array();	// lehreinheit Objekt
 
 	//Tabellenspalten
-	var $beispiel_id;	// Serial
-	var $uebung_id;		// integer
-	var $bezeichnung;	// varchar(32)
-	var $punkte;		// real
-	var $updateamum;	// timestamp
-	var $updatevon;		// varchar(16)
-	var $insertamum;	// timestamp
-	var $insertvon;		// varchar(16)
-	var $nummer;		// smallint
+	public $beispiel_id;	// Serial
+	public $uebung_id;		// integer
+	public $bezeichnung;	// varchar(32)
+	public $punkte;			// real
+	public $updateamum;		// timestamp
+	public $updatevon;		// varchar(16)
+	public $insertamum;		// timestamp
+	public $insertvon;		// varchar(16)
+	public $nummer;			// smallint
 
-	var $student_uid;
-	var $vorbereitet;
-	var $probleme;
+	public $student_uid;
+	public $vorbereitet;
+	public $probleme;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional ein beispiel
-	// * @param $conn        	Datenbank-Connection
-	// * 		$beispiel_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function beispiel($conn, $beispiel_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $beispiel_id
+	 */
+	public function __construct($beispiel_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($beispiel_id!=null)
+		parent::__construct();
+		
+		if(!is_null($beispiel_id))
 			$this->load($beispiel_id);
 	}
 
-	// *********************************************************
-	// * Laedt ein Beispiel
-	// * @param uebung_id
-	// *********************************************************
-	function load($beispiel_id)
+	/**
+	 * Laedt ein Beispiel
+	 * @param beispiel_id
+	 */
+	public function load($beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg='Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_beispiel WHERE beispiel_id='$beispiel_id'";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE beispiel_id='".addslashes($beispiel_id)."'";
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->beispiel_id = $row->beispiel_id;
 				$this->uebung_id = $row->uebung_id;
@@ -104,12 +89,18 @@ class beispiel
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden des Beispiels';
+			$this->errormsg = 'Fehler beim Laden des Beispiels';
 			return false;
 		}
 	}
 
-	function load_beispiel($uebung_id)
+	/**
+	 * Laedt alle Beispiele einer Uebung
+	 *
+	 * @param $uebung_id
+	 * @return boolean
+	 */
+	public function load_beispiel($uebung_id)
 	{
 		if(!is_numeric($uebung_id))
 		{
@@ -117,13 +108,13 @@ class beispiel
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id' ORDER BY bezeichnung";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='".addslashes($uebung_id)."' ORDER BY bezeichnung";
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$beispiel_obj = new beispiel($this->conn);
+				$beispiel_obj = new beispiel();
 
 				$beispiel_obj->beispiel_id = $row->beispiel_id;
 				$beispiel_obj->uebung_id = $row->uebung_id;
@@ -141,26 +132,45 @@ class beispiel
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Beispiele';
+			$this->errormsg = 'Fehler beim Laden der Beispiele';
 			return false;
 		}
 	}
 
-	function get_next_nummer()
+	/**
+	 * Liefert die naechste Nummer
+	 *
+	 * @return boolean
+	 */
+	public function get_next_nummer()
 	{
 		$qry = "SELECT max(nummer) FROM campus.tbl_beispiel";
-		$result = pg_query($this->conn, $qry);
-		$row = pg_fetch_object($result);
-		$next = $row->max + 1;
-		$this->next_nummer = $next;
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->next_nummer = $row->max + 1;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg='Fehler beim Ermitteln der Nummer';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg='Fehler beim Ermitteln der Nummer';
+			return false;
+		}
 	}	
 	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->uebung_id))
 		{
@@ -174,25 +184,14 @@ class beispiel
 		}
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert ein Beispiel in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	
+	/**
+	 * Speichert ein Beispiel in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -231,30 +230,30 @@ class beispiel
 			       " WHERE beispiel_id=".$this->addslashes($this->beispiel_id).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('campus.tbl_beispiel_beispiel_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row=pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->uebung_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn,'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn,'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -268,7 +267,15 @@ class beispiel
 		}
 	}
 
-	function exists($uebung_id, $bezeichnung)
+	/**
+	 * Prueft ob bereits zu dieser Uebung bereits ein Beispiel 
+	 * mit dieser Bezeichnung vorhanden ist
+	 *
+	 * @param $uebung_id
+	 * @param $bezeichnung
+	 * @return boolean
+	 */
+	public function exists($uebung_id, $bezeichnung)
 	{
 		if(!is_numeric($uebung_id))
 		{
@@ -276,23 +283,31 @@ class beispiel
 			return false;
 		}
 
-		$qry = "SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id' AND bezeichnung=".$this->addslashes($bezeichnung);
+		$qry = "SELECT beispiel_id FROM campus.tbl_beispiel 
+				WHERE uebung_id='".addslashes($uebung_id)."' AND bezeichnung=".$this->addslashes($bezeichnung);
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return true;
 			else
 				return false;
 		}
 		else
 		{
-			$this->errormsg ='Fehler beim lesen der Beispiele';
+			$this->errormsg ='Fehler beim Lesen der Beispiele';
 			return false;
 		}
 	}
 
-	function studentbeispiel_exists($uid,$beispiel_id)
+	/**
+	 * Prueft ob ein Beispiel existiert
+	 *
+	 * @param $uid
+	 * @param $beispiel_id
+	 * @return boolean
+	 */
+	public function studentbeispiel_exists($uid,$beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
@@ -300,23 +315,30 @@ class beispiel
 			return false;
 		}
 
-		$qry = "SELECT vorbereitet FROM campus.tbl_studentbeispiel WHERE beispiel_id='$beispiel_id' AND student_uid='".addslashes($uid)."'";
+		$qry = "SELECT vorbereitet FROM campus.tbl_studentbeispiel 
+				WHERE beispiel_id='".addslashes($beispiel_id)."' AND student_uid='".addslashes($uid)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return true;
 			else
 				return false;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen der aus der DB';
+			$this->errormsg = 'Fehler beim Lesen der aus der DB';
 			return false;
 		}
 	}
 
-	function delete($beispiel_id)
+	/**
+	 * Loescht ein Beispiel
+	 *
+	 * @param $beispiel_id
+	 * @return unknown
+	 */
+	public function delete($beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
@@ -324,30 +346,38 @@ class beispiel
 			return false;
 		}
 
-		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id='$beispiel_id';
-				DELETE FROM campus.tbl_beispiel WHERE beispiel_id='$beispiel_id';";
+		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id='".addslashes($beispiel_id)."';
+				DELETE FROM campus.tbl_beispiel WHERE beispiel_id='".addslashes($beispiel_id)."';";
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim loeschen des Beispiels';
+			$this->errormsg = 'Fehler beim Löschen des Beispiels';
 			return false;
 		}
 	}
 
-	function load_studentbeispiel($uid, $beispiel_id)
+	/**
+	 * Laedt ein Beispiel eines Studenten
+	 *
+	 * @param $uid
+	 * @param $beispiel_id
+	 * @return boolean
+	 */
+	public function load_studentbeispiel($uid, $beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_studentbeispiel WHERE student_uid='$uid' AND beispiel_id='$beispiel_id'";
+		$qry = "SELECT * FROM campus.tbl_studentbeispiel 
+				WHERE student_uid='".addslashes($uid)."' AND beispiel_id='".addslashes($beispiel_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->beispiel_id = $row->beispiel_id;
 				$this->student_uid = $row->student_uid;
@@ -361,29 +391,36 @@ class beispiel
 			}
 			else
 			{
-				$this->errormsg = 'Fehler beim laden des Student_Beispiels';
+				$this->errormsg = 'Fehler beim Laden des Student_Beispiels';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden des Student_Beispiels';
+			$this->errormsg = 'Fehler beim Laden des Student_Beispiels';
 			return false;
 		}
 	}
 
-	function check_anzahl_studentbeispiel($beispiel_id)
+	/**
+	 * Prueft die Anzahl der vorbereiteten Beispiele
+	 *
+	 * @param $beispiel_id
+	 * @return boolean
+	 */
+	public function check_anzahl_studentbeispiel($beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE vorbereitet = true and beispiel_id='$beispiel_id'";
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel 
+				WHERE vorbereitet = true and beispiel_id='".addslashes($beispiel_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->anzahl_studentbeispiel = $row->anzahl;
 				return true;
@@ -400,10 +437,11 @@ class beispiel
 			return false;
 		}
 	}
-	// **
-	// * Prueft die studentbeispiel Daten auf gueltigkeit
-	// *
-	function studentbeispiel_validate()
+	
+	/**
+	 * Prueft die studentbeispiel Daten auf Gueltigkeit
+	 */
+	private function studentbeispiel_validate()
 	{
 		if(!is_numeric($this->beispiel_id))
 		{
@@ -413,11 +451,11 @@ class beispiel
 		return true;
 	}
 
-	// **
-	// * Speichert einen Studentbeispiel Datensatz in die DB
-	// *
-	// *
-	function studentbeispiel_save($new=null)
+	/**
+	 * Speichert einen Studentbeispiel Datensatz in die DB
+	 *
+	 */
+	public function studentbeispiel_save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -449,7 +487,7 @@ class beispiel
 			       " WHERE beispiel_id=".$this->beispiel_id." AND student_uid=".$this->addslashes($this->student_uid).';';
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}

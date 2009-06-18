@@ -23,73 +23,57 @@
  * Klasse aufmerksamdurch 
  * @create 02-01-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class aufmerksamdurch
+class aufmerksamdurch extends basis_db
 {
-	var $conn;     // @var resource DB-Handle
-	var $new;       // @var boolean
-	var $errormsg;  // @var string
-	var $done=false;	// @var boolean
-	var $result = array();
+	public $new;
+	public $result = array();
 	
 	//Tabellenspalten
-	Var $aufmerksamdurch_kurzbz;		// @var string
-	var $beschreibung;				// @var integer
-	var $ext_id;					// @var integer
+	public $aufmerksamdurch_kurzbz;
+	public $beschreibung;
+	public $ext_id;
 	
 	
-	// ****
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $aufmerksamdurch_kurzbz = ID (Default=null)
-	// *		$unicode
-	// ****
-	function aufmerksamdurch($conn,$aufmerksamdurch_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $aufmerksamdurch_kurzbz = ID (Default=null)
+	 */
+	public function __construct($aufmerksamdurch_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else 
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}		
-*/	
+		parent::__construct();
+		
+		if(!is_null($aufmerksamdurch_kurzbz))
+			$this->load($aufmerksamdurch_kurzbz);
 	}
 	
-	// *******************************************
-	// * @param  $aufmerksam_kurzbz ID 
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function load($aufmerksam_kurzbz)
+	/**
+	 * Laedt einen Datensatz
+	 * @param  $aufmerksam_kurzbz ID 
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($aufmerksam_kurzbz)
 	{
 		//noch nicht implementiert
+		return false;
 	}
 	
-	// *******************************************
-	// * Laedt alle Datansaetze
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function getAll($orderby='aufmerksamdurch_kurzbz')
+	/**
+	 * Laedt alle Datansaetze
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAll($orderby='aufmerksamdurch_kurzbz')
 	{
 		$qry = "SELECT * FROM public.tbl_aufmerksamdurch";
 		if($orderby!='')
 			$qry .= " ORDER BY ".$orderby;
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new aufmerksamdurch($this->conn, null, null);
+				$obj = new aufmerksamdurch();
 				
 				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 				$obj->beschreibung = $row->beschreibung;
@@ -100,32 +84,20 @@ class aufmerksamdurch
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden';
+			$this->errormsg = 'Fehler beim Laden';
 			return false;			
 		}
-	}	
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
-	
-	// **************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank	 
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $schluessel_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************************************
-	function save()
-	{
-		$this->done=false;
 			
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $schluessel_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save()
+	{
+		
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
@@ -134,62 +106,23 @@ class aufmerksamdurch
 			     $this->addslashes($this->aufmerksamdurch_kurzbz).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->ext_id).');';
-			 $this->done=true;			
 		}
 		else
 		{			
-			$qryz="SELECT * FROM public.tbl_aufmerksamdurch WHERE aufmerksamdurch_kurzbz='$this->aufmerksamdurch_kurzbz';";
-			if($resultz = pg_query($this->conn, $qryz))
-			{
-				while($rowz = pg_fetch_object($resultz))
-				{
-					$update=false;			
-					if($rowz->beschreibung!=$this->beschreibung)			$update=true;
-					if($rowz->beschreibung!=$this->ext_id)				$update=true;
-				
-					if($update)
-					{
-						$qry='UPDATE public.tbl_aufmerksamdurch SET '.
-							'beschreibung='.$this->addslashes($this->beschreibung).', '.
-							'ext_id='.$this->addslashes($this->ext_id).' '. 
-							'WHERE aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).';';
-							$this->done=true;
-					}
-				}
-			}
+			$qry='UPDATE public.tbl_aufmerksamdurch SET '.
+				'beschreibung='.$this->addslashes($this->beschreibung).', '.
+				'ext_id='.$this->addslashes($this->ext_id).' '. 
+				'WHERE aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).';';
 		}
-		if ($this->done)
+		
+		if(pg_query($this->conn, $qry))
 		{
-			if(pg_query($this->conn, $qry))
-			{
-				//Log schreiben
-				/*$sql = $qry;
-				$qry = "SELECT nextval('log_seq') as id;";
-				if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-				{
-					$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-					return false;
-				}
-							
-				$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-				if(pg_query($this->conn, $qry))
-					return true;
-				else 
-				{
-					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-					return false;
-				}	*/
-				return true;		
-			}
-			else 
-			{
-				$this->errormsg = 'Fehler beim Speichern der Daten';
-				return false;
-			}
+			return true;		
 		}
 		else 
 		{
-			return true;
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
 		}
 	}
 }

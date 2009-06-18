@@ -23,69 +23,55 @@
 /**
  * Klasse fuer die Fragen des Reihungstesttools
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/gebiet.class.php');
 require_once(dirname(__FILE__).'/pruefling.class.php');
 
-class frage
+class frage extends basis_db
 {
 	//Tabellenspalten
-	var $frage_id;
-	var $gebiet_id;
-	var $nummer;
-	var $demo;
-	var $level;
-	var $kategorie_kurzbz;
+	public $frage_id;
+	public $gebiet_id;
+	public $nummer;
+	public $demo;
+	public $level;
+	public $kategorie_kurzbz;
 	
-	var $sprache;
-	var $audio;
-	var $text;
-	var $bild;
-	var $pruefling_id;
-	var $prueflingfrage_id;
-	var $begintime;
-	var $endtime;
+	public $sprache;
+	public $audio;
+	public $text;
+	public $bild;
+	public $pruefling_id;
+	public $prueflingfrage_id;
+	public $begintime;
+	public $endtime;
 	
-	var $insertamum;
-	var $updateamum;
-	var $insertvon;
-	var $updatevon;
+	public $insertamum;
+	public $updateamum;
+	public $insertvon;
+	public $updatevon;
 	
 	// ErgebnisArray
-	var $result=array();
-	var $num_rows=0;
-	var $errormsg;
-	var $new;
+	public $result=array();
+	public $num_rows=0;
+	public $new;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine frage
-	// * @param $conn        	Datenbank-Connection
-	// *        $frage_id       Frage die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	public function frage($conn, $frage_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional eine frage
+	 * @param $frage_id       Frage die geladen werden soll (default=null)
+	 */
+	public function __construct($frage_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-
-		if($frage_id != null)
+		parent::__construct();
+		
+		if(!is_null($frage_id))
 			$this->load($frage_id);
 	}
 
-	// ***********************************************************
-	// * Laedt Frage mit der uebergebenen ID
-	// * @param $frage_id ID der Frage die geladen werden soll
-	// ***********************************************************
+	/**
+	 * Laedt Frage mit der uebergebenen ID
+	 * @param $frage_id ID der Frage die geladen werden soll
+	 */
 	public function load($frage_id)
 	{ 
 		if(!is_numeric($frage_id) || $frage_id=='')
@@ -96,9 +82,9 @@ class frage
 		
 		$qry = "SELECT * FROM testtool.tbl_frage WHERE frage_id='".addslashes($frage_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->frage_id = $row->frage_id;
 				$this->gebiet_id = $row->gebiet_id;
@@ -126,33 +112,22 @@ class frage
 		}
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	private function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	private function validate()
 	{
 		return true;
 	}
 
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
+	/**
+	 * Speichert die Benutzerdaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten der Datensatz mit $uid upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
@@ -184,31 +159,31 @@ class frage
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE frage_id='".addslashes($this->frage_id)."';";
 		}
-		//echo $qry;
-		if(pg_query($this->conn,$qry))
+		
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				$qry = "SELECT currval('testtool.tbl_frage_frage_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->frage_id = $row->id;
-						pg_query($this->conn,'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Lesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -254,10 +229,9 @@ class frage
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE frage_id='".addslashes($this->frage_id)."' AND sprache='".addslashes($this->sprache)."';";
 		}
-		//echo $qry;
-		if(pg_query($this->conn,$qry))
+		
+		if($this->db_query($qry))
 		{
-			//Log schreiben
 			return true;
 		}
 		else
@@ -266,17 +240,24 @@ class frage
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Liefert die Fragen eines Gebietes mit der nummer $nummer
+	 *
+	 * @param $gebiet_id
+	 * @param $nummer
+	 * @return true wenn ok, sonst false
+	 */
 	public function getFragen($gebiet_id, $nummer)
 	{
 		$qry = "SELECT * FROM testtool.tbl_frage 
 				WHERE gebiet_id='".addslashes($gebiet_id)."' AND nummer='".addslashes($nummer)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new frage($this->conn, null, null);
+				$obj = new frage();
 				
 				$obj->frage_id = $row->frage_id;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -331,9 +312,9 @@ class frage
 			$qry.="ORDER BY tbl_pruefling_frage.nummer ASC LIMIT 1";
 		}
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 				return $row->frage_id;
 			else
 				return false;
@@ -354,9 +335,9 @@ class frage
 		$qry = "SELECT * FROM testtool.tbl_frage_sprache JOIN testtool.tbl_frage USING(frage_id)
 				WHERE frage_id='".addslashes($frage_id)."' AND sprache='".addslashes($sprache)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->frage_id = $row->frage_id;
 				$this->sprache = $row->sprache;
@@ -413,7 +394,7 @@ class frage
 	 */
 	public function generateFragenpool($pruefling_id, $gebiet_id)
 	{
-		$gebiet = new gebiet($this->conn, $gebiet_id);
+		$gebiet = new gebiet($gebiet_id);
 		
 		//Bei Levelgesteuerten Fragen wird nur die erste Frage angelegt
 		if($gebiet->level_start!='')
@@ -421,9 +402,9 @@ class frage
 			// Anzahl der bereits vorhandenen Fragen holen
 			$qry = "SELECT count(*) as anzahl FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
 					WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($pruefling_id)."'";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					if($row->anzahl>=$gebiet->maxfragen)
 					{
@@ -440,9 +421,9 @@ class frage
 			
 			// Wie viele Fragen gibt es in diesem Gebiet
 			$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage WHERE NOT demo AND gebiet_id='".addslashes($gebiet_id)."'";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					$fragengesamt = $row->anzahl;
 				}
@@ -464,9 +445,9 @@ class frage
 						GROUP BY level
 						ORDER BY level";
 				
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					while($row = pg_fetch_object($result))
+					while($row = $this->db_fetch_object())
 					{
 						$level[$row->level]=round(($row->anzahl/$fragengesamt)*$maxfragen);
 					}
@@ -483,7 +464,7 @@ class frage
 			}
 		}
 		
-		pg_query($this->conn, 'BEGIN;');
+		$this->db_query('BEGIN;');
 		
 		while($maxfragen>0)
 		{
@@ -512,9 +493,9 @@ class frage
 						tbl_frage.gebiet_id='".addslashes($gebiet_id)."' AND
 						tbl_pruefling_frage.pruefling_id='".addslashes($pruefling_id)."'
 					ORDER BY nummer DESC LIMIT 1;";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 					$this->nummer = $row->nummer+1;
 				else 
 					$this->nummer = 1;
@@ -522,7 +503,7 @@ class frage
 			else
 			{
 				$this->errormsg = 'Fehler beim Generieren des Fragenpools'.$qry;
-				pg_query($this->conn, 'ROLLBACK');
+				$this->db_query('ROLLBACK');
 				return false;
 			}
 			
@@ -532,14 +513,14 @@ class frage
 			//PrueflingFrage speichern
 			if(!$this->save_prueflingfrage(true))
 			{
-				pg_query($this->conn, 'ROLLBACK');
+				$this->db_query('ROLLBACK');
 				return false;
 			}
 			
 			$maxfragen--;
 		}
 
-		pg_query($this->conn, 'COMMIT;');
+		$this->db_query('COMMIT;');
 		return true;
 	}
 	
@@ -558,9 +539,9 @@ class frage
 		}
 	
 		$qry = "SELECT * FROM testtool.tbl_pruefling_frage WHERE prueflingfrage_id='".addslashes($prueflingfrage_id)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->prueflingfrage_id = $row->prueflingfrage_id;
 				$this->pruefling_id = $row->pruefling_id;
@@ -607,9 +588,9 @@ class frage
 		
 		$qry = "SELECT * FROM testtool.tbl_pruefling_frage WHERE pruefling_id='".addslashes($pruefling_id)."' AND frage_id='".addslashes($frage_id)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->prueflingfrage_id = $row->prueflingfrage_id;
 				$this->pruefling_id = $row->pruefling_id;
@@ -691,7 +672,7 @@ class frage
 					" WHERE prueflingfrage_id='".addslashes($this->prueflingfrage_id)."'";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -711,8 +692,8 @@ class frage
 	 */
 	private function getNewFrage($gebiet_id, $pruefling_id, $level=null)
 	{
-		$gebiet = new gebiet($this->conn, $gebiet_id);
-		$pruefling = new pruefling($this->conn);
+		$gebiet = new gebiet($gebiet_id);
+		$pruefling = new pruefling();
 		
 		
 		//Frage suchen die dem pruefling noch nicht zugeordnet ist
@@ -744,9 +725,9 @@ class frage
 		
 		$qry .= " LIMIT 1";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->frage_id;
 			}

@@ -19,72 +19,45 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class reservierung
+class reservierung extends basis_db 
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $reservierungen = array(); // reservierung Objekt
+	public $new;      					// boolean
+	public $reservierungen = array(); 	// reservierung Objekt
 
 	//Tabellenspalten
-	var $reservierung_id;	// int
-	var $ort_kurzbz;		// varchar(8)
-	var $studiengang_kz;	// int
-	var $uid;				// varchar(32)
-	var $stunde;			// smalint
-	var $datum;				// date
-	var $titel;				// varchar(10)
-	var $beschreibung;		// varchar(32)
-	var $semester;			// smalint
-	var $verband;			// char(1)
-	var $gruppe;			// char(1)
-	var $gruppe_kurzbz;		// varchar(10)
+	public $reservierung_id;	// int
+	public $ort_kurzbz;			// varchar(8)
+	public $studiengang_kz;		// int
+	public $uid;				// varchar(32)
+	public $stunde;				// smalint
+	public $datum;				// date
+	public $titel;				// varchar(10)
+	public $beschreibung;		// varchar(32)
+	public $semester;			// smalint
+	public $verband;			// char(1)
+	public $gruppe;				// char(1)
+	public $gruppe_kurzbz;		// varchar(10)
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Reservierung
-	// * @param $conn        	Datenbank-Connection
-	// *        $reservierung_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function reservierung($conn, $reservierung_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional eine Reservierung
+	 * @param $reservierung_id
+	 */
+	public function __construct($reservierung_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-		else
-	*/
-			$this->new = true;
+		parent::__construct();
+		$this->new = true;
 		if($reservierung_id!=null)
 			$this->load($reservierung_id);
 	}
-
-	// *********************************************************
-	// * Laedt eine Reservierung
-	// * @param reservierung_id
-	// *********************************************************
-	function load($reservierung_id)
-	{
-		$this->errormsg = 'Not implemented';
-		return false;
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->ort_kurzbz)>8)
 		{
@@ -140,24 +113,13 @@ class reservierung
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Reservierung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert Reservierung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!is_null($new))
 			$this->new = $new;
@@ -200,7 +162,7 @@ class reservierung
 			       " WHERE reservierung_id='".addslashes($this->reservierung_id)."'";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			$this->new = false;
@@ -213,12 +175,12 @@ class reservierung
 		}
 	}
 	
-	// ************************************************************
-	// * Loescht eine Reservierung
-	// * @param reservierung_id ID der zu leoschenden Reservierung
-	// * @return true wenn ok, false im Fehlerfall
-	// ************************************************************
-	function delete($reservierung_id)
+	/**
+	 * Loescht eine Reservierung
+	 * @param reservierung_id ID der zu leoschenden Reservierung
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($reservierung_id)
 	{
 		if(!is_numeric($reservierung_id))
 		{
@@ -228,7 +190,7 @@ class reservierung
 		
 		$qry = "DELETE FROM campus.tbl_reservierung WHERE reservierung_id='$reservierung_id'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{

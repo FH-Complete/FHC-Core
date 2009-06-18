@@ -19,69 +19,52 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class legesamtnote
+class legesamtnote extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $legesamtnoten = array(); // lehreinheit Objekt
+	public $new;
+	public $legesamtnoten = array();
 
 	//Tabellenspalten
-	var $student_uid;		// varchar(16)
-	var $lehreinheit_id;		// int
-	var $note;		// smallint
-	var $benotungsdatum;	//date
-	var $updateamum;		// timestamp
-	var $updatevon;			// varchar(16)
-	var $insertamum;		// timestamp
-	var $insertvon;			// varchar(16)
+	public $student_uid;		// varchar(16)
+	public $lehreinheit_id;	// int
+	public $note;				// smallint
+	public $benotungsdatum;	//date
+	public $updateamum;		// timestamp
+	public $updatevon;			// varchar(16)
+	public $insertamum;		// timestamp
+	public $insertvon;			// varchar(16)
 
-
-
-
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Uebung
-	// * @param $conn        	Datenbank-Connection
-	// * 		$uebung_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function legesamtnote($conn, $student_uid=null, $lehreinheit_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional eine LEGesamtNote
+	 * @param $uebung_id
+	 */
+	public function __construct($student_uid=null, $lehreinheit_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($this->conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($student_uid != null)
+		parent::__construct();
+		
+		if(!is_null($student_uid))
 			$this->load($student_uid, $lehreinheit_id);
 	}
 
-	// *********************************************************
-	// * Laedt die legesamtnote
-	// * @param student_uid, lehreinheit_id
-	// *********************************************************
-	function load($student_uid, $lehreinheit_id)
+	/**
+	 * Laedt die legesamtnote
+	 * @param student_uid, lehreinheit_id
+	 */
+	public function load($student_uid, $lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
 			$this->errormsg='lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_legesamtnote where student_uid = '".$student_uid."' and lehreinheit_id = '".$lehreinheit_id."'";
+		$qry = "SELECT * FROM campus.tbl_legesamtnote 
+				WHERE student_uid = '".addslashes($student_uid)."' AND lehreinheit_id = '".addslashes($lehreinheit_id)."'";
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->student_uid = $row->student_uid;
@@ -101,13 +84,18 @@ class legesamtnote
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Uebung';
+			$this->errormsg = 'Fehler beim Laden der LEGesamtNote';
 			return false;
 		}
 	}
 	
-
-	function load_legesamtnote($lehreinheit_id)
+	/**
+	 * Ledt die LEGesamtnoten einer Lehreinheit
+	 *
+	 * @param $lehreinheit_id
+	 * @return boolean
+	 */
+	public function load_legesamtnote($lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -115,14 +103,14 @@ class legesamtnote
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id='".$lehreinheit_id."' order by student_uid";
+		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id='".$lehreinheit_id."' ORDER BY student_uid";
 
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$legesamtnote_obj = new uebung($this->conn);
+				$legesamtnote_obj = new legesamtnote();
 
 				$legesamtnote_obj->student_uid = $row->student_uid;
 				$legesamtnote_obj->note = $row->note;
@@ -139,17 +127,17 @@ class legesamtnote
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der legesamtnoten';
+			$this->errormsg = 'Fehler beim Laden der legesamtnoten';
 			return false;
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->lehreinheit_id))
 		{
@@ -164,28 +152,14 @@ class legesamtnote
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
+	/**
+	 * Speichert Uebung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Uebung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
-	{
-		//if(is_null($new))
-		//	$new = $this->new;
-
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
@@ -211,10 +185,10 @@ class legesamtnote
 			       ' benotungsdatum='.$this->addslashes($this->benotungsdatum).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." and student_uid = '".$this->student_uid."';";
+			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND student_uid = '".$this->student_uid."';";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}

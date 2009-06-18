@@ -305,7 +305,7 @@ class person extends basis_db
 		}
 		if($this->geschlecht!='m' && $this->geschlecht!='w' && $this->geschlecht!='u')
 		{
-			$this->errormsg = 'Geschlecht muß w, m oder u sein!';
+			$this->errormsg = 'Geschlecht muï¿½ w, m oder u sein!';
 			return false;
 		}
 		
@@ -314,15 +314,15 @@ class person extends basis_db
 		{
 			if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$this->gebdatum, $regs))
 			{
-				$day = sprintf('%02s',$regs[1]);
-				$month = sprintf('%02s',$regs[2]);
-				$year = substr($regs[3],2,2);
+				//$day = sprintf('%02s',$regs[1]);
+				//$month = sprintf('%02s',$regs[2]);
+				//$year = substr($regs[3],2,2);
 			}
 			elseif(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->gebdatum, $regs))
 			{
-				$day = sprintf('%02s',$regs[3]);
-				$month = sprintf('%02s',$regs[2]);
-				$year = substr($regs[1],2,2);
+				//$day = sprintf('%02s',$regs[3]);
+				//$month = sprintf('%02s',$regs[2]);
+				//$year = substr($regs[1],2,2);
 			}
 			else 
 			{

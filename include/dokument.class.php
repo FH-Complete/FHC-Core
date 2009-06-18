@@ -19,64 +19,46 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class dokument
+class dokument extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $result = array();
+	public $new;
+	public $result = array();
 	
 	//Tabellenspalten
-	var $dokument_kurzbz;
-	var $bezeichnung;
-	var $studiengang_kz;
+	public $dokument_kurzbz;
+	public $bezeichnung;
+	public $studiengang_kz;
 	
-	var $prestudent_id;
-	var $mitarbeiter_uid;
-	var $datum;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
-	var $ext_id;
+	public $prestudent_id;
+	public $mitarbeiter_uid;
+	public $datum;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $ext_id;
 	
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional ein dokument
-	// * @param $conn        	Datenbank-Connection
-	// * 		$dokument_kurzbz
-	// * 		$prestudent_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function dokument($conn, $dokument_kurzbz=null, $prestudent_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional ein Dokument
+	 * @param $dokument_kurzbz
+	 * @param $prestudent_id
+	 */
+	public function __construct($dokument_kurzbz=null, $prestudent_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if(!is_null($unicode))
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
-		*/
+		parent::__construct();
+		
 		if(!is_null($dokument_kurzbz) && !is_null($prestudent_id))
 			$this->load($dokument_kurzbz, $prestudent_id);
 	}
 	
-	// *********************************************************
-	// * Laedt eine Dokument-Prestudent Zuordnung
-	// * @param dokument_kurzbz
-	// *        prestudent_id
-	// *********************************************************
-	function load($dokument_kurzbz, $prestudent_id)
+	/**
+	 * Laedt eine Dokument-Prestudent Zuordnung
+	 * @param dokument_kurzbz
+	 *        prestudent_id
+	 */
+	public function load($dokument_kurzbz, $prestudent_id)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -84,11 +66,12 @@ class dokument
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_dokumentprestudent WHERE prestudent_id='$prestudent_id' AND dokument_kurzbz='".addslashes($dokument_kurzbz)."';";
+		$qry = "SELECT * FROM public.tbl_dokumentprestudent 
+				WHERE prestudent_id='$prestudent_id' AND dokument_kurzbz='".addslashes($dokument_kurzbz)."';";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{								
 				$this->dokument_kurzbz = $row->dokument_kurzbz;
 				$this->prestudent_id = $row->prestudent_id;
@@ -114,12 +97,12 @@ class dokument
 		}
 	}
 		
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern 
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if($this->dokument_kurzbz=='')
 		{
@@ -146,25 +129,14 @@ class dokument
 		}
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert ein Beispiel in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	
+	/**
+	 * Speichert ein Beispiel in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -192,8 +164,8 @@ class dokument
 			//never used
 			return false;
 		}
-		//echo $qry;
-		if(pg_query($this->conn,$qry))
+		
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -204,12 +176,12 @@ class dokument
 		}
 	}
 
-	// *******************************************
-	// * Loescht eine Zuordnung
-	// * @param dokument_kurzbz
-	// *        prestudent_id
-	// *******************************************
-	function delete($dokument_kurzbz, $prestudent_id)
+	/**
+	 * Loescht eine Zuordnung
+	 * @param dokument_kurzbz
+	 *        prestudent_id
+	 */
+	public function delete($dokument_kurzbz, $prestudent_id)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -217,9 +189,10 @@ class dokument
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_dokumentprestudent WHERE dokument_kurzbz='".addslashes($dokument_kurzbz)."' AND prestudent_id='".addslashes($prestudent_id)."'";
+		$qry = "DELETE FROM public.tbl_dokumentprestudent 
+				WHERE dokument_kurzbz='".addslashes($dokument_kurzbz)."' AND prestudent_id='".addslashes($prestudent_id)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 	
 		{
@@ -228,13 +201,13 @@ class dokument
 		}
 	}
 	
-	// *********************************************
-	// * Laedt alle Dokumente eines Prestudenten die
-	// * er bereits abgegeben hat
-	// * @param prestudent_id
-	// * @return true wenn ok, false wenn Fehler
-	// *********************************************
-	function getPrestudentDokumente($prestudent_id)
+	/**
+	 * Laedt alle Dokumente eines Prestudenten die
+	 * er bereits abgegeben hat
+	 * @param prestudent_id
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getPrestudentDokumente($prestudent_id)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -242,13 +215,14 @@ class dokument
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz) WHERE prestudent_id='$prestudent_id' ORDER BY dokument_kurzbz";
+		$qry = "SELECT * FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz) 
+				WHERE prestudent_id='$prestudent_id' ORDER BY dokument_kurzbz";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$dok = new dokument($this->conn, null, null, null);
+				$dok = new dokument();
 				
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
@@ -272,14 +246,14 @@ class dokument
 		}
 	}
 	
-	// **********************************************
-	// * Laedt alle Dokumente fuer einen Stg die der
-	// * Prestudent noch nicht abgegeben hat
-	// * @param studiengang_kz
-	// *        prestudent_id
-	// * @return true wenn ok, false wenn Fehler
-	// **********************************************
-	function getFehlendeDokumente($studiengang_kz, $prestudent_id=null)
+	/**
+	 * Laedt alle Dokumente fuer einen Stg die der
+	 * Prestudent noch nicht abgegeben hat
+	 * @param studiengang_kz
+	 *        prestudent_id
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getFehlendeDokumente($studiengang_kz, $prestudent_id=null)
 	{
 		if(!is_null($prestudent_id) && !is_numeric($prestudent_id))
 		{
@@ -304,11 +278,11 @@ class dokument
 		
 		$qry.=" ORDER BY dokument_kurzbz";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$dok = new dokument($this->conn, null, null, null);
+				$dok = new dokument();
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
 				$this->result[] = $dok;
@@ -322,20 +296,21 @@ class dokument
 		}
 	}
 	
-	// ************************************************
-	// * Liefert die Dokumente eines Studienganges
-	// * @param $studiengang_kz
-	// * @return true wenn ok false im Fehlerfall
-	// ************************************************
-	function getDokumente($studiengang_kz)
+	/**
+	 * Liefert die Dokumente eines Studienganges
+	 * @param $studiengang_kz
+	 * @return true wenn ok false im Fehlerfall
+	 */
+	public function getDokumente($studiengang_kz)
 	{
-		$qry = "SELECT * FROM public.tbl_dokumentstudiengang JOIN public.tbl_dokument USING(dokument_kurzbz) WHERE studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM public.tbl_dokumentstudiengang JOIN public.tbl_dokument USING(dokument_kurzbz) 
+				WHERE studiengang_kz='".addslashes($studiengang_kz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$dok = new dokument($this->conn, null, null, null);
+				$dok = new dokument();
 				
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;

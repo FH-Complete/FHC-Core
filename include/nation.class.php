@@ -24,45 +24,32 @@
  * Klasse Nation (FAS-Online)
  * @create 06-04-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class nation
+class nation extends basis_db 
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $nation = array(); // nation Objekt
+	public $new;      // boolean
+	public $nation = array(); // nation Objekt
 
 	//Tabellenspalten
-	var $code;
-	var $sperre;
-	var $kontinent;
-	var $entwicklungsstand;
-	var $eu;
-	var $ewr;
-	var $kurztext;
-	var $langtext;
-	var $engltext;
+	public $code;
+	public $sperre;
+	public $kontinent;
+	public $entwicklungsstand;
+	public $eu;
+	public $ewr;
+	public $kurztext;
+	public $langtext;
+	public $engltext;
 
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $code      Zu ladende Nation
+	 * @param $code      Zu ladende Nation
 	 */
-	function nation($conn, $code=null, $unicode=false)
+	public function __construct($code=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
+		parent::__construct();
+		
 		if($code != null)
 			$this->load($code);
 	}
@@ -73,18 +60,18 @@ class nation
 	 * @param  $code code der zu ladenden Nation
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($code)
+	public function load($code)
 	{
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code='$code';";
-		//echo $qry;
-		if(!$res = pg_query($this->conn,$qry))
+		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code='".addslashes($code)."';";
+		
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		if($row = pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->code = $code;
 
@@ -110,7 +97,7 @@ class nation
 	 * @param ohnesperre wenn dieser Parameter auf true gesetzt ist werden
 	 *        nur die nationen geliefert dessen Buerger bei uns studieren duerfen
 	 */
-	function getAll($ohnesperre=false)
+	public function getAll($ohnesperre=false)
 	{
 		//Lesen der Daten aus der Datenbank
 		$qry = "SELECT * FROM bis.tbl_nation";
@@ -119,15 +106,15 @@ class nation
 
 		$qry .=" ORDER BY kurztext";
 
-		if(!$res = pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$nation = new nation($this->conn);
+			$nation = new nation();
 
 			$nation->code = $row->nation_code;
 			$nation->sperre = ($row->sperre=='t'?true:false);
@@ -143,15 +130,12 @@ class nation
 		}
 		return true;
 	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	// ************************************************************
-	// * Speichert die Personendaten in die Datenbank
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	
+	/**
+	 * Speichert die Personendaten in die Datenbank
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 
 
@@ -167,7 +151,7 @@ class nation
 			$this->addslashes($this->sperre).');';
 
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}

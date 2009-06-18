@@ -23,58 +23,39 @@
  * Klasse projektbetreuer
  * @create 08-02-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class projektbetreuer
+class projektbetreuer extends basis_db
 {
-	var $conn;     			// @var resource DB-Handle
-	var $new;       		// @var boolean
-	var $errormsg;  		// @var string
-	var $result = array(); 	// @var adresse Objekt
+	public $new;       		// boolean
+	public $result = array(); 	// adresse Objekt
 	
 	//Tabellenspalten
-	var $person_id;			// @var integer
-	var $projektarbeit_id;	// @var integer
-	var $note;				// @var integer
-	var $betreuerart_kurzbz;// @var varchar
-	var $faktor;			// @var numeric(3,2)
-	var $name;				// @var string
-	var $punkte;			// @var numeric(6,2)
-	var $stunden;			// @var numeric(8,4)
-	var $stundensatz;		// @var numeric(6,2)
-	var $ext_id;			// @var integer
-	var $insertamum;		// @var timestamp
-	var $insertvon;			// @var bigint
-	var $updateamum;		// @var timestamp
-	var $updatevon;			// @var bigint
+	public $person_id;			// integer
+	public $projektarbeit_id;	// integer
+	public $note;				// integer
+	public $betreuerart_kurzbz;// varchar
+	public $faktor;				// numeric(3,2)
+	public $name;				// string
+	public $punkte;				// numeric(6,2)
+	public $stunden;			// numeric(8,4)
+	public $stundensatz;		// numeric(6,2)
+	public $ext_id;				// integer
+	public $insertamum;			// timestamp
+	public $insertvon;			// bigint
+	public $updateamum;			// timestamp
+	public $updatevon;			// bigint
 
-	var $person_id_old;
+	public $person_id_old;
 	
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $person_id, $projektarbeit ID des Projektbetreuers, der geladen werden soll (Default=null)
+	 * @param $person_id, $projektarbeit ID des Projektbetreuers, der geladen werden soll (Default=null)
 	 */
-	function projektbetreuer($conn, $person_id=null, $projektarbeit_id=null, $unicode=false)
+	public function __construct($person_id=null, $projektarbeit_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else 
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/
+		parent::__construct();
+
 		if($projektarbeit_id != null && $person_id!=null) 	
 			$this->load($person_id, $projektarbeit_id);
 	}
@@ -85,7 +66,7 @@ class projektbetreuer
 	 * @param  $projektarbeit_id ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($person_id, $projektarbeit_id, $betreuerart_kurzbz)
+	public function load($person_id, $projektarbeit_id, $betreuerart_kurzbz)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -101,9 +82,9 @@ class projektbetreuer
 		
 		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE person_id='$person_id' AND projektarbeit_id='$projektarbeit_id' AND betreuerart_kurzbz='".addslashes($betreuerart_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->person_id = $row->person_id;
 				$this->projektarbeit_id = $row->projektarbeit_id;
@@ -135,15 +116,11 @@ class projektbetreuer
 	}
 			
 	/**
-	 * Prueft die Variablen auf gueltigkeit
+	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{		
-				
-		//Gesamtlaenge pruefen
-		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
-
 		if($this->betreuerart_kurzbz=='')
 		{
 			$this->errormsg = 'Betreuerart muss eingegeben werden';
@@ -180,35 +157,36 @@ class projektbetreuer
 			return false;
 		}
 		
-				
+		//Pruefen ob projektarbeit_id eine gueltige Zahl ist
+		if(!is_numeric($this->projektarbeit_id))
+		{
+			$this->errormsg = 'projektarbeit_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		//Pruefen ob person_id eine gueltige Zahl ist
+		if(!is_numeric($this->person_id))
+		{
+			$this->errormsg = 'person_id muss eine gueltige Zahl sein';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;		
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
+		
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank	 
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save($new=null)
+	public function save($new=null)
 	{
 		if($new==null)
 			$new = $this->new;
 		
 		//Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 			
 		if($new)
@@ -235,19 +213,6 @@ class projektbetreuer
 			if($this->person_id_old=='')
 				$this->person_id_old = $this->person_id;
 			
-			//Pruefen ob projektarbeit_id eine gueltige Zahl ist
-			if(!is_numeric($this->projektarbeit_id))
-			{
-				$this->errormsg = 'projektarbeit_id muss eine gueltige Zahl sein';
-				return false;
-			}
-			
-			//Pruefen ob person_id eine gueltige Zahl ist
-			if(!is_numeric($this->person_id))
-			{
-				$this->errormsg = 'person_id muss eine gueltige Zahl sein';
-				return false;
-			}
 			if($this->betreuerart_kurzbz_old=='')
 				$this->betreuerart_kurzbz_old = $this->betreuerart_kurzbz;
 			
@@ -264,8 +229,8 @@ class projektbetreuer
 			    'updatevon='.$this->addslashes($this->updatevon).' '.
 				"WHERE projektarbeit_id='".addslashes($this->projektarbeit_id)."' AND person_id='".addslashes($this->person_id_old)."' AND betreuerart_kurzbz='".addslashes($this->betreuerart_kurzbz_old)."';";
 		}
-		//echo $qry;
-		if(pg_query($this->conn,$qry))
+		
+		if($this->db_query($qry))
 		{			
 			return true;		
 		}
@@ -282,7 +247,7 @@ class projektbetreuer
 	 * @param $projektarbeit_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($person_id, $projektarbeit_id, $betreuerart_kurzbz)
+	public function delete($person_id, $projektarbeit_id, $betreuerart_kurzbz)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -298,7 +263,7 @@ class projektbetreuer
 		
 		$qry = "DELETE FROM lehre.tbl_projektbetreuer WHERE person_id='".$person_id."' AND projektarbeit_id='".$projektarbeit_id."' AND betreuerart_kurzbz='".addslashes($betreuerart_kurzbz)."';";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -309,11 +274,11 @@ class projektbetreuer
 		}
 	}
 	
-	// ************************************************
-	// * Liefert alle Betreuer zu einer Projektarbeit
-	// * @param projektarbeit_id
-	// ************************************************
-	function getProjektbetreuer($projektarbeit_id)
+	/**
+	 * Liefert alle Betreuer zu einer Projektarbeit
+	 * @param projektarbeit_id
+	 */
+	public function getProjektbetreuer($projektarbeit_id)
 	{
 		if(!is_numeric($projektarbeit_id))
 		{
@@ -323,11 +288,11 @@ class projektbetreuer
 		
 		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY name";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new projektbetreuer($this->conn, null, null, null);
+				$obj = new projektbetreuer();
 				
 				$obj->person_id = $row->person_id;
 				$obj->projektarbeit_id = $row->projektarbeit_id;
@@ -346,6 +311,12 @@ class projektbetreuer
 				
 				$this->result[] = $obj;
 			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
 		}
 	}
 }

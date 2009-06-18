@@ -19,63 +19,47 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class entwicklungsteam
+class entwicklungsteam extends basis_db 
 {
-	var $conn;    // @var resource DB-Handle
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $result = array(); // @var email Objekt
+	public $new;
+	public $result = array();
 	
 	//Tabellenspalten
-	var $mitarbeiter_uid;
-	var $studiengang_kz;
-	var $besqualcode;
-	var $beginn;
-	var $ende;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
-	var $ext_id;
+	public $mitarbeiter_uid;
+	public $studiengang_kz;
+	public $besqualcode;
+	public $beginn;
+	public $ende;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $ext_id;
 	
-	var $besqual;
-	var $studiengang_kz_old;
+	public $besqual;
+	public $studiengang_kz_old;
 	
-	// ***********************************************
-	// * Konstruktor
-	// * @param conn    Connection zur Datenbank
-	// *        mitarbeiter_uid ID des zu ladenden Datensatzes
-	// *        studiengang_kz
-	// ***********************************************
-	function entwicklungsteam($conn, $mitarbeiter_uid=null, $studiengang_kz=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param mitarbeiter_uid ID des zu ladenden Datensatzes
+	 *        studiengang_kz
+	 */
+	public function __construct($mitarbeiter_uid=null, $studiengang_kz=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-		*/
-		if($mitarbeiter_uid != null && $studiengang_kz != null)
+		parent::__construct();
+		
+		if(!is_null($mitarbeiter_uid) && !is_null($studiengang_kz))
 			$this->load($mitarbeiter_uid, $studiengang_kz);
 	}
 	
-	// ***********************************************
-	// * Laedt einen Datensatz
-	// * @param mitarbeiter_uid ID des zu ladenden Datensatzes
-	// *        studiengang_kz
-	// ***********************************************
-	function load($mitarbeiter_uid, $studiengang_kz)
+	/**
+	 * Laedt einen Datensatz
+	 * @param mitarbeiter_uid ID des zu ladenden Datensatzes
+	 *        studiengang_kz
+	 */
+	public function load($mitarbeiter_uid, $studiengang_kz)
 	{
 		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
 		{
@@ -84,11 +68,12 @@ class entwicklungsteam
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) 
+				WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz'";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->studiengang_kz = $row->studiengang_kz;
@@ -101,7 +86,7 @@ class entwicklungsteam
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->besqual = $row->besqualbez;				
-				return true;		
+				return true;
 			}
 			else 
 			{
@@ -116,12 +101,12 @@ class entwicklungsteam
 		}
 	}
 			
-	// **************************************************
-	// * Loescht einen Datensatz
-	// * @param bisverwendung_id ID des zu loeschenden Datensatzes
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************
-	function delete($mitarbeiter_uid, $studiengang_kz)
+	/**
+	 * Loescht einen Datensatz
+	 * @param bisverwendung_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($mitarbeiter_uid, $studiengang_kz)
 	{
 		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
 		{
@@ -129,9 +114,10 @@ class entwicklungsteam
 			return false;
 		}
 		
-		$qry = "DELETE FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid = '".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz';";
+		$qry = "DELETE FROM bis.tbl_entwicklungsteam 
+				WHERE mitarbeiter_uid = '".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz';";
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -143,29 +129,38 @@ class entwicklungsteam
 		}
 	}
 	
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 *
+	 * @return true wenn ok, sonst false
+	 */
+	protected function validate()
 	{
+		if($this->mitarbeiter_uid=='')
+		{
+			$this->errormsg = 'Es muss ein Mitarbeiter angegeben werden';
+			return false;
+		}
+		if($this->studiengang_kz=='')
+		{
+			$this->errormsg = 'Es muss ein Studiengang angegeben werden';
+			return false;
+		}
+		if($this->besqualcode=='')
+		{
+			$this->errormsg = 'BesondereQualifikation muss eingetragen werden';
+			return false;
+		}
 		return true;
 	}
 	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *********************************************************************
-	// * Speichert den aktuellen Datensatz
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************************
-	function save($new=null)
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!$this->validate())
 			return false;
@@ -206,7 +201,7 @@ class entwicklungsteam
 				  " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND studiengang_kz='$this->studiengang_kz_old'";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -217,24 +212,25 @@ class entwicklungsteam
 		}
 	}
 	
-	// ********************************************
-	// * Laedt alle Entwicklungsteameintraege eines Mitarbeiters
-	// * @param $uid UID des Mitarbeiters
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function getEntwicklungsteam($mitarbeiter_uid, $studiengang_kz=null)
+	/*
+	 * Laedt alle Entwicklungsteameintraege eines Mitarbeiters
+	 * @param $uid UID des Mitarbeiters
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getEntwicklungsteam($mitarbeiter_uid, $studiengang_kz=null)
 	{
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) 
+				WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
 		
 		if($studiengang_kz!=null)
 			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new entwicklungsteam($this->conn, null, null, null);
+				$obj = new entwicklungsteam();
 				
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->studiengang_kz = $row->studiengang_kz;
@@ -259,16 +255,21 @@ class entwicklungsteam
 		}
 	}
 	
-	// *****
-	// * Preuft ob der Eintrag schon existiert
-	// *****
-	function exists($mitarbeiter_uid,$studiengang_kz)
+	/**
+	 * Preuft ob der Eintrag schon existiert
+	 * 
+	 * @param $mitarbeiter_uid
+	 * @param $studiengang_kz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function exists($mitarbeiter_uid,$studiengang_kz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry = "SELECT count(*) as anzahl FROM bis.tbl_entwicklungsteam 
+				WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
 					return true;

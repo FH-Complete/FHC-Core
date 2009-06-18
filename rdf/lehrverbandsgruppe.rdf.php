@@ -111,7 +111,7 @@ function draw_orgformpart($stg_kz)
 	$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz not in('VBB','ZGS')";
 	if($stg_obj->db_query($qry))
 	{
-		while($row = $stg_opj->db_fetch_object())
+		while($row = $stg_obj->db_fetch_object())
 		{
 			draw_orgformsubmenu($stg_kz, $row->orgform_kurzbz);
 		}
@@ -122,7 +122,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 {
 	global $conn, $stsem_obj, $rdf_url, $orgform_sequence;
 	
-	$stg_obj = new studiengang($conn, $stg_kz);
+	$stg_obj = new studiengang($stg_kz);
 	$stg_kurzbz = $stg_obj->kuerzel;
 	
 	echo '
@@ -175,7 +175,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 					</RDF:Description>
 
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv" >
-						<VERBAND:name>ZGV erfüllt</VERBAND:name>
+						<VERBAND:name>ZGV erfÃ¼llt</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
 						<VERBAND:stg_kz>'.$stg_kz.'</VERBAND:stg_kz>
 						<VERBAND:stsem>'.$stsem->studiensemester_kurzbz.'</VERBAND:stsem>
@@ -461,7 +461,7 @@ while ($row=$dbo->db_fetch_object())
 			</RDF:Description>
 	
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv'; ?>" >
-				<VERBAND:name>ZGV erfüllt</VERBAND:name>
+				<VERBAND:name>ZGV erfÃ¼llt</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 				<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
