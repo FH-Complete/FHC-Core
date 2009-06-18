@@ -23,86 +23,76 @@
 class prestudent extends person
 {
 	//Tabellenspalten
-	var $prestudent_id;	// varchar(16)
-	var $aufmerksamdurch_kurzbz;
-	var $studiengang_kz;
-	var $berufstaetigkeit_code;
-	var $ausbildungcode;
-	var $zgv_code;
-	var $zgvort;
-	var $zgvdatum;
-	var $zgvmas_code;
-	var $zgvmaort;
-	var $zgvmadatum;
-	var $aufnahmeschluessel;
-	var $facheinschlberuf;
-	var $anmeldungreihungstest;
-	var $reihungstestangetreten;
-	var $reihungstest_id;
-	var $punkte; //rt_gesamtpunkte
-	var $rt_punkte1;
-	var $rt_punkte2;
-	var $bismelden;
-	var $anmerkung;
-	var $ext_id_prestudent;
-	var $dual;
+	public $prestudent_id;	// varchar(16)
+	public $aufmerksamdurch_kurzbz;
+	public $studiengang_kz;
+	public $berufstaetigkeit_code;
+	public $ausbildungcode;
+	public $zgv_code;
+	public $zgvort;
+	public $zgvdatum;
+	public $zgvmas_code;
+	public $zgvmaort;
+	public $zgvmadatum;
+	public $aufnahmeschluessel;
+	public $facheinschlberuf;
+	public $anmeldungreihungstest;
+	public $reihungstestangetreten;
+	public $reihungstest_id;
+	public $punkte; //rt_gesamtpunkte
+	public $rt_punkte1;
+	public $rt_punkte2;
+	public $bismelden;
+	public $anmerkung;
+	public $ext_id_prestudent;
+	public $dual;
 	
-	var $status_kurzbz;
-	var $studiensemester_kurzbz;
-	var $ausbildungssemester;
-	var $datum;
-	var $insertamum;
-	var $insertvon;
-	var $updateamum;
-	var $updatevon;
-	var $orgform_kurzbz;
+	public $status_kurzbz;
+	public $studiensemester_kurzbz;
+	public $ausbildungssemester;
+	public $datum;
+	public $insertamum;
+	public $insertvon;
+	public $updateamum;
+	public $updatevon;
+	public $orgform_kurzbz;
 	
-	var $studiensemester_old='';
-	var $ausbildungssemester_old='';
+	public $studiensemester_old='';
+	public $ausbildungssemester_old='';
 	
 	// ErgebnisArray
-	var $result=array();
-	var $num_rows=0;
+	public $result=array();
+	public $num_rows=0;
 		
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Prestudent
-	// * @param $conn        	Datenbank-Connection
-	// *        $prestudent_id            Prestudent der geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function prestudent($conn, $prestudent_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional einen Prestudent
+	 * @param $prestudent_id Prestudent der geladen werden soll (default=null)
+	 */
+	public function __construct($prestudent_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
-*/		
+		parent::__construct();
+
 		if($prestudent_id != null)
 			$this->load($prestudent_id);
 	}
 	
-	// ***********************************************************
-	// * Laedt Prestudent mit der uebergebenen ID
-	// * @param $uid ID der Person die geladen werden soll
-	// ***********************************************************
-	function load($prestudent_id)
+	/**
+	 * Laedt Prestudent mit der uebergebenen ID
+	 * @param $uid ID der Person die geladen werden soll
+	 */
+	public function load($prestudent_id)
 	{
-		$qry = "SELECT * FROM public.tbl_prestudent WHERE prestudent_id='$prestudent_id'";
-		if($result = pg_query($this->conn, $qry))
+		if(!is_numeric($prestudent_id))
 		{
-			if($row = pg_fetch_object($result))
+			$this->errormsg = 'ID ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_prestudent WHERE prestudent_id='$prestudent_id'";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
 			{
 				$this->prestudent_id = $row->prestudent_id;
 				$this->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
@@ -147,12 +137,12 @@ class prestudent extends person
 		}		
 	}
 	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern 
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if($this->punkte>9999.9999)
 		{
@@ -172,13 +162,13 @@ class prestudent extends person
 		return true;
 	}
 	
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
-	function save()
+	/**
+	 * Speichert die Benutzerdaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten der Datensatz mit $uid upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Personen Datensatz speichern
 		//if(!person::save())
@@ -250,30 +240,30 @@ class prestudent extends person
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				$qry = "SELECT currval('public.tbl_prestudent_prestudent_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->prestudent_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}						
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK;');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -287,13 +277,13 @@ class prestudent extends person
 		}
 	}
 
-	// ******************************************************************
-	// * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.
-	// * Wenn $equal auf true gesetzt ist wird genau dieses Datum verwendet,
-	// * ansonsten werden auch alle mit späterem Datum geladen.
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************	
-	function getPrestudentRT($datum, $equal=false)
+	/**
+	 * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.
+	 * Wenn $equal auf true gesetzt ist wird genau dieses Datum verwendet,
+	 * ansonsten werden auch alle mit späterem Datum geladen.
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getPrestudentRT($datum, $equal=false)
 	{
 		$sql_query='SELECT DISTINCT * FROM public.vw_prestudent WHERE rt_datum';
 		if ($equal)
@@ -302,7 +292,7 @@ class prestudent extends person
 			$sql_query.='>=';
 		$sql_query.="'$datum' ORDER BY nachname,vorname";
 		
-		if(!$result=pg_query($this->conn,$sql_query))
+		if(!$this->db_query($sql_query))
 		{	
 			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$sql_query;
 			return false;
@@ -310,9 +300,9 @@ class prestudent extends person
 		
 		$this->num_rows=0;
 		
-		while($row = pg_fetch_object($result))
+		while($row = $this->db_fetch_object())
 		{
-			$ps=new prestudent($this->conn);
+			$ps=new prestudent();
 			$ps->prestudent_id = $row->prestudent_id;
 			$ps->person_id = $row->person_id;
 			$ps->reihungstest_id = $row->reihungstest_id;
@@ -366,14 +356,14 @@ class prestudent extends person
 			//$ps->ext_id_prestudent = $row->ext_id_prestudent;
 			$this->result[]=$ps;
 			$this->num_rows++; 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	
-		}	
-		
+		}
+		return true;		
 	}
 	
-	// ********
-	// * Laedt die Rolle(n) eines Prestudenten
-	// ********
-	function getPrestudentRolle($prestudent_id, $status_kurzbz=null, $studiensemester_kurzbz=null, $order="datum, insertamum", $ausbildungssemester=null)
+	/**
+	 * Laedt die Rolle(n) eines Prestudenten
+	 */
+	public function getPrestudentRolle($prestudent_id, $status_kurzbz=null, $studiensemester_kurzbz=null, $order="datum, insertamum", $ausbildungssemester=null)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -390,11 +380,11 @@ class prestudent extends person
 			$qry.= " AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
 		$qry.= ' ORDER BY '.$order;
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$rolle = new prestudent($this->conn, null, null);
+				$rolle = new prestudent();
 				
 				$rolle->prestudent_id = $row->prestudent_id;
 				$rolle->status_kurzbz = $row->status_kurzbz;
@@ -418,10 +408,16 @@ class prestudent extends person
 		}
 	}
 	
-	// ********
-	// * Laedt die Rolle(n) eines Prestudenten
-	// ********
-	function load_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
+	/**
+	 * Laedt die Rolle
+	 *
+	 * @param $prestudent_id
+	 * @param $status_kurzbz
+	 * @param $studiensemester_kurzbz
+	 * @param $ausbildungssemester
+	 * @return boolean
+	 */
+	public function load_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		if(!is_numeric($prestudent_id) || $prestudent_id=='')
 		{
@@ -434,9 +430,9 @@ class prestudent extends person
 			   " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'".
 			   " AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{								
 				$this->prestudent_id = $row->prestudent_id;
 				$this->status_kurzbz = $row->status_kurzbz;
@@ -464,12 +460,12 @@ class prestudent extends person
 		}
 	}
 	
-	// *******************************************************************************
-	// * Laedt die Interessenten und Bewerber fuer ein bestimmtes Studiensemester
-	// * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
-	// *                                geladen werden sollen
-	// *******************************************************************************
-	function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null, $orgform=null)
+	/**
+	 * Laedt die Interessenten und Bewerber fuer ein bestimmtes Studiensemester
+	 * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
+	 *                                geladen werden sollen
+	 */
+	public function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null, $orgform=null)
 	{
 		$qry = "SELECT 
 					*, a.anmerkung, tbl_person.anmerkung as anmerkungen 
@@ -531,11 +527,11 @@ class prestudent extends person
 		}
 		
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$ps = new prestudent($this->conn, null, null);
+				$ps = new prestudent();
 				
 				$ps->person_id = $row->person_id;
 				$ps->staatsbuergerschaft = $row->staatsbuergerschaft;
@@ -600,16 +596,16 @@ class prestudent extends person
 		}
 	}
 	
-	// ********************************************************
-	// * Prueft ob eine Person bereits einen PreStudenteintrag
-	// * fuer einen Studiengang besitzt
-	// * @param person_id
-	// *        studiengang_kz
-	// * @return true wenn vorhanden
-	// *		 false wenn nicht vorhanden
-	// *		 false und errormsg wenn Fehler aufgetreten ist
-	// *********************************************************         
-	function exists($person_id, $studiengang_kz)
+	/**
+	 * Prueft ob eine Person bereits einen PreStudenteintrag
+	 * fuer einen Studiengang besitzt
+	 * @param person_id
+	 *        studiengang_kz
+	 * @return true wenn vorhanden
+	 *		 false wenn nicht vorhanden
+	 *		 false und errormsg wenn Fehler aufgetreten ist
+	 */
+	public function exists($person_id, $studiengang_kz)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -623,10 +619,11 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE person_id='$person_id' AND studiengang_kz='$studiengang_kz'";
-		if($result = pg_query($this->conn, $qry))
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent 
+				WHERE person_id='$person_id' AND studiengang_kz='$studiengang_kz'";
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{	
 				if($row->anzahl>0)
 				{
@@ -652,11 +649,11 @@ class prestudent extends person
 		}
 	}
 	
-	// *******************************************
-	// * Speichert die Prestudentrolle
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function save_rolle()
+	/**
+	 * Speichert die Prestudentrolle
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save_rolle()
 	{
 		if($this->new)
 		{
@@ -704,7 +701,7 @@ class prestudent extends person
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND status_kurzbz='".addslashes($this->status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_old)."' AND ausbildungssemester='".addslashes($this->ausbildungssemester_old)."';";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -716,14 +713,14 @@ class prestudent extends person
 		}
 	}
 	
-	// ******************************************
-	// * Loescht eine Rolle
-	// * @param $prestudent_id
-	// *        $status_kurzbz
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false wenn Fehler
-	// ******************************************
-	function delete_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
+	/**
+	 * Loescht eine Rolle
+	 * @param $prestudent_id
+	 *        $status_kurzbz
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function delete_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -734,9 +731,9 @@ class prestudent extends person
 		$qry = "DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id' AND status_kurzbz='".addslashes($status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
 		if($this->load_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester))
 		{
-			pg_query($this->conn, 'BEGIN;');
+			$this->db_query('BEGIN;');
 			
-			$log = new log($this->conn, null, null);
+			$log = new log();
 			
 			$log->executetime = date('Y-m-d H:i:s');
 			$log->beschreibung = 'Loeschen der Rolle '.$status_kurzbz.' bei '.$prestudent_id;
@@ -758,21 +755,21 @@ class prestudent extends person
 			if($log->save(true))
 			{
 						
-				if(pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					pg_query($this->conn, 'COMMIT');
+					$this->db_query('COMMIT');
 					return true;
 				}
 				else 
 				{
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					$this->errormsg = 'Fehler beim Loeschen der Daten';
 					return false;
 				}
 			}
 			else 
 			{
-				pg_query($this->conn, 'ROLLBACK');
+				$this->db_query('ROLLBACK');
 				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 				return false;
 			}
@@ -782,8 +779,15 @@ class prestudent extends person
 			return false;
 		}			
 	}
-		
-	function getLastStatus($prestudent_id, $studiensemester_kurzbz='')
+	
+	/**
+	 * Liefert den Letzten Status eines Prestudenten in einem Studiensemester
+	 * Wenn kein Studiensemester angegeben wird, wird der letztgueltige Status ermittelt
+	 * @param $prestudent_id
+	 * @param $studiensemester_kurzbz
+	 * @return boolean
+	 */
+	public function getLastStatus($prestudent_id, $studiensemester_kurzbz='')
 	{
 		if($prestudent_id=='' || !is_numeric($prestudent_id))
 		{
@@ -794,12 +798,12 @@ class prestudent extends person
 		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'";
 
 		if($studiensemester_kurzbz!='')
-			$qry.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
 		$qry.=" ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{				
 				$this->prestudent_id = $row->prestudent_id;
 				$this->status_kurzbz = $row->status_kurzbz;
@@ -826,11 +830,11 @@ class prestudent extends person
 		}
 	}
 	
-	// **********************************************
-	// * Laedt alle Prestudenten der Person
-	// * @return true wenn ok, false wenn Fehler
-	// **********************************************
-	function getPrestudenten($person_id)
+	/**
+	 * Laedt alle Prestudenten der Person
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getPrestudenten($person_id)
 	{
 		if(!is_numeric($person_id) || $person_id=='')
 		{
@@ -840,11 +844,11 @@ class prestudent extends person
 		
 		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id='$person_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new prestudent($this->conn, null, null);
+				$obj = new prestudent();
 				
 				$obj->prestudent_id = $row->prestudent_id;
 				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;

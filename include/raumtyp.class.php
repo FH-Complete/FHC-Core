@@ -23,51 +23,50 @@
  * Klasse ortraumtyp (FAS-Online)
  * @create 04-12-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class raumtyp
+class raumtyp extends basis_db
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt
+	public $new;     			//  boolean
+	public $result = array(); 	//  fachbereich Objekt
 
 	//Tabellenspalten
-	var $beschreibung;		// @var string
-	var $raumtyp_kurzbz;	// @var string
+	public $beschreibung;		//  string
+	public $raumtyp_kurzbz;		//  string
 
 
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $ort_kurzbz und hierarchie ID des zu ladenden OrtRaumtyps
+	 * @param $ort_kurzbz und hierarchie ID des zu ladenden Raumtyps
 	 */
-	function raumtyp($conn, $raumtyp_kurzbz=null)
+	public function __construct($raumtyp_kurzbz=null)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		
 		if($raumtyp_kurzbz != null)
 			$this->load($raumtyp_kurzbz);
 	}
 
 	/**
-	 * Laedt alle verfuegbaren OrtRaumtypen
+	 * Laedt alle verfuegbaren Raumtypen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
-		$qry = 'SELECT * FROM public.tbl_raumtyp order by raumtyp_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz;';
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$raumtyp_obj = new raumtyp($this->conn);
+			$raumtyp_obj = new raumtyp();
 
-			$raumtyp_obj->beschreibung 	= $row->beschreibung;
-			$raumtyp_obj->raumtyp_kurzbz 	= $row->raumtyp_kurzbz;
+			$raumtyp_obj->beschreibung = $row->beschreibung;
+			$raumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
 
 
 			$this->result[] = $raumtyp_obj;
@@ -80,7 +79,7 @@ class raumtyp
 	 * @param $raumtyp ID des zu ladenden Raumtyps
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($raumtyp_kurzbz)
+	public function load($raumtyp_kurzbz)
 	{
 		if($raumtyp_kurzbz == '')
 		{
@@ -88,15 +87,15 @@ class raumtyp
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_raumtyp WHERE raumtyp_kurzbz = '$raumtyp_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_raumtyp WHERE raumtyp_kurzbz = '".addslashes($raumtyp_kurzbz)."';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row=pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->beschreibung 	= $row->beschreibung;
 			$this->raumtyp_kurzbz 	= $row->kurzbz;
@@ -112,51 +111,39 @@ class raumtyp
 	}
 
 	/**
-	 * Loescht einen Datensatz
-	 * @param $raumtyp_kurzbz ID des Datensatzes der geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($raumtyp_kurzbz)
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	public function validate()
 	{
-		$this->beschreibung = str_replace("'",'´',$this->beschreibung);
-		$this->raumtyp_kurzbz = str_replace("'",'´',$this->raumtyp_kurzbz);
-
-
 		//Laenge Pruefen
 		if(strlen($this->beschreibung)>256)
 		{
-			$this->errormsg = "Beschreibung darf nicht laenger als 256 Zeichen sein bei <b>$this->raumtyp_kurzbz</b> - ".$this->beschreibung;
+			$this->errormsg = 'Beschreibung darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->raumtyp_kurzbz)>8)
 		{
-			$this->errormsg = "Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->raumtyp_kurzbz</b>";
+			$this->errormsg = 'Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein';
+			return false;
+		}
+		if($this->raumtyp_kurzbz == '')
+		{
+			$this->errormsg = 'Keine gültige Kurzbz';
 			return false;
 		}
 		$this->errormsg = '';
 		return true;
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($this->new)
@@ -176,38 +163,13 @@ class raumtyp
 		else
 		{
 			//bestehenden Datensatz akualisieren
-
-			//Pruefen ob id gueltig ist
-			if($this->raumtyp_kurzbz == '')
-			{
-				$this->errormsg = 'Keine gültige ID';
-				return false;
-			}
-
 			$qry = 'UPDATE public.tbl_raumtyp SET '.
 				'beschreibung='.$this->addslashes($this->beschreibung).' '.
 				'WHERE raumtyp_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else

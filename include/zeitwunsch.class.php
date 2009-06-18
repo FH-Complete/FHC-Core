@@ -19,86 +19,61 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class zeitwunsch
+class zeitwunsch extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $zeitwuensche = array(); // zeitwunsch Objekt
+	public $conn;     // resource DB-Handle
+	public $errormsg; // string
+	public $new;      // boolean
+	public $zeitwuensche = array(); // zeitwunsch Objekt
 
 	//Tabellenspalten
-	var $stunde;			// smalint
-	var $mitarbeiter_uid;	// varchar(32)
-	var $tag;				// smalint
-	var $gewicht;			// smalint
-	var $min_stunde;
-	var $max_stunde;
+	public $stunde;			// smalint
+	public $mitarbeiter_uid;	// varchar(32)
+	public $tag;				// smalint
+	public $gewicht;			// smalint
+	public $min_stunde;
+	public $max_stunde;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
-	// * @param $conn        	Datenbank-Connection
-	// *        $uid			Uid des Mitarbeiters
-	// *        $tag            Tag des Zeitwunsches
-	// *        $stunde         Stunde des Zeitwunsches
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function zeitwunsch($conn, $mitarbeiter_uid=null, $tag=null, $stunde=null, $unicode=false)
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	 */
+	public function __construct()
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		// ggf Mitarbeiter laden
-		if($mitarbeiter_uid != null && $tag!=null && $stunde!=null)
-			$this->load($mitarbeiter_uid, $tag, $stunde);
-
+		parent::__construct();
+		
 		$this->init();
 	}
 
-	function init()
+	/**
+	 * Initialisierung
+	 *
+	 */
+	private function init()
 	{
 		// Stundenraster abfragen
 		$sql='SELECT min(stunde) AS min_stunde,max(stunde) AS max_stunde FROM lehre.tbl_stunde;';
-		if(!$result=pg_query($this->conn, $sql))
+		if(!$this->db_query($sql))
 		{
-			$this->errormsg=pg_last_error($this->conn);
+			$this->errormsg=$this->db_last_error();
 			return false;
 		}
 		else
 		{
-			$row=pg_fetch_object($result);
+			$row=$this->db_fetch_object();
 			$this->min_stunde=$row->min_stunde;
 			$this->max_stunde=$row->max_stunde;
 		}
 		return true;
 	}
 
-	// *********************************************************
-	// * Laedt einen Zeitwunsch
-	// * @param
-	// *********************************************************
-	function load($mitarbeiter_uid, $tag, $stunde)
-	{
-		return true;
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->mitarbeiter_uid)>32)
 		{
@@ -128,25 +103,14 @@ class zeitwunsch
 
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert einen Zeitwunsch in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	
+	/**
+	 * Speichert einen Zeitwunsch in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -166,9 +130,8 @@ class zeitwunsch
 			         tag=".$this->tag.' AND stunde='.$this->stunde;
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			//Log schreiben
 			return true;
 		}
 		else
@@ -180,18 +143,20 @@ class zeitwunsch
 
 	/**
 	 * Zeitwunsch einer Person laden
+	 * @param uid
+	 * @param datum
 	 * @return boolean Ergebnis steht in Array $zeitwunsch wenn true
 	 */
-	function loadPerson($uid,$datum=null)
+	public function loadPerson($uid,$datum=null)
 	{
 		// Zeitwuensche abfragen
-		if(!$result=pg_query($this->conn, "SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'"))
+		if(!$this->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='".addslashes($uid)."'"))
 		{
-			$this->errormsg=pg_last_error($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 		else
-			while ($row=pg_fetch_object($result))
+			while ($row = $this->db_fetch_object())
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
 
 		if (!is_null($datum))
@@ -203,15 +168,15 @@ class zeitwunsch
 			// Zeitsperren abfragen
 			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
 				FROM campus.tbl_zeitsperre
-				WHERE mitarbeiter_uid='$uid' AND vondatum<='$ende' AND bisdatum>'$start'";
-			if(!$result=pg_query($this->conn, $sql))
+				WHERE mitarbeiter_uid='".addslashes($uid)."' AND vondatum<='$ende' AND bisdatum>'$start'";
+			if(!$this->db_query($sql))
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg=$this->db_last_error();
 				return false;
 			}
 			else
 			{
-				while ($row=pg_fetch_object($result))
+				while($row = $this->db_fetch_object())
 				{
 					$beginn=montag($datum);
 					for ($i=1;$i<=7;$i++)
@@ -257,7 +222,7 @@ class zeitwunsch
 	 * Zeitwunsch der Personen in Lehreinheiten laden
 	 * @return true oder false
 	 */
-	function loadZwLE($le_id,$datum=null)
+	public function loadZwLE($le_id,$datum=null)
 	{
 		//$this->init();
 		// SUB-Select fuer LVAs
@@ -273,13 +238,13 @@ class zeitwunsch
 				FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid IN ('.$sql_query_le.') GROUP BY tag,stunde';
 
 		// Zeitwuensche abfragen
-		if(!$result=pg_query($this->conn, $sql_query))
+		if(!$this->db_query($sql_query))
 		{
-			$this->errormsg=pg_last_error($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 		else
-			while ($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
 
 		// ***********************************************************
@@ -295,12 +260,12 @@ class zeitwunsch
 			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
 				FROM campus.tbl_zeitsperre
 				WHERE mitarbeiter_uid IN ($sql_query_le) AND vondatum<='$ende' AND bisdatum>'$start'";
-			if(!$result=pg_query($this->conn, $sql))
+			if(!$this->db_query($sql))
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg = $this->db_last_error();
 				return false;
 			}
-			while ($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
 				$beginn=montag($datum);
 				for ($i=1;$i<=7;$i++)
@@ -339,6 +304,5 @@ class zeitwunsch
 		}
 		return true;
 	}
-
 }
 ?>

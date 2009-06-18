@@ -30,25 +30,25 @@
 
 class mail
 {
-	var $to;
-	var $CC_recievers;
-	var $BCC_recievers;
-	var $sender;
-	var $replyTo;
-	var $subject;
-	var $textContent;
-	var $htmlContent;
-	var $attachments;
-	var $errormsg;
+	public $to;
+	public $CC_recievers;
+	public $BCC_recievers;
+	public $sender;
+	public $replyTo;
+	public $subject;
+	public $textContent;
+	public $htmlContent;
+	public $attachments;
+	public $errormsg;
 	
-	// **********************************************************
-	// * MAIL - Konstruktor
-	// * $to Empfaenger
-	// * $from Absender
-	// * $subject Betreff
-	// * $text Text des Mails
-	// ********************************************************** 
-	function mail($to, $from, $subject, $text)
+	/**
+	 * MAIL - Konstruktor
+	 * $to Empfaenger
+	 * $from Absender
+	 * $subject Betreff
+	 * $text Text des Mails
+	 */
+	public function __construct($to, $from, $subject, $text)
 	{
 		$this->to = $to;
 		$this->subject = $subject;
@@ -59,10 +59,10 @@ class mail
 		$attachments='';
 	}
 
-	// ***********************************************************
-	// * Mail zusammenbauen und senden
-	// ***********************************************************
-	function send()
+	/**
+	 * Mail zusammenbauen und senden
+	 */
+	public function send()
 	{
 		//wenn MAIL_DEBUG gesetzt ist dann alles an diese Adresse schicken
 		if(MAIL_DEBUG!='')
@@ -151,10 +151,10 @@ class mail
 			return false;		
 	}
 
-	// **********************************************
-	// * Setzt den Text fuer ein Mail
-	// **********************************************
-	function setTextContent($text, $charset = 'UTF-8', $encoding = '8bit')
+	/**
+	 * Setzt den Text fuer ein Mail
+	 */
+	public function setTextContent($text, $charset = 'UTF-8', $encoding = '8bit')
 	{
 		$this->textContent[0] = $text;
 		$this->textContent[1] = $charset;
@@ -162,10 +162,10 @@ class mail
 		return true;
 	}
 	
-	// **********************************************
-	// * Setzt den HTMLText fuer ein Mail
-	// **********************************************	
-	function setHTMLContent($html, $charset = 'UTF-8', $encoding = '8bit')
+	/**
+	 * Setzt den HTMLText fuer ein Mail
+	 */
+	public function setHTMLContent($html, $charset = 'UTF-8', $encoding = '8bit')
 	{
 		$this->htmlContent[0] = $html;
 		$this->htmlContent[1] = $charset;
@@ -176,14 +176,14 @@ class mail
 		return true;
 	}
 
-	// ***********************************************
-	// * Fuegt ein Attachment zum Mail hinzu
-	// * $file Dateiname des hinzuzufuegenden Files
-	// * $type MIME Type "application/xls"
-	// * $name Anzeigename des Files
-	// * $ContentID die ContentID der Datei falls sie als inline-image genutzt wird
-	// ***********************************************
-	function addAttachmentBinary($file, $type, $name, $ContentID = "")
+	/**
+	 * Fuegt ein Attachment zum Mail hinzu
+	 * $file Dateiname des hinzuzufuegenden Files
+	 * $type MIME Type "application/xls"
+	 * $name Anzeigename des Files
+	 * $ContentID die ContentID der Datei falls sie als inline-image genutzt wird
+	 */
+	public function addAttachmentBinary($file, $type, $name, $ContentID = "")
 	{
 		if (!file_exists($file)) 
 		{
@@ -206,19 +206,19 @@ class mail
 		return true;
 	}
 	
-	// ********************************************
-	// * Setzt den ReplyTo
-	// ********************************************
-	function setReplyTo($repl)
+	/**
+	 * Setzt den ReplyTo
+	 */
+	public function setReplyTo($repl)
 	{
 		$this->replyTo = $repl;
 		return true;
 	}
 	
-	// ********************************************
-	// * Setzt die CC Empfaenger
-	// ********************************************
-	function setCCRecievers($rcvs)
+	/**
+	 * Setzt die CC Empfaenger
+	 */
+	public function setCCRecievers($rcvs)
 	{
 		$this->CC_recievers = '';
 		if (is_array($rcvs)) 
@@ -234,10 +234,10 @@ class mail
 		return true;
 	}
 	
-	// ********************************************
-	// * Setzt die BCC Empfaenger
-	// ********************************************
-	function setBCCRecievers($rcvs)
+	/**
+	 * Setzt die BCC Empfaenger
+	 */
+	public function setBCCRecievers($rcvs)
 	{
 		$this->BCC_recievers = '';
 		if (is_array($rcvs)) 

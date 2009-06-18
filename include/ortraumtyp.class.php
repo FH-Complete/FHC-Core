@@ -23,27 +23,27 @@
  * Klasse ortraumtyp (FAS-Online)
  * @create 04-12-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class ortraumtyp
+class ortraumtyp extends basis_db
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt
+	public $new;     			// boolean
+	public $result = array(); 	// fachbereich Objekt
 
 	//Tabellenspalten
-	var $ort_kurzbz;		// @var string
-	var $hierarchie;		// @var smallint
-	var $raumtyp_kurzbz;	// @var string
+	public $ort_kurzbz;		// string
+	public $hierarchie;		// smallint
+	public $raumtyp_kurzbz;	// string
 
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
 	 *        $ort_kurzbz und hierarchie ID des zu ladenden OrtRaumtyps
 	 */
-	function ortraumtyp($conn, $ort_kurzbz=null, $hierarchie=0)
+	public function __construct($ort_kurzbz=null, $hierarchie=0)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		
 		if($ort_kurzbz != null && $hierarchie!=null && is_numeric($hierarchie))
 			$this->load($ort_kurzbz, $hierarchie);
 	}
@@ -52,19 +52,19 @@ class ortraumtyp
 	 * Laedt alle verfuegbaren OrtRaumtypen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
-		$qry = 'SELECT * FROM public.tbl_ortraumtyp order by ort_kurzbz, hierarchie;';
+		$qry = 'SELECT * FROM public.tbl_ortraumtyp ORDER BY ort_kurzbz, hierarchie;';
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$ortraumtyp_obj = new ort($this->conn);
+			$ortraumtyp_obj = new ort();
 
 			$ortraumtyp_obj->ort_kurzbz 	= $row->ort_kurzbz;
 			$ortraumtyp_obj->hierarchie 	= $row->hierarchie;
@@ -80,7 +80,7 @@ class ortraumtyp
 	 * @param $ortraumtyp, hierarchie ID des zu ladenden OrtRaumtyps
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($ort_kurzbz, $hierarchie)
+	public function load($ort_kurzbz, $hierarchie)
 	{
 		if($ort_kurzbz == '' || !is_numeric($hierarchie) || $hierarchie=='')
 		{
@@ -88,15 +88,15 @@ class ortraumtyp
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_ortraumtyp WHERE ort_kurzbz = '$ort_kurzbz' AND hierarchie = '$hierarchie';";
+		$qry = "SELECT * FROM public.tbl_ortraumtyp WHERE ort_kurzbz = '".addslashes($ort_kurzbz)."' AND hierarchie = '".addslashes($hierarchie)."';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row=pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->ort_kurzbz 		= $row->ort_kurzbz;
 			$this->hierarchie 		= $row->hierarchie;
@@ -110,53 +110,36 @@ class ortraumtyp
 
 		return true;
 	}
-
-	/**
-	 * Loescht einen Datensatz
-	 * @param $ort_kurzbz, hierarchie ID des Datensatzes der geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($ort_kurzbz)
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
+	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	public function validate()
 	{
-		$this->ort_kurzbz = str_replace("'",'´',$this->ort_kurzbz);
-		$this->raumtyp_kurzbz = str_replace("'",'´',$this->raumtyp_kurzbz);
-
-
 		//Laenge Pruefen
 		if(strlen($this->ort_kurzbz)>8)
 		{
-			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->kurzbz, $hierarchie</b>";
+			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->raumtyp_kurzbz)>8)
 		{
-			$this->errormsg = "Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein bei <b>$this->kurzbz, $hierarchie</b> - $this->raumtyp_kurzbz";
+			$this->errormsg = 'Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
 		}
 		$this->errormsg = '';
 		return true;
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($this->new)
@@ -190,25 +173,8 @@ class ortraumtyp
 				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).' AND hierarchie = '.$this->addslashes($this->hierarchie).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else

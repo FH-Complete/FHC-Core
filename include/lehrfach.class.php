@@ -19,103 +19,86 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lehrfach
+class lehrfach extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $lehrfaecher = array(); // lehrfach Objekt
+	public $new;      // boolean
+	public $lehrfaecher = array(); // lehrfach Objekt
 
 	//Tabellenspalten
-	var $lehrfach_id;		// integer
-	var $studiengang_kz;	// integer
-	var $fachbereich_kurzbz;// integer
-	var $kurzbz;			// varchar(12)
-	var $bezeichnung;		// varchar(255)
-	var $farbe;				// char(6)
-	var $aktiv;				// boolean
-	var $semester;			// smallint
-	var $sprache;			// varchar(16)
-	var $ext_id;
+	public $lehrfach_id;		// integer
+	public $studiengang_kz;		// integer
+	public $fachbereich_kurzbz;	// integer
+	public $kurzbz;				// varchar(12)
+	public $bezeichnung;		// varchar(255)
+	public $farbe;				// char(6)
+	public $aktiv;				// boolean
+	public $semester;			// smallint
+	public $sprache;			// varchar(16)
+	public $ext_id;
 
-	// ***********************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional ein LF
-	// * @param $conn        Datenbank-Connection
-	// *        $lehrfach_nr Lehrfach das geladen werden soll (default=null)
-	// *        $unicode     Gibt an ob die Daten mit UNICODE Codierung
-	// *                     oder LATIN9 Codierung verarbeitet werden sollen
-	// ***********************************************************************
-	function lehrfach($conn, $lehrfach_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional ein Lehrfach
+	 * @param $lehrfach_nr Lehrfach das geladen werden soll (default=null)
+	 */
+	public function __construct($lehrfach_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($lehrfach_id != null)
+		parent::__construct();
+		
+		if(!is_null($lehrfach_id))
 			$this->load($lehrfach_id);
 	}
 
-	// *********************************************************
-	// * Laedt Lehrfach mit der uebergebenen ID
-	// * @param $lehrfach_nr Nr des LF das geladen werden soll
-	// *********************************************************
-	function load($lehrfach_id)
+	/**
+	 * Laedt Lehrfach mit der uebergebenen ID
+	 * @param $lehrfach_id ID des LF das geladen werden soll
+	 */
+	public function load($lehrfach_id)
 	{
-		//lehrfach_nr auf Gueltigkeit pruefen
-		if(is_numeric($lehrfach_id) && $lehrfach_id!='')
-		{
-			$qry = "SELECT * FROM lehre.tbl_lehrfach WHERE lehrfach_id='$lehrfach_id'";
-
-			if(!$result=pg_query($this->conn,$qry))
-			{
-				$this->errormsg = 'Fehler beim lesen des Lehrfaches';
-				return false;
-			}
-
-			if($row = pg_fetch_object($result))
-			{
-				$this->lehrfach_id = $row->lehrfach_id;
-				$this->studiengang_kz = $row->studiengang_kz;
-				$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
-				$this->kurzbz = $row->kurzbz;
-				$this->bezeichnung = $row->bezeichnung;
-				$this->farbe = $row->farbe;
-				$this->aktiv = ($row->aktiv=='t'?true:false);
-				$this->semester = $row->semester;
-				$this->sprache = $row->sprache;
-				$this->ext_id = $row->ext_id;
-			}
-			else
-			{
-				$this->errormsg = 'Es ist kein Lehrfach mit der ID '.$lehrfach_id.' vorhanden';
-				return false;
-			}
-
-			return true;
-		}
-		else
+		//lehrfach_id auf Gueltigkeit pruefen
+		if(!is_numeric($lehrfach_id) && $lehrfach_id!='')
 		{
 			$this->errormsg = 'Die lehrfach_nr muss eine gueltige Zahl sein';
 			return false;
 		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehrfach WHERE lehrfach_id='$lehrfach_id'";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Lesen des Lehrfaches';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->lehrfach_id = $row->lehrfach_id;
+			$this->studiengang_kz = $row->studiengang_kz;
+			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+			$this->kurzbz = $row->kurzbz;
+			$this->bezeichnung = $row->bezeichnung;
+			$this->farbe = $row->farbe;
+			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->semester = $row->semester;
+			$this->sprache = $row->sprache;
+			$this->ext_id = $row->ext_id;
+		}
+		else
+		{
+			$this->errormsg = 'Es ist kein Lehrfach mit dieser ID vorhanden';
+			return false;
+		}
+
+		return true;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->studiengang_kz))
 		{
@@ -160,25 +143,14 @@ class lehrfach
 
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert das Lehrfach in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	
+	/**
+	 * Speichert das Lehrfach in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -222,34 +194,34 @@ class lehrfach
 			       " WHERE lehrfach_id='$this->lehrfach_id'";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				if($this->lehrfach_id=='')
 				{
 					$qry = "SELECT currval('lehre.tbl_lehrfach_lehrfach_id_seq') as id";
-					if($result = pg_query($this->conn, $qry))
+					if($this->db_query($qry))
 					{
-						if($row = pg_fetch_object($result))
+						if($row = $this->db_fetch_object())
 						{
 							$this->lehrfach_id = $row->id;
 						}
 						else 
 						{
 							$this->errormsg = 'Fehler beim Auslesen der Sequence';
-							pg_query($this->conn, 'ROLLBACK');
+							$this->db_query('ROLLBACK');
 							return false;
 						}
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
-				pg_query($this->conn, 'COMMIT');
+				$this->db_query('COMMIT');
 			}
 			//Log schreiben
 			return true;
@@ -263,13 +235,13 @@ class lehrfach
 
 	/**
 	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
-	 * @param 	$stg Studiengangs_kz
-	 *			$sem Semester
-	 *			$order Sortierkriterium
-	 *			$fachb fachbereich_kurzbz
+	 * @param $stg Studiengangs_kz
+	 * @param $sem Semester
+	 * @param $order Sortierkriterium
+	 * @param $fachb fachbereich_kurzbz
 	 * @return array mit Lehrfaechern oder false=fehler
 	 */
-	function getTab($stg=null,$sem=null, $order='lehrfach_id', $fachb=null)
+	public function getTab($stg=null,$sem=null, $order='lehrfach_id', $fachb=null)
 	{
 		if($stg!=null && !is_numeric($stg))
 		{
@@ -287,21 +259,21 @@ class lehrfach
 		   $sql_query .= " WHERE true";
 
 		if($stg!=null)
-		   $sql_query .= " AND studiengang_kz='$stg'";
+		   $sql_query .= " AND studiengang_kz='".addslashes($stg)."'";
 
 		if($sem!=null)
-			$sql_query .= " AND semester='$sem'";
+			$sql_query .= " AND semester='".addslashes($sem)."'";
 
 		if($fachb!=null)
 			$sql_query .= " AND fachbereich_kurzbz='".addslashes($fachb)."'";
 
 		$sql_query .= " ORDER BY $order";
 
-		if($result=pg_query($this->conn,$sql_query))
+		if($this->db_query($sql_query))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$l = new lehrfach($this->conn);
+				$l = new lehrfach();
 				$l->lehrfach_id = $row->lehrfach_id;
 				$l->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$l->kurzbz = $row->kurzbz;
@@ -321,7 +293,7 @@ class lehrfach
 		}
 		else
 		{
-			$this->errormsg = pg_errormessage($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 		return true;

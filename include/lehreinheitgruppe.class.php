@@ -19,61 +19,43 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lehreinheitgruppe
+class lehreinheitgruppe extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $lehreinheitgruppe = array(); // lehreinheitgruppe Objekt
+	public $new;      // boolean
+	public $lehreinheitgruppe = array(); // lehreinheitgruppe Objekt
 
 	//Tabellenspalten
-	var $lehreinheitgruppe_id;	//integer
-	var $lehreinheit_id;		// integer
-	var $studiengang_kz;		// integer
-	var $semester;				// smalint
-	var $verband;				// char(1)
-	var $gruppe;				// char(1)
-	var $gruppe_kurzbz;			// varchar(16)
-	var $ext_id;				// bigint
-	var $updateamum;			// timestamp
-	var $updatevon;				// varchar(16)
-	var $insertamum;			// timestamp
-	var $insertvon;				// varchar(16)
+	public $lehreinheitgruppe_id;	//integer
+	public $lehreinheit_id;		// integer
+	public $studiengang_kz;		// integer
+	public $semester;				// smalint
+	public $verband;				// char(1)
+	public $gruppe;				// char(1)
+	public $gruppe_kurzbz;			// varchar(16)
+	public $ext_id;				// bigint
+	public $updateamum;			// timestamp
+	public $updatevon;				// varchar(16)
+	public $insertamum;			// timestamp
+	public $insertvon;				// varchar(16)
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
-	// * @param $conn        	Datenbank-Connection
-	// *        $gruppelehreinheit_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function lehreinheitgruppe($conn, $lehreinheitgruppe_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional eine LEGruppe
+	 * @param $lehreinheitgruppe_id
+	 */
+	public function __construct($lehreinheitgruppe_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
-	*/		
-		if($lehreinheitgruppe_id!=null)
+		parent::__construct();
+		
+		if(!is_null($lehreinheitgruppe_id))
 			$this->load($lehreinheitgruppe_id);
 	}
 
-	// *********************************************************
-	// * Laedt die LEGruppe
-	// * @param lehreinheit_id
-	// *********************************************************
+	/**
+	 * Laedt die LEGruppe
+	 * @param lehreinheit_id
+	 */
 	function load($lehreinheitgruppe_id)
 	{
 		if(!is_numeric($lehreinheitgruppe_id))
@@ -83,9 +65,9 @@ class lehreinheitgruppe
 		}
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->lehreinheitgruppe_id = $row->lehreinheitgruppe_id;
 				$this->lehreinheit_id = $row->lehreinheit_id;
@@ -102,6 +84,11 @@ class lehreinheitgruppe
 				
 				return true;
 			}
+			else 
+			{
+				$this->errormsg = 'Es existiert kein Eintrag mit dieser ID';
+				return false;
+			}
 		}
 		else
 		{
@@ -110,12 +97,12 @@ class lehreinheitgruppe
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->lehreinheit_id))
 		{
@@ -150,24 +137,13 @@ class lehreinheitgruppe
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert GruppeLE in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert GruppeLE in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -178,7 +154,6 @@ class lehreinheitgruppe
 
 		if($new)
 		{
-			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, ext_id, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
 					$this->addslashes($this->studiengang_kz).','.
@@ -205,7 +180,7 @@ class lehreinheitgruppe
 			       " WHERE lehreinheitgruppe_id=".$this->addslashes($this->lehreinheitgruppe_id).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -217,20 +192,20 @@ class lehreinheitgruppe
 		}
 	}
 
-	// ****************************************************
-	// * Sieht nach ob Gruppe schon zu dieser Lehreinheit
-	// * zugeordnet ist.
-	// * @param lehreinheit_id
-	// *        studiengang_kz
-	// *        semester
-	// *        verband
-	// *        gruppe
-	// *        gruppe_kurzbz
-	// * @return true wenn vorhanden, false wenn nicht
-	// ****************************************************
-	function exists($lehreinheit_id, $studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz)
+	/**
+	 * Sieht nach ob Gruppe schon zu dieser Lehreinheit
+	 * zugeordnet ist.
+	 * @param lehreinheit_id
+	 *        studiengang_kz
+	 *        semester
+	 *        verband
+	 *        gruppe
+	 *        gruppe_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function exists($lehreinheit_id, $studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($lehreinheit_id)."'";
 
 		if($gruppe_kurzbz!='')
 		{
@@ -238,35 +213,35 @@ class lehreinheitgruppe
 		}
 		else
 		{
-			$qry .= " AND semester='$semester'";
+			$qry .= " AND semester='".addslashes($semester)."'";
 			if($verband!='')
-				$qry .= " AND verband='$verband'";
+				$qry .= " AND verband='".addslashes($verband)."'";
 			if($gruppe!='')
-				$qry .= " AND gruppe='$gruppe'";
+				$qry .= " AND gruppe='".addslashes($gruppe)."'";
 		}
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return true;
 			else
 				return false;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen der Lehreinheitgruppen';
+			$this->errormsg = 'Fehler beim Lesen der Lehreinheitgruppen';
 			return false;
 		}
 	}
 
-	// *******************************************
-	// * Liefert alle Gruppenzuordnungen zu einer
-	// * Lehreinheit.
-	// * @param lehreinheit_id Lehreinheit zu der
-	// *        die Gruppen geladen werden sollen
-	// * @return true wenn ok, false im fehlerfall
-	// *******************************************
-	function getLehreinheitgruppe($lehreinheit_id)
+	/**
+	 * Liefert alle Gruppenzuordnungen zu einer
+	 * Lehreinheit.
+	 * @param lehreinheit_id Lehreinheit zu der
+	 *        die Gruppen geladen werden sollen
+	 * @return true wenn ok, false im fehlerfall
+	 */
+	public function getLehreinheitgruppe($lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -275,11 +250,12 @@ class lehreinheitgruppe
 		}
 
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$leg_obj = new lehreinheitgruppe($this->conn, null, null);
+				$leg_obj = new lehreinheitgruppe();
 
 				$leg_obj->lehreinheitgruppe_id = $row->lehreinheitgruppe_id;
 				$leg_obj->lehreinheit_id = $row->lehreinheit_id;
@@ -305,12 +281,12 @@ class lehreinheitgruppe
 		}
 	}
 
-	// ***************************************************************
-	// * Loescht die Zuornung Gruppe-Lehreinheit
-	// * @param lehreinheigruppe_id ID des zu loeschenden Datensatzes
-	// * @return true wenn ok, false im fehlerfall
-	// ***************************************************************
-	function delete($lehreinheitgruppe_id)
+	/**
+	 * Loescht die Zuornung Gruppe-Lehreinheit
+	 * @param lehreinheigruppe_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im fehlerfall
+	 */
+	public function delete($lehreinheitgruppe_id)
 	{
 		if(!is_numeric($lehreinheitgruppe_id))
 		{
@@ -319,9 +295,9 @@ class lehreinheitgruppe
 		}
 		$qry_del = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$sql_undo = "INSERT INTO lehre.tbl_lehreinheitgruppe ".
 							"(lehreinheitgruppe_id, lehreinheit_id, studiengang_kz, semester, ".
@@ -338,7 +314,7 @@ class lehreinheitgruppe
 							$this->addslashes($row->insertamum).','.
 							$this->addslashes($row->insertvon).');';
 
-				$log = new log($this->conn, null, null);
+				$log = new log();
 				$log->sql = $qry_del;
 				$log->sqlundo = $sql_undo;
 				$log->mitarbeiter_uid = get_uid();
@@ -347,30 +323,30 @@ class lehreinheitgruppe
 				else
 				{
 					$qry_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang WHERE studiengang_kz='$row->studiengang_kz'";
-					$result_stg = pg_query($this->conn, $qry_stg);
-					$row_stg = pg_fetch_object($result_stg);
+					$this->db_query($qry_stg);
+					$row_stg = $this->db_fetch_object();
 					$grp = $row_stg->kuerzel.$row->semester.$row->verband.$row->gruppe;
 				}
 				$log->beschreibung = "Gruppenzuteilung loeschen $grp - $row->lehreinheit_id";
-				pg_query($this->conn, 'BEGIN;');
+				$this->db_query('BEGIN;');
 
 				if($log->save(true))
 				{
-					if(pg_query($this->conn, $qry_del))
+					if($this->db_query($qry_del))
 					{
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else
 					{
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = 'Fehler beim Loeschen';
 						return false;
 					}
 				}
 				else
 				{
-					pg_query($this->conn, 'ROLLBACK;');
+					$this->db_query('ROLLBACK;');
 					$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
 					return false;
 				}
@@ -383,53 +359,63 @@ class lehreinheitgruppe
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen aus der Datenbank';
+			$this->errormsg = 'Fehler beim Lesen aus der Datenbank';
 			return false;
 		}
 	}
 
-	// ****
-	// * Prueft ob die Gruppe schon dieser Lehreinheit zugeordnet ist
-	// ****
-	function checkVorhanden()
+	/**
+	 * Prueft ob die Gruppe schon dieser Lehreinheit zugeordnet ist
+	 */
+	public function checkVorhanden()
 	{
 		$qry = "SELECT 
 					count(*) as anzahl 
 				FROM 
 					lehre.tbl_lehreinheitgruppe 
 				WHERE 
-					lehreinheit_id='$this->lehreinheit_id' AND 
-					studiengang_kz='$this->studiengang_kz'";
+					lehreinheit_id='".addslashes($this->lehreinheit_id)."' AND 
+					studiengang_kz='".addslashes($this->studiengang_kz)."'";
 		if($this->semester!='')
-			$qry.=" AND trim(semester)='$this->semester'";
+			$qry.=" AND trim(semester)='".addslashes($this->semester)."'";
 		else 
 			$qry.=" AND (trim(semester)='' OR semester is null)";
 			
 		if($this->verband!='')
-			$qry.=" AND trim(verband)='$this->verband'";
+			$qry.=" AND trim(verband)='".addslashes($this->verband)."'";
 		else 
 			$qry.=" AND (trim(verband)='' OR verband is null)";
 			
 		if($this->gruppe!='')
-			$qry.=" AND	trim(gruppe)='$this->gruppe'";
+			$qry.=" AND	trim(gruppe)='".addslashes($this->gruppe)."'";
 		else 
 			$qry.=" AND (trim(gruppe)='' OR gruppe is null)";
 			
 		if($this->gruppe_kurzbz!='')
-			$qry.=" AND	trim(gruppe_kurzbz)='$this->gruppe_kurzbz'";
+			$qry.=" AND	trim(gruppe_kurzbz)='".addslashes($this->gruppe_kurzbz)."'";
 		else 
 			$qry.= " AND (trim(gruppe_kurzbz)='' OR gruppe_kurzbz is null)";
 		
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
 					return true;
 				else 
 					return false;
 			}
+			else 
+			{
+				$this->errormsg = 'Interner Fehler';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg='Fehler bei einer Abfrage';
+			return false;
 		}
 	}
 }

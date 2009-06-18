@@ -23,63 +23,44 @@
  * Klasse Betriebsmittel 
  * @create 22-01-2007
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class betriebsmittel
+class betriebsmittel extends basis_db 
 {
-	var $conn;     			// @var resource DB-Handle
-	var $new;       		// @var boolean
-	var $errormsg;  		// @var string
-	var $result;
-	var $done=false;		// @var boolean
+	public $new;       		// boolean
+	public $result;
 	
 	//Tabellenspalten
-	var $betriebsmittel_id;	// @var integer
-	var $betriebsmitteltyp;	// @var string
-	var $nummer;			// @var string
-	var $nummerintern;		// @var string
-	var $reservieren;		// @var boolean
-	var $ort_kurzbz;		// @var string
-	var $ext_id;			// @var integer
-	var $insertamum;		// @var timestamp
-	var $insertvon;		// @var bigint
-	var $updateamum;		// @var timestamp
-	var $updatevon;		// @var bigint
+	public $betriebsmittel_id;	// integer
+	public $betriebsmitteltyp;	// string
+	public $nummer;				// string
+	public $nummerintern;		// string
+	public $reservieren;		// boolean
+	public $ort_kurzbz;			// string
+	public $ext_id;				// integer
+	public $insertamum;			// timestamp
+	public $insertvon;			// bigint
+	public $updateamum;			// timestamp
+	public $updatevon;			// bigint
 	
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $betriebsmittel_id ID des Betrtiebsmittels, das geladen werden soll (Default=null)
+	 * @param $betriebsmittel_id ID des Betrtiebsmittels, das geladen werden soll (Default=null)
 	 */
-	function betriebsmittel($conn,$betriebsmittel_id=null, $unicode=false)
+	public function __construct($betriebsmittel_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else 
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg= "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-		*/
+		parent::__construct();
+		
+		if(!is_null($betriebsmittel_id))
+			$this->load($betriebsmittel_id);
 	}
-	
-	
-	// **************************************************************
-	// * Laedt das Betriebsmittel mit der ID $betriebsmittel_id
-	// * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittel
-	// * @return true wenn ok, false im Fehlerfall
-	// ***************************************************************
-	function load($betriebsmittel_id)
+		
+	/**
+	 * Laedt das Betriebsmittel mit der ID $betriebsmittel_id
+	 * @param  $betriebsmittel_id ID des zu ladenden Betriebsmittel
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($betriebsmittel_id)
 	{
 		if(!is_numeric($betriebsmittel_id))
 		{
@@ -87,11 +68,11 @@ class betriebsmittel
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='$betriebsmittel_id'";
+		$qry = "SELECT * FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='".addslashes($betriebsmittel_id)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->betriebsmittel_id = $row->betriebsmittel_id;
 				$this->beschreibung = $row->beschreibung;
@@ -115,38 +96,27 @@ class betriebsmittel
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
 	
-	// *************************************
-	// * Prueft die Daten vor dem Speichern 
-	// * auf Gueltigkeit
-	// *************************************
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern 
+	 * auf Gueltigkeit
+	 */
+	protected function validate()
 	{
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *******************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank	 
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************************************************
-	function save($new=null)
+		
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if($new==null)
 			$new=$this->new;
@@ -168,7 +138,6 @@ class betriebsmittel
 			     $this->addslashes($this->ext_id).',  now(), '.
 			     $this->addslashes($this->insertvon).', now(), '.
 			     $this->addslashes($this->updatevon).');';
-			 $this->done=true;			
 		}
 		else
 		{			
@@ -191,14 +160,14 @@ class betriebsmittel
 				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('public.tbl_betriebsmittel_betriebsmittel_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->betriebsmittel_id = $row->id;
 					}
@@ -228,7 +197,7 @@ class betriebsmittel
 	 * @param $betriebsmittel_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($betriebsmittel_id)
+	public function delete($betriebsmittel_id)
 	{
 		if(!is_numeric($betriebsmittel_id))
 		{
@@ -236,26 +205,35 @@ class betriebsmittel
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='$betriebsmittel_id'";
+		$qry = "DELETE FROM public.tbl_betriebsmittel WHERE betriebsmittel_id='".addslashes($betriebsmittel_id)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 
 		{
-			$this->errormsg = 'Fehler beim loeschen der Daten';
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
 	
-	function getBetriebsmittel($betriebsmitteltyp, $nummer)
+	/**
+	 * Laedt die Betriebsmittel
+	 *
+	 * @param $betriebsmitteltyp
+	 * @param $nummer
+	 * @return boolean
+	 */
+	public function getBetriebsmittel($betriebsmitteltyp, $nummer)
 	{
-		$qry = "SELECT * FROM public.tbl_betriebsmittel WHERE betriebsmitteltyp='".addslashes($betriebsmitteltyp)."' AND nummer='".addslashes($nummer)."' ORDER BY updateamum DESC";
+		$qry = "SELECT * FROM public.tbl_betriebsmittel 
+				WHERE betriebsmitteltyp='".addslashes($betriebsmitteltyp)."' AND nummer='".addslashes($nummer)."' 
+				ORDER BY updateamum DESC";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$bm = new betriebsmittel($this->conn, null, null);
+				$bm = new betriebsmittel();
 				
 				$bm->betriebsmittel_id = $row->betriebsmittel_id;
 				$bm->beschreibung = $row->beschreibung;

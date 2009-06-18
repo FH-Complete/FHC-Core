@@ -23,72 +23,51 @@
  * Klasse Adresse
  * @create 13-03-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class adresse
+class adresse extends basis_db
 {
-	var $conn;     // @var resource DB-Handle
-	var $new;       // @var boolean
-	var $errormsg;  // @var string
-	var $result = array(); // @var adresse Objekt
-	var $done=false; //@ boolean
+	public $new;				//  boolean
+	public $result = array();	//  adresse Objekt
 
 	//Tabellenspalten
-	var $adresse_id;	// @var integer
-	var $person_id;	// @var integer
-	var $name; 		// @var string
-	var $strasse;		// @var string
-	var $plz;		// @var string
-	var $ort;            	// @var string
-	var $gemeinde;	// @var string
-	var $nation;          	// @var string
-	var $typ;		// @var string
-	var $heimatadresse;	// @var boolean
-	var $zustelladresse;	// @var boolean
-	var $firma_id;		// @var integer
-	var $updateamum;	// @var timestamp
-	var $updatevon;	// @var string
-	var $insertamum;      // @var timestamp
-	var $insertvon;      // @var string
-	var $ext_id;		// @var integer
+	public $adresse_id;			//  integer
+	public $person_id;			//  integer
+	public $name; 				//  string
+	public $strasse;			//  string
+	public $plz;				//  string
+	public $ort;            	//  string
+	public $gemeinde;			//  string
+	public $nation;          	//  string
+	public $typ;				//  string
+	public $heimatadresse;		//  boolean
+	public $zustelladresse;		//  boolean
+	public $firma_id;			//  integer
+	public $updateamum;			//  timestamp
+	public $updatevon;			//  string
+	public $insertamum;      	//  timestamp
+	public $insertvon;      	//  string
+	public $ext_id;				//  integer
 
-	// *************************************************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $adress_id ID der Adresse die geladen werden soll (Default=null)
-	// *        $unicode   wenn false dann wird das Encoding auf LATIN9 gesetzt
-	// *                   wenn true dann auf UNICODE
-	// *                   wenn null dann wird das Encoding nicht veraendert
-	// *************************************************************************
-	function adresse($conn,$adresse_id=null,$unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $adress_id ID der Adresse die geladen werden soll (Default=null)
+	 */
+	public function __construct($adresse_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/
-		if($adresse_id != null)
+		parent::__construct();
+		
+		if(!is_null($adresse_id))
 			$this->load($adresse_id);
 	}
 
-	// ***********************************************
-	// * Laedt die Adresse mit der ID $adresse_id
-	// * @param  $adress_id ID der zu ladenden Adresse
-	// * @return true wenn ok, false im Fehlerfall
-	// ***********************************************
-	function load($adresse_id)
+	/**
+	 * Laedt die Adresse mit der ID $adresse_id
+	 * @param  $adress_id ID der zu ladenden Adresse
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($adresse_id)
 	{
-
 		//Pruefen ob adress_id eine gueltige Zahl ist
 		if(!is_numeric($adresse_id) || $adresse_id == '')
 		{
@@ -97,33 +76,32 @@ class adresse
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM public.tbl_adresse WHERE adresse_id='$adresse_id'";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE adresse_id='".addslashes($adresse_id)."'";
 
-		if(!$res = pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		if($row = pg_fetch_object($res))
+		if($row = $this->db_fetch_object($res))
 		{
 			$this->adresse_id		= $row->adresse_id;
 			$this->heimatadresse 	= ($row->heimatadresse=='t'?true:false);
 			$this->zustelladresse	= ($row->zustelladresse=='t'?true:false);
-			$this->gemeinde		= $row->gemeinde;
-			$this->name			= $row->name;
+			$this->gemeinde			= $row->gemeinde;
+			$this->name				= $row->name;
 			$this->nation			= $row->nation;
-			$this->ort			= $row->ort;
+			$this->ort				= $row->ort;
 			$this->person_id		= $row->person_id;
-			$this->plz			= $row->plz;
-			$this->strasse		= $row->strasse;
-			$this->typ			= $row->typ;
+			$this->plz				= $row->plz;
+			$this->strasse			= $row->strasse;
+			$this->typ				= $row->typ;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 			$this->insertamum		= $row->insertamum;
 			$this->insertvon		= $row->insertvon;
-			$this->firma_id		= $row->firma_id;
-
+			$this->firma_id			= $row->firma_id;
 		}
 		else
 		{
@@ -134,32 +112,32 @@ class adresse
 		return true;
 	}
 
-	// *************************************************************************
-	// * Laedt alle adressen zu der Person die uebergeben wird
-	// * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
-	// * @return true wenn ok, false im Fehlerfall
-	// *************************************************************************
-	function load_pers($pers_id)
+	/**
+	 * Laedt alle Adressen zu der Person die uebergeben wird
+	 * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_pers($pers_id)
 	{
 		//Pruefen ob pers_id eine gueltige Zahl ist
 		if(!is_numeric($pers_id) || $pers_id == '')
 		{
-			$this->errormsg = 'person_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'person_id muss eine gültige Zahl sein';
 			return false;
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$pers_id'";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='".addslashes($pers_id)."'";
 
-		if(!$res = pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object($res))
 		{
-			$adr_obj = new adresse($this->conn, null, null);
+			$adr_obj = new adresse();
 
 			$adr_obj->adresse_id      = $row->adresse_id;
 			$adr_obj->heimatadresse = ($row->heimatadresse=='t'?true:false);
@@ -183,32 +161,32 @@ class adresse
 		return true;
 	}
 	
-	// *************************************************************************
-	// * Laedt alle adressen zu der Firma die uebergeben wird
-	// * @param $firma_id ID der Firma zu der die Adressen geladen werden sollen
-	// * @return true wenn ok, false im Fehlerfall
-	// *************************************************************************
-	function load_firma($firma_id)
+	/**
+	 * Laedt alle Adressen zu der Firma die uebergeben wird
+	 * @param $firma_id ID der Firma zu der die Adressen geladen werden sollen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_firma($firma_id)
 	{
 		//Pruefen ob pers_id eine gueltige Zahl ist
 		if(!is_numeric($firma_id) || $firma_id == '')
 		{
-			$this->errormsg = 'firma_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'firma_id muss eine gültige Zahl sein';
 			return false;
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE firma_id='$firma_id'";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE firma_id='".addslashes($firma_id)."'";
 
-		if(!$res = pg_query($this->conn,$qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object($res))
 		{
-			$adr_obj = new adresse($this->conn, null, null);
+			$adr_obj = new adresse();
 
 			$adr_obj->adresse_id      = $row->adresse_id;
 			$adr_obj->heimatadresse = ($row->heimatadresse=='t'?true:false);
@@ -232,73 +210,61 @@ class adresse
 		return true;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen auf Gueltigkeit
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen auf Gueltigkeit
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		//Zahlenfelder pruefen
 		if(!is_numeric($this->person_id) && $this->person_id!='')
 		{
-			$this->errormsg='person_id enthaelt ungueltige Zeichen:'.$this->person_id.' - adresse: '.$this->adresse_id."\n";
+			$this->errormsg='person_id enthaelt ungueltige Zeichen';
 			return false;
 		}
 		//Gesamtlaenge pruefen
-		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>255)
 		{
-			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein  - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->strasse)>255)
 		{
-			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->plz)>10)
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->ort)>255)
 		{
-			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->nation)>3)
 		{
-			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->gemeinde)>255)
 		{
-			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein - adresse: '.$this->adresse_id."\n";
+			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
 
 		$this->errormsg = '';
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ***********************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// ***********************************************************************
-	function save()
+	
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen pruefen
 		if(!$this->validate())
@@ -323,129 +289,94 @@ class adresse
 			      ($this->firma_id!=null?$this->addslashes($this->firma_id):'null').', now(), '.
 			      $this->addslashes($this->updatevon).', '.
 			      $this->addslashes($this->ext_id).');';
-
-			      $this->done=true;
 		}
 		else
 		{
-			//Updaten des bestehenden Datensatzes
-
 			//Pruefen ob adresse_id eine gueltige Zahl ist
 			if(!is_numeric($this->adresse_id))
 			{
-				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein: '.$this->adresse_id."\n";
+				$this->errormsg = 'adresse_id muss eine gültige Zahl sein: '.$this->adresse_id."\n";
 				return false;
 			}
-			$qryz="SELECT * FROM public.tbl_adresse WHERE adresse_id='$this->adresse_id';";
-			if($resultz = pg_query($this->conn, $qryz))
-			{
-				if($rowz = pg_fetch_object($resultz))
-				{
-					$update=false;
-					if($rowz->person_id!=$this->person_id) 				$update=true;
-					if($rowz->name!=$this->name) 					$update=true;
-					if($rowz->strasse!=$this->strasse) 					$update=true;
-					if($rowz->plz!=$this->plz)	 					$update=true;
-					if($rowz->typ!=$this->typ)		 				$update=true;
-					if($rowz->ort!=$this->ort)		 				$update=true;
-					if($rowz->nation!=$this->nation)	 				$update=true;
-					if($rowz->gemeinde!=$this->gemeinde) 				$update=true;
-					if($rowz->heimatadresse!=$this->heimatadresse?'true':'false')	$update=true;
-					if($rowz->zustelladresse!=$this->zustelladresse?'true':'false') 	$update=true;
-					if($rowz->firma_id!=$this->firma_id) 	$update=true;
-
-					if($update)
-					{
-						$qry='UPDATE public.tbl_adresse SET'.
-							' person_id='.$this->addslashes($this->person_id).', '.
-							' name='.$this->addslashes($this->name).', '.
-							' strasse='.$this->addslashes($this->strasse).', '.
-							' plz='.$this->addslashes($this->plz).', '.
-					      	' typ='.$this->addslashes($this->typ).', '.
-					      	' ort='.$this->addslashes($this->ort).', '.
-					      	' nation='.$this->addslashes($this->nation).', '.
-					      	' gemeinde='.$this->addslashes($this->gemeinde).', '.
-					      	' firma_id='.$this->addslashes($this->firma_id).','.
-					      	' updateamum= now(), '.
-					      	' updatevon='.$this->addslashes($this->updatevon).', '.
-					      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
-					      	' zustelladresse='.($this->zustelladresse?'true':'false').' '.
-					      	'WHERE adresse_id='.$this->adresse_id.';';
-						      	$this->done=true;
-					}
-				}
-			}
+			$qry='UPDATE public.tbl_adresse SET'.
+				' person_id='.$this->addslashes($this->person_id).', '.
+				' name='.$this->addslashes($this->name).', '.
+				' strasse='.$this->addslashes($this->strasse).', '.
+				' plz='.$this->addslashes($this->plz).', '.
+		      	' typ='.$this->addslashes($this->typ).', '.
+		      	' ort='.$this->addslashes($this->ort).', '.
+		      	' nation='.$this->addslashes($this->nation).', '.
+		      	' gemeinde='.$this->addslashes($this->gemeinde).', '.
+		      	' firma_id='.$this->addslashes($this->firma_id).','.
+		      	' updateamum= now(), '.
+		      	' updatevon='.$this->addslashes($this->updatevon).', '.
+		      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
+		      	' zustelladresse='.($this->zustelladresse?'true':'false').' '.
+		      	'WHERE adresse_id='.$this->adresse_id.';';
 		}
-		//echo $qry;
-		if ($this->done)
+		
+		if($this->db_query($qry))
 		{
-			if(pg_query($this->conn,$qry))
+			if($this->new)
 			{
-				if($this->new)
+				//naechste ID aus der Sequence holen
+				$qry="SELECT currval('public.tbl_adresse_adresse_id_seq') as id;";
+				if($this->db_query($qry))
 				{
-					//naechste ID aus der Sequence holen
-					$qry="SELECT currval('public.tbl_adresse_adresse_id_seq') as id;";
-					if($result = pg_query($this->conn, $qry))
+					if($row = $this->db_fetch_object())
 					{
-						if($row = pg_fetch_object($result))
-						{
-							$this->adresse_id = $row->id;
-							pg_query($this->conn, 'COMMIT');
-							return true;
-						}
-						else
-						{
-							pg_query($this->conn, 'ROLLBACK');
-							$this->errormsg = "Fehler beim Auslesen der Sequence";
-							return false;
-						}
+						$this->adresse_id = $row->id;
+						$this->db_query('COMMIT');
+						return true;
 					}
 					else
 					{
-						pg_query($this->conn, 'ROLLBACK');
-						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Sequence";
 						return false;
 					}
 				}
+				else
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
 			}
-			else
-			{
-				//echo $qry;
-				$this->errormsg = "*****\nFehler beim Speichern des Adress-Datensatzes: ".$this->person_id."\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
-				return false;
-			}
-			return true;
+			else 
+				return true;
 		}
 		else
 		{
-			return true;
+			$this->errormsg = 'Fehler beim Speichern des Adress-Datensatzes';
+			return false;
 		}
 	}
 
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param $adresse_id ID die geloescht werden soll
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
-	function delete($adresse_id)
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $adresse_id ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($adresse_id)
 	{
 		//Pruefen ob adresse_id eine gueltige Zahl ist
 		if(!is_numeric($adresse_id) || $adresse_id == '')
 		{
-			$this->errormsg = 'adresse_id muss eine gueltige Zahl sein'."\n";
+			$this->errormsg = 'adresse_id muss eine gültige Zahl sein'."\n";
 			return false;
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id='$adresse_id';";
+		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id='".addslashes($adresse_id)."';";
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim loeschen der Daten'."\n";
+			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
 			return false;
 		}
 	}

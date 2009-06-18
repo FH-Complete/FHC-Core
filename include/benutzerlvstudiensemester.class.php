@@ -19,79 +19,72 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class benutzerlvstudiensemester
+class benutzerlvstudiensemester extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $benutzerlvstudiensemester = array(); // benutzerlvstudiensemester Objekt
+	public $new; // boolean
+	public $benutzerlvstudiensemester = array(); // benutzerlvstudiensemester Objekt
 
 	//Tabellenspalten
-	var $uid;						// varchar(16)
-	var $studiensemester_kurzbz;	// varchar(16)
-	var $lehrveranstaltung_id;		// integer
+	public $uid;						// varchar(16)
+	public $studiensemester_kurzbz;	// varchar(16)
+	public $lehrveranstaltung_id;		// integer
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Zuteilung
-	// * @param $conn        	Datenbank-Connection
-	// *        $uid
-	// * 		$studiensemester_kurzbz
-	// *		$lehrveranstaltung_nr
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function benutzerlvstudiensemester($conn, $uid=null, $studiensemester_kurzbz=null, $lehrveranstaltung_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional eine Zuteilung
+	 * @param $uid
+	 * @param $studiensemester_kurzbz
+	 * @param $lehrveranstaltung_id
+	 */
+	public function __construct($uid=null, $studiensemester_kurzbz=null, $lehrveranstaltung_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
+		
+		$this->new = true;
 
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-		else
-*/	
-			$this->new = true;
-
-		if($uid!=null && $studiensemester_kurzbz!=null && $lehrveranstaltung_id!=null)
+		if(!is_null($uid) && !is_null($studiensemester_kurzbz) && !is_null($lehrveranstaltung_id))
 			$this->load($uid, $studiensemester_kurzbz, $lehrveranstaltung_id);
 	}
 
-	// *********************************************************
-	// * Laedt eine Zuteilung
-	// * @param $uid, $studiensemester_kurzbz, $lehrveranstaltung_nr
-	// *********************************************************
-	function load($uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
+	/**
+	 * Laedt eine Zuteilung
+	 * @param $uid, $studiensemester_kurzbz, $lehrveranstaltung_nr
+	 */
+	public function load($uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
 		$this->errormsg = 'Not implemented';
 		return false;
 	}
 	
-	//**********************************************************
-	//* Laedt alle uids in zu einer lv/szudiensemester - kombination
-	//* gibt auch vor- und Nachname zurueck
-	//**********************************************************
-	function get_all_uids($studiensemester_kurzbz, $lehrveranstaltung_id)
+	/**
+	 * Laedt alle uids in zu einer lv/szudiensemester - kombination
+	 * gibt auch vor- und Nachname zurueck
+	 * @param studiensemester_kurzbz
+	 * @param lehrveranstaltung_id
+	 * @return boolean
+	 */
+	public function get_all_uids($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
-		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname FROM campus.tbl_benutzerlvstudiensemester, campus.vw_benutzer where studiensemester_kurzbz='".$studiensemester_kurzbz."' AND lehrveranstaltung_id = '".$lehrveranstaltung_id."' and vw_benutzer.uid = tbl_benutzerlvstudiensemester.uid order by nachname";
-		if(!$res = pg_query($this->conn, $qry))
+		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname 
+				FROM campus.tbl_benutzerlvstudiensemester, campus.vw_benutzer 
+				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
+					AND lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."' 
+					AND vw_benutzer.uid = tbl_benutzerlvstudiensemester.uid ORDER BY nachname";
+		
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		if (pg_num_rows($res) == 0)
+		
+		if ($this->db_num_rows() == 0)
 			return false;
 		else
 		{
-			while($row = pg_fetch_object($res))
+			while($row = $this->db_fetch_object())
 			{
-				$lv_obj = new benutzerlvstudiensemester($this->conn);
+				$lv_obj = new benutzerlvstudiensemester();
 				$lv_obj->uid = $row->uid;
 				$lv_obj->nachname = $row->nachname;
 				$lv_obj->vorname = $row->vorname;
@@ -99,15 +92,14 @@ class benutzerlvstudiensemester
 			}
 			return true;
 		}
-	}	
+	}
 	
-	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->uid)>16)
 		{
@@ -127,24 +119,13 @@ class benutzerlvstudiensemester
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Zuteilung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert Zuteilung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!is_null($new))
 			$this->new = $new;
@@ -163,10 +144,12 @@ class benutzerlvstudiensemester
 		else
 		{
 			// ToDo
-			$qry = 'Select 1;';
+			//$qry = 'Select 1;';
+			$this->errormsg = 'Update ist noch nicht implementiert';
+			return false;
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			$this->new = false;
@@ -174,7 +157,7 @@ class benutzerlvstudiensemester
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der BenutzerLVStudiensemester:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der BenutzerLVStudiensemester';
 			return false;
 		}
 	}

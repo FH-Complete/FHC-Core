@@ -23,15 +23,12 @@
  * Klasse Konto
  * @create 2007-05-14
  */
-
-require_once ('basis_db.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class konto extends basis_db
 {
-	//var $conn;     // @var resource DB-Handle
-	public $new;       // @var boolean
-	public $errormsg;  // @var string
-	public $result = array(); // @var adresse Objekt
+	public $new;
+	public $result = array();
 	public $buch_nr = array();
 	public $buch_date = array();
 
@@ -60,10 +57,10 @@ class konto extends basis_db
 	public $standardbetrag;
 	public $standardtext;
 
-	// **************************************************************************
-	// * Konstruktor
-	// * @param $buchungsnr ID der Adresse die geladen werden soll (Default=null)
-	// **************************************************************************
+	/**
+	 * Konstruktor
+	 * @param $buchungsnr Nr der zu ladenden Buchung (default=null)
+	 */
 	public function __construct($buchungsnr=null)
 	{
 		parent::__construct();
@@ -72,11 +69,11 @@ class konto extends basis_db
 			$this->load($buchungsnr);
 	}
 
-	// ************************************************
-	// * Laedt die Funktion mit der ID $buchungsnr
-	// * @param  $buchungsnr ID der zu ladenden  Email
-	// * @return true wenn ok, false im Fehlerfall
-	// ************************************************
+	/**
+	 * Laedt die Funktion mit der ID $buchungsnr
+	 * @param  $buchungsnr ID der zu ladenden  Email
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function load($buchungsnr)
 	{
 		if(!is_numeric($buchungsnr))
@@ -128,11 +125,11 @@ class konto extends basis_db
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen auf gueltigkeit
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	private function validate()
+	/**
+	 * Prueft die Variablen auf gueltigkeit
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		$this->betrag = str_replace(',','.',$this->betrag);
 		if(!is_numeric($this->betrag))
@@ -168,13 +165,13 @@ class konto extends basis_db
 		return true;
 	}
 
-	// ***********************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $kontakt_id aktualisiert
-	// * @param $new true wenn insert false wenn update
-	// * @return true wenn ok, false im Fehlerfall
-	// ***********************************************************************
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz aktualisiert
+	 * @param $new true wenn insert false wenn update
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function save($new=null)
 	{
 		//Variablen pruefen
@@ -225,7 +222,6 @@ class konto extends basis_db
 				   " WHERE buchungsnr='".addslashes($this->buchungsnr)."';";
 
 		}
-		//echo $qry;
 
 		if($this->db_query($qry))
 		{
@@ -262,11 +258,11 @@ class konto extends basis_db
 		}
 	}
 
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param buchungsnr ID die geloescht werden soll
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param buchungsnr ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function delete($buchungsnr)
 	{
 		//Pruefen ob Verweise auf diese Buchung Vorhanden sind
@@ -306,12 +302,12 @@ class konto extends basis_db
 		}
 	}
 
-	// ******************************************
-	// * Laedt alle Buchungen einer Person
-	// * und legt diese geordnet in ein Array
-	// * @param person_id, filter
-	// * @return true wenn ok, false wenn fehler
-	// ******************************************
+	/**
+	 * Laedt alle Buchungen einer Person
+	 * und legt diese geordnet in ein Array
+	 * @param person_id, filter
+	 * @return true wenn ok, false wenn fehler
+	 */
 	public function getBuchungen($person_id, $filter='alle', $studiengang_kz='')
 	{
 		if(!is_numeric($person_id))
@@ -321,7 +317,7 @@ class konto extends basis_db
 		}
 
 		if($studiengang_kz!='')
-			$stgwhere = " AND tbl_konto.studiengang_kz='$studiengang_kz' ";
+			$stgwhere = " AND tbl_konto.studiengang_kz='".addslashes($studiengang_kz)."' ";
 		else
 			$stgwhere = '';
 
@@ -345,7 +341,7 @@ class konto extends basis_db
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE person_id='".$person_id."' $stgwhere ORDER BY buchungsdatum";
-		//echo $qry;
+		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -392,10 +388,10 @@ class konto extends basis_db
 		}
 	}
 
-	// ******************************************
-	// * Liefert alle Buchungstypen
-	// * @return true wenn ok, false wenn Fehler
-	// ******************************************
+	/**
+	 * Liefert alle Buchungstypen
+	 * @return true wenn ok, false wenn Fehler
+	 */
 	public function getBuchungstyp()
 	{
 		$qry = "SELECT * FROM public.tbl_buchungstyp ORDER BY beschreibung";
@@ -422,13 +418,14 @@ class konto extends basis_db
 		}
 	}
 
-	// ******************************
-	// * Berechnet den offenen Betrag
-	// * einer Buchung
-	// ******************************
+	/**
+	 * Berechnet den offenen Betrag
+	 * einer Buchung
+	 */
 	public function getDifferenz($buchungsnr)
 	{
-		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='$buchungsnr' OR buchungsnr_verweis='$buchungsnr'";
+		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+				WHERE buchungsnr='".addslashes($buchungsnr)."' OR buchungsnr_verweis='".addslashes($buchungsnr)."'";
 
 		if($this->db_query($qry))
 		{
@@ -448,28 +445,42 @@ class konto extends basis_db
 	}
 
 
-	// ******************************
-	// * ueberprueft, ob studiengebuehr gebucht ist fuer
-	// * student_uid und studiensemester
-	// * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
-	// ******************************
+	/**
+	 * ueberprueft, ob studiengebuehr gebucht ist fuer
+	 * student_uid und studiensemester
+	 * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
+	 */
 	public function checkStudienbeitrag($uid, $stsem)
 	{
-		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer WHERE tbl_konto.studiensemester_kurzbz = '".$stsem."' AND tbl_benutzer.uid = '".$uid."' AND tbl_benutzer.person_id = tbl_konto.person_id and tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
-		$this->db_query($subqry);
-		if ($this->db_num_rows()==0)
-			return false;
-		else
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer 
+					WHERE 
+						tbl_konto.studiensemester_kurzbz = '".addslashes($stsem)."' 
+						AND tbl_benutzer.uid = '".addslashes($uid)."' 
+						AND tbl_benutzer.person_id = tbl_konto.person_id 
+						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
+		
+		if($this->db_query($subqry))
 		{
-			while ($subrow = $this->db_fetch_object())
+			if ($this->db_num_rows()==0)
+				return false;
+			else
 			{
-					$buch_nr[] = $subrow->buchungsnr;
-					$buch_date[] = $subrow->buchungsdatum;
+				while ($subrow = $this->db_fetch_object())
+				{
+						$buch_nr[] = $subrow->buchungsnr;
+						$buch_date[] = $subrow->buchungsdatum;
+				}
 			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
 		}
 
 
-		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto WHERE buchungsnr='".$buch_nr[0]."' OR buchungsnr_verweis='".$buch_nr[0]."'";
+		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+				WHERE buchungsnr='".$buch_nr[0]."' OR buchungsnr_verweis='".$buch_nr[0]."'";
 
 		if($this->db_query($qry))
 		{

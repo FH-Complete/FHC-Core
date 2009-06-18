@@ -23,57 +23,38 @@
  * Klasse firma
  * @create 18-12-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class firma
+class firma extends basis_db
 {
-	var $conn;     			// @var resource DB-Handle
-	var $new;       		// @var boolean
-	var $errormsg;  		// @var string
-	var $result = array(); 	// @var adresse Objekt
+	public $new;       			// boolean
+	public $result = array(); 	// adresse Objekt
 
 	//Tabellenspalten
-	var $firma_id;			// @var integer
-	var $name;			// @var string
-	var $adresse;			// @var string
-	var $email;			// @var string
-	var $telefon;			// @var string
-	var $fax;			// @var string
-	var $anmerkung;		// @var string
-	var $ext_id;			// @var integer
-	var $insertamum;		// @var timestamp
-	var $insertvon;		// @var bigint
-	var $updateamum;		// @var timestamp
-	var $updatevon;		// @var bigint
-	var $firmentyp_kurzbz;	// @var
-	var $schule; // @var boolean
+	public $firma_id;		// integer
+	public $name;			// string
+	public $adresse;		// string
+	public $email;			// string
+	public $telefon;		// string
+	public $fax;			// string
+	public $anmerkung;		// string
+	public $ext_id;			// integer
+	public $insertamum;		// timestamp
+	public $insertvon;		// bigint
+	public $updateamum;		// timestamp
+	public $updatevon;		// bigint
+	public $firmentyp_kurzbz;	
+	public $schule; 		// boolean
 
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $firma_id ID der Adresse die geladen werden soll (Default=null)
+	 * @param $firma_id ID der Firma die geladen werden soll (Default=null)
 	 */
-	function firma($conn,$firma_id=null, $unicode=false)
+	public function __construct($firma_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-		*/
-		if($firma_id != null)
+		parent::__construct();
+		
+		if(!is_null($firma_id))
 			$this->load($firma_id);
 	}
 
@@ -82,7 +63,7 @@ class firma
 	 * @param  $firma_id ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($firma_id)
+	public function load($firma_id)
 	{
 		if(!is_numeric($firma_id))
 		{
@@ -92,9 +73,9 @@ class firma
 		
 		$qry = "SElECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->firma_id = $row->firma_id;
 				$this->name = $row->name;
@@ -129,53 +110,41 @@ class firma
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{
-
 		//Gesamtlaenge pruefen
-		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(strlen($this->name)>128)
 		{
-			$this->errormsg = 'Name darf nicht länger als 128 Zeichen sein  - firma_id: '.$this->firma_id.'/'.$this->name;
+			$this->errormsg = 'Name darf nicht länger als 128 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->anmerkung)>256)
 		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein - firma_id: '.$this->firma_id.'/'.$this->name;
+			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
 
 		$this->errormsg = '';
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
+		
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $firma_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO public.tbl_firma (name, adresse, email, telefon, fax, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, schule) VALUES('.
+			$qry='INSERT INTO public.tbl_firma (name, adresse, email, telefon, fax, anmerkung, 
+					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, schule) VALUES('.
 			     $this->addslashes($this->name).', '.
 			     $this->addslashes($this->adresse).', '.
 			     $this->addslashes($this->email).', '.
@@ -215,32 +184,32 @@ class firma
 		     	'schule='.($this->schule?'true':'false').' '.
 				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
-		//echo $qry;
-		if(pg_query($this->conn,$qry))
+		
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				//Sequence lesen
 				$qry="SELECT currval('public.tbl_firma_firma_id_seq') as id;";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->firma_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -248,7 +217,7 @@ class firma
 		}
 		else
 		{
-			$this->errormsg = "*****\nFehler beim Speichern des Firma-Datensatzes.\n".$qry."\n".pg_errormessage($this->conn)."\n*****\n";
+			$this->errormsg = 'Fehler beim Speichern des Firma-Datensatzes';
 			return false;
 		}
 	}
@@ -258,7 +227,7 @@ class firma
 	 * @param $firma_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($firma_id)
+	public function delete($firma_id)
 	{
 		if(!is_numeric($firma_id))
 		{
@@ -268,7 +237,7 @@ class firma
 		
 		$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 
 		{
@@ -281,15 +250,15 @@ class firma
 	 * Laedt alle Firmen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
 		$qry = "SElECT * FROM public.tbl_firma ORDER BY name";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$fa = new firma($this->conn, null, null);
+				$fa = new firma();
 				
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
@@ -316,19 +285,19 @@ class firma
 		}
 	}
 	
-	// *******************************************
-	// * Liefert alle vorhandenen Firmentypen
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function getFirmenTypen()
+	/**
+	 * Liefert alle vorhandenen Firmentypen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getFirmenTypen()
 	{
 		$qry = "SELECT * FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$fa = new firma($this->conn, null, null);
+				$fa = new firma();
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->beschreibung = $row->beschreibung;
 				
@@ -343,11 +312,11 @@ class firma
 		}
 	}
 	
-	// *********************************************
-	// * Laedt alle Firmen eines bestimmen Firmentyps
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************
-	function getFirmen($firmentyp_kurzbz='')
+	/**
+	 * Laedt alle Firmen eines bestimmen Firmentyps
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getFirmen($firmentyp_kurzbz='')
 	{
 		$qry = "SElECT * FROM public.tbl_firma";
 		
@@ -355,11 +324,11 @@ class firma
 			$qry.=" WHERE firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
 		$qry.=" ORDER BY name";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$fa = new firma($this->conn, null, null);
+				$fa = new firma();
 				
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;

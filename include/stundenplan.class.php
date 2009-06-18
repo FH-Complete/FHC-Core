@@ -19,76 +19,61 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class stundenplan
+class stundenplan extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $stundenplan = array(); // stundenplan Objekt
-	var $stpl_table;
+	public $new;      // boolean
+	public $stundenplan = array(); // stundenplan Objekt
+	public $stpl_table;
 	
 	//Tabellenspalten
-	var $stundenplan_id;
-	var $unr;
-	var $mitarbeiter_uid;
-	var $datum;
-	var $stunde;
-	var $ort_kurzbz;
-	var $gruppe_kurzbz;
-	var $titel;
-	var $anmerkung;
-	var $lehreinheit_id;
-	var $studiengang_kz;
-	var $semester;
-	var $verband;
-	var $gruppe;
-	var $fix;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
+	public $stundenplan_id;
+	public $unr;
+	public $mitarbeiter_uid;
+	public $datum;
+	public $stunde;
+	public $ort_kurzbz;
+	public $gruppe_kurzbz;
+	public $titel;
+	public $anmerkung;
+	public $lehreinheit_id;
+	public $studiengang_kz;
+	public $semester;
+	public $verband;
+	public $gruppe;
+	public $fix;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Stundenplaneintrag
-	// * @param $conn        	Datenbank-Connection
-	// *        $stundenplantabelle
-	// *		$stundenplan_id
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function stundenplan($conn, $stundenplantabelle, $stundenplan_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional einen Stundenplaneintrag
+	 * @param $stundenplantabelle
+	 * @param $stundenplan_id
+	 */
+	public function __construct($stundenplantabelle, $stundenplan_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
+		parent::__construct();
+		
 		$this->stpl_table = $stundenplantabelle;
 		
 		if($stundenplan_id!=null)
 			$this->load($stundenplan_id);
 	}
 
-	// *********************************************************
-	// * Laedt einen Stundenplaneintrag
-	// * @param stundenplan_id
-	// *********************************************************
-	function load($stundenplan_id)
+	/**
+	 * Laedt einen Stundenplaneintrag
+	 * @param stundenplan_id
+	 */
+	public function load($stundenplan_id)
 	{
 		$qry = "SELECT * FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id='$stundenplan_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$id = $this->stpl_table.'_id';
 				$this->stundenplan_id = $row->$id;
@@ -126,35 +111,23 @@ class stundenplan
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
-		
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Stundenplaneintrag in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert Stundenplaneintrag in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -209,22 +182,23 @@ class stundenplan
 			       " WHERE ".$this->stpl_table."_id=".$this->addslashes($this->stundenplan_id).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Stundenplanes:'.pg_last_error($this->conn);
+			$this->errormsg = 'Fehler beim Speichern des Stundenplanes:'.$this->db_last_error();
 			return false;
 		}
 	}
 	
-	// ****
-	// * Loescht einen Eintrag aus der Stundenplantabelle
-	// ****
-	function delete($id)
+	/**
+	 * Loescht einen Eintrag aus der Stundenplantabelle
+	 * @param id stundenplan_id
+	 */
+	public function delete($id)
 	{
 		if(!is_numeric($id))
 		{
@@ -234,13 +208,13 @@ class stundenplan
 		
 		$qry = "DELETE FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id='$id'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Loeschen des Eintrages: '.pg_last_error($this->conn);
+			$this->errormsg = 'Fehler beim Loeschen des Eintrages: '.$this->db_last_error();
 			return false;
 		}
 	}

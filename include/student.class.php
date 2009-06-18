@@ -24,56 +24,39 @@ class student extends benutzer
 {
 
     //Tabellenspalten
-	var $matrikelnr;
-	var $prestudent_id;
-	var $studiengang_kz;
-	var $semester;
-	var $verband;
-	var $gruppe;
-	var $ext_id_student;
+	public $matrikelnr;
+	public $prestudent_id;
+	public $studiengang_kz;
+	public $semester;
+	public $verband;
+	public $gruppe;
+	public $ext_id_student;
 	
-	var $studiensemester_kurzbz;
+	public $studiensemester_kurzbz;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Studenten
-	// * @param $conn        	Datenbank-Connection
-	// *        $uid			Student der geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function student($conn, $uid=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional einen Studenten
+	 * @param $uid	Student der geladen werden soll (default=null)
+	 */
+	public function __construct($uid=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
-*/
+		parent::__construct();
+		
 		//Student laden
 		if($uid!=null)
 			$this->load($uid);
 	}
 
-	// **************************************************
-	// * Laedt die Daten eines Studenten
-	// * Wenn Studiensemester_kurzbz angegeben wird, dann werden
-	// * Studiengang, Semester, Verband und Gruppe aus der Tabelle 
-	// * Studentlehrverband geholt.
-	// * @param uid
-	// * 		studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************
-	function load($uid, $studiensemester_kurzbz=null)
+	/**
+	 * Laedt die Daten eines Studenten
+	 * Wenn Studiensemester_kurzbz angegeben wird, dann werden
+	 * Studiengang, Semester, Verband und Gruppe aus der Tabelle 
+	 * Studentlehrverband geholt.
+	 * @param uid
+	 * 		studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($uid, $studiensemester_kurzbz=null)
 	{
 		if(!benutzer::load($uid))
 			return false;
@@ -84,9 +67,9 @@ class student extends benutzer
 					tbl_studentlehrverband.verband as verband, tbl_studentlehrverband.gruppe as gruppe  
 					FROM public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid) 
 					WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND student_uid='".addslashes($uid)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->uid = $row->student_uid;
 				$this->matrikelnr = $row->matrikelnr;
@@ -116,12 +99,12 @@ class student extends benutzer
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->uid)>16)
 		{
@@ -173,19 +156,19 @@ class student extends benutzer
 	}
 
 
-	// ************************************************************
-	// * Speichert die Studentendaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $person_id upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null, $savebenutzer=true)
+	/**
+	 * Speichert die Studentendaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $person_id upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null, $savebenutzer=true)
 	{
 		//Variablen checken
 		if(!$this->validate())
 			return false;
 
-		pg_query($this->conn,'BEGIN;');
+		$this->db_query('BEGIN;');
 		
 		if($new==null)
 			$new = $this->new;
@@ -195,7 +178,7 @@ class student extends benutzer
 			//Basisdaten speichern
 			if(!benutzer::save())
 			{
-				pg_query($this->conn,'ROLLBACK;');
+				$this->db_query('ROLLBACK;');
 				return false;
 			}
 		}
@@ -234,15 +217,15 @@ class student extends benutzer
 			       " WHERE student_uid='".addslashes($this->uid)."';";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			pg_query($this->conn,'COMMIT;');
+			$this->db_query('COMMIT;');
 			//Log schreiben
 			return true;
 		}
 		else
 		{
-			pg_query($this->conn,'ROLLBACK;');
+			$this->db_query('ROLLBACK;');
 			$this->errormsg = 'Fehler beim Speichern des Studenten-Datensatzes'.$qry;
 			return false;
 		}
@@ -259,32 +242,31 @@ class student extends benutzer
 	 * @param integer stg_kz    Kennzahl des Studiengangs
 	 * @return integer Anzahl der gefundenen Einträge; <b>negativ</b> bei Fehler
 	 */
-
-	function getStudents($stg_kz,$sem=null,$ver=null,$grp=null,$gruppe=null, $stsem=null)
+	public function getStudents($stg_kz,$sem=null,$ver=null,$grp=null,$gruppe=null, $stsem=null)
 	{
 		$where = '';
 		if ($gruppe!=null)
 		{
-			$where=" gruppe_kurzbz='".$gruppe."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
+			$where=" gruppe_kurzbz='".addslashes($gruppe)."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
 			if($stsem!=null)
-				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$stsem'";
+				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='".addslashes($stsem)."'";
 		}
 		else
 		{
 			if ($stg_kz>=0)
 			{
-				$where.=" tbl_studentlehrverband.studiengang_kz=$stg_kz";
+				$where.=" tbl_studentlehrverband.studiengang_kz='".addslashes($stg_kz)."'";
 				if ($sem!=null)
-					$where.=" AND tbl_studentlehrverband.semester=$sem";
+					$where.=" AND tbl_studentlehrverband.semester='".addslashes($sem)."'";
 				if ($ver!=null)
-					$where.=" AND tbl_studentlehrverband.verband='".$ver."'";
+					$where.=" AND tbl_studentlehrverband.verband='".addslashes($ver)."'";
 				if ($grp!=null)
-					$where.=" AND tbl_studentlehrverband.gruppe='".$grp."'";
+					$where.=" AND tbl_studentlehrverband.gruppe='".addslashes($grp)."'";
 			}
 		}			
 
 		if($stsem!=null)
-				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$stsem'";
+				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
 		
 		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
 		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz,
@@ -294,17 +276,16 @@ class student extends benutzer
 			$sql_query.= ",public.tbl_benutzergruppe";
 		$sql_query.= " WHERE tbl_prestudent.prestudent_id=tbl_student.prestudent_id AND tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
-		if(!($erg=pg_query($this->conn, $sql_query)))
+		if(!$this->db_query($sql_query))
 		{
-			$this->errormsg=pg_errormessage($this->conn);
+			$this->errormsg=$this->db_last_error();
 			return false;
 		}
-		$num_rows=pg_num_rows($erg);
 		$result=array();
-		for($i=0;$i<$num_rows;$i++)
+		
+		while($row = $this->db_fetch_object())
 		{
-   			$row=pg_fetch_object($erg,$i);
-			$l=new student($this->conn, null, null);
+			$l=new student();
 			// Personendaten
 			$l->uid=$row->uid;
 			$l->person_id=$row->person_id;
@@ -348,20 +329,21 @@ class student extends benutzer
 		return $result;
 	}
 	
-	// ****
-	// * Prueft ob die StudentLehrverband Zuteilung
-	// * bereits existiert
-	// * @param student_uid
-	// *        studiensemester_kurzbz
-	// * @return true wenn vorhanden, false wenn nicht
-	// ****
-	function studentlehrverband_exists($student_uid, $studiensemester_kurzbz)
+	/**
+	 * Prueft ob die StudentLehrverband Zuteilung
+	 * bereits existiert
+	 * @param student_uid
+	 * @param studiensemester_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function studentlehrverband_exists($student_uid, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband WHERE student_uid='".addslashes($student_uid)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband 
+				WHERE student_uid='".addslashes($student_uid)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
 					return true;
@@ -381,20 +363,22 @@ class student extends benutzer
 		}
 	}
 	
-	// ****
-	// * Prueft ob die StudentLehrverband Zuteilung
-	// * bereits existiert
-	// * @param student_uid
-	// *        studiensemester_kurzbz
-	// * @return true wenn vorhanden, false wenn nicht
-	// ****
-	function load_studentlehrverband($student_uid, $studiensemester_kurzbz)
+	/**
+	 * Prueft ob die StudentLehrverband Zuteilung
+	 * bereits existiert
+	 * @param student_uid
+	 *        studiensemester_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function load_studentlehrverband($student_uid, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_studentlehrverband WHERE student_uid='".addslashes($student_uid)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_studentlehrverband 
+				WHERE student_uid='".addslashes($student_uid)."' 
+				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->uid = $row->student_uid;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -422,10 +406,12 @@ class student extends benutzer
 		}
 	}
 	
-	// ****
-	// * Speichert die Zuteilung von Student zu Lehrverband
-	// ****
-	function save_studentlehrverband($new=null)
+	/**
+	 * Speichert die Zuteilung von Student zu Lehrverband
+	 * @param $new
+	 * @return boolean
+	 */
+	public function save_studentlehrverband($new=null)
 	{
 		if($new==null)
 			$new = $this->new;
@@ -455,30 +441,36 @@ class student extends benutzer
 					" updatevon=".$this->addslashes($this->updatevon).
 					" WHERE student_uid='".addslashes($this->uid)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_kurzbz)."'";
 		}
-		//echo $qry;
-		if(pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Speichern der Studentlehrverband zuordnung';
+			$this->errormsg = 'Fehler beim Speichern der Studentlehrverbandzuordnung';
 			return false;
 		}
 	}
 	
-	// ****************************************
-	// * Laedt die UID anhand der Prestudent_id
-	// * @param prestudent_id
-	// * @return uid wenn ok, false wenn Fehler
-	// ****************************************
-	function getUid($prestudent_id)
+	/**
+	 * Laedt die UID anhand der Prestudent_id
+	 * @param prestudent_id
+	 * @return uid wenn ok, false wenn Fehler
+	 */
+	public function getUid($prestudent_id)
 	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'PrestudentID ist ungueltig';
+			return false;
+		}
+		
 		$qry = "SELECT student_uid FROM public.tbl_student WHERE prestudent_id='$prestudent_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->student_uid;
 			}
@@ -495,18 +487,18 @@ class student extends benutzer
 		}
 	}
 	
-	// ****************************************
-	// * Laedt die UID anhand der Matrikelnummer
-	// * @param matrikelnummer
-	// * @return uid wenn ok, false wenn Fehler
-	// ****************************************
-	function getUidFromMatrikelnummer($matrikelnummer)
+	/**
+	 * Laedt die UID anhand der Matrikelnummer
+	 * @param matrikelnummer
+	 * @return uid wenn ok, false wenn Fehler
+	 */
+	public function getUidFromMatrikelnummer($matrikelnummer)
 	{
 		$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnr='".addslashes($matrikelnummer)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->student_uid;
 			}

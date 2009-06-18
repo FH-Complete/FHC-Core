@@ -19,66 +19,50 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class abschlusspruefung
+class abschlusspruefung extends basis_db
 {
-	var $conn;    // @var resource DB-Handle
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $result = array(); // @var email Objekt
+	public $new;
+	public $result = array();
 	
 	//Tabellenspalten
-	var $abschlusspruefung_id;
-	var $student_uid;
-	var $vorsitz;
-	var $pruefer1;
-	var $pruefer2;
-	var $pruefer3;
-	var $abschlussbeurteilung_kurzbz;
-	var $note;
-	var $akadgrad_id;
-	var $datum;
-	var $sponsion;
-	var $pruefungstyp_kurzbz;
-	var $anmerkung;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
-	var $ext_id;
+	public $abschlusspruefung_id;
+	public $student_uid;
+	public $vorsitz;
+	public $pruefer1;
+	public $pruefer2;
+	public $pruefer3;
+	public $abschlussbeurteilung_kurzbz;
+	public $note;
+	public $akadgrad_id;
+	public $datum;
+	public $sponsion;
+	public $pruefungstyp_kurzbz;
+	public $anmerkung;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $ext_id;
 		
-	// ***********************************************
-	// * Konstruktor
-	// * @param conn    Connection zur Datenbank
-	// *        abschlusspruefung_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function abschlusspruefung($conn, $abschlusspruefung_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param abschlusspruefung_id ID des zu ladenden Datensatzes
+	 */
+	public function __construct($abschlusspruefung_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/		
-		if($abschlusspruefung_id!= null)
+		parent::__constuct();
+		
+		if(!is_null($abschlusspruefung_id))
 			$this->load($abschlusspruefung_id);
 	}
 	
-	// ***********************************************
-	// * Laedt einen Datensatz
-	// * @param abschlusspruefung_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function load($abschlusspruefung_id)
+	/**
+	 * Laedt einen Datensatz
+	 * @param abschlusspruefung_id ID des zu ladenden Datensatzes
+	 */
+	public function load($abschlusspruefung_id)
 	{
 		//id auf Gueltigkeit pruefen
 		if(!is_numeric($abschlusspruefung_id))
@@ -88,11 +72,11 @@ class abschlusspruefung
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE abschlusspruefung_id='$abschlusspruefung_id';";
+		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE abschlusspruefung_id='".addslashes($abschlusspruefung_id)."';";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->abschlusspruefung_id = $row->abschlusspruefung_id;
 				$this->student_uid = $row->student_uid;
@@ -127,12 +111,12 @@ class abschlusspruefung
 		}
 	}
 			
-	// **************************************************
-	// * Loescht einen Datensatz
-	// * @param abschlusspruefung_id ID des zu loeschenden Datensatzes
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************
-	function delete($abschlusspruefung_id)
+	/**
+	 * Loescht einen Datensatz
+	 * @param abschlusspruefung_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($abschlusspruefung_id)
 	{
 		//abschlusspruefung_id auf Gueltigkeit pruefen
 		if(!is_numeric($abschlusspruefung_id))
@@ -141,9 +125,9 @@ class abschlusspruefung
 			return false;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_abschlusspruefung WHERE abschlusspruefung_id = '$abschlusspruefung_id';";
+		$qry = "DELETE FROM lehre.tbl_abschlusspruefung WHERE abschlusspruefung_id = '".addslashes($abschlusspruefung_id)."';";
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -155,29 +139,38 @@ class abschlusspruefung
 		}
 	}
 	
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern
+	 *
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	protected function validate()
 	{
+		if($this->akadgrad_id=='')
+		{
+			$this->errormsg = 'AkadGrad muss eingegeben werden';
+			return false;
+		}
+		if($this->pruefungstyp_kurzbz=='')
+		{
+			$this->errormsg = 'Pruefungstyp muss eingetragen werden';
+			return false;
+		}
+		if($this->student_uid=='')
+		{
+			$this->errormsg = 'UID muss eingetragen werden';
+			return false;
+		}
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *********************************************************************
-	// * Speichert den aktuellen Datensatz
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************************
-	function save($new=null)
+			
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!$this->validate())
 			return false;
@@ -230,30 +223,30 @@ class abschlusspruefung
 				  " WHERE abschlusspruefung_id='".addslashes($this->abschlusspruefung_id)."'";
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				$qry = "SELECT currval('lehre.tbl_abschlusspruefung_abschlusspruefung_id') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->abschlusspruefung_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -267,20 +260,20 @@ class abschlusspruefung
 		}
 	}
 	
-	// ************************************************
-	// * Laedt alle Abschlusspruefungen eines Studenten
-	// * @param student_uid UID des Studenten
-	// * @return true wenn ok, false wenn Fehler
-	// ************************************************
-	function getAbschlusspruefungen($student_uid)
+	/**
+	 * Laedt alle Abschlusspruefungen eines Studenten
+	 * @param student_uid UID des Studenten
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getAbschlusspruefungen($student_uid)
 	{
 		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".addslashes($student_uid)."' ORDER BY datum DESC";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new abschlusspruefung($this->conn, null, null);
+				$obj = new abschlusspruefung();
 				
 				$obj->abschlusspruefung_id = $row->abschlusspruefung_id;
 				$obj->student_uid = $row->student_uid;

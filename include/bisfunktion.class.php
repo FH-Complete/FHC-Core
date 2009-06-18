@@ -19,58 +19,42 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bisfunktion
+class bisfunktion extends basis_db 
 {
-	var $conn;    // @var resource DB-Handle
-	var $new;      // @var boolean
-	var $errormsg; // @var string
-	var $result = array(); // @var email Objekt
+	public $new;      //  boolean
+	public $result = array(); //  email Objekt
 	
 	//Tabellenspalten
-	var $bisverwendung_id;
-	var $studiengang_kz;
-	var $sws;
-	var $updateamum;
-	var $updatevon;
-	var $insertamum;
-	var $insertvon;
-	var $ext_id;
-	var $studiengang_kz_old;
+	public $bisverwendung_id;
+	public $studiengang_kz;
+	public $sws;
+	public $updateamum;
+	public $updatevon;
+	public $insertamum;
+	public $insertvon;
+	public $ext_id;
+	public $studiengang_kz_old;
 	
-	// ***********************************************
-	// * Konstruktor
-	// * @param conn    Connection zur Datenbank
-	// *        bisverwendung_id ID des zu ladenden Datensatzes
-	// ***********************************************
-	function bisfunktion($conn, $bisverwendung_id=null, $studiengang_kz=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param bisverwendung_id ID des zu ladenden Datensatzes
+	 */
+	public function __construct($bisverwendung_id=null, $studiengang_kz=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-				
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-		*/
-		if($bisverwendung_id != null && $studiengang_kz != null)
+		parent::__construct();
+		
+		if(!is_null($bisverwendung_id) && !is_null($studiengang_kz))
 			$this->load($bisverwendung_id, $studiengang_kz);
 	}
 	
-	// ***********************************************
-	// * Laedt einen Datensatz
-	// * @param bisverwendung_id ID des zu ladenden Datensatzes
-	// *        studiengang_kz
-	// ***********************************************
-	function load($bisverwendung_id, $studiengang_kz)
+	/**
+	 * Laedt einen Datensatz
+	 * @param bisverwendung_id ID des zu ladenden Datensatzes
+	 *        studiengang_kz
+	 */
+	public function load($bisverwendung_id, $studiengang_kz)
 	{
 		//bisverwendung_id auf gueltigkeit pruefen
 		if(!is_numeric($bisverwendung_id) || $bisverwendung_id == '')
@@ -87,9 +71,9 @@ class bisfunktion
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='$bisverwendung_id' AND studiengang_kz='$studiengang_kz'";
 		
-		if($result = pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->bisverwendung_id = $row->bisverwendung_id;
 				$this->studiengang_kz = $row->studiengang_kz;
@@ -100,9 +84,9 @@ class bisfunktion
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				
-				return true;		
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler bei der Datenbankabfrage';
 				return false;
@@ -115,14 +99,14 @@ class bisfunktion
 		}
 	}
 			
-	// **************************************************
-	// * Loescht einen Datensatz
-	// * @param bisverwendung_id ID des zu loeschenden Datensatzes
-	// * @return true wenn ok, false im Fehlerfall
-	// **************************************************
-	function delete($bisverwendung_id, $studiengang_kz)
+	/**
+	 * Loescht einen Datensatz
+	 * @param bisverwendung_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($bisverwendung_id, $studiengang_kz)
 	{
-		//akte_id auf gueltigkeit pruefen
+		//id auf gueltigkeit pruefen
 		if(!is_numeric($bisverwendung_id) || $bisverwendung_id == '')
 		{
 			$this->errormsg = 'bisverwendung_id muss eine gueltige Zahl sein';
@@ -136,7 +120,7 @@ class bisfunktion
 		
 		$qry = "DELETE FROM bis.tbl_bisfunktion WHERE bisverwendung_id = '$bisverwendung_id' AND studiengang_kz='$studiengang_kz';";
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
@@ -148,7 +132,12 @@ class bisfunktion
 		}
 	}
 	
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern auf Gueltigkeit
+	 *
+	 * @return true wenn ok, sonst false
+	 */
+	protected function validate()
 	{
 		
 		if($this->sws!='' && !is_numeric($this->sws))
@@ -158,28 +147,18 @@ class bisfunktion
 		}
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *********************************************************************
-	// * Speichert den aktuellen Datensatz
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************************
-	function save($new=null)
+			
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $akte_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(!$this->validate())
 			return false;
+		
 		if($new==null)
 			$new = $this->new;
 			
@@ -212,10 +191,10 @@ class bisfunktion
 				  " updateamum=".$this->addslashes($this->updateamum).",".
 				  " updatevon=".$this->addslashes($this->updatevon).",".
 				  " ext_id=".$this->addslashes($this->ext_id).
-				  " WHERE bisverwendung_id='".addslashes($this->bisverwendung_id)."' AND studiengang_kz='$this->studiengang_kz_old'";
+				  " WHERE bisverwendung_id='".addslashes($this->bisverwendung_id)."' AND studiengang_kz='".addslashes($this->studiengang_kz_old)."'";
 		}
-		//echo $qry;
-		if(pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -226,12 +205,12 @@ class bisfunktion
 		}
 	}
 	
-	// ********************************************
-	// * Laedt alle Verwendungen eines Mitarbeiters
-	// * @param $uid UID des Mitarbeiters
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function getBisFunktion($bisverwendung_id, $studiengang_kz=null)
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters
+	 * @param $uid UID des Mitarbeiters
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getBisFunktion($bisverwendung_id, $studiengang_kz=null)
 	{
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".addslashes($bisverwendung_id)."'";
@@ -240,11 +219,12 @@ class bisfunktion
 			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
 
 		$qry.=" ORDER BY studiengang_kz";
-		if($result = pg_query($this->conn,$qry))
+		
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new bisfunktion($this->conn, null, null, null);
+				$obj = new bisfunktion();
 				
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->studiengang_kz = $row->studiengang_kz;

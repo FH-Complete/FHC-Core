@@ -19,60 +19,46 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class pruefling
+class pruefling extends basis_db
 {
 	//Tabellenspalten
-	var $pruefling_id;
-	var $studiengang_kz;
-	var $idnachweis;
-	var $registriert;
-	var $prestudent_id;
-	var $semester;
+	public $pruefling_id;
+	public $studiengang_kz;
+	public $idnachweis;
+	public $registriert;
+	public $prestudent_id;
+	public $semester;
 	
 	// ErgebnisArray
-	var $result=array();
-	var $num_rows=0;
-	var $errormsg;
-	var $new;
+	public $result=array();
+	public $num_rows=0;
+	public $new;
 		
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen pruefling
-	// * @param $conn        	Datenbank-Connection
-	// *        $frage_id       Frage die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function pruefling($conn, $pruefling_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional einen pruefling
+	 * @param $frage_id       Frage die geladen werden soll (default=null)
+	 */
+	public function __construct($pruefling_id=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/		
+		parent::__construct();
+
 		if($pruefling_id != null)
 			$this->load($pruefling_id);
 	}
 	
-	// ***********************************************************
-	// * Laedt Pruefling mit der uebergebenen ID
-	// * @param $pruefling_id ID der Frage die geladen werden soll
-	// ***********************************************************
-	function load($pruefling_id)
+	/**
+	 * Laedt Pruefling mit der uebergebenen ID
+	 * @param $pruefling_id ID der Frage die geladen werden soll
+	 */
+	public function load($pruefling_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE pruefling_id='".addslashes($pruefling_id)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->pruefling_id = $row->pruefling_id;
 				$this->studiengang_kz = $row->studiengang_kz;
@@ -90,39 +76,28 @@ class pruefling
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim laden: $qry";
+			$this->errormsg = "Fehler beim Laden: $qry";
 			return false;
 		}		
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+			
+	/**
+	 * Prueft die Variablen vor dem Speichern 
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		return true;
 	}
 	
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
-	function save()
+	/**
+	 * Speichert die Benutzerdaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten der Datensatz mit $uid upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -148,29 +123,29 @@ class pruefling
 			       " WHERE pruefling_id='".addslashes($this->pruefling_id)."';";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
 				$qry = "SELECT currval('testtool.tbl_pruefling_pruefling_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->pruefling_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else 
 					{
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = 'Fehler beim Lesen der Sequence';
 						return false;
 					}
 				}
 				else
 				{
-					pg_query($this->conn, 'ROLLBACK;');
+					$this->db_query('ROLLBACK;');
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					return false;
 				}
@@ -182,18 +157,25 @@ class pruefling
 		}
 		else 
 		{	
-			pg_query($this->conn, 'ROLLBACK');
+			$this->db_query('ROLLBACK');
 			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
 			return false;
 		}
 	}
 	
-	function getPruefling($prestudent_id)
+	/**
+	 * Laedt einen Puefling anhand der Prestudent_id
+	 *
+	 * @param $prestudent_id
+	 * @return boolean
+	 */
+	public function getPruefling($prestudent_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE prestudent_id='".addslashes($prestudent_id)."'";
-		if($result = pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->pruefling_id = $row->pruefling_id;
 				$this->studiengang_kz = $row->studiengang_kz;
@@ -211,7 +193,7 @@ class pruefling
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim laden: $qry";
+			$this->errormsg = "Fehler beim Laden: $qry";
 			return false;
 		}		
 	}
@@ -223,9 +205,9 @@ class pruefling
 	 * @param $pruefling_id
 	 * @param $gebiet_id
 	 */
-	function getPrueflingLevel($pruefling_id, $gebiet_id)
+	public function getPrueflingLevel($pruefling_id, $gebiet_id)
 	{
-		$gebiet = new gebiet($this->conn, $gebiet_id);
+		$gebiet = new gebiet($gebiet_id);
 				
 		//wenn Levelsystem fuer dieses Gebiet aktiviert ist
 		if($gebiet->level_start!='')
@@ -234,11 +216,12 @@ class pruefling
 			$max_level = 0;
 			$min_level = 0;
 					
-			$qry = "SELECT max(level) as max, min(level) as min FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."'";
+			$qry = "SELECT max(level) as max, min(level) as min FROM testtool.tbl_frage 
+					WHERE gebiet_id='".addslashes($gebiet_id)."'";
 			
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					$max_level = $row->max;
 					$min_level = $row->min;
@@ -272,9 +255,9 @@ class pruefling
 			$aktueller_level=$gebiet->level_start;
 			$anzahl_richtig=0;
 			$anzahl_falsch=0;
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $this->db_fetch_object())
 				{
 					if($row->punkte>0)
 					{
@@ -313,6 +296,11 @@ class pruefling
 				
 				return $aktueller_level;
 			}
+			else 
+			{
+				$this->errormsg = 'Fehler bei einer Abfrage';
+				return false;
+			}
 		}
 		else 
 			return -1;
@@ -324,16 +312,16 @@ class pruefling
 	 * @param $prestudent_id
 	 * @return Endpunkte des Reihungstests
 	 */
-	function getReihungstestErgebnis($prestudent_id)
+	public function getReihungstestErgebnis($prestudent_id)
 	{
 		$qry = "SELECT * FROM testtool.vw_auswertung 
 				WHERE prestudent_id='".addslashes($prestudent_id)."'";
 		
 		$ergebnis=0;
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
 				//wenn maxpunkte ueberschritten wurde -> 100%
 				if($row->punkte>=$row->maxpunkte)
@@ -344,6 +332,11 @@ class pruefling
 				$ergebnis+=$prozent*$row->gewicht;		
 			}
 			return $ergebnis;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
 		}
 	}
 }

@@ -23,70 +23,54 @@
  * Klasse Zeugnisnote
  * @create 2007-06-06
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class zeugnisnote
+class zeugnisnote extends basis_db
 {
-	var $conn;     			// resource DB-Handle
-	var $new;       		// boolean
-	var $errormsg;  		// string
-	var $result=array();
+	public $new;       		// boolean
+	public $result=array();
 
 	//Tabellenspalten
-	var $lehrveranstaltung_id;		// integer
-	var $student_uid;				// varchar(16)
-	var $studiensemester_kurzbz;	// varchar(16)
-	var $note;						// smalint
-	var $uebernahmedatum;			// date
-	var $benotungsdatum;			// date
-	var $updateamum;				// timestamp
-	var $updatevon;					// varchar(16)
-	var $insertamum;				// timestamp
-	var $insertvon;					// varchar(16)
-	var $ext_id;					// bigint
-	var $bemerkung;					// text
+	public $lehrveranstaltung_id;		// integer
+	public $student_uid;				// varchar(16)
+	public $studiensemester_kurzbz;	// varchar(16)
+	public $note;						// smalint
+	public $uebernahmedatum;			// date
+	public $benotungsdatum;			// date
+	public $updateamum;				// timestamp
+	public $updatevon;					// varchar(16)
+	public $insertamum;				// timestamp
+	public $insertvon;					// varchar(16)
+	public $ext_id;					// bigint
+	public $bemerkung;					// text
 
-	var $lehrveranstaltung_bezeichung;
-	var $note_bezeichnung;
-	var $zeugnis;
-	var $lv_lehrform_kurzbz;
+	public $lehrveranstaltung_bezeichung;
+	public $note_bezeichnung;
+	public $zeugnis;
+	public $lv_lehrform_kurzbz;
 
-	// *********************************************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// *********************************************************************
-	function zeugnisnote($conn, $lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null , $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 */
+	public function __construct($lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg= "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-*/
 		if($lehrveranstaltung_id!=null && $student_uid!=null && $studiensemester_kurzbz!=null)
 			$this->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
 	}
 
-	// **************************************************************
-	// * Laedt eine Zeugnisnote
-	// * @param  $lehrveranstaltung_id
-	// *         $student_uid
-	// *         $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// ***************************************************************
-	function load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * Laedt eine Zeugnisnote
+	 * @param  $lehrveranstaltung_id
+	 *         $student_uid
+	 *         $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -99,9 +83,9 @@ class zeugnisnote
 				student_uid='".addslashes($student_uid)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$this->student_uid = $row->student_uid;
@@ -130,11 +114,11 @@ class zeugnisnote
 		}
 	}
 
-	// *************************************
-	// * Prueft die Daten vor dem Speichern
-	// * auf Gueltigkeit
-	// *************************************
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern
+	 * auf Gueltigkeit
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->lehrveranstaltung_id))
 		{
@@ -169,24 +153,13 @@ class zeugnisnote
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************************************************
-	function save($new=null)
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if($new==null)
 			$new=$this->new;
@@ -226,34 +199,32 @@ class zeugnisnote
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
 
-		//if(pg_send_query($this->conn, $qry))
-		if(pg_query($this->conn, $qry))		
+		if($this->db_query($qry))		
 		{
 			return true;
 		}
 		else
 		{
-			//echo $qry;
 			$this->errormsg='Fehler beim Speichern der Zeugnisnote';
 			return false;
 		}
 	}
 
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
-	function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "DELETE FROM lehre.tbl_zeugnisnote WHERE
 				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND
 				student_uid='".addslashes($student_uid)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else
 		{
@@ -262,14 +233,14 @@ class zeugnisnote
 		}
 	}
 
-	// *********************************************
-	// * Laed die Noten
-	// * @param $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false wenn Fehler
-	// *********************************************
-	function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * Laedt die Noten
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		$where='';
 		if($lehrveranstaltung_id!=null)
@@ -321,11 +292,11 @@ class zeugnisnote
 				WHERE true $where2
 				ORDER BY sort";
 		//echo $qry;
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new zeugnisnote($this->conn, null, null, null, null);
+				$obj = new zeugnisnote();
 
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$obj->student_uid = $row->uid;

@@ -19,64 +19,49 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class benutzergruppe
+class benutzergruppe extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $benutzergruppen = array(); // benutzergruppe Objekt
+	public $new;
+	public $benutzergruppen = array(); // benutzergruppe Objekt
 	
 	//Tabellenspalten
-	var $uid;			// varchar(16)
-	var $gruppe_kurzbz;	// varchar(16)
-	var $updateamum;	// timestamp
-	var $updatevon;		// varchar(16)
-	var $insertamum;	// timestamp
-	var $insertvon;		// varchar(16)
-	var $studiensemester_kurzbz; // varchar(16)
+	public $uid;			// varchar(16)
+	public $gruppe_kurzbz;	// varchar(16)
+	public $updateamum;		// timestamp
+	public $updatevon;		// varchar(16)
+	public $insertamum;		// timestamp
+	public $insertvon;		// varchar(16)
+	public $studiensemester_kurzbz; // varchar(16)
 	
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine BenutzerGruppe
-	// * @param $conn        	Datenbank-Connection
-	// *		$uid
-	// *        $gruppe_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung 
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function benutzergruppe($conn, $uid=null, $gruppe_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional eine BenutzerGruppe
+	 * @param $uid
+	 * @param $gruppe_kurzbz
+	 */
+	public function __construct($uid=null, $gruppe_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else 
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-			
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/		
-		if($gruppe_kurzbz!=null && $uid!=null)
+		parent::__construct();
+		
+		if(!is_null($gruppe_kurzbz) && !is_null($uid))
 			$this->load($uid, $gruppe_kurzbz);
 	}
 	
-	// *********************************************************
-	// * Laedt die BenutzerGruppe
-	// * @param uid, gruppe_kurzbz, studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************
-	function load($uid, $gruppe_kurzbz, $studiensemester_kurzbz=null)
+	/**
+	 * Laedt die BenutzerGruppe
+	 * @param uid, gruppe_kurzbz, studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($uid, $gruppe_kurzbz, $studiensemester_kurzbz=null)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 		if($studiensemester_kurzbz!=null)
 			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->uid = $row->uid;
 				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
@@ -95,29 +80,29 @@ class benutzergruppe
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 	}
 	
-	// *********************************************************
-	// * Laedt die User in einer Benutzergruppe
-	// * @param gruppe_kurzbz, stsem
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************
-	function load_uids($gruppe_kurzbz, $stsem)
+	/**
+	 * Laedt die User in einer Benutzergruppe
+	 * @param gruppe_kurzbz, stsem
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_uids($gruppe_kurzbz, $stsem)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' and studiensemester_kurzbz = '".$stsem."'";
+		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' and studiensemester_kurzbz = '".addslashes($stsem)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if (pg_num_rows($result) == 0)
+			if ($this->db_num_rows() == 0)
 				return false;
 			else
 			{			
-				while($row = pg_fetch_object($result))
+				while($row = $this->db_fetch_object())
 				{
-					$bg_obj = new benutzergruppe($this->conn);
+					$bg_obj = new benutzergruppe();
 					$bg_obj->uid = $row->uid;
 					$this->uids[] = $bg_obj;
 				}
@@ -126,17 +111,17 @@ class benutzergruppe
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden des Datensatzes';
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 	}	
 	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern 
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern 
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->uid)>16)
 		{
@@ -162,24 +147,13 @@ class benutzergruppe
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische 
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert BenutzerGruppe in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert BenutzerGruppe in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -202,26 +176,35 @@ class benutzergruppe
 		else
 		{
 			//ToDo
-			$qry = 'Select 1;';
+			//$qry = 'Select 1;';
+			$this->errormsg = 'Update ist noch nicht implementiert';
+			return false;
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der BenutzerGruppe:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der BenutzerGruppe';
 			return false;
 		}
 	}
 	
-	function delete($uid, $gruppe_kurzbz)
+	/**
+	 * Loescht eine Gruppenzuordnung
+	 *
+	 * @param $uid
+	 * @param $gruppe_kurzbz
+	 * @return boolean
+	 */
+	public function delete($uid, $gruppe_kurzbz)
 	{
 		$qry = "DELETE FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 
 		{

@@ -23,71 +23,50 @@
  * Klasse bisio - Incomming/Outgoing
  * @create 2007-05-14
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bisio
+class bisio extends basis_db
 {
-	var $conn;     			// resource DB-Handle
-	var $new;       		// boolean
-	var $errormsg;  		// string
-	var $result = array();	// adresse Objekt
+	public $new;       		// boolean
+	public $result = array();	// adresse Objekt
 
 	//Tabellenspalten
-	var $bisio_id; 					// serial
-	var $mobilitaetsprogramm_code; 	// integer
-	var $mobilitaetsprogramm_kurzbz;
-	var $nation_code; 				// varchar(3)
-	var $von; 						// date
-	var $bis; 						// date
-	var $zweck_code; 				// varchar(20)
-	var $zweck_bezeichnung;
-	var $student_uid; 				// varchar(16)
-	var $updateamum; 				// timestamp
-	var $updatevon; 				// varchar(16)
-	var $insertamum; 				// timestamp
-	var $insertvon; 				// varchar(16) 
-	var $ext_id;					// bigint
-	var $ort;
-	var $universitaet;
-	var $lehreinheit_id;
+	public $bisio_id; 					// serial
+	public $mobilitaetsprogramm_code; 	// integer
+	public $mobilitaetsprogramm_kurzbz;
+	public $nation_code; 				// varchar(3)
+	public $von; 						// date
+	public $bis; 						// date
+	public $zweck_code; 				// varchar(20)
+	public $zweck_bezeichnung;
+	public $student_uid; 				// varchar(16)
+	public $updateamum; 				// timestamp
+	public $updatevon; 				// varchar(16)
+	public $insertamum; 				// timestamp
+	public $insertvon; 				// varchar(16) 
+	public $ext_id;					// bigint
+	public $ort;
+	public $universitaet;
+	public $lehreinheit_id;
 
-	// **************************************************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $bisio_id  ID die geladen werden soll (Default=null)
-	// *        $unicode   Wenn true dann wird das Encoding auf Unicode gesetzt
-	// **************************************************************************
-	function bisio($conn, $bisio_id=null, $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $bisio_id  ID die geladen werden soll (Default=null)
+	 */
+	public function __construct($bisio_id=null)
 	{
-		$this->conn = $conn;
-		/*
-		if($unicode!=null)
-		{
-			if ($unicode)
-			{
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			}
-			else
-			{
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-			}
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-	
-		}
-	*/	
-		if($bisio_id!=null)
+		parent::__construct();
+				
+		if(!is_null($bisio_id))
 			$this->load($bisio_id);
 	}
 
-	// ************************************************
-	// * Laedt die Funktion mit der ID $buchungsnr
-	// * @param  $buchungsnr ID der zu ladenden  Email
-	// * @return true wenn ok, false im Fehlerfall
-	// ************************************************
-	function load($bisio_id)
+	/**
+	 * Laedt die Funktion mit der ID $buchungsnr
+	 * @param  $buchungsnr ID der zu ladenden  Email
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($bisio_id)
 	{
 		if(!is_numeric($bisio_id))
 		{
@@ -97,9 +76,9 @@ class bisio
 
 		$qry = "SELECT * FROM bis.tbl_bisio WHERE bisio_id='$bisio_id'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->bisio_id = $row->bisio_id;
 				$this->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code;
@@ -132,11 +111,11 @@ class bisio
 		}
 	}
 
-	// *******************************************
-	// * Prueft die Variablen auf Gueltigkeit
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen auf Gueltigkeit
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->mobilitaetsprogramm_code))
 		{
@@ -176,26 +155,15 @@ class bisio
 		
 		return true;
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ***********************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $kontakt_id aktualisiert
-	// * @param $new true wenn insert false wenn update
-	// * @return true wenn ok, false im Fehlerfall
-	// ***********************************************************************
-	function save($new=null)
+	
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $kontakt_id aktualisiert
+	 * @param $new true wenn insert false wenn update
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		//Variablen pruefen
 		if(!$this->validate())
@@ -242,31 +210,30 @@ class bisio
 				   ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).
 				   " WHERE bisio_id='".addslashes($this->bisio_id)."';";
 		}
-		//echo $qry;
-
-		if(pg_query($this->conn, $qry))
+		
+		if($this->db_query($qry))
 		{
 				if($new)
 				{
 					$qry = "SELECT currval('bis.tbl_bisio_bisio_id_seq') as id";
-					if($result = pg_query($this->conn, $qry))
+					if($this->db_query($qry))
 					{
-						if($row = pg_fetch_object($result))
+						if($row = $this->db_fetch_object())
 						{
 							$this->bisio_id = $row->id;
-							pg_query($this->conn, 'COMMIT;');
+							$this->db_query('COMMIT;');
 						}
 						else
 						{
 							$this->errormsg = 'Fehler beim Auslesen der Sequence';
-							pg_query($this->conn, 'ROLLBACK;');
+							$this->db_query('ROLLBACK;');
 							return false;
 						}
 					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
@@ -279,12 +246,12 @@ class bisio
 		}
 	}
 
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param bisio_id ID die geloescht werden soll
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
-	function delete($bisio_id)
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param bisio_id ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($bisio_id)
 	{
 		if(!is_numeric($bisio_id))
 		{
@@ -294,7 +261,7 @@ class bisio
 		
 		$qry = "DELETE FROM bis.tbl_bisio WHERE bisio_id='$bisio_id'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 
 		{
@@ -303,13 +270,13 @@ class bisio
 		}
 	}
 
-	// *****************************************
-	// * Liefert alle Incomming/Outgoing 
-	// * Eintraege eines Studenten
-	// * @param $uid
-	// * @return true wenn ok, false wenn fehler
-	// *****************************************
-	function getIO($uid)
+	/**
+	 * Liefert alle Incomming/Outgoing 
+	 * Eintraege eines Studenten
+	 * @param $uid
+	 * @return true wenn ok, false wenn fehler
+	 */
+	public function getIO($uid)
 	{
 		$qry = "SELECT	tbl_bisio.*, 
 						tbl_mobilitaetsprogramm.kurzbz as mobilitaetsprogramm_kurzbz,
@@ -324,11 +291,11 @@ class bisio
 					tbl_mobilitaetsprogramm.mobilitaetsprogramm_code=tbl_bisio.mobilitaetsprogramm_code
 				ORDER BY bis";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$io = new bisio($this->conn, null, null);
+				$io = new bisio();
 				
 				$io->bisio_id = $row->bisio_id;
 				$io->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code;
@@ -358,6 +325,5 @@ class bisio
 			return false;
 		}
 	}
-	
 }
 ?>

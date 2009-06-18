@@ -23,62 +23,64 @@
  * Klasse lvinfo (FAS-Online)
  * @create 04-12-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lvinfo
+class lvinfo extends basis_db
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt
+	public $new;     			// boolean
+	public $result = array(); 	// fachbereich Objekt
 
 	//Tabellenspalten
-	var $lehrveranstaltung_id;		// @var integer
-	var $lehrziele;		// @var string
-	var $titel;				// @var varchar(256)
-	var $methodik;			// @var string
-	var $lehrinhalte;		// @var string
-	var $voraussetzungen;	// @var string
-	var $unterlagen;		// @var string
-	var $pruefungsordnung;	// @var string
-	var $anmerkungen;		// @var string
-	var $kurzbeschreibung;	// @var string
-	var $genehmigt;		// @var boolean
-	var $aktiv;			// @var boolean
-	var $sprache;			// @var string
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
+	public $lehrveranstaltung_id; // integer
+	public $lehrziele;			// string
+	public $titel;				// varchar(256)
+	public $methodik;			// string
+	public $lehrinhalte;		// string
+	public $voraussetzungen;	// string
+	public $unterlagen;			// string
+	public $pruefungsordnung;	// string
+	public $anmerkungen;		// string
+	public $kurzbeschreibung;	// string
+	public $genehmigt;			// boolean
+	public $aktiv;				// boolean
+	public $sprache;			// string
+	public $updateamum;			// timestamp
+	public $updatevon=0;		// string
+	public $insertamum;			// timestamp
+	public $insertvon=0;		// string
 
-	var $lastqry;			//zuletzt ausgefuehrte qry (benoetigt fuer log)
+	public $lastqry;			//zuletzt ausgefuehrte qry (benoetigt fuer log)
+	
 	/**
 	 * Konstruktor
 	 * @param $conn Connection zur DB
 	 *        $lvinfo_id ID des zu ladenden Ortes
 	 */
-	function lvinfo($conn, $lvinfo_id=null)
+	public function __construct($lvinfo_id=null)
 	{
-		$this->conn = $conn;
+		parent::__construct();
+		
 		if($lvinfo_id != null && is_numeric($lvinfo_id))
 			$this->load($lvinfo_id);
 	}
+	
 	/**
 	 * Laedt alle verfuegbaren LVInfos
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
-		$qry = 'SELECT * FROM campus.tbl_lvinfo order by lvinfo_id;';
+		$qry = 'SELECT * FROM campus.tbl_lvinfo ORDER BY lvinfo_id;';
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$lvinfo_obj = new lvinfo($this->conn);
+			$lvinfo_obj = new lvinfo();
 
 			$lvinfo_obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			$lvinfo_obj->lehrziele 			= $row->lehrziele;
@@ -109,21 +111,23 @@ class lvinfo
 	 *        $sprache
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($lehrveranstaltung_id, $sprache)
+	public function load($lehrveranstaltung_id, $sprache)
 	{
 		if($lehrveranstaltung_id == '' || !is_numeric($lehrveranstaltung_id))
 		{
 			$this->errormsg = 'lvinfo_id ungültig';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id = '$lehrveranstaltung_id' AND sprache='".addslashes($sprache)."';";
+		$qry = "SELECT * FROM campus.tbl_lvinfo 
+				WHERE lehrveranstaltung_id = '$lehrveranstaltung_id' AND sprache='".addslashes($sprache)."';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
-		if($row=pg_fetch_object($res))
+		
+		if($row = $this->db_fetch_object())
 		{
 			$this->lehrveranstaltung_id	= $row->lehrveranstaltung_id;
 			$this->lehrziele 			= $row->lehrziele;
@@ -157,7 +161,7 @@ class lvinfo
 	 * @param $lvinfo_id ID des Datensatzes der geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function delete($lvinfo_id)
+	public function delete($lvinfo_id)
 	{
 		if(!is_numeric($lvinfo_id))
 		{
@@ -167,7 +171,7 @@ class lvinfo
 
 		$qry = "DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvinfo_id'";
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			$this->lastqry = $qry;
 			return true;
@@ -178,20 +182,17 @@ class lvinfo
 			return false;
 		}
 	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
+	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{
 		//Laenge Pruefen
 		if(strlen($this->sprache)>16)
 		{
-			$this->errormsg = "Sprache darf nicht laenger als 16 Zeichen sein bei <b>".$this->lvinfo_id."</b> - $this->sprache";
+			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(!is_numeric($this->lehrveranstaltung_id))
@@ -201,14 +202,15 @@ class lvinfo
 		}
 		return true;
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($this->new)
@@ -266,9 +268,8 @@ class lvinfo
 				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id)." AND sprache=".$this->addslashes($this->sprache).";";
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-
 			$this->lastqry=$qry;
 			return true;
 		}
@@ -279,7 +280,14 @@ class lvinfo
 		}
 	}
 
-	function exists($lehrveranstaltung_id, $sprache=null)
+	/**
+	 * Prueft ob bereits eine LV-Info angelegt ist
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $sprache
+	 * @return boolean
+	 */
+	public function exists($lehrveranstaltung_id, $sprache=null)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -292,18 +300,14 @@ class lvinfo
 		if(!is_null($sprache))
 			$qry .= " AND sprache='".addslashes($sprache)."'";
 
-		if($result=pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
-				{
 					return true;
-				}
 				else
-				{
 					return false;
-				}
 			}
 			else
 			{
@@ -325,7 +329,7 @@ class lvinfo
 	 * @param $target ID der Lehrveranstaltung zu der die LV-Info kopiert werden soll
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	function copy($source, $target)
+	public function copy($source, $target)
 	{
 		if(!is_numeric($source) || $source=='')
 		{
@@ -347,7 +351,7 @@ class lvinfo
 		lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt,
 		aktiv, updateamum, updatevon, insertamum, insertvon FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=$source";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}

@@ -19,48 +19,41 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lehrverband
+class lehrverband extends basis_db 
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $result = array(); // lehrverband Objekt
+	public $new;      // boolean
+	public $result = array(); // lehrverband Objekt
 
 	//Tabellenspalten
-	var $studiengang_kz;	// integer
-	var $semester;			// integer
-	var $verband;			// integer
-	var $gruppe;			// integer
-	var $aktiv;				// boolean
-	var $bezeichnung;		// varchar(16)
-	var $orgform_kurzbz;
+	public $studiengang_kz;	// integer
+	public $semester;			// integer
+	public $verband;			// integer
+	public $gruppe;			// integer
+	public $aktiv;				// boolean
+	public $bezeichnung;		// varchar(16)
+	public $orgform_kurzbz;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional einen Lehrverband
-	// * @param $conn        	Datenbank-Connection
-	// *
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function lehrverband($conn, $unicode=false)
+	/**
+	 * Konstruktor
+	 * 
+	 */
+	public function __construct()
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
+		parent::__construct();
 	}
 
-	function exists($studiengang_kz, $semester, $verband, $gruppe)
+	/**
+	 * Prueft ob ein Lehrverband existiert
+	 *
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @param $verband
+	 * @param $gruppe
+	 * @return true wenn vorhanden, sonst false
+	 */
+	public function exists($studiengang_kz, $semester, $verband, $gruppe)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_lehrverband WHERE
 		            studiengang_kz='".addslashes($studiengang_kz)."' AND
@@ -68,25 +61,38 @@ class lehrverband
 		            trim(verband)='".trim(addslashes($verband))."' AND
 		            trim(gruppe)='".trim(addslashes($gruppe))."'";
 
-		if($row=pg_fetch_object(pg_query($this->conn, $qry)))
+		if($this->db_query($qry))
 		{
-			if($row->anzahl>0)
+			if($row = $this->db_fetch_object())
 			{
-				return true;
+				if($row->anzahl>0)
+					return true;
+				else
+					return false;
 			}
 			else
 			{
+				$this->errormsg = 'Fehler bei Abfrage: '.$qry;
 				return false;
 			}
 		}
-		else
+		else 
 		{
-			$this->errormsg = 'Fehler bei Abfrage: '.$qry;
+			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
 		}
 	}
 
-	function load($studiengang_kz, $semester, $verband, $gruppe)
+	/**
+	 * Laedt einen Lehrverband
+	 *
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @param $verband
+	 * @param $gruppe
+	 * @return boolean
+	 */
+	public function load($studiengang_kz, $semester, $verband, $gruppe)
 	{
 		$qry = "SELECT * FROM public.tbl_lehrverband
 				WHERE studiengang_kz='".addslashes($studiengang_kz)."'
@@ -94,9 +100,9 @@ class lehrverband
 				AND verband='".addslashes($verband)."'
 				AND gruppe='".addslashes($gruppe)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->semester = $row->semester;
@@ -115,17 +121,17 @@ class lehrverband
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim lesen der Daten';
+			$this->errormsg = 'Fehler beim Lesen der Daten';
 			return false;
 		}
 	}
 	
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->semester))
 		{
@@ -148,7 +154,15 @@ class lehrverband
 		return true;
 	}
 
-	function getlehrverband($studiengang_kz=null, $semester=null, $verband=null)
+	/**
+	 * Liefert alle Lehrverbaende unterhalb des uebergebenen
+	 *
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @param $verband
+	 * @return boolean
+	 */
+	public function getlehrverband($studiengang_kz=null, $semester=null, $verband=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_lehrverband WHERE aktiv=true';
 		if(!is_null($studiengang_kz))
@@ -159,11 +173,11 @@ class lehrverband
 			$qry .=' AND verband='.$this->addslashes($verband);
 
 		$qry .= ' ORDER BY studiengang_kz, semester, verband, gruppe';
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$lv_obj = new lehrverband($this->conn);
+				$lv_obj = new lehrverband();
 
 				$lv_obj->studiengang_kz = $row->studiengang_kz;
 				$lv_obj->semester = $row->semester;
@@ -179,29 +193,18 @@ class lehrverband
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen der Lehrverbaende '.$qry;
+			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende '.$qry;
 			return false;
 		}
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Lehrverband in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert Lehrverband in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if($new==null)
 			$new = $this->new;
@@ -233,7 +236,7 @@ class lehrverband
 				   " AND gruppe='".addslashes($this->gruppe)."';";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;

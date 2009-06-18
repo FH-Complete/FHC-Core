@@ -24,78 +24,38 @@
  * Klasse schluesseltyp (FAS-Online)
  * @create 03-01-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class schluesseltyp
+class schluesseltyp extends basis_db 
 {
-	var $conn;     				// resource DB-Handle
-	var $errormsg; 			// string
-	var $new;      				// boolean
-	//var $schluesseltyp = array(); 	// schluesseltyp Objekt
+	public $new;      				// boolean
 
 	//Tabellenspalten
-	var $schluesseltyp;			//string
-	var $beschreibung;   		//string
-	var $anzahl; 				//smallint
-	var $kaution;				//numeric(5,2)
+	public $schluesseltyp;			//string
+	public $beschreibung;   		//string
+	public $anzahl; 				//smallint
+	public $kaution;				//numeric(5,2)
 
 	/**
 	 * Konstruktor
-	 * @param $conn      Connection
-	 *        $code      Zu ladende Schluesseltyp
 	 */
-	function schluesseltyp($conn, $code=null, $unicode=false)
+	public function __construct()
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry 			= "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry 			= "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	= 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-	}
-
-
-	/**
-	 * Laedt die Funktion mit der ID $schluesseltyp
-	 * @param  $code code des zu ladenden  schluesseltyps
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function load($code)
-	{
-		$this->errormsg 		= 'Noch nicht implementiert';
-		return false;
+		parent::__construct();
 	}
 
 	/**
-	 * Laedt alle schluesseltypen
+	 * Speichert die Daten in die Datenbank
+	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
-	function getAll()
-	{
-		$this->errormsg 		= 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	// ************************************************************
-	// * Speichert die Daten in die Datenbank
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	public function save()
 	{
 		$qry1='SELECT * FROM public.tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
-		if($result1=pg_query($this->conn,$qry1))
+		if($this->db_query($qry1))
 		{
-			if(pg_num_rows($result1)>0) //eintrag gefunden
+			if($this->db_num_rows()>0) //eintrag gefunden
 			{
-				if($row1 = pg_fetch_object($result1))
+				if($row1 = $this->db_fetch_object())
 				{
 					if($row1->anzahl=null)
 					{
@@ -120,7 +80,7 @@ class schluesseltyp
 					$this->addslashes($this->kaution).');';
 					echo nl2br($qry."\n");
 			}
-			if(pg_query($this->conn,$qry))
+			if($this->db_query($qry))
 			{
 				return true;
 			}

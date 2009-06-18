@@ -24,8 +24,9 @@
  * Klasse fuer die Gebiete des Testtools (Reihungstesttool)
  *
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class gebiet
+class gebiet extends basis_db 
 {
 	//Tabellenspalten
 	public $gebiet_id;
@@ -50,46 +51,32 @@ class gebiet
 		
 	// ErgebnisArray
 	public $result=array();
-	public $errormsg;
 	public $new;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional ein Gebiet
-	// * @param $conn        	Datenbank-Connection
-	// *        $gebiet_id      Gebiet das geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	public function gebiet($conn, $gebiet_id=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional ein Gebiet
+	 * @param $gebiet_id      Gebiet das geladen werden soll (default=null)
+	 */
+	public function __construct($gebiet_id=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($gebiet_id != null)
+		parent::__construct();
+		
+		if(!is_null($gebiet_id))
 			$this->load($gebiet_id);
 	}
 
-	// ***********************************************************
-	// * Laedt Gebiet mit der uebergebenen ID
-	// * @param $gebiet_id ID des Gebiets das geladen werden soll
-	// ***********************************************************
+	/**
+	 * Laedt Gebiet mit der uebergebenen ID
+	 * @param $gebiet_id ID des Gebiets das geladen werden soll
+	 * @return true wenn ok, sonst false
+	 */
 	public function load($gebiet_id)
 	{
 		$qry = "SELECT * FROM testtool.tbl_gebiet WHERE gebiet_id='".addslashes($gebiet_id)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->gebiet_id = $row->gebiet_id;
 				$this->kurzbz = $row->kurzbz;
@@ -116,7 +103,7 @@ class gebiet
 			}
 			else
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $gebiet_id";
+				$this->errormsg = "Gebiet nicht gefunden";
 				return false;
 			}
 		}
@@ -126,23 +113,12 @@ class gebiet
 			return false;
 		}
 	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	private function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
+	
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	private function validate()
 	{
 		if(strlen($this->kurzbz)>10)
@@ -198,12 +174,12 @@ class gebiet
 		return true;
 	}
 
-	// ******************************************************************
-	// * Speichert das Gebiet in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz aktualisiert
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
+	/**
+	 * Speichert das Gebiet in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * ansonsten der Datensatz aktualisiert
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	public function save($new=null)
 	{
 		if(is_null($new))
@@ -260,31 +236,31 @@ class gebiet
 			       " WHERE gebiet_id='".addslashes($this->gebiet_id)."';";
 		}
 		
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//aktuelle ID aus der Sequence holen
 			if($new)
 			{
 				$qry='SELECT currval("testtool.tbl_gebiet_gebiet_id_seq") as id;';
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						$this->gebiet_id = $row->id;
-						pg_query($this->conn, 'COMMIT');
+						$this->db_query('COMMIT');
 						return true;
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Lesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
@@ -293,7 +269,7 @@ class gebiet
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Frage';
 			return false;
 		}
 	}
@@ -304,7 +280,7 @@ class gebiet
 	 *
 	 * @param $gebiet_id
 	 */
-	function check_gebiet($gebiet_id)
+	public function check_gebiet($gebiet_id)
 	{
 		$this->errormsg = '';
 		$this->load($gebiet_id);
@@ -325,9 +301,9 @@ class gebiet
 		if($this->level_start!='')
 		{
 			$qry = "SELECT count(*) as anzahl, level FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' GROUP BY level";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $this->db_fetch_object())
 				{
 					if($row->anzahl<$this->maxfragen)
 					{
@@ -341,9 +317,9 @@ class gebiet
 		$qry = "SELECT frage_id, nummer FROM testtool.tbl_frage 
 				WHERE (SELECT count(*) as anzahl FROM testtool.tbl_vorschlag WHERE frage_id=tbl_frage.frage_id)<2
 				AND gebiet_id='".addslashes($gebiet_id)."' AND NOT demo;";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
 				$this->errormsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) hat weniger als 2 Vorschlaege.\n";
 			}
@@ -353,9 +329,9 @@ class gebiet
 		if($this->level_start!='')
 		{
 			$qry = "SELECT level FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND level is not null GROUP by level";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if(pg_num_rows($result)<2)
+				if($this->db_num_rows()<2)
 				{
 					$this->errormsg .= "Wenn Levels verwendet werden, muessen mindestens 2 verschiedene Level vorhanden sein.\n";
 				}
@@ -368,9 +344,9 @@ class gebiet
 			if($this->maxfragen!='' && $this->maxfragen!=0)
 			{
 				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND not demo AND level is not null GROUP BY level";
-				if($result = pg_query($this->conn, $qry))
+				if($this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object())
 					{
 						if($row->anzahl>$this->maxfragen)
 						{
@@ -395,9 +371,9 @@ class gebiet
 							GROUP BY level, punkte ) as b 
 						GROUP BY level) as c
 					WHERE c.anzahl>1";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $this->db_fetch_object())
 				{
 					$this->errormsg .= "Pro Level/Frage darf die positive Punkteanzahl nicht unterschiedlich sein wenn Zufallsfragen und Levels/Levelgleichverteilung verwendet wird. (Unterschiede in Level $row->level)\n";
 				}
@@ -431,11 +407,11 @@ class gebiet
 	{
 		$qry = 'SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung';
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new gebiet($this->conn, null, null);
+				$obj = new gebiet();
 				
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->kurzbz = $row->kurzbz;
@@ -486,7 +462,7 @@ class gebiet
 					FROM testtool.tbl_vorschlag JOIN testtool.tbl_frage USING(frage_id)
 					WHERE gebiet_id='".addslashes($gebiet_id)."' AND punkte>0 AND NOT demo";
 			if($this->maxfragen!='' && $this->maxfragen>0)
-				$qry.=" LIMIT $maxfragen";
+				$qry.=" LIMIT $this->maxfragen";
 		}
 		elseif($this->levelgleichverteilung && !$this->multipleresponse)
 		{
@@ -548,13 +524,13 @@ class gebiet
 				) as a 
 			GROUP by level, punkte";
 			
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
 				$maxfragen = $this->maxfragen;
 				$maxpunkte = 0;
 				$lastpunkte=0;
 				//Punkte mit der Anzahl der Mindestfragen fuer dieses Level multiplizieren
-				while($row = pg_fetch_object($result))
+				while($row = $this->db_fetch_object())
 				{
 					if($maxfragen>0)
 					{
@@ -569,9 +545,9 @@ class gebiet
 			}
 		}
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				return $row->max;
 			}

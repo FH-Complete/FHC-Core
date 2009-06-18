@@ -23,69 +23,53 @@
  * Klasse Zeugnisnote
  * @create 2007-06-06
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lvgesamtnote
+class lvgesamtnote extends basis_db 
 {
-	var $conn;     			// resource DB-Handle
-	var $new;       		// boolean
-	var $errormsg;  		// string
-	var $result=array();					
+	public $new;       		// boolean
+	public $result=array();					
 		
 	//Tabellenspalten
-	var $lehrveranstaltung_id;		// integer
-	var $student_uid;				// varchar(16)
-	var $mitarbeiter_uid;			// varchar(16)
-	var $studiensemester_kurzbz;	// varchar(16)
-	var $note;						// smalint
-	var $freigabedatum;				// date
-	var $benotungsdatum;			// date
-	var $updateamum;				// timestamp
-	var $updatevon;					// varchar(16)
-	var $insertamum;				// timestamp
-	var $insertvon;					// varchar(16)
-	var $bemerkung;					// text
-	var $freigabevon_uid;			//varchar(16)
+	public $lehrveranstaltung_id;		// integer
+	public $student_uid;				// varchar(16)
+	public $mitarbeiter_uid;			// varchar(16)
+	public $studiensemester_kurzbz;		// varchar(16)
+	public $note;						// smalint
+	public $freigabedatum;				// date
+	public $benotungsdatum;				// date
+	public $updateamum;					// timestamp
+	public $updatevon;					// varchar(16)
+	public $insertamum;					// timestamp
+	public $insertvon;					// varchar(16)
+	public $bemerkung;					// text
+	public $freigabevon_uid;			//varchar(16)
 	
-	var $lehrveranstaltung_bezeichung;
-	var $note_bezeichnung;
+	public $lehrveranstaltung_bezeichung;
+	public $note_bezeichnung;
 	
-	// *********************************************************************
-	// * Konstruktor
-	// * @param $conn      Connection
-	// *        $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// *********************************************************************
-	function lvgesamtnote($conn, $lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null , $unicode=false)
+	/**
+	 * Konstruktor
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 */
+	public function __construct($lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*		
-		if($unicode!=null)
-		{
-			if ($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else 
-				$qry="SET CLIENT_ENCODING TO 'LATIN9';";
-
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg= "Encoding konnte nicht gesetzt werden";
-				return false;
-			}
-		}
-	*/	
+		parent::__construct();
+		
 		if($lehrveranstaltung_id!=null && $student_uid!=null && $studiensemester_kurzbz!=null)
 			$this->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
 	}
 	
-	// **************************************************************
-	// * Laedt eine LVGesamtNote
-	// * @param  $lehrveranstaltung_id
-	// *         $student_uid
-	// *         $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// ***************************************************************
-	function load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * Laedt eine LVGesamtNote
+	 * @param $lehrveranstaltung_id
+	 * @param $student_uid
+	 * @param $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -98,9 +82,9 @@ class lvgesamtnote
 				student_uid='".addslashes($student_uid)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$this->student_uid = $row->student_uid;
@@ -130,11 +114,11 @@ class lvgesamtnote
 		}
 	}
 	
-	// *************************************
-	// * Prueft die Daten vor dem Speichern 
-	// * auf Gueltigkeit
-	// *************************************
-	function validate()
+	/**
+	 * Prueft die Daten vor dem Speichern 
+	 * auf Gueltigkeit
+	 */
+	protected function validate()
 	{
 		if(!is_numeric($this->lehrveranstaltung_id))
 		{
@@ -168,25 +152,14 @@ class lvgesamtnote
 		}
 		return true;
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische 
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *******************************************************************************
-	// * Speichert den aktuellen Datensatz in die Datenbank	 
-	// * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************************************************
-	function save($new=null)
+		
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $betriebsmittel_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if($new==null)
 			$new=$this->new;
@@ -228,48 +201,48 @@ class lvgesamtnote
 				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Speichern des Datensatzes: ".pg_last_error($this->conn);
+			$this->errormsg = "Fehler beim Speichern des Datensatzes: ".$this->db_last_error();
 			return false;
 		}
 	}
 	
-	// ********************************************************
-	// * Loescht den Datenensatz mit der ID die uebergeben wird
-	// * @param $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// ********************************************************
-	function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $lehrveranstaltung_id
+	 * @param $student_uid
+	 * @param $studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "DELETE FROM campus.tbl_lvgesamtnote WHERE 
 				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND
 				student_uid='".addslashes($student_uid)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 			return true;
 		else 
 		{
-			$this->errormsg = 'Fehler beim loeschen der Daten';
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
 	
-	// *********************************************
-	// * Laed die Noten
-	// * @param $lehrveranstaltung_id
-	// *        $student_uid
-	// *        $studiensemester_kurzbz
-	// * @return true wenn ok, false wenn Fehler
-	// *********************************************
-	function getLvGesamtNoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * Laedt die Noten
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getLvGesamtNoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT 
 					tbl_lvgesamtnote.*,
@@ -291,11 +264,11 @@ class lvgesamtnote
 		if($student_uid!=null)
 			$qry.=" AND tbl_lvgesamtnote.student_uid='".addslashes($student_uid)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new lvgesamtnote($this->conn, null, null, null, null);
+				$obj = new lvgesamtnote();
 				
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$obj->student_uid = $row->student_uid;
@@ -319,7 +292,7 @@ class lvgesamtnote
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

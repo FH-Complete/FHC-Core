@@ -1,13 +1,24 @@
 <?php
-/*
-	$Header: /include/stundenplan.class.php,v 1.2 2004/10/16 17:05:38 pam Exp $
-	$Log: stundenplan.class.php,v $
-	Revision 1.2 2004/10/16 17:05:38 pam
-	Anpassung an neue DB-Struktur.
-	globals.inc.php wird benoetigt.
-*/
-
-
+/* Copyright (C) 2007 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ */
 /****************************************************************************
  * @class 			Stundenplan
  * @author	 		Christian Paminger
@@ -17,70 +28,73 @@
  * @brief  			Klasse zm Berechnen und Anzeigen des Stundenplans.
  * Abhaengig:	 	von functions.inc.php
  *****************************************************************************/
+require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/lehrstunde.class.php');
+require_once(dirname(__FILE__).'/ferien.class.php');
+require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-require_once('lehrstunde.class.php');
-require_once('ferien.class.php');
-require_once('benutzerberechtigung.class.php');
-require_once('datum.class.php');
-
-class wochenplan
+class wochenplan extends basis_db
 {
-	var $conn;			// @brief Connection zur Datenbank
-	var $crlf;			// @brief Return Linefeed
-	var $type; 			// @brief Typ des Plans (Student, Lektor, Verband, Ort)
-	var $user;			// @brief Benutzergruppe
-	var $user_uid;		// @brief id in der Datenbank des Benutzers
-	var $link;			// @brief Link auf eigene Seite
-	var $kal_link;		// @brief Link auf den kalender
+	public $conn;			// @brief Connection zur Datenbank
+	public $crlf;			// @brief Return Linefeed
+	public $type; 			// @brief Typ des Plans (Student, Lektor, Verband, Ort)
+	public $user;			// @brief Benutzergruppe
+	public $user_uid;		// @brief id in der Datenbank des Benutzers
+	public $link;			// @brief Link auf eigene Seite
+	public $kal_link;		// @brief Link auf den kalender
 
-	var $stg_kz;		// @brief Kennzahl des Studiengangs
-	var $stg_bez;		// @brief Bezeichnung Studiengang
-	var $stg_kurzbz;	// @brief Kurzbezeichnung Studiengang
-	var $stg_kurzbzlang;// @brief lange Kurzbezeichnung Studiengang
-	var $sem;			// @brief Semester
-	var $ver;			// @brief Verband (A,B,C,...)
-	var $grp;			// @brief Gruppe (1,2)
+	public $stg_kz;		// @brief Kennzahl des Studiengangs
+	public $stg_bez;		// @brief Bezeichnung Studiengang
+	public $stg_kurzbz;	// @brief Kurzbezeichnung Studiengang
+	public $stg_kurzbzlang;// @brief lange Kurzbezeichnung Studiengang
+	public $sem;			// @brief Semester
+	public $ver;			// @brief Verband (A,B,C,...)
+	public $grp;			// @brief Gruppe (1,2)
 
-	var $pers_uid;		// @brief Account Name der Person (PK)
-	var $pers_titelpost;	// @brief Titel der Person
-	var $pers_titelpre;	// @brief Titel der Person
-	var $pers_nachname;	// @brief Personendaten
-	var $pers_vorname;	// @brief Personendaten
-	var $pers_vornamen;	// @brief Personendaten
+	public $pers_uid;		// @brief Account Name der Person (PK)
+	public $pers_titelpost;	// @brief Titel der Person
+	public $pers_titelpre;	// @brief Titel der Person
+	public $pers_nachname;	// @brief Personendaten
+	public $pers_vorname;	// @brief Personendaten
+	public $pers_vornamen;	// @brief Personendaten
 
-	var $ort_kurzbz;	// @brief Ort PK
-	var $ort_bezeichnung;
-	var $ort_planbezeichnung;
-	var $ort_ausstattung;
+	public $ort_kurzbz;	// @brief Ort PK
+	public $ort_bezeichnung;
+	public $ort_planbezeichnung;
+	public $ort_ausstattung;
 
-	var $gruppe_kurzbz;
-	var $gruppe_bezeichnung;
+	public $gruppe_kurzbz;
+	public $gruppe_bezeichnung;
 
-	var $datum;			// @brief Datum des Montags der zu zeichnenden Woche
-	var $datum_nextweek;
-	var $datum_next4week;
-	var $datum_prevweek;
-	var $datum_prev4week;
-	var $datum_begin;
-	var $datum_end;
-	var $kalenderwoche;
+	public $datum;			// @brief Datum des Montags der zu zeichnenden Woche
+	public $datum_nextweek;
+	public $datum_next4week;
+	public $datum_prevweek;
+	public $datum_prev4week;
+	public $datum_begin;
+	public $datum_end;
+	public $kalenderwoche;
 
-	var $studiensemester_now;
-	var $studiensemester_next;
+	public $studiensemester_now;
+	public $studiensemester_next;
 
-	var $std_plan;
-	var $stunde;
+	public $std_plan;
+	public $stunde;
 
-	var $wochenplan;
-	var $errormsg;
+	public $wochenplan;
+	public $errormsg;
 
-	function wochenplan($type,$conn)
+	/**
+	 * Konstruktor
+	 * @param $type
+	 */
+	public function __construct($type)
 	{
-		$this->type=$type;
-		$this->conn=$conn;
-		// Suchpfad einstellen
-		if (!$result=pg_query($this->conn, 'SET search_path TO lehre;'))
-			$this->errormsg=pg_last_error($this->conn);
+		parent::__construct();
+		
+		$this->type=$type;		
+		
 		$this->link='stpl_week.php?type='.$type;
 		$this->kal_link='stpl_kalender.php?type='.$type;
 		$this->datum=mktime();
@@ -88,7 +102,11 @@ class wochenplan
 		$this->crlf=crlf();
 	}
 
-	function init_stdplan()
+	/**
+	 * initialisiert den Studenplan
+	 *
+	 */
+	public function init_stdplan()
 	{
 		//Stundenplan Array initialisieren (Anzahl auf 0 setzten)
 		unset($this->std_plan);
@@ -100,16 +118,20 @@ class wochenplan
 			}
 	}
 
-	/**************************************************************************
-	 * @brief Funktion load_data ladet alle Zusatzinformationen fuer die Darstellung
-	 *			und ueberprueft die Daten
+	/**
+	 * Funktion load_data ladet alle Zusatzinformationen fuer die Darstellung
+	 * und ueberprueft die Daten
 	 *
-	 * @param datum Datum eines Tages in der angeforderten Woche
-	 *
-	 * @return gruppe_kurzbz
-	 *
+	 * @param $type
+	 * @param $uid
+	 * @param $ort_kurzbz
+	 * @param $studiengang_kz
+	 * @param $sem
+	 * @param $ver
+	 * @param $grp
+	 * @param $gruppe
 	 */
-	function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL)
+	public function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL)
 	{
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
@@ -176,28 +198,27 @@ class wochenplan
 			else
 				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen FROM campus.vw_mitarbeiter WHERE uid='$this->pers_uid'";
 			//echo $sql_query;
-			if (!($result=pg_exec($this->conn, $sql_query)))
+			if (!$this->db_query($sql_query))
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg=$this->db_last_error();
 				return false;
 			}
-			if (pg_num_rows($result)!=1)
+			if($row = $this->db_fetch_object())
 			{
-				$this->errormsg='Error: Cannot identify UID "'.$this->pers_uid.'"!';
-				return false;
-			}
-			$this->pers_uid=pg_result($result,0,'"uid"');
-			$this->pers_titelpre=pg_result($result,0,'"titelpre"');
-			$this->pers_titelpost=pg_result($result,0,'"titelpost"');
-			$this->pers_nachname=pg_result($result,0,'"nachname"');
-			$this->pers_vorname=pg_result($result,0,'"vorname"');
-			$this->pers_vornamen=pg_result($result,0,'"vornamen"');
-			if ($this->type=='student')
-			{
-				$this->stg_kz=pg_result($result,0,'"studiengang_kz"');
-				$this->sem=pg_result($result,0,'"semester"');
-				$this->ver=pg_result($result,0,'"verband"');
-				$this->grp=pg_result($result,0,'"gruppe"');
+				$this->pers_uid = $row->uid;
+				$this->pers_titelpre = $row->titelpre;
+				$this->pers_titelpost = $row->titelpost;
+				$this->pers_nachname = $row->nachname;
+				$this->pers_vorname =$row->vorname;
+				$this->pers_vornamen = $row->vornamen;
+				
+				if ($this->type=='student')
+				{
+					$this->stg_kz = $row->studiengang_kz;
+					$this->sem = $row->semester;
+					$this->ver = $row->verband;
+					$this->grp = $row->gruppe;
+				}
 			}
 		}
 
@@ -206,13 +227,16 @@ class wochenplan
 		{
 			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
 			//echo $sql_query;
-			if (!$result=pg_query($this->conn, $sql_query))
-				$this->errormsg=pg_last_error($this->conn);
-			$this->ort_bezeichnung=pg_result($result,0,'"bezeichnung"');
-			$this->ort_kurzbz=pg_result($result,0,'"ort_kurzbz"');
-			$this->ort_planbezeichnung=pg_result($result,0,'"planbezeichnung"');
-			$this->ort_ausstattung=pg_result($result,0,'"ausstattung"');
-			$this->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
+			if (!$this->db_query($sql_query))
+				$this->errormsg=$this->db_last_error();
+			if($row = $this->db_fetch_object())
+			{
+				$this->ort_bezeichnung = $row->bezeichnung;
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->ort_planbezeichnung = $row->planbezeichnung;
+				$this->ort_ausstattung = $row->ausstattung;
+				$this->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
+			}
 		}
 
 		// Studiengangsdaten ermitteln
@@ -220,45 +244,51 @@ class wochenplan
 		{
 			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ FROM public.tbl_studiengang WHERE studiengang_kz=$this->stg_kz";
 			//echo $sql_query;
-			if(!($result=pg_exec($this->conn, $sql_query)))
-				die(pg_last_error($this->conn));
-			$this->stg_bez=pg_result($result,0,'"bezeichnung"');
-			$this->stg_kurzbz=pg_result($result,0,'"typ"').pg_result($result,0,'"kurzbz"');
-			$this->stg_kurzbzlang=pg_result($result,0,'"kurzbzlang"');
+			if(!($this->db_query($sql_query)))
+				die($this->db_last_error());
+			if($row = db_fetch_object())
+			{
+				$this->stg_bez = $row->bezeichnung;
+				$this->stg_kurzbz = $row->typ.$row->kurzbz;
+				$this->stg_kurzbzlang = $row->kurzbzlang;
+			}
 		}
 
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
-		if(!$this->stunde=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		$this->stunde = $this->db_result;
 
 		// Studiensemesterdaten ermitteln
 		$sql_query="SELECT * FROM public.tbl_studiensemester WHERE now()<ende ORDER BY start LIMIT 2";
-		if(!$result=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
 		else
 		{
-			$row=pg_fetch_object($result);
-			$this->studiensemester_now->name=$row->studiensemester_kurzbz;
-			$this->studiensemester_now->start=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8,2),substr($row->start,0,4));
-			$this->studiensemester_now->ende=mktime(0,0,0,substr($row->ende,5,2),substr($row->ende,8,2),substr($row->ende,0,4));
-			$row=pg_fetch_object($result);
-			$this->studiensemester_next->name=$row->studiensemester_kurzbz;
-			$this->studiensemester_next->start=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8,2),substr($row->start,0,4));
-			$this->studiensemester_next->ende=mktime(0,0,0,substr($row->ende,5,2),substr($row->ende,8,2),substr($row->ende,0,4));
+			if($row = $this->db_fetch_object())
+			{
+				$this->studiensemester_now->name=$row->studiensemester_kurzbz;
+				$this->studiensemester_now->start=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8,2),substr($row->start,0,4));
+				$this->studiensemester_now->ende=mktime(0,0,0,substr($row->ende,5,2),substr($row->ende,8,2),substr($row->ende,0,4));#
+			}
+			if($row = $this->db_fetch_object())
+			{
+				$this->studiensemester_next->name=$row->studiensemester_kurzbz;
+				$this->studiensemester_next->start=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8,2),substr($row->start,0,4));
+				$this->studiensemester_next->ende=mktime(0,0,0,substr($row->ende,5,2),substr($row->ende,8,2),substr($row->ende,0,4));
+			}
 		}
 		return true;
 	}
 
-	/**************************************************************************
-	 * @brief Funktion load_week ladet die Stundenplandaten einer Woche
+	/**
+	 * Funktion load_week ladet die Stundenplandaten einer Woche
 	 *
 	 * @param datum Datum eines Tages in der angeforderten Woche
-	 *
 	 * @return true oder false
-	 *
 	 */
-	function load_week($datum, $stpl_view='stundenplan')
+	public function load_week($datum, $stpl_view='stundenplan')
 	{
 		// Pruefung der Attribute
 		if (!isset($this->type))
@@ -281,7 +311,7 @@ class wochenplan
 		$this->kalenderwoche=kalenderwoche($this->datum);
 
 		// Stundenplandaten ermittlen
-		$this->wochenplan=new lehrstunde($this->conn);
+		$this->wochenplan=new lehrstunde();
 		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view);
 		if ($anz<0)
 		{
@@ -337,7 +367,11 @@ class wochenplan
 		return true;
 	}
 
-	function draw_header()
+	/**
+	 * Schreibt den Stundenplan Header im HTML-Format
+	 *
+	 */
+	public function draw_header()
 	{
 		echo '<TABLE width="100%" bgcolor="#EEEEEE" border="0" cellspacing="0">'.$this->crlf;
 		echo '	<TR>'.$this->crlf;
@@ -399,18 +433,25 @@ class wochenplan
 		{
 			// Orte abfragen
 			$sql_query="SELECT * FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
-			if(!$result_ort=pg_exec($this->conn, $sql_query))
-				die(pg_last_error($this->conn));
-			$num_rows_ort=pg_numrows($result_ort);
+			if(!$this->db_query($sql_query))
+				die($this->db_last_error());
+			$num_rows_ort=$this->db_num_rows();
 
 			// vorigen Ort bestimmen
 			for ($i=0;$i<($num_rows_ort-1);$i++)
-				if (pg_result($result_ort,$i+1,'"ort_kurzbz"')==$this->ort_kurzbz)
-					$prev_ort=pg_fetch_object($result_ort,$i);
+			{
+				$row = $this->db_fetch_object(null,$i+1);
+				
+				if ($row->ort_kurzbz==$this->ort_kurzbz)
+					$prev_ort=$this->db_fetch_object(null,$i);
+			}
 			// naechsten Ort bestimmen
 			for ($i=1;$i<$num_rows_ort;$i++)
-				if (pg_result($result_ort,$i-1,'"ort_kurzbz"')==$this->ort_kurzbz)
-					$next_ort=pg_fetch_object($result_ort,$i);
+			{
+				$row = $this->db_fetch_object(null, $i-1);
+				if ($row->ort_kurzbz==$this->ort_kurzbz)
+					$next_ort=$this->db_fetch_object(null,$i);
+			}
 
 			// Ort Jump
 			echo '<FORM align="center" name="AuswahlOrt" action="stpl_week.php">'.$this->crlf;
@@ -425,7 +466,7 @@ class wochenplan
 			echo "		<SELECT name=\"select\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">".$this->crlf;
 			for ($i=0;$i<$num_rows_ort;$i++)
 			{
-				$row=pg_fetch_object ($result_ort, $i);
+				$row=$this->db_fetch_object (null, $i);
 				echo '			<OPTION value="stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'&datum='.$this->datum.'"';
 				if ($row->ort_kurzbz==$this->ort_kurzbz)
 					echo ' selected ';
@@ -465,18 +506,19 @@ class wochenplan
         return true;
 	}
 
-	/**************************************************************************
+	/**
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
-	function draw_week($raumres, $user_uid='')
+	public function draw_week($raumres, $user_uid='')
 	{
 		$o_datum=new datum();
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
-		if(!$result_stunde=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$num_rows_stunde=pg_numrows($result_stunde);
-
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		$result_stunde = $this->db_result;
+		$num_rows_stunde = $this->db_num_rows($result_stunde);
+ 
 		// Formularbeginn wenn Lektor
 		if ($this->user=='lektor' && $this->type=='ort')
 			echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
@@ -488,13 +530,14 @@ class wochenplan
 		echo '			<th align="right">Stunde&nbsp;<br>Beginn&nbsp;<br>Ende&nbsp;</th>'.$this->crlf;
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
-			$beginn=pg_result($result_stunde,$i,'"beginn"');
+			$row = $this->db_fetch_object($result_stunde);
+			$beginn=$row->beginn;
 			$beginn=substr($beginn,0,5);
-			$ende=pg_result($result_stunde,$i,'"ende"');
+			$ende=$row->ende;
 			$ende=substr($ende,0,5);
-			$stunde=pg_result($result_stunde,$i,'"stunde"');
+			$stunde=$row->stunde;
 			echo '			<th><div align="center">'.$stunde.'<br>&nbsp;'.$beginn .'&nbsp;<br>&nbsp;'.$ende.'&nbsp;</div></th>'.$this->crlf;
-			}
+		}
 		echo '		</tr>'.$this->crlf;
 		// Von Montag bis Samstag
 		$datum_now=mktime();
@@ -508,7 +551,8 @@ class wochenplan
 	  		echo '		<tr><td>'.date("l",$datum).'<br>'.date("j. M y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
 			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
-				$j=pg_result($result_stunde,$k,'"stunde"');
+				$row = $this->db_fetch_object($result_stunde, $k);
+				$j = $row->stunde;
 				// Stunde aufbereiten
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
@@ -588,10 +632,6 @@ class wochenplan
 					else
 						$lf=$lehrfach[0].'<BR />';
 
-					//$lkt=$this->std_plan[$i][$j][0]->lektor.'<BR>';
-					//$lvb=$this->std_plan[$i][$j][0]->stg.'-'.$this->std_plan[$i][$j][0]->sem.$this->std_plan[$i][$j][0]->ver.$this->std_plan[$i][$j][0]->grp.'<BR>';
-
-
 					// Blinken oder nicht ?
 					if ($kollision)
 					{
@@ -658,26 +698,25 @@ class wochenplan
 		}
 	}
 
-	/**************************************************************************
-	 * @brief Funktion draw_week_xul Stundenplan im XUL-Format
+	/**
+	 * Funktion draw_week_xul Stundenplan im XUL-Format
 	 *
 	 * @param datum Datum eines Tages in der angeforderten Woche
-	 *
 	 * @return true oder false
-	 *
 	 */
-	function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false)
+	public function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false)
 	{
 		//echo $wunsch;
 		global $cfgStdBgcolor;
 		$count=0;
-		$berechtigung=new benutzerberechtigung($this->conn);
+		$berechtigung=new benutzerberechtigung();
 		$berechtigung->getBerechtigungen($uid);
 		// Stundentafel abfragen
 		$sql_query="SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
-		if(!$result_stunde=pg_query($this->conn, $sql_query))
-			$this->errormsg=pg_last_error($this->conn);
-		$num_rows_stunde=pg_numrows($result_stunde);
+		if(!$this->db_query($sql_query))
+			$this->errormsg=$this->db_last_error();
+		$result_stunde = $this->db_result;
+		$num_rows_stunde=$this->db_num_rows($result_stunde);
 
 		// Kontext Menue
 		echo '<popupset>
@@ -715,7 +754,7 @@ class wochenplan
 			</vbox>'.$this->crlf; //<html:br />Beginn<html:br />Ende
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
-			$row=pg_fetch_object($result_stunde,$i);
+			$row=$this->db_fetch_object($result_stunde,$i);
 			$beginn=substr($row->beginn,0,5);
 			$ende=substr($row->ende,0,5);
 			$stunde=$row->stunde;
@@ -732,7 +771,7 @@ class wochenplan
 		$datum=$this->datum;
 
 		// Ferien holen
-		$ferien=new ferien($this->conn);
+		$ferien=new ferien();
 		if ($this->type=='verband')
 			$ferien->getAll($this->stg_kz);
 		else
@@ -745,7 +784,8 @@ class wochenplan
 			echo '</vbox>';
 			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
-				$j=pg_result($result_stunde,$k,'"stunde"');
+				$row = $this->db_fetch_object($result_stunde, $k);
+				$j=$row->stunde;
 				if (isset($wunsch[$i][$j]))
 					$index=$wunsch[$i][$j];
 				else
@@ -910,8 +950,7 @@ class wochenplan
 						$updatevonam.='am ';
 						foreach ($updateamum as $u)
 							$updatevonam.=$u.' ';
-						//$updatevonam='Geaendert von '.$updatevon.', am '.$updateamum;
-
+						
 						// Blinken oder nicht ?
 						if ($kollision)
 						{
@@ -984,7 +1023,7 @@ class wochenplan
 				</vbox>'.$this->crlf; //<html:br />Beginn<html:br />Ende
 			for ($i=0;$i<$num_rows_stunde; $i++)
 			{
-				$row=pg_fetch_object($result_stunde,$i);
+				$row=$this->db_fetch_object($result_stunde,$i);
 				$beginn=substr($row->beginn,0,5);
 				$ende=substr($row->ende,0,5);
 				$stunde=$row->stunde;
@@ -1001,17 +1040,15 @@ class wochenplan
 
 
 
-	/**************************************************************************
-	 * @brief Funktion load_stpl_search sucht Vorschlag fuer Stundenverschiebung
+	/**
+	 * Funktion load_stpl_search sucht Vorschlag fuer Stundenverschiebung
 	 *
 	 * @param 	datum 		der Aktuellen Woche
 	 * @param	stpl_id 		Array der stundenplan_id's
 	 * @param	db_stpl_table	Name der DB-Tabelle
-	 *
 	 * @return true oder false
-	 *
 	 */
-	function load_stpl_search($datum,$stpl_id,$db_stpl_table, $block=1)
+	public function load_stpl_search($datum,$stpl_id,$db_stpl_table, $block=1)
 	{
 		// Initatialisierung der Variablen
 		$lehrverband=array();
@@ -1027,10 +1064,11 @@ class wochenplan
 		$this->datum_end=date("Y-m-d",$this->datum_end);
 		// Stundentafel abfragen
 		$sql_query='SELECT min(stunde),max(stunde)FROM lehre.tbl_stunde';
-		if(!$result_stunde=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$min_stunde=pg_result($result_stunde,0,'min');
-		$max_stunde=pg_result($result_stunde,0,'max');
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		$row = $this->db_fetch_object();
+		$min_stunde=$row->min;
+		$max_stunde=$row->max;
 		// Stundenplaneintraege holen
 		$sql_query="SELECT * FROM $stpl_view WHERE";
 		$stplids='';
@@ -1039,14 +1077,14 @@ class wochenplan
 		$stplids=substr($stplids,3);
 		$sql_query.=$stplids;
 		//echo $sql_query;
-		if(!$result_stpl=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$num_rows_stpl=pg_numrows($result_stpl);
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		$num_rows_stpl=$this->db_num_rows();
 		// Daten aufbereiten
 		$leids='';
 		for ($i=0;$i<$num_rows_stpl;$i++)
 		{
-			$row=pg_fetch_object($result_stpl,$i);
+			$row=$this->db_fetch_object(null,$i);
 			//$block=$row->stundenblockung;
 			//$raumtyp[$i]=$row->raumtyp;
 			//$raumtypalt[$i]=$row->raumtypalternativ;
@@ -1067,8 +1105,8 @@ class wochenplan
 			// Raumtypen
 			$leids = substr($leids, 0, strlen($leids)-1);
 			$qry = "SELECT raumtyp, raumtypalternativ FROM lehre.tbl_lehreinheit WHERE lehreinheit_id IN ($leids)";
-			if($result = pg_query($this->conn, $qry)){
-				while($row = pg_fetch_object($result))
+			if($this->db_query($qry)){
+				while($row = $this->db_fetch_object())
 				{
 					$raumtyp[]=$row->raumtyp;
 					$raumtyp[]=$row->raumtypalternativ;
@@ -1115,33 +1153,30 @@ class wochenplan
 		// Raeume die in Frage kommen, aufgrund der Raumtypen
 		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
 			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; 
-			// WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY ort_kurzbz"; // NATURAL JOIN tbl_ortraumtyp WHERE $rtype  hierarchie
-		//echo $sql_query;
-		if(!$result=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$num_orte=pg_numrows($result);
-		for ($i=0;$i<$num_orte;$i++)
-			$orte[]=pg_fetch_result($result,$i,"ort_kurzbz");
+		
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		while($row = $this->db_fetch_object())
+			$orte[]=$row->ort_kurzbz;
 
 		// Raster vorbereiten
 		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
+		{
 			for ($s=$min_stunde;$s<=$max_stunde;$s++)
 			{
 				$raster[$t][$s]->ort=array();
 				$raster[$t][$s]->kollision=false;
 			}
-
+		}
 		// Stundenplanabfrage bauen (Wo ist Kollision?)
 		$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_view
 			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' AND
 			($lkt $gruppen OR ($lvb) ) AND unr!=$unr"; //AND unr!=$unr"
 		//echo $sql_query;
-		if(!$result_kollision=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$num_k=pg_numrows($result_kollision);
-		for ($i=0;$i<$num_k;$i++)
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		while($row = $this->db_fetch_object())
 		{
-			$row=pg_fetch_object($result_kollision,$i);
 			$mtag=substr($row->datum, 8,2);
 			$month=substr($row->datum, 5,2);
 			$jahr=substr($row->datum, 0,4);
@@ -1158,12 +1193,11 @@ class wochenplan
 		$sql_query.=" UNION SELECT DISTINCT datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
 			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' ";
 		
-		if(!$result_besetzt=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$num_b=pg_numrows($result_besetzt);
-		for ($i=0;$i<$num_b;$i++)
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+			
+		while($row = $this->db_fetch_object())
 		{
-			$row=pg_fetch_object($result_besetzt,$i);
 			$mtag=substr($row->datum, 8,2);
 			$month=substr($row->datum, 5,2);
 			$jahr=substr($row->datum, 0,4);
@@ -1186,17 +1220,15 @@ class wochenplan
 		return true;
 	}
 
-	/**************************************************************************
-	 * @brief Funktion load_lva_search sucht Vorschlag fuer LVAs
+	/**
+	 * Funktion load_lva_search sucht Vorschlag fuer LVAs
 	 *
 	 * @param 	datum 		der Aktuellen Woche
 	 * @param	lva_id 		Array der lvaIDs
 	 * @param	db_stpl_table	Name der DB-Tabelle
-	 *
 	 * @return true oder false
-	 *
 	 */
-	function load_lva_search($datum,$lva_id,$db_stpl_table,$type)
+	public function load_lva_search($datum,$lva_id,$db_stpl_table,$type)
 	{
 		// Initialiseren der Variablen
 		$lehrverband=array();
@@ -1213,10 +1245,11 @@ class wochenplan
 		$this->datum_end=date("Y-m-d",$this->datum_end);
 		// Stundentafel abfragen
 		$sql_query='SELECT min(stunde),max(stunde) FROM lehre.tbl_stunde';
-		if(!$result_stunde=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$min_stunde=pg_result($result_stunde,0,'min');
-		$max_stunde=pg_result($result_stunde,0,'max');
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		$row = $this->db_fetch_object();
+		$min_stunde=$row->min;
+		$max_stunde=$row->max;
 
 		// LEs holen
 		$sql_query='SELECT *, (planstunden-verplant::smallint) AS offenestunden FROM '.$lva_stpl_view.' WHERE';
@@ -1227,9 +1260,9 @@ class wochenplan
 		$sql_query.=$lvas;
 		//$this->errormsg.=$sql_query;
 		//return false;
-		if(!$result_lva=pg_exec($this->conn, $sql_query))
-			die(pg_last_error($this->conn));
-		$num_rows_lva=pg_numrows($result_lva);
+		if(!$this->db_query($sql_query))
+			die($this->db_last_error());
+		$num_rows_lva=$this->db_num_rows();
 		// Arrays setzen
 		//$wochenrythmus=array();
 		$verplant=array();
@@ -1240,7 +1273,8 @@ class wochenplan
 		// Daten aufbereiten
 		for ($i=0;$i<$num_rows_lva;$i++)
 		{
-			$row=pg_fetch_object($result_lva,$i);
+			$row=$this->db_fetch_object(null,$i);
+			
 			$raumtyp[$i]=$row->raumtyp;
 			$raumtypalt[$i]=$row->raumtypalternativ;
 			if ($row->gruppe_kurzbz!=null && $row->gruppe_kurzbz!='')
@@ -1363,14 +1397,17 @@ class wochenplan
 		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
 			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; //
 		//echo $sql_query;
-		if(!$result=pg_query($this->conn, $sql_query))
+		if(!$this->db_query($sql_query))
 		{
-			$this->errormsg=pg_last_error($this->conn);
+			$this->errormsg=$this->db_last_error();
 			return false;
 		}
-		$num_orte=pg_numrows($result);
+		$num_orte=$this->db_num_rows();
 		for ($i=0;$i<$num_orte;$i++)
-			$orte[]=pg_fetch_result($result,$i,"ort_kurzbz");
+		{
+			$row = $this->db_fetch_object(null, $i);	
+			$orte[]=$row->ort_kurzbz;
+		}
 
 		// Suche nach freien Orten. Bei 'lva_multi_search' wird die Schleife (do) aktiv
 		$count=0;
@@ -1410,17 +1447,15 @@ class wochenplan
 				$sql_query.=" AND unr!=$unr";
 			//$this->errormsg.=htmlspecialchars($sql_query);
 			//return false;
-			if(!$result_kollision=pg_query($this->conn, $sql_query))
+			if(!$this->db_query($sql_query))
 			{
-				//die(pg_last_error($this->conn));
-				$this->errormsg=pg_last_error($this->conn).$sql_query;
+				$this->errormsg = $this->db_last_error().$sql_query;
 				return false;
 			}
-			$num_k=pg_numrows($result_kollision);
+
 			// Kollisionen ins Raster eintragen
-			for ($i=0;$i<$num_k;$i++)
+			while($row = $this->db_fetch_object())
 			{
-				$row=pg_fetch_object($result_kollision,$i);
 				$mtag=substr($row->datum, 8,2);
 				$month=substr($row->datum, 5,2);
 				$jahr=substr($row->datum, 0,4);
@@ -1435,23 +1470,19 @@ class wochenplan
 				($rtype)";
 			if (is_numeric($unr))
 				$sql_query.=" AND unr!=$unr";
-			//echo $sql_query;
 			
 			// Reservierungen beruecksichtigen
 			$sql_query.=" UNION SELECT distinct datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
 						WHERE datum>='$datum_begin' AND datum<'$datum_end'";
 			
-			if(!$result_besetzt=pg_query($this->conn, $sql_query))
+			if(!$this->db_query($sql_query))
 			{
-				$this->errormsg=pg_last_error($this->conn).$sql_query;
+				$this->errormsg = $this->db_last_error().$sql_query;
 				return false;
 			}
-			$num_b=pg_numrows($result_besetzt);
-
-			// Besetzte Orte ins Raster eintragen
-			for ($i=0;$i<$num_b;$i++)
+			
+			while($row = $this->db_fetch_object())
 			{
-				$row=pg_fetch_object($result_besetzt,$i);
 				$mtag=substr($row->datum, 8,2);
 				$month=substr($row->datum, 5,2);
 				$jahr=substr($row->datum, 0,4);
@@ -1499,24 +1530,23 @@ class wochenplan
 	}
 
 
-	/**************************************************************************
-	 * @brief Funktion draw_week_csv Stundenplan im CSV-Format
+	/**
+	 * Funktion draw_week_csv Stundenplan im CSV-Format
 	 *
 	 * @param target Ziel-System zB Outlook
-	 *
 	 * @return true oder false
-	 *
 	 */
-	function draw_week_csv($target, $lvplan_kategorie)
+	public function draw_week_csv($target, $lvplan_kategorie)
 	{
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
-		$num_rows_stunde=pg_numrows($this->stunde);
+		$num_rows_stunde=$this->db_num_rows($this->stunde);
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
   			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
-				$j=pg_result($this->stunde,$k,'"stunde"');  // get id of hour
+				$row = $this->db_fetch_object($this->stunde, $k);
+				$j=$row->stunde;  // get id of hour
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
 					// Daten aufbereiten
@@ -1584,21 +1614,22 @@ class wochenplan
 					else
 						$lvb=$lehrverband[0];
 
-
-					$start_time=pg_result($this->stunde,$k,'"beginn"');
+					$row = $this->db_fetch_object($this->stunde, $k);
+					$start_time=$row->beginn;
 					// Blockungen erkennen
 					if (($this->std_plan[$i][$j][0]->unr == $this->std_plan[$i][$j+1][0]->unr) && $this->std_plan[$i][$j][0]!=0 && $k<($num_rows_stunde-1))
 					{
-						$end_time=pg_result($this->stunde,++$k,'"ende"');
+						$row = $this->db_fetch_object($this->stunde, ++$k);
+						$end_time=$row->ende;
 						if (($this->std_plan[$i][$j][0]->unr == $this->std_plan[$i][$j+2][0]->unr) && $k<($num_rows_stunde-2))
 						{
-							$end_time=pg_result($this->stunde,++$k,'"ende"');
+							$end_time=$row->ende;
 							if (($this->std_plan[$i][$j][0]->unr == $this->std_plan[$i][$j+3][0]->unr) && $k<($num_rows_stunde-3))
-								$end_time=pg_result($this->stunde,++$k,'"ende"');
+								$end_time=$row->ende;
 						}
 					}
 					else
-						$end_time=pg_result($this->stunde,$k,'"ende"');
+						$end_time=$row->ende;
 					//$start_time=substr($start_time,0,5);
 					//$end_time=substr($end_time,0,5);
 					//$start_date=$this->datum[year].'/'.$this->datum[mon].'/'.$this->datum[mday];

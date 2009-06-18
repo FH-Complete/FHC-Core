@@ -19,59 +19,45 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lehrform
+class lehrform extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $lehrform = array(); // lehrform Objekt
+	public $new;				// boolean
+	public $lehrform = array(); // lehrform Objekt
 
 	//Tabellenspalten
-	var $lehrform_kurbz;	// varchar(8)
-	var $bezeichnung;		// varchar (256)
-	var $verplanen; 		// boolean
+	public $lehrform_kurbz;		// varchar(8)
+	public $bezeichnung;		// varchar (256)
+	public $verplanen; 			// boolean
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
-	// * @param $conn        	Datenbank-Connection
-	// *        $lehrform_kurbz Lehrform die geladen werden soll (default=null)
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function lehrform($conn, $lehrform_kurzbz=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional eine Lehrform
+	 * @param $lehrform_kurbz Lehrform die geladen werden soll (default=null)
+	 */
+	public function __construct($lehrform_kurzbz=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+		parent::__construct();
 
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-*/
-		if($lehrform_kurzbz != null)
+		if(!is_null($lehrform_kurzbz))
 			$this->load($lehrform_kurzbz);
 	}
 
-	// *********************************************************
-	// * Laedt Lehrform mit der uebergebenen ID
-	// * @param $lehrform_kurzbz Lehrform die geladen werden soll
-	// *********************************************************
-	function load($lehrform_kurzbz)
+	/**
+	 * Laedt Lehrform mit der uebergebenen ID
+	 * @param $lehrform_kurzbz Lehrform die geladen werden soll
+	 */
+	public function load($lehrform_kurzbz)
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrform_kurzbz)."'";
-		if(!$result=pg_query($this->conn,$qry))
+		
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim lesen der Lehrform';
+			$this->errormsg = 'Fehler beim Lesen der Lehrform';
 			return false;
 		}
 
-		if($row = pg_fetch_object($result))
+		if($row = $this->db_fetch_object())
 		{
 			$this->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$this->bezeichnung = $row->bezeichnung;
@@ -87,21 +73,23 @@ class lehrform
 
 	}
 
-	// ***************************
-	// * Liefert alle Lehrformen
-	// ***************************
-	function getAll()
+	/**
+	 * Liefert alle Lehrformen
+	 * @return boolean
+	 */
+	public function getAll()
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz";
-		if(!$result=pg_query($this->conn,$qry))
+		
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim lesen der Lehrform';
+			$this->errormsg = 'Fehler beim Lesen der Lehrform';
 			return false;
 		}
 
-		while($row = pg_fetch_object($result))
+		while($row = $this->db_fetch_object())
 		{
-			$lf = new lehrform($this->conn);
+			$lf = new lehrform();
 
 			$lf->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$lf->bezeichnung = $row->bezeichnung;
@@ -113,12 +101,12 @@ class lehrform
 		return true;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function validate()
 	{
 		if(strlen($this->lehrform_kurbz)>8)
 		{
@@ -139,24 +127,13 @@ class lehrform
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * zeichen mit backslash versehen und das ergbnis
-	// * unter hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert die Lehrform in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
+	/**
+	 * Speichert die Lehrform in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
@@ -177,7 +154,7 @@ class lehrform
 			       " WHERE lehrform_kurzbz='$this->lehrform_kurzbz'";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;

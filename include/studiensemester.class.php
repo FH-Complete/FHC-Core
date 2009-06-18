@@ -174,13 +174,13 @@ class studiensemester extends basis_db
 	 */
 	public function getNearestTillNext()
 	{
-		if(!$nearest=$this->getNearest())
+		if(!$this->getNearest())
 			return false;
 		
 		$start=$this->start;
 		$studiensemester_kurzbz=$this->studiensemester_kurzbz;
 		
-		if (!$next=$this->getNextFrom($this->studiensemester_kurzbz))
+		if (!$this->getNextFrom($this->studiensemester_kurzbz))
 			return false;
 		$ende=$this->start;
 
@@ -367,6 +367,7 @@ class studiensemester extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Studiensemesters';
+			return false;
 		}
 	}
 	
@@ -389,19 +390,19 @@ class studiensemester extends basis_db
 				}
 				else
 				{
-					$this->errormsg = 'Es wurde kein vorjähriges Studiensemester gefunden';
+					$this->errormsg = 'Es wurde kein vorjï¿½hriges Studiensemester gefunden';
 					return false;
 				}
 			}
 			else
 			{
-				$this->errormsg = 'Es wurde kein vorjähriges Studiensemester gefunden';
+				$this->errormsg = 'Es wurde kein vorjï¿½hriges Studiensemester gefunden';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Ermitteln des vorjährigen Studiensemesters';
+			$this->errormsg = 'Fehler beim Ermitteln des vorjï¿½hrigen Studiensemesters';
 			return false;
 		}
 	}
@@ -518,6 +519,11 @@ class studiensemester extends basis_db
 			}
 			else
 				return $studiensemester_kurzbz;
+		}
+		else 
+		{
+			$this->errormsg='Fehler bei einer Abfrage';
+			return false;
 		}
 	}
 }

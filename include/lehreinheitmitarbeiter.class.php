@@ -19,66 +19,50 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class lehreinheitmitarbeiter
+class lehreinheitmitarbeiter extends basis_db
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $lehreinheitmitarbeiter = array(); // lehreinheitmitarbeiter Objekt
+	public $new;      // boolean
+	public $lehreinheitmitarbeiter = array(); // lehreinheitmitarbeiter Objekt
 
 	//Tabellenspalten
-	var $lehreinheit_id;		// integer
-	var $mitarbeiter_uid;		// varchar(16)
-	var $mitarbeiter_uid_old;	// verwendet bei Update der UID
-	var $semesterstunden;		// smalint
-	var $planstunden;			// smalint
-	var $stundensatz;			// numeric(6,2)
-	var $faktor;				// numeric(2,1)
-	var $anmerkung;				// varchar(256)
-	var $lehrfunktion_kurzbz; 	// varchar(16)
-	var $bismelden;				// boolean
-	var $insertamum;			// timestamp
-	var $insertvon;				// varchar(16)
-	var $updateamum;			// timestamp
-	var $updatevon;				// varchar(16)
-	var $ext_id; 				// bigint
+	public $lehreinheit_id;			// integer
+	public $mitarbeiter_uid;		// varchar(16)
+	public $mitarbeiter_uid_old;	// verwendet bei Update der UID
+	public $semesterstunden;		// smalint
+	public $planstunden;			// smalint
+	public $stundensatz;			// numeric(6,2)
+	public $faktor;					// numeric(2,1)
+	public $anmerkung;				// varchar(256)
+	public $lehrfunktion_kurzbz; 	// varchar(16)
+	public $bismelden;				// boolean
+	public $insertamum;				// timestamp
+	public $insertvon;				// varchar(16)
+	public $updateamum;				// timestamp
+	public $updatevon;				// varchar(16)
+	public $ext_id; 				// bigint
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine LE
-	// * @param $conn        	Datenbank-Connection
-	// *        $lehreinheit_id
-	// *		$uid
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function lehreinheitmitarbeiter($conn, $lehreinheit_id=null, $mitarbeiter_uid=null, $unicode=false)
+	/**
+	 * Konstruktor - Laedt optional einee LEMitarbeiterzuordnung
+	 * @param $lehreinheit_id
+	 * @param $uid
+	 */
+	public function __construct($lehreinheit_id=null, $mitarbeiter_uid=null)
 	{
-		$this->conn = $conn;
-/*
-		if($unicode!=null)
-		{
-			if($unicode)
-				$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-			else
-				$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-			if(!pg_query($conn,$qry))
-			{
-				$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-				return false;
-			}
-		}
-*/
-		if($lehreinheit_id!=null && $mitarbeiter_uid!=null)
+		parent::__construct();
+		
+		if(!is_null($lehreinheit_id) && !is_null($mitarbeiter_uid))
 			$this->load($lehreinheit_id, $mitarbeiter_uid);
 	}
 
-	// *********************************************************
-	// * Laedt die LEMitarbeiter
-	// * @param lehreinheit_id
-	// *********************************************************
-	function load($lehreinheit_id, $mitarbeiter_uid=null)
+	/**
+	 * Laedt die LEMitarbeiterzuordnung
+	 * @param lehreinheit_id
+	 * @param mitarbeiter_uid
+	 * @return boolean
+	 */
+	public function load($lehreinheit_id, $mitarbeiter_uid=null)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -86,10 +70,11 @@ class lehreinheitmitarbeiter
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
-		if($result = pg_query($this->conn, $qry))
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
+				WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
@@ -109,34 +94,40 @@ class lehreinheitmitarbeiter
 			}
 			else
 			{
-				$this->errormsg = 'Fehler beim laden der Daten';
+				$this->errormsg = 'Fehler beim Laden der Daten';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler  beim laden der Daten';
+			$this->errormsg = 'Fehler  beim Laden der Daten';
 			return false;
 		}
 	}
 
-	// *********************************************************
-	// * Laedt die Lektoren einer Lehreinheit
-	// * @param lehreinheit_id
-	// * @return array + true wenn ok / false im Fehlerfall
-	// *********************************************************
-	function getLehreinheitmitarbeiter($lehreinheit_id, $mitarbeiter_uid=null)
+	/**
+	 * Laedt die Lektoren einer Lehreinheit
+	 * @param lehreinheit_id
+	 * @return array + true wenn ok / false im Fehlerfall
+	 */
+	public function getLehreinheitmitarbeiter($lehreinheit_id, $mitarbeiter_uid=null)
 	{
+		if(!is_numeric($lehreinheit_id))
+		{
+			$this->errormsg = 'Lehreinheit_id ist ungueltig';
+			return false;
+		}
+		
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id'";
 		if($mitarbeiter_uid!=null)
 			$qry.=" AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
 		$qry .=" ORDER BY mitarbeiter_uid";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new lehreinheitmitarbeiter($this->conn, null, null, null);
+				$obj = new lehreinheitmitarbeiter();
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
@@ -160,12 +151,12 @@ class lehreinheitmitarbeiter
 		return false;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if($this->stundensatz!='' && !is_numeric($this->stundensatz))
 		{
@@ -196,24 +187,13 @@ class lehreinheitmitarbeiter
 		return true;
 	}
 
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert LEMitarbeiter in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save($new=null)
+	/**
+	 * Speichert LEMitarbeiter in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
 		if(is_null($new))
 			$new = $this->new;
@@ -270,25 +250,25 @@ class lehreinheitmitarbeiter
 			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid_old).";";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der LEMitarbeiter:'.$qry.pg_errormessage($this->conn);
+			$this->errormsg = 'Fehler beim Speichern der LEMitarbeiter:'.$this->db_last_error();
 			return false;
 		}
 	}
 
-	// *******************************************************
-	// * Prueft ob die Kombination Lehreinheit-Mitarbeiter
-	// * bereits existiert
-	// * @param $lehreinheit_id
-	// *        $uid
-	// * @return true wenn die zuteilung existiert sonst false
-	// *******************************************************
-	function exists($lehreinheit_id, $uid)
+	/**
+	 * Prueft ob die Kombination Lehreinheit-Mitarbeiter
+	 * bereits existiert
+	 * @param $lehreinheit_id
+	 * @param $uid
+	 * @return true wenn die zuteilung existiert sonst false
+	 */
+	public function exists($lehreinheit_id, $uid)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -296,29 +276,30 @@ class lehreinheitmitarbeiter
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($uid)."'";
-		if($result=pg_query($this->conn, $qry))
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
+				WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($uid)."'";
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return true;
 			else
 				return false;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen der Lehreinheitmitarbeiter zuteilung';
+			$this->errormsg = 'Fehler beim Lesen der Lehreinheitmitarbeiterzuteilung';
 			return false;
 		}
 	}
 
-	// *******************************************
-	// * Loescht die Zuteilung eines Mitarbeiters
-	// * zu einer Lehreinheit
-	// * @param $lehreinheit_id
-	// *        $mitarbeiter_uid
-	// * @return true wenn ok, false im fehlerfall
-	// *******************************************
-	function delete($lehreinheit_id, $mitarbeiter_uid)
+	/**
+	 * Loescht die Zuteilung eines Mitarbeiters
+	 * zu einer Lehreinheit
+	 * @param $lehreinheit_id
+	 * @param $mitarbeiter_uid
+	 * @return true wenn ok, false im fehlerfall
+	 */
+	public function delete($lehreinheit_id, $mitarbeiter_uid)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
@@ -327,9 +308,9 @@ class lehreinheitmitarbeiter
 		}
 		$qry_del = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$undo = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, '.
 			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, updateamum, updatevon)'.
@@ -348,29 +329,29 @@ class lehreinheitmitarbeiter
 						$this->addslashes($row->updateamum).','.
 						$this->addslashes($row->updatevon).');';
 
-				$log = new log($this->conn, null, null);
+				$log = new log();
 				$log->sqlundo = $undo;
 				$log->sql = $qry_del;
 				$log->mitarbeiter_uid = get_uid();
 				$log->beschreibung = "Lektorzuteilung loeschen $mitarbeiter_uid - $lehreinheit_id";
-				pg_query($this->conn, 'BEGIN;');
+				$this->db_query('BEGIN;');
 				if($log->save(true))
 				{
-					if(pg_query($this->conn, $qry_del))
+					if($this->db_query($qry_del))
 					{
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else
 					{
-						pg_query($this->conn, 'ROLLBACK;');
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
 						return false;
 					}
 				}
 				else
 				{
-					pg_query($this->conn, 'ROLLBACK;');
+					$this->db_query('ROLLBACK;');
 					$this->errormsg = 'UNDO Eintrag konnte nicht erstellt werden';
 					return false;
 				}
@@ -383,7 +364,7 @@ class lehreinheitmitarbeiter
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim lesen der Daten';
+			$this->errormsg = 'Fehler beim Lesen der Daten';
 			return false;
 		}
 	}

@@ -34,14 +34,11 @@ class variable extends basis_db
 	public $name;	// varchar(64)
 	public $wert;	// varchar(64)
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Variable
-	// * @param $conn        	Datenbank-Connection
-	// *        $uid
-	// *		$name
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
+	/**
+	 * Konstruktor - Laedt optional eine Variable
+	 * @param $uid
+	 * @param $name
+	 */
 	public function __construct($uid=null, $name=null)
 	{
 		parent::__construct();
@@ -50,11 +47,11 @@ class variable extends basis_db
 			$this->load($uid, $name);
 	}
 
-	// *********************************************************
-	// * Laedt eine Variable
-	// * @param $uid
-	// * @param $name
-	// *********************************************************
+	/**
+	 * Laedt eine Variable
+	 * @param $uid
+	 * @param $name
+	 */
 	public function load($uid, $name)
 	{
 		$qry = "SELECT wert FROM public.tbl_variable WHERE uid='".addslashes($uid)."' AND name='".addslashes($name)."'";
@@ -75,12 +72,12 @@ class variable extends basis_db
 			return false;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	private function validate()
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	protected function validate()
 	{
 		if(strlen($this->uid)>32)
 		{
@@ -101,12 +98,12 @@ class variable extends basis_db
 		return true;
 	}
 
-	// ************************************************************
-	// * Speichert Variable in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
+	/**
+	 * Speichert Variable in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	public function save($new=null)
 	{
 		if(is_null($new))
@@ -142,9 +139,9 @@ class variable extends basis_db
 		}
 	}
 	
-	// ****
-	// * Loescht einen Variableneintrag
-	// ****
+	/**
+	 * Loescht einen Variableneintrag
+	 */
 	public function delete($name, $uid)
 	{
 		if($name=='' || $uid == '')
@@ -164,14 +161,14 @@ class variable extends basis_db
 		}
 	}
 	
-	// ******
-	// * Liefert alle Variablen eines Benutzers
-	// ******
+	/**
+	 * Liefert alle Variablen eines Benutzers
+	 */
 	public function getVars($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_variable WHERE uid='".addslashes($uid)."' ORDER BY name";
 		
-		if($result = $this->db_query($qry))
+		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
@@ -207,8 +204,6 @@ class variable extends basis_db
 			$this->errormsg.=$this->db_last_error();
 			return false;
 		}
-		else
-			$num_rows = $this->db_num_rows();
 		
 		while($row=$this->db_fetch_object())
 		{

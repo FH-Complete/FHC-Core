@@ -20,12 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
-require_once('basis_db.class.php');
-require_once('organisationseinheit.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 
 class benutzerberechtigung extends basis_db
 {
-	public $errormsg; // string
 	public $new;      // boolean
 	public $berechtigungen = array(); // benutzerberechtigung Objekt
 
@@ -53,10 +52,10 @@ class benutzerberechtigung extends basis_db
 	public $fix;
 	public $lektor;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
-	// * @param $benutzerberechtigung_id
-	// *************************************************************************
+	/**
+	 * Konstruktor - Laedt optional eine Berechtigung
+	 * @param $benutzerberechtigung_id
+	 */
 	public function __construct($benutzerberechtigung_id=null)
 	{
 		parent::__construct();
@@ -65,20 +64,20 @@ class benutzerberechtigung extends basis_db
 			$this->load($benutzerberechtigung_id);
 	}
 
-	// *********************************************************
-	// * Laedt eine Benutzerberechtigung
-	// * @param benutzerberechtigung_id
-	// *********************************************************
+	/**
+	 * Laedt eine Benutzerberechtigung
+	 * @param benutzerberechtigung_id
+	 */
 	public function load($benutzerberechtigung_id)
 	{
-		return true;
+		return false;
 	}
 
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
+	/**
+	 * Prueft die Variablen vor dem Speichern
+	 * auf Gueltigkeit.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	protected function validate()
 	{
 		if(strlen($this->art)>16)
@@ -121,12 +120,12 @@ class benutzerberechtigung extends basis_db
 		return true;
 	}
 	
-	// ************************************************************
-	// * Speichert Benutzerberechtigung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
+	/**
+	 * Speichert Benutzerberechtigung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
@@ -175,12 +174,12 @@ class benutzerberechtigung extends basis_db
 		return false;
 	}
 
-	// ************************************************************
-	// * Speichert Benutzerberechtigung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
+	/**
+	 * Speichert Benutzerberechtigung in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	function delete($benutzerberechtigung_id)
 	{
 		/*
@@ -195,12 +194,12 @@ class benutzerberechtigung extends basis_db
 		return false;
 	}
 
-	// *******************************************************************************
-	// * Laedt die Berechtigungen eines Users
-	// * @param $uid
-	// * @param $all wenn $all auf true gesetzt wird, werden auch bereits abgelaufene
-	//*              berechtigungen geladen.
-	// *******************************************************************************
+	/**
+	 * Laedt die Berechtigungen eines Users
+	 * @param $uid
+	 * @param $all wenn $all auf true gesetzt wird, werden auch bereits abgelaufene
+	 *              berechtigungen geladen.
+	 */
 	public function getBerechtigungen($uid,$all=false)
 	{
 		// Berechtigungen holen
@@ -315,15 +314,15 @@ class benutzerberechtigung extends basis_db
 		return true;
 	}
 
-	//****************************************************************************
-	// * Prueft ob die Berechtigung vorhanden ist. Vor der Verwendung muss die
-	// * Funktion getBerechtigungen aufgerufen werden.
-	// *
-	// * @param $berechtigung
-	// * @param $oe_kurzbz
-	// * @param $art
-	// * @return true wenn eine Berechtigung entspricht.
-	// ***************************************************************************
+	/**
+	 * Prueft ob die Berechtigung vorhanden ist. Vor der Verwendung muss die
+	 * Funktion getBerechtigungen aufgerufen werden.
+	 *
+	 * @param $berechtigung
+	 * @param $oe_kurzbz
+	 * @param $art
+	 * @return true wenn eine Berechtigung entspricht.
+	 */
 	public function isBerechtigt($berechtigung_kurzbz,$oe_kurzbz=null,$art=null)
 	{
 		$timestamp=time();
@@ -359,10 +358,10 @@ class benutzerberechtigung extends basis_db
 		return false;
 	}
 
-	// ******************************************************
-	// * Prueft ob die Person Fixangestellt ist
-	// * @return true wenn ja, false wenn nein
-	// ******************************************************
+	/**
+	 * Prueft ob die Person Fixangestellt ist
+	 * @return true wenn ja, false wenn nein
+	 */
 	public function isFix()
 	{
 		if ($this->fix)
@@ -371,11 +370,11 @@ class benutzerberechtigung extends basis_db
 			return false;
 	}
 
-	// ********************************************************************
-	// * Gibt Array mit den Studiengangskennzahlen zurueck fuer welche die
-	// * Person eine Berechtigung besitzt.
-	// * Optional wird auf Berechtigung eingeschraenkt.
-	// ********************************************************************
+	/**
+	 * Gibt Array mit den Studiengangskennzahlen zurueck fuer welche die
+	 * Person eine Berechtigung besitzt.
+	 * Optional wird auf Berechtigung eingeschraenkt.
+	 */
 	public function getStgKz($berechtigung_kurzbz=null)
 	{
 		$studiengang_kz=array();

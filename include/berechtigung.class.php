@@ -19,196 +19,83 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class berechtigung
+class berechtigung extends basis_db
 {
-	/**
-	 * interne userberechtigung_id (Zaehler aus DB)
-	 * @var integer
-	 */
-	var $userberechtigung_id;
-	/**
-	 * @var integer
-	 */
-	var $studiengang_kz;
-	/**
-	 * @var integer
-	 */
-	var $fachbereich_id;
-	/**
-	 * @var string
-	 */
-	var $berechtigung_kurzbz;
-	/**
-	 * @var string
-	 */
-	var $uid;
-	/**
-	 * @var string
-	 */
-	var $studiensemester_kurzbz;
-	/**
-	 * @var integer
-	 */
-	var $start;
-	/**
-	 * @var integer
-	 */
-	var $ende;
-	/**
-	 * @var integer
-	 */
-	var $starttimestamp;
-	/**
-	 * @var integer
-	 */
-	var $endetimestamp;
-	/**
-	 * @var string
-	 */
-	var $art;
+	public $berechtigungen=array();
+	public $new;
 
+	public $rolle_kurzbz;
+	public $beschreibung;
+	public $berechtigung_kurzbz;
+	
 	/**
-	 * @var array
+	 * Konstruktor
+	 * @param 
 	 */
-	var $berechtigungen=array();
-
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-
-	//Tabellenspalten
-	var $beschreibung;			// varchar(256)
-
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
-	// * @param $conn        	Datenbank-Connection
-	// *        $berechtigung_kurzbz
-	// *        $unicode     	Gibt an ob die Daten mit UNICODE Codierung
-	// *                     	oder LATIN9 Codierung verarbeitet werden sollen
-	// *************************************************************************
-	function berechtigung($conn, $berechtigung_kurzbz=null, $unicode=false)
+	public function __construct()
 	{
-		$this->conn = $conn;
-		$this->new=true;
-
-		if($unicode)
-			$qry = "SET CLIENT_ENCODING TO 'UNICODE';";
-		else
-			$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-
-		if(!pg_query($conn,$qry))
-		{
-			$this->errormsg	 = 'Encoding konnte nicht gesetzt werden';
-			return false;
-		}
-
-		if($berechtigung_kurzbz!=null)
-			$this->load($berechtigung_kurzbz);
-	}
-
-	// *********************************************************
-	// * Laedt eine Berechtigung
-	// * @param berechtigung_kurzbz
-	// *********************************************************
-	function load($berechtigung_kurzbz)
-	{
-		return true;
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
-	{
-		if(strlen($this->berechtigung_kurzbz)>16)
-		{
-			$this->errormsg = 'Berechtigung_kurzbz darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if(strlen($this->beschreibung)>256)
-		{
-			$this->errormsg = 'Beschreibung darf nicht laenger als 256 Zeichen sein';
-			return false;
-		}
-
-		return true;
-	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// ************************************************************
-	// * Speichert Berechtigung in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function save()
-	{
-		//Variablen auf Gueltigkeit pruefen
-		if(!$this->validate())
-			return false;
-
-		if($this->new)
-		{
-			$qry = 'INSERT INTO public.tbl_berechtigung (berechtigung_kurzbz, beschreibung)
-			        VALUES('.$this->addslashes($this->berechtigung_kurzbz).','.
-					$this->addslashes($this->beschreibung).');';
-		}
-		else
-		{
-			$qry = 'UPDATE public.tbl_berechtigung SET'.
-			       ' beschreibung='.$this->addslashes($this->beschreibung).
-			       " WHERE berechtigung_kurzbz='".addslashes($this->berechtigung_kurzbz)."'";
-		}
-
-		if(pg_query($this->conn,$qry))
-		{
-			//Log schreiben
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Speichern der Berechtigung:'.$qry;
-			return false;
-		}
+		parent::__construct();
 	}
 	
-	// ************************************************************
-	// * Holt alle Berechtigungen aus der Datenbank
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
-	function getAll()
+	/**
+	 * Holt alle BerechtigungsRollen
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getRollen()
 	{
-		$qry = 'SELECT * FROM tbl_berechtigung';
+		$qry = 'SELECT * FROM system.tbl_rolle';
 
-		if(!$res = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new berechtigung();
+	
+				$obj->rolle_kurzbz=$row->rolle_kurzbz;
+				$obj->beschreibung=$row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;	
+		}
+		else
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
-		}
-
-		while($row = pg_fetch_object($res))
+		}		
+	}
+	
+	/**
+	 * Laedt alle Berechtigungen zu einer rolle
+	 *
+	 * @param $rolle_kurzbz
+	 */
+	public function getRolleBerechtigung($rolle_kurzbz)
+	{
+		$qry = "SELECT * FROM system.tbl_rolleberechtigung JOIN system.tbl_berechtigung USING(berechtigung_kurzbz)
+				WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."' ORDER BY berechtigung_kurzbz, beschreibung";
+		
+		if($this->db_query($qry))
 		{
-			$b_obj = new berechtigung($this->conn);
-
-			$b_obj->berechtigung_kurzbz=$row->berechtigung_kurzbz;
-			$b_obj->beschreibung=$row->beschreibung;
-			
-			$this->result[] = $b_obj;
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new berechtigung();
+				
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->rolle_kurzbz = $row->rolle_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
 		}
-		return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Berechtigungen';
+			return false;
+		}
 	}
 }
 ?>

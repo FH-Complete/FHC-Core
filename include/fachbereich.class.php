@@ -23,55 +23,52 @@
  * Klasse fachbereich (FAS-Online)
  * @create 04-12-2006
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class fachbereich
+class fachbereich extends basis_db
 {
-	var $conn;   			// @var resource DB-Handle
-	var $new;     			// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var fachbereich Objekt
+	public $new;     			// boolean
+	public $result = array(); 	// fachbereich Objekt
 
 	//Tabellenspalten
-	var $fachbereich_kurzbz;	// @var string
-	var $bezeichnung;		// @var string
-	var $farbe;			// @var string
-	var $studiengang_kz;	// @var integer
-	var $aktiv;			// @var boolean
-	var $ext_id;			// @var bigint
+	public $fachbereich_kurzbz;	// string
+	public $bezeichnung;		// string
+	public $farbe;				// string
+	public $studiengang_kz;		// integer
+	public $aktiv;				// boolean
+	public $ext_id;				// bigint
 
-	var $bezeichnung_arr = array();
+	public $bezeichnung_arr = array();
 
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $fachb_id ID des zu ladenden Fachbereiches
+	 * @param $fachb_id ID des zu ladenden Fachbereiches
 	 */
-	function fachbereich($conn, $fachbereich_kurzbz=null)
+	public function __construct($fachbereich_kurzbz=null)
 	{
-		$this->conn = $conn;
-		if($fachbereich_kurzbz != null)
-		{
+		parent::__construct();
+		
+		if(!is_null($fachbereich_kurzbz))
 			$this->load($fachbereich_kurzbz);
-		}
 	}
 
 	/**
 	 * Laedt alle verfuegbaren Fachbereiche
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getAll()
+	public function getAll()
 	{
 		$qry = 'SELECT * FROM public.tbl_fachbereich order by fachbereich_kurzbz;';
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object())
 		{
-			$fachb_obj = new fachbereich($this->conn);
+			$fachb_obj = new fachbereich();
 
 			$fachb_obj->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
 			$fachb_obj->bezeichnung = $row->bezeichnung;
@@ -91,7 +88,7 @@ class fachbereich
 	 * @param $fachb_id ID des zu ladenden Fachbereiches
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function load($fachbereich_kurzbz)
+	public function load($fachbereich_kurzbz)
 	{
 		if($fachbereich_kurzbz == '')
 		{
@@ -101,13 +98,13 @@ class fachbereich
 
 		$qry = "SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz = '".addslashes($fachbereich_kurzbz)."';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row=pg_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
 			$this->bezeichnung = $row->bezeichnung;
@@ -124,65 +121,48 @@ class fachbereich
 
 		return true;
 	}
-
-	/**
-	 * Loescht einen Datensatz
-	 * @param $fachb_id id des Datensatzes der geloescht werden soll
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	function delete($fachb_id)
-	{
-		$this->errormsg = 'Noch nicht implementiert';
-		return false;
-	}
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
+	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function checkvars()
+	protected function validate()
 	{
-		$this->bezeichnung = str_replace("'",'´',$this->bezeichnung);
-		$this->fachbereich_kurzbz = str_replace("'",'´',$this->fachbereich_kurzbz);
-
-
 		//Laenge Pruefen
 		if(strlen($this->bezeichnung)>128)
 		{
-			$this->errormsg = "Bezeichnung darf nicht laenger als 128 Zeichen sein bei <b>$this->ext_id</b> - $this->bezeichnung";
+			$this->errormsg = 'Bezeichnung darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
 		if(strlen($this->fachbereich_kurzbz)>16)
 		{
-			$this->errormsg = "Kurzbez darf nicht laenger als 16 Zeichen sein bei <b>$this->ext_id</b> - $this->fachbereich_kurzbz";
+			$this->errormsg = 'Kurzbez darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if($this->fachbereich_kurzbz == '')
+		{
+			$this->errormsg = 'fachbereich_kurzbz ungueltig!';
 			return false;
 		}
 		$this->errormsg = '';
 		return true;
 	}
+	
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function save()
+	public function save()
 	{
 		//Gueltigkeit der Variablen pruefen
-		if(!$this->checkvars())
+		if(!$this->validate())
 			return false;
 
 		if($this->new)
 		{
-			//Pruefen ob fachbereich_kurzbz gueltig ist
-			if($this->fachbereich_kurzbz == '')
-			{
-				$this->errormsg = 'fachbereich_id ungueltig! ('.$this->fachbereich_kurzbz.'/'.$this->ext_id.')';
-				return false;
-			}
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO public.tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, aktiv, ext_id, studiengang_kz) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, aktiv, 
+					ext_id, studiengang_kz) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->farbe).', '.
@@ -193,14 +173,7 @@ class fachbereich
 		else
 		{
 			//bestehenden Datensatz akualisieren
-
-			//Pruefen ob fachbereich_kurzbz gueltig ist
-			if($this->fachbereich_kurzbz == '')
-			{
-				$this->errormsg = 'fachbereich_kurzbz ungueltig.';
-				return false;
-			}
-
+			
 			$qry = 'UPDATE public.tbl_fachbereich SET '.
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
@@ -211,25 +184,8 @@ class fachbereich
 				'WHERE fachbereich_kurzbz = '.$this->addslashes($this->fachbereich_kurzbz).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			/*//Log schreiben
-			$sql = $qry;
-			$qry = "SELECT nextval('log_seq') as id;";
-			if(!$row = pg_fetch_object(pg_query($this->conn, $qry)))
-			{
-				$this->errormsg = 'Fehler beim Auslesen der Log-Sequence';
-				return false;
-			}
-
-			$qry = "INSERT INTO log(log_pk, creationdate, creationuser, sql) VALUES('$row->id', now(), '$this->updatevon', '".addslashes($sql)."')";
-			if(pg_query($this->conn, $qry))
-				return true;
-			else
-			{
-				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
-				return false;
-			}*/
 			return true;
 		}
 		else

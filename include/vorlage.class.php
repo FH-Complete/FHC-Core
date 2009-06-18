@@ -19,85 +19,52 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class vorlage
+class vorlage extends basis_db
 {
 	// ErgebnisArray
-	var $result=array();
-	var $num_rows=0;
-	var $errormsg;
-	var $new;
+	public $result=array();
+	public $num_rows=0;
+	public $errormsg;
+	public $new;
 	
 	//Tabellenspalten
-	var $vorlage_kurzbz;
-	var $studiengang_kz;
-	var $version;
-	var $text;
+	public $vorlage_kurzbz;
+	public $studiengang_kz;
+	public $version;
+	public $text;
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection
-	// * @param $conn	Datenbank-Connection
-	// *************************************************************************
-	function vorlage($conn)
+	/**
+	 * Konstruktor
+	 */
+	public function __construct()
 	{
-		$this->conn = $conn;
+		parent::__construct();
 	}
 
-	// ***********************************************************
-	// * Laedt Vorschlag mit der uebergebenen ID
-	// * @param $vorlage_kurzbz, studiengang_kz, version
-	// ***********************************************************
-	function load($vorlage_kurzbz, $studiengang_kz, $version)
-	{
-		return false;
-	}
-
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-
-	// *******************************************
-	// * Prueft die Variablen vor dem Speichern
-	// * auf Gueltigkeit.
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function validate()
-	{
-		return true;
-	}
-
-	// ******************************************************************
-	// * Speichert die Benutzerdaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
-	// * ansonsten der Datensatz mit $uid upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ******************************************************************
-	function save()
-	{
-		return false;
-	}
-
-	function getAktuelleVorlage($studiengang_kz, $vorlage_kurzbz)
+	/**
+	 * Liefert die Aktuelle Vorlage
+	 *
+	 * @param $studiengang_kz
+	 * @param $vorlage_kurzbz
+	 * @return boolean
+	 */
+	public function getAktuelleVorlage($studiengang_kz, $vorlage_kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_vorlagestudiengang WHERE 
 				(studiengang_kz=0 OR studiengang_kz='".addslashes($studiengang_kz)."') AND 
 				vorlage_kurzbz='".addslashes($vorlage_kurzbz)."' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
 
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$this->vorlage_kurzbz = $row->vorlage_kurzbz;
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->version = $row->version;
 				$this->text = $row->text;
+				return true;
 			}
 			else 
 			{

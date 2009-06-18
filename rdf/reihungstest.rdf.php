@@ -19,7 +19,6 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
@@ -29,13 +28,9 @@ header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/reihungstest.class.php');
 require_once('../include/studiengang.class.php');
-
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $rdf_url='http://www.technikum-wien.at/reihungstest';
 
@@ -45,7 +40,6 @@ $rdf_url='http://www.technikum-wien.at/reihungstest';
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:RT="<?php echo $rdf_url; ?>/rdf#"
 >
-
 
   <RDF:Seq about="<?php echo $rdf_url ?>/alle">
 
@@ -69,12 +63,12 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 }
 
 $stg = array();
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll();
 foreach ($stg_obj->result as $row) 
 	$stg[$row->studiengang_kz]=$row->kuerzel;
 
-$rt = new reihungstest($conn, null, true);
+$rt = new reihungstest();
 $rt->getAll();
 foreach ($rt->result as $row)
 {
