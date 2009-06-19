@@ -22,23 +22,10 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-include('../../vilesci/config.inc.php');
-include('../../include/functions.inc.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-/*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
-echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';*/
-
-$uid=get_uid();
-
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Fehler: Es konnte keine Verbindung zum Server aufgebaut werden!';
-//$error_msg.=loadVariables($conn,$REMOTE_USER);
-// Stundentafel abfragen
-$sql_query="SET datestyle TO ISO; SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
-if(!$result_stunde=pg_exec($conn, $sql_query))
-	die(pg_last_error($this->conn));
-$num_rows_stunde=pg_numrows($result_stunde);
 ?>
 
 <!DOCTYPE overlay>

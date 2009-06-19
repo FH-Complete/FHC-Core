@@ -21,7 +21,7 @@
  */
 
 // Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzerberechtigung.class.php');
@@ -71,14 +71,10 @@ function resize($filename, $width, $height)
 	imagedestroy($image);
 }
 
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
 
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('mitarbeiter'))
 	die('Keine Berechtigung');
@@ -107,7 +103,7 @@ if(isset($_POST['submitbild']))
 			$content = fread($fp, filesize($filename));
 			fclose($fp);
 			
-			$akte = new akte($conn);
+			$akte = new akte();
 			
 			if($akte->getAkten($_GET['person_id'], 'Lichtbil'))
 			{

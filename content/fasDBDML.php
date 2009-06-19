@@ -29,7 +29,7 @@
 // * - Bankverbindungen
 // ****************************************
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/log.class.php');
@@ -41,20 +41,15 @@ require_once('../include/benutzerfunktion.class.php');
 require_once('../include/studiensemester.class.php');
 
 $user = get_uid();
-//header("Content-type: application/xhtml+xml");
-//error_reporting(0);
 
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
+$db = new basis_db();
 $return = false;
 $errormsg = 'unknown';
 $data = '';
 $error = false;
 
 //Berechtigungen laden
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('lv-plan'))
 {
@@ -82,7 +77,7 @@ if(!$error)
 		else
 		{
 			//Speichert die Adressdaten in die Datenbank
-			$adresse = new adresse($conn, null, true);
+			$adresse = new adresse();
 			
 			if($_POST['neu']=='false')
 			{
@@ -115,9 +110,9 @@ if(!$error)
 			if($_POST['nation']=='A')
 			{
 				$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."') AND plz='".addslashes($_POST['plz'])."'";
-				if($result = pg_query($conn, $qry))
+				if($db->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $db->db_fetch_object())
 					{
 						$adresse->gemeinde = $row->name;	
 					}
@@ -166,7 +161,7 @@ if(!$error)
 		else 
 		{
 			//Loescht Adressen aus der DB
-			$adresse = new adresse($conn, null, true);
+			$adresse = new adresse();
 	
 			if($adresse->delete($_POST['adresse_id']))
 			{
@@ -194,7 +189,7 @@ if(!$error)
 		else 
 		{
 			//Speichert die Kontaktdaten in die Datenbank
-			$kontakt = new kontakt($conn, null, true);
+			$kontakt = new kontakt();
 	
 			if($_POST['neu']=='false')
 			{
@@ -245,7 +240,7 @@ if(!$error)
 		else 
 		{
 			//Loescht Kontaktdaten aus der Datenbank
-			$kontakt = new kontakt($conn, null, true);
+			$kontakt = new kontakt();
 	
 			if($kontakt->delete($_POST['kontakt_id']))
 			{
@@ -273,7 +268,7 @@ if(!$error)
 		else 
 		{
 			//Speichert die Kontaktdaten in die Datenbank
-			$bankverbindung = new bankverbindung($conn, null, true);
+			$bankverbindung = new bankverbindung();
 			
 			if($_POST['neu']=='false')
 			{
@@ -327,7 +322,7 @@ if(!$error)
 		else
 		{ 
 			//Loescht Bankverbindungen aus der Datenbank
-			$bankverbindung = new bankverbindung($conn, null, true);
+			$bankverbindung = new bankverbindung();
 			
 			if($bankverbindung->delete($_POST['bankverbindung_id']))
 			{
@@ -354,7 +349,7 @@ if(!$error)
 		}
 		else
 		{ 
-			$benutzerfunktion = new benutzerfunktion($conn);
+			$benutzerfunktion = new benutzerfunktion();
 			if(isset($_POST['neu']) && $_POST['neu']=='true')
 			{
 				$benutzerfunktion->new = true;
@@ -423,7 +418,7 @@ if(!$error)
 		{ 
 			if(isset($_POST['benutzerfunktion_id']) && is_numeric($_POST['benutzerfunktion_id']))
 			{
-				$benutzerfunktion = new benutzerfunktion($conn);
+				$benutzerfunktion = new benutzerfunktion();
 				if($benutzerfunktion->delete($_POST['benutzerfunktion_id']))
 				{
 					$return = true;	
@@ -438,7 +433,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='variablechange') /**********************SONSTIGES*****************/
 	{
-		$variable = new variable($conn, null, null, true);
+		$variable = new variable();
 		
 		$variable->uid = $user;
 		$variable->new = false;
@@ -448,7 +443,7 @@ if(!$error)
 		{
 			if(isset($_POST['wert']) && $_POST['wert']!=0)
 			{
-				$stsem = new studiensemester($conn);
+				$stsem = new studiensemester();
 				$studiensemester_kurzbz = $stsem->jump($_POST['stsem'], $_POST['wert']);
 			}
 			else 
@@ -508,10 +503,10 @@ if(!$error)
 			else
 			{
 				$qry = "UPDATE public.tbl_person SET foto=null WHERE person_id='".$_POST['person_id']."'";
-				if(pg_query($conn, $qry))
+				if($db->db_query($qry))
 				{
 					$qry = "DELETE FROM public.tbl_akte WHERE person_id='".$_POST['person_id']."' AND dokument_kurzbz='Lichtbil'";
-					if(pg_query($conn, $qry))
+					if($db->db_query($qry))
 					{
 						$return = true;
 					}
@@ -536,7 +531,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getvariable')
 	{
-		$variable = new variable($conn, null, null, true);
+		$variable = new variable();
 		
 		if($variable->load($user, $_POST['name']))
 		{	

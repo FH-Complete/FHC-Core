@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-include('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 ?>
 var menuUndoDatasource=0;
 var STPLlastDetailUrl='leer';
@@ -465,11 +465,18 @@ function ResCheckShow()
 	window.open('<?php echo APP_ROOT;?>vilesci/lehre/check/res_check.php', 'KollisionReservierung');
 }
 
-
 // ****
 // * Oeffnet das Handbuch
 // ****
 function OpenManualTempus()
 {
 	window.open('<?php echo APP_ROOT ?>content/Tempus.pdf','Manual');
+}
+
+// ****
+// * Oeffnet den About Dialog
+// ****
+function OpenAboutDialog()
+{
+	window.open('<?php echo APP_ROOT ?>content/about.xul.php','About','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

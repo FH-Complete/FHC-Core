@@ -126,7 +126,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-bis-mitarbeiter-checkfunktion:command" oncommand="BISMitarbeiterCheckFunktion();"/>
   <command id="menu-bis-studenten-plausibilitaetspruefung:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
-  <command id="menu-help-close:command" oncommand="OpenAboutDialog()"/>
+  <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
   <command id="menu-help-manual:command" oncommand="OpenManual()"/>
   <command id="menu-help-todo:command" oncommand="OpenToDoDialog()"/>
 </commandset>
@@ -660,11 +660,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">
             <menuitem
-               id        =  "menu-help-close"
-               key       =  "menu-help-close:key"
-               label     = "&menu-help-close.label;"
-               command   =  "menu-help-close:command"
-               accesskey = "&menu-help-close.accesskey;"/>
+               id        =  "menu-help-about"
+               key       =  "menu-help-about:key"
+               label     = "&menu-help-about.label;"
+               command   =  "menu-help-about:command"
+               accesskey = "&menu-help-about.accesskey;"/>
             <menuitem
                id        =  "menu-help-manual"
                key       =  "menu-help-manual:key"

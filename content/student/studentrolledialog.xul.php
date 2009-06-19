@@ -26,7 +26,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 
@@ -34,11 +34,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Connection');
-	
 if(isset($_GET['prestudent_id']))
 	$prestudent_id=$_GET['prestudent_id'];
 else 
@@ -63,13 +60,13 @@ $vorname = '';
 $nachname = '';
 if($prestudent_id!='')
 {
-	$prestudent = new prestudent($conn, null, true);
+	$prestudent = new prestudent();
 	$prestudent->load($prestudent_id);
 	
 	$vorname = $prestudent->vorname;
 	$nachname = $prestudent->nachname;
 }
-
+$db = new basis_db();
 ?>
 
 <window id="student-rolle-dialog" title="Status"
@@ -127,9 +124,9 @@ if($prestudent_id!='')
 						<?php
 							$maxsem=10;
 							$qry = "SELECT max(semester) as maxsem FROM public.tbl_lehrverband WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id='".addslashes($prestudent_id)."')";
-							if($result = pg_query($conn, $qry))
+							if($result = $db->db_query($qry))
 							{
-								if($row = pg_fetch_object($result))
+								if($row = $db->db_fetch_object($result))
 								{
 									$maxsem = $row->maxsem;
 								}
@@ -146,8 +143,8 @@ if($prestudent_id!='')
       			<?php
       				$hidden='true';
       				$qry = "SELECT orgform_kurzbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE prestudent_id='$prestudent_id'";
-      				if($result = pg_query($conn, $qry))
-      					if($row = pg_fetch_object($result))
+      				if($result = $db->db_query($qry))
+      					if($row = $db->db_fetch_object($result))
       						if($row->orgform_kurzbz=='VBB')
       							$hidden='false';
       			?>
@@ -158,9 +155,9 @@ if($prestudent_id!='')
 						<menuitem value="" label="-- keine Auswahl --"/>
 						<?php
 						$qry = "SELECT orgform_kurzbz, bezeichnung FROM bis.tbl_orgform WHERE rolle ORDER BY bezeichnung";
-						if($result = pg_query($conn, $qry))
+						if($result = $db->db_query($qry))
 						{
-							while($row = pg_fetch_object($result))
+							while($row = $db->db_fetch_object($result))
 							{
 								echo '<menuitem value="'.$row->orgform_kurzbz.'" label="'.$row->bezeichnung.'"/>';
 							}

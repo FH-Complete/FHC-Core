@@ -33,7 +33,7 @@
 // * - Lehreinheit anlegen/bearbeiten/loeschen
 // ****************************************
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/lehreinheit.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
@@ -46,22 +46,18 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/lehrstunde.class.php');
 
 $user = get_uid();
-
+$db = new basis_db();
 error_reporting(0);
-
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 $return = false;
 $errormsg = 'unknown';
 $data = '';
 $error = false;
 
-loadVariables($conn, $user);
+loadVariables($user);
 
 //Berechtigungen laden
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('lv-plan'))
 {
@@ -74,11 +70,11 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 
 function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 {
-	global $conn, $db_stpl_table,$errormsg;
+	global $db_stpl_table,$errormsg;
 
 	//Lehrstunden laden
-	$lehrstunden=new lehrstunde($conn);
-	$lehrstunde=new lehrstunde($conn);
+	$lehrstunden=new lehrstunde();
+	$lehrstunde=new lehrstunde();
 	$lehrstunden->load_lehrstunden_le($lehreinheit_id,$mitarbeiter_uid_old);
 
 	foreach ($lehrstunden->lehrstunden as $ls)
@@ -135,7 +131,7 @@ if(!$error)
 
 		if(!$error)
 		{
-			$lem = new lehreinheitmitarbeiter($conn, null, null, true);
+			$lem = new lehreinheitmitarbeiter();
 
 			if(!$lem->load($_POST['lehreinheit_id'],$_POST['mitarbeiter_uid_old']))
 			{
@@ -171,7 +167,7 @@ if(!$error)
 						//Update im Stundenplan
 						$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
 						$qry = "UPDATE $stpl_table SET mitarbeiter_uid='$lem->mitarbeiter_uid' WHERE lehreinheit_id='$lem->lehreinheit_id' AND mitarbeiter_uid='$lem->mitarbeiter_uid_old'";
-						if(pg_query($conn, $qry))
+						if($db->db_query($qry))
 						{
 							$error = false;
 						}
@@ -198,7 +194,7 @@ if(!$error)
 						//Wenn ja dann ein Warning zurueckliefern
 
 						//Maximale Stundenanzahl ermitteln
-						$ma = new mitarbeiter($conn);
+						$ma = new mitarbeiter();
 						$ma->load($lem->mitarbeiter_uid);
 
 						if($ma->fixangestellt)
@@ -207,7 +203,7 @@ if(!$error)
 							$max_stunden = WARN_SEMESTERSTD_FREI;
 
 						//Summer der Stunden ermitteln
-						$le = new lehreinheit($conn);
+						$le = new lehreinheit();
 						$le->load($lem->lehreinheit_id);
 
 						$qry = "SELECT
@@ -221,9 +217,9 @@ if(!$error)
 									stundensatz>0 AND
 									bismelden";
 
-						if($result = pg_query($conn, $qry))
+						if($db->db_query($qry))
 						{
-							if($row = pg_fetch_object($result))
+							if($row = $db->db_fetch_object())
 							{
 								if($row->summe>=$max_stunden)
 								{
@@ -269,9 +265,9 @@ if(!$error)
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object())
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
@@ -302,7 +298,7 @@ if(!$error)
 		{
 			if(isset($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
-				$lem = new lehreinheitmitarbeiter($conn, null, null, true);
+				$lem = new lehreinheitmitarbeiter();
 
 				$lem->lehreinheit_id = $_POST['lehreinheit_id'];
 				$lem->lehrfunktion_kurzbz = 'Lektor';
@@ -318,9 +314,9 @@ if(!$error)
 
 				//Stundensatz aus tbl_mitarbeiter holen
 				$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
-				if($result = pg_query($conn, $qry))
+				if($db->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $db->db_fetch_object($result))
 					{
 						if($row->stundensatz!='')
 							$lem->stundensatz = $row->stundensatz;
@@ -338,14 +334,14 @@ if(!$error)
 				{
 					$error=true;
 					$return=false;
-					$errormsg='Fehler bei einer Datenbankabfrage:'.pg_errormessage($conn);
+					$errormsg='Fehler bei einer Datenbankabfrage:'.$db->db_last_error();
 				}
 
 				//Faktor und Semesterstunden aus tbl_lehrveranstaltung holen
-				$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".$_POST['lehreinheit_id']."';";
-				if($result = pg_query($conn, $qry))
+				$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."';";
+				if($db->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $db->db_fetch_object())
 					{
 						if($row->planfaktor!='')
 							$lem->faktor = $row->planfaktor;
@@ -374,7 +370,7 @@ if(!$error)
 				{
 					$error = true;
 					$return = false;
-					$errormsg = 'Fehler in einer Datenbankabfrage:'.pg_errormessage($conn);
+					$errormsg = 'Fehler in einer Datenbankabfrage:'.$db->db_last_error();
 				}
 
 				if(!$error)
@@ -405,9 +401,9 @@ if(!$error)
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object())
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
@@ -440,19 +436,19 @@ if(!$error)
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
 				//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'
+				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'
 						UNION
-						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
-				if($result = pg_query($conn, $qry))
+						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
+				if($db->db_query($qry))
 				{
-					if(pg_num_rows($result)>0)
+					if($db->db_num_rows()>0)
 					{
 						$return = false;
-						$errormsg = 'Dieser Lektor kann nicht geloescht werden da er schon verplant ist';
+						$errormsg = 'Dieser Lektor kann nicht gelöscht werden da er schon verplant ist';
 					}
 					else
 					{
-						$leg = new lehreinheitmitarbeiter($conn);
+						$leg = new lehreinheitmitarbeiter();
 						if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
 						{
 							$return = true;
@@ -473,7 +469,7 @@ if(!$error)
 			else
 			{
 				$return = false;
-				$errormsg = 'Fehler beim loeschen der Zuordnung';
+				$errormsg = 'Fehler beim Löschen der Zuordnung';
 			}
 		}
 	}
@@ -483,9 +479,9 @@ if(!$error)
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."')";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object())
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
@@ -519,9 +515,9 @@ if(!$error)
 					tbl_lehreinheitgruppe.lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."' AND
 					tbl_lehreinheitgruppe.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehreinheit_id=tbl_uebung.lehreinheit_id";
-			if($result = pg_query($conn, $qry))
+			if($db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object())
 				{
 					if($row->anzahl>0)
 					{
@@ -549,7 +545,7 @@ if(!$error)
 							 FROM 
 							 	lehre.tbl_lehreinheitgruppe 
 							WHERE 
-								lehreinheitgruppe_id='".$_POST['lehreinheitgruppe_id']."'
+								lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."'
 							)
 						UNION
 						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan 
@@ -560,12 +556,12 @@ if(!$error)
 							 FROM 
 							 	lehre.tbl_lehreinheitgruppe 
 							WHERE 
-								lehreinheitgruppe_id='".$_POST['lehreinheitgruppe_id']."'
+								lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."'
 							)
 						";
-				if($result = pg_query($conn, $qry))
+				if($db->db_query($qry))
 				{
-					if(pg_num_rows($result)>0)
+					if($db->db_num_rows()>0)
 					{
 						$error = true;
 						$return = false;
@@ -574,7 +570,7 @@ if(!$error)
 				}
 				else 
 				{
-					$errormsg = 'Fehler beim Pruefen des Stundenplanes: '.pg_last_error($conn);
+					$errormsg = 'Fehler beim Pruefen des Stundenplanes: '.$db->db_last_error();
 					$return = false;
 					$error = true;
 				}
@@ -586,7 +582,7 @@ if(!$error)
 				//Lehreinheitgruppezuteilung loeschen
 				if(isset($_POST['lehreinheitgruppe_id']) && is_numeric($_POST['lehreinheitgruppe_id']))
 				{
-					$leg = new lehreinheitgruppe($conn);
+					$leg = new lehreinheitgruppe();
 					if($leg->delete($_POST['lehreinheitgruppe_id']))
 					{
 						$return = true;
@@ -600,7 +596,7 @@ if(!$error)
 				else
 				{
 					$return = false;
-					$errormsg = 'Fehler beim Loeschen der Zuordnung';
+					$errormsg = 'Fehler beim Löschen der Zuordnung';
 				}
 			}
 		}
@@ -611,9 +607,9 @@ if(!$error)
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object())
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
@@ -645,7 +641,7 @@ if(!$error)
 			//Lehreinheitgruppezuteilung anlegen
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']))
 			{
-				$leg = new lehreinheitgruppe($conn);
+				$leg = new lehreinheitgruppe();
 				$leg->lehreinheit_id = $_POST['lehreinheit_id'];
 				$leg->studiengang_kz = $_POST['studiengang_kz'];
 				$leg->semester = $_POST['semester'];
@@ -691,9 +687,9 @@ if(!$error)
 		else
 			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung'])."'";
 
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object())
 			{
 				$studiengang_kz = $row->studiengang_kz;
 				$fachbereich_kurzbz = 0;
@@ -716,7 +712,7 @@ if(!$error)
 
 		if(!$error)
 		{
-			$leDAO=new lehreinheit($conn, null, true);
+			$leDAO=new lehreinheit();
 			if ($_POST['do']=='create' || ($_POST['do']=='update'))
 			{
 				if($_POST['do']=='update')
@@ -808,12 +804,12 @@ if(!$error)
 				else
 				{
 					// Loeschen verhindern wenn diese Lehreinheit schon verplant ist
-					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'
+					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'
 							UNION
-							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".$_POST['lehreinheit_id']."'";
-					if($result = pg_query($conn, $qry))
+							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+					if($db->db_query($qry))
 					{
-						if(pg_num_rows($result)>0)
+						if($db->db_num_rows()>0)
 						{
 							$return = false;
 							$errormsg = 'Diese Lehreinheit ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
@@ -822,9 +818,9 @@ if(!$error)
 						{
 							//Loeschen verhindern wenn ein MoodleKurs existiert
 							$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
-							if($result = pg_query($conn, $qry))
+							if($db->db_query($qry))
 							{
-								if(pg_num_rows($result)>0)
+								if($db->db_num_rows()>0)
 								{
 									$return = false;
 									$errormsg = 'Lehreinheit kann nicht geloescht werden, da dazu bereits ein Moodle-Kurs angelegt wurde';
@@ -857,7 +853,7 @@ if(!$error)
 	{
 		if(isset($_POST['mitarbeiter_uid']))
 		{
-			$mitarbeiter = new mitarbeiter($conn);
+			$mitarbeiter = new mitarbeiter();
 			if($mitarbeiter->load($_POST['mitarbeiter_uid']))
 			{
 				$data = $mitarbeiter->stundensatz;

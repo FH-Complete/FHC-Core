@@ -22,7 +22,7 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-include('../../vilesci/config.inc.php');
+include('../../config/vilesci.config.inc.php');
 include('../../include/globals.inc.php');
 include('../../include/functions.inc.php');
 include('../../include/berechtigung.class.php');
@@ -33,21 +33,19 @@ include('../../include/reservierung.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
-
+$PHP_SELF = $_SERVER['PHP_SELF'];
 // Startwerte setzen
 $db_stpl_table=null;
+$db = new basis_db();
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
-//echo $_SERVER[REQUEST_URI];
 
 $uid = get_uid();
 
 $error_msg='';
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg.='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
 // Benutzerdefinierte Variablen laden
-$error_msg.=loadVariables($conn,$uid);
+loadVariables($uid);
 
 if (!isset($ignore_kollision))
 	$ignore_kollision=(boolean)false;
@@ -55,11 +53,9 @@ elseif ($ignore_kollision=='false')
 	$ignore_kollision=(boolean)false;
 else
 	$ignore_kollision=(boolean)true;
-//var_dump($ignore_kollision);
 
 // Bezeichnungen fuer Tabellen und Views
 $lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
-
 
 // Variablen uebernehmen
 if (isset($_GET['aktion']))
@@ -106,7 +102,7 @@ else
 if (isset($_GET['pers_uid']))
 	$pers_uid=$_GET['pers_uid'];
 if (isset($_GET['gruppe']))
-	$gruppe_kurzbz=$_GET['gruppe'];
+	$gruppe=$_GET['gruppe'];
 else
 	$gruppe=null;
 if (isset($_GET['semester_aktuell']))
@@ -134,13 +130,6 @@ else
 ?>
 <vbox id="boxTimeTableWeek" flex="5" style="overflow:auto;">
 <?php
-// Authentifizierung
-/*if ($uid=check_student($REMOTE_USER, $conn))
-	$user='student';
-elseif ($uid=check_lektor($REMOTE_USER, $conn))
-	$user='lektor';
-else
-    die("Cannot set usertype!");*/
 $user=NULL;
 
     // User bestimmen
@@ -150,8 +139,8 @@ if (!isset($pers_uid))
 	$pers_uid=$uid;
 
 // Datums Format
-if(!$result=pg_query($conn, "SET datestyle TO ISO;"))
-	$error_msg=pg_last_error($conn);
+if(!$db->db_query("SET datestyle TO ISO;"))
+	$error_msg=$db->db_last_error();
 
 // ****************************************************************************
 // Variablen fuer Aktionen setzen
@@ -206,13 +195,13 @@ if ($aktion=='stpl_move' || $aktion=='stpl_single_search' || $aktion=='stpl_set'
 
 // ****************************************************************************
 // Aktionen durchfuehren
-$error_msg.=db_query($conn,'BEGIN;');
+$db->db_query('BEGIN;');
 // *************** Stunden verschieben ****************************************
 if ($aktion=='stpl_move' || $aktion=='stpl_set')
 {
 	foreach ($stpl_id as $stundenplan_id)
 	{
-		$lehrstunde=new lehrstunde($conn);
+		$lehrstunde=new lehrstunde();
 		$lehrstunde->load($stundenplan_id,$db_stpl_table);
 		$diffStunde=$new_stunde-$lehrstunde->stunde;
 		$lehrstunde->datum=$new_datum;
@@ -234,7 +223,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 	if (isset($stpl_idx))
 		foreach ($stpl_idx as $stundenplan_id)
 		{
-			$lehrstunde=new lehrstunde($conn);
+			$lehrstunde=new lehrstunde();
 			$lehrstunde->load($stundenplan_id,$db_stpl_table);
 			$lehrstunde->datum=$new_datum;
 			$lehrstunde->stunde+=$diffStunde;
@@ -255,14 +244,14 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 // ****************** STPL Delete *******************************
 elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 {
-	$lehrstunde=new lehrstunde($conn);
+	$lehrstunde=new lehrstunde();
 	foreach ($stpl_id as $stundenplan_id)
 	{
 		$lehrstunde->delete($stundenplan_id,$db_stpl_table);
 		$error_msg.=$lehrstunde->errormsg;
 	}
 	
-	$reservierung=new reservierung($conn);
+	$reservierung=new reservierung();
 	foreach ($res_id as $reservierung_id)
 	{
 		$reservierung->delete($reservierung_id);
@@ -272,11 +261,10 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 // ******************** Lehrveranstaltung setzen ******************************
 elseif ($aktion=='lva_single_set')
 {
-	//$anz_lvas=count($lva_id);
 	$z=0;
 	foreach ($lva_id AS $le_id)
 	{
-		$lva[$z]=new lehreinheit($conn);
+		$lva[$z]=new lehreinheit();
 		$lva[$z]->loadLE($le_id);
 		//$error_msg.='test'.$le_id.($lva[$i]->errormsg).($lva[$i]->stundenblockung);
 		for ($j=0;$j<$lva[$z]->stundenblockung && $error_msg=='';$j++)
@@ -286,34 +274,32 @@ elseif ($aktion=='lva_single_set')
 	}
 	for ($i=0;$i<$z && $error_msg=='';$i++)
 	{
-		//$lva[$i]=new lehrveranstaltung($lva_id[$i]);
-		//$error_msg.='Blockung'.$lva[$i]->stundenblockung.var_dump($lva);
-		//$error_msg.='Datum:'.$new_datum.' Std:'.($new_stunde+$j).$new_ort.$db_stpl_table.$uid;
 		for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
 			if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
 				$error_msg.='Error: '.$lva[$i]->errormsg;
-			//else die('test');
 	}
-	//$error_msg.='test';
 }
 //******************* Multi Verplanung ***************
 elseif ($aktion=='lva_multi_set')
 {
 	// Ferien holen
-	$ferien=new ferien($conn);
+	$ferien=new ferien();
 	if ($type=='verband')
 		$ferien->getAll($stg_kz);
 	else
 		$ferien->getAll(0);
 
 	// Ende holen
-	if (!$result_semester=pg_query($conn,"SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';"))
-		die (pg_last_error($conn));
-	if (pg_numrows($result_semester)>0)
-		$ende=pg_result($result_semester,0,'ende');
+	if (!$result_semester=$db->db_query("SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';"))
+		die ($db->db_last_error());
+	if ($db->db_num_rows()>0)
+	{
+		$row = $db->db_fetch_object(); 
+		$ende = $row->ende;
+	}
 	else
 		$error_msg.="Fatal Error: Ende Datum ist nicht gesetzt ($semester_aktuell)!";
-	//echo '<label>'.$ende.'</label>';
+	
 	$ende=mktime(0,0,1,substr($ende,5,2),substr($ende,8,2),substr($ende,0,4));
 	$anz_lvas=count($lva_id);
 	// Arrays intitialisieren
@@ -331,13 +317,14 @@ elseif ($aktion=='lva_multi_set')
 		$lvas.=' OR lehreinheit_id='.$id;
 	$lvas=substr($lvas,3);
 	$sql_query.=$lvas;
-	if(!$result_lva=pg_query($conn, $sql_query))
-		$error_msg.=pg_last_error($conn);
-	$num_rows_lva=pg_numrows($result_lva);
+
+	if(!$result_lva = $db->db_query($sql_query))
+		$error_msg.=$db->db_last_error();
+	$num_rows_lva=$db->db_num_rows($result_lva);
 	// Daten aufbereiten
 	for ($i=0;$i<$num_rows_lva;$i++)
 	{
-		$row=pg_fetch_object($result_lva,$i);
+		$row=$db->db_fetch_object($result_lva,$i);
 		$verplant[]=$row->verplant;
 		$block[]=$row->stundenblockung;
 		$wochenrythmus[]=$row->wochenrythmus;
@@ -353,21 +340,7 @@ elseif ($aktion=='lva_multi_set')
 		$offenestunden=$os;
 	else
 		$error_msg.='Offene Stunden sind nicht eindeutig!';
-	//$error_msg.='Offene Stunden='.$offenestunden;
-
-	/*// Verplante Stunden
-	$verplant=array_unique($verplant);
-	if (count($verplant)==1)
-		$verplant=$verplant[0];
-	else
-		$error_msg.='Verplante Stunden sind nicht eindeutig!';
-	//Semesterstunden
-	$semesterstunden=array_unique($semesterstunden);
-	if (count($semesterstunden)==1)
-		$semesterstunden=$semesterstunden[0];
-	else
-		$error_msg.='Semesterstunden sind nicht eindeutig!';*/
-
+	
 	//Blockung
 	$blk=$block[0];
 	$block=array_unique($block);
@@ -396,7 +369,7 @@ elseif ($aktion=='lva_multi_set')
 			//LVAs holen und pruefen ob moeglich
 			for ($i=0;$i<$anz_lvas;$i++)
 			{
-				$lva[$i]=new lehreinheit($conn);
+				$lva[$i]=new lehreinheit();
 				$lva[$i]->loadLE($lva_id[$i]);
 				for ($j=0;$j<$block;$j++)
 					if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
@@ -420,12 +393,15 @@ elseif ($aktion=='lva_multi_set')
 // Lehrveranstaltungen aus dem Stundenplan loeschen
 elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 {
-	$result_semester=pg_query($conn,"SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
-	if (pg_numrows($result_semester)>0)
+	$result_semester = $db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';");
+	if ($db->db_num_rows()>0)
 	{
 		$start=date('Y-m-d',$datum);
 		if ($aktion=='lva_stpl_del_multi')
-			$ende=pg_result($result_semester,0,'ende');
+		{
+			$row = $db->db_fetch_object($result_semester);
+			$ende = $row->ende;
+		}
 		else
 			$ende=date('Y-m-d',jump_week($datum,1));
 		$anz_lvas=count($lva_id);
@@ -436,31 +412,32 @@ elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 		$sql_query_lvaid=substr($sql_query_lvaid,3);
 		$sql_query.=$sql_query_lvaid;
 		$sql_query.=") AND datum>='$start' AND datum<'$ende'";
-		if(!$result_lva_del=pg_query($conn, $sql_query))
-			$error_msg.=pg_last_error($conn);
+		if(!$result_lva_del=$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error();
 	}
 	else
 		$error_msg.='Studiensemester '.$semester_aktuell.' konnte nicht gefunden werden!';
 }
 
 if ($error_msg=='')
-	$error_msg.=@db_query($conn,'COMMIT;');
+	$db->db_query('COMMIT;');
 else
-	$error_msg.=@db_query($conn,'ROLLBACK;');
+	$db->db_query('ROLLBACK;');
 
 // Stundenplan erstellen
-$stdplan=new wochenplan($type,$conn);
+$stdplan=new wochenplan($type);
 if (!isset($datum))
 	$datum=mktime();
 if (!isset($semesterplan) || !$semesterplan)
 	$begin=$ende=$datum;
 else
 {
-	$result_semester=pg_query($conn,"SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='$semester_aktuell';");
-	if (pg_numrows($result_semester)>0)
+	$db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';");
+	if ($db->db_num_rows()>0)
 	{
-		$begin=strtotime(pg_result($result_semester,0,'start'));
-		$ende=strtotime(pg_result($result_semester,0,'ende'));
+		$row = $db->db_fetch_object();
+		$begin=strtotime($row->start);
+		$ende=strtotime($row->ende);
 	}
 	else
 		$error_msg.='Studiensemester '.$semester_aktuell.' konnte nicht gefunden werden!';
@@ -475,7 +452,7 @@ $stdplan->user_uid=$uid;
 $zeitwunsch=null;
 if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_search')
 {
-	$wunsch=new zeitwunsch($conn);
+	$wunsch=new zeitwunsch();
 	if ($type=='lektor')
 		if ($wunsch->loadPerson($pers_uid,$datum))
 			$zeitwunsch=$wunsch->zeitwunsch;
@@ -491,7 +468,7 @@ if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_searc
 // Zusaetzliche Daten laden
 if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$gruppe) && $error_msg!='')
 	$error_msg.=$stdplan->errormsg;
-//echo 'load_data'.$error_msg;
+
 // Stundenplan einer Woche laden
 if (! $stdplan->load_week($datum,$db_stpl_table))
 	$error_msg.=$stdplan->errormsg;
@@ -500,20 +477,17 @@ while ($begin<=$ende)
 	$stdplan->init_stdplan();
 	$datum=$begin;
 	$begin+=604800;	// eine Woche
-	//echo '<label>'.date("Y-m-d - D",$datum).$datum.'</label>';
+
 	// Stundenplan einer Woche laden
 	if (! $stdplan->load_week($datum,$db_stpl_table))
 		$error_msg.=$stdplan->errormsg;
-		
+	
 	//Raumvorschlag setzen
 	
-	//echo 'load_week'.$error_msg;
 	if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
 		if (! $stdplan->load_lva_search($datum,$lva_id,$db_stpl_table, $aktion))
 			$error_msg.=$stdplan->errormsg;
-		else
-			$error_msg.=$stdplan->errormsg;
-	//echo 'load_lva_search'.$error_msg;
+	
 	if ($aktion=='stpl_single_search')
 	{
 		if(isset($stpl_id))
@@ -524,12 +498,12 @@ while ($begin<=$ende)
 		else 
 			$error_msg.='Derzeit gibt es keinen Raumvorschlag fuer Reservierungen';
 	}
-	//echo 'load_stpl_search'.$error_msg;
 
 	// Stundenplan der Woche drucken
 	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision);
+	
 }
-//echo $error_msg;.$_SERVER["REQUEST_URI"]
+
 ?>
 
 </vbox>
