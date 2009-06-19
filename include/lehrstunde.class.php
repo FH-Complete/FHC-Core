@@ -212,6 +212,7 @@ class lehrstunde extends basis_db
 	 */
 	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null)
 	{
+		$num_rows_einheit=0;
 		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
@@ -296,15 +297,13 @@ class lehrstunde extends basis_db
 				$this->ss=studiensemester::getNearest();
 			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($this->ss)."' OR studiensemester_kurzbz IS NULL)";
 
-			if (!$this->db_query($sql_query))
+			if (!$result_einheit=$this->db_query($sql_query))
 			{
 				$this->errormsg=pg_last_error($this->conn);
 				return false;
 			}
-			else
-			{
-				$result_einheit = $this->db_result;
-			}				
+			else 
+				$num_rows_einheit=$db->db_num_rows($result_einheit);
 		}
 
 		///////////////////////////////////////////////////////////////////////
@@ -338,8 +337,9 @@ class lehrstunde extends basis_db
 					$sql_query.=' AND gruppe_kurzbz IS NULL';
 				$sql_query.=' )';
 				
-				while($row=$this->db_fetch_object($result_einheit))
+				for ($i=0;$i<$num_rows_einheit;$i++)
 				{
+					$row=$db->db_fetch_object($result_einheit,$i);
 					$sql_query.=" OR gruppe_kurzbz='$row->gruppe_kurzbz'";
 				}
 				$sql_query.=')';

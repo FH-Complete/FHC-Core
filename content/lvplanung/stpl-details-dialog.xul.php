@@ -26,20 +26,17 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/stundenplan.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/datum.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-echo '<?xml-stylesheet href="../datepicker/datepicker.css" type="text/css"?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
 	
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 	$id=$_GET['id'];
@@ -47,15 +44,16 @@ else
 	$id='';
 	
 $datum_obj = new datum();
+$db = new basis_db();
 
-loadVariables($conn, get_uid());
+loadVariables(get_uid());
 
-$stundenplan = new stundenplan($conn, $db_stpl_table, null, true);
+$stundenplan = new stundenplan($db_stpl_table);
 
 if(!$stundenplan->load($id))
 	die('Fehler beim Laden der Daten');
 
-$studiengang = new studiengang($conn, null, true);
+$studiengang = new studiengang();
 $studiengang->load($stundenplan->studiengang_kz);
 
 ?>
@@ -115,9 +113,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 										FROM lehre.tbl_lehreinheitgruppe
 										WHERE lehreinheit_id='$stundenplan->lehreinheit_id'";
 								
-								if($result = pg_query($conn, $qry))
+								if($db->db_query($qry))
 								{
-									while($row = pg_fetch_object($result))
+									while($row = $db->db_fetch_object())
 									{
 										if($row->gruppe_kurzbz!='')
 										{
@@ -158,9 +156,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 							<?php
 								$qry = "SELECT ort_kurzbz FROM public.tbl_ort ORDER BY ort_kurzbz";
 								
-								if($result = pg_query($conn, $qry))
+								if($db->db_query($qry))
 								{
-									while($row = pg_fetch_object($result))
+									while($row = $db->db_fetch_object())
 									{
 										if($row->ort_kurzbz!='')
 										{
@@ -185,9 +183,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 							<?php
 								$qry = "SELECT stunde FROM lehre.tbl_stunde ORDER BY stunde";
 								
-								if($result = pg_query($conn, $qry))
+								if($db->db_query($qry))
 								{
-									while($row = pg_fetch_object($result))
+									while($row = $db->db_fetch_object())
 									{
 										if($row->stunde!='')
 										{

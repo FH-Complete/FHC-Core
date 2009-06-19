@@ -20,8 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../vilesci/config.inc.php');
-require_once('../../include/functions.inc.php');
+require_once('../../config/vilesci.config.inc.php');
+
 ?>
 var MitarbeiterVerwendungDetailBisverwendungId=''; // enthaelt die bisverwendung_id
 var MitarbeiterVerwendungDetailMitarbeiterUid=''; // enthaelt die mitarbeiterUID

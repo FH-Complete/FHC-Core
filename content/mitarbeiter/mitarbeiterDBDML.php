@@ -29,7 +29,7 @@
 // * - Bankverbindungen
 // ****************************************
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/log.class.php');
@@ -43,17 +43,13 @@ require_once('../../include/resturlaub.class.php');
 
 $user = get_uid();
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $return = false;
 $errormsg = 'unknown';
 $data = '';
 $error = false;
 
 //Berechtigungen laden
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
 {
@@ -69,7 +65,7 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='mitarbeitersave')
 	{
 		//Speichert die Mitarbeiterdaten
-		$mitarbeiter = new mitarbeiter($conn, null, true);
+		$mitarbeiter = new mitarbeiter();
 		
 		if($mitarbeiter->load($_POST['uid']))
 		{
@@ -111,7 +107,7 @@ if(!$error)
 			
 			if($mitarbeiter->save())
 			{
-				$resturlaub = new resturlaub($conn, null, true);
+				$resturlaub = new resturlaub();
 				if($resturlaub->load($_POST['uid']))
 				{
 					$resturlaub->new = false;
@@ -154,7 +150,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='verwendungsave')
 	{
 		//Speichert die BISVerwendung
-		$verwendung = new bisverwendung($conn, null, true);
+		$verwendung = new bisverwendung();
 		
 		if($_POST['neu']!='true')
 		{
@@ -209,7 +205,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='verwendungdelete')
 	{
 		//Loescht die BISVerwendung
-		$verwendung = new bisverwendung($conn, null, true);
+		$verwendung = new bisverwendung();
 		if($verwendung->delete($_POST['bisverwendung_id']))
 		{
 			$return = true;
@@ -223,7 +219,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='funktionsave')
 	{
 		//Speichert die BISFunktion
-		$funktion = new bisfunktion($conn, null, true);
+		$funktion = new bisfunktion();
 		
 		if($_POST['neu']!='true')
 		{
@@ -265,7 +261,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='funktiondelete')
 	{
 		//Loescht die BISVerwendung
-		$funktion = new bisfunktion($conn, null, true);
+		$funktion = new bisfunktion();
 		if($funktion->delete($_POST['bisverwendung_id'],$_POST['studiengang_kz']))
 		{
 			$return = true;
@@ -279,7 +275,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='entwicklungsteamsave')
 	{
 		//Speichert den Entwicklungsteameintrag
-		$entwt = new entwicklungsteam($conn, null, true);
+		$entwt = new entwicklungsteam();
 		
 		if($_POST['neu']!='true')
 		{
@@ -331,7 +327,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='entwicklungsteamdelete')
 	{
 		//Loescht einen Entwicklungsteameintrag
-		$entwt = new entwicklungsteam($conn, null, true);
+		$entwt = new entwicklungsteam();
 		if($entwt->delete($_POST['mitarbeiter_uid'],$_POST['studiengang_kz']))
 		{
 			$return = true;

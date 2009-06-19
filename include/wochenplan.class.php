@@ -246,7 +246,7 @@ class wochenplan extends basis_db
 			//echo $sql_query;
 			if(!($this->db_query($sql_query)))
 				die($this->db_last_error());
-			if($row = db_fetch_object())
+			if($row = $this->db_fetch_object())
 			{
 				$this->stg_bez = $row->bezeichnung;
 				$this->stg_kurzbz = $row->typ.$row->kurzbz;
@@ -982,21 +982,21 @@ class wochenplan extends basis_db
 							stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
 							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
-							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.utf8_encode($this->ort_kurzbz).'">';
+							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.$this->ort_kurzbz.'">';
 						echo '<label align="center">'.$blink_ein;
-						echo utf8_encode($lf);
+						echo $lf;
 						echo $lvb;
 						if ($this->type!='lektor')
-							echo utf8_encode($lkt);
+							echo $lkt;
 						if ($this->type!='ort')
-							echo  utf8_encode($orte);
+							echo $orte;
 						echo $blink_aus.'</label></button>';
 					}
 				}
 				if (isset($this->std_plan[$i][$j][0]->frei_orte))
 					foreach ($this->std_plan[$i][$j][0]->frei_orte as $f_ort)
 					{
-						echo '<label value="'.utf8_encode($f_ort).'"
+						echo '<label value="'.$f_ort.'"
 							styleOrig=""
 							ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
 							ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"
@@ -1233,9 +1233,9 @@ class wochenplan extends basis_db
 		// Initialiseren der Variablen
 		$lehrverband=array();
 		// Name der View
-		$stpl_view=VIEW_BEGIN.$db_stpl_table;
-		$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
-		$stpl_table=TABLE_BEGIN.$db_stpl_table;
+		$stpl_view='lehre.'.VIEW_BEGIN.$db_stpl_table;
+		$lva_stpl_view='lehre.'.VIEW_BEGIN.'lva_'.$db_stpl_table;
+		$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
 		//Kalenderdaten setzen
 		$this->datum=montag($datum);
 		$this->datum_begin=$this->datum;

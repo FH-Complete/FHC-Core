@@ -24,7 +24,7 @@
 // * Datenbankschnittstelle fuer FAS und Tempus
 // *********************************************
 
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/log.class.php');
@@ -35,17 +35,13 @@ $user = get_uid();
 
 error_reporting(0);
 
-// Datenbank Verbindung
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $return = false;
 $errormsg = 'unknown';
 $data = '';
 $error = false;
 
 //Berechtigungen laden
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('lv-plan'))
 {
@@ -71,7 +67,7 @@ if(!$error)
 
 		if(!$error)
 		{
-			$log = new log($conn, null, null, true);
+			$log = new log();
 
 			if($log->undo($_POST['log_id']))
 			{
@@ -98,7 +94,7 @@ if(!$error)
 			}
 			else
 			{
-				$obj = new benutzerfunktion($conn);
+				$obj = new benutzerfunktion();
 				$obj->uid = $_POST['uid'];
 				$obj->studiengang_kz = $_POST['studiengang_kz'];
 				$obj->funktion_kurzbz = 'lkt';
@@ -139,7 +135,7 @@ if(!$error)
 			}
 			else
 			{
-				$obj = new benutzerfunktion($conn);
+				$obj = new benutzerfunktion();
 				//Benutzerfunktion suchen
 				if($obj->getBenutzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
 				{
@@ -193,8 +189,8 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savestundenplaneintrag')
 	{
-		loadVariables($conn, get_uid());
-		$stundenplan = new stundenplan($conn, $db_stpl_table, null, true);
+		loadVariables(get_uid());
+		$stundenplan = new stundenplan($db_stpl_table);
 		if($stundenplan->load($_POST['stundenplan_id']))
 		{
 			$stundenplan->unr = $_POST['unr'];

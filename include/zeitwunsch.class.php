@@ -27,6 +27,7 @@ class zeitwunsch extends basis_db
 	public $errormsg; // string
 	public $new;      // boolean
 	public $zeitwuensche = array(); // zeitwunsch Objekt
+	public $zeitwunsch;
 
 	//Tabellenspalten
 	public $stunde;			// smalint

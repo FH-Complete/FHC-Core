@@ -50,6 +50,10 @@
 <!ENTITY menu-prefs-ignore_kollision.label    	"ignore_kollision">
 <!ENTITY menu-prefs-ignore_kollision.accesskey	"k">
 
+<!ENTITY menu-help-about.key          	"U">
+<!ENTITY menu-help-about.label        	"Über FHComplete">
+<!ENTITY menu-help-about.accesskey    	"U">
+
 <!ENTITY menu-help-todo.key          	"T">
 <!ENTITY menu-help-todo.label        	"ToDo">
 <!ENTITY menu-help-todo.accesskey    	"T">

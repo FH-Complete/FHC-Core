@@ -305,9 +305,9 @@
 <!ENTITY menu-help.label              	"Hilfe">
 <!ENTITY menu-help.accesskey          	"H">
 
-<!ENTITY menu-help-close.key          	"U">
-<!ENTITY menu-help-close.label        	"Über FHComplete">
-<!ENTITY menu-help-close.accesskey    	"U">
+<!ENTITY menu-help-about.key          	"U">
+<!ENTITY menu-help-about.label        	"Über FHComplete">
+<!ENTITY menu-help-about.accesskey    	"U">
 
 <!ENTITY menu-help-manual.key          	"H">
 <!ENTITY menu-help-manual.label        	"Handbuch">

@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-include('../vilesci/config.inc.php');
+include('../config/vilesci.config.inc.php');
 ?>
 function lehrstunde(id,idList)
 {

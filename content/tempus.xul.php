@@ -1,24 +1,17 @@
 <?php
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-include('../vilesci/config.inc.php');
-include('../include/functions.inc.php');
-include('../include/benutzerberechtigung.class.php');
-include('../include/fas/benutzer.class.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/studiensemester.class.php');
 
 $uid=get_uid();
 $error_msg='';
 
-//Variablen laden
-if (!$conn = @pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-$error_msg.=loadVariables($conn,$uid);
+loadVariables($uid);
 
-$benutzer = new benutzer($conn);
-$benutzer->loadVariables($uid);
-
-loadVariables($conn, $uid);
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 /*echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';*/
@@ -59,6 +52,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
   <command id="menu-extras-lvplanwartung:command" oncommand="LVPlanWartungShow();"/>
   <command id="menu-extras-rescheck:command" oncommand="ResCheckShow();"/>
+  <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
   <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
   <command id="menu-help-manual:command" oncommand="OpenManualTempus();"/>
 </commandset>
@@ -109,8 +103,9 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
            label     = "Studiensemester">
            <menupopup id="menu-properties-popup">
        <?php
-       		$stsem_arr = $benutzer->getpossibilities('semester_aktuell');
-       		foreach ($stsem_arr as $stsem)
+       		$stsemobj = new studiensemester();
+       		$stsemobj->getAll();
+       		foreach ($stsemobj->result as $stsem)
        		{
   				echo "
 			<menuitem
@@ -118,7 +113,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 				label = '$stsem'
 				type = 'radio'
 				command = 'menu-properties-studiensemester:command'
-				checked = ".($benutzer->variable->semester_aktuell==$stsem?"'true' ":"'false'")." />";
+				checked = ".($semester_aktuell==$stsem?"'true' ":"'false'")." />";
        		}
        ?>
 
@@ -208,11 +203,11 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">
             <menuitem
-               id        =  "menu-help-close"
-               key       =  "menu-help-close:key"
-               label     = "&menu-help-close.label;"
-               command   =  "menu-help-close:command"
-               accesskey = "&menu-help-close.accesskey;"/>
+               id        =  "menu-help-about"
+               key       =  "menu-help-about:key"
+               label     = "&menu-help-about.label;"
+               command   =  "menu-help-about:command"
+               accesskey = "&menu-help-about.accesskey;"/>
             <menuitem
                id        =  "menu-help-manual"
                key       =  "menu-help-manual:key"

@@ -934,7 +934,7 @@ function StudentAuswahl()
 	
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 
-	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
+	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung fÃ¼r '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
 	url='<?php echo APP_ROOT;?>rdf/prestudentrolle.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
@@ -3401,7 +3401,7 @@ function StudentNotenDelete()
 	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	stsem = tree.view.getCellText(tree.currentIndex,col);
 	
-	if(confirm('Wollen Sie diese Note wirklich löschen'))
+	if(confirm('Wollen Sie diese Note wirklich lï¿½schen'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');

@@ -25,7 +25,7 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -46,7 +46,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<caption label="Zeugnis"/>
 	<tree id="student-zeugnis-tree" seltype="single" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/akte/liste"
-		style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100px" enableColumnDrag="true"
+		style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="150px" enableColumnDrag="true"
 		ondblclick="StudentZeugnisAnzeigen()"
 		context="student-zeugnis-tree-popup"
 		flags="dont-build-content"

@@ -25,11 +25,9 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-require_once('../../vilesci/config.inc.php');
-require_once('../../include/functions.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-
 ?>
 
 <!DOCTYPE overlay>
@@ -38,8 +36,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns:NC="http://home.netscape.com/NC-rdf#"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
-<!-- datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/alle" -->
 
 <vbox id="mitarbeiter-detail-stammdaten" flex="1" style="overflow:auto">
 <textbox id="mitarbeiter-detail-textbox-person_id" hidden="true" />
@@ -88,7 +84,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="Geburtsdatum" control="mitarbeiter-detail-textbox-geburtsdatum"/>
       						<hbox>
       							<box class="Datum" id="mitarbeiter-detail-textbox-geburtsdatum" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
-      							<!--<textbox id="mitarbeiter-detail-textbox-geburtsdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
       						<label value="Geburtsort" control="mitarbeiter-detail-textbox-geburtsort"/>
       						<textbox id="mitarbeiter-detail-textbox-geburtsort" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>

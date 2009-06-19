@@ -21,7 +21,7 @@
  */
 // Holt den Hexcode eines Aktes aus der DB wandelt es in Zeichen
 // um und gibt das Dokument zurueck.
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/akte.class.php');
 
 //Hexcode in String umwandeln
@@ -33,14 +33,10 @@ function hexstr($hex)
     return $string;
 }
 
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 //Hex Dump aus der DB holen
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 {
-	$akte = new akte($conn, $_GET['id']);
+	$akte = new akte($_GET['id']);
 
 	//Header fuer Bild schicken
 	header("Content-type: $akte->mimetype");
