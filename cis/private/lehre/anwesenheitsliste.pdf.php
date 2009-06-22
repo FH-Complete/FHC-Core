@@ -43,12 +43,6 @@
    
    if(!$conn=pg_pconnect(CONN_STRING))
       die('Fehler beim Herstellen der Datenbankverbindung');
-
-	$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	if(!pg_query($conn,$qry))
-	{
-		die("Encoding konnte nicht gesetzt werden");
-	}   
 	
    //Uebergabeparameter abpruefen
    if(isset($_GET['stg'])) //Studiengang
@@ -105,4 +99,6 @@ function getmax($val1,$val2)
 }
 
 require_once('../../../include/'.EXT_FKT_PATH.'/anwesenheitsliste.inc.php');
+
+
 ?>
