@@ -23,20 +23,23 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			$db=false;
+
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
 	
 	//require_once('../../../include/Excel/excel.php');
-	
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
 if(!isset($_POST['uid']))
 {
 	$uid = (isset($_GET['uid'])?$_GET['uid']:'-1');
@@ -79,9 +82,12 @@ else
 	$abstract_en = (isset($_POST['abstract_en'])?$_POST['abstract_en']:'-1');
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
 }
+
 if($uid=='-1')
+{
 	exit;		
-		
+}	
+	
 $user = get_uid();
 $datum_obj = new datum();
 $error='';
@@ -124,7 +130,7 @@ if($command=='add')
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
-		$result=pg_query($conn, $qry_upd);
+		$result=$db->pg_query($qry_upd);
 		$command="update";
 	}
 	else 
@@ -150,7 +156,7 @@ if($command=="update" || $error==true)
 						updatevon = '".$user."', 
 						updateamum = now() 
 						WHERE paabgabe_id='".$paabgabe_id."'";
-					$result=pg_query($conn, $qry);
+					$result=$db->pg_query($qry);
 				} 
 				else 
 				{
@@ -172,8 +178,7 @@ if($command=="update" || $error==true)
 						updatevon = '".$user."', 
 						updateamum = now() 
 						WHERE paabgabe_id='".$paabgabe_id."'";
-					$result=pg_query($conn, $qry);
-				
+					$result=$db->db_query($qry);
 					
 					echo '
 					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -188,12 +193,12 @@ if($command=="update" || $error==true)
 					<body class="Background_main"  style="background-color:#eeeeee;">
 					<h3>Abgabe Studentenbereich - Zus&auml;tzliche Daten f&uuml;r die Abgabe</h3>';
 					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
-					$result_zd=@pg_query($conn, $qry_zd);
-					$row_zd=@pg_fetch_object($result_zd);
+					$result_zd=@$db->db_query($qry_zd);
+					$row_zd=@$db->db_fetch_object($result_zd);
 					$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br></div>\n";
 					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 					$htmlstr .= "<tr></tr>\n";
-					$htmlstr .= "<form accept-charset='UTF-8' action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
+					$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
@@ -204,12 +209,12 @@ if($command=="update" || $error==true)
 					$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
 					$htmlstr .= "<tr>\n";
 					$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
-					$sprache = @pg_query($conn, "SELECT sprache FROM tbl_sprache");
-				    $num = pg_num_rows($sprache);
+					$sprache = @$db->db_query("SELECT sprache FROM tbl_sprache");
+				    $num = $db->db_num_rows($sprache);
 				    if ($num > 0) 
 				    {
 				        $htmlstr .= "<SELECT NAME=\"sprache\" SIZE=1> \n";
-				        while ($mrow=@pg_fetch_object($sprache)) 
+				        while ($mrow=@$db->db_fetch_object($sprache)) 
 				        {
 				            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
 				            if ($mrow->sprache == $sprache) 
@@ -282,10 +287,10 @@ if($command!="add")
 	$htmlstr .= "<tr></tr>\n";
 	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 	$htmlstr .= "<tr><td>fix</td><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload</td><td></td></tr>\n";
-	$result=@pg_query($conn, $qry);
-		while ($row=@pg_fetch_object($result))
+	$result=@$db->db_query($qry);
+		while ($row=@$db->db_fetch_object($result))
 		{
-			$htmlstr .= "<form accept-charset='UTF-8' action='$PHP_SELF' method='POST' enctype='multipart/form-data' name='".$row->projektarbeit_id."'>\n";
+			$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' enctype='multipart/form-data' name='".$row->projektarbeit_id."'>\n";
 			$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
 			$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
 			$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$row->paabgabetyp_kurzbz."'>\n";
@@ -324,8 +329,8 @@ if($command!="add")
 			$htmlstr .= "		</td>\n";
 			$htmlstr .= "		<td align='center' style='background-color:".$bgcol."'>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>\n";
 			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row->paabgabetyp_kurzbz."'";
-			$result_typ=pg_query($conn, $qry_typ);
-			$row_typ=pg_fetch_object($result_typ);
+			$result_typ=$db->db_query($qry_typ);
+			$row_typ=$db->db_fetch_object($result_typ);
 			$htmlstr .= "              <td>$row_typ->bezeichnung</td>\n";
 			$htmlstr .= "		<td width='250'>$row->kurzbz</td>\n";		
 			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
