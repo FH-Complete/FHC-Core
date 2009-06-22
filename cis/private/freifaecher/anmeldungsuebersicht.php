@@ -17,12 +17,14 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+ 
 /*
  * Ermoeglicht das Anmelden zu Freifaechern
  */
-#require_once('../../config.inc.php');
+
 require_once('../../../config/cis.config.inc.php');
 
 // ------------------------------------------------------------------------------------------
