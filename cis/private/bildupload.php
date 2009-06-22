@@ -21,7 +21,8 @@
  */
 
 // Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
-require_once('../config.inc.php');
+
+require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -41,7 +42,7 @@ function strhex($string)
 function resize($filename, $width, $height)
 {
 	$ext = explode('.',$_FILES['bild']['name']);
-    $ext = strtolower($ext[count($ext)-1]);
+  $ext = strtolower($ext[count($ext)-1]);
 
 	// Hoehe und Breite neu berechnen
 	list($width_orig, $height_orig) = getimagesize($filename);
@@ -71,22 +72,17 @@ function resize($filename, $width, $height)
 	@imagedestroy($image);
 }
 
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Oeffnen der Datenbankverbindung');
-
 $user = get_uid();
-
 if(isset($_GET['person_id']))
 {
 	$benutzer = new benutzer();
 	$benutzer->load($user);
 		
 	if($benutzer->person_id!=$_GET['person_id'])
-		die('Sie haben keine Berechtigung für diese Seite');
+		die('Sie haben keine Berechtigung f&uuml;r diese Seite');
 }
 else 
-	die('Fehler bei der Parameterübergabe');
+	die('Fehler bei der Parameter&uuml;bergabe');
 
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
@@ -113,7 +109,7 @@ if(isset($_POST['submitbild']))
 			$content = fread($fp, filesize($filename));
 			fclose($fp);
 			
-			$akte = new akte($conn);
+			$akte = new akte();
 			
 			if($akte->getAkten($_GET['person_id'], 'Lichtbil'))
 			{
@@ -161,7 +157,7 @@ if(isset($_POST['submitbild']))
 			//in HEX-Werte umrechnen
 			$content = strhex($content);
 
-			$person = new person($conn);
+			$person = new person();
 			if($person->load($_GET['person_id']))
 			{
 				//HEX Wert in die Datenbank speichern
