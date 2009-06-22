@@ -41,6 +41,8 @@ require_once('../../../../include/mitarbeiter.class.php');
 require_once('../../../../include/moodle_course.class.php');
 require_once('../../../../include/mail.class.php');
 
+$lvid=(isset($_GET['lvid'])?$_GET['lvid']:'');
+$stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>

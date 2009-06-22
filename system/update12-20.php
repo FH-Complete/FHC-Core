@@ -47,6 +47,28 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_status LIMIT 1;"))
 			UPDATE pg_catalog.pg_constraint SET conname='prestudent_prestudentstatus' WHERE conname='prestudent_prestudentrolle';
 			UPDATE pg_catalog.pg_constraint SET conname='status_prestudentstatus' WHERE conname='rolle_prestudentrolle';
 			UPDATE pg_catalog.pg_constraint SET conname='studiensemester_prestudentstatus' WHERE conname='studiensemester_prestudentrolle';
+			
+			CREATE OR REPLACE FUNCTION get_rolle_prestudent (integer, character varying) returns character varying
+			DECLARE i_prestudent_id ALIAS FOR $1;
+			DECLARE cv_studiensemester_kurzbz ALIAS FOR $2;
+			DECLARE rec RECORD;
+			BEGIN
+			    IF (cv_studiensemester_kurzbz IS NULL) THEN
+			        SELECT INTO rec status_kurzbz 
+			        FROM public.tbl_prestudentstatus
+			        WHERE prestudent_id=i_prestudent_id 
+			        ORDER BY datum desc,insertamum desc, ext_id desc
+			        LIMIT 1;
+			    ELSE
+			        SELECT INTO rec status_kurzbz 
+			        FROM tbl_prestudentstatus 
+			        WHERE prestudent_id=i_prestudent_id AND studiensemester_kurzbz=cv_studiensemester_kurzbz
+			        ORDER BY datum desc,insertamum desc, ext_id desc
+			        LIMIT 1;
+			    END IF;
+
+			RETURN rec.status_kurzbz;
+			END;
 			";
 
 	if(!pg_query($conn, $qry))

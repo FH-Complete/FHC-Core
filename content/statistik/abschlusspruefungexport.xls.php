@@ -24,19 +24,24 @@
  * Die zu exportierenden Spalten werden per GET uebergeben.
  * Die Adressen werden immer dazugehaengt
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/Excel/excel.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
+$db = new basis_db();
 $user = get_uid();
 $datum_obj = new datum();
-loadVariables($conn, $user);
+loadVariables($user);
+
+	function writecol($zeile, $i, $content)
+	{
+		global $worksheet, $maxlength;
+		$worksheet->write($zeile, $i, $content);
+		if(mb_strlen($content)>$maxlength[$i])
+			$maxlength[$i]=mb_strlen($content);
+	}
 	
 	//Parameter holen
 	$studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
@@ -51,10 +56,11 @@ loadVariables($conn, $user);
 
 	// sending HTTP headers
 	$workbook->send("Abschlusspruefung". "_" . date("d_m_Y") . ".xls");
-
+	$workbook->setVersion(8);
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Abschlusspruefung");
-
+	$worksheet->setInputEncoding('utf-8');
+	
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 
@@ -63,7 +69,7 @@ loadVariables($conn, $user);
 	// let's merge
 	$format_title->setAlign('merge');
 
-	$stsem = new studiensemester($conn);
+	$stsem = new studiensemester();
 	$stsem->load($studiensemester_kurzbz);
 	
 	//Zeilenueberschriften ausgeben	
@@ -74,17 +80,17 @@ loadVariables($conn, $user);
 	foreach ($headline as $title)
 	{
 		$worksheet->write(0,$i,$title, $format_bold);
-			$maxlength[$i]=strlen($title);
+			$maxlength[$i]=mb_strlen($title);
 		$i++;
 	}
 			
 	// Daten holen
 	$qry = "SELECT 
 				titelpre, vorname, nachname, titelpost, 
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=vorsitz),
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer1),
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer2),
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer3),  
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=vorsitz) as vorsitz,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer1) as pruefer1,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer2) as pruefer2,
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer3) as pruefer3,  
 				(SELECT bezeichnung FROM lehre.tbl_abschlussbeurteilung WHERE tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz=tbl_abschlusspruefung.abschlussbeurteilung_kurzbz) as bezeichnung, tbl_pruefungstyp.beschreibung, datum, sponsion, tbl_abschlusspruefung.anmerkung
 			FROM 
 				lehre.tbl_abschlusspruefung, public.tbl_studentlehrverband, public.tbl_benutzer, public.tbl_person, 
@@ -97,36 +103,39 @@ loadVariables($conn, $user);
 				tbl_person.person_id = tbl_benutzer.person_id AND
 				tbl_abschlusspruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz
 			ORDER BY nachname, vorname";
-				//tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz = tbl_abschlusspruefung.abschlussbeurteilung_kurzbz AND
-				//AND	datum>='".$stsem->start."' AND datum<='".$stsem->ende."'";
 
 	if($semester!='')
 		$qry.= " AND tbl_studentlehrverband.semester='".addslashes($semester)."'";
 	
 	$zeile=1;
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_array($result))
+		while($row = $db->db_fetch_object())
 		{
 			$i=0;
 			
-			foreach ($row as $idx=>$content)
-			{
-				if(is_numeric($idx))
-				{
-					$worksheet->write($zeile, $i, $content);
-					if(strlen($content)>$maxlength[$i])
-						$maxlength[$i]=strlen($content);
-					$i++;
-				}
-			}
+			writecol($zeile, $i++, $row->titelpre);
+			writecol($zeile, $i++, $row->vorname);
+			writecol($zeile, $i++, $row->nachname);
+			writecol($zeile, $i++, $row->titelpost);
+			writecol($zeile, $i++, $row->vorsitz);
+			writecol($zeile, $i++, $row->pruefer1);
+			writecol($zeile, $i++, $row->pruefer2);
+			writecol($zeile, $i++, $row->pruefer3);
+			writecol($zeile, $i++, $row->bezeichnung);
+			writecol($zeile, $i++, $row->beschreibung);
+			writecol($zeile, $i++, $row->datum);
+			writecol($zeile, $i++, $row->sponsion);
+			writecol($zeile, $i++, $row->anmerkung);
+			
 			$zeile++;
 		}
 	}
+	else 
+		die('Fehler in Qry: '.$qry);
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
     
 	$workbook->close();
-
 ?>

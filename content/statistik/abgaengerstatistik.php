@@ -20,20 +20,18 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
 	
-$rechte = new benutzerberechtigung($conn);
+$db = new basis_db();
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen(get_uid());
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -46,12 +44,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	</head>
 	<body>';
 
-
 	echo "<h2>Abgängerstatistik $stsem";
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$studsem = new studiensemester($conn);
+	$studsem = new studiensemester();
 	$studsem->getAll();
 
 	foreach ($studsem->studiensemester as $stsemester)
@@ -68,9 +65,6 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 
 if($stsem!='')
 {
-	
-	
-	
 	$stgs = $rechte->getStgKz();
 	
 	if($stgs[0]=='')
@@ -80,24 +74,23 @@ if($stsem!='')
 		$stgwhere=' AND studiengang_kz in(';
 		foreach ($stgs as $stg)
 			$stgwhere.="'$stg',";
-		$stgwhere = substr($stgwhere,0, strlen($stgwhere)-1);
+		$stgwhere = mb_substr($stgwhere,0, mb_strlen($stgwhere)-1);
 		$stgwhere.=' )';
 	}
 	
-	// SELECT count(*) FROM public.tbl_prestudent WHERE studiengang_kz=stg.studiengang_kz) AS prestd,
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='$stsem'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS abgewiesener,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abbrecher' AND studiensemester_kurzbz='$stsem'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abbrecher' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS abbrecher,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Unterbrecher' AND studiensemester_kurzbz='$stsem'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Unterbrecher' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS unterbrecher,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS absolvent
 			FROM
 				public.tbl_studiengang stg
@@ -105,7 +98,7 @@ if($stsem!='')
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
 			ORDER BY kurzbzlang; ";
 
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
 		echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
@@ -120,7 +113,7 @@ if($stsem!='')
 				<tbody>
 			 ";
 		
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			echo '<tr>';
 			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
