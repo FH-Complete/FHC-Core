@@ -26,22 +26,27 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		$db=false;
+		
+	
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/benutzer.class.php');
 	require_once('../../../include/mitarbeiter.class.php');
 
-	//DB Verbindung herstellen
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
-$getuid=get_uid();
-$htmlstr = "";
+	$getuid=get_uid();
+	$htmlstr = "";
 
 	
-$sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
+	$sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
 			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
@@ -55,7 +60,8 @@ $sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_
 			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer') 
 			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 		ORDER BY nachname";
-if(!$erg=pg_query($conn, $sql_query))
+
+if(!$erg=$db->db_query($sql_query))
 {
 	$errormsg='Fehler beim Laden der Betreuungen';
 }
@@ -76,7 +82,7 @@ else
 				<th>Betreuerart</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
-	while($row=pg_fetch_object($erg))
+	while($row=$db->db_fetch_object($erg))
 	{
 		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
