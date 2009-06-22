@@ -26,6 +26,7 @@
 	$benutzerberechtigung_id = "";
 	$art = "";
 	$fachbereich_kurzbz = "";
+	$studiengang_kz ="";
 	$studiengang_kurzbz = "";
 	$berechtigung_kurzbz = "";
 	$uid = "";
@@ -33,7 +34,7 @@
 	$start = "";
 	$ende = "";
 	$neu = false;
-	
+
 	if(isset($_POST["del"]))
 	{
 		$benutzerberechtigung_id = $_POST["benutzerberechtigung_id"];
@@ -160,7 +161,7 @@
 				
 				$htmlstr .= "		<td><select name='studiengang_kz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
 				$htmlstr .= "			<option value=''></option>\n";
-				
+	
 				foreach ($sg->result as $sgkey)
 				{
 					if ($b->studiengang_kz == $sgkey->studiengang_kz && $b->studiengang_kz != null)
