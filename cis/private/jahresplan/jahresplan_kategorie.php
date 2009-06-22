@@ -33,14 +33,10 @@
 */
 
 // ---------------- CIS Include Dateien einbinden
-	require_once('../../config.inc.php');
-	// Datenbankverbindung - ohne erfolg kann hier bereits beendet werden
-	if (!$conn=pg_pconnect(CONN_STRING))
-	{
-		die('Jahresplan<br />Keine Veranstaltungen zurzeit Online.<br />Bitte etwas Geduld.<br />Danke'); 
-	}
+	require_once('../../../config/cis.config.inc.php');
+		
+// ---------------- CIS Funktionen
 	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/globals.inc.php');
 
 // ---------------- Datenbank-Verbindung 
 	include_once('../../../include/person.class.php');
@@ -51,76 +47,26 @@
 	include_once('../../../include/jahresplan.class.php');
  	include_once('jahresplan_funktionen.inc.php');
 	
+	if (!$is_wartungsberechtigt)
+		die('Sie sind nicht berechtigt f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
+// ------------------------------------------------------------------------------------------
+//	Init
+// ------------------------------------------------------------------------------------------
+	$error='';	
+	
 // ------------------------------------------------------------------------------------------
 //	Request Parameter 
 // ------------------------------------------------------------------------------------------
-	if (!$userUID=get_uid())
-	{
-		die('Es wurde keine Benutzer UID gefunden ?');
-	}
-
-// ------------------------------------------------------------------------------------------
-//	Personen Classe 
-//		Anwernderdaten ermitteln
-// ------------------------------------------------------------------------------------------
-	$userNAME=$userUID;
-	$unicode=null; // Standart Encoding der Datenbank
-	$pers = new benutzer($conn,$userUID,$unicode); // Lesen Person - Benutzerdaten
-	if (isset($pers->nachname))
-	{
-		$userNAME=(isset($pers->anrede) ? $pers->anrede.' ':'');
-		$userNAME.=(isset($pers->titelpre) ? $pers->titelpre.' ':'');
-		$userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
-		$userNAME.=(isset($pers->nachname) ? $pers->nachname.' ':'');		
-	}
-	
-// ------------------------------------------------------------------------------------------
-//	Benutzer Classe 
-//		Berechtigungen ermitteln
-// ------------------------------------------------------------------------------------------
-	$is_lector=false;
-	$is_wartungsberechtigt=false;
-	if (isset($pers->nachname))
-	{
-	
-		$benutzerberechtigung = new benutzerberechtigung($conn,$userUID);
-		$benutzerberechtigung->getBerechtigungen($userUID,true);
-		// Nur Lektoren oder Mitarbeiter duerfen alle Termine sehen , Studenten nur Freigegebene Kategorien
-		if($benutzerberechtigung->fix || $benutzerberechtigung->lektor)
-			$is_lector=true;
-		else
-			$is_lector=false;
-
-		// Kennzeichen setzen fuer Berechtigungspruefung
-		$berechtigung='veranstaltung';
-		$studiengang_kz=null;
-		$art='suid';
-		$fachbereich_kurzbz=null;
-		// Berechtigungen abfragen
-		$is_wartungsberechtigt=$benutzerberechtigung->isBerechtigt($berechtigung,$studiengang_kz,$art, $fachbereich_kurzbz);
-		if (!$is_wartungsberechtigt)
-		{
-			$is_wartungsberechtigt=false;
-		}	
-		unset($benutzerberechtigung); // Klasse Berechtigungen entfernen 
-	}	
-
-	if (!$is_wartungsberechtigt)
-	{
-		die('Sie sind nicht berechtigt f&uuml;r diese Seite');
-	}	
-	
-// ------------------------------------------------------------------------------------------
-// Datenlesen fuer Anzeige
-//	a) verarbeiten wenn Request Parameter 'work' belegt ist
-//	b) alle Kategorien lesen
-// ------------------------------------------------------------------------------------------
-	
-	$Jahresplan = new jahresplan($conn);
-	$Jahresplan->InitVeranstaltungskategorie();
-
 	$work=(isset($_REQUEST['work']) ? $_REQUEST['work'] :'');
-	$error='';
+
+
+// ------------------------------------------------------------------------------------------
+// Aufgabe 
+//	a) verarbeiten wenn Request Parameter 'work' belegt ist
+//	b) alle Kategorien lesen fuer Anzeige
+// ------------------------------------------------------------------------------------------
+	$Jahresplan->InitVeranstaltungskategorie();
 
 // ------------------------------------------------------------------------------------------
 // Datenverarbeiten	
@@ -129,8 +75,9 @@
 	{
 		if ($work=='save')
 		{
+			
 			// Bildverarbeitung 
-			if(isset($_FILES['uploadBild']['tmp_name']))
+			if(isset($_FILES['uploadBild']['tmp_name']) && !empty($_FILES['uploadBild']['tmp_name']) )
 			{
 				$filename = $_FILES['uploadBild']['tmp_name'];
 				//File oeffnen
@@ -150,15 +97,29 @@
 					}	
 				}	
 			}
-			// Update oder Insert ( veranstaltungskategorie_kurzbz_old )
-			if(!$veranstaltungskategorie=$Jahresplan->saveVeranstaltungskategorie($_REQUEST))
+
+			$Jahresplan->new=false;
+			if ( (isset($_REQUEST["veranstaltungskategorie_kurzbz_old"]) && $_REQUEST["veranstaltungskategorie_kurzbz"] != $_REQUEST["veranstaltungskategorie_kurzbz_old"])
+			||  (!isset($_REQUEST["veranstaltungskategorie_kurzbz_old"]) || empty($_REQUEST["veranstaltungskategorie_kurzbz_old"])) )
+			{
+				$Jahresplan->new=true;
+				if (isset($_REQUEST["veranstaltungskategorie_kurzbz_old"]) && $_REQUEST["veranstaltungskategorie_kurzbz"] != $_REQUEST["veranstaltungskategorie_kurzbz_old"])
+					$Jahresplan->deleteVeranstaltungskategorie($_REQUEST["veranstaltungskategorie_kurzbz_old"]);
+			}	
+			
+			$Jahresplan->veranstaltungskategorie_kurzbz=$_REQUEST["veranstaltungskategorie_kurzbz"];
+			$Jahresplan->bezeichnung=$_REQUEST["bezeichnung"];
+			$Jahresplan->farbe=$_REQUEST["farbe"];
+			$Jahresplan->bild=$_REQUEST["bild"];							
+
+			if(!$Jahresplan->saveVeranstaltungskategorie())
 			{	
-				$error='Fehler beim &auml;ndern ! '.$Jahresplan->getError();
+				$error='Fehler bei der '.($Jahresplan->new?' Neuanlage ':' &Auml;nderung ').' '.$Jahresplan->errormsg;
 			}
 			else
 			{
-				$error='Veranstaltungskategorie "'.$_REQUEST['veranstaltungskategorie_kurzbz'].'" ge&auml;ndert.';
-				$error.='	<script language="JavaScript1.2" type="text/javascript">
+				$error='Veranstaltungskategorie "'.$_REQUEST['veranstaltungskategorie_kurzbz'].'" '.($Jahresplan->new?' angelegt ':' ge&auml;ndert ').'" '.$Jahresplan->errormsg;
+				$error.=' <script language="JavaScript1.2" type="text/javascript">
 						<!--
 							if (window.opener && !window.opener.closed) {
 								if (confirm("Soll die Hauptseite neu aufgebaut werden?")) {
@@ -170,12 +131,11 @@
 					';
 			}
 		}
-		
 		if ($work=='del')
 		{
-			if(!$veranstaltungskategorie=$Jahresplan->deleteVeranstaltungskategorie(trim($_REQUEST['veranstaltungskategorie_kurzbz'])))
+			if(!$Jahresplan->deleteVeranstaltungskategorie($_REQUEST['veranstaltungskategorie_kurzbz']))
 			{	
-				$error='Fehler beim l&ouml;schen ! '.$Jahresplan->getError();
+				$error=$Jahresplan->errormsg;
 			}
 			else
 			{
@@ -192,23 +152,14 @@
 					';
 			}
 		}
-	}
-	// Datenverarbeiten ende
+	} // Datenverarbeiten ende
 	
 // ------------------------------------------------------------------------------------------
 // Aktuelle Datenlesen
 // ------------------------------------------------------------------------------------------
 	$Jahresplan->InitVeranstaltungskategorie();
-	if ($Jahresplan->loadVeranstaltungskategorie())
-	{
-		$veranstaltungskategorie=$Jahresplan->getVeranstaltungskategorie();
-	}	
-	else // Es gibt keine Kategorie oder Fehler beim Lesen - keine weitere Anzeige mehr moeglich
-	{
-		die($Jahresplan->getError());
-	}
-	
-#var_dump($veranstaltungskategorie);		
+	if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
+		die('Fehler beim lesen der Veranstaltungskategorie! '.$Jahresplan->errormsg);
 ?> 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -222,7 +173,8 @@
 	.cursor_hand { cursor: pointer;vertical-align: top;white-space : nowrap;}
 	.ausblenden {display:none;}
 	.footer_zeile {color: silver;}
-
+	.pflichtfeld {style:background-color:#FFFFE0;border : 1px solid Black;}
+	
 	tr.header_liste_row_0  {background:#FEFFEC;vertical-align: top;white-space : nowrap;}
 	tr.header_liste_row_1  {background:#F7F7F7;vertical-align: top;white-space : nowrap;}
 
@@ -259,15 +211,17 @@
 			<th colspan="2">Aktion</th>
 		</tr>
 			
-		<?php  for ($iTmpZehler=-1;$iTmpZehler<count($veranstaltungskategorie);$iTmpZehler++) { 
+		<?php 
+			 // Zaehler = -1 fuer die Neuanlage  	
+			 for ($iTmpZehler=-1;$iTmpZehler<count($veranstaltungskategorie);$iTmpZehler++) { 
 				// Create IMG  
-				if (isset($veranstaltungskategorie[$iTmpZehler]) && $veranstaltungskategorie[$iTmpZehler]["bild"])
+				if (isset($veranstaltungskategorie[$iTmpZehler]) && $veranstaltungskategorie[$iTmpZehler]->bild)
 				{
-					$veranstaltungskategorie[$iTmpZehler]['veranstaltungskategorie_kurzbz']=trim($veranstaltungskategorie[$iTmpZehler]['veranstaltungskategorie_kurzbz']);
-					$veranstaltungskategorie[$iTmpZehler]['bezeichnung']=trim($veranstaltungskategorie[$iTmpZehler]['bezeichnung']);					
+					$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz=trim($veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz);
+					$veranstaltungskategorie[$iTmpZehler]->bezeichnung=trim($veranstaltungskategorie[$iTmpZehler]->bezeichnung);					
 
-					$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]["bild"])<700?'heximg='.$veranstaltungskategorie[$iTmpZehler]["bild"]:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]);
-					$veranstaltungskategorie[$iTmpZehler]["bild_image"]='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'" src="'.$cURL.'" />';
+					$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]->bild)<700?'heximg='.$veranstaltungskategorie[$iTmpZehler]->bild:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz);
+					$veranstaltungskategorie[$iTmpZehler]->bild_image='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]->bezeichnung.'" src="'.$cURL.'" />';
 				}
 		
 		?>
@@ -275,22 +229,24 @@
 		<form name="selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 		<tr <?php echo ($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ');?> >
 	
-			<td>*
-				<input type="text" name="veranstaltungskategorie_kurzbz" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]['veranstaltungskategorie_kurzbz'])?$veranstaltungskategorie[$iTmpZehler]['veranstaltungskategorie_kurzbz']:constEingabeFehlt);?>" size="17" maxlength="16" onblur="if (this.value=='') {this.value=this.defaultValue;}" onfocus="if (this.value=='<?php echo constEingabeFehlt; ?>') { this.value='';}" />
-				<input class="ausblenden" name="veranstaltungskategorie_kurzbz_old" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]['veranstaltungskategorie_kurzbz'])?$veranstaltungskategorie[$iTmpZehler]['veranstaltungskategorie_kurzbz']:'');?>" />
+			<td>
+				<input class="pflichtfeld" type="text" name="veranstaltungskategorie_kurzbz" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz)?$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz:constEingabeFehlt);?>" size="17" maxlength="16" onblur="if (this.value=='') {this.value=this.defaultValue;}" onfocus="if (this.value=='<?php echo constEingabeFehlt; ?>') { this.value='';}" />
+				<input class="ausblenden" name="veranstaltungskategorie_kurzbz_old" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz)?$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz:'');?>" />
 			</td>
 	
-			<td>*<input name="bezeichnung" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]['bezeichnung'])?$veranstaltungskategorie[$iTmpZehler]['bezeichnung']:'');?>" size="20" maxlength="63" /></td>
-			<td><input  <?php echo (isset($veranstaltungskategorie[$iTmpZehler]['farbe'])?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]['farbe'].';"':'');?> name="farbe" onchange="if (this.value=='') {this.style.backgroundColor='transparent';} else {this.style.backgroundColor='#' + this.value;}" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]['farbe'])?$veranstaltungskategorie[$iTmpZehler]['farbe']:'');?>" size="7" maxlength="6" /></td>
+			<td><input class="pflichtfeld" name="bezeichnung" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->bezeichnung)?$veranstaltungskategorie[$iTmpZehler]->bezeichnung:'');?>" size="20" maxlength="63" /></td>
+
+			<td><input  <?php echo (isset($veranstaltungskategorie[$iTmpZehler]->farbe)?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]->farbe.';"':'');?> name="farbe" onchange="if (this.value=='') {this.style.backgroundColor='transparent';} else {this.style.backgroundColor='#' + this.value;}" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->farbe)?$veranstaltungskategorie[$iTmpZehler]->farbe:'');?>" size="7" maxlength="6" /></td>
 
 			<td>
 				 <input size="8" maxlength="140" type="file" id="uploadBild" name="uploadBild" alt="suche" title="suchen" style="font-size:xx-small;" />
-				 <input class="ausblenden" name="bild" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]['bild'])?$veranstaltungskategorie[$iTmpZehler]['bild']:'');?>" />				
+
+				 <input class="ausblenden" name="bild" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->bild)?$veranstaltungskategorie[$iTmpZehler]->bild:'');?>" />				
 			</td>
 
 			<td>
 				<input class="ausblenden" size="10" name="work" value="?" />
-				<?php echo (isset($veranstaltungskategorie[$iTmpZehler]["bild_image"])?$veranstaltungskategorie[$iTmpZehler]["bild_image"]:'');?>
+				<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->bild_image)?$veranstaltungskategorie[$iTmpZehler]->bild_image:'');?>
 			</td>
 			
 			<td class="cursor_hand" onclick="if (window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.veranstaltungskategorie_kurzbz.value=='<?php echo constEingabeFehlt; ?>')  {window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.veranstaltungskategorie_kurzbz.focus();return false;}; if (window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.bezeichnung.value.length<1) {window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.bezeichnung.focus();return false;}; window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='save';window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" >speichern <img height="14px" border="0" alt="sichern - save" src="../../../skin/images/date_edit.png" /></td>
@@ -299,8 +255,9 @@
 		</form>
 		<?php } ?>				
 		<tr class="footer_zeile"><td colspan="7">Kurzbezeichnung mit einem * (Stern) an erster Stelle werden nur f&uuml;r Mitarbeiter und Lektoren angezeigt.</td></tr>
-		<tr class="footer_zeile"><td colspan="7">Pflichtfelder sind mit * (Stern) gekennzeichnet.</td></tr>
 	</table>
+	<div><table><tr><td style="color:black;background-color:#FFFFE0;border : 1px solid Black;">&nbsp;&nbsp;&nbsp;</td><td>Pflichtfeld</td></tr></table></div>
+
 	<?php echo $error; ?>
 </body>
 </html>

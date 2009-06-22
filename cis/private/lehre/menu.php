@@ -98,7 +98,7 @@
 		}
 	}
 	
-	$stg_obj = new studiengang($sql_conn);
+	$stg_obj = new studiengang();
 				if($stg_obj->getAll(null,false))
 				{
 					$stg = array();
@@ -199,7 +199,7 @@ function js_toggle_container(conid)
 			  	<select name="course" onChange="MM_jumpMenu('self',this,0)">
 				<?php
 
-					$stg_obj = new studiengang($sql_conn);
+					$stg_obj = new studiengang();
 					$stg_obj->getAll('typ, kurzbz');
 					//$sql_query = "SELECT DISTINCT studiengang_kz AS id, kurzbzlang FROM public.tbl_studiengang WHERE NOT(studiengang_kz='0') ORDER BY kurzbzlang";
 					//$result = pg_exec($sql_conn, $sql_query);
@@ -233,7 +233,7 @@ function js_toggle_container(conid)
 			  	<select name="term" onChange="MM_jumpMenu('self',this,0)">
 				<?php
 
-					$stg_obj=new studiengang($sql_conn,$course_id);
+					$stg_obj=new studiengang($course_id);
 					$short = $stg_obj->kuerzel;
 				    $max = $stg_obj->max_semester;
 

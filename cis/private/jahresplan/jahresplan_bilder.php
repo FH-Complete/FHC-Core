@@ -25,49 +25,41 @@
 /*-------------------------------------------------------------------------------------------	
 	Bilder aus Tabellen Person oder Veranstaltungskategorie lesen - Selektion Parameter
 -------------------------------------------------------------------------------------------*/
-	
 // ---------------- CIS Include Dateien einbinden
-	require_once('../../config.inc.php');
-
+	require_once('../../../config/cis.config.inc.php');
+	
  // ---------------- Datenbank-Verbindung 
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
+
 // ---------------- Jahresplan Classe und Allg.Funktionen		
 	include_once('../../../include/jahresplan.class.php');
 	
-	// Datenbankverbindung - ohne erfolg kann hier bereits beendet werden
-	if (!$conn=pg_pconnect(CONN_STRING))
-	{
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.'); 
-	}
 	$heximg ='';
-
 	// Es wurde bereits der Hex-String ueber geben	
 	if (isset($_REQUEST['heximg']))
 	{
 	 	$heximg = $_REQUEST['heximg'];
-     	}     
+  	}     
 	 
 	// Veranstaltungskategoriebild
 	if (empty($heximg) && isset($_REQUEST['veranstaltungskategorie_kurzbz']))
 	{
-	   	$veranstaltung_id=trim($_REQUEST['veranstaltungskategorie_kurzbz']);
-		$Jahresplan = new jahresplan($conn);
+	
+		$Jahresplan = new jahresplan();
 		$Jahresplan->InitVeranstaltungskategorie();
-		$Jahresplan->setVeranstaltungskategorie_kurzbz($veranstaltung_id);
-		$arrTempVeranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie();
-		if (isset($arrTempVeranstaltungskategorie[0]['bild']))	
+		$Jahresplan->show_only_public_kategorie=false;
+		$arrTempVeranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie($_REQUEST['veranstaltungskategorie_kurzbz']);
+		if (isset($arrTempVeranstaltungskategorie[0]->bild))	
 		{
-			$heximg=$arrTempVeranstaltungskategorie[0]['bild'];
+			$heximg=$arrTempVeranstaltungskategorie[0]->bild;
 		}	
 	}
 
 	// Personenbild
 	if (empty($heximg) && isset($_REQUEST['userUID']))
 	{
-		$userUID=trim($_REQUEST['userUID']);
-		$unicode=null; // Standart Encoding der Datenbank
-		$benutzer = new benutzer($conn,$userUID,$unicode); // Lesen Person - Benutzerdaten
+		$benutzer = new benutzer($_REQUEST['userUID']); // Lesen Person - Benutzerdaten
 		if (isset($benutzer->foto))
 		{
 			$heximg=$benutzer->foto;
@@ -75,22 +67,21 @@
 	}
 	 
 	if (empty($heximg)) // Leeres Images
-     	{
+   	{
 	    $heximg ='4749463839611e000a0080ff00c0c0c000000021f90401000000002c000000001e000a0040020f848fa9cbed0fa39cb4da8bb3debc00003b';
 	}
-
      
 	@ob_end_clean();
    	header("Content-type: image/gif");
 	exit(jahresplan_hexstr($heximg));
 
 
-function jahresplan_hexstr($hex)
-{
-    $string="";
-    for ($i=0;$i<strlen($hex)-1;$i+=2)
-        $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-    return $string;
-}
+	function jahresplan_hexstr($hex)
+	{
+    	$string="";
+	    for ($i=0;$i<strlen($hex)-1;$i+=2)
+    	    $string.=chr(hexdec($hex[$i].$hex[$i+1]));
+	    return $string;
+	}
 
 ?>

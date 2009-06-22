@@ -95,21 +95,15 @@
 		$ss->load($studiensemester);
 	}
 
-	$datum_beginn='2008-06-01'; // $ss->start;
-	$datum_ende='2008-08-31';	//$ss->ende;
+	$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
 
-	$dTmpCheck=date("Y.m.d", mktime(0,0,0,date("m"),date("d"),date("y")));
-	if ($datum_ende<$dTmpCheck)
-	{
+	$dTmpAktuellerMontag=date("Y-m-d",strtotime(date('Y')."W".date('W')."1")); // Montag der Aktuellen Woche
+	$dTmpAktuellesDatum=explode("-",$dTmpAktuellerMontag);
+	$dTmpMontagPlus=date("Y-m-d", mktime(0,0,0,date($dTmpAktuellesDatum[1]),date($dTmpAktuellesDatum[2])+$days,date($dTmpAktuellesDatum[0])));
 
-		$dTmpAktuellerMontag=date("Y-m-d",strtotime(date('Y')."W".date('W')."1")); // Montag der Aktuellen Woche
-		$dTmpAktuellesDatum=explode("-",$dTmpAktuellerMontag);
-		$dTmpMontagPlus=date("Y-m-d", mktime(0,0,0,date($dTmpAktuellesDatum[1]),date($dTmpAktuellesDatum[2])+14,date($dTmpAktuellesDatum[0])));
-
-		$datum_beginn=$dTmpAktuellerMontag; 
-		$datum_ende=$dTmpMontagPlus;
+	$datum_beginn=$dTmpAktuellerMontag; 
+	$datum_ende=$dTmpMontagPlus;
 	
-	}	
 
 
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
@@ -172,7 +166,7 @@
 					echo "<option value='$fb->fachbereich_kurzbz' $selected>$fb->bezeichnung</option>";
 				}
 			}
-			echo '</SELECT><input type="submit" value="Anzeigen"></FORM>';
+			echo '</SELECT><input style="display:none;" type="Text" name="days" value="'.$days.'"><input type="submit" value="Anzeigen"></FORM>';
 			echo '<br>';
 		}
 	?>
@@ -202,22 +196,22 @@
 		if($ma->aktiv)
 		{
 			$zs->getzeitsperren($ma->uid, false);
-			echo '<TR>';
-			echo "<td>$ma->nachname $ma->vorname</td>";
+			echo '<tr>';
+			echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
 			for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 			{
 				$tag=date('d',$ts);
 				$monat=date('M',$ts);
 				$wt=date('w',$ts);
 				if ($wt==0 || $wt==6)
-					$class='feiertag';
+					$class=' class="feiertag" ';
 				else
 					$class='';
 				$grund=$zs->getTyp($ts);
 				$erbk=$zs->getErreichbarkeit($ts);
-				echo "<td class='$class'>$grund<br>$erbk</td>";
+				echo '<td '.$class.' style="white-space: nowrap;">'.$grund.'<br>'.$erbk.'</td>';
 			}
-			echo '</TR>';
+			echo '</tr>';
 		}
 	}
 	?>

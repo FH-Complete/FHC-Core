@@ -1814,7 +1814,7 @@ function kommune_funk_benutzerperson($userUID,$oWettbewerb)
 	else
 		$unicode=null;
 
-	$pers = new benutzer($oWettbewerb->sqlCONN,$userUID,$unicode); // Lesen PersonenBenutzer
+	$pers = new benutzer($userUID); // Lesen PersonenBenutzer
 	if (!isset($pers->nachname))
 		return $userUID;
 		
