@@ -27,17 +27,21 @@
  * Aufruf:
  * anwesenheitsliste.php?stg_kz=222&sem=1&lvid=1234
  */
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+  $error=0;	
+	if (!$db = new basis_db())
+    {
+			$db=false;
+      $error=1;
+    }			
+			
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
-
-    $error=0;
-    //Connection Herstellen
-    if(!$conn = pg_pconnect(CONN_STRING))
-    {
-       $error=1;
-    }
 
     if(isset($_GET['stg_kz']))
     	$stg_kz=$_GET['stg_kz'];
@@ -89,13 +93,13 @@
 
 	  	//Content fuer Anwesenheitslisten erstellen
 	  	$stg_arr = array();
-	  	$stg_obj = new studiengang($conn);
+	  	$stg_obj = new studiengang();
 	  	$stg_obj->getAll();
 	  	
 	  	foreach ($stg_obj->result as $row)
 	  		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 	  	
-	  	$lv = new lehrveranstaltung($conn, $lvid);
+	  	$lv = new lehrveranstaltung($lvid);
 	  	  	
 	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
 	  	$awbild_content .= "<tr><td><a class='Item' href='anwesenheitsliste_bilder.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
@@ -107,13 +111,13 @@
 	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
 	  		  	
-	  	if($result = pg_query($conn, $qry))
+	  	if($result = $db->db_query($qry))
 	  	{
-	  		if(pg_num_rows($result)>0)
+	  		if($db->db_num_rows($result)>0)
 	  		{
 		  		$lastlehreinheit='';
 		  		$gruppen = '';
-		  		while($row = pg_fetch_object($result))
+		  		while($row = $db->db_fetch_object($result))
 		  		{
 		  			if($lastlehreinheit!=$row->lehreinheit_id)
 		  			{
@@ -123,9 +127,9 @@
 			  						WHERE lehreinheit_id='$lastlehreinheit'";
 			  				$lektoren = '';
 			  				
-			  				if($result_lkt = pg_query($conn, $qry))
+			  				if($result_lkt = $db->db_query($qry))
 			  				{
-			  					while($row_lkt = pg_fetch_object($result_lkt))
+			  					while($row_lkt = $db->db_fetch_object($result_lkt))
 			  					{
 			  						if($lektoren!='')
 			  							$lektoren.=', ';
@@ -158,9 +162,9 @@
 		  		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 						WHERE lehreinheit_id='$lastlehreinheit'";
 				$lektoren = '';
-				if($result_lkt = pg_query($conn, $qry))
+				if($result_lkt = $db->db_query($qry))
 				{
-					while($row_lkt = pg_fetch_object($result_lkt))
+					while($row_lkt = $db->db_fetch_object($result_lkt))
 					{
 						if($lektoren!='')
 							$lektoren.=', ';
