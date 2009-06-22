@@ -23,11 +23,17 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
-//echo Test($_REQUEST);
 
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			$db=false;
+		
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/datum.class.php');
@@ -36,9 +42,6 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 
 $fixtermin=false;
-
-if (!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 if(!isset($_POST['uid']))
 {
@@ -63,6 +66,7 @@ else
 	$datum = (isset($_POST['datum'])?$_POST['datum']:'');
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 }
+
 $user = get_uid();
 $datum_obj = new datum();
 $stg_arr = array();
@@ -116,18 +120,18 @@ if(isset($_POST["schick"]))
 	if($datum)
 	{
 		$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
-		if(!$result_std=pg_query($conn, $qry_std))
+		if(!$result_std=$db->db_query($qry_std))
 		{
 			echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
 		}
 		else
 		{
-			$row_std=@pg_fetch_object($result_std);
+			$row_std=@$db->db_fetch_object($result_std);
 			if($command=='insert')
 			{
 				$qrychk="SELECT * FROM campus.tbl_paabgabe 
 					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
-				if($result=pg_query($conn, $qrychk))
+				if($result=$db->db_query($qrychk))
 				{
 					if(pg_num_rows($result)>0)
 					{
@@ -139,7 +143,7 @@ if(isset($_POST["schick"]))
 						$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
 							VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
 						//echo $qry;	
-						if(!$result=pg_query($conn, $qry))
+						if(!$result=$db->db_query($qry))
 						{
 							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
 						}
@@ -147,9 +151,9 @@ if(isset($_POST["schick"]))
 						{
 							$row=@pg_fetch_object($result);
 							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
-							if($result_typ=pg_query($conn, $qry_typ))
+							if($result_typ=$db->db_query($qry_typ))
 							{
-								$row_typ=@pg_fetch_object($result_typ);
+								$row_typ=@$db->db_fetch_object($result_typ);
 							}
 							else 
 							{
@@ -171,18 +175,18 @@ if(isset($_POST["schick"]))
 				//Terminänderung
 				//Ermittlung der alten Daten
 				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
-				if(!$result_old=pg_query($conn, $qry_old))
+				if(!$result_old=$db->db_query($qry_old))
 				{
 					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
 				}
 				else 
 				{
-					$row_old=@pg_fetch_object($result_old);
+					$row_old=@$db->db_fetch_object($result_old);
 					//Abgabetyp
 					$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row_old->paabgabetyp_kurzbz."'";
-					if($result_told=pg_query($conn, $qry_told))
+					if($result_told=$db->db_query($qry_told))
 					{
-						$row_told=@pg_fetch_object($result_told);
+						$row_told=@$db->db_fetch_object($result_told);
 					}
 					else 
 					{
@@ -199,7 +203,7 @@ if(isset($_POST["schick"]))
 						updateamum = now() 
 						WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
 					//echo $qry;	
-					if(!$result=pg_query($conn, $qry))
+					if(!$result=$db->db_query($qry))
 					{
 						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>&nbsp;";	
 					}
@@ -207,13 +211,13 @@ if(isset($_POST["schick"]))
 					{
 						//Abgabetyp
 						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
-						if(!$result=pg_query($conn, $qry))
+						if(!$result=$db->db_query($qry))
 						{
-							$row_typ=@pg_fetch_object($result_typ);
+								$row_typ=@$db->db_fetch_object($result_typ);
 						}
 						else 
 						{
-							$row_typ->bezeichnung='';
+								$row_typ->bezeichnung='';
 						}
 						$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung",
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
@@ -244,23 +248,23 @@ if(isset($_POST["del"]))
 	{
 		//Ermittlung der alten Daten
 		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
-		if(!$result_old=pg_query($conn, $qry_old))
+		if(!$result_old=$db->db_query($qry_old))
 		{
 			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
 		}
 		else 
 		{
-			$row_old=@pg_fetch_object($result_old);
+			$row_old=@$db->db_fetch_object($result_old);
 			$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
-			if(!$result_std=pg_query($conn, $qry_std))
+			if(!$result_std=$db->db_query($qry_std))
 			{
 				echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
 			}
 			else
 			{
-				$row_std=@pg_fetch_object($result_std);
+				$row_std=@$db->db_fetch_object($result_std);
 				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
-				if(!$result=pg_query($conn, $qry))
+				if(!$result=$db->db_query($qry))
 				{
 					echo "<font color=\"#FF0000\">Fehler beim Löschen des Termins!</font><br>&nbsp;";
 				}
@@ -301,8 +305,8 @@ $htmlstr .= "<br><b>Abgabetermine:</b>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 $htmlstr .= "<tr></tr>\n";
 $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
-$result=@pg_query($conn, $qry);
-	while ($row=@pg_fetch_object($result))
+$result=@$db->db_query($qry);
+	while ($row=@$db->db_fetch_object($result))
 	{
 		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
@@ -336,8 +340,8 @@ $result=@pg_query($conn, $qry);
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 		$htmlstr .= "			<option value=''>&nbsp;</option>";
 		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
-		$result_typ=@pg_query($conn, $qry_typ);
-		while ($row_typ=@pg_fetch_object($result_typ))
+		$result_typ=@$db->db_query($qry_typ);
+		while ($row_typ=@$db->db_fetch_object($result_typ))
 		{
 			if($row->paabgabetyp_kurzbz==$row_typ->paabgabetyp_kurzbz)
 			{
@@ -391,7 +395,7 @@ $result=@pg_query($conn, $qry);
 	}	
 	
 //Eingabezeile für neuen Termin
-$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$projektarbeit_id."'>\n";
+$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
@@ -405,8 +409,8 @@ $htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 $qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
-$result_typ=pg_query($conn, $qry_typ);
-while ($row_typ=pg_fetch_object($result_typ))
+$result_typ=$db->db_query($qry_typ);
+while ($row_typ=@$db->db_fetch_object($result_typ))
 {
 	$htmlstr .= "		<option value='".$row_typ->paabgabetyp_kurzbz."'>".$row_typ->bezeichnung."</option>";
 }		
@@ -420,76 +424,5 @@ $htmlstr .= "</tr>\n";
 $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
-
-	echo $htmlstr;
-	
-function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
-
-{
-
-    $tmpArrayString='';
-
-    if (!is_array($arr) && !is_object($arr)) return $arr;
-
-    if (is_array($arr) && count($arr)<1 && $displayShow) return '';
-
-    if (is_array($arr) && count($arr)<1 && $displayShow) return "<br><b>function Test (???)</b><br>";
-
-  
-
-    $lfdnr=$lfd + 1;
-
-    $tmpAnzeigeStufe='';
-
-    for ($i=1;$i<$lfdnr;$i++) $tmpAnzeigeStufe.="=";
-
-    $tmpAnzeigeStufe.="=>";
-
-        while (list( $tmp_key, $tmp_value ) = each($arr) )
-
-        {
-
-        if (!$onlyRoot && (is_array($tmp_value) || is_object($tmp_value)) && count($tmp_value) >0)
-
-        {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key</b>".Test($tmp_value,$lfdnr);
-
-        } else if ( (is_array($tmp_value) || is_object($tmp_value)) )
-
-        {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
-
-                } else if ($tmp_value!='')
-
-                {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe $tmp_key :== ".$tmp_value;
-
-                } else {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe $tmp_key :-- (is Empty :: $tmp_value)";
-
-                } 
-
-    }
-
-     if ($lfd!='') { return $tmpArrayString; }
-
-     if (!$displayShow) { return $tmpArrayString; }
-
-      
-
-    $tmpArrayString.="<br>";
-
-    $tmpArrayString="<br><hr><br>******* START *******<br>".$tmpArrayString."<br>******* ENDE *******<br><hr><br>";
-
-    $tmpArrayString.="<br>Server:: ".$_SERVER['PHP_SELF']."<br>";
-
-    return "$tmpArrayString";
-
-}
-
-//===========================================================================================  
+echo $htmlstr;
 ?>

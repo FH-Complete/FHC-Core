@@ -26,7 +26,16 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-	require_once('../../config.inc.php');
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			$db=false;
+			
+			
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/datum.class.php');
@@ -34,8 +43,6 @@
 	
 	//require_once('../../../include/Excel/excel.php');
 	
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 if(!isset($_POST['uid']))
 {
@@ -104,27 +111,27 @@ $htmlstr='';
 					<body class="Background_main"  style="background-color:#eeeeee;">
 					<h3>Abgabe Zusatzdaten</h3>';
 					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
-					$result_zd=@pg_query($conn, $qry_zd);
-					$row_zd=@pg_fetch_object($result_zd);
-					$htmlstr = "<div>Student: <b>".$uid."</b><br>Titel: <b>".$row_zd->titel."<b><br><br></div>\n";
-					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
-					$htmlstr .= "<tr></tr>\n";
-					$htmlstr .= "<tr>\n";
-					$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
-					$htmlstr .= "<input  type='text' name='sprache'  id='sprache' value='".$row_zd->sprache."' size='10' maxlength='8' readonly='readonly'>";
-				    $htmlstr .= "</td></tr>\n";
-					$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$row_zd->kontrollschlagwoerter."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$row_zd->schlagwoerter."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$row_zd->schlagwoerter_en."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46' rows='7' readonly='readonly'>$row_zd->abstract</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7' readonly='readonly'>$row_zd->abstract_en</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input type='text' name='seitenanzahl' value=".$row_zd->seitenanzahl." size='5' maxlength='4' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "</tr>\n";
-					$htmlstr .= "</table><table>";
-					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld</td></tr><tr><td>&nbsp;</td></tr>\n";
-					$htmlstr .= "</table>\n";	
-					$htmlstr .= "</body></html>";
-
+					$result_zd=@$db->db_query($qry_zd);
+					if ($row_zd=@$db->db_fetch_object($result_zd))
+					{
+							$htmlstr = "<div>Student: <b>".$uid."</b><br>Titel: <b>".$row_zd->titel."<b><br><br></div>\n";
+							$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
+							$htmlstr .= "<tr></tr>\n";
+							$htmlstr .= "<tr>\n";
+							$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
+							$htmlstr .= "<input  type='text' name='sprache'  id='sprache' value='".$row_zd->sprache."' size='10' maxlength='8' readonly='readonly'>";
+						    $htmlstr .= "</td></tr>\n";
+							$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$row_zd->kontrollschlagwoerter."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
+							$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$row_zd->schlagwoerter."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
+							$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$row_zd->schlagwoerter_en."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
+							$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46' rows='7' readonly='readonly'>$row_zd->abstract</textarea></td></tr>\n";
+							$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7' readonly='readonly'>$row_zd->abstract_en</textarea></td></tr>\n";
+							$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input type='text' name='seitenanzahl' value=".$row_zd->seitenanzahl." size='5' maxlength='4' readonly='readonly'></td></tr>\n";
+							$htmlstr .= "</tr>\n";
+							$htmlstr .= "</table><table>";
+							$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld</td></tr><tr><td>&nbsp;</td></tr>\n";
+							$htmlstr .= "</table>\n";	
+					}
 	echo $htmlstr;
 	echo '</body></html>';
 
