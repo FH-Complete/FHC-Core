@@ -35,16 +35,9 @@
 *
 */
  
- 
 // ---------------- CIS Include Dateien einbinden
-	require_once('../../config.inc.php');
-	// Datenbankverbindung - ohne erfolg kann hier bereits beendet werden
-	if (!$conn=pg_pconnect(CONN_STRING))
-	{
-		die('Jahresplan<br>Keine Veranstaltungen zurzeit Online.<br>Bitte etwas Geduld.<br>Danke'); 
-	}
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/globals.inc.php');
 
 // ---------------- Datenbank-Verbindung 
 	include_once('../../../include/person.class.php');
@@ -55,103 +48,67 @@
 	include_once('../../../include/jahresplan.class.php');
  	include_once('jahresplan_funktionen.inc.php');
 	
+	if (!$is_wartungsberechtigt)
+		die('Sie sind nicht berechtigt f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
+// ------------------------------------------------------------------------------------------
+//	Init
+// ------------------------------------------------------------------------------------------
+	$error='';	
+	
 // ------------------------------------------------------------------------------------------
 //	Request Parameter 
 // ------------------------------------------------------------------------------------------
-	if (!$userUID=get_uid())
-	{
-		die('Es wurde keine Benutzer UID gefunden ?');
-	}
 	// Parameter Veranstaltungskategorie
   	$veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_kurzbz']) ? $_REQUEST['veranstaltungskategorie_kurzbz']:''));
 	// Parameter Veranstaltung
    	$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
-   	$Jahr=trim((isset($_REQUEST['Jahr']) ? $_REQUEST['Jahr']:date("Y", mktime(0,0,0,date("m"),date("d"),date("y")))));
-   	$Monat=trim((isset($_REQUEST['Monat']) ? $_REQUEST['Monat']:date("m", mktime(0,0,0,date("m"),date("d"),date("y")))));
-	$Suchtext=trim((isset($_REQUEST['Suchtext']) ? $_REQUEST['Suchtext']:''));
-
 	$work=trim((isset($_REQUEST['work']) ? $_REQUEST['work']:''));
 	
-// ------------------------------------------------------------------------------------------
-//	Personen Classe 
-//		Anwernderdaten ermitteln
-// ------------------------------------------------------------------------------------------
-	$userNAME=$userUID;
-	$unicode=null; // Standart Encoding der Datenbank
-	$pers = new benutzer($conn,$userUID,$unicode); // Lesen Person - Benutzerdaten
-	if (isset($pers->nachname))
-	{
-		$userNAME=(isset($pers->anrede) ? $pers->anrede.' ':'');
-		$userNAME.=(isset($pers->titelpre) ? $pers->titelpre.' ':'');
-		$userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
-		$userNAME.=(isset($pers->nachname) ? $pers->nachname.' ':'');		
-	}
-// ------------------------------------------------------------------------------------------
-//	Benutzer Classe 
-//		Berechtigungen ermitteln
-// ------------------------------------------------------------------------------------------
-	$is_lector=false;
-	$is_wartungsberechtigt=false;
-	if (isset($pers->nachname))
-	{
-		$benutzerberechtigung = new benutzerberechtigung($conn,$userUID);
-		$benutzerberechtigung->getBerechtigungen($userUID,true);
-		// Nur Lektoren oder Mitarbeiter duerfen alle Termine sehen , Studenten nur Freigegebene Kategorien
-		if($benutzerberechtigung->fix || $benutzerberechtigung->lektor)
-			$is_lector=true;
-		else
-			$is_lector=false;
-		// Kennzeichen setzen fuer Berechtigungspruefung
-		$berechtigung='veranstaltung';
-		$studiengang_kz=null;
-		$art='suid';
-		$fachbereich_kurzbz=null;
-		// Berechtigungen abfragen
-		$is_wartungsberechtigt=$benutzerberechtigung->isBerechtigt($berechtigung,$studiengang_kz,$art, $fachbereich_kurzbz);
-		if (!$is_wartungsberechtigt)
-		{
-			$is_wartungsberechtigt=false;
-		}	
-		unset($benutzerberechtigung); // Klasse Berechtigungen entfernen 
-	}	
-
-	if (!$is_wartungsberechtigt)
-	{
-		exit('Sie sind nicht berechtigt f&uuml;r diese Seite !');
-	}
 // ------------------------------------------------------------------------------------------
 // Datenlesen fuer Anzeige
 //	a) verarbeiten wenn Request Parameter 'work' - save(update) oder del
 //	b) alle Veranstaltung lesen
-// ------------------------------------------------------------------------------------------
-	$Jahresplan = new jahresplan($conn);
-
-	$error='';
-	$work=(isset($_REQUEST['work']) ? $_REQUEST['work'] :'');
-	if (!empty($work) && isset($_REQUEST['veranstaltung_id']) )
+	if (!empty($work))
 	{
+	
 		$Jahresplan->InitVeranstaltung();
-		// Nur Berechtigte duerfen alle Informationen sehen (Mitarbeiter)	
-		$Jahresplan->setVeranstaltungskategorieMitarbeiter($is_lector);
 		// Nur Berechtigte duerfen auch noch nicht freigegebene Sehen	
-		if (!$is_wartungsberechtigt)	
-			$Jahresplan->setFreigabe(true);
-		else
-			$Jahresplan->setFreigabe(false);
-
+		$Jahresplan->show_only_public_kategorie=($is_mitarbeiter?false:true);
+		$Jahresplan->freigabe=($is_wartungsberechtigt?false:true);
 		if ($work=='save')
 		{
-			$_REQUEST['veranstaltung_id']=(isset($_REQUEST['veranstaltung_id']) && !empty($_REQUEST['veranstaltung_id'])?trim($_REQUEST['veranstaltung_id']):'');
-			if(!$veranstaltung=$Jahresplan->saveVeranstaltung($_REQUEST))
+			
+			$Jahresplan->new=false;
+			if (!isset($veranstaltung_id) || empty($veranstaltung_id) )
+				$Jahresplan->new=true;
+
+
+			$Jahresplan->veranstaltung_id=$veranstaltung_id;
+			$Jahresplan->veranstaltungskategorie_kurzbz=$_REQUEST["veranstaltungskategorie_kurzbz"];
+			$Jahresplan->beschreibung=$_REQUEST["beschreibung"];
+			$Jahresplan->inhalt=$_REQUEST["inhalt"];
+			
+			$Jahresplan->start=date('Y-m-d H:i:s',$_REQUEST["start"]);							
+			$Jahresplan->ende=date('Y-m-d H:i:s',$_REQUEST["ende"]);	
+
+			$Jahresplan->insertamum=date('Y-m-d H:i:s');							
+			$Jahresplan->insertvon=$user;							
+
+			$Jahresplan->updateamum=date('Y-m-d H:i:s');
+			$Jahresplan->updatevon=$user;		
+								
+			$Jahresplan->freigabeamum=(!empty($_REQUEST["freigabeamum"])?date('Y-m-d H:i:s',$_REQUEST["freigabeamum"]):null);							
+			$Jahresplan->freigabevon=$_REQUEST["freigabevon"];	
+
+			if(!$veranstaltung=$Jahresplan->saveVeranstaltung())
 			{	
-				$error='Fehler beim anlegen ! '.$Jahresplan->getError()." ".$Jahresplan->getVeranstaltung_id();
-				$error.= "<br>" . $Jahresplan->getStringSQL() ."<br>";
-				
+				$error='Fehler bei der '.($Jahresplan->new?' Neuanlage ':' &Auml;nderung ').' '.$Jahresplan->errormsg; 
 			}
 			else
 			{
-				$veranstaltung_id=$Jahresplan->getVeranstaltung_id();
-				$error=(!empty($_REQUEST['veranstaltung_id_old'])?' &Auml;nderung ':' anlegen ').' ID '.$veranstaltung_id .' erfolgreich ! '.$Jahresplan->getError();
+				$veranstaltung_id=$Jahresplan->veranstaltung_id;
+				$error='Veranstaltung ID "'.$veranstaltung_id.'" '.($Jahresplan->new?' angelegt ':' ge&auml;ndert ').'" '.$Jahresplan->errormsg;
 				$error.='	<script language="JavaScript1.2" type="text/javascript">
 						<!--
 							if (window.opener && !window.opener.closed) {
@@ -167,16 +124,15 @@
 		
 		if ($work=='del')
 		{
-			if(!$veranstaltung=$Jahresplan->deleteVeranstaltung($_REQUEST))
+			if(!$veranstaltung=$Jahresplan->deleteVeranstaltung($veranstaltung_id))
 			{	
-				$error='Fehler beim l&ouml;schen ! '.$Jahresplan->getError();
+				$error='Fehler beim l&ouml;schen ! '.$Jahresplan->errormsg;
 			}
 			else
 			{
-				$error='Veranstaltung "'.$_REQUEST['veranstaltung_id'].'" gel&ouml;scht.';
+				$error='Veranstaltung "'.$veranstaltung_id.'" gel&ouml;scht.';
 				$veranstaltung_id='';
 				$_REQUEST['veranstaltung_id']='';
-				$_REQUEST['veranstaltung_id_old']='';
 				$error.='	<script language="JavaScript1.2" type="text/javascript">
 						<!--
 							if (window.opener && !window.opener.closed) {
@@ -197,14 +153,10 @@
 //			Veranstaltungskategorien ohne Selektionsbedingung
 // ------------------------------------------------------------------------------------------
 	$Jahresplan->InitVeranstaltungskategorie();
-	if ($Jahresplan->loadVeranstaltungskategorie())
-	{
-		$veranstaltungskategorie=$Jahresplan->getVeranstaltungskategorie();
-	}	
-	else // Es gibt keine Kategorie oder Fehler beim Lesen - keine weitere Anzeige mehr moeglich
-	{
-		die($Jahresplan->getError());
-	}
+	// Nur Berechtigte duerfen auch noch nicht freigegebene Sehen	
+	$Jahresplan->show_only_public_kategorie=($is_mitarbeiter?false:true);
+	if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
+		die($Jahresplan->errormsg);
 	
 // ------------------------------------------------------------------------------------------
 // Daten lesen fuer Anzeige der
@@ -212,34 +164,31 @@
 // ------------------------------------------------------------------------------------------
 	if (!empty($veranstaltung_id))
 	{
-		$Jahresplan = new jahresplan($conn);
 		$Jahresplan->InitVeranstaltung();	
-		// Nur Berechtigte duerfen alle Informationen sehen (Mitarbeiter)	
-		$Jahresplan->setVeranstaltungskategorieMitarbeiter($is_lector);
 		// Nur Berechtigte duerfen auch noch nicht freigegebene Sehen	
-		if (!$is_wartungsberechtigt)	
-			$Jahresplan->setFreigabe(true);
-		else
-			$Jahresplan->setFreigabe(false);
-			
-		$Jahresplan->setVeranstaltung_id($veranstaltung_id);
-		$Jahresplan->setVeranstaltungskategorie_kurzbz($veranstaltungskategorie_kurzbz);
-		
+		$Jahresplan->show_only_public_kategorie=($is_mitarbeiter?false:true);
+		$Jahresplan->freigabe=($is_wartungsberechtigt?false:true);
+
+		$Jahresplan->veranstaltung_id=$veranstaltung_id;
+		$Jahresplan->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
+
 		$veranstaltung=array();
-		if ($Jahresplan->loadVeranstaltung())
+		if ($veranstaltungen=$Jahresplan->loadVeranstaltung())
 		{
-			$veranstaltung=$Jahresplan->getVeranstaltung();
-			$veranstaltung=jahresplan_funk_veranstaltung_extend($veranstaltung);
+			$veranstaltungen=jahresplan_funk_veranstaltung_extend($veranstaltungen);
+			while (list($key, $value) = each($veranstaltungen)) 
+			{
+			    $veranstaltung[$key]=$value;
+			}
 		}
 		elseif (empty($work))  // Es gibt keine Veranstaltung oder Fehler beim Lesen - keine weitere Anzeige mehr moeglich
 		{
-			die($Jahresplan->getError());
+			die($Jahresplan->errormsg);
 		}
 	// Plausib
 		if (!is_array($veranstaltung) || count($veranstaltung)<1 || !isset($veranstaltung["veranstaltung_id"])) 
 		{
 			$work='new';
-			$veranstaltung_id='';
 		}	
 	}
 	else // Reload ohne Datenverarbeitung , die Aufrufparameter in die Datentabelle uebertragen fuer Value der Inputfelder
@@ -440,7 +389,7 @@
 ?>
   <h1>&nbsp;Veranstaltung bearbeiten&nbsp;</h1>
   <fieldset>
-    <legend><?php echo (!empty($veranstaltung_id)?"Datenpflege ID $veranstaltung_id":' Neuanlage '); ?></legend>
+    <legend><?php echo (!empty($veranstaltung_id)?"Datenpflege ID $veranstaltung_id":' Neuanlage '); ?><font style="font-size:xx-small;">&nbsp;durch&nbsp;<?php echo $userNAME; ?>&nbsp;</font></legend>
 
 		<form name="selVeranstaltung" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 			<table cellpadding="10" cellspacing="0">
@@ -450,7 +399,6 @@
 					<td>
 						<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id); ?>
 						<input class="ausblenden" id="veranstaltung_id" name="veranstaltung_id" type="text" size="4" maxlength="10" value="<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id); ?>" >
-						<input class="ausblenden" name="veranstaltung_id_old" type="text" value="<?php echo (isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id);?>" >
 					</td>
 
 					<td title="Neuanlage <?php echo date("d.m.Y",$veranstaltung['start_timestamp']);?>"  class="cursor_hand" onclick="self.location.href='<?php echo $_SERVER['PHP_SELF'].'?start_timestamp='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:$cTmpTimestampStart).'&amp;ende_timestamp='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:$cTmpTimestampEnde) ;?>';" >Neuanlage&nbsp;<img border="0" alt="Neuanlage" src="../../../skin/images/date_add.png" ></td>
@@ -468,21 +416,18 @@
 						  	for ($iTmpZehler=0;$iTmpZehler<count($veranstaltungskategorie);$iTmpZehler++)
 							{
 								// Check Space
-								$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]=trim($veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]);
-								$veranstaltungskategorie[$iTmpZehler]["bezeichnung"]=trim($veranstaltungskategorie[$iTmpZehler]["bezeichnung"]);
+								$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz=trim($veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz);
+								$veranstaltungskategorie[$iTmpZehler]->bezeichnung=trim($veranstaltungskategorie[$iTmpZehler]->bezeichnung);
 		
-								$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]["bild"])<800?'heximg='.$veranstaltungskategorie[$iTmpZehler]["bild"]:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]);
-								$veranstaltungskategorie[$iTmpZehler]["bild_image"]='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'" src="'.$cURL.'">';
+								$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]->bild)<800?'heximg='.$veranstaltungskategorie[$iTmpZehler]->bild:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz);
+								$veranstaltungskategorie[$iTmpZehler]->bild_image='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]->bezeichnung.'" src="'.$cURL.'">';
 		
-								echo '<option  '.(!empty($veranstaltungskategorie[$iTmpZehler]["farbe"])?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]["farbe"].'" ':'').'  '.(isset($veranstaltung['veranstaltungskategorie_kurzbz']) && $veranstaltung['veranstaltungskategorie_kurzbz']==$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]?' selected="selected" ':'').' value="'.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"].'">'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'</option>';
+								echo '<option  '.(!empty($veranstaltungskategorie[$iTmpZehler]->farbe)?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]->farbe.'" ':'').'  '.(isset($veranstaltung['veranstaltungskategorie_kurzbz']) && $veranstaltung['veranstaltungskategorie_kurzbz']==$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz?' selected="selected" ':'').' value="'.$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz.'">'.$veranstaltungskategorie[$iTmpZehler]->bezeichnung.'</option>';
 							}	
 						}
 					?>
 					</select></td>
 				</tr>				
-
-					
-
 				<tr>
 					<td><label for="Datum1">Datum von</label></td>
 					<td>
@@ -547,19 +492,16 @@
 					<td><label for="inhalt">Beschreibung</label></td>
 					<td><textarea rows="3" cols="80" id="inhalt" name="inhalt"><?php echo (isset($veranstaltung['inhalt'])?$veranstaltung['inhalt']:'');?></textarea></td>
 				</tr>	
-			
-
 				<tr>
 					<td>
 						<table>
 						<tr>
 							<td><label for="inhalt">Freigabe</label></td>
-							<td><input type="checkbox" <?php echo (!isset($veranstaltung['freigabeamum']) || empty($veranstaltung['freigabeamum'])?'':' checked="checked" ' ); ?>  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.freigabevon.value='<?php echo $userUID;?>';window.document.selVeranstaltung.freigabeamum.value='<?php echo time();?>';} else {window.document.selVeranstaltung.freigabeamum.value='';};" name="tmpFreigabe" ></td>
+							<td><input type="checkbox" <?php echo (!isset($veranstaltung['freigabeamum']) || empty($veranstaltung['freigabeamum'])?'':' checked="checked" ' ); ?>  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.freigabevon.value='<?php echo $user;?>';window.document.selVeranstaltung.freigabeamum.value='<?php echo time();?>';} else {window.document.selVeranstaltung.freigabeamum.value='';};" name="tmpFreigabe" ></td>
 
 						</tr>
 						</table>
 					</td>
-
 					<td>
 						<table>
 						<tr>
@@ -572,7 +514,7 @@
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
-							<td  class="cursor_hand"  onclick="callWindows('jahresplan_detail.php?work=update&amp;veranstaltung_id=<?php echo $veranstaltung_id; ?>','Veranstaltung_Detail').focus(); ">Voransicht&nbsp;<img  title="Voransicht" src="../../../skin/images/date_magnify.png" alt="Voransicht" ></td>
+							<td class="cursor_hand" onclick="callWindows('jahresplan_detail.php?work=update&amp;veranstaltung_id=<?php echo $veranstaltung_id; ?>','Veranstaltung_Detail').focus(); ">Voransicht&nbsp;<img  title="Voransicht" src="../../../skin/images/date_magnify.png" alt="Voransicht" ></td>
 							<td>&nbsp;</td>
 						</tr>
 						</table>
@@ -580,13 +522,13 @@
 				</tr>	
 				<tr class="ausblenden">
 					<td colspan="2">
-						<input type="Text" value="<?php echo (!isset($veranstaltung['insertvon']) || empty($veranstaltung['insertvon'])?$userUID:$veranstaltung['insertvon'] ); ?>" name="insertvon" >
+						<input type="Text" value="<?php echo (!isset($veranstaltung['insertvon']) || empty($veranstaltung['insertvon'])?$user:$veranstaltung['insertvon'] ); ?>" name="insertvon" >
 						<input type="Text" value="<?php echo (!isset($veranstaltung['insertamum_timestamp']) || empty($veranstaltung['insertamum_timestamp'])?time():$veranstaltung['insertamum_timestamp'] ); ?>" name="insertamum" >
 					</td>
 				</tr>
 				<tr class="ausblenden">
 					<td colspan="2">
-						<input type="Text" value="<?php echo $userUID; ?>" name="updatevon" >
+						<input type="Text" value="<?php echo $user; ?>" name="updatevon" >
 						<input type="Text" value="<?php echo time(); ?>" name="updateamum" >
 					</td>
 				</tr>
@@ -603,21 +545,19 @@
 	  </fieldset>
 
 	<?php
-	echo '<br>'.$error;
+	echo '<p class="error">'.$error.'</p>';
+	
 	$veranstaltung_id=(isset($veranstaltung['veranstaltung_id'])?$veranstaltung['veranstaltung_id']:$veranstaltung_id);
 	if (!empty($veranstaltung_id))
 	{
-		echo '<hr>'.jahresplan_veranstaltung_detail_user($conn,$veranstaltung,$is_wartungsberechtigt);
-		echo '<a href="javascript:callWindows(\'jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;openfirst=1&amp;start='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;ende='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'\',\'Reservierung\');">Reservierungen in einem neuen Fenster anzeigen.</a>';	
-		echo '<iframe id="reservierung" src="jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;start='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;ende='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'"></iframe>';
-
+		echo '<hr>'.jahresplan_veranstaltung_detail_user($veranstaltung,$is_wartungsberechtigt);
+		echo '<a href="javascript:callWindows(\'jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;openfirst=1&amp;startDatum='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;endeDatum='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'\',\'Reservierung\');">Reservierungen in einem neuen Fenster anzeigen.</a>';	
+		echo '<iframe id="reservierung" src="jahresplan_reservierung.php?veranstaltung_id='.$veranstaltung_id.'&amp;startDatum='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:mktime(12,0,0,date("m"),date("d"),date("y"))).'&amp;endeDatum='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:mktime(13,0,0,date("m"),date("d"),date("y"))).'"></iframe>';
 	}
 	else
 	{
 		echo '<hr><span class="footer_zeile">Reservierungen k&ouml;nnen erst nach dem speichern der Veranstaltung zugeordnet werden.</span>';
 	}
 	?>	
-
-	  
 </body>
 </html>	

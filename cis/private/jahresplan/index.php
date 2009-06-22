@@ -22,96 +22,45 @@
  */
 
 // ---------------- CIS Include Dateien einbinden
-	require_once('../../config.inc.php');
-	// Datenbankverbindung - ohne erfolg kann hier bereits beendet werden
-
-	if (!$conn=pg_pconnect(CONN_STRING))
-	{
-		die('Jahresplan<br />Keine Veranstaltungen zurzeit Online.<br />Bitte etwas Geduld.<br />Danke'); 
-	}
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/globals.inc.php');
 
 // ---------------- Datenbank-Verbindung 
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
 	include_once('../../../include/benutzerberechtigung.class.php');
-	
-// ---------------- Jahresplan Classe und Allg.Funktionen		
+
+// ------------------------------------------------------------------------------------------
+//	Jahresplan Classe 
+// ------------------------------------------------------------------------------------------
 	include_once('../../../include/jahresplan.class.php');
+// ---------------- Check User und Jahresplan-Classe Init
 	include_once('jahresplan_funktionen.inc.php');
+
+// ------------------------------------------------------------------------------------------
+//	Init
+// ------------------------------------------------------------------------------------------
+	$error='';	
  
 // ------------------------------------------------------------------------------------------
-//	Request Parameter 
+//	Request Parameter einlesen
 // ------------------------------------------------------------------------------------------
-	if (!$userUID=get_uid())
-	{
-		die('Es wurde keine Benutzer UID gefunden ?');
-	}
+
 	// Parameter Veranstaltungskategorie
   	$veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_kurzbz']) ? $_REQUEST['veranstaltungskategorie_kurzbz']:''));
 	// Parameter Veranstaltung
    	$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
    	$Jahr=trim((isset($_REQUEST['Jahr']) ? $_REQUEST['Jahr']:date("Y", mktime(0,0,0,date("m"),date("d"),date("y")))));
    	$Monat=trim((isset($_REQUEST['Monat']) ? $_REQUEST['Monat']:date("m", mktime(0,0,0,date("m"),date("d"),date("y")))));
-	$Suchtext=trim((isset($_REQUEST['Suchtext']) ? $_REQUEST['Suchtext']:''));
+	$suchtext=trim((isset($_REQUEST['suchtext']) ? $_REQUEST['suchtext']:''));
  
-// ------------------------------------------------------------------------------------------
-//	Personen Classe 
-//		Anwernderdaten ermitteln
-// ------------------------------------------------------------------------------------------
-	$userNAME=$userUID;
-	$unicode=null; // Standart Encoding der Datenbank
-	$pers = new benutzer($conn,$userUID,$unicode); // Lesen Person - Benutzerdaten
-	if (isset($pers->nachname))
-	{
-		$userNAME=(isset($pers->anrede) ? $pers->anrede.' ':'');
-		$userNAME.=(isset($pers->titelpre) ? $pers->titelpre.' ':'');
-		$userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
-		$userNAME.=(isset($pers->nachname) ? $pers->nachname.' ':'');		
-	}
 	
 // ------------------------------------------------------------------------------------------
-//	Benutzerberechtigung Classe 
-//		Berechtigungen ermitteln
+// 	Alle Kategoriedaten lesen fuer Selektfeld (open in jahresplan_funktionen)
 // ------------------------------------------------------------------------------------------
-	$is_lector=false;
-	$is_wartungsberechtigt=false;
-	if (isset($pers->nachname))
-	{
-		$benutzerberechtigung = new benutzerberechtigung($conn,$userUID);
-		$benutzerberechtigung->getBerechtigungen($userUID,true);
-		// Nur Lektoren oder Mitarbeiter duerfen alle Termine sehen , Studenten nur Freigegebene Kategorien
-		if($benutzerberechtigung->fix || $benutzerberechtigung->lektor)
-			$is_lector=true;
-		else
-			$is_lector=false;
-
-		// Kennzeichen setzen fuer Berechtigungspruefung
-		$berechtigung='veranstaltung';
-		$studiengang_kz=null;
-		$art='suid';
-		$fachbereich_kurzbz=null;
-		// Berechtigungen abfragen
-		$is_wartungsberechtigt=$benutzerberechtigung->isBerechtigt($berechtigung,$studiengang_kz,$art, $fachbereich_kurzbz);
-		if (!$is_wartungsberechtigt)
-		{
-			$is_wartungsberechtigt=false;
-		}	
-	}	
-// ------------------------------------------------------------------------------------------
-// 	Alle Kategoriedaten lesen fuer Selektfeld
-// ------------------------------------------------------------------------------------------
-	$Jahresplan = new jahresplan($conn);
 	$Jahresplan->InitVeranstaltungskategorie();
-	if ($Jahresplan->loadVeranstaltungskategorie())
-	{
-		$veranstaltungskategorie=$Jahresplan->getVeranstaltungskategorie();
-	}	
-	else // Es gibt keine Kategorie oder Fehler beim Lesen - keine weitere Anzeige mehr moeglich
-	{
-		die($Jahresplan->getError());
-	}
+	if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
+		die('Fehler beim lesen der Veranstaltungskategorie ! '.$Jahresplan->errormsg);
 	
 ?> 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -119,7 +68,6 @@
 <head>
 <title>Jahresplan</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <style type="text/css">
 	<!-- 
@@ -232,7 +180,7 @@
 		if (InfoWin) {
 			InfoWin.close();
 	 	}
-	       InfoWin=window.open(url,nameID,"copyhistory=no,directories=no,location=no,dependent=no,toolbar=yes,menubar=no,status=no,resizable=yes,scrollbars=yes, width=500,height=600,left=60, top=15");  
+	       InfoWin=window.open(url,nameID,"copyhistory=no,directories=no,location=no,dependent=no,toolbar=yes,menubar=no,status=no,resizable=yes,scrollbars=yes, width=550,height=600,left=60, top=15");  
 		InfoWin.focus();
 		InfoWin.setTimeout("window.close()",800000);
 	}
@@ -242,14 +190,12 @@
 </head>
 <body>
 <?php 
- // Wartungsberechtigt bekommen noch ein Spezielles Menue
+	// Wartungsberechtigt bekommen noch ein Spezielles Menue
 	if ($is_wartungsberechtigt)
-	{
-// wunsch keine Veranstaltungs Menue		echo '[&nbsp;<a href="index.php">Veranstaltung</a>&nbsp;|&nbsp;<a href="jahresplan_veranstaltung.php">Veranstaltung bearbeiten</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">Kategorie</a>&nbsp;]&nbsp;'.$userNAME;
 		echo '[&nbsp;<a href="index.php">Veranstaltung</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">Kategorie</a>&nbsp;]&nbsp;'.$userNAME;
-		
-	} // Ende Wartungsberechtigt
 ?>
+
+
 	<h1>&nbsp;Veranstaltungen&nbsp;</h1>
 	<form name="selJahresplan" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 		<table cellpadding="0" cellspacing="0">
@@ -269,8 +215,8 @@
 			<td title="1 Jahr vor" ><img onclick="if (window.document.selJahresplan.Jahr.options.selectedIndex==(window.document.selJahresplan.Jahr.options.length - 1)) {window.document.selJahresplan.Jahr.options.selectedIndex=0} else {window.document.selJahresplan.Jahr.options.selectedIndex++;};window.document.selJahresplan.submit();" alt="1 Jahr vor" src="../../../skin/images/right.gif" border="0"></td>
 			<td>&nbsp;</td>
 			<!-- Monatsauswahl -->			
-			<td title="1 Monat zur&uuml;ck" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==0) {window.document.selJahresplan.Monat.options.selectedIndex=(window.document.selJahresplan.Monat.options.length - 1);} else { window.document.selJahresplan.Monat.options.selectedIndex--; }; window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.Suchtext.value='';window.document.selJahresplan.submit();" alt="1 Monat zur&uuml;ck" src="../../../skin/images/left.gif" border="0"></td>
-			<td><select name="Monat" onchange="window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.Suchtext.value='';window.document.selJahresplan.submit();" >
+			<td title="1 Monat zur&uuml;ck" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==0) {window.document.selJahresplan.Monat.options.selectedIndex=(window.document.selJahresplan.Monat.options.length - 1);} else { window.document.selJahresplan.Monat.options.selectedIndex--; }; window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" alt="1 Monat zur&uuml;ck" src="../../../skin/images/left.gif" border="0"></td>
+			<td><select name="Monat" onchange="window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" >
 			<?php
 				for ($iTmpZehler=0;$iTmpZehler<=12;$iTmpZehler++)
 				{
@@ -278,7 +224,7 @@
 				}
 			?>	
 			</select></td>
-			<td title="1 Monat vor" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==(window.document.selJahresplan.Monat.options.length - 1)) {window.document.selJahresplan.Monat.options.selectedIndex=0} else {window.document.selJahresplan.Monat.options.selectedIndex++;};window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.Suchtext.value='';window.document.selJahresplan.submit();" alt="1 Monat vor" src="../../../skin/images/right.gif" border="0"></td>
+			<td title="1 Monat vor" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==(window.document.selJahresplan.Monat.options.length - 1)) {window.document.selJahresplan.Monat.options.selectedIndex=0} else {window.document.selJahresplan.Monat.options.selectedIndex++;};window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" alt="1 Monat vor" src="../../../skin/images/right.gif" border="0"></td>
 			<td>&nbsp;</td>
 			<!-- Kategorieauswahl -->
 			<td><select name="veranstaltungskategorie_kurzbz" onchange="window.document.selJahresplan.submit();" >
@@ -293,12 +239,12 @@
 				  	for ($iTmpZehler=0;$iTmpZehler<count($veranstaltungskategorie);$iTmpZehler++)
 					{
 						// Check Space
-						$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]=trim($veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]);
-						$veranstaltungskategorie[$iTmpZehler]["bezeichnung"]=trim($veranstaltungskategorie[$iTmpZehler]["bezeichnung"]);
+						$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz=trim($veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz);
+						$veranstaltungskategorie[$iTmpZehler]->bezeichnung=trim($veranstaltungskategorie[$iTmpZehler]->bezeichnung);
 						// Kategoriebild erzeugen (wird spaeter verwendet)
-						$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]["bild"])<800?'heximg='.$veranstaltungskategorie[$iTmpZehler]["bild"]:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]);
-						$veranstaltungskategorie[$iTmpZehler]["bild_image"]='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'" src="'.$cURL.'" />';
-						echo '<option  '.(!empty($veranstaltungskategorie[$iTmpZehler]["farbe"])?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]["farbe"].'" ':'').'  '.($veranstaltungskategorie_kurzbz==$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"]?' selected="selected" ':'').' value="'.$veranstaltungskategorie[$iTmpZehler]["veranstaltungskategorie_kurzbz"].'">'.$veranstaltungskategorie[$iTmpZehler]["bezeichnung"].'</option>';
+						$cURL='jahresplan_bilder.php?time='.time().'&'.(strlen($veranstaltungskategorie[$iTmpZehler]->bild)<800?'heximg='.$veranstaltungskategorie[$iTmpZehler]->bild:'veranstaltungskategorie_kurzbz='.$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz);
+						$veranstaltungskategorie[$iTmpZehler]->bild_image='<img height="20" border="0" alt="Kategoriebild" titel="'.$veranstaltungskategorie[$iTmpZehler]->bezeichnung.'" src="'.$cURL.'" />';
+						echo '<option  '.(!empty($veranstaltungskategorie[$iTmpZehler]->farbe)?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]->farbe.'" ':'').'  '.($veranstaltungskategorie_kurzbz==$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz?' selected="selected" ':'').' value="'.$veranstaltungskategorie[$iTmpZehler]->veranstaltungskategorie_kurzbz.'">'.$veranstaltungskategorie[$iTmpZehler]->bezeichnung.'</option>';
 					}	
 				}
 			?>
@@ -306,11 +252,11 @@
 			<td>&nbsp;</td>
 			<!-- Veranstaltungs ID  -->
 			<td>ID</td>
-			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.Suchtext.value='';window.document.selJahresplan.submit(); } " name="veranstaltung_id" type="text" size="4" maxlength="10" title="Veranstaltungs ID" value="<?php echo $veranstaltung_id;?>"></td>
+			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit(); } " name="veranstaltung_id" type="text" size="4" maxlength="10" title="Veranstaltungs ID" value="<?php echo $veranstaltung_id;?>"></td>
 			<td>&nbsp;</td>
 			<!-- Textsuche  -->
 			<td>Suche</td>
-			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.submit(); } "  name="Suchtext" type="text" size="15" maxlength="30" title="Suchtext" value="<?php echo $Suchtext;?>"></td>
+			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.submit(); } "  name="suchtext" type="text" size="15" maxlength="30" title="suchtext" value="<?php echo $suchtext;?>"></td>
 			<td>&nbsp;</td>
 			<!-- Datenanzeige Startknopf  -->
 			<td  title="Veranstaltungen anzeigen">
@@ -328,17 +274,13 @@
 
 	// Veranstaltung Initialisieren der Klasse
 	$Jahresplan->InitVeranstaltung();
-	// Nur Berechtigte duerfen alle Informationen sehen (Mitarbeiter)	
-	$Jahresplan->setVeranstaltungskategorieMitarbeiter($is_lector);
 	// Nur Berechtigte duerfen auch noch nicht freigegebene Sehen	
-	if (!$is_wartungsberechtigt)	
-		$Jahresplan->setFreigabe(true);
-	else
-		$Jahresplan->setFreigabe(false);
-	$Jahresplan->setVeranstaltungskategorie_kurzbz($veranstaltungskategorie_kurzbz);
-	$Jahresplan->setVeranstaltung_id($veranstaltung_id);
-	$Suchtext_korr=(!empty($Suchtext)?mb_ereg_replace("*","%",$Suchtext):'');
-	$Jahresplan->setSuchtext($Suchtext_korr);
+	$Jahresplan->show_only_public_kategorie=($is_mitarbeiter?false:true);
+	$Jahresplan->freigabe=($is_wartungsberechtigt?false:true);
+		
+	$Jahresplan->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
+	$Jahresplan->veranstaltung_id=$veranstaltung_id;
+	$Jahresplan->suchtext=(!empty($suchtext)?str_replace('*','%',$suchtext):'');
 
 	//  Datum setzen ausser wenn eine eindeutige ID selektiert wurde. Diese soll in allen Perioden gesucht werden
 	if (empty($veranstaltung_id)) 
@@ -348,7 +290,7 @@
 			$Jahr=date("Y", mktime(0,0,0,date("m"),date("d"),date("y")));	
 		}	
 
-		$Jahresplan->setStart_jahr($Jahr);
+		$Jahresplan->start_jahr=$Jahr;
 		if (!empty($Woche))
 		{
 			$iTmpMinKW=date("W",mktime(0, 0, 0,(empty($Monat) || $Monat>12?'01':$Monat),1, $Jahr));
@@ -356,56 +298,57 @@
 			$iTmpMaxKW=number_format($iTmpMaxKW);
 			if ($iTmpMaxKW<2 && $iTmpMonat==12)
 				$iTmpMaxKW=53;
-			$Jahresplan->setStart_jahr_woche($Jahr.$iTmpMinKW);
-			$Jahresplan->setEnde_jahr_woche($Jahr.$iTmpMaxKW);
+			$Jahresplan->start_jahr_woche=$Jahr.$iTmpMinKW;
+			$Jahresplan->ende_jahr_woche=$Jahr.$iTmpMaxKW;
 		}
 		elseif (!empty($Monat))
 		{
-			$Jahresplan->setStart_jahr_monat($Jahr.(empty($Monat) || $Monat>12?'01':$Monat));
-			$Jahresplan->setEnde_jahr_monat($Jahr.(empty($Monat) || $Monat>12?'01':$Monat));
+			$Jahresplan->start_jahr_monat=$Jahr.(empty($Monat) || $Monat>12?'01':$Monat);
+			$Jahresplan->ende_jahr_monat=$Jahr.(empty($Monat) || $Monat>12?'01':$Monat);
 		}	
 	}	
 
 	// **************************************
 	// Veranstaltungen zu Selektion - lesen
 	// **************************************
-	$veranstaltung=array();
-	if ($Jahresplan->loadVeranstaltung())
+	if (!$veranstaltung=$Jahresplan->loadVeranstaltung())
 	{
-		$veranstaltung=$Jahresplan->getVeranstaltung();
+		$veranstaltung=array();
 	}	
-#echo $Jahresplan->getStringSQL();
-
+	
+#	var_dump($veranstaltung);
+#	exit;
+	
 	// Ausgabe der Veranstaltungsdaten bzw Hinweisstext
 	if (is_array($veranstaltung) && isset($veranstaltung[0]))
 	{
 		// Detailanzeige
 		if (!empty($veranstaltung_id))
 		{
-			echo jahresplan_veranstaltung_detailanzeige($conn,$veranstaltung,$is_wartungsberechtigt);
+			echo jahresplan_veranstaltung_detailanzeige($veranstaltung,$is_wartungsberechtigt);
 		}
 		// Listenanzeige
-		elseif (!empty($Suchtext))
+		elseif (!empty($suchtext))
 		{
-			echo jahresplan_veranstaltung_listenanzeige($conn,$veranstaltung,$is_wartungsberechtigt);
+			echo jahresplan_veranstaltung_listenanzeige($veranstaltung,$is_wartungsberechtigt);
 		}
 		// Kalenderanzeige
 		else
 		{
-			echo jahresplan_veranstaltungskategorie_kalenderanzeige($conn,$veranstaltung,$is_wartungsberechtigt,$Jahr,$Monat);
+			echo jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$is_wartungsberechtigt,$Jahr,$Monat);
 		}
 	}
 	// Keine Daten gefunden
-	elseif (empty($veranstaltung_id) && empty($Suchtext))
+	elseif (empty($veranstaltung_id) && empty($suchtext))
 	{
-		echo jahresplan_veranstaltungskategorie_kalenderanzeige($conn,$veranstaltung,$is_wartungsberechtigt,$Jahr,$Monat);
+		echo jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$is_wartungsberechtigt,$Jahr,$Monat);
 	}
 	else
 	{
-		echo "<br />keine Daten gefunden ".(!empty($Suchtext)? ' Suchtext '.$Suchtext:'' ).(!empty($veranstaltung_id)? ' ID '.$veranstaltung_id:'' );
+		echo "<br />keine Daten gefunden ".(!empty($suchtext)? ' suchtext '.$suchtext:'' ).(!empty($veranstaltung_id)? ' ID '.$veranstaltung_id:'' );
 	}
 	// Fehlerausgabe 
-	echo '<p>'.$Jahresplan->getError().'</p>';
+	echo '<p>'.$Jahresplan->errormsg.'</p>';
 ?>
 </body>
 </html>
