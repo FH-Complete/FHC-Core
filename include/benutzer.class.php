@@ -81,7 +81,7 @@ class benutzer extends person
 	 */
 	protected function validate()
 	{
-		if(strlen($this->uid)>32)
+		if(mb_strlen($this->uid)>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
@@ -91,7 +91,7 @@ class benutzer extends person
 			$this->errormsg = 'UID muss eingegeben werden '.$this->uid;
 			return false;
 		}
-		if(strlen($this->alias)>256)
+		if(mb_strlen($this->alias)>256)
 		{
 			$this->errormsg = 'Alias darf nicht laenger als 256 Zeichen sein';
 			return false;

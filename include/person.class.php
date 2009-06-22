@@ -154,27 +154,27 @@ class person extends basis_db
 		$this->titelpost = trim($this->titelpost);
 		$this->titelpre = trim($this->titelpre);
 		
-		if(utf8_strlen($this->sprache)>16)
+		if(mb_strlen($this->sprache)>16)
 		{
 			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->anrede)>16)
+		if(mb_strlen($this->anrede)>16)
 		{
 			$this->errormsg = 'Anrede darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->titelpost)>32)
+		if(mb_strlen($this->titelpost)>32)
 		{
 			$this->errormsg = 'Titelpost darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->titelpre)>64)
+		if(mb_strlen($this->titelpre)>64)
 		{
 			$this->errormsg = 'Titelpre darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->nachname)>64)
+		if(mb_strlen($this->nachname)>64)
 		{
 			$this->errormsg = 'Nachname darf nicht laenger als 64 Zeichen sein';
 			return false;
@@ -185,12 +185,12 @@ class person extends basis_db
 			return false;
 		}
 
-		if(utf8_strlen($this->vorname)>32)
+		if(mb_strlen($this->vorname)>32)
 		{
 			$this->errormsg = 'Vorname darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->vornamen)>128)
+		if(mb_strlen($this->vornamen)>128)
 		{
 			$this->errormsg = 'Vornamen darf nicht laenger als 128 Zeichen sein';
 			return false;
@@ -201,18 +201,18 @@ class person extends basis_db
 			$this->errormsg = "Geburtsdatum muss eingegeben werden\n";
 			return false;
 		}*/
-		if(utf8_strlen($this->gebort)>128)
+		if(mb_strlen($this->gebort)>128)
 		{
 			$this->errormsg = 'Geburtsort darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
 
-		if(utf8_strlen($this->homepage)>256)
+		if(mb_strlen($this->homepage)>256)
 		{
 			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->svnr)>10)
+		if(mb_strlen($this->svnr)>10)
 		{
 			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
 			return false;
@@ -253,12 +253,12 @@ class person extends basis_db
 			}
 		}
 
-		if(utf8_strlen($this->ersatzkennzeichen)>10)
+		if(mb_strlen($this->ersatzkennzeichen)>10)
 		{
 			$this->errormsg = 'Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->familienstand)>1)
+		if(mb_strlen($this->familienstand)>1)
 		{
 			$this->errormsg = 'Familienstand ist ungueltig';
 			return false;
@@ -273,12 +273,12 @@ class person extends basis_db
 			$this->errormsg = 'Aktiv ist ungueltig';
 			return false;
 		}
-		if(utf8_strlen($this->insertvon)>16)
+		if(mb_strlen($this->insertvon)>16)
 		{
 			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->updatevon)>16)
+		if(mb_strlen($this->updatevon)>16)
 		{
 			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -288,17 +288,17 @@ class person extends basis_db
 			$this->errormsg = 'Ext_ID ist keine gueltige Zahl';
 			return false;
 		}
-		if(utf8_strlen($this->geschlecht)>1)
+		if(mb_strlen($this->geschlecht)>1)
 		{
 			$this->errormsg = 'Geschlecht darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->geburtsnation)>3)
+		if(mb_strlen($this->geburtsnation)>3)
 		{
 			$this->errormsg = 'Geburtsnation darf nicht laenger als 3 Zeichen sein';
 			return false;
 		}
-		if(utf8_strlen($this->staatsbuergerschaft)>3)
+		if(mb_strlen($this->staatsbuergerschaft)>3)
 		{
 			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
 			return false;
@@ -316,13 +316,13 @@ class person extends basis_db
 			{
 				//$day = sprintf('%02s',$regs[1]);
 				//$month = sprintf('%02s',$regs[2]);
-				//$year = substr($regs[3],2,2);
+				//$year = mb_substr($regs[3],2,2);
 			}
 			elseif(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->gebdatum, $regs))
 			{
 				//$day = sprintf('%02s',$regs[3]);
 				//$month = sprintf('%02s',$regs[2]);
-				//$year = substr($regs[1],2,2);
+				//$year = mb_substr($regs[1],2,2);
 			}
 			else 
 			{
@@ -331,9 +331,9 @@ class person extends basis_db
 			}
 			
 			/* das muss nicht immer so sein
-			$day_svnr = substr($this->svnr, 4, 2);
-			$month_svnr = substr($this->svnr, 6, 2);
-			$year_svnr = substr($this->svnr, 8, 2);
+			$day_svnr = mb_substr($this->svnr, 4, 2);
+			$month_svnr = mb_substr($this->svnr, 6, 2);
+			$year_svnr = mb_substr($this->svnr, 8, 2);
 		
 			if($day_svnr!=$day || $month_svnr!=$month || $year_svnr!=$year)
 			{

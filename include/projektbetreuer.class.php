@@ -126,12 +126,12 @@ class projektbetreuer extends basis_db
 			$this->errormsg = 'Betreuerart muss eingegeben werden';
 			return false;
 		}
-		if(strlen($this->betreuerart_kurzbz)>16)
+		if(mb_strlen($this->betreuerart_kurzbz)>16)
 		{
 			$this->errormsg = 'betreuerart darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->name)>32)
+		if(mb_strlen($this->name)>32)
 		{
 			$this->errormsg = 'Name darf nicht länger als 32 Zeichen sein';
 			return false;

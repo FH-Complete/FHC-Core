@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 // Auth: Benutzer des Webportals
 function get_uid()
 {
-	return strtolower(trim($_SERVER['REMOTE_USER']));
+	return mb_strtolower(trim($_SERVER['REMOTE_USER']));
 	// fuer Testzwecke
 	//return 'oesi';
 	//return 'pam';
@@ -317,30 +317,6 @@ function getStudiensemesterFromDatum($datum, $naechstes=true)
 	}
 	else
 		return false;
-}
-
-// ***************************************************************
-// * Diese Funktion liefert sowohl bei UTF-8 als auch
-// * bei Latin9 die richtige Anzahl der Zeichen
-// * (das normale strlen liefert bei UTF-8 Zeichen falsche Werte.)
-// ***************************************************************
-function utf8_strlen($str)
-{
-	$count = 0;
-  	for ($i = 0; $i < strlen($str); ++$i)
-    	if ((ord($str[$i]) & 0xC0) != 0x80)
-      		++$count;
-
-  	return $count;
-}
-
-// ****************************************************************
-// * strtoupper das auch Umlaute und andere Sonderzeichen
-// * in Grossbuchstaben umwandelt
-// ****************************************************************
-function strtoupperFULL($str)
-{
-   return(mb_strtoupper($str, "UTF-8"));
 }
 
 // ****************************************************************

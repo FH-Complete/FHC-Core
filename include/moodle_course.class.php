@@ -622,13 +622,13 @@ class moodle_course
 		//Bloecke hinzufuegen
 		$qry = 
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(20, $this->mdl_course_id, 'course-view', 'l', 0, 1);". //Teilnehmer
-		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(1, $this->mdl_course_id, 'course-view', 'l', 1, 1);". //Aktivitäten
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(1, $this->mdl_course_id, 'course-view', 'l', 1, 1);". //Aktivitï¿½ten
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(25, $this->mdl_course_id, 'course-view', 'l', 2, 1);". //Forumssuche
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(2, $this->mdl_course_id, 'course-view', 'l', 3, 1);". //Admin
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(9, $this->mdl_course_id, 'course-view', 'l', 4, 1);". //Kursliste
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(18, $this->mdl_course_id, 'course-view', 'r', 0, 1);". //Neueste Nachrichten
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(8, $this->mdl_course_id, 'course-view', 'r', 1, 1);". //Kalender / Bald aktuell...
-		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(22, $this->mdl_course_id, 'course-view', 'r', 2, 1);"; //Neueste Aktivitäten
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(22, $this->mdl_course_id, 'course-view', 'r', 2, 1);"; //Neueste Aktivitï¿½ten
 
 		if(!pg_query($this->conn_moodle, $qry))
 		{
@@ -1059,13 +1059,13 @@ class moodle_course
 		//Bloecke hinzufuegen
 		$qry = 
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(20, $this->mdl_course_id, 'course-view', 'l', 0, 1);". //Teilnehmer
-		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(1, $this->mdl_course_id, 'course-view', 'l', 1, 1);". //Aktivitäten
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(1, $this->mdl_course_id, 'course-view', 'l', 1, 1);". //Aktivitï¿½ten
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(25, $this->mdl_course_id, 'course-view', 'l', 2, 1);". //Forumssuche
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(2, $this->mdl_course_id, 'course-view', 'l', 3, 1);". //Admin
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(9, $this->mdl_course_id, 'course-view', 'l', 4, 1);". //Kursliste
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(18, $this->mdl_course_id, 'course-view', 'r', 0, 1);". //Neueste Nachrichten
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(8, $this->mdl_course_id, 'course-view', 'r', 1, 1);". //Kalender / Bald aktuell...
-		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(22, $this->mdl_course_id, 'course-view', 'r', 2, 1);"; //Neueste Aktivitäten
+		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(22, $this->mdl_course_id, 'course-view', 'r', 2, 1);"; //Neueste Aktivitï¿½ten
 
 		if(!pg_query($this->conn_moodle, $qry))
 		{
@@ -1100,7 +1100,7 @@ class moodle_course
 		{
 			if($row = pg_fetch_object($result))
 			{
-				$shortname = strtoupper('TK-'.$studiensemester_kurzbz.'-'.$row->kuerzel.'-'.$row->semester.'-'.$row->kurzbz);
+				$shortname = mb_strtoupper('TK-'.$studiensemester_kurzbz.'-'.$row->kuerzel.'-'.$row->semester.'-'.$row->kurzbz);
 			}
 			else 
 			{
@@ -1398,16 +1398,16 @@ class moodle_course
 						}
 						else
 						{
-							if ( substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="A")
+							if ( mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="A")
 								$row->note=1;
-							elseif (substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="B")
+							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="B")
 								$row->note=2;
-							elseif (substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="C")
+							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="C")
 								$row->note=3;
-							elseif (substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="D")
+							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="D")
 								$row->note=4;
-							elseif (substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="E" 
-								|| substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="F" )
+							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="E" 
+								|| mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="F" )
 								$row->note=5;
 							else
 							{

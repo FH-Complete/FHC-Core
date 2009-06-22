@@ -106,7 +106,7 @@ class student extends benutzer
 	 */
 	protected function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(mb_strlen($this->uid)>16)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -116,12 +116,12 @@ class student extends benutzer
 			$this->errormsg = 'UID muss eingegeben werden';
 			return false;
 		}
-		if(strlen($this->matrikelnr)>15)
+		if(mb_strlen($this->matrikelnr)>15)
 		{
 			$this->errormsg = 'Matrikelnummer darf nicht laenger als 15 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->updatevon)>32)
+		if(mb_strlen($this->updatevon)>32)
 		{
 			$this->errormsg = 'Updatevon darf nicht laenger als 32 Zeichen sein';
 			return false;
@@ -141,12 +141,12 @@ class student extends benutzer
 			$this->errormsg = 'Semester muss ein gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->verband)>1)
+		if(mb_strlen($this->verband)>1)
 		{
 			$this->errormsg = 'Verband darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->gruppe)>1)
+		if(mb_strlen($this->gruppe)>1)
 		{
 			$this->errormsg = 'Gruppe darf nicht laenger als 1 Zeichen sein';
 			return false;

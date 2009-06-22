@@ -93,12 +93,12 @@ class feedback extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->betreff)>128)
+		if(mb_strlen($this->betreff)>128)
 		{
 			$this->errormsg = 'Betreff darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->uid)>32)
+		if(mb_strlen($this->uid)>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;

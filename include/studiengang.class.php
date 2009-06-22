@@ -112,7 +112,7 @@ class studiengang extends basis_db
 				$this->bescheidgz=$row->bescheidgz;
 				$this->bescheidvom=$row->bescheidvom;
 				$this->ext_id=$row->ext_id;
-				$this->kuerzel = strtoupper($row->typ.$row->kurzbz);
+				$this->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
@@ -175,7 +175,7 @@ class studiengang extends basis_db
 			$stg_obj->bescheidgz=$row->bescheidgz;
 			$stg_obj->bescheidvom=$row->bescheidvom;
 			$stg_obj->ext_id=$row->ext_id;
-			$stg_obj->kuerzel = strtoupper($row->typ.$row->kurzbz);
+			$stg_obj->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
@@ -199,22 +199,22 @@ class studiengang extends basis_db
 	private function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>128)
+		if(mb_strlen($this->bezeichnung)>128)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 128 Zeichen sein.';
 			return false;
 		}
-		if(strlen($this->kurzbz)>5)
+		if(mb_strlen($this->kurzbz)>5)
 		{
 			$this->errormsg = 'Kurzbez darf nicht laenger als 5 Zeichen sein.';
 			return false;
 		}
-		if(strlen($this->kurzbzlang)>10)
+		if(mb_strlen($this->kurzbzlang)>10)
 		{
 			$this->errormsg = 'Kurzbezlang darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->english)>128)
+		if(mb_strlen($this->english)>128)
 		{
 			$this->errormsg = 'english darf nicht laenger als 128 Zeichen sein';
 			return false;

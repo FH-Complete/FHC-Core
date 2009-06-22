@@ -59,7 +59,7 @@ class reservierung extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>8)
 		{
 			$this->errormsg = 'Ort_Kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
@@ -69,7 +69,7 @@ class reservierung extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->uid)>32)
+		if(mb_strlen($this->uid)>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
@@ -79,12 +79,12 @@ class reservierung extends basis_db
 			$this->errormsg = 'Stunde ist ungueltig';
 			return false;
 		}
-		if(strlen($this->titel)>10)
+		if(mb_strlen($this->titel)>10)
 		{
 			$this->errormsg = 'Titel darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->beschreibung)>32)
+		if(mb_strlen($this->beschreibung)>32)
 		{
 			$this->beschreibung = 'Beschreibung darf nicht laenger als 32 Zeichen sein';
 			return false;
@@ -94,17 +94,17 @@ class reservierung extends basis_db
 			$this->errormsg = 'Semester ist ungueltig';
 			return false;
 		}
-		if(strlen($this->verband)>1)
+		if(mb_strlen($this->verband)>1)
 		{
 			$this->errormsg = 'Verband darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->gruppe)>1)
+		if(mb_strlen($this->gruppe)>1)
 		{
 			$this->errormsg = 'Gruppe darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->gruppe_kurzbz)>10)
+		if(mb_strlen($this->gruppe_kurzbz)>10)
 		{
 			$this->gruppe_kurzbz = 'Gruppe_kurzbz darf nicht laenger als 10 Zeichen sein';
 			return false;

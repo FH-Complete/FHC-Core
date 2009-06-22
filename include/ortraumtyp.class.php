@@ -118,12 +118,12 @@ class ortraumtyp extends basis_db
 	public function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>8)
 		{
 			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->raumtyp_kurzbz)>8)
+		if(mb_strlen($this->raumtyp_kurzbz)>8)
 		{
 			$this->errormsg = 'Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;

@@ -116,34 +116,34 @@ class bankverbindung extends basis_db
 	{
 		//Gesamtlaenge pruefen
 		//$this->errormsg = 'Eine der Maximiallaengen wurde ueberschritten';
-		if(strlen($this->name)>64)
+		if(mb_strlen($this->name)>64)
 		{
-			$this->errormsg = 'Name darf nicht länger als 64 Zeichen sein';
+			$this->errormsg = 'Name darf nicht lï¿½nger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->anschrift)>128)
+		if(mb_strlen($this->anschrift)>128)
 		{
-			$this->errormsg = 'Anschrift darf nicht länger als 128 Zeichen sein';
+			$this->errormsg = 'Anschrift darf nicht lï¿½nger als 128 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->blz)>16)
+		if(mb_strlen($this->blz)>16)
 		{
-			$this->errormsg = 'BLZ darf nicht länger als 16 Zeichen sein';
+			$this->errormsg = 'BLZ darf nicht lï¿½nger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->bic)>16)
+		if(mb_strlen($this->bic)>16)
 		{
-			$this->errormsg = 'BIC darf nicht länger als 16 Zeichen sein';
+			$this->errormsg = 'BIC darf nicht lï¿½nger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->kontonr)>16)
+		if(mb_strlen($this->kontonr)>16)
 		{
-			$this->errormsg = 'KontoNr darf nicht länger als 16 Zeichen sein';
+			$this->errormsg = 'KontoNr darf nicht lï¿½nger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->iban)>32)
+		if(mb_strlen($this->iban)>32)
 		{
-			$this->errormsg = 'IBAN darf nicht länger als 32 Zeichen sein';
+			$this->errormsg = 'IBAN darf nicht lï¿½nger als 32 Zeichen sein';
 			return false;
 		}
 				
@@ -271,7 +271,7 @@ class bankverbindung extends basis_db
 			return true;
 		else 
 		{
-			$this->errormsg = 'Fehler beim Löschen des Datensatzes';
+			$this->errormsg = 'Fehler beim Lï¿½schen des Datensatzes';
 			return false;
 		}
 	}

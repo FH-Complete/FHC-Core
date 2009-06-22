@@ -42,12 +42,12 @@ class fop
 	      					break;
 						}
 						
-						if(isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'],'MSIE'))
+						if(isset($_SERVER['HTTP_USER_AGENT']) && mb_strpos($_SERVER['HTTP_USER_AGENT'],'MSIE'))
 	      					header('Content-Type: application/force-download');
 	    				else
 	      					header('Content-Type: application/octet-stream');
 	    				
-	    				header('Content-Length: '.strlen($buffer));
+	    				header('Content-Length: '.mb_strlen($buffer));
 	    				header('Content-disposition: attachment; filename="'.$filename.'.pdf"');
 	    				
 						

@@ -141,27 +141,27 @@ class projektarbeit extends basis_db
 		{
 			$this->errormsg='Lehreinheit_id darf nicht NULL sein!';
 		}
-		if(strlen($this->projekttyp_kurzbz)>16)
+		if(mb_strlen($this->projekttyp_kurzbz)>16)
 		{
 			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->titel)>1024)
+		if(mb_strlen($this->titel)>1024)
 		{
 			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->titel_english)>1024)
+		if(mb_strlen($this->titel_english)>1024)
 		{
 			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->themenbereich)>64)
+		if(mb_strlen($this->themenbereich)>64)
 		{
 			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->anmerkung)>256)
+		if(mb_strlen($this->anmerkung)>256)
 		{
 			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
 			return false;

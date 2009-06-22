@@ -86,7 +86,7 @@ class studiensemester extends basis_db
 	 */	
 	private function validate()
 	{
-		if(strlen($this->studiensemester_kurzbz)>16)
+		if(mb_strlen($this->studiensemester_kurzbz)>16)
 		{
 			$this->errormsg = 'Studiensemester Kurzbezeichnung darf nicht laenger als 16 Zeichen sein';
 			return false;

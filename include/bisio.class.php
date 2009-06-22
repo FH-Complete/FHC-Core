@@ -123,19 +123,19 @@ class bisio extends basis_db
 			return false;
 		}
 		
-		if(strlen($this->nation_code)>3)
+		if(mb_strlen($this->nation_code)>3)
 		{
 			$this->errormsg = 'Nation ist ungueltig';
 			return false;
 		}
 		
-		if(strlen($this->zweck_code)>20)
+		if(mb_strlen($this->zweck_code)>20)
 		{
 			$this->errormsg = 'Zweck ist ungueltig';
 			return false;
 		}
 		
-		if(strlen($this->student_uid)>16)
+		if(mb_strlen($this->student_uid)>16)
 		{
 			$this->errormsg = 'Student_UID ist ungueltig';
 			return false;

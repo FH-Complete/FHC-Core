@@ -129,12 +129,12 @@ class fachbereich extends basis_db
 	protected function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>128)
+		if(mb_strlen($this->bezeichnung)>128)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->fachbereich_kurzbz)>16)
+		if(mb_strlen($this->fachbereich_kurzbz)>16)
 		{
 			$this->errormsg = 'Kurzbez darf nicht laenger als 16 Zeichen sein';
 			return false;

@@ -76,7 +76,7 @@ class zeitwunsch extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->mitarbeiter_uid)>32)
+		if(mb_strlen($this->mitarbeiter_uid)>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein.';
 			return false;
@@ -231,7 +231,7 @@ class zeitwunsch extends basis_db
 		$sql_query_le='SELECT DISTINCT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE ';
 		for ($i=0;$i<count($le_id);$i++)
 			$sql_query_leid.=' OR lehreinheit_id='.$le_id[$i];
-		$sql_query_leid=substr($sql_query_leid,3);
+		$sql_query_leid=mb_substr($sql_query_leid,3);
 		$sql_query_le.=$sql_query_leid;
 
 		// Schlechteste Zeitwuensche holen

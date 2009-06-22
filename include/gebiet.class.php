@@ -121,12 +121,12 @@ class gebiet extends basis_db
 	 */
 	private function validate()
 	{
-		if(strlen($this->kurzbz)>10)
+		if(mb_strlen($this->kurzbz)>10)
 		{
 			$this->errormsg = 'Kurzbz darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>50)
+		if(mb_strlen($this->bezeichnung)>50)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 50 Zeichen sein';
 			return false;

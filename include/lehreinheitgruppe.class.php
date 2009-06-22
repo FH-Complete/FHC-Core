@@ -119,17 +119,17 @@ class lehreinheitgruppe extends basis_db
 			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->verband)>1)
+		if(mb_strlen($this->verband)>1)
 		{
 			$this->verband = 'Verband darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->gruppe)>1)
+		if(mb_strlen($this->gruppe)>1)
 		{
 			$this->gruppe = 'Gruppe darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->gruppe_kurzbz)>16)
+		if(mb_strlen($this->gruppe_kurzbz)>16)
 		{
 			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;

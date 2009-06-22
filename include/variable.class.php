@@ -79,17 +79,17 @@ class variable extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->uid)>32)
+		if(mb_strlen($this->uid)>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return true;
 		}
-		if(strlen($this->name)>64)
+		if(mb_strlen($this->name)>64)
 		{
 			$this->errormsg = 'Name darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->wert)>64)
+		if(mb_strlen($this->wert)>64)
 		{
 			$this->errormsg = 'Wert darf nicht laenger als 64 Zeichen sein';
 			return false;

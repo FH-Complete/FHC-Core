@@ -267,7 +267,7 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'LehrveranstaltungsNr muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->studiensemester_kurzbz)>16)
+		if(mb_strlen($this->studiensemester_kurzbz)>16)
 		{
 			$this->errormsg = 'Studiensemesterkurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -282,7 +282,7 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'Lehrfach_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->lehrform_kurzbz)>8)
+		if(mb_strlen($this->lehrform_kurzbz)>8)
 		{
 			$this->errormsg = 'Lehrform_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;
@@ -314,12 +314,12 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'StartKW muss zwischen 1 und 53 liegen';
 			return false;
 		}
-		if(strlen($this->raumtyp)>8)
+		if(mb_strlen($this->raumtyp)>8)
 		{
 			$this->errormsg = 'Raumtyp darf nicht laenger als 8 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->raumtypalternativ)>8)
+		if(mb_strlen($this->raumtypalternativ)>8)
 		{
 			$this->errormsg = 'Raumtypalternativ darf nicht alenger als 8 Zeichen sein';
 			return false;
@@ -334,7 +334,7 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
 			return false;
 		}
-		if(strlen($this->anmerkung)>255)
+		if(mb_strlen($this->anmerkung)>255)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 255 Zeichen sein';
 			return false;
@@ -480,7 +480,7 @@ class lehreinheit extends basis_db
 		$sql_lkt='';
 		foreach ($this->mitarbeiter_uid as $lkt)
 			$sql_lkt.="OR mitarbeiter_uid='".addslashes($lkt)."' ";
-		$sql_lkt=substr($sql_lkt,3);
+		$sql_lkt=mb_substr($sql_lkt,3);
 		$sql_lkt="(($sql_lkt) AND mitarbeiter_uid!='_DummyLektor')";
 
 		// Datenbank abfragen
@@ -508,7 +508,7 @@ class lehreinheit extends basis_db
 				$sql_lkt='';
 				foreach ($this->mitarbeiter_uid as $lkt)
 					$sql_lkt.="OR uid='$lkt' ";
-				$sql_lkt=substr($sql_lkt,3);
+				$sql_lkt=mb_substr($sql_lkt,3);
 				$sql_lkt="(($sql_lkt) AND uid!='_DummyLektor')";
 				$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
 							FROM lehre.vw_reservierung
@@ -543,7 +543,7 @@ class lehreinheit extends basis_db
 						$sql_lkt='';
 						foreach ($this->mitarbeiter_uid as $lkt)
 							$sql_lkt.="OR mitarbeiter_uid='$lkt' ";
-						$sql_lkt=substr($sql_lkt,3);
+						$sql_lkt=mb_substr($sql_lkt,3);
 						$sql_query="SELECT * FROM campus.tbl_zeitsperre
 										WHERE ($sql_lkt) AND 
 											(  (vondatum<'$datum' AND bisdatum>'$datum') 
@@ -649,7 +649,7 @@ class lehreinheit extends basis_db
 	{
 		$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
 
-		if (strlen($studiensemester)<=0)
+		if (mb_strlen($studiensemester)<=0)
 		{
 			$this->errormsg='Studiensemester ist nicht gesetzt!(lehreinheit.getLehreinheitLVPL)';
 			return false;
@@ -665,9 +665,9 @@ class lehreinheit extends basis_db
 			$where.=" AND studiengang_kz='$stg_kz'";
 			if ($sem>0)
 				$where.=" AND semester=$sem";
-			if (strlen($ver)>0 && $ver!=' ')
+			if (mb_strlen($ver)>0 && $ver!=' ')
 				$where.=" AND verband='$ver'";
-			if (strlen($grp)>0 && $grp!=' ')
+			if (mb_strlen($grp)>0 && $grp!=' ')
 				$where.=" AND gruppe='$grp' ";
 		}
 		$sql_query='SELECT *, planstunden-verplant::smallint AS offenestunden

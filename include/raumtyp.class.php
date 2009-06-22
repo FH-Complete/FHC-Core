@@ -117,12 +117,12 @@ class raumtyp extends basis_db
 	public function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->beschreibung)>256)
+		if(mb_strlen($this->beschreibung)>256)
 		{
 			$this->errormsg = 'Beschreibung darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->raumtyp_kurzbz)>8)
+		if(mb_strlen($this->raumtyp_kurzbz)>8)
 		{
 			$this->errormsg = 'Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;

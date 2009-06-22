@@ -139,7 +139,7 @@ class funktion extends basis_db
 	{
 
 		//Laenge Pruefen
-		if(strlen($this->beschreibung)>64)
+		if(mb_strlen($this->beschreibung)>64)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 128 Zeichen sein';
 			return false;

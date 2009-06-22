@@ -1017,7 +1017,7 @@ function StatistikPrintStromanalyse()
 		param = "?studiensemester_kurzbz="+stsem;
 	else
 		param ='';
-	window.open('<?php echo APP_ROOT ?>content/statistik/stromanalyse.php'+param,'Stromanalyse');
+	window.open('<?php echo APP_ROOT ?>content/statistik/bama_stromanalyse.php'+param,'Stromanalyse');
 }
 
 function StatistikPrintStudentExportExtended()

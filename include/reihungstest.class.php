@@ -155,12 +155,12 @@ class reihungstest extends basis_db
 			return false;
 		}
 		//Gesamtlaenge pruefen
-		if(strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>8)
 		{
 			$this->errormsg = 'Ort_kurzbz darf nicht länger als 8 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->anmerkung)>64)
+		if(mb_strlen($this->anmerkung)>64)
 		{
 			$this->errormsg = 'Anmerkung darf nicht länger als 64 Zeichen sein';
 			return false;

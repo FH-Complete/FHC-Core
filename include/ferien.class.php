@@ -80,8 +80,8 @@ class ferien extends basis_db
 			$f->studiengang_kz = $row->studiengang_kz;
 			$f->vondatum=$row->vondatum;
 			$f->bisdatum=$row->bisdatum;
-			$f->vontimestamp=mktime(0,0,0,substr($row->vondatum,5,2),substr($row->vondatum,8),substr($row->vondatum,0,4));;
-			$f->bistimestamp=mktime(23,59,59,substr($row->bisdatum,5,2),substr($row->bisdatum,8),substr($row->bisdatum,0,4));;
+			$f->vontimestamp=mktime(0,0,0,mb_substr($row->vondatum,5,2),mb_substr($row->vondatum,8),mb_substr($row->vondatum,0,4));;
+			$f->bistimestamp=mktime(23,59,59,mb_substr($row->bisdatum,5,2),mb_substr($row->bisdatum,8),mb_substr($row->bisdatum,0,4));;
 			// in array speichern
 			$this->ferien[]=$f;
 		}
@@ -133,7 +133,7 @@ class ferien extends basis_db
 	protected function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>64)
+		if(mb_strlen($this->bezeichnung)>64)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 64 Zeichen sein';
 			return false;
