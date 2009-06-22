@@ -22,14 +22,21 @@
 /*
  * Ermoeglicht das Anmelden zu Freifaechern
  */
-require_once('../../config.inc.php');
+#require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		$db=false;
+
+
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
-
-if(!$conn=pg_connect(CONN_STRING))
-	die('Die Datenbankverbindung konnte nicht hergestellt werden.');
-
+	
 $user = get_uid();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -56,30 +63,28 @@ $user = get_uid();
 		    	Bitte w&auml;hlen Sie eines der Freif&auml;cher aus
 		    	<br />
 <?php
-$lvid = isset($_POST['lvid'])?$_POST['lvid']:'';
+$lvid = trim(isset($_POST['lvid'])?$_POST['lvid']:'');
 
 //Aktuelles Studiensemester holen
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getaktorNext();
 
-
-$lv_obj = new lehrveranstaltung($conn);
-
+$lv_obj = new lehrveranstaltung();
 if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 {
-	echo "<FORM method='POST' name='frmauswahl'>";
-	echo "<SELECT name='lvid' onchange='window.document.frmauswahl.submit();'>";
-	if($lvid=='')
-		echo "\n<OPTION value='0' selected>--Auswahl--</OPTION>";
-	foreach($lv_obj->lehrveranstaltungen as $row)
-	{
-		if($lvid==$row->lehrveranstaltung_id)
-			echo "\n<OPTION value='$row->lehrveranstaltung_id' selected>$row->bezeichnung</OPTION>";
-		else
-			echo "\n<OPTION value='$row->lehrveranstaltung_id'>$row->bezeichnung</OPTION>";
+		echo "<FORM method='POST' name='frmauswahl'>";
+			echo "<SELECT name='lvid' onchange='window.document.frmauswahl.submit();'>";
+			if($lvid=='')
+				echo "\n<OPTION value='0' selected>--Auswahl--</OPTION>";
+			foreach($lv_obj->lehrveranstaltungen as $row)
+		{
+			if($lvid==$row->lehrveranstaltung_id)
+				echo "\n<OPTION value='$row->lehrveranstaltung_id' selected>$row->bezeichnung</OPTION>";
+			else
+				echo "\n<OPTION value='$row->lehrveranstaltung_id'>$row->bezeichnung</OPTION>";
 	}
-	echo "\n</SELECT>";
-	echo "\n</FORM>";
+		echo "\n</SELECT>";
+		echo "\n</FORM>";
 }
 else
 {
@@ -87,7 +92,7 @@ else
 }
 
 //Wenn das Formular abgeschickt wurde
-if(isset($_POST['lvid']))
+if($lvid!='')
 {
 
 	$qry = "SELECT
@@ -105,37 +110,37 @@ if(isset($_POST['lvid']))
 				        WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem')
 			ORDER BY
 				nachname, vorname";
-
-if($result=pg_query($conn,$qry))
-{
-	$ff = array();
-	$content='';
-
-	$mailto= "&nbsp;<a href='mailto:";
-	$content .= "<table>\n  <tr class='liste'><th></th><th>Nachname</th><th>Vorname</th><th>Mail</th><th>Studiengang</th><th>Semester</th></tr>";
-	$i=0;
-	while($row=pg_fetch_object($result))
-	{
-		$i++;
-		$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$row->semester</td></tr>";
-		if($i!=1)
-			$mailto.=",";
-		$mailto.=$row->uid."@technikum-wien.at";
-	}
-	$mailto.="'>Mail an alle in diesem Freifach senden</a>";
-	$content .= "</table>";
-
-	if($i==0)
-	{
-		echo "<b>Es gibt noch keine Anmeldungen für dieses Freifach</b>";
-	}
-	else
-	{
-		//echo "Anzahl der Anmeldungen: ".$i;
-		echo $content;
-		echo "<br />";
-		echo $mailto;
-	}
+				
+		if($result=$db->db_query($qry))
+		{
+			$ff = array();
+			$content='';
+		
+			$mailto= "&nbsp;<a href='mailto:";
+			$content .= "<table>\n  <tr class='liste'><th></th><th>Nachname</th><th>Vorname</th><th>Mail</th><th>Studiengang</th><th>Semester</th></tr>";
+			$i=0;
+			while($row=$db->db_fetch_object($result))
+			{
+				$i++;
+				$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$row->semester</td></tr>";
+				if($i!=1)
+					$mailto.=",";
+				$mailto.=$row->uid."@technikum-wien.at";
+			}
+			$mailto.="'>Mail an alle in diesem Freifach senden</a>";
+			$content .= "</table>";
+		
+			if($i==0)
+			{
+				echo "<b>Es gibt noch keine Anmeldungen für dieses Freifach</b>";
+			}
+			else
+			{
+				//echo "Anzahl der Anmeldungen: ".$i;
+				echo $content;
+				echo "<br />";
+				echo $mailto;
+			}
 }
 else
 	echo "Fehler beim Auslesen der Zuteilunstabelle";
