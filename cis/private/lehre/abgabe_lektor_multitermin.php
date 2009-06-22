@@ -26,16 +26,20 @@
  * 			f&uuml;r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-	require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		$db=false;
+		
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
 	require_once('../../../include/mail.class.php');
-	
-
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $i=0;
 $irgendwas='';
@@ -79,9 +83,9 @@ if(isset($_POST["schick"]))
 			WHERE projektarbeit_id='".$termine[$j]."' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' 
 			AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
 		//echo $qrychk;
-		if($result=pg_query($conn, $qrychk))
+		if($result=$db->db_query($qrychk))
 		{
-			if(pg_num_rows($result)>0)
+			if($db->db_num_rows($result)>0)
 			{
 				echo "Datensatz bereits vorhanden";
 			}
@@ -91,17 +95,17 @@ if(isset($_POST["schick"]))
 				$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
 					VALUES ('".$termine[$j]."', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
 				//echo $qry;	
-				if(!$result=pg_query($conn, $qry))
+				if(!$result=$db->db_query($qry))
 				{
 					echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
 				}
 				else 
 				{
-					$row=@pg_fetch_object($result);
+					$row=$db->db_fetch_object($result);
 					$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
-					if($result_typ=pg_query($conn, $qry_typ))
+					if($result_typ=$db->db_query($qry_typ))
 					{
-						$row_typ=@pg_fetch_object($result_typ);
+						$row_typ=$db->db_fetch_object($result_typ);
 					}
 					else 
 					{
@@ -109,9 +113,9 @@ if(isset($_POST["schick"]))
 					}
 					//Student zu projektarbeit_id suchen
 					$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=$termine[$j])";
-					if($result_std=pg_query($conn, $qry_std))
+					if($result_std=@$db->db_query($qry_std))
 					{
-						$row_std=@pg_fetch_object($result_std);
+						$row_std=$db->db_fetch_object($result_std);
 						$mail = new mail($row_std->uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 					}
@@ -143,7 +147,7 @@ $htmlstr='';
 		//Eingabezeile f&uuml;r neuen Termin
 		$htmlstr .= "<br><b>Abgabetermin:</b>\n";
 		$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
-		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='multitermin'>\n";
+		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='multitermin'>\n";
 		$htmlstr .= "<input type='hidden' name='irgendwas' value='".$irgendwas."'>\n";
 		$htmlstr .= "<tr></tr>\n";
 		$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td></tr>\n";
@@ -152,8 +156,8 @@ $htmlstr='';
 		$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 		$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
-		$result_typ=pg_query($conn, $qry_typ);
-		while ($row_typ=pg_fetch_object($result_typ))
+		$result_typ=$db->db_query($qry_typ);
+		while ($row_typ=@$db->db_fetch_object($result_typ))
 		{
 			$htmlstr .= "		<option value='".$row_typ->paabgabetyp_kurzbz."'>".$row_typ->bezeichnung."</option>";
 		}		
