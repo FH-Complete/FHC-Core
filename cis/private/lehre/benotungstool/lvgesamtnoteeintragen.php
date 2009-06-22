@@ -113,7 +113,7 @@ function savenote($lvid, $student_uid, $note)
 		{
 			$student = new student($conn);
 			$student->load($student_uid);
-			die('Der Student '.$student->nachname.' '.$student->vorname.' ('.trim($student->matrikelnr).') ist dieser Lehrveranstaltung nicht zugeordnet. Die Note wird nicht uebernommen');
+			return 'Der Student '.$student->nachname.' '.$student->vorname.' ('.trim($student->matrikelnr).') ist dieser Lehrveranstaltung nicht zugeordnet. Die Note wird nicht uebernommen!'."\n";
 		}
 	
 	$lvgesamtnote = new lvgesamtnote($conn);
