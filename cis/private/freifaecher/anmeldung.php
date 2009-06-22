@@ -22,18 +22,23 @@
 /*
  * Ermoeglicht das Anmelden zu Freifaechern
  */
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 
-if(!$conn=pg_connect(CONN_STRING))
-	die('Die Datenbankverbindung konnte nicht hergestellt werden.');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		$db=false;
+
 
 $user = get_uid();
 
 //Aktuelles Studiensemester holen
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getaktorNext();
 
 ?>
@@ -67,50 +72,50 @@ if(isset($_POST['submit']))
 	//Wenn eine der Checkboxen angeklickt wurde
 	if(isset($_POST['chkbox']))
 	{
-		pg_query($conn,'BEGIN');
+		$db->db_query('BEGIN');
 		//Zuerst die alten Eintraege herausloeschen...
 		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
-		if(!pg_query($conn,$qry))
+		if(!$db->db_query($qry))
 			die('Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut');
 
 		//...dann die angeklickten FF hinzufuegen
 		foreach ($_POST['chkbox'] as $elem)
 		{
 			$qry = "INSERT INTO campus.tbl_benutzerlvstudiensemester(uid, lehrveranstaltung_id, studiensemester_kurzbz) VALUES('$user','$elem','$stsem');";
-			if(!pg_query($conn,$qry))
+			if(!$db->db_query($qry))
 			{
-				pg_query($conn,'ROLLBACK');
+				$db->db_query('ROLLBACK');
 				die("Freifaecher konnten nicht zugeteilt werden! Bitte Versuchen Sie es erneut");
 			}
 		}
-		pg_query($conn,'COMMIT');
+		$db->db_query('COMMIT');
 		echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
 	}
 	else
 	{
 		//Wenn keine Checkbox angeklickt wurde, alle Eintraege herausloeschen
 		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
-		if(!pg_query($conn,$qry))
-			die("Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut");
+		if(!$db->db_query($qry))
+				die("Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut");
 		else
-			echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
+				echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
 	}
 }
 
 //Freifachzuteilungen holen
 $qry = "SELECT * FROM campus.tbl_benutzerlvstudiensemester WHERE uid = '$user' AND studiensemester_kurzbz='$stsem'";
-if($result=pg_query($conn,$qry))
+if($result=$db->db_query($qry))
 {
 	$ff = array();
-	while($row=pg_fetch_object($result))
-		$ff[] = $row->lehrveranstaltung_id;
+	while($row=$db->db_fetch_object($result))
+				$ff[] = $row->lehrveranstaltung_id;
 }
 else
 	echo 'Fehler beim Auslesen der Zuteilunstabelle';
 
 echo '<br />';
 //Freifaecher laden
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 {
 	$anz = count($lv_obj->lehrveranstaltungen);
