@@ -269,14 +269,14 @@ class wochenplan extends basis_db
 			if($row = $this->db_fetch_object())
 			{
 				$this->studiensemester_now->name=$row->studiensemester_kurzbz;
-				$this->studiensemester_now->start=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8,2),substr($row->start,0,4));
-				$this->studiensemester_now->ende=mktime(0,0,0,substr($row->ende,5,2),substr($row->ende,8,2),substr($row->ende,0,4));#
+				$this->studiensemester_now->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
+				$this->studiensemester_now->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));#
 			}
 			if($row = $this->db_fetch_object())
 			{
 				$this->studiensemester_next->name=$row->studiensemester_kurzbz;
-				$this->studiensemester_next->start=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8,2),substr($row->start,0,4));
-				$this->studiensemester_next->ende=mktime(0,0,0,substr($row->ende,5,2),substr($row->ende,8,2),substr($row->ende,0,4));
+				$this->studiensemester_next->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
+				$this->studiensemester_next->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));
 			}
 		}
 		return true;
@@ -323,9 +323,9 @@ class wochenplan extends basis_db
 		for($i=0;$i<$anz;$i++)
 		{
 			$idx=0;
-			$mtag=substr($this->wochenplan->lehrstunden[$i]->datum, 8,2);
-			$month=substr($this->wochenplan->lehrstunden[$i]->datum, 5,2);
-			$jahr=substr($this->wochenplan->lehrstunden[$i]->datum, 0,4);
+			$mtag=mb_substr($this->wochenplan->lehrstunden[$i]->datum, 8,2);
+			$month=mb_substr($this->wochenplan->lehrstunden[$i]->datum, 5,2);
+			$jahr=mb_substr($this->wochenplan->lehrstunden[$i]->datum, 0,4);
 			$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 			if ($tag==0)
 				$tag=7; //Sonntag
@@ -532,9 +532,9 @@ class wochenplan extends basis_db
 		{
 			$row = $this->db_fetch_object($result_stunde);
 			$beginn=$row->beginn;
-			$beginn=substr($beginn,0,5);
+			$beginn=mb_substr($beginn,0,5);
 			$ende=$row->ende;
-			$ende=substr($ende,0,5);
+			$ende=mb_substr($ende,0,5);
 			$stunde=$row->stunde;
 			echo '			<th><div align="center">'.$stunde.'<br>&nbsp;'.$beginn .'&nbsp;<br>&nbsp;'.$ende.'&nbsp;</div></th>'.$this->crlf;
 		}
@@ -755,8 +755,8 @@ class wochenplan extends basis_db
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
 			$row=$this->db_fetch_object($result_stunde,$i);
-			$beginn=substr($row->beginn,0,5);
-			$ende=substr($row->ende,0,5);
+			$beginn=mb_substr($row->beginn,0,5);
+			$ende=mb_substr($row->ende,0,5);
 			$stunde=$row->stunde;
 			echo '<vbox><label align="center">'.$stunde.'<html:br />
 						<html:small>'.$beginn.'<html:br />
@@ -837,12 +837,12 @@ class wochenplan extends basis_db
 								for ($c=$a+1;$c<count($lvb);$c++)
 									for ($d=0;$d<count($lvb[$c]);$d++)
 									{
-										$s1=substr($lvb[$a][$b],0,1);
-										$s2=substr($lvb[$c][$d],0,1);
-										$v1=substr($lvb[$a][$b],1,1);
-										$v2=substr($lvb[$c][$d],1,1);
-										$g1=substr($lvb[$a][$b],2,1);
-										$g2=substr($lvb[$c][$d],2,1);
+										$s1=mb_substr($lvb[$a][$b],0,1);
+										$s2=mb_substr($lvb[$c][$d],0,1);
+										$v1=mb_substr($lvb[$a][$b],1,1);
+										$v2=mb_substr($lvb[$c][$d],1,1);
+										$g1=mb_substr($lvb[$a][$b],2,1);
+										$g2=mb_substr($lvb[$c][$d],2,1);
 										if ($s1==$s2 || !$s1 || $s1=='' || $s1=='0' || !$s2 || $s2=='' || $s2=='0')
 											if ($v1==$v2 || !$v1 || $v1=='' || $v1=='0' || !$v2 || $v2=='' || $v2=='0')
 												if ($g1==$g2 || !$g1 || $g1=='' || $g1=='0' || !$g2 || $g2=='' || $g2=='0')
@@ -893,7 +893,7 @@ class wochenplan extends basis_db
 								$lehrfach[]=$lf;
 								$ort[]=$lehrstunde->ort;
 								$stg_kz=$lehrstunde->stg_kz;
-								$updateamum[]=substr($lehrstunde->updateamum,0,16);
+								$updateamum[]=mb_substr($lehrstunde->updateamum,0,16);
 								$updatevon[]=$lehrstunde->updatevon;
 								if ($lehrstunde->reservierung)
 									$paramList.='&amp;reservierung_id'.$z++.'='.$lehrstunde->stundenplan_id;
@@ -1024,8 +1024,8 @@ class wochenplan extends basis_db
 			for ($i=0;$i<$num_rows_stunde; $i++)
 			{
 				$row=$this->db_fetch_object($result_stunde,$i);
-				$beginn=substr($row->beginn,0,5);
-				$ende=substr($row->ende,0,5);
+				$beginn=mb_substr($row->beginn,0,5);
+				$ende=mb_substr($row->ende,0,5);
 				$stunde=$row->stunde;
 				echo '<vbox><label align="center">'.$stunde.'<html:br />
 						<html:small>'.$beginn.'<html:br />
@@ -1074,7 +1074,7 @@ class wochenplan extends basis_db
 		$stplids='';
 		foreach ($stpl_id as $id)
 			$stplids.=" OR $stpl_view_id=$id";
-		$stplids=substr($stplids,3);
+		$stplids=mb_substr($stplids,3);
 		$sql_query.=$stplids;
 		//echo $sql_query;
 		if(!$this->db_query($sql_query))
@@ -1103,7 +1103,7 @@ class wochenplan extends basis_db
 		if($leids!='')
 		{
 			// Raumtypen
-			$leids = substr($leids, 0, strlen($leids)-1);
+			$leids = mb_substr($leids, 0, mb_strlen($leids)-1);
 			$qry = "SELECT raumtyp, raumtypalternativ FROM lehre.tbl_lehreinheit WHERE lehreinheit_id IN ($leids)";
 			if($this->db_query($qry)){
 				while($row = $this->db_fetch_object())
@@ -1117,20 +1117,20 @@ class wochenplan extends basis_db
 		$rtype='';
 		foreach ($raumtyp as $r)
 			$rtype.=" OR raumtyp_kurzbz='$r'";
-		$rtype=substr($rtype,3);
+		$rtype=mb_substr($rtype,3);
 		//Lektor
 		$lektor=array_unique($lektor);
 		$lkt='';
 		foreach ($lektor as $l)
 			$lkt.=" OR uid='$l'";
-		$lkt=substr($lkt,3);
+		$lkt=mb_substr($lkt,3);
 		// Einheiten
 		$gruppe=array_unique($gruppe);
 		$gruppen='';
 		foreach ($gruppe as $g)
 			if ($g!='')
 				$gruppen.=" OR gruppe_kurzbz='$g'";
-		//$gruppen=substr($gruppen,3);
+		//$gruppen=mb_substr($gruppen,3);
 		//Lehrverband
 		//$lehrverband=array_unique($lehrverband);
 		$lvb='';
@@ -1147,7 +1147,7 @@ class wochenplan extends basis_db
 			//	$lvb.=' AND gruppe_kurzbz IS NULL';
 			$lvb.=')';
 		}
-		$lvb=substr($lvb,3);
+		$lvb=mb_substr($lvb,3);
 		//if($rtype=='')
 		//	$rtype='1=1';
 		// Raeume die in Frage kommen, aufgrund der Raumtypen
@@ -1177,9 +1177,9 @@ class wochenplan extends basis_db
 			die($this->db_last_error());
 		while($row = $this->db_fetch_object())
 		{
-			$mtag=substr($row->datum, 8,2);
-			$month=substr($row->datum, 5,2);
-			$jahr=substr($row->datum, 0,4);
+			$mtag=mb_substr($row->datum, 8,2);
+			$month=mb_substr($row->datum, 5,2);
+			$jahr=mb_substr($row->datum, 0,4);
 			$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 			$raster[$tag][$row->stunde]->kollision=true;
 		}
@@ -1198,9 +1198,9 @@ class wochenplan extends basis_db
 			
 		while($row = $this->db_fetch_object())
 		{
-			$mtag=substr($row->datum, 8,2);
-			$month=substr($row->datum, 5,2);
-			$jahr=substr($row->datum, 0,4);
+			$mtag=mb_substr($row->datum, 8,2);
+			$month=mb_substr($row->datum, 5,2);
+			$jahr=mb_substr($row->datum, 0,4);
 			$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 			$raster[$tag][$row->stunde]->ort[]=$row->ort_kurzbz;
 		}
@@ -1256,7 +1256,7 @@ class wochenplan extends basis_db
 		$lvas='';
 		foreach ($lva_id as $id)
 			$lvas.=' OR lehreinheit_id='.$id;
-		$lvas=substr($lvas,3);
+		$lvas=mb_substr($lvas,3);
 		$sql_query.=$lvas;
 		//$this->errormsg.=$sql_query;
 		//return false;
@@ -1357,13 +1357,13 @@ class wochenplan extends basis_db
 		$raumtypalt=array_unique($raumtypalt);
 		foreach ($raumtypalt as $r)
 			$rtype.=" OR raumtyp_kurzbz='$r'";
-		$rtype=substr($rtype,3);
+		$rtype=mb_substr($rtype,3);
 		//Lektor
 		$lektor=array_unique($lektor);
 		$lkt='';
 		foreach ($lektor as $l)
 			$lkt.=" OR mitarbeiter_uid='$l'";
-		$lkt=substr($lkt,3);
+		$lkt=mb_substr($lkt,3);
 		//Dummy Lektor kollidiert nicht
 		$lkt='(('.$lkt.") AND mitarbeiter_uid!='_DummyLektor')";
 		// Gruppen
@@ -1373,7 +1373,7 @@ class wochenplan extends basis_db
 			$gruppe=array_unique($gruppe);
 			foreach ($gruppe as $g)
 				$gruppen.=" OR gruppe_kurzbz='$g'";
-			//$gruppen=substr($gruppen,3);
+			//$gruppen=mb_substr($gruppen,3);
 		}
 		//Lehrverband
 		//$lehrverband=array_unique($lehrverband);
@@ -1391,7 +1391,7 @@ class wochenplan extends basis_db
 				$lvb.=' AND gruppe_kurzbz IS NULL';
 			$lvb.=')';
 		}
-		$lvb=substr($lvb,3);
+		$lvb=mb_substr($lvb,3);
 
 		// Raeume die in Frage kommen aufgrund der Raumtypen
 		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
@@ -1456,9 +1456,9 @@ class wochenplan extends basis_db
 			// Kollisionen ins Raster eintragen
 			while($row = $this->db_fetch_object())
 			{
-				$mtag=substr($row->datum, 8,2);
-				$month=substr($row->datum, 5,2);
-				$jahr=substr($row->datum, 0,4);
+				$mtag=mb_substr($row->datum, 8,2);
+				$month=mb_substr($row->datum, 5,2);
+				$jahr=mb_substr($row->datum, 0,4);
 				$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 				$raster[$tag][$row->stunde]->kollision=true;
 			}
@@ -1483,9 +1483,9 @@ class wochenplan extends basis_db
 			
 			while($row = $this->db_fetch_object())
 			{
-				$mtag=substr($row->datum, 8,2);
-				$month=substr($row->datum, 5,2);
-				$jahr=substr($row->datum, 0,4);
+				$mtag=mb_substr($row->datum, 8,2);
+				$month=mb_substr($row->datum, 5,2);
+				$jahr=mb_substr($row->datum, 0,4);
 				$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 				$raster[$tag][$row->stunde]->ort[]=$row->ort_kurzbz;
 				//if ($row->ort_kurzbz=='EDV6.10' && $tag==2 && $row->stunde==8)
@@ -1630,8 +1630,8 @@ class wochenplan extends basis_db
 					}
 					else
 						$end_time=$row->ende;
-					//$start_time=substr($start_time,0,5);
-					//$end_time=substr($end_time,0,5);
+					//$start_time=mb_substr($start_time,0,5);
+					//$end_time=mb_substr($end_time,0,5);
 					//$start_date=$this->datum[year].'/'.$this->datum[mon].'/'.$this->datum[mday];
 
 					$start_date=date("d.m.Y",$this->datum);

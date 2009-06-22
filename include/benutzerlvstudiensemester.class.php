@@ -101,12 +101,12 @@ class benutzerlvstudiensemester extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(mb_strlen($this->uid)>16)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->studiensemester_kurzbz)>16)
+		if(mb_strlen($this->studiensemester_kurzbz)>16)
 		{
 			$this->errormsg = 'Studiensemester_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;

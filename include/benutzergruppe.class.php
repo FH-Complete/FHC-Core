@@ -123,22 +123,22 @@ class benutzergruppe extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->uid)>16)
+		if(mb_strlen($this->uid)>16)
 		{
 			$this->errormsg = 'UID darf nich laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->gruppe_kurzbz)>16)
+		if(mb_strlen($this->gruppe_kurzbz)>16)
 		{
 			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->updatevon)>16)
+		if(mb_strlen($this->updatevon)>16)
 		{
 			//ToDo: Just 4 Sync dannach wieder errormsg setzen
-			$this->updatevon = substr($this->updatevon,0,15);
+			$this->updatevon = mb_substr($this->updatevon,0,15);
 		}
-		if(strlen($this->insertvon)>16)
+		if(mb_strlen($this->insertvon)>16)
 		{
 			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
 			return false;

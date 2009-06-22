@@ -177,7 +177,7 @@ $xml_url=XML_ROOT.$xml.$params;
 $xml_doc = new DOMDocument;
 
 if(!$xml_doc->load($xml_url))
-	die('unable to load xml');
+	die('unable to load xml: '.$xml_url);
 
 //XSL aus der DB holen
 $qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0";

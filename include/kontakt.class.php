@@ -116,17 +116,17 @@ class kontakt extends basis_db
 				
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
-		if(strlen($this->kontakttyp)>32)
+		if(mb_strlen($this->kontakttyp)>32)
 		{
 			$this->errormsg = 'kontakttyp darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->anmerkung)>64)
+		if(mb_strlen($this->anmerkung)>64)
 		{
 			$this->errormsg = 'anmerkung darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->kontakt)>128)
+		if(mb_strlen($this->kontakt)>128)
 		{
 			$this->errormsg = 'kontakt darf nicht länger als 128 Zeichen sein';
 			return false;

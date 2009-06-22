@@ -81,7 +81,7 @@ class gruppe extends basis_db
 	 */
 	public function exists($gruppe_kurzbz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes(strtoupper($gruppe_kurzbz))."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_gruppe WHERE gruppe_kurzbz='".addslashes(mb_strtoupper($gruppe_kurzbz))."'";
 
 		if($this->db_query($qry))
 		{
@@ -281,7 +281,7 @@ class gruppe extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->gruppe_kurzbz)>16)
+		if(mb_strlen($this->gruppe_kurzbz)>16)
 		{
 			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -296,7 +296,7 @@ class gruppe extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>32)
+		if(mb_strlen($this->bezeichnung)>32)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 32 Zeichen sein';
 			return false;
@@ -316,7 +316,7 @@ class gruppe extends basis_db
 			$this->errormsg = 'Mailgrp muss ein boolscher wert sein';
 			return false;
 		}
-		if(strlen($this->beschreibung)>128)
+		if(mb_strlen($this->beschreibung)>128)
 		{
 			$this->errormsg = 'Beschreibung darf nicht laenger als 128 Zeichen sein';
 			return false;
@@ -331,12 +331,12 @@ class gruppe extends basis_db
 			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
 			return false;
 		}
-		if(strlen($this->updatevon)>16)
+		if(mb_strlen($this->updatevon)>16)
 		{
 			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->insertvon)>16)
+		if(mb_strlen($this->insertvon)>16)
 		{
 			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -363,7 +363,7 @@ class gruppe extends basis_db
 		if($new)
 		{
 			if ($upper)			
-				$kurzbz = strtoupper($this->gruppe_kurzbz);
+				$kurzbz = mb_strtoupper($this->gruppe_kurzbz);
 			else
 				$kurzbz = $this->gruppe_kurzbz;
 			
@@ -403,7 +403,7 @@ class gruppe extends basis_db
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
-			       " WHERE gruppe_kurzbz=".$this->addslashes(strtoupper($this->gruppe_kurzbz)).";";
+			       " WHERE gruppe_kurzbz=".$this->addslashes(mb_strtoupper($this->gruppe_kurzbz)).";";
 		}
 
 		if($this->db_query($qry))

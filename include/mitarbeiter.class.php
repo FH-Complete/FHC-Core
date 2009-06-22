@@ -117,7 +117,7 @@ class mitarbeiter extends benutzer
 	// ************************************************
 	protected function validate()
 	{
-		//if(utf8_strlen($this->uid)>16)
+		//if(mb_strlen($this->uid)>16)
 		//{
 		//	$this->errormsg = "ID darf nicht laenger als 16 Zeichen sein\n";
 		//	return false;
@@ -137,12 +137,12 @@ class mitarbeiter extends benutzer
 			$this->errormsg = "Personalnummer muss eine gueltige Zahl sein\n";
 			return false;
 		}
-		if(utf8_strlen($this->kurzbz)>8)
+		if(mb_strlen($this->kurzbz)>8)
 		{
 			$this->errormsg = "kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
 		}
-		if(utf8_strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>8)
 		{
 			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
@@ -157,12 +157,12 @@ class mitarbeiter extends benutzer
 			$this->errormsg = "fixangestellt muss boolean sein\n";
 			return false;
 		}
-		if(utf8_strlen($this->telefonklappe)>25)
+		if(mb_strlen($this->telefonklappe)>25)
 		{
 			$this->errormsg = "telefonklappe darf nicht laenger als 25 Zeichen sein\n";
 			return false;
 		}
-		if(utf8_strlen($this->updatevon)>32)
+		if(mb_strlen($this->updatevon)>32)
 		{
 			$this->errormsg = "updatevon darf nicht laenger als 32 Zeichen sein\n";
 			return false;
@@ -924,14 +924,14 @@ class mitarbeiter extends benutzer
 	}
 	
 	// ************************
-	// * gibt die UIDs der Untergebenen zurück
+	// * gibt die UIDs der Untergebenen zurï¿½ck
 	// ************************
 	public function getUntergebene($uid=null)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
 		
-		//Alle Studiengänge und Fachbereiche holen bei denen die Person die Leitung hat
+		//Alle Studiengï¿½nge und Fachbereiche holen bei denen die Person die Leitung hat
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
 				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."'";
 

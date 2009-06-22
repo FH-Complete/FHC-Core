@@ -148,7 +148,7 @@ class betriebsmittelperson extends basis_db
 			return false;
 		}
 		
-		if(strlen($this->anmerkung)>256)
+		if(mb_strlen($this->anmerkung)>256)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
 			return false;

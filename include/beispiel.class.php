@@ -177,7 +177,7 @@ class beispiel extends basis_db
 			$this->errormsg = 'uebung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>32)
+		if(mb_strlen($this->bezeichnung)>32)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 32 Zeichen sein';
 			return false;

@@ -151,17 +151,17 @@ class ort extends basis_db
 	public function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>30)
+		if(mb_strlen($this->bezeichnung)>30)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 30 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->planbezeichnung)>30)
+		if(mb_strlen($this->planbezeichnung)>30)
 		{
 			$this->errormsg = 'Planbezeichnung darf nicht laenger als 30 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>8)
 		{
 			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 8 Zeichen sein';
 			return false;

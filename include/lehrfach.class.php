@@ -105,22 +105,22 @@ class lehrfach extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->fachbereich_kurzbz)>16)
+		if(mb_strlen($this->fachbereich_kurzbz)>16)
 		{
 			$this->errormsg = 'Fachbereich_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->kurzbz)>12)
+		if(mb_strlen($this->kurzbz)>12)
 		{
 			$this->errormsg = 'Kurzbezeichnung darf nicht laenger als 12 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->bezeichnung)>255)
+		if(mb_strlen($this->bezeichnung)>255)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 255 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->farbe)>6)
+		if(mb_strlen($this->farbe)>6)
 		{
 			$this->errormsg = 'Farbe darf nicht laenger als 6 Zeichen sein';
 			return false;
@@ -135,7 +135,7 @@ class lehrfach extends basis_db
 			$this->errormsg = 'Semester muss eine Zahl sein';
 			return false;
 		}
-		if(strlen($this->sprache)>16)
+		if(mb_strlen($this->sprache)>16)
 		{
 			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
 			return false;

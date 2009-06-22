@@ -178,7 +178,7 @@ class lehreinheitmitarbeiter extends basis_db
 			$this->errormsg = 'Faktor muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->anmerkung)>255)
+		if(mb_strlen($this->anmerkung)>255)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 255 Zeichen sein.';
 			return false;

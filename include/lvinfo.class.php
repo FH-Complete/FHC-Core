@@ -190,7 +190,7 @@ class lvinfo extends basis_db
 	protected function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->sprache)>16)
+		if(mb_strlen($this->sprache)>16)
 		{
 			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
 			return false;

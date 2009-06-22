@@ -22,13 +22,13 @@
 
 class datum
 {
-	var $conn;     // resource DB-Handle
-	var $errormsg; // string
-	var $new;      // boolean
-	var $ts_day=86400;	// Timestamp eines Tages
-	var $result = array(); // studiensemester Objekt
-
-	function datum()
+	public $ts_day=86400;	// Timestamp eines Tages
+	
+	/**
+	 * Konstruktor
+	 *
+	 */
+	public function __construct()
 	{
 	}
 
@@ -36,9 +36,9 @@ class datum
 	 * Liefert einen UNIX Timestamp von einem String im
 	 * Format "31.12.2007 14:30"
 	 */
-	function mktime_datumundzeit($datumundzeit)
+	public function mktime_datumundzeit($datumundzeit)
 	{
-		if(ereg("([0-9]{2}).([0-9]{2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datumundzeit, $regs))
+		if(mb_ereg("([0-9]{2}).([0-9]{2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datumundzeit, $regs))
 			return mktime($regs[4],$regs[5],0,$regs[2],$regs[1],$regs[3]);
 		else
 		{
@@ -51,9 +51,9 @@ class datum
 	 * Liefert einen UNIX Timestamp von einem String im
 	 * Format "31.12.2007"
 	 */
-	function mktime_datum($datum)
+	public function mktime_datum($datum)
 	{
-		if(ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$datum, $regs))
+		if(mb_ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$datum, $regs))
 		{
 			return mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
 		}
@@ -68,9 +68,9 @@ class datum
 	 * Liefert einen UNIX Timestamp von einem Datum im
 	 * ISO-Format "2007-01-31"
 	 */
-	function mktime_fromdate($datum)
+	public function mktime_fromdate($datum)
 	{
-		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
+		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
 		{
 			return mktime(0,0,0,$regs[2],$regs[3],$regs[1]);
 		}
@@ -85,9 +85,9 @@ class datum
 	 * Liefert einen UNIX Timestamp von einem String im
 	 * Format "2007-01-31 14:30:12"
 	 */
-	function mktime_fromtimestamp($timestamp)
+	public function mktime_fromtimestamp($timestamp)
 	{
-		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$timestamp, $regs))
+		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$timestamp, $regs))
 		{
 			return mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[3],$regs[1]);
 		}
@@ -101,7 +101,7 @@ class datum
 	/**
 	 * Springt von einen UNIX Timestamp ($datum) $wochen nach vor bzw. hinten
 	 */
-	function jump_week($datum, $wochen)
+	public function jump_week($datum, $wochen)
 	{
 		$stunde_vor=date("G",$datum);
 		// Eine Woche sind 604800 Sekunden
@@ -115,7 +115,7 @@ class datum
 	/**
 	 * Springt von einen UNIX Timestamp ($datum) $days nach vor bzw. hinten
 	 */
-	function jump_day($datum, $days)
+	public function jump_day($datum, $days)
 	{
 		$stunde_vor=date("G",$datum);
 		// Ein Tag sind 86400 Sekunden
@@ -130,9 +130,9 @@ class datum
 	 * Konvertiert das ISO Datumsformat (YYYY-MM-DD)
 	 * nach (DD.MM.YYYY)
 	 */
-	function convertISODate($datum)
+	public function convertISODate($datum)
 	{
-		return (strlen($datum)>0?date('d.m.Y',strtotime($datum)):'');
+		return (mb_strlen($datum)>0?date('d.m.Y',strtotime($datum)):'');
 	}
 
 
@@ -140,9 +140,9 @@ class datum
 	 * Prueft Uhrzeit auf Gueltigkeit (HH:MM:SS)
 	 * @return true wenn ok, false wenn falsches Format
 	 */
-	function checkUhrzeit($uhrzeit)
+	public function checkUhrzeit($uhrzeit)
 	{
-		if(ereg("([0-9]{2}):([0-9]{2})(:([0-9]{2}))?$",$uhrzeit))
+		if(mb_ereg("([0-9]{2}):([0-9]{2})(:([0-9]{2}))?$",$uhrzeit))
 			return true;
 		else
 			return false;
@@ -152,9 +152,9 @@ class datum
 	 * Prueft ob das Datum im Format dd.mm.YYYY oder YYYY-mm-dd ist
 	 * @return true wenn ok, false wenn falsches Format
 	 */
-	function checkDatum($datum)
+	public function checkDatum($datum)
 	{
-		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})$",$datum) || ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})$",$datum))
+		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})$",$datum) || mb_ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})$",$datum))
 			return true;
 		else
 			return false;
@@ -170,7 +170,7 @@ class datum
 	 * 				  Eintraege wie zB 'last Monday' oder 'a' auch in ein Datum umgewandelt werden.
 	 * @return Formatierten Timestamp wenn ok, false im Fehlerfall
 	 */
-	function formatDatum($datum, $format='Y-m-d H:i:s', $strict=false)
+	public function formatDatum($datum, $format='Y-m-d H:i:s', $strict=false)
 	{
 		if(trim($datum)=='')
 			return '';
@@ -179,27 +179,27 @@ class datum
 		$error=false;
 		
 		//2008-12-31
-		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
+		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
 			$ts = mktime(0,0,0,$regs[2],$regs[3],$regs[1]);
 		
 		//2008-12-31 12:30
-		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
+		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[3],$regs[1]);
 		
 		//2008-12-31 12:30:15
-		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
+		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[3],$regs[1]);
 			
 		//1.12.2008
-		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$datum, $regs))
+		if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$datum, $regs))
 			$ts = mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
 			
 		//1.12.2008 12:30
-		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
+		if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[1],$regs[3]);
 				
 		//1.12.2008 12:30:15
-		if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
+		if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[1],$regs[3]);
 		
 		if($ts=='' && !$strict)

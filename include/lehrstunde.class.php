@@ -352,7 +352,7 @@ class lehrstunde extends basis_db
 			$sql_query='';
 			foreach ($idList as $id)
 				$sql_query.=' OR '.$stpl_id.'='.$id;
-			$sql_query=substr($sql_query,3);
+			$sql_query=mb_substr($sql_query,3);
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
 		//echo $sql_query_stdplan;
@@ -388,7 +388,7 @@ class lehrstunde extends basis_db
 			else
 				$stunde->farbe='FFFFFF';
 			$stunde->studiengang_kz=$row->studiengang_kz;
-			$stunde->studiengang=strtoupper($row->stg_typ.$row->stg_kurzbz);
+			$stunde->studiengang=mb_strtoupper($row->stg_typ.$row->stg_kurzbz);
 			$stunde->sem=$row->semester;
 			$stunde->ver=$row->verband;
 			$stunde->grp=$row->gruppe;

@@ -201,22 +201,22 @@ class zeitsperre extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->bezeichnung)>32)
+		if(mb_strlen($this->bezeichnung)>32)
 		{
 			$this->errormsg = "Bezeichnung darf nicht laenger als 32 Zeichen sein";
 			return false;
 		}
-		if(strlen($this->zeitsperretyp_kurzbz)>8)
+		if(mb_strlen($this->zeitsperretyp_kurzbz)>8)
 		{
 			$this->errormsg = "Zeitsperretyp_kurzbz darf nicht laenger als 8 Zeichen sein";
 			return false;
 		}
-		if(strlen($this->mitarbeiter_uid)>32)
+		if(mb_strlen($this->mitarbeiter_uid)>32)
 		{
 			$this->errormsg = "Mitarbeiter_uid darf nicht laenger als 8 Zeichen sein";
 			return false;
 		}
-		if(strlen($this->erreichbarkeit_kurzbz)>8)
+		if(mb_strlen($this->erreichbarkeit_kurzbz)>8)
 		{
 			$this->errormsg = "Erreichbarkeit darf nicht laenger als 8 Zeichen sein";
 			return false;

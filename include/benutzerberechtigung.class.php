@@ -80,13 +80,13 @@ class benutzerberechtigung extends basis_db
 	 */
 	protected function validate()
 	{
-		if(strlen($this->art)>16)
+		if(mb_strlen($this->art)>16)
 		{
 			$this->errormsg = 'Art darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 
-		if(strlen($this->fachbereich_kurzbz)>16)
+		if(mb_strlen($this->fachbereich_kurzbz)>16)
 		{
 			$this->errormsg = 'fachbereich_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -96,7 +96,7 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'Studiengangskennzahl muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(strlen($this->berechtigung_kurzbz)>16)
+		if(mb_strlen($this->berechtigung_kurzbz)>16)
 		{
 			$this->errormsg = 'Berechtigung_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
@@ -106,7 +106,7 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'Berechtigung_kurzbz muss angegeben werden';
 			return false;
 		}
-		if(strlen($this->uid)>32)
+		if(mb_strlen($this->uid)>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
@@ -276,12 +276,12 @@ class benutzerberechtigung extends basis_db
 				$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
 				$b->start=$row->start;
 				if ($row->start!=null)
-					$b->starttimestamp=mktime(0,0,0,substr($row->start,5,2),substr($row->start,8),substr($row->start,0,4));
+					$b->starttimestamp=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8),mb_substr($row->start,0,4));
 				else
 					$b->starttimestamp=null;
 				$b->ende=$row->ende;
 				if ($row->ende!=null)
-					$b->endetimestamp=mktime(23,59,59,substr($row->ende,5,2),substr($row->ende,8),substr($row->ende,0,4));
+					$b->endetimestamp=mktime(23,59,59,mb_substr($row->ende,5,2),mb_substr($row->ende,8),mb_substr($row->ende,0,4));
 				$b->negativ = ($row->negativ=='t'?true:false);
 				$b->updateamum = $row->updateamum;
 				$b->updatevon = $row->updatevon;
@@ -342,7 +342,7 @@ class benutzerberechtigung extends basis_db
 			}
 		
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
-			   && (is_null($art) || strstr($b->art, $art))
+			   && (is_null($art) || mb_strstr($b->art, $art))
 			   && (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz))
 			{
 				if (!is_null($b->starttimestamp) && !is_null($b->endetimestamp))
@@ -415,11 +415,11 @@ class benutzerberechtigung extends basis_db
 			if($in=='')
 				return array();
 			else
-				$in = ' AND oe_kurzbz IN('.substr($in,0, strlen($in)-1).')';
+				$in = ' AND oe_kurzbz IN('.mb_substr($in,0, mb_strlen($in)-1).')';
 		}
 		
 		if($not!='')
-			$not = ' AND oe_kurzbz NOT IN('.substr($not,0, strlen($not)-1).')';
+			$not = ' AND oe_kurzbz NOT IN('.mb_substr($not,0, mb_strlen($not)-1).')';
 		
 		$qry = "SELECT studiengang_kz FROM public.tbl_studiengang WHERE 1=1 $in $not";
 		
@@ -478,11 +478,11 @@ class benutzerberechtigung extends basis_db
 			if($in=='')
 				return array();
 			else
-				$in = ' AND oe_kurzbz IN('.substr($in,0, strlen($in)-1).')';
+				$in = ' AND oe_kurzbz IN('.mb_substr($in,0, mb_strlen($in)-1).')';
 		}
 		
 		if($not!='')
-			$not = ' AND oe_kurzbz NOT IN('.substr($not,0, strlen($not)-1).')';
+			$not = ' AND oe_kurzbz NOT IN('.mb_substr($not,0, mb_strlen($not)-1).')';
 		
 		$qry = "SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE 1=1 $in $not";
 		

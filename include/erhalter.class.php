@@ -124,12 +124,12 @@ class erhalter extends basis_db
 	protected function validate()
 	{	
 		//Laenge Pruefen
-		if(strlen($this->bezeichnung)>255)           
+		if(mb_strlen($this->bezeichnung)>255)           
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 255 Zeichen sein';
 			return false;
 		}
-		if(strlen($this->kurzbz)>5)
+		if(mb_strlen($this->kurzbz)>5)
 		{
 			$this->errormsg = 'Kurzbez darf nicht laenger als 5 Zeichen sein';
 			return false;

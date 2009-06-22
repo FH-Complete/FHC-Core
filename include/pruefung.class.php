@@ -179,7 +179,7 @@ class pruefung extends basis_db
 	public function validate()
 	{
 		//Laenge Pruefen
-		if(strlen($this->anmerkung)>256)
+		if(mb_strlen($this->anmerkung)>256)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
 			return false;

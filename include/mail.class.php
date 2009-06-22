@@ -225,7 +225,7 @@ class mail
 		{
 			foreach ($rcvs as $rcv)
 				$this->CC_recievers .= ",$rcv";
-			$this->CC_recievers = substr($this->CC_recievers, 1);
+			$this->CC_recievers = mb_substr($this->CC_recievers, 1);
 		}
 		else
 		{
@@ -244,7 +244,7 @@ class mail
 		{
 			foreach ($rcvs as $rcv)
 				$this->BCC_recievers .= ",$rcv";
-			$this->BCC_recievers = substr($this->BCC_recievers, 1);
+			$this->BCC_recievers = mb_substr($this->BCC_recievers, 1);
 		}
 		else
 		{

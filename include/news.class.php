@@ -287,12 +287,12 @@ class news extends basis_db
 	public function validate()
 	{	
 		//Laenge Pruefen
-		if(strlen($this->betreff)>128)           
+		if(mb_strlen($this->betreff)>128)           
 		{
 			$this->errormsg = 'Betreff darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}		
-		if(strlen($this->verfasser)>64)
+		if(mb_strlen($this->verfasser)>64)
 		{
 			$this->errormsg = 'Verfasser darf nicht laenger als 64 Zeichen sein';
 			return false;
