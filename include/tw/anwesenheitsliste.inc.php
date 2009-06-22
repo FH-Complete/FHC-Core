@@ -22,6 +22,12 @@
 
 //PDF fuer die Anwesenheitsliste auf CIS
 
+	$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
+	if(!pg_query($conn,$qry))
+	{
+		die("Encoding konnte nicht gesetzt werden");
+	}   
+	
 //PDF erzeugen
 $pdf = new PDF('P','pt');
 $pdf->Open();
@@ -361,6 +367,11 @@ $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','',8);
 $pdf->MultiCell(520,$lineheight,'Fehlt ein Student länger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTÄNDIG AUSGEFÜLLTE LISTEN abgeben!',0,'L',0);
 
+	$qry = "SET CLIENT_ENCODING TO 'UTF8';";
+	if(!pg_query($conn,$qry))
+	{
+		die("Encoding konnte nicht gesetzt werden");
+	}   
 
 $pdf->Output('anwesenheitsliste.pdf','I');
 ?>
