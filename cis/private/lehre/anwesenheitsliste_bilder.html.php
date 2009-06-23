@@ -25,16 +25,20 @@
     *
     */
 
-   require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+      die('Fehler beim Herstellen der Datenbankverbindung');
+
    require_once('../../../include/person.class.php');
    require_once('../../../include/studiengang.class.php');
    require_once('../../../include/studiensemester.class.php');
    require_once('../../../include/lehrveranstaltung.class.php');
    error_reporting(E_ALL);
    ini_set('display_errors','1');
-   
-   if(!$conn=pg_pconnect(CONN_STRING))
-      die('Fehler beim Herstellen der Datenbankverbindung');
    
    //Uebergabeparameter abpruefen
    if(isset($_GET['stg'])) //Studiengang
@@ -90,13 +94,13 @@
 <body>
 ';
    
-$stgobj=new studiengang($conn);
+$stgobj=new studiengang();
 $stgobj->load($stg);
 //Logo
 echo "<table width='100%'>
 	<tr>
 		<td>";
-$lvobj = new lehrveranstaltung($conn, $lvid);
+$lvobj = new lehrveranstaltung($lvid);
 
 echo '<span style="font-size:17px; font-weight:bold;">Anwesenheitsliste '.$lvobj->bezeichnung.'</span>';
 
@@ -105,9 +109,9 @@ if($lehreinheit_id!='')
 	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
 	
 $gruppen='';
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($gruppen!='')
 			$gruppen.=', ';
