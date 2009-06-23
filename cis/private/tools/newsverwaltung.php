@@ -33,17 +33,17 @@
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
 	include_once('../../../include/benutzerberechtigung.class.php');
-	// ---------------- News Classe und Allg.Funktionen	
+// ---------------- News Classe und Allg.Funktionen	
 	require_once('../../../include/news.class.php');
+
+	// Init	
+	$error='';
+
+	$fachbereich_kurzbz=(isset($_REQUEST['fachbereich_kurzbz']) && !empty($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachbereich_kurzbz']:null);
+	$studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:null));
+	$semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
 	
 
-// ---------------- Originalaufruf festhalten mittels eines Schalters
-	$newsSwitch=false;
-	if (!isset($_REQUEST['studiengang_kz']) && !isset($_REQUEST['semester']) && !isset($_REQUEST['fachbereich_kurzbz']))
-	{
-		$newsSwitch='tools';
-	}
-	
 	$rechte = new benutzerberechtigung();
  	$rechte->getBerechtigungen($user);
 
@@ -59,6 +59,7 @@
 		$berechtigt=true;
 	else
 		$berechtigt=false;
+		
 	if(!$berechtigt)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
@@ -88,9 +89,11 @@
 		$news->betreff = trim((isset($_REQUEST['betreff']) ? $_REQUEST['betreff']:''));
 		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:''));
 		$news->text = trim((isset($_REQUEST['text']) ? $_REQUEST['text']:''));
-		$news->studiengang_kz=trim((isset($_REQUEST['studiengang_kz']) ? $_REQUEST['studiengang_kz']:0));
-		$news->semester=(isset($_REQUEST['semester']) ? $_REQUEST['semester']:null);
-		$news->fachbereich_kurzbz=(isset($_REQUEST['fachbereich_kurzbz']) ? $_REQUEST['fachbereich_kurzbz']:null);
+		
+		$news->studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:0));
+		$news->semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
+
+		$news->fachbereich_kurzbz=(isset($_REQUEST['fachbereich_kurzbz']) && !empty($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachbereich_kurzbz']:null);
 		
 		$chksenat=(isset($_REQUEST['chksenat']) ?true :false);
 		if(isset($chksenat))
@@ -337,10 +340,9 @@
 
 	$maxalter=0;		
 	
-	$studiengang_kz=trim((isset($_REQUEST['studiengang_kz']) ? $_REQUEST['studiengang_kz']:0));
-	$semester=trim((isset($_REQUEST['semester']) ? $_REQUEST['semester']:null));
-	$fachbereich_kurzbz=trim((isset($_REQUEST['fachbereich_kurzbz']) ? $_REQUEST['fachbereich_kurzbz']:'*'));
-
+	$fachbereich_kurzbz=(isset($_REQUEST['fachbereich_kurzbz']) && !empty($_REQUEST['fachbereich_kurzbz']) ? $_REQUEST['fachbereich_kurzbz']:'*');
+	$studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:0));
+    $semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
 #org news_entry.php	if (!$news->getnews(0,0,null, true, '*', 0))
 	if (!$news->getnews($maxalter, $studiengang_kz, $semester, $all, $fachbereich_kurzbz, $maxnews))
 		die($news->errormsg);	
@@ -372,7 +374,7 @@
 						echo '<td>';
 					echo '  <table class="tabcontent">';
 					echo '    <tr>';
-					echo '      <td nowarp>';
+					echo '      <td nowarp title="Studiengang_kz:'.$row->studiengang_kz ,', Semester:'. $row->semester .', Fachbereich_kurzbz:'.$row->fachbereich_kurzbz.'">';
 					echo $datum.'&nbsp;'.$row->verfasser;
 					echo '      </td>';
 					echo '		<td align="right" nowrap>';
