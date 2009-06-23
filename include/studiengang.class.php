@@ -50,6 +50,7 @@ class studiengang extends basis_db
 	public $zusatzinfo_html;
 	public $sprache;
 	public $testtool_sprachwahl;
+	public $studienplaetze;
 
 	public $kuerzel;			// = typ + kurzbz (Bsp: BBE)
 
@@ -117,6 +118,7 @@ class studiengang extends basis_db
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
 				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+				$this->studienplaetze = $row->studienplaetze;
 
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
@@ -180,6 +182,7 @@ class studiengang extends basis_db
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
 			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+			$stg_obj->studienplaetze = $row->studienplaetze;
 
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
