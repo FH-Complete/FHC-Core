@@ -55,12 +55,12 @@ else
 	die('Fehlerhafte Parameteruebergabe');
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -77,7 +77,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -91,7 +91,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
-	if($result = pg_query($conn, $qry))
+	if($result = pg_query($qry))
 	{
 		if(pg_num_rows($result)==0)
 			die('Sie haben keine Berechtigung für diese Seite');
@@ -108,15 +108,15 @@ function savenote($lvid, $student_uid, $note)
 	$jetzt = date("Y-m-d H:i:s");
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid='".addslashes($student_uid)."' AND lehrveranstaltung_id='".addslashes($lvid)."'";
-	if($result = pg_query($conn, $qry))
+	if($result = pg_query($qry))
 		if(pg_num_rows($result)==0)
 		{
-			$student = new student($conn);
+			$student = new student();
 			$student->load($student_uid);
 			return 'Der Student '.$student->nachname.' '.$student->vorname.' ('.trim($student->matrikelnr).') ist dieser Lehrveranstaltung nicht zugeordnet. Die Note wird nicht uebernommen!'."\n";
 		}
 	
-	$lvgesamtnote = new lvgesamtnote($conn);
+	$lvgesamtnote = new lvgesamtnote();
     if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
     {
 		$lvgesamtnote->student_uid = $student_uid;
@@ -181,7 +181,7 @@ if (isset($_REQUEST["submit"]))
 					$note = $_POST['note_'.$id];
 					
 					//UID ermitteln
-					$student = new student($conn);
+					$student = new student();
 					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
 					{
 						$response.="\nStudent mit der Matrikelnummer ".$matrikelnummer.' existiert nicht';
