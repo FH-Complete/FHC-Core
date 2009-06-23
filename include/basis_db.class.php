@@ -17,6 +17,7 @@ abstract class db extends basis
 	abstract function db_fetch_object($result=null, $i=null);
 	abstract function db_num_rows($result=null);
 	abstract function db_last_error();
+	abstract function db_affected_rows($result=null);
 
 }
 

@@ -60,5 +60,13 @@ class basis_db extends db
 	{
 		return pg_last_error();
 	}
+	
+	function db_affected_rows($result=null)
+	{
+		if(is_null($result))
+			return pg_affected_rows($this->db_result);
+		else
+			return pg_affected_rows($result);
+	}
 }
 ?>

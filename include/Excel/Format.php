@@ -428,7 +428,16 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
 
             $header      = pack("vv",       $record, $length);
 
-            $rotation      = 0x00;
+            //$rotation      = 0x00;
+            //oesi fix rotation mit utf8
+            switch($this->_rotation)
+            { 
+            	case 0: $rotation = 0; break; 
+            	case 1: $rotation = 255; break; 
+            	case 2: $rotation = 90; break; 
+            	case 3: $rotation = 180; break; 
+            	default: $rotation = 0; break; 
+           	}
             $biff8_options = 0x00;
             $data  = pack("vvvC", $ifnt, $ifmt, $style, $align);
             $data .= pack("CCC", $rotation, $biff8_options, $used_attrib);
