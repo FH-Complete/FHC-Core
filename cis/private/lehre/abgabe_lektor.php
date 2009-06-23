@@ -23,7 +23,7 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 	require_once('../../../config/cis.config.inc.php');
