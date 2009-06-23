@@ -94,7 +94,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:false));
 #	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'AppList.xml'));	
-	if ($_SERVER["SERVER_NAME"]=="dav.technikum-wien.at")
+	if ($_SERVER["SERVER_NAME"]=="dav.technikum-wien.at" || $_SERVER["SERVER_NAME"]=="calva.technikum-wien.at")
 	{
 		$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']: dirname(__FILE__).'/AppList.xml'));	
 		if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
@@ -105,6 +105,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	else
 	{
 		$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'../../../documents/infrastruktur/AppList.xml'));	
+		if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
+		{
+			if (is_file("AppList.xml") )
+			{
+				$cXMLFile="AppList.xml";
+			}
+		}
+		
 	}	
 	
 									
