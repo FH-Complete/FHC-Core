@@ -73,11 +73,11 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 		$nummer_source = $ueb_1->nummer;
 		$qry = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source."' and lehreinheit_id = '".$lehreinheit_id_target."'";
 		//echo $qry;
-		if($result1 = pg_query($conn, $qry))	
+		if($result1 = $db->db_query($qry))	
 		{
-			if (pg_num_rows($result1) >0)
+			if ($db->db_num_rows($result1) >0)
 			{
-				$row1 = pg_fetch_object($result1);		
+				$row1 = $db->db_fetch_object($result1);		
 				$ueb_1_target =new uebung($row1->uebung_id);
 				$ueb_1_target->new = false;
 				$new = null;
@@ -89,7 +89,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			}
 			else
 			{
-				$ueb_1_target =new uebung($conn);
+				$ueb_1_target =new uebung();
 				$ueb_1_target->new = true;
 				$new = true;
 				$ueb_1_target->insertamum = date('Y-m-d H:i:s');
