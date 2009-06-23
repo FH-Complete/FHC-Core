@@ -23,7 +23,14 @@
  * Script zum Kopieren einer Kreuzerltool Uebung zu einer anderen Lehreinheit
  * (zB fuer die Uebernahme der Uebungen aus dem Vorjahr)
  */
-require_once('../../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			$db=false;
+
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -34,10 +41,6 @@ require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
 
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-	
 $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -65,7 +68,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 		echo "<span class='error'>Übung und Lehreinheit muss ausgewählt sein!</span>";
 	else
 	{
-		$ueb_1 = new uebung($conn, $uebung_id_source);
+		$ueb_1 = new uebung($uebung_id_source);
 		$lehreinheit_id=$ueb_1->lehreinheit_id;
 		$nummer_source = $ueb_1->nummer;
 		$qry = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source."' and lehreinheit_id = '".$lehreinheit_id_target."'";
@@ -75,7 +78,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			if (pg_num_rows($result1) >0)
 			{
 				$row1 = pg_fetch_object($result1);		
-				$ueb_1_target =new uebung($conn, $row1->uebung_id);
+				$ueb_1_target =new uebung($row1->uebung_id);
 				$ueb_1_target->new = false;
 				$new = null;
 				$ueb_1_target->insertamum = null;
@@ -122,7 +125,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			{
 				// Subübungen durchlaufen			
 				$error = 0;
-				$ueb_2 = new uebung($conn);
+				$ueb_2 = new uebung();
 
 				$ueb_2->load_uebung($lehreinheit_id,2,$uebung_id_source);
 				
@@ -134,12 +137,11 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 															
 						$nummer_source2 = $subrow->nummer;
 						$qry2 = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source2."' and lehreinheit_id = '".$lehreinheit_id_target."'";
-						$result2 = pg_query($conn, $qry2);
-	
-						if (pg_num_rows($result2) >0)
+						$result2 = $db->db_query($qry2);
+						if ($db->db_num_rows($result2) >0)
 						{
 							$row2 = pg_fetch_object($result2);		
-							$ueb_2_target =new uebung($conn, $row2->uebung_id);
+							$ueb_2_target =new uebung($row2->uebung_id);
 							$ueb_2_target->new = false;
 							$new = null;
 							$ueb_2_target->insertamum = null;
@@ -150,7 +152,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						}
 						else
 						{
-							$ueb_2_target =new uebung($conn);
+							$ueb_2_target =new uebung();
 							$ueb_2_target->new = true;
 							$new = true;
 							$ueb_2_target->insertamum = date('Y-m-d H:i:s');
@@ -186,29 +188,29 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						if ($subrow->angabedatei != "")
 						{	
 							$angabedatei_source = $subrow->angabedatei;
-							$angabedatei_target = makeUploadName($conn, 'angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
+							$angabedatei_target = makeUploadName('angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
 							$angabedatei_target .= ".".mb_substr($angabedatei_source, mb_strrpos($angabedatei_source, '.',0) + 1);
 							echo $angabedatei_source."->".$angabedatei_target."<br>";
 							exec("cp ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_source." ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_target);
 							$angabeupdate = "update campus.tbl_uebung set angabedatei = '".$angabedatei_target."' where uebung_id = '".$ueb_2_target->uebung_id."'";
-							pg_query($conn, $angabeupdate);
+							$db->db_query($angabeupdate);
 						}
 										
 						if (($error == 0) and $ueb_2_target->beispiele)
 						{
 							// beispiele synchronisieren
-							$bsp_obj = new beispiel($conn);
+							$bsp_obj = new beispiel();
 							$bsp_obj->load_beispiel($subrow->uebung_id);
 							foreach ($bsp_obj->beispiele as $bsp)
 							{
 								$nummer_source_bsp = $bsp->nummer;
 								$qrybsp = "SELECT * from campus.tbl_beispiel where nummer = '".$nummer_source_bsp."' and uebung_id = '".$ueb_2_target->uebung_id."'";
-								$resultbsp = pg_query($conn, $qrybsp);
+								$resultbsp = $db->db_query($qrybsp);
 			
-								if (pg_num_rows($resultbsp) >0)
+								if ($db->db_num_rows($resultbsp) >0)
 								{
-									$rowbsp = pg_fetch_object($resultbsp);		
-									$bsp_target =new beispiel($conn, $rowbsp->beispiel_id);
+									$rowbsp = $db->db_fetch_object($resultbsp);		
+									$bsp_target =new beispiel($rowbsp->beispiel_id);
 									$bsp_target->new = false;
 									$new = null;
 									$bsp_target->insertamum = null;
@@ -219,7 +221,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 								}
 								else
 								{
-									$bsp_target =new beispiel($conn);
+									$bsp_target =new beispiel();
 									$bsp_target->new = true;
 									$new = true;
 									$bsp_target->insertamum = date('Y-m-d H:i:s');
@@ -241,14 +243,14 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 								
 								//Notenschlüssel synchronisieren
 								$clear = "delete from campus.tbl_notenschluesseluebung where uebung_id = '".$ueb_1_target->uebung_id."'";
-								pg_query($conn, $clear);
+								$db->db_query($clear);
 								
 								$qry_ns_source = "SELECT * from campus.tbl_notenschluesseluebung where uebung_id = '".$uebung_id_source."'";
-								$result_ns_source = pg_query($conn, $qry_ns_source);
-								while($row_ns = pg_fetch_object($result_ns_source))
+								$result_ns_source = $db->db_query($qry_ns_source);
+								while($row_ns = $db->db_fetch_object($result_ns_source))
 								{
 									$ns_insert = "INSERT INTO campus.tbl_notenschluesseluebung values ('".$ueb_1_target->uebung_id."','".$row_ns->note."', '".$row_ns->punkte."')";
-									pg_query($conn, $ns_insert);					
+									$db->db_query($ns_insert);					
 								}					
 											
 							}									
