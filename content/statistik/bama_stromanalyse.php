@@ -55,8 +55,8 @@ if($studiensemester_kurzbz != -1)
 		$summe=0;
 		$rest=0; 
 		
-		//StudiengÃƒÂ¤nge, die zuvor abgeschlossen wurden
-		$qry_master="SELECT DISTINCT count(*)as count ,studiengang_kz, typ, tbl_studiengang.bezeichnung as bez 
+		//StudiengÃ?nge, die zuvor abgeschlossen wurden
+		$qry_master="SELECT DISTINCT count(*)as count ,studiengang_kz, typ, tbl_studiengang.bezeichnung as bez, tbl_studiengang.kurzbz  
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
 		JOIN public.tbl_studiengang USING(studiengang_kz) 
@@ -68,9 +68,9 @@ if($studiensemester_kurzbz != -1)
 			AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
 			AND rolle_kurzbz='Student' 
 			AND ausbildungssemester='1') 
-		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung ORDER BY tbl_studiengang.bezeichnung, studiengang_kz"; 
+		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz ORDER BY count desc"; 
 		
-		//Anzahl der Studenten ohne AbschluÃƒÅ¸ auf der FHTW
+		//Anzahl der Studenten ohne AbschluÃ¾ auf der FHTW
 		/*$qry_rest="SELECT count(*) as rest FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=tbl_prestudent.person_id) 
 			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
@@ -105,7 +105,9 @@ if($studiensemester_kurzbz != -1)
 		$row_anzahl=pg_fetch_object($result_anzahl);
 		
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;-moz-border-radius-topleft:10px;-moz-border-radius-topright:10px;-khtml-border-radius-topleft:10px;-khtml-border-radius-topright:10px;' align='center'>";
-		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'><TD colspan='4'>&nbsp;&nbsp;&nbsp;Studiengang: $row_stg->studiengang_kz, $row_stg->bezeichnung</TD><TD align='center'  width='20%'>$row_anzahl->anzahl Studierende im 1.Sem.</TD></TR></TABLE>";
+		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'><TD colspan='4'>&nbsp;&nbsp;&nbsp;";
+		$ausgabe .= "<a href='bama_studentenstrom.svg.php?stsem=WS2008&studiengang_kz=".$row_stg->studiengang_kz."&typ=m&kurz=".$row_stg->kurzbz."' target='_blank'>";
+		$ausgabe .= "Studiengang: $row_stg->studiengang_kz, $row_stg->bezeichnung (".strtoupper($row_stg->typ.$row_stg->kurzbz).")</a></TD><TD align='center'  width='20%'>$row_anzahl->anzahl Studierende im 1.Sem.</TD></TR></TABLE>";
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;' align='center'>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Kz</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Typ</TH>";
@@ -152,9 +154,9 @@ if($studiensemester_kurzbz != -1)
 		$summe=0;
 		$rest=0; 
 		
-		//Master-StudiengÃƒÂ¤nge, die noch besucht wurden
-		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, bezeichnung as bez FROM 
-		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ, tbl_studiengang.bezeichnung  
+		//Master-Studiengänge, die noch besucht wurden
+		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, bezeichnung as bez, kurzbz FROM 
+		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ, tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz   
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
 		JOIN public.tbl_studiengang USING(studiengang_kz) 
@@ -165,7 +167,7 @@ if($studiensemester_kurzbz != -1)
 			WHERE studiengang_kz='".$row_stg->studiengang_kz."'  
 			AND rolle_kurzbz='Absolvent'
 			AND (studiensemester_kurzbz='".$studiensemester_kurzbz."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."') )) as b 
-		GROUP BY studiengang_kz, typ, bezeichnung ORDER BY bezeichnung, studiengang_kz";
+		GROUP BY studiengang_kz, typ, bezeichnung, kurzbz ORDER BY count desc";
 		
 		//Anzahl der Studenten ohne weitere Masterstudien am FHTW
 		/*$qry_rest="SELECT count(*) as anzahl FROM public.tbl_person 
@@ -198,7 +200,9 @@ if($studiensemester_kurzbz != -1)
 		
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;-moz-border-radius-topleft:10px;-moz-border-radius-topright:10px;-khtml-border-radius-topleft:10px;-khtml-border-radius-topright:10px;' align='center'>";
 		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'>";
-		$ausgabe .= "<TD colspan='4'>&nbsp;&nbsp;&nbsp;Studiengang: $row_stg->studiengang_kz, $row_stg->bezeichnung</TD>";
+		$ausgabe .= "<TD colspan='4'>&nbsp;&nbsp;&nbsp;";
+		$ausgabe .= "<a href='bama_studentenstrom.svg.php?stsem=WS2008&studiengang_kz=".$row_stg->studiengang_kz."&typ=b&kurz=".$row_stg->kurzbz."' target='_blank'>";
+		$ausgabe .= "Studiengang: $row_stg->studiengang_kz, $row_stg->bezeichnung (".strtoupper($row_stg->typ.$row_stg->kurzbz).")</a></TD>";
 		$ausgabe .= "<TD align='center'  width='20%'>$row_anzahl->anzahl Absolventen</TD></TR></TABLE>";
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;' align='center'>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Kz</TH>";
@@ -243,14 +247,14 @@ echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<title>Studentenströme</title>
+<title>BaMa Stromanalyse</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
-<h2>Studentenströme</h2>
+<h2>BaMa Stromanalyse</h2>
 Wählen Sie bitte nachfolgend ein Wintersemester aus.';
 
 $htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='strom'>\n";
@@ -276,5 +280,7 @@ $htmlstr .= "</form>\n";
 	echo $htmlstr;
 	echo $ausgabe;
 	
-echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden fuehrt zu Verfaelschungen bei der Anzahl der 'Externen':<br>- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
+echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden führt zu Verfaelschungen bei der Anzahl der 'Externen':<br>
+- Absolventen bzw. Studenten in verschiedenen Studiengaengen.<br>
+- Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
 ?>
