@@ -79,7 +79,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -97,7 +97,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0
 	
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_REQUEST["student_uid"];	
-	$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+	$legesamtnote = new legesamtnote($lehreinheit_id);
     if (!$legesamtnote->load($student_uid,$lehreinheit_id))
     {
 		$legesamtnote->student_uid = $student_uid;
