@@ -141,7 +141,7 @@ echo '<br><br>
 	</thead>
 	<tbody>';
 
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;
@@ -166,10 +166,10 @@ if($lehreinheit_id!='')
 	
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$i=0;
-	while($elem = pg_fetch_object($result))
+	while($elem = $db->db_fetch_object($result))
 	{
 		$i++;
 		echo '<tr class="liste'.($i%2).'">';
