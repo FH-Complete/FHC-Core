@@ -57,12 +57,12 @@ else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
