@@ -30,86 +30,97 @@
  * term_id: Semester
  * showall: Zeigt alle Pinboardeintraege an
  */
-	require_once('../../config.inc.php');
+// ---------------- CIS Include Dateien einbinden
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		$db=false;
+		
+		
+// ---------------- Diverse Funktionen und UID des Benutzers ermitteln
+	require_once('../../../include/functions.inc.php');
+	if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
+
+		
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/news.class.php');
 	require_once('../../../include/studiensemester.class.php');
+	require_once('../../../include/news.class.php');
 
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
+	// Init	
+	$error='';
+	$PHP_SELF = $_SERVER['PHP_SELF'];
 
-    $senat=false;
-    $short='';
-    $course_id = '';
-    $term_id = '';
-    $fachbereich_kurzbz='';
-    $studiensemester_kurzbz = '';
-    $datum_content='';
-    $stsem_content='';
-    $datum = '';
-    $user = get_uid();
-    $stsemarr = array();
-    $PHP_SELF = $_SERVER['PHP_SELF'];
+	$showall=(isset($_REQUEST['showall']) ? true:false);
 
-    if(isset($_GET['studiensemester_kurzbz']))
-    	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
-    else
-    {
-    	$stsem_obj = new studiensemester($sql_conn);
-    	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
-    }
+    	$short='';
+    	$datum_content='';
+    	$stsem_content='';
+	$stsemarr = array();
 
-    if(isset($_GET['datum']))
-    	$datum = $_GET['datum'];
+	// Open der NEWs-Classe
+	$news = new news();
 
-	if(isset($_GET['course_id']) && is_numeric($_GET['course_id']))
+	
+	// Parameter einlesen		
+	$news_id=trim((isset($_REQUEST['news_id']) ? $_REQUEST['news_id']:''));
+	$btnSend=trim((isset($_REQUEST['btnSend']) ? $_REQUEST['btnSend']:''));
+	$btnDel=trim((isset($_REQUEST['btnDel']) ? $_REQUEST['btnDel']:''));
+	$btnRead=trim((isset($_REQUEST['btnRead']) ? $_REQUEST['btnRead']:''));
+		
+
+	$datum=trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:''));
+	
+	$studiensemester_kurzbz=trim((isset($_REQUEST['studiensemester_kurzbz']) && is_numeric($_REQUEST['studiensemester_kurzbz']) ? $_REQUEST['studiensemester_kurzbz']:''));
+	if (empty($studiensemester_kurzbz))
 	{
-		$stg_obj = new studiengang($sql_conn, $_GET['course_id']);
+    		$stsem_obj = new studiensemester();
+	    	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
+    	}
+
+	
+	$term_id=trim((isset($_REQUEST['term_id']) ? $_REQUEST['term_id']:''));
+	$course_id=trim((isset($_REQUEST['course_id']) && is_numeric($_REQUEST['course_id']) ? $_REQUEST['course_id']:''));
+	if (!empty($course_id))
+	{
+		$stg_obj = new studiengang($course_id);
 		$short = $stg_obj->kuerzel;
 		$short_long = $stg_obj->kurzbzlang;
 		$stg_bezeichnung = $stg_obj->bezeichnung;
-		$course_id = $_GET['course_id'];
-		$term_id = $_GET['term_id'];
 	}
 
-	if(isset($_GET['fachbereich_kurzbz']))
+	$senat=false;
+	$fachbereich_kurzbz=trim((isset($_REQUEST['fachbereich_kurzbz']) ? $_REQUEST['fachbereich_kurzbz']:''));
+	if (!empty($fachbereich_kurzbz) && $fachbereich_kurzbz=='Senat')
 	{
-		$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
-		if($fachbereich_kurzbz=='Senat')
-			$senat = true;
+		$senat = true;	
 	}
 
-	if(isset($_GET['showall']))
-	{
-		$showall=true;
-	}
-	else
-	{
-		$showall=false;
-	}
 
-	function print_STGnews($stg_id, $semester, $sql_conn, $showall=false, $fachbereich_kurzbz)
+
+	
+	
+	function print_STGnews($stg_id, $semester, $showall=false, $fachbereich_kurzbz)
 	{
 		$alter = ($showall?0:MAXNEWSALTER);
 		$maxnews = ($showall?0:MAXNEWS);
-		$news_obj = new news($sql_conn);
-
+		$news_obj = new news();
 		if($news_obj->getnews($alter, $stg_id, $semester, $showall, $fachbereich_kurzbz, $maxnews))
-		{
 			$zaehler = print_news($news_obj);
-		}
 		else
 			echo $news_obj->errormsg;
 		if($zaehler==0)
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
 
-	function print_FBnews($sql_conn, $fachbereich_kurzbz, $datum)
+	function print_FBnews($fachbereich_kurzbz, $datum)
 	{
-		$news_obj = new news($sql_conn);
 
+		$news_obj = new news();
 		if($news_obj->getFBNews($fachbereich_kurzbz, $datum))
 		{
 			if($fachbereich_kurzbz=='Senat')
@@ -167,6 +178,7 @@
 		return $zaehler;
 	}
 ?>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -202,19 +214,20 @@ function show(id)
 		echo ' </tr>';
 
 		//Senatsbeschluesse duerfen nur die Mitarbeiter sehen
-		if(!check_lektor($user, $sql_conn))
+		if(!check_lektor($user))
 			die('<tr><td>Sie haben keine Berechtigung für diesen Bereich</td></tr>');
 
 		echo '<tr><td>&nbsp;</td></tr>';
+		
 		echo '<tr><td>';
 		//Datum aller Senatsbeschluesse holen
 		$qry = "SELECT distinct datum FROM campus.tbl_news WHERE fachbereich_kurzbz='Senat'";
-		if($result = pg_query($sql_conn, $qry));
+		if($result = $db->db_query($qry));
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				//Studiensemester des Datums ermitteln
-				$stsem = getStudiensemesterFromDatum($sql_conn, $row->datum);
+				$stsem = getStudiensemesterFromDatum($row->datum);
 				//Wenn dieses StSem noch nicht angezeigt wird, dann anzeigen
 				if(!in_array($stsem, $stsemarr))
 				{
@@ -251,7 +264,7 @@ function show(id)
 		echo '</td><td>&nbsp;</td></tr>';
 		echo '<tr><td class="tdvertical">';
 		//News ausgeben
-		print_FBnews($sql_conn, $fachbereich_kurzbz, $datum);
+		print_FBnews($fachbereich_kurzbz, $datum);
 		echo '</td>';
 
 	}
@@ -279,7 +292,7 @@ function show(id)
 	?>
 	</tr>
 	  <tr>
-	  	<td class="tdvertical"><?php print_STGnews($course_id, (int)$term_id, $sql_conn, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
+	  	<td class="tdvertical"><?php print_STGnews($course_id, (int)$term_id, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
 
 		<td>&nbsp;</td>
 		<td class="tdvertical">
@@ -288,12 +301,12 @@ function show(id)
 
                 //Studiengangsleiter auslesen
 				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl' LIMIT 1)";
-				if($result_course_leader = pg_query($sql_conn, $qry))
+				if($result_course_leader = $db->db_query($qry))
 				{
-					$num_rows_course_leader = pg_numrows($result_course_leader);
+					$num_rows_course_leader = $db->db_num_rows($result_course_leader);
 					if($num_rows_course_leader > 0)
 					{
-						$row_course_leader = pg_fetch_object($result_course_leader, 0);
+						$row_course_leader = $db->db_fetch_object($result_course_leader, 0);
 					}
 				}
 
@@ -345,9 +358,9 @@ function show(id)
 								WHERE standort_kurzbz='".addslashes($row_course_leader->standort_kurzbz)."' AND
 								tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 								tbl_adresse.firma_id=tbl_firma.firma_id";
-						if($result_standort = pg_query($sql_conn, $qry_standort))
+						if($result_standort = $db->db_query($qry_standort))
 						{
-							if($row_standort = pg_fetch_object($result_standort))
+							if($row_standort = $db->db_fetch_object($result_standort))
 							{
 								$hauptnummer = $row_standort->nummer;
 							}
@@ -372,13 +385,13 @@ function show(id)
 			  	//Studiengangsleiter Stellvertreter auselesen
 				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv' LIMIT 1)";
 
-				if($result_course_leader_deputy = pg_query($sql_conn, $sql_query))
+				if($result_course_leader_deputy = $db->db_query($sql_query))
 				{
-					$num_rows_course_leader_deputy = pg_numrows($result_course_leader_deputy);
+					$num_rows_course_leader_deputy = $db->db_num_rows($result_course_leader_deputy);
 
 					if($num_rows_course_leader_deputy > 0)
 					{
-						$row_course_leader_deputy = pg_fetch_object($result_course_leader_deputy, 0);
+						$row_course_leader_deputy = $db->db_fetch_object($result_course_leader_deputy, 0);
 					}
 				}
 
@@ -430,9 +443,9 @@ function show(id)
 								WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
 								tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 								tbl_adresse.firma_id=tbl_firma.firma_id";
-						if($result_standort = pg_query($sql_conn, $qry_standort))
+						if($result_standort = $db->db_query($qry_standort))
 						{
-							if($row_standort = pg_fetch_object($result_standort))
+							if($row_standort = $db->db_fetch_object($result_standort))
 							{
 								$hauptnummer = $row_standort->nummer;
 							}
@@ -456,11 +469,11 @@ function show(id)
 
 				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass')";
 
-				if($result_course_secretary = pg_query($sql_conn, $sql_query))
+				if($result_course_secretary = $db->db_query($sql_query))
 				{
-					$num_rows_course_secretary = pg_numrows($result_course_secretary);
+					$num_rows_course_secretary = $db->db_num_rows($result_course_secretary);
 
-					while($row_course_secretary = pg_fetch_object($result_course_secretary))
+					while($row_course_secretary = $db->db_fetch_object($result_course_secretary))
 					{
 		                echo "<br><b>";
 		
@@ -510,9 +523,9 @@ function show(id)
 										WHERE standort_kurzbz='".addslashes($row_course_secretary->standort_kurzbz)."' AND
 										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 										tbl_adresse.firma_id=tbl_firma.firma_id";
-								if($result_standort = pg_query($sql_conn, $qry_standort))
+								if($result_standort = $db->db_query($qry_standort))
 								{
-									if($row_standort = pg_fetch_object($result_standort))
+									if($row_standort = $db->db_fetch_object($result_standort))
 									{
 										$hauptnummer = $row_standort->nummer;
 									}
@@ -535,9 +548,9 @@ function show(id)
 				
 				$qry = "SELECT zusatzinfo_html FROM public.tbl_studiengang WHERE studiengang_kz='$course_id'";
 				
-				if($result = pg_query($sql_conn, $qry))
+				if($result = $db->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $db->db_fetch_object($result))
 					{
 						echo $row->zusatzinfo_html;
 					}
@@ -547,13 +560,13 @@ function show(id)
 
 				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
 
-				if($result_course_stdv = pg_query($sql_conn, $sql_query))
+				if($result_course_stdv = $db->db_query($sql_query))
 				{
-					$num_rows_course_stdv = pg_numrows($result_course_stdv);
+					$num_rows_course_stdv = $db->db_num_rows($result_course_stdv);
 
 					if($num_rows_course_stdv > 0)
 					{
-						while($row_stdv = pg_fetch_object($result_course_stdv))
+						while($row_stdv = $db->db_fetch_object($result_course_stdv))
 						{
 							echo "<a class='Item' href='mailto:".$row_stdv->uid."@".DOMAIN."'>$row_stdv->titelpre $row_stdv->vorname $row_stdv->nachname $row_stdv->titelpost</a><br>";
 						}
