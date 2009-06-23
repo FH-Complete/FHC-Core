@@ -56,7 +56,7 @@ if(!$conn = pg_pconnect(CONN_STRING))
 
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 if(isset($_GET['stsem']))
@@ -74,7 +74,7 @@ if(isset($_GET['uebung_id']) && is_numeric($_GET['uebung_id']))
 else
 {
 	if(!isset($_GET['all'])) 
-		die('Fehlerhafte Parameteruebergabe');
+			die('Fehlerhafte Parameteruebergabe');
 	else 
 	{
 		$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -104,7 +104,7 @@ $qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeite
 		tbl_lehreinheit.lehrveranstaltung_id in(Select lehrveranstaltung_id from lehre.tbl_lehreinheit where lehreinheit_id='$lehreinheit_obj->lehreinheit_id') AND
 		mitarbeiter_uid='$user'";
 
-if(!$result = pg_query($qry))
+if(!$result = $db->db_query($qry))
 	die('Fehler beim laden der Berechtigung');
 
 $rechte = new benutzerberechtigung();

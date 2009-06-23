@@ -20,7 +20,14 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			$db=false;
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -81,12 +88,12 @@ else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -142,13 +149,13 @@ else
 
 }
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>1)
+	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;
@@ -170,11 +177,11 @@ if($result = pg_query($conn, $qry))
 				$lektoren .=')';
 			}
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
 				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
+				while($row_gruppen = $db->db_fetch_object($result_gruppen))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
@@ -272,7 +279,7 @@ else
 	die("Derzeit gibt es keine Uebungen");
 */
 
-	$uebung_obj = new uebung($conn);
+	$uebung_obj = new uebung();
 	$uebung_obj->load_uebung($lehreinheit_id,1);
 	if(count($uebung_obj->uebungen)>0)
 	{
@@ -290,7 +297,7 @@ else
 			if($uebung_id=='')
 				$uebung_id=$row->uebung_id;
 			
-			$subuebung_obj = new uebung($conn);
+			$subuebung_obj = new uebung();
 			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
 			if(count($subuebung_obj->uebungen)>0)
 				{
@@ -363,7 +370,7 @@ else
 	else
 		die("Derzeit gibt es keine Uebungen");
 
-$uebung_obj = new uebung($conn);
+$uebung_obj = new uebung();
 $uebung_obj->load($uebung_id);
 echo "<h3><u>$uebung_obj->bezeichnung</u></h3>";
 
@@ -372,26 +379,7 @@ echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&le
 if ($show_excel_link)
 	echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a>";
 echo "</li>";
-/*
-$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
-if($result = pg_query($conn, $qry))
-{
-	while($row = pg_fetch_object($result))
-	{
-		echo "<li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id&stsem=$stsem' target='_blank'>";
-
-		if($row->gruppe_kurzbz=='')
-			echo "Gruppe $row->verband$row->gruppe";
-		else
-			echo "$row->gruppe_kurzbz";
-
-		if ($show_excel_link)		
-			echo "</a>&nbsp;<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&gruppe=$row->lehreinheitgruppe_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a></li>";
-	}
-}
-*/
 echo '</ul>';
-
 echo "</td><!--<td valign='top'>
 <ul><li>
 <a href='anwesenheitsliste.php?output=xls&lehreinheit_id=$lehreinheit_id&all'>Gesamt&uuml;bersicht&nbsp;<img src='../../../../skin/images/excel.gif' width=16 height=16></a>
