@@ -16,9 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/*
+ * Erstellt eine Liste mit den Noten des eingeloggten Studenten
+ * das betreffende Studiensemester kann ausgewaehlt werden
+ */
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+
 require_once('../../config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
@@ -30,10 +43,7 @@ require_once('../../../include/lehreinheitgruppe.class.php');
 require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
 
-//$conn_moodle='';
 if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
 	die('Fehler beim Connecten zur DB');
 
@@ -55,10 +65,9 @@ $berechtigt = false;
 
 //Pruefen ob Rechte fuer diese LV vorhanden sind
 $qry = "SELECT distinct vorname, nachname, tbl_benutzer.uid as uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true AND studiensemester_kurzbz='$stsem' ORDER BY nachname, vorname";
-
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row_lector = pg_fetch_object($result))
+	while($row_lector = $db->db_fetch_object($result))
 	{
 		if($user==$row_lector->uid)
 			$berechtigt=true;
@@ -71,7 +80,7 @@ $rechte->getBerechtigungen($user);
 if($rechte->isBerechtigt('admin'))
 	$berechtigt=true;
 
-$lv = new lehrveranstaltung($conn);
+$lv = new lehrveranstaltung();
 $lv->load($lvid);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -120,9 +129,9 @@ if(isset($_POST['neu']))
 	}
 	else 
 	{
-		$lehrveranstaltung = new lehrveranstaltung($conn);
+		$lehrveranstaltung = new lehrveranstaltung();
 		$lehrveranstaltung->load($lvid);
-		$studiengang = new studiengang($conn);
+		$studiengang = new studiengang();
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
 		
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
@@ -137,7 +146,7 @@ if(isset($_POST['neu']))
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{
-			$mdl_course = new moodle_course($conn, $conn_moodle);
+			$mdl_course = new moodle_course($conn_moodle);
 			
 			$mdl_course->lehrveranstaltung_id = $lvid;
 			$mdl_course->studiensemester_kurzbz = $stsem;
@@ -153,12 +162,12 @@ if(isset($_POST['neu']))
 				//Eintrag in der Vilesci DB
 				$mdl_course->create_vilesci();
 	
-				$mdl_user = new moodle_user($conn, $conn_moodle);
+				$mdl_user = new moodle_user($conn_moodle);
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
 					
-				$mdl_user = new moodle_user($conn, $conn_moodle);
+				$mdl_user = new moodle_user($conn_moodle);
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
@@ -178,7 +187,7 @@ if(isset($_POST['neu']))
 			
 			if(count($lehreinheiten)>0)
 			{
-				$mdl_course = new moodle_course($conn, $conn_moodle);
+				$mdl_course = new moodle_course($conn_moodle);
 				
 				$mdl_course->mdl_fullname = $_POST['bezeichnung'];
 				$mdl_course->mdl_shortname = $shortname;
@@ -198,12 +207,12 @@ if(isset($_POST['neu']))
 							echo '<br>Fehler beim Anlegen:'.$mdl_course->errormsg;
 					}
 					
-					$mdl_user = new moodle_user($conn, $conn_moodle);
+					$mdl_user = new moodle_user($conn_moodle);
 					//Lektoren Synchronisieren
 					if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
 					
-					$mdl_user = new moodle_user($conn, $conn_moodle);	
+					$mdl_user = new moodle_user($conn_moodle);	
 					//Studenten Synchronisieren
 					if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
@@ -223,7 +232,7 @@ if(isset($_POST['changegruppe']))
 {
 	if(isset($_POST['moodle_id']) && is_numeric($_POST['moodle_id']))
 	{
-		$mcourse = new moodle_course($conn, $conn_moodle);
+		$mcourse = new moodle_course($conn_moodle);
 		if($mcourse->updateGruppenSync($_POST['moodle_id'], isset($_POST['gruppen'])))
 			echo '<b>Daten wurden aktualisiert</b><br>';
 		else 
@@ -238,12 +247,12 @@ if(isset($_POST['changegruppe']))
 //Anlegen eines Testkurses
 if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 {
-	$mdl_course = new moodle_course($conn, $conn_moodle);
+	$mdl_course = new moodle_course($conn_moodle);
 	if(!$mdl_course->loadTestkurs($lvid, $stsem))
 	{
-		$lehrveranstaltung = new lehrveranstaltung($conn);
+		$lehrveranstaltung = new lehrveranstaltung();
 		$lehrveranstaltung->load($lvid);
-		$studiengang = new studiengang($conn);
+		$studiengang = new studiengang();
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
 		
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
@@ -260,7 +269,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 			$id=$mdl_course->mdl_course_id;
 			$errormsg='';
 			
-			$mdl_user = new moodle_user($conn, $conn_moodle);
+			$mdl_user = new moodle_user($conn_moodle);
 			//Lektoren zuweisen
 			if(!$mdl_user->sync_lektoren($id, $lvid, $stsem))
 				$errormsg.='Fehler bei der Lektorenzuordnung:'.$mdl_user->errormsg.'<br>';
@@ -280,7 +289,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 	}
 }
 
-$mdl_course = new moodle_course($conn, $conn_moodle);
+$mdl_course = new moodle_course($conn_moodle);
 if($mdl_course->course_exists_for_lv($lvid, $stsem) || $mdl_course->course_exists_for_allLE($lvid, $stsem))
 {
 	echo 'Es ist bereits ein Moodle Kurs für die Gesamt LV vorhanden';
@@ -294,8 +303,8 @@ else
 									WHERE lehrveranstaltung_id='".addslashes($lvid)."' 
 									AND studiensemester_kurzbz='".addslashes($stsem)."')";
 	$disable_lv='';
-	if($result = pg_query($conn, $qry))
-		if(pg_num_rows($result)>0)
+	if($result = $db->db_query($qry))
+		if($db->db_num_rows($result)>0)
 		{
 			$disable_lv='disabled="true"';
 			//wenn schon ein Moodle Kurs zu einer Lehreinheit angelegt wurde,
@@ -310,7 +319,7 @@ else
 			<input type="radio" id="radiole" name="art" value="le" onclick="togglediv()" '.($art=='le'?'checked':'').'>einen Moodle Kurs für einzelne Lehreinheiten anlegen
 		  ';
 	
-	$le = new lehreinheit($conn);
+	$le = new lehreinheit();
 	$le->load_lehreinheiten($lv->lehrveranstaltung_id, $stsem);
 	echo '<div id="lehreinheitencheckboxen" style="display:none">';
 	foreach ($le->lehreinheiten as $row)
@@ -318,7 +327,7 @@ else
 		//Gruppen laden
 		$gruppen = '';
 		
-		$lehreinheitgruppe = new lehreinheitgruppe($conn);
+		$lehreinheitgruppe = new lehreinheitgruppe();
 		$lehreinheitgruppe->getLehreinheitgruppe($row->lehreinheit_id);
 		foreach ($lehreinheitgruppe->lehreinheitgruppe as $grp)
 		{
@@ -371,7 +380,7 @@ echo '</td></tr></table>';
 
 echo '<br><br><br>';
 echo '<b>Testkurse</b><br><br>';
-$mdlcourse = new moodle_course($conn, $conn_moodle);
+$mdlcourse = new moodle_course($conn_moodle);
 if($mdlcourse->loadTestkurs($lvid, $stsem))
 {
 	echo '<a href="'.MOODLE_PATH.'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse->mdl_fullname.'</a>';

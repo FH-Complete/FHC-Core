@@ -16,11 +16,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/* @date 27.10.2005
+   @brief Zeigt die Daten aus der tbl_lvinfo an
 
-require_once('../../../config.inc.php');
+   @edit	08-11-2006 Versionierung wurde entfernt. Alle eintraege werden jetzt im WS2007
+   					   abgespeichert
+   			03-02-2006 Anpassung an die neue Datenbank
+*/
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -44,19 +59,16 @@ include_once('../../../../include/Excel/Root.php');
 include_once('../../../../include/Excel/File.php');
 include_once('../../../../include/Excel/Writer.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 if(isset($_GET['uebung_id']) && is_numeric($_GET['uebung_id']))
 {
 	$uebung_id = $_GET['uebung_id'];
-	$uebung_obj = new uebung($conn, $uebung_id);
-	$lehreinheit_obj = new lehreinheit($conn, $uebung_obj->lehreinheit_id);
+	$uebung_obj = new uebung($uebung_id);
+	$lehreinheit_obj = new lehreinheit($uebung_obj->lehreinheit_id);
 
 }
 else
@@ -66,7 +78,7 @@ else
 	else
 	{
 		$lehreinheit_id = $_GET['lehreinheit_id'];
-		$lehreinheit_obj = new lehreinheit($conn, $lehreinheit_id);
+		$lehreinheit_obj = new lehreinheit($lehreinheit_id);
 	}
 }
 
@@ -78,13 +90,13 @@ $qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeite
 		tbl_lehreinheit.lehrveranstaltung_id in(Select lehrveranstaltung_id from lehre.tbl_lehreinheit where lehreinheit_id='$lehreinheit_obj->lehreinheit_id') AND
 		mitarbeiter_uid='$user'";
 
-if(!$result = pg_query($conn, $qry))
+if(!$result = $db->db_query($qry))
 	die('Fehler beim laden der Berechtigung');
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!(pg_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz)))
+if(!($db->db_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz)))
 	die('Sie haben keine Berechtigung f&uuml;r diesen Bereich');
 
 if(isset($_GET['output']) && $_GET['output']=='xls')
@@ -92,10 +104,10 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 	if(isset($_GET['all']))
 	{
 		//EXCEL VERSION / ALLE Kreuzerllisten
-		$le_obj = new lehreinheit($conn);
+		$le_obj = new lehreinheit();
 		$le_obj->load($lehreinheit_id);
 
-		$lv_obj = new lehrveranstaltung($conn);
+		$lv_obj = new lehrveranstaltung();
 		$lv_obj->load($le_obj->lehrveranstaltung_id);
 
 		// Creating a workbook
@@ -130,7 +142,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		$maxlength[$i]=strlen('Matrikelnr');
 		$worksheet->write(1,++$i,"Gruppe", $format_title);
 		$maxlength[$i]=strlen('Gruppe');
-		$ueb_obj = new uebung($conn);
+		$ueb_obj = new uebung();
 		$ueb_obj->load_uebung($lehreinheit_id);
 		foreach($ueb_obj->uebungen as $row_ueb)
 		{
@@ -150,9 +162,9 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		{
 			$gruppe = $_GET['gruppe'];
 			$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$gruppe'";
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object($result))
 				{
 					if($row->gruppe_kurzbz!='')
 					{
@@ -210,11 +222,11 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 			$gruppe='';
 		}
 
-		if($result_stud = pg_query($conn, $qry_stud))
+		if($result_stud = $db->db_query($qry_stud))
 		{
 			$zeile=3;
 
-			while($row_stud = pg_fetch_object($result_stud))
+			while($row_stud = $db->db_fetch_object($result_stud))
 			{
 				$spalte=0;
 				$summe=0;
@@ -238,9 +250,9 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				foreach($ueb_obj->uebungen as $row_ueb)
 				{
 					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$row_ueb->uebung_id' AND student_uid='$row_stud->uid' AND vorbereitet=true";
-					if($result = pg_query($conn, $qry))
+					if($result = $db->db_query($qry))
 					{
-						if($row = pg_fetch_object($result))
+						if($row = $db->db_fetch_object($result))
 						{
 							$punkte = $row->punkte;
 							$summe +=$punkte;
@@ -259,8 +271,8 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 
 				//mitarbeit
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$row_stud->uid'";
-				if($result = pg_query($conn, $qry))
-					if($row = pg_fetch_object($result))
+				if($result = $db->db_query($qry))
+					if($row = $db->db_fetch_object($result))
 						$mitarbeit=$row->mitarbeit;
 					else
 						$mitarbeit='failed';
@@ -315,7 +327,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		$maxlength[$i]=strlen('Matrikelnr');
 		$worksheet->write(1,++$i,"Gruppe", $format_title);
 		$maxlength[$i]=strlen('Gruppe');
-		$beispiel_obj = new beispiel($conn);
+		$beispiel_obj = new beispiel();
 		$beispiel_obj->load_beispiel($uebung_id);
 		foreach($beispiel_obj->beispiele as $row_bsp)
 		{
@@ -337,9 +349,9 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		{
 			$gruppe = $_GET['gruppe'];
 			$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$gruppe'";
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object($result))
 				{
 					if($row->gruppe_kurzbz!='')
 					{
@@ -400,11 +412,11 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 			$gruppe='';
 		}
 
-		if($result_stud = pg_query($conn, $qry_stud))
+		if($result_stud = $db->db_query($qry_stud))
 		{
 			$zeile=3;
 
-			while($row_stud = pg_fetch_object($result_stud))
+			while($row_stud = $db->db_fetch_object($result_stud))
 			{
 				$spalte=0;
 				$punkte_heute=0;
@@ -428,7 +440,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
-					$studentbeispiel_obj = new beispiel($conn);
+					$studentbeispiel_obj = new beispiel();
 					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
 					if($studentbeispiel_obj->vorbereitet)
 						$punkte = $row_bsp->punkte;
@@ -444,8 +456,8 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 
 				//mitarbeit heute
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id' AND student_uid='$row_stud->uid'";
-				if($result = pg_query($conn, $qry))
-					if($row = pg_fetch_object($result))
+				if($result = $db->db_query($qry))
+					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
 					else
 						$worksheet->write($zeile,++$spalte,'failed');
@@ -460,8 +472,8 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 						tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 						tbl_beispiel.beispiel_id=tbl_studentbeispiel.beispiel_id
 						";
-				if($result = pg_query($conn, $qry))
-					if($row = pg_fetch_object($result))
+				if($result = $db->db_query($qry))
+					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->gesamt_ohne_mitarbeit!=''?$row->gesamt_ohne_mitarbeit:'0'));
 					else
 						$worksheet->write($zeile,++$spalte,'failed');
@@ -470,8 +482,8 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 
 				//mitarbeit insgesamt
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) WHERE student_uid='$row_stud->uid' AND lehreinheit_id='$lehreinheit_id'";
-				if($result = pg_query($conn, $qry))
-					if($row = pg_fetch_object($result))
+				if($result = $db->db_query($qry))
+					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
 					else
 						$worksheet->write($zeile,++$spalte,'failed');
@@ -518,8 +530,8 @@ function addUser(student_uid)
 		//Update der Daten
 		$uids = split('#',$_POST['update_ids']);
 
-		$uebung_obj = new uebung($conn, $uebung_id);
-		$beispiel_obj = new beispiel($conn);
+		$uebung_obj = new uebung($uebung_id);
+		$beispiel_obj = new beispiel();
 		$beispiel_obj->load_beispiel($uebung_id);
 		$error=false;
 		foreach($uids as $uid)
@@ -533,7 +545,7 @@ function addUser(student_uid)
 					else
 						$vorbereitet=false;
 
-					$bsp_obj = new beispiel($conn);
+					$bsp_obj = new beispiel();
 
 					if(!$bsp_obj->studentbeispiel_exists($uid,$bsp->beispiel_id))
 					{
@@ -564,13 +576,13 @@ function addUser(student_uid)
 			echo "<span class='error'>Fehler beim Speichern der &Auml;nderungen</span>";
 	}
 
-	$uebung_obj = new uebung($conn, $uebung_id);
-	$lehreinheit_obj = new lehreinheit($conn, $uebung_obj->lehreinheit_id);
+	$uebung_obj = new uebung($uebung_id);
+	$lehreinheit_obj = new lehreinheit($uebung_obj->lehreinheit_id);
 
-	$beispiel_obj = new beispiel($conn);
+	$beispiel_obj = new beispiel();
 
-	$lehrveranstaltung_obj = new lehrveranstaltung($conn, $lehreinheit_obj->lehrveranstaltung_id);
-	$stg_obj = new studiengang($conn, $lehrveranstaltung_obj->studiengang_kz);
+	$lehrveranstaltung_obj = new lehrveranstaltung($lehreinheit_obj->lehrveranstaltung_id);
+	$stg_obj = new studiengang($lehrveranstaltung_obj->studiengang_kz);
 
 	$beispiel_obj->load_beispiel($uebung_id);
 	$anzahl = count($beispiel_obj->beispiele);
@@ -578,9 +590,9 @@ function addUser(student_uid)
 	{
 		$gruppe = $_GET['gruppe'];
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$gruppe'";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{
 				if($row->gruppe_kurzbz!='')
 				{
@@ -663,15 +675,15 @@ function addUser(student_uid)
 	}
 	echo "<td align='center' width='200'><b>Unterschrift</b></td></tr>\n";
 
-	if($result = pg_query($conn, $qry_stud))
+	if($result = $db->db_query($qry_stud))
 	{
-		while($row_stud = pg_fetch_object($result))
+		while($row_stud = $db->db_fetch_object($result))
 		{
 			echo "<tr onMouseOver=\"this.style.backgroundColor='#c7dfe8'\" onMouseOut=\"this.style.backgroundColor='#ffffff'\">
 			<td nowrap><input type='checkbox' name='update_$row_stud->uid' disabled>&nbsp;<b>$row_stud->nachname</b>&nbsp;$row_stud->vorname $row_stud->uid</td>";
 			foreach($beispiel_obj->beispiele as $row_bsp)
 			{
-				$studentbeispiel_obj = new beispiel($conn);
+				$studentbeispiel_obj = new beispiel();
 				$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
 				echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
 			}

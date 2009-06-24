@@ -17,10 +17,18 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -59,12 +67,9 @@ require_once('../../../../include/datum.class.php');
 
 <body>
 <?php
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 $rechte = new benutzerberechtigung();
@@ -81,12 +86,12 @@ else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -106,7 +111,7 @@ echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool'
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -142,27 +147,27 @@ else
 
 }
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>1)
+	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_lektoren = pg_query($conn, $qry_lektoren))
+			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
 				$i=0;
-				while($row_lektoren = pg_fetch_object($result_lektoren))
+				while($row_lektoren = $db->db_fetch_object($result_lektoren))
 				{
 					$lektoren .= $row_lektoren->kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_lektoren))
+					if($i<$db->db_num_rows($result_lektoren))
 						$lektoren.=', ';
 					else
 						$lektoren.=' ';
@@ -171,18 +176,18 @@ if($result = pg_query($conn, $qry))
 				$lektoren .=')';
 			}
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
 				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
+				while($row_gruppen = $db->db_fetch_object($result_gruppen))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
 					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_gruppen))
+					if($i<$db->db_num_rows($result_gruppen))
 						$gruppen.=', ';
 					else
 						$gruppen.=' ';
@@ -194,7 +199,7 @@ if($result = pg_query($conn, $qry))
 	}
 	else
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 	}
 }
@@ -226,54 +231,7 @@ echo "<br>
 */
 
 echo "<h3>Statistik für Kreuzerllisten</h3>";
-
-/*
-$uebung_obj = new uebung($conn);
-$uebung_obj->load_uebung($lehreinheit_id);
-if(count($uebung_obj->uebungen)>0)
-{
-	echo "<table width='100%'><tr><td valign='top'>";
-	echo "Wählen Sie bitte eine Kreuzerlliste aus: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-	foreach ($uebung_obj->uebungen as $row)
-	{
-		if($uebung_id =='')
-			$uebung_id = $row->uebung_id;
-
-		if($uebung_id == $row->uebung_id)
-			$selected = 'selected';
-		else
-			$selected = '';
-		echo "<OPTION value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id' $selected>";
-		//Freigegeben = +
-		//Nicht Freigegeben = -
-		if($datum_obj->mktime_fromtimestamp($row->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($row->freigabebis)>time())
-			echo '+ ';
-		else
-			echo '- ';
-		echo $row->bezeichnung;
-		echo '</OPTION>';
-	}
-	echo '</SELECT>';
-	echo "</td>
-		<td>
-			<table>
-			<tr>
-				<td><b>+</b>...</td>
-				<td>Kreuzerlliste ist <u>freigeschalten</u>.</td>
-			</tr>
-			<tr>
-				<td><b>-</b>...</td>
-				<td>Kreuzerlliste ist <u>nicht freigeschalten</u>.</td>
-			</tr>
-			</table>
-		</td>
-	</tr></table>";
-}
-else
-	echo "Derzeit gibt es keine Uebungen";
-*/
-
-$uebung_obj = new uebung($conn);
+$uebung_obj = new uebung();
 $uebung_obj->load_uebung($lehreinheit_id,1);
 if(count($uebung_obj->uebungen)>0)
 {
@@ -291,7 +249,7 @@ if(count($uebung_obj->uebungen)>0)
 		if($uebung_id=='')
 			$uebung_id=$row->uebung_id;
 		
-		$subuebung_obj = new uebung($conn);
+		$subuebung_obj = new uebung();
 		$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
 		if(count($subuebung_obj->uebungen)>0)
 			{
@@ -361,7 +319,7 @@ else
 echo "<br><br><br>";
 if(isset($uebung_id) && $uebung_id!='')
 {
-	$beispiel_obj = new beispiel($conn);
+	$beispiel_obj = new beispiel();
 	if($beispiel_obj->load_beispiel($uebung_id))
 	{
 		if(count($beispiel_obj->beispiele)>0)
@@ -379,8 +337,8 @@ if(isset($uebung_id) && $uebung_id!='')
           		</tr>';
 			$i=0;
 			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-						$gesamt=pg_num_rows($result_cnt);
+				if($result_cnt = $db->db_query($qry_cnt))
+						$gesamt=$db->db_num_rows($result_cnt);
 
 			foreach ($beispiel_obj->beispiele as $row)
 			{
@@ -388,11 +346,9 @@ if(isset($uebung_id) && $uebung_id!='')
 				$solved = 0;
 				$psolved = 0;
 				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-					if($row_cnt = pg_fetch_object($result_cnt))
+				if($result_cnt = $db->db_query($qry_cnt))
+					if($row_cnt = $db->db_fetch_object($result_cnt))
 						$solved = $row_cnt->anzahl;
-
-
 
 				if($solved>0)
 					$psolved = $solved/$gesamt*100;

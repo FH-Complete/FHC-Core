@@ -17,10 +17,18 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -131,11 +139,9 @@ require_once('../../../../include/legesamtnote.class.php');
 
 <body>
 <?php
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
 
 $user = get_uid();
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 $rechte = new benutzerberechtigung();
@@ -152,12 +158,12 @@ else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -178,7 +184,7 @@ echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool'
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -213,27 +219,27 @@ else
 			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
 
 }
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>0)
+	if($db->db_num_rows($result)>0)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
 					$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_lektoren = pg_query($conn, $qry_lektoren))
+			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
 				$i=0;
-				while($row_lektoren = pg_fetch_object($result_lektoren))
+				while($row_lektoren = $db->db_fetch_object($result_lektoren))
 				{
 					$lektoren .= $row_lektoren->kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_lektoren))
+					if($i<$db->db_num_rows($result_lektoren))
 						$lektoren.=', ';
 					else
 						$lektoren.=' ';
@@ -241,18 +247,18 @@ if($result = pg_query($conn, $qry))
 				$lektoren .=')';
 			}
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
 				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
+				while($row_gruppen = $db->db_fetch_object($result_gruppen))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
 					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_gruppen))
+					if($i<$db->db_num_rows($result_gruppen))
 						$gruppen.=', ';
 					else
 						$gruppen.=' ';
@@ -264,7 +270,7 @@ if($result = pg_query($conn, $qry))
 	}
 	else
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 	}
 }
@@ -300,7 +306,7 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 	
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_POST["student_uid"];	
-	$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+	$legesamtnote = new legesamtnote($lehreinheit_id);
     if (!$legesamtnote->load($student_uid,$lehreinheit_id))
     {
 		$legesamtnote->student_uid = $student_uid;
@@ -332,11 +338,7 @@ echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 echo "
 <table>
 ";
-//$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
-//if($result_grp = pg_query($conn, $qry))
-//{
-//	while($row_grp = pg_fetch_object($result_grp))
-//	{
+
 		echo "<tr>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
@@ -392,15 +394,15 @@ echo "
 */
 		// studentenquery		
 		$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."' ORDER BY nachname, vorname";
-    if($result_stud = pg_query($conn, $qry_stud))
+    if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
-			while($row_stud = pg_fetch_object($result_stud))
+			while($row_stud = $db->db_fetch_object($result_stud))
 			{
-				$studentnote = new studentnote($conn);
+				$studentnote = new studentnote();
 				$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->uid);
 				//echo $studentnote->debug;
-   			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+   			$legesamtnote = new legesamtnote($lehreinheit_id);
    			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
 				{    				
     				$note = null;

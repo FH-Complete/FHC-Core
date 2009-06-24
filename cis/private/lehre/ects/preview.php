@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /* @date 27.10.2005
    @brief Zeigt die Daten aus der tbl_lvinfo an
@@ -26,14 +27,20 @@
    					   abgespeichert
    			03-02-2006 Anpassung an die neue Datenbank
 */
-	require_once('../../../config.inc.php');
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 	require_once('../../../../include/studiensemester.class.php');
 	require_once('../../../../include/lehrveranstaltung.class.php');
 	require_once('../../../../include/lvinfo.class.php');
 	require_once('../../../../include/studiengang.class.php');
 
-	if(!$conn=pg_pconnect(CONN_STRING))
-		die('Fehler beim Connecten zur Datenbank');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -104,10 +111,10 @@
 	{
 		$lehrveranstaltung_id=$_GET['lv'];
 
-		$stsemobj = new studiensemester($conn);
+		$stsemobj = new studiensemester();
 		$stsem = $stsemobj->getaktorNext();
 
-  	  	$lvinfo_obj = new lvinfo($conn);
+  	  	$lvinfo_obj = new lvinfo();
   	  	if($lvinfo_obj->load($lehrveranstaltung_id, ATTR_SPRACHE_DE))
   	  	{
 			// german content variables
@@ -139,10 +146,10 @@
 	else
 		die('Fehler bei der Parameteruebergabe');
 
-	$stsemobj = new studiensemester($conn);
+	$stsemobj = new studiensemester();
 	$stsem = $stsemobj->getaktorNext();
 
-	$lv_obj = new lehrveranstaltung($conn);
+	$lv_obj = new lehrveranstaltung();
 	if(!$lv_obj->load($lehrveranstaltung_id))
 		die($lv_obj->errormsg);
 
@@ -167,14 +174,14 @@
 	      	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 	      	tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz";
 
-	if(!$result=pg_query($conn, $qry))
+	if(!$result=$db->db_query($qry))
 		die('Fehler beim Lesen aus der Datenbank');
 
 	$fachbereiche="'1'";
 	$fachbereich['kurzbz']=array();
 	$fachbereich['bezeichnung']=array();
 
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		$fachbereiche .= ", '$row->fachbereich_kurzbz'";
 		$fachbereich['kurzbz'][]=$row->fachbereich_kurzbz;
@@ -182,7 +189,7 @@
 	}
 
 	//Studiengangsbezeichnung auslesen
-	$stg_hlp_obj = new studiengang($conn);
+	$stg_hlp_obj = new studiengang();
 	$stg_hlp_obj->load($stg);
 
 	$stg_kurzbz = $stg_hlp_obj->kuerzel;
@@ -190,19 +197,19 @@
 
 	//Lehrform auslesen
 	$qry = "Select distinct lehrform_kurzbz FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz='$stsem'";
-	if(!$res = pg_query($conn,$qry))
+	if(!$res = $db->db_query($qry))
 		die('Fehler beim Lesen aus der Datenbank');
 	//echo $fachbereiche;
-	while($row = pg_fetch_object($res))
+	while($row = $db->db_fetch_object($res))
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
 	$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche)";
 	
-	if(!$res=pg_query($conn,$qry))
-		die('Fehler beim herstellen der DB Connection');
+	if(!$res=$db->db_query($qry))
+		die('Fehler '.$db->errormsg);
 
 	$fachbereichsleiter=array();
-	while($row=pg_fetch_object($res))
+	while($row=$db->db_fetch_object($res))
 		$fachbereichsleiter[$row->fachbereich_kurzbz] = $row->vorname."&nbsp;".$row->nachname;
 
 	//Fachbereichskoordinatoren fuer alle FB ermitteln
@@ -220,11 +227,11 @@
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz ";
 
-	if(!$res=pg_exec($conn,$qry))
-		die('Fehler beim herstellen der DB Connection');
+	if(!$res=$db->db_query($qry))
+		die('Fehler ! '.$db->errormsg);
 
 	$fachbereichskoordinator=array();
-	while($row=pg_fetch_object($res))
+	while($row=$db->db_fetch_object($res))
 	{
 		$name = $row->vorname."&nbsp;".$row->nachname;
 
@@ -243,9 +250,9 @@
 			AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid";
 
 	$lehrendearray = array();
-	if($result=pg_query($conn,$qry))
+	if($result=$db->db_query($qry))
 	{
-		while($row=pg_fetch_object($result))
+		while($row=$db->db_fetch_object($result))
 			$lehrendearray[] = "$row->vorname $row->nachname";
 	}
 

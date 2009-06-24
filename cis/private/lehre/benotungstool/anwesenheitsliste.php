@@ -26,7 +26,7 @@
 // ------------------------------------------------------------------------------------------
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-			$db=false;
+			die('Fehler beim Herstellen der Datenbankverbindung');
 			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
@@ -50,9 +50,6 @@ include_once('../../../../include/Excel/PPS.php');
 include_once('../../../../include/Excel/Root.php');
 include_once('../../../../include/Excel/File.php');
 include_once('../../../../include/Excel/Writer.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
 
 $user = get_uid();
 
@@ -110,7 +107,7 @@ if(!$result = $db->db_query($qry))
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 	
-if(!(pg_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lehreinheit_obj->studiengang_kz)))
+if(!($db->db_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lehreinheit_obj->studiengang_kz)))
 	die('Sie haben keine Berechtigung f&uuml;r diesen Bereich');
 	
 if(isset($_GET['output']) && $_GET['output']=='xls')

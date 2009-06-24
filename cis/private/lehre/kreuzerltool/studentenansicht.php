@@ -16,14 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 // ********************
 // * Studentenansicht fuers Kreuzerltool
 // ********************
 
-require_once('../../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -58,9 +66,6 @@ require_once('../../../../include/datum.class.php');
 
 <body id="inhalt">
 <?php
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
@@ -74,12 +79,12 @@ else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -99,7 +104,7 @@ echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;"Kreuzerl"-Too
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -146,28 +151,28 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 		tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
 			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
 //echo $qry;
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>1)
+	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			//Beteiligte Mitarbeiter auslesen
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_lektoren = pg_query($conn, $qry_lektoren))
+			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
 				$i=0;
-				while($row_lektoren = pg_fetch_object($result_lektoren))
+				while($row_lektoren = $db->db_fetch_object($result_lektoren))
 				{
 					$lektoren .= $row_lektoren->kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_lektoren))
+					if($i<$db->db_num_rows($result_lektoren))
 						$lektoren.=', ';
 					else
 						$lektoren.=' ';
@@ -176,18 +181,18 @@ if($result = pg_query($conn, $qry))
 				$lektoren .=')';
 			}
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
 				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
+				while($row_gruppen = $db->db_fetch_object($result_gruppen))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
 					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_gruppen))
+					if($i<$db->db_num_rows($result_gruppen))
 						$gruppen.=', ';
 					else
 						$gruppen.=' ';
@@ -199,7 +204,7 @@ if($result = pg_query($conn, $qry))
 	}
 	else
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 		else
 			$lehreinheit_id ='';
@@ -220,13 +225,13 @@ if($lehreinheit_id=='')
 	die('Derzeit gibt es keine Kreuzerllisten f&uuml;r diese Lehrveranstaltung');
 $qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid='$user'";
 $name='';
-if($result = pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result = $db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$name = $row->vorname.' '.$row->nachname;
 
 echo "<br><b>Leistungsuebersicht f&uuml;r $name</b><br><br>";
 
-$uebung_obj = new uebung($conn);
+$uebung_obj = new uebung();
 $uebung_obj->load_uebung($lehreinheit_id);
 if(count($uebung_obj->uebungen)>0)
 {
@@ -276,19 +281,19 @@ if(isset($_POST['submit']))
 {
 	$error=false;
 
-	$ueb_hlp_obj = new uebung($conn);
+	$ueb_hlp_obj = new uebung();
 	$ueb_hlp_obj->load($uebung_id);
 	//Wenn Kreuzerlliste Freigegeben ist
 	if($datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabevon)<time() &&
 	   $datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabebis)>time())
 	{
-		$bsp_obj = new beispiel($conn);
+		$bsp_obj = new beispiel();
 
 		if($bsp_obj->load_beispiel($uebung_id))
 		{
 			foreach ($bsp_obj->beispiele as $row)
 			{
-				$stud_bsp_obj = new beispiel($conn);
+				$stud_bsp_obj = new beispiel();
 
 				if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
 				{
@@ -325,12 +330,12 @@ if(isset($_POST['submit']))
 }
 
 //********ANZEIGE DER EINGETRAGENEN KREUZERL***********
-$uebung_obj = new uebung($conn);
+$uebung_obj = new uebung();
 $uebung_obj->load($uebung_id);
 echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
 echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
 
-$ueb_obj = new uebung($conn);
+$ueb_obj = new uebung();
 if($ueb_obj->load_studentuebung($user, $uebung_id))
 {
 	$anmerkung = $ueb_obj->anmerkung;
@@ -358,12 +363,12 @@ echo "
 			    <td class='ContentHeader2'>Punkte</td>
 			</tr>";
 
-$bsp_obj = new beispiel($conn);
+$bsp_obj = new beispiel();
 $bsp_obj->load_beispiel($uebung_id);
 
 foreach ($bsp_obj->beispiele as $row)
 {
-	$stud_bsp_obj = new beispiel($conn);
+	$stud_bsp_obj = new beispiel();
 	if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
 	{
 		$vorbereitet = $stud_bsp_obj->vorbereitet;
@@ -394,15 +399,15 @@ echo "
 //Gesamtpunkte diese Kreuzerlliste
 $qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
 $punkte_gesamt=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result=$db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$punkte_gesamt = $row->punktegesamt;
 
 //Eingetragen diese Kreuzerlliste
 $qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$user' AND vorbereitet=true";
 $punkte_eingetragen=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result=$db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 
 //Gesamtpunkte alle Kreuzerllisten
@@ -410,8 +415,8 @@ $qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_bei
 		WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 		tbl_uebung.lehreinheit_id='$lehreinheit_id'";
 $punkte_gesamt_alle=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result=$db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$punkte_gesamt_alle = $row->punktegesamt_alle;
 
 //Eingetragen alle Kreuzerllisten
@@ -421,24 +426,24 @@ $qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tb
 		tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
 		tbl_studentbeispiel.student_uid='$user' AND vorbereitet=true";
 $punkte_eingetragen_alle=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result=$db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
 
 //Mitarbeitspunkte
 $qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
 		WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user'";
 $mitarbeit_alle=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result=$db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
 
 //Mitarbeitspunkte
 $qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
 		WHERE uebung_id='$uebung_id' AND student_uid='$user'";
 $mitarbeit=0;
-if($result=pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result=$db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$mitarbeit = $row->mitarbeitspunkte;
 echo "
 
@@ -498,7 +503,7 @@ echo "
 if($uebung_obj->statistik)
 {
 	echo "<h3>Statistik</h3>";
-	$beispiel_obj = new beispiel($conn);
+	$beispiel_obj = new beispiel();
 	if($beispiel_obj->load_beispiel($uebung_id))
 	{
 		if(count($beispiel_obj->beispiele)>0)
@@ -516,8 +521,8 @@ if($uebung_obj->statistik)
           		</tr>';
 			$i=0;
 			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-						$gesamt=pg_num_rows($result_cnt);
+				if($result_cnt = $db->db_query($qry_cnt))
+						$gesamt=$db->db_num_rows($result_cnt);
 
 			foreach ($beispiel_obj->beispiele as $row)
 			{
@@ -525,8 +530,8 @@ if($uebung_obj->statistik)
 				$solved = 0;
 				$psolved = 0;
 				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-					if($row_cnt = pg_fetch_object($result_cnt))
+				if($result_cnt = $db->db_query($qry_cnt))
+					if($row_cnt = $db->db_fetch_object($result_cnt))
 						$solved = $row_cnt->anzahl;
 
 

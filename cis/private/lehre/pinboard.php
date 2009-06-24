@@ -16,10 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-/**
+ 
+ 
+ 
+/*--------------------------------------------------------------------------------------------
  * Pinboard
  * Zeigt alle Pinboardeintraege an. Am rechten Rand werden
  * Studiengangsleiter, Studiengangsleiter Stellvertreter, Assistentin
@@ -29,7 +33,9 @@
  * course_id: Studiengang
  * term_id: Semester
  * showall: Zeigt alle Pinboardeintraege an
- */
+ --------------------------------------------------------------------------------------------*/
+ 
+ 
 // ---------------- CIS Include Dateien einbinden
 	require_once('../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
@@ -37,8 +43,7 @@
 // ------------------------------------------------------------------------------------------
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-		$db=false;
-		
+			die('Fehler beim Herstellen der Datenbankverbindung');
 		
 // ---------------- Diverse Funktionen und UID des Benutzers ermitteln
 	require_once('../../../include/functions.inc.php');
@@ -51,65 +56,67 @@
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/news.class.php');
 
+		// Open der NEWs-Classe
+	if (!$news = new news())
+			die('News Fehler! '.$news->errormsg);
+	
 	// Init	
 	$error='';
-	$PHP_SELF = $_SERVER['PHP_SELF'];
-
-	$showall=(isset($_REQUEST['showall']) ? true:false);
-
-    	$short='';
-    	$datum_content='';
-    	$stsem_content='';
+  $short='';
+	$short_long ='';
+	$stg_bezeichnung='';
+	
+  $datum_content='';
+  $stsem_content='';
 	$stsemarr = array();
 
-	// Open der NEWs-Classe
-	$news = new news();
-
-	
 	// Parameter einlesen		
 	$news_id=trim((isset($_REQUEST['news_id']) ? $_REQUEST['news_id']:''));
-	$btnSend=trim((isset($_REQUEST['btnSend']) ? $_REQUEST['btnSend']:''));
-	$btnDel=trim((isset($_REQUEST['btnDel']) ? $_REQUEST['btnDel']:''));
-	$btnRead=trim((isset($_REQUEST['btnRead']) ? $_REQUEST['btnRead']:''));
-		
-
 	$datum=trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:''));
+	$showall=(isset($_REQUEST['showall']) ? true:false);
+
+	$fachbereich_kurzbz=trim((isset($_REQUEST['fachbereich_kurzbz']) ? $_REQUEST['fachbereich_kurzbz']:''));
 	
+	$studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:''));
+	$semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:0));
 	$studiensemester_kurzbz=trim((isset($_REQUEST['studiensemester_kurzbz']) && is_numeric($_REQUEST['studiensemester_kurzbz']) ? $_REQUEST['studiensemester_kurzbz']:''));
+
+	
+#echo "<p>fachbereich_kurzbz:$fachbereich_kurzbz, studiengang_kz:$studiengang_kz, semester:$semester,$studiensemester_kurzbz: studiensemester_kurzbz </p>";	
+	
+	$senat=false;
+	if (!empty($fachbereich_kurzbz) && mb_strtolower($fachbereich_kurzbz)==mb_strtolower('Senat'))
+		$senat = true;	
+
 	if (empty($studiensemester_kurzbz))
 	{
-    		$stsem_obj = new studiensemester();
-	    	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
-    	}
-
+   		if ($stsem_obj = new studiensemester())
+		    	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
+ 	}
 	
-	$term_id=trim((isset($_REQUEST['term_id']) ? $_REQUEST['term_id']:''));
-	$course_id=trim((isset($_REQUEST['course_id']) && is_numeric($_REQUEST['course_id']) ? $_REQUEST['course_id']:''));
-	if (!empty($course_id))
+	if (!is_null($studiengang_kz)&& $studiengang_kz!='' && is_numeric($studiengang_kz))
 	{
-		$stg_obj = new studiengang($course_id);
-		$short = $stg_obj->kuerzel;
-		$short_long = $stg_obj->kurzbzlang;
-		$stg_bezeichnung = $stg_obj->bezeichnung;
+		if ($stg_obj = new studiengang($studiengang_kz))
+		{		
+			$short = $stg_obj->kuerzel;
+			$short_long = $stg_obj->kurzbzlang;
+			$stg_bezeichnung = $stg_obj->bezeichnung;
+		}	
+		else
+		{
+			$studiengang_kz= '';
+			$semester = '';		
+		}
 	}
 
-	$senat=false;
-	$fachbereich_kurzbz=trim((isset($_REQUEST['fachbereich_kurzbz']) ? $_REQUEST['fachbereich_kurzbz']:''));
-	if (!empty($fachbereich_kurzbz) && $fachbereich_kurzbz=='Senat')
-	{
-		$senat = true;	
-	}
-
-
-
 	
 	
-	function print_STGnews($stg_id, $semester, $showall=false, $fachbereich_kurzbz)
+	function print_STGnews($studiengang_kz, $semester, $showall=false, $fachbereich_kurzbz)
 	{
 		$alter = ($showall?0:MAXNEWSALTER);
 		$maxnews = ($showall?0:MAXNEWS);
 		$news_obj = new news();
-		if($news_obj->getnews($alter, $stg_id, $semester, $showall, $fachbereich_kurzbz, $maxnews))
+		if($news_obj->getnews($alter, $studiengang_kz, $semester, $showall, $fachbereich_kurzbz, $maxnews))
 			$zaehler = print_news($news_obj);
 		else
 			echo $news_obj->errormsg;
@@ -123,7 +130,7 @@
 		$news_obj = new news();
 		if($news_obj->getFBNews($fachbereich_kurzbz, $datum))
 		{
-			if($fachbereich_kurzbz=='Senat')
+			if(mb_strtolower($fachbereich_kurzbz)==mb_strtolower('Senat'))
 				$open=false;
 			else
 				$open=true;
@@ -233,7 +240,7 @@ function show(id)
 				{
 					if($stsem_content!='')
 						$stsem_content.=' - ';
-					$stsem_content .="<a href='$PHP_SELF?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem' class='Item'>";
+					$stsem_content .="<a href='".$_SERVER['PHP_SELF']."?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem' class='Item'>";
 
 					if(isset($studiensemester_kurzbz) && $studiensemester_kurzbz==$stsem)
 						$stsem_content .="<u>$stsem</u>";
@@ -250,7 +257,7 @@ function show(id)
 						$datum = $row->datum;
 					if($datum_content!='')
 						$datum_content.=' - ';
-					$datum_content.="<a href='$PHP_SELF?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem&datum=$row->datum' class='Item'>";
+					$datum_content.="<a href='".$_SERVER['PHP_SELF']."?fachbereich_kurzbz=Senat&studiensemester_kurzbz=$stsem&datum=$row->datum' class='Item'>";
 					//Wenn datum=ausgewaehltes Datum dann das Datum unterstreichen
 					if($datum == $row->datum)
 						$datum_content.='<u>'.date('d.m.Y',strtotime(strftime($row->datum))).'</u>';
@@ -292,7 +299,7 @@ function show(id)
 	?>
 	</tr>
 	  <tr>
-	  	<td class="tdvertical"><?php print_STGnews($course_id, (int)$term_id, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
+	  	<td class="tdvertical"><?php print_STGnews($studiengang_kz, (int)$semester, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
 
 		<td>&nbsp;</td>
 		<td class="tdvertical">
@@ -300,7 +307,7 @@ function show(id)
                 <?php
 
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stgl' LIMIT 1)";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stgl' LIMIT 1)";
 				if($result_course_leader = $db->db_query($qry))
 				{
 					$num_rows_course_leader = $db->db_num_rows($result_course_leader);
@@ -383,7 +390,7 @@ function show(id)
 			  	echo "<p>Stellvertreter:<br>";
 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stglstv' LIMIT 1)";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stglstv' LIMIT 1)";
 
 				if($result_course_leader_deputy = $db->db_query($sql_query))
 				{
@@ -467,7 +474,7 @@ function show(id)
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
                 //Sekritariat auslesen
 
-				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='ass')";
+				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='ass')";
 
 				if($result_course_secretary = $db->db_query($sql_query))
 				{
@@ -546,7 +553,7 @@ function show(id)
 					}
 				}
 				
-				$qry = "SELECT zusatzinfo_html FROM public.tbl_studiengang WHERE studiengang_kz='$course_id'";
+				$qry = "SELECT zusatzinfo_html FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz'";
 				
 				if($result = $db->db_query($qry))
 				{
@@ -558,7 +565,7 @@ function show(id)
 				
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
 
-				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$course_id' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
+				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
 
 				if($result_course_stdv = $db->db_query($sql_query))
 				{

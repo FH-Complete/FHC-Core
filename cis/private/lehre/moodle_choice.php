@@ -16,23 +16,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-/*
- *
- */
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/moodle_course.class.php');
 require_once('../../../include/moodle_user.class.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-
-//$conn_moodle='';
-if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
-	die('Fehler beim Connecten zur DB');
 
 $user = get_uid();
 
@@ -70,7 +68,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 			<tr>
 				<td>';
 
-$mdlcourse = new moodle_course($conn, $conn_moodle);
+$mdlcourse = new moodle_course($conn_moodle);
 $mdlcourse->getAll($lvid, $stsem);
 
 foreach ($mdlcourse->result as $row)

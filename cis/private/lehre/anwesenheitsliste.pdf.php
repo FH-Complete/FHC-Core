@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
    /**
     * anwesenheitsliste.pdf.php
@@ -26,24 +27,17 @@
     *
     */
 
-   setlocale(LC_ALL, "de");
+	 require_once('../../../config/cis.config.inc.php');
    // Pfad zu fpdf
    define('FPDF_FONTPATH','../../../include/pdf/font/');
    // library einbinden
    require_once('../../../include/pdf/fpdf.php');
-   
-   require_once('../../config.inc.php');
    require_once('../../../include/person.class.php');
    require_once('../../../include/studiengang.class.php');
    require_once('../../../include/studiensemester.class.php');
    require_once('../../../include/lehrveranstaltung.class.php');
    require_once('../../../include/pdf.inc.php');
-   error_reporting(E_ALL);
-   ini_set('display_errors','1');
-   
-   if(!$conn=pg_pconnect(CONN_STRING))
-      die('Fehler beim Herstellen der Datenbankverbindung');
-	
+
    //Uebergabeparameter abpruefen
    if(isset($_GET['stg'])) //Studiengang
    {

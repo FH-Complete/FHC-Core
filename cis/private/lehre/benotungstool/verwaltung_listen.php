@@ -17,10 +17,18 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -37,13 +45,9 @@ function microtime_float()
     return ((float)$usec + (float)$sec);
 }
 $time = microtime_float();
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 $rechte = new benutzerberechtigung();
@@ -63,7 +67,7 @@ else
 if (isset($_GET["download"])){
 	$file=$_GET["download"];
 	$uebung_id = $_GET["uebung_id"];
-	$ueb = new uebung($conn);
+	$ueb = new uebung();
 	$ueb->load($uebung_id);
 	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
 	header('Content-Type: application/octet-stream');
@@ -112,12 +116,12 @@ if (isset($_GET["download"])){
 
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -154,30 +158,10 @@ else
 $beispiel_id = (isset($_GET['beispiel_id'])?$_GET['beispiel_id']:'');
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
-/*
-//Filenamen für up-/downloads bauen
-// which kann sein angabe, abgabe oder zip
-function makeUploadName($conn, $which, $lehreinheit_id=null, $uebung_id=null, $ss=null)
-{
-	$query = "SELECT tbl_studiengang.kurzbzlang, tbl_lehrfach.semester, tbl_lehrfach.kurzbz from public.tbl_studiengang, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit where tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id and tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id and tbl_lehrveranstaltung.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_lehreinheit.lehreinheit_id = '".$lehreinheit_id."'";
-	$result = pg_query($conn, $query);
-	$row = pg_fetch_object($result);
-	$name = $row->kurzbzlang."_".$row->semester."_".$row->kurzbz."_".$ss;
-
-if ($which == "angabe")
-	{
-		$name .= "_".$uebung_id;
-	}
-
-	return $name;
-}
-*/
-
-
 //Angabedatei löschen
 if (isset($_GET["deletefile"])){
 	$file=$_GET["deletefile"];
-	$ueb = new uebung($conn);
+	$ueb = new uebung();
 	$ueb->load($uebung_id);
 	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
 	$ueb->angabedatei = '';
@@ -199,12 +183,12 @@ if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 		if (is_numeric($punkte_arr[$i]))
 		{
 			$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '".$liste_id."' and note = '".$i."'";
-			$result = pg_query($conn, $qry);
-			if(pg_num_rows($result)>0)
+			$result = $db->db_query($qry);
+			if($db->db_num_rows($result)>0)
 				$str = "update campus.tbl_notenschluesseluebung set punkte = '".$punkte_arr[$i]."' where uebung_id = '".$liste_id."' and note = '".$i."'";
 			else
 				$str = "insert into campus.tbl_notenschluesseluebung (uebung_id, note, punkte) values ('".$liste_id."','".$i."','".$punkte_arr[$i]."')";
-			if (!pg_query($conn, $str))
+			if (!$db->db_query($str))
 				echo "<span class='error'>Daten konnten nicht gespeichert werden</span>";
 		}
 	}
@@ -217,7 +201,7 @@ echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool'
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -253,29 +237,29 @@ else
 			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
 }
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$result_alle_lehreinheiten = $result;
-	if(pg_num_rows($result)>1)
+	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			//Zugeteilte Lektoren
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_lektoren = pg_query($conn, $qry_lektoren))
+			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
 				$i=0;
-				while($row_lektoren = pg_fetch_object($result_lektoren))
+				while($row_lektoren = $db->db_fetch_object($result_lektoren))
 				{
 					$lektoren .= $row_lektoren->kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_lektoren))
+					if($i<$db->db_num_rows($result_lektoren))
 						$lektoren.=', ';
 					else
 						$lektoren.=' ';
@@ -286,18 +270,18 @@ if($result = pg_query($conn, $qry))
 
 			//Zugeteilte Gruppen
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
 				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
+				while($row_gruppen = $db->db_fetch_object($result_gruppen))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
 					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_gruppen))
+					if($i<$db->db_num_rows($result_gruppen))
 						$gruppen.=', ';
 					else
 						$gruppen.=' ';
@@ -309,7 +293,7 @@ if($result = pg_query($conn, $qry))
 	}
 	else
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 	}
 }
@@ -460,7 +444,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 
 			//Uebung anlegen (KL oder Abgabe)
 			$datum_obj = new datum();
-			$uebung_obj = new uebung($conn);
+			$uebung_obj = new uebung();
 			//$uebung_obj->gewicht='';
 			$uebung_obj->punkte='';
 			$uebung_obj->angabedatei='';
@@ -503,7 +487,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 				if ($angabedatei_up)
 				{
 					$name_up = pathinfo($_FILES["angabedatei"]["name"]);
-					$name_neu = makeUploadName($conn, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
+					$name_neu = makeUploadName($db, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
 					$angabedatei = $name_neu.".".$name_up["extension"];
 					
 					$angabepfad = BENOTUNGSTOOL_PATH."angabe/".$angabedatei;
@@ -519,7 +503,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 				$error_msg='';
 				for($i=0;$i<$anzahlderbeispiele;$i++)
 				{
-					$beispiel_obj = new beispiel($conn);
+					$beispiel_obj = new beispiel();
 					$beispiel_obj->uebung_id = $uebung_id;
 					$beispiel_obj->bezeichnung = "Beispiel ".($i<9?'0'.($i+1):($i+1));
 					$beispiel_obj->punkte = $punkteprobeispiel;
@@ -553,7 +537,7 @@ if(isset($_POST['beispiel_delete']))
 {
 	if(isset($_POST['beispiel']))
 	{
-		$beispiel_obj = new beispiel($conn);
+		$beispiel_obj = new beispiel();
 		$error_msg='';
 		//Ausgewaehlte Beispiele holen
 		$delete_ids = $_POST['beispiel'];
@@ -573,7 +557,7 @@ if(isset($_POST['delete_uebung']))
 {
 	if(isset($_POST['uebung']))
 	{
-		$ueb_obj = new uebung($conn);
+		$ueb_obj = new uebung();
 		$error_msg='';
 		//Ausgewaehlte Beispiele holen
 		$delete_ids = $_POST['uebung'];
@@ -670,7 +654,7 @@ if(isset($_POST['uebung_edit']))
 		if ($angabedatei_up)
 		{
 			$name_up = pathinfo($_FILES["angabedatei"]["name"]);
-			$name_neu = makeUploadName($conn, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
+			$name_neu = makeUploadName($db, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
 			$angabedatei_neu = $name_neu.".".$name_up["extension"];
 			
 			$angabepfad = BENOTUNGSTOOL_PATH."angabe/".$angabedatei_neu;
@@ -683,11 +667,11 @@ if(isset($_POST['uebung_edit']))
 		}
 		else
 		{	
-			$uebung_akt = new uebung($conn);
+			$uebung_akt = new uebung();
 			$uebung_akt->load($uebung_id);
 			$angabedatei_neu = $uebung_akt->angabedatei;
 		}
-		$uebung_obj = new uebung($conn);
+		$uebung_obj = new uebung();
 		$uebung_obj->load($uebung_id);
 		$uebung_obj->gewicht=$gewicht;
 		$uebung_obj->punkte='';
@@ -721,7 +705,7 @@ if(isset($_POST['uebung_edit']))
 
 if (isset($_GET['liste_id']) && isset($_GET['notenschluessel']))
 {
-	$ueb_ns = new uebung($conn);
+	$ueb_ns = new uebung();
 	$ueb_ns->toggle_prozent_punkte($_GET['liste_id']);
 	echo $ueb_ns->errormsg;
 }
@@ -746,7 +730,7 @@ if(isset($_POST['liste_edit']))
 	if(!$error)
 	{
 		
-		$uebung_obj = new uebung($conn);
+		$uebung_obj = new uebung();
 		$uebung_obj->load($_GET['liste_id']);
 		$uebung_obj->gewicht=$gewicht;
 		$uebung_obj->punkte='';
@@ -793,7 +777,7 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 			{
 				if($bezeichnung!='')
 				{
-					$beispiel_obj = new beispiel($conn);
+					$beispiel_obj = new beispiel();
 					if(isset($_POST['beispiel_edit']))
 					{
 						$beispiel_obj->load($beispiel_id);					
@@ -844,7 +828,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Aufgabe bearbeiten</td><td>&nbsp;</td></tr>\n";
 	echo "<tr><td>&nbsp;</td><td></td></tr>";
 
-	$uebung_obj = new uebung($conn);
+	$uebung_obj = new uebung();
 	$uebung_obj->load($uebung_id);
 	$downloadname = mb_ereg_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
 	
@@ -880,7 +864,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	<input type='hidden' name='liste_id' value='".$liste_id."'>
 	</form>";
 
-	$beispiel_obj = new beispiel($conn);
+	$beispiel_obj = new beispiel();
 	$beispiel_obj->load_beispiel($uebung_id);
 	$anzahl = count($beispiel_obj->beispiele);
 	echo "</td><td valign='top'>";
@@ -898,42 +882,6 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	
 		echo "</table>
 		</form>";
-		
-		/*
-		// notenschlüssel
-		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$uebung_id' order by note";
-		if($result = pg_query($conn, $qry))
-		{
-			$notenschluessel = array();
-			$notenschluessel[1] = '';
-			$notenschluessel[2] = '';
-			$notenschluessel[3] = '';
-			$notenschluessel[4] = '';
-			$notenschluessel[5] = '';
-			if(pg_num_rows($result)>=1)
-			{
-				while($schluesselrow = pg_fetch_object($result))
-				{
-					$notenschluessel[$schluesselrow->note] = $schluesselrow->punkte;
-				}
-			}
-		}
-		
-		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
-		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Notenschlüssel definieren</td></tr>\n";
-		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
-	
-		echo "<tr><td>Note</td><td>Mindestpunkte</td></tr>";
-		echo "<tr><td><input type='text' name='schluessel_note_1' maxlength='2' size='2' value='1'></td><td><input type='text' size='2' name='schluessel_punkte_1' value='$notenschluessel[1]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_2' maxlength='2' size='2' value='2'></td><td><input type='text' size='2' name='schluessel_punkte_2' value='$notenschluessel[2]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_3' maxlength='2' size='2' value='3'></td><td><input type='text' size='2' name='schluessel_punkte_3' value='$notenschluessel[3]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_4' maxlength='2' size='2' value='4'></td><td><input type='text' size='2' name='schluessel_punkte_4' value='$notenschluessel[4]'></td></tr>";
-echo "<tr><td><input type='text' name='schluessel_note_5' maxlength='2' size='2' value='5'></td><td><input type='text' size='2' name='schluessel_punkte_5' value='$notenschluessel[5]'></td></tr>";
-		echo "<tr><td align='right' colspan='2'><input type='submit' name='schluessel' value='Speichern'></td></tr>";
-	
-		echo "</table>
-		</form>";
-		*/
 	}
 	
 	echo "</td></tr><tr><td valign='top'>";
@@ -997,7 +945,7 @@ else
 		echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Übung bearbeiten</td><td>&nbsp;</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td></tr>";
 	
-		$liste_obj = new uebung($conn);
+		$liste_obj = new uebung();
 		$liste_obj->load($liste_id);
 	
 		echo "
@@ -1012,11 +960,11 @@ else
 	echo "<table><tr><td valign='top'>";
 	echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>";
 	echo "<table width='440'>";
-	$studentuebung = new uebung($conn);
+	$studentuebung = new uebung();
 	if (!$studentuebung->check_studentuebung($liste_id))	
 		echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Aufgaben bearbeiten</td></tr>";
 
-	$uebung_obj = new uebung($conn);
+	$uebung_obj = new uebung();
 	$uebung_obj->load_uebung($lehreinheit_id,$level=2,$uebung_id=$liste_id);
 	$anzahl = count($uebung_obj->uebungen);
 	$copy_content="<table cellpadding=0><tr><td class='ContentHeader3'>&Uuml;bung in andere LE kopieren</td></tr><tr><td></td><td></td><td>&nbsp;</td></tr><tr><th>&nbsp;</th></tr>";
@@ -1028,22 +976,22 @@ else
 		//Alle Lehreinheiten holen die zu dieser lehrveranstaltung gehoeren
 		//und der angemeldete User berechtigt ist
 		$copy_option_content = array();
-		for($i=0;$i<pg_num_rows($result_alle_lehreinheiten);$i++)
+		for($i=0;$i<$db->db_num_rows($result_alle_lehreinheiten);$i++)
 		{
-			$row_alle_lehreinheiten = pg_fetch_object($result_alle_lehreinheiten,$i);
+			$row_alle_lehreinheiten = $db->db_fetch_object($result_alle_lehreinheiten,$i);
 			if($lehreinheit_id!=$row_alle_lehreinheiten->lehreinheit_id)
 			{
 				//zugeteilte Lektoren holen
 				$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
-				if($result_lektoren = pg_query($conn, $qry_lektoren))
+				if($result_lektoren = $db->db_query($qry_lektoren))
 				{
 					$lektoren = '( ';
 					$j=0;
-					while($row_lektoren = pg_fetch_object($result_lektoren))
+					while($row_lektoren = $db->db_fetch_object($result_lektoren))
 					{
 						$lektoren .= $row_lektoren->kurzbz;
 						$j++;
-						if($j<pg_num_rows($result_lektoren))
+						if($j<$db->db_num_rows($result_lektoren))
 							$lektoren.=', ';
 						else
 							$lektoren.=' ';
@@ -1052,18 +1000,18 @@ else
 				}
 				//zugeteilte Gruppen holen
 				$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
-				if($result_gruppen = pg_query($conn, $qry_gruppen))
+				if($result_gruppen = $db->db_query($qry_gruppen))
 				{
 					$gruppen = '';
 					$j=0;
-					while($row_gruppen = pg_fetch_object($result_gruppen))
+					while($row_gruppen = $db->db_fetch_object($result_gruppen))
 					{
 						if($row_gruppen->gruppe_kurzbz=='')
 							$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
 						else
 							$gruppen.=$row_gruppen->gruppe_kurzbz;
 						$j++;
-						if($j<pg_num_rows($result_gruppen))
+						if($j<$db->db_num_rows($result_gruppen))
 							$gruppen.=', ';
 						else
 							$gruppen.=' ';
@@ -1087,7 +1035,7 @@ else
 			echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$row->uebung_id'></td>";
 			//Wenn andere Lehreinheiten vorhanden sind dann wird die moeglichkeit zum kopieren von
 			//Uebungen in diese Lehreinheiten angeboten.
-			if(isset($result_alle_lehreinheiten) && pg_num_rows($result_alle_lehreinheiten)>1)
+			if(isset($result_alle_lehreinheiten) && $db->db_num_rows($result_alle_lehreinheiten)>1)
 			{
 				$copy_content.= '<tr height=23>';
 				$copy_content.= '<td nowrap align="right">';
@@ -1099,9 +1047,9 @@ else
 				{
 					$qry = "SELECT uebung_id FROM campus.tbl_uebung WHERE lehreinheit_id='$id' AND bezeichnung='$row->bezeichnung'";
 					//echo $qry;
-					if($result_vorhanden = pg_query($conn, $qry))
+					if($result_vorhanden = $db->db_query($qry))
 					{
-						if(pg_num_rows($result_vorhanden)==0)
+						if($db->db_num_rows($result_vorhanden)==0)
 						{
 							$copy_option_content.= "<OPTION value='$id'>$bezeichnung</OPTION>\n";
 							$has_option_content=true;
@@ -1134,7 +1082,7 @@ else
 	}
 	else
 	{
-		$studentuebung = new uebung($conn);
+		$studentuebung = new uebung();
 		if (!$studentuebung->check_studentuebung($liste_id))
 		{
 			echo "<tr><td colspan='3'>Derzeit sind keine Aufgaben angelegt</td><td></td></tr>";
@@ -1192,7 +1140,7 @@ else
 	";
 		// notenschlüssel
 		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$liste_id' order by note";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			$notenschluessel = array();
 			$notenschluessel[1] = '';
@@ -1200,9 +1148,9 @@ else
 			$notenschluessel[3] = '';
 			$notenschluessel[4] = '';
 			$notenschluessel[5] = '';
-			if(pg_num_rows($result)>=1)
+			if($db->db_num_rows($result)>=1)
 			{
-				while($schluesselrow = pg_fetch_object($result))
+				while($schluesselrow = $db->db_fetch_object($result))
 				{
 					$notenschluessel[$schluesselrow->note] = $schluesselrow->punkte;
 				}
@@ -1246,8 +1194,6 @@ else
 			echo "</table>
 			</form>";
 		}
-	
-	
 	}
 	if(!isset($_POST['uebung_neu']))
 		$thema = "Abgabe ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));

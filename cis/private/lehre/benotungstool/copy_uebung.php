@@ -29,7 +29,7 @@
 // ------------------------------------------------------------------------------------------
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-			$db=false;
+			die('Fehler beim Herstellen der Datenbankverbindung');
 
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
@@ -140,7 +140,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						$result2 = $db->db_query($qry2);
 						if ($db->db_num_rows($result2) >0)
 						{
-							$row2 = pg_fetch_object($result2);		
+							$row2 = $db->db_fetch_object($result2);		
 							$ueb_2_target =new uebung($row2->uebung_id);
 							$ueb_2_target->new = false;
 							$new = null;
@@ -188,7 +188,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						if ($subrow->angabedatei != "")
 						{	
 							$angabedatei_source = $subrow->angabedatei;
-							$angabedatei_target = makeUploadName('angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
+							$angabedatei_target = makeUploadName($db,'angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
 							$angabedatei_target .= ".".mb_substr($angabedatei_source, mb_strrpos($angabedatei_source, '.',0) + 1);
 							echo $angabedatei_source."->".$angabedatei_target."<br>";
 							exec("cp ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_source." ".BENOTUNGSTOOL_PATH."angabe/".$angabedatei_target);

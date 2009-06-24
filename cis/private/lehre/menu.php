@@ -16,19 +16,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config.inc.php');
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 	require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/studiensemester.class.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
-
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim Oeffnen der Datenbankverbindung');
 
      $cutlength=10;
 	// Variablen setzen
@@ -42,7 +47,7 @@
 	$rechte=new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 
-	if(check_lektor($user,$sql_conn))
+	if(check_lektor($user))
        $is_lector=true;
     else
        $is_lector=false;
@@ -68,12 +73,12 @@
 		{
 			$sql_query = "SELECT studiengang_kz, semester FROM campus.vw_student WHERE uid='$user' LIMIT 1";
 
-			$result_student = pg_query($sql_conn, $sql_query);
-			$num_rows_student = pg_numrows($result_student);
+			$result_student = $db->db_query($sql_query);
+			$num_rows_student = $db->db_numrows($result_student);
 
 			if($num_rows_student > 0)
 			{
-				$row = pg_fetch_object($result_student, 0);
+				$row = $db->db_fetch_object($result_student, 0);
 
 				$course_id = $row->studiengang_kz;
 				$term_id = $row->semester;
@@ -201,9 +206,7 @@ function js_toggle_container(conid)
 
 					$stg_obj = new studiengang();
 					$stg_obj->getAll('typ, kurzbz');
-					//$sql_query = "SELECT DISTINCT studiengang_kz AS id, kurzbzlang FROM public.tbl_studiengang WHERE NOT(studiengang_kz='0') ORDER BY kurzbzlang";
-					//$result = pg_exec($sql_conn, $sql_query);
-					//$num_rows_result = pg_num_rows($result);
+
 					$sel_kurzbzlang='';
 					foreach($stg_obj->result as $row)
 					{
@@ -262,22 +265,22 @@ function js_toggle_container(conid)
 		</tr>
 
 		<?php
-			$lv_obj = new lehrveranstaltung($sql_conn);
+			$lv_obj = new lehrveranstaltung();
 
 			//if(!$lv_obj->load_lva($course_id,$term_id, null, true, true))
 			//	echo "<tr><td>$lv_obj->errormsg</td></tr>";
 			$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz='".addslashes($course_id)."' AND semester='".addslashes($term_id)."' AND aktiv AND lehre ORDER BY orgform_kurzbz DESC, bezeichnung";
 
 			$lastform='';
-			if($result = pg_query($sql_conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object($result))
 				{
 					if($row->orgform_kurzbz!=$lastform)
 					{
 						$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz='$row->orgform_kurzbz'";
-						if($result_orgform = pg_query($sql_conn, $qry_orgform))
-							if($row_orgform = pg_fetch_object($result_orgform))
+						if($result_orgform = $db->db_query($qry_orgform))
+							if($row_orgform = $db->db_fetch_object($result_orgform))
 								echo "<tr><td><b>$row_orgform->bezeichnung</b></td></tr>";			
 						$lastform=$row->orgform_kurzbz;
 					}
@@ -312,13 +315,13 @@ function js_toggle_container(conid)
 						  	<td class="tdwrap">
 								<ul style="margin-top: 0px; margin-bottom: 0px;">';
 								
-								$stsemobj = new studiensemester($sql_conn);
+								$stsemobj = new studiensemester();
 								$stsem = $stsemobj->getAktorNext();
 								$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
 	
-								if($result = pg_query($sql_conn,$qry))
+								if($result = $db->db_query($qry))
 								{
-									while($row = pg_fetch_object($result))
+									while($row = $db->db_fetch_object($result))
 									{
 										if($row->studiengang_kz==0 && $row->semester==0)
 											echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="../freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung, $cutlength).'</a></li>';
@@ -353,7 +356,7 @@ function js_toggle_container(conid)
 					<ul style="margin-top: 0px; margin-bottom: 0px;">
 					<?php
 					
-					$stsemobj = new studiensemester($sql_conn);
+					$stsemobj = new studiensemester();
 					$stsem = $stsemobj->getAktorNext();
 						//$qry = "SELECT * FROM tbl_lehrfach WHERE lehrfach_nr IN (SELECT distinct lehrfach_nr FROM tbl_lehrveranstaltung WHERE lektor='$user' AND studiensemester_kurzbz='$stsem') AND studiengang_kz!=0";
 					$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
@@ -361,9 +364,9 @@ function js_toggle_container(conid)
 					        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 					        mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'";
 
-					if($result = pg_query($sql_conn,$qry))
+					if($result = $db->db_query($qry))
 					{
-							while($row = pg_fetch_object($result))
+							while($row = $db->db_fetch_object($result))
 							{
 								if($row->studiengang_kz==0 AND $row->semester==0)
 								{
@@ -371,7 +374,7 @@ function js_toggle_container(conid)
 								}	
 								else
 								{
-									$stg_obj = new studiengang($sql_conn);
+									$stg_obj = new studiengang();
 									$stg_obj->load($row->studiengang_kz);
 									$kurzbz = $stg_obj->kuerzel.'-'.$row->semester;
 									// Altes Kuerzel $kurzbz=$stg[$row->studiengang_kz].$row->semester;

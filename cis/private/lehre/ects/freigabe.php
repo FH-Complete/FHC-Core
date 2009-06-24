@@ -16,24 +16,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-/* @author Andres Oesterreicher
+/*
+	 @author Andres Oesterreicher
    @date 20.10.2005
    @brief Formular zum Freigeben der LV Informationen aus der tabelle tbl_lvinfo
 
    @edit	08-11-2006 Versionierung entfernt. Studiensemester = WS2007
-   			03-01-2006 Anpassung an neue DB
+  	 			03-01-2006 Anpassung an neue DB
 */
-	require_once('../../../config.inc.php');
+	
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 	require_once('../../../../include/functions.inc.php');
 	require_once('../../../../include/studiensemester.class.php');
 	require_once('../../../../include/lvinfo.class.php');
-
-	if(!$conn=pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zur Datenbank hergestellt werden');
 
 	$user = get_uid();
 
@@ -57,7 +64,7 @@
 			return false;
 	}
 
-	if(!check_lektor($user,$conn))
+	if(!check_lektor($user))
 	{
 		die('<center>Sie haben keine Berechtigung fuer diesen Bereich</center>');
 	}
@@ -95,19 +102,19 @@
 	{
 		//Loeschen der beiden Datensaetze
 
-		$lvinfo_obj = new lvinfo($conn);
-		pg_query('BEGIN');
+		$lvinfo_obj = new lvinfo();
+		$db->db_query('BEGIN');
 		if($lvinfo_obj->delete($lv))
 		{
 			if(!WriteLog($lvinfo_obj->lastqry,$user))
 			{
 				echo "<br>Fehler beim Schreiben des Log-files<br>";
 			}
-			pg_query('COMMIT');
+			$db->db_query('COMMIT');
 		}
 		else
 		{
-			pg_query('ROLLBACK');
+			$db->db_query('ROLLBACK');
 			echo "<br>Fehler beim loeschen<br>";
 		}
 	}
@@ -123,9 +130,9 @@
 		else
 			$qry.="'".ATTR_SPRACHE_EN."'";
 
-		if($result=pg_query($conn,$qry))
+		if($result=$db->db_query($qry))
 		{
-			if($row=pg_fetch_object($result))
+			if($row=$db->db_fetch_object($result))
 			{
 				$wert = $row->genehmigt=='t'?'false':'true';
 				$qry="UPDATE campus.tbl_lvinfo SET genehmigt=$wert WHERE lehrveranstaltung_id=$lv AND sprache=";
@@ -134,7 +141,7 @@
 				else
 					$qry.="'".ATTR_SPRACHE_EN."'";
 
-				if(pg_query($conn,$qry))
+				if($db->db_query($qry))
 					WriteLog($qry,$user);
 				else
 					echo "Fehler beim Datenbankzugriff";
@@ -192,7 +199,7 @@ function ask() {
        <?php
        //DropDown Menues zur Auswahl von Studiengang und Semester anzeigen
 
-       echo "<form name='auswFrm' action='$PHP_SELF' method='POST'>";
+       echo "<form name='auswFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
        echo "<input type='hidden' name='status' value='a'>";
        echo "<input type='hidden' name='lv' value='$lv'>";
        //stg Drop Down
@@ -201,21 +208,19 @@ function ask() {
        			AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
        			AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz
        			ORDER by kurzbzlang";
-       if(!$result=pg_query($conn,$qry))
+       if(!$result=$db->db_query($qry))
           die ('<center>Fehler bei einer Datenbankabfrage</center>');
 
        echo "Studiengang   <SELECT name='stg' onChange='javascript:window.document.auswFrm.status.value=\"changestg\";window.document.auswFrm.submit();'>";
        //$firststg;
        $vorhanden=false;
 
-       while($row=pg_fetch_object($result))
+       while($row=$db->db_fetch_object($result))
        {
        	   if(!isset($firststg))
        	      $firststg=$row->studiengang_kz;
-
        	   if(!isset($stg))
        	      $stg=$row->studiengang_kz;
-
        	   if($stg==$row->studiengang_kz)
        	   {
        	      echo "<option value='$row->studiengang_kz' selected>$row->kurzbzlang</option>";
@@ -235,7 +240,7 @@ function ask() {
        			AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
        			AND tbl_lehrveranstaltung.studiengang_kz='$stg'
        			ORDER by semester";
-       if(!$result=pg_query($conn,$qry))
+       if(!$result=$db->db_query($qry))
           die ("<center>Fehler bei einer Datenbankabfrage</center>");
 
        echo " Semester   <SELECT name='sem' onChange='javascript:window.document.auswFrm.submit();'>";
@@ -243,7 +248,7 @@ function ask() {
        //$firstsem;
        $vorhanden=false;
 
-       while($row=pg_fetch_object($result))
+       while($row=$db->db_fetch_object($result))
        {
        	   if(!isset($firstsem))
        	      $firstsem = $row->semester;
@@ -282,38 +287,38 @@ function ask() {
 		             <?php
 						$qry="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, to_char(tbl_lvinfo.updateamum,'DD-MM-YYYY HH24:MI') as amum,tbl_lvinfo.updateamum as updateamum, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz=$stg AND semester=$sem AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_DE."' ORDER BY tbl_lehrveranstaltung.bezeichnung ASC";
 
-		                if(!$result=pg_query($conn,$qry))
+		                if(!$result=$db->db_query($qry))
 		                    die("<center>Fehler bei einer Datenbankabfrage</center>");
 
 		                $i=-1;
-		                while($row=pg_fetch_object($result))
+		                while($row=$db->db_fetch_object($result))
 		                {
 							$i++;
 							$qry1="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND lehrveranstaltung_id='$row->lehrveranstaltung_id'";
 
-		                	if(!$result1=pg_query($conn,$qry1))
+		                	if(!$result1=$db->db_query($qry1))
 			                    die("<center>Fehler bei einer Datenbankabfrage</center>");
 
-                            if(!$row1=pg_fetch_object($result1))
+                            if(!$row1=$db->db_fetch_object($result1))
 								die("<center>Fehler bei einer Datenbankabfrage</center>");
 
                             $qry2="SELECT vorname, nachname FROM campus.vw_mitarbeiter WHERE uid='$row->updatevon'";
 
                             $bearbeitet=$row->updatevon;
-		                	if($result2=pg_query($conn,$qry2))
-			                   if($row2=pg_fetch_object($result2))
+		                	if($result2=$db->db_query($qry2))
+			                   if($row2=$db->db_fetch_object($result2))
                                    $bearbeitet=$row2->vorname.' '.$row2->nachname;
                             echo "\n";
 		                	echo "<tr class='liste".($i%2)."'>"."\n";
-		                    echo "<td align='center'><a href='$PHP_SELF?del=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id' onClick='return ask();'>Delete</a></td>"."\n";
+		                    echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?del=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id' onClick='return ask();'>Delete</a></td>"."\n";
 		                    echo "<td align='center'>$row->bezeichnung</td>"."\n";
 		                    //echo "<td align='center'>$row->studiensemester_kurzbz</td>"."\n";
 		                    echo "<td align='center'>$bearbeitet</td>"."\n";
 		                    echo "<td align='center'>".$row->amum."</td>"."\n";
 		                    echo "<td align='center'><a href='#' onClick='javascript:window.open(\"preview.php?lv=$row->lehrveranstaltung_id&language=de\",\"Preview\",\"width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\");'><img src='../../../../skin/images/flagge-aut.gif' border=0 width=30 ></a>&nbsp;";
 		                    echo "<a href='#' onClick='javascript:window.open(\"preview.php?lv=$row1->lehrveranstaltung_id&language=en\",\"Preview\",\"width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\");'><img src='../../../../skin/images/flagge-eng.gif' border=0 width=30 ></a></td>"."\n";
-		                    echo "<td align='center'><input type='checkbox' onClick='javascript:window.location.href=\"$PHP_SELF?changestat=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id&lang=de\";' ".($row->genehmigt=='t'?'checked':'').">"."\n";
-		                    echo "<input type='checkbox' onClick='javascript:window.location.href=\"$PHP_SELF?changestat=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id&lang=en\";' ".($row1->genehmigt=='t'?'checked':'')."></td>"."\n";
+		                    echo "<td align='center'><input type='checkbox' onClick='javascript:window.location.href=\"".$_SERVER['PHP_SELF']."?changestat=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id&lang=de\";' ".($row->genehmigt=='t'?'checked':'').">"."\n";
+		                    echo "<input type='checkbox' onClick='javascript:window.location.href=\"".$_SERVER['PHP_SELF']."?changestat=1&stg=$stg&sem=$sem&lv=$row->lehrveranstaltung_id&lang=en\";' ".($row1->genehmigt=='t'?'checked':'')."></td>"."\n";
 		                    echo "</tr>";
 		                }
 	             ?>

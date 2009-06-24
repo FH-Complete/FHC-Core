@@ -17,10 +17,18 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -35,12 +43,9 @@ require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/pruefung.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 
@@ -66,12 +71,12 @@ else
 	die('Fehlerhafte Parameteruebergabe');
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -88,7 +93,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -111,10 +116,10 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 		// lehreinheiten holen, in denen der student ist	
 		$le_arr = array();			
 		$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' and uid='".$student_uid."' ORDER BY lehrform_kurzbz DESC";
-		 if($result_stud = pg_query($conn, $qry_stud))
+		 if($result_stud = $db->db_query($qry_stud))
 			{
 				$i=1;
-				while($row_stud = pg_fetch_object($result_stud))
+				while($row_stud = $db->db_fetch_object($result_stud))
 				{
 					$le_arr[] = $row_stud->lehreinheit_id;
 				}
@@ -125,7 +130,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 	
 	$jetzt = date("Y-m-d H:i:s");
 
-	$pr = new Pruefung($conn);
+	$pr = new Pruefung();
 
 	if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
 	{
@@ -133,7 +138,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			$termin1 = 1;
 		else
 			{
-				$lvnote = new lvgesamtnote($conn);
+				$lvnote = new lvgesamtnote();
 				if ($lvnote->load($lvid, $student_uid, $stsem))
 				{
 					$pr_note = $lvnote->note;
@@ -144,7 +149,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 					$pr_note = 9;
 					$benotungsdatum = $jetzt;
 				}
-				$pr_1 = new Pruefung($conn);
+				$pr_1 = new Pruefung();
 				$pr_1->lehreinheit_id = $lehreinheit_id;
 				$pr_1->student_uid = $student_uid;
 				$pr_1->mitarbeiter_uid = $user;
@@ -162,8 +167,8 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			}
 	}
 
-	$prTermin2 = new Pruefung($conn);
-	$pr_2 = new Pruefung($conn);
+	$prTermin2 = new Pruefung();
+	$pr_2 = new Pruefung();
 
 	if ($prTermin2->getPruefungen($student_uid, "Termin2", $lvid, $stsem))
 	{
@@ -203,7 +208,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 		$jetzt = date("Y-m-d H:i:s");	
 	
 		$lvid = $_REQUEST["lvid"];
-		$lvgesamtnote = new lvgesamtnote($conn);
+		$lvgesamtnote = new lvgesamtnote();
 	    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
 	    {
 			$lvgesamtnote->student_uid = $student_uid;
