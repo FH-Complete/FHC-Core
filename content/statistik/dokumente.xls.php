@@ -23,21 +23,18 @@
  * Exportiert eine Liste der Absolventen in ein Excel File.
  * Das betreffende Studiensemester wird uebergeben.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/dokument.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
-
-loadVariables($conn, get_uid());
+loadVariables(get_uid());
 //Parameter holen
 $studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
 $studiensemester_kurzbz  = isseT($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:$semester_aktuell;
+$db = new basis_db();
 
 if($studiengang_kz!='')
 {
@@ -46,10 +43,12 @@ if($studiengang_kz!='')
 
 	// sending HTTP headers
 	$workbook->send("Dokumente_".$studiensemester_kurzbz.".xls");
-
+	$workbook->setVersion(8);
+	
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Dokumente");
-
+	$worksheet->setInputEncoding('utf-8');
+	
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 		
@@ -67,7 +66,7 @@ if($studiengang_kz!='')
 	$worksheet->write($zeile,++$spalte,'STATUS',$format_bold);
 	$maxlength[$spalte]=6;
 	
-	$dokumente = new dokument($conn);
+	$dokumente = new dokument();
 	$dokumente->getDokumente($studiengang_kz);
 	$dokumente_arr = array();
 	foreach ($dokumente->result as $row)
@@ -90,33 +89,33 @@ if($studiengang_kz!='')
 					(SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang 
 					 WHERE 
 					 	dokument_kurzbz NOT IN(	SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE 
-					 							prestudent_id=tbl_prestudent.prestudent_id) AND studiengang_kz='$studiengang_kz')<>0 
-					 	AND tbl_prestudentstatus.studiensemester_kurzbz='$studiensemester_kurzbz' AND studiengang_kz='$studiengang_kz'
+					 							prestudent_id=tbl_prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."')<>0 
+					 	AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'
 			)
 			ORDER BY nachname, vorname
 		   ";
 		
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			
 			$zeile++;
 			$spalte=0;
 			
 			$worksheet->write($zeile,$spalte,$row->nachname);
-			if(strlen($row->nachname)>$maxlength[$spalte])
-				$maxlength[$spalte]=strlen($row->nachname);
+			if(mb_strlen($row->nachname)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->nachname);
 			
 			$worksheet->write($zeile,++$spalte, $row->vorname);
-			if(strlen($row->vorname)>$maxlength[$spalte])
-				$maxlength[$spalte]=strlen($row->vorname);
+			if(mb_strlen($row->vorname)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->vorname);
 							
 			$worksheet->write($zeile,++$spalte, $row->status);
-			if(strlen($row->status)>$maxlength[$spalte])
-				$maxlength[$spalte]=strlen($row->status);
+			if(mb_strlen($row->status)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->status);
 
-			$dokumente = new dokument($conn);
+			$dokumente = new dokument();
 			$dokumente->getPrestudentDokumente($row->prestudent_id);
 			
 			foreach ($dokumente->result as $docs)

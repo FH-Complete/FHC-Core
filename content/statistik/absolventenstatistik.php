@@ -28,19 +28,16 @@
  * - Geschlecht
  * - Herkunft (AT/EU/Nicht EU)
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 {
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 }
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -58,7 +55,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$studsem = new studiensemester($conn);
+	$studsem = new studiensemester();
 	$studsem->getAll();
 
 	foreach ($studsem->studiensemester as $stsemester)
@@ -101,33 +98,33 @@ if($stsem!='')
 	//Bachelor
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) a) AS gesamt_stg,
 					
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
-	   			 	WHERE status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND typ='b'
+	   			 	WHERE status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND typ='b'
 					) a) AS gesamt_alle,
 					
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='BB'
 					) a) AS bb,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='VZ'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='VZ'
 					) a) AS vz,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='w'
 					) a) AS w,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m'
 					) a) AS m,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND nation_code='A'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m' AND nation_code='A'
 					) a) AS herkunft_at,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND eu AND nation_code<>'A'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m' AND eu AND nation_code<>'A'
 					) a) AS herkunft_eu,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND NOT eu
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m' AND NOT eu
 					) a) AS herkunft_noteu,
 				true
 			FROM
@@ -135,8 +132,8 @@ if($stsem!='')
 			WHERE
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv AND typ='b'
 			ORDER BY typ, kurzbzlang; ";
-	//echo '<pre>'.$qry.'</pre><br><br>';
-	if($result = pg_query($conn, $qry))
+	$db = new basis_db();
+	if($db->db_query($qry))
 	{
 		
 		$gesamt=0;
@@ -148,11 +145,11 @@ if($stsem!='')
 		$gesamt_at=0;
 		$gesamt_eu=0;
 		$gesamt_noteu=0;
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			echo '<tr>';
 			echo '<td>&nbsp;</td>';
-			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+			echo "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
 			echo "<td align='center'>$row->bb / $row->vz</td>";
@@ -198,33 +195,33 @@ if($stsem!='')
 	</tr>';
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS gesamt_stg,
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_studiengang USING(studiengang_kz)
-	   			 	WHERE status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND typ='m'
+	   			 	WHERE status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND typ='m'
 					) AS gesamt_alle,
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='BB'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='BB'
 					) AS bb,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND orgform_kurzbz='VZ'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='VZ'
 					) AS vz,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='w'
 					) AS w,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m'
 					) AS m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND nation_code='A'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m' AND nation_code='A'
 					) AS herkunft_at,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND eu AND nation_code<>'A'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m' AND eu AND nation_code<>'A'
 					) AS herkunft_eu,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN bis.tbl_nation on(staatsbuergerschaft=nation_code)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND NOT eu
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='m' AND NOT eu
 					) AS herkunft_noteu,
 				true
 			FROM
@@ -232,8 +229,8 @@ if($stsem!='')
 			WHERE
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv AND typ='m'
 			ORDER BY typ, kurzbzlang; ";
-	//echo '<pre>'.$qry.'</pre><br><br>';
-	if($result = pg_query($conn, $qry))
+	
+	if($db->db_query($qry))
 	{
 		
 		$gesamt=0;
@@ -245,11 +242,11 @@ if($stsem!='')
 		$gesamt_at=0;
 		$gesamt_eu=0;
 		$gesamt_noteu=0;
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			echo '<tr>';
 			echo '<td>&nbsp;</td>';
-			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+			echo "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
 			echo "<td align='center'>$row->bb / $row->vz</td>";

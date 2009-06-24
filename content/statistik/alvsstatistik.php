@@ -19,30 +19,26 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/Excel/excel.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur Datenbank');
-
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 
 $stsem = (isset($_GET['stsem'])?$_GET['stsem']:$semester_aktuell);
-
 $format = (isset($_GET['format'])?$_GET['format']:'');
 
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 
 $stg_arr = array();
 foreach ($studiengang->result as $row)
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel.' ('.$row->kurzbzlang.')';
 
-$fachbereich = new fachbereich($conn);
+$fachbereich = new fachbereich();
 $fachbereich->getAll();
 
 $fb_arr = array();
@@ -60,7 +56,7 @@ SELECT * FROM (
 		lehre.tbl_lehreinheitmitarbeiter
 	WHERE
 		tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
-		tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
+		tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND
 		tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 		tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 		faktor<>0 AND
@@ -70,13 +66,13 @@ SELECT * FROM (
 	) as a JOIN public.tbl_studiengang USING(studiengang_kz)
 ORDER BY typ, tbl_studiengang.kurzbz, fachbereich_kurzbz
 ";
-
-if(!$result = pg_query($conn, $qry))
+$db = new basis_db();
+if(!$db->db_query($qry))
 	die('Fehler bei Datenbankabfrage');
 
 $fachbereiche = array();
 
-while($row = pg_fetch_object($result))
+while($row = $db->db_fetch_object())
 {
 	if(!in_array($row->fachbereich_kurzbz, $fachbereiche))
 		$fachbereiche[] = $row->fachbereich_kurzbz;
@@ -100,13 +96,13 @@ WHERE
 	tbl_projektbetreuer.faktor<>0 AND
 	tbl_projektbetreuer.stunden<>0 AND
 	tbl_projektbetreuer.stundensatz<>0 AND
-	tbl_lehreinheit.studiensemester_kurzbz='$stsem'
+	tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."'
 GROUP BY studiengang_kz";
 
-if(!$result = pg_query($conn, $qry))
+if(!$result = $db->db_query($qry))
 	die('Fehler bei DB-Abfrage');
 
-while($row = pg_fetch_object($result))
+while($row = $db->db_fetch_object())
 	$data[$row->studiengang_kz]['betreuungen']=$row->stunden;
 
 if($format=='xls')
@@ -116,10 +112,10 @@ if($format=='xls')
 
 	// sending HTTP headers
 	$workbook->send("ALVSStatistik_".$stsem.".xls");
-
+	$workbook->setVersion(8);
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("ALVSStatistik");
-
+	$worksheet->setInputEncoding('utf-8');
 	//Formate Definieren
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();

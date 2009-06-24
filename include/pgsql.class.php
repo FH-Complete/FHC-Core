@@ -68,5 +68,13 @@ class basis_db extends db
 		else
 			return pg_affected_rows($result);
 	}
+	
+	function db_fetch_array($result=null)
+	{
+		if(is_null($result))
+			return pg_fetch_array($this->db_result);
+		else
+			return pg_fetch_array($result);
+	}
 }
 ?>

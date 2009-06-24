@@ -100,9 +100,9 @@ if(!$error)
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{
 				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
 				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&

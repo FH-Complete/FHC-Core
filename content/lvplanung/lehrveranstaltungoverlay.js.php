@@ -1779,7 +1779,7 @@ function LehrveranstaltungNotenDelete()
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	stsem = tree.view.getCellText(tree.currentIndex,col);
 
-	if(confirm('Wollen Sie diese Note wirklich löschen'))
+	if(confirm('Wollen Sie diese Note wirklich lï¿½schen'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
@@ -1823,7 +1823,7 @@ function LeMitarbeiterGesamtkosten()
 	else
 		gesamtkosten = 0;
 	
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').value=gesamtkosten.toFixed(2)+' €';
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').value=gesamtkosten.toFixed(2)+' â‚¬';
 	
 	if(gesamtkosten<=0)
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: red');

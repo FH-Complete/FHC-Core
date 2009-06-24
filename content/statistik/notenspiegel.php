@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/person.class.php');
@@ -29,11 +29,9 @@ require_once('../../include/note.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/Excel/excel.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur Datenbank');
-
+$db = new basis_db();
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 
 if(!isset($_GET['studiengang_kz']))
 	die('Falsche Parameteruebergabe');
@@ -46,20 +44,18 @@ $typ = isset($_GET['typ'])?$_GET['typ']:'';
 if($semester=='')
 	die('Bitte ein Semester auswaehlen');
 
-$stg = new studiengang($conn);
+$stg = new studiengang();
 $stg_arr = array();
 $stg->getAll(false);
 foreach ($stg->result as $studiengang)
 	$stg_arr[$studiengang->studiengang_kz]=$studiengang->kuerzel;
 
-$stg = new studiengang($conn);
+$stg = new studiengang();
 $stg->load($studiengang_kz);
 
-$student = new student($conn);
+$student = new student();
 $result_student = $student->getStudents($studiengang_kz,$semester,null,null,null, $semester_aktuell);
 
-//$lehrveranstaltung = new lehrveranstaltung($conn);
-//$lehrveranstaltung->load_lva($studiengang_kz, $semester, null, null, true);
 $qry = "SELECT 
 			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
 		FROM 
@@ -72,9 +68,9 @@ $qry = "SELECT
 				FROM 
 					campus.vw_student_lehrveranstaltung, public.tbl_studentlehrverband
 	        	WHERE 
-	        		tbl_studentlehrverband.studiengang_kz='$studiengang_kz' AND 
-	        		tbl_studentlehrverband.semester='$semester' AND 
-	        		vw_student_lehrveranstaltung.studiensemester_kurzbz='$semester_aktuell' AND
+	        		tbl_studentlehrverband.studiengang_kz='".addslashes($studiengang_kz)."' AND 
+	        		tbl_studentlehrverband.semester='".addslashes($semester)."' AND 
+	        		vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 	        		uid=student_uid AND 
 	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
@@ -85,15 +81,15 @@ $qry = "SELECT
 	    FROM
 	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
 	    WHERE
-	    	tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
-	    	tbl_lehrveranstaltung.semester='$semester' AND
-	    	tbl_zeugnisnote.studiensemester_kurzbz='$semester_aktuell'
+	    	tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+	    	tbl_lehrveranstaltung.semester='".addslashes($semester)."' AND
+	    	tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($semester_aktuell)."'
 		ORDER BY bezeichnung";
-//echo $qry;
-if(!$result_lva = pg_query($conn, $qry))
+
+if(!$result_lva = $db->db_query($qry))
 	die('Fehler beim Ermitteln der Lehrveranstaltungen');
 
-$noten = new note($conn);
+$noten = new note();
 $noten->getAll();
 $noten_arr = array();
 $noten_farben = array();
@@ -108,12 +104,13 @@ if($typ=='xls')
 {
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
-	
+	$workbook->setVersion(8);
 	// sending HTTP headers
 	$workbook->send("Notenliste_".$semester_aktuell."_".$stg->kuerzel.($semester!=''?'_'.$semester:'').".xls");
 	
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Notenliste");
+	$worksheet->setInputEncoding('utf-8');
 	
 	//Formate Definieren
 	$format_bold =& $workbook->addFormat();
@@ -131,7 +128,6 @@ if($typ=='xls')
 	//Farben ueberschreiben
 	foreach ($noten_farben as $note=>$farbe) 
 	{
-		
 		if($farbe!='')
 		{
 			$workbook->setCustomColor($note+10, 
@@ -155,7 +151,7 @@ if($typ=='xls')
 	$worksheet->write($zeile,++$spalte,'Personenkennzeichen', $format_bold);
 	$maxlength[$spalte]=20;
 	
-	while($row_lva = pg_fetch_object($result_lva))
+	while($row_lva = $db->db_fetch_object($result_lva))
 	{
 		$worksheet->write($zeile,++$spalte,$stg_arr[$row_lva->studiengang_kz].$row_lva->semester.' '.$row_lva->bezeichnung.' ('.$row_lva->ects.' ECTS)', $format_rotate);
 		$maxlength[$spalte]=3;
@@ -183,9 +179,9 @@ if($typ=='xls')
 		$worksheet->write($zeile,++$spalte,$row_student->matrikelnr, $format_bold);
 				
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='$row_student->uid' AND studiensemester_kurzbz='$semester_aktuell'";
-		if($result = pg_query($conn, $qry))
-			while($row = pg_fetch_object($result))
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='".addslashes($row_student->uid)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+		if($result = $db->db_query($qry))
+			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
 		
 		$anzahl=0;
@@ -193,9 +189,9 @@ if($typ=='xls')
 		$rowcount=0;
 		$summeects=0;
 		$gewichtetenote=0;
-		while($rowcount<pg_num_rows($result_lva))
+		while($rowcount<$db->db_num_rows($result_lva))
 		{
-			$row_lva = pg_fetch_object($result_lva,$rowcount);
+			$row_lva = $db->db_fetch_object($result_lva,$rowcount);
 			$rowcount++;
 			if(isset($noten[$row_lva->lehrveranstaltung_id]))
 			{								
@@ -261,9 +257,9 @@ if($typ=='xls')
 	$summe_schnitt=0;
 	$anzahl_schnitt=0;
 	$rowcount=0;
-	while($rowcount<pg_numrows($result_lva))
+	while($rowcount<$db->db_num_rows($result_lva))
 	{
-		$row_lva = pg_fetch_object($result_lva, $rowcount);
+		$row_lva = $db->db_fetch_object($result_lva, $rowcount);
 		$rowcount++;
 		if(isset($summe_lv[$row_lva->lehrveranstaltung_id]))
 		{
@@ -321,7 +317,7 @@ else
 	echo "<h2>Notenspiegel $stg->kuerzel $semester</h2>";
 	
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Personenkennzeichen</th>';
-	while($row_lva = pg_fetch_object($result_lva))
+	while($row_lva = $db->db_fetch_object($result_lva))
 	{
 		echo "<th>".$stg_arr[$row_lva->studiengang_kz]."$row_lva->semester $row_lva->bezeichnung ($row_lva->ects ECTS)</th>";
 	}
@@ -339,9 +335,9 @@ else
 		echo "<tr><td>$i</td><td>$row_student->nachname $row_student->vorname</td><td>$row_student->matrikelnr</td>";
 		
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='$row_student->uid' AND studiensemester_kurzbz='$semester_aktuell'";
-		if($result = pg_query($conn, $qry))
-			while($row = pg_fetch_object($result))
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='".addslashes($row_student->uid)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+		if($result = $db->db_query($qry))
+			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
 		
 		$anzahl=0;
@@ -349,9 +345,9 @@ else
 		$rowcount=0;
 		$summeects=0;
 		$gewichtetenote=0;
-		while($rowcount<pg_numrows($result_lva))
+		while($rowcount<$db->db_num_rows($result_lva))
 		{
-			$row_lva =  pg_fetch_object($result_lva, $rowcount);
+			$row_lva =  $db->db_fetch_object($result_lva, $rowcount);
 			$rowcount++;
 			if(isset($noten[$row_lva->lehrveranstaltung_id]))
 			{
@@ -403,9 +399,9 @@ else
 	$summe_schnitt=0;
 	$anzahl_schnitt=0;
 	$rowcount=0;
-	while($rowcount<pg_numrows($result_lva))
+	while($rowcount<$db->db_num_rows($result_lva))
 	{
-		$row_lva = pg_fetch_object($result_lva, $rowcount);
+		$row_lva = $db->db_fetch_object($result_lva, $rowcount);
 		$rowcount++;
 		if(isset($summe_lv[$row_lva->lehrveranstaltung_id]))
 		{

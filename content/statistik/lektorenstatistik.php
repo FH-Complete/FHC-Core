@@ -26,22 +26,20 @@
  * Bei einem klick auf das Institut wird die Detailansicht angezeigt, in der die einzelnen
  * Lektoren Namentlich aufscheinen.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/fachbereich.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-
 $ws='';
 $ss='';
+$db = new basis_db();
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 {
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 }
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -54,13 +52,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	</head>
 	<body>';
 
-	
-	
 if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 {
 	$ss = (isset($_GET['ss'])?$_GET['ss']:'');
 	$ws = (isset($_GET['ws'])?$_GET['ws']:'');
-	$fachbereich = new fachbereich($conn);
+	$fachbereich = new fachbereich();
 	if(!$fachbereich->load($_GET['fachbereich_kurzbz']))
 		die('Institut existiert nicht');
 	
@@ -72,14 +68,14 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 				JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 				JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 				JOIN public.tbl_person USING(person_id)
-			WHERE studiensemester_kurzbz in('$ws','$ss') 
+			WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') 
 				AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt
 			ORDER BY nachname, vorname";
 	
 	
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		echo "Fixangestellt - Anzahl: ".pg_num_rows($result)."
+		echo "Fixangestellt - Anzahl: ".$db->db_num_rows()."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
@@ -91,7 +87,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			echo '<tr>';
 			echo "<td>$row->titelpre</td>";
@@ -110,14 +106,13 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 				JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 				JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 				JOIN public.tbl_person USING(person_id)
-			WHERE studiensemester_kurzbz in('$ws','$ss') 
+			WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') 
 				AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND NOT fixangestellt
 			ORDER BY nachname, vorname";
-	
-	
-	if($result = pg_query($conn, $qry))
+		
+	if($db->db_query($qry))
 	{
-		echo "<br /><br />Freiangestellt - Anzahl: ".pg_num_rows($result)."
+		echo "<br /><br />Freiangestellt - Anzahl: ".$db->db_num_rows()."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
@@ -129,7 +124,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			echo '<tr>';
 			echo "<td>$row->titelpre</td>";
@@ -137,7 +132,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			echo "<td>$row->vorname</td>";
 			echo "<td>$row->titelpost</td>";
 			echo "</tr>";
-		}		
+		}
 	}
 	echo '</tbody></table>';
 }
@@ -145,13 +140,13 @@ else
 {
 	if(substr($stsem, 0, 2)=='WS')
 	{
-		$stsem_obj = new studiensemester($conn);
+		$stsem_obj = new studiensemester();
 		$ss = $stsem_obj->getNextFrom($stsem);
 		$ws = $stsem;
 	}
 	else 
 	{
-		$stsem_obj = new studiensemester($conn);
+		$stsem_obj = new studiensemester();
 		$ws = $stsem_obj->getPreviousFrom($stsem);
 		$ss = $stsem;
 	}
@@ -159,7 +154,7 @@ else
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$studsem = new studiensemester($conn);
+	$studsem = new studiensemester();
 	$studsem->getAll();
 
 	foreach ($studsem->studiensemester as $stsemester)
@@ -170,7 +165,7 @@ else
 			$selected='';
 		if(substr($stsemester->studiensemester_kurzbz, 0, 2)=='WS')
 		{
-			$stsem_obj = new studiensemester($conn);
+			$stsem_obj = new studiensemester();
 			$ss1 = $stsem_obj->getNextFrom($stsemester->studiensemester_kurzbz);
 			$ws1 = $stsemester->studiensemester_kurzbz;
 			echo '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$ws1.'/'.$ss1.'</option>';			
@@ -204,10 +199,10 @@ else
 		
 		$qry = "SELECT 
 					bezeichnung, fachbereich_kurzbz,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('$ws','$ss') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt) a) as fix,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('$ws','$ss') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt) a) as extern,
-					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='$ws' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ws,
-					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='$ss' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ss
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt) a) as fix,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt) a) as extern,
+					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ws)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ws,
+					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ss)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ss
 				FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 		/*
 		Mitarbeiter laut institutszuordnung
@@ -215,14 +210,13 @@ else
 		(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='oezuordnung' AND NOT fixangestellt AND aktiv) as extern,
 		*/
 		//echo '<pre>'.$qry.'</pre><br><br>';
-		if($result = pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
-			
 			$gesamt_fix=0;
 			$gesamt_extern=0;
 			$gesamt_ws=0;
 			$gesamt_ss=0;
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object())
 			{
 				if($row->fix==0 && $row->extern==0)
 				{

@@ -19,15 +19,12 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Datenbankverbindung konnte nicht hergestellt werden');
 
 if(isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
@@ -50,10 +47,12 @@ else
 	$fachbereich_kurzbz = '';
 
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
+
+$db = new basis_db();
 
 $stg_arr = array();
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll();
 
 foreach ($studiengang->result as $row)
@@ -61,13 +60,13 @@ foreach ($studiengang->result as $row)
 
 if($studiengang_kz!='')
 {
-	$studiengang = new studiengang($conn);
+	$studiengang = new studiengang();
 	$studiengang->load($studiengang_kz);
 }
 
 if($mitarbeiter_uid!='')
 {
-	$mitarbeiter = new benutzer($conn);
+	$mitarbeiter = new benutzer();
 	$mitarbeiter->load($mitarbeiter_uid);
 }
 
@@ -177,13 +176,13 @@ echo '<th>Lektor</th>';
 echo '<th>Kosten</th>';
 echo '<th>Gesamtkosten</th>';
 echo '</tr>';
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$last_lva='';
 	$stunden_lv=0;
 	$kosten_lv=0;
 	$gesamtkosten_lva=0;
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($last_lva!=$row->lehrveranstaltung_id)
 		{
@@ -220,9 +219,9 @@ if($result = pg_query($conn, $qry))
 
 		$gruppen='';
 		$qry_grp = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-		if($result_grp=pg_query($conn, $qry_grp))
+		if($result_grp = $db->db_query($qry_grp))
 		{
-			while($row_grp = pg_fetch_object($result_grp))
+			while($row_grp = $db->db_fetch_object($result_grp))
 			{
 				if($gruppen=='')
 					$gruppen = ($row_grp->gruppe_kurzbz!=''?$row_grp->gruppe_kurzbz:trim($stg_arr[$row_grp->studiengang_kz].'-'.$row_grp->semester.$row_grp->verband.$row_grp->gruppe));
@@ -269,13 +268,13 @@ if($studiengang_kz!='')
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
-				tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+				tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 
 	if($semester!='')
-		$qry.=" AND tbl_lehrveranstaltung.semester='$semester'";
+		$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
 }
 elseif($mitarbeiter_uid!='')
 {
@@ -288,8 +287,8 @@ elseif($mitarbeiter_uid!='')
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_projektbetreuer.person_id='$mitarbeiter->person_id' AND
-				tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+				tbl_projektbetreuer.person_id='".addslashes($mitarbeiter->person_id)."' AND
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 }
@@ -305,7 +304,7 @@ elseif($fachbereich_kurzbz!='')
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 				tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
@@ -313,9 +312,9 @@ elseif($fachbereich_kurzbz!='')
 else 
 	die('Something unexpected happend');
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>0)
+	if($db->db_num_rows($result)>0)
 	{
 		echo '<tr><td colspan="2"><b>Betreuungen</b></td></tr>';
 
@@ -333,7 +332,7 @@ if($result = pg_query($conn, $qry))
 		
 		$gesamtkosten_betreuung=0;
 		$stunden_betreuung=0;
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo '<tr class="liste1">';
 			echo '<td>&nbsp;</td>';
@@ -341,7 +340,7 @@ if($result = pg_query($conn, $qry))
 			//echo "<td>&nbsp;</td>";
 			//echo '<td>&nbsp;</td>';
 			echo "<td align='right'>".number_format($row->stunden,2)."</td>";
-			$benutzer = new benutzer($conn);
+			$benutzer = new benutzer();
 			$benutzer->load($row->student_uid);
 			echo "<td>$benutzer->nachname $benutzer->vorname</td>";
 			echo "<td>$row->nachname $row->vorname</td>";

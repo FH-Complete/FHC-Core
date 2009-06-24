@@ -25,14 +25,13 @@
  * Bei einem klick auf das Institut wird die Detailansicht angezeigt, in der die einzelnen
  * Lektoren Namentlich aufscheinen.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/fachbereich.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
+$db = new basis_db();
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
@@ -46,7 +45,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 
 if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 {
-	$fachbereich = new fachbereich($conn);
+	$fachbereich = new fachbereich();
 	if(!$fachbereich->load($_GET['fachbereich_kurzbz']))
 		die('Institut existiert nicht');
 	
@@ -57,9 +56,9 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv 
 			ORDER BY nachname, vorname";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		echo "Fixangestellt - Anzahl: ".pg_num_rows($result)."
+		echo "Fixangestellt - Anzahl: ".$db->db_num_rows($result)."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
@@ -71,7 +70,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo '<tr>';
 			echo "<td>$row->titelpre</td>";
@@ -89,9 +88,9 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv
 			ORDER BY nachname, vorname";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		echo "<br /><br />Freiangestellt - Anzahl: ".pg_num_rows($result)."
+		echo "<br /><br />Freiangestellt - Anzahl: ".$db->db_num_rows($result)."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
@@ -103,7 +102,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo '<tr>';
 			echo "<td>$row->titelpre</td>";
@@ -145,13 +144,12 @@ else
 				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as extern
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		
 		$gesamt_fix=0;
 		$gesamt_extern=0;
 
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($row->fix==0 && $row->extern==0)
 			{
@@ -170,9 +168,9 @@ else
 					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung') AND aktiv AND fixangestellt) as fix,
 					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung') AND aktiv AND NOT fixangestellt) as extern
 				";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{
 				echo '<tr>';
 				echo "<td>Nicht zugeordnet</td>";

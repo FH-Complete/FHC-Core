@@ -24,20 +24,16 @@
  * Der Mitarbeiterfilter und die zu exportierenden Spalten werden per GET uebergeben.
  * Die Adressen der Mitarbeiter werden immer dazugehaengt
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/Excel/excel.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
+$db = new basis_db();
 $user = get_uid();
-
-loadVariables($conn, $user);
+loadVariables($user);
 
 //Parameter holen
 
@@ -89,7 +85,7 @@ while (isset($_GET[$varname]))
 $zustelladresse=true;
 
 // Mitarbeiter holen
-$mitarbeiterDAO=new mitarbeiter($conn);
+$mitarbeiterDAO=new mitarbeiter();
 $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
 
 //Sortieren der Eintraege nach Nachname, Vorname
@@ -109,13 +105,14 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 	
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
-
+	$workbook->setVersion(8);
 	// sending HTTP headers
 	$workbook->send("Mitarbeiter". "_" . date("d_m_Y") . ".xls");
 
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Mitarbeiter");
-
+	$worksheet->setInputEncoding('utf-8');
+	
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 
@@ -126,7 +123,7 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 
 	//Zeilenueberschriften ausgeben
 	for ($i=0;$i<$anzSpalten;$i++)
-		$worksheet->write(0,$i,strtoupper(str_replace('_bezeichnung','',$spalte[$i])), $format_bold);
+		$worksheet->write(0,$i,mb_strtoupper(str_replace('_bezeichnung','',$spalte[$i])), $format_bold);
 	$worksheet->write(0,$i,"STRASSE", $format_bold);
 	$worksheet->write(0,$i+1,"PLZ", $format_bold);
 	$worksheet->write(0,$i+2,"ORT", $format_bold);
@@ -136,11 +133,11 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 	$j=1;
 	$maxlength = array();
 	for ($i=0;$i<$anzSpalten;$i++)
-		$maxlength[$i]=strlen(str_replace('_bezeichnung','',$spalte[$i]));
-	$maxlength[$i]=strlen('STRASSE');
-	$maxlength[$i+1]=strlen('PLZ');
-	$maxlength[$i+2]=strlen('ORT');
-	$maxlength[$i+3]=strlen('FIRMENNAME');
+		$maxlength[$i]=mb_strlen(str_replace('_bezeichnung','',$spalte[$i]));
+	$maxlength[$i]=mb_strlen('STRASSE');
+	$maxlength[$i+1]=mb_strlen('PLZ');
+	$maxlength[$i+2]=mb_strlen('ORT');
+	$maxlength[$i+3]=mb_strlen('FIRMENNAME');
 
 	//Zeilen (Mitarbeiter) ausgeben
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
@@ -151,36 +148,36 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 			if(is_bool($mitarbeiter->$spalte[$i]))
 				$mitarbeiter->$spalte[$i] = ($mitarbeiter->$spalte[$i]?'Ja':'Nein');
 			
-			if(strlen($mitarbeiter->$spalte[$i])>$maxlength[$i])
-				$maxlength[$i] = strlen($mitarbeiter->$spalte[$i]);
+			if(mb_strlen($mitarbeiter->$spalte[$i])>$maxlength[$i])
+				$maxlength[$i] = mb_strlen($mitarbeiter->$spalte[$i]);
 			$worksheet->write($j,$i, $mitarbeiter->$spalte[$i]);
 		}
 		
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
 		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$mitarbeiter->person_id' AND zustelladresse=true LIMIT 1";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{	
-				if(strlen($row->strasse)>$maxlength[$i])
-					$maxlength[$i]=strlen($row->strasse);
+				if(mb_strlen($row->strasse)>$maxlength[$i])
+					$maxlength[$i]=mb_strlen($row->strasse);
 				$worksheet->write($j,$i, $row->strasse);
-				if(strlen($row->plz)>$maxlength[$i+1])
-					$maxlength[$i+1]=strlen($row->plz);
+				if(mb_strlen($row->plz)>$maxlength[$i+1])
+					$maxlength[$i+1]=mb_strlen($row->plz);
 				$worksheet->write($j,$i+1, $row->plz);
-				if(strlen($row->ort)>$maxlength[$i+2])
-					$maxlength[$i+2]=strlen($row->ort);
+				if(mb_strlen($row->ort)>$maxlength[$i+2])
+					$maxlength[$i+2]=mb_strlen($row->ort);
 				$worksheet->write($j,$i+2, $row->ort);
 				
 				if($row->firma_id!='')
 				{
 					$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$row->firma_id'";
-					if($result = pg_query($conn, $qry))
+					if($result = $db->db_query($qry))
 					{
-						if($row = pg_fetch_object($result))
+						if($row = $db->db_fetch_object($result))
 						{
-							if(strlen($row->name)>$maxlength[$i+3])
-								$maxlength[$i+3]=strlen($row->name);
+							if(mb_strlen($row->name)>$maxlength[$i+3])
+								$maxlength[$i+3]=mb_strlen($row->name);
 							$worksheet->write($j,$i+3, $row->name);
 						}
 					}

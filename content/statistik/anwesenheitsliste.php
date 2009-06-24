@@ -22,16 +22,13 @@
 /*
  * Generiert eine Anwesenheitsliste mit Fotos
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/akte.class.php');
 
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbzlang', false);
 	
   //Uebergabeparameter abpruefen
@@ -109,23 +106,24 @@ else
 		$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
 }
 
-echo '<html><head>
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"><html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Anwesenheitsliste</title>
 <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 </head><body><h2>Studentenliste - '.date('d.m.Y').'</h2><br>';
-
-if($result = pg_query($conn, $qry))
+$db = new basis_db();
+if($result = $db->db_query($qry))
 {
 	echo "<table class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>";
 	echo '<thead><tr class="liste"><th>Foto</th><th class="table-sortable:default">Nachname</th><th class="table-sortable:default">Vorname</th><th class="table-sortable:default">Gruppe</th></tr></thead><tbody>';
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '<tr>';
 		if($row->foto!='')
 		{
-			$akte = new akte($conn);
+			$akte = new akte();
 			$akte->getAkten($row->person_id, 'Lichtbil');
 			
 			echo "<td><a href='../akte.php?id=".$akte->result[0]->akte_id."'><img src='../bild.php?src=person&person_id=$row->person_id'></a></td>";
