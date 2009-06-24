@@ -19,22 +19,19 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/Excel/excel.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur Datenbank');
-
 $user = get_uid();
-loadVariables($conn, $user);
-
+loadVariables($user);
+$db = new basis_db();
 $stsem = $semester_aktuell;
 
 $format = (isset($_GET['format'])?$_GET['format']:'');
 
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 
 $stg_arr = array();
@@ -45,22 +42,22 @@ $qry = "
 	SELECT
 		stdlvb.studiengang_kz,
 		count(*) AS all,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=1 AND studiengang_kz=stdlvb.studiengang_kz ) AS s1,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=2 AND studiengang_kz=stdlvb.studiengang_kz ) AS s2,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=3 AND studiengang_kz=stdlvb.studiengang_kz ) AS s3,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=4 AND studiengang_kz=stdlvb.studiengang_kz ) AS s4,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=5 AND studiengang_kz=stdlvb.studiengang_kz ) AS s5,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=6 AND studiengang_kz=stdlvb.studiengang_kz ) AS s6,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=7 AND studiengang_kz=stdlvb.studiengang_kz ) AS s7,
-		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='$stsem' AND semester=8 AND studiengang_kz=stdlvb.studiengang_kz ) AS s8
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=1 AND studiengang_kz=stdlvb.studiengang_kz ) AS s1,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=2 AND studiengang_kz=stdlvb.studiengang_kz ) AS s2,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=3 AND studiengang_kz=stdlvb.studiengang_kz ) AS s3,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=4 AND studiengang_kz=stdlvb.studiengang_kz ) AS s4,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=5 AND studiengang_kz=stdlvb.studiengang_kz ) AS s5,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=6 AND studiengang_kz=stdlvb.studiengang_kz ) AS s6,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=7 AND studiengang_kz=stdlvb.studiengang_kz ) AS s7,
+		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=8 AND studiengang_kz=stdlvb.studiengang_kz ) AS s8
 	FROM
 		tbl_studentlehrverband stdlvb JOIN tbl_studiengang USING(studiengang_kz)
 	WHERE
-		studiensemester_kurzbz='$stsem' AND semester>0 AND semester<9 AND aktiv
+		studiensemester_kurzbz='".addslashes($stsem)."' AND semester>0 AND semester<9 AND aktiv
 	GROUP BY typ, kurzbz, studiengang_kz
 	ORDER BY typ, kurzbz, studiengang_kz
 ";
-if(!$result = pg_query($conn, $qry))
+if(!$result = $db->db_query($qry))
 	die('Fehler bei Datenbankabfrage');
 
 if($format=='xls')
@@ -96,7 +93,7 @@ if($format=='xls')
 	$worksheet->write($zeile,++$spalte,'8', $format_bold);
 	$worksheet->write($zeile,++$spalte,'Gesamt', $format_bold);
 
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$zeile++;
 		$spalte=0;
@@ -138,7 +135,7 @@ else
 
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>'.$stsem.'</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>Gesamt</th></tr>';
 
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo "<tr>";
 		echo "<td align='left'>".$stg_arr[$row->studiengang_kz]."</td>";

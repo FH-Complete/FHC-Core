@@ -23,29 +23,24 @@
  * Erstellt ein Excel File mit allen Lektoren und den Studiengaengen in denen diese Unterrichten
  * Diese Liste wird dann per Mail an die Geschaeftsstelle gesendet.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/mail.class.php');
 
-if (!$conn=pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
-
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $semester_aktuell  = $stsem->getaktorNext();
 
 $file = 'lehrauftragsgesamtliste.xls';
 
 // Creating a workbook
 $workbook = new Spreadsheet_Excel_Writer($file);
-
-// sending HTTP headers
-//$workbook->send("Lehrauftragsgesamtliste.xls");
-
+$workbook->setVersion(8);
 // Creating a worksheet
 $worksheet =& $workbook->addWorksheet("Lektoren");
+$worksheet->setInputEncoding('utf-8');
 
 //Formate Definieren
 $format_left =& $workbook->addFormat();
@@ -72,7 +67,7 @@ $format_number_bold->setBold();
 $format_number_bold->setLeft(2);
 
 $i=0;
-$studiensemester = new studiensemester($conn);
+$studiensemester = new studiensemester();
 $stsem = $studiensemester->getNearest();
 
 $worksheet->write(0,0,'Erstellt am '.date('d.m.Y')." Studiensemester: $stsem", $format_bold);
@@ -85,7 +80,7 @@ $maxlength[$spalte]=10;
 $worksheet->write($zeile+1,$spalte++,"Vorname", $format_bold);
 $maxlength[$spalte]=10;
 $worksheet->write($zeile+1,$spalte++,"UID", $format_bold);
-
+$db = new basis_db();
 $qry = "SELECT 
 			distinct tbl_studiengang.studiengang_kz, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel
 		FROM 
@@ -93,16 +88,17 @@ $qry = "SELECT
 			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 			JOIN public.tbl_studiengang USING(studiengang_kz)
 		WHERE 
-			tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
+			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND
 			tbl_lehreinheitmitarbeiter.faktor is not null AND
 			tbl_lehreinheitmitarbeiter.faktor<>0 AND
 			tbl_lehreinheitmitarbeiter.stundensatz is not null AND
 			tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
 			tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 			tbl_lehreinheitmitarbeiter.semesterstunden<>0 ORDER BY kuerzel";
-$result = pg_query($conn, $qry);
+if(!$result = $db->db_query($qry))
+	die('Fehler in qry');
 
-while($row = pg_fetch_object($result)) 
+while($row = $db->db_fetch_object($result)) 
 {
 	$worksheet->write($zeile, $spalte,$row->kuerzel, $format_bold_center);
 	$worksheet->write($zeile, $spalte+1,$row->kuerzel, $format_bold_center);
@@ -126,7 +122,7 @@ $maxspalten = $spalte;
 function drawStg($stg)
 {
 	global $faktor_arr, $satz_arr, $stunden, $gesamt, $worksheet, $stg_spalte;
-	global $zeile, $row, $gesamtsumme, $format_number, $maxlength, $format_left;
+	global $zeile, $gesamtsumme, $format_number, $maxlength, $format_left;
 	
 	$faktoren = '';
 	$saetze = '';
@@ -187,7 +183,7 @@ FROM
 	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 WHERE 
-	studiensemester_kurzbz='$stsem' AND 
+	studiensemester_kurzbz='".addslashes($stsem)."' AND 
 	tbl_lehreinheitmitarbeiter.faktor is not null AND
 	tbl_lehreinheitmitarbeiter.faktor<>0 AND
 	tbl_lehreinheitmitarbeiter.stundensatz is not null AND
@@ -197,13 +193,13 @@ WHERE
 GROUP BY mitarbeiter_uid, studiengang_kz, stundensatz, faktor, nachname, vorname ORDER BY nachname, vorname, studiengang_kz 
  ";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$lastuid='';
 	$laststg='';
 	$zeile++;
 	
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($lastuid!=$row->mitarbeiter_uid)
 		{
@@ -263,9 +259,9 @@ if($result = pg_query($conn, $qry))
 	drawStg($laststg);
 	drawGesamtsumme();
 }
-//foreach($maxlength as $i=>$breite)
-//		$worksheet->setColumn(0, $i, $breite+2);
-	
+else 
+	die('Fehler in qry');
+
 $workbook->close();
 
 //Mail versenden mit Excel File im Anhang

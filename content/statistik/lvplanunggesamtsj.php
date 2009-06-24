@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -28,14 +28,12 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/Excel/excel.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Datenbankverbindung konnte nicht hergestellt werden');
-
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
+$db = new basis_db();
 
 $stg_arr = array();
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll();
 
 foreach ($studiengang->result as $row)
@@ -44,9 +42,9 @@ foreach ($studiengang->result as $row)
 // ****** FUNKTIONEN ******* //
 function drawBetreuungen()
 {
-	global $row, $gesamtkosten_lva, $kosten_lv, $zeile, $spalte, $stsem1, $stsem2, $last_fb, $worksheet;
-	global $stunden_lv, $format_bold, $format_colored, $gesamtkosten_betreuung, $stunden_betreuungen;
-	global $gesamtkosten_fb, $conn, $format_number, $format_number1;
+	global $gesamtkosten_lva, $zeile, $spalte, $stsem1, $stsem2, $last_fb, $worksheet;
+	global $format_bold, $format_colored, $gesamtkosten_betreuung;
+	global $gesamtkosten_fb, $format_number, $format_number1;
 	
 	$qry_fb = "SELECT
 				*
@@ -58,18 +56,19 @@ function drawBetreuungen()
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				(tbl_lehreinheit.studiensemester_kurzbz='$stsem1' OR
-				 tbl_lehreinheit.studiensemester_kurzbz='$stsem2') AND
+				(tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem1)."' OR
+				 tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem2)."') AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0 AND
-				tbl_lehrfach.fachbereich_kurzbz='$last_fb'
-				";
+				tbl_lehrfach.fachbereich_kurzbz='".addslashes($last_fb)."'
+			";
+	$db = new basis_db();
 	$gesamtkosten_betreuung=0;
-	if($result_fb = pg_query($conn, $qry_fb))
+	if($result_fb = $db->db_query($qry_fb))
 	{
 		$spalte=11;
 		$worksheet->writeNumber($zeile, ++$spalte, $gesamtkosten_lva, $format_number);
 				
-		if(pg_num_rows($result_fb)>0)
+		if($db->db_num_rows($result_fb)>0)
 		{
 					
 			$zeile++;
@@ -89,7 +88,7 @@ function drawBetreuungen()
 					
 			
 			$stunden_betreuung=0;
-			while($row_fb = pg_fetch_object($result_fb))
+			while($row_fb = $db->db_fetch_object($result_fb))
 			{
 				$zeile++;
 				$spalte=2;
@@ -99,7 +98,7 @@ function drawBetreuungen()
 				$worksheet->write($zeile, ++$spalte, number_format($row_fb->stunden,2));
 				$worksheet->write($zeile, ++$spalte, '');
 				
-				$benutzer = new benutzer($conn);
+				$benutzer = new benutzer();
 				$benutzer->load($row_fb->student_uid);
 				$worksheet->write($zeile, ++$spalte, "$benutzer->nachname $benutzer->vorname");
 				$worksheet->write($zeile, ++$spalte, "$row_fb->nachname $row_fb->vorname");
@@ -127,7 +126,7 @@ function drawBetreuungen()
 }
 // ****** END FUNKTIONEN ******* //
 $stsem1 = $semester_aktuell;
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 
 if(substr($stsem1,0,1)=='S') //Eigentlich gehoert =='W', nur kurzfristige aenderung
 	$stsem2 = $stsem_obj->getNextFrom($stsem1);
@@ -163,13 +162,13 @@ $qry = "SELECT
 
 // Creating a workbook
 $workbook = new Spreadsheet_Excel_Writer();
-
+$workbook->setVersion(8);
 // sending HTTP headers
 $workbook->send("LVPlanungGesamtSJ". "_" . date("Y_m_d") . ".xls");
 
 // Creating a worksheet
 $worksheet =& $workbook->addWorksheet("LV-Planung Gesamt");
-
+$worksheet->setInputEncoding('utf-8');
 $format_bold =& $workbook->addFormat();
 $format_bold->setBold();
 
@@ -212,7 +211,7 @@ $worksheet->write($zeile, ++$spalte,'Kosten', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Summe', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Gesamtkosten', $format_colored1);
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$last_lva='';
 	$stunden_lv=0;
@@ -220,7 +219,7 @@ if($result = pg_query($conn, $qry))
 	$gesamtkosten_lva=0;
 	$gesamtkosten_fb=0;
 	$last_fb='';
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($last_lva!=$row->lehrveranstaltung_id)
 		{
@@ -270,9 +269,9 @@ if($result = pg_query($conn, $qry))
 
 		$gruppen='';
 		$qry_grp = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-		if($result_grp=pg_query($conn, $qry_grp))
+		if($result_grp = $db->db_query($qry_grp))
 		{
-			while($row_grp = pg_fetch_object($result_grp))
+			while($row_grp = $db->db_fetch_object($result_grp))
 			{
 				if($gruppen=='')
 					$gruppen = ($row_grp->gruppe_kurzbz!=''?$row_grp->gruppe_kurzbz:trim($stg_arr[$row_grp->studiengang_kz].'-'.$row_grp->semester.$row_grp->verband.$row_grp->gruppe));
@@ -309,8 +308,6 @@ if($result = pg_query($conn, $qry))
 	drawBetreuungen();
 		
 }
-
-	
 
 $zeile++;
 $spalte=8;

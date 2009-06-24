@@ -24,17 +24,14 @@
  * Kosten fuer die Geschaeftsstelle und markiert die Zeilen die in den letzten
  * 31 Tagen veraendert wurden. Dieses File wirde dann per Mail versandt
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/mail.class.php');
 
-if (!$conn=pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
-
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $semester_aktuell  = $stsem->getaktorNext();
 
 $file = 'lehrauftragsliste.xls';
@@ -43,12 +40,8 @@ $file = 'lehrauftragsliste.xls';
 echo 'Lehrauftragslisten werden erstellt. Bitte warten!<BR>';
 flush();
 $workbook = new Spreadsheet_Excel_Writer($file);
-
+$workbook->setVersion(8);
 //Studiengaenge ermitteln bei denen sich die lektorzuordnung innerhalb der letzten 31 Tage geaendert haben
-//(tbl_lehreinheitmitarbeiter.updateamum>now()- interval '31 days' OR
-//					tbl_lehreinheitmitarbeiter.insertamum>now()- interval '31 days') AND
-//(tbl_projektbetreuer.updateamum>now()-interval '31 days' OR
-//					tbl_projektbetreuer.insertamum>now()-interval '31 days') AND
 $qry_stg = "SELECT distinct studiengang_kz
 			FROM (
 				SELECT
@@ -57,7 +50,7 @@ $qry_stg = "SELECT distinct studiengang_kz
 					lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				WHERE
-					lehre.tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+					lehre.tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 					tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 					tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
@@ -68,7 +61,7 @@ $qry_stg = "SELECT distinct studiengang_kz
 				FROM
 					lehre.tbl_projektbetreuer, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
 				WHERE
-					lehre.tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+					lehre.tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 					tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id AND
 					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
@@ -77,18 +70,21 @@ $qry_stg = "SELECT distinct studiengang_kz
 $liste_gesamt = array();
 
 $gesamt =& $workbook->addWorksheet('Gesamt');
+$gesamt->setInputEncoding('utf-8');
 $gesamtsheet_row=1;
+$db = new basis_db();
 
-if($result_stg = pg_query($conn, $qry_stg))
+if($result_stg = $db->db_query($qry_stg))
 {
-	while($row_stg = pg_fetch_object($result_stg))
+	while($row_stg = $db->db_fetch_object($result_stg))
 	{
 		//Studiengang laden
-		$studiengang = new studiengang($conn, $row_stg->studiengang_kz);
+		$studiengang = new studiengang($row_stg->studiengang_kz);
 		$studiengang_kz=$row_stg->studiengang_kz;
 
 		// Creating a worksheet
 		$worksheet =& $workbook->addWorksheet($studiengang->kuerzel);
+		$worksheet->setInputEncoding('utf-8');
 		//echo "Writing $studiengang->kuerzel ...".microtime()."<br>";
 		//Formate Definieren
 		$format_bold =& $workbook->addFormat();
@@ -156,19 +152,19 @@ if($result_stg = pg_query($conn, $qry_stg))
 					tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
 					tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 					tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-					studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell' AND
+					studiengang_kz='".addslashes($studiengang_kz)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null
 					AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0
 					AND EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
 					ORDER BY nachname, vorname, tbl_mitarbeiter.mitarbeiter_uid";
 
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			$zeile=3;
 			$gesamtkosten = 0;
 			$liste=array();
 			$gesamtsheet_row++;
-			while($row=pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				//Gesamtstunden und Kosten ermitteln
 				if(array_key_exists($row->mitarbeiter_uid, $liste))
@@ -208,9 +204,9 @@ if($result_stg = pg_query($conn, $qry_stg))
 						tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 						tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-						tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND
+						tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-						tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND 
+						tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND 
 						NOT EXISTS (SELECT 
 										mitarbeiter_uid 
 									FROM 
@@ -218,18 +214,18 @@ if($result_stg = pg_query($conn, $qry_stg))
 									WHERE 
 										mitarbeiter_uid=tbl_benutzer.uid AND
 										tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
-										tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
+										tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
 										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 										tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 										tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
 										tbl_lehreinheitmitarbeiter.faktor<>0 AND
 										EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id) AND
-										tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell');";
+										tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."');";
 			
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object($result))
 				{
 					if(!isset($liste[$row->uid]))
 					{
@@ -254,15 +250,15 @@ if($result_stg = pg_query($conn, $qry_stg))
 				$qry = "SELECT tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, CASE WHEN COALESCE(tbl_projektbetreuer.updateamum, tbl_projektbetreuer.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
 			        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung,
 			               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
-			        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND
+			        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='".addslashes($uid)."' AND
 			              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
 			              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-			              tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-			              tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+			              tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+			              tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
 
-				if($result = pg_query($conn, $qry))
+				if($result = $db->db_query($qry))
 				{
-					while($row = pg_fetch_object($result))
+					while($row = $db->db_fetch_object($result))
 					{
 						$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
 						$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz*$row->faktor);
@@ -427,6 +423,7 @@ if($result_stg = pg_query($conn, $qry_stg))
 	
 	//Betreuerstunden
 	$worksheet =& $workbook->addWorksheet('Betreuerstunden');
+	$worksheet->setInputEncoding('utf-8');
 	$qry = "SELECT 
 				studiensemester_kurzbz, nachname, vorname, sum(stunden) AS stunden, titelpre,
 				sum(tbl_projektbetreuer.stundensatz*stunden*tbl_projektbetreuer.faktor)::numeric(6,2) AS euro, person_id 
@@ -435,7 +432,7 @@ if($result_stg = pg_query($conn, $qry_stg))
 				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id) 
 				JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
 			WHERE 
-				studiensemester_kurzbz='$semester_aktuell' AND
+				studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 				stunden>0
 			GROUP BY 
 				studiensemester_kurzbz,person_id,nachname,vorname, titelpre
@@ -454,10 +451,10 @@ if($result_stg = pg_query($conn, $qry_stg))
 	$worksheet->write(2,++$i,"Stunden", $format_bold);
 	$worksheet->write(2,++$i,"Kosten", $format_bold);
 		
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$zeile=3;
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$i=0;
 			//Studiensemester
@@ -488,7 +485,6 @@ if($result_stg = pg_query($conn, $qry_stg))
     $fileatttype = "application/xls";
     $fileattname = "lehrauftragsliste_".date('Y_m_d').".xls";
 
-    $headers = "From: $from";
     $mail = new mail(MAIL_GST, 'vilesci@'.DOMAIN, $subject, $message);
     $mail->addAttachmentBinary($file, $fileatttype, $fileattname);
     

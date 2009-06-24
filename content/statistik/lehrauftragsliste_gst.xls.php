@@ -23,13 +23,10 @@
  * Erstellt ein Excel File mit einer Uebersicht der
  * Kosten fuer die Geschaeftsstelle
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
-
-if (!$conn=pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
 
 if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
@@ -42,20 +39,20 @@ else
 	$semester='';
 
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
 
 //Studiengang laden
-$studiengang = new studiengang($conn, $studiengang_kz);
+$studiengang = new studiengang($studiengang_kz);
 
 // Creating a workbook
 $workbook = new Spreadsheet_Excel_Writer();
-
+$workbook->setVersion(8);
 // sending HTTP headers
 $workbook->send("Lehrauftragsliste_".$semester_aktuell."_".$studiengang->kuerzel.($semester!=''?'_'.$semester:'').".xls");
 
 // Creating a worksheet
 $worksheet =& $workbook->addWorksheet("Lehrauftragsliste");
-
+$worksheet->setInputEncoding('utf-8');
 //Formate Definieren
 $format_bold =& $workbook->addFormat();
 $format_bold->setBold();
@@ -94,12 +91,12 @@ $qry = "SELECT * FROM (
 			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-			studiengang_kz='$studiengang_kz' AND studiensemester_kurzbz='$semester_aktuell' AND 
+			studiengang_kz='".addslashes($studiengang_kz)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND 
 			tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null 
 			AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0 AND
 			EXISTS (SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
 if($semester!='')
-	$qry.=" AND semester='$semester'";
+	$qry.=" AND semester='".addslashes($semester)."'";
 
 //Projektsbetreuungen
 $qry.= " UNION 
@@ -116,22 +113,22 @@ $qry.= " UNION
 		 	tbl_benutzer.person_id=tbl_projektbetreuer.person_id AND
 		 	tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id AND
 		 	tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-		 	tbl_lehreinheit.studiensemester_kurzbz = '$semester_aktuell' AND 
+		 	tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($semester_aktuell)."' AND 
 		 	tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-		 	tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
+		 	tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
 		 	tbl_person.person_id=tbl_projektbetreuer.person_id";
 if($semester!='')
-	$qry.=" AND tbl_lehrveranstaltung.semester='$semester'";
+	$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
 $qry.=") as foo";
 $qry.="	ORDER BY nachname, vorname, mitarbeiter_uid";
-//echo $qry;
-if($result = pg_query($conn, $qry))
+$db = new basis_db();
+if($result = $db->db_query($qry))
 {
 	$zeile=3;
 	$gesamtkosten = 0;
 	$liste=array();
 	
-	while($row=pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		//Gesamtstunden und Kosten ermitteln
 		if(array_key_exists($row->mitarbeiter_uid, $liste))
@@ -159,13 +156,13 @@ if($result = pg_query($conn, $qry))
 	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND 
 	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
 	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	              tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-	              tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+	              tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+	              tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
 		if($semester!='')
-			$qry.=" AND tbl_lehrveranstaltung.semester='$semester'";
-		if($result = pg_query($conn, $qry))
+			$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
+		if($result = $db->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
 				$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz*$row->faktor);

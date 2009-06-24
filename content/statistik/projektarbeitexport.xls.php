@@ -24,18 +24,15 @@
  * Die zu exportierenden Spalten werden per GET uebergeben.
  * Die Adressen werden immer dazugehaengt
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/Excel/excel.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
+$db = new basis_db();
 $user = get_uid();
 $datum_obj = new datum();
-loadVariables($conn, $user);
+loadVariables($user);
 	
 	//Parameter holen
 	$studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
@@ -50,13 +47,15 @@ loadVariables($conn, $user);
 
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
-
+	$workbook->setVersion(8);
+	
 	// sending HTTP headers
 	$workbook->send("Projektarbeit". "_" . date("d_m_Y") . ".xls");
 
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Studenten");
-
+	$worksheet->setInputEncoding('utf-8');
+	
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 	
@@ -75,7 +74,7 @@ loadVariables($conn, $user);
 	foreach ($headline as $title)
 	{
 		$worksheet->write(0,$i,$title, $format_bold);
-			$maxlength[$i]=strlen($title);
+			$maxlength[$i]=mb_strlen($title);
 		$i++;
 	}
 			
@@ -102,9 +101,9 @@ loadVariables($conn, $user);
 	
 	//echo $qry;
 	$zeile=1;
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_array($result))
+		while($row = $db->db_fetch_array($result))
 		{
 			$zeile++;
 			$i=0;
@@ -115,8 +114,8 @@ loadVariables($conn, $user);
 				if(is_numeric($idx))
 				{
 					$worksheet->write($zeile, $i, $content);
-					if(strlen($content)>$maxlength[$i])
-						$maxlength[$i]=strlen($content);
+					if(mb_strlen($content)>$maxlength[$i])
+						$maxlength[$i]=mb_strlen($content);
 					$i++;
 				}
 			}
@@ -126,9 +125,9 @@ loadVariables($conn, $user);
 									
 			$qry_betreuer = "SELECT betreuerart_kurzbz, COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,''), tbl_note.anmerkung, faktor, name, punkte, stunden, stundensatz FROM (lehre.tbl_projektbetreuer JOIN tbl_person USING(person_id)) LEFT JOIN lehre.tbl_note USING(note) WHERE projektarbeit_id='".$row['projektarbeit_id']."'";
 			
-			if($result_betreuer = pg_query($conn, $qry_betreuer))
+			if($result_betreuer = $db->db_query($qry_betreuer))
 			{
-				if(pg_num_rows($result_betreuer)>0)
+				if($db->db_num_rows($result_betreuer)>0)
 				{
 					$headline=array('Betreuerart','Betreuer','Note','Faktor','Name','Punkte','Stunden','Stundensatz');
 		
@@ -137,13 +136,13 @@ loadVariables($conn, $user);
 					foreach ($headline as $title)
 					{
 						$worksheet->write($zeile,$i,$title, $format_bold);
-						if(strlen($title)>$maxlength[$i])
-							$maxlength[$i]=strlen($title);
+						if(mb_strlen($title)>$maxlength[$i])
+							$maxlength[$i]=mb_strlen($title);
 						$i++;
 					}
 					
 					$zeile++;
-					while($row_betreuer = pg_fetch_array($result_betreuer))
+					while($row_betreuer = $db->db_fetch_array($result_betreuer))
 					{
 						$i=1;
 				
@@ -152,8 +151,8 @@ loadVariables($conn, $user);
 							if(is_numeric($idx))
 							{
 								$worksheet->write($zeile, $i, $content);
-								if(strlen($content)>$maxlength[$i])
-									$maxlength[$i]=strlen($content);
+								if(mb_strlen($content)>$maxlength[$i])
+									$maxlength[$i]=mb_strlen($content);
 								$i++;
 							}
 						}

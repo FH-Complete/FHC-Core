@@ -24,35 +24,33 @@
  * Exportiert eine Liste der Absolventen in ein Excel File.
  * Das betreffende Studiensemester wird uebergeben.
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
-
 //Parameter holen
 $studiensemester_kurzbz = isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:'';
+$db = new basis_db();
 
 if($studiensemester_kurzbz!='')
 {
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
-
+	$workbook->setVersion(8);
 	// sending HTTP headers
 	$workbook->send("Absolventenstatistik". "_".$studiensemester_kurzbz.".xls");
 
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Absolventenstatistik");
-
+	$worksheet->setInputEncoding('utf-8');
+	
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 		
 	$stg_arr=array();
-	$studiengang = new studiengang($conn);
+	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbzlang', false);
 	foreach ($studiengang->result as $row)
 		$stg_arr[$row->studiengang_kz] = $row->kuerzel;
@@ -85,9 +83,9 @@ if($studiensemester_kurzbz!='')
 				public.get_rolle_prestudent (prestudent_id, '$studiensemester_kurzbz')='Absolvent'
 			ORDER BY studiengang_kz, nachname, vorname";
 
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			$zeile++;
 			$spalte=0;
@@ -113,6 +111,8 @@ if($studiensemester_kurzbz!='')
 				$maxlength[$spalte]=strlen($row->geschlecht);
 		}
 	}
+	else 
+		die('Fehlerhafte Qry:'.$qry);
 	
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
@@ -137,7 +137,7 @@ else
 	echo '<form method="GET" action="'.$_SERVER['PHP_SELF'].'">';
 	echo 'Studiensemester: <SELECT name="studiensemester_kurzbz">';
 	
-	$stsem = new studiensemester($conn);
+	$stsem = new studiensemester();
 	$stsem_akt = $stsem->getaktorNext();
 	$stsem->getAll();
 	

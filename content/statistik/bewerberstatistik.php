@@ -40,7 +40,7 @@
  * studiengang_kz ... gibt den Studiengang an der angezeigt werden soll, wenn showdetails=true
  */
 
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
@@ -49,20 +49,17 @@ require_once('../../include/datum.class.php');
 require_once('../../include/aufmerksamdurch.class.php');
 require_once('../../include/studiengang.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
-	
+$db = new basis_db();
 // Wenn der Parameter Mail per GET oder Commandline Argument uebergeben wird,
 // dann wird die Statistik per Mail versandt
 if(isset($_GET['mail']) || (isset($_SERVER['argv']) && in_array('mail',$_SERVER['argv'])))
 {
 	$mail=true;
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem_obj->getNextStudiensemester();
 	$stsem = $stsem_obj->studiensemester_kurzbz;
 }
@@ -74,7 +71,7 @@ else
 //das Mail enthaelt alle Studiengaenge
 if(!$mail)
 {
-	$rechte = new benutzerberechtigung($conn);
+	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen(get_uid());
 }
 $content='';
@@ -119,7 +116,7 @@ if(isset($_GET['showdetails']))
 	$studiengang_kz  = $_GET['studiengang_kz'];
 	$stgwhere = " AND studiengang_kz='".addslashes($studiengang_kz)."'";
 	
-	$stg_obj = new studiengang($conn);
+	$stg_obj = new studiengang();
 	if(!$stg_obj->load($studiengang_kz))
 		die('Studiengang existiert nicht');
 
@@ -146,9 +143,10 @@ if(isset($_GET['showdetails']))
 					</tr>
 				</thead>
 				<tbody>";
-	if($result = pg_query($conn, $qry))
+	
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			$content.='<tr>';
 			$content.="<td>$row->beschreibung</td>";
@@ -177,9 +175,9 @@ if(isset($_GET['showdetails']))
 					</tr>
 				</thead>
 				<tbody>";
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			$content.='<tr>';
 			$content.="<td>$row->berufstaetigkeit_bez</td>";
@@ -202,7 +200,7 @@ $content.='
 if(!$mail)
 {
 	$content.= '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
-	$studsem = new studiensemester($conn);
+	$studsem = new studiensemester();
 	$studsem->getAll();
 
 	foreach ($studsem->studiensemester as $stsemester)
@@ -231,7 +229,7 @@ if($stsem!='')
 			$stgwhere=' AND studiengang_kz in(';
 			foreach ($stgs as $stg)
 				$stgwhere.="'$stg',";
-			$stgwhere = substr($stgwhere,0, strlen($stgwhere)-1);
+			$stgwhere = mb_substr($stgwhere,0, mb_strlen($stgwhere)-1);
 			$stgwhere.=' )';
 		}
 	}
@@ -316,7 +314,7 @@ if($stsem!='')
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
 			ORDER BY typ, kurzbz; ";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$content.= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
@@ -355,7 +353,7 @@ if($stsem!='')
 		$student3sem_m_sum = 0;
 		$student3sem_w_sum = 0;
 		
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$content.= "\n";
 			$content.= '<tr>';
@@ -507,9 +505,9 @@ if($stsem!='')
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere AND orgform_kurzbz='VBB'
 			ORDER BY kurzbzlang; ";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if(pg_num_rows($result)>0)
+		if($db->db_num_rows($result)>0)
 		{
 			$content.= "<br><br><h2>Aufsplittung Mischformen</h2><br>";
 			$content.= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
@@ -550,11 +548,11 @@ if($stsem!='')
 			$student3sem_bb_sum = 0;
 			$student3sem_fst_sum = 0;
 			
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				$content.= "\n";
 				$content.= '<tr>';
-				$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+				$content.= "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 				$content.= "<td align='center'>$row->interessenten_vz / $row->interessenten_bb / $row->interessenten_fst</td>";
 				$content.= "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb / $row->interessentenzgv_fst</td>";
 				$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb / $row->interessentenrtanmeldung_fst</td>";
@@ -630,11 +628,11 @@ if($stsem!='')
 					</tr>
 				</thead>
 				<tbody>";
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
 		$summestudenten=0;
 		
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			$summestudenten += $row->anzahlpers;
 			$content.= "\n<tr><td>$row->anzahlpers</td><td>$row->anzahlstg</td></tr>";
@@ -655,14 +653,14 @@ if($stsem!='')
 			$stgwhere=' AND studiengang_kz in(';
 			foreach ($stgs as $stg)
 				$stgwhere.="'$stg',";
-			$stgwhere = substr($stgwhere,0, strlen($stgwhere)-1);
+			$stgwhere = mb_substr($stgwhere,0, mb_strlen($stgwhere)-1);
 			$stgwhere.=' )';
 		}
 	}
 	else 
 		$stgwhere='';
 	
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getPreviousFrom($stsem); // voriges semester
 	$stsem = $stsem_obj->getPreviousFrom($stsem); // voriges jahr
 	
@@ -756,7 +754,7 @@ if($stsem!='')
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
 			ORDER BY typ, kurzbz; ";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$content.= "\n<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
@@ -792,11 +790,11 @@ if($stsem!='')
 		$student3sem_m_sum = 0;
 		$student3sem_w_sum = 0;
 		
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$content.= "\n";
 			$content.= '<tr>';
-			$content.= "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
+			$content.= "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 			$content.= "<td align='center'>$row->interessenten ($row->interessenten_m / $row->interessenten_w)</td>";
 			$content.= "<td align='center'>k.A.</td>";
 			$content.= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
@@ -869,11 +867,11 @@ if($stsem!='')
 						</tr>
 					</thead>
 					<tbody>";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			$summestudenten=0;
 			
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				$summestudenten += $row->anzahlpers;
 				$content.= "\n<tr><td>$row->anzahlpers</td><td>$row->anzahlstg</td></tr>";

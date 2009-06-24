@@ -23,23 +23,20 @@
  * Erstellt eine Liste der Koordinatoren eines Instituts und der Anzahl der Stunden
  * die er in den jeweiligen Studiengaengen unterrichtet
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 
-echo '
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <title>Koordinatorstunden</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!');
-
 $user = get_uid();
-loadVariables($conn, $user);
+loadVariables($user);
+$db = new basis_db();
 
 if(isset($_GET['fachbereich_kurzbz']))
 	$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
@@ -53,7 +50,7 @@ $data = array();
 $name = array();
 
 //alle Studiengaenge holen
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll();
 
 foreach ($studiengang->result as $row)
@@ -61,8 +58,7 @@ foreach ($studiengang->result as $row)
 	
 //Alle Fachbereichsleiter des uebergebenen Studienganges holen und
 //Die Anzahl der Stunden die dieser in den einzelnen Studiengaengen haelt ermitteln
-$qry = "SET CLIENT_ENCODING TO 'UNICODE';
-		SELECT 
+$qry = "SELECT 
 			distinct on(tbl_lehreinheit.lehreinheit_id)
 			tbl_benutzerfunktion.uid, 
 			tbl_lehreinheitmitarbeiter.semesterstunden, 
@@ -87,13 +83,13 @@ $qry = "SET CLIENT_ENCODING TO 'UNICODE';
 			tbl_benutzer.person_id=tbl_person.person_id AND
 			tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
 			tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
-			tbl_lehreinheit.studiensemester_kurzbz='$semester_aktuell'
+			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'
 		ORDER BY tbl_lehreinheit.lehreinheit_id, nachname, vorname
 		";
 
-if($result = pg_query($conn, $qry))
+if($db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
 		if(array_key_exists($row->uid, $data))
 		{
