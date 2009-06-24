@@ -331,10 +331,10 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 				echo '
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$row->semester.'/'.$row->gruppe_kurzbz.'">
 						<VERBAND:name>'.$row->gruppe_kurzbz.' ('.$row->bezeichnung.')</VERBAND:name>
-						<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
-						<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
-						<VERBAND:sem><?php echo $row->semester; ?></VERBAND:sem>
-						<VERBAND:gruppe><?php echo $row->gruppe_kurzbz; ?></VERBAND:gruppe>
+						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
+						<VERBAND:stg_kz>'.$stg_kz.'</VERBAND:stg_kz>
+						<VERBAND:sem>'.$row->semester.'</VERBAND:sem>
+						<VERBAND:gruppe>'.$row->gruppe_kurzbz.'</VERBAND:gruppe>
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
 					';		
