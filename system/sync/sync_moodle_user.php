@@ -23,18 +23,14 @@
  * Synchronisiert die Lektoren und Studenten der aktuellen MoodleKurse
  * wenn kein aktuelles Studiensemester vorhanden ist, wird NICHT Synchronisiert
  */
-require_once('../../vilesci/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/moodle_course.class.php');
 require_once('../../include/moodle_user.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/studiengang.class.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-
-if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
-	die('Fehler beim Connecten zur DB');
+require_once('../../include/mail.class.php');
 	
+$db = new basis_db();
 $sync_lektoren_gesamt=0;
 $sync_studenten_gesamt=0;
 $group_updates=0;
@@ -45,21 +41,21 @@ $lektoren=array();
 
 //nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine 
 //Probleme durch die Vorrueckung entstehen
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 if($stsem_kurzbz=$stsem->getakt())
 {
 	//nur die Eintraege des aktuellen Studiensemesters syncen
-	$qry = "SELECT distinct mdl_course_id FROM lehre.tbl_moodle WHERE studiensemester_kurzbz='$stsem_kurzbz'";
-	if($result = pg_query($conn, $qry))
+	$qry = "SELECT distinct mdl_course_id FROM lehre.tbl_moodle WHERE studiensemester_kurzbz='".addslashes($stsem_kurzbz)."'";
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
-			$course = new moodle_course($conn, $conn_moodle);
+			$course = new moodle_course();
 			if($course->load($row->mdl_course_id))
 			{
 				$message_lkt='';
 				//Lektoren
-				$mdluser = new moodle_user($conn, $conn_moodle);
+				$mdluser = new moodle_user();
 				$mitarbeiter = $mdluser->getMitarbeiter($row->mdl_course_id);
 				
 				if($mdluser->sync_lektoren($row->mdl_course_id))
@@ -79,7 +75,7 @@ if($stsem_kurzbz=$stsem->getakt())
 				}
 				
 				//Studenten
-				$mdluser = new moodle_user($conn, $conn_moodle);
+				$mdluser = new moodle_user();
 				if($mdluser->sync_studenten($row->mdl_course_id))
 				{
 					$sync_studenten_gesamt+=$mdluser->sync_create;
@@ -123,7 +119,8 @@ if($stsem_kurzbz=$stsem->getakt())
 					$to = "$uid@".DOMAIN;
 					//$to = 'oesi@technikum-wien.at';
 					
-					if(mail($to,'Moodle - Aktualisierungen', $header.$message_lkt, 'From: vilesci@'.DOMAIN))
+					$mail = new mail($to, 'vilesci@'.DOMAIN,'Moodle - Aktualisierungen',$header.$message_lkt);
+					if($mail->send())
 						echo "Mail wurde an $to versandt<br>";
 					else 
 						echo "Fehler beim Senden des Mails an $to<br>";
@@ -139,7 +136,8 @@ if($stsem_kurzbz=$stsem->getakt())
 			$to = MAIL_ADMIN;
 			//$to = 'oesi@technikum-wien.at';
 			
-			if(mail($to,'Moodle Syncro', $header.$message, 'From: vilesci@'.DOMAIN))
+			$mail = new mail($to, 'vilesci@'.DOMAIN,'Moodle Syncro',$header.$message);
+			if($mail->send())
 				echo "Mail wurde an $to versandt:<br>".nl2br($header.$message);
 			else 
 				echo "Fehler beim Senden des Mails an $to:<br>".nl2br($header.$message);

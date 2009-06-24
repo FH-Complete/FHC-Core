@@ -1,4 +1,0 @@
-create table public.tbl_syncperson (person_fas bigint not null, person_portal bigint not null);
-create table public.tbl_syncschluesseltyp (fas_typ bigint not null, portal_typ varchar(16) not null);
-grant select, insert, update on public.tbl_syncperson to admin;
-grant select, insert, update on public.tbl_syncschluesseltyp to admin;
