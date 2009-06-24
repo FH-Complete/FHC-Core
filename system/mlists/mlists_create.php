@@ -1,21 +1,40 @@
 <?php
-/**
- * Changes:	23.10.2004: Anpassung an neues DB-Schema (WM)
+/* Copyright (C) 2008 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-	require_once('../../vilesci/config.inc.php');
+/**
+ * Gerneriert die Textfiles fuer die Mailverteiler
+ * der Gruppen und das Textfile fuer die Aliase
+ */
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/studiensemester.class.php');
 
-
-	if (!$conn = pg_pconnect(CONN_STRING))
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	if(!($result_stg=pg_query($conn, "SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
-		die(pg_errormessage($conn));
-	$num_rows=pg_num_rows($result_stg);
-	$ss=new studiensemester($conn);
+	$db = new basis_db();
+	
+	if(!($result_stg = $db->db_query("SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($result_stg);
+	$ss=new studiensemester();
 	$ss_nearest=$ss->getNearest();
-
 ?>
 <HTML>
 <HEAD>
@@ -27,7 +46,6 @@
 <BODY class="background_main">
 <H3>MailingListen </H3>
 
-
 <?php
 	$crlf="\n";
 	for ($i=0; $i<$num_rows; $i++)
@@ -35,36 +53,36 @@
 		$row=pg_fetch_object($result_stg);
      	$stg_id=$row->studiengang_kz;
 		$stg_kzbz=$row->kurzbz;
-		$sql_query="SELECT * FROM public.tbl_gruppe WHERE studiengang_kz=$stg_id AND mailgrp=true ORDER BY gruppe_kurzbz";
-		//echo $sql_query;
-		if(!($result_mg=pg_query($conn, $sql_query)))
-			die(pg_errormessage($conn));
-		$nr_mg=pg_num_rows($result_mg);
+		$sql_query="SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='".addslashes($stg_id)."' AND mailgrp=true ORDER BY gruppe_kurzbz";
+		
+		if(!($result_mg = $db->db_query($sql_query)))
+			die($db->db_last_error());
+		$nr_mg=$db->db_num_rows($result_mg);
 
 		// Mailgroups
 		for  ($j=0; $j<$nr_mg; $j++)
 		{
-			$row_mg=pg_fetch_object($result_mg, $j);
+			$row_mg = $db->db_fetch_object($result_mg, $j);
 			$mg_kurzbz=$row_mg->gruppe_kurzbz;
 			$sql_query='SELECT tbl_benutzergruppe.uid, nachname, vorname '.
 				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
 				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
 				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
 					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$ss_nearest') AND aktiv ORDER BY nachname;";
-			//echo $sql_query;
-			if(!($result_person=pg_query($conn, $sql_query)))
-				die(pg_errormessage($conn));
+			
+			if(!($result_person = $db->db_query($sql_query)))
+				die($db->db_last_error());
 
 			// File Operations
 			$name=$mg_kurzbz.'.txt';
-			$name=strtolower($name);
+			$name=mb_strtolower($name);
 			$fp=fopen('../../../mlists/'.$name,"w");
 			//$fp=fopen('../../../../mlists/'.$name,"w");
 
-			$nr_person=pg_num_rows($result_person);
+			$nr_person=$db->db_num_rows($result_person);
 			for  ($p=0; $p<$nr_person; $p++)
 			{
-				$row=pg_fetch_object($result_person, $p);
+				$row = $db->db_fetch_object($result_person, $p);
 				fwrite($fp, '#'.$row->nachname.' '.$row->vorname.$crlf.$row->uid.$crlf);
 			}
 			fclose($fp);
@@ -87,10 +105,10 @@
 	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null)
 	        tbl_benutzer.aktiv ORDER BY nachname, vorname";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$fp=fopen('../../../mlists/tw_alias.txt',"w");
-		while($row=pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			fwrite($fp,"# ".$row->nachname." ".$row->vorname.$crlf);
 			fwrite($fp,$row->alias.": ".$row->uid.$crlf);
