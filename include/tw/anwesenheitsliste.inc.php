@@ -22,12 +22,6 @@
 
 //PDF fuer die Anwesenheitsliste auf CIS
 
-	$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	if(!pg_query($conn,$qry))
-	{
-		die("Encoding konnte nicht gesetzt werden");
-	}   
-	
 //PDF erzeugen
 $pdf = new PDF('P','pt');
 $pdf->Open();
@@ -36,22 +30,24 @@ $pdf->AliasNbPages();
 
 $pdf->SetFillColor(111,111,111);
 $pdf->SetXY(30,40);
-$stgobj=new studiengang($conn);
+$stgobj=new studiengang();
 $stgobj->load($stg);
 //Logo
 $pdf->Image("../../../skin/images/logo.jpg","430","55","120","35","jpg","");
 //$pdf->Image("../../../skin/images/tw_logo_02.jpg","400","30","116","43","jpg","");
 
-$lvobj = new lehrveranstaltung($conn, $lvid);
+$bezeichnung='';
+if ($lvobj = new lehrveranstaltung($lvid))
+	$bezeichnung=mb_convert_encoding($lvobj->bezeichnung,'ISO-8859-15','UTF-8');
 
 $pdf->SetFont('Arial','',16);
-$pdf->MultiCell(0,20,'Anwesenheitsliste '.$lvobj->bezeichnung,0,'L',0);
+$pdf->MultiCell(0,20,'Anwesenheitsliste '.$bezeichnung,0,'L',0);
 
 $pdf->SetFont('Arial','',10);
 $pdf->SetFillColor(190,190,190);
 //Bei langen Namen muss der Gruppenname etwas weiter unten angezeigt werden da er
 //sonst von der zweiten Zeile des Titels ueberschrieben wird.
-if(strlen($lvobj->bezeichnung)>50)
+if(strlen($bezeichnung)>50)
 $pdf->SetXY(30,75);
 else
 $pdf->SetXY(30,60);
@@ -64,9 +60,9 @@ if($lehreinheit_id!='')
 	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
 	
 $gruppen='';
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($gruppen!='')
 			$gruppen.=', ';
@@ -76,6 +72,8 @@ if($result = pg_query($conn, $qry))
 			$gruppen.=$row->gruppe_kurzbz;
 	}
 }
+$gruppen=mb_convert_encoding($gruppen,'ISO-8859-15','UTF-8');
+ 
 if(strlen($gruppen)>50)
 	$linebreak="\n";
 else 
@@ -159,19 +157,23 @@ $qry = "SELECT
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
 			lehrveranstaltung_id='".addslashes($lvid)."' AND 
 			studiensemester_kurzbz='$stsem' ";
-if($lehreinheit_id!='')
-	$qry.=" AND tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."'";
+		if($lehreinheit_id!='')
+				$qry.=" AND tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."'";
 $qry.=" ORDER BY nachname, vorname;";
-
-if($result = pg_query($conn,$qry))
+if($result = $db->db_query($qry))
 {
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		$pdf->SetFont('Arial','',8);
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(280,$lineheight,"$row->vorname $row->nachname",1,'L',0);
+		
+		$vorname=mb_convert_encoding(trim($row->vorname),'ISO-8859-15','UTF-8');
+		$nachname=mb_convert_encoding(trim($row->nachname),'ISO-8859-15','UTF-8');
+		$name="$vorname $nachname";
+		
+		$pdf->MultiCell(280,$lineheight,$name,1,'L',0);
 		$maxX +=280;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
@@ -212,7 +214,6 @@ $inhalt[]=array(' ','Hörer/Name','Kennzeichen','Gruppe','','','','','',''); //Sp
 
 //Studenten holen
 
-
 $pdf->SetFont('Arial','',8);
 		$maxY=$pdf->GetY();
 		$maxX=30;
@@ -246,7 +247,7 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;
@@ -272,10 +273,10 @@ if($lehreinheit_id!='')
 	
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 //echo $qry;
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$i=0;
-	while($elem = pg_fetch_object($result))
+	while($elem = $db->db_fetch_object($result))
 	{
 		//Abbrecher und Unterbrecher nicht anzeigen
 		if($elem->status!='Abbrecher' && $elem->status!='Unterbrecher')
@@ -294,15 +295,24 @@ if($result = pg_query($conn, $qry))
 				$maxY=$pdf->GetY();
 			}
 	
+			$vorname=mb_convert_encoding(trim($elem->vorname),'ISO-8859-15','UTF-8');
+			$nachname=mb_convert_encoding(trim($elem->nachname),'ISO-8859-15','UTF-8');
+			$name="$vorname $nachname";
+			$matrikelnr=trim(mb_convert_encoding($elem->matrikelnr,'ISO-8859-15','UTF-8'));
+			$sem_verb_grup=trim(mb_convert_encoding($elem->semester.$elem->verband.$elem->gruppe,'ISO-8859-15','UTF-8'));
+
+				
+
+			
 			$maxX=30;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->MultiCell(20,$lineheight,$i,1,'R',1);
 			$maxX +=20;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->SetFont('Courier','B',8);
-			$pdf->MultiCell(130,$lineheight,$elem->nachname,1,'L',1);
+			$pdf->MultiCell(130,$lineheight,$nachname,1,'L',1);
 			$pdf->SetFont('Arial','',8);
-			$pdf->SetXY($maxX+strlen($elem->nachname)*5+1,$maxY);
+			$pdf->SetXY($maxX+strlen($nachname)*5+1,$maxY);
 			if($elem->status=='Incoming') //Incoming
 				$inc=' (i)';
 			else 
@@ -314,14 +324,15 @@ if($result = pg_query($conn, $qry))
 			if($elem->note==6) //angerechnet
 				$inc.=' (ar)';
 			
-			$pdf->MultiCell(130,$lineheight,$elem->vorname.$inc,0,'L',0);
+			
+			$pdf->MultiCell(130,$lineheight,$vorname.$inc,0,'L',0);
 			$maxX +=130;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->SetFont('Arial','',8);
-			$pdf->MultiCell(65,$lineheight,trim($elem->matrikelnr),1,'C',1);
+			$pdf->MultiCell(65,$lineheight,$matrikelnr,1,'C',1);
 			$maxX +=65;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(65,$lineheight,$elem->semester.$elem->verband.$elem->gruppe,1,'C',1);
+			$pdf->MultiCell(65,$lineheight,$sem_verb_grup,1,'C',1);
 			$maxX +=65;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
@@ -340,7 +351,7 @@ if($result = pg_query($conn, $qry))
 			$maxX +=40;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
-		   $inhalt[]=array($i,$elem->nachname.' '.$elem->vorname,trim($elem->matrikelnr),$elem->semester.$elem->verband.$elem->gruppe,'','','','','','');
+		    $inhalt[]=array($i,$nachname.' '.$vorname,$matrikelnr,$sem_verb_grup,'','','','','','');
 		}
    }
 }
@@ -358,7 +369,10 @@ $maxY=$pdf->GetY()+5;
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','B',8);
-$pdf->MultiCell(520,$lineheight,'Fachhochschulstudiengang ('.strtoupper($stgobj->typ).') '.$stgobj->bezeichnung,0,'L',0);
+
+
+$bezeichnung=mb_convert_encoding('Fachhochschulstudiengang ('.strtoupper($stgobj->typ).') '.$stgobj->bezeichnung,'ISO-8859-15','UTF-8');
+$pdf->MultiCell(520,$lineheight,$bezeichnung,0,'L',0);
 
 //FHStg
 $maxY=$pdf->GetY();
@@ -366,12 +380,5 @@ $maxX=30;
 $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','',8);
 $pdf->MultiCell(520,$lineheight,'Fehlt ein Student länger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTÄNDIG AUSGEFÜLLTE LISTEN abgeben!',0,'L',0);
-
-	$qry = "SET CLIENT_ENCODING TO 'UTF8';";
-	if(!pg_query($conn,$qry))
-	{
-		die("Encoding konnte nicht gesetzt werden");
-	}   
-
 $pdf->Output('anwesenheitsliste.pdf','I');
 ?>
