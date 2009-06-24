@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
 /* @author Andres Oesterreicher
@@ -28,7 +29,14 @@
    @edit	08-11-2006 Versionierung entfernt: Studiensemester=WS2007
    			02-01-2007 Umstellung auf die neue DB
 */
-   require_once('../../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
    require_once('../../../../include/functions.inc.php');
    require_once('../../../../include/studiengang.class.php');
    require_once('../../../../include/lehrveranstaltung.class.php');
@@ -50,7 +58,7 @@
    function save()
    {
    		window.document.editFrm.status.value="save";
-   		window.document.editFrm.action="<?php echo $PHP_SELF; ?>";
+   		window.document.editFrm.action="<?php echo $_SERVER['PHP_SELF']; ?>";
    		window.document.editFrm.target="_self";
    		window.document.editFrm.submit();
    }
@@ -67,14 +75,10 @@
 			return $string;
 	}
 
-	//Verbindung zur DB herstellen
-	if(!$conn=pg_pconnect(CONN_STRING))
-		die('Fehler beim Connecten zur Datenbank');
-
 	$user = get_uid();
 
     //Berechtigung ueberpruefen
-    if(!check_lektor($user,$conn))
+    if(!check_lektor($user))
     {
     	die("<br><center>Sie haben keine Berechtigung f&uuml;r diesen Bereich</center>");
     }
@@ -87,7 +91,7 @@
 
 	if(isset($_GET['lvid']))
 	{
-		$lv_obj = new lehrveranstaltung($conn);
+		$lv_obj = new lehrveranstaltung();
 		$lv_obj->load($lv);
 
 		if(!isset($stg))
@@ -157,7 +161,7 @@
 		if($status=='save') // Beim druecken auf "Speichern"
 		{
 			//Speichert die aenderungen in der Datenbank (de und en)
-			$lv_obj_sav= new lvinfo($conn);
+			$lv_obj_sav= new lvinfo();
 			$save_error=false;
 			$save_log_error=false;
 			//Deutsch
@@ -177,7 +181,7 @@
 			$lv_obj_sav->methodik = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_de));
 			//$lv_obj_sav->titel = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_de));
 
-			$lv_obj1 = new lvinfo($conn);
+			$lv_obj1 = new lvinfo();
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
 
 			if(!$vorhanden)
@@ -208,7 +212,7 @@
 			$lv_obj_sav->methodik = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_en));
 			//$lv_obj_sav->titel = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_en));
 
-			$lv_obj1 = new lvinfo($conn);
+			$lv_obj1 = new lvinfo();
 			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
 
 			if(!$vorhanden)
@@ -233,7 +237,7 @@
 	$output .= "<table class='tabcontent'><tr>";
 	$output .= "<td width='85%'>";
 	$output .= "<form action='".$_SERVER['PHP_SELF']."' name='auswahlFrm' method='POST'>";
-	$stg_obj = new studiengang($conn);
+	$stg_obj = new studiengang();
 
 	//Anzeigen des DropDown Menues mit Stg
 	if($stg_obj->getAll('typ, kurzbz'))
@@ -245,7 +249,7 @@
 		//DropDown Menue mit den Stg fuellen
 		foreach($stg_obj->result as $elem)
 		{
-			$lv_help_obj = new lehrveranstaltung($conn);
+			$lv_help_obj = new lehrveranstaltung();
 			$lv_help_obj->load_lva($elem->studiengang_kz, null,null,true);
 
 			if(count($lv_help_obj->lehrveranstaltungen)>0)
@@ -290,7 +294,7 @@
 
 		for($i=1;$i<=$stg_obj->max_semester;$i++)
 		{
-			$lv_help_obj = new lehrveranstaltung($conn);
+			$lv_help_obj = new lehrveranstaltung();
 			$lv_help_obj->load_lva($stg, $i, null,true);
 
 			if(count($lv_help_obj->lehrveranstaltungen)>0)
@@ -320,7 +324,7 @@
 		$errormsg .= "$stg_obj->errormsg";
 
 	//Anzeigen des DropDown Menues mit Lehrveranstaltungen
-	$lv_obj = new lehrveranstaltung($conn);
+	$lv_obj = new lehrveranstaltung();
 	if($lv_obj->load_lva($stg,$sem,null,true))
 	{
        $output .= "Lehrveranstaltung <SELECT name='lv' onChange='javascript:window.document.auswahlFrm.changed.value=\"lv\";window.document.auswahlFrm.submit();'>";
@@ -381,14 +385,14 @@
 	if(isset($lv) && isset($stg) && isset($sem)) // Wenn oben alles Ausgewaehlt wurde
 	{
 		//Anzeige des Formulares
-		$stg_obj1 = new studiengang($conn);
+		$stg_obj1 = new studiengang();
 		$stg_obj1->load($stg);
 
 		if(isset($errormsg))
 			echo "<font color='#FF0000' size='4'>$errormsg</font>";
 
-		$lv_obj_en = new lvinfo($conn);
-		$lv_obj_de = new lvinfo($conn);
+		$lv_obj_en = new lvinfo();
+		$lv_obj_de = new lvinfo();
 
 		if($lv_obj_en->load($lv, ATTR_SPRACHE_EN))
 			$lv_en=$lv_obj_en;
@@ -424,7 +428,7 @@
 			$methodik_en = $lv_en->methodik;
 		}
 
-		$lv_obj = new lehrveranstaltung($conn);
+		$lv_obj = new lehrveranstaltung();
 		$lv_obj->load($lv);
 		echo "<br><br>";
 		echo "<Form name='editFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
@@ -432,15 +436,15 @@
 		echo "<table class='tabcontent'>";
 		echo "<tr><td width='200'><b>ECTS - Credits</b></td><td width='200'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>Bei Fehlern in den Fixfeldern bitte an die <a class='Item' href='mailto:$stg_obj1->email'>zust&auml;ndige Assistentin</a> wenden.</td></tr>";
 
-		$stsem_obj = new studiensemester($conn);
+		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 		//Namen der Lehrenden Auslesen
 		$qry = "SELECT * FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND mitarbeiter_uid=uid";
 		echo "<tr><td class='tdvertical' nowrap><b>Lehrende laut Lehrauftrag</b></td><td nowrap>";
 		$helparray = array();
-		if($result=pg_query($conn,$qry))
+		if($result=$db->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 			{
 				if(!in_array("$row->vorname $row->nachname",$helparray))//damit ein Name nicht doppelt vorkommt
 					$helparray[] = "$row->vorname $row->nachname";
@@ -455,9 +459,9 @@
 	   $qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id)";
 	   
 	   echo "<tr><td class='tdvertical'><b>Institutsleiter</b></td><td>";
-	   if($result=pg_query($conn,$qry))
+	   if($result=$db->db_query($qry))
 	   {
-	   	   while($row=pg_fetch_object($result))
+	   	   while($row=$db->db_fetch_object($result))
 	   	   {
 	   	   	   echo "$row->vorname $row->nachname<br>";
 	   	   }
@@ -481,9 +485,9 @@
 				tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz";
 	   
 		echo "<tr><td class='tdvertical'><b>Institutskoordinator</b></td><td>";
-	   if($result=pg_query($conn,$qry))
+	   if($result=$db->db_query($qry))
 	   {
-	   	   while($row=pg_fetch_object($result))
+	   	   while($row=$db->db_fetch_object($result))
 	   	   {
 	   	   	   echo "$row->vorname $row->nachname<br>";
 	   	   }

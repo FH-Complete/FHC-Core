@@ -130,7 +130,7 @@ if($command=='add')
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
-		$result=$db->pg_query($qry_upd);
+		$result=$db->$db->db_query($qry_upd);
 		$command="update";
 	}
 	else 
@@ -156,7 +156,7 @@ if($command=="update" || $error==true)
 						updatevon = '".$user."', 
 						updateamum = now() 
 						WHERE paabgabe_id='".$paabgabe_id."'";
-					$result=$db->pg_query($qry);
+					$result=$db->db_query($qry);
 				} 
 				else 
 				{

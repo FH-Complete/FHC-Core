@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /**
  * Erstellt ein Zip Archiv des Download-Bereichs und leitet dann zum Download weiter
@@ -25,14 +26,10 @@
  * Aufruf: zipdownload.php?stg=255&sem=1$short=eng
  */
 
-   require_once('../../../config.inc.php');
+   require_once('../../../config/cis.config.inc.php');
    require_once('../../../../include/functions.inc.php');
 
-   //Connection zur DB herstellen
-   if(!$conn = pg_pconnect(CONN_STRING))
-   {
-   		die('Fehler beim herstellen der DB Verbindung');
-   }
+
   
   $user = get_uid(); 
 
@@ -52,7 +49,8 @@
     if(!isset($_GET['downloadname']))
    {
    		die('Fehler bei der Parameteruebergabe');
-   } 		
+   } 		
+
    
    $uebung_id   = $_GET['uebung_id'];
 	$lehreinheit_id   = $_GET['lehreinheit_id'];

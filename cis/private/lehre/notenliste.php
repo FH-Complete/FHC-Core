@@ -16,15 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /*
  * Erstellt eine Liste mit den Noten des eingeloggten Studenten
  * das betreffende Studiensemester kann ausgewaehlt werden
  */
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
@@ -64,9 +71,6 @@ require_once('../../../include/datum.class.php');
 	    	<td>
 <?php
 
-if(!$conn=pg_connect(CONN_STRING))
-	die("Die Datenbankverbindung konnte nicht hergestellt werden.");
-
 if(isset($_GET["stsem"]))
 	$stsem = $_GET["stsem"];
 else
@@ -78,7 +82,7 @@ $datum_obj = new datum();
 $error = '';
 
 
-if(!check_student($user, $conn))
+if(!check_student($user))
 {
 	$error .= 'Sie m&uuml;ssen als Student eingeloggt sein um ihre Noten abzufragen!';
 	echo $error;
@@ -87,11 +91,11 @@ else
 {
 	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.bezeichnung FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) WHERE campus.vw_student.uid = '$user'";
 	
-	if (!$result=pg_query($conn,$qry))
+	if (!$result=$db->db_query($qry))
 		die("Kein Studentendatensatz!");
 	else
 	{
-		$row=pg_fetch_object($result);
+		$row=$db->db_fetch_object($result);
 		
 		$vorname= $row->vorname;
 		$nachname = $row->nachname;
@@ -100,7 +104,7 @@ else
 	
 	//Aktuelles Studiensemester ermitteln
 	
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	if($stsem=='')
 		$stsem = $stsem_obj->getaktorNext();
 	
@@ -139,12 +143,12 @@ else
 				tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
 			ORDER BY bezeichnung";
 
-	if($result=pg_query($conn,$qry))
+	if($result=$db->db_query($qry))
 	{
 		//Tabelle anzeigen
 		$tbl= "<table><tr class='liste'><th>Lehrveranstaltung</th><th>LV-Note</th><th>Zeugnisnote</th><th>Benotungsdatum der Zeugnisnote</th></tr>";
 		$i=0;
-		while($row=pg_fetch_object($result))
+		while($row=$db->db_fetch_object($result))
 		{
 			$i++;
 			$tbl.= "<tr class='liste".($i%2)."'><td>$row->bezeichnung</td>";

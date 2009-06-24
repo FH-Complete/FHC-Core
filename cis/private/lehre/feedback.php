@@ -1,17 +1,49 @@
 <?php
-	require_once('../../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+/* @date 27.10.2005
+   @brief Zeigt die Daten aus der tbl_lvinfo an
+
+   @edit	08-11-2006 Versionierung wurde entfernt. Alle eintraege werden jetzt im WS2007
+   					   abgespeichert
+   			03-02-2006 Anpassung an die neue Datenbank
+*/
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/feedback.class.php');
 
-    //Connection Herstellen
-    if(!$conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim oeffnen der Datenbankverbindung');
-
 	$user = get_uid();
 
-	if(check_lektor($user, $conn))
+	if(check_lektor($user))
        $is_lector=true;
 
 ?>
@@ -27,7 +59,7 @@
 	if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
 	   die('Fehler bei der Uebergabe der Parameter');
 	$lvid = $_GET['lvid'];
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 	if(isset($POST["feedback_message"]))
 	   $feedback_message=$POST["feedback_message"];
@@ -47,7 +79,7 @@
 			<table class="tabcontent">
 			  <tr>
 			<?php
-				$lv_obj = new lehrveranstaltung($conn);
+				$lv_obj = new lehrveranstaltung();
 				if($lv_obj->load($lvid))
 				{
 					$short_name = $lv_obj->bezeichnung;
@@ -59,14 +91,14 @@
             an:
 			<?php
 			$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
-			$result = pg_query($conn, $qry);
-			$row = pg_fetch_object($result);
+			$result = $db->db_query($qry);
+			$row = $db->db_fetch_object($result);
 			$qry = "SELECT distinct vorname, nachname, uid FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE uid=mitarbeiter_uid AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$row->studiensemester_kurzbz'";
-			if(!$result=pg_query($conn, $qry))
+			if(!$result=$db->db_query($qry))
 				die('Fehler beim Auslesen der Lektoren');
-			$rows = pg_num_rows($result);
+			$rows = $db->db_num_rows($result);
 			$i=0;
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				echo $row->vorname.' '.$row->nachname;
 				$i++;
@@ -84,7 +116,7 @@
 	    <?php
 			if(isset($edit_id) && $edit_id != "" && !isset($edit_break))
 			{
-				$fb_obj = new feedback($conn);
+				$fb_obj = new feedback();
 				if($fb_obj->load($edit_id))
 				{
 					echo '<input type="text" name="feedback_subject" value="'.$fb_obj->betreff.'" size="54"><br>';
@@ -110,7 +142,7 @@
 		{
 			if(isset($edit_feedback))
 			{
-				$fb_obj = new feedback($conn);
+				$fb_obj = new feedback();
 				$fb_obj->betreff = $feedback_subject;
 				$fb_obj->text = $feedback_message;
 				$fb_obj->feedback_id = $edit_id;
@@ -127,7 +159,7 @@
 
 			if(!isset($edit_id) && !isset($edit_break) && !isset($edit_feedback))
 			{
-				$fb_obj = new feedback($conn);
+				$fb_obj = new feedback();
 				$fb_obj->betreff = $feedback_subject;
 				$fb_obj->text = $feedback_message;
 				$fb_obj->datum = date('Y-m-d');
@@ -147,7 +179,7 @@
 			echo 'Die Nachricht wurde erfolgreich eingetragen.<br><br><br>';
 		}
 
-		$fb_obj = new feedback($conn);
+		$fb_obj = new feedback();
 		if($fb_obj->load_feedback($lvid))
 		{
 			echo '<table class="tabcontent">';
@@ -156,9 +188,9 @@
 			{
 				$sql_query = "SELECT vorname, nachname FROM campus.vw_benutzer WHERE uid='$row->uid'";
 
-				if($result_person = pg_query($conn, $sql_query))
+				if($result_person = $db->db_query($sql_query))
 				{
-					if($row_pers=pg_fetch_object($result_person))
+					if($row_pers=$db->db_fetch_object($result_person))
 					{
 
 						echo '<tr>';

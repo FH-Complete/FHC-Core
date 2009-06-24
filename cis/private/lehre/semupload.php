@@ -6,20 +6,14 @@
 // *@date 31.Aug. 2005
 // *@edit 19.Dez. 2006 Anpassung an neue DB
 // ***************************************************/
-	require_once('../../config.inc.php');
-	require_once('../../../include/functions.inc.php');
+	 	require_once('../../../config/cis.config.inc.php');
+		require_once('../../../include/functions.inc.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
 
-    //Connection Herstellen
-    if(!$conn = pg_pconnect(CONN_STRING))
-    {
-       die('Fehler beim oeffnen der Datenbankverbindung');
-    }
-
 	$user = get_uid();
 
-	if(check_lektor($user,$conn))
+	if(check_lektor($user))
        $is_lector=true;
 
 	 if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
@@ -29,10 +23,10 @@
 	 else
 	 	$lvid = $_GET['lvid'];
 
-    $lv_obj = new lehrveranstaltung($conn);
+    $lv_obj = new lehrveranstaltung();
     if(!$lv_obj->load($lvid))
     	die('Fehler beim Laden der Lehrveranstaltung');
-    $stg_obj = new studiengang($conn);
+    $stg_obj = new studiengang();
 
     if(!$stg_obj->load($lv_obj->studiengang_kz))
     	die('Fehler beim Laden des Studienganges');

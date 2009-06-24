@@ -17,10 +17,18 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -36,28 +44,25 @@ function microtime_float()
 }
 $time = microtime_float();
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $inserted = 0;
 $upgedated = 0;
 $text = "";
 
 $qry = "SELECT DISTINCT(lehreinheit_id) from campus.tbl_uebung order by lehreinheit_id";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		
 		$query = "select count(*) from campus.tbl_uebung where liste_id is null and beispiele = 't' and lehreinheit_id = '".$row->lehreinheit_id."'";
-		$res = pg_query($conn, $query);
-		$anzahl = pg_fetch_object($res);
+		$res = $db->db_query($query);
+		$anzahl = $db->db_fetch_object($res);
 		if ($anzahl->count > 0)
 		{
 		
 						
 			$datum_obj = new datum();
-			$uebung_obj = new uebung($conn);
+			$uebung_obj = new uebung();
 			$uebung_obj->get_next_nummer();
 			$uebung_obj->gewicht=1;
 			$uebung_obj->punkte='';
@@ -83,8 +88,8 @@ if($result = pg_query($conn, $qry))
 				$inserted++;				
 				$liste_id = $uebung_obj->uebung_id;
 				$update_qry = "UPDATE campus.tbl_uebung set liste_id = '".$liste_id."' where lehreinheit_id = '".$row->lehreinheit_id."' and uebung_id != '".$liste_id."' and beispiele = 't'";
-				$r = pg_query($conn, $update_qry);
-				$upgedated += pg_affected_rows($r);
+				$r = $db->db_query($update_qry);
+				$upgedated += $db->db_affected_rows($r);
 			}
 		}
 	}

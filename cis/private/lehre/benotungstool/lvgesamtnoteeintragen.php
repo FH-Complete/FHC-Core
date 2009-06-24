@@ -20,7 +20,13 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../../config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -38,12 +44,9 @@ require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
-
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 $rechte = new benutzerberechtigung();
@@ -91,9 +94,9 @@ if(!$rechte->isBerechtigt('admin',0) &&
 			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
-	if($result = pg_query($qry))
+	if($result = $db->db_query($qry))
 	{
-		if(pg_num_rows($result)==0)
+		if($db->db_num_rows($result)==0)
 			die('Sie haben keine Berechtigung für diese Seite');
 	}
 	else 
@@ -102,14 +105,14 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-function savenote($lvid, $student_uid, $note)
+function savenote($db,$lvid, $student_uid, $note)
 {
-	global $conn, $stsem, $user;
+	global $stsem, $user;
 	$jetzt = date("Y-m-d H:i:s");
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid='".addslashes($student_uid)."' AND lehrveranstaltung_id='".addslashes($lvid)."'";
-	if($result = pg_query($qry))
-		if(pg_num_rows($result)==0)
+	if($result = $db->db_query($qry))
+		if($db->db_num_rows($result)==0)
 		{
 			$student = new student();
 			$student->load($student_uid);
@@ -162,7 +165,7 @@ if (isset($_REQUEST["submit"]))
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
 		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
-			$response = savenote($lvid, $student_uid, $note);
+			$response = savenote($db,$lvid, $student_uid, $note);
 		else
 			$response = "Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
 		
@@ -189,7 +192,7 @@ if (isset($_REQUEST["submit"]))
 					}
 					if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
 					{
-						$val=savenote($lvid, $student_uid, $note);
+						$val=savenote($db,$lvid, $student_uid, $note);
 						if($val!='neu' && $val!='update' && $val!='update_f')
 							$response.=$val;
 					}

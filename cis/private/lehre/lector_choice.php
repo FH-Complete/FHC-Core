@@ -16,19 +16,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config.inc.php');
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 	require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/studiensemester.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
-
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim oeffnen der Datenbankverbindung');
 
 	$user = get_uid();
 
@@ -40,15 +45,15 @@
 	else
 		die('Fehler bei der Parameteruebergabe');
 
-	$lv_obj = new lehrveranstaltung($sql_conn);
+	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($lvid);
 
-	$stg_obj=new studiengang($sql_conn);
+	$stg_obj=new studiengang();
 	$stg_obj->load($lv_obj->studiengang_kz);
 
 	$openpath="../../../documents/".strtolower($stg_obj->kuerzel)."/".$lv_obj->semester."/".strtolower($lv_obj->lehreverzeichnis)."/upload/";
 
-	$stsem_obj = new studiensemester($sql_conn);
+	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -90,9 +95,9 @@
 			<?php
 				$is_berechtigt=false;
 				$qry = "SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE lehrveranstaltung_id='$lvid'";
-				if($result = pg_query($sql_conn, $qry))
+				if($result = $db->db_query($qry))
 				{
-					while($row = pg_fetch_object($result))
+					while($row = $db->db_fetch_object($result))
 					{
 						if($rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz,null,$row->fachbereich_kurzbz))
 							$is_berechtigt=true;
@@ -112,9 +117,9 @@
 								mitarbeiter_uid=uid AND uid='$user' ORDER BY nachname, vorname, uid";
 								//studiensemester_kurzbz='$stsem' AND
 
-				if($result = pg_query($sql_conn, $sql_query))
+				if($result = $db->db_query($sql_query))
 				{
-					if(pg_num_rows($result)>0)
+					if($db->db_num_rows($result)>0)
 					{
 						$is_berechtigt=true;
 					}

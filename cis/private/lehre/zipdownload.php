@@ -16,25 +16,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+
 /**
  * Erstellt ein Zip Archiv des Download-Bereichs und leitet dann zum Download weiter
  * @create 20-03-2006
  * Aufruf: zipdownload.php?stg=255&sem=1$short=eng
  */
 
-   require_once('../../config.inc.php');
+	 require_once('../../../config/cis.config.inc.php');
    require_once('../../../include/studiengang.class.php');
    require_once('../../../include/functions.inc.php');
       
-   //Connection zur DB herstellen
-   if(!$conn = pg_pconnect(CONN_STRING))
-   {
-   		die('Fehler beim herstellen der DB Verbindung');
-   }
-   
    //Gueltigkeit der Parameter pruefen		
    if(!isset($_GET['stg']) || !is_numeric($_GET['stg']))
    {
@@ -56,7 +52,7 @@
    $short = $_GET['short'];
    
    //Studiengangskuerzel holen
-   $stg_obj = new studiengang($conn);
+   $stg_obj = new studiengang();
    $stg_obj->load($stg);
 
    $kurzbz = mb_strtolower($stg_obj->kuerzel);

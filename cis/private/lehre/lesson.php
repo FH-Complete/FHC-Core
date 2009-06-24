@@ -17,26 +17,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config.inc.php');
-	require_once('../../../include/functions.inc.php');
+
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
+		require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/studiensemester.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/moodle_course.class.php');
 
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim oeffnen der Datenbankverbindung');
-
 	$user = get_uid();
 
 	$user_is_allowed_to_upload=false;
 
-	if(check_lektor($user,$sql_conn))
+	if(check_lektor($user))
        $is_lector=true;
 	else
 	   $is_lector=false;
@@ -46,7 +51,7 @@
 	else
 		$lvid = addslashes($_GET['lvid']);
 
-	$lv_obj = new lehrveranstaltung($sql_conn);
+	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($lvid);
 	$lv=$lv_obj;
 
@@ -54,7 +59,7 @@
 	$term_id = $lv->semester;
 	$short = $lv->lehreverzeichnis;
 
-	$stg_obj = new studiengang($sql_conn);
+	$stg_obj = new studiengang();
 	$stg_obj->load($lv->studiengang_kz);
 
 	$kurzbz = $stg_obj->kuerzel;
@@ -126,7 +131,7 @@ function hideSemPlanHelp(){
 		echo $lv_obj->bezeichnung.' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$term_id;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
-		$stsem = new studiensemester($sql_conn);
+		$stsem = new studiensemester();
 		if($lv->studiengang_kz==0)
 			$angezeigtes_stsem = $stsem->getNearest();
 		else
@@ -141,13 +146,13 @@ function hideSemPlanHelp(){
 
 	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_person.aktiv=true AND studiensemester_kurzbz='$angezeigtes_stsem' ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
 
-		if(!$result = pg_query($sql_conn, $qry))
+		if(!$result = $db->db_query($qry))
 		{
 			echo 'Es konnten keine Lektoren zugeordnet werden';
 		}
 		else
 		{
-			$num_rows_result = pg_num_rows($result);
+			$num_rows_result = $db->db_num_rows($result);
 
 			if(!($num_rows_result > 0))
 			{
@@ -156,7 +161,7 @@ function hideSemPlanHelp(){
 			else
 			{
 				$i=0;
-				while($row_lector = pg_fetch_object($result))
+				while($row_lector = $db->db_fetch_object($result))
 				{
 					$i++;
 					if($user==$row_lector->uid)
@@ -178,9 +183,9 @@ function hideSemPlanHelp(){
 	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
 	  	$qry .= " AND studiensemester_kurzbz='$angezeigtes_stsem'";
 
-	  if($result = pg_query($sql_conn, $qry))
+	  if($result = $db->db_query($qry))
 	  {
-	  	while($row = pg_fetch_object($result))
+	  	while($row = $db->db_fetch_object($result))
 	  	{
 	  		if($rechte->isBerechtigt('lehre',null,null,$row->fachbereich_kurzbz) || $rechte->isBerechtigt('assistenz',$row->studiengang_kz))
 	  			$user_is_allowed_to_upload=true;

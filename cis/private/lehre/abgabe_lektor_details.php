@@ -133,7 +133,7 @@ if(isset($_POST["schick"]))
 					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
 				if($result=$db->db_query($qrychk))
 				{
-					if(pg_num_rows($result)>0)
+					if($db->db_num_rows($result)>0)
 					{
 						//Datensatz bereits vorhanden
 					}
@@ -149,7 +149,7 @@ if(isset($_POST["schick"]))
 						}
 						else 
 						{
-							$row=@pg_fetch_object($result);
+							$row=@$db->db_fetch_object($result);
 							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
 							if($result_typ=$db->db_query($qry_typ))
 							{
@@ -308,7 +308,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 $result=@$db->db_query($qry);
 	while ($row=@$db->db_fetch_object($result))
 	{
-		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$row->projektarbeit_id."'>\n";
+		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";

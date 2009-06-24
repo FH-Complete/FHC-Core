@@ -17,29 +17,36 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../../config.inc.php');
-require_once('../../../../include/functions.inc.php');
-require_once('../../../../include/lehrveranstaltung.class.php');
-require_once('../../../../include/studiengang.class.php');
-require_once('../../../../include/studiensemester.class.php');
-require_once('../../../../include/lehreinheit.class.php');
-require_once('../../../../include/benutzerberechtigung.class.php');
-require_once('../../../../include/uebung.class.php');
-require_once('../../../../include/beispiel.class.php');
-require_once('../../../../include/studentnote.class.php');
-require_once('../../../../include/datum.class.php');
-require_once('../../../../include/legesamtnote.class.php');
-require_once('../../../../include/lvgesamtnote.class.php');
-require_once('../../../../include/zeugnisnote.class.php');
-require_once('../../../../include/pruefung.class.php');
-require_once('../../../../include/person.class.php');
-require_once('../../../../include/benutzer.class.php');
-require_once('../../../../include/mitarbeiter.class.php');
-require_once('../../../../include/moodle_course.class.php');
-require_once('../../../../include/mail.class.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
+	require_once('../../../../include/functions.inc.php');
+	require_once('../../../../include/lehrveranstaltung.class.php');
+	require_once('../../../../include/studiengang.class.php');
+	require_once('../../../../include/studiensemester.class.php');
+	require_once('../../../../include/lehreinheit.class.php');
+	require_once('../../../../include/benutzerberechtigung.class.php');
+	require_once('../../../../include/uebung.class.php');
+	require_once('../../../../include/beispiel.class.php');
+	require_once('../../../../include/studentnote.class.php');
+	require_once('../../../../include/datum.class.php');
+	require_once('../../../../include/legesamtnote.class.php');
+	require_once('../../../../include/lvgesamtnote.class.php');
+	require_once('../../../../include/zeugnisnote.class.php');
+	require_once('../../../../include/pruefung.class.php');
+	require_once('../../../../include/person.class.php');
+	require_once('../../../../include/benutzer.class.php');
+	require_once('../../../../include/mitarbeiter.class.php');
+	require_once('../../../../include/moodle_course.class.php');
+	require_once('../../../../include/mail.class.php');
 
 $lvid=(isset($_GET['lvid'])?$_GET['lvid']:'');
 $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
@@ -470,8 +477,7 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 
 <body>
 <?php
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
+
 if(MOODLE)
 {
 	if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
@@ -479,11 +485,11 @@ if(MOODLE)
 }
 $user = get_uid();
 
-if(!check_lektor($user, $conn))
+if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 $rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
+$rechte->getBerechtigungen();
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
@@ -496,12 +502,12 @@ else
 	$lehreinheit_id = '';
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
 	die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -536,9 +542,9 @@ $qry = "SELECT
 								lehrveranstaltung_id='".addslashes($lvid)."')
 		
 		";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>0)
+	if($db->db_num_rows($result)>0)
 		$grade_from_moodle=false;
 	else 
 	{
@@ -559,7 +565,7 @@ echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool'
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -583,9 +589,9 @@ if(!$rechte->isBerechtigt('admin',0) &&
 			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if(pg_num_rows($result)==0)
+		if($db->db_num_rows($result)==0)
 			die('Sie haben keine Berechtigung für diese Seite');
 	}
 	else 
@@ -594,86 +600,6 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-//Lehreinheiten laden
-/*
-if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
-{
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
-}
-else
-{
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='$user') AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
-
-}
-
-if($result = pg_query($conn, $qry))
-{
-	if(pg_num_rows($result)>1)
-	{
-		//Lehreinheiten DropDown
-		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
-		{
-			if($lehreinheit_id=='')
-				$lehreinheit_id=$row->lehreinheit_id;
-			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_lektoren = pg_query($conn, $qry_lektoren))
-			{
-				$lektoren = '( ';
-				$i=0;
-				while($row_lektoren = pg_fetch_object($result_lektoren))
-				{
-					$lektoren .= $row_lektoren->kurzbz;
-					$i++;
-					if($i<pg_num_rows($result_lektoren))
-						$lektoren.=', ';
-					else
-						$lektoren.=' ';
-				}
-				$lektoren .=')';
-			}
-			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
-			{
-				$gruppen = '';
-				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
-				{
-					if($row_gruppen->gruppe_kurzbz=='')
-						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
-					else
-						$gruppen.=$row_gruppen->gruppe_kurzbz;
-					$i++;
-					if($i<pg_num_rows($result_gruppen))
-						$gruppen.=', ';
-					else
-						$gruppen.=' ';
-				}
-			}
-			echo "<OPTION value='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->lfbez-$row->lehrform_kurzbz - $gruppen $lektoren</OPTION>\n";
-		}
-		echo '</SELECT> ';
-	}
-	else
-	{
-		if($row = pg_fetch_object($result))
-			$lehreinheit_id = $row->lehreinheit_id;
-	}
-}
-else
-{
-	echo 'Fehler beim Auslesen der Lehreinheiten';
-}*/
 echo $stsem_content;
 echo '</td><tr></table>';
 echo '<table width="100%"><tr>';
@@ -697,7 +623,7 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_POST["student_uid"];
 	$lvid = $_REQUEST["lvid"];
-	$lvgesamtnote = new lvgesamtnote($conn);
+	$lvgesamtnote = new lvgesamtnote();
     if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
     {
 		$lvgesamtnote->student_uid = $student_uid;
@@ -737,36 +663,15 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		$neuenoten = 0;
 		$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
 
-		//	$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
-			
-		//	if($result_grp = pg_query($conn, $qry))
-		//	{
-		//		while($row_grp = pg_fetch_object($result_grp))
-		//		{
-		/*		
-					if($row_grp->gruppe_kurzbz!='')
-					{
-							$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
-					}
-					else
-					{
-							$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
-							             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
-							             semester='$row_grp->semester' ".
-										 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
-										 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
-							            " ORDER BY nachname, vorname";
-					}
-		*/
 		// studentenquery					
 		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";
-        if($result_stud = pg_query($conn, $qry_stud))
+        if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
 			
-			while($row_stud = pg_fetch_object($result_stud))
+			while($row_stud = $db->db_fetch_object($result_stud))
 			{	
-				$lvgesamtnote = new lvgesamtnote($conn);
+				$lvgesamtnote = new lvgesamtnote();
     			if ($lvgesamtnote->load($lvid,$row_stud->uid,$stsem))
     			{
 					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)	    				
@@ -788,13 +693,13 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		//mail an assistentin und den user selber verschicken	
 		if ($neuenoten > 0)
 		{
-			$lv = new lehrveranstaltung($conn, $lvid);
-			$sg = new studiengang($conn, $lv->studiengang_kz);
+			$lv = new lehrveranstaltung($lvid);
+			$sg = new studiengang($lv->studiengang_kz);
 			$lektor_adresse = $user."@".DOMAIN;
 			$adressen = $sg->email.", ".$user."@".DOMAIN;
 			
 			
-			$mit = new mitarbeiter($conn);
+			$mit = new mitarbeiter();
 			$mit->load($user);
 
 			$freigeber = "<b>".strtoupper($user)."</b>";
@@ -824,7 +729,7 @@ echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 
 // alle pruefungen für die LV holen
 $studpruef_arr = array();
-$pr_all = new Pruefung($conn);
+$pr_all = new Pruefung();
 if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 {
 	if ($pr_all->result)
@@ -843,13 +748,6 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 echo "
 <table>
 ";
-
-//$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id' ORDER BY semester, verband, gruppe, gruppe_kurzbz";
-
-//if($result_grp = pg_query($conn, $qry))
-//{
-//	while($row_grp = pg_fetch_object($result_grp))
-//	{
 		echo "<tr>
 				<td colspan='11'>&nbsp;</td>
 			</tr>
@@ -901,38 +799,12 @@ echo "
 */
 		// studentenquery					
 		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";	
-        if($result_stud = pg_query($conn, $qry_stud))
+        if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
 			$errorshown=false;
-			while($row_stud = pg_fetch_object($result_stud))
+			while($row_stud = $db->db_fetch_object($result_stud))
 			{
-    				
-				//$studentnote = new studentnote($conn,$lehreinheit_id,$stsem,$row_stud->uid);
-				
-
-				
-				/*
-    			$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
-    			
-    			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
-				{    				
-    				$note_le = null;
-    			}
-    			else
-    				$note_le = $legesamtnote->note;
-    			if ($lvgesamtnote = new lvgesamtnote($conn, $lvid,$row_stud->uid,$stsem))
-    			{
-    				$note_lv = $lvgesamtnote->note;
-    			}
-    			else
-    				$note_lv = null;
-				
-				if ($note_lv)
-					$note_vorschlag = $note_lv;
-				else
-					$note_vorschlag = $note_le;
-				*/
 				
 				echo "
 				<tr class='liste".($i%2)."'>
@@ -951,7 +823,7 @@ echo "
 				if($grade_from_moodle)
 				{
 					//Noten aus Moodle
-					$moodle_course = new moodle_course($conn, $conn_moodle);
+					$moodle_course = new moodle_course($conn_moodle);
 					$mdldata = $moodle_course->loadNoten($lvid, $stsem, $row_stud->uid, true);
 					
 					if(is_array($mdldata))
@@ -980,11 +852,11 @@ echo "
 				else 
 				{
 					//Noten aus Uebungstool
-					$le = new lehreinheit($conn);
+					$le = new lehreinheit();
 					$le->load_lehreinheiten($lvid, $stsem);
 					foreach($le->lehreinheiten as $l)				
 					{				
-						$legesamtnote = new legesamtnote($conn, $l->lehreinheit_id);
+						$legesamtnote = new legesamtnote($l->lehreinheit_id);
 		    			
 		    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
 						{    				
@@ -1002,7 +874,7 @@ echo "
 		    			}
 		    		}
 				}	    			
-    			if ($lvgesamtnote = new lvgesamtnote($conn, $lvid,$row_stud->uid,$stsem))
+    			if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->uid,$stsem))
     			{
     				$note_lv = $lvgesamtnote->note;
     			}
@@ -1015,7 +887,7 @@ echo "
 					$note_vorschlag = round($note_le/$le_anz);
 				else
 					$note_vorschlag = null;
-				if ($zeugnisnote = new zeugnisnote($conn, $lvid, $row_stud->uid, $stsem))
+				if ($zeugnisnote = new zeugnisnote($lvid, $row_stud->uid, $stsem))
 					$znote = $zeugnisnote->note;
 				else
 					$znote = null;			
@@ -1051,19 +923,9 @@ echo "
 					$stylestr ="";
 				echo "<td".$stylestr." align='center'>".$znote."</td>";
 				
-				// prüfungen ///////////////////////////////////////////////////////////////////////////
-				//$pr = new pruefung($conn);
-				//$pr->getPruefungen($row_stud->uid, "Termin2", null);
-				//if (count($pr->result)>0)
+				// Pruefungen ///////////////////////////////////////////////////////////////////////////
 				if (key_exists($row_stud->uid,$studpruef_arr))			
 				{
-
-					//$pr_datum = $pr->result[0]->datum;
-					//$pr_note = $pr->result[0]->note;
-					//$pr_le_id = $pr->result[0]->lehreinheit_id;
-					
-					//echo "<td>".$pr_datum."</td>";
-					//echo "<form name='nachpruefung_".$row_stud->uid."'>";
 					echo "<td colspan='2'>";
 					echo "<span id='span_".$row_stud->uid."'>";
 					echo "<table>";

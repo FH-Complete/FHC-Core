@@ -23,7 +23,14 @@
 // * Studentenansicht fuers Kreuzerltool
 // ********************
 
-require_once('../../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -39,8 +46,6 @@ require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 include('functions.inc.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
 
 $user = get_uid();
 //$user = 'if06b172';
@@ -60,25 +65,24 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:''); //Uid
 
 	
 	
-if(check_lektor($user, $conn) && (isset($_GET['uid']) && $_GET["uid"] != ""))
+if(check_lektor($user) && (isset($_GET['uid']) && $_GET["uid"] != ""))
 {
 	$rights = new benutzerberechtigung();
 	$rights->getBerechtigungen($user); 
-	//if(!check_lektor_lehreinheit($conn, $user, $_GET["lehreinheit_id"]) && !$rights->isBerechtigt('admin',0))
-	$lehreinheit=new lehreinheit($conn, $_GET["lehreinheit_id"]);
-	if(!check_lektor_lehrveranstaltung($conn, $user, $lehreinheit->lehrveranstaltung_id, $lehreinheit->studiensemester_kurzbz) && !$rights->isBerechtigt('admin',0))
-		die("Sie haben keine Berechtigung für diese Lehreinheit");
+	$lehreinheit=new lehreinheit($_GET["lehreinheit_id"]);
+	if(!check_lektor_lehrveranstaltung($user, $lehreinheit->lehrveranstaltung_id, $lehreinheit->studiensemester_kurzbz) && !$rights->isBerechtigt('admin',0))
+			die("Sie haben keine Berechtigung für diese Lehreinheit");
 	$lektorenansicht = 1;
 	$user = $_GET["uid"];
 }
 
 //Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung($conn);
+$lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
-	die($lv_obj->errormsg);
+		die($lv_obj->errormsg);
 
 //Studiengang laden
-$stg_obj = new studiengang($conn,$lv_obj->studiengang_kz);
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -94,7 +98,7 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 if (isset($_GET["download_abgabe"])){
 	$file=$_GET["download_abgabe"];
 	$uebung_id = $_GET["uebung_id"];
-	$ueb = new uebung($conn);
+	$ueb = new uebung();
 	$ueb->load_studentuebung($user, $uebung_id);
 	$ueb->load_abgabe($ueb->abgabe_id);
 	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
@@ -108,7 +112,7 @@ if (isset($_GET["download_abgabe"])){
 if (isset($_GET["download"])){
 	$file=$_GET["download"];
 	$uebung_id = $_GET["uebung_id"];
-	$ueb = new uebung($conn);
+	$ueb = new uebung();
 	$ueb->load($uebung_id);
 	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
 	header('Content-Type: application/octet-stream');
@@ -147,7 +151,7 @@ if (isset($_GET["download"])){
 
 if (isset($_REQUEST["deleteabgabe"]))
 {
-	$ueb = new uebung($conn);
+	$ueb = new uebung();
 	$ueb->load_studentuebung($user, $uebung_id);
 	if (!$ueb->delete_abgabe($ueb->abgabe_id))
 		echo $ueb->errormsg;
@@ -166,11 +170,11 @@ if (isset($_POST["abgabe"]))
 		$datum = date('Y-m-d H:i:s');
 		$datumstr = ereg_replace(" ","_",$datum);
 		$name_up = pathinfo($_FILES["abgabedatei"]["name"]);
-		$name_neu = makeUploadName($conn, $which='abgabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem,$uid=$user, $date=$datumstr);
+		$name_neu = makeUploadName($db, $which='abgabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem,$uid=$user, $date=$datumstr);
 		$abgabedatei = $name_neu.".".$name_up["extension"];
 		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;	
 			
-		$uebung_obj = new uebung($conn);
+		$uebung_obj = new uebung();
 		$uebung_obj->load_studentuebung($user, $uebung_id);
 			
 		if ($uebung_obj->errormsg != "")
@@ -217,7 +221,7 @@ if (isset($_POST["abgabe"]))
 	else
 	{
 		$abgabe_anmerkung = $_POST["abgabe_anmerkung"];
-		$uebung_obj2 = new uebung($conn);
+		$uebung_obj2 = new uebung();
 		$uebung_obj2->load_studentuebung($user, $uebung_id);
 		if ($uebung_obj2->errormsg == "")
 		{
@@ -244,7 +248,7 @@ echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool'
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
@@ -298,28 +302,28 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 			tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
 				WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
 //echo $qry;
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>1)
+	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
 		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			//Beteiligte Mitarbeiter auslesen
 			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_lektoren = pg_query($conn, $qry_lektoren))
+			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
 				$i=0;
-				while($row_lektoren = pg_fetch_object($result_lektoren))
+				while($row_lektoren = $db->db_fetch_object($result_lektoren))
 				{
 					$lektoren .= $row_lektoren->kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_lektoren))
+					if($i<$db->db_num_rows($result_lektoren))
 						$lektoren.=', ';
 					else
 						$lektoren.=' ';
@@ -328,18 +332,18 @@ if($result = pg_query($conn, $qry))
 				$lektoren .=')';
 			}
 			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_gruppen = pg_query($conn, $qry_gruppen))
+			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
 				$i=0;
-				while($row_gruppen = pg_fetch_object($result_gruppen))
+				while($row_gruppen = $db->db_fetch_object($result_gruppen))
 				{
 					if($row_gruppen->gruppe_kurzbz=='')
 						$gruppen.=$row_gruppen->semester.$row_gruppen->verband.$row_gruppen->gruppe;
 					else
 						$gruppen.=$row_gruppen->gruppe_kurzbz;
 					$i++;
-					if($i<pg_num_rows($result_gruppen))
+					if($i<$db->db_num_rows($result_gruppen))
 						$gruppen.=', ';
 					else
 						$gruppen.=' ';
@@ -351,7 +355,7 @@ if($result = pg_query($conn, $qry))
 	}
 	else
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 			$lehreinheit_id = $row->lehreinheit_id;
 		else
 			$lehreinheit_id ='';
@@ -373,8 +377,8 @@ if($lehreinheit_id=='')
 
 $qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid='$user'";
 $name='';
-if($result = pg_query($conn, $qry))
-	if($row = pg_fetch_object($result))
+if($result = $db->db_query($qry))
+	if($row = $db->db_fetch_object($result))
 		$name = $row->vorname.' '.$row->nachname;
 
 
@@ -382,13 +386,13 @@ if($result = pg_query($conn, $qry))
 if (!isset($_GET["notenuebersicht"]))
 {
 	$l = 0;	
-	$ueb_check = new uebung($conn);
+	$ueb_check = new uebung();
 	$ueb_check->load_uebung($lehreinheit_id,1);
 	if	(count($ueb_check->uebungen > 0))
 	{
 		foreach ($ueb_check->uebungen as $row)
 		{
-			$sub_check = new uebung($conn);
+			$sub_check = new uebung();
 			$sub_check->load_uebung($lehreinheit_id,2,$row->uebung_id);
 			if (count($sub_check->uebungen) > 0)
 				$l = 1;
@@ -398,7 +402,7 @@ if (!isset($_GET["notenuebersicht"]))
 	if ($l > 0)
 	{
 		echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user'>Notenübersicht</a> f&uuml;r $name</b><br><br>";
-		$uebung_obj = new uebung($conn);
+		$uebung_obj = new uebung();
 		$uebung_obj->load_uebung($lehreinheit_id,1);
 		if(count($uebung_obj->uebungen)>0)
 		{
@@ -412,11 +416,8 @@ if (!isset($_GET["notenuebersicht"]))
 					$selected = 'selected';
 				else
 					$selected = '';		
-						
-				//if($uebung_id=='')
-				//	$uebung_id=$row->uebung_id;
 				
-				$subuebung_obj = new uebung($conn);
+				$subuebung_obj = new uebung();
 				$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
 				if(count($subuebung_obj->uebungen)>0)
 					{
@@ -498,13 +499,13 @@ if (!isset($_GET["notenuebersicht"]))
 	{
 		$error=false;
 	
-		$ueb_hlp_obj = new uebung($conn);
+		$ueb_hlp_obj = new uebung();
 		$ueb_hlp_obj->load($uebung_id);
 		//Wenn Kreuzerlliste Freigegeben ist
 		if($datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabevon)<time() &&
 		   $datum_obj->mktime_fromtimestamp($ueb_hlp_obj->freigabebis)>time())
 		{
-			$bsp_obj = new beispiel($conn);
+			$bsp_obj = new beispiel();
 	
 			if($bsp_obj->load_beispiel($uebung_id))
 			{
@@ -518,7 +519,7 @@ if (!isset($_GET["notenuebersicht"]))
 				{		
 					foreach ($bsp_obj->beispiele as $row)
 					{
-						$stud_bsp_obj = new beispiel($conn);
+						$stud_bsp_obj = new beispiel();
 		
 						if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
 						{
@@ -544,7 +545,7 @@ if (!isset($_GET["notenuebersicht"]))
 							die('<span class="error">Fehler beim Ermitteln der Beispiele</span>');
 						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && ($stud_bsp_obj->vorbereitet==true) && ($ueb_hlp_obj->maxstd != null)) //isset($_POST['problem_'.$row->beispiel_id]) &&  $stud_bsp_obj->new || 
 						{
-							$hlp = new beispiel($conn);
+							$hlp = new beispiel();
 							if($hlp->load_studentbeispiel($user, $row->beispiel_id))
 							{
 								if($hlp->vorbereitet!=$stud_bsp_obj->vorbereitet)
@@ -583,7 +584,7 @@ if (!isset($_GET["notenuebersicht"]))
 	//********ANZEIGE DER EINGETRAGENEN KREUZERL***********
 	if ($l > 0)
 	{	
-		$uebung_obj = new uebung($conn);
+		$uebung_obj = new uebung();
 		$uebung_obj->load($uebung_id);
 		$downloadname = mb_ereg_replace($uebung_id,mb_ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
 		echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
@@ -592,7 +593,7 @@ if (!isset($_GET["notenuebersicht"]))
 			echo "Angabe: <a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&download=".$downloadname."'>".$downloadname."</a><br><br>";
 		
 		
-		$ueb_obj = new uebung($conn);
+		$ueb_obj = new uebung();
 		if($ueb_obj->load_studentuebung($user, $uebung_id))
 		{
 			$anmerkung = $ueb_obj->anmerkung;
@@ -611,8 +612,8 @@ if (!isset($_GET["notenuebersicht"]))
 		{
 			
 			$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id IN (SELECT beispiel_id from campus.tbl_beispiel where uebung_id = $uebung_id) AND vorbereitet=true and student_uid = '$user'";
-				if($result_cnt = pg_query($conn,$qry_cnt))
-					if($row_cnt = pg_fetch_object($result_cnt))
+				if($result_cnt = $db->db_query($qry_cnt))
+					if($row_cnt = $db->db_fetch_object($result_cnt))
 						$anzahl = $row_cnt->anzahl;
 						
 			echo "<script type='text/javascript'>";
@@ -640,7 +641,7 @@ if (!isset($_GET["notenuebersicht"]))
 				
 			echo "</script>";
 			
-			$bsp_obj = new beispiel($conn);
+			$bsp_obj = new beispiel();
 			$bsp_obj->load_beispiel($uebung_id);			
 			if ($bsp_obj->beispiele)
 			{
@@ -671,8 +672,7 @@ if (!isset($_GET["notenuebersicht"]))
 				foreach ($bsp_obj->beispiele as $row)
 				{
 					$bsp_voll = false;		
-					$stud_bsp_obj = new beispiel($conn);
-						
+					$stud_bsp_obj = new beispiel();
 					if ($uebung_obj->maxstd > 0)
 					{
 						$stud_bsp_obj->check_anzahl_studentbeispiel($row->beispiel_id);
@@ -753,26 +753,26 @@ if (!isset($_GET["notenuebersicht"]))
 			//Gesamtpunkte diese Kreuzerlliste
 			$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
 			$punkte_gesamt=0;
-			if($result=pg_query($conn, $qry))
-				if($row = pg_fetch_object($result))
+			if($result=$db->db_query($qry))
+				if($row = $db->db_fetch_object($result))
 					$punkte_gesamt = $row->punktegesamt;
 			
 			//Eingetragen diese Kreuzerlliste
 			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$user' AND vorbereitet=true";
 			$punkte_eingetragen=0;
-			if($result=pg_query($conn, $qry))
-				if($row = pg_fetch_object($result))
+			if($result=$db->db_query($qry))
+				if($row = $db->db_fetch_object($result))
 					$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 			
 			//Gesamtpunkte alle Kreuzerllisten in dieser Übung
-			$ueb_help = new uebung($conn, $uebung_id);
+			$ueb_help = new uebung($uebung_id);
 			$liste_id = $ueb_help->liste_id;
 			$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
 					WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 					tbl_uebung.lehreinheit_id='$lehreinheit_id' and tbl_uebung.liste_id = '$liste_id'";
 			$punkte_gesamt_alle=0;
-			if($result=pg_query($conn, $qry))
-				if($row = pg_fetch_object($result))
+			if($result=$db->db_query($qry))
+				if($row = $db->db_fetch_object($result))
 					$punkte_gesamt_alle = $row->punktegesamt_alle;
 			
 			//Eingetragen alle Kreuzerllisten
@@ -783,24 +783,24 @@ if (!isset($_GET["notenuebersicht"]))
 					tbl_uebung.liste_id = '$liste_id' AND 
 					tbl_studentbeispiel.student_uid='$user' AND vorbereitet=true";
 			$punkte_eingetragen_alle=0;
-			if($result=pg_query($conn, $qry))
-				if($row = pg_fetch_object($result))
+			if($result=$db->db_query($qry))
+				if($row = $db->db_fetch_object($result))
 					$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
 			
 			//Mitarbeitspunkte
 			$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
 					WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user' AND liste_id = '$liste_id'";
 			$mitarbeit_alle=0;
-			if($result=pg_query($conn, $qry))
-				if($row = pg_fetch_object($result))
+			if($result=$db->db_query($qry))
+				if($row = $db->db_fetch_object($result))
 					$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
 			
 			//Mitarbeitspunkte
 			$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
 					WHERE uebung_id='$uebung_id' AND student_uid='$user'";
 			$mitarbeit=0;
-			if($result=pg_query($conn, $qry))
-				if($row = pg_fetch_object($result))
+			if($result=$db->db_query($qry))
+				if($row = $db->db_fetch_object($result))
 					$mitarbeit = $row->mitarbeitspunkte;
 			echo "
 			
@@ -860,7 +860,7 @@ if (!isset($_GET["notenuebersicht"]))
 			if($uebung_obj->statistik)
 			{
 				echo "<h3>Statistik</h3>";
-				$beispiel_obj = new beispiel($conn);
+				$beispiel_obj = new beispiel();
 				if($beispiel_obj->load_beispiel($uebung_id))
 				{
 					if(count($beispiel_obj->beispiele)>0)
@@ -878,8 +878,8 @@ if (!isset($_GET["notenuebersicht"]))
 			          		</tr>';
 						$i=0;
 						$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
-							if($result_cnt = pg_query($conn,$qry_cnt))
-									$gesamt=pg_num_rows($result_cnt);
+							if($result_cnt = $db->db_query($qry_cnt))
+									$gesamt=$db->db_num_rows($result_cnt);
 			
 						foreach ($beispiel_obj->beispiele as $row)
 						{
@@ -887,8 +887,8 @@ if (!isset($_GET["notenuebersicht"]))
 							$solved = 0;
 							$psolved = 0;
 							$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
-							if($result_cnt = pg_query($conn,$qry_cnt))
-								if($row_cnt = pg_fetch_object($result_cnt))
+							if($result_cnt = $db->db_query($qry_cnt))
+								if($row_cnt = $db->db_fetch_object($result_cnt))
 									$solved = $row_cnt->anzahl;
 			
 			
@@ -978,10 +978,10 @@ else
 		$nachname_arr = Array();
 				
 			$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."'  ORDER BY nachname, vorname";			
-            if($result_stud_dd = pg_query($conn, $qry_stud_dd))
+            if($result_stud_dd = $db->db_query($qry_stud_dd))
 			{
 				$i=1;
-				while($row_stud_dd = pg_fetch_object($result_stud_dd))
+				while($row_stud_dd = $db->db_fetch_object($result_stud_dd))
 				{
 					$uid_arr[] = $row_stud_dd->uid;
 					$vorname_arr[] = $row_stud_dd->vorname;
@@ -1017,7 +1017,7 @@ else
 	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
 	echo "<table><tr><td>";
 	
-	$uebung_obj = new uebung($conn);
+	$uebung_obj = new uebung();
 	$uebung_obj->load_uebung($lehreinheit_id,1);
 	if(count($uebung_obj->uebungen)>0)
 	{
@@ -1033,9 +1033,9 @@ else
 		foreach ($uebung_obj->uebungen as $row)
 		{	
 			
-			$subuebung_obj = new uebung($conn);
+			$subuebung_obj = new uebung();
 			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
-			$l1note = new studentnote($conn);
+			$l1note = new studentnote();
 			if(count($subuebung_obj->uebungen) >= 0)
 			{
 				
@@ -1118,7 +1118,7 @@ else
 	
 	echo "</td><td valign='top'>";
 	
-	$legesamtnote = new legesamtnote($conn, $lehreinheit_id);
+	$legesamtnote = new legesamtnote($lehreinheit_id);
 	    			
 	if (!$legesamtnote->load($user, $lehreinheit_id))
 	{    				
@@ -1128,13 +1128,13 @@ else
 	{
 		$lenote = $legesamtnote->note;
 	} 
-	if ($lvgesamtnote = new lvgesamtnote($conn, $lvid,$user,$stsem))
+	if ($lvgesamtnote = new lvgesamtnote($lvid,$user,$stsem))
 	{
 		$lvnote = $lvgesamtnote->note;
 	}
 	else
 		$lvnote = null;
-	if ($zeugnisnote = new zeugnisnote($conn, $lvid,$user,$stsem))
+	if ($zeugnisnote = new zeugnisnote($lvid,$user,$stsem))
 	{
 		$znote = $zeugnisnote->note;
 	}

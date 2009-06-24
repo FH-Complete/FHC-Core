@@ -16,14 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /*
  * Erstellt Notenliste im Excel Format
  */
 
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/studiensemester.class.php');
@@ -38,9 +46,6 @@ require_once('../../../include/Excel/PPS.php');
 require_once('../../../include/Excel/Root.php');
 require_once('../../../include/Excel/File.php');
 require_once('../../../include/Excel/Writer.php');
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
 
    	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
    		$lvid=$_GET['lvid'];
@@ -106,20 +111,20 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	// let's merge
 	$format_title->setAlign('merge');
 
-	$lvobj = new lehrveranstaltung($conn, $lvid);
+	$lvobj = new lehrveranstaltung($lvid);
 		
 	$worksheet->write(0,0,"Notenliste ".$lvobj->bezeichnung);
 	
-	$stg_obj = new studiengang($conn, $stg);
+	$stg_obj = new studiengang($stg);
 	
 	$qry = "SELECT distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, semester, verband, gruppe, gruppe_kurzbz from campus.vw_lehreinheit WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."'";
 	if($lehreinheit_id!='')
 		$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
 		
 	$gruppen='';
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($gruppen!='')
 				$gruppen.=', ';
@@ -149,9 +154,9 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	
 	$qry.=' ORDER BY nachname, vorname';
 	
-	if($result = pg_query($conn,$qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row=pg_fetch_object($result))
+		while($row=$db->db_fetch_object($result))
 		{
 			$worksheet->write($lines,0,"$row->vorname $row->nachname");
 			$lines++;
@@ -165,7 +170,7 @@ if (!$conn = pg_pconnect(CONN_STRING))
 	$worksheet->write($lines,3,"Gruppe");
 	$worksheet->write($lines,4,"Kennzeichen");
 	$worksheet->write($lines,5,"Note");
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;	
@@ -191,11 +196,11 @@ $qry = "SELECT
 	
 	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$i=1;
 		$lines++;
-		while($elem = pg_fetch_object($result))
+		while($elem = $db->db_fetch_object($result))
 		{
 			if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
 	   		{   	
