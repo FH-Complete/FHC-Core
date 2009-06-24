@@ -22,67 +22,68 @@
 /*
  *
  */
-class moodle_course
+require_once(dirname(__FILE__).'/basis_db.class.php');
+
+class moodle_course extends basis_db
 {
-	var $conn;
-	var $conn_moodle;
-	var $errormsg;
-	var $result = array();
+	private $conn_moodle;
+	public $result = array();
 	
 	//Vilesci Attribute
-	var $moodle_id;
-	var $mdl_course_id;
-	var $lehreinheit_id;
-	var $lehrveranstaltung_id;
-	var $studiensemester_kurzbz;
-	var $insertamum;
-	var $insertvon;
-	var $gruppen;
+	public $moodle_id;
+	public $mdl_course_id;
+	public $lehreinheit_id;
+	public $lehrveranstaltung_id;
+	public $studiensemester_kurzbz;
+	public $insertamum;
+	public $insertvon;
+	public $gruppen;
 	
 	//Moodle Attribute
-	var $mdl_fullname;
-	var $mdl_shortname;
+	public $mdl_fullname;
+	public $mdl_shortname;
 	
-	var $mdl_context_id;
-	var $mdl_context_level;
-	var $mdl_context_instanceid;
-	var $mdl_context_path;	
-	var $mdl_context_depth;
+	public $mdl_context_id;
+	public $mdl_context_level;
+	public $mdl_context_instanceid;
+	public $mdl_context_path;	
+	public $mdl_context_depth;
 
-	var $lehrveranstaltung_bezeichnung;
-	var $lehrveranstaltung_semester;			
-	var	$lehrveranstaltung_studiengang_kz;
+	public $lehrveranstaltung_bezeichnung;
+	public $lehrveranstaltung_semester;			
+	public	$lehrveranstaltung_studiengang_kz;
 
 	// Kurs Resourcen - Anzahl 	
-	var	$mdl_benotungen;
-	var	$mdl_resource;
-	var	$mdl_quiz;
-	var	$mdl_chat;
-	var	$mdl_forum;
-	var	$mdl_choice;
+	public	$mdl_benotungen;
+	public	$mdl_resource;
+	public	$mdl_quiz;
+	public	$mdl_chat;
+	public	$mdl_forum;
+	public	$mdl_choice;
 		
-	var $note;
+	public $note;
 
-	// **********************************************
-	// * moodle_course
-	// * @param $conn Connection zur Vilesci DB
-	// *        $conn_moodle Connection zur Moodle DB
-	// **********************************************
-	function moodle_course($conn, $conn_moodle)
+	/**
+	 * Konstruktor
+	 * 
+	 */
+	public function __construct()
 	{
-		$this->conn = $conn;
-		$this->conn_moodle = $conn_moodle;
-		
-		$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-		pg_query($this->conn_moodle, $qry);
+		if(!$this->conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
+		{
+			$this->errormsg = 'Fehler beim Herstellen der Moodle Connection';
+			return false;
+		}
+		else 
+			return true;
 	}
 	
-	// **********************************************
-	// * Laedt einen MoodleKurs
-	// * @param mdl_course_id ID des Moodle Kurses
-	// * @return true wenn ok, false im Fehlerfall
-	// **********************************************
-	function load($mdl_course_id)
+	/**
+	 * Laedt einen MoodleKurs
+	 * @param mdl_course_id ID des Moodle Kurses
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($mdl_course_id)
 	{
 		$qry = "SELECT * FROM public.mdl_course WHERE id='".addslashes($mdl_course_id)."'";
 		if($result = pg_query($this->conn_moodle, $qry))
@@ -107,14 +108,14 @@ class moodle_course
 		}
 	}
 	
-	// **********************************************
-	// * Laedt alle MoodleKurse die zu einer LV/Stsem
-	// * plus die MoodleKurse die auf dessen LE haengen
-	// * @param lehrveranstaltung_id
-	// *        studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// **********************************************
-	function getAll($lehrveranstaltung_id, $studiensemester_kurzbz)
+	/**
+	 * Laedt alle MoodleKurse die zu einer LV/Stsem
+	 * plus die MoodleKurse die auf dessen LE haengen
+	 * @param lehrveranstaltung_id
+	 *        studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAll($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT distinct on(mdl_course_id) * 
 				FROM 
@@ -128,11 +129,12 @@ class moodle_course
 					 (tbl_lehreinheit.lehreinheit_id=tbl_moodle.lehreinheit_id)
 					)";
 					
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row = $this->db_fetch_object())
 			{
-				$obj = new moodle_course($this->conn, $this->conn_moodle);
+				$obj = new moodle_course();
+				
 				$obj->moodle_id = $row->moodle_id;
 				$obj->mdl_course_id = $row->mdl_course_id;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
@@ -164,31 +166,28 @@ class moodle_course
 	}
 
 
-	// **********************************************
-	// * Laedt alle MoodleKurse die zu einer LV/Stsem
-	// * plus die MoodleKurse die auf dessen LE haengen
-	// * @param lehrveranstaltung_id
-	// *        studiensemester_kurzbz
-	// * @return true wenn ok, false im Fehlerfall
-	// **********************************************
-	function getAllVariant($lehrveranstaltung_id='',$studiensemester_kurzbz='',$studiengang='',$semester='',$detail=false)
+	/**
+	 * Laedt alle MoodleKurse die zu einer LV/Stsem
+	 * plus die MoodleKurse die auf dessen LE haengen
+	 * @param lehrveranstaltung_id
+	 *        studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAllVariant($lehrveranstaltung_id='',$studiensemester_kurzbz='',$studiengang='',$semester='',$detail=false)
 	{
 			// Initialisierung
 			$this->errormsg = '';
 			$this->result=array();
-			
-#				,tbl_moodle.*
 				
 			$qry = "SELECT distinct tbl_lehreinheit.studiensemester_kurzbz,tbl_lehrveranstaltung.semester
-				,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_lehrveranstaltung.lehrveranstaltung_id,tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester 
-				,tbl_moodle.mdl_course_id
-			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle
-			where tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
-			 and ((tbl_moodle.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
-			 		and tbl_moodle.studiensemester_kurzbz=lehre.tbl_lehreinheit.studiensemester_kurzbz)
-			  OR
-				 (tbl_moodle.lehreinheit_id=tbl_lehreinheit.lehreinheit_id))
-			";
+						,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_lehrveranstaltung.lehrveranstaltung_id,tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester 
+						,tbl_moodle.mdl_course_id
+					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle
+					where tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
+					 and ((tbl_moodle.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+					 		and tbl_moodle.studiensemester_kurzbz=lehre.tbl_lehreinheit.studiensemester_kurzbz)
+					  OR
+						 (tbl_moodle.lehreinheit_id=tbl_lehreinheit.lehreinheit_id))";
 		
 		if ($lehrveranstaltung_id!='')
 			$qry.=" and tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' ";
@@ -203,26 +202,20 @@ class moodle_course
 			$qry.=" and tbl_lehrveranstaltung.semester='".addslashes($semester)."' ";
 
 		$qry.=";";					
-#exit($qry);
-		
 					
-		if(!$result = @pg_query($this->conn, $qry))
+		if(!$result = $this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 
-		while($row=@pg_fetch_object($result))
+		while($row = $this->db_fetch_object($result))
 		{
-			$obj = new moodle_course($this->conn, $this->conn_moodle);
-#			$obj->moodle_id = $row->moodle_id;
+			$obj = new moodle_course();
+
 			$obj->mdl_course_id = $row->mdl_course_id;
-#			$obj->lehreinheit_id = $row->lehreinheit_id;
 			$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-#			$obj->insertamum = $row->insertamum;
-#			$obj->insertvon = $row->insertvon;
-#			$obj->gruppen = ($row->gruppen=='t'?true:false);
 			$obj->lehrveranstaltung_kurzbz=$row->kurzbz;
 			
 			$obj->lehrveranstaltung_bezeichnung=$row->bezeichnung;
@@ -230,17 +223,15 @@ class moodle_course
 			$obj->lehrveranstaltung_studiengang_kz=$row->studiengang_kz;
 
 			$qry_mdl = "SELECT * FROM public.mdl_course WHERE id='".addslashes($row->mdl_course_id)."'";
-			if($result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			if($result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_fullname = $row_mdl->fullname;
 					$obj->mdl_shortname = $row_mdl->shortname;
 				}
 			}
 
-
-		// Detailandaten - Param: $detail=true
 			// Anzahl Benotungen
 			$obj->mdl_benotungen = 0;
 			// Anzahl Aktivitaeten und Lehrmaterial
@@ -251,63 +242,63 @@ class moodle_course
 			$obj->mdl_choice= 0;
 			
 			// Anzahl Noten je Kurs und User			
-			$qry_mdl = "select count(*) as anz
-				from mdl_grade_grades , mdl_grade_items
-				where mdl_grade_items.itemtype='course'
-				and mdl_grade_grades.finalgrade IS NOT NULL 
-				and mdl_grade_grades.itemid=mdl_grade_items.id
-				and mdl_grade_items.courseid ='".addslashes($row->mdl_course_id)."'; ";
+			$qry_mdl = "SELECT count(*) as anz
+				FROM mdl_grade_grades , mdl_grade_items
+				WHERE mdl_grade_items.itemtype='course'
+				AND mdl_grade_grades.finalgrade IS NOT NULL 
+				AND mdl_grade_grades.itemid=mdl_grade_items.id
+				AND mdl_grade_items.courseid ='".addslashes($row->mdl_course_id)."'; ";
 
-			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_benotungen = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
 			}					
 			
 			
-			$qry_mdl = "select count(course) as anz from public.mdl_chat where mdl_chat.course='".addslashes($row->mdl_course_id)."'; ";
-			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_chat WHERE mdl_chat.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_chat = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
 			}					
 
-			$qry_mdl = "select count(course) as anz from public.mdl_resource where mdl_resource.course='".addslashes($row->mdl_course_id)."'; ";
-			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_resource WHERE mdl_resource.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_resource = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
 			}					
 
 			
-			$qry_mdl = "select count(course) as anz from public.mdl_quiz where mdl_quiz.course='".addslashes($row->mdl_course_id)."'; ";
-			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_quiz WHERE mdl_quiz.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_quiz = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
 			}					
 
-			$qry_mdl = "select count(course) as anz from public.mdl_forum where mdl_forum.course='".addslashes($row->mdl_course_id)."'; ";
-			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_forum WHERE mdl_forum.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_forum = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
 			}					
 			
-			$qry_mdl = "select count(course) as anz from public.mdl_choice where mdl_choice.course='".addslashes($row->mdl_course_id)."'; ";
-			if($detail && $result_mdl = @pg_query($this->conn_moodle, $qry_mdl))
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_choice WHERE mdl_choice.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
 			{
-				if($row_mdl = @pg_fetch_object($result_mdl))
+				if($row_mdl = pg_fetch_object($result_mdl))
 				{
 					$obj->mdl_choice = (empty($row_mdl->anz)?0:$row_mdl->anz);
 				}
@@ -321,19 +312,19 @@ class moodle_course
 	}
 
 	
-	// **********************************************
-	// * Schaut ob fuer diese LV/StSem schon ein 
-	// * Moodle Kurs existiert
-	// * @param lehrveranstaltung_id
-	// *        studiensemester_kurzbz
-	// * @return true wenn vorhanden, false wenn nicht
-	// **********************************************
-	function course_exists_for_lv($lehrveranstaltung_id, $studiensemester_kurzbz)
+	/**
+	 * Schaut ob fuer diese LV/StSem schon ein 
+	 * Moodle Kurs existiert
+	 * @param lehrveranstaltung_id
+	 *        studiensemester_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function course_exists_for_lv($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return true;	
 			else 
 				return false;
@@ -345,18 +336,18 @@ class moodle_course
 		}
 	}
 	
-	// **********************************************
-	// * Schaut ob fuer diese LE schon ein Moodle
-	// * Kurs existiert
-	// * @param lehreinheit_id
-	// * @return true wenn vorhanden, false wenn nicht
-	// **********************************************
-	function course_exists_for_le($lehreinheit_id)
+	/**
+	 * Schaut ob fuer diese LE schon ein Moodle
+	 * Kurs existiert
+	 * @param lehreinheit_id
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function course_exists_for_le($lehreinheit_id)
 	{
 		$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehreinheit_id='".addslashes($lehreinheit_id)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return true;
 			else 
 				return false;
@@ -368,22 +359,22 @@ class moodle_course
 		}
 	}
 	
-	// **********************************************
-	// * Schaut ob fuer diese LV/StSem schon ein 
-	// * Moodle Kurs existiert
-	// * @param lehrveranstaltung_id
-	// *        studiensemester_kurzbz
-	// * @return true wenn vorhanden, false wenn nicht
-	// **********************************************
-	function course_exists_for_allLE($lehrveranstaltung_id, $studiensemester_kurzbz)
+	/**
+	 * Schaut ob fuer diese LV/StSem schon ein 
+	 * Moodle Kurs existiert
+	 * @param lehrveranstaltung_id
+	 *        studiensemester_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function course_exists_for_allLE($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT 1 FROM lehre.tbl_lehreinheit 
 				WHERE lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
 				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				AND lehreinheit_id NOT IN (SELECT lehreinheit_id FROM lehre.tbl_moodle WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if(pg_num_rows($result)>0)
+			if($this->db_num_rows()>0)
 				return false;
 			else 
 				return true;
@@ -394,23 +385,12 @@ class moodle_course
 			return false;
 		}
 	}
-	
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// ************************************************
-	// * Legt einen Eintrag in der tbl_moodle an
-	// * @return true wenn ok, false im Fehlerfall
-	// ************************************************
-	function create_vilesci()
+		
+	/**
+	 * Legt einen Eintrag in der tbl_moodle an
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function create_vilesci()
 	{
 		if($this->mdl_course_id=='')
 		{
@@ -429,27 +409,27 @@ class moodle_course
 				$this->addslashes($this->insertvon).','.
 				($this->gruppen?'true':'false').');';
 				
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			$qry = "SELECT currval('lehre.tbl_moodle_moodle_id_seq') as id;";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					$this->moodle_id = $row->id;
-					pg_query($this->conn, 'COMMIT;');
+					$this->db_query('COMMIT;');
 					return true;
 				}
 				else 
 				{
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					return false;
 				}				
 			}
 			else 
 			{
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					return false;
 			}
@@ -461,10 +441,11 @@ class moodle_course
 		}
 	}
 	
-	// ***********************************************
-	// * Legt einen Kurs im Moodle an
-	// ***********************************************
-	function create_moodle()
+	/**
+	 * Legt einen Kurs im Moodle an
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function create_moodle()
 	{
 		pg_query($this->conn_moodle, 'BEGIN;');
 		
@@ -475,9 +456,9 @@ class moodle_course
 		{
 			$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit 
 					WHERE lehreinheit_id='".addslashes($this->lehreinheit_id)."'";
-			if($result = pg_query($this->conn, $qry))
+			if($this->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $this->db_fetch_object())
 				{
 					$lvid = $row->lehrveranstaltung_id;
 				}
@@ -499,12 +480,13 @@ class moodle_course
 			$lvid = $this->lehrveranstaltung_id;
 		
 		//Studiengang und Semester holen
-		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg 
+				FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE lehrveranstaltung_id='$lvid'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = pg_fetch_object())
 			{
 				$semester = $row->semester;
 				$stg = $row->stg;
@@ -645,11 +627,11 @@ class moodle_course
 	}
 	
 	
-	// ************************************************************
-	// * Laedt eine CourseCategorie anhand der Bezeichnung und der
-	// * ParentID
-	// ************************************************************
-	function getCategorie($bezeichnung, $parent)
+	/**
+	 * Laedt eine CourseCategorie anhand der Bezeichnung und der
+	 * ParentID
+	 */
+	public function getCategorie($bezeichnung, $parent)
 	{
 		if($bezeichnung=='')
 		{
@@ -682,11 +664,11 @@ class moodle_course
 		}
 	}
 	
-	// ************************************************************
-	// * Erzeugt eine CourseCategorie anhand der Bezeichnung und der
-	// * ParentID
-	// ************************************************************
-	function createCategorie($bezeichnung, $parent)
+	/**
+	 * Erzeugt eine CourseCategorie anhand der Bezeichnung und der
+	 * ParentID
+	 */
+	public function createCategorie($bezeichnung, $parent)
 	{
 		if($bezeichnung=='')
 		{
@@ -833,10 +815,10 @@ class moodle_course
 		}
 	}
 	
-	// ************************************************************
-	// * Laedt einen Context anhand des contextlevels und der instanceid
-	// ************************************************************
-	function getContext($contextlevel, $instanceid)
+	/**
+	 * Laedt einen Context anhand des contextlevels und der instanceid
+	 */
+	public function getContext($contextlevel, $instanceid)
 	{
 
 		$qry ="SELECT * FROM public.mdl_context WHERE contextlevel='".addslashes($contextlevel)."' 
@@ -867,11 +849,11 @@ class moodle_course
 		}
 	}
 	
-	// ****************************************************
-	// * Liefert alle Kurse dieser LV in denen der Student 
-	// * zugeteilt ist
-	// ****************************************************
-	function getCourse($lehrveranstaltung_id, $studiensemester_kurzbz, $student_uid)
+	/**
+	 * Liefert alle Kurse dieser LV in denen der Student 
+	 * zugeteilt ist
+	 */
+	public function getCourse($lehrveranstaltung_id, $studiensemester_kurzbz, $student_uid)
 	{
 		//alle betreffenden Kurse holen
 		$qry = "SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id FROM lehre.tbl_moodle JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
@@ -883,17 +865,17 @@ class moodle_course
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		
 		$courses = array();
-		if($result = pg_query($this->conn, $qry))
+		if($result = $this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object($result))
 			{
 				//schauen in welchen der Student ist
 				$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung 
 						WHERE uid='".addslashes($student_uid)."' AND lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
 
-				if($result_vw = pg_query($this->conn, $qry))
+				if($result_vw = $this->db_query($qry))
 				{
-					if(pg_num_rows($result_vw)>0)
+					if($this->db_num_rows($result_vw)>0)
 					{
 						if(!array_key_exists($row->mdl_course_id, $courses))
 							$courses[]=$row->mdl_course_id;						
@@ -904,14 +886,14 @@ class moodle_course
 		return $courses;
 	}
 	
-	// ***************************************************
-	// * Aktualisiert die Spalte gruppen in der tbl_moodle
-	// * @param moodle_id ID der MoodleZuteilung
-	// *        gruppen boolean true wenn syncronisiert 
-	// *                werden soll, false wenn nicht
-	// * @return true wenn ok, false im Fehlerfall
-	// ***************************************************
-	function updateGruppenSync($moodle_id, $gruppen)
+	/**
+	 * Aktualisiert die Spalte gruppen in der tbl_moodle
+	 * @param moodle_id ID der MoodleZuteilung
+	 *        gruppen boolean true wenn syncronisiert 
+	 *                werden soll, false wenn nicht
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function updateGruppenSync($moodle_id, $gruppen)
 	{
 		if(!is_numeric($moodle_id))
 		{
@@ -921,7 +903,7 @@ class moodle_course
 		
 		$qry = "UPDATE lehre.tbl_moodle SET gruppen=".($gruppen?'true':'false')." WHERE moodle_id='".addslashes($moodle_id)."'";
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;
 		}
@@ -932,22 +914,23 @@ class moodle_course
 		}
 	}
 	
-	// ********************************
-	// * Legt einen Testkurs an
-	// ********************************
-	function createTestkurs($lehrveranstaltung_id, $studiensemester_kurzbz)
+	/**
+	 * Legt einen Testkurs an
+	 */
+	public function createTestkurs($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
 		pg_query($this->conn_moodle, 'BEGIN;');
 		
 		//CourseCategorie ermitteln
 				
 		//Studiengang und Semester holen
+		
 		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$semester = $row->semester;
 				$stg = $row->stg;
@@ -1080,13 +1063,13 @@ class moodle_course
 		}
 	}
 	
-	// ******************************************************
-	// * Laedt den Testkurs zu dieser Lehrveranstaltung
-	// * @param lehrveranstaltung_id
-	// *        studiensemester_kurzbz
-	// * @return ID wenn gefunden, false wenn nicht vorhanden
-	// ******************************************************
-	function loadTestkurs($lehrveranstaltung_id, $studiensemester_kurzbz)
+	/**
+	 * Laedt den Testkurs zu dieser Lehrveranstaltung
+	 * @param lehrveranstaltung_id
+	 *        studiensemester_kurzbz
+	 * @return ID wenn gefunden, false wenn nicht vorhanden
+	 */
+	public function loadTestkurs($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT
 					UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel,
@@ -1096,9 +1079,9 @@ class moodle_course
 				WHERE
 					lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
 		
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$shortname = mb_strtoupper('TK-'.$studiensemester_kurzbz.'-'.$row->kuerzel.'-'.$row->semester.'-'.$row->kurzbz);
 			}
@@ -1152,32 +1135,33 @@ class moodle_course
 		}
 	}
 	
-	// ******************************************************
-	// * Laedt die Noten zu einem Moodle Course ID
-	// * @param mdl_course_id
-	// *        
-	// * @return objekt mit den Noten der Teilnehmer dieses Kurses
-	// ******************************************************
-	function loadNoten($lehrveranstaltung_id='', $studiensemester_kurzbz='',$student_uid='',$bDetailinfo=false)
+	/**
+	 * Laedt die Noten zu einem Moodle Course ID
+	 * @param mdl_course_id
+	 *        
+	 * @return objekt mit den Noten der Teilnehmer dieses Kurses
+	 */
+	public function loadNoten($lehrveranstaltung_id='', $studiensemester_kurzbz='',$student_uid='',$bDetailinfo=false)
 	{
 
 		// Init
-			$lehrveranstaltung_id=trim($lehrveranstaltung_id);
-			$studiensemester_kurzbz=trim($studiensemester_kurzbz);
-			$student_uid=trim($student_uid);
-			$this->errormsg='';		
+		$lehrveranstaltung_id=trim($lehrveranstaltung_id);
+		$studiensemester_kurzbz=trim($studiensemester_kurzbz);
+		$student_uid=trim($student_uid);
+		$this->errormsg='';		
 					
 		// plausib
-			if (empty($lehrveranstaltung_id) 
-			|| empty($studiensemester_kurzbz) 
-			|| empty($student_uid) ) 
-			{
-				$this->errormsg = 'Es fehlt die Eingabe von';
-				$this->errormsg.=(empty($lehrveranstaltung_id)?' Lehrveranstaltung':$lehrveranstaltung_id);
-				$this->errormsg.=(empty($studiensemester_kurzbz)?' Semester (Kurzbz.)':$studiensemester_kurzbz);
-				$this->errormsg.=(empty($student_uid)?' Student':$student_uid);								
-				return false;
-			}
+		if (empty($lehrveranstaltung_id) 
+		|| empty($studiensemester_kurzbz) 
+		|| empty($student_uid) ) 
+		{
+			$this->errormsg = 'Es fehlt die Eingabe von';
+			$this->errormsg.=(empty($lehrveranstaltung_id)?' Lehrveranstaltung':$lehrveranstaltung_id);
+			$this->errormsg.=(empty($studiensemester_kurzbz)?' Semester (Kurzbz.)':$studiensemester_kurzbz);
+			$this->errormsg.=(empty($student_uid)?' Student':$student_uid);								
+			return false;
+		}
+		
 		// --------------------------------------------------------------------
 		// Ermitteln die Lehreinheiten und Moodle ID
 		//		mit dem studiensemester_kurzbz ( bsp WS2008 )
@@ -1197,7 +1181,7 @@ class moodle_course
 			  AND tbl_lehreinheit.studiensemester_kurzbz like E'".addslashes($studiensemester_kurzbz)."'
 		;";
 		
-		if(!$result = @pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Kurse ';
 			return false;
@@ -1207,13 +1191,13 @@ class moodle_course
 		$lehreinheit_kpl = array(); // Gesamte Information der Lehreinheit und Moodle IDs
 		$lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
 		//echo $qry;
-		while($row = pg_fetch_object($result))
+		while($row = $this->db_fetch_object())
 		{
 			$row->lehreinheit_id=trim($row->lehreinheit_id);
 			$lehreinheit[$row->lehreinheit_id]=$row->lehreinheit_id; // Fuer Select Campus
 			$lehreinheit_kpl[$row->lehreinheit_id]=$row; // Fuer GesamtDaten wird Ergaenzt von Campus,
 		}	
-		@pg_free_result($result);
+		
 		if (count($lehreinheit)<1) // Es gibt keine Lehreinheiten
 		{
 			$this->errormsg='Es wurde kein passender Moodle-Kurs gefunden';
@@ -1239,7 +1223,7 @@ class moodle_course
 		$qry.= " AND lehreinheit_id in (".implode(",",$lehreinheit)."); ";
 		
 		unset($lehreinheit); // lehreinheit wird nach Check nicht mehr benoetigt. wird nun die Lehrveranstalt
-		if(!$result = @pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Studenten mit Lehreinheit(en) ';
 			return false;
@@ -1247,7 +1231,7 @@ class moodle_course
 		// Lehreinheit und Moodlekurs zusammenfuehren
 		$lehrveranstaltUSER=array(); // Detailinformation fuer das Noten-Ergebnis		
 		$lehrveranstaltMOODLE=array(); // Je Student alle Moodle IDs
-		while($row = @pg_fetch_object($result))
+		while($row = $this->db_fetch_object())
 		{
 			// Von der Lehreinheit kann der Moodle-Kurs ermittelt werden
 			$mdl_course_id=trim($lehreinheit_kpl[$row->lehreinheit_id]->mdl_course_id);
@@ -1259,7 +1243,7 @@ class moodle_course
 			// Alle Moodle IDs zum Studenten sammeln fuer Noten Select
 			$lehrveranstaltMOODLE[$mdl_username][$mdl_course_id]=$mdl_course_id;
 		}
-		@pg_free_result($result);	
+		
 		unset($lehreinheit_kpl); // Wird nicht mehr benoetigt (die Daten sind nun in LV,LE )
 
 		// Fuer die naechste Verarbeitung die Array Sortieren
@@ -1272,8 +1256,8 @@ class moodle_course
 		// --------------------------------------------------------------------
 		// Moodle Noten - Uebersetztungstabellen einlesen (min. ein Record )
 		// --------------------------------------------------------------------
-		$qry = "select * from mdl_grade_letters order by contextid, lowerboundary desc; ";
-		if(!$result = @pg_query($this->conn_moodle, $qry))
+		$qry = "SELECT * FROM mdl_grade_letters ORDER BY contextid, lowerboundary desc; ";
+		if(!$result = pg_query($this->conn_moodle, $qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Noten ';
 			return false;
@@ -1282,7 +1266,7 @@ class moodle_course
 		$mdl_grade_letters_first=null;
 		// Init
 		$mdl_grade_letters=array(); 
-		while($row = @pg_fetch_object($result))
+		while($row = pg_fetch_object($result))
 		{
 			if ($mdl_grade_letters_first==null)
 				$mdl_grade_letters_first=$row->contextid;
@@ -1290,9 +1274,6 @@ class moodle_course
 		}	
 		asort($mdl_grade_letters);
 		reset($mdl_grade_letters);
-		
-		
-
 		
 		if (!isset($mdl_grade_letters[$mdl_grade_letters_first]))
 		{
@@ -1306,7 +1287,7 @@ class moodle_course
 		//		
 		//
 		// --------------------------------------------------------------------
-		$qry = "select mdl_grade_items.courseid,
+		$qry = "SELECT mdl_grade_items.courseid,
 				mdl_user.username,mdl_user.lastname,mdl_user.firstname,
 				mdl_grade_grades.userid,
 		        mdl_grade_grades.rawgrade,
@@ -1314,29 +1295,29 @@ class moodle_course
 				mdl_grade_grades.rawgrademin, 
 				mdl_grade_grades.finalgrade,
 				mdl_course.fullname,mdl_course.shortname
-			from mdl_grade_items , mdl_grade_grades ,mdl_user,mdl_course
-			where mdl_grade_items.itemtype='course'
-			 and mdl_grade_grades.finalgrade IS NOT NULL 
-			 and mdl_course.id=mdl_grade_items.courseid
-			 and mdl_grade_grades.itemid=mdl_grade_items.id
-			 and mdl_grade_grades.userid=mdl_user.id
+			FROM mdl_grade_items , mdl_grade_grades ,mdl_user,mdl_course
+			WHERE mdl_grade_items.itemtype='course'
+			 AND mdl_grade_grades.finalgrade IS NOT NULL 
+			 AND mdl_course.id=mdl_grade_items.courseid
+			 AND mdl_grade_grades.itemid=mdl_grade_items.id
+			 AND mdl_grade_grades.userid=mdl_user.id
 			";
 		$usr_qry="";
 	    while (list( $user_key, $course_ids ) = each($lehrveranstaltMOODLE) )
 		{
 			if(empty($usr_qry))
-				$usr_qry.=" and ( (mdl_user.username like E'".addslashes($user_key)."' and mdl_grade_items.courseid in (".implode(",",$course_ids).") ) ";
+				$usr_qry.=" AND ( (mdl_user.username like E'".addslashes($user_key)."' AND mdl_grade_items.courseid in (".implode(",",$course_ids).") ) ";
 			else
-				$usr_qry.=" or (mdl_user.username like E'".addslashes($user_key)."' and mdl_grade_items.courseid in (".implode(",",$course_ids).") ) ";
+				$usr_qry.=" OR (mdl_user.username like E'".addslashes($user_key)."' AND mdl_grade_items.courseid in (".implode(",",$course_ids).") ) ";
 		}
 		if (!empty($usr_qry))
 			$qry.=$usr_qry." )";
-		$qry.= "order by mdl_grade_items.courseid,mdl_user.lastname,mdl_user.firstname;"; // Ende SQL String 
+		$qry.= "ORDER BY mdl_grade_items.courseid,mdl_user.lastname,mdl_user.firstname;"; // Ende SQL String 
 
 		if (isset($lehrveranstaltMOODLE)) // wird nicht mehr benoetigt 
 			unset($lehrveranstaltMOODLE);
 		
-		if(!$result = @pg_query($this->conn_moodle, $qry))
+		if(!$result = pg_query($this->conn_moodle, $qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Moodle Benutzer und Noten ';
 			return false;
@@ -1346,7 +1327,7 @@ class moodle_course
 		$mdl_course=array(); 
 		$mdl_noten=array(); 
 		$mdl_noten_course=array();
-		while($row = @pg_fetch_object($result))
+		while($row = pg_fetch_object($result))
 		{
 			$mdl_course_id=trim($row->courseid);
 			$mdl_username=trim($row->username);		
@@ -1354,8 +1335,7 @@ class moodle_course
 			
 			if (empty($mdl_finalgrade))
 				continue; // Keine Notenfindung 
-			
-			
+						
 			// Vergleichswerte fuer die Noten aus der Tabelle mdl_grade_letters suchen
 			$arrTmpDefaultNoten=array();
 			$mdl_grade_letters_first=1; // Es muss einen Default geben (Administrator Noten)
@@ -1383,7 +1363,7 @@ class moodle_course
 				// Vergleichsoperatoren fuer Noten
 				$iTmpVergl=$arrTmpDefaultNoten[$iTmpIndex]->lowerboundary;
 				$iTmpFaktor=(!empty($row->rawgrademax)?(int)(100/$row->rawgrademax):1);
-					//echo "<br>::$iTmpIndex $mdl_finalgrade>=( $iTmpVergl / $iTmpFaktor)::<br>";
+					
 					if ($mdl_finalgrade>=( $iTmpVergl / $iTmpFaktor) )
 					{
 						if (is_numeric($arrTmpDefaultNoten[$iTmpIndex]->letter)) 
@@ -1441,13 +1421,9 @@ class moodle_course
 					$mdl_course['ohneLV'][]=$row; 
 				}	
 			}
-
-			
-#		echo "<br />courseid:=".$row->courseid ."(".$row->fullname." ".$row->shortname.") username:=".$row->username ." Name:=".$row->firstname." ".$row->lastname." Note <b>".$row->note ."</b>";
 			
 		}	
-		// nicht benoetigten Speicher freigeben 
-		@pg_free_result($result);	
+		
 		unset($result);
 
 		if (isset($qry)) unset($qry);
