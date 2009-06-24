@@ -106,24 +106,24 @@
 					exec('sudo chown www-data:teacher "'.$dir_name.'"');
 			}
 		  	$dest_dir = @dir($dir_name);
-		  	if(!is_dir($dest_dir->path))
+		  	if(!@is_dir($dest_dir->path))
 			{
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan'))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan'))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan"');
@@ -186,24 +186,24 @@
 					exec('sudo chown www-data:teacher "'.$dir_name.'"');
 			}
 		  	$dest_dir = @dir($dir_name);
-		  	if(!is_dir($dest_dir->path))
+		  	if(!@is_dir($dest_dir->path))
 			{
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download'))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download'))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download"');
@@ -273,7 +273,7 @@
 
   	//Leistungsuebersicht
   	$dir_name=$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung';
-	if(!is_dir($dir_name))
+	if(!@is_dir($dir_name))
 	{
 		exec('mkdir -m 775 "'.$dir_name.'"');
 		exec('sudo chown www-data:teacher "'.$dir_name.'"');
@@ -281,22 +281,22 @@
   	$dest_dir = @dir($dir_name);
   	if(!is_dir($dest_dir->path))
 	{
-		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
+		if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 		{
 			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 		}
-		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
+		if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 		{
 			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 		}
-		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
+		if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 		{
 			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 		}
-		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung'))
+		if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung'))
 		{
 			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung"');
 			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung"');
@@ -539,30 +539,30 @@
 			echo '<td class="tdvertical" align="center">';
 			//Studentenabgabe
 		  	$dir_name=$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload';
-			if(!is_dir($dir_name))
+			if(!@is_dir($dir_name))
 			{
 				exec('mkdir -m 775 "'.$dir_name.'"');
 				exec('sudo chown www-data:teacher "'.$dir_name.'"');
 			}
 		  	$dest_dir = @dir($dir_name);
-		  	if(!is_dir($dest_dir->path))
+		  	if(!@is_dir($dest_dir->path))
 			{
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 				}
-				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload'))
+				if(!@is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload'))
 				{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload"');
 					exec('sudo chown www-data:mysql "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload"');

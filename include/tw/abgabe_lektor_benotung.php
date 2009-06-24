@@ -26,12 +26,20 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
+ 	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			 
+ 
 // Pfad zu fpdf
 define('FPDF_FONTPATH','../../include/pdf/font/');
 // library einbinden
 require_once('../../include/pdf/fpdf.php');
 
-require_once('../../cis/config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/person.class.php');
@@ -40,19 +48,6 @@ require_once('../../include/mitarbeiter.class.php');
 
 require_once('../../include/pdf.inc.php');
 
-error_reporting(E_ALL);
-ini_set('display_errors','1');
-
-//DB Verbindung herstellen
-if (!$conn = @pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
-	$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-	if(!pg_query($conn,$qry))
-	{
-		die("Encoding konnte nicht gesetzt werden");
-	}	
-	
 $getuid=get_uid();
 $datum_obj = new datum();
 $htmlstr = "";
@@ -149,14 +144,20 @@ else
 		$pdf->MultiCell(0,15,'Beurteilung Diplomarbeit');
 	}
 	$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
-	if(!$erg_beu=pg_query($conn, $qry_beu))
+	if(!$erg_beu=@$db->db_query($qry_beu))
 	{
 		die('Fehler beim Laden des Betreuernamens');
 	}
 	else
 	{
-		if($row_beu=@pg_fetch_object($erg_beu))
+		if($row_beu=$db->db_fetch_object($erg_beu))
 		{
+			// UTF-8 encoden
+			while (list($key, $value) = each($row_beu)) 
+			{
+				if (!empty($value))
+			    	$row_beu->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
+			}
 			$beurteiler=trim($row_beu->titelpre.' '.$row_beu->vorname.' '.$row_beu->nachname.' '.$row_beu->titelpost);
 		}
 		else 
@@ -474,14 +475,21 @@ $sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_
 	ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 	ORDER BY nachname";
 
-if(!$erg=pg_query($conn, $sql_query))
+if(!$erg=$db->db_query($sql_query))
 {
 	die('Fehler beim Laden der Betreuungen');
 }
 else
 {
-	if($row=@pg_fetch_object($erg))
+	if($row=@$db->db_fetch_object($erg))
 	{
+			// UTF-8 encoden
+		while (list($key, $value) = each($row)) 
+		{
+			if (!empty($value))
+		    	$row->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
+		}
+
 		echo '
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<html>
