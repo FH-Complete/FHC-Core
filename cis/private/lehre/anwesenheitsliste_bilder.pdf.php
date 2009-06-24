@@ -27,13 +27,19 @@
     *
     */
 
-	 require_once('../../../config/cis.config.inc.php');		
+ 	require_once('../../../config/cis.config.inc.php');
+// ------------------------------------------------------------------------------------------
+//	Datenbankanbindung 
+// ------------------------------------------------------------------------------------------
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+				
    // Pfad zu fpdf
    define('FPDF_FONTPATH','../../../include/pdf/font/');
    // library einbinden
    require_once('../../../include/pdf/fpdf.php');
    
-   require_once('../../config.inc.php');
    require_once('../../../include/person.class.php');
    require_once('../../../include/studiengang.class.php');
    require_once('../../../include/studiensemester.class.php');
@@ -93,6 +99,5 @@ function getmax($val1,$val2)
 	return ($val1>$val2)?$val1:$val2;
 
 }
-
 require_once('../../../include/'.EXT_FKT_PATH.'/anwesenheitsliste_bilder.inc.php');
 ?>

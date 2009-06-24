@@ -42,10 +42,10 @@
 	require_once('../../../include/feedback.class.php');
 
 	$user = get_uid();
-
 	if(check_lektor($user))
-       $is_lector=true;
-
+	       $is_lector=true;
+	if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
+	   die('Fehler bei der Uebergabe der Parameter');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -56,16 +56,12 @@
 </head>
 <body id="inhalt">
 <?php
-	if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
-	   die('Fehler bei der Uebergabe der Parameter');
+
 	$lvid = $_GET['lvid'];
 	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 	if(isset($POST["feedback_message"]))
 	   $feedback_message=$POST["feedback_message"];
-
-//	if(isset($feedback_message))
-//		echo $feedback_message;
 
 ?>
 
@@ -81,9 +77,7 @@
 			<?php
 				$lv_obj = new lehrveranstaltung();
 				if($lv_obj->load($lvid))
-				{
 					$short_name = $lv_obj->bezeichnung;
-				}
 				else
 					die($lv_obj->errormsg);
 			?>

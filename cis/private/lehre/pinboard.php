@@ -22,7 +22,6 @@
  */
  
  
- 
 /*--------------------------------------------------------------------------------------------
  * Pinboard
  * Zeigt alle Pinboardeintraege an. Am rechten Rand werden
@@ -80,7 +79,6 @@
 	$studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:''));
 	$semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:0));
 	$studiensemester_kurzbz=trim((isset($_REQUEST['studiensemester_kurzbz']) && is_numeric($_REQUEST['studiensemester_kurzbz']) ? $_REQUEST['studiensemester_kurzbz']:''));
-
 	
 #echo "<p>fachbereich_kurzbz:$fachbereich_kurzbz, studiengang_kz:$studiengang_kz, semester:$semester,$studiensemester_kurzbz: studiensemester_kurzbz </p>";	
 	
@@ -94,7 +92,7 @@
 		    	$studiensemester_kurzbz = $stsem_obj->getaktorNext();
  	}
 	
-	if (!is_null($studiengang_kz)&& $studiengang_kz!='' && is_numeric($studiengang_kz))
+	if (!is_null($studiengang_kz) && $studiengang_kz!='' && is_numeric($studiengang_kz))
 	{
 		if ($stg_obj = new studiengang($studiengang_kz))
 		{		
@@ -119,7 +117,7 @@
 		if($news_obj->getnews($alter, $studiengang_kz, $semester, $showall, $fachbereich_kurzbz, $maxnews))
 			$zaehler = print_news($news_obj);
 		else
-			echo $news_obj->errormsg;
+			echo '<p>'.$news_obj->errormsg.'</p>';
 		if($zaehler==0)
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
@@ -137,7 +135,7 @@
 			$zaehler = print_news($news_obj, $open);
 		}
 		else
-			echo $news_obj->errormsg;
+			echo '<p>'.$news_obj->errormsg.'</p>';
 		if($zaehler==0)
 		   echo '<p>Zur Zeit gibt es keine aktuellen News!</p>';
 	}
@@ -172,13 +170,6 @@
 			'.mb_ereg_replace("../../skin","../../../skin","$row->text").'
 			</div>
 			';
-				//echo '<div class="titel"><table style="width: 100%"><tr><td  width="30%" align="left">'.$row->betreff.' </td><td width="30%" align=center>'.$datum.'</td><td width="30%" align=right>'.$row->verfasser.'</td></tr></table></div>';
-			//}
-			//else
-			//{
-			//	echo '<div class="titel">'.$row->betreff.' [Semester '.$row->semester.'] '.$datum.' '.$row->verfasser.'</div>';
-			//}
-			//echo '<div class="text">'.$row->text.'</div>';
 			echo "</div><br />";
 		}
 		echo '</div>';
@@ -246,7 +237,6 @@ function show(id)
 						$stsem_content .="<u>$stsem</u>";
 					else
 						$stsem_content .=$stsem;
-
 					$stsem_content .="</a>";
 					$stsemarr[] = $stsem;
 				}
@@ -307,7 +297,7 @@ function show(id)
                 <?php
 
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stgl' LIMIT 1)";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stgl' LIMIT 1)";
 				if($result_course_leader = $db->db_query($qry))
 				{
 					$num_rows_course_leader = $db->db_num_rows($result_course_leader);
@@ -390,7 +380,7 @@ function show(id)
 			  	echo "<p>Stellvertreter:<br>";
 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stglstv' LIMIT 1)";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stglstv' LIMIT 1)";
 
 				if($result_course_leader_deputy = $db->db_query($sql_query))
 				{
@@ -474,7 +464,7 @@ function show(id)
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
                 //Sekritariat auslesen
 
-				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='ass')";
+				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='ass')";
 
 				if($result_course_secretary = $db->db_query($sql_query))
 				{
@@ -564,9 +554,7 @@ function show(id)
 				}
 				
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
-
-				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stdv' AND tbl_person.person_id=public.tbl_benutzer.person_id AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
-
+				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stdv' AND  tbl_person.aktiv and tbl_person.person_id=public.tbl_benutzer.person_id AND public.tbl_benutzer.aktiv AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
 				if($result_course_stdv = $db->db_query($sql_query))
 				{
 					$num_rows_course_stdv = $db->db_num_rows($result_course_stdv);
@@ -587,9 +575,7 @@ function show(id)
 				//Links nur Anzeigen wenn im Config angegeben
 				if(CIS_EXT_MENU)
 				{
-?>
-
-            	<table border="0" width="100%" cellpadding="0" cellspacing="0">
+?>            	<table border="0" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
 				  <td>&nbsp;</td>
 				</tr>
@@ -642,7 +628,6 @@ function show(id)
                 	$path = '../../../documents/'.strtolower($short).'/download';
 					if(!$dest_dir = is_dir($path))
 					{
-
 						if(!is_dir($path))
 						{
 							if(!is_dir('../../../documents/'.strtolower($short)))

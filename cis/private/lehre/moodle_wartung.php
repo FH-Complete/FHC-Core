@@ -28,12 +28,14 @@ require_once('../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
+require_once('../../../include/basis_db.class.php');
+if (!$db = new basis_db())
+		die('Fehler beim Herstellen der Datenbankverbindung');
 
-require_once('../../config.inc.php');
 require_once('../../../include/functions.inc.php');
+if (!$user=get_uid())
+	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
+
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/moodle_course.class.php');
 require_once('../../../include/moodle_user.class.php');
@@ -43,11 +45,6 @@ require_once('../../../include/lehreinheitgruppe.class.php');
 require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 
-
-if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
-	die('Fehler beim Connecten zur DB');
-
-$user = get_uid();
 
 if(isset($_GET['lvid']))
 	$lvid=$_GET['lvid'];
@@ -146,7 +143,7 @@ if(isset($_POST['neu']))
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{
-			$mdl_course = new moodle_course($conn_moodle);
+			$mdl_course = new moodle_course();
 			
 			$mdl_course->lehrveranstaltung_id = $lvid;
 			$mdl_course->studiensemester_kurzbz = $stsem;
@@ -162,12 +159,12 @@ if(isset($_POST['neu']))
 				//Eintrag in der Vilesci DB
 				$mdl_course->create_vilesci();
 	
-				$mdl_user = new moodle_user($conn_moodle);
+				$mdl_user = new moodle_user();
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
 					
-				$mdl_user = new moodle_user($conn_moodle);
+				$mdl_user = new moodle_user();
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
@@ -187,7 +184,7 @@ if(isset($_POST['neu']))
 			
 			if(count($lehreinheiten)>0)
 			{
-				$mdl_course = new moodle_course($conn_moodle);
+				$mdl_course = new moodle_course();
 				
 				$mdl_course->mdl_fullname = $_POST['bezeichnung'];
 				$mdl_course->mdl_shortname = $shortname;
@@ -207,12 +204,12 @@ if(isset($_POST['neu']))
 							echo '<br>Fehler beim Anlegen:'.$mdl_course->errormsg;
 					}
 					
-					$mdl_user = new moodle_user($conn_moodle);
+					$mdl_user = new moodle_user();
 					//Lektoren Synchronisieren
 					if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
 					
-					$mdl_user = new moodle_user($conn_moodle);	
+					$mdl_user = new moodle_user();	
 					//Studenten Synchronisieren
 					if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
@@ -232,7 +229,7 @@ if(isset($_POST['changegruppe']))
 {
 	if(isset($_POST['moodle_id']) && is_numeric($_POST['moodle_id']))
 	{
-		$mcourse = new moodle_course($conn_moodle);
+		$mcourse = new moodle_course();
 		if($mcourse->updateGruppenSync($_POST['moodle_id'], isset($_POST['gruppen'])))
 			echo '<b>Daten wurden aktualisiert</b><br>';
 		else 
@@ -247,7 +244,7 @@ if(isset($_POST['changegruppe']))
 //Anlegen eines Testkurses
 if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 {
-	$mdl_course = new moodle_course($conn_moodle);
+	$mdl_course = new moodle_course();
 	if(!$mdl_course->loadTestkurs($lvid, $stsem))
 	{
 		$lehrveranstaltung = new lehrveranstaltung();
@@ -269,7 +266,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 			$id=$mdl_course->mdl_course_id;
 			$errormsg='';
 			
-			$mdl_user = new moodle_user($conn_moodle);
+			$mdl_user = new moodle_user();
 			//Lektoren zuweisen
 			if(!$mdl_user->sync_lektoren($id, $lvid, $stsem))
 				$errormsg.='Fehler bei der Lektorenzuordnung:'.$mdl_user->errormsg.'<br>';
@@ -289,7 +286,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 	}
 }
 
-$mdl_course = new moodle_course($conn_moodle);
+$mdl_course = new moodle_course();
 if($mdl_course->course_exists_for_lv($lvid, $stsem) || $mdl_course->course_exists_for_allLE($lvid, $stsem))
 {
 	echo 'Es ist bereits ein Moodle Kurs für die Gesamt LV vorhanden';
@@ -380,7 +377,7 @@ echo '</td></tr></table>';
 
 echo '<br><br><br>';
 echo '<b>Testkurse</b><br><br>';
-$mdlcourse = new moodle_course($conn_moodle);
+$mdlcourse = new moodle_course();
 if($mdlcourse->loadTestkurs($lvid, $stsem))
 {
 	echo '<a href="'.MOODLE_PATH.'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse->mdl_fullname.'</a>';

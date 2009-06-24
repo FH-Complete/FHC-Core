@@ -23,14 +23,14 @@
 // * Studentenansicht fuers Kreuzerltool
 // ********************
 
-	require_once('../../../config/cis.config.inc.php');
+ require_once('../../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
+	require_once('../../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
-
+			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');

@@ -29,11 +29,11 @@
    @edit	08-11-2006 Versionierung entfernt: Studiensemester=WS2007
    			02-01-2007 Umstellung auf die neue DB
 */
-	require_once('../../../config/cis.config.inc.php');
+	require_once('../../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
+	require_once('../../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
 			
@@ -76,12 +76,10 @@
 	}
 
 	$user = get_uid();
-
     //Berechtigung ueberpruefen
     if(!check_lektor($user))
-    {
     	die("<br><center>Sie haben keine Berechtigung f&uuml;r diesen Bereich</center>");
-    }
+	
     if(isset($_GET['lvid']))
     	$lv=$_GET['lvid'];
 
@@ -100,6 +98,12 @@
 			$sem = $lv_obj->semester;
 	}
 
+	if(!isset($stg) && isset($_GET['stg']))
+		$stg = $_GET['stg'];
+	if(!isset($sem) && isset($_GET['sem']))
+		$sem = $_GET['sem'];	
+		
+	
 	if(isset($_POST['changed'])) //Gibt an welches der Auswahlfelder geaendert wurde
 		$changed = $_POST['changed'];
 
