@@ -23,37 +23,42 @@
  * requires moodle_course.class.php
  * studiengang.class.php
  */
-class moodle_user
+require_once(dirname(__FILE__).'/basis_db.class.php');
+
+class moodle_user extends basis_db
 {
-	var $conn;
-	var $conn_moodle;
-	var $errormsg;
-	var $log=''; 			//log message fuer Syncro
-	var $log_public='';		//log message fuer Syncro
-	var $sync_create=0; 	//anzahl der durchgefuehrten zuteilungen beim syncro
-	var $group_update=0;	//anzahl der updates an gruppen
+	private $conn_moodle;
+	public $log=''; 			//log message fuer Syncro
+	public $log_public='';		//log message fuer Syncro
+	public $sync_create=0; 	//anzahl der durchgefuehrten zuteilungen beim syncro
+	public $group_update=0;	//anzahl der updates an gruppen
 	
-	var $mdl_user_id;
-	var $mdl_user_username;
-	var $mdl_user_firstname;
-	var $mdl_user_lastname;
-	
-	
-	// **********************************************
-	// * moodle_user
-	// * @param $conn Connection zur Vilesci DB
-	// *        $conn_moodle Connection zur Moodle DB
-	// **********************************************
-	function moodle_user($conn, $conn_moodle)
-	{
-		$this->conn = $conn;
-		$this->conn_moodle = $conn_moodle;
+	public $mdl_user_id;
+	public $mdl_user_username;
+	public $mdl_user_firstname;
+	public $mdl_user_lastname;
 		
-		$qry = "SET CLIENT_ENCODING TO 'LATIN9';";
-		pg_query($this->conn_moodle, $qry);
+	/**
+	 * Konstruktor
+	 */
+	public function __construct()
+	{
+		if(!$this->conn_moodle=pg_pconnect(CONN_STRING_MOODLE))
+		{
+			$this->errormsg = 'Fehler beim Herstellen der Moodle Verbindung';
+			return false;
+		}
+		else 
+			return true;
 	}
 	
-	function loaduser($uid)
+	/**
+	 * Laedt einen Moodle User
+	 *
+	 * @param $uid
+	 * @return boolean
+	 */
+	public function loaduser($uid)
 	{
 		$qry = "SELECT * FROM public.mdl_user WHERE username='".addslashes($uid)."'";
 		
@@ -80,11 +85,11 @@ class moodle_user
 		}
 	}
 	
-	// ***********************************************
-	// * Liefert ein Array mit allen Lektoren die
-	// * zu dem Moodle Kurs zugeteilt sind 
-	// ***********************************************
-	function getMitarbeiter($mdl_course_id)
+	/**
+	 * Liefert ein Array mit allen Lektoren die
+	 * zu dem Moodle Kurs zugeteilt sind 
+	 */
+	public function getMitarbeiter($mdl_course_id)
 	{
 		//Mitarbeiter laden die zu diesem Kurs zugeteilt sind
 		$qry = "SELECT 
@@ -103,25 +108,30 @@ class moodle_user
 					tbl_lehreinheit.studiensemester_kurzbz=tbl_moodle.studiensemester_kurzbz
 					AND mdl_course_id='".addslashes($mdl_course_id)."'";
 		$mitarbeiter=array();
-		if($result_ma = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			while($row_ma = pg_fetch_object($result_ma))
+			while($row_ma = $this->db_fetch_object())
 			{
 				$mitarbeiter[] = $row_ma->mitarbeiter_uid;
 			}
 			return $mitarbeiter;
 		}
+		else 
+		{
+			$this->errormsg='Fehler beim Laden der Mitarbeiter';
+			return false;
+		}
 	}
 	
-	// ************************************************
-	// * Synchronisiert die Lektoren der Lehreinheiten
-	// * mit denen des Moodle Kurses
-	// * @param $mdl_course_id ID des MoodleKurses
-	// *        lehrveranstaltung_id wird nur angegeben beim Syncro von Testkursen
-	// *        studiensemester_kurzbz wird nur angegeben beim Syncro von Testkursen
-	// * @return true wenn ok, false wenn Fehler
-	// ************************************************
-	function sync_lektoren($mdl_course_id, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null)
+	/**
+	 * Synchronisiert die Lektoren der Lehreinheiten
+	 * mit denen des Moodle Kurses
+	 * @param $mdl_course_id ID des MoodleKurses
+	 *        lehrveranstaltung_id wird nur angegeben beim Syncro von Testkursen
+	 *        studiensemester_kurzbz wird nur angegeben beim Syncro von Testkursen
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function sync_lektoren($mdl_course_id, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null)
 	{
 		//Mitarbeiter laden die zu diesem Kurs zugeteilt sind
 		if(!is_null($lehrveranstaltung_id) && !is_null($studiensemester_kurzbz))
@@ -152,17 +162,17 @@ class moodle_user
 						AND mdl_course_id='".addslashes($mdl_course_id)."'";
 		}
 		$mitarbeiter='';
-		if($result_ma = pg_query($this->conn, $qry))
+		if($result_ma = $this->db_query($qry))
 		{
 			//Context des Kurses holen
-			$mdlcourse = new moodle_course($this->conn, $this->conn_moodle);
+			$mdlcourse = new moodle_course();
 			if(!$mdlcourse->getContext(50, $mdl_course_id))
 			{
 				$this->errormsg = 'Fehler beim Laden des Contexts';
 				return false;
 			}
 			
-			while($row_ma = pg_fetch_object($result_ma))
+			while($row_ma = $this->db_fetch_object($result_ma))
 			{
 				//MoodleID des Users holen bzw ggf neu anlegen
 				if(!$this->loaduser($row_ma->mitarbeiter_uid))
@@ -238,13 +248,13 @@ class moodle_user
 		}
 	}
 	
-	// ************************************************
-	// * Synchronisiert die Studenten der Lehreinheiten
-	// * mit denen des Moodle Kurses
-	// * @param $mdl_course_id ID des MoodleKurses
-	// * @return true wenn ok, false wenn Fehler
-	// ************************************************
-	function sync_studenten($mdl_course_id)
+	/**
+	 * Synchronisiert die Studenten der Lehreinheiten
+	 * mit denen des Moodle Kurses
+	 * @param $mdl_course_id ID des MoodleKurses
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function sync_studenten($mdl_course_id)
 	{
 		//Studentengruppen laden die zu diesem Kurs zugeteilt sind
 		$qry = "SELECT 
@@ -263,17 +273,17 @@ class moodle_user
 					tbl_lehreinheit.studiensemester_kurzbz=tbl_moodle.studiensemester_kurzbz
 					AND mdl_course_id='".addslashes($mdl_course_id)."'";
 		$studenten='';
-		if($result_std = pg_query($this->conn, $qry))
+		if($result_std = $this->db_query($qry))
 		{
 			//Context des Kurses holen
-			$mdlcourse = new moodle_course($this->conn, $this->conn_moodle);
+			$mdlcourse = new moodle_course();
 			if(!$mdlcourse->getContext(50, $mdl_course_id))
 			{
 				$this->errormsg = 'Fehler beim Laden des Contexts';
 				return false;
 			}
 			
-			while($row_std = pg_fetch_object($result_std))
+			while($row_std = $this->db_fetch_object($result_std))
 			{
 				//Schauen ob fuer diesen Kurs die Gruppen mitgesynct werden sollen
 				$gruppensync = $row_std->gruppen=='t'?true:false;
@@ -287,9 +297,9 @@ class moodle_user
 							FROM
 								public.tbl_studentlehrverband
 							WHERE
-								studiensemester_kurzbz='$row_std->studiensemester_kurzbz' AND
-								studiengang_kz = '$row_std->studiengang_kz' AND
-								semester = '$row_std->semester'";
+								studiensemester_kurzbz='".addslashes($row_std->studiensemester_kurzbz)."' AND
+								studiengang_kz = '".addslashes($row_std->studiengang_kz)."' AND
+								semester = '".addslashes($row_std->semester)."'";
 					if(trim($row_std->verband)!='')
 					{
 						$qry.=" AND verband = '$row_std->verband'";
@@ -298,7 +308,7 @@ class moodle_user
 							$qry.=" AND gruppe = '$row_std->gruppe'";
 						}
 					}
-					$studiengang_obj = new studiengang($this->conn);
+					$studiengang_obj = new studiengang();
 					$studiengang_obj->load($row_std->studiengang_kz);
 					$gruppenbezeichnung = $studiengang_obj->kuerzel.'-'.trim($row_std->semester).trim($row_std->verband).trim($row_std->gruppe);
 				}
@@ -309,17 +319,15 @@ class moodle_user
 							FROM
 								public.tbl_benutzergruppe
 							WHERE
-								gruppe_kurzbz='$row_std->gruppe_kurzbz' AND
-								studiensemester_kurzbz='$row_std->studiensemester_kurzbz'
-							";
+								gruppe_kurzbz='".addslashes($row_std->gruppe_kurzbz)."' AND
+								studiensemester_kurzbz='".addslashes($row_std->studiensemester_kurzbz)."'";
 					$gruppenbezeichnung = $row_std->gruppe_kurzbz;
 				}
 
-				if($result_user = pg_query($this->conn, $qry))
+				if($result_user = $this->db_query($qry))
 				{
-					while($row_user = pg_fetch_object($result_user))
+					while($row_user = $this->db_fetch_object($result_user))
 					{
-						
 						//MoodleID des Users holen bzw ggf neu anlegen
 						if(!$this->loaduser($row_user->student_uid))
 						{
@@ -421,14 +429,14 @@ class moodle_user
 		}
 	}
 	
-	// ************************************************
-	// * Schaut ob eine Zuteilung von Person zu Gruppe
-	// * existiert
-	// * @param grouid ID der Gruppe
-	// *        userid ID des Users
-	// * @return ID der Zuteilung
-	// ************************************************
-	function getGroupMember($groupid, $userid)
+	/**
+	 * Schaut ob eine Zuteilung von Person zu Gruppe
+	 * existiert
+	 * @param grouid ID der Gruppe
+	 *        userid ID des Users
+	 * @return ID der Zuteilung
+	 */
+	public function getGroupMember($groupid, $userid)
 	{
 		$qry = "SELECT id FROM public.mdl_groups_members WHERE groupid='".addslashes($groupid)."' AND userid='".addslashes($userid)."'";
 		if($result = pg_query($this->conn_moodle, $qry))
@@ -449,14 +457,14 @@ class moodle_user
 		}
 	}
 	
-	// ***************************************************
-	// * Legt eine Zuteilung eines Users zu 
-	// * einer Gruppe an
-	// * @param groupid ID der Gruppe
-	// *        userid ID des Users
-	// * @return ID der Zuteilung oder false im Fehlerfall
-	// ***************************************************
-	function createGroupMember($groupid, $userid)
+	/**
+	 * Legt eine Zuteilung eines Users zu 
+	 * einer Gruppe an
+	 * @param groupid ID der Gruppe
+	 *        userid ID des Users
+	 * @return ID der Zuteilung oder false im Fehlerfall
+	 */
+	public function createGroupMember($groupid, $userid)
 	{
 		$qry = 'BEGIN; INSERT INTO public.mdl_groups_members(groupid, userid) VALUES('.
 				$this->addslashes($groupid).','.$this->addslashes($userid).');';
@@ -490,13 +498,14 @@ class moodle_user
 			return false;
 		}
 	}
-	// ************************************************
-	// * Holt die ID einer MoodleGruppe
-	// * @param $mdl_course_id ID des Kurses
-	// *        $gruppenbezeichnung Name der Gruppe
-	// * @return GruppenID wenn ok, false im Fehlerfall
-	// ************************************************
-	function getGroup($mdl_course_id, $gruppenbezeichnung)
+	
+	/**
+	 * Holt die ID einer MoodleGruppe
+	 * @param $mdl_course_id ID des Kurses
+	 *        $gruppenbezeichnung Name der Gruppe
+	 * @return GruppenID wenn ok, false im Fehlerfall
+	 */
+	public function getGroup($mdl_course_id, $gruppenbezeichnung)
 	{
 		$qry = "SELECT id FROM public.mdl_groups WHERE courseid='".addslashes($mdl_course_id)."' AND name='".addslashes($gruppenbezeichnung)."'";
 		
@@ -508,7 +517,7 @@ class moodle_user
 			}
 			else 
 			{
-				$this->errormsg = "Gruppe wurde nciht gefunden $gruppenbezeichnung";
+				$this->errormsg = "Gruppe wurde nicht gefunden $gruppenbezeichnung";
 				return false;
 			}
 		}
@@ -519,13 +528,13 @@ class moodle_user
 		}
 	}
 	
-	// ****************************************************
-	// * Legt eine MoodleGruppe zu einem Kurs an
-	// * @param mdl_course_id ID des MoodleKuses
-	// *        gruppenbezeichnung Bezeichnung der Gruppe
-	// * @return ID der Gruppe wenn ok, false im Fehlerfall
-	// ****************************************************
-	function createGroup($mdl_course_id,  $gruppenbezeichnung)
+	/**
+	 * Legt eine MoodleGruppe zu einem Kurs an
+	 * @param mdl_course_id ID des MoodleKuses
+	 *        gruppenbezeichnung Bezeichnung der Gruppe
+	 * @return ID der Gruppe wenn ok, false im Fehlerfall
+	 */
+	public function createGroup($mdl_course_id,  $gruppenbezeichnung)
 	{
 		$qry = 'BEGIN;INSERT INTO public.mdl_groups(courseid, name, description) VALUES('.
 				$this->addslashes($mdl_course_id).','.
@@ -561,28 +570,18 @@ class moodle_user
 			return false;
 		}
 	}
-	// ************************************************
-	// * wenn $var '' ist wird "null" zurueckgegeben
-	// * wenn $var !='' ist werden datenbankkritische
-	// * Zeichen mit backslash versehen und das Ergebnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
-	function addslashes($var)
-	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// ********************************************
-	// * Legt einen User im Moodle an
-	// * @param $uid UID der Person die angelegt werden soll
-	// * @return true wenn ok, false wenn Fehler
-	// ********************************************
-	function createUser($uid)
+		
+	/**
+	 * Legt einen User im Moodle an
+	 * @param $uid UID der Person die angelegt werden soll
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function createUser($uid)
 	{
 		$qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'";
-		if($result = pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object())
 			{
 				$username = $row->uid;
 				$vorname = $row->vorname;
@@ -641,15 +640,15 @@ class moodle_user
 		}
 	}
 	
-	// *********************************************
-	// * Teilt den User mit der ID $mdl_user_id zum
-	// * Kurs mit der ContextID $mdl_context_id zu.
-	// * @param $mdl_user_id Moodle ID des Users
-	// *        $mdl_context_id ContextID des Kurses
-	// *        $role Rolle der Zuteilung (1=Admin/3=Lektor/5=Student)
-	// * @return true wenn ok, false wenn Fehler
-	// *********************************************
-	function createZuteilung($mdl_user_id, $mdl_context_id, $role)
+	/**
+	 * Teilt den User mit der ID $mdl_user_id zum
+	 * Kurs mit der ContextID $mdl_context_id zu.
+	 * @param $mdl_user_id Moodle ID des Users
+	 *        $mdl_context_id ContextID des Kurses
+	 *        $role Rolle der Zuteilung (1=Admin/3=Lektor/5=Student)
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function createZuteilung($mdl_user_id, $mdl_context_id, $role)
 	{
 		$qry = "INSERT INTO public.mdl_role_assignments(roleid, contextid, userid) 
 				VALUES(".
@@ -668,13 +667,13 @@ class moodle_user
 		}
 	}
 	
-	// *********************************************
-	// * Fuegt dem User die globale Gastrolle hinzu
-	// * @param $mdl_user_id Moodle ID des Users der
-	// *                     die GastRolle bekommt
-	// * @return true wenn ok, false wenn Fehler
-	// *********************************************
-	function createGlobaleGastrolle($mdl_user_id)
+	/**
+	 * Fuegt dem User die globale Gastrolle hinzu
+	 * @param $mdl_user_id Moodle ID des Users der
+	 *                     die GastRolle bekommt
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function createGlobaleGastrolle($mdl_user_id)
 	{
 	
 		//Nachschauen ob diese Person bereits eine globale Gastrolle hat
@@ -697,6 +696,7 @@ class moodle_user
 				else 
 					$this->log.="\nFehler beim Anlegen der Gast-Zuteilung: $this->errormsg";
 			}
+			return true;
 		}
 		else 
 		{
@@ -705,13 +705,13 @@ class moodle_user
 		}
 	}
 	
-	// *************************************************
-	// * Loescht die Zuteilung eines Users zu einem Kurs
-	// * @param $mdl_user_id MoodleID des Users
-	// *        $mdl_context_id ContextID des Users
-	// * @return true wenn ok, false wenn Fehler
-	// *************************************************
-	function deleteZuteilung($mdl_user_id, $mdl_context_id)
+	/**
+	 * Loescht die Zuteilung eines Users zu einem Kurs
+	 * @param $mdl_user_id MoodleID des Users
+	 *        $mdl_context_id ContextID des Users
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function deleteZuteilung($mdl_user_id, $mdl_context_id)
 	{
 		$qry = "DELETE FROM public.mdl_role_assignments 
 				WHERE userid='".addslashes($mdl_user_id)."' AND contextid='".addslashes($mdl_context_id)."'";
@@ -724,14 +724,14 @@ class moodle_user
 		}		
 	}
 
-	// *******************************************************
-	// * Teilt die TestStudenten zu einem Testkurs zu
-	// * @param mdl_course_id ID des Moodle Kurses
-	// *******************************************************
-	function createTestStudentenZuordnung($mdl_course_id)
+	/**
+	 * Teilt die TestStudenten zu einem Testkurs zu
+	 * @param mdl_course_id ID des Moodle Kurses
+	 */
+	public function createTestStudentenZuordnung($mdl_course_id)
 	{
 		//Context des Kurses holen
-		$mdlcourse = new moodle_course($this->conn, $this->conn_moodle);
+		$mdlcourse = new moodle_course();
 		if(!$mdlcourse->getContext(50, $mdl_course_id))
 		{
 			$this->errormsg = 'Fehler beim Laden des Contexts';
