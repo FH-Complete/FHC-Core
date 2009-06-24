@@ -23,6 +23,17 @@
  * LV Details fuer CIS Seite
  * diese Datei wird von /cis/private/lehre/lesson.php inkludiert
  */
+  if (!isset($db)) 
+ {
+	// ---------------- CIS Include Dateien einbinden
+		require_once('../../../config/cis.config.inc.php');
+	// ------------------------------------------------------------------------------------------
+	//	Datenbankanbindung 
+	// ------------------------------------------------------------------------------------------
+		require_once('../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+ }
 ?>
 <table class="tabcontent">
 	<tr>
@@ -31,32 +42,30 @@
 		<?php
 
 		//Lehrveranstaltungsinformation
-
 		   echo "<img src=\"../../../skin/images/button_i.jpg\" width=\"67\" height=\"45\"><br><strong>Lehrveranstaltungsinformation</strong><br>";
-
 		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='German' AND aktiv=true";
 		   $need_br=false;
 
-		   if($result=pg_query($sql_conn,$qry))
+		   if($result=$db->db_query($qry))
 		   {
-		      if(pg_num_rows($result)>0)
+		      if($db->db_num_rows($result)>0)
 		      {
 			     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=de','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Deutsch&nbsp;</a>";
 			     $need_br=true;
 		      }
 		   }
 		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvid' AND genehmigt=true AND sprache='English' AND aktiv=true";
-		   if($result=pg_query($sql_conn,$qry))
+		   if($result=$db->db_query($qry))
 		   {
-		      if(pg_num_rows($result)>0)
+		      if($db->db_num_rows($result)>0)
 		      {
-		      	 $row1=pg_fetch_object($result);
+		      	 $row1=$db->db_fetch_object($result);
 			     echo "<a href=\"#\" class='Item' onClick=\"javascript:window.open('ects/preview.php?lv=$lvid&language=en','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">Englisch</a>";
 			     $need_br=true;
 		      }
 		   }
 
-		   if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))
+		   if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))
 		   {
 		   		if($need_br)
 		   			echo "<br>";
@@ -68,33 +77,56 @@
 		</td>
 	    <td class="tdvertical" align="center">
 		  <?php
-		  if (!isset($GLOBALS["DOCUMENT_ROOT"]))
-					$GLOBALS["DOCUMENT_ROOT"]='../../..';
+			if (!isset($DOC_ROOT) && isset($_SERVER["DOCUMENT_ROOT"]) )
+				$DOC_ROOT=$_SERVER["DOCUMENT_ROOT"];
+			if (!isset($DOC_ROOT) || empty($DOC_ROOT))
+					$DOC_ROOT='../../..';
 
-		  //SEMESTERPLAN
-		  	$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/semesterplan');
-
-		  	if(!@is_dir($dest_dir->path))
+		  	$dir_name=$DOC_ROOT.'/documents';
+			if(!is_dir($dir_name))
 			{
-				if(!is_dir('../../../documents/'.strtolower($kurzbz)))
+					exec('mkdir -m 775 "'.$dir_name.'"');
+					exec('sudo chown www-data:teacher "'.$dir_name.'"');
+			}					
+			
+			if (!is_dir($DOC_ROOT.'/documents')) // Entwicklung - Documents im eigenen Verz.	  
+					$DOC_ROOT='../../..';
+				
+		  	if(!@is_dir($DOC_ROOT.'/documents'))
+			{
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents'.'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');				
+			}					
+					
+		  //SEMESTERPLAN
+		  	$dir_name=$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan';
+			if(!is_dir($dir_name))
+			{
+					exec('mkdir -m 775 "'.$dir_name.'"');
+					exec('sudo chown www-data:teacher "'.$dir_name.'"');
+			}
+		  	$dest_dir = @dir($dir_name);
+		  	if(!is_dir($dest_dir->path))
+			{
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/semesterplan'))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan'))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/semesterplan"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/semesterplan"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/semesterplan"');
 				}
 			}
 
@@ -126,7 +158,7 @@
 				echo '<strong>Semesterplan</strong>';
 			}
 
-			if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
+			if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
 			{
 				echo '<br><a class="Item" href="#" onClick="javascript:window.open(\'semupload.php?lvid='.$lvid.'\',\'_blank\',\'width=400,height=300,location=no,menubar=no,status=no,toolbar=no\');return false;">';
 				echo "Upload</a>";
@@ -147,29 +179,34 @@
 		<td class="tdvertical" align="center">
 		<?php
 		//DOWNLOAD
-			$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/download');
-
-			if(!@is_dir($dest_dir->path))
+		  	$dir_name=$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download';
+			if(!is_dir($dir_name))
 			{
-				if(!is_dir('../../../documents/'.strtolower($kurzbz)))
+					exec('mkdir -m 775 "'.$dir_name.'"');
+					exec('sudo chown www-data:teacher "'.$dir_name.'"');
+			}
+		  	$dest_dir = @dir($dir_name);
+		  	if(!is_dir($dest_dir->path))
+			{
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/download'))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download'))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/download"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/download"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/download"');
 				}
 			}
 
@@ -204,14 +241,14 @@
 			//Wenn user eine Lehrfachzuteilung fuer dieses Lehrfach hat wird
 			//Ein Link zum Upload angezeigt und ein Link um das Download-Verzeichnis
 			//als Zip Archiv herunterzuladen
-			if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
+			if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))// || $rechte->isBerechtigt('lehre',null,null,$fachbereich_id))
 			{
-				echo "<br>".strtolower("$kurzbz/$term_id/$short/download");
+				echo "<br>".strtolower("$kurzbz/$semester/$short/download");
 				echo '<br>';
-				echo "<a class='Item' target='_blank' href='upload.php?course_id=$course_id&term_id=$term_id&short=$short'>Upload</a>";
+				echo "<a class='Item' target='_blank' href='upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short'>Upload</a>";
 				echo '&nbsp;&nbsp;&nbsp;';
 				if(isset($dir_empty) && $dir_empty == false)
-					echo "<a class='Item' title='Alle Dateien im Download Verzeichnis als Zip-Archiv herunterladen' href='zipdownload.php?stg=$course_id&sem=$term_id&short=$short' target='_blank'>Zip-Archiv</a>";
+					echo "<a class='Item' title='Alle Dateien im Download Verzeichnis als Zip-Archiv herunterladen' href='zipdownload.php?stg=$studiengang_kz&sem=$semester&short=$short' target='_blank'>Zip-Archiv</a>";
 				else
 					echo "Zip-Archiv";
 			}
@@ -231,33 +268,38 @@
   	{
 		//Anwesenheitsliste
 
-		echo "<b><a href='anwesenheitsliste.php?stg_kz=$course_id&sem=$term_id&lvid=$lvid&stsem=$angezeigtes_stsem' class='Item'>Anwesenheits- und Notenlisten</a></b><br>";
+		echo "<b><a href='anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem' class='Item'>Anwesenheits- und Notenlisten</a></b><br>";
   	}
 
   	//Leistungsuebersicht
-  	$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung');
-
-	if(!@is_dir($dest_dir->path))
+  	$dir_name=$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung';
+	if(!is_dir($dir_name))
 	{
-		if(!is_dir('../../../documents/'.strtolower($kurzbz)))
+		exec('mkdir -m 775 "'.$dir_name.'"');
+		exec('sudo chown www-data:teacher "'.$dir_name.'"');
+	}
+  	$dest_dir = @dir($dir_name);
+  	if(!is_dir($dest_dir->path))
+	{
+		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 		{
-			@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
-			exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
+			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
+			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 		}
-		if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
+		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 		{
-			@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
-			exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
+			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 		}
-		if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
+		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 		{
-			@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
-			exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
+			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 		}
-		if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung'))
+		if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung'))
 		{
-			@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung"');
-			exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/leistung"');
+			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung"');
+			exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/leistung"');
 		}
 	}
 
@@ -293,9 +335,9 @@
 	  <td class="tdvertical" align="center">
 		<?php
 		//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
-		if($course_id!='0')
+		if($studiengang_kz!='0')
 		{
-			echo '<a href="news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$term_id.'sem.'.strtolower($short_short_name).'" class="Item">
+			echo '<a href="news://cis.technikum-wien.at/'.strtolower($stg_obj->kurzbzlang).'.'.$semester.'sem.'.strtolower($short_short_name).'" class="Item">
 					<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
 					<strong>Newsgroups</strong>
 				</a>';
@@ -329,9 +371,9 @@
 			(lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
 								WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND 
 								studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."'))";
-	if($result = pg_query($sql_conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if(pg_num_rows($result)==0)
+		if($db->db_num_rows($result)==0)
 		{
 			$show=true;
 		}
@@ -341,9 +383,9 @@
 			WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
 									WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND
 									studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')";
-	if($result = pg_query($sql_conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if(pg_num_rows($result)>0)
+		if($db->db_num_rows($result)>0)
 		{
 			$show=true;
 		}
@@ -397,9 +439,9 @@
 	$showmoodle=false;
 	//Schauen ob Moodle fuer diesen Studiengang freigeschaltet ist
 	$qry = "SELECT moodle FROM public.tbl_studiengang JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
-	if($result = pg_query($sql_conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 		{
 			if($row->moodle=='t')
 			{
@@ -416,13 +458,16 @@
 								WHERE lehrveranstaltung_id='".addslashes($lvid)."' 
 								AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')";
 	
-	if($result = pg_query($sql_conn, $qry))
-		if(pg_num_rows($result)>0)
+	if($result = $db->db_query($qry))
+		if($db->db_num_rows($result)>0)
 			$showmoodle=false;
 	
+	if(!$conn = pg_pconnect(CONN_STRING))
+		die('Fehler beim Verbinden zur MoodleDB');
 	if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
 		die('Fehler beim Verbinden zur MoodleDB');
-	$mdlcourse = new moodle_course($sql_conn, $conn_moodle);
+		
+	$mdlcourse = new moodle_course($conn, $conn_moodle);
 	$mdlcourse->getAll($lvid, $angezeigtes_stsem);
 	if(count($mdlcourse->result)>0)
 		$showmoodle=true;
@@ -432,8 +477,6 @@
 	if($showmoodle)
 	{
 		$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-		
-		
 		if(count($mdlcourse->result)>0)
 		{
 			if(!$is_lector)
@@ -452,7 +495,6 @@
 				else 
 					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
 			}
-			
 			echo '<a href="'.$link.'" target="_blank" class="Item" >
 			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
 			    	<strong>Moodle</strong></a><br>';
@@ -496,29 +538,34 @@
 				echo '</tr><tr>';
 			echo '<td class="tdvertical" align="center">';
 			//Studentenabgabe
-			$dest_dir = @dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload');
-
-			if(!@is_dir($dest_dir->path))
+		  	$dir_name=$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload';
+			if(!is_dir($dir_name))
 			{
-				if(!is_dir('../../../documents/'.strtolower($kurzbz)))
+				exec('mkdir -m 775 "'.$dir_name.'"');
+				exec('sudo chown www-data:teacher "'.$dir_name.'"');
+			}
+		  	$dest_dir = @dir($dir_name);
+		  	if(!is_dir($dest_dir->path))
+			{
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz)))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name)))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name)))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
-					exec('sudo chown www-data:teacher "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
+					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'"');
 				}
-				if(!is_dir('../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload'))
+				if(!is_dir($DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload'))
 				{
-					@exec('mkdir -m 775 "../../../documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload"');
-					exec('sudo chown www-data:mysql "'.$GLOBALS["DOCUMENT_ROOT"].'/documents/'.strtolower($kurzbz).'/'.$term_id.'/'.strtolower($short_short_name).'/upload"');
+					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload"');
+					exec('sudo chown www-data:mysql "'.$DOC_ROOT.'/documents/'.strtolower($kurzbz).'/'.$semester.'/'.strtolower($short_short_name).'/upload"');
 				}
 			}
 
@@ -557,7 +604,7 @@
 				}
 				else
 				{
-					echo "<a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
+					echo "<a href=\"upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short\" target=\"_blank\">";
 					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
 						  <strong>Studenten Abgabe</strong>
 						  </a>";
@@ -581,7 +628,7 @@
 				}
 				else
 				{
-					echo "<a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short\" target=\"_blank\">";
+					echo "<a href=\"upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short\" target=\"_blank\">";
 					echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
 						  <strong>Studenten Abgabe</strong>
 						  </a>";
