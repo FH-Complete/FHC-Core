@@ -21,13 +21,14 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
+ require_once('../../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
+	require_once('../../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+				
 	require_once('../../../../include/functions.inc.php');
 	require_once('../../../../include/lehrveranstaltung.class.php');
 	require_once('../../../../include/studiengang.class.php');
@@ -477,19 +478,13 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 
 <body>
 <?php
-
-if(MOODLE)
-{
-	if(!$conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
-		die('Fehler beim oeffnen der Datenbankverbindung');
-}
 $user = get_uid();
 
 if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 
 $rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen();
+$rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
@@ -823,7 +818,7 @@ echo "
 				if($grade_from_moodle)
 				{
 					//Noten aus Moodle
-					$moodle_course = new moodle_course($conn_moodle);
+					$moodle_course = new moodle_course();
 					$mdldata = $moodle_course->loadNoten($lvid, $stsem, $row_stud->uid, true);
 					
 					if(is_array($mdldata))
@@ -844,7 +839,7 @@ echo "
 						//den Error nur einmal anzeigen und nicht für jeden Studenten
 						if(!$errorshown)
 						{
-							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
+							echo '<p><b>'.$moodle_course->errormsg.'</b></p>';
 							$errorshown=true;
 						}
 					}

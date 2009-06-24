@@ -30,11 +30,11 @@
   	 			03-01-2006 Anpassung an neue DB
 */
 	
-	require_once('../../../config/cis.config.inc.php');
+	require_once('../../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
+	require_once('../../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
 			
@@ -43,6 +43,8 @@
 	require_once('../../../../include/lvinfo.class.php');
 
 	$user = get_uid();
+	if(!check_lektor($user))
+		die('<center>Sie haben keine Berechtigung fuer diesen Bereich</center>');
 
 	/* WriteLog($qry,$uid)
 	 * @brief Schreib die Querys im format: uid - datum - qry ins LogFile
@@ -52,7 +54,6 @@
 	 */
 	function WriteLog($qry,$uid)
 	{
-
 		if($fp=fopen(LOG_PATH.'lvinfo.log',"a"))
 		{
 			fwrite($fp,"\n");
@@ -64,24 +65,13 @@
 			return false;
 	}
 
-	if(!check_lektor($user))
-	{
-		die('<center>Sie haben keine Berechtigung fuer diesen Bereich</center>');
-	}
+	
+	$lv=trim((isset($_REQUEST['lv']) ? $_REQUEST['lv']:''));
 
-	if(isset($_POST['stg'])) //Studiengang der Angezeigt werden soll
-		$stg=$_POST['stg'];
-	else if(isset($_GET['stg']))
-		$stg=$_GET['stg'];
-	else
-		$stg='';
-
-	if(isset($_POST['sem'])) //Semester das angezeigt werden soll
-		$sem=$_POST['sem'];
-	else if(isset($_GET['sem']))
-		$sem = $_GET['sem'];
-	else
-		$sem='';
+	 //Studiengang der Angezeigt werden soll
+	$stg=trim((isset($_REQUEST['stg']) ? $_REQUEST['stg']:''));
+	//Semester das angezeigt werden soll
+	$sem=trim((isset($_REQUEST['sem']) ? $_REQUEST['sem']:''));
 
 	if(isset($_POST["lv"])) //Id des DS der freigegeben/nicht freigegeben werden soll
 		$id=$_POST["lv"];
@@ -91,9 +81,6 @@
 
 	if(isset($_POST["changestat"])) //Wenn diese Variable gesetzt ist dann wird DS mit $id freigegeben/nicht freigegeben
 		$changestat=$_POST["changestat"];
-
-	if(!isset($_GET['lv']) && !isset($_POST['lv']))
-		$lv='';
 
 	if(isset($_POST["status"]) && $_POST["status"] =='changestg')
 		unset($sem);

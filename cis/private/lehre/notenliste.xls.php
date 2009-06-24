@@ -20,11 +20,14 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+ 
+ 
+ 
 /*
  * Erstellt Notenliste im Excel Format
  */
 
-require_once('../../../config/cis.config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
@@ -32,20 +35,22 @@ require_once('../../../config/cis.config.inc.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
 			
-require_once('../../../include/lehrveranstaltung.class.php');
-require_once('../../../include/studiengang.class.php');
-require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/Excel/PEAR.php');
-require_once('../../../include/Excel/BIFFwriter.php');
-require_once('../../../include/Excel/Workbook.php');
-require_once('../../../include/Excel/Format.php');
-require_once('../../../include/Excel/Worksheet.php');
-require_once('../../../include/Excel/Parser.php');
-require_once('../../../include/Excel/OLE.php');
-require_once('../../../include/Excel/PPS.php');
-require_once('../../../include/Excel/Root.php');
-require_once('../../../include/Excel/File.php');
-require_once('../../../include/Excel/Writer.php');
+	require_once('../../../include/lehrveranstaltung.class.php');
+	require_once('../../../include/studiengang.class.php');
+	require_once('../../../include/studiensemester.class.php');
+	require_once('../../../include/Excel/excel.php');
+	
+#	require_once('../../../include/Excel/PEAR.php');
+#	require_once('../../../include/Excel/BIFFwriter.php');
+#	require_once('../../../include/Excel/Workbook.php');
+#	require_once('../../../include/Excel/Format.php');
+#	require_once('../../../include/Excel/Worksheet.php');
+#	require_once('../../../include/Excel/Parser.php');
+#	require_once('../../../include/Excel/OLE.php');
+#	require_once('../../../include/Excel/PPS.php');
+#	require_once('../../../include/Excel/Root.php');
+#	require_once('../../../include/Excel/File.php');
+#	require_once('../../../include/Excel/Writer.php');
 
    	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
    		$lvid=$_GET['lvid'];
@@ -93,12 +98,15 @@ require_once('../../../include/Excel/Writer.php');
 
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
-
+	$workbook->setVersion(8);
+	
 	// sending HTTP headers
 	$workbook->send("Notenliste". "_" . date("d_m_Y") . ".xls");
 
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Notenliste");
+	// Neu - UTF-8 Excel
+	$worksheet->setInputEncoding('utf-8');
 
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();

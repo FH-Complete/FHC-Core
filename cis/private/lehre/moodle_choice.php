@@ -68,7 +68,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 			<tr>
 				<td>';
 
-$mdlcourse = new moodle_course($conn_moodle);
+$mdlcourse = new moodle_course();
 $mdlcourse->getAll($lvid, $stsem);
 
 foreach ($mdlcourse->result as $row)
