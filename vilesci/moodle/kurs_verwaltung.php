@@ -77,11 +77,7 @@
 // ***********************************************************************************************
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
-	// DB Connect
-	$conn=@pg_pconnect(CONN_STRING) or die('<div style="text-align:center;"><br />Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');// 	Datenbankverbindung
-	$conn_moodle = pg_pconnect(CONN_STRING_MOODLE) or die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
-	// Classen Instanzen
-	$objMoodle = new moodle_course($conn, $conn_moodle);	
+	$objMoodle = new moodle_course();	
 
 	
 // ***********************************************************************************************

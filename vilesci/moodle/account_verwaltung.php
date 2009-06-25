@@ -54,14 +54,12 @@
 	$cSearchstr = (isset($_REQUEST['searchstr'])?trim($_REQUEST['searchstr']):'');
 // @cCharset Zeichensatz - Ajax mit UTF-8
 	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'UTF-8');
+
 // ***********************************************************************************************
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
-	// DB Connect
-	$conn=@pg_pconnect(CONN_STRING) or die('<div style="text-align:center;"><br />Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');// 	Datenbankverbindung
-	$conn_moodle = pg_pconnect(CONN_STRING_MOODLE) or die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
 	// Classen Instanzen
-	$objMoodle = new moodle_user($conn, $conn_moodle);	
+	$objMoodle = new moodle_user();	
 
 // ***********************************************************************************************
 //	Verarbeitung einer Moodle-Account Anlageaktion
