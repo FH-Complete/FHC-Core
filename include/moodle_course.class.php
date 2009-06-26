@@ -486,7 +486,7 @@ class moodle_course extends basis_db
 		
 		if($this->db_query($qry))
 		{
-			if($row = pg_fetch_object())
+			if($row = $this->db_fetch_object())
 			{
 				$semester = $row->semester;
 				$stg = $row->stg;
@@ -611,7 +611,6 @@ class moodle_course extends basis_db
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(18, $this->mdl_course_id, 'course-view', 'r', 0, 1);". //Neueste Nachrichten
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(8, $this->mdl_course_id, 'course-view', 'r', 1, 1);". //Kalender / Bald aktuell...
 		"INSERT INTO public.mdl_block_instance(blockid, pageid, pagetype, position, weight, visible) VALUES(22, $this->mdl_course_id, 'course-view', 'r', 2, 1);"; //Neueste Aktivit�ten
-
 		if(!pg_query($this->conn_moodle, $qry))
 		{
 			pg_query($this->conn_moodle, 'ROLLBACK');
