@@ -23,17 +23,15 @@
 /*******************************************************************************************************
  *				stromanalyse - Auswertung der Studentenstroeme in der FHTW
  *******************************************************************************************************/
-require_once('../../cis/config.inc.php');
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-//DB Verbindung herstellen
-if (!$conn = @pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+$db = new basis_db();
 $user = get_uid();
-$rechte = new benutzerberechtigung($conn);
+$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $htmlstr='';
 $ausgabe='';
@@ -49,24 +47,24 @@ if($studiensemester_kurzbz != -1)
 	$ausgabe = "<H2>Master-Studiengänge: ($studiensemester_kurzbz)</H2>";
 
 	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='m' ORDER by bezeichnung, studiengang_kz";
-	$result_stg=pg_query($conn, $qry_stg);
-	while ($row_stg=pg_fetch_object($result_stg))
+	$result_stg=$db->db_query($qry_stg);
+	while ($row_stg = $db->db_fetch_object($result_stg))
 	{
 		$summe=0;
 		$rest=0; 
 		
-		//StudiengÃ?nge, die zuvor abgeschlossen wurden
+		//Studiengaenge, die zuvor abgeschlossen wurden
 		$qry_master="SELECT DISTINCT count(*)as count ,studiengang_kz, typ, tbl_studiengang.bezeichnung as bez, tbl_studiengang.kurzbz  
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 		JOIN public.tbl_studiengang USING(studiengang_kz) 
-		WHERE rolle_kurzbz='Absolvent' AND typ!='m' 
+		WHERE status_kurzbz='Absolvent' AND typ!='m' 
 			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-			WHERE studiengang_kz='".$row_stg->studiengang_kz."' 
-			AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
-			AND rolle_kurzbz='Student' 
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
+			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
+			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
+			AND status_kurzbz='Student' 
 			AND ausbildungssemester='1') 
 		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz ORDER BY count desc"; 
 		
@@ -96,13 +94,14 @@ if($studiensemester_kurzbz != -1)
 		//Anzahl der Studenten im 1.Semester des MasterStg
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-			WHERE studiengang_kz='".$row_stg->studiengang_kz."' 
-			AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
-			AND rolle_kurzbz='Student' 
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
+			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
+			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
+			AND status_kurzbz='Student' 
 			AND ausbildungssemester='1'";
-		$result_anzahl=pg_query($conn, $qry_anzahl);
-		$row_anzahl=pg_fetch_object($result_anzahl);
+		if(!$result_anzahl=$db->db_query($qry_anzahl))
+			die($db->db_last_error());
+		$row_anzahl=$db->db_fetch_object($result_anzahl);
 		
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;-moz-border-radius-topleft:10px;-moz-border-radius-topright:10px;-khtml-border-radius-topleft:10px;-khtml-border-radius-topright:10px;' align='center'>";
 		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'><TD colspan='4'>&nbsp;&nbsp;&nbsp;";
@@ -114,9 +113,9 @@ if($studiensemester_kurzbz != -1)
 		$ausgabe .= "<TH width='60%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Name</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Anzahl</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent</TH>";
-		$result_master=pg_query($conn, $qry_master);
+		$result_master=$db->db_query($qry_master);
 		$i=0;
-		while ($row_master=pg_fetch_object($result_master))
+		while ($row_master=$db->db_fetch_object($result_master))
 		{
 				$color=(($i%2==0)?"#F3F3E9":"#EFEFDD");
 				$ausgabe .= "<TR style='background-color:$color;'>";
@@ -148,8 +147,8 @@ if($studiensemester_kurzbz != -1)
 	
 	$ausgabe .= "<H2>Bachelor-Studiengänge: (SS".substr($studiensemester_kurzbz,-4)."/$studiensemester_kurzbz)</H2>";
 	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='b' ORDER by bezeichnung,studiengang_kz";
-	$result_stg=pg_query($conn, $qry_stg);
-	while ($row_stg=pg_fetch_object($result_stg))
+	$result_stg=$db->db_query($qry_stg);
+	while ($row_stg=$db->db_fetch_object($result_stg))
 	{
 		$summe=0;
 		$rest=0; 
@@ -158,15 +157,15 @@ if($studiensemester_kurzbz != -1)
 		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, bezeichnung as bez, kurzbz FROM 
 		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ, tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz   
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 		JOIN public.tbl_studiengang USING(studiengang_kz) 
-		WHERE rolle_kurzbz='Student' AND typ='m' 
+		WHERE status_kurzbz='Student' AND typ='m' 
 			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-			WHERE studiengang_kz='".$row_stg->studiengang_kz."'  
-			AND rolle_kurzbz='Absolvent'
-			AND (studiensemester_kurzbz='".$studiensemester_kurzbz."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."') )) as b 
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
+			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."'  
+			AND status_kurzbz='Absolvent'
+			AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."') )) as b 
 		GROUP BY studiengang_kz, typ, bezeichnung, kurzbz ORDER BY count desc";
 		
 		//Anzahl der Studenten ohne weitere Masterstudien am FHTW
@@ -191,12 +190,12 @@ if($studiensemester_kurzbz != -1)
 		//Anzahl der Absolventen des Studiengangs
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-			WHERE studiengang_kz='".$row_stg->studiengang_kz."' 
-			AND rolle_kurzbz='Absolvent'
-			AND (studiensemester_kurzbz='".$studiensemester_kurzbz."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."')";
-		$result_anzahl=pg_query($conn, $qry_anzahl);
-		$row_anzahl=pg_fetch_object($result_anzahl);
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
+			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
+			AND status_kurzbz='Absolvent'
+			AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."')";
+		$result_anzahl=$db->db_query($qry_anzahl);
+		$row_anzahl=$db->db_fetch_object($result_anzahl);
 		
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;-moz-border-radius-topleft:10px;-moz-border-radius-topright:10px;-khtml-border-radius-topleft:10px;-khtml-border-radius-topright:10px;' align='center'>";
 		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'>";
@@ -210,9 +209,9 @@ if($studiensemester_kurzbz != -1)
 		$ausgabe .= "<TH width='60%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Name</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Anzahl</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent</TH>";
-		$result_bachelor=pg_query($conn, $qry_bachelor);
+		$result_bachelor=$db->db_query($qry_bachelor);
 		$i=0;
-		while ($row_bachelor=pg_fetch_object($result_bachelor))
+		while ($row_bachelor=$db->db_fetch_object($result_bachelor))
 		{
 				$color=(($i%2==0)?"#F3F3E9":"#EFEFDD");
 				$ausgabe .= "<TR style='background-color:$color;'>";
@@ -260,8 +259,8 @@ Wählen Sie bitte nachfolgend ein Wintersemester aus.';
 $htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='strom'>\n";
 $htmlstr .= "<select name='studiensemester_kurzbz'>\n";
 $qry_sem = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz LIKE 'WS%' ORDER BY start";
-$result_sem=pg_query($conn, $qry_sem);
-while ($row_sem=pg_fetch_object($result_sem))
+$result_sem=$db->db_query($qry_sem);
+while ($row_sem=$db->db_fetch_object($result_sem))
 {
 	if($row_sem->studiensemester_kurzbz==$studiensemester_kurzbz)
 	{
