@@ -137,12 +137,12 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.3 \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Organisation, die die Qualifikation\n verliehen hat \n Name and status of awarding institution \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien, Verleihung des Status \n "Fachhochschule" im November 2000 \n University of Applied Sciences Fachhochschule Technikum Wien, \n status University of Applied Science since November 2000</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien, Verleihung des Status \n "Fachhochschule" im November 2000 \n University of Applied Sciences Technikum Wien, \n status University of Applied Science since November 2000</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.4 \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Einrichtung, die das Studium durchführte \n Name and status of institution administering studies</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien \n University of Applied Sciences Fachhochschule Technikum Wien</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien \n University of Applied Sciences Technikum Wien</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.5 \n</fo:block></fo:table-cell>

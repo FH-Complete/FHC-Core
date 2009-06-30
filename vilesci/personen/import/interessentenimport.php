@@ -20,8 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../config.inc.php');
-require_once('../../../system/sync/sync_config.inc.php');
+require_once('../../../config/vilesci.config.inc.php');
 require_once('../../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
@@ -37,25 +36,24 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/lehrverband.class.php');
 require_once('../../../include/nation.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Connection');
-
+$db = new basis_db();
 $user=get_uid();
 $datum_obj = new datum();
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 function getGemeindeDropDown($postleitzahl)
 {
-	global $conn, $_REQUEST, $gemeinde;
+	global $_REQUEST, $gemeinde;
+	$db = new basis_db();
+	
 	$found=false;
 	$firstentry='';
 	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
 	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			if($firstentry=='')
 				$firstentry=$row->name;
@@ -91,14 +89,16 @@ if(isset($_GET['type']) && $_GET['type']=='getgemeindecontent' && isset($_GET['p
 
 function getOrtDropDown($postleitzahl, $gemeindename)
 {
-	global $conn, $_REQUEST;
+	global $_REQUEST;
+	$db = new basis_db();
+	
 	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
 	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
 			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
 	echo '<SELECT id="ort" name="ort">';
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object())
 		{
 			if($row->ortschaftsname==$ort)
 				$selected='selected';
@@ -114,7 +114,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 {
 	header('Content-Type: text/html; charset=UTF-8');
 	
-	echo getOrtDropDown($_GET['plz'], utf8_decode($_GET['gemeinde']));
+	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
 	exit;
 }
 ?>
@@ -122,7 +122,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
+<link href="../../../skin/styles/tw.css" rel="stylesheet" type="text/css">
 <script language="Javascript">
 function disablefields(obj)
 {
@@ -388,10 +388,12 @@ $geburtsdatum_error=false;
 // * 0254 = Studiengangskennzahl vierstellig
 // * 001 = Laufende Nummer
 // ****
-function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
-{
-	$jahr = substr($studiensemester_kurzbz, 4);	
-	$sem = substr($studiensemester_kurzbz, 0, 2);
+function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
+{ 
+	$db = new basis_db();
+	
+	$jahr = mb_substr($studiensemester_kurzbz, 4);	
+	$sem = mb_substr($studiensemester_kurzbz, 0, 2);
 	if($sem=='SS')
 		$jahr = $jahr-1;
 	$art =0;
@@ -400,11 +402,11 @@ function generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz)
 	
 	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
 	
-	if($result = pg_query($conn, $qry))
+	if($db->db_query($qry))
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object())
 		{
-			$max = substr($row->matrikelnr,7);
+			$max = mb_substr($row->matrikelnr,7);
 		}
 		else 
 			$max = 0;
@@ -445,7 +447,7 @@ function clean_string($string)
 if($studiensemester_kurzbz == '')
 {
 	//Im September wird das Aktuelle Studiensemester vorgeschlagen sonst immer das naechste WS
-	$stsem = new studiensemester($conn);
+	$stsem = new studiensemester();
 	if(date('m')=='9')
 		$studiensemester_kurzbz = $stsem->getaktorNext();
 	else
@@ -463,12 +465,12 @@ if(isset($_POST['save']))
 	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort |
 	//		Email: $email | Telefon: $telefon | Mobil: $mobil | Letzteausbildung: $letzteausbildung | ausbildungsart: $ausbildungsart |
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
-	$person = new person($conn);
-	$prestudent = new prestudent($conn);
+	$person = new person();
+	$prestudent = new prestudent();
 	
 	$prestudent_vorhanden=false;
 	
-	pg_query($conn, 'BEGIN');
+	$db->db_query('BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Ansosnsten wird es an die Person mit $person_id angehaengt
 	if($person_id!='0')
@@ -492,9 +494,9 @@ if(isset($_POST['save']))
 			{
 				//Prestudent ID holen
 				$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id='$person_id' AND studiengang_kz='$studiengang_kz'";
-				if($result = pg_query($conn, $qry))
+				if($result = $db->db_query($qry))
 				{
-					if(pg_num_rows($result)>1)
+					if($db->db_num_rows($result)>1)
 					{
 						// Wenn bereits mehrere Prestudenten in diesem Studingang vorhanden sind, dann abbrechen
 						$error=true;
@@ -502,15 +504,15 @@ if(isset($_POST['save']))
 					}
 					else 
 					{
-						$row = pg_fetch_object($result);
+						$row = $db->db_fetch_object($result);
 						$prestudent_id=$row->prestudent_id;
 
 						//Wenn der Prestudent noch keinen Studenten eintrag hat, dann wird die neue
 						//Rolle hinzugefuegt, sonst wird abgebrochen
 						$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id' AND status_kurzbz='Student'";
-						if($result = pg_query($conn, $qry))
+						if($result = $db->db_query($qry))
 						{
-							if(pg_num_rows($result)>0)
+							if($db->db_num_rows($result)>0)
 							{
 								$error=true;
 								$errormsg = 'Der Interessent konnte nicht angelegt werden, da diese Person bereits als Student in diesem Studiengang angelegt ist.';
@@ -568,7 +570,7 @@ if(isset($_POST['save']))
 		if($person_id=='0')
 			$ueberschreiben='Nein';
 
-		$adr = new adresse($conn);
+		$adr = new adresse();
 		//Adresse neu anlegen
 		if($ueberschreiben=='Nein')
 		{
@@ -639,7 +641,7 @@ if(isset($_POST['save']))
 		//EMail Adresse speichern
 		if($email!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'email';
 			$kontakt->kontakt = $email;
@@ -657,7 +659,7 @@ if(isset($_POST['save']))
 		//Telefonnummer speichern
 		if($telefon!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'telefon';
 			$kontakt->kontakt = $telefon;
@@ -675,7 +677,7 @@ if(isset($_POST['save']))
 		//Mobiltelefonnummer speichern
 		if($mobil!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'mobil';
 			$kontakt->kontakt = $mobil;
@@ -706,9 +708,9 @@ if(isset($_POST['save']))
 		
 		//Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
 		$qry_zgv = "SELECT * FROM public.tbl_prestudent WHERE person_id='$person->person_id' AND zgv_code is not null ORDER BY zgvmas_code, zgv_code DESC LIMIT 1";
-		if($result_zgv = pg_query($conn, $qry_zgv))
+		if($result_zgv = $db->db_query($qry_zgv))
 		{
-			if($row_zgv = pg_fetch_object($result_zgv))
+			if($row_zgv = $db->db_fetch_object($result_zgv))
 			{
 				if($row_zgv->zgv_code!='')
 				{
@@ -733,7 +735,7 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		//Prestudent Rolle Anlegen			
-		$rolle = new prestudent($conn);
+		$rolle = new prestudent();
 
 		$rolle->prestudent_id = $prestudent->prestudent_id;
 		if(!$incoming)
@@ -761,12 +763,12 @@ if(isset($_POST['save']))
 	if(!$error && $incoming)
 	{
 		//Matrikelnummer und UID generieren
-		$matrikelnr = generateMatrikelnummer($conn, $studiengang_kz, $studiensemester_kurzbz);
+		$matrikelnr = generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz);
 				
-		$jahr = substr($matrikelnr,0, 2);
-		$stg = substr($matrikelnr, 3, 4);
+		$jahr = mb_substr($matrikelnr,0, 2);
+		$stg = mb_substr($matrikelnr, 3, 4);
 		
-		$stg_obj = new studiengang($conn);
+		$stg_obj = new studiengang();
 		$stg_obj->load(ltrim($stg,'0'));
 		
 		$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
@@ -778,19 +780,19 @@ if(isset($_POST['save']))
 		$benutzer->aktiv = true;
 							
 		$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".clean_string($person->vorname).".".clean_string($person->nachname)."')";
-		$result_alias = pg_query($conn, $qry_alias);
-		if(pg_num_rows($result_alias)==0)								
-			$benutzer->alias = strtolower(clean_string($person->vorname).'.'.clean_string($person->nachname));
+		$result_alias = $db->db_query($qry_alias);
+		if($db->db_num_rows($result_alias)==0)								
+			$benutzer->alias = mb_strtolower(clean_string($person->vorname).'.'.clean_string($person->nachname));
 		else 
 			$benutzer->alias = '';
 									
 		$benutzer->insertamum = date('Y-m-d H:i:s');
 		$benutzer->insertvon = $user;
-																	
+						
 		if($benutzer->save(true, false))
 		{
 			//Studentendatensatz anlegen
-			$student = new student($conn);
+			$student = new student();
 			$student->uid = $uid;
 			$student->matrikelnr = $matrikelnr;
 			$student->prestudent_id = $prestudent->prestudent_id;
@@ -801,7 +803,7 @@ if(isset($_POST['save']))
 			$student->insertamum = date('Y-m-d H:i:s');
 			$student->insertvon = $user;
 
-			$lvb = new lehrverband($conn);
+			$lvb = new lehrverband();
 			if(!$lvb->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
 			{
 				$lvb->studiengang_kz = $student->studiengang_kz;
@@ -817,7 +819,7 @@ if(isset($_POST['save']))
 			if($student->save(true, false))
 			{
 				//StudentLehrverband anlegen
-				$studentlehrverband = new student($conn);
+				$studentlehrverband = new student();
 				$studentlehrverband->uid = $uid;
 				$studentlehrverband->studiensemester_kurzbz = $studiensemester_kurzbz;
 				$studentlehrverband->studiengang_kz = $studiengang_kz;
@@ -848,12 +850,12 @@ if(isset($_POST['save']))
 	
 	if(!$error)
 	{
-		pg_query($conn, 'COMMIT');
+		$db->db_query('COMMIT');
 		die("<b>".($incoming?'Incoming':'Interessent')." $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='interessentenimport.php?studiengang_kz=$studiengang_kz'>Neue Person Anlegen</a>");
 	}
 	else
 	{
-		pg_query($conn, 'ROLLBACK');
+		$db->db_query('ROLLBACK');
 		echo '<span class="error">'.$errormsg.'</span>';
 	}
 }
@@ -863,7 +865,7 @@ $geburtsdatum_orig = $geburtsdatum;
 if($geburtsdatum!='')
 {
 	//Wenn das Datum im Format d.m.Y ist dann in Y-m-d umwandeln
-	if(strpos($geburtsdatum,'.'))
+	if(mb_strpos($geburtsdatum,'.'))
 	{
 		if($datum_obj->mktime_datum($geburtsdatum))
 		{
@@ -876,7 +878,7 @@ if($geburtsdatum!='')
 	}
 	else 
 	{
-		if(!ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
+		if(!mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 			$geburtsdatum_error=true;
 	}
 	
@@ -909,7 +911,7 @@ echo '</td></tr>';
 echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum_orig.'" /> (Format: dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
-$nation =  new nation($conn);
+$nation =  new nation();
 $nation->getAll();
 foreach ($nation->nation as $row)
 {
@@ -960,9 +962,9 @@ echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="
 echo '<tr><td>Letzte Ausbildung</td><td><SELECT id="letzteausbildung" name="letzteausbildung">';
 echo '<OPTION value="" '.($letzteausbildung==''?'selected':'').'>-- keine Auswahl --</OPTION>';
 $qry = "SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungcode";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '<OPTION value="'.$row->ausbildungcode.'" '.($letzteausbildung==$row->ausbildungcode?'selected':'').'>'.$row->ausbildungbez.'</OPTION>';
 	}
@@ -972,7 +974,7 @@ echo '</td></tr>';
 echo '<tr><td>Ausbildungsart</td><td><input type="text" id="ausbildungsart" name="ausbildungsart" value="'.$ausbildungsart.'" /></td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
 echo '<tr><td>Studiengang *</td><td><SELECT id="studiengang_kz" name="studiengang_kz">';
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz');
 foreach ($stg_obj->result as $row)
 {
@@ -982,7 +984,7 @@ foreach ($stg_obj->result as $row)
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
@@ -996,9 +998,9 @@ echo '</td></tr>';
 echo '<tr><td>OrgForm</td><td><SELECT name="orgform_kurzbz">';
 echo '<OPTION value="">-- keine Auswahl --</OPTION>';
 $qry = "SELECT orgform_kurzbz, bezeichnung FROM bis.tbl_orgform WHERE rolle ORDER BY bezeichnung";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '<OPTION value="'.$row->orgform_kurzbz.'" '.($orgform_kurzbz==$row->orgform_kurzbz?'selected':'').'>'.$row->bezeichnung.'</OPTION>';
 	}
@@ -1050,10 +1052,10 @@ if($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
 			$qry_stati = "SELECT 'Mitarbeiter' as rolle FROM campus.vw_mitarbeiter WHERE person_id='$row->person_id'
@@ -1061,19 +1063,19 @@ if($where!='')
 							SELECT (get_rolle_prestudent(prestudent_id, null) || ' ' || UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz)) as rolle FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE person_id='$row->person_id'
 							UNION
 							SELECT 'PreInteressent' as rolle FROM public.tbl_preinteressent WHERE person_id='$row->person_id'";
-			if($result_stati = pg_query($conn, $qry_stati))
+			if($result_stati = $db->db_query($qry_stati))
 			{
-				while($row_stati=pg_fetch_object($result_stati))
+				while($row_stati = $db->db_fetch_object($result_stati))
 				{
 					$status.=$row_stati->rolle.', ';
 				}
 			}
-			$status = substr($status, 0, strlen($status)-2);
+			$status = mb_substr($status, 0, mb_strlen($status)-2);
 			
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
-			if($result_adr = pg_query($conn, $qry_adr))
-				while($row_adr=pg_fetch_object($result_adr))
+			if($result_adr = $db->db_query($qry_adr))
+				while($row_adr=$db->db_fetch_object($result_adr))
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo '</td>';
 			echo '<td>'.$status.'</td>';
