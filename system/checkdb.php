@@ -32,16 +32,13 @@ require_once('database.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect('host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' user='.DB_USER.' password='.DB_PASSWORD))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
-
+$db = new basis_db();
 $uid=get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('admin'))
-	die('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung fï¿½r diese Seite');
 
 echo '
 <html>
@@ -124,8 +121,8 @@ if(isset($_POST['commit']))
 {
 	if(isset($_POST['qry']))
 	{
-		if(!pg_query($conn, $_POST['qry']))
-			echo pg_last_error($conn);
+		if(!$db->db_query($_POST['qry']))
+			echo $db->db_last_error();
 	}
 }
 
@@ -139,10 +136,10 @@ foreach ($schemas as $schema)
 	$obj[$schema['name']]=array();
 	$obj[$schema['name']]['error']=false;
 	
-	$qry = "SELECT nspname FROM pg_namespace WHERE nspname='".$schema['name']."'";
-	if($result = pg_query($conn, $qry))
+	$qry = "SELECT table_schema FROM information_schema.tables WHERE table_schema='".$schema['name']."'";
+	if($db->db_query($qry))
 	{
-		if(!pg_num_rows($result)>0)
+		if(!$db->db_num_rows()>0)
 		{
 			$obj[$schema['name']]['qry']='CREATE SCHEMA '.$schema['name'].';';
 			$obj[$schema['name']]['error']=true;
@@ -158,24 +155,29 @@ $tabs=array_keys($tabellen);
 $i=0;
 foreach ($tabellen AS $tabelle)
 {
+	if(!isset($tabelle['schemaid']) || $tabelle['schemaid']=='')
+	{
+		//Tabelle auslassen, wenn kein Schema angegeben ist
+		echo 'Tabelle '.$tabelle['name'].' ist keinem Schema zugeordnet!<br>';
+		continue;
+	}
 	$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]=array();
 	$sql_query2='';
 	$pk='';
 	// Tabelle pruefen
-	//var_dump($tabelle);
-	$sql_query="SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname='".$schemas[$tabelle['schemaid']]['name']."' AND tablename='".$tabelle['name']."';";
-	if (!$result=pg_query($conn,$sql_query))
-		echo '<BR><strong>'.$tabs[$i].': '.pg_last_error($conn).' </strong><BR>';
+	
+	$sql_query="SELECT table_name FROM information_schema.tables WHERE table_schema='".$schemas[$tabelle['schemaid']]['name']."' AND table_name='".$tabelle['name']."';";
+	if (!$db->db_query($sql_query))
+		echo '<BR><strong>'.$tabs[$i].': '.$db->db_last_error().' </strong><BR>';
 	else
 	{
-		if (pg_num_rows($result)==0)
+		if ($db->db_num_rows()==0)
 		{
 			$sql_query= 'CREATE TABLE '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name']." (";
 			foreach ($tabelle['attribute'] AS $attribut)
 			{
 				if ($datatypes[$attribut['datatypeid']]['name']!='geometry')
 				{
-					//echo $datatypes[$attribut['datatypeid']]['name'];
 					$sql_query.= $attribut['name'].' ';
 					if ($attribut['pk'])
 						$pk.=$attribut['name'].',';
@@ -201,12 +203,7 @@ foreach ($tabellen AS $tabelle)
 			if ($pk!="")
 				$sql_query.=', CONSTRAINT "pk_'.$schemas[$tabelle['schemaid']]['name'].'_'.$tabelle['name'].'" PRIMARY KEY ('.substr($pk,0,-1).')';
 			$sql_query.=');';
-			//echo $sql_query.'<BR>'.$sql_query2;
-			//if (!$res_attr=pg_query($conn,$sql_query.$sql_query2))
-			//	echo '<BR><strong>'.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].': '.pg_last_error($conn).' </strong><BR>'.$sql_query.'<BR>'.$sql_query_nn.'<BR>';
-			//else
-			//	echo 'Tabelle '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].' wurde erfolgreich angelegt!<BR>';
-			
+					
 			$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['qry']=$sql_query;
 			$obj[$schemas[$tabelle['schemaid']]['name']]['error']=true;
 		}
@@ -217,25 +214,15 @@ foreach ($tabellen AS $tabelle)
 			{
 				$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['attribute'][$attribut['name']]=array();
 				
-				//var_dump($attribut);
-				$sql_query="SELECT nspname AS schemaname, relname AS tablename, pg_get_userbyid(relowner) AS tableowner, attname AS attribute
-						FROM pg_catalog.pg_attribute JOIN pg_catalog.pg_class ON (attrelid=relfilenode) JOIN pg_namespace ON (oid=relnamespace)
-						WHERE relkind='r' AND nspname='".$schemas[$tabelle['schemaid']]['name']."' AND relname='".$tabelle['name']."'
-							AND attname='".$attribut['name']."'; ";
-				if (!$res_attr=pg_query($conn,$sql_query))
+				$qry_query="SELECT column_name FROM information_schema.columns 
+							WHERE table_schema=".$schemas[$tabelle['schemaid']]['name']."' 
+							AND table_name='".$tabelle['name']."' AND column_name='".$attribut['name']."'; ";
+				if ($db->db_query($sql_query))
 				{
-					//echo '<BR><strong>'.$attribut['name'].': '.pg_last_error($conn).' </strong><BR>';
-				}
-				else
-				{
-					if (pg_num_rows($res_attr)==1)
-					{
-						//echo $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'.'.$attribut['name'].': OK - ';
-					}
-					else if (pg_num_rows($res_attr)==0)
+					if ($db->db_num_rows()==0)
 					{
 						$sql_query_nn='';
-						//echo $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'.'.$attribut['name'].' ist nicht angelegt!<BR>';
+						
 						$sql_query='ALTER TABLE '.$schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'
 							ADD COLUMN '.$attribut['name'].' ';
 						$sql_query.=$datatypes[$attribut['datatypeid']]['name'];
@@ -259,11 +246,7 @@ foreach ($tabellen AS $tabelle)
 								ALTER COLUMN '.$attribut['name'].' SET NOT NULL;';
 						}
 						$sql_query.=';';
-						//echo $sql_query;
-						//if (!$res_attr=pg_query($conn,$sql_query.$sql_query_nn))
-						//	echo '<BR><strong>'.$attribut['name'].': '.pg_last_error($conn).' </strong><BR>'.$sql_query.'<BR>'.$sql_query_nn.'<BR>';
-						//else
-						//	echo $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'].'.'.$attribut['name'].' wurde erfolgreich hinzugefuegt!<BR>';
+						
 						$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['attribute'][$attribut['name']]['qry']=$sql_query;
 						$obj[$schemas[$tabelle['schemaid']]['name']]['error']=true;
 						$obj[$schemas[$tabelle['schemaid']]['name']]['tables'][$tabelle['name']]['error']=true;
@@ -279,8 +262,7 @@ foreach ($tabellen AS $tabelle)
 	$i++;
 }
 
-//echo '<H2>Pruefe Constraints!</H2>';
-
+// Constraints pruefen
 function getTablenameFromAttributIDs($attr)
 {
 	global $tabellen;
@@ -291,7 +273,12 @@ function getTablenameFromAttributIDs($attr)
 	foreach ($tabellen AS $tabelle)
 		foreach ($tabelle['attribute'] AS $attribut)
 			if ($attribut['id']==$attributid)
-				return $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'];
+			{
+				if(isset($tabelle['schemaid']))
+					return $schemas[$tabelle['schemaid']]['name'].'.'.$tabelle['name'];
+				else
+					return 'public.'.$tabelle['name'];
+			}
 	return false;
 }
 function getAttributesnameFromAttributIDs($attr)
@@ -307,34 +294,35 @@ function getAttributesnameFromAttributIDs($attr)
 	return substr($attributes,0,-2);
 }
 
-//Alter table campus.tbl_paabgabe add Constraint projektarbeit_paabgabe foreign key (projektarbeit_id) references lehre.tbl_projektarbeit (projektarbeit_id) on update cascade on delete restrict;
-
 foreach ($relations AS $relation)
 {
 	$sql_query='';
 	$pk='';
 	// Auf Foreign Key pruefen
-	//var_dump($relation);
+	
 	if (count($relation['foreignkeys'])>0)
 	{
+		$parentattr='';
+		$childattr='';
 		foreach ($relation['foreignkeys'] AS $foreignkey)
 		{		
 			$sql_query='';
 			$parenttable=getTablenameFromAttributIDs($foreignkey['attrparent']);
 			$childtable=getTablenameFromAttributIDs($foreignkey['attrchild']);
-			$parentattr=getAttributesnameFromAttributIDs($foreignkey['attrparent']);
-			$childattr=getAttributesnameFromAttributIDs($foreignkey['attrchild']);
-			//$constrname=str_replace('.','_',);
+			$parentattr.=getAttributesnameFromAttributIDs($foreignkey['attrparent']).', ';
+			$childattr.=getAttributesnameFromAttributIDs($foreignkey['attrchild']).', ';
+		}
+		
+		$parentattr = substr($parentattr, 0, -2);
+		$childattr = substr($childattr, 0, -2);
 			
 			list($schema, $tablename) = explode(".", $childtable);
 			
-			$qry = "SELECT * FROM pg_constraint WHERE contype='f' AND conrelid=(
-						SELECT oid FROM pg_class WHERE relname='".$tablename."' AND relnamespace=(
-							SELECT oid FROM pg_namespace WHERE nspname='".$schema."'))
-						AND conname='".$relation['name']."'";
-			if($result = pg_query($conn, $qry))
+			$qry = "SELECT 1 FROM information_schema.key_column_usage 
+					WHERE table_schema='".$schema."' AND table_name='".$tablename."' AND constraint_name='".$relation['name']."'";
+			if($db->db_query($qry))
 			{
-				if(pg_num_rows($result)==0)
+				if($db->db_num_rows()==0)
 				{
 					$sql_query='ALTER TABLE '.$childtable.' ADD CONSTRAINT '.$relation['name'].' FOREIGN KEY ('.$childattr.') REFERENCES '.$parenttable.' ('.$parentattr.') ';
 					$sql_query.='ON UPDATE CASCADE ON DELETE RESTRICT;';
@@ -349,47 +337,133 @@ foreach ($relations AS $relation)
 					$obj[$schema]['error']=true;
 					$obj[$schema]['tables'][$tablename]['error']=true;
 				}
-			}
-			
-			//if (refintegritychildupdate)
-			//	$sql_query.='
-			//echo $sql_query.'<BR>';
-		}
+			}		
 	}
 
 	flush();
 	$i++;
 }
-/*
-echo '<H2>Gegenpruefung!</H2>';
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'papaya';";
-if (!$result=@pg_query($conn,$sql_query))
-		echo '<BR><strong>'.pg_last_error($conn).' </strong><BR>';
-	else
-		while ($row=pg_fetch_object($result))
+
+
+// Gegenpruefung
+
+//Prueft ob ein Schema in database.inc.php vorhanden ist
+function schemaExists($schema)
+{
+	global $schemas;
+	
+	foreach ($schemas AS $schemata)
+	{
+		if($schemata['name']==$schema)
+			return true;
+	}
+	return false;
+}
+
+//Prueft ob eine Tabelle in database.inc.php vorhanden ist
+function tableExists($schema, $table)
+{
+	global $schemas;
+	global $tabellen;
+	
+	foreach ($schemas AS $schemata)
+	{
+		if($schemata['name']==$schema)
+			$schemaid=$schemata['id'];
+	}
+	
+	foreach ($tabellen as $tabelle)
+	{
+		if($tabelle['name']==$table && $tabelle['schemaid']==$schemaid)
+			return true;
+	}
+	
+	return false;	
+}
+//Prueft ob eine Tabelle in database.inc.php vorhanden ist
+function attributExists($schema, $table, $attribut)
+{
+	global $schemas;
+	global $tabellen;
+	
+	foreach ($schemas AS $schemata)
+	{
+		if($schemata['name']==$schema)
+			$schemaid=$schemata['id'];
+	}
+	
+	foreach ($tabellen as $tabelle)
+	{
+		if($tabelle['name']==$table && $tabelle['schemaid']==$schemaid)
 		{
-			$fulltablename=$row->schemaname.'.'.$row->tablename;
-			if (!isset($tabellen[$fulltablename]))
-				echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
-			else
-				if (!$result_fields=@pg_query($conn,"SELECT * FROM $fulltablename LIMIT 1;"))
-					echo '<BR><strong>'.pg_last_error($conn).' </strong><BR>';
-				else
-					for ($i=0; $i<pg_num_fields($result_fields); $i++)
-					{
-						$found=false;
-						$fieldnameDB=pg_field_name($result_fields,$i);
-						foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
-							if ($fieldnameDB==$fieldnameARRAY)
-							{
-								$found=true;
-								break;
-							}
-						if (!$found)
-							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
-					}
+			foreach($tabelle['attribute'] as $attr)
+			{
+				if($attr['name']==$attribut)
+					return true;
+			}
+			return false;
 		}
-*/
+	}
+	
+	return false;	
+}
+// Schema
+
+$additionalElements='';
+
+$sql_query="SELECT table_schema FROM information_schema.tables 
+			WHERE 	table_schema != 'pg_catalog' 
+				AND table_schema != 'information_schema' 
+				AND table_schema != 'sync' 
+				AND table_schema != 'papaya' 
+			GROUP BY table_schema";
+if ($result=$db->db_query($sql_query))
+{
+	while ($row_schema=$db->db_fetch_object($result))
+	{
+		if (!schemaExists($row_schema->table_schema))
+		{
+			$additionalElements.='Schema '.$row_schema->table_schema."\n";
+		}
+		else
+		{
+			//Tabellen
+			$qry = "SELECT table_name FROM information_schema.tables WHERE table_schema='".$row_schema->table_schema."'";
+			if ($result_table=$db->db_query($qry))
+			{
+				while($row_table = $db->db_fetch_object($result_table))
+				{
+					if(!tableExists($row_schema->table_schema, $row_table->table_name))
+					{
+						$additionalElements.='Tabelle '.$row_schema->table_schema.'.'.$row_table->table_name."\n";
+					}
+					else 
+					{
+						//Attribute
+						$qry = "SELECT column_name FROM information_schema.columns 
+								WHERE table_schema='".$row_schema->table_schema."'
+									AND table_name='".$row_table->table_name."'";
+						
+						if($result_attrib = $db->db_query($qry))
+						{
+							while($row_attrib = $db->db_fetch_object($result_attrib))
+							{
+								if(!attributExists($row_schema->table_schema, $row_table->table_name, $row_attrib->column_name))
+								{
+									$additionalElements.='Attribut '.$row_schema->table_schema.'.'.$row_table->table_name.'.'.$row_attrib->column_name."\n";
+								}
+								else 
+								{
+									//KEYs Pruefen
+								}
+							}
+						}
+					}
+				}				
+			}
+		}
+	}
+}
 $out_schema="\n";
 $out_schema_data="\n";
 $out_tbl="\n";
@@ -427,6 +501,7 @@ $out_schema.= '<div class="boxhead">Schema</div>';
 $out_schema.= '<table>';
 
 $gesamtqry = '';
+$gesamtqry_att='';
 
 foreach ($obj as $schema=>$value)
 {
@@ -507,7 +582,7 @@ foreach ($obj as $schema=>$value)
 					$out_att.= '<tr>';
 					if(isset($attvalue['qry']) && $attvalue['qry']!='')
 					{
-						$gesamtqry .= $attvalue['qry']."\n";
+						$gesamtqry_att .= $attvalue['qry']."\n";
 						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;"><img src="../skin/images/exclamation.png" /></a></td>';
 						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.$attrib.'</a></td>';
 						
@@ -517,10 +592,10 @@ foreach ($obj as $schema=>$value)
 					{
 						$out_att.= '<td></td>';
 						$out_att.= '<td><a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.$attrib.'</a></td>';
-						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.$attvalue['datatype'].($attvalue['attribute']['length']!=''?' ('.$attvalue['attribute']['length'].')':'').'</a></td>';
+						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.(isset($attvalue['datatype'])?$attvalue['datatype']:'').($attvalue['attribute']['length']!=''?' ('.$attvalue['attribute']['length'].')':'').'</a></td>';
 						$out_att.= '<td>&nbsp;<a href="#" onclick="display(\'attrib.'.$schema.$tables.$attrib.'\'); return false;">'.
-									($attvalue['attribute']['unique']=='1'?'U':'').
-									($attvalue['attribute']['notnull']=='1'?'NN':'').
+									(isset($attvalue['attribute'])?($attvalue['attribute']['unique']=='1'?'U':''):'').
+									(isset($attvalue['attribute'])?($attvalue['attribute']['notnull']=='1'?'NN':''):'').
 									'</a></td>';
 						
 					}
@@ -538,10 +613,11 @@ foreach ($obj as $schema=>$value)
 $out_schema.= '</table>';
 $out_schema.= '</div>';
 
-echo '<a href="#" onclick="display(\'schema.gesamtqry\'); return false;"><img src="../skin/images/system-software-update.png" title="Gesamtsystem aktualisieren" alt="Gesamtsystem aktualisieren"><br /></a>';
-
+echo '<a href="#" onclick="display(\'schema.gesamtqry\'); return false;"><img src="../skin/images/system-software-update.png" title="Gesamtsystem aktualisieren" alt="Gesamtsystem aktualisieren"></a>&nbsp;&nbsp;';
+echo '<a href="#" onclick="display(\'schema.additionalelements\'); return false;"><img src="../skin/images/user-trash-full.png" title="Element die in der DB sind, aber nicht in diesem Script" alt="Element die in der DB sind, aber nicht in diesem Script"><br /></a>';
 echo $out_schema;
-echo querybox('Gesamtsystem aktualisieren',$gesamtqry, 'schema.gesamtqry');
+echo querybox('Gesamtsystem aktualisieren',$gesamtqry.$gesamtqry_att, 'schema.gesamtqry');
+echo querybox('Element die in der DB sind, aber nicht in diesem Script',$additionalElements, 'schema.additionalelements');
 echo $out_schema_data;
 echo $out_tbl;
 echo $out_tbl_data;
