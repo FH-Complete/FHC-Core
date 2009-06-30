@@ -84,7 +84,7 @@ class adresse extends basis_db
 			return false;
 		}
 
-		if($row = $this->db_fetch_object($res))
+		if($row = $this->db_fetch_object())
 		{
 			$this->adresse_id		= $row->adresse_id;
 			$this->heimatadresse 	= ($row->heimatadresse=='t'?true:false);

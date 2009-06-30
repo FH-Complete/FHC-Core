@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../../config.inc.php');
+require_once('../../../config/vilesci.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/person.class.php');
@@ -29,15 +29,13 @@ require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/adresse.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/nation.class.php');
 require_once('../../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Connection');
-
+$db = new basis_db();
 $user=get_uid();
 $datum_obj = new datum();
 
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 // Clean stuff from a string
@@ -64,6 +62,83 @@ loadVariables($user);
     return ereg_replace("[^a-zA-Z0-9]", "", $string);
     //[:space:]
  }
+
+function getGemeindeDropDown($postleitzahl)
+{
+	global $_REQUEST, $gemeinde;
+	$db = new basis_db();
+	
+	$found=false;
+	$firstentry='';
+	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
+	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
+	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
+	if($db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object())
+		{
+			if($firstentry=='')
+				$firstentry=$row->name;
+			if($gemeinde_x=='')
+				$gemeinde_x=$row->name;
+			
+			if($row->name==$gemeinde_x)
+			{
+				$selected='selected';
+				$found=true;
+			}
+			else
+				$selected='';
+			echo "<option value='$row->name' $selected>$row->name</option>";
+		}
+	}
+	
+	echo '</SELECT>';
+	if(!$found && (isset($importort) && $importort!=''))
+	{
+		echo $importort;
+	}
+	$gemeinde = $gemeinde_x;
+}
+
+if(isset($_GET['type']) && $_GET['type']=='getgemeindecontent' && isset($_GET['plz']))
+{
+	header('Content-Type: text/html; charset=UTF-8');
+
+	echo getGemeindeDropDown($_GET['plz']);
+	exit;
+}
+
+function getOrtDropDown($postleitzahl, $gemeindename)
+{
+	global $_REQUEST;
+	$db = new basis_db();
+	
+	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
+			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
+	echo '<SELECT id="ort" name="ort">';
+	if($db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object())
+		{
+			if($row->ortschaftsname==$ort)
+				$selected='selected';
+			else 
+				$selected='';
+			echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+		}
+	}
+	
+	echo '</SELECT>';
+}
+if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
+{
+	header('Content-Type: text/html; charset=UTF-8');
+	
+	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
+	exit;
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -120,6 +195,115 @@ function GeburtsdatumEintragen()
 	}
 }
 
+// **************************************
+// * XMLHttpRequest Objekt erzeugen
+// **************************************
+var anfrage = null;
+
+function erzeugeAnfrage()
+{
+	try
+	{
+		anfrage = new XMLHttpRequest();
+	}
+	catch (versuchmicrosoft)
+	{
+		try
+		{
+			anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+		}
+		catch (anderesmicrosoft)
+		{
+			try
+			{
+				anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			catch (fehlschlag)
+			{
+				anfrage = null;
+            }
+        }
+    }
+	if (anfrage == null)
+		alert("Fehler beim Erstellen des Anfrageobjekts!");
+}
+
+//Gemeinde DropDown holen wenn Nation Oesterreich
+function loadGemeindeData()
+{
+	if(document.getElementById('adresse_nation').value=='A')
+	{
+		anfrage=null;
+		//Request erzeugen und die Note speichern
+		erzeugeAnfrage(); 
+	    var jetzt = new Date();
+		var ts = jetzt.getTime();
+		var plz = document.getElementById('plz').value;
+	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getgemeindecontent"?>';
+	    url += '&plz='+plz+"&"+ts;
+	    anfrage.open("GET", url, true);
+	    anfrage.onreadystatechange = setGemeindeData;
+	    anfrage.send(null);
+	    document.getElementById('adresse-gemeinde-textfeld').type='hidden';
+		document.getElementById('adresse-ort-textfeld').type='hidden';
+	}
+	else
+	{
+		document.getElementById('adresse-gemeinde-textfeld').type='text';
+		document.getElementById('adresse-ort-textfeld').type='text';
+		document.getElementById('gemeindediv').innerHTML='';
+		document.getElementById('ortdiv').innerHTML='';
+	}
+}
+
+function setGemeindeData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var gemeindediv = document.getElementById('gemeindediv');
+			gemeindediv.innerHTML = resp;
+			loadOrtData();
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}
+
+function loadOrtData()
+{
+	if(document.getElementById('gemeinde'))
+	{
+		anfrage=null;
+		//Request erzeugen und die Note speichern
+		erzeugeAnfrage(); 
+	    var jetzt = new Date();
+		var ts = jetzt.getTime();
+		var plz = document.getElementById('plz').value;
+		var gemeinde = document.getElementById('gemeinde').value;
+	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getortcontent"?>';
+	    url += '&plz='+plz+"&gemeinde="+encodeURIComponent(gemeinde)+"&"+ts;
+	    anfrage.open("GET", url, true);
+	    anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	    anfrage.onreadystatechange = setOrtData;
+	    anfrage.send(null);
+	}
+}
+
+function setOrtData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var ortdiv = document.getElementById('ortdiv');
+			ortdiv.innerHTML = resp;
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}	
 </script>
 </head>
 <body>
@@ -129,11 +313,12 @@ function GeburtsdatumEintragen()
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+//if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
+//	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $where = '';
 $error = false;
+$importort='';
 //Parameter
 $titel = (isset($_POST['titel'])?$_POST['titel']:'');
 $titelpost = (isset($_POST['titelpost'])?$_POST['titelpost']:'');
@@ -142,8 +327,27 @@ $vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
 $geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
 $geburtsdatum = (isset($_POST['geburtsdatum'])?$_POST['geburtsdatum']:'');
 $adresse = (isset($_POST['adresse'])?$_POST['adresse']:'');
-$plz = (isset($_POST['plz'])?$_POST['plz']:'');
-$ort = (isset($_POST['ort'])?$_POST['ort']:'');
+$adresse_nation = (isset($_REQUEST['adresse_nation'])?$_REQUEST['adresse_nation']:'A');
+$plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
+if($adresse_nation=='A')
+{
+	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+	$gemeinde = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
+}
+else 
+{
+	$ort = (isset($_REQUEST['ort_txt'])?$_REQUEST['ort_txt']:'');
+	$gemeinde = (isset($_REQUEST['gemeinde_txt'])?$_REQUEST['gemeinde_txt']:'');
+}
+//wenn die Gemeinde leer ist und im Ort etwas steht
+//dann umdrehen (Das passiert wenn die Daten aus dem Mail von der www importiert werden)
+if($gemeinde=='' && $ort!='')
+{
+	$importort=$ort;
+	$gemeinde=$ort;
+	$ort='';
+}
+
 $email = (isset($_POST['email'])?$_POST['email']:'');
 $telefon = (isset($_POST['telefon'])?$_POST['telefon']:'');
 $mobil = (isset($_POST['mobil'])?$_POST['mobil']:'');
@@ -167,8 +371,8 @@ if(isset($_POST['save']))
 	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort |
 	//		Email: $email | Telefon: $telefon | Mobil: $mobil | Letzteausbildung: $letzteausbildung | ausbildungsart: $ausbildungsart |
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
-	$person = new person($conn);
-	pg_query($conn, 'BEGIN');
+	$person = new person();
+	$db->db_query('BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Ansosnsten wird es an die Person mit $person_id angehaengt
 	if($person_id!='0')
@@ -220,11 +424,11 @@ if(isset($_POST['save']))
 	//UID generieren
 	if(!$error)
 	{		
-		$nachname_clean = strtolower(clean_string($nachname));
-		$vorname_clean = strtolower(clean_string($vorname));
+		$nachname_clean = mb_strtolower(clean_string($nachname));
+		$vorname_clean = mb_strtolower(clean_string($vorname));
 		$uid='';
 		
-		$uid = generateMitarbeiterUID($conn, $vorname_clean, $nachname_clean, $lektor);
+		$uid = generateMitarbeiterUID($vorname_clean, $nachname_clean, $lektor);
 			
 		$bn = new benutzer();
 		
@@ -239,13 +443,13 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		$kurzbz='';
- 		$mitarbeiter = new mitarbeiter($conn);
+ 		$mitarbeiter = new mitarbeiter();
  		$nachname_clean = clean_string($nachname);
  		$vorname_clean = clean_string($vorname);
  		for($nn=6,$vn=2;$nn!=0;$nn--,$vn++)
  		{
- 			$kurzbz = substr($nachname_clean,0,$nn);
- 			$kurzbz .= substr($vorname_clean,0,$vn);
+ 			$kurzbz = mb_substr($nachname_clean,0,$nn);
+ 			$kurzbz .= mb_substr($vorname_clean,0,$vn);
 
  			if(!$mitarbeiter->kurzbz_exists($kurzbz))
  				if($mitarbeiter->errormsg=='')
@@ -262,8 +466,8 @@ if(isset($_POST['save']))
 	//Alias generieren
 	if(!$error)
 	{
-		$nachname_clean = strtolower(clean_string($nachname));
-		$vorname_clean = strtolower(clean_string($vorname));
+		$nachname_clean = mb_strtolower(clean_string($nachname));
+		$vorname_clean = mb_strtolower(clean_string($vorname));
 		$bn = new benutzer();
 		
 		if(!$bn->alias_exists($vorname_clean.'.'.$nachname_clean))
@@ -299,7 +503,7 @@ if(isset($_POST['save']))
 	//Mitarbeiter anlegen
 	if(!$error)
 	{
-		$mitarbeiter = new mitarbeiter($conn);
+		$mitarbeiter = new mitarbeiter();
 		
 		$mitarbeiter->uid = $uid;
 		$mitarbeiter->personalnummer = $personalnummer;
@@ -331,13 +535,14 @@ if(isset($_POST['save']))
 		if($person_id=='0')
 			$ueberschreiben='Nein';
 
-		$adr = new adresse($conn);
+		$adr = new adresse();
 		//Adresse neu anlegen
 		if($ueberschreiben=='Nein')
 		{
 			$adr->new = true;
 			$adr->insertamum = date('Y-m-d H:i:s');
 			$adr->insertvon = $user;
+			$adr->nation = $adresse_nation;
 		}
 		else
 		{
@@ -375,6 +580,7 @@ if(isset($_POST['save']))
 			$adr->plz = $plz;
 			$adr->ort = $ort;
 			$adr->typ = 'h';
+			$adr->gemeinde = $gemeinde;
 			$adr->heimatadresse = true;
 			$adr->zustelladresse = true;
 			if(!$adr->save())
@@ -391,7 +597,7 @@ if(isset($_POST['save']))
 		//EMail Adresse speichern
 		if($email!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'email';
 			$kontakt->kontakt = $email;
@@ -409,7 +615,7 @@ if(isset($_POST['save']))
 		//Telefonnummer speichern
 		if($telefon!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'telefon';
 			$kontakt->kontakt = $telefon;
@@ -427,7 +633,7 @@ if(isset($_POST['save']))
 		//Mobiltelefonnummer speichern
 		if($mobil!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'mobil';
 			$kontakt->kontakt = $mobil;
@@ -446,12 +652,12 @@ if(isset($_POST['save']))
 
 	if(!$error)
 	{
-		pg_query($conn, 'COMMIT');
+		$db->db_query('COMMIT');
 		die("<b>Mitarbeiter $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='mitarbeiterimport.php'>Neue Person Anlegen</a><br>");
 	}
 	else
 	{
-		pg_query($conn, 'ROLLBACK');
+		$db->db_query('ROLLBACK');
 		echo '<font class="error">'.$errormsg.'</font>';
 	}
 }
@@ -459,7 +665,7 @@ if(isset($_POST['save']))
 if($geburtsdatum!='')
 {
 	//Wenn das Datum im Format d.m.Y ist dann in Y-m-d umwandeln
-	if(strpos($geburtsdatum,'.'))
+	if(mb_strpos($geburtsdatum,'.'))
 	{
 		if($datum_obj->mktime_datum($geburtsdatum))
 		{
@@ -472,7 +678,7 @@ if($geburtsdatum!='')
 	}
 	else 
 	{
-		if(!ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
+		if(!mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 			$geburtsdatum_error=true;
 	}
 	
@@ -502,22 +708,61 @@ echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10"
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
 echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
-echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256" name="adresse" value="'.$adresse.'" /></td></tr>';
-echo '<tr><td>Postleitzahl</td><td><input type="text" maxlength="16" id="plz" name="plz" value="'.$plz.'" /></td></tr>';
-echo '<tr><td>Ort</td><td><input type="text" id="ort" maxlength="256" name="ort" value="'.$ort.'" /></td></tr>';
+echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
+$nation =  new nation();
+$nation->getAll();
+foreach ($nation->nation as $row)
+{
+	if($row->code==$adresse_nation)
+		$selected='selected';
+	else 
+		$selected='';
+	echo "<option value='$row->code' $selected>$row->langtext</option>";
+}
+echo '</SELECT></td></tr>';
+echo '<tr><td>Postleitzahl</td><td><input type="text" size="5" maxlength="16" id="plz" name="plz" value="'.$plz.'" onblur="loadGemeindeData()" /></td></tr>';
+echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256"  size="40" name="adresse" value="'.$adresse.'" /></td></tr>';
+echo '<tr><td>Gemeinde</td><td><div id="gemeindediv">';
+//wenn die Nation Oesterreich ist, dann wird ein DropDown fuer Gemeinde und Ort angezeigt.
+//wenn die Nation nicht Oesterreich ist, werden nur textfelder angezeigt
+if($adresse_nation=='A' && $plz!='')
+{
+	echo getGemeindeDropDown($plz);
+}
+else 
+{
+	echo '<font color="gray">Bitte zuerst eine Postleitzahl eintragen</font>';
+}	
+
+//wenn der Ort per EMail-Import von der www kommt und der Ort in der Gemeindetabelle
+//nicht gefunden wird, dann wird der Ort in Klammer neben dem DropDown angezeigt
+if($importort!='' && $gemeinde!=$importort)
+	echo ' ( '.$importort.' )';
+
+echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-gemeinde-textfeld" maxlength="256" name="gemeinde_txt" value="'.$gemeinde.'" />';
+
+echo '</td></tr>';
+echo '<tr><td>Ort</td><td><div id="ortdiv">';
+if($adresse_nation=='A' && $plz!='')
+{
+	echo getOrtDropDown($plz, $gemeinde);
+}
+echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-ort-textfeld" maxlength="256" name="ort_txt" value="'.$ort.'"/></td></tr>';
+
 echo '</table>';
-echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" checked>Bestehende Adresse überschreiben</div>';
-echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein">Adresse neu anlegen</div>';
-echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="">Adresse nicht anlegen</div>';
+echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse überschreiben</div>';
+echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufügen</div>';
+echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="" onclick="disablefields2(true)">Adresse nicht anlegen</div>';
 echo '</fieldset></td></tr>';
 echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" name="email" value="'.$email.'" /></td></tr>';
 echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" name="telefon" value="'.$telefon.'" /></td></tr>';
 echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="mobil" value="'.$mobil.'" /></td></tr>';
 echo '<tr><td>Letzte Ausbildung</td><td><SELECT id="letzteausbildung" name="letzteausbildung">';
+echo '<OPTION value="">-- keine Auswahl --</OPTION>';
 $qry = "SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungcode";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '<OPTION value="'.$row->ausbildungcode.'" '.($letzteausbildung==$row->ausbildungcode?'selected':'').'>'.$row->ausbildungbez.'</OPTION>';
 	}
@@ -566,10 +811,10 @@ if($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
 			$qry_stati = "SELECT 'Mitarbeiter' as rolle FROM campus.vw_mitarbeiter WHERE person_id='$row->person_id'
@@ -577,18 +822,18 @@ if($where!='')
 							SELECT (get_rolle_prestudent(prestudent_id, null) || ' ' || UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz)) as rolle FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE person_id='$row->person_id'
 							UNION
 							SELECT 'PreInteressent' as rolle FROM public.tbl_preinteressent WHERE person_id='$row->person_id'";
-			if($result_stati = pg_query($conn, $qry_stati))
+			if($result_stati = $db->db_query($qry_stati))
 			{
-				while($row_stati=pg_fetch_object($result_stati))
+				while($row_stati = $db->db_fetch_object($result_stati))
 				{
 					$status.=$row_stati->rolle.', ';
 				}
 			}
-			$status = substr($status, 0, strlen($status)-2);
+			$status = mb_substr($status, 0, mb_strlen($status)-2);
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
-			if($result_adr = pg_query($conn, $qry_adr))
-				while($row_adr=pg_fetch_object($result_adr))
+			if($result_adr = $db->db_query($qry_adr))
+				while($row_adr=$db->db_fetch_object($result_adr))
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo '</td>';
 			echo "<td>$status</td>";

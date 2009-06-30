@@ -34,28 +34,28 @@
 // ****
 function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 {
-	$art = substr($matrikelnummer, 2, 1);
-	$nr = substr($matrikelnummer, strlen(trim($matrikelnummer))-3);
+	$art = mb_substr($matrikelnummer, 2, 1);
+	$nr = mb_substr($matrikelnummer, mb_strlen(trim($matrikelnummer))-3);
 	if($art=='2') //Sommersemester
 		$nr = $nr+500;
 	elseif($art=='0' && $stgtyp=='m') //Incoming im Masterstudiengang
 		$nr = $nr+500;
 
 
-	return strtolower($stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr);
+	return mb_strtolower($stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr);
 }
 
 // ****
 // * Gerneriert die Mitarbeiter UID
 // ****
-function generateMitarbeiterUID($conn, $vorname, $nachname, $lektor)
+function generateMitarbeiterUID($vorname, $nachname, $lektor)
 {
-	$bn = new benutzer($conn);
+	$bn = new benutzer();
 
 	for($nn=8,$vn=0;$nn!=0;$nn--,$vn++)
 	{
-		$uid = substr($nachname,0,$nn);
-		$uid .= substr($vorname,0,$vn);
+		$uid = mb_substr($nachname,0,$nn);
+		$uid .= mb_substr($vorname,0,$vn);
 
 		if(!$bn->uid_exists($uid))
 			if($bn->errormsg=='')

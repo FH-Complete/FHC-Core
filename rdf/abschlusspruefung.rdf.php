@@ -99,7 +99,7 @@ if($db->db_query($qry))
 		if($db->db_query($qry))
 			if($row_rek = $db->db_fetch_object())
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
-		$qry = "SELECT titel as themenbereich, ende, projektarbeit_id, note FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn LIMIT 2";
+		$qry = "SELECT titel as themenbereich, ende, projektarbeit_id, note FROM lehre.tbl_projektarbeit a WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') ORDER BY beginn DESC LIMIT 2";
 		$themenbereich='';
 		$datum_projekt='';
 		$betreuer = '';
