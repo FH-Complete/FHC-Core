@@ -19,13 +19,8 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-    require_once('../config.inc.php');
+    require_once('../../config/cis.config.inc.php');
     require_once('../../include/news.class.php');
-
-    //Connection Herstellen
-    if(!$conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim öffnen der Datenbankverbindung");
-
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -49,8 +44,7 @@
 	  	<div id="news">
 		  <?php
 
-		  	$news = new news($conn);
-
+		  	$news = new news();
 		  	$news->getnews(MAXNEWSALTER,0,null, false, null, MAXNEWS);
 		  	$zaehler=0;
 		  	$open=true;
@@ -79,8 +73,6 @@
 					';
 				echo "</div><br />";
 			}
-
-
 			if($zaehler==0)
 				echo 'Zur Zeit gibt es keine aktuellen News!';
 		  ?>
