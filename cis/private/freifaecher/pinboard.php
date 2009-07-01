@@ -21,18 +21,18 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *
  */
-	require_once('../../config.inc.php');
+ 
+	// ---------------- CIS Include Dateien einbinden
+	require_once('../../../config/cis.config.inc.php');
+	
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/news.class.php');
 
    //Connection Herstellen
-  if(!$sql_conn = pg_pconnect(CONN_STRING))
-      die("Fehler beim oeffnen der Datenbankverbindung");
 
-
-	function print_news($sql_conn)
+	function print_news()
 	{
-		$news_obj = new news($sql_conn);
+		$news_obj = new news();
 		$news_obj->getnews(MAXNEWSALTER,'0','0', false, null, MAXNEWS);
 		$open=true;
 		$zaehler=0;
@@ -101,7 +101,7 @@
 	  	<td>&nbsp;</td>
 	  </tr>
 	  <tr>
-	  	<td valign="top"><?php print_news($sql_conn); ?></td>
+	  	<td valign="top"><?php print_news(); ?></td>
 	  </tr>
     </table></td>
 	<td class="tdwidth30">&nbsp;</td>
