@@ -807,27 +807,32 @@ echo "
 					{
 #							$error=(isset($mdldata[1])?$mdldata[1]:"Kurs Info ");
 							$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
-#							$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
+							$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
 #							$userArr=(isset($mdldata[4])?$mdldata[4]:array());
 #							$userasObj=(isset($mdldata[5])?$mdldata[5]:array());
 #							$id=(isset($mdldata[6])?$mdldata[6]:'');
 #							$kursname=(isset($mdldata[7])?$mdldata[7]:'');
 #							$shortname=(isset($mdldata[8])?$mdldata[8]:'');
 #							$courseArr=(isset($mdldata[9])?$mdldata[9]:array());
-							$note='?';	
+							$title='';
 							reset($kursArr);		
 	    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++) 
 							{	
 								if (strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
 								{
-									$note=$kursArr[$iKurs][6];
+								   $note=$kursArr[$iKurs][6];
+							       foreach ($kursasObj[$iKurs] as $key => $value) 
+								   {
+	   								  
+										$title.=$key."=>".$value."\r\n";
+									}	
 								}	
 							}
 		    				if ($note == 5)
 		    					$leneg = " style='color:red; font-weight:bold'";
 		    				else
 		    					$leneg = " style='font-weight:bold'";
-		    				$note_les_str .= "<span".$leneg.">".$note."</span> <span style='font-size:10px'>(".$moodle_course->mdl_shortname.")</span> ";
+		    				$note_les_str .= "<span  title='".$title."' ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$moodle_course->mdl_shortname.")</span> ";
 					}		
 					else
 					{
