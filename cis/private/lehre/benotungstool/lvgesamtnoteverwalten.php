@@ -555,9 +555,9 @@ else
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
-echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
-echo '</font></td><td  class="ContentHeader" align="right">'."\n";
+		echo '<td class="tdwidth10">&nbsp;</td>';
+		echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool</font></td>';
+		echo '<td  class="ContentHeader" align="right">';
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -567,8 +567,7 @@ if($stsem=='')
 $stsem_obj->getAll();
 
 //Studiensemester DropDown
-$stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
-
+$stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
 	$selected = ($stsem == $studiensemester->studiensemester_kurzbz?'selected':'');
@@ -594,12 +593,12 @@ if(!$rechte->isBerechtigt('admin',0) &&
 		die('Fehler beim Pruefen der Rechte');
 	}
 }
-
 echo $stsem_content;
 echo '</td><tr></table>';
+
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo "<td>\n";
+echo "<td>";
 echo "<b>$lv_obj->bezeichnung</b>";
 /*
 if($lehreinheit_id=='')
@@ -683,8 +682,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		
 		//		}
 		//	}
-		
 		$studlist .= "</table>";
+		
 		//mail an assistentin und den user selber verschicken	
 		if ($neuenoten > 0)
 		{
@@ -712,15 +711,17 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	}
 }
 
-echo '<table width="100%"><tr><td>';
+echo '<table width="100%" height="10px"><tr><td>';
 echo "<h3><a href='javascript:window.history.back()'>Zurück</a></h3>";
 echo '</td><td align="right">';
 echo '<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch (PDF)</a>';
 echo '</td></tr></table>';
 
 
-echo "<h3>LV Gesamtnote verwalten</h3>";
-echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
+echo '<table width="100%" height="10px"><tr><td>';
+	echo "<h3>LV Gesamtnote verwalten</h3>";
+	echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
+echo '</td></tr></table>';
 
 // alle pruefungen für die LV holen
 $studpruef_arr = array();
@@ -769,40 +770,18 @@ echo "
 			<tr>
 				<td colspan='11'>&nbsp;</td>
 			</tr>";
-/*
-		if($row_grp->gruppe_kurzbz!='')
-		{
-				echo "
-				<tr>
-					<td colspan='11' align='center'><b>$row_grp->gruppe_kurzbz</b></td>
-				</tr>";
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz='".addslashes($row_grp->gruppe_kurzbz)."' AND studiensemester_kurzbz = '".$stsem."' ORDER BY nachname, vorname";
-		}
-		else
-		{
-			echo "
-				<tr>
-					<td colspan='11' align='center'><b>Verband $row_grp->verband ".($row_grp->gruppe!=''?"Gruppe $row_grp->gruppe":'')."</b></td>
-				</tr>";
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
-				             WHERE studiengang_kz='$row_grp->studiengang_kz' AND
-				             semester='$row_grp->semester' ".
-							 ($row_grp->verband!=''?" AND trim(verband)=trim('$row_grp->verband')":'').
-							 ($row_grp->gruppe!=''?" AND trim(gruppe)=trim('$row_grp->gruppe')":'').
-				            " ORDER BY nachname, vorname";
-		}
-*/
+
 		// studentenquery					
 		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";	
-        if($result_stud = $db->db_query($qry_stud))
+      	$mdldata=null;
+	    if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
 			$errorshown=false;
 			while($row_stud = $db->db_fetch_object($result_stud))
 			{
 				
-				echo "
-				<tr class='liste".($i%2)."'>
+				echo "<tr class='liste".($i%2)."'>
 					<td><a href='mailto:$row_stud->uid@".DOMAIN."'><img src='../../../../skin/images/button_mail.gif'></a></td>";
 					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
 					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
@@ -818,7 +797,48 @@ echo "
 				if($grade_from_moodle)
 				{
 					//Noten aus Moodle
-					$moodle_course = new moodle_course();
+					if (!isset($moodle_course))
+						$moodle_course = new moodle_course();
+					if (is_null($mdldata))
+					{
+						$mdldata = $moodle_course->loadNoten($lvid, $stsem, '', true,false);
+					}
+					if ($mdldata)
+					{
+#							$error=(isset($mdldata[1])?$mdldata[1]:"Kurs Info ");
+							$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
+#							$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
+#							$userArr=(isset($mdldata[4])?$mdldata[4]:array());
+#							$userasObj=(isset($mdldata[5])?$mdldata[5]:array());
+#							$id=(isset($mdldata[6])?$mdldata[6]:'');
+#							$kursname=(isset($mdldata[7])?$mdldata[7]:'');
+#							$shortname=(isset($mdldata[8])?$mdldata[8]:'');
+#							$courseArr=(isset($mdldata[9])?$mdldata[9]:array());
+							$note='?';	
+							reset($kursArr);		
+	    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++) 
+							{	
+								if (strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
+								{
+									$note=$kursArr[$iKurs][6];
+								}	
+							}
+		    				if ($note == 5)
+		    					$leneg = " style='color:red; font-weight:bold'";
+		    				else
+		    					$leneg = " style='font-weight:bold'";
+		    				$note_les_str .= "<span".$leneg.">".$note."</span> <span style='font-size:10px'>(".$moodle_course->mdl_shortname.")</span> ";
+					}		
+					else
+					{
+						//den Error nur einmal anzeigen und nicht f�r jeden Studenten
+						if(!$errorshown)
+						{
+							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
+							$errorshown=true;
+						}
+					}					
+/* alt 
 					$mdldata = $moodle_course->loadNoten($lvid, $stsem, $row_stud->uid, true);
 					
 					if(is_array($mdldata))
@@ -843,6 +863,7 @@ echo "
 							$errorshown=true;
 						}
 					}
+*/					
 				}
 				else 
 				{
@@ -958,12 +979,11 @@ echo "
 		}
 //	}
 //}
-echo "</table>";
-
-?>
+echo "</table>
 </td></tr>
 </table>
-
+";
+?>
 <div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:150px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent"></div>
 
 </body>
