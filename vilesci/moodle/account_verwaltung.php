@@ -30,7 +30,12 @@
 */
 
 // ---------------- Standart Include Dateien einbinden
-	require_once('../config.inc.php');
+#	require_once('../config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');	
+	require_once('../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
+		
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
@@ -52,9 +57,6 @@
 	$cMdl_user_id = (isset($_REQUEST['mdl_user_id'])?trim($_REQUEST['mdl_user_id']):'');
 // @cSearchstr Suchtext in Tabelle Benutzer 
 	$cSearchstr = (isset($_REQUEST['searchstr'])?trim($_REQUEST['searchstr']):'');
-// @cCharset Zeichensatz - Ajax mit UTF-8
-	$cCharset= (isset($_REQUEST['client_encode'])?trim($_REQUEST['client_encode']):'UTF-8');
-
 // ***********************************************************************************************
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
@@ -106,10 +108,10 @@
 			and tbl_benutzer.uid IS NOT NULL 
 			ORDER BY nachname, vorname;";
 
-			if($result = @pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{	
 				// Header Top mit Anzahl der gelisteten Kurse		
-				$content.= '<a name="top">'. @pg_num_rows($result).' Person(en) gefunden</a>';	
+				$content.= '<a name="top">'. $db->db_num_rows($result).' Person(en) gefunden</a>';	
 				
 				$content.='<table  style="border: 1px outset #F7F7F7;">';
 
@@ -130,7 +132,7 @@
 				
 					// Alle gefundenen User in einer Schleife anzeigen.
 					$iTmpCounter=0;
-					while($row = @pg_fetch_object($result))
+					while($row = $db->db_fetch_object($result))
 					{
 						// ZeilenCSS (gerade/ungerade) zur besseren Ansicht
 						$iTmpCounter++;
@@ -182,7 +184,7 @@
 	<head>
 		<title>Moodle - Accountverwaltung</title>
 		<base target="main">
-		<meta http-equiv="Content-Type" content="text/html; charset='.$cCharset.'">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	</head>
 	<body class="background_main">

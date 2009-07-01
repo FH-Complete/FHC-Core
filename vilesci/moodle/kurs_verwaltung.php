@@ -32,12 +32,19 @@
 // ***********************************************************************************************	
 // Include Dateien
 // ***********************************************************************************************
+#	require_once('../config.inc.php');
+// ---------------- Vilesci Include Dateien einbinden
+	require_once('../../config/vilesci.config.inc.php');	
+	require_once('../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
+		
 // ---------------- Standart Include Dateien einbinden
-	require_once('../config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
 	include_once('../../include/moodle_course.class.php');
+	
 	
 // ***********************************************************************************************	
 // Variable Initialisieren
@@ -78,7 +85,6 @@
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
 	$objMoodle = new moodle_course();	
-
 	
 // ***********************************************************************************************
 //	Verarbeitung einer Moodle-Kurs Loeschaktion
@@ -86,7 +92,7 @@
 	
 	if ($mdl_course_id!='' && $studiensemester_kurzbz!='') // Kurs wird zum bearbeiten (loeschen) freigegeben
 	{
-		include(dirname(__FILE__)."/xmlrpcutils/utils.php");
+		include("../../include/xmlrpcutils/utils.php");
 	    // Aktuellen Moodle Server ermitteln.
 		if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
 		{
@@ -140,7 +146,7 @@
 				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
 				if ($moodle_id!='')
 					$qry.= " and moodle_id='".addslashes($moodle_id)."'"; 
-				if(!pg_query($conn, $qry))
+				if(!$db->db_query($conn, $qry))
 					$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
 				$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
 		}	
@@ -164,9 +170,9 @@
 	// Studiensemester public.tbl_studiensemester_kurzbz
 		$content.='<td>Studiensemester</td><td><select onchange="document.'.$cFormName.'.submit();" name="studiensemester_kurzbz">';
 		$sql_query = "SELECT studiensemester_kurzbz,to_char(start,'YYYYMM') as \"startYYYYMM\",to_char(ende,'YYYYMM') as \"endeYYYYMM\" FROM public.tbl_studiensemester order by start; ";
-		if ($result = @pg_query($conn, $sql_query))
+		if ($result = $db->db_query($sql_query))
 		{
-			while ($row = @pg_fetch_object($result))
+			while ($row = $db->db_fetch_object($result))
 			{
 			// Gibt es noch keinen POST/GET Parameterwert den aktuellen Studiensemesterwert nehmen zum Positionieren in der Selektliste 
 			if (empty($studiensemester_kurzbz) && $cYYYYMM>=$row->startYYYYMM  && $cYYYYMM<=$row->endeYYYYMM) 
@@ -180,9 +186,9 @@
 	// Studiengang public.tbl_studiengang_kz
 		$content.='<td>Studiengang</td><td><select onchange="document.'.$cFormName.'.submit();" name="studiengang_kz"><option value="">&nbsp;Alle&nbsp;</option>';		
 		$sql_query = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzkz,kurzbzlang FROM public.tbl_studiengang where public.tbl_studiengang.moodle='t' ORDER BY kurzkz,kurzbzlang;";
-		if ($result = @pg_query($conn, $sql_query))
+		if ($result = $db->db_query($sql_query))
 		{
-			while($row=@pg_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 			{
 				$content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kurzkz.'-'.$row->kurzbzlang.'&nbsp;</option>';
 			}
@@ -194,8 +200,8 @@
 		if ($studiengang_kz!='')
 		{
 			$sql_query = "SELECT max_semester FROM public.tbl_studiengang where studiengang_kz='".addslashes($studiengang_kz)."' OFFSET 0 LIMIT 1 ;";
-			$result = @pg_query($conn, $sql_query);
-			if ($row = @pg_fetch_object($result))
+			$result = $db->db_query($sql_query);
+			if ($row = $db->db_fetch_object($result))
 			{
 				for($i=0;$i<=$row->max_semester;$i++)
 				{
