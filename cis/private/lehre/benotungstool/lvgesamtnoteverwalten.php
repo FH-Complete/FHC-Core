@@ -477,15 +477,13 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 </head>
 
 <body>
+
 <?php
 $user = get_uid();
-
 if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
-
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
@@ -495,7 +493,6 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
-
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
@@ -552,6 +549,8 @@ if($result = $db->db_query($qry))
 else 
 	die('Fehler');
 
+$htmlOutput='';
+	
 //Kopfzeile
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
@@ -734,16 +733,13 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 		{		
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $pruefung->datum;
-			//echo print_r($studpruef_arr[$pruefung->student_uid]);
+			#echo print_r($studpruef_arr[$pruefung->student_uid]);
 		}	
 	}
 }
 
-
 //Studentenliste
-echo "
-<table>
-";
+echo '<table>';
 		echo "<tr>
 				<td colspan='11'>&nbsp;</td>
 			</tr>
@@ -773,7 +769,7 @@ echo "
 
 		// studentenquery					
 		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";	
-      	$mdldata=null;
+      	$mdldaten=null;
 	    if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
@@ -794,81 +790,89 @@ echo "
 				$note_les_str = '';
 				$le_anz = 0;
 				$note_le = 0;
+				$note=0;
 				if($grade_from_moodle)
 				{
-					//Noten aus Moodle
-					if (!isset($moodle_course))
-						$moodle_course = new moodle_course();
-					if (is_null($mdldata))
+					// Alle Moodlekursdaten zu Lehreinheit und Semester lesen wenn noch nicht belegt.
+					if (is_null($mdldaten))
 					{
-						$mdldata = $moodle_course->loadNoten($lvid, $stsem, '', true,false);
-					}
-					if ($mdldata)
+						//Noten aus Moodle
+						if (!isset($moodle_course))
+							$moodle_course = new moodle_course();
+
+						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,false))
+							$mdldaten=''; 
+					}	
+					// Verarbeiten die Kursdaten
+					if (!is_null($mdldaten) && is_array($mdldaten))
 					{
-#							$error=(isset($mdldata[1])?$mdldata[1]:"Kurs Info ");
-							$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
-							$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
-#							$userArr=(isset($mdldata[4])?$mdldata[4]:array());
-#							$userasObj=(isset($mdldata[5])?$mdldata[5]:array());
-#							$id=(isset($mdldata[6])?$mdldata[6]:'');
-#							$kursname=(isset($mdldata[7])?$mdldata[7]:'');
-#							$shortname=(isset($mdldata[8])?$mdldata[8]:'');
-#							$courseArr=(isset($mdldata[9])?$mdldata[9]:array());
-							$title='';
-							reset($kursArr);		
-	    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++) 
+							reset($mdldaten);		
+							$title="";
+							$mdl_shortname='';
+	    					for ($imdldaten=0;$imdldaten<count($mdldaten) ;$imdldaten++) 
 							{	
-								if (strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
-								{
-								   $note=$kursArr[$iKurs][6];
-							       foreach ($kursasObj[$iKurs] as $key => $value) 
-								   {
-	   								  
-										$title.=$key."=>".$value."\r\n";
+
+								$mdldata=$mdldaten[$imdldaten]->result;
+	#							$error=(isset($mdldata[1])?$mdldata[1]:"Kurs Info ");
+								$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
+								$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
+	#							$userArr=(isset($mdldata[4])?$mdldata[4]:array());
+	#							$userasObj=(isset($mdldata[5])?$mdldata[5]:array());
+	#							$id=(isset($mdldata[6])?$mdldata[6]:'');
+								$kursname=(isset($mdldata[7])?$mdldata[7]:'');
+								$shortname=(isset($mdldata[8])?$mdldata[8]:'');
+	#							$courseArr=(isset($mdldata[9])?$mdldata[9]:array());
+
+								$note=0;
+								$userGef=false;
+								
+								reset($kursArr);		
+		    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++) 
+								{	
+									if (strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
+									{
+																	
+									   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
+									   
+		  							   $title="\r\nNote in Moodlekurse: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
+									   
+									   $note=trim($kursArr[$iKurs][6]);
+									   $note_le += $note;
+					    			   $le_anz += 1;
+								       foreach ($kursasObj[$iKurs] as $key => $value) 
+									   {
+											$title.=$key."=>".$value."\r\n";
+										}	
+										$userGef=true;
+
+					    				if ($note == 5)
+					    					$leneg = " style='color:red; font-weight:bold'";
+			    						else
+		    								$leneg = " style='font-weight:bold'";
+		    							#if ($note!='--')		    							
+											$note_les_str .= "<span ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$mdl_shortname.")</span> ";
+									}	// ende If Richtiger User
+									
+									if ($userGef)
+									{
+										$iKurs=count($kursArr)+1; // diesen USER for beenden - user wurde gefunden	
 									}	
-								}	
-							}
-		    				if ($note == 5)
-		    					$leneg = " style='color:red; font-weight:bold'";
-		    				else
-		    					$leneg = " style='font-weight:bold'";
-		    				$note_les_str .= "<span  title='".$title."' ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$moodle_course->mdl_shortname.")</span> ";
+
+								} // ende Kursschleife
+							} // MoodleKurse abarbeiten
+
+#				echo "<p><h1> $title Anzahl Noten gef. $le_anz $note_le </h1></p>";
 					}		
 					else
 					{
 						//den Error nur einmal anzeigen und nicht f¸r jeden Studenten
-						if(!$errorshown)
+						$moodle_course->errormsg=trim($moodle_course->errormsg);
+						if(!$errorshown && !empty($moodle_course->errormsg) )
 						{
 							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
 							$errorshown=true;
 						}
 					}					
-/* alt 
-					$mdldata = $moodle_course->loadNoten($lvid, $stsem, $row_stud->uid, true);
-					
-					if(is_array($mdldata))
-					{
-						foreach ($mdldata as $elem)
-						{
-							$note_le += $elem[0]->note;
-		    				$le_anz += 1;
-		    				if ($elem[0]->note == 5)
-		    					$leneg = " style='color:red; font-weight:bold'";
-		    				else
-		    					$leneg = " style='font-weight:bold'";
-		    				$note_les_str .= "<span".$leneg.">".$elem[0]->note."</span> <span style='font-size:10px'>(".$elem[0]->shortname.")</span> ";
-						}
-					}
-					elseif(!$mdldata)
-					{
-						//den Error nur einmal anzeigen und nicht f√ºr jeden Studenten
-						if(!$errorshown)
-						{
-							echo '<p><b>'.$moodle_course->errormsg.'</b></p>';
-							$errorshown=true;
-						}
-					}
-*/					
 				}
 				else 
 				{
@@ -894,7 +898,8 @@ echo "
 		    				$note_les_str .= "<span".$leneg.">".$legesamtnote->note."</span> (".$l->lehreinheit_id.") ";
 		    			}
 		    		}
-				}	    			
+				}	    		
+					
     			if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->uid,$stsem))
     			{
     				$note_lv = $lvgesamtnote->note;
@@ -914,19 +919,22 @@ echo "
 					$znote = null;			
 								
 				
-				echo "<td>$note_les_str</td>";
+				echo "<td>".$note_les_str."&nbsp;</td>";
+				
 				if (key_exists($row_stud->uid,$studpruef_arr))	
-					$hide = "style='visibility:hidden;'";
+					$hide = "style='display:none;visibility:hidden;'";
 				else
-					$hide = "style='visibility:visible;'";				
-				echo "<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td nowrap><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='hidden' name='note_orig' value='$note_lv'><input type='button' value='->' onclick='saveLVNote(\"$row_stud->uid\")'></span></td></form>";
+					$hide = "style='display:block;visibility:visible;'";				
 
+				echo "<td valign='bottom' nowrap><form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='hidden' name='note_orig' value='$note_lv'><input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\"></span></form></td>";
+				
+					
 				if ($note_lv == 5)
 					$negmarkier = " style='color:red; font-weight:bold;'";
 				else
 					$negmarkier = "";			
 				
-				echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note_lv</span></td>";
+				echo "<td align='center' id='note_$row_stud->uid'><span ".$negmarkier.">$note_lv</span></td>";
 				
 				//status //////////////////////////////////////////////////////////////////////////////////
 				echo "<td align='center' id='status_$row_stud->uid'>";				
@@ -988,7 +996,9 @@ echo "</table>
 </td></tr>
 </table>
 ";
+echo $htmlOutput;
 ?>
+
 <div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:150px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent"></div>
 
 </body>
