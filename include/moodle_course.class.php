@@ -1142,12 +1142,15 @@ class moodle_course extends basis_db
 	 */
 	public function loadNoten($lehrveranstaltung_id='', $studiensemester_kurzbz='',$student_uid='',$bDetailinfo=false,$bServerinfo=false)
 	{
-
+	
 		// Init
 		$this->lehrveranstaltung_id=trim($lehrveranstaltung_id);
 		$this->studiensemester_kurzbz=trim($studiensemester_kurzbz);
+
 		$student_uid=trim($student_uid);
+
 		$this->errormsg='';		
+		$this->result=null;	
 					
 		// plausib
 		if (empty($this->lehrveranstaltung_id) 
@@ -1158,71 +1161,59 @@ class moodle_course extends basis_db
 			$this->errormsg.=(empty($this->studiensemester_kurzbz)?' Semester (Kurzbz.) ':$this->studiensemester_kurzbz);
 			return false;
 		}
-		
-/*
-		if (empty($this->lehrveranstaltung_id) 
-		|| empty($this->studiensemester_kurzbz) 
-		|| empty($student_uid) ) 
-		{
-			$this->errormsg = 'Es fehlt die Eingabe von ';
-			$this->errormsg.=(empty($this->lehrveranstaltung_id)?' Lehrveranstaltung ':$this->lehrveranstaltung_id);
-			$this->errormsg.=(empty($this->studiensemester_kurzbz)?' Semester (Kurzbz.) ':$this->studiensemester_kurzbz);
-			$this->errormsg.=(empty($student_uid)?' Student ':$student_uid);								
-			return false;
-		}
 
-*/
 		// --------------------------------------------------------------------
 		// Ermitteln die Lehreinheiten und Moodle ID
 		//		mit dem studiensemester_kurzbz ( bsp WS2008 )
 		//		und der lehrveranstaltung_id aus FAS ( bsp 23802 )
 		// --------------------------------------------------------------------
+
 		$qry = "
-		SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,studiensemester_kurzbz,tbl_moodle.lehrveranstaltung_id
+		SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_lehreinheit.lehrveranstaltung_id
 			FROM lehre.tbl_moodle 
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
 		WHERE tbl_moodle.lehrveranstaltung_id like '".addslashes($this->lehrveranstaltung_id)."' 
 		AND tbl_moodle.studiensemester_kurzbz like '".addslashes($this->studiensemester_kurzbz)."'
 		UNION 
-			SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_moodle.lehrveranstaltung_id
+			SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_lehreinheit.lehrveranstaltung_id
 			FROM lehre.tbl_moodle
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 			WHERE tbl_lehreinheit.lehrveranstaltung_id like '".addslashes($this->lehrveranstaltung_id)."' 
 			  AND tbl_lehreinheit.studiensemester_kurzbz like '".addslashes($this->studiensemester_kurzbz)."'
 		;";
-
-#exit($qry);
 		
-		if(!$result=$this->db_query($qry))
+		if(!$result_moodle=$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim Lesen der Kurse , '.$this->errormsg;
+
+			$this->errormsg = 'Fehler beim Lesen der Moodle Kurse , '.$this->errormsg;
 			return false;
 		}	
 
 		// init
-		$lehreinheit_kpl = array(); // Gesamte Information der Lehreinheit und Moodle IDs
-		$lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
-		//echo $qry;
-		while($row = $this->db_fetch_object($result))
+		$_lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
+		$_lehrveranstaltung = array(); // Gesamte Information der Lehreinheit und Moodle IDs
+		$_studiensemester_kurzbz=array();	
+		$_lehreinheit_kpl=array();	
+		while($row = $this->db_fetch_object($result_moodle))
 		{
+		
 			$row->lehreinheit_id=trim($row->lehreinheit_id);
-			$lehreinheit[$row->lehreinheit_id]=$row->lehreinheit_id; // Fuer Select Campus
-			$lehreinheit_kpl[$row->lehreinheit_id]=$row; // Fuer GesamtDaten wird Ergaenzt von Campus,
-		}	
+			$_lehreinheit_kpl[$row->lehreinheit_id]=$row;
+			
+			$_lehreinheit[$row->lehreinheit_id]=$row->lehreinheit_id; // Fuer Select Campus
 
-		if (count($lehreinheit)<1) // Es gibt keine Lehreinheiten
+			$row->lehrveranstaltung_id=trim($row->lehrveranstaltung_id);
+			$_lehrveranstaltung[$row->lehrveranstaltung_id]=$row->lehrveranstaltung_id; // Fuer Select Campus
+
+			$row->studiensemester_kurzbz=trim($row->studiensemester_kurzbz);
+			$_studiensemester_kurzbz[$row->studiensemester_kurzbz]=$row->studiensemester_kurzbz; // Fuer Select Campus
+
+		}	
+		if (count($_lehreinheit)<1) // Es gibt keine Lehreinheiten
 		{
 			$this->errormsg='Es wurde kein passenden Moodle-Kurs gefunden';
 			return false;
 		}
-		
-		// Fuer die naechste Verarbeitung die Array Sortieren 
-		asort($lehreinheit);
-		reset($lehreinheit);
-
-		asort($lehreinheit_kpl);
-		reset($lehreinheit_kpl);		
-
 		// --------------------------------------------------------------------
 		//
 		// Suchen Studenten Lehreinheiten zu Moodle - LE  
@@ -1230,28 +1221,32 @@ class moodle_course extends basis_db
 		//		die einen Moodlekurs besuchen der auch eine Lehrveranstaltung ist
 		//	Als Ergebnis sind alle Studenten mit gemeinsame Moodle und FAS  LV
 		// --------------------------------------------------------------------
-
-		$qry = "SELECT * FROM campus.vw_student_lehrveranstaltung ";
-		$qry.= " WHERE lehreinheit_id in (".implode(",",$lehreinheit).") ";
+		$qry = "SELECT distinct vw_student_lehrveranstaltung.lehreinheit_id,lehrveranstaltung_id,studiensemester_kurzbz,kurzbz,bezeichnung,semester,studiengang_kz 
+			FROM campus.vw_student_lehrveranstaltung 
+			";
+		$qry.= " WHERE vw_student_lehrveranstaltung.lehreinheit_id in (".implode(",",$_lehreinheit).") ";
+		$qry.= " AND lehrveranstaltung_id in (".implode(",",$_lehrveranstaltung).") ";
+		$qry.= " AND vw_student_lehrveranstaltung.studiensemester_kurzbz in ('".implode("','",$_studiensemester_kurzbz)."') ";
 		if (!empty($student_uid))
-			$qry.= " AND uid like  '".addslashes($student_uid)."' ; ";
+			$qry.= " AND uid ='".addslashes($student_uid)."'  ";
 
-		if(!$result=$this->db_query($qry))
+		if(!$result_moodle=$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Studenten mit Lehreinheit(en) ';
 			return false;
 		}	
-
-		if (!$anz=$this->db_num_rows($result))
+		
+		if (!$anz=$this->db_num_rows($result_moodle))
 		{
-			$this->errormsg ="keine Moodle Kursdaten gefunden!";
+			$this->errormsg ="keine Lehrveranstaltung (Lehreinheit) fuer Moodle Kursdaten gefunden!";
 			return false;
 		}		
-
-
+		
+		
 		if (!function_exists('xu_load_extension'))
 			include_once("xmlrpcutils/utils.php");
-		
+
+					
 	    // Aktuellen Moodle Server ermitteln.
 		if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
 		{
@@ -1271,14 +1266,19 @@ class moodle_course extends basis_db
 		$method = "NotenCourseByID";
 		
 		
-		while($row = $this->db_fetch_object($result))
+		$last_moodle_id=false;
+		while($row = $this->db_fetch_object($result_moodle))
 		{
 			// Von der Lehreinheit kann der Moodle-Kurs ermittelt werden
-			$this->moodle_id=trim($lehreinheit_kpl[$row->lehreinheit_id]->mdl_course_id);
-			$m_user['CourseID']=$this->moodle_id;
+			$this->mdl_course_id=trim($_lehreinheit_kpl[$row->lehreinheit_id]->mdl_course_id);
+			if ($last_moodle_id==$this->mdl_course_id)	
+				continue;
 
-
-
+			$last_moodle_id=$this->mdl_course_id;
+			
+			$m_user=array();
+			$m_user['CourseID']=$this->mdl_course_id;
+			
 			$mdl_username=trim($student_uid);
 			$m_user['UserId']=$mdl_username;
 			
@@ -1316,250 +1316,47 @@ class moodle_course extends basis_db
 				$kursname=(isset($result[7])?$result[7]:'');
 				$shortname=(isset($result[8])?$result[8]:'');
 				$courseArr=(isset($result[9])?$result[9]:array());
-				$note=(isset($userArr) && isset($userArr[6])?$userArr[6]:'?');	
-				#$showHTML.="<h1>Ende xmlrpc </h1><br />Fehler ::=".$error."<br />Studtent::= <b>".$student_uid."</b><br />Studiensemester::= <b>".$this->studiensemester_kurzbz."</b><br />Lehrveranstaltung::= <b>".$this->lehrveranstaltung_id."</b><br />Detail : <b>" .($bDetailinfo?'Ja':'Nein')."</b><br /> Note::= ".$note."<hr />";
-				
-				$this->mdl_fullname=$kursname;
-				$this->mdl_shortname=$shortname;				
-				$this->note=$note;
-				
-				$this->errormsg = (isset($result[1])?$result[1]:"");
-				
-				if ($bDetailinfo)
-					return $result;
+	
+				if (!empty($student_uid))
+					$note=(isset($userArr) && isset($userArr[6])?$userArr[6]:'?');	
 				else
-					return $userArr;
+					$note=0;
+					
+				$obj = new moodle_course();
+				
+				$obj->mdl_course_id = $this->mdl_course_id;
+				$obj->lehreinheit_id=$row->lehreinheit_id;
+				
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				
+				$obj->lehrveranstaltung_kurzbz=$row->kurzbz;
+				$obj->lehrveranstaltung_bezeichnung=$row->bezeichnung;
+				$obj->lehrveranstaltung_semester=$row->semester;			
+				$obj->lehrveranstaltung_studiengang_kz=$row->studiengang_kz;
+
+				$obj->mdl_fullname=$kursname;
+				$obj->mdl_shortname=$shortname;				
+				$obj->note=$note;
+				
+				$obj->errormsg=(isset($result[1])?$result[1]:"");
+				$obj->note=$note;
+
+				if ($bDetailinfo || empty($student_uid))
+					$obj->result=$result;
+				else
+					$obj->result=$userArr;
+				
+				$this->errormsg.=(!empty($this->errormsg)?", \n":"").$obj->errormsg;
+				$this->result[]=$obj;
 						
 			}		
 			else 
 			{
-				$this->errormsg = (isset($result[1])?$result[1]:"Fehler Kurs Info ".$this->moodle_id);
-				return false;
-			}				
-		}
-/*		
-		// Lehreinheit und Moodlekurs zusammenfuehren
-		$lehrveranstaltUSER=array(); // Detailinformation fuer das Noten-Ergebnis		
-		$lehrveranstaltMOODLE=array(); // Je Student alle Moodle IDs
-		while($row = $this->db_fetch_object())
-		{
-			// Von der Lehreinheit kann der Moodle-Kurs ermittelt werden
-			$mdl_course_id=trim($lehreinheit_kpl[$row->lehreinheit_id]->mdl_course_id);
-			$this->moodle_id=$mdl_course_id;
-			
-			// Die Moodle Kurs ID zu den Lehreinheitdaten hinzufuegen ( DatenSelect erweitern )
-			$row->mdl_course_id=$mdl_course_id; 
-			$mdl_username=trim($row->uid);
-			// Campusdaten merken fuer Student und MoodleID ( wird fuer merge mit Moodlenoten benotigt )
-			$lehrveranstaltUSER[$mdl_username][$mdl_course_id]=$row;
-			// Alle Moodle IDs zum Studenten sammeln fuer Noten Select
-			$lehrveranstaltMOODLE[$mdl_username][$mdl_course_id]=$mdl_course_id;
-		}
-		
-		unset($lehreinheit_kpl); // Wird nicht mehr benoetigt (die Daten sind nun in LV,LE )
-
-		// Fuer die naechste Verarbeitung die Array Sortieren
-		asort($lehrveranstaltUSER);
-		reset($lehrveranstaltUSER);
-		
-		if (count($lehrveranstaltMOODLE)<1) // Es gibt keine Moodle - LV,LE
-			return false;
-			
-		// --------------------------------------------------------------------
-		// Moodle Noten - Uebersetztungstabellen einlesen (min. ein Record )
-		// --------------------------------------------------------------------
-		$qry = "SELECT * FROM mdl_grade_letters ORDER BY contextid, lowerboundary desc; ";
-		if(!$result = $this->db_query($this->conn_moodle, $qry))
-		{
-			$this->errormsg = 'Fehler beim Lesen der Noten ';
-			return false;
-		}	
-
-		$mdl_grade_letters_first=null;
-		// Init
-		$mdl_grade_letters=array(); 
-		while($row = $this->db_fetch_object($result))
-		{
-			if ($mdl_grade_letters_first==null)
-				$mdl_grade_letters_first=$row->contextid;
-			$mdl_grade_letters[$row->contextid][]=$row;
-		}	
-		asort($mdl_grade_letters);
-		reset($mdl_grade_letters);
-		
-		if (!isset($mdl_grade_letters[$mdl_grade_letters_first]))
-		{
-			$this->errormsg = ' Keinen Notenschluessel gefunden! ( Tabelle: mdl_grade_letters ist leer. )';
-			return false;
-		}	
-		// --------------------------------------------------------------------
-		//
-		// 	Moodle zu User, und MoodleIDs lesen 
-		//		aus der Tabelle GRADE "Noten werden die Benotungen geholt
-		//		
-		//
-		// --------------------------------------------------------------------
-		$qry = "SELECT mdl_grade_items.courseid,
-				mdl_user.username,mdl_user.lastname,mdl_user.firstname,
-				mdl_grade_grades.userid,
-		        mdl_grade_grades.rawgrade,
-				mdl_grade_grades.rawgrademax,
-				mdl_grade_grades.rawgrademin, 
-				mdl_grade_grades.finalgrade,
-				mdl_course.fullname,mdl_course.shortname
-			FROM mdl_grade_items , mdl_grade_grades ,mdl_user,mdl_course
-			WHERE mdl_grade_items.itemtype='course'
-			 AND mdl_grade_grades.finalgrade IS NOT NULL 
-			 AND mdl_course.id=mdl_grade_items.courseid
-			 AND mdl_grade_grades.itemid=mdl_grade_items.id
-			 AND mdl_grade_grades.userid=mdl_user.id
-			";
-		$usr_qry="";
-	    while (list( $user_key, $course_ids ) = each($lehrveranstaltMOODLE) )
-		{
-			if(empty($usr_qry))
-				$usr_qry.=" AND ( (mdl_user.username like E'".addslashes($user_key)."' AND mdl_grade_items.courseid in (".implode(",",$course_ids).") ) ";
-			else
-				$usr_qry.=" OR (mdl_user.username like E'".addslashes($user_key)."' AND mdl_grade_items.courseid in (".implode(",",$course_ids).") ) ";
-		}
-		if (!empty($usr_qry))
-			$qry.=$usr_qry." )";
-		$qry.= "ORDER BY mdl_grade_items.courseid,mdl_user.lastname,mdl_user.firstname;"; // Ende SQL String 
-
-		if (isset($lehrveranstaltMOODLE)) // wird nicht mehr benoetigt 
-			unset($lehrveranstaltMOODLE);
-		
-		if(!$result = $this->db_query($this->conn_moodle, $qry))
-		{
-			$this->errormsg = 'Fehler beim Lesen der Moodle Benutzer und Noten ';
-			return false;
-		}	
-		
-		// Init		 
-		$mdl_course=array(); 
-		$mdl_noten=array(); 
-		$mdl_noten_course=array();
-		while($row = $this->db_fetch_object($result))
-		{
-			$mdl_course_id=trim($row->courseid);
-			$mdl_username=trim($row->username);		
-			$mdl_finalgrade=trim($row->finalgrade);		
-			
-			if (empty($mdl_finalgrade))
-				continue; // Keine Notenfindung 
-						
-			// Vergleichswerte fuer die Noten aus der Tabelle mdl_grade_letters suchen
-			$arrTmpDefaultNoten=array();
-			$mdl_grade_letters_first=1; // Es muss einen Default geben (Administrator Noten)
-			if (isset($mdl_grade_letters[$mdl_grade_letters_first]))
-				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];						
-				
-			if($this->getContext(50, $mdl_course_id))
-				$mdl_grade_letters_first = $this->mdl_context_id;
-						
-			if (isset($mdl_grade_letters[$mdl_grade_letters_first]))
-			{
-				$arrTmpDefaultNoten=$mdl_grade_letters[$mdl_grade_letters_first];
-			}	
-			if (!is_array($arrTmpDefaultNoten) || count($arrTmpDefaultNoten)<1)		
-			{
-				$this->errormsg = 'Keinen Notenschluessel gefunden! ( Tabelle: mdl_grade_letters ist leer, oder kein Eintrag zu Kurs '.$mdl_course_id.'. ) ';
-				return false;
-			}	
-			$row->NotenermittlungTabIndex=$mdl_grade_letters_first;
-			$row->NotenermittlungTab=$arrTmpDefaultNoten;
-			$row->note=0;
-			
-		    for ($iTmpIndex=0;$iTmpIndex<count($arrTmpDefaultNoten);$iTmpIndex++)
-			{
-				// ------------ NOTEN ERMITTLUNG
-				// Vergleichsoperatoren fuer Noten
-				$iTmpVergl=$arrTmpDefaultNoten[$iTmpIndex]->lowerboundary;
-				$iTmpFaktor=(!empty($row->rawgrademax)?(int)(100/$row->rawgrademax):1);
+				$this->errormsg.=(!empty($this->errormsg)?", \n":"").(isset($result[1])?$result[1]:"Fehler Kurs Info ".$this->moodle_id);
+			}		
 					
-					if ($mdl_finalgrade>=( $iTmpVergl / $iTmpFaktor) )
-					{
-						if (is_numeric($arrTmpDefaultNoten[$iTmpIndex]->letter)) 
-						{
-							$row->note=($iTmpIndex + 1);
-							if($row->note>5 || $row->note<1)
-							{
-								echo "FOOOO";
-								$this->errormsg = 'Unbekannter Notenschluessel';
-								return false;
-							}
-						}
-						else
-						{
-							if ( mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="A")
-								$row->note=1;
-							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="B")
-								$row->note=2;
-							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="C")
-								$row->note=3;
-							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="D")
-								$row->note=4;
-							elseif (mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="E" 
-								|| mb_substr($arrTmpDefaultNoten[$iTmpIndex]->letter,0,1)=="F" )
-								$row->note=5;
-							else
-							{
-								$this->errormsg = ' Unbekannter Notenschluessel "'.$arrTmpDefaultNoten[$iTmpIndex]->letter.'" ( Erlaubt sind 1 bis 5, oder A bis F ) ! ';
-								return false;
-							}	
-						}		
-						break;
-					}
-			}
-
-			// Wenn kein Detail werden nur die Noten genommen Moodle Noten 
-			if (!$bDetailinfo)
-			{
-				$mdl_noten_course[]=array("courseid"=>$row->courseid,"fullname"=>$row->fullname,"shortname"=>$row->shortname,"userid"=>$row->userid,"username"=>$row->username,"firstname"=>$row->firstname,"lasttname"=>$row->lastname,"note"=>$row->note);
-				$mdl_noten[]=$row->note;
-				$mdl_course[]=$row; 
-			}
-			else // Fuer Detailinformation Moodle Noten und Lehrveranstaltung mischen zu einem Datensatz
-			{			
-				if ($bDetailinfo && isset($lehrveranstaltUSER[$mdl_username][$mdl_course_id]))
-				{
-					$lehrverantstaltung=$lehrveranstaltUSER[$mdl_username][$mdl_course_id];
-				    while (list( $key, $value ) = each($lehrverantstaltung) )
-       					$row->$key=$value;
-					unset($lehrverantstaltung);		
-					$mdl_course[$mdl_course_id][]=$row; 
-				}	
-				elseif($bDetailinfo) // Wenn Detailinformation werden auch die ohne FAS LV genommen
-				{
-					$mdl_course['ohneLV'][]=$row; 
-				}	
-			}
-			
-		}	
-		
-		unset($result);
-
-		if (isset($qry)) unset($qry);
-		if (isset($moodle_id)) unset($moodle_id);
-		if (isset($lehreinheit_id)) unset($lehreinheit_id);
-		if (isset($lehrveranstaltUSER)) unset($lehrveranstaltUSER);		
-		
-		// Fuer Detail wird die gesamte Information geliefert, oder ohne Detail nur die Noten
-		if (!is_array($mdl_course) || count($mdl_course)<1)
-		{
-			$this->errormsg = ' keine Informationen gefunden'. count($mdl_course) ;
-			return true;
-		}	
-
-		if($bDetailinfo) // Alle Informationen Retour
-			return $this->note=$mdl_course;
-			
-		// Nur die Noten senden	wenn 1 Datensatz gefunden wird,
-		// ansonst weitere Informationen zum zuordnen der Note zu einem Studenten
-		return (count($mdl_noten)>1?$this->note=$mdl_noten_course:$this->note=$mdl_noten[0]);
-*/	
-
+		}
+		return $this->result;
 	}	// Ende moodle Noten 
-
-
 } // Ende moodle_course class
