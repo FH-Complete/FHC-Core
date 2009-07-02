@@ -102,35 +102,32 @@ class news extends basis_db
 	public function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null, $maxnews)
 	{
 		$qry = "SELECT * FROM campus.tbl_news WHERE true";
-		
-		if($maxalter!=0)
+		if(trim($maxalter)!='0')
 		{
 			$qry.= " AND (now()-datum)<interval '$maxalter days'";
 		}
-				
 		if(!$all)
 			$qry.=' AND datum<=now() AND (datum_bis>= now()::date OR datum_bis is null)';
 			
-		if($fachbereich_kurzbz!='*')
+		if(trim($fachbereich_kurzbz)!='*')
 		{
-			if(is_null($fachbereich_kurzbz) || $fachbereich_kurzbz=='')
+			if(is_null($fachbereich_kurzbz) || trim($fachbereich_kurzbz)=='')
 				$qry.=' AND fachbereich_kurzbz is null';	
 			else 
-				$qry.=" AND fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
+				$qry.=" AND fachbereich_kurzbz='".addslashes(trim($fachbereich_kurzbz))."'";
 		}
 				
-		if($studiengang_kz=='0')
-			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".($semester!=''?($semester=='0'?' AND semester=0':''):'AND semester is null');
-		elseif($studiengang_kz=='')
+		if(trim($studiengang_kz)=='0')
+			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".(trim($semester)!=''?(trim($semester)=='0'?' AND semester=0':''):' AND semester is null');
+		elseif(trim($studiengang_kz)=='')
 			$qry.='';
 		else
-			$qry.=" AND ((studiengang_kz='$studiengang_kz' AND semester='$semester') OR (studiengang_kz='$studiengang_kz' AND semester=0) OR (studiengang_kz=0 AND semester='$semester') OR (studiengang_kz=0 and semester is null))";
+			$qry.=" AND ((studiengang_kz='".trim($studiengang_kz)."' AND semester='".trim($semester)."') OR (studiengang_kz='".trim($studiengang_kz)."' AND semester=0) OR (studiengang_kz=0 AND semester='".trim($semester)."') OR (studiengang_kz=0 and semester is null))";
 			
 		$qry.=' ORDER BY datum DESC, updateamum DESC';
-		if($maxnews!=0)
-			$qry.= " LIMIT $maxnews";
-		
-		//echo $qry;
+		if(trim($maxnews)!='0')
+			$qry.= " LIMIT ".trim($maxnews);
+#		echo "$maxalter, $studiengang_kz, $semester, $all, $fachbereich_kurzbz, $maxnews <br> $qry";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
