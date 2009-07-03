@@ -56,6 +56,18 @@ class basis_db extends db
 		}			
 	}
 
+	function db_result($result = null, $i,$item)
+	{
+		if(is_null($result))
+		{
+			return pg_result($this->db_result, $i,$item);
+		}
+		else 
+		{
+			return pg_result($result, $i,$item);
+		}			
+	}
+	
 	function db_last_error()
 	{
 		return pg_last_error();
