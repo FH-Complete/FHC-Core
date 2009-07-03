@@ -26,7 +26,11 @@
 
 header("Content-type: application/xhtml+xml");
 
-require_once('../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
 require_once('../../include/functions.inc.php');
 require_once('../../include/frage.class.php');
 require_once('../../include/vorschlag.class.php');
@@ -36,10 +40,6 @@ require_once('../../include/gebiet.class.php');
 $PHP_SELF=$_SERVER["PHP_SELF"];
 
 session_start();
-
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 if(isset($_GET['gebiet_id']))
 	$gebiet_id = $_GET['gebiet_id'];
@@ -137,7 +137,7 @@ else
 if(!isset($_SESSION['pruefling_id']))
 	die('Bitte zuerst anmelden!');
 
-$gebiet = new gebiet($conn, $gebiet_id);
+$gebiet = new gebiet($gebiet_id);
 
 if($gebiet->level_start!='')
 	$levelgebiet=true;
@@ -150,7 +150,7 @@ list($stunde, $minute, $sekunde) = split(':',$gebiet->zeit);
 if(isset($_GET['start']))
 {
 	//Fragenpool generieren
-	$frage = new frage($conn);
+	$frage = new frage();
 	if(!$frage->generateFragenpool($_SESSION['pruefling_id'], $gebiet_id))
 		die('Fehler beim Generieren des Fragenpools:'.$frage->errormsg);
 	
@@ -159,7 +159,7 @@ if(isset($_GET['start']))
 		die('Es wurde keine Frage gefunden');
 	
 	//Beginnzeit Speichern
-	$prueflingfrage = new frage($conn);
+	$prueflingfrage = new frage();
 	if(!$prueflingfrage->getPrueflingfrage($_SESSION['pruefling_id'], $frage_id))
 		die('Fehler:'.$prueflingfrage->errormsg);
 	
@@ -178,14 +178,14 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 	// Unterscheidung ob mehrere oder nur eine Antwort uebergeben wird
 	$error=false;
 	
-	pg_query($conn, 'BEGIN;');
+	$db->db_query('BEGIN;');
 
 	// alle vorhandenen Antworten zu dieser Frage loeschen
 	$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id in(
 				SELECT antwort_id FROM testtool.tbl_antwort JOIN testtool.tbl_vorschlag USING(vorschlag_id)
 				WHERE frage_id='".addslashes($_GET['frage_id'])."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."')";
 
-	pg_query($conn, $qry);
+	$db->db_query($qry);
 	
 	// Antwort nur Speichern wenn eine Antwort gewaehlt wurde	
 	if(isset($_POST['vorschlag_id']) && $_POST['vorschlag_id']!='')
@@ -202,7 +202,7 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 		{
 			if($vorschlag_id!='')
 			{
-				$antwort = new antwort($conn);
+				$antwort = new antwort();
 				
 				$antwort->new = true;
 				$antwort->vorschlag_id = $vorschlag_id;
@@ -219,7 +219,7 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 		if(!$error)
 		{
 			//Endzeit der Frage eintragen
-			$prueflingfrage = new frage($conn);
+			$prueflingfrage = new frage();
 			if(!$prueflingfrage->getPrueflingfrage($_SESSION['pruefling_id'], $frage_id))
 			{
 				$errormsg = $antwort->errormsg;
@@ -237,15 +237,15 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 	
 	if($error)
 	{
-		pg_query($conn, 'ROLLBACK;');
+		$db->db_query('ROLLBACK;');
 		die('Fehler:'.$errormsg);
 	}
 	else 
 	{
-		pg_query($conn, 'COMMIT;');
+		$db->db_query('COMMIT;');
 	}
 	
-	$frage = new frage($conn);
+	$frage = new frage();
 	
 	if($levelgebiet)
 	{
@@ -263,9 +263,9 @@ $qry = "SELECT begintime
 		WHERE pruefling_id='".addslashes($_SESSION['pruefling_id'])."' AND gebiet_id='".addslashes($gebiet_id)."'
 		ORDER BY begintime ASC LIMIT 1";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if($row = pg_fetch_object($result))
+	if($row = $db->db_fetch_object($result))
 	{
 		if($row->begintime!='')
 		{
@@ -290,9 +290,9 @@ $info='';
 $qry_pruefling = "SELECT vorname, nachname, stg_bez FROM testtool.vw_pruefling 
 					WHERE pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
 
-if($result_pruefling = pg_query($conn, $qry_pruefling))
+if($result_pruefling = $db->db_query($qry_pruefling))
 {
-	if($row_pruefling = pg_fetch_object($result_pruefling))
+	if($row_pruefling = $db->db_fetch_object($result_pruefling))
 	{
 		$info = "$row_pruefling->vorname $row_pruefling->nachname, $row_pruefling->stg_bez";
 	}
@@ -313,8 +313,8 @@ else
 	$qry = "SELECT '$gebiet->zeit'-(now()-min(begintime)) as time 
 			FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
 			WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
 	//Zeit in Sekunden umrechnen
 	list($stunde, $minute, $sekunde) = split(':',$row->time);
 	$zeit = (int) ($stunde*60*60+$minute*60+$sekunde);
@@ -332,7 +332,7 @@ echo '</td></tr>';
 echo '</table>';
 
 //Laden der Frage
-$frage = new frage($conn);
+$frage = new frage();
 
 if($frage_id!='') //Frage wurde uebergeben
 {
@@ -346,8 +346,8 @@ else
 		// dann ist das Gebiet fertig
 		$qry = "SELECT count(*) as anzahl FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
 				WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
-		$result = pg_query($conn, $qry);
-		$row = pg_fetch_object($result);
+		$result = $db->db_query($qry);
+		$row = $db->db_fetch_object($result);
 		
 		if($row->anzahl>=$gebiet->maxfragen)
 		{
@@ -368,12 +368,12 @@ if($frage->frage_id!='')
 	if(!$demo)
 	{
 		//Nachschauen ob diese Frage bereits angesehen wurde
-		$antwort = new antwort($conn);
+		$antwort = new antwort();
 		$antwort->getAntwort($_SESSION['pruefling_id'],$frage_id);
 		if(count($antwort->result)==0)
 		{
 			//wenn diese noch nicht angesehen wurde, dann wird die begintime gesetzt
-			$prueflingfrage = new frage($conn);
+			$prueflingfrage = new frage();
 			if(!$prueflingfrage->getPrueflingfrage($_SESSION['pruefling_id'], $frage_id))
 				die('Diese Frage ist nicht fuer Sie bestimmt');
 				
@@ -397,7 +397,7 @@ if($frage->frage_id!='')
 	echo "$frage->text<br/><br/>\n";
 
 	//Vorschlaege laden
-	$vs = new vorschlag($conn);
+	$vs = new vorschlag();
 	$vs->getVorschlag($frage->frage_id, $_SESSION['sprache'], $gebiet->zufallvorschlag);
 	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\">";
 	echo '<table cellspacing="30px">';
@@ -405,7 +405,7 @@ if($frage->frage_id!='')
 	$anzahl = 1;
 	
 	//Antworten laden falls bereits vorhanden
-	$antwort = new antwort($conn);
+	$antwort = new antwort();
 	$antwort->getAntwort($_SESSION['pruefling_id'],$frage->frage_id);
 		
 	//Vorschlaege anzeigen
@@ -472,8 +472,8 @@ if($frage->frage_id!='')
 				WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."' AND demo=false ORDER BY nummer";
 
 		//Nummern der Fragen Anzeigen
-		$result = pg_query($conn, $qry);
-		while($row = pg_fetch_object($result))
+		$result = $db->db_query($qry);
+		while($row = $db->db_fetch_object($result))
 		{
 			if($row->frage_id==$frage_id)
 				echo " <u>$row->nummer</u> -";
@@ -486,7 +486,7 @@ if($frage->frage_id!='')
 	if(!$levelgebiet)
 	{
 		//Naechste Frage holen und Weiter-Button anzeigen
-		$frage = new frage($conn);
+		$frage = new frage();
 		$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 		if($nextfrage)
 		{
@@ -499,7 +499,7 @@ if($frage->frage_id!='')
 				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
 						WHERE tbl_frage.gebiet_id='".addslashes($gebiet_id)."' 
 						AND demo ";
-				if($row = pg_fetch_object(pg_query($conn, $qry)))
+				if($row = $db->db_fetch_object($db->db_query($qry)))
 				{
 					if($row->anzahl>1)
 					{

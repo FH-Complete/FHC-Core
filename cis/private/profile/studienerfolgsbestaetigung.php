@@ -21,13 +21,15 @@
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
 
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiensemester.class.php');
-	
-	if(!$conn = pg_pconnect(CONN_STRING))
-		die('Fehler beim Connecten');
-	
+
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+  		die('Fehler beim Oeffnen der Datenbankverbindung');
+
+		
 	$uid=get_uid();
 	$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
 	
@@ -69,14 +71,14 @@ function createStudienerfolg()
 	Bitte wählen Sie das entsprechende Studiensemester aus.<br><br>
 	<?php
 		$qry = "SELECT distinct studiensemester_kurzbz FROM campus.vw_student JOIN public.tbl_prestudentstatus USING(prestudent_id) WHERE uid='$uid'";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			echo 'Studiensemester: <SELECT id="stsem">';
 			
-			$stsem_obj = new studiensemester($conn);
+			$stsem_obj = new studiensemester();
 			$stsem = $stsem_obj->getPrevious();
 			
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				if($stsem==$row->studiensemester_kurzbz)
 					$selected = 'selected';

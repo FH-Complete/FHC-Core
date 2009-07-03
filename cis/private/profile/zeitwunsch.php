@@ -23,7 +23,11 @@
 // * @brief bietet die Moeglichkeit zur Anzeige und
 // * Aenderung der Zeitwuensche
 
-	require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
 	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
@@ -37,15 +41,12 @@
 	if(isset($_GET['type']))
 		$type=$_GET['type'];
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-
 	$datum_obj = new datum();
 
 	//Stundentabelleholen
-	if(! $result_stunde=pg_query($conn, "SET search_path TO campus; SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
-		die(pg_last_error($conn));
-	$num_rows_stunde=pg_num_rows($result_stunde);
+	if(! $result_stunde=$db->db_query("SET search_path TO campus; SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+		die($db->db_last_error());
+	$num_rows_stunde=$db->db_num_rows($result_stunde);
 
 	// Zeitwuensche speichern
 	if (isset($type) && $type=='save')
@@ -58,45 +59,45 @@
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
 				$query="SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
-				if(! $erg_wunsch=pg_query($conn, $query))
-					die(pg_last_error($conn));
-				$num_rows_wunsch=pg_num_rows($erg_wunsch);
+				if(! $erg_wunsch=$db->db_query($query))
+					die($db->db_last_error());
+				$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
 					$query="INSERT INTO tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
-					if(!($erg=pg_query($conn, $query)))
-						die(pg_last_error($conn));
+					if(!($erg=$db->db_query($query)))
+						die($db->db_last_error());
 				}
 				elseif ($num_rows_wunsch==1)
 				{
 					$query="UPDATE tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 					//echo $query;
-					if(!($erg=pg_query($conn, $query)))
-						die(pg_last_error($conn));
+					if(!($erg=$db->db_query($query)))
+						die($db->db_last_error());
 				}
 				else
 					die("Zuviele Eintraege fuer!");
 			}
 	}
 
-	if(!($erg=pg_query($conn, "SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
-		die(pg_last_error($conn));
-	$num_rows=pg_num_rows($erg);
+	if(!($erg=$db->db_query("SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($erg);
 	for ($i=0;$i<$num_rows;$i++)
 	{
-		$tag=pg_result($erg,$i,"tag");
-		$stunde=pg_result($erg,$i,"stunde");
-		$gewicht=pg_result($erg,$i,"gewicht");
+		$tag=$db->db_result($erg,$i,"tag");
+		$stunde=$db->db_result($erg,$i,"stunde");
+		$gewicht=$db->db_result($erg,$i,"gewicht");
 		$wunsch[$tag][$stunde]=$gewicht;
 	}
 
 
 
 	// Personendaten
-	if(! $result=pg_query($conn, "SELECT * FROM vw_benutzer WHERE uid='$uid'"))
-		die(pg_last_error($conn));
-	if (pg_num_rows($result)==1)
-		$person=pg_fetch_object($result);
+	if(! $result=$db->db_query("SELECT * FROM vw_benutzer WHERE uid='$uid'"))
+		die($db->db_last_error());
+	if ($db->db_num_rows($result)==1)
+		$person=$db->db_fetch_object($result);
 
 ?>
 
@@ -154,11 +155,11 @@ function checkvalues()
 	  	echo '<th>Stunde<br>Beginn<br>Ende</th>';
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
-			$beginn=pg_result($result_stunde,$i,'"beginn"');
+			$beginn=$db->db_result($result_stunde,$i,'"beginn"');
 			$beginn=substr($beginn,0,5);
-			$ende=pg_result($result_stunde,$i,'"ende"');
+			$ende=$db->db_result($result_stunde,$i,'"ende"');
 			$ende=substr($ende,0,5);
-			$stunde=pg_result($result_stunde,$i,'"stunde"');
+			$stunde=$db->db_result($result_stunde,$i,'"stunde"');
 			echo "<th><div align=\"center\">$stunde<br>$beginn<br>$ende</div></th>";
 		}
 		?>

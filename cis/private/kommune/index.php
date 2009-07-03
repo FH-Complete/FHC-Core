@@ -53,7 +53,7 @@
          
          
 // ---------------- CIS Include Dateien einbinden
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
 // ---------------- Datenbank-Verbindung 
@@ -76,18 +76,17 @@
 // Kommunen - Wettbewerb - Datenobjekt -----------------------------------------------------------------------------------------------------------
 	// Datenobjekt - Alle Daten je Parameter werden gesammelt fuer die neachste Funktionn
 	$oWettbewerb= new stdClass;
-	
+	if (!$db = new basis_db())
+      die('<div style="text-align:center;"><br />Keine Wettbewerbe zurzeit Online.<br />Bitte etwas Geduld.<br />Danke</div>');// 	Datenbankverbindung  
 	// DB Open
-	$oWettbewerb->sqlCONN=@pg_pconnect(CONN_STRING) or die('<div style="text-align:center;"><br />Keine Wettbewerbe zurzeit Online.<br />Bitte etwas Geduld.<br />Danke</div>');// 	Datenbankverbindung
+	$oWettbewerb->sqlCONN=$db;
 
 	// Parameter DB Schema
 	$oWettbewerb->sqlSCHEMA='kommune';
 #	$oWettbewerb->sqlSCHEMA='public';
 
 	// Parameter ClientEncode
-	$oWettbewerb->clientENCODE=(defined('CONN_CLIENT_ENCODING')?CONN_CLIENT_ENCODING:'LATIN9');
-   	$oWettbewerb->clientENCODE = (isset($_REQUEST['client_encode']) ? $_REQUEST['client_encode']:$oWettbewerb->clientENCODE);
-
+	$oWettbewerb->clientENCODE='UTF-8';
 	
 	// Parameter Applikation - Template Auswahl
 	$oWettbewerb->workSITE = (isset($_REQUEST[constKommuneParmSetWork]) ? $_REQUEST[constKommuneParmSetWork] : constKommuneAnzeigeDEFAULT);

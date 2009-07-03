@@ -20,7 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-   require_once('../config.inc.php');
+	  require_once('../../config/cis.config.inc.php');
+    require_once('../../include/basis_db.class.php');
+    if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+   
    require_once('../../include/functions.inc.php');
    require_once('../../include/studiengang.class.php');
    require_once('../../include/gruppe.class.php');
@@ -30,18 +34,15 @@
    require_once('../../include/lehrverband.class.php');
    require_once('../../include/benutzerfunktion.class.php');
 
-   if(!$conn=pg_pconnect(CONN_STRING))
-      die('Fehler beim Herstellen der DB Connection');
-
    $user=get_uid();
 
-   $is_lector=check_lektor($user,$conn);
+   $is_lector=check_lektor($user);
    $is_stdv=false;
    
    //Studentenvertreter duerfen den Verteiler tw_std oeffnen
    if(!$is_lector)
    {
-   		$fkt = new benutzerfunktion($conn);
+   		$fkt = new benutzerfunktion();
    		if($fkt->benutzerfunktion_exists($user, 'stdv'))
    			$is_stdv=true;
    }
@@ -145,7 +146,7 @@
 		   	<h3>Zum Verteiler anzeigen bitte auf &nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;]&nbsp;klicken&nbsp; bzw. zum Ausblenden auf&nbsp;&nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_down.png' title='Ausblenden' alt='Ausblenden' border='0'>&nbsp;]&nbsp;klicken</h3>
 	   		<br>
 <?php
-		$stg_obj = new studiengang($conn);
+		$stg_obj = new studiengang();
 #		if(!$stg_obj->getAll('ascii(bezeichnung), bezeichnung, typ', true))
 		if(!$stg_obj->getAll(null, true))
 			echo $stg_obj->errormsg;
@@ -213,7 +214,7 @@
 
 
 			// Verteiler Normal
-			$grp_obj = new gruppe($conn);
+			$grp_obj = new gruppe();
 			if(!$grp_obj->getgruppe($row->studiengang_kz, null, true, true))
 				echo $grp_obj->errormsg;
 
@@ -281,11 +282,11 @@
 		  	if($row->studiengang_kz!=0) //0 ist für ganzes TW
 		  	{
 				// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
-				$std_obj = new student($conn, $user);
+				$std_obj = new student($user);
 
 		  		$qry_stud = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row->studiengang_kz' AND student_uid NOT LIKE '_Dummy%'";
 
-			  		if(!$row_stud=pg_fetch_object(pg_query($conn, $qry_stud)))
+			  		if(!$row_stud=$db->db_fetch_object($db->db_query($qry_stud)))
 			  			echo 'Fehler beim Laden der Studenten';
 
 			  		if($row_stud->anzahl>0)
@@ -317,7 +318,7 @@
 					echo '<table class="tabcontent2" id="'.$row->kuerzel.'" style="display: none">';
 
 			  		//$sql_query1 = "SELECT DISTINCT studiengang_kz, semester, verband, gruppe FROM public.tbl_student where studiengang_kz ='$row->studiengang_kz' AND student_uid NOT LIKE '_dummy%' ORDER BY semester";
-					$lv_obj = new lehrverband($conn);
+					$lv_obj = new lehrverband();
 					$lv_obj->getlehrverband($row->studiengang_kz);
 
 					$zeilenzaehler=0;
@@ -336,7 +337,7 @@
 				  					$qry_cnt .= " AND gruppe='$row1->gruppe'";
 			  				}
 
-				  			if($row_cnt = pg_fetch_object(pg_query($conn, $qry_cnt)))
+				  			if($row_cnt = $db->db_fetch_object($db->db_query($qry_cnt)))
 				  			{
 				  				if($row_cnt->anzahl>0)
 				  				{
@@ -365,15 +366,12 @@
 							  			$param .="&amp;grp=$row1->gruppe";
 							  			echo " Gruppe $row1->gruppe";
 							  		}
-
 						  			echo "</td>";
 						  			echo "  <td width='23'></td>";
 						  			echo "  <td width=\"200\"><a href='mailto:$strhelp@".DOMAIN."' class=\"Item\">$strhelp@".DOMAIN."</a></td>";
 						  			echo "  <td width=\"100\" align=\"right\"><a class=\"Item\" href=\"#\" onClick='javascript:window.open(\"stud_in_grp.php?".$param."\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes,resizable=1\");return false;'>Personen</a></td>";
 						  			echo "</tr>";
 						  			$zeilenzaehler++;
-
-
 			  					}
 			  				}
 			  			}
@@ -389,7 +387,6 @@
 		  		{
 		  			echo "</table>";
 		  		}
-			
 		  }
 		  echo "</table>";
 

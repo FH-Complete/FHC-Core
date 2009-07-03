@@ -15,14 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 // Holt den Hexcode eines Bildes aus der DB wandelt es in Zeichen
 // um und gibt das ein Bild zurueck.
 // Aufruf mit <img src='bild.php?src=frage&frage_id=1
-require_once('../config.inc.php');
+  require_once('../../config/cis.config.inc.php');
+  require_once('../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+  		die('Fehler beim Oeffnen der Datenbankverbindung');
 
 //Hexcode in String umwandeln
 function hexstr($hex)
@@ -32,10 +36,6 @@ function hexstr($hex)
         $string.=chr(hexdec($hex[$i].$hex[$i+1]));
     return $string;
 }
-
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
 
 //Hex Dump aus der DB holen
 $qry = '';
@@ -55,8 +55,8 @@ if($qry!='')
 	//Header fuer Sound schicken
 	header("Content-type: audio/mpeg");
 	//header("Content-type: audio/wav");
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
 	//HEX Werte in Zeichen umwandeln und ausgeben
 	echo hexstr($row->audio);
 }

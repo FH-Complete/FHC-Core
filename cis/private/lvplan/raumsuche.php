@@ -19,13 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../config.inc.php');
+
+require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/raumtyp.class.php');
 require_once('../../../include/datum.class.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur Datenbank');
 
 $datum = (isset($_POST['datum'])?$_POST['datum']:date('d.m.Y'));
 $vonzeit = (isset($_POST['vonzeit'])?$_POST['vonzeit']:date('H:i'));
@@ -87,7 +85,7 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return che
 		Bis* <input type="text" name="biszeit" id="biszeit" size="5" value="'.$biszeit.'">
 		Raumtyp: <SELECT name="raumtyp">
 		<OPTION value="">Alle</OPTION>';
-$raumtyp_obj = new raumtyp($conn);
+$raumtyp_obj = new raumtyp();
 $raumtyp_obj->getAll();
 
 foreach ($raumtyp_obj->result as $row)
@@ -145,7 +143,7 @@ if($sent)
 	}
 	if(!$error)
 	{
-		$ort = new ort($conn);
+		$ort = new ort();
 		$ort->search($datum, $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
 		
 		echo '<br><table>';

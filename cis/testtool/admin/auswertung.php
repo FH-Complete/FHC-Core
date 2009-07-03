@@ -21,7 +21,11 @@
  *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
  */
 
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 
@@ -62,11 +66,6 @@ function sortByField($multArray,$sortField,$desc=true)
     return $ResArray;
 }
 
-
-// Verbindungsaufbau
-if (!$conn = pg_connect(CONN_STRING))
-	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-
 $ergebnis='';
 $gebiet=array();
 $kategorie=array();
@@ -76,10 +75,10 @@ $erg_kat=array();
 $sql_query=";
 		SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
 //echo $sql_query;
-if(!($result=pg_query($conn, $sql_query)))
-    die(pg_errormessage($conn));
+if(!($result=$db->db_query($sql_query)))
+    die($db->db_last_error());
 
-while ($row=pg_fetch_object($result))
+while ($row=$db->db_fetch_object($result))
 {
 	$rtest[$row->reihungstest_id]->reihungstest_id=$row->reihungstest_id;
 	$rtest[$row->reihungstest_id]->studiengang_kz=$row->studiengang_kz;
@@ -97,9 +96,9 @@ if (isset($_POST['reihungstest']))
 		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($_POST['studiengang'])."'";
 	
 	//echo $sql_query;
-	if(!($result=pg_query($conn, $sql_query)))
-	    die(pg_errormessage($conn));
-	while ($row=pg_fetch_object($result))
+	if(!($result=$db->db_query($sql_query)))
+	     die($db->db_last_error());
+	while ($row=$db->db_fetch_object($result))
 	{
 		$gebiet[$row->gebiet_id]->name=$row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id=$row->gebiet_id;
@@ -116,10 +115,10 @@ if (isset($_POST['reihungstest']))
 		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($_POST['studiengang'])."'";
 	
 	//echo $sql_query;
-	if(!($result=pg_query($conn, $sql_query)))
-	    die(pg_errormessage($conn));
+	if(!($result=$db->db_query($sql_query)))
+	    die($db->db_last_error());
 	
-	while ($row=pg_fetch_object($result))
+	while ($row=$db->db_fetch_object($result))
 	{
 		$ergebnis[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
 		$ergebnis[$row->pruefling_id]->nachname=$row->nachname;
@@ -161,11 +160,11 @@ if (isset($_POST['reihungstest']))
 		$sql_query.=" AND tbl_prestudent.studiengang_kz='".$_POST['studiengang']."'";
 	
 	//echo $sql_query;
-	if(!($result=pg_query($conn, $sql_query)))
-	    die(pg_errormessage($conn));
+	if(!($result=$db->db_query($sql_query)))
+	    die($db->db_last_error());
 	$gesamtpunkte=array();
 	
-	while ($row=pg_fetch_object($result))
+	while ($row=$db->db_fetch_object($result))
 	{
 		$gesamtpunkte[$row->kategorie_kurzbz]=$row->gesamtpunkte;
 		$kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
@@ -186,10 +185,10 @@ if (isset($_POST['reihungstest']))
 	$sql_query.=" ORDER BY nachname, vorname";
 	//echo $sql_query;
 	
-	if(!($result=pg_query($conn, $sql_query)))
-	    die(pg_errormessage($conn));
+	if(!($result=$db->db_query($sql_query)))
+	     die($db->db_last_error());
 	
-	while ($row=pg_fetch_object($result))
+	while ($row=$db->db_fetch_object($result))
 	{
 		$erg_kat[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
 		$erg_kat[$row->pruefling_id]->nachname=$row->nachname;
@@ -207,7 +206,7 @@ if (isset($_POST['reihungstest']))
 }
 
 //Studiengaenge laden
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
 $stg_arr = array();
 

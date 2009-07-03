@@ -22,7 +22,7 @@
 // **
 // * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
 
-	require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/person.class.php');
@@ -32,8 +32,6 @@
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
 
-	if (!$conn = pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	$datum_obj = new datum();
 
@@ -46,7 +44,7 @@
 	$datum_ende=date('Y-m-d',$ts_ende);
 
 	// Lektoren holen
-	$ma=new mitarbeiter($conn);
+	$ma=new mitarbeiter();
 	$mitarbeiter=$ma->getMitarbeiterZeitsperre($datum_beginn,$datum_ende);
 ?>
 
@@ -89,7 +87,7 @@
 	</TR>
 
 	<?php
-	$zs=new zeitsperre($conn);
+	$zs=new zeitsperre();
 	foreach ($mitarbeiter as $ma)
 	{
 		$zs->getzeitsperren($ma->uid);

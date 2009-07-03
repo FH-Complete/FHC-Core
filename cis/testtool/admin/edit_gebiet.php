@@ -24,15 +24,15 @@
  * Seite zum Editieren von Testtool-Gebieten
  */
 
-require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/gebiet.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
+if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-$user = get_uid();
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -57,7 +57,7 @@ echo '<h1>&nbsp;Gebiet bearbeiten</h1>';
 if(!$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
-$gebiet = new gebiet($conn);
+$gebiet = new gebiet();
 $gebiet->getAll();
 
 echo '<a href="index.php?gebiet_id='.$gebiet_id.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
@@ -87,7 +87,7 @@ echo '<br /><br />';
 //Speichern der Daten
 if(isset($_POST['speichern']))
 {
-	$gebiet = new gebiet($conn);
+	$gebiet = new gebiet();
 	if($gebiet->load($gebiet_id))
 	{
 		$gebiet->kurzbz = $_POST['kurzbz'];
@@ -125,7 +125,7 @@ if(isset($_POST['speichern']))
 
 if($gebiet_id!='')
 {
-	$gebiet = new gebiet($conn, $gebiet_id);
+	$gebiet = new gebiet($gebiet_id);
 
 	echo "<hr />";
 	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?gebiet_id='.$gebiet_id.'" method="POST">';

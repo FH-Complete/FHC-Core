@@ -25,7 +25,12 @@
 
 header('Content-type: application/xhtml+xml');
 
-require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
+
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/frage.class.php');
 require_once('../../../include/vorschlag.class.php');
@@ -43,10 +48,6 @@ function strhex($string)
         $hex.=(strlen(dechex(ord($string[$i])),'UTF-8')<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
     return $hex;
 }
-
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 $user=get_uid();
 $rechte = new benutzerberechtigung();
@@ -139,7 +140,7 @@ if(isset($_POST['submitbild']))
 			//in HEX-Werte umrechnen
 			$content = strhex($content);
 
-			$frage = new frage($conn);
+			$frage = new frage();
 			if($frage->getFrageSprache($_GET['frage_id'], $sprache))
 			{
 				//HEX Wert in die Datenbank speichern
@@ -178,7 +179,7 @@ if(isset($_POST['submitaudio']))
 			//in HEX-Werte umrechnen
 			$content = strhex($content);
 
-			$frage = new frage($conn);
+			$frage = new frage();
 			if($frage->getFrageSprache($_GET['frage_id'], $sprache))
 			{
 				//HEX Wert in die Datenbank speichern
@@ -200,7 +201,7 @@ if(isset($_POST['submitaudio']))
 //Speichern der Frage-Daten
 if(isset($_POST['submitdata']))
 {
-	$frage = new frage($conn);
+	$frage = new frage();
 	if($frage->load($_GET['frage_id']))
 	{
 		$frage->demo = isset($_POST['demo']);
@@ -281,7 +282,7 @@ if(isset($_POST['submitvorschlag']))
 		else
 			echo "<b>Datei ist kein Bild!</b><br />";
 	}
-	$vorschlag = new vorschlag($conn);
+	$vorschlag = new vorschlag();
 	$error=false;
 
 	if($_POST['vorschlag_id']!='')
@@ -345,7 +346,7 @@ if(isset($_POST['submitvorschlag']))
 //Vorschlag loeschen
 if(isset($_GET['type']) && $_GET['type']=='delete' && isset($_GET['vorschlag_id']))
 {
-	$vs = new vorschlag($conn);
+	$vs = new vorschlag();
 	if(!$vs->delete($_GET['vorschlag_id']))
 		echo '<b>'.$vs->errormsg.'</b><br />';
 	$vorschlag_id='';
@@ -354,7 +355,7 @@ if(isset($_GET['type']) && $_GET['type']=='delete' && isset($_GET['vorschlag_id'
 // anlegen einer neuen Frage
 if(isset($_GET['type']) && $_GET['type']=='neuefrage')
 {
-	$frage_obj = new frage($conn);
+	$frage_obj = new frage();
 	
 	$frage_obj->gebiet_id = $_GET['gebiet_id'];
 	$frage_obj->nummer=999;
@@ -384,7 +385,7 @@ if(isset($_GET['type']) && $_GET['type']=='neuefrage')
 //Gebiet pruefen
 if(isset($_GET['type']) && $_GET['type']=='gebietpruefen' && isset($_GET['gebiet_id']))
 {
-	$gebiet = new gebiet($conn, $gebiet_id);
+	$gebiet = new gebiet($gebiet_id);
 	
 	if($gebiet->check_gebiet($gebiet_id))
 	{
@@ -408,10 +409,10 @@ echo '<table width="100%"><tr><td>';
 
 //Liste der Gebiete
 $qry  = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	echo 'Gebiet: <select onchange="window.location.href=\''.$PHP_SELF.'?gebiet_id=\'+this.value;">';
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($gebiet_id=='')
 			$gebiet_id = $row->gebiet_id;
@@ -434,9 +435,9 @@ echo '</td><td align="right">';
 
 $qry = "SELECT sprache FROM public.tbl_sprache ORDER BY sprache DESC";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($sprache=='')
 			$sprache = $row->sprache;
@@ -453,10 +454,10 @@ echo '<br />';
 // Liste der Fragen
 $qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' ORDER BY nummer";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	echo 'Nummer: ';
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($nummer=='')
 			$nummer = $row->nummer;
@@ -472,7 +473,7 @@ if($result = pg_query($conn, $qry))
 echo "\n\n<br />";
 
 //Fragen holen
-$frage = new frage($conn);
+$frage = new frage();
 $frage->getFragen($gebiet_id, $nummer);
 
 if(count($frage->result)==1)
@@ -554,7 +555,7 @@ if($frage_id!='')
 	echo "</table>";
 	echo '</td><td style="border-left: 1px solid black" valign="top">';
 
-	$vorschlag = new vorschlag($conn);
+	$vorschlag = new vorschlag();
 
 	if($vorschlag_id!='')
 		if(!$vorschlag->load($vorschlag_id, $sprache))
@@ -592,7 +593,7 @@ if($frage_id!='')
 
 	echo '</td></tr></table>';
 
-	$vorschlag = new vorschlag($conn);
+	$vorschlag = new vorschlag();
 	$vorschlag->getVorschlag($frage_id, $sprache, false);
 	$i=0;
 	if(count($vorschlag->result)>0)

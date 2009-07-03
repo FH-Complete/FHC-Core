@@ -17,9 +17,11 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *
  */
-require_once('../config.inc.php');
+require_once('../../config/cis.config.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -28,20 +30,17 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 
-//Connection Herstellen
-if(!$db_conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Oeffnen der Datenbankverbindung');
-
-$user=get_uid();
+	if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $cutlength=10;
 $rechte=new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-$fkt=new funktion($db_conn);
+$fkt=new funktion();
 $fkt->getAll($user);
 
-$stg_obj = new studiengang($db_conn);
+$stg_obj = new studiengang();
 
 if($stg_obj->getAll('kurzbzlang', false))
 {
@@ -53,12 +52,12 @@ else
 	die('Fehler beim Auslesen der Studiengaenge');
 
 
-if(check_lektor($user,$db_conn))
+if(check_lektor($user))
    $is_lector=true;
 else
    $is_lector=false;
   
-if(check_student($user,$db_conn))
+if(check_student($user))
    $is_student=true;
 else
    $is_student=false;
@@ -76,9 +75,9 @@ else
 	}
 
 $qry = "SELECT aktiv FROM campus.vw_benutzer WHERE uid='$user'";
-if($result = pg_query($db_conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if($row = pg_fetch_object($result))
+	if($row = $db->db_fetch_object($result))
 	{
 		$aktiv = ($row->aktiv=='t'?true:false);
 	}

@@ -19,7 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
@@ -94,13 +98,10 @@ echo '<table class="tabcontent">
 	    </table>
 	    <br>';
 
-//Variablen initialisieren
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Datenbankverbindung fehlgeschlagen');
 
 $user = get_uid();
 $datum = new datum();
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 $stg_arr = array();
 
@@ -121,7 +122,7 @@ $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 //Speichern der Daten
 if(isset($_POST['save']) || isset($_POST['edit']))
 {
-	$zeit = new zeitaufzeichnung($conn);
+	$zeit = new zeitaufzeichnung();
 	
 	if(isset($_POST['edit']))
 	{
@@ -162,7 +163,7 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 //Datensatz loeschen
 if(isset($_GET['type']) && $_GET['type']=='delete')
 {
-	$zeit = new zeitaufzeichnung($conn);
+	$zeit = new zeitaufzeichnung();
 	
 	if($zeit->load($zeitaufzeichnung_id))
 	{
@@ -183,7 +184,7 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 //Laden der Daten zum aendern
 if(isset($_GET['type']) && $_GET['type']=='edit')
 {
-	$zeit = new zeitaufzeichnung($conn);
+	$zeit = new zeitaufzeichnung();
 	
 	if($zeit->load($zeitaufzeichnung_id))
 	{
@@ -209,9 +210,9 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 //Projekte holen fuer zu denen der Benutzer zugeteilt ist
 $qry_projekt = "SELECT distinct tbl_projekt.* FROM fue.tbl_projektbenutzer JOIN fue.tbl_projekt USING(projekt_kurzbz) WHERE beginn<=now() AND (ende>=now() OR ende is null) AND uid='$user'";
 
-if($result_projekt = pg_query($conn, $qry_projekt))
+if($result_projekt = $db->db_query($qry_projekt))
 {
-	if(pg_num_rows($result_projekt)>0)
+	if($db->db_num_rows($result_projekt)>0)
 	{
 		$bn = new benutzer();
 		if(!$bn->load($user))
@@ -226,7 +227,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		echo '<table>';
 		//Projekt
 		echo '<tr><td>Projekt</td><td><SELECT name="projekt" id="projekt">';
-		while($row_projekt = pg_fetch_object($result_projekt))
+		while($row_projekt = $db->db_fetch_object($result_projekt))
 		{
 			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
 				$selected = 'selected';
@@ -239,7 +240,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		
 		//Studiengang
 		echo '<td>Studiengang</td><td><SELECT name="studiengang">';
-		$stg_obj = new studiengang($conn);
+		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz',false);
 		
 		echo "<option value=''>-- keine Auswahl --</option>";
@@ -262,10 +263,10 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		echo '<td>Aktivit&auml;t</td><td>';
 		
 		$qry = "SELECT * FROM fue.tbl_aktivitaet ORDER by beschreibung";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			echo '<SELECT name="aktivitaet">';
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				if($aktivitaet_kurzbz == $row->aktivitaet_kurzbz)
 					$selected = 'selected';
@@ -280,7 +281,7 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 		echo '</td><td>Fachbereich</td><td><SELECT name="fachbereich">';
 		echo '<option value="">-- keine Auswahl --</option>';
 		
-		$fb_obj = new fachbereich($conn);
+		$fb_obj = new fachbereich();
 		$fb_obj->getAll();
 		
 		foreach ($fb_obj->result as $fb) 
@@ -339,11 +340,11 @@ if($result_projekt = pg_query($conn, $qry_projekt))
 	    		ORDER BY start DESC";
 	    //AND ende>(now() - INTERVAL '40 days')
 	    //echo $qry;
-	    if($result = pg_query($conn, $qry))
+	    if($result = $db->db_query($qry))
 	    {
 		    $i = 0;
 		    $summe=0;
-			while($row=pg_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 		    {		        
 		    	$summe = $row->summe;
 				echo "   <tr>\n";

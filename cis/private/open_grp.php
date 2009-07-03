@@ -34,19 +34,8 @@ function mail_id_generator()
 	}
     return $mail_id;
 }
-
-require_once('../config.inc.php');
+require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
-/* ffe, 20051020 to stop bored people
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Fehler beim Herstellen der DB Verbindung");
-
-if(!check_lektor($_SERVER["REMOTE_USER"],$conn))
-{
-	ob_clean();
-	exit();
-}
-*/
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

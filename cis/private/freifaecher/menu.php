@@ -21,21 +21,19 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *
  */
-	require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
   require_once('../../../include/functions.inc.php');
   require_once('../../../include/benutzerberechtigung.class.php');
   require_once('../../../include/lehrveranstaltung.class.php');
 
-  //Connection Herstellen
-  if(!$sql_conn = pg_pconnect(CONN_STRING))
-     die("Fehler beim oeffnen der Datenbankverbindung");
+	if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	$user = get_uid();
 
   $rechte= new benutzerberechtigung();
   $rechte->getBerechtigungen($user);
 
-	if(check_lektor($user,$sql_conn))
+	if(check_lektor($user))
        $is_lector=true;
   else
        $is_lector=false;
@@ -111,7 +109,7 @@
 		  <td class='tdwrap'>&nbsp;</td>
 		</tr>
 		<?php
-			$lv_obj = new lehrveranstaltung($sql_conn);
+			$lv_obj = new lehrveranstaltung();
 			if(!$lv_obj->load_lva('0',null, null, true,null,'bezeichnung'))
 				echo "<tr><td>$lv_obj->errormsg</td></tr>";
 

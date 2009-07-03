@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/konto.class.php');
@@ -30,10 +30,6 @@
 	require_once('../../../include/studiengang.class.php');
 
 	$uid=get_uid();
-
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Fehler beim Hestellen der Datenbankverbindung.");
-	   	
 	$datum_obj = new datum();
 
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -45,7 +41,7 @@
 			</head>
 			<body id="inhalt">';
 
-	$studiengang = new studiengang($conn);
+	$studiengang = new studiengang();
 	$studiengang->getAll();
 	
 	$stg_arr = array();
@@ -66,14 +62,14 @@
 	      				</tr>
 	      			</table>';
 		
-	$konto = new konto($conn);
+	$konto = new konto();
 	$konto->getBuchungstyp();
 	$buchungstyp = array();
 	
 	foreach ($konto->result as $row)
 		$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
 	
-	$konto = new konto($conn);
+	$konto = new konto();
 	$konto->getBuchungen($benutzer->person_id);
 	if(count($konto->result)>0)
 	{

@@ -9,9 +9,14 @@
  * Update: 			11.11.2004 von Christian Paminger
  *****************************************************************************/
 
-require_once('../../config.inc.php');
-require_once('../../../include/ort.class.php');
-require_once('../../../include/functions.inc.php');
+
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
+  require_once('../../../include/ort.class.php');
+  require_once('../../../include/functions.inc.php');
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
@@ -35,14 +40,12 @@ if (isset($_GET['grp']))
 if (isset($_GET['gruppe_kurzbz']))
 	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
 
-// Datenbankverbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-// Datums Format und search_path
-if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
-	die(pg_last_error($conn));
 
-$stsem = getStudiensemesterFromDatum($conn, $datum);
+// Datums Format und search_path
+if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
+	die($db->db_last_error());
+
+$stsem = getStudiensemesterFromDatum($datum);
 	
 //Stundenplan
 $sql_query='SELECT vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
@@ -72,8 +75,8 @@ else
 }
 $sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, gruppe_kurzbz LIMIT 100';
 //echo $sql_query.'<BR>';
-$erg_stpl=pg_exec($conn, $sql_query);
-$num_rows_stpl=pg_numrows($erg_stpl);
+$erg_stpl=$db->db_query($sql_query);
+$num_rows_stpl=$db->db_numrows($erg_stpl);
 
 //Reservierungen
 $sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM vw_reservierung, vw_mitarbeiter WHERE datum='$datum' AND stunde=$stunde";
@@ -86,8 +89,8 @@ if ($type=='verband' || $type=='student')
     $sql_query.=" AND studiengang_kz='$stg_kz' AND (semester='$sem' OR semester=0 OR semester IS NULL)";
 $sql_query.=' ORDER BY  titel LIMIT 100';
 //echo $sql_query.'<BR>';
-$erg_repl=pg_exec($conn, $sql_query);
-$num_rows_repl=pg_numrows($erg_repl);
+$erg_repl=$db->db_query($sql_query);
+$num_rows_repl=$db->db_num_rows($erg_repl);
 ?>
 
 <html>
@@ -105,25 +108,25 @@ Stunde: <?php echo $stunde; ?><BR><BR>
 <?php
 if ($num_rows_stpl>0)
 echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th></tr>';
-$ort = new ort($conn);
+$ort = new ort();
 for ($i=0; $i<$num_rows_stpl; $i++)
 {
-    $unr=pg_result($erg_stpl,$i,"unr");
-    $ortkurzbz=pg_result($erg_stpl,$i,"ort_kurzbz");
-    $lehrfachkurzbz=pg_result($erg_stpl,$i,"lehrfach");
-    $bezeichnung=pg_result($erg_stpl,$i,"bezeichnung");
-    $pers_kurzbz=pg_result($erg_stpl,$i,"lektor");
-    $titelpre=pg_result($erg_stpl,$i,"titelpre");
-    $pers_vorname=pg_result($erg_stpl,$i,"vorname");
-    $pers_nachname=pg_result($erg_stpl,$i,"nachname");
-    $pers_email=pg_result($erg_stpl,$i,"uid").'@'.DOMAIN;
-    $stgkurzbz=strtoupper(trim(pg_result($erg_stpl,$i,"stg_typ").pg_result($erg_stpl,$i,"stg_kurzbz")));
-    $semester=trim(pg_result($erg_stpl,$i,"semester"));
-    $verband=trim(pg_result($erg_stpl,$i,"verband"));
-    $gruppe=trim(pg_result($erg_stpl,$i,"gruppe"));
-    $gruppe_kurzbz=trim(pg_result($erg_stpl,$i,"gruppe_kurzbz"));
-    $anzahl_lvb=trim(pg_result($erg_stpl,$i,"anzahl_lvb"));
-    $anzahl_grp=trim(pg_result($erg_stpl,$i,"anzahl_grp"));
+    $unr=$db->db_result($erg_stpl,$i,"unr");
+    $ortkurzbz=$db->db_result($erg_stpl,$i,"ort_kurzbz");
+    $lehrfachkurzbz=$db->db_result($erg_stpl,$i,"lehrfach");
+    $bezeichnung=$db->db_result($erg_stpl,$i,"bezeichnung");
+    $pers_kurzbz=$db->db_result($erg_stpl,$i,"lektor");
+    $titelpre=$db->db_result($erg_stpl,$i,"titelpre");
+    $pers_vorname=$db->db_result($erg_stpl,$i,"vorname");
+    $pers_nachname=$db->db_result($erg_stpl,$i,"nachname");
+    $pers_email=$db->db_result($erg_stpl,$i,"uid").'@'.DOMAIN;
+    $stgkurzbz=strtoupper(trim($db->db_result($erg_stpl,$i,"stg_typ").$db->db_result($erg_stpl,$i,"stg_kurzbz")));
+    $semester=trim($db->db_result($erg_stpl,$i,"semester"));
+    $verband=trim($db->db_result($erg_stpl,$i,"verband"));
+    $gruppe=trim($db->db_result($erg_stpl,$i,"gruppe"));
+    $gruppe_kurzbz=trim($db->db_result($erg_stpl,$i,"gruppe_kurzbz"));
+    $anzahl_lvb=trim($db->db_result($erg_stpl,$i,"anzahl_lvb"));
+    $anzahl_grp=trim($db->db_result($erg_stpl,$i,"anzahl_grp"));
     $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
     $ort->load($ortkurzbz);
     ?>
@@ -151,13 +154,13 @@ if ($num_rows_repl>0)
     echo '<tr><th>Titel</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
     for ($i=0; $i<$num_rows_repl; $i++)
     {
-        $titel=pg_result($erg_repl,$i,"titel");
-        $ortkurzbz=pg_result($erg_repl,$i,"ort_kurzbz");
-        $titelpre=pg_result($erg_repl,$i,"titelpre");
-   		$pers_vorname=pg_result($erg_repl,$i,"vorname");
-   		$pers_nachname=pg_result($erg_repl,$i,"nachname");
-    	$pers_email=pg_result($erg_repl,$i,"uid").'@'.DOMAIN;
-    	$beschreibung=pg_result($erg_repl,$i,"beschreibung");
+        $titel=$db->db_result($erg_repl,$i,"titel");
+        $ortkurzbz=$db->db_result($erg_repl,$i,"ort_kurzbz");
+        $titelpre=$db->db_result($erg_repl,$i,"titelpre");
+   		$pers_vorname=$db->db_result($erg_repl,$i,"vorname");
+   		$pers_nachname=$db->db_result($erg_repl,$i,"nachname");
+    	$pers_email=$db->db_result($erg_repl,$i,"uid").'@'.DOMAIN;
+    	$beschreibung=$db->db_result($erg_repl,$i,"beschreibung");
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
         echo '<td >'.$ortkurzbz.'</td>';

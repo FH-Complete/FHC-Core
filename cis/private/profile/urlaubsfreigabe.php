@@ -20,7 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  */
 
-require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitsperre.class.php');
@@ -29,9 +33,6 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur Datenbank');
 
 $user = get_uid();
 
@@ -77,7 +78,7 @@ echo '<html>
 	<br>
 ';
 //Untergebene holen
-$mitarbeiter = new mitarbeiter($conn);
+$mitarbeiter = new mitarbeiter();
 $mitarbeiter->getUntergebene($user);
 
 if(count($mitarbeiter->untergebene)==0 && !$rechte->isBerechtigt('admin'))
@@ -99,9 +100,9 @@ if($rechte->isBerechtigt('admin'))
 $qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene)";
 
 $mitarbeiter = array();
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$mitarbeiter[$row->uid]['vorname']=$row->vorname;
 		$mitarbeiter[$row->uid]['nachname']=$row->nachname;
@@ -115,7 +116,7 @@ if($uid!='' && !isset($mitarbeiter[$uid]) && $uid!=$user && !$rechte->isBerechti
 //Freigeben eines Urlaubes
 if(isset($_GET['action']) && $_GET['action']=='freigabe')
 {
-	$zeitsperre = new zeitsperre($conn);
+	$zeitsperre = new zeitsperre();
 	if($zeitsperre->load($_GET['id']))
 	{
 		if(isset($mitarbeiter[$zeitsperre->mitarbeiter_uid]))
@@ -142,7 +143,7 @@ if(isset($_POST['saveresturlaub']))
 {
 	if(isset($_POST['resturlaubstage']) && is_numeric($_POST['resturlaubstage']))
 	{
-		$resturlaub = new resturlaub($conn);
+		$resturlaub = new resturlaub();
 		$resturlaub->load($uid);
 		
 		$resturlaub->resturlaubstage=$_POST['resturlaubstage'];
@@ -160,8 +161,12 @@ if(isset($_POST['saveresturlaub']))
 //Monat zeichenen
 function draw_monat($monat)
 {
-	global $untergebene, $mitarbeiter, $conn, $year, $datum_obj, $uid;
+	global $untergebene, $mitarbeiter, $year, $datum_obj, $uid;
 	
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
+  
 	echo '<td style="border: 1px solid black; height:100px; width: 30%" valign="top">';
 	echo '<center><b>';
 	echo date('F',mktime(0,0,0,$monat,1,date('Y')));
@@ -181,9 +186,9 @@ function draw_monat($monat)
 		$qry.=" AND mitarbeiter_uid='".addslashes($uid)."'";
 	$qry.="ORDER BY vondatum, mitarbeiter_uid";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$freigabe='';
 			if($row->freigabeamum!='')
@@ -212,7 +217,7 @@ if($uid!='')
 
 	//Anzeige Resturlaubsberechnung
 	
-	$resturlaub = new resturlaub($conn);
+	$resturlaub = new resturlaub();
 
 	if($resturlaub->load($uid))
 	{
@@ -252,8 +257,8 @@ if($uid!='')
 				(
 					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
 				)";
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
 	$gebuchterurlaub = $row->anzahltage;
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;

@@ -326,13 +326,12 @@
 	$maxalter=(defined('MAXNEWSALTER')?MAXNEWSALTER:30);		
 	
 	$maxalter=0;		
-	
 	$fachbereich_kurzbz=null;
-	$studiengang_kz=0;
-    $semester=0;
+	$studiengang_kz='0';
+    $semester='0';
 #$news_obj->getnews(MAXNEWSALTER,'0','0',true, null, MAXNEWS);
 	if (!$news->getnews($maxalter, $studiengang_kz, $semester, $all, $fachbereich_kurzbz, $maxnews))
-		die($news->errormsg);	
+		 exit($news->errormsg);	
 		
 	// Datenlesen OK - in Tabellenform anzeigen
 	if(count($news->result)<1)

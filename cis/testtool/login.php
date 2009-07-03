@@ -20,7 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../config.inc.php');
+	require_once('../../config/cis.config.inc.php');
+  require_once('../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
@@ -39,10 +43,6 @@ if (isset($_GET['logout']))
 	}
 }
 
-//Connection Herstellen
-if(!$db_conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Oeffnen der Datenbankverbindung');
-
 if(isset($_POST['tag']) && isset($_POST['monat']) && isset($_POST['jahr']))
 {
 	if($_POST['tag']!='' && $_POST['monat']!='' && $_POST['jahr']!='')
@@ -53,10 +53,10 @@ if(isset($_POST['tag']) && isset($_POST['monat']) && isset($_POST['jahr']))
 
 if (isset($_POST['prestudent']) && isset($gebdatum))
 {
-	$ps=new prestudent($db_conn,$_POST['prestudent']);
+	$ps=new prestudent($_POST['prestudent']);
 	if ($gebdatum==$ps->gebdatum)
 	{
-		$pruefling = new pruefling($db_conn);
+		$pruefling = new pruefling();
 		if($pruefling->getPruefling($ps->prestudent_id))
 		{
 			$studiengang = $pruefling->studiengang_kz;
@@ -76,7 +76,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 		$_SESSION['nachname']=$ps->nachname;
 		$_SESSION['vorname']=$ps->vorname;
 		$_SESSION['gebdatum']=$ps->gebdatum;
-		$stg_obj = new studiengang($db_conn, $studiengang);
+		$stg_obj = new studiengang($studiengang);
 		$_SESSION['sprache']=$stg_obj->sprache;
 				
 		$_SESSION['semester']=$semester;
@@ -92,7 +92,7 @@ if (isset($_SESSION['prestudent_id']))
 else
 {
 	//$prestudent_id=null;
-	$ps=new prestudent($db_conn);
+	$ps=new prestudent();
 	$datum=date('Y-m-d');
 	$ps->getPrestudentRT($datum,true);
 	if ($ps->num_rows==0)
@@ -106,7 +106,7 @@ if(isset($_GET['type']) && $_GET['type']=='sprachechange' && isset($_GET['sprach
 
 if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 {
-	$pruefling = new pruefling($db_conn);
+	$pruefling = new pruefling();
 	
 	if(!$pruefling->getPruefling($_SESSION['prestudent_id']))
 	{
@@ -128,7 +128,7 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 
 if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 {
-	$pruefling = new pruefling($db_conn);
+	$pruefling = new pruefling();
 	if($_POST['pruefling_id']!='')
 		if(!$pruefling->load($_POST['pruefling_id']))
 			die('Pruefling wurde nicht gefunden');
@@ -175,10 +175,10 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '</form>';
 		echo '<br><br>';
 				
-		$prestudent = new prestudent($db_conn, $prestudent_id);
-		$stg_obj = new studiengang($db_conn, $prestudent->studiengang_kz);
+		$prestudent = new prestudent($prestudent_id);
+		$stg_obj = new studiengang($prestudent->studiengang_kz);
 		
-		$pruefling = new pruefling($db_conn);
+		$pruefling = new pruefling();
 		if($pruefling->getPruefling($prestudent_id))
 		{
 		
@@ -205,9 +205,9 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 							tbl_pruefling.pruefling_id='".addslashes($pruefling->pruefling_id)."'
 						ORDER BY sprache DESC";
 				echo 'Sprache:';
-				if($result = pg_query($db_conn, $qry))
+				if($result = $db->db_query($qry))
 				{
-					while($row = pg_fetch_object($result))
+					while($row = $db->db_fetch_object($result))
 					{
 						if($_SESSION['sprache']==$row->sprache)
 							$selected='style="border:1px solid black;"';

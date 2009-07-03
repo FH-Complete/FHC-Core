@@ -10,25 +10,29 @@
 	 *	   seit der letzten änderung, ich wurde von ferdinand esberger
 	 * 	   gebeten dies wieder in ordnung zu bringen
 	 */
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/File/SearchReplace.php');
 	require_once('../../../include/File/Match.php');
 
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
 
-	$user = get_uid();
+	if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
 
 	if(!isset($txtUID))
 		$txtUID='';
 	if(!isset($txtPassword))
 		$txtPassword='';
 
-	if(check_lektor($user,$sql_conn))
+	if(check_lektor($user))
        $is_lector=true;
-
+  else
+        $is_lector=false;
 	function ip_increment($ip = "")
 	{
 		$ip = split("\.", $ip);
@@ -105,9 +109,9 @@
 			{
 				$sql_query = "SELECT DISTINCT vorname, nachname FROM campus.vw_benutzer WHERE uid='".addslashes($txtUID)."' LIMIT 1";
 
-				if($result = pg_query($sql_conn, $sql_query))
+				if($result = $db->db_query($sql_query))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $db->db_fetch_object($result))
 					{
 						$name = $row->vorname.' '.$row->nachname;
 					}

@@ -22,7 +22,11 @@
 // Holt den Hexcode eines Bildes aus der DB wandelt es in Zeichen
 // um und gibt das ein Bild zurueck.
 // Aufruf mit <img src='bild.php?src=frage&frage_id=1
-require_once('../config.inc.php');
+
+  require_once('../../config/cis.config.inc.php');
+  require_once('../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+  		die('Fehler beim Oeffnen der Datenbankverbindung');
 
 //Hexcode in String umwandeln
 function hexstr($hex)
@@ -32,10 +36,6 @@ function hexstr($hex)
         $string.=chr(hexdec($hex[$i].$hex[$i+1]));
     return $string;
 }
-
-//Connection Herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
 
 //Hex Dump aus der DB holen
 $qry = '';
@@ -59,8 +59,8 @@ if($qry!='')
 {
 	//Header fuer Bild schicken
 	header("Content-type: image/gif");
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
 	//HEX Werte in Zeichen umwandeln und ausgeben
 	echo hexstr($row->bild);
 }
