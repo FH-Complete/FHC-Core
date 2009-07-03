@@ -7,11 +7,10 @@
 <title>Personen im Mailverteiler</title>
 <body id="inhalt">
 <?php
-    require_once('../config.inc.php');
-
-    //Connection Herstellen
-    if(!$conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
+  require_once('../../config/cis.config.inc.php');
+  require_once('../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+  		die('Fehler beim Oeffnen der Datenbankverbindung');
 
     if(!isset($_GET['kz']))
     	die('Fehlerhafte parameteruebergabe');
@@ -43,9 +42,9 @@
 		$qry.= ' ORDER BY nachname, vorname';
 	}
 
-	if($result=pg_query($conn, $qry))
+	if($result=$db->db_query($qry))
 	{
-		while($row=pg_fetch_object($result))
+		while($row=$db->db_fetch_object($result))
 		{
 			echo "<tr>";
 			echo "  <td>$row->nachname</td>";

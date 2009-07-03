@@ -19,7 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
 
@@ -28,21 +32,17 @@
 	if (isset($_GET['id']))
 		$id=$_GET['id'];
 
-	// Datenbankverbindung
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 	
 	// Datums Format und search_path
-	if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
-		die(pg_last_error($conn));
+	if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
+		die($db->db_last_error());
 
 	if (isset($id))
 	{
 		$sql_query="DELETE FROM tbl_reservierung WHERE reservierung_id=$id";
-		$erg=pg_exec($conn, $sql_query);
+		$erg=$db->db_query($sql_query);
 	}
 
 	
@@ -69,8 +69,8 @@
 	//EIGENE
 	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' AND uid='$uid'";
 	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
-	$erg_res=pg_query($conn, $sql_query);
-	$num_rows_res=pg_numrows($erg_res);
+	$erg_res=$db->db_query($sql_query);
+	$num_rows_res=$db->db_num_rows($erg_res);
 	
 	if ($num_rows_res>0)
 	{
@@ -80,14 +80,13 @@
 		for ($i=0; $i<$num_rows_res; $i++)
 		{
 			$zeile=$i % 2;
-			$id=pg_result($erg_res,$i,"reservierung_id");
-			$datum1=pg_result($erg_res,$i,"datum");
-			$titel=pg_result($erg_res,$i,"titel");
-			$stunde=pg_result($erg_res,$i,"stunde");
-			$ort_kurzbz=pg_result($erg_res,$i,"ort_kurzbz");
-			$pers_uid=pg_result($erg_res,$i,"uid");
-			//$lektor_kurzbz=pg_result($erg_res,$i,"lektor_kurzbz");
-			$beschreibung=pg_result($erg_res,$i,"beschreibung");
+			$id=$db->db_result($erg_res,$i,"reservierung_id");
+			$datum1=$db->db_result($erg_res,$i,"datum");
+			$titel=$db->db_result($erg_res,$i,"titel");
+			$stunde=$db->db_result($erg_res,$i,"stunde");
+			$ort_kurzbz=$db->db_result($erg_res,$i,"ort_kurzbz");
+			$pers_uid=$db->db_result($erg_res,$i,"uid");
+			$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
 			echo '<tr class="liste'.$zeile.'">';
 			echo '<td>'.$datum1.'</td>';
 			echo '<td>'.$titel.'</td>';
@@ -107,8 +106,8 @@
 	//ALLE
 	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' ";
 	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
-	$erg_res=pg_query($conn, $sql_query);
-	$num_rows_res=pg_numrows($erg_res);
+	$erg_res=$db->db_query($sql_query);
+	$num_rows_res=$db->db_num_rows($erg_res);
 	
 	if ($num_rows_res>0)
 	{
@@ -118,14 +117,13 @@
 		for ($i=0; $i<$num_rows_res; $i++)
 		{
 			$zeile=$i % 2;
-			$id=pg_result($erg_res,$i,"reservierung_id");
-			$datum=pg_result($erg_res,$i,"datum");
-			$titel=pg_result($erg_res,$i,"titel");
-			$stunde=pg_result($erg_res,$i,"stunde");
-			$ort_kurzbz=pg_result($erg_res,$i,"ort_kurzbz");
-			$pers_uid=pg_result($erg_res,$i,"uid");
-			//$lektor_kurzbz=pg_result($erg_res,$i,"lektor_kurzbz");
-			$beschreibung=pg_result($erg_res,$i,"beschreibung");
+			$id=$db->db_result($erg_res,$i,"reservierung_id");
+			$datum=$db->db_result($erg_res,$i,"datum");
+			$titel=$db->db_result($erg_res,$i,"titel");
+			$stunde=$db->db_result($erg_res,$i,"stunde");
+			$ort_kurzbz=$db->db_result($erg_res,$i,"ort_kurzbz");
+			$pers_uid=$db->db_result($erg_res,$i,"uid");
+			$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
 			echo '<tr class="liste'.$zeile.'">';
 			echo '<td>'.$datum.'</td>';
 			echo '<td>'.$titel.'</td>';

@@ -336,7 +336,7 @@ else
 		
 		//Lektoren laden
 		$lektoren = '';
-		$lehreinheitmitarbeiter = new lehreinheitmitarbeiter($conn);
+		$lehreinheitmitarbeiter = new lehreinheitmitarbeiter();
 		$lehreinheitmitarbeiter->getLehreinheitmitarbeiter($row->lehreinheit_id);
 		
 		foreach ($lehreinheitmitarbeiter->lehreinheitmitarbeiter as $ma)

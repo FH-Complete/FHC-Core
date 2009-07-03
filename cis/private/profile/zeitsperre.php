@@ -22,7 +22,7 @@
 // **
 // * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
 
-	require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/person.class.php');
@@ -81,14 +81,10 @@
 			//&lektor=$lektor&funktion=$funktion";
 	}
 
-
-	if (!$conn = pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-
 	$datum_obj = new datum();
 
 	// Studiensemester setzen
-	$ss=new studiensemester($conn,$studiensemester);
+	$ss=new studiensemester($studiensemester);
 	if ($studiensemester==null)
 	{
 		$studiensemester = $ss->getaktorNext();
@@ -110,7 +106,7 @@
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
 	// Lektoren holen
-	$ma=new mitarbeiter($conn);
+	$ma=new mitarbeiter();
 
 	if(!is_null($institut))
 	{
@@ -151,7 +147,7 @@
 		{
 			echo '<br>';
 			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">Institut: <SELECT name="institut">';
-			$fachbereich = new fachbereich($conn);
+			$fachbereich = new fachbereich();
 			$fachbereich->getAll();
 			echo "<option value='' ".(is_null($institut)?'selected':'').">-- Auswahl --</option>";
 			foreach ($fachbereich->result as $fb)
@@ -190,7 +186,7 @@
 	</TR>
 
 	<?php
-	$zs=new zeitsperre($conn);
+	$zs=new zeitsperre();
 	foreach ($mitarbeiter as $ma)
 	{
 		if($ma->aktiv)

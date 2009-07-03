@@ -27,7 +27,7 @@
 // ---------------- Diverse Funktionen und UID des Benutzers ermitteln
 	require_once('../../../include/functions.inc.php');
 	if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 // ---------------- Classen Datenbankabfragen und Funktionen 
 	include_once('../../../include/person.class.php');

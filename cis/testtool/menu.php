@@ -20,14 +20,14 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('../config.inc.php');
+	require_once('../../config/cis.config.inc.php');
+  require_once('../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 require_once('../../include/gebiet.class.php');
-
 session_start();
 
-//Connection Herstellen
-if(!$db_conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim oeffnen der Datenbankverbindung');
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -53,11 +53,11 @@ if (isset($_SESSION['pruefling_id']))
 	  	
 	$qry = "SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz='".addslashes($_SESSION['studiengang_kz'])."' AND semester='".addslashes($_SESSION['semester'])."' ORDER BY reihung";
 	//echo $qry;
-	if($result = pg_query($db_conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
-			$gebiet = new gebiet($db_conn);
+			$gebiet = new gebiet();
 			if($gebiet->check_gebiet($row->gebiet_id))
 			{
 				//Status der Gebiete Pruefen
@@ -66,9 +66,9 @@ if (isset($_SESSION['pruefling_id']))
 				$qry = "SELECT extract('epoch' from '$gebiet->zeit'-(now()-min(begintime))) as time
 						FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
 						WHERE gebiet_id='".addslashes($row->gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
-				if($result_time = pg_query($db_conn, $qry))
+				if($result_time = $db->db_query($qry))
 				{
-					if($row_time = pg_fetch_object($result_time))
+					if($row_time = $db->db_fetch_object($result_time))
 					{
 						if($row_time->time>0)
 						{

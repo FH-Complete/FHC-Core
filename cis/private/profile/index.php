@@ -20,7 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Simane-Sequens <	gerald.simane-sequens@technikum-wien.at>.
  */
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/studiengang.class.php');
@@ -37,57 +41,55 @@
 	}
 		
 	$stg = '';
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-	   	
-	$stg_obj = new studiengang($conn);
+
+	$stg_obj = new studiengang();
 	$stg_obj->getAll('typ, kurzbz', false);
 	
 	$stg_arr = array();
 	foreach ($stg_obj->result as $row)
 		$stg_arr[$row->studiengang_kz]=$row->kurzbzlang;
 	
-	if(!($erg=pg_query($conn, "SELECT * FROM campus.vw_benutzer WHERE uid='$uid'")))
-		die(pg_last_error($conn));
-	$num_rows=pg_num_rows($erg);
+	if(!($erg=$db->db_query("SELECT * FROM campus.vw_benutzer WHERE uid='$uid'")))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($erg);
 	if ($num_rows==1)
 	{
-		$person_id=pg_result($erg,0,"person_id");
-		$vorname=pg_result($erg,0,"vorname");
-		$vornamen=pg_result($erg,0,"vornamen");
-		$nachname=pg_result($erg,0,"nachname");
-		$gebdatum=pg_result($erg,0,"gebdatum");
-		$gebort=pg_result($erg,0,"gebort");
-		$titelpre=pg_result($erg,0,"titelpre");
-		$titelpost=pg_result($erg,0,"titelpost");
-		$email=pg_result($erg,0,"uid").'@'.DOMAIN;
-		$email_alias=pg_result($erg,0,"alias");
-		$hp=pg_result($erg,0,"homepage");
-		$aktiv=pg_result($erg,0,"aktiv");
-		$foto=pg_result($erg,0,"foto");
+		$person_id=$db->db_result($erg,0,"person_id");
+		$vorname=$db->db_result($erg,0,"vorname");
+		$vornamen=$db->db_result($erg,0,"vornamen");
+		$nachname=$db->db_result($erg,0,"nachname");
+		$gebdatum=$db->db_result($erg,0,"gebdatum");
+		$gebort=$db->db_result($erg,0,"gebort");
+		$titelpre=$db->db_result($erg,0,"titelpre");
+		$titelpost=$db->db_result($erg,0,"titelpost");
+		$email=$db->db_result($erg,0,"uid").'@'.DOMAIN;
+		$email_alias=$db->db_result($erg,0,"alias");
+		$hp=$db->db_result($erg,0,"homepage");
+		$aktiv=$db->db_result($erg,0,"aktiv");
+		$foto=$db->db_result($erg,0,"foto");
 	}
-	if(!($erg_stud=pg_query($conn, "SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='$uid'")))
-		die(pg_last_error($conn));
-	$stud_num_rows=pg_num_rows($erg_stud);
+	if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='$uid'")))
+		die($db->db_last_error());
+	$stud_num_rows=$db->db_num_rows($erg_stud);
 
 	if ($stud_num_rows==1)
 	{
-		$stg=pg_result($erg_stud,0,"studiengang_kz");
-		$stgbez=pg_result($erg_stud,0,"stgbz");
-		$stgkz=pg_result($erg_stud,0,"stgkz");
-		$semester=pg_result($erg_stud,0,"semester");
-		$verband=pg_result($erg_stud,0,"verband");
-		$gruppe=pg_result($erg_stud,0,"gruppe");
-		$matrikelnr=pg_result($erg_stud,0,"matrikelnr");
+		$stg=$db->db_result($erg_stud,0,"studiengang_kz");
+		$stgbez=$db->db_result($erg_stud,0,"stgbz");
+		$stgkz=$db->db_result($erg_stud,0,"stgkz");
+		$semester=$db->db_result($erg_stud,0,"semester");
+		$verband=$db->db_result($erg_stud,0,"verband");
+		$gruppe=$db->db_result($erg_stud,0,"gruppe");
+		$matrikelnr=$db->db_result($erg_stud,0,"matrikelnr");
 	}
-	if(!($erg_lekt=pg_query($conn, "SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'")))
-		die(pg_last_error($conn));
+	if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'")))
+		die($db->db_last_error());
 
 		
-	$lekt_num_rows=pg_num_rows($erg_lekt);
+	$lekt_num_rows=$db->db_num_rows($erg_lekt);
 	if ($lekt_num_rows==1)
 	{
-		$row=pg_fetch_object($erg_lekt,0);
+		$row=$db->db_fetch_object($erg_lekt,0);
 		$kurzbz=$row->kurzbz;
 		$tel=$row->telefonklappe;
 
@@ -98,17 +100,17 @@
 			if($row->standort_kurzbz!='')
 			{
 						$qry = "SELECT telefon FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma WHERE tbl_standort.standort_kurzbz='$row->standort_kurzbz' AND tbl_standort.adresse_id=tbl_adresse.adresse_id AND tbl_adresse.firma_id=tbl_firma.firma_id";
-						if($result_tel = pg_query($conn, $qry))
-						if($row_tel = pg_fetch_object($result_tel))
+						if($result_tel = $db->db_query($qry))
+						if($row_tel = $db->db_fetch_object($result_tel))
 						$vorwahl = $row_tel->telefon;
 			}
 		}	
 	}
 
 	// Mail-Groups
-	if(!($erg_mg=pg_query($conn, "SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid' ORDER BY gruppe_kurzbz")))
-		die(pg_last_error($conn));
-	$nr_mg=pg_num_rows($erg_mg);
+	if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid' ORDER BY gruppe_kurzbz")))
+		die($db->db_last_error());
+	$nr_mg=$db->db_num_rows($erg_mg);
 	
 	
 ?>
@@ -147,7 +149,7 @@ function RefreshImage()
 	
 	if(isset($_POST['savekurzbeschreibung']) && !$ansicht)
 	{
-		$person = new person($conn);
+		$person = new person();
 		$person->load($person_id);
 		
 		//Remove Script Tags and other stuff
@@ -228,20 +230,6 @@ function RefreshImage()
 		if($hp!='')
 			echo "<P><b>Homepage</b><br><a href='$hp' target='_blank'>$hp</a></p>";
 		echo '<p>';
-      		
-  		/*
-  		$qry = "SELECT kompetenzen FROM public.tbl_person WHERE person_id='$person_id'";
-  		if($result = pg_query($conn, $qry))
-  		{
-  			if($row = pg_fetch_object($result))
-  			{
-  				if($row->kompetenzen!='')
-  				{
-  					echo "<b>Kompetenzen</b><br>".mb_eregi_replace(';','<br>', $row->kompetenzen);
-  				}
-  			}
-  		}
-  		*/
 		echo '
       		</p>
         	<br>
@@ -300,13 +288,13 @@ function RefreshImage()
 						uid='$uid' AND 
 						(tbl_fachbereich.aktiv=true OR fachbereich_kurzbz is null) AND 
 						(tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.studiengang_kz is null)";
-			if($result_funktion = pg_query($conn, $qry))
+			if($result_funktion = $db->db_query($qry))
 			{
-				if(pg_num_rows($result_funktion)>0)
+				if($db->db_num_rows($result_funktion)>0)
 				{
 					echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Funktion</th><th>Studiengang</th><th>Semester</th><th>Institut</th></tr>';
 
-					while($row_funktion = pg_fetch_object($result_funktion))
+					while($row_funktion = $db->db_fetch_object($result_funktion))
 					{
 						echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".($row_funktion->studiengang_kz!=0?$stg_arr[$row_funktion->studiengang_kz]:'')."</td><td>$row_funktion->semester</td><td>$row_funktion->bezeichnung</td></tr>";
 					}
@@ -324,13 +312,13 @@ function RefreshImage()
 					WHERE 
 						person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1) AND 
 						retouram is null";
-			if($result_betriebsmittel = pg_query($conn, $qry))
+			if($result_betriebsmittel = $db->db_query($qry))
 			{
-				if(pg_num_rows($result_betriebsmittel)>0)
+				if($db->db_num_rows($result_betriebsmittel)>0)
 				{
 					echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
 
-					while($row_bm = pg_fetch_object($result_betriebsmittel))
+					while($row_bm = $db->db_fetch_object($result_betriebsmittel))
 					{
 						echo "<tr class='liste1'><td>$row_bm->betriebsmitteltyp</td><td>$row_bm->nummer</td><td>$row_bm->ausgegebenam</td></tr>";
 					}
@@ -366,7 +354,7 @@ function RefreshImage()
   		
   		for($i=0;$i<$nr_mg;$i++)
 		{
-			$row=pg_fetch_object($erg_mg,$i);
+			$row=$db->db_fetch_object($erg_mg,$i);
 			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($row->gruppe_kurzbz).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
     		echo "<TD>&nbsp;$row->beschreibung</TD><TD></TD></TR>";
 		}
@@ -392,7 +380,7 @@ function RefreshImage()
 		//Wenn eine Assistentin fuer diesen Studiengang eingetragen ist,
 		//dann werden die aenderungswuesche an diese Adresse gesendet
 		$qry = "SELECT email FROM public.tbl_studiengang where studiengang_kz='$stg'";
-		if($row=pg_fetch_object(pg_query($conn,$qry)))
+		if($row=$db->db_fetch_object($db->db_query($qry)))
 		{
 			if($row->email!='')
 				$mail = $row->email;
@@ -410,11 +398,11 @@ function RefreshImage()
 		{
 			//Wenn eine OEH Kandidatur vorhanden ist, WYSIWYG Editor anzeigen
 			$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oeh-kandidatur' AND uid='$uid'";
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				if(pg_num_rows($result)>0)
+				if($db->db_num_rows($result)>0)
 				{
-					$person = new person($conn);
+					$person = new person();
 					$person->load($person_id);
 					echo '<hr>';
 					echo '<b>Kurzbeschreibung für die &Ouml;H-Kandidatur:</b><br>';

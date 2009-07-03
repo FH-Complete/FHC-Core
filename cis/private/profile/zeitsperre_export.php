@@ -22,7 +22,7 @@
 // **
 // * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
 
-	require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/person.class.php');
@@ -75,14 +75,10 @@
 	else
 		$studiensemester=null;
 
-
-	if (!$conn = pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-
 	$datum_obj = new datum();
 
 	// Studiensemester setzen
-	$ss=new studiensemester($conn,$studiensemester);
+	$ss=new studiensemester($studiensemester);
 	if ($studiensemester==null)
 	{
 		$studiensemester = $ss->getaktorNext();
@@ -95,7 +91,7 @@
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
 	// Lektoren holen
-	$ma=new mitarbeiter($conn);
+	$ma=new mitarbeiter();
 	if(!is_null($institut))
 	{
 		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);
@@ -127,7 +123,7 @@
 			$class='';
 		echo '"'.$tagbez[$wt].' '.$tag.'.'.$monat.'"'.$trenn;
 	}
-	$zs=new zeitsperre($conn);
+	$zs=new zeitsperre();
 	foreach ($mitarbeiter as $ma)
 	{
 		$zs->getzeitsperren($ma->uid, false);

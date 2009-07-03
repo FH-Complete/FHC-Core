@@ -20,7 +20,11 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-	require_once('../../config.inc.php');
+require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
@@ -29,10 +33,6 @@
 	require_once('../../../include/benutzer.class.php');
 	require_once('../../../include/mitarbeiter.class.php');
 	require_once('../../../include/mail.class.php');
-
-	//DB Verbindung herstellen
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $content_resturlaub = '';
 $content = '';
@@ -66,7 +66,7 @@ $t=getdate();
 $uid = get_uid();
 $taste=0;
 
-$ma= new mitarbeiter($conn);
+$ma= new mitarbeiter();
 for($i=0;$i<6;$i++)
 {
 	$jahre[$i]="$t[year]"+($i-1);
@@ -158,7 +158,7 @@ if((isset($_GET['delete']) || isset($_POST['delete'])))
 	//print_r($_GET['delete']);
 	//echo "<br>";
 	$qry="DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$_GET['delete']." AND (freigabevon!='' OR freigabevon IS NULL)";
-	$result = pg_query($conn, $qry);
+	$result = $db->db_query($qry);
 }
 
 //Eintragung speichern
@@ -210,7 +210,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
 				)";
 		}
-		$result = pg_query($conn, $qryins);
+		$result = $db->db_query($qryins);
 	}
 	//Mail an Vorgesetzten
 	$vorgesetzter = $ma->getVorgesetzte($uid);
@@ -297,9 +297,9 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	}
 	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>'".$wvon."') ";
 	//echo "<br>"."db:".$qry;
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			//echo " ".$row->vondatum;
 			//echo "-".$row->bisdatum;
@@ -393,7 +393,7 @@ th, td, table
 	//Anzeige Resturlaubsberechnung
 	echo '<table width="100%">';
 	echo '<tr><td colspan=2>';
-	$resturlaub = new resturlaub($conn);
+	$resturlaub = new resturlaub();
 
 	if($resturlaub->load($uid))
 	{
@@ -433,8 +433,8 @@ th, td, table
 				(
 					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
 				)";
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
 	$gebuchterurlaub = $row->anzahltage;
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;
@@ -494,9 +494,9 @@ $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY 
 
 $content.= "<OPTION value=''>-- Vertretung --</OPTION>\n";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($vertretung == $row->uid)
 		{
@@ -515,9 +515,9 @@ $qry = "SELECT * FROM campus.tbl_erreichbarkeit ORDER BY erreichbarkeit_kurzbz";
 
 $content.= "<OPTION value=''>-- Erreichbarkeit --</OPTION>\n";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($erreichbar == $row->erreichbarkeit_kurzbz)
 		{

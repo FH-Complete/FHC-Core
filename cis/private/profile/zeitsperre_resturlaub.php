@@ -23,7 +23,11 @@
 // * @brief bietet die Moeglichkeit zur Anzeige und
 // * Aenderung der Zeitwuensche und Zeitsperren
 
-	require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
@@ -41,9 +45,6 @@
 	if(isset($_GET['type']))
 		$type=$_GET['type'];
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-
 	//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitsperren 
 	//des uebergebenen Users anzeigen
 	if(isset($_GET['uid']))
@@ -60,12 +61,12 @@
 		}
 	}
 	$datum_obj = new datum();
-	$ma= new mitarbeiter($conn);
+	$ma= new mitarbeiter();
 
 	//Stundentabelleholen
-	if(! $result_stunde=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
-		die(pg_last_error($conn));
-	$num_rows_stunde=pg_num_rows($result_stunde);
+	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+		die($db->db_last_error());
+	$num_rows_stunde=$db->db_num_rows($result_stunde);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -243,7 +244,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	
 	
 	
-	$zeitsperre = new zeitsperre($conn);
+	$zeitsperre = new zeitsperre();
 
 	if($_GET['type']=='edit_sperre')
 	{
@@ -347,7 +348,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 //loeschen einer zeitsperre
 if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 {
-	$zeit = new zeitsperre($conn);
+	$zeit = new zeitsperre();
 	$zeit->load($_GET['id']);
 	//pruefen ob die person die den datensatz loeschen will auch der
 	//besitzer dieses datensatzes ist
@@ -365,15 +366,15 @@ if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 }
 
 //zeitsperren des users laden
-$zeit = new zeitsperre($conn);
+$zeit = new zeitsperre();
 $zeit->getzeitsperren($uid);
 $content_table='<br><br>';
 
 $qry = "SELECT * FROM campus.tbl_erreichbarkeit";
 $erreichbarkeit_arr=array();
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$erreichbarkeit_arr[$row->erreichbarkeit_kurzbz]=$row->beschreibung;
 	}
@@ -388,8 +389,8 @@ if(count($zeit->result)>0)
 		$i++;
 		//name der vertretung holen
 		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND tbl_benutzer.person_id=tbl_person.person_id AND mitarbeiter_uid='$row->vertretung_uid'";
-		$result_vertretung = pg_query($conn, $qry);
-		$row_vertretung = pg_fetch_object($result_vertretung);
+		$result_vertretung = $db->db_query($qry);
+		$row_vertretung = $db->db_fetch_object($result_vertretung);
 		$content_table.= "<tr class='liste".($i%2)."'>
 							<td>$row->bezeichnung</td>
 							<td>$row->zeitsperretyp_kurzbz</td>
@@ -410,7 +411,7 @@ if(count($zeit->result)>0)
 else
 	$content_table.= "Derzeit sind keine Zeitsperren eingetragen!";
 
-$zeitsperre = new zeitsperre($conn);
+$zeitsperre = new zeitsperre();
 $action = "$PHP_SELF?type=new_sperre";
 //wenn ein datensatz editiert werden soll, dann diesen laden
 if(isset($_GET['type']) && $_GET['type']=='edit')
@@ -437,9 +438,9 @@ $content_form.= "<table>\n";
 $content_form.= '<tr><td>Grund</td><td><SELECT name="zeitsperretyp_kurzbz">';
 //dropdown fuer zeitsperretyp
 $qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
@@ -461,7 +462,7 @@ else
 
 for($i=0;$i<$num_rows_stunde;$i++)
 {
-	$row = pg_fetch_object($result_stunde, $i);
+	$row = $db->db_fetch_object($result_stunde, $i);
 
 	if($zeitsperre->vonstunde==$row->stunde)
 		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
@@ -483,7 +484,7 @@ else
 
 for($i=0;$i<$num_rows_stunde;$i++)
 {
-	$row = pg_fetch_object($result_stunde, $i);
+	$row = $db->db_fetch_object($result_stunde, $i);
 	if($zeitsperre->bisstunde==$row->stunde)
 		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
@@ -509,9 +510,9 @@ $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY 
 
 $content_form.= "<OPTION value=''>-- Auswahl --</OPTION>\n";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($zeitsperre->vertretung_uid == $row->uid)
 			$content_form.= "<OPTION value='$row->uid' selected>$row->nachname $row->vorname ($row->uid)</OPTION>\n";
@@ -535,47 +536,7 @@ $content_resturlaub = '';
 $resturlaubstage = '0';
 $mehrarbeitsstunden = '0';
 $anspruch = '25';
-/*
-if(isset($_GET['type']) && $_GET['type']=='save_resturlaub')
-{
-	$_POST['mehrarbeitsstunden'] = mb_eregi_replace(',','.',$_POST['mehrarbeitsstunden']);
-
-	$resturlaub = new resturlaub($conn);
-	if($resturlaub->load($uid))
-	{
-		$resturlaub->new = false;
-	}
-	else
-	{
-		$resturlaub->new = true;
-		$resturlaub->insertamum = date('Y-m-d H:i:s');
-		$resturlaub->insertvon = $uid;
-	}
-	$resturlaub->mitarbeiter_uid = $uid;
-	$resturlaub->updateamum = date('Y-m-d H:i:s');
-	$resturlaub->updatevon = $uid;
-	if(isset($_POST['resturlaubstage']))
-		$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
-	if(isset($_POST['anspruch']))
-		$resturlaub->urlaubstageprojahr = $_POST['anspruch'];
-	$resturlaub->mehrarbeitsstunden = $_POST['mehrarbeitsstunden'];
-
-	if($resturlaub->save())
-	{
-		$content_resturlaub .= '<b>Daten wurden gespeichert!</b>';
-	}
-	else
-	{
-		$content_resturlaub .= "<b>Fehler beim Speichern der Daten: $resturlaub->errormsg</b>";
-	}
-
-	$resturlaubstage = htmlspecialchars($resturlaub->resturlaubstage,ENT_QUOTES);
-	$mehrarbeitsstunden = htmlspecialchars($resturlaub->mehrarbeitsstunden,ENT_QUOTES);
-	$anspruch = htmlspecialchars($resturlaub->urlaubstageprojahr,ENT_QUOTES);
-}
-else
-{*/
-	$resturlaub = new resturlaub($conn);
+	$resturlaub = new resturlaub();
 
 	if($resturlaub->load($uid))
 	{
@@ -583,16 +544,6 @@ else
 		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 		$anspruch = $resturlaub->urlaubstageprojahr;
 	}
-/*}
-if($anspruch=='')
-	$anspruch=25;
-
-//Eingabefelder am 15.12.2007 deaktivieren
-if((date('d')>=15 && date('m')>=12 && date('Y')>=2007) || date('Y')>2007)
-	$disabled='disabled="true"';
-else
-	$disabled='';
-*/
 //Den Bereich fuer die Resturlaubstage nur anzeigen wenn dies
 //im config angegeben ist
 if(URLAUB_TOOLS)
@@ -632,8 +583,8 @@ if(URLAUB_TOOLS)
 					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
 				)";
 	$tttt="\n";
-	$result = pg_query($conn, $qry);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
 	$gebuchterurlaub = $row->anzahltage;
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;

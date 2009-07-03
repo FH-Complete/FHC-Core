@@ -17,18 +17,17 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *
  */
+
 /*
  * Formular zum Senden eins Feedbacks an die CIS-Administratoren
  */
-    require_once('../../config.inc.php');
+    require_once('../../../config/cis.config.inc.php');
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/mail.class.php');
-
-    //Connection Herstellen
-    if(!$sql_conn = pg_pconnect(CONN_STRING))
-       die('Fehler beim öffnen der Datenbankverbindung');
 
 	$user = get_uid();
 
@@ -47,9 +46,9 @@
 
 		if($feedback_message != "")
 		{
-			if($result = pg_query($sql_conn, $sql_query))
+			if($result = $db->db_query($sql_query))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object($result))
 				{
 					$mail = new mail($destination,'feedback@'.DOMAIN, "[CIS-Feedback]", $feedback_message);
 					$mail->setReplyTo($row->emailtw);

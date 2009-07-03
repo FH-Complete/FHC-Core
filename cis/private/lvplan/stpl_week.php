@@ -42,7 +42,11 @@
 //$ort_kurzbz='EDV6.08';
 //$datum=1102260015;
 
-require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 //require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
@@ -118,12 +122,6 @@ if (isset($_POST['beschreibung']))
 if (isset($_POST['titel']))
 	$titel=$_POST['titel'];
 
-// Verbindungsaufbau
-if (!$conn = pg_pconnect(CONN_STRING))
-{
-	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-}
-
 $berechtigung=new benutzerberechtigung();
 $berechtigung->getBerechtigungen($uid);
 if ($berechtigung->isBerechtigt('raumres'))
@@ -132,15 +130,15 @@ else
 	$raumres=false;
 
 // Datums Format
-if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
+if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
 {
-	die(pg_last_error($conn));
+	die($db->db_last_error());
 }
 
 // Authentifizierung
-if (check_student($uid, $conn))
+if (check_student($uid))
 	$user='student';
-elseif (check_lektor($uid, $conn))
+elseif (check_lektor($uid))
 	$user='lektor';
 else
 {
@@ -161,16 +159,16 @@ if (!isset($pers_uid))
 // Reservieren
 if (isset($reserve) && ($user=='lektor' || $raumres))
 {
-	if(!$erg_std=pg_query($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+	if(!$erg_std=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
-		die(pg_last_error($conn));
+		die($db->db_last_error());
 	}
-	$num_rows_std=pg_numrows($erg_std);
+	$num_rows_std=$db->db_num_rows($erg_std);
 	$count=0;
 	for ($t=1;$t<7;$t++)
 		for ($j=0;$j<$num_rows_std;$j++)
 		{
-			$stunde=pg_result($erg_std,$j,'"stunde"');
+			$stunde=$db->db_result($erg_std,$j,'"stunde"');
 			$var='reserve'.$t.'_'.$stunde;
 			//echo $$var;
 			if (isset($_POST[$var]))
@@ -184,15 +182,15 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 						VALUES
 							('$datum_res', '$user_uid', '$ort_kurzbz', $stunde, '$beschreibung', '$titel', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
 				//echo $query;
-				if(!($erg=pg_exec($conn, $query)))
-					echo pg_last_error($conn);
+				if(!($erg=$db->db_query($query)))
+					echo $db->db_last_error();
 				$count++;
 			}
 		}
 }
 
 // Stundenplan erstellen
-$stdplan=new wochenplan($type,$conn);
+$stdplan=new wochenplan($type);
 if (!isset($datum))
 	$datum=mktime();
 

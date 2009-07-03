@@ -19,17 +19,17 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-    require_once('../../config.inc.php');
+  require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/funktion.class.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/person.class.php');
     require_once('../../../include/benutzer.class.php');
     require_once('../../../include/student.class.php');
-
-    //Connection Herstellen
-    if(!$conn = pg_pconnect(CONN_STRING))
-       die("Fehler beim öffnen der Datenbankverbindung");
 
     if(isset($_POST['cmbChoice']))
     	$cmbChoice = $_POST['cmbChoice'];
@@ -73,18 +73,14 @@
 	  	  <select name="cmbChoice">
 			  <option value="all">Alle Kategorien</option>
 			  <?php
-				$fkt_obj = new funktion($conn);
+				$fkt_obj = new funktion();
 				$fkt_obj->getAll();
 
-				//$qry = "SELECT DISTINCT funktion_kurzbz AS kurzbz, bezeichnung FROM public.tbl_funktion WHERE aktiv=TRUE ORDER BY bezeichnung";
+		
 
-				//$result = pg_exec($sql_conn, $sql_query);
-				//$num_rows = pg_num_rows($result);
-
-				//for($i = 0; $i < $num_rows; $i++)
 				foreach ($fkt_obj->result as $row)
 				{
-					//$row = pg_fetch_object($result, $i);
+
 
 					if(isset($cmbChoice) && $cmbChoice == $row->funktion_kurzbz)
 					{
@@ -134,9 +130,9 @@
 					}
 					
 					$num_rows=0;
-					if ($result = pg_query($conn, $sql_query))
+					if ($result = $db->db_query($sql_query))
 					{
-						$num_rows = pg_num_rows($result);
+						$num_rows = $db->db_num_rows($result);
 					}	
 
 					if($num_rows > 0)
@@ -163,7 +159,7 @@
 
 						for($i = 0; $i < $num_rows; $i++)
 						{
-							$row = pg_fetch_object($result, $i);
+							$row = $db->db_fetch_object($result, $i);
 
 							echo "<tr>";
 
@@ -245,9 +241,9 @@
 								if($row->standort_kurzbz!='')
 								{
 									$qry = "SELECT telefon FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma WHERE tbl_standort.standort_kurzbz='$row->standort_kurzbz' AND tbl_standort.adresse_id=tbl_adresse.adresse_id AND tbl_adresse.firma_id=tbl_firma.firma_id";
-									if($result_tel = pg_query($conn, $qry))
+									if($result_tel = $db->db_query($qry))
 									{
-										if($result_tel && $row_tel = pg_fetch_object($result_tel))
+										if($result_tel && $row_tel = $db->db_fetch_object($result_tel))
 										{
 											$vorwahl = $row_tel->telefon;
 										}	
@@ -328,7 +324,7 @@
 							$kurzbz='';
 							if($row->studiengang_kz != -1)
 							{
-								$stg_obj = new studiengang($conn, $row->studiengang_kz);
+								$stg_obj = new studiengang($row->studiengang_kz);
 								if($i % 2 == 0)
 								{
 									echo "<td align=\"left\" class='tdwrap'>&nbsp;$stg_obj->kuerzel</td>";
@@ -377,7 +373,7 @@
 							{
 								$verband='';
 								$gruppe='';
-								if ($std_obj = new student($conn, $row->uid))
+								if ($std_obj = new student($row->uid))
 								{
 									$verband=$std_obj->verband;
 									$gruppe=$std_obj->gruppe;

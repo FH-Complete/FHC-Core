@@ -29,18 +29,20 @@
  * Update: 			10.9.2005 von Christian Paminger
  *****************************************************************************/
 
-require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
+  require_once('../../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
+
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/studiensemester.class.php');
 
-// Datenbankverbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 // Datums Format und search_path
-if(!$erg_std=pg_query($conn, "SET datestyle TO ISO; SET search_path TO campus;"))
-	die(pg_last_error($conn));
+if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
+	die($db->db_last_error());
 
 
 //Startwerte setzen
@@ -73,7 +75,7 @@ $uid = get_uid();
 // Beginn Ende setzen
 if (!isset($begin))
 {
-	$objSS=new studiensemester($conn);
+	$objSS=new studiensemester();
 	$ss=$objSS->getaktorNext();
 	$objSS->load($ss);
 	$begin=datum::mktime_fromdate($objSS->start);
@@ -153,19 +155,19 @@ if (!isset($begin) || !isset($ende))
 	}
 	else
 	{
-		$result_semester=@pg_query($conn,"SELECT start,ende FROM tbl_studiensemester WHERE studiensemester_kurzbz=(SELECT wert FROM tbl_variable WHERE name='semester_aktuell' AND uid='$uid');");
-		if (pg_numrows($result_semester)>0)
+		$result_semester=$db->db_query("SELECT start,ende FROM tbl_studiensemester WHERE studiensemester_kurzbz=(SELECT wert FROM tbl_variable WHERE name='semester_aktuell' AND uid='$uid');");
+		if ($db->db_num_rows($result_semester)>0)
 		{
-			$begin=strtotime(pg_result($result_semester,0,'start'));
-			$ende=strtotime(pg_result($result_semester,0,'ende'));
+			$begin=strtotime($db->db_result($result_semester,0,'start'));
+			$ende=strtotime($db->db_result($result_semester,0,'ende'));
 		}
 		else
 		{
 			die('Studiensemester konnte nicht gefunden werden!');
 		}
-		$result_semester=@pg_query($conn,"SELECT wert FROM tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
-		if (pg_numrows($result_semester)>0)
-			$db_stpl_table=pg_result($result_semester,0,'wert');
+		$result_semester=$db->db_query("SELECT wert FROM tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
+		if ($db->db_num_rows($result_semester)>0)
+			$db_stpl_table=$db->db_result($result_semester,0,'wert');
 		else
 		{
 			die('User nicht vorhanden!');
@@ -177,9 +179,9 @@ if ($ende-$begin>31536000)
 }
 
 if (!isset($type))
-	if ($pers_uid=check_student($uid, $conn))
+	if ($pers_uid=check_student($uid))
 		$type='student';
-	elseif ($pers_uid=check_lektor($uid, $conn))
+	elseif ($pers_uid=check_lektor($uid))
 		$type='lektor';
     else
     {
@@ -187,12 +189,12 @@ if (!isset($type))
     }
 if (!isset($pers_uid))
 	if ($type=='student')
-		$pers_uid=check_student($uid, $conn);
+		$pers_uid=check_student($uid);
 	elseif ($type=='lektor')
-		$pers_uid=check_lektor($uid, $conn);
+		$pers_uid=check_lektor($uid);
 
 // Stundenplanobjekt erzeugen
-$stdplan=new wochenplan($type,$conn);
+$stdplan=new wochenplan($type);
 $stdplan->crlf=$crlf;
 
 // Zusaetzliche Daten laden

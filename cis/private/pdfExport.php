@@ -25,19 +25,18 @@
  * Hilfe der XSL-FO Vorlage aus der DB und generiert
  * daraus ein PDF (xslfo2pdf)
  */
-require_once('../../cis/config.inc.php');
+	require_once('../../config/cis.config.inc.php');
+  require_once('../../include/basis_db.class.php');
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
 
-// Datenbank Verbindung
-if (!$conn = pg_pconnect(CONN_STRING))
-   	$error_msg='Es konnte keine Verbindung zum Server aufgebaut werden!';
-
 $user = get_uid();
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 
@@ -82,7 +81,7 @@ if(isset($_GET['typ']))
 	$params.='&typ='.$_GET['typ'];
 
 
-$konto = new konto($conn);
+$konto = new konto();
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 {
 		
@@ -101,9 +100,9 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	//XSL aus der DB holen
 	$qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz='".addslashes($xsl_stg_kz)."') AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
 	
-	if(!$result = pg_query($conn, $qry))
-		die('Fehler beim laden der Vorlage'.pg_errormessage($conn));
-	if(!$row = pg_fetch_object($result))
+	if(!$result = $db->db_query($qry))
+		die('Fehler beim laden der Vorlage'.$db->db_last_error());
+	if(!$row = $db->db_fetch_object($result))
 		die('Vorlage wurde nicht gefunden'.$qry);
 	
 	// Load the XSL source
@@ -134,9 +133,9 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		$uid = str_replace(';','',$_GET['uid']);
 		$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'";
 		
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{
 				$nachname = '_'.$row->nachname;
 			}
@@ -175,9 +174,9 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		$heute = date('Y-m-d');
 		$query = "SELECT tbl_studentlehrverband.semester, tbl_studiengang.typ, tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, tbl_studentlehrverband, tbl_studiengang where tbl_studentlehrverband.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_studentlehrverband.student_uid = '".$uid."' and tbl_studentlehrverband.studiensemester_kurzbz = '".$ss."'";
 	
-		if($result = pg_query($conn, $query))
+		if($result = $db->db_query($query))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{
 				$person_id = $row->person_id;
 				$titel = "Zeugnis_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$row->semester;
@@ -190,8 +189,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 			}
 		}
 	
-	
-		$akte = new akte($conn);
+		$akte = new akte();
 		$akte->person_id = $person_id;
 	  	$akte->dokument_kurzbz = "Zeugnis";
 	  	$akte->inhalt = $hex;
