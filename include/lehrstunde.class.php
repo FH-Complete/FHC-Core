@@ -424,7 +424,7 @@ class lehrstunde extends basis_db
 			{
 				$row = $this->db_fetch_object($stpl_tbl, $i);
 				
-				$stunde=new lehrstunde($this->conn);
+				$stunde=new lehrstunde();
 				$stunde->reservierung=true;
 				$stunde->stundenplan_id=$row->reservierung_id;
 				$stunde->unr=0;
