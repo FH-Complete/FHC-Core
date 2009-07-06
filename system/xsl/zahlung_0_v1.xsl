@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -72,10 +72,10 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block text-align="center" font-size="20pt">
 					<xsl:choose>
 					  <xsl:when test="buchung/rueckerstattung">
-					    AUSZAHLUNGSBESTÄTIGUNG
+					    AUSZAHLUNGSBESTÃTIGUNG
 					  </xsl:when>
 					  <xsl:otherwise>
-					   ZAHLUNGSBESTÄTIGUNG
+					   ZAHLUNGSBESTÃTIGUNG
 					  </xsl:otherwise>
 					</xsl:choose>
 					</fo:block>
@@ -96,10 +96,10 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block text-align="left" font-size="10pt">
 					<xsl:choose>
 					  <xsl:when test="buchung/rueckerstattung">
-					    \n <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, bestätigt hiermit, dass die Studiengangsleitung folgende Auszahlungen getätigt hat:
+					    \n <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, bestÃ€tigt hiermit, dass die Studiengangsleitung folgende Auszahlungen getÃ€tigt hat:
 					  </xsl:when>
 					  <xsl:otherwise>
-					   \n Die Studiengangsleitung bestätigt hiermit, dass <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getätigt hat:
+					   \n Die Studiengangsleitung bestÃ€tigt hiermit, dass <xsl:value-of select="person/name_gesamt" />, geboren am <xsl:value-of select="person/geburtsdatum" />, folgende Einzahlungen getÃ€tigt hat:
 					  </xsl:otherwise>
 					</xsl:choose>
 					</fo:block>						
@@ -172,7 +172,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
 									<fo:block text-align="left" font-size="10pt">
-									Fachhochschule Technikum\n Wien\n Höchstädtplatz 5\n A-1200 Wien\n ZVR-Nr.: 074476526\n DVR-Nr.: 0928381
+									Fachhochschule Technikum\n Wien\n HÃ¶chstÃ€dtplatz 5\n A-1200 Wien\n ZVR-Nr.: 074476526\n DVR-Nr.: 0928381
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell>

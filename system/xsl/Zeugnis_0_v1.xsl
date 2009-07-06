@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="xml" version="1.0" indent="yes"/>
 	<xsl:template match="zeugnisse">
@@ -148,7 +148,7 @@
 									<fo:block font-size="7pt">Notenstufen: </fo:block>
 								</fo:table-cell>
 								<fo:table-cell>
-									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), angerechnet (ar), nicht beurteilt (nb),</fo:block>
+									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), GenÃŒgend (4), Nicht genÃŒgend (5), angerechnet (ar), nicht beurteilt (nb),</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
@@ -225,7 +225,7 @@
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
 									<fo:block font-size="8pt" content-width="165mm" text-align="left">
-										<xsl:text>Fachhochschule Technikum Wien, Höchstädtplatz 5, 1200 Wien, ZVR-Nr.: 074476426, DVR-Nr.:0928381</xsl:text>
+										<xsl:text>Fachhochschule Technikum Wien, HÃ¶chstÃ€dtplatz 5, 1200 Wien, ZVR-Nr.: 074476426, DVR-Nr.:0928381</xsl:text>
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -243,7 +243,7 @@
 					<xsl:choose>
 						<xsl:when test="bisio_von">
 					    Auslandsaufenthalt: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/>
-						\n Die im Ausland absolvierten Lehrveranstaltungen werden für das <xsl:value-of select="../semester"/>. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet  (Details siehe Transcript of Records der Gasthochschule).
+						\n Die im Ausland absolvierten Lehrveranstaltungen werden fÃŒr das <xsl:value-of select="../semester"/>. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet  (Details siehe Transcript of Records der Gasthochschule).
 					  </xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="bezeichnung"/>

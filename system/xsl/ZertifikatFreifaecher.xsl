@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" version="1.0" indent="yes" />
@@ -28,7 +28,7 @@
 
 					<fo:block-container position="absolute" top="68mm" left="30mm">
 						<fo:block line-height="14pt" font-family="sans-serif" font-size="10pt">
-							<xsl:text>über die Teilnahme von Herrn/Frau</xsl:text>
+							<xsl:text>ÃŒber die Teilnahme von Herrn/Frau</xsl:text>
 						</fo:block>
 					</fo:block-container>
 					
@@ -60,7 +60,7 @@
 
 					<fo:block-container position="absolute" top="120mm" left="30mm">
 						<fo:block content-width="180mm" line-height="14pt" font-family="sans-serif" font-size="10pt">
-							<xsl:text>im Ausmaß von </xsl:text><xsl:value-of select="sws" />
+							<xsl:text>im AusmaÃ von </xsl:text><xsl:value-of select="sws" />
 							<xsl:text> Semesterstunden; </xsl:text>
 							<xsl:value-of select="ects" /><xsl:text> ECTS Punkte</xsl:text>
 							<xsl:text>\n\n im </xsl:text><xsl:value-of select="studiensemester" />
@@ -84,7 +84,7 @@
 					<xsl:if test="note &gt; 0">
 					<fo:block-container position="absolute" top="230mm" left="30mm">
 						<fo:block content-width="180mm" line-height="14pt" font-family="sans-serif" font-size="12pt">
-							<xsl:text>Die Prüfung wurde mit </xsl:text>
+							<xsl:text>Die PrÃŒfung wurde mit </xsl:text>
 							<fo:inline font-weight="900">
 							<xsl:value-of select="note_bezeichnung" /><xsl:text> (</xsl:text>
 							<xsl:value-of select="note" /><xsl:text>)</xsl:text>
@@ -150,7 +150,7 @@
 								<fo:table-row  line-height="10pt">
 									<fo:table-cell number-columns-spanned="3">
 										<fo:block font-size="10pt" content-width="165mm" text-align="center">
-											<xsl:text>Fachhochschule Technikum Wien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476426\nDVR-Nr.:0928381</xsl:text>
+											<xsl:text>Fachhochschule Technikum Wien\nHÃ¶chstÃ€dtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476426\nDVR-Nr.:0928381</xsl:text>
 										</fo:block></fo:table-cell>
 								</fo:table-row>
 								

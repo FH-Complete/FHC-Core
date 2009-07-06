@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" version="1.0" indent="yes" />
@@ -20,13 +20,13 @@
 	
 					<fo:block-container position="absolute" top="10mm" left="15mm" height="20mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
-							<xsl:text>Protokoll Diplom-Prüfung</xsl:text>
+							<xsl:text>Protokoll Diplom-PrÃŒfung</xsl:text>
 						</fo:block>
 					</fo:block-container>
 
 					<fo:block-container position="absolute" top="20mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
-							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gemäß (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid\n 
+							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gemÃ€Ã (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid\n 
 							des Fachhochschulrates GZ: <xsl:value-of select="bescheidgz" /> vom <xsl:value-of select="bescheidvom" /> genehmigten Antrag.
 						</fo:block>
 					</fo:block-container>
@@ -62,7 +62,7 @@
 						            <fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="200mm" text-align="left" font-weight="bold">
-												<xsl:text> Prüfungssenat:</xsl:text>
+												<xsl:text> PrÃŒfungssenat:</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -76,7 +76,7 @@
 						            <fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="200mm" text-align="left" font-weight="bold">
-												<xsl:text> 1. Prüfungsteil</xsl:text>
+												<xsl:text> 1. PrÃŒfungsteil</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-top-width="0.2mm" border-top-style="solid" border-top-color="black" border-left-width="0.2mm" border-left-style="solid" border-left-color="black" border-right-width="0.2mm" border-right-style="solid" border-right-color="black" border-bottom-width="0.2mm" border-bottom-style="solid" border-bottom-color="white">
@@ -86,7 +86,7 @@
 										</fo:table-cell>
 										<fo:table-cell border-right-width="0.2mm" border-right-style="solid" border-right-color="black" border-top-width="0.2mm" border-top-style="solid" border-top-color="black">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="36.4mm" text-align="left">
-												<xsl:text> Note Präsentation</xsl:text>
+												<xsl:text> Note PrÃ€sentation</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -102,7 +102,7 @@
 						            <fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid" border-color="black">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer/in</xsl:text>
+												<xsl:text> PrÃŒfer/in</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -159,7 +159,7 @@
 						            <fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
-												<xsl:text> 2. Prüfungsteil</xsl:text>
+												<xsl:text> 2. PrÃŒfungsteil</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -175,12 +175,12 @@
 						            <fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer/in</xsl:text>
+												<xsl:text> PrÃŒfer/in</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfungsfrage</xsl:text>
+												<xsl:text> PrÃŒfungsfrage</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -234,7 +234,7 @@
 						            	<fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="261.6mm" text-align="left" font-weight="bold">
-												<xsl:text> 3. Prüfungsteil</xsl:text>
+												<xsl:text> 3. PrÃŒfungsteil</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
@@ -250,12 +250,12 @@
 								<fo:table-row line-height="10pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer/in</xsl:text>
+												<xsl:text> PrÃŒfer/in</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfungsfrage</xsl:text>
+												<xsl:text> PrÃŒfungsfrage</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -308,9 +308,9 @@
 					
 					<fo:block-container position="absolute" top="115mm" left="15mm">
 						<fo:block text-align="left" line-height="9pt" font-family="sans-serif" font-size="7pt">
-							Die kommissionelle Diplomprüfung vor einem facheinschlägigen Prüfungssenat setzt sich aus der Präsentation der Diplomarbeit (1. Prüfungsteil), 
-							einem Prüfungsgespräch, das auf die Querverbindungen des Themas der Diplomarbeit zu den relevanten Fächern des Studienplanes eingeht (2. Prüfungsteil) 
-							sowie einem Prüfungsgespräch über sonstige curriculumrelevante Inhalte (3. Prüfungsteil) zusammen. [II.E.5.d., S.11]
+							Die kommissionelle DiplomprÃŒfung vor einem facheinschlÃ€gigen PrÃŒfungssenat setzt sich aus der PrÃ€sentation der Diplomarbeit (1. PrÃŒfungsteil), 
+							einem PrÃŒfungsgesprÃ€ch, das auf die Querverbindungen des Themas der Diplomarbeit zu den relevanten FÃ€chern des Studienplanes eingeht (2. PrÃŒfungsteil) 
+							sowie einem PrÃŒfungsgesprÃ€ch ÃŒber sonstige curriculumrelevante Inhalte (3. PrÃŒfungsteil) zusammen. [II.E.5.d., S.11]
 						</fo:block>
 					</fo:block-container>
 										
@@ -370,7 +370,7 @@
 									</fo:table-cell>
 									<fo:table-cell>
 										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
-											Prüfungssenat
+											PrÃŒfungssenat
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>

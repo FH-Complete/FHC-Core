@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -39,7 +39,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						\n<xsl:value-of select="mitarbeiter/zuhanden" />
 					</fo:inline>				
 					\n\n<fo:block font-size="7pt">
-						Abs.: Fachhochschule Technikum Wien, Höchstädtplatz 5, A-1200 Wien
+						Abs.: Fachhochschule Technikum Wien, HÃ¶chstÃ€dtplatz 5, A-1200 Wien
 					</fo:block>
 					
 					\n\n\n
@@ -114,9 +114,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<fo:block><xsl:text>
 				</xsl:text></fo:block>
 				<!-- Tabelle ENDE -->
-				<fo:block font-size="8pt">Die angeführten Stundensätze sind Bruttobeträge, von denen gegebenenfalls die Dienstnehmeranteile für Steuern und Sozialversicherung abgezogen werden. 
-					Die angeführte Stundenzahl ist die maximal vorgesehene; abgerechnet werden jedoch nur die tatsächlich gehaltenen Stunden laut Anwesenheitslisten. 
-					Außerdem besteht die Verpflichtung zur Teilnahme an Lektorenkonferenzen.
+				<fo:block font-size="8pt">Die angefÃŒhrten StundensÃ€tze sind BruttobetrÃ€ge, von denen gegebenenfalls die Dienstnehmeranteile fÃŒr Steuern und Sozialversicherung abgezogen werden. 
+					Die angefÃŒhrte Stundenzahl ist die maximal vorgesehene; abgerechnet werden jedoch nur die tatsÃ€chlich gehaltenen Stunden laut Anwesenheitslisten. 
+					AuÃerdem besteht die Verpflichtung zur Teilnahme an Lektorenkonferenzen.
 				</fo:block>
 				<fo:block><xsl:text>
 				</xsl:text></fo:block>
@@ -155,7 +155,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</fo:table-body>
 				</fo:table>
 				<fo:block text-align="center" font-size="7pt">
-				Fachhochschule Technikum\nWien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
+				Fachhochschule Technikum\nWien\nHÃ¶chstÃ€dtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
 				</fo:block>
 			</fo:flow>
 		</fo:page-sequence>

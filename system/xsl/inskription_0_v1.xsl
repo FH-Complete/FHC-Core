@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -21,7 +21,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	
 					<fo:block-container position="absolute" top="40pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbestätigung Fachhochschule Technikum Wien
+							StudienbestÃ€tigung Fachhochschule Technikum Wien
 						</fo:block>
 					</fo:block-container> 
 									
@@ -33,7 +33,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die BestÃ€tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -103,7 +103,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="190pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbestätigung Fachhochschule Technikum Wien
+							StudienbestÃ€tigung Fachhochschule Technikum Wien
 						</fo:block>
 					</fo:block-container> 
 
@@ -115,7 +115,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die BestÃ€tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -185,7 +185,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="340pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-					Studienbestätigung Fachhochschule Technikum Wien
+					StudienbestÃ€tigung Fachhochschule Technikum Wien
 						</fo:block>
 					</fo:block-container> 
 
@@ -197,7 +197,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die BestÃ€tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -268,7 +268,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="490pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbestätigung Fachhochschule Technikum Wien
+							StudienbestÃ€tigung Fachhochschule Technikum Wien
                         </fo:block>
 					</fo:block-container> 
 
@@ -280,7 +280,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die BestÃ€tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -352,7 +352,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="640pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbestätigung Fachhochschule Technikum Wien
+							StudienbestÃ€tigung Fachhochschule Technikum Wien
                         </fo:block>
 					</fo:block-container> 
 
@@ -364,7 +364,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die BestÃ€tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>

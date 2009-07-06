@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" version="1.0" indent="yes" />
@@ -20,13 +20,13 @@
 	
 					<fo:block-container position="absolute" top="25mm" left="15mm" height="20mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
-							<xsl:text>Protokoll Diplom-Prüfung</xsl:text>
+							<xsl:text>Protokoll Diplom-PrÃŒfung</xsl:text>
 						</fo:block>
 					</fo:block-container>
 
 					<fo:block-container position="absolute" top="35mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
-							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gemäß (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid\n 
+							abgehalten an dem Fachhochschul-Studiengang <xsl:value-of select="stg_bezeichnung" /> gemÃ€Ã (FhStG), BGBl <xsl:value-of select="bescheidbgbl1" /> idgF BGBl. <xsl:value-of select="bescheidbgbl2" /> und dem mit Bescheid\n 
 							des Fachhochschulrates GZ: <xsl:value-of select="bescheidgz" /> vom <xsl:value-of select="bescheidvom" /> genehmigten Antrag.
 						</fo:block>
 					</fo:block-container>
@@ -62,7 +62,7 @@
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left" font-weight="bold">
-												<xsl:text> Prüfungssenat:</xsl:text>
+												<xsl:text> PrÃŒfungssenat:</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -92,7 +92,7 @@
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Note Präsentation DA</xsl:text>
+												<xsl:text> Note PrÃ€sentation DA</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
@@ -142,12 +142,12 @@
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer</xsl:text>
+												<xsl:text> PrÃŒfer</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfungsfrage</xsl:text>
+												<xsl:text> PrÃŒfungsfrage</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -217,12 +217,12 @@
 								 <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfer</xsl:text>
+												<xsl:text> PrÃŒfer</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
-												<xsl:text> Prüfungsfrage</xsl:text>
+												<xsl:text> PrÃŒfungsfrage</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -325,7 +325,7 @@
 									</fo:table-cell>
 									<fo:table-cell>
 										<fo:block font-family="sans-serif" font-size="10pt" content-width="65mm" text-align="center" font-weight="bold">
-											Prüfungssenat
+											PrÃŒfungssenat
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -133,24 +133,24 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Wie melde ich mich am System an?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Windows NT/XP: Melden sie sich an der Domäne TW an indem Sie die Tasten &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; gleichzeitig drücken, danach Accountname und Passwort eingeben.
+						Windows NT/XP: Melden sie sich an der DomÃ€ne TW an indem Sie die Tasten &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; gleichzeitig drÃŒcken, danach Accountname und Passwort eingeben.
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Linux: Nach dem Systemstart im Boot Manager einfach Linux auswählen. Das System startet mit dem KDE Login Manager. Dort ist ebenfalls der Accountname und das Passwort einzugeben.\n
+						Linux: Nach dem Systemstart im Boot Manager einfach Linux auswÃ€hlen. Das System startet mit dem KDE Login Manager. Dort ist ebenfalls der Accountname und das Passwort einzugeben.\n
 					</fo:block>
 					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Ändern des Passwortes
+						Ãndern des Passwortes
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Windows NT/XP: In den EDV-Räumen.\n
-						Loggen Sie sich mit Ihrem Account unter Windows NT/XP in der TW Domäne ein, drücken Sie &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; und wählen Sie den Punkt "Kennwort ändern".
+						Windows NT/XP: In den EDV-RÃ€umen.\n
+						Loggen Sie sich mit Ihrem Account unter Windows NT/XP in der TW DomÃ€ne ein, drÃŒcken Sie &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; und wÃ€hlen Sie den Punkt "Kennwort Ã€ndern".
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Linux: Passwort ändern auf Ihrem Fileserver <xsl:value-of select="fileserver" />.\n
+						Linux: Passwort Ã€ndern auf Ihrem Fileserver <xsl:value-of select="fileserver" />.\n
 						Loggen Sie sich mittels SSH (z.B. putty Programm) auf Ihrem Fileserver ein und geben Sie den Befehl "passwd" ein.\n
-						Webmail: Auch im Webmailsystem auf https://webmail.technikum-wien.at können Sie ihr Passwort ändern.\n
-						In allen Fällen wird neben dem Windows-Passwort auch das Unix-Passwort für die Fileserver bzw. den Mailserver mitgeändert.\n
+						Webmail: Auch im Webmailsystem auf https://webmail.technikum-wien.at kÃ¶nnen Sie ihr Passwort Ã€ndern.\n
+						In allen FÃ€llen wird neben dem Windows-Passwort auch das Unix-Passwort fÃŒr die Fileserver bzw. den Mailserver mitgeÃ€ndert.\n
 					</fo:block>
 					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
@@ -158,28 +158,28 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						Nach einem erfolgreichen Login ist unter Windows NT/XP das Laufwerk M: mit Ihrem Userverzeichnis am 
-						Server verbunden. Dort haben Sie die Möglichkeit Ihre Daten abzulegen. Achten Sie immer darauf, Ihr Quota
-						(Speicherplatz den Sie zur Verfügung haben) nicht zu überschreiten! Einige Programme (wie etwa Netscape)
+						Server verbunden. Dort haben Sie die MÃ¶glichkeit Ihre Daten abzulegen. Achten Sie immer darauf, Ihr Quota
+						(Speicherplatz den Sie zur VerfÃŒgung haben) nicht zu ÃŒberschreiten! Einige Programme (wie etwa Netscape)
 						funktionieren dann nicht mehr einwandfrei.\n
 					</fo:block>
 					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Welche Möglichkeiten habe ich auf meine Daten zuzugreifen?
+						Welche MÃ¶glichkeiten habe ich auf meine Daten zuzugreifen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						Innerhalb des TW LANs wird Ihr Serververzeichnis immer mit dem Laufwerk M: verbunden. 
-						Ausserhalb der FH können Sie per SSH bzw. WinSCP auf Ihre Daten auch von zu Hause aus zugreifen.\n
-						Dazu müssen Sie sich mit dem Server <xsl:value-of select="fileserver" /> verbinden.\n
+						Ausserhalb der FH kÃ¶nnen Sie per SSH bzw. WinSCP auf Ihre Daten auch von zu Hause aus zugreifen.\n
+						Dazu mÃŒssen Sie sich mit dem Server <xsl:value-of select="fileserver" /> verbinden.\n
 					</fo:block>
 					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
 						Wie kann ich meine Mails von zu Hause aus abrufen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Verwenden Sie dazu den POP3 Dienst. In Ihrem Mail Client müssen Sie ihren Accountnamen und den POP3
+						Verwenden Sie dazu den POP3 Dienst. In Ihrem Mail Client mÃŒssen Sie ihren Accountnamen und den POP3
 						Server pop.technikum-wien.at einstellen. Als SMTP Server verwenden Sie den Ihres Providers. 
-						Die FH selbst bietet keinen Wählleitungszugang!\n
-						Eine weitere Möglichkeit, von überall Mails abzurufen, ist unser Webmail Service auf https://webmail.technikum-wien.at\n
+						Die FH selbst bietet keinen WÃ€hlleitungszugang!\n
+						Eine weitere MÃ¶glichkeit, von ÃŒberall Mails abzurufen, ist unser Webmail Service auf https://webmail.technikum-wien.at\n
 					</fo:block>
 					
 					<xsl:if test="bezeichnung">
@@ -187,7 +187,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							Warum werden meine Einstellungen am Windows NT/XP Desktop nicht gespeichert?
 						</fo:block>
 						<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-							Alle Studenten teilen sich dasselbe Profil. Sie können daher keine Einstellungen sichern.\n
+							Alle Studenten teilen sich dasselbe Profil. Sie kÃ¶nnen daher keine Einstellungen sichern.\n
 						</fo:block>
 					</xsl:if>
 					
@@ -195,13 +195,13 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Wo erhalte ich weitere Informationen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Die primäre Anlaufstelle für Fragen rund um den Netzwerkbetrieb ist die Webseite\n
+						Die primÃ€re Anlaufstelle fÃŒr Fragen rund um den Netzwerkbetrieb ist die Webseite\n
 					</fo:block>
 					<fo:block text-align="center" content-width='180mm' font-family="sans-serif" font-size="10pt">
 						https://cis.technikum-wien.at\n
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Verwenden Sie die Informationen auf dieser Seite, um einen Überblick über die vorhandenen Möglichkeiten zu erhalten.
+						Verwenden Sie die Informationen auf dieser Seite, um einen Ãberblick ÃŒber die vorhandenen MÃ¶glichkeiten zu erhalten.
 					</fo:block>
 				</fo:block-container>
 				
