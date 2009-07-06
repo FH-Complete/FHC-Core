@@ -15,22 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/datum.class.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/person.class.php');
-require_once('../../include/prestudent.class.php');
-require_once('../../include/pruefling.class.php');
-require_once('../../include/studiengang.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/datum.class.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/prestudent.class.php');
+	require_once('../../include/pruefling.class.php');
+	require_once('../../include/studiengang.class.php');
 
-if (!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $datum_obj = new datum();
 	
@@ -62,7 +64,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 			FROM public.tbl_reihungstest JOIN public.tbl_studiengang USING (studiengang_kz)
 			WHERE datum>=now() ORDER BY datum";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo '<table class="liste table-stripeclass:alternate table-autostripe">
 				<thead>
@@ -77,7 +79,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 					</tr>
 				</thead>
 				<tbody>';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo '<tr>';
 			echo "<td>$row->kurzbzlang</td>";
@@ -99,14 +101,14 @@ if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 {
 	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841;
 			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=841;";
-	if(pg_query($conn, $qry))
+	if($db->db_query($qry))
 		echo ' <b>Antworten wurden gelöscht</b>';
 	else 
 		echo ' <b>Fehler beim Löschen der Antworten</b>';
 }
 
 //$prestudent_id=null;
-$ps=new prestudent($conn);
+$ps=new prestudent();
 $datum=date('Y-m-d');
 $ps->getPrestudentRT($datum,true);
 if ($ps->num_rows==0)
@@ -127,10 +129,10 @@ foreach($ps->result as $prestd)
 echo '</SELECT>';
 
 $qry = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	echo 'Gebiet: <SELECT name="gebiet">';
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if(isset($_POST['gebiet']) && $_POST['gebiet']==$row->gebiet_id)
 			$selected='selected';
@@ -148,7 +150,7 @@ if(isset($_POST['deleteteilgebiet']))
 	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
 	   is_numeric($_POST['prestudent']) && is_numeric($_POST['gebiet']))
 	{
-		$pruefling = new pruefling($conn);
+		$pruefling = new pruefling();
 		$pruefling->getPruefling($_POST['prestudent']);
 		if($pruefling->pruefling_id=='')
 			die('Pruefling wurde nicht gefunden');
@@ -159,9 +161,9 @@ if(isset($_POST['deleteteilgebiet']))
 				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."'));
 				DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id' AND
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			echo '<b>'.pg_affected_rows($result).' Antworten wurden gelöscht</b>';
+			echo '<b>'.$db->db_affected_rows($result).' Antworten wurden gelöscht</b>';
 		}
 		else 
 			echo '<b>Fehler beim Löschen der Daten</b>';
@@ -183,7 +185,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				JOIN public.tbl_person USING (person_id)
 				WHERE prestudent_id='".$_POST['prestudent_id']."'
 				ORDER BY kurzbz,nummer";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			echo '<table class="liste table-stripeclass:alternate table-autostripe">
 					<thead>
@@ -200,7 +202,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 					</tr>
 					</thead>
 					<tbody>';
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				echo '<tr>';
 				echo "<td>$row->nachname</td>";
@@ -223,7 +225,7 @@ if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
 	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';
 	UPDATE testtool.tbl_pruefling SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';";	
-	if(pg_query($conn, $qry))
+	if($db->db_query($qry))
 		echo '<b>Studiengang geändert!</b><br>';
 	else 
 		echo '<b>Fehler beim Ändern des Studienganges!</b><br>';
@@ -231,9 +233,9 @@ if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 $name='';
 $dummystg='';
 $qry = "SELECT studiengang_kz, vorname, nachname FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE prestudent_id='13478'";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if($row = pg_fetch_object($result))
+	if($row = $db->db_fetch_object($result))
 	{
 		$name = $row->vorname.' '.$row->nachname;
 		$dummystg=$row->studiengang_kz;
@@ -242,7 +244,7 @@ if($result = pg_query($conn, $qry))
 echo "Prestudent Studiengang von $name ändern";
 echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
 	<SELECT name="stg">';
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz');
 
 foreach ($stg_obj->result as $row)

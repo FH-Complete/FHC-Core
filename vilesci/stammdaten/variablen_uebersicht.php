@@ -15,25 +15,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
-	require_once('../../include/functions.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+		require_once('../../include/functions.inc.php');
     require_once('../../include/studiengang.class.php');
     require_once('../../include/benutzerberechtigung.class.php');
     
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-	$user = get_uid();
-	
+	if (!$user = get_uid())
+			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
 	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Berechtigung für diese Seite');
+			die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
 	
 	$htmlstr = "";
 	
@@ -47,9 +51,9 @@
 				  ORDER BY 
 				  	nachname";
 	
-    if(!$erg=pg_query($conn, $sql_query))
+    if(!$erg=$db->db_query($sql_query))
 	{
-		$errormsg='Fehler beim Laden der Berechtigungen';
+			$htmlstr='Fehler beim Laden der Berechtigungen';
 	}	
 	else
 	{
@@ -57,17 +61,17 @@
 		$htmlstr .= "<div style='text-align:right'>";
 		$htmlstr .= "<form name='neuform' action='variablen_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
 		$htmlstr .= "</div>";
-	    $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+	  $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 		$htmlstr .= "   <thead><tr class='liste'>\n";
-	    $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
-	    $htmlstr .= "   </tr></thead><tbody>\n";
-	    $i = 0;
-		while($row=pg_fetch_object($erg))
+	  $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
+	  $htmlstr .= "   </tr></thead><tbody>\n";
+	  $i = 0;
+		while($row=$db->db_fetch_object($erg))
 	    {
 	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
-			$htmlstr .= "   <tr>\n";
+					$htmlstr .= "   <tr>\n";
 	        $htmlstr .= "       <td>".$row->uid."</td>\n";
-			$htmlstr .= "       <td>".$row->vorname."</td>\n";
+					$htmlstr .= "       <td>".$row->vorname."</td>\n";
 	        $htmlstr .= "       <td><a href='variablen_details.php?uid=".$row->uid."' target='vilesci_detail'>".$row->nachname."</a></td>\n";		
 	        $htmlstr .= "   </tr>\n";
 	        $i++;

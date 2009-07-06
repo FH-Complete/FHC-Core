@@ -1,4 +1,26 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+			
 // ***************************************************************
 // * Script zum Zusammenlegen Doppelter Studenten
 // * Es werden zwei Listen mit Studenten angezeigt
@@ -6,15 +28,17 @@
 // * rechts markierten zusammengelegt werden soll.
 // * Der linke Student wird danach entfernt.
 // ***************************************************************
-//DB Verbindung herstellen
-require_once('../config.inc.php');
-require_once('../../include/person.class.php');
-require_once('../../include/functions.inc.php');
 
-if (!$conn = @pg_pconnect(CONN_STRING))
-{
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-}
+//DB Verbindung herstellen
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+			
+	require_once('../../include/person.class.php');
+	require_once('../../include/functions.inc.php');
+
 
 $msg='';
 $outp='';
@@ -104,30 +128,30 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 
 		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$radio_1';";
 
-		if(pg_query($conn,$sql_query_upd1))
+		if($db->db_query($sql_query_upd1))
 		{
 			$msg = "Daten erfolgreich gespeichert<br>";
 			$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1);
-			pg_query($conn,"COMMIT;");
-			if(@pg_query($conn,'SELECT person_portal FROM sync.tbl_syncperson LIMIT 1'))
+			$db->db_query("COMMIT;");
+			if(@$db->db_query('SELECT person_portal FROM sync.tbl_syncperson LIMIT 1'))
 			{
 				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
 				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
-				pg_query($conn,$sql_query_upd1);
+				$db->db_query($sql_query_upd1);
 				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 			}
-			if(@pg_query($conn,'SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
+			if(@pg_query('SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
 			{
 				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
 				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
-				pg_query($conn,$sql_query_upd1);
+				$db->db_query($sql_query_upd1);
 				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 			}
 		}
 		else
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
-			pg_query($conn,"ROLLBACK;");
+			$db->db_query("ROLLBACK;");
 			$msg.= "<br>".mb_eregi_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
 		$radio_1=0;
@@ -183,7 +207,7 @@ echo "</form>";
 	 echo "<th>Ext-ID</th>";
 	 echo "<th>&nbsp;</th></tr>";
 
-	 $lf  = new person($conn);
+	 $lf  = new person();
 	 $lf->getTab($filter, $order_1);
 	 $i=0;
 	 foreach($lf->personen as $l)
@@ -217,7 +241,7 @@ echo "</form>";
 	 echo "<th>Ext-ID</th>";
 	 echo "</tr>";
 
-	 $lf  = new person($conn);
+	 $lf  = new person();
 	 $lf->getTab($filter, $order_2);
 	 $i=0;
 	 foreach($lf->personen as $l)

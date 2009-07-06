@@ -15,11 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/benutzerberechtigung.class.php');
@@ -28,15 +34,15 @@
 	require_once('../../include/benutzer.class.php');
 	require_once('../../include/studiensemester.class.php');
 	
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-	$user = get_uid();
+	if (!$user = get_uid())
+			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
 	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Rechte für diese Seite');
+			die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
 	
 	$reloadstr = "";  // neuladen der liste im oberen frame
 	$htmlstr = "";
@@ -48,7 +54,7 @@
 	
 	if(isset($_GET['standard']))
 	{
-		$stsem_obj = new studiensemester($conn);
+		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 		
 		$qrys = array(
@@ -63,7 +69,7 @@
 		$error = false;
 		foreach ($qrys as $qry)
 		{
-			if(!@pg_query($conn, $qry))
+			if(!@$db->db_query($qry))
 			{
 				$error = true;
 			}
@@ -80,8 +86,7 @@
 	{
 		if($name!='' && $uid!='')
 		{
-			$variable = new variable($conn);
-			
+			$variable = new variable();
 			if(!$variable->delete($name, $uid))
 				$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
 			else 
@@ -99,7 +104,7 @@
 	
 	if(isset($_POST["schick"]))
 	{
-		$variable=new variable($conn);
+		$variable=new variable();
 		
 		if($variable->load($uid, $name))
 			$varialbe->new = false;
@@ -119,9 +124,9 @@
 	}
 	
 	$qry = "SELECT distinct name FROM public.tbl_variable order by name";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$namen[] = $row->name;
 		}
@@ -135,7 +140,7 @@
 			$htmlstr .= "<br><div class='kopf'>Benutzer <b>".$uid."</b> existiert nicht</div>";
 		else
 		{
-			$var = new variable($conn);
+			$var = new variable();
 			$var->getVars($uid);
 	
 			$htmlstr .= "<br><div class='kopf'>Variablen für <b>".$uid."</b></div>\n";

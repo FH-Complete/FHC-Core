@@ -15,20 +15,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/lehrveranstaltung.class.php');
 	require_once('../../include/lehreinheit.class.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/studiensemester.class.php');
-		
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$user = get_uid();
 	
@@ -61,7 +62,7 @@
 	//Studiengang DropDown
 	echo "Studiengang: <SELECT name='stg_kz' onchange='window.location.href=this.value'>";
 	
-	$stg = new studiengang($conn);
+	$stg = new studiengang();
 	$stg->getAll('typ, kurzbz', false);
 	
 	
@@ -89,7 +90,7 @@
 	echo '</SELECT>';
 	
 	//Studiensemester DropDown
-	$studiensem = new studiensemester($conn);
+	$studiensem = new studiensemester();
 	if($stsem=='')
 		$stsem = $studiensem->getAktorNext();
 	$studiensem->getAll();
@@ -116,9 +117,9 @@
 			$qry = "SELECT (SELECT unr FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$le_id_bleibt') as unr_bleibt, 
 						   (SELECT unr FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$le_id_delete') as unr_delete";
 
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object($result))
 				{
 					//Wenn beide UNRs gleich sind -> zusammenlegen
 					if($row->unr_bleibt==$row->unr_delete)
@@ -147,7 +148,7 @@
 						*/
 						
 						$error = false;
-						pg_query($conn, 'BEGIN');
+						$db->db_query('BEGIN');
 						
 						//Mitarbeiter loeschen die nicht uebernommen werden
 						foreach($_POST as $key=>$wert)
@@ -156,21 +157,21 @@
 							{
 								$arr = split('_',$key);
 								$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$arr[1]' AND mitarbeiter_uid='$arr[2]'";
-								pg_query($conn, $qry);
+								$db->db_query($qry);
 								echo $qry.'<br>';
 							}
 						}
 						
 						//Mitarbeiter die in beiden Lehreinheiten geich sind werden gemerged
 						$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$le_id_delete'";
-						if($result_delete = pg_query($conn, $qry))
+						if($result_delete = $db->db_query($qry))
 						{
-							while($row_delete = pg_fetch_object($result_delete))
+							while($row_delete = $db->db_fetch_object($result_delete))
 							{
 								$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$le_id_bleibt' AND mitarbeiter_uid='$row_delete->mitarbeiter_uid'";
-								if($result_bleibt = pg_query($conn, $qry))
+								if($result_bleibt = $db->db_query($qry))
 								{
-									if($row_bleibt = pg_fetch_object($result_bleibt))
+									if($row_bleibt = $db->db_fetch_object($result_bleibt))
 									{
 										echo "Lehreinheitmitarbeiter $row_bleibt->mitarbeiter_uid wird gemerged<br>";
 										if($row_delete->lehrfunktion_kurzbz==$row_bleibt->lehrfunktion_kurzbz)
@@ -223,11 +224,11 @@
 													updateamum='$updateamum',
 													updatevon='$updatevon'
 													WHERE lehreinheit_id='$row_bleibt->lehreinheit_id' AND mitarbeiter_uid='$row_bleibt->mitarbeiter_uid'";
-											pg_query($conn, $qry);
+											$db->db_query($qry);
 											echo $qry.'<br>';
 											
 											$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row_delete->lehreinheit_id' AND mitarbeiter_uid='$row_delete->mitarbeiter_uid'";
-											pg_query($conn, $qry);
+											$db->db_query($qry);
 											echo $qry.'<br>';
 										}
 										else 
@@ -244,17 +245,17 @@
 						{
 							//Gruppen die in beiden Lehreinheiten gleich sind werden geloescht
 							$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$le_id_bleibt'";
-							if($result_bleibt = pg_query($conn, $qry))
+							if($result_bleibt = $db->db_query($qry))
 							{
-								while($row_bleibt = pg_fetch_object($result_bleibt))
+								while($row_bleibt = $db->db_fetch_object($result_bleibt))
 								{
 									$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$le_id_delete' AND studiengang_kz='$row_bleibt->studiengang_kz' AND semester='$row_bleibt->semester' AND (verband='$row_bleibt->verband' ".($row_bleibt->verband==''?' OR verband is null':'').") AND (gruppe='$row_bleibt->gruppe'".($row_bleibt->gruppe==''?' OR gruppe is null':'').") AND (gruppe_kurzbz='$row_bleibt->gruppe_kurzbz'".($row_bleibt->gruppe_kurzbz==''?' OR gruppe_kurzbz is null':'').")";
-									if($result_gruppe = pg_query($conn, $qry))
+									if($result_gruppe = $db->db_query($qry))
 									{
-										if($row_gruppe = pg_fetch_object($result_gruppe))
+										if($row_gruppe = $db->db_fetch_object($result_gruppe))
 										{
 											$qry = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$row_gruppe->lehreinheitgruppe_id'";
-											pg_query($conn, $qry);
+											$db->db_query($qry);
 											echo $qry.'<br>';
 										}
 									}
@@ -273,13 +274,13 @@
 							$qry .= "UPDATE lehre.tbl_projektarbeit SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
 							$qry .= "UPDATE lehre.tbl_pruefung SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
 							$qry .= "UPDATE lehre.tbl_lehreinheitmitarbeiter SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';\n";
-							pg_query($conn, $qry);
+							$db->db_query($qry);
 							echo nl2br($qry);
 
 							//Wenn der Synclehreinheit Eintrag schon existiert dann den anderen loeschen sonst umbiegen
 							$qry = "SELECT * FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk in(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete')";
 			
-							if($result = pg_query($conn, $qry))
+							if($result = $db->db_query($qry))
 							{
 								if(pg_numrows($result)==0)
 								{
@@ -288,18 +289,18 @@
 								else 
 									$qry = "DELETE FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_bleibt' AND lehreinheit_pk in(SELECT lehreinheit_pk FROM sync.tbl_synclehreinheit WHERE lehreinheit_id='$le_id_delete');";
 								
-								pg_query($conn, $qry);
+								$db->db_query($qry);
 								echo $qry.'<br>';
 							}
 							$qry = "DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$le_id_delete'\n";
-							pg_query($conn, $qry);
+							$db->db_query($qry);
 							echo nl2br($qry);
 						
-							pg_query($conn, 'COMMIT');
+							$db->db_query('COMMIT');
 						}
 						else 
 						{
-							pg_query($conn, 'ROLLBACK');
+							$db->db_query('ROLLBACK');
 						}
 					}
 					else 
@@ -341,14 +342,16 @@
 	
 	function draw_table($qry, $delete)
 	{
-		global $conn;
+			if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 		
 		echo '<table class="liste"><tr><th>LE_id</th><th>LV_id</th><th>StSem</th><th>LF_id</th><th>LForm</th><th>Blockung</th><th>WR</th>
 		                 <th>StartKW</th><th>Raumtyp</th><th>RaumtypAlt</th><th>lehre</th><th>unr</th><th>lvnr</th></tr>';
 		
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				echo '<tr class="liste1">';
 				echo "<td><input type='radio' name='radio_".($delete?'delete':'bleibt')."' value='$row->lehreinheit_id'>$row->lehreinheit_id</td><td>$row->lehrveranstaltung_id</td><td>$row->studiensemester_kurzbz</td>
@@ -359,9 +362,9 @@
 				
 				//Liste der zugehoerigen Mitarbeiter
 				$qry_ma = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row->lehreinheit_id'";
-				if($result_ma = pg_query($conn, $qry_ma))
+				if($result_ma = $db->db_query($qry_ma))
 				{
-					while($row_ma = pg_fetch_object($result_ma))
+					while($row_ma = $db->db_fetch_object($result_ma))
 					{
 						echo "<tr><td></td><td><input type='checkbox' name='check_".$row->lehreinheit_id."_".$row_ma->mitarbeiter_uid."'>$row_ma->mitarbeiter_uid</td><td>$row_ma->lehrfunktion_kurzbz</td>
 								  <td>$row_ma->semesterstunden</td><td>$row_ma->planstunden</td><td>$row_ma->stundensatz</td>

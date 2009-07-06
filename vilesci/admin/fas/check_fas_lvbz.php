@@ -1,4 +1,28 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+ 
+ 
+ 
 /**
  * Ueberpruefung der Daten fuer Datenbankintegration FAS->VILESCI
  *
@@ -14,8 +38,12 @@
  * Danach wird eine Mail an die zustaendige Assistentin geschickt.
  */
 
- include("../../config.inc.php");
 
+		require_once('../../../config/vilesci.config.inc.php');
+		require_once('../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+ 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -43,18 +71,15 @@ TR.liste1
 <body>
 <?php
 
-	if(!$conn=pg_pconnect(CONN_STRING_FAS))
+	if(!$conn_fas=pg_pconnect(CONN_STRING_FAS))
 		die("Fehler beim Connecten zur DB");
-	if(!$conn_calva=pg_pconnect(CONN_STRING))
-		die("Fehler beim Connecten zur DB");
-
+		
 	//Liste der Studiengaenge holen
 	$qry="Select studiengang_kz, kurzbzlang from tbl_studiengang";
-	if(!$result=pg_exec($conn_calva,$qry))
+	if(!$result=$db->db_query($qry))
 		die("Fehler beim Auslesen der Studiengaenge");
-
 	$studiengaenge=array();
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 		$studiengaenge[$row->studiengang_kz]=$row->kurzbzlang;
 
 	//alle Kurzbezeichnungen trimmen
@@ -76,9 +101,8 @@ TR.liste1
 	      AND a.ausbildungssemester_fk=ausbildungssemester.ausbildungssemester_pk order by studiengang.kennzahl";
 
 	$arr=array();
-	if(!$result=pg_exec($conn,$qry))
-		die("Fehler bei qry".pg_last_error($conn));
-
+	if(!$result=pg_query($conn_fas,$qry))
+		die("Fehler bei qry".pg_last_error($conn_fas));
 	while($row=pg_fetch_object($result))
 	{
 		if((!array_key_exists($row->pk1.$row->pk2,$arr) || $arr[$row->pk1.$row->pk2]['bez1']!=$row->bez1)
@@ -171,11 +195,9 @@ TR.liste1
 	         lva1.ausbildungssemester_fk=lva2.ausbildungssemester_fk
 	      ORDER BY lva1.studiengang_fk";
 
-	if(!$result=pg_exec($conn,$qry))
+	if(!$result=pg_query($conn_fas,$qry))
 		die("Fehler beim ueberpruefen der Stammdaten");
-
 	$laststg='0';
-
 	//Tabelle aufbauen
 	while($row=pg_fetch_object($result))
 	{
@@ -242,8 +264,8 @@ TR.liste1
 	      AND studiengang.studiengang_pk=a.studiengang_fk
 	      AND a.ausbildungssemester_fk=ausbildungssemester_pk order by studiengang.kennzahl";
 	$arr=array();
-	if(!$result=pg_exec($conn,$qry))
-		die("Fehler bei qry".pg_last_error($conn));
+	if(!$result=pg_query($conn_fas,$qry))
+		die("Fehler bei qry".pg_last_error($conn_fas));
 
 	while($row=pg_fetch_object($result))
 	{
@@ -319,10 +341,8 @@ TR.liste1
 		if($elem!='0')
 		{
 			$qry="Select email from tbl_studiengang where studiengang_kz='$elem'";
-			$result=pg_exec($conn_calva,$qry);
-
-			$row=pg_fetch_object($result);
-
+			$result=$db->db_query($qry);
+			$row=$db->db_fetch_object($result);
 			echo "<br>".$studiengaenge[$elem]." goes to $row->email<br><br>";
 			echo $mesg[$elem];
 			if($row->email!='')

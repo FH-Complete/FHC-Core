@@ -1,20 +1,41 @@
 <?php
-	require_once('../config.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/ort.class.php');
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	{
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	}
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/ort.class.php');
     	
 	if (isset($_GET["toggle"]))
 	{
 		if ($_GET["rlehre"] != "" && $_GET["rlehre"] != NULL)
 		{
 			$rlehre = $_GET["rlehre"];
-			$sg_update = new ort($conn);
+			$sg_update = new ort();
 			$qry = "UPDATE public.tbl_ort SET lehre = NOT lehre WHERE ort_kurzbz='".$rlehre."';";
-			if(!pg_query($conn, $qry))
+			if(!$db->db_query($qry))
 			{
 				die('Fehler beim Speichern des Datensatzes');
 			}	
@@ -22,9 +43,9 @@
 		if ($_GET["rres"] != "" && $_GET["rres"] != NULL)
 		{
 			$rres = $_GET["rres"];
-			$sg_update = new ort($conn);
+			$sg_update = new ort();
 			$qry = "UPDATE public.tbl_ort SET reservieren = NOT reservieren WHERE ort_kurzbz='".$rres."';";
-			if(!pg_query($conn, $qry))
+			if(!$db->db_query($qry))
 			{
 				die('Fehler beim Speichern des Datensatzes');
 			}	
@@ -32,16 +53,16 @@
 		if ($_GET["raktiv"] != "" && $_GET["raktiv"] != NULL)
 		{
 			$raktiv = $_GET["raktiv"];
-			$sg_update = new ort($conn);
+			$sg_update = new ort();
 			$qry = "UPDATE public.tbl_ort SET aktiv = NOT aktiv WHERE ort_kurzbz='".$raktiv."';";
-			if(!pg_query($conn, $qry))
+			if(!$db->db_query($qry))
 			{
 				die('Fehler beim Speichern des Datensatzes');
 			}	
 		}
 	}
 	
-$sg = new ort($conn);
+$sg = new ort();
 if (!$sg->getAll('ort_kurzbz',false))
     die($sg->errormsg);
 

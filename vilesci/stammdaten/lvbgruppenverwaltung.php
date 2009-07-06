@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/lehrverband.class.php');
@@ -61,15 +65,11 @@ $verband = (isset($_GET['verband'])?$_GET['verband']:'');
 $gruppe = (isset($_GET['gruppe'])?$_GET['gruppe']:'');
 $gruppe_kurzbz = (isset($_GET['gruppe_kurzbz'])?$_GET['gruppe_kurzbz']:'');
 
-//Connection zur Datenbank herstellen
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Es konnte keine Verbindung zur Datenbank hergestellt werden');
-
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 //Studiengang Drop Down anzeigen
-$stud = new studiengang($conn);
+$stud = new studiengang();
 if(!$stud->getAll('typ, kurzbzlang'))
 	echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
 
@@ -104,7 +104,7 @@ else
 if(!$admin && !$assistenz)
 	die('Sie haben keine Berechtigung für diesen Studiengang');
 
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->load($studiengang_kz);
 
 //Anlegen einer neuen Gruppe
@@ -118,7 +118,7 @@ if($type=='neu')
 		//neue Spezialgruppe anlegen
 		$gruppe_kurzbz=$studiengang->kuerzel.'-'.$semester.strtoupper($_POST['spzgruppe_neu']);
 		
-		$gruppe = new gruppe($conn);
+		$gruppe = new gruppe();
 		
 		if(!$gruppe->exists($gruppe_kurzbz))
 		{
@@ -152,7 +152,7 @@ if($type=='neu')
 	}
 	else 
 	{
-		$lvb = new lehrverband($conn);
+		$lvb = new lehrverband();
 		
 		if(isset($_POST['semester_neu']))
 		{
@@ -220,7 +220,7 @@ if($type=='copy')
 		$mailgrp = isset($_POST['mailgrp_copy']);
 		$generiert = isset($_POST['generiert_copy']);
 				
-		$gruppe = new gruppe($conn);
+		$gruppe = new gruppe();
 		
 		if(!$gruppe->exists($gruppe_kurzbz))
 		{
@@ -267,7 +267,7 @@ if($aktiv!='')
 	
 	if($gruppe_kurzbz!='')
 	{
-		$gruppe = new gruppe($conn);
+		$gruppe = new gruppe();
 		if($gruppe->load($gruppe_kurzbz))
 		{
 			$gruppe->aktiv=!$gruppe->aktiv;
@@ -287,7 +287,7 @@ if($aktiv!='')
 	}
 	else 
 	{
-		$lvb = new lehrverband($conn);
+		$lvb = new lehrverband();
 		
 		if($lvb->load($studiengang_kz, $semester, $verband, $gruppe))
 		{
@@ -314,7 +314,7 @@ if($type=='save')
 	//Spezialgruppe speichern
 	if($gruppe_kurzbz!='')
 	{
-		$gruppe = new gruppe($conn);
+		$gruppe = new gruppe();
 		if($gruppe->load($gruppe_kurzbz))
 		{
 			$gruppe->bezeichnung = $_POST['bezeichnung'];
@@ -349,7 +349,7 @@ if($type=='save')
 	else 
 	{
 		//Lehrverbandsgruppe speichern
-		$lvb = new lehrverband($conn);
+		$lvb = new lehrverband();
 		if($lvb->load($studiengang_kz, $semester, $verband, $gruppe))
 		{
 			$lvb->bezeichnung = $_POST['bezeichnung'];
@@ -391,12 +391,12 @@ if (empty($studiengang_kz))
 	$studiengang_kz=0;
 }
 $qry = "SELECT * FROM public.tbl_lehrverband WHERE studiengang_kz='$studiengang_kz' $where ORDER BY studiengang_kz, semester, verband, gruppe";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$lastsemester='';
 	$lastverband='';
 	
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if(trim($row->verband)=='')
 		{
@@ -426,9 +426,9 @@ if($result = pg_query($conn, $qry))
 					}
 					//Spezialgruppen des vorherigen Semesters
 					$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' $where ORDER BY sort, gruppe_kurzbz";
-					if($result_gruppe = pg_query($conn, $qry_gruppe))
+					if($result_gruppe = $db->db_query($qry_gruppe))
 					{
-						while($row_gruppe = pg_fetch_object($result_gruppe))
+						while($row_gruppe = $db->db_fetch_object($result_gruppe))
 						{
 							echo "&nbsp;&nbsp;&nbsp;&nbsp;|-";
 							if($admin)
@@ -510,9 +510,9 @@ if($result = pg_query($conn, $qry))
 		}
 		//Spezialgruppen des vorherigen Semesters
 		$qry_gruppe = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='$studiengang_kz' AND semester='$lastsemester' $where ORDER BY sort, gruppe_kurzbz";
-		if($result_gruppe = pg_query($conn, $qry_gruppe))
+		if($result_gruppe = $db->db_query($qry_gruppe))
 		{
-			while($row_gruppe = pg_fetch_object($result_gruppe))
+			while($row_gruppe = $db->db_fetch_object($result_gruppe))
 			{
 				echo "&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.gif':'false.gif')."'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz</a></b><br>";
 			}
@@ -535,7 +535,7 @@ if($type=='edit')
 {
 	if($gruppe_kurzbz!='')
 	{
-		$gruppe = new gruppe($conn);
+		$gruppe = new gruppe();
 		if($gruppe->load($gruppe_kurzbz))
 		{
 			echo '<div style="position:fixed;
@@ -571,7 +571,7 @@ if($type=='edit')
 					  		<td>Sort:</td>
 					  		<td><input type='text' name='sort' size='2' maxlength='2' value='$gruppe->sort' /></td>
 					  	</tr>";
-				$stg_obj = new studiengang($conn, $studiengang_kz);
+				$stg_obj = new studiengang($studiengang_kz);
 				if($stg_obj->orgform_kurzbz=='VBB')
 				{
 					echo "
@@ -581,9 +581,9 @@ if($type=='edit')
 					echo "	<SELECT name='orgform_kurzbz'>";
 					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-					if($result_orgform = pg_query($conn, $qry_orgform))
+					if($result_orgform = $db->db_query($qry_orgform))
 					{
-						while($row_orgform = pg_fetch_object($result_orgform))
+						while($row_orgform = $db->db_fetch_object($result_orgform))
 						{
 							if($row_orgform->orgform_kurzbz==$gruppe->orgform_kurzbz)
 								$selected='selected';
@@ -654,7 +654,7 @@ if($type=='edit')
 				  		<td><input type='text' name='sort_copy' size='2' maxlength='2' value='$gruppe->sort' /></td>
 				  	</tr>";
 			
-			$stg_obj = new studiengang($conn, $studiengang_kz);
+			$stg_obj = new studiengang($studiengang_kz);
 			if($stg_obj->orgform_kurzbz=='VBB')
 			{
 				echo "
@@ -664,9 +664,9 @@ if($type=='edit')
 				echo "	<SELECT name='orgform_kurzbz_copy'>";
 				echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 				$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-				if($result_orgform = pg_query($conn, $qry_orgform))
+				if($result_orgform = $db->db_query($qry_orgform))
 				{
-					while($row_orgform = pg_fetch_object($result_orgform))
+					while($row_orgform = $db->db_fetch_object($result_orgform))
 					{
 						if($row_orgform->orgform_kurzbz==$gruppe->orgform_kurzbz)
 							$selected='selected';
@@ -707,7 +707,7 @@ if($type=='edit')
 	}
 	else 
 	{
-		$lvb = new lehrverband($conn);
+		$lvb = new lehrverband();
 		if($lvb->load($studiengang_kz, $semester, $verband, $gruppe))
 		{
 			echo '<div style="position:fixed;
@@ -726,7 +726,7 @@ if($type=='edit')
 				  		<td>Aktiv:</td>
 				  		<td><input type='checkbox' name='aktiv' ".($lvb->aktiv?'checked':'')." /></td>
 				  	</tr>";
-				$stg_obj = new studiengang($conn, $studiengang_kz);
+				$stg_obj = new studiengang($studiengang_kz);
 				if($stg_obj->orgform_kurzbz=='VBB')
 				{ 	
 					echo "
@@ -736,9 +736,9 @@ if($type=='edit')
 					echo "	<SELECT name='orgform_kurzbz'>";
 					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-					if($result_orgform = pg_query($conn, $qry_orgform))
+					if($result_orgform = $db->db_query($qry_orgform))
 					{
-						while($row_orgform = pg_fetch_object($result_orgform))
+						while($row_orgform = $db->db_fetch_object($result_orgform))
 						{
 							if($row_orgform->orgform_kurzbz==$lvb->orgform_kurzbz)
 								$selected='selected';

@@ -1,16 +1,31 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2008 Technikum-Wien
  *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-include('../../config.inc.php');
-
-$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
-$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
+		require_once('../../../config/vilesci.config.inc.php');
+#		require_once('../../../include/basis_db.class.php');
+#		if (!$db = new basis_db())
+#				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		$conn_fas=pg_connect(CONN_STRING_FAS) or die("Connection zur FAS Datenbank fehlgeschlagen");
 
 $adress='ruhan@technikum-wien.at';
 //$adress='fas_sync@technikum-wien.at';
@@ -47,177 +62,28 @@ TR.liste1
 }
 </style>
 <?php
+$qry1='';
 if(isset($_POST['person_pk']))
 {
-	if(isset($_POST['familienname']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", familienname='".$_POST['familienname']."'";
-		}
-		else
-		{
-			$qry1= "familienname='".$_POST['familienname']."'";
-		}
-	}
-	if(isset($_POST['vorname']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", vorname='".$_POST['vorname']."'";
-		}
-		else
-		{
-			$qry1= "vorname='".$_POST['vorname']."'";
-		}
-	}
-	if(isset($_POST['anrede']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", anrede='".$_POST['anrede']."'";
-		}
-		else
-		{
-			$qry1= "anrede='".$_POST['anrede']."'";
-		}
-	}
-	if(isset($_POST['vornamen']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", vornamen='".$_POST['vornamen']."'";
-		}
-		else
-		{
-			$qry1= "vornamen='".$_POST['vornamen']."'";
-		}
-	}
-	if(isset($_POST['geschlecht']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", geschlecht='".$_POST['geschlecht']."'";
-		}
-		else
-		{
-			$qry1= "geschlecht='".$_POST['geschlecht']."'";
-		}
-	}
-	if(isset($_POST['gebdat']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", gebdat='".$_POST['gebdat']."'";
-		}
-		else
-		{
-			$qry1= "gebdat='".$_POST['gebdat']."'";
-		}
-	}
-	if(isset($_POST['gebort']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", gebort='".$_POST['gebort']."'";
-		}
-		else
-		{
-			$qry1= "gebort='".$_POST['gebort']."'";
-		}
-	}
-	if(isset($_POST['staatsbuergerschaft']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", staatsbuergerschaft='".$_POST['staatsbuergerschaft']."'";
-		}
-		else
-		{
-			$qry1= "staatsbuergerschaft='".$_POST['staatsbuergerschaft']."'";
-		}
-	}
-	if(isset($_POST['familienstand']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", familienstand='".$_POST['familienstand']."'";
-		}
-		else
-		{
-			$qry1= "familienstand='".$_POST['familienstand']."'";
-		}
-	}
-	if(isset($_POST['svnr']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", svnr='".$_POST['svnr']."'";
-		}
-		else
-		{
-			$qry1= "svnr='".$_POST['svnr']."'";
-		}
-	}
-	if(isset($_POST['anzahlderkinder']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", anzahlderkinder='".$_POST['anzahlderkinder']."'";
-		}
-		else
-		{
-			$qry1= "anzahlderkinder='".$_POST['anzahlderkinder']."'";
-		}
-	}
-	if(isset($_POST['ersatzkennzeichen']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", ersatzkennzeichen='".$_POST['ersatzkennzeichen']."'";
-		}
-		else
-		{
-			$qry1= "ersatzkennzeichen='".$_POST['ersatzkennzeichen']."'";
-		}
-	}
-	if(isset($_POST['titel']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", titel='".$_POST['titel']."'";
-		}
-		else
-		{
-			$qry1= "titel='".$_POST['titel']."'";
-		}
-	}
-	if(isset($_POST['gebnation']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", gebnation='".$_POST['gebnation']."'";
-		}
-		else
-		{
-			$qry1= "gebnation='".$_POST['gebnation']."'";
-		}
-	}
-	if(isset($_POST['postnomentitel']) )
-	{
-		if(strlen(trim($qry1))>0)
-		{
-			$qry1.= ", postnomentitel='".$_POST['postnomentitel']."'";
-		}
-		else
-		{
-			$qry1= "postnomentitel='".$_POST['postnomentitel']."'";
-		}
-	}
+		$qry1.=(isset($_POST['familienname'])?(!empty($qry1)?',':'')."familienname='".addslashes(trim($_POST['familienname']))."'" :''); 
+		$qry1.=(isset($_POST['vorname'])?(!empty($qry1)?',':'')."vorname='".addslashes(trim($_POST['vorname']))."'" :''); 
+		$qry1.=(isset($_POST['anrede'])?(!empty($qry1)?',':'')."anrede='".addslashes(trim($_POST['anrede']))."'" :''); 
+		$qry1.=(isset($_POST['vornamen'])?(!empty($qry1)?',':'')."vornamen='".addslashes(trim($_POST['vornamen']))."'" :''); 
+		$qry1.=(isset($_POST['geschlecht'])?(!empty($qry1)?',':'')."geschlecht='".addslashes(trim($_POST['geschlecht']))."'" :''); 
+		$qry1.=(isset($_POST['gebdat'])?(!empty($qry1)?',':'')."gebdat='".addslashes(trim($_POST['gebdat']))."'" :''); 
+		$qry1.=(isset($_POST['gebort'])?(!empty($qry1)?',':'')."gebort='".addslashes(trim($_POST['gebort']))."'" :''); 
+		$qry1.=(isset($_POST['staatsbuergerschaft'])?(!empty($qry1)?',':'')."staatsbuergerschaft='".addslashes(trim($_POST['staatsbuergerschaft']))."'" :''); 
+		$qry1.=(isset($_POST['familienstand'])?(!empty($qry1)?',':'')."familienstand='".addslashes(trim($_POST['familienstand']))."'" :''); 
+		$qry1.=(isset($_POST['svn'])?(!empty($qry1)?',':'')."svn='".addslashes(trim($_POST['svn']))."'" :''); 
+		$qry1.=(isset($_POST['anzahlderkinder'])?(!empty($qry1)?',':'')."anzahlderkinder='".addslashes(trim($_POST['anzahlderkinder']))."'" :''); 
+		$qry1.=(isset($_POST['ersatzkennzeichen'])?(!empty($qry1)?',':'')."ersatzkennzeichen='".addslashes(trim($_POST['ersatzkennzeichen']))."'" :''); 
+		$qry1.=(isset($_POST['titel'])?(!empty($qry1)?',':'')."titel='".addslashes(trim($_POST['titel']))."'" :''); 
+		$qry1.=(isset($_POST['gebnation'])?(!empty($qry1)?',':'')."gebnation='".addslashes(trim($_POST['gebnation']))."'" :''); 
+		$qry1.=(isset($_POST['postnomentitel'])?(!empty($qry1)?',':'')."postnomentitel='".addslashes(trim($_POST['postnomentitel']))."'" :''); 
+		
 	if(strlen(trim($qry1))>0)
 	{
 		$qry = "UPDATE person SET ".$qry1. " WHERE person_pk=".$_POST['person_pk'];
-
 		if(pg_query($conn_fas, $qry))
 		{
 			echo "Erfolgreich gespeichert: ".$qry;

@@ -15,20 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/bisfunktion.class.php');
 require_once('../../include/studiengang.class.php');
-
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
 $funktion_geaendert=0;
 $funktion_hinzugefuegt=0;
@@ -40,7 +42,7 @@ $user = get_uid();
 $wochen=BIS_SWS_WOCHEN;
 
 $stg_arr = array();
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
 $lastbismeldung = date('Y-m-d',mktime(0,0,0,11,15,date('Y')-1));
 foreach ($stg_obj->result as $stg)
@@ -58,7 +60,7 @@ echo '<html>
 	<h2>Mitarbeiter BIS-Funktion Check</h2>
 	';
 
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsemprev = $stsem->getPrevious();
 $stsemprevprev = $stsem->getBeforePrevious();
 
@@ -72,10 +74,10 @@ $qry =  "SELECT tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehrveranstaltun
 		(studiensemester_kurzbz='$stsemprev' OR studiensemester_kurzbz='$stsemprevprev') AND
 		bismelden=true AND tbl_lehreinheitmitarbeiter.semesterstunden>0 GROUP BY mitarbeiter_uid, studiengang_kz";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$lastuid='';
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($lastuid!=$row->mitarbeiter_uid)
 		{
@@ -83,9 +85,9 @@ if($result = pg_query($conn, $qry))
 			//Verwendung suchen
 			$person_error=false;
 			$qry_verw = "SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() OR ende is null OR ende>'$lastbismeldung') AND mitarbeiter_uid='$row->mitarbeiter_uid' order by beginn DESC";
-			if($result_verw = pg_query($conn, $qry_verw))
+			if($result_verw = $db->db_query($qry_verw))
 			{
-				if(pg_num_rows($result_verw)==0)
+				if($db->db_num_rows($result_verw)==0)
 				{
 					echo "<br>Es wurde keine Verwendung fuer <b>$row->mitarbeiter_uid</b> gefunden";
 					$person_error = true;
@@ -110,7 +112,7 @@ if($result = pg_query($conn, $qry))
 			}
 			else
 			{
-				echo "<br>Fehler beim Ermitteln der Verwendung ".pg_last_error($conn);
+				echo "<br>Fehler beim Ermitteln der Verwendung ".$db->db_last_error();
 				$person_error = true;
 			}
 		}
@@ -121,7 +123,7 @@ if($result = pg_query($conn, $qry))
 			$swsneu = round($row->semstd/$wochen, 2);
 
 			//Funktion fuer diesen Studiengang suchen
-			$bisfunktion = new bisfunktion($conn);
+			$bisfunktion = new bisfunktion();
 
 			if($bisfunktion->load($verwendung_id, $row->studiengang_kz))
 			{
@@ -170,11 +172,11 @@ if($result = pg_query($conn, $qry))
 				(tbl_lehreinheit.studiensemester_kurzbz='$stsemprev' OR tbl_lehreinheit.studiensemester_kurzbz='$stsemprevprev'))
 				AND (ende>'$lastbismeldung' OR ende is null)
 			ORDER BY mitarbeiter_uid, studiengang_kz";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		$funktion_ohne_lehrauftrag = pg_num_rows($result);
 
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo "<br><b>$row->mitarbeiter_uid</b> hat im Studiengang ".$stg_arr[$row->studiengang_kz]." ($row->studiengang_kz) eine Funktion ohne Lehrauftrag";
 		}
