@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" version="1.0" indent="yes" />
@@ -83,7 +83,7 @@
 
 				<fo:block-container position="absolute" top="170pt" left="60pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="16pt">
-					Bachelor-Prüfungszeugnis
+					Bachelor-PrÃŒfungszeugnis
 				</fo:block>
 				</fo:block-container>
 
@@ -190,7 +190,7 @@
 
 				<fo:block-container position="absolute" top="323pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-				Gesetzliche Grundlage: gem. § 5 Abs. 1 des Bundesgesetzes über Fachhochschul-Studiengänge (FHStG), BGBl.Nr. <xsl:value-of select="bescheidbgbl1" />
+				Gesetzliche Grundlage: gem. Â§ 5 Abs. 1 des Bundesgesetzes ÃŒber Fachhochschul-StudiengÃ€nge (FHStG), BGBl.Nr. <xsl:value-of select="bescheidbgbl1" />
 				</fo:block>
 				</fo:block-container>
 
@@ -211,7 +211,7 @@
 
 				<fo:block-container position="absolute" top="354pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Note der Bachelor-Prüfung
+						Note der Bachelor-PrÃŒfung
 
 				                 <fo:inline font-size="12pt" font-weight="900" text-align="center" >                    \n
 				                 
@@ -239,7 +239,7 @@
 
 				<fo:block-container position="absolute" top="560pt" left="62pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Kommissionelle Prüfung
+						Kommissionelle PrÃŒfung
 
 				</fo:block>
 				</fo:block-container>
@@ -284,7 +284,7 @@
 
 				<fo:block-container position="absolute" top="575pt" left="206pt" height="0pt">
 				<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-						Vorsitz des Prüfungssenats
+						Vorsitz des PrÃŒfungssenats
 				                 \n
 				                 \n
 				                 \n

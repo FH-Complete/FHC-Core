@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" version="1.0" indent="yes" />
@@ -34,14 +34,14 @@
 					</fo:block-container>
 					
 					<fo:block-container position="absolute" top="26mm" left="15mm">
-						<fo:block font-size="12pt">Höchstädtplatz 5\nA-1200 Wien</fo:block>
+						<fo:block font-size="12pt">HÃ¶chstÃ€dtplatz 5\nA-1200 Wien</fo:block>
 						<fo:block font-size="6pt">ZVR-Nr.: 074476426, DVR-Nr.: 0928381</fo:block>
 					</fo:block-container>
 
 					
 					<fo:block-container position="absolute" top="45mm" left="15mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
-							Bestätigung des Studienerfolges
+							BestÃ€tigung des Studienerfolges
 						</fo:block>
 					</fo:block-container> 
 					
@@ -167,7 +167,7 @@
 					<!-- TABELLE -->
 					<fo:block-container position="absolute" top="110mm" left="15mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							Folgende Prüfungen wurden erfolgreich abgelegt:
+							Folgende PrÃŒfungen wurden erfolgreich abgelegt:
 						</fo:block>
 					</fo:block-container>
 					
@@ -286,7 +286,7 @@
 									<fo:block font-size="7pt">Benotung: </fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), angerechnet (ar), nicht beurteilt (nb),</fo:block>
+									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), GenÃŒgend (4), Nicht genÃŒgend (5), angerechnet (ar), nicht beurteilt (nb),</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 								<fo:table-row>
