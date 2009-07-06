@@ -170,7 +170,7 @@
 									<fo:block font-size="7pt"></fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">non-credit participation (na), participated(t), passed (b), approbiert (ap), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</fo:block>
+									<fo:block font-size="7pt">non-credit participation (na), participated(t), passed (b), successfully completed (ea), not successfully completed (nea)</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-body>
