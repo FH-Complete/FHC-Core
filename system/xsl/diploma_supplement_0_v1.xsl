@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" version="1.0" indent="yes" />
@@ -51,8 +51,8 @@
 				
 				<fo:block-container position="absolute" top="25mm" left="20mm" right="200mm" height="0mm">
 					<fo:block text-align="block" line-height="10pt" font-family="sans-serif" font-size="6pt">
-				Dieser Anhang zum Diplom wurde nach dem von der Europäischen Kommission, dem Europarat und UNESCO/CEPES entwickelten Modell erstellt. Mit dem
-				\n Anhang wird das Ziel verfolgt, ausreichend unabhängige Daten zu erfassen, um die internationale "Transparenz" und die angemessene akademische und berufliche \n Anerkennung von Qualifikationen (Diplomen, Abschlüssen, Zeugnissen usw.) zu verbessern. Der Anhang soll eine Beschreibung über Art, Niveau, Kontext, Inhalt \n und Status eines Studiums bieten, den die im Original-Befähigungsnachweis, dem der Anhang beigefügt ist, genannte Person absolviert und erfolgreich abgeschlossen\n hat.\n This diploma supplement follows the model developed by the European Commission, Council of Europe and UNESCO/CEPES. The purpose of the supplement \n is to provide sufficient independent data to improve the international transparency and fair academic and professional recognition of qualifications (diplomas, degrees, certificates, etc.). It \n is designed to provide a description of the nature, level, context, content and status of the studies that were pursued and successfully completed by the individual \n named on the original qualification to which this supplement is appended.
+				Dieser Anhang zum Diplom wurde nach dem von der EuropÃ€ischen Kommission, dem Europarat und UNESCO/CEPES entwickelten Modell erstellt. Mit dem
+				\n Anhang wird das Ziel verfolgt, ausreichend unabhÃ€ngige Daten zu erfassen, um die internationale "Transparenz" und die angemessene akademische und berufliche \n Anerkennung von Qualifikationen (Diplomen, AbschlÃŒssen, Zeugnissen usw.) zu verbessern. Der Anhang soll eine Beschreibung ÃŒber Art, Niveau, Kontext, Inhalt \n und Status eines Studiums bieten, den die im Original-BefÃ€higungsnachweis, dem der Anhang beigefÃŒgt ist, genannte Person absolviert und erfolgreich abgeschlossen\n hat.\n This diploma supplement follows the model developed by the European Commission, Council of Europe and UNESCO/CEPES. The purpose of the supplement \n is to provide sufficient independent data to improve the international transparency and fair academic and professional recognition of qualifications (diplomas, degrees, certificates, etc.). It \n is designed to provide a description of the nature, level, context, content and status of the studies that were pursued and successfully completed by the individual \n named on the original qualification to which this supplement is appended.
 					</fo:block>
 				</fo:block-container> 
 				
@@ -131,7 +131,7 @@
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.2 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Hauptstudienfach oder -fächer für die Qualifikation \n Main field(s) of study for the qualification</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Hauptstudienfach oder -fÃ€cher fÃŒr die Qualifikation \n Main field(s) of study for the qualification</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="studiengang_bezeichnung_deutsch" />\n<xsl:value-of select="studiengang_bezeichnung_englisch" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
@@ -141,12 +141,12 @@
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.4 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Einrichtung, die das Studium durchführte \n Name and status of institution administering studies</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Name und Status der Einrichtung, die das Studium durchfÃŒhrte \n Name and status of institution administering studies</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Fachhochschule Technikum Wien \n University of Applied Sciences Technikum Wien</fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.5 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Im Unterricht/in den Prüfungen verwendete Sprachen \n Language(s) of instruction/examination</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Im Unterricht/in den PrÃŒfungen verwendete Sprachen \n Language(s) of instruction/examination</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Deutsch, Englisch\n German, English</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
@@ -201,7 +201,7 @@
 						<fo:table-body>
 							<fo:table-row  line-height="12pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="10pt" font-weight="bold"> 4. \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid"  background-color="rgb(200,200,200)"><fo:block font-size="8pt" font-weight="bold">ANGABEN ÜBER DEN INHALT UND DIE ERZIELTEN ERGEBNISSE \n INFORMATION ON THE CONTENTS AND RESULTS GAINED</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid"  background-color="rgb(200,200,200)"><fo:block font-size="8pt" font-weight="bold">ANGABEN ÃBER DEN INHALT UND DIE ERZIELTEN ERGEBNISSE \n INFORMATION ON THE CONTENTS AND RESULTS GAINED</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
@@ -251,7 +251,7 @@
 								<fo:table-cell border-width="0.2mm" border-style="solid" >
 									<fo:block font-size="8pt">
 										<fo:inline text-decoration="underline"> Einzelbeurteilung/Grades</fo:inline>
-										\n 1=Sehr gut/Excellent  \n 2=Gut/Good  \n 3=Befriedigend/Satisfactory  \n 4=Genügend/Sufficient \n 5=Nicht Genügend/Unsatisfactory \n \n TG=Teilgenommen/Participated \n AR=Angerechnet/Credited \n \n Gesamtbeurteilung/Overall assessment: \n -Bestanden (pass) \n -Mit gutem Erfolg bestanden (pass with merit) \n -Mit ausgezeichnetem Erfolg bestanden (pass with distinction)
+										\n 1=Sehr gut/Excellent  \n 2=Gut/Good  \n 3=Befriedigend/Satisfactory  \n 4=GenÃŒgend/Sufficient \n 5=Nicht GenÃŒgend/Unsatisfactory \n \n TG=Teilgenommen/Participated \n AR=Angerechnet/Credited \n \n Gesamtbeurteilung/Overall assessment: \n -Bestanden (pass) \n -Mit gutem Erfolg bestanden (pass with merit) \n -Mit ausgezeichnetem Erfolg bestanden (pass with distinction)
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -300,13 +300,13 @@
 						<fo:table-body>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 5.1 \n \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Zugangsberechtigung zu weiterführenden Studien \n Access to further study \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Zugangsberechtigung zu weiterfÃŒhrenden Studien \n Access to further study \n \n \n \n \n \n \n \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="zugangsberechtigung_deutsch" />\n<xsl:value-of select="zugangsberechtigung_englisch" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm"> 5.2 \n \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="80mm"> Beruflicher Status \n Professional status conferred \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="91mm"> Zugang zu akademischen Berufen nach Maßgabe der berufsrechtlichen Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG.\n Access to academic professions according to the professional regulation; Diploma in the sense of directive RL 89/48/EEC.</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="91mm"> Zugang zu akademischen Berufen nach MaÃgabe der berufsrechtlichen Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG.\n Access to academic professions according to the professional regulation; Diploma in the sense of directive RL 89/48/EEC.</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
@@ -340,7 +340,7 @@
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 6.2 \n</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Informationsquellen für ergänzende Angaben \n Further information sources</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Informationsquellen fÃŒr ergÃ€nzende Angaben \n Further information sources</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> http://www.technikum-wien.at, http://www.fhr.ac.at\n</fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
@@ -420,7 +420,7 @@
 				Fachhochschule Technikum Wien \n
 				\n
 				Hoechstaedtplatz 5 \n
-				A-1200 Wien, Österreich\n
+				A-1200 Wien, Ãsterreich\n
 				T: +43-1-3334077-<xsl:value-of select="telefonklappe" />
 					</fo:block>
 				</fo:block-container>
