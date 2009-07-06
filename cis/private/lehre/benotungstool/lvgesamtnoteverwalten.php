@@ -49,6 +49,7 @@
 	require_once('../../../../include/moodle_course.class.php');
 	require_once('../../../../include/mail.class.php');
 
+$debg=(isset($_REQUEST['debug'])?$_REQUEST['debug']:'');	
 $lvid=(isset($_GET['lvid'])?$_GET['lvid']:'');
 $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 ?>
@@ -849,7 +850,7 @@ echo '<table>';
 					    					$leneg = " style='color:red; font-weight:bold'";
 			    						else
 		    								$leneg = " style='font-weight:bold'";
-		    							#if ($note!='--')		    							
+		    							if ($note!='-' || $debg)		    							
 											$note_les_str .= "<span ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$mdl_shortname.")</span> ";
 									}	// ende If Richtiger User
 									
