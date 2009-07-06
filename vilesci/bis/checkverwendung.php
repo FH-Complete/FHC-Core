@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2008 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,20 +15,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+
+ 
 //*
 //* Überprüfung der Verwendungsdatensaetze im FASonline
 //*
 //*
 
-require('../config.inc.php');
-require('../../include/studiensemester.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
+
+		require('../../include/studiensemester.class.php');
+
 
 $error_log='';
 $fehler=0;
@@ -61,15 +67,15 @@ function myaddslashes($var)
 <br>
 <?php
 $qry="SELECT * FROM public.tbl_studiensemester";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$beginn[$row->studiensemester_kurzbz]=$row->start;
 		$ende[$row->studiensemester_kurzbz]=$row->ende;
 	}
 }
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $lastss = $stsem_obj->getPrevious();
 $lastws = $stsem_obj->getBeforePrevious();
 
@@ -78,11 +84,11 @@ $qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
 	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE aktiv AND bismelden AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)!=1 ORDER by nachname,vorname;';
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<H2>Bei $num_rows_all aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung
@@ -91,12 +97,12 @@ if($resultall = pg_query($conn, $qryall))
 			JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 			WHERE tbl_benutzer.aktiv=TRUE AND bismelden=TRUE
 			AND (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			$num_rows=pg_num_rows($result);
+			$num_rows=$db->db_num_rows($result);
 			if($num_rows>1)
 			{
-				while($row=pg_fetch_object($result))
+				while($row=$db->db_fetch_object($result))
 				{
 					if($i==0)
 					{
@@ -117,19 +123,19 @@ $qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
 	WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL
 	AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE aktiv AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all aktiven Mitarbeitern sind keine aktuellen Verwendungen eingetragen</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
 			WHERE tbl_benutzer.aktiv=TRUE AND mitarbeiter_uid='".$rowall->uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			$num_rows=pg_num_rows($result);
-			while($row=pg_fetch_object($result))
+			$num_rows=$db->db_num_rows($result);
+			while($row=$db->db_fetch_object($result))
 			{
 				if($i==0)
 				{
@@ -149,19 +155,19 @@ $qryall='SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname;';
 
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung
 			WHERE (ende>now() OR ende IS NULL) AND mitarbeiter_uid='".$rowall->uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			$num_rows=pg_num_rows($result);
-			while($row=pg_fetch_object($result))
+			$num_rows=$db->db_num_rows($result);
+			while($row=$db->db_fetch_object($result))
 			{
 				if($i==0)
 				{
@@ -179,19 +185,19 @@ $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern sind die Eintragungen 'hauptberuflich' nicht plausibel (hauptberuflich ja, aber Verwendung nicht 1,5,6)</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung
 			WHERE verwendung_code NOT IN ('1','5','6') AND hauptberuflich=true AND mitarbeiter_uid='".$rowall->uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			$num_rows=pg_num_rows($result);
-			while($row=pg_fetch_object($result))
+			$num_rows=$db->db_num_rows($result);
+			while($row=$db->db_fetch_object($result))
 			{
 				if($i==0)
 				{
@@ -215,11 +221,11 @@ $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	OR (beschausmasscode='5' AND vertragsstunden>'0')
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern ist das Beschäftigungsausmaß nicht plausibel</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung
@@ -231,10 +237,10 @@ if($resultall = pg_query($conn, $qryall))
 			OR (beschausmasscode='4' AND vertragsstunden>'35')
 			OR (beschausmasscode='5' AND vertragsstunden>'0'))
 			AND mitarbeiter_uid='".$rowall->uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			$num_rows=pg_num_rows($result);
-			while($row=pg_fetch_object($result))
+			$num_rows=$db->db_num_rows($result);
+			while($row=$db->db_fetch_object($result))
 			{
 				if($i==0)
 				{
@@ -253,20 +259,20 @@ $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 	AND verwendung_code NOT IN ('1','2') AND (ende>now() OR ende IS NULL)
 	GROUP BY uid,nachname,vorname
 	ORDER by nachname,vorname,uid;";
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all aktiven, freien Lektoren ist die Verwendung nicht plausibel</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
 		$qry="SELECT * FROM bis.tbl_bisverwendung
 			WHERE verwendung_code NOT IN ('1','2')
 			AND mitarbeiter_uid='".$rowall->uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			$num_rows=pg_num_rows($result);
-			while($row=pg_fetch_object($result))
+			$num_rows=$db->db_num_rows($result);
+			while($row=$db->db_fetch_object($result))
 			{
 				if($i==0)
 				{
@@ -289,18 +295,18 @@ $qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachn
        	WHERE ((beginn<'".$ende[$lastss]."') AND (ende>'".$beginn[$lastws]."') OR ende is null) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
         	ORDER BY nachname,vorname;";
 
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Lektoren <u>mit Lehrauftrag</u> sind die Verwendungen nicht plausibel</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 		$qry="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$rowall->mitarbeiter_uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 			{
 				echo "Verwendung Code ".$row->verwendung_code.", Beschäftigungscode ".$row->ba1code.", ".$row->ba2code.", ".$row->beginn." - ".$row->ende."<br>";
 			}
@@ -314,11 +320,11 @@ $qryall="SELECT DISTINCT mitarbeiter_uid, nachname, vorname
 	JOIN campus.vw_mitarbeiter ON (tbl_entwicklungsteam.mitarbeiter_uid=uid)
 	WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false))
         	ORDER BY mitarbeiter_uid;";
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Lektoren sind die Angaben über Habilitationen nicht plausibel</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
@@ -328,9 +334,9 @@ if($resultall = pg_query($conn, $qryall))
 		        	JOIN bis.tbl_besqual USING(besqualcode)
 			WHERE ((besqualcode!=1 AND habilitation) OR (besqualcode=1 AND habilitation=false))
 			AND mitarbeiter_uid='".$rowall->mitarbeiter_uid."';";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row=_fetch_object($result))
 			{
 				echo "Verwendung Code ".$row->verwendung_code.", ".$row->anfang." - ".$row->zuende.", Habilitation ".($row->habilitation=='t'?'ja':'nein')." <-> Entwicklungsteam-bes.Qualifikation:(Stg. ".$row->studiengang_kz.") '".$row->besqualbez."'.<br>";
 			}
@@ -352,11 +358,11 @@ $qryall="
 		a.verwendung_code=b.verwendung_code
 		) c ON(mitarbeiter_uid=uid)";
 
-if($resultall = pg_query($conn, $qryall))
+if($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=pg_num_rows($resultall);
+	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Lektoren sind mehrere gleiche aktive Verwendungen vorhanden</H2>";
-	while($rowall=pg_fetch_object($resultall))
+	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";

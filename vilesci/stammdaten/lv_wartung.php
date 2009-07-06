@@ -1,4 +1,26 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+			
 // *****************************************
 // * Script zum Zusammenlegen Doppelter LVs
 // * Es werden zwei Listen mit LVs angezeigt
@@ -7,26 +29,23 @@
 // * Die linke LV wird danach entfernt.
 // ************************************
 //DB Verbindung herstellen
-require_once('../config.inc.php');
-require_once('../../include/lehrveranstaltung.class.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/functions.inc.php');
 
-if (!$conn = @pg_pconnect(CONN_STRING))
-{
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-}
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+			
+		require_once('../../include/lehrveranstaltung.class.php');
+		require_once('../../include/studiengang.class.php');
+		require_once('../../include/functions.inc.php');
+
 
 $msg='';
 $outp='';
 $smax=0;
 
-/*if(!isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
-{
-	echo substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7);
-}*/
-
-$s=new studiengang($conn);
+$s=new studiengang();
 $s->getAll('erhalter_kz,typ,kurzbzlang',false);
 $studiengang=$s->result;
 $user = get_uid();
@@ -142,13 +161,13 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		//updateamum vergleichen - jüngeres Datum gewinnt
 		$qry1="SELECT updateamum FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
 		$qry2="SELECT updateamum FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$radio_1';";
-		if($result1=pg_query($conn,$qry1))
+		if($result1=$db->db_query($qry1))
 		{
-			if($result2=pg_query($conn,$qry2))
+			if($result2=$db->db_query($qry2))
 			{
-				if($row1 = pg_fetch_object($result1))
+				if($row1 = $db->db_fetch_object($result1))
 				{
-					if($row2 = pg_fetch_object($result2))
+					if($row2 = $db->db_fetch_object($result2))
 					{
 						if($row2->updateamum>$row1->updateamum)
 						{
@@ -168,16 +187,16 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 		$sql_query_upd1.="UPDATE campus.tbl_lvinfo SET lehrveranstaltung_id='$radio_2' WHERE lehrveranstaltung_id='$radio_1';";
 		$sql_query_upd1.="UPDATE sync.tbl_synclehrveranstaltung SET lva_vilesci='$radio_2' WHERE lva_vilesci='$radio_1';";
 		$sql_query_upd1.="DELETE FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$radio_1';";
-		if(pg_query($conn,$sql_query_upd1))
+		if($db->db_query($sql_query_upd1))
 		{
 			$msg = "Daten Erfolgreich gespeichert<br>";
-			pg_query($conn,"COMMIT;");
+			$db->db_query("COMMIT;");
 			$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 		}
 		else
 		{
 			$msg = "Die Änderung konnte nicht durchgeführt werden!";
-			pg_query($conn,"ROLLBACK;");
+			$db->db_query("ROLLBACK;");
 			$msg .= "<br>".mb_eregi_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
 		}
 
@@ -226,7 +245,7 @@ $smax=$s[$stg_kz]->max_sem;
 	 echo "<th>SS</th>";
 	 echo "<th>&nbsp;</th></tr>";
 
-	 $lf  = new lehrveranstaltung($conn);
+	 $lf  = new lehrveranstaltung();
 	 $lf->getTab($stg_kz,$semester, $order_1);
 	 $i=0;
 	 foreach($lf->lehrveranstaltungen as $l)
@@ -255,7 +274,7 @@ $smax=$s[$stg_kz]->max_sem;
 	 echo "<th>ECTS</th>";
 	 echo "<th>SS</th></tr>";
 
-	 $lf  = new lehrveranstaltung($conn);
+	 $lf  = new lehrveranstaltung();
 	 $lf->getTab($stg_kz,$semester, $order_2);
 	 $i=0;
 	 foreach($lf->lehrveranstaltungen as $l)

@@ -1,16 +1,34 @@
 <?php
-/* Copyright (C) 2007
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-require('../config.inc.php');
-require('../../include/studiensemester.class.php');
-require('../../include/datum.class.php');
 
-$conn=pg_connect(CONN_STRING) or die("Connection zur Portal Datenbank fehlgeschlagen");
+		require('../../include/studiensemester.class.php');
+		require('../../include/datum.class.php');
 
 
 $error_log='';
@@ -22,7 +40,7 @@ $v='';
 $erhalter='';
 $zaehl=0;
 $eteam=array();
-$studiensemester=new studiensemester($conn);
+$studiensemester=new studiensemester();
 $ssem=$studiensemester->getaktorNext();		//aktuelles Semester
 $psem=$studiensemester->getPrevious();		//voriges Semester
 $bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
@@ -52,9 +70,9 @@ else
 }
 
 $qry="SELECT * FROM public.tbl_erhalter";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if($row = pg_fetch_object($result))
+	if($row = $db->db_fetch_object($result))
 	{
 		if(strlen(trim($row->erhalter_kz))==1)
 		{
@@ -85,56 +103,37 @@ $qry="SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_ben
 	public.tbl_benutzerfunktion
 */
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-
+	
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
    <ErhKz>".$erhalter."</ErhKz>
    <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
    <PersonalMeldung>";
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."';";
-		if($resultet=pg_query($conn,$qryet))
+		if($resultet=$db->db_query($qryet))
 		{
-			while($rowet=pg_fetch_object($resultet))
+			while($rowet=$db->db_fetch_object($resultet))
 			{
 				$eteam[$rowet->studiengang_kz]=$rowet->besqualcode;
 			}
 		}
+		$error_log='';
+		
 		if($row->gebdatum=='' || $row->gebdatum==NULL)
 		{
-			if($error_log!='')
-			{
-				$error_log.=", Geburtsdatum ('".$row->gebdatum."')";
-			}
-			else
-			{
-				$error_log="Geburtsdatum ('".$row->gebdatum."')";
-			}
+				$error_log.=($error_log!=''?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
 		}
 		if($row->geschlecht=='' || $row->geschlecht==NULL)
 		{
-			if($error_log!='')
-			{
-				$error_log.=", Geschlecht ('".$row->geschlecht."')";
-			}
-			else
-			{
-				$error_log="Geschlecht ('".$row->geschlecht."')";
-			}
+				$error_log.=($error_log!=''?', ':'')."Geschlecht ('".$row->geschlecht."')";
 		}
 		if($row->ausbildungcode=='' || $row->ausbildungcode==NULL)
 		{
-			if($error_log!='')
-			{
-				$error_log.=", HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
-			}
-			else
-			{
-				$error_log="HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
-			}
+				$error_log.=($error_log!=''?', ':'')."HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
 		}
 		$datei.="
      <Person>
@@ -143,9 +142,9 @@ if($result = pg_query($conn, $qry))
       <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
       <HoechsteAbgeschlosseneAusbildung>".$row->ausbildungcode."</HoechsteAbgeschlosseneAusbildung>";
 		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND habilitation=true;";
-		if($resultvw=pg_query($conn,$qryvw))
+		if($resultvw=$db->db_query($qryvw))
 		{
-			if(pg_num_rows($resultvw)>0)
+			if($db->db_num_rows($resultvw)>0)
 			{
 				$datei.="
        <Habilitation>J</Habilitation>";
@@ -157,64 +156,29 @@ if($result = pg_query($conn, $qry))
 			}
 		}
 		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND (ende is null OR ende>'$bisprevious') AND beginn<'$bisdatum';";
-		if($resultvw=pg_query($conn,$qryvw))
+		if($resultvw=$db->db_query($qryvw))
 		{
-			while($rowvw=pg_fetch_object($resultvw))
+			while($rowvw=$db->db_fetch_object($resultvw))
 			{
 				if($rowvw->ba1code=='' || $rowvw->ba1code==NULL)
 				{
-					if($error_log!='')
-					{
-						$error_log.=", Beschaeftigungsart1 ('".$rowvw->ba1code."')";
-					}
-					else
-					{
-						$error_log="Beschaeftigungsart1 ('".$rowvw->ba1code."')";
-					}
+						$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart1 ('".$rowvw->ba1code."')";
 				}
 				if($rowvw->ba2code=='' || $rowvw->ba2code==NULL)
 				{
-					if($error_log!='')
-					{
-						$error_log.=", Beschaeftigungsart2 ('".$rowvw->ba2code."')";
-					}
-					else
-					{
-						$error_log="Beschaeftigungsart2 ('".$rowvw->ba2code."')";
-					}
+						$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart2 ('".$rowvw->ba2code."')";
 				}
 				if($rowvw->beschausmasscode=='' || $rowvw->beschausmasscode==NULL)
 				{
-					if($error_log!='')
-					{
-						$error_log.=", BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
-					}
-					else
-					{
-						$error_log="BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
-					}
+						$error_log.=($error_log!=''?', ':'')."BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
 				}
 				if($rowvw->verwendung_code=='' || $rowvw->verwendung_code==NULL)
 				{
-					if($error_log!='')
-					{
-						$error_log.=", VerwendungsCode ('".$rowvw->verwendung_code."')";
-					}
-					else
-					{
-						$error_log="VerwendungsCode ('".$rowvw->verwendung_code."')";
-					}
+						$error_log.=($error_log!=''?', ':'')."VerwendungsCode ('".$rowvw->verwendung_code."')";
 				}
 				if(!$rowvw->hauptberuflich && ($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL))
 				{
-					if($error_log!='')
-					{
-						$error_log.=", Hauptberuf ('".$rowvw->hauptberufcode."')";
-					}
-					else
-					{
-						$error_log="Hauptberuf ('".$rowvw->hauptberufcode."')";
-					}
+						$error_log.=($error_log!=''?', ':'')."Hauptberuf ('".$rowvw->hauptberufcode."')";
 				}
 				if($rowvw->ba1code==3)
 				{
@@ -233,20 +197,13 @@ if($result = pg_query($conn, $qry))
               <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
 				//Studiengangsleiter
 				$qryslt="SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='stgl' AND studiengang_kz<10000;";
-				if($resultslt=pg_query($conn,$qryslt))
+				if($resultslt=$db->db_query($qryslt))
 				{
-					while($rowslt=pg_fetch_object($resultslt))
+					while($rowslt=$db->db_fetch_object($resultslt))
 					{
 						if($rowslt->studiengang_kz=='' || $rowslt->studiengang_kz==NULL)
 						{
-							if($error_log!='')
-							{
-								$error_log.=", StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
-							}
-							else
-							{
-								$error_log="StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
-							}
+								$error_log=($error_log!=''?', ':'')."StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
 						}
 						if(!in_array($rowslt->studiengang_kz, $nichtmelden))
 						{
@@ -259,66 +216,31 @@ if($result = pg_query($conn, $qry))
 				}
 				//Funktionen
 				$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".$rowvw->bisverwendung_id."' AND studiengang_kz>0 AND studiengang_kz<10000;";
-				if($resultfkt=pg_query($conn,$qryfkt))
+				if($resultfkt=$db->db_query($qryfkt))
 				{
-					while($rowfkt=pg_fetch_object($resultfkt))
+					while($rowfkt=$db->db_fetch_object($resultfkt))
 					{
 						if($rowfkt->studiengang_kz=='' || $rowfkt->studiengang_kz==NULL)
 						{
-							if($error_log!='')
-							{
-								$error_log.=", StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
-							}
-							else
-							{
-								$error_log="StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
-							}
+								$error_log.=($error_log!=''?', ':'')."StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
 						}
 						if($rowfkt->sws=='' || $rowfkt->sws==NULL)
 						{
-							if($error_log!='')
-							{
-								$error_log.=", SWS ('".$rowfkt->sws."')";
-							}
-							else
-							{
-								$error_log="SWS ('".$rowfkt->sws."')";
-							}
+								$error_log.=($error_log!=''?', ':'')."SWS ('".$rowfkt->sws."')";
 						}
 						if($rowvw->hauptberuflich=='' || $rowvw->hauptberuflich==NULL)
 						{
-							if($error_log!='')
-							{
-								$error_log.=", Hauptberuflich ('".$rowvw->hauptberuflich."')";
-							}
-							else
-							{
-								$error_log="Hauptberuflich ('".$rowvw->hauptberuflich."')";
-							}
+								$error_log.=($error_log!=''?', ':'')."Hauptberuflich ('".$rowvw->hauptberuflich."')";
 						}
 						if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich=='f')
 						{
-							if($error_log!='')
-							{
-								$error_log.=", HauptberufCode ('".$rowvw->hauptberufcode."')";
-							}
-							else
-							{
-								$error_log="HauptberufCode ('".$rowvw->hauptberufcode."')";
-							}
+								$error_log.=($error_log!=''?', ':'')."HauptberufCode ('".$rowvw->hauptberufcode."')";
 						}
 						if (isset($eteam[$rowfkt->studiengang_kz]))
 						{
 							if(($eteam[$rowfkt->studiengang_kz]=='' || $eteam[$rowfkt->studiengang_kz]==NULL))
 							{
-								if($error_log!='')
-								{
-									$error_log.=", BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
-								}
-								else
-								{
-									$error_log="BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
-								}
+									$error_log.=($error_log!=''?', ':'')."BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
 							}
 						}
 						$datei.="
@@ -368,6 +290,7 @@ if($result = pg_query($conn, $qry))
 			$v.="\n";
 			$error_log='';
 		}
+		
 	}
 	$datei.="
       </PersonalMeldung>

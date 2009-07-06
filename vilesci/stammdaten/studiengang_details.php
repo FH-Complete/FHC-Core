@@ -1,20 +1,43 @@
 <?php
-	require_once('../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/erhalter.class.php');
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
+	
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
 	$errorstr = ''; //fehler beim insert
 	$sel = '';
 	$chk = '';
 
-	$sg_var = new studiengang($conn);
+	$sg_var = new studiengang();
 	$studiengang_typ_arr = $sg_var->studiengang_typ_arr;
 	
 	$studiengang_kz = '';
@@ -71,7 +94,7 @@
 			$aktiv = "f";
 		$ext_id = $_POST["ext_id"];
 
-		$sg_update = new studiengang($conn);
+		$sg_update = new studiengang();
 		$sg_update->studiengang_kz = $studiengang_kz;
 		$sg_update->kurzbz = $kurzbz;
 		$sg_update->kurzbzlang = $kurzbzlang;
@@ -113,7 +136,7 @@
 	if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= "true")))
 	{
 		$studiengang_kz = $_REQUEST["studiengang_kz"];
-		$sg = new studiengang($conn,$studiengang_kz);
+		$sg = new studiengang($studiengang_kz);
 		if ($sg->errormsg!='')
 			die($sg->errormsg);
 		$studiengang_kz = $sg->studiengang_kz;
@@ -142,7 +165,7 @@
 		$neu = "false";
 	}
 	
-	$erh = new erhalter($conn);
+	$erh = new erhalter();
 
    	if (!$erh->getAll('kurzbz'))
        	die($erh->errormsg);
@@ -187,9 +210,9 @@
 	$htmlstr .= "					<td>Organisationsform</td>\n";
 	$htmlstr .= "					<td><SELECT name='organisationsform' onchange='submitable()'>";
 	$qry = "SELECT orgform_kurzbz FROM bis.tbl_orgform ORDER BY orgform_kurzbz";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($row->orgform_kurzbz == $organisationsform)
 				$selected = 'selected';

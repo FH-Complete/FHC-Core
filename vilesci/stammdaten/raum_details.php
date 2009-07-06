@@ -15,25 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
-	require_once('../../include/globals.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/ort.class.php');
-
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require_once('../../include/globals.inc.php');
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/ort.class.php');
+	
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
 	$errorstr = ''; //fehler beim insert
 	$sel = '';
 	$chk = '';
 
-	$sg_var = new ort($conn);
+	$sg_var = new ort();
 		
 	$ort_kurzbz = '';
 	$bezeichnung = '';
@@ -67,7 +69,7 @@
 		$telefonklappe = $_POST["telefonklappe"];
 
 		
-		$sg_update = new ort($conn);
+		$sg_update = new ort();
 		$sg_update->ort_kurzbz = $ort_kurzbz;
 		$sg_update->bezeichnung = $bezeichnung;
 		$sg_update->planbezeichnung = $planbezeichnung;
@@ -101,7 +103,7 @@
 	if ((isset($_REQUEST['ort_kurzbz'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= "true")))
 	{
 		$ort_kurzbz = $_REQUEST["ort_kurzbz"];
-		$sg = new ort($conn,$ort_kurzbz);
+		$sg = new ort($ort_kurzbz);
 		if ($sg->errormsg!='')
 			die($sg->errormsg);
 		$ort_kurzbz = $sg->ort_kurzbz;
@@ -157,9 +159,9 @@
 	$htmlstr .= "					<SELECT name='standort_kurzbz'>";
 	$htmlstr.="				<OPTION value=''>-- keine Auswahl --</OPTION>\n";
 	$qry = 'SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz';
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($row->standort_kurzbz==$standort_kurzbz)
 				$selected='selected';

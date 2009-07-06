@@ -11,13 +11,16 @@
 
 <h1>Zutrittskarten Import</h1>
 <?php
-	require('../../../config.inc.php');
-	$conn=pg_pconnect(CONN_STRING);
+		require_once('../../../../config/vilesci.config.inc.php');
+		require_once('../../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
 	//Tabelle leeren
 	$sql_query="DELETE FROM sync.tbl_zutrittskarte;";
-	$result=pg_exec($conn, $sql_query);
+	$result=$db->db_query($sql_query);
 	if(!$result)
-		die(pg_errormessage().'<BR>'.$i.'<BR>'.$sql_query);
+			die($db->db_last_error().'<BR>'.$i.'<BR>'.$sql_query);
 	if(isset($_FILES['datei']['tmp_name']))
 	{
 		//Extension herausfiltern
@@ -103,10 +106,10 @@
 				else
 					$sql_query.="'$validend',";
 				$sql_query.="'$text1','$text2','$text3','$text4','$text5','$text6','$pin')";
-				$result=pg_exec($conn, $sql_query);
+				$result=$db->db_query($sql_query);
 				//echo $sql_query;
 				if(!$result)
-						die(pg_errormessage().'<BR>'.$i.'<BR>'.$sql_query);
+						die($db->db_last_error().'<BR>'.$i.'<BR>'.$sql_query);
 			}
 		}
 		else

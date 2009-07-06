@@ -1,6 +1,13 @@
 <?php
 require('../../../config.inc.php');
 
+		require_once('../../../../config/vilesci.config.inc.php');
+		require_once('../../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
+
 // Mail Headers festlegen
 $headers= "MIME-Version: 1.0\r\n";
 $headers.="Content-Type: text/html; charset=UTF-8\r\n";
@@ -16,8 +23,6 @@ $doppelte=array();
 $error=false;
 $fausgabe='<table>';
 
-if (!$conn=pg_pconnect(CONN_STRING))
-	die(pg_last_error($conn));
 
 define("DB_SERVER","192.168.101.230:1433");
 define("DB_USER","sa");
@@ -101,10 +106,10 @@ $qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as n
 	 AND public.vw_betriebsmittelperson.benutzer_aktiv AND public.vw_betriebsmittelperson.retouram IS NULL AND bmp.benutzer_aktiv AND bmp.retouram IS NULL
 	 AND bmp.person_id<public.vw_betriebsmittelperson.person_id
 	 ORDER BY bmp.nachname;";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$fausgabe.='<tr><th>PersonID</th><th>Nachname</th><th>vorname</th><th>BetriebsmittelNr</th><th>AusgabeAm</th><th>InsertAmUm</th></tr>';
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		//echo "<br>".$row->person2.", ".$row->nachname2.", ".$row->vorname2.", ".$row->nummer2.", ".$row->person1.", ".$row->nachname1.", ".$row->vorname1.", ".$row->nummer1;
 		//$error=true;
@@ -134,9 +139,9 @@ $qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as
 	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer,matrikelnr";
 //abhanden gekommene karten???
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		$update=false;
 		$stg_kurzbz=strtoupper(trim($row->typ).trim($row->kurzbz));

@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/reihungstest.class.php');
@@ -33,9 +37,6 @@
 	
 	require_once('../../include/Excel/excel.php');
 	
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
 	$user = get_uid();
 	$datum_obj = new datum();
 	$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
@@ -51,12 +52,12 @@
 	
 	if(isset($_GET['excel']))
 	{
-		$studiengang = new studiengang($conn);
+		$studiengang = new studiengang();
 		$studiengang->getAll('typ, kurzbz', false);
 		foreach ($studiengang->result as $stg) 
 			$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;	
 		
-		$reihungstest = new reihungstest($conn);
+		$reihungstest = new reihungstest();
 		if($reihungstest->load($_GET['reihungstest_id']))
 		{
 			// Creating a workbook
@@ -94,10 +95,10 @@
 			
 			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
 
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
 				$zeile=3;
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object($result))
 				{
 					$i=0;
 					
@@ -122,9 +123,9 @@
 						$maxlength[$i] = mb_strlen($row->email);
 					
 					$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
-					if($result_adresse = pg_query($conn, $qry))
+					if($result_adresse = $db->db_query($qry))
 					{
-						if($row_adresse = pg_fetch_object($result_adresse))
+						if($row_adresse = $db->db_fetch_object($result_adresse))
 						{
 							$worksheet->write($zeile,++$i,$row_adresse->strasse);
 							if(strlen($row_adresse->strasse)>$maxlength[$i])
@@ -171,7 +172,7 @@
 		// Speichern eines Reihungstesttermines
 		if(isset($_POST['speichern']))
 		{
-			$reihungstest = new reihungstest($conn);
+			$reihungstest = new reihungstest();
 			
 			if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
 			{
@@ -227,7 +228,7 @@
 		// Uebertraegt die Punkte eines Prestudenten ins FAS
 		if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 		{
-			$prestudent = new prestudent($conn);
+			$prestudent = new prestudent();
 			$prestudent->load($prestudent_id);
 			
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
@@ -251,16 +252,16 @@
 					FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) 
 					WHERE reihungstest_id='".addslashes($reihungstest_id)."'";
 			// AND (rt_punkte1='' OR rt_punkte1 is null)";
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object($result))
 				{
 					if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
 					{
-						$prestudent = new prestudent($conn);
+						$prestudent = new prestudent();
 						$prestudent->load($row->prestudent_id);
 						
-						$pruefling = new pruefling($conn);
+						$pruefling = new pruefling();
 						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
 						
 						$prestudent->rt_punkte1 = $rtpunkte;
@@ -283,7 +284,7 @@
 		echo '<br><table width="100%"><tr><td>';
 		
 		//Studiengang DropDown
-		$studiengang = new studiengang($conn);
+		$studiengang = new studiengang();
 		$studiengang->getAll('typ, kurzbz', false);
 			
 		echo "<SELECT name='studiengang' onchange='window.location.href=this.value'>";
@@ -308,7 +309,7 @@
 		echo "</SELECT>";
 		
 		//Reihungstest DropDown
-		$reihungstest = new reihungstest($conn);
+		$reihungstest = new reihungstest();
 		if($stg_kz==-1)
 			$reihungstest->getAll(date('Y').'-01-01'); //Alle Reihungstests ab diesem Jahr laden
 		else
@@ -333,7 +334,7 @@
 		
 		echo "</td></tr></table><br>";
 		
-		$reihungstest = new reihungstest($conn);
+		$reihungstest = new reihungstest();
 		
 		if(!$neu)
 		{
@@ -387,7 +388,7 @@
 			$selected = '';
 		echo "<OPTION value='' $selected>-- keine Auswahl --</OPTION>";	
 		
-		$ort = new ort($conn);
+		$ort = new ort();
 		$ort->getAll();
 		
 		foreach ($ort->result as $row) 
@@ -425,10 +426,10 @@
 			//Liste der Interessenten die zum Reihungstest angemeldet sind
 			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
 			$mailto = '';
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				echo 'Anzahl: '.pg_num_rows($result);
-				$pruefling = new pruefling($conn);
+				echo 'Anzahl: '.$db->db_num_rows($result);
+				$pruefling = new pruefling();
 				
 				echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
 						<thead>

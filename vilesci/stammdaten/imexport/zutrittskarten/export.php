@@ -1,5 +1,29 @@
 <?php
-require('../../../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+		require_once('../../../../config/vilesci.config.inc.php');
+		require_once('../../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 //include('../../../include/functions.inc.php');
 require_once('../../../../include/Excel/PEAR.php');
 require_once('../../../../include/Excel/BIFFwriter.php');
@@ -14,18 +38,15 @@ require_once('../../../../include/Excel/File.php');
 require_once('../../../../include/Excel/Writer.php');
 require_once('../../../../include/Excel/Validator.php');
 
-if (!$conn=pg_pconnect(CONN_STRING))
-	die(pg_last_error($conn));
-
 // letzte Nummer
 $sql_query="SELECT max(key) AS last_keynr FROM sync.tbl_zutrittskarte;";
 //echo $sql_query;
-if(!$result=pg_exec($conn, $sql_query))
-	die(pg_errormessage().'<BR>'.$sql_query);
-if ($row=pg_fetch_object($result))
+if(!$result=$db->db_query($sql_query))
+	die($db->db_last_error().'<BR>'.$sql_query);
+if ($row=$db->db_fetch_object($result))
 	$key_nummer=$row->last_keynr+1;
 else
-	die ('Letzte Nummer konnte nicht eroiert werden!');
+	die ('Letzte Nummer konnte nicht ermittelt werden!');
 
 // Neue Zutrittskarten
 /*$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
@@ -52,8 +73,8 @@ $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer, uid, matrikelnr, k
 			WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
 				AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte);";
 //echo $sql_query;
-if(!$result_neu=pg_exec($conn, $sql_query))
-	die(pg_errormessage().'<BR>'.$sql_query);
+if(!$result_neu=$db->db_query($sql_query))
+	die($db->db_last_error().'<BR>'.$sql_query);
 
 // Updates von Zutrittskarten
 $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key, uid, matrikelnr,
@@ -69,8 +90,8 @@ $sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key,
 					OR trim(vw_betriebsmittelperson.vorname)!=trim(tbl_zutrittskarte.firstname)
 					OR trim(vw_betriebsmittelperson.uid)!=trim(tbl_zutrittskarte.text1));";
 //echo $sql_query;
-if(!$result_upd=pg_exec($conn, $sql_query))
-	die(pg_errormessage().'<BR>'.$sql_query);
+if(!$result_upd=$db->db_query($sql_query))
+	die($db->db_last_error().'<BR>'.$sql_query);
 
 // Loeschen von Zutrittskarten
 $sql_query="SELECT *
@@ -81,8 +102,8 @@ $sql_query="SELECT *
 					WHERE betriebsmitteltyp='Zutrittskarte' AND retouram IS NULL
 				);";	// AND benutzer_aktiv
 //echo $sql_query;
-if(!$result_del=pg_exec($conn, $sql_query))
-	die(pg_errormessage().'<BR>'.$sql_query);
+if(!$result_del=$db->db_query($sql_query))
+	die($db->db_last_error().'<BR>'.$sql_query);
 
 
 
@@ -131,7 +152,7 @@ $worksheet->setColumn(1,1,5); // zweite Spalten auf width=5
 $z=1; // Start bei Zeile 1
 
 // Neue Zutrittskarten
-while ($row=pg_fetch_object($result_neu))
+while ($row=$db->db_fetch_object($result_neu))
 {
 	$command='a';
 	$gruppe=$row->stg_kurzbz;
@@ -158,7 +179,7 @@ while ($row=pg_fetch_object($result_neu))
 }
 
 // Updates von Zutrittskarten
-while ($row=pg_fetch_object($result_upd))
+while ($row=$db->db_fetch_object($result_upd))
 {
 	$command='u';
 	$gruppe=$row->stg_kurzbz;
@@ -185,7 +206,7 @@ while ($row=pg_fetch_object($result_upd))
 }
 
 // Loeschen von Zutrittskarten
-while ($row=pg_fetch_object($result_del))
+while ($row=$db->db_fetch_object($result_del))
 {
 	$command='d';
 	$worksheet->write($z,0, $command);
