@@ -829,7 +829,7 @@ echo '<table>';
 								reset($kursArr);		
 		    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++) 
 								{	
-									if (strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
+									if (isset($kursArr[$iKurs]) && isset($kursArr[$iKurs][2]) && isset($kursArr[$iKurs][6]) && strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
 									{
 																	
 									   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
