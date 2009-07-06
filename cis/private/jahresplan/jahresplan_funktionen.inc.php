@@ -485,14 +485,11 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 					// Veranstaltungen je Tag
 				  	for ($iTmpVeranstaltung=0;$iTmpVeranstaltung<count($iTmpStartTagErgebniss);$iTmpVeranstaltung++)
 					{
-						if ($wartungsberechtigt)			
-						{					
-							$cTmpJavaWartung=' onclick="callWindows(\'jahresplan_veranstaltung.php?veranstaltung_id='.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id.'\',\'Veranstaltung_Detail\');" onmouseout="hide_layer(\'kalinfo'.$iTmpMonat.$iTmpWoche.$iTmpTag.$iTmpVeranstaltung.'\');" ';
-						}
-						else
-						{
-							$cTmpJavaWartung=' onclick="callWindows(\'jahresplan_detail.php?veranstaltung_id='.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id.'\',\'Veranstaltung_Detail\');" onmouseout="hide_layer(\'kalinfo'.$iTmpMonat.$iTmpWoche.$iTmpTag.$iTmpVeranstaltung.'\');" ';
-						}
+				
+
+						$cTmpJavaWartung=' onclick="callWindows(\'jahresplan_veranstaltung.php?veranstaltung_id='.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id.'\',\'Veranstaltung_Detail\');" onmouseout="hide_layer(\'kalinfo'.$iTmpMonat.$iTmpWoche.$iTmpTag.$iTmpVeranstaltung.'\');" ';
+						$cTmpJavaWartungInfo=' onclick="callWindows(\'jahresplan_detail.php?veranstaltung_id='.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id.'\',\'Veranstaltung_Detail\');" onmouseout="hide_layer(\'kalinfo'.$iTmpMonat.$iTmpWoche.$iTmpTag.$iTmpVeranstaltung.'\');" ';
+
 
 						// Rundung je Termin Start
 						$showHTML.='
@@ -502,16 +499,39 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 							</b>';
 						// Termin Start		
 						$showHTML.='<table class="kalender_tages_info" cellpadding="0" cellspacing="0" style="background-color:#'.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->farbe.';">';
-						$showHTML.='<tr class="kalender_tages_info" '.$cTmpJavaWartung.'  title="Veranstaltung '.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bezeichnung." ID ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->inhalt)." \n ".strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_timestamp)." Uhr \n - ". ($iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum==$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum?strftime(constKalenderZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) : strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) ).' Uhr">';
+
+						$showHTML.='<tr class="kalender_tages_info" ';
+
+						if (!$wartungsberechtigt)			
+							$showHTML.=$cTmpJavaWartungInfo;
+						$showHTML.=' title="Veranstaltung '.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bezeichnung." ID ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->inhalt)." \n ".strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_timestamp)." Uhr \n - ". ($iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum==$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum?strftime(constKalenderZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) : strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) ).' Uhr">';
+
 							$showHTML.='<td class="kalender_tages_info">
 									<table summary="blank'.$iTmpMonat.$iTmpWoche.$iTmpTag.'" style="border:0px;vertical-align:top;text-align:left;" cellpadding="0" cellspacing="0">
-										<tr>
-											<td>&nbsp;'.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bild_image.'&nbsp;</td>
-											<td>'.(strlen($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)>8?substr(trim($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung),0,8).'<span style="font-size:7px;">...</span>' :trim($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)).'</td>
-										</tr>
+										<tr>';
+			
+										if ($wartungsberechtigt)	
+											$showHTML.='<td  class="cursor_hand" '.$cTmpJavaWartung.'>';
+										else
+											$showHTML.='<td>';	
+										
+										$showHTML.='&nbsp;'.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bild_image.'&nbsp;</td>';
+
+										if ($wartungsberechtigt)	
+											$showHTML.='<td  class="cursor_hand" '.$cTmpJavaWartung.'>';
+										else
+											$showHTML.='<td>';				
+																	
+										$showHTML.=(strlen($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)>8?substr(trim($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung),0,8).'<span style="font-size:7px;">...</span>' :trim($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)).'</td>';
+
+										if ($wartungsberechtigt)	
+											$showHTML.='<td title="Voransicht" class="cursor_hand" '.$cTmpJavaWartungInfo.'>[i]</td>';
+											
+										$showHTML.='</tr>
 									</table>
 								</td>';
 						$showHTML.='</tr>';
+						
 						// Termine Wartungsberechtigte Icons anzeigen					
 						if ($wartungsberechtigt)			
 						{
@@ -596,6 +616,11 @@ function jahresplan_veranstaltungskategorie_kalendererzeugen($veranstaltung_tabe
 		$iTmpMaxKW=(int)date("W",mktime(0, 0, 0,$iTmpMonat,$iTmpMaxTage, $Jahr));
 		if ($iTmpMaxKW<2 && $iTmpMonat==12)
 			$iTmpMaxKW=53;
+
+
+			
+		if ($iTmpMinKW>51 && $iTmpMonat==1)
+			$iTmpMinKW=1;
 			
 		// Fuer die Erste Woche das Montag-Datum ermitteln
 		$iTmpTagNr=date('w',mktime(0, 0, 0, $iTmpMonat  ,1, $Jahr));	
