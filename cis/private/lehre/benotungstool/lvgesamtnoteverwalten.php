@@ -838,14 +838,18 @@ echo '<table>';
 		  							   $title="\r\nNote in Moodlekurse: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
 									   
 									   $note=trim($kursArr[$iKurs][6]);
-									   $note_le += $note;
-					    			   $le_anz += 1;
 								       foreach ($kursasObj[$iKurs] as $key => $value) 
 									   {
 											$title.=$key."=>".$value."\r\n";
 										}	
 										$userGef=true;
-
+										
+									   	if ($note!='-' )
+									   	{
+									   		$note_le += $note;
+					    			   		$le_anz += 1;
+									   	}
+										
 					    				if ($note == 5)
 					    					$leneg = " style='color:red; font-weight:bold'";
 			    						else
@@ -862,7 +866,7 @@ echo '<table>';
 								} // ende Kursschleife
 							} // MoodleKurse abarbeiten
 
-#				echo "<p><h1> $title Anzahl Noten gef. $le_anz $note_le </h1></p>";
+				#echo "<p><h1> $title Anzahl Noten gef. $le_anz $note_le </h1></p>";
 					}		
 					else
 					{
