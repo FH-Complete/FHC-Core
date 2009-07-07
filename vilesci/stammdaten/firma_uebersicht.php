@@ -21,13 +21,12 @@
  *			Gerald Raab <gerald.raab@technikum-wien.at>.
  */
 
-	require_once('../config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
     require_once('../../include/firma.class.php');
     
-	if (!$conn = pg_pconnect(CONN_STRING))
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-    
+	$db = new basis_db();
+	
 	$filter = (isset($_GET['filter'])?$_GET['filter']:'');
 	$firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
 	
@@ -36,11 +35,14 @@
 	if($filter=='')
 		$sql_query = "SELECT * FROM public.tbl_firma WHERE true";
 	else 
-		$sql_query = "SELECT * FROM public.tbl_firma WHERE lower(name) like lower('%$filter%') OR lower(adresse) like lower('%$filter%') OR lower(anmerkung) like lower('%$filter%')";
+		$sql_query = "SELECT * FROM public.tbl_firma 
+					  WHERE lower(name) like lower('%".addslashes($filter)."%') 
+					  OR lower(adresse) like lower('%".addslashes($filter)."%') 
+					  OR lower(anmerkung) like lower('%".addslashes($filter)."%')";
 	if($firmentypfilter!='')
 		$sql_query.=" AND firmentyp_kurzbz='".addslashes($firmentypfilter)."'";
-	//echo $sql_query;
-    if(!$erg=pg_query($conn, $sql_query))
+	
+    if(!$erg=$db->db_query($sql_query))
 	{
 		$errormsg='Fehler beim Laden der Firma';
 	}
@@ -53,9 +55,8 @@
 	    $htmlstr .= "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Name</th><th class='table-sortable:default'>Adresse</th><th class='table-sortable:default'>Email</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Fax</th><th class='table-sortable:default'>Anmerkung</th><th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Schule</th>";
 	    $htmlstr .= "   </tr></thead><tbody>\n";
 	    $i = 0;
-		while($row=pg_fetch_object($erg))
+		while($row=$db->db_fetch_object($erg))
 	    {
-	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
 	        $htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->firma_id."</a></td>\n";
 			$htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->name."</a></td>\n";
@@ -104,7 +105,7 @@ var filter = '<?php echo $filter; ?>';
 	echo '<input type="text" name="filter" value="'.$filter.'">';
 	echo 'Typ: <SELECT name="firmentypfilter">
 			<option value="">-- Alle --</option>';
-	$firma = new firma($conn);
+	$firma = new firma();
 	$firma->getFirmenTypen();
 	foreach ($firma->result as $row)
 	{
