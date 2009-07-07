@@ -23,16 +23,13 @@
  * Detailansicht fuer die Firmenverwaltung
  * Ermoeglicht die Eingabe der Firmendaten plus zugehoeriger Adressen
  */
-	require_once('../config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/firma.class.php');
 	require_once('../../include/adresse.class.php');
 	require_once('../../include/nation.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
-	
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
+		
 	// ******* INIT ********
 	$user = get_uid();
 	
@@ -42,6 +39,8 @@
 	
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('preinteressent') && !$rechte->isBerechtigt('assistenz'))
 		die('Sie haben keine Berechtigung für diese Seite');
+	
+	$db = new basis_db();
 	
 	$htmlstr = '';
 	$errorstr = '';
@@ -74,7 +73,7 @@
 	{
 		if(is_numeric($adresse_id))
 		{
-			$adresse_obj = new adresse($conn);
+			$adresse_obj = new adresse();
 			if(!$adresse_obj->delete($adresse_id))
 			{
 				$errorstr = 'Fehler beim Loeschen der Adresse:'.$adresse_obj->errormsg;
@@ -85,7 +84,7 @@
 	//Speichern einer Adresse
 	if(isset($_POST['saveadresse']))
 	{
-		$adresse_obj = new adresse($conn);
+		$adresse_obj = new adresse();
 	
 		if(is_numeric($adresse_id))
 		{
@@ -120,9 +119,7 @@
 			$adresse_obj->firma_id = $firma_id;
 			$adresse_obj->updateamum = date('Y-m-d H:i:s');
 			$adresse_obj->updatvon = $user;
-	
-			//var_dump($adresse_obj);
-	
+
 			if(!$adresse_obj->save())
 			{
 				$errorstr = 'Fehler beim Speichern der Adresse:'.$adresse_obj->errormsg;
@@ -137,7 +134,7 @@
 	// Speichern der Firmendaten
 	if(isset($_POST['save']))
 	{
-		$firma = new firma($conn);
+		$firma = new firma();
 		
 		if($firma_id!='')
 		{
@@ -217,7 +214,7 @@ function confdel()
 	elseif($messagestr!='')
 		echo "<div class='insertok'>".$messagestr."</div>\n";
 	
-	$firma = new firma($conn);
+	$firma = new firma();
 	if($firma_id!='')
 	{
 		if (!$firma->load($firma_id))
@@ -245,9 +242,9 @@ function confdel()
 
 	$qry = "SELECT firmentyp_kurzbz FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if ($firma->firmentyp_kurzbz == $row->firmentyp_kurzbz)
 				$sel = " selected";
@@ -279,7 +276,7 @@ function confdel()
 		
 	//Nationen laden
 	$nation_arr = array();
-	$nation = new nation($conn);
+	$nation = new nation();
 	$nation->getAll();
 	
 	foreach($nation->nation as $row)
@@ -291,7 +288,7 @@ function confdel()
 	//echo "<h3>Adressen:</h3>";
 	echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?firma_id=$firma_id' method='POST' />";
 	echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th><font size='0'>Heimatadr.</font></th><th><font size='0'>Zustelladr.</font></th></tr>";
-	$adresse_obj = new adresse($conn);
+	$adresse_obj = new adresse();
 	$adresse_obj->load_firma($firma_id);
 
 	//Anzeigen aller Adresssen
@@ -314,7 +311,7 @@ function confdel()
 	//wenn die Adressen editiert werden dann die Adressdaten laden
 	if(isset($_GET['editadresse']))
 	{
-		$adresse_obj = new adresse($conn);
+		$adresse_obj = new adresse();
 		if($adresse_obj->load($adresse_id))
 		{
 			$strasse = $adresse_obj->strasse;
