@@ -19,25 +19,29 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require('../vilesci/config.inc.php');
+/**
+ * Script zur Erinnerung der Assistenz
+ * Dieses Script wird 1x pro Monat per Cronjob gestartet
+ */
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
+require_once('../include/mail.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
+$db = new basis_db();
 
 $qry = "SELECT distinct email FROM public.tbl_studiengang WHERE studiengang_kz!=0 AND email is not null";
 
-$headers = "From: vilesci@technikum-wien.at";
 $message = "Dies ist eine automatische eMail!\n\nAm 20. jedes Monats wird die Lehrauftragsliste automatisch and die GST geschickt. Bitte führen Sie bis dahin noch alle anstehenden Korrekturen durch!\n\nBesten Dank,\nGeschäftsstelle";
+$subject = "Erinnerung Lehrauftragsliste";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
-		//$to = "pam@technikum-wien.at";
  		$to = $row->email;
- 		$subject = "Erinnerung Lehrauftragsliste";
 
-    	if(mail($to, $subject, $message, $headers))
+ 		$mail = new mail($to, 'vilesci@'.DOMAIN, $subject, $message);
+    	if($mail->send())
 			echo "Email an $to versandt\n";
     	 else
         	echo "Fehler beim Versenden des Erinnerungsmails an $to\n";

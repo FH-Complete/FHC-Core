@@ -245,10 +245,6 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 
 	if(v.length>2)
 	{
-		if(filter=='')
-			filter1 = menulist.value;
-		else
-			filter1 = filter;
 		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+v+'&'+gettimestamp();
 
 		var oldDatasources = menulist.database.GetDataSources();
@@ -269,7 +265,6 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 		menulist.database.AddDataSource(datasource);
 		if(typeof(filter)!='undefined')
 			menulist.builder.rebuild();
-
 	}
 }
 

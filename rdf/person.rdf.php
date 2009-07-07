@@ -54,7 +54,7 @@ echo '
 
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
-
+$filter = utf8_encode($filter);
 $qry = "SELECT distinct person_id, vorname, nachname, titelpre, titelpost FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*' ORDER BY nachname, vorname, titelpre, titelpost";
 
 if(isset($_GET['nurmittitel']))

@@ -24,41 +24,36 @@
  * Aktualisiert in der Datenbank alle UID Felder und verlaengert diese von 16 auf 32 Zeichen
  * Views die UIDs als Spalten enthalten werden geloescht und danach wieder angelegt
  */
-require_once('../vilesci/config.inc.php');
+require_once('../config/system.config.inc.php');
+require_once('../include/basis_db.class.php');
 
-$connstring=CONN_STRING;
-$connstring="host=theseus.technikum-wien.at dbname=-devvilesci user= password=";
-if(!$conn = pg_connect($connstring))
-	die('Keine Verbindung zur DB');
-
+$db = new basis_db();
 //Alle Tabellen holen die UID als Spalte haben
-//die 16 Zeichen lang ist. (atttypmod=20 weil automatisch 4 zeichen dazugezaehlt werden)
+//die 16 Zeichen lang ist.
 $qry="
-SELECT 
-	attname as spalte, relname as tabelle 
-FROM 
-	pg_attribute JOIN pg_class on(attrelid=pg_class.oid) JOIN pg_type ON(atttypid=pg_type.oid) 
+SELECT column_name as spalte, table_name as tabelle, table_schema as schema 
+FROM information_schema.columns 
 WHERE 
-	attname in ('student_uid','uid','mitarbeiter_uid', 'insertvon','updatevon','koordinator',
-	            'lektor','vorsitz','updateaktivvon','freigabevon_uid','vertretung_uid','freigabevon', 'lektor_uid') 
-	AND atttypmod=20 
-	AND (relname like 'tbl_%' OR relname like 'vw_%')
-	AND typname='varchar' ORDER BY tabelle DESC, spalte";
+	column_name in('student_uid','uid','mitarbeiter_uid', 'insertvon','updatevon','koordinator',
+				'lektor','vorsitz','updateaktivvon','freigabevon_uid','vertretung_uid','freigabevon', 'lektor_uid') 
+	AND data_type='character varying' 
+	AND character_maximum_length='16' 
+ORDER BY table_name DESC, column_name";
 $views=array();
 $anzviews=0;
-pg_query($conn, 'SET search_path to bis, campus, fue, kommune, lehre, public, sync, testtool');
-if($result = pg_query($conn, $qry))
+
+if($result = $db->db_query($qry))
 {
-	pg_query($conn,'BEGIN');
-	while($row = pg_fetch_object($result))
+	$db->db_query('BEGIN');
+	while($row = $db->db_fetch_object($result))
 	{
 		//Alle Views die Spalten enthalten die geaendert werden loeschen
 		if(substr($row->tabelle,0,3)=='vw_')
 		{
 			$qry_view = "SELECT * FROM pg_views WHERE viewname='$row->tabelle'";
-			if($result_view = pg_query($conn, $qry_view))
+			if($result_view = $db->db_query($qry_view))
 			{
-				if($row_view = pg_fetch_object($result_view))
+				if($row_view = $db->db_fetch_object($result_view))
 				{
 					$views[$anzviews]['definition']=$row_view->definition;
 					$views[$anzviews]['schema']=$row_view->schemaname;
@@ -67,7 +62,7 @@ if($result = pg_query($conn, $qry))
 					
 					$qry_drp_view = "DROP VIEW $row_view->schemaname.$row_view->viewname;";
 					echo $qry_drp_view;
-					pg_query($conn, $qry_drp_view);
+					$db->db_query($qry_drp_view);
 				}
 			}
 			
@@ -75,22 +70,70 @@ if($result = pg_query($conn, $qry))
 		else
 		{
 			//Spalte in der Tabelle aendern
-			$qry_alter="ALTER TABLE $row->tabelle ALTER COLUMN $row->spalte TYPE varchar(32);";
+			$qry_alter="ALTER TABLE $row->schema.$row->tabelle ALTER COLUMN $row->spalte TYPE varchar(32);";
 			echo $qry_alter.'<br>';
 			
-			if(pg_query($conn, $qry_alter))
+			if($db->db_query($qry_alter))
 				echo "$row->tabelle : $row->spalte<br>";
 			else 
-				echo "Fehler: $qry_alter<br>";
+				echo "<b>Fehler: $qry_alter</b><br>";
 		}
 	}
 	
+	// ----------- ort_kurzbz ------------ //
+	$qry="SELECT column_name as spalte, table_name as tabelle, table_schema as schema 
+			FROM information_schema.columns 
+			WHERE 
+				column_name='ort_kurzbz'
+				AND data_type='character varying' 
+				AND character_maximum_length='8' 
+			ORDER BY table_name DESC, column_name";
+	if($result = $db->db_query($qry))
+	{
+	
+		while($row = $db->db_fetch_object($result))
+		{
+			//Alle Views die Spalten enthalten die geaendert werden loeschen
+			if(substr($row->tabelle,0,3)=='vw_')
+			{
+				$qry_view = "SELECT * FROM pg_views WHERE viewname='$row->tabelle'";
+				if($result_view = $db->db_query($qry_view))
+				{
+					if($row_view = $db->db_fetch_object($result_view))
+					{
+						$views[$anzviews]['definition']=$row_view->definition;
+						$views[$anzviews]['schema']=$row_view->schemaname;
+						$views[$anzviews]['viewname']=$row_view->viewname;
+						$anzviews++;
+						
+						$qry_drp_view = "DROP VIEW $row_view->schemaname.$row_view->viewname;";
+						echo $qry_drp_view;
+						$db->db_query($qry_drp_view);
+					}
+				}
+			}
+			else
+			{
+				//Spalte in der Tabelle aendern
+				$qry_alter="ALTER TABLE $row->schema.$row->tabelle ALTER COLUMN $row->spalte TYPE varchar(16);";
+				echo $qry_alter.'<br>';
+				
+				if($db->db_query($qry_alter))
+					echo "$row->tabelle : $row->spalte<br>";
+				else 
+					echo "<b>Fehler: $qry_alter</b><br>";
+			}
+		}
+	}
+
 	//Views wieder anlegen
 	foreach ($views as $view)
 	{
 		$qry = "CREATE VIEW ".$view['schema'].".".$view['viewname']." AS ".$view['definition'];
-		if(pg_query($conn, $qry))
+		if($db->db_query($qry))
 			echo $qry.'<br>';
+		else 
+			echo '<b>Fehler beim Anlegen der View: '.$qry.'<br>';
 	}
 	
 	//ViewBerechtigungen wieder einspielen
@@ -125,18 +168,10 @@ if($result = pg_query($conn, $qry))
 	Grant select on lehre.vw_fas_lehrveranstaltung to group "web";
 	Grant select on vw_betriebsmittelperson to group "admin";
 	Grant select on vw_betriebsmittelperson to group "web";
+	Grant select on testtool.vw_ablauf to group "admin";
+	Grant select on testtool.vw_ablauf to group "web";
 	Grant select on testtool.vw_pruefling to group "admin";
 	Grant select on testtool.vw_pruefling to group "web";
-	Grant select on testtool.vw_gebiet to group "admin";
-	Grant select on testtool.vw_gebiet to group "web";
-	Grant select on testtool.vw_frage to group "admin";
-	Grant select on testtool.vw_frage to group "web";
-	Grant select on testtool.vw_antwort to group "admin";
-	Grant select on testtool.vw_antwort to group "web";
-	Grant select on testtool.vw_anz_antwort to group "admin";
-	Grant select on testtool.vw_anz_antwort to group "web";
-	Grant select on testtool.vw_anz_richtig to group "admin";
-	Grant select on testtool.vw_anz_richtig to group "web";
 	Grant select on testtool.vw_auswertung to group "admin";
 	Grant select on testtool.vw_auswertung to group "web";
 	Grant select on testtool.vw_auswertung_kategorie to group "admin";
@@ -149,9 +184,13 @@ if($result = pg_query($conn, $qry))
 	GRANT SELECT ON lehre.vw_stundenplandev_student_unr TO GROUP admin;
 	';
 	echo $qry;
-	pg_query($conn, $qry);
+	if(!$db->db_query($qry))
+		echo '<b>Fehler bei qry:</b>'.$qry;
 	
-	pg_query($conn,'COMMIT');
+	if(!$db->db_query('COMMIT'))
+		echo '<b>Fehler beim Commit</b>';
+	else 
+		echo '<br><br><b>Aktualisierung erfolgreich</b>';
 }
 
 ?>
