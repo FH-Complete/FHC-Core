@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ */
 // ************************************
 // * Script zur Pruefung und Korrektur
 // * moeglicher Inkonsistenzen
@@ -6,17 +27,17 @@
 // * - Studenten ohne Prestudent_id werden korrigiert
 // * - Inkonsistenzen der Tabellen tbl_studentlehrverband, tbl_student werden korrigiert
 // **********************************
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/lehrverband.class.php');
+require_once('../include/mail.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Hestellen der DB Verbindung');
-	
+$db = new basis_db();
+
 $anzahl_neue_prestudent_id=0;
 $anzahl_fehler_prestudent=0;
 $anzahl_gruppenaenderung=0;
@@ -30,21 +51,21 @@ $abunterbrecher_verschoben=0;
 // * Bei Studenten mit fehlener Prestudent_id wird die passende id ermittelt und Eingetragen
 // ****
 $qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE prestudent_id is null";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$text.="Suche Studenten mit fehlender Prestudent_id ...\n\n";
 	
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
-		$qry_id = "SELECT tbl_prestudent.prestudent_id FROM campus.vw_student JOIN public.tbl_prestudent USING(person_id) WHERE uid='$row->student_uid' AND tbl_prestudent.studiengang_kz='$row->studiengang_kz'";
-		if($result_id = pg_query($conn, $qry_id))
+		$qry_id = "SELECT tbl_prestudent.prestudent_id FROM campus.vw_student JOIN public.tbl_prestudent USING(person_id) WHERE uid='".addslashes($row->student_uid)."' AND tbl_prestudent.studiengang_kz='$row->studiengang_kz'";
+		if($result_id = $db->db_query($qry_id))
 		{
-			if(pg_num_rows($result_id)==1)
+			if($db->db_num_rows($result_id)==1)
 			{
-				if($row_id = pg_fetch_object($result_id))
+				if($row_id = $db->db_fetch_object($result_id))
 				{
-					$qry_upd = "UPDATE public.tbl_student SET prestudent_id='$row_id->prestudent_id' WHERE student_uid='$row->student_uid'";
-					if(pg_query($conn, $qry_upd))
+					$qry_upd = "UPDATE public.tbl_student SET prestudent_id='$row_id->prestudent_id' WHERE student_uid='".addslashes($row->student_uid)."'";
+					if($db->db_query($qry_upd))
 					{
 						$text .= "Prestudent_id von $row->student_uid wurde auf $row_id->prestudent_id gesetzt\n";
 						$anzahl_neue_prestudent_id++;
@@ -56,12 +77,12 @@ if($result = pg_query($conn, $qry))
 					$anzahl_fehler_prestudent++;
 				}
 			}
-			elseif(pg_num_rows($result_id)>1)
+			elseif($db->db_num_rows($result_id)>1)
 			{
 				$text .= "Student $row->student_uid hat keine Prestudent_id und MEHRERE passende Prestudenteintraege\n";
 				$anzahl_fehler_prestudent++;
 			}
-			elseif(pg_num_rows($result_id)==0)
+			elseif($db->db_num_rows($result_id)==0)
 			{
 				$text .= "Student $row->student_uid hat keine Prestudent_id und KEINE passenden Prestudenteintraege\n";
 				$anzahl_fehler_prestudent++;
@@ -69,7 +90,7 @@ if($result = pg_query($conn, $qry))
 		}
 		else 
 		{
-			$text.="Fehler bei Abfrage:".pg_last_error($conn)."\n";
+			$text.="Fehler bei Abfrage:".$db->db_last_error()."\n";
 			$anzahl_fehler_prestudent++;
 		}
 	}
@@ -112,18 +133,18 @@ $qry = "SELECT
 			        )
 		";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		//Eintrag nur korrigieren wenn der Abbrecher/Unterbrecher Status der letzte in diesem Studiensemester ist
-		$prestd = new prestudent($conn);
+		$prestd = new prestudent();
 		$prestd->getLastStatus($row->prestudent_id, $row->studiensemester_kurzbz);
 		
 		if($prestd->status_kurzbz=='Unterbrecher' || $prestd->status_kurzbz=='Abbrecher')
 		{
 			//Studentlehrverbandeintrag aktualisieren
-			$student = new student($conn);
+			$student = new student();
 			if($student->studentlehrverband_exists($row->student_uid, $row->studiensemester_kurzbz))
 				$student->new = false;
 			else 
@@ -143,7 +164,7 @@ if($result = pg_query($conn, $qry))
 			$student->updatevon = 'chkstudentlvb';
 			
 			//Pruefen ob der Lehrverband exisitert, wenn nicht dann wird er angelegt
-			$lehrverband = new lehrverband($conn);
+			$lehrverband = new lehrverband();
 			if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
 			{
 				$lehrverband->studiengang_kz = $student->studiengang_kz;
@@ -173,7 +194,7 @@ if($result = pg_query($conn, $qry))
 // * Unterschiedliche Gruppenzuteilungen in tbl_studentlehrverband - tbl_student korrigieren
 // *****
 
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 
 $stsem = $stsem->getNearest();
 
@@ -200,25 +221,25 @@ $qry = "SELECT
 				tbl_student.gruppe<>tbl_studentlehrverband.gruppe
 			)";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$qry = "UPDATE public.tbl_student SET studiengang_kz='$row->studiengang_kz', semester='$row->semester', verband='$row->verband', gruppe='$row->gruppe' WHERE student_uid='$row->student_uid'";
-		if(pg_query($conn, $qry))
+		if($db->db_query($qry))
 		{
 			$text .= "Bei Student $row->student_uid wurde die Gruppenzuordnung von $row->studiengang_kz_old/$row->semester_old/$row->verband_old/$row->gruppe_old auf $row->studiengang_kz/$row->semester/$row->verband/$row->gruppe geaendert\n";
 			$anzahl_gruppenaenderung++;
 		}
 		else 
 		{
-			$text.="Fehler beim Aendern der Gruppe: ".pg_last_error($conn)."\n";
+			$text.="Fehler beim Aendern der Gruppe: ".$db->db_last_error()."\n";
 			$anzahl_gruppenaenderung_fehler++;
 		}
 	}
 }
 else 
-	$text.="Fehler bei Abfrage".pg_last_error($conn);
+	$text.="Fehler bei Abfrage".$db->db_last_error();
 
 $statistik .= "Prestudent_id wurde bei $anzahl_neue_prestudent_id Studenten korrigiert\n";
 $statistik .= "$anzahl_fehler_prestudent Fehler sind bei der Korrektur der Prestudent_id aufgetreten\n";
@@ -228,7 +249,8 @@ $statistik .= "Bei $anzahl_gruppenaenderung Studenten wurde die Gruppenzuordnung
 $statistik .= "$anzahl_gruppenaenderung_fehler Fehler sind bei der Korrektur der Gruppenzuordnung aufgetreten\n";
 $statistik .= "\n\n";
 
-if(mail(MAIL_ADMIN, 'CHECK Studentlehrverband', $statistik.$text, "From: vilesci@technikum-wien.at"))
+$mail = new mail(MAIL_ADMIN, 'vilesci@'.DOMAIN, 'CHECK Studentlehrverband', $statistik.$text);
+if($mail->send())
 	echo 'Mail an '.MAIL_ADMIN.' wurde versandt';
 else 
 	echo 'Fehler beim Versenden des Mails an '.MAIL_ADMIN;

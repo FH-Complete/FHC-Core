@@ -27,15 +27,15 @@
  * Wenn kein aktuelles Studiensemester vorhanden ist, wird keine
  * Nachricht versendet.
  */
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiensemester.class.php');
-
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur Datenbank');
+require_once('../include/mail.class.php');
 	
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 if(!$studiensemester = $stsem->getakt())
 	die('Es ist kein aktuelles Studiensemester vorhanden -> Versand nicht noetig');
+
+$db = new basis_db();
 
 //Alle Lektoren holen die am Vortag zu einer Lehreinheit zugeteilt wurden
 //und in diesem Studiensemester noch keinen Lehrauftrag haben.
@@ -56,12 +56,12 @@ WHERE uid IN(
 	)
 ";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>0)
+	if($db->db_num_rows($result)>0)
 	{
 		$mitarbeiter='';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$mitarbeiter .= trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost)." ($row->uid)\n";
 		}
@@ -70,7 +70,8 @@ if($result = pg_query($conn, $qry))
 		$message.=$mitarbeiter;
 		$to = MAIL_GST;
 		
-		if(mail($to,'Neue Lektoren mit Lehrauftrag', $message, 'From: vilesci@'.DOMAIN))
+		$mail = new mail($to,'vilesci@'.DOMAIN,'Neue Lektoren mit Lehrauftrag', $message);
+		if($mail->send())
 			echo "Mail wurde an $to versandt:<br>".nl2br($message);
 		else 
 			echo "Fehler beim Senden des Mails an $to:<br>".nl2br($message);

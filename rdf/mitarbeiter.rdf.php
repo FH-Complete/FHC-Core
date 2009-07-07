@@ -79,7 +79,7 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 {
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-	$mitarbeiter=new mitarbeiter($conn, null, true);
+	$mitarbeiter=new mitarbeiter();
 }
 else 	
 {
@@ -195,6 +195,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 }
 else 
 {
+	$filter = utf8_encode($filter);
 	echo "<RDF:Seq about=\"".$rdf_url."liste\" >";
 	if(isset($_GET['optional']) && $_GET['optional']=='true')
 	{
@@ -235,7 +236,7 @@ else
 		}
 		else 
 		{
-			$mitarbeiter->getMitarbeiterFilter($filter);		
+			$mitarbeiter->getMitarbeiterFilter($filter);
 		}
 		
 		foreach ($mitarbeiter->result as $row)

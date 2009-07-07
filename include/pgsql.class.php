@@ -88,5 +88,21 @@ class basis_db extends db
 		else
 			return pg_fetch_array($result);
 	}
+	
+	function db_num_fields($result=null)
+	{
+		if(is_null($result))
+			return pg_num_fields($this->db_result);
+		else
+			return pg_num_fields($result);
+	}
+	
+	function db_field_name($result=null, $i)
+	{
+		if(is_null($result))
+			return pg_field_name($this->db_result, $i);
+		else
+			return pg_field_name($result, $i);
+	}
 }
 ?>

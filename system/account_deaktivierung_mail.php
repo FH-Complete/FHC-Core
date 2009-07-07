@@ -26,17 +26,17 @@
  * - Accounts die laenger als 3 Tage deaktiviert sind, werden per Mail an die
  *   Bibliothek gemeldet.
  */
-require_once('../vilesci/config.inc.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
+require_once('../include/mail.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
+$db = new basis_db();
 
 echo '
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<html>
 		<head>
 		<title>Check</title>
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		</head>
 		<body class="Background_main">
@@ -46,13 +46,13 @@ $text='';
 //Information an Bibliothek wenn ein Account deaktiviert wurde
 $qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter, titelpre, vorname, nachname, titelpost FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) WHERE tbl_benutzer.aktiv=false AND updateaktivam=CURRENT_DATE- interval '3 days'";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>0)
+	if($db->db_num_rows($result)>0)
 	{
 		$message = "Dies ist eine automatische Mail!\n";
 		$message .= "Folgende Studenten/Mitarbeiter wurden im FAS deaktiviert: \n\n";
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$message .= " - $row->titelpre $row->vorname $row->nachname $row->titelpost ( $row->uid )\n";
 		}
@@ -64,7 +64,8 @@ if($result = pg_query($conn, $qry))
 
 		//$to = 'oesi@technikum-wien.at';
 		$to = 'bibliothek@'.DOMAIN;
-		mail($to,'Account Deaktivierung ', $message, 'From: vilesci@'.DOMAIN);
+		$mail = new mail($to, 'vilesci@'.DOMAIN, 'Account Deaktivierung', $message);
+		$mail->send();
 		$text.= "Warnung fuer Bibliothek wurde an $to verschickt\n";
 	}
 }
@@ -72,9 +73,9 @@ if($result = pg_query($conn, $qry))
 //Alle die vor einer Woche inaktiv gesetzt wurden darueber informieren
 $qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam=CURRENT_DATE- interval '1 week'";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
@@ -106,7 +107,8 @@ if($result = pg_query($conn, $qry))
 
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
-		mail($to,'Ihr Datensatz wurde deaktiviert! '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
+		$mail = new mail($to,'vilesci@'.DOMAIN,'Ihr Datensatz wurde deaktiviert! '.$row->uid, $message);
+		$mail->send();
 		$text.= "Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
 }
@@ -116,9 +118,9 @@ if($result = pg_query($conn, $qry))
 $qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_ABBRECHER_WEEKS." week'
 		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
@@ -135,7 +137,7 @@ if($result = pg_query($conn, $qry))
 
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
-		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
+		$mail = new mail($to, 'vilesci@'.DOMAIN, 'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
 }
@@ -144,9 +146,9 @@ if($result = pg_query($conn, $qry))
 $qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_STUDENT_WEEKS." week'
 		AND get_rolle_prestudent (prestudent_id, NULL)<>'Abbrecher'";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
@@ -163,7 +165,8 @@ if($result = pg_query($conn, $qry))
 
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
-		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
+		$mail = new mail($to,'vilesci@'.DOMAIN,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
+		$mail->send();
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
 }
@@ -171,9 +174,9 @@ if($result = pg_query($conn, $qry))
 //Mitarbeiter
 $qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_MITARBEITER_WEEKS." week'";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$message = "Dies ist eine automatische Mail!\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
@@ -183,7 +186,7 @@ if($result = pg_query($conn, $qry))
 		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
 		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an die Mitarbeiter unserer Personalabteillung.\n";
-		$message .= "Adelheit Schaaf  - schaaf@technikum-wien.at\n";
+		$message .= "Nicole Sagmeister - sagmeister@technikum-wien.at\n";
 		$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
 		$message .= "Mit freundlichen Grüßen,\n";
 		$message .= "FACHHOCHSCHULE TECHNIKUM WIEN\n";
@@ -192,7 +195,8 @@ if($result = pg_query($conn, $qry))
 
 		//$to = 'oesi@technikum-wien.at';
 		$to = $row->uid.'@'.DOMAIN;
-		mail($to,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message, 'From: vilesci@'.DOMAIN);
+		$mail = new mail($to,'vilesci@'.DOMAIN, 'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
+		$mail->send();
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
 }
@@ -200,7 +204,8 @@ if($result = pg_query($conn, $qry))
 echo nl2br($text);
 if($text!='')
 {
-	mail(MAIL_IT.', tw_ht@technikum-wien.at, schmuderm@technikum-wien.at, vilesci@technikum-wien.at' , 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text, 'From: vilesci@'.DOMAIN);
+	$mail = new mail(MAIL_IT.', tw_ht@technikum-wien.at, schmuderm@technikum-wien.at, vilesci@technikum-wien.at', 'vilesci@'.DOMAIN, 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text);
+	$mail->send();
 }
 
 echo '</body></html>';
