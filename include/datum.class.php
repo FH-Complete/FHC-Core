@@ -187,24 +187,28 @@ class datum
 			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[3],$regs[1]);
 		
 		//2008-12-31 12:30:15
-		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
+		if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[3],$regs[1]);
+
+		if($ts=='')
+		{
+			//1.12.2008
+			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$datum, $regs))
+				$ts = mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
 			
-		//1.12.2008
-		if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$datum, $regs))
-			$ts = mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
-			
-		//1.12.2008 12:30
-		if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
-			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[1],$regs[3]);
+			//1.12.2008 12:30
+			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
+				$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[1],$regs[3]);
 				
-		//1.12.2008 12:30:15
-		if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
-			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[1],$regs[3]);
+			//1.12.2008 12:30:15
+			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
+				$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[1],$regs[3]);
+		}
 		
 		if($ts=='' && !$strict)
 		{
 			$ts = strtotime($datum);
+			
 			if(!$ts || $ts==-1)
 			{
 				//wenn strtotime fehlschlaegt liefert diese -1 zurueck, ab php5.1.0 jedoch false
