@@ -833,29 +833,31 @@ echo '<table>';
 									if (isset($kursArr[$iKurs]) && isset($kursArr[$iKurs][2]) && isset($kursArr[$iKurs][6]) && strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
 									{
 																	
-									   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
-									   
-		  							   $title="\r\nNote in Moodlekurse: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
-									   
-									   $note=trim($kursArr[$iKurs][6]);
-								       foreach ($kursasObj[$iKurs] as $key => $value) 
-									   {
-											$title.=$key."=>".$value."\r\n";
-										}	
+									    $note=trim($kursArr[$iKurs][6]);
 										$userGef=true;
 										
-									   	if ($note!='-' )
+									   	if (is_numeric($note)  || $debg)
 									   	{
-									   		$note_le += $note;
-					    			   		$le_anz += 1;
-									   	}
-										
-					    				if ($note == 5)
-					    					$leneg = " style='color:red; font-weight:bold'";
-			    						else
-		    								$leneg = " style='font-weight:bold'";
-		    							if ($note!='-' || $debg)		    							
+										   	if (is_numeric($note))
+										   	{
+										   		$note_le += $note;
+						    			   		$le_anz += 1;
+											}	
+						    				if ($note == 5)
+						    					$leneg = " style='color:red; font-weight:bold'";
+				    						else
+		    									$leneg = " style='font-weight:bold'";
+											
+										   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
+			  							   $title="\r\nNote in Moodlekurse: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
+									       foreach ($kursasObj[$iKurs] as $key => $value) 
+										   {
+												$title.=$key."=>".$value."\r\n";
+											}	
+											
+												
 											$note_les_str .= "<span ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$mdl_shortname.")</span> ";
+										}	
 									}	// ende If Richtiger User
 									
 									if ($userGef)
