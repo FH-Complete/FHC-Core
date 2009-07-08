@@ -199,7 +199,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
        <?php
        		$stsemobj = new studiensemester();
        		$stsemobj->getAll();
-       		foreach ($stsemobj->result as $stsem)
+       		foreach ($stsemobj->studiensemester as $stsem)
        		{
   				echo "
 			<menuitem

@@ -144,7 +144,7 @@ class akte extends basis_db
 			$this->errormsg = 'Person ID muss angegeben werden';
 			return false;
 		}
-		if($this->dokument_kurzbz!='')
+		if($this->dokument_kurzbz=='')
 		{
 			$this->errormsg = 'DokumentKurzbz muss angegeben werden';
 			return false;

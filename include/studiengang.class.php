@@ -51,6 +51,7 @@ class studiengang extends basis_db
 	public $sprache;
 	public $testtool_sprachwahl;
 	public $studienplaetze;
+	public $oe_kurzbz;
 
 	public $kuerzel;			// = typ + kurzbz (Bsp: BBE)
 
@@ -119,6 +120,7 @@ class studiengang extends basis_db
 				$this->sprache = $row->sprache;
 				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
 				$this->studienplaetze = $row->studienplaetze;
+				$this->oe_kurzbz = $row->oe_kurzbz;
 
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
@@ -183,6 +185,7 @@ class studiengang extends basis_db
 			$stg_obj->sprache = $row->sprache;
 			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
 			$stg_obj->studienplaetze = $row->studienplaetze;
+			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
 
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
@@ -248,7 +251,7 @@ class studiengang extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
-				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html) VALUES ('.
+				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, oe_kurzbz) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->kurzbz).', '.
 				$this->addslashes($this->kurzbzlang).', '.
@@ -271,7 +274,8 @@ class studiengang extends basis_db
 				$this->addslashes($this->aktiv).', '.
 				$this->addslashes($this->ext_id).', '.
 				$this->addslashes($this->orgform_kurzbz).', '.
-				$this->addslashes($this->zusatzinfo_html).');';
+				$this->addslashes($this->zusatzinfo_html).', '.
+				$this->addslashes($this->oe_kurzbz).';';
 		}
 		else
 		{
@@ -300,6 +304,7 @@ class studiengang extends basis_db
 				'telefon='.$this->addslashes($this->telefon).', '.
 				'orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).', '.
 				'aktiv='.$this->addslashes($this->aktiv).', '.
+				'oe_kurzbz='.$this->oe_kurzbz.','.
 				'zusatzinfo_html='.$this->addslashes($this->zusatzinfo_html).' '.
 				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
 		}

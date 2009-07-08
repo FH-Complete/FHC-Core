@@ -22,6 +22,8 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/organisationseinheit.class.php');
+require_once(dirname(__FILE__).'/studiengang.class.php');
+require_once(dirname(__FILE__).'/fachbereich.class.php');
 
 class benutzerberechtigung extends basis_db
 {
@@ -323,9 +325,24 @@ class benutzerberechtigung extends basis_db
 	 * @param $art
 	 * @return true wenn eine Berechtigung entspricht.
 	 */
-	public function isBerechtigt($berechtigung_kurzbz,$oe_kurzbz=null,$art=null)
+	public function isBerechtigt($berechtigung_kurzbz,$oe_kurzbz=null,$art=null, $fachbereich_kurzbz=null)
 	{
 		$timestamp=time();
+		
+		//Studiengang
+		if(is_numeric($oe_kurzbz))
+		{
+			//Studiengang
+			$stg = new studiengang($oe_kurzbz);
+			$oe_kurzbz = $stg->oe_kurzbz;
+		}
+		
+		//Fachbereich
+		if(!is_null($fachbereich_kurzbz))
+		{
+			$fb = new fachbereich($fachbereich_kurzbz);
+			$oe_kurzbz = $fb->oe_kurzbz;
+		}
 		
 		foreach ($this->berechtigungen as $b)
 		{
