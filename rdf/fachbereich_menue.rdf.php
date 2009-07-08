@@ -49,15 +49,15 @@ $fb = $rechte->getFbKz();
 
 $qry = "SELECT * FROM public.tbl_fachbereich";
 
-if(count($fb)>0 && !in_array('0',$fb))
+if(count($fb)>0)
 {
+	$in='';
 	foreach($fb as $fbbz)
-		$in = ", '".addslashes($fbbz)."'";
+		$in.= ", '".addslashes($fbbz)."'";
 	$qry.=" WHERE fachbereich_kurzbz in ('1'$in)";
 }
 
 $qry.=" ORDER BY bezeichnung";
-
 
 $rdf_url='http://www.technikum-wien.at/fachbereich';
 

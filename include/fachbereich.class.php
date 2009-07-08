@@ -37,6 +37,7 @@ class fachbereich extends basis_db
 	public $studiengang_kz;		// integer
 	public $aktiv;				// boolean
 	public $ext_id;				// bigint
+	public $oe_kurzbz;
 
 	public $bezeichnung_arr = array();
 
@@ -76,6 +77,7 @@ class fachbereich extends basis_db
 			$fachb_obj->studiengang_kz = $row->studiengang_kz;
 			$fachb_obj->ext_id = $row->ext_id;
 			$fachb_obj->aktiv = ($row->aktiv=='t'?true:false);
+			$fachb_obj->oe_kurzbz = $row->oe_kurzbz;
 
 			$this->result[] = $fachb_obj;
 			$this->bezeichnung_arr[$row->fachbereich_kurzbz] = $row->bezeichnung;
@@ -112,6 +114,7 @@ class fachbereich extends basis_db
 			$this->studiengang_kz = $row->studiengang_kz;
 			$this->ext_id = $row->ext_id;
 			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->oe_kurzbz = $row->oe_kurzbz;
 		}
 		else
 		{
