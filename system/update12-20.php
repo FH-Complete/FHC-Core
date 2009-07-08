@@ -24,29 +24,27 @@
  * Dieses Skript fuehrt Datenbankupdates von Version 1.2 auf 2.0 durch
  */
 
-require_once ('../config/system.config.inc.php');
+require_once('../config/system.config.inc.php');
+require_once('../include/basis_db.class.php');
 
-// Datenbank Verbindung
-//if (!$conn = pg_pconnect("host=.technikum-wien.at dbname= user= password="))
-if (!$conn = pg_pconnect('host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' user='.DB_USER.' password='.DB_PASSWORD))
-   	die('Es konnte keine Verbindung zum Server aufgebaut werden!'.pg_last_error($conn));
+$db = new basis_db();
 
 echo '<H1>DB-Updates!</H1>';
 echo '<H2>Version 1.2 &rarr; 2.0</H2>';
 
 // **************** lehre.tbl_prestudentstatus -> tbl_prestudentstatus ************************
-if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_status LIMIT 1;"))
+if(!@$db->db_query('SELECT * FROM public.tbl_status LIMIT 1;'))
 {
 	$qry = "ALTER TABLE public.tbl_status RENAME TO tbl_status;
 			ALTER TABLE public.tbl_prestudentstatus RENAME TO tbl_prestudentstatus;
 			ALTER TABLE public.tbl_status RENAME COLUMN status_kurzbz TO status_kurzbz;
 			ALTER TABLE public.tbl_prestudentstatus RENAME COLUMN status_kurzbz TO status_kurzbz;
-			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_status' WHERE conname='pk_tbl_status';
-			UPDATE pg_catalog.pg_constraint SET conname='orgform_prestudentstatus' WHERE conname='orgform_prestudentrolle';
-			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_prestudentstatus' WHERE conname='pk_tbl_prestudentstatus';
-			UPDATE pg_catalog.pg_constraint SET conname='prestudent_prestudentstatus' WHERE conname='prestudent_prestudentrolle';
-			UPDATE pg_catalog.pg_constraint SET conname='status_prestudentstatus' WHERE conname='rolle_prestudentrolle';
-			UPDATE pg_catalog.pg_constraint SET conname='studiensemester_prestudentstatus' WHERE conname='studiensemester_prestudentrolle';
+			--UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_status' WHERE conname='pk_tbl_status';
+			--UPDATE pg_catalog.pg_constraint SET conname='orgform_prestudentstatus' WHERE conname='orgform_prestudentrolle';
+			--UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_prestudentstatus' WHERE conname='pk_tbl_prestudentstatus';
+			--UPDATE pg_catalog.pg_constraint SET conname='prestudent_prestudentstatus' WHERE conname='prestudent_prestudentrolle';
+			--UPDATE pg_catalog.pg_constraint SET conname='status_prestudentstatus' WHERE conname='rolle_prestudentrolle';
+			--UPDATE pg_catalog.pg_constraint SET conname='studiensemester_prestudentstatus' WHERE conname='studiensemester_prestudentrolle';
 			
 			CREATE OR REPLACE FUNCTION get_rolle_prestudent (integer, character varying) returns character varying
 			DECLARE i_prestudent_id ALIAS FOR $1;
@@ -71,8 +69,8 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_status LIMIT 1;"))
 			END;
 			";
 
-	if(!pg_query($conn, $qry))
-		echo '<strong>public.tbl_status: '.pg_last_error($conn).' </strong><br>';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status: '.$db->db_last_error().' </strong><br>';
 	else
 		echo '	public.tbl_status: Umbenannt auf tbl_status!<br>
 				constrains umbenannt
@@ -81,7 +79,7 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_status LIMIT 1;"))
 }
 
 // *************** public.tbl_organisationseinheit *******************************
-if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_organisationseinheit LIMIT 1;"))
+if(!@$db->db_query('SELECT * FROM public.tbl_organisationseinheit LIMIT 1;'))
 {
 	$qry = "CREATE TABLE public.tbl_organisationseinheit 
 			(
@@ -118,27 +116,106 @@ if(!$result = @pg_query($conn, "SELECT * FROM public.tbl_organisationseinheit LI
 			ALTER TABLE public.tbl_fachbereich ADD COLUMN oe_kurzbz character varying(32);
 			ALTER TABLE public.tbl_fachbereich ADD CONSTRAINT fachbereich_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			
+			-- ORGANISATIONSEINHEITEN Anlegen
+			INSERT INTO public.tbl_organisationseinheittyp(organisationseinheittyp_kurzbz, bezeichnung, beschreibung) VALUES('Erhalter',null, null);
+			INSERT INTO public.tbl_organisationseinheittyp(organisationseinheittyp_kurzbz, bezeichnung, beschreibung) VALUES('Studienzentrum',null, null);
+			INSERT INTO public.tbl_organisationseinheittyp(organisationseinheittyp_kurzbz, bezeichnung, beschreibung) VALUES('Studiengang',null, null);
+			INSERT INTO public.tbl_organisationseinheittyp(organisationseinheittyp_kurzbz, bezeichnung, beschreibung) VALUES('Institut',null, null);
+			INSERT INTO public.tbl_organisationseinheittyp(organisationseinheittyp_kurzbz, bezeichnung, beschreibung) VALUES('Abteilung',null, null);
+
+			-- Technikum Wien Spezifisch!!
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('etw',null,'Technikum Wien','Erhalter');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ctee','etw','Communication Technologies & Electronic Engineering','Studienzentrum');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bel','ctee','BEL','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bew','ctee','BEW','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bic','ctee','BIC','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mes','ctee','MES','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mie','ctee','MIE','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mtm','ctee','MTM','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mti','ctee','MTI','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('EmbeddedSystems','ctee','Embedded System','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Telecom','ctee','Telecommunications & Internet Technologies','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ElectronicEng','ctee','Electronic Engineering','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('itbs','etw','Information Technologies & Business Solutions','Studienzentrum');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bif','itbs','BIF','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bit','itbs','BIT','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bwi','itbs','BWI','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mic','itbs','MIC','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mit','itbs','MIT','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mse','itbs','MSE','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mwi','itbs','MWI','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mgs','itbs','MGS','Studiengang');		
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Informatik','itbs','Informatik','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Wirtschaftsinf','itbs','Wirtschaftsinformatik','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('InformationEng','itbs','Information Engineering & Security','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('eet','etw','Engineering & Environmental Technologies','Studienzentrum');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('biw','eet','BIW','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('miw','eet','MIW','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bmr','eet','BMR','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mmr','eet','MMR','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bee','eet','BEE','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mee','eet','MEE','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Mechatronics','eet','Mechatronics','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('AdvancedTech','eet','Advanced Technologies','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ErnEnergie','eet','Erneuerbare Energietechnologien','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('lst','etw','Life Science Technologies','Studienzentrum');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bbe','lst','BBE','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('bst','lst','BST','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mbe','lst','MBE','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mgr','lst','MGR','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mst','lst','MST','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('mut','lst','MUT','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('BiomedTech','lst','Biomedizinische Technik & Umweltmanagement','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('SportsEng','lst','Sports Engineering and Biomechanics','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('AngewandteMath','etw','Angewandte Mathematik und Naturwissenschaften','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('MgmntWirtRecht','etw','Management, Wirtschaft, Recht','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Sozialkompetenz','etw','Sozialkompetenz- und Managementmethoden','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Sprachen','etw','Sprachen und Kulturwissenschaften','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Dummy','etw','Dummy','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Freifaecher','etw','Freifaecher','Institut');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Praxissemester','etw','Praxissemester','Institut');		
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('eak','etw','Aufbaukurse','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('lca','etw','Cisco Academy','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ltc','etw','LLL China','Studiengang');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Auslandsbuero','etw','AuslandsbÃ¼ro','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Bibliothek','etw','Bibliothek','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Geschaeftsltg','etw','GeschÃ¤ftsleitung','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Unternehmenskommunikation','etw','Unternehmenskommunikation','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Infrastruktur','etw','Infrastruktur','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Haustechnik','Infrastruktur','Haustechnik','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ServiceDesk','Infrastruktur','ServiceDesk','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('Systementwicklung','Infrastruktur','Systementwicklung','Abteilung');
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ZentrServices','Infrastruktur','ZentraleServices','Abteilung');
+
+			-- Alle noch nicht eingetragenen Institute und Studiengaenge direkt unter etw haengen
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT lower(typ::varchar(1) || kurzbz), 'etw',  lower(typ::varchar(1) || kurzbz), 'Studiengang' FROM public.tbl_studiengang WHERE oe_kurzbz is null;
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT fachbereich_kurzbz, 'etw', bezeichnung, 'Institut' FROM public.tbl_fachbereich WHERE oe_kurzbz is null;
+
+			-- Eintraege in Tabelle Studiengang und Fachbereich
+			UPDATE public.tbl_studiengang set oe_kurzbz = lower(typ::varchar(1) || kurzbz) WHERE  lower(typ::varchar(1) || kurzbz) in(select oe_kurzbz FROM public.tbl_organisationseinheit);
+			UPDATE public.tbl_fachbereich set oe_kurzbz=fachbereich_kurzbz WHERE fachbereich_kurzbz in(select oe_kurzbz FROM public.tbl_organisationseinheit);
+
 			";
-	if(!pg_query($conn, $qry))
-		echo '<strong>public.tbl_organisationsform: '.pg_last_error($conn).' </strong><br>';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_organisationsform: '.$db->db_last_error().' </strong><br>';
 	else
-		echo '	public.tbl_organisationsform: Tabelle wurde hinzugefügt!<br>';
+		echo '	public.tbl_organisationsform: Tabelle wurde hinzugefï¿½gt!<br>';
 ;
 }
 
 // ************* system.tbl_berechtigung ******************
-if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;"))
+if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 {
 	$qry = "CREATE SCHEMA system;
 			CREATE TABLE system.tbl_benutzerrolle
 			(
  				benutzerberechtigung_id serial NOT NULL,
+ 				rolle_kurzbz Character varying(32),
+ 				berechtigung_kurzbz Character varying(32),
  				uid Character varying(16),
  				funktion_kurzbz Character varying(16),
- 				status_kurzbz Character varying(32),
- 				berechtigung_kurzbz Character varying(16),
- 				art Character varying(5) DEFAULT 'r'::character varying NOT NULL,
- 				oe_kurzbz Character varying(32),
+ 				oe_kurzbz Character varying(32), 				
+ 				art Character varying(5) DEFAULT 's'::character varying NOT NULL,
 				studiensemester_kurzbz Character varying(16),
 				start Date,
 				ende Date,
@@ -157,52 +234,97 @@ if(!$result = @pg_query($conn, "SELECT * FROM system.tbl_berechtigung LIMIT 1;")
 			
 			CREATE TABLE system.tbl_berechtigung
 			(
- 				berechtigung_kurzbz Character varying(16) NOT NULL,
+ 				berechtigung_kurzbz Character varying(32) NOT NULL,
  				beschreibung Character varying(256)
 			)
 			WITH (OIDS=FALSE);
 			ALTER TABLE system.tbl_berechtigung ADD CONSTRAINT pk_tbl_berechtigung PRIMARY KEY (berechtigung_kurzbz);
 			
-			CREATE TABLE system.tbl_status
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			CREATE TABLE system.tbl_rolle
 			(
- 				status_kurzbz Character varying(32) NOT NULL,
- 				beschreibung Character varying(256)
-			) WITH (OIDS=FALSE);
-			
-			ALTER TABLE system.tbl_status ADD CONSTRAINT pk_tbl_status PRIMARY KEY (status_kurzbz);
-			
-			CREATE TABLE system.tbl_statusberechtigung
-			(
- 				berechtigung_kurzbz Character varying(16) NOT NULL,
- 				status_kurzbz Character varying(32) NOT NULL
+ 				rolle_kurzbz Character varying(32) NOT NULL,
+ 				beschreibung Character varying(256),
+ 				art Character varying(5)
 			)
 			WITH (OIDS=FALSE);
 			
-			ALTER TABLE system.tbl_statusberechtigung ADD CONSTRAINT pk_tbl_statusberechtigung PRIMARY KEY (berechtigung_kurzbz,status_kurzbz);
-			ALTER TABLE system.tbl_statusberechtigung ADD CONSTRAINT rolleberechtigung_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-			ALTER TABLE system.tbl_statusberechtigung ADD CONSTRAINT rolleberechtigung_rolle FOREIGN KEY (status_kurzbz) REFERENCES system.tbl_status (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			CREATE TABLE system.tbl_rolleberechtigung
+			(
+ 				berechtigung_kurzbz Character varying(32) NOT NULL,
+ 				rolle_kurzbz Character varying(32)
+			)
+			WITH (OIDS=FALSE);
+
+			ALTER TABLE system.tbl_rolle ADD CONSTRAINT pk_tbl_rolle PRIMARY KEY (rolle_kurzbz);
+			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT pk_tbl_rolleberechtigung PRIMARY KEY(berechtigung_kurzbz, rolle_kurzbz);
+			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_rolle FOREIGN KEY(rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_berechtigung FOREIGN KEY(berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			
-			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (status_kurzbz) REFERENCES system.tbl_status (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_studienseemster FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
 			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP ".DB_CIS_USER_GROUP.";
 			GRANT SELECT ON system.tbl_berechtigung TO GROUP ".DB_CIS_USER_GROUP.";
-			GRANT SELECT ON system.tbl_status TO GROUP ".DB_CIS_USER_GROUP.";
-			GRANT SELECT ON system.tbl_statusberechtigung TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_rolle TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT SELECT ON system.tbl_rolleberechtigung TO GROUP ".DB_CIS_USER_GROUP.";
+			
 			
 			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_benutzerrolle TO GROUP ".DB_FAS_USER_GROUP.";
 			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_berechtigung TO GROUP ".DB_FAS_USER_GROUP.";
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_status TO GROUP ".DB_FAS_USER_GROUP.";
-			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_statusberechtigung TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolle TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_rolleberechtigung TO GROUP ".DB_FAS_USER_GROUP.";
+			
+			
+			--- SYNCRONISIEREN
+			
+			INSERT INTO system.tbl_rolle(rolle_kurzbz, beschreibung) SELECT berechtigung_kurzbz, beschreibung FROM public.tbl_berechtigung
+
+			-- Berechtigungen uebernehmen
+			
+			INSERT INTO system.tbl_benutzerrolle(uid, funktion_kurzbz, rolle_kurzbz, berechtigung_kurzbz, art, oe_kurzbz, 
+												studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, insertamum, insertvon)
+			SELECT 
+				uid, null, berechtigung_kurzbz, null, art,
+				CASE WHEN fachbereich_kurzbz IS NOT NULL THEN (SELECT oe_kurzbz FROM public.tbl_fachbereich WHERE fachbereich_kurzbz=tbl_benutzerberechtigung.fachbereich_kurzbz)
+					 WHEN studiengang_kz IS NOT NULL THEN (SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz=tbl_benutzerberechtigung.studiengang_kz)
+					 ELSE null
+				END, 
+				studiensemester_kurzbz, start, ende, false, updateamum, updatevon, insertamum, insertvon
+			FROM public.tbl_benutzerberechtigung;
+
+			--- ALTE TABELLE LOESCHEN
+			DROP TABLE public.tbl_benutzerberechtigung;
 			";
 	
-	if(!pg_query($conn, $qry))
-		echo '<strong>system schema: '.pg_last_error($conn).' </strong><br>';
+	if(!$db->db_query($qry))
+		echo '<strong>system schema: '.$db->db_last_error().' </strong><br>';
 	else
-		echo 'system schema: Berechtigungstabellen wurden hinzugefügt!<br>';
+		echo 'system schema: Berechtigungstabellen wurden hinzugefuegt!<br>';
 
 }
+
+// **************** public.tbl_benutzerfunktion ************************
+if(!@$db->db_query('SELECT oe_kurzbz FROM public.tbl_benutzerfunktion LIMIT 1;'))
+{
+	$qry = "ALTER TABLE public.tbl_benutzerfunktion ADD COLUMN oe_kurzbz Character varying(32);
+			ALTER TABLE public.tbl_benutzerfunktion ADD COLUMN datum_von Date;
+			ALTER TABLE public.tbl_benutzerfunktion ADD COLUMN datum_bis Date;
+			
+			-- studiengang in oe_kurzbz kopieren
+			UPDATE public.tbl_benutzerfunktion SET oe_kurzbz = (SELECT lower(typ::varchar(1) || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz);
+			
+			-- spalte loeschen
+			ALTER TABLE public.tbl_benutzerfunktion DROP COLUMN studiengang_kz;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_benutzerfunktion: '.$db->db_last_error().' </strong><br>';
+	else
+		echo '	public.tbl_benutzerfunktion: Umbenannt auf oe_kurzbz statt studiengang_kz hinzugefuegt!<br>
+				Datum Von/Bis hinzugefuegt';
+}
+
+
 ?>
