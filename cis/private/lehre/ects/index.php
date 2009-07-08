@@ -98,10 +98,10 @@
 			$sem = $lv_obj->semester;
 	}
 
-	if(!isset($stg) && isset($_GET['stg']))
-		$stg = $_GET['stg'];
-	if(!isset($sem) && isset($_GET['sem']))
-		$sem = $_GET['sem'];	
+	if(!isset($stg) && isset($_POST['stg']))
+		$stg = $_POST['stg'];
+	if(!isset($sem) && isset($_POST['sem']))
+		$sem = $_POST['sem'];	
 		
 	
 	if(isset($_POST['changed'])) //Gibt an welches der Auswahlfelder geaendert wurde
@@ -308,7 +308,9 @@
 					$firstsem=$i;
 
 				if(!isset($sem) || (isset($sem) && $sem>$stg_obj->max_semester))
+				{
 					$sem = $i;
+				}
 
 				if($i == $sem)
 				{

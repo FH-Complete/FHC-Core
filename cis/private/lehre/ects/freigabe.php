@@ -73,14 +73,14 @@
 	//Semester das angezeigt werden soll
 	$sem=trim((isset($_REQUEST['sem']) ? $_REQUEST['sem']:''));
 
-	if(isset($_POST["lv"])) //Id des DS der freigegeben/nicht freigegeben werden soll
-		$id=$_POST["lv"];
+	if(isset($_GET["lv"])) //Id des DS der freigegeben/nicht freigegeben werden soll
+		$id=$_GET["lv"];
 
 	if(isset($_GET["del"])) //Wenn diese Variable gesetzt ist dann wird DS mit $idde und $iden geloescht
 		$del=$_GET["del"];
 
-	if(isset($_POST["changestat"])) //Wenn diese Variable gesetzt ist dann wird DS mit $id freigegeben/nicht freigegeben
-		$changestat=$_POST["changestat"];
+	if(isset($_GET["changestat"])) //Wenn diese Variable gesetzt ist dann wird DS mit $id freigegeben/nicht freigegeben
+		$changestat=$_GET["changestat"];
 
 	if(isset($_POST["status"]) && $_POST["status"] =='changestg')
 		unset($sem);
@@ -110,7 +110,7 @@
 	{
 		//Setzt die Spalte genehmigt auf den entsprechenden Wert
 		//=Wenn Hackerl angeklickt wird
-
+	
 		$qry="SELECT genehmigt FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lv' AND sprache=";
 		if($_GET['lang']=='de')
 			$qry.="'".ATTR_SPRACHE_DE."'";

@@ -67,15 +67,22 @@ class moodle_course extends basis_db
 	 * Konstruktor
 	 * 
 	 */
-	public function __construct()
+	public function __construct($conn_moodle=null)
 	{
-		if(!$this->conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
+		if(is_null($conn_moodle))
 		{
-			$this->errormsg = 'Fehler beim Herstellen der Moodle Connection';
-			return false;
+			if(!$this->conn_moodle = pg_pconnect(CONN_STRING_MOODLE))
+			{
+				$this->errormsg = 'Fehler beim Herstellen der Moodle Connection';
+				return false;
+			}
+			else 
+				return true;
 		}
 		else 
-			return true;
+			$this->conn_moodle = $conn_moodle;
+			
+		return true;
 	}
 	
 	/**
@@ -133,7 +140,7 @@ class moodle_course extends basis_db
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-				$obj = new moodle_course();
+				$obj = new moodle_course($this->conn_moodle);
 				
 				$obj->moodle_id = $row->moodle_id;
 				$obj->mdl_course_id = $row->mdl_course_id;
@@ -211,7 +218,7 @@ class moodle_course extends basis_db
 
 		while($row = $this->db_fetch_object($result))
 		{
-			$obj = new moodle_course();
+			$obj = new moodle_course($this->conn_moodle);
 
 			$obj->mdl_course_id = $row->mdl_course_id;
 			$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
@@ -1322,7 +1329,7 @@ class moodle_course extends basis_db
 				else
 					$note=0;
 					
-				$obj = new moodle_course();
+				$obj = new moodle_course($this->conn_moodle);
 				
 				$obj->mdl_course_id = $this->mdl_course_id;
 				$obj->lehreinheit_id=$row->lehreinheit_id;
