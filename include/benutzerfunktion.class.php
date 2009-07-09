@@ -23,10 +23,10 @@
  * Klasse benutzerfunktion (FAS-Online)
  * @create 04-12-2006
  */
-
-class benutzerfunktion
+require_once(dirname(__FILE__).'/basis_db.class.php');	
+class benutzerfunktion extends basis_db
 {
-	var $conn;   		// @var resource DB-Handle
+
 	var $new;     		// @var boolean
 	var $errormsg; 		// @var string
 	var $result = array(); 	// @var benutzerfunktion Objekt
@@ -50,9 +50,10 @@ class benutzerfunktion
 	// * @param $conn Connection zur DB
 	// *        $benutzerfunktion_id ID der zu ladenden Funktion
 	// **********************************************************
-	function benutzerfunktion($conn, $benutzerfunktion_id=null)
+
+	function __construct($benutzerfunktion_id=null)
 	{
-		$this->conn = $conn;
+		parent::__construct();
 		if($benutzerfunktion_id != null)
 			$this->load($benutzerfunktion_id);
 	}
@@ -65,15 +66,15 @@ class benutzerfunktion
 	{
 		$qry = 'SELECT * FROM public.tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$res = $this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
 			return false;
 		}
 
-		while($row = pg_fetch_object($res))
+		while($row = $this->db_fetch_object($res))
 		{
-			$pfunktion_obj = new benutzerfunktion($this->conn);
+			$pfunktion_obj = new benutzerfunktion();
 
 			$pfunktion_obj->benutzerfunktion_id = $row->benutzerfunktion_id;
 			$pfunktion_obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
@@ -99,7 +100,7 @@ class benutzerfunktion
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
 
-		if($row = pg_fetch_object(pg_query($this->conn, $qry)))
+		if($row = $this->db_fetch_object($this->db_query($qry)))
 		{
 			if($row->anzahl>0)
 				return true;
@@ -123,9 +124,9 @@ class benutzerfunktion
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
 
-		if($result = pg_query($this->conn, $qry))
+		if($result = $this->db_query($qry))
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $this->db_fetch_object($result))
 			{
 				$this->benutzerfunktion_id = $row->benutzerfunktion_id;
 				$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
@@ -169,11 +170,11 @@ class benutzerfunktion
 			$qry.=" AND semester='".addslashes($semester)."'";
 
 		$qry.=" ORDER BY funktion_kurzbz, studiengang_kz, semester";
-		if($result = pg_query($this->conn, $qry))
+		if($result = $this->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $this->db_fetch_object($result))
 			{
-				$obj = new benutzerfunktion($this->conn,  null, null);
+				$obj = new benutzerfunktion(null, null);
 				
 				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
 				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
@@ -213,13 +214,13 @@ class benutzerfunktion
 
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id = '$benutzerfunktion_id';";
 
-		if(!$res = pg_query($this->conn, $qry))
+		if(!$res = $this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row=pg_fetch_object($res))
+		if($row=$this->db_fetch_object($res))
 		{
 			$this->benutzerfunktion_id = $row->benutzerfunktion_id;
 			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
@@ -249,9 +250,9 @@ class benutzerfunktion
 	function delete($benutzerfunktion_id)
 	{
 		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='$benutzerfunktion_id'";
-		if(!pg_query($this->conn, $qry))
+		if(!$this->db_query($qry))
 		{
-			$this->errormsg = pg_errormessage($this->conn);
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 		else
@@ -284,14 +285,14 @@ class benutzerfunktion
 			//Neuen Datensatz anlegen
 			//Pruefen ob uid vorhanden
 			$qry = "SELECT uid FROM public.tbl_benutzer WHERE uid = '$this->uid';";
-			if(!$resx = pg_query($this->conn, $qry))
+			if(!$resx = $this->db_query($qry))
 			{
 				$this->errormsg = 'Fehler beim Laden des Datensatzes';
 				return false;
 			}
 			else
 			{
-				if (pg_num_rows($resx)==0)
+				if ($this->db_num_rows($resx)==0)
 				{
 					$this->errormsg = "uid <b>$this->uid</b> in Tabelle tbl_benutzer nicht gefunden!";
 					return false;
@@ -334,36 +335,36 @@ class benutzerfunktion
 				'WHERE benutzerfunktion_id = '.$this->addslashes($this->benutzerfunktion_id).';';
 		}
 
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			if($new)
 			{
 				//Sequence Auslesen
 				$qry = "SELECT currval('public.tbl_benutzerfunktion_benutzerfunktion_id_seq') as id";
-				if($result = pg_query($this->conn, $qry))
+				if($result = $this->db_query($qry))
 				{
-					if($row = pg_fetch_object($result))
+					if($row = $this->db_fetch_object($result))
 					{
 						$this->benutzerfunktion_id = $row->id;
-						pg_query($this->conn, 'COMMIT;');
+						$this->db_query('COMMIT;');
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						pg_query($this->conn, 'ROLLBACK');
+						$this->db_query('ROLLBACK');
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					pg_query($this->conn, 'ROLLBACK');
+					$this->db_query('ROLLBACK');
 				}
 			}
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.pg_errormessage($this->conn);
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.$this->db_last_error();
 			return false;
 		}
 	}
