@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,37 +15,39 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+ 
 /**
  *	Statistik der Zeitwuensche
  *
  */
 
-	require('../config.inc.php');
-	require('../../include/globals.inc.php');
-
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require('../../include/globals.inc.php');
 
 	//Stundentabelleholen
-	if(! $result_stunde=pg_exec($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
-		die(pg_last_error($conn));
-	$num_rows_stunde=pg_numrows($result_stunde);
+	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+		die($db->db_last_error());
+	$num_rows_stunde=$db->db_num_rows($result_stunde);
 
-	if(!($erg=pg_exec($conn, "SELECT DISTINCT mitarbeiter_uid AS uid FROM campus.tbl_zeitwunsch")))
-		die(pg_last_error($conn));
-	$anz_lektoren=pg_numrows($erg);
+	if(!($erg=$db->db_query("SELECT DISTINCT mitarbeiter_uid AS uid FROM campus.tbl_zeitwunsch")))
+		die($db->db_last_error());
+	$anz_lektoren=$db->db_num_rows($erg);
 
-	if(!($erg=pg_exec($conn, "SELECT tag,stunde,gewicht+3 AS gewicht, count(*) AS anz FROM campus.tbl_zeitwunsch GROUP BY tag,stunde,gewicht;")))
-		die(pg_last_error($conn));
-	$num_rows=pg_numrows($erg);
+	if(!($erg=$db->db_query("SELECT tag,stunde,gewicht+3 AS gewicht, count(*) AS anz FROM campus.tbl_zeitwunsch GROUP BY tag,stunde,gewicht;")))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($erg);
 	for ($i=0;$i<$num_rows;$i++)
 	{
-		$row=pg_fetch_object($erg,$i);
+		$row=$db->db_fetch_object($erg,$i);
 		$wunsch[$row->tag][$row->stunde][$row->gewicht]=$row->anz;
 	}
 
@@ -67,11 +69,11 @@ Anzahl der Lektoren: <?PHP echo $anz_lektoren; ?>
 	echo '<th>Stunde<br>Beginn<br>Ende</th>';
 	for ($i=0;$i<$num_rows_stunde; $i++)
 	{
-		$beginn=pg_result($result_stunde,$i,'"beginn"');
+		$beginn=$db->db_result($result_stunde,$i,'"beginn"');
 		$beginn=substr($beginn,0,5);
-		$ende=pg_result($result_stunde,$i,'"ende"');
+		$ende=$db->db_result($result_stunde,$i,'"ende"');
 		$ende=substr($ende,0,5);
-		$stunde=pg_result($result_stunde,$i,'"stunde"');
+		$stunde=$db->db_result($result_stunde,$i,'"stunde"');
 		echo "<th><div align=\"center\">$stunde<br>$beginn<br>$ende</div></th>";
 	}
 	?>
@@ -104,11 +106,11 @@ Details
 	echo '<th>Stunde<br>Beginn<br>Ende</th>';
 	for ($i=0;$i<$num_rows_stunde; $i++)
 	{
-		$beginn=pg_result($result_stunde,$i,'"beginn"');
+		$beginn=$db->db_result($result_stunde,$i,'"beginn"');
 		$beginn=substr($beginn,0,5);
-		$ende=pg_result($result_stunde,$i,'"ende"');
+		$ende=$db->db_result($result_stunde,$i,'"ende"');
 		$ende=substr($ende,0,5);
-		$stunde=pg_result($result_stunde,$i,'"stunde"');
+		$stunde=$db->db_result($result_stunde,$i,'"stunde"');
 		echo "<th><div align=\"center\">$stunde<br>$beginn<br>$ende</div></th>";
 	}
 	?>

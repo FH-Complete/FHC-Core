@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,18 +15,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+		
 /*******************************************************************************************************
  *				               abgabe_assistenz
  * 		abgabe_assistenz ist die AssistenzoberflÃ¤che des Abgabesystems 
  * 			            fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-	require_once('../../cis/config.inc.php');
+	require_once('../../config/cis.config.inc.php');
+	require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/datum.class.php');
 	require_once('../../include/person.class.php');
@@ -34,27 +39,23 @@
 	require_once('../../include/benutzerberechtigung.class.php');
 	require_once('../../include/mitarbeiter.class.php');
 
-	//DB Verbindung herstellen
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
-$getuid=get_uid();
-$htmlstr = "";
-$erstbegutachter='';
-$zweitbegutachter='';
+	if (!$getuid = get_uid())
+			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+				
+	$htmlstr = "";
+	$erstbegutachter='';
+	$zweitbegutachter='';
+	$fachbereich_kurzbz='';
 
-if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
-	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
-else
-	$stg_kz=0;
-if(!is_numeric($stg_kz) && $stg_kz!='')
-	$stg_kz='0';
+	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
+	if(!is_numeric($stg_kz) && $stg_kz!='')
+		$stg_kz='0';
 
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($getuid);
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($getuid);
 
-if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
+	die('Sie haben keine Berechtigung für diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
 $sql_query = "SELECT * 
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit  
@@ -69,7 +70,7 @@ $sql_query = "SELECT *
 			ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy 
 		ORDER BY nachname";
 
-if(!$erg=pg_query($conn, $sql_query))
+if(!$erg=$db->db_query($sql_query))
 {
 	$errormsg='Fehler beim Laden der Betreuungen';
 }
@@ -90,7 +91,7 @@ else
 				<th>2.Begutachter</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
-	while($row=pg_fetch_object($erg))
+	while($row=$db->db_fetch_object($erg))
 	{
 		$erstbegutachter='';
 		$zweitbegutachter='';
@@ -110,13 +111,13 @@ else
 		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
 		";
 
-		if(!$betr=pg_query($conn, $qry_betr))
+		if(!$betr=$db->db_query($qry_betr))
 		{
 			$errormsg='Fehler beim Laden der Betreuer';
 		}
 		else
 		{
-			while($row_betr=pg_fetch_object($betr))
+			while($row_betr=$db->db_fetch_object($betr))
 			{
 				if($row_betr->first!='')
 				{

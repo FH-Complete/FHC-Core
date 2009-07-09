@@ -15,25 +15,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+			
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/lehrfach.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
-$f=new fachbereich($conn);
+	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
+	if(!is_numeric($stg_kz) && $stg_kz!='')
+		$stg_kz='0';
+	
+	$gg='';
+
+
+$f=new fachbereich();
 $f->getAll();
 $fachbereiche=$f->result;
-$s=new studiengang($conn);
+$s=new studiengang();
 $s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
 
@@ -59,7 +69,7 @@ else
 
 if (isset($_POST['neu']))
 {
-	$lf = new lehrfach($conn);
+	$lf = new lehrfach();
 	$lf->new=true;
 	$lf->studiengang_kz=$_POST['stg_kz'];
 	$lf->fachbereich_kurzbz=$_POST['fachbereich_kurzbz'];
@@ -82,7 +92,7 @@ if (isset($_POST['neu']))
 
 if (isset($_POST['type']) && $_POST['type']=='editsave')
 {
-	$lf = new lehrfach($conn);
+	$lf = new lehrfach();
 	$lf->new=false;
 	$lf->lehrfach_id = $_POST['lehrfach_id'];
 	$lf->studiengang_kz=$_POST['stg_kz'];
@@ -198,7 +208,7 @@ if($rechte->isBerechtigt('admin',0))
 {
 	if (isset($_GET['type']) && $_GET['type']=='aktiv')
 	{
-		$lf = new lehrfach($conn);
+		$lf = new lehrfach();
 		$lf->load($_GET['lehrfach_nr']);
 		if ($lf->aktiv)
 			$lf->aktiv=false;
@@ -214,7 +224,7 @@ if($rechte->isBerechtigt('admin',0))
 	}
 	if (isset($_GET['type']) && $_GET['type']=='edit')
 	{
-		$lf=new lehrfach($conn);
+		$lf=new lehrfach();
 		$lf->load($_GET['lehrfach_nr']);
 		echo '<form name="lehrfach_edit" method="post" action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'">';
 		echo '<p><b>Edit Lehrfach: '.$_GET['lehrfach_nr'].'</b>';
@@ -277,12 +287,12 @@ if($rechte->isBerechtigt('admin',0))
 	    echo '<tr><td>Sprache</td><td><select name="sprache">';
 	
 		$qry1="SELECT * FROM public.tbl_sprache";
-		if(!$result1=pg_query($conn,$qry1))
+		if(!$result1=$db->db_query($qry1))
 		{
 			die( "Fehler bei der DB-Connection");
 		}
 	
-		while($row1=pg_fetch_object($result1))
+		while($row1=$db->db_fetch_object($result1))
 		{
 		   if($row1->sprache==$lf->sprache)
 		      echo "<option value='$row1->sprache' selected>$row1->sprache</option>";
@@ -358,10 +368,10 @@ if($rechte->isBerechtigt('admin',0))
 	    echo '<tr><td>Sprache</td><td><select name="sprache">';
 	
 		$qry1="SELECT * FROM public.tbl_sprache";
-		if(!$result1=pg_query($conn,$qry1))
+		if(!$result1=$db->db_query($qry1))
 			die( 'Fehler bei der DB-Connection');
 	
-		while($row1=pg_fetch_object($result1))
+		while($row1=$db->db_fetch_object($result1))
 		   echo "<option value='$row1->sprache'>$row1->sprache</option>";
 	
 		echo '</select></td></tr>	</table>';
@@ -400,14 +410,14 @@ if(!isset($_GET['type']))
 				ORDER BY tbl_lehrfach.kurzbz, tbl_lehrfach.lehrfach_id";
 	
 	//echo $sql_query;
-	$result_lehrfach=pg_query($conn, $sql_query);
-	if(!$result_lehrfach) error("Lehrfach not found!");
+	if(!$result_lehrfach=$db->db_query($sql_query))
+		 error("Lehrfach not found!");
 
 
 	if ($result_lehrfach!=0)
 	{
 		echo '
-		<h3>&Uuml;bersicht - '.pg_num_rows($result_lehrfach).' Einträge</h3>
+		<h3>&Uuml;bersicht - '.$db->db_num_rows($result_lehrfach).' Einträge</h3>
 		<table class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
 		<thead>';
 		
@@ -427,10 +437,10 @@ if(!isset($_GET['type']))
 		</thead>
 		<tbody>";
 		
-		$num_rows=pg_num_rows($result_lehrfach);
+		$num_rows=$db->db_num_rows($result_lehrfach);
 		for($i=0;$i<$num_rows;$i++)
 		{
-		   $row=pg_fetch_object($result_lehrfach);
+		   $row=$db->db_fetch_object($result_lehrfach);
 		   echo "
 			<tr>
 				<td>$row->nummer</td>

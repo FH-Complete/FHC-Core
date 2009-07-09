@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/person.class.php');
@@ -33,26 +38,22 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/nation.class.php');
 
 
-if(!$conn=pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Connection');
-
 $user=get_uid();
 $datum_obj = new datum();
 
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 function getGemeindeDropDown($postleitzahl)
 {
-	global $conn, $_REQUEST, $gemeinde;
+	global $db, $_REQUEST, $gemeinde;
 	$found=false;
 	$firstentry='';
 	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
 	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($firstentry=='')
 				$firstentry=$row->name;
@@ -88,14 +89,14 @@ if(isset($_GET['type']) && $_GET['type']=='getgemeindecontent' && isset($_GET['p
 
 function getOrtDropDown($postleitzahl, $gemeindename)
 {
-	global $conn, $_REQUEST;
+	global $db, $_REQUEST;
 	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
 	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
 			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
 	echo '<SELECT id="ort" name="ort">';
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($row->ortschaftsname==$ort)
 				$selected='selected';
@@ -362,7 +363,7 @@ $svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsem->getNextStudiensemester('WS');
 $studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:$stsem->studiensemester_kurzbz);
 
@@ -386,8 +387,8 @@ if(isset($_POST['save']))
 	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort |
 	//		Email: $email | Telefon: $telefon | Mobil: $mobil | Letzteausbildung: $letzteausbildung | ausbildungsart: $ausbildungsart |
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
-	$person = new person($conn);
-	pg_query($conn, 'BEGIN');
+	$person = new person();
+	$db->db_query('BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Sonst nicht
 	if($person_id=='0')
@@ -431,7 +432,7 @@ if(isset($_POST['save']))
 		if($person_id=='0')
 			$ueberschreiben='Nein';
 
-		$adr = new adresse($conn);
+		$adr = new adresse();
 		//Adresse neu anlegen
 		if($ueberschreiben=='Nein')
 		{
@@ -502,7 +503,7 @@ if(isset($_POST['save']))
 		//EMail Adresse speichern
 		if($email!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'email';
 			$kontakt->kontakt = $email;
@@ -520,7 +521,7 @@ if(isset($_POST['save']))
 		//Telefonnummer speichern
 		if($telefon!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'telefon';
 			$kontakt->kontakt = $telefon;
@@ -538,7 +539,7 @@ if(isset($_POST['save']))
 		//Mobiltelefonnummer speichern
 		if($mobil!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'mobil';
 			$kontakt->kontakt = $mobil;
@@ -557,7 +558,7 @@ if(isset($_POST['save']))
 
 	if(!$error)
 	{
-		$preinteressent = new preinteressent($conn);
+		$preinteressent = new preinteressent();
 		
 		$preinteressent->person_id = $person->person_id;
 		$preinteressent->studiensemester_kurzbz = $studiensemester_kurzbz;
@@ -580,7 +581,7 @@ if(isset($_POST['save']))
 				if(substr($key,0,4)=='stg_')
 				{
 					$stg_kz = substr($key, 4);
-					$zuordnung = new preinteressent($conn);
+					$zuordnung = new preinteressent();
 					$zuordnung->preinteressent_id = $preinteressent->preinteressent_id;
 					$zuordnung->studiengang_kz = $stg_kz;
 					$zuordnung->prioritaet = 1;
@@ -598,7 +599,7 @@ if(isset($_POST['save']))
 	}
 	if(!$error)
 	{
-		pg_query($conn, 'COMMIT');
+		$db->db_query('COMMIT');
 		/*<script language='Javascript'>
 				window.opener.StudentProjektbetreuerMenulistPersonLoad(window.opener.document.getElementById('student-projektbetreuer-menulist-person'), '$nachname');
 				window.opener.MenulistSelectItemOnValue('student-projektbetreuer-menulist-person', $person->person_id);
@@ -607,7 +608,7 @@ if(isset($_POST['save']))
 	}
 	else
 	{
-		pg_query($conn, 'ROLLBACK');
+		$db->db_query('ROLLBACK');
 		echo '<span class="error">'.$errormsg.'</span>';
 	}
 }
@@ -656,9 +657,9 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Staatsbuergerschaft</td><td><SELECT name="nation">';
 $qry = "SELECT nation_code, kurztext FROM bis.tbl_nation ORDER BY kurztext";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($row->nation_code==$nation)
 			$selected='selected';
@@ -675,7 +676,7 @@ echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen
 echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
-$nation =  new nation($conn);
+$nation =  new nation();
 $nation->getAll();
 foreach ($nation->nation as $row)
 {
@@ -725,7 +726,7 @@ echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" na
 echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="mobil" value="'.$mobil.'" /></td></tr>';
 //Preinteressentdaten
 echo '<tr><td>Studiensemester: </td><td><SELECT name="studiensemester_kurzbz">';
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 
 $stsem->getAll();
 if($studiensemester_kurzbz=='')
@@ -760,9 +761,9 @@ function shortname($name)
 		return $name;
 }
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($schule==$row->firma_id)
 			$selected='selected';
@@ -828,13 +829,13 @@ if($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		$stg_obj = new studiengang($conn);
+		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz', false);
 		
 		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
 			
@@ -843,9 +844,9 @@ if($where!='')
 							SELECT (get_rolle_prestudent(prestudent_id, null) || ' ' || UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz)) as rolle FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE person_id='$row->person_id'
 							UNION
 							SELECT 'PreInteressent' as rolle FROM public.tbl_preinteressent WHERE person_id='$row->person_id'";
-			if($result_stati = pg_query($conn, $qry_stati))
+			if($result_stati = $db->db_query($qry_stati))
 			{
-				while($row_stati=pg_fetch_object($result_stati))
+				while($row_stati=$db->db_fetch_object($result_stati))
 				{
 					if (!empty($status))
 							$status.=', ';
@@ -856,8 +857,8 @@ if($where!='')
 			
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
-			if($result_adr = pg_query($conn, $qry_adr))
-				while($row_adr=pg_fetch_object($result_adr))
+			if($result_adr = $db->db_query($qry_adr))
+				while($row_adr=$db->db_fetch_object($result_adr))
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo '</td>';
 			echo "<td>$status</td>";
@@ -870,12 +871,12 @@ if($where!='')
 		//Studiengaenge anzeigen
 		$qry = "SELECT *, UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang 
 				WHERE aktiv AND typ in('b','m') ORDER BY typ, bezeichnung";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			echo '<table><tr><td valign="top">';
 			echo '<table>';
 			$lasttyp='';
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				if($lasttyp!=$row->typ)
 				{
@@ -887,13 +888,6 @@ if($where!='')
 			}
 			echo '</table></td></tr></table>';
 		}
-
-		/*
-		foreach ($studiengang->result as $row)
-		{
-			echo "<tr><td><input type='checkbox' name='stg_$row->studiengang_kz'></td><td>$row->kuerzel</td><td>$row->bezeichnung</td></tr>";
-		}*/
-		
 	}
 }
 else

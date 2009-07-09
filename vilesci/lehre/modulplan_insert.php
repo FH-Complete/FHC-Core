@@ -1,16 +1,40 @@
 <?php
-	include('../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	
-	$conn=pg_connect(CONN_STRING);
+
 	$sql_query="SELECT id, kurzbz FROM einheit ORDER BY kurzbz";
-	$result_einheit=pg_exec($conn, $sql_query);
-	if(!$result_einheit) error("Einheit not found!");
+	$result_einheit=$db->db_query($sql_query);
+	if(!$result_einheit) die("Einheit not found! ".$db->db_last_error());
 	$sql_query="SELECT id, kurzbz FROM lehrfach ORDER BY kurzbz";
-	$result_lehrf=pg_exec($conn, $sql_query);
-	if(!$result_lehrf) error("Lehrfach not found!");
+	$result_lehrf=$db->db_query($sql_query);
+	if(!$result_lehrf) die("Lehrfach not found! ".$db->db_last_error());
 	$sql_query="SELECT id, kurzbz FROM ort ORDER BY kurzbz";
-	$result_ort=pg_exec($conn, $sql_query);
-	if(!$result_ort) error("Ort not found!");
+	$result_ort=$db->db_query($sql_query);
+	if(!$result_ort) die("Ort not found! ".$db->db_last_error());
 	if (!isset($einheitid))
 		$einheitid=1;
 	if (!isset($lehrfachid))
@@ -43,10 +67,10 @@
   <p>Einheit 
     <select name="einheitid">
       <?php
-		$num_rows=pg_numrows($result_einheit);
+		$num_rows=$db->db_num_rows($result_einheit);
 		for ($i=0;$i<$num_rows;$i++) 
 		{
-			$row=pg_fetch_object ($result_einheit, $i);
+			$row=$db->db_fetch_object ($result_einheit, $i);
 			if ($stgid==$row->id)
 				echo "<option value=\"$row->id\" selected>$row->kurzbz</option>";
 			else
@@ -57,10 +81,10 @@
     Lehrfach 
     <select name="lehrfachid">
       <?php
-		$num_rows=pg_numrows($result_lehrf);
+		$num_rows=$db->db_num_rows($result_lehrf);
 		for ($i=0;$i<$num_rows;$i++) 
 		{
-			$row=pg_fetch_object ($result_lehrf, $i);
+			$row=$db->db_fetch_object ($result_lehrf, $i);
 			if ($lehrfachid==$row->id)
 				echo "<option value=\"$row->id\" selected>$row->kurzbz</option>";
 			else
@@ -71,10 +95,10 @@
     Ort 
     <select name="ortid">
       <?php
-		$num_rows=pg_numrows($result_ort);
+		$num_rows=$db->db_num_rows($result_ort);
 		for ($i=0;$i<$num_rows;$i++) 
 		{
-			$row=pg_fetch_object ($result_ort, $i);
+			$row=$db->db_fetch_object ($result_ort, $i);
 			if ($ortid==$row->id)
 				echo "<option value=\"$row->id\" selected>$row->kurzbz</option>";
 			else
@@ -127,8 +151,8 @@ if ($type=="save")
 			$datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
 		$sql_query="SELECT id FROM stundenplan WHERE datum='$datum' AND stunde_id='$std' AND ort_id='$ortid'";
-		$result=pg_exec($conn, $sql_query);
-		if($result && (pg_numrows($result)>0)) 
+		$result=$db->db_query($sql_query);
+		if($result && ($db->db_num_rows($result)>0)) 
 		{
 			echo "error!<br>Doppelbelegung gefunden auf Ort=$ortid Datum=$datum Stunde=$stunde!<br>";
 			$error=true;
@@ -147,8 +171,8 @@ if ($type=="save")
 			$datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
 		$sql_query="SELECT id FROM stundenplan WHERE datum='$datum' AND stunde_id='$std' AND lehrfach_id='$lehrfachid'";
-		$result=pg_exec($conn, $sql_query);
-		if($result && (pg_numrows($result)>0)) 
+		$result=$db->db_query($sql_query);
+		if($result && ($db->db_num_rows($result)>0)) 
 		{
 			echo "error!<br>Doppelbelegung gefunden auf Lehrfach=$lehrfachid Datum=$datum Stunde=$stunde!<br>";
 			$error=true;
@@ -168,8 +192,8 @@ if ($type=="save")
 			$datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
 		$sql_query="SELECT id FROM einheiten WHERE datum='$datum' AND stunde_id='$std' AND ort_id='$ortid'";
-		$result=pg_exec($conn, $sql_query);
-		if($result && (pg_numrows($result)>0)) 
+		$result=$db->db_query($sql_query);
+		if($result && ($db->db_num_rows($result)>0)) 
 		{
 			echo "error!<br>Doppelbelegung gefunden im Einheitenplan auf Ort=$ortid Datum=$datum Stunde=$stunde!<br>";
 			$error=true;
@@ -188,8 +212,8 @@ if ($type=="save")
 			$datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
 		$sql_query="SELECT id FROM einheitenplan WHERE datum='$datum' AND stunde_id='$std' AND lehrfach_id='$lehrfachid'";
-		$result=pg_exec($conn, $sql_query);
-		if($result && (pg_numrows($result)>0)) 
+		$result=$db->db_query($sql_query);
+		if($result && ($db->db_num_rows($result)>0)) 
 		{
 			echo "error!<br>Doppelbelegung gefunden im Einheitenplan auf Lehrfach=$lehrfachid Datum=$datum Stunde=$stunde!<br>";
 			$error=true;
@@ -213,10 +237,10 @@ if ($type=="save")
 			}
 			$sql_query="INSERT INTO einheitenplan (einheit_id, lehrfach_id, ort_id, datum, stunde_id) VALUES ('$einheitid', '$lehrfachid', '$ortid', '$datum', '$std')";
 			//echo $sql_query;
-			$result=pg_exec($conn, $sql_query);
+			$result=$db->db_query($sql_query);
 			if(!$result) 
 			{
-				echo pg_errormessage()."<br>";
+				echo $db->db_last_error()."<br>";
 				$error=true;
 			}
 			else

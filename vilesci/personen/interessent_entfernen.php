@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2008 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,16 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Author: Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+ 
 /*
 Entfernen (doppelter) Interessenten
 */
-require_once('../config.inc.php');
-require_once('../../include/functions.inc.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require_once('../../include/functions.inc.php');
+
 
 function myaddslashes($var)
 {
@@ -37,7 +45,7 @@ $msg='';
 //prestudent_id
 if (isset($_GET['prestudent']) || isset($_POST['prestudent']))
 {
-	$prestudent_id=(isset($_GET['prestudent'])?$_GET['prestudent']:$_POST['prestudent']);
+	$prestudent=(isset($_GET['prestudent'])?$_GET['prestudent']:$_POST['prestudent']);
 }
 else 
 {
@@ -56,14 +64,14 @@ else
 if($person!='' && $prestudent!='')
 {
 	$qry="SELECT * FROM public.tbl_prestudent WHERE person_id=".$person.";";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if(pg_num_rows($result)>1)
+		if($db->db_num_rows($result)>1)
 		{
 			$q2="SELECT * FROM public.tbl_prestudent WHERE person_id=".$person." AND prestudent_id=".$prestudent.";";
-			if($result2 = pg_query($conn, $q2))
+			if($result2 = $db->db_query($q2))
 			{
-				if(pg_num_rows($result2)<1)
+				if($db->db_num_rows($result2)<1)
 				{
 					//kein prestudent mit eingegebener person_id und prestudent_id gefunden
 					$msg="Die Eingaben passen nicht zusammen!";
@@ -71,13 +79,13 @@ if($person!='' && $prestudent!='')
 				else 
 				{
 					$q3="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';";
-					if($result3 = pg_query($conn, $q3))
+					if($result3 = $db->db_query($q3))
 					{
-						if(pg_num_rows($result3)==1)
+						if($db->db_num_rows($result3)==1)
 						{
 							//mehrere prestudenten an diesem studenten => nur prestudentrolle und prestudent werden gelöscht
 							$del="DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";";
-							if(pg_query($conn, $del))
+							if($db->db_query($del))
 							{
 								$msg="Prestudent mit ID ".$prestudent." und Prestudentrolle Interessent entfernt.<br>".mb_eregi_replace(";DELETE",";<br>DELETE",$del);
 							}
@@ -95,20 +103,20 @@ if($person!='' && $prestudent!='')
 				}	
 			}
 		}
-		elseif(pg_num_rows($result)==1)
+		elseif($db->db_num_rows($result)==1)
 		{
-			if($row = pg_fetch_object($result))
+			if($row = $db->db_fetch_object($result))
 			{
 				if($row->prestudent_id==$prestudent)
 				{
 					$q3="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';";
-					if($result3 = pg_query($conn, $q3))
+					if($result3 = $db->db_query($q3))
 					{
-						if(pg_num_rows($result3)==1)
+						if($db->db_num_rows($result3)==1)
 						{
 							//löschen von prestudentrolle, prestudent, adresse, kontakt und person werden gelöscht
 							$del="DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id=".$prestudent." AND status_kurzbz='Interessent';DELETE FROM public.tbl_prestudent WHERE prestudent_id=".$prestudent.";DELETE FROM public.tbl_adresse WHERE person_id=".$person.";DELETE FROM public.tbl_kontakt WHERE person_id=".$person.";DELETE FROM public.tbl_person WHERE person_id=".$person.";";
-							if(pg_query($conn, $del))
+							if($db->db_query($del))
 							{
 								$msg="Prestudent mit ID ".$prestudent." und Person mit ID ".$person." entfernt.<br>".mb_eregi_replace(";DELETE",";<br>DELETE",$del);	
 							}
@@ -169,7 +177,7 @@ echo "</table></form>";
 ?>
 <br>
 <center><h2><?php echo "<span style=\"font-size:0.7em\">".
-substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7).": ".
+#substr(CONN_STRING,strpos(CONN_STRING,'dbname=')+7,strpos(CONN_STRING,'user=')-strpos(CONN_STRING,'dbname=')-7).": ".
 $msg."</span>"; ?></h2></center>
 <br>
 

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,28 +15,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+ 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
-$user = get_uid();
+	if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	
 
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('support'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die('Sie haben keine Berechtigung fuer diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
    
 echo '<html>
 	<head>
@@ -64,7 +69,7 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 	if(isset($_GET['betriebsmittel_id']) && is_numeric($_GET['betriebsmittel_id'])
 	   && isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	{
-		$bmp = new betriebsmittelperson($conn);
+		$bmp = new betriebsmittelperson();
 		if($bmp->delete($_GET['betriebsmittel_id'], $_GET['person_id']))
 			echo '<b>Datensatz wurde geloescht</b>';
 		else 
@@ -91,7 +96,7 @@ if($search!='')
 			JOIN public.tbl_person USING(person_id) 
 			LEFT JOIN public.tbl_benutzer USING(person_id) 
 			WHERE nummer='".addslashes($search)."' OR uid='".addslashes($search)."'";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo "<b>Datenbank Result</b><br><table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
 				<thead>
@@ -110,7 +115,7 @@ if($search!='')
 		echo '</tr></thead>';
 		echo '<tbody>';
 		
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo "<tr>";
 			echo "<td>$row->nummer</td>";
@@ -123,9 +128,9 @@ if($search!='')
 			echo "<td>";
 			//Alle UIDs zu dieser Person suchen
 			$qry_uid = "SELECT uid FROM public.tbl_benutzer WHERE person_id='$row->person_id'";
-			if($result_uid = pg_query($conn, $qry_uid))
+			if($result_uid = $db->db_query($qry_uid))
 			{
-				while($row_uid = pg_fetch_object($result_uid))
+				while($row_uid = $db->db_fetch_object($result_uid))
 				{
 					echo "<a href='personen_details.php?uid=$row_uid->uid' target='_top'>$row_uid->uid</a><br>";
 				}
@@ -145,12 +150,12 @@ if($search!='')
 	//Suche im LDAP
 	
 	// LDAP Verbindung herstellen
-	$ds=ldap_connect(LDAP_SERVER);
+	if (!$ds=ldap_connect(LDAP_SERVER))
+			die('Keine Verbindung zum LDAP '.LDAP_SERVER);
 	
-	if ($ds)
-		$r=ldap_bind($ds);     // this is an "anonymous" bind, typically
-	else
-	    echo "<h4>Unable to connect to LDAP server</h4>";
+	if (!$r=@ldap_bind($ds))     // this is an "anonymous" bind, typically
+	    die("<h4>Unable to connect to LDAP server! ".LDAP_SERVER."</h4>");
+	
 	
 	if(is_numeric($search))
     	$sr=ldap_search($ds, "ou=People, dc=technikum-wien, dc=at", "departmentNumber=".$search);

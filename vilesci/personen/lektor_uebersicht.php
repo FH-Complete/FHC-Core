@@ -1,15 +1,42 @@
 <?php
-	require_once('../config.inc.php');
-	require_once('../../include/functions.inc.php');
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		include('../../include/functions.inc.php');
+
+
+	foreach ($_REQUEST as $key => $value) 
+	{
+			 $key=$value; 
+	}
 	if(isset($_GET['uid']) && isset($_GET['del']))
 	{
 		//$sql_query = "Delete from tbl_person where uid='".$_GET["uid"]."';";
 		//echo $sql_query;
-		//if(!pg_exec($conn,$sql_query))
-		//   echo "Fehler beim löschen: möglicherweise besteht noch eine Referenz zu einer anderen Tabelle<br>";
 		echo 'Loeschen noch nicht implementiert';
 	}
 
@@ -17,14 +44,17 @@
 	{
 		$sql_query = "UPDATE public.tbl_mitarbeiter SET fixangestellt=". ($_GET['fix']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
 		//echo $sql_query;
-		pg_query($conn,$sql_query);
-	}
+		if(!($erg=$db->db_query($sql_query)))
+			die($db->db_last_error());
+		}
 
 	if(isset($_GET['lek']) && isset($_GET['uid']))
 	{
 		$sql_query = "UPDATE public.tbl_mitarbeiter SET lektor=". ($_GET['lek']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
 		//echo $sql_query;
-		pg_query($conn,$sql_query);
+		if(!($erg=$db->db_query($sql_query)))
+				die($db->db_last_error());
+
 	}
 ?>
 <html>
@@ -53,12 +83,12 @@ function confdel()
 	else
 		$qry .= " ORDER BY nachname, vorname";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo "<table class='liste'>";
 		echo "<tr class='liste'><th><a href='lektor_uebersicht.php?order=uid'>UID</a></th><th>Titel</th><th>Vorname</th><th><a href='lektor_uebersicht.php?order=nachname'>Nachname</a></th><th><a href='lektor_uebersicht.php?order=fixangestellt DESC, nachname'>Fix</a></th><th>Lkt</th><th>Raum</th><th>Standort</th><th>Tel</th><th>eMail</th><th colspan='3'>Aktion</th></tr>";
 
-		for ($i=0; $row=pg_fetch_object($result); $i++)
+		for ($i=0; $row=$db->db_fetch_object($result); $i++)
 		{
 			echo "<tr class='liste". ($i%2) ."'>";
 			if((isset($fix) || isset($lek))&& isset($uid) && $uid==$row->uid) //Anker setzen
@@ -93,7 +123,7 @@ function confdel()
 		echo "</table>";
 	}
 	else
-		echo "Fehler beim laden der Mitarbeiter: ".pg_errormessage($conn);
+		echo "Fehler beim laden der Mitarbeiter: ".$db->db_last_error();
 
 	if(isset($_GET['fix']) || isset($_GET['lek'])) //Zum Anker hüpfen
 	{

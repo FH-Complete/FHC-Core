@@ -15,25 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../../vilesci/config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
-
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
-$fb_obj = new fachbereich($conn);
+$fb_obj = new fachbereich();
 $fb_obj->getAll();
 
 $rechte = new benutzerberechtigung();
@@ -52,7 +54,7 @@ echo '
 		<body class="Background_main">
 		<h2>Liste der MitarbeiterInnen der Institute an der Fachhochschule Technikum Wien</h2>';
 
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $ws = $stsem->getNearest(1);
 $ss = $stsem->getNearest(2);
 
@@ -112,7 +114,7 @@ $qry = "SELECT
 			JOIN public.tbl_person USING(person_id) 
 		WHERE tbl_benutzer.aktiv $where";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	echo "<br><br><table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
@@ -139,7 +141,7 @@ if($result = pg_query($conn, $qry))
 				</thead>
 				<tbody>";
 
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '<tr>';
 		echo "<td>$row->nachname</td>";
@@ -151,8 +153,8 @@ if($result = pg_query($conn, $qry))
 		echo '<td>';
 		$qry = "SELECT distinct studiengang_kz FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE mitarbeiter_uid='$row->mitarbeiter_uid' AND studiensemester_kurzbz in('$ss', '$ws')";
 		$text='';
-		if($result_stg = pg_query($conn, $qry))
-			while($row_stg = pg_fetch_object($result_stg))
+		if($result_stg = $db->db_query($qry))
+			while($row_stg = $db->db_fetch_object($result_stg))
 				$text.= $stg_obj->kuerzel_arr[$row_stg->studiengang_kz].', ';
 		echo mb_substr($text, 0, mb_strlen($text)-2);
 		echo '</td>';
@@ -160,8 +162,8 @@ if($result = pg_query($conn, $qry))
 		echo "<td>";
 		$qry = "SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE mitarbeiter_uid='$row->mitarbeiter_uid' AND studiensemester_kurzbz in('$ss', '$ws')";
 		$text='';
-		if($result_fb = pg_query($conn, $qry))
-			while($row_fb = pg_fetch_object($result_fb))
+		if($result_fb = $db->db_query($qry))
+			while($row_fb = $db->db_fetch_object($result_fb))
 				$text.= $fb_obj->bezeichnung_arr[$row_fb->fachbereich_kurzbz].', ';
 		echo mb_substr($text, 0, mb_strlen($text)-2);
 		echo "</td>";

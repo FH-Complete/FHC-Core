@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,14 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
- 
- 
-require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -38,16 +41,13 @@ require_once('../../include/mail.class.php');
 
 
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
-   
 $user = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $datum_obj = new datum();
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsem_aktuell = $stsem->getaktorNext();
 
 $selection = (isset($_GET['selection'])?$_GET['selection']:'preinteressent');
@@ -58,7 +58,7 @@ if(isset($_GET['type']) && $_GET['type']=='firmenrequest')
 {
 	header('Content-Type: text/html; charset=UTF-8');
 	$firmentyp_kurzbz = (isset($_GET['firmentyp_kurzbz'])?$_GET['firmentyp_kurzbz']:'');
-	$firma = new firma($conn);
+	$firma = new firma();
 	$firma->getFirmen($firmentyp_kurzbz);
 	echo " -- keine Angabe --\n";
 	foreach ($firma->result as $row)
@@ -287,12 +287,12 @@ else
 	die('<h2>Details</h2>');
 	
 	
-$preinteressent = new preinteressent($conn);
+$preinteressent = new preinteressent();
 
 if(!$preinteressent->load($id))
 	die('Datensatz konnte nicht geladen werden');
 	
-$person = new person($conn);
+$person = new person();
 if(!$person->load($preinteressent->person_id))
 	die('Personen Datensatz konnte nicht geladen werden');
 
@@ -364,7 +364,7 @@ if(isset($_POST['saveperson']))
 if(isset($_GET['action']) && $_GET['action']=='neuezuordnung')
 {
 	//speichern einer neue Studiengangszuordnung
-	$zuordnung = new preinteressent($conn);
+	$zuordnung = new preinteressent();
 
 	if(!$zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_POST['studiengang_kz']))
 	{
@@ -384,7 +384,7 @@ if(isset($_GET['action']) && $_GET['action']=='neuezuordnung')
 if(isset($_GET['savezuordnung']))
 {
 	//bestehende Zuordnung speichern
-	$zuordnung = new preinteressent($conn);	
+	$zuordnung = new preinteressent();	
 	
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 	{
@@ -404,7 +404,7 @@ if(isset($_POST['freigabe']))
 	if($preinteressent->studiensemester_kurzbz!='')
 	{
 		//freigabe einer zuordnung
-		$zuordnung = new preinteressent($conn);
+		$zuordnung = new preinteressent();
 		if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 		{
 			if($zuordnung->freigabedatum=='')
@@ -422,10 +422,10 @@ if(isset($_POST['freigabe']))
 									FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
 									WHERE preinteressent_id='$preinteressent->preinteressent_id'";
 					$name='';
-					if($result_person = pg_query($conn, $qry_person))
-						if($row_person = pg_fetch_object($result_person))
+					if($result_person = $db->db_query($qry_person))
+						if($row_person = $db->db_fetch_object($result_person))
 							$name = $row_person->nachname.' '.$row_person->vorname;
-					$stg_obj = new studiengang($conn);
+					$stg_obj = new studiengang();
 					$stg_obj->load($zuordnung->studiengang_kz);
 					$to = $stg_obj->email;
 					//$to = 'oesi@technikum-wien.at';
@@ -458,7 +458,7 @@ if(isset($_POST['freigabe']))
 if(isset($_POST['freigabe_rueckgaengig']))
 {
 	//studiengangsfreigabe zurueckziehen
-	$zuordnung = new preinteressent($conn);
+	$zuordnung = new preinteressent();
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 	{
 		if($zuordnung->freigabedatum!='')
@@ -488,7 +488,7 @@ if(isset($_POST['freigabe_rueckgaengig']))
 if(isset($_POST['zuordnungloeschen']))
 {
 	//zuordnung zu einem studiengang loeschen
-	$zuordnung = new preinteressent($conn);
+	$zuordnung = new preinteressent();
 	if($zuordnung->loadZuordnung($preinteressent->preinteressent_id, $_GET['studiengang_kz']))
 	{
 		if($zuordnung->uebernahmedatum=='')
@@ -518,9 +518,9 @@ $disabled=true;
 $qry = "SELECT count(*) as anzahl FROM (
 		SELECT 1 FROM public.tbl_prestudent WHERE person_id='$person->person_id' UNION 
 		SELECT 1 FROM public.tbl_benutzer WHERE person_id='$person->person_id') as foo";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if($row = pg_fetch_object($result))
+	if($row = $db->db_fetch_object($result))
 	{
 		if($row->anzahl==0)
 			$disabled=false;
@@ -561,7 +561,7 @@ echo '</tr><tr>';
 //Staatsbuergerschaft
 echo "<td>Staatsb&uuml;rgerschaft:</td><td><SELECT ".($disabled?'disabled':'')." name='staatsbuergerschaft'>";
 echo "<option value=''>-- Keine Auswahl --</option>";
-$nation = new nation($conn);
+$nation = new nation();
 $nation->getAll();
 
 foreach ($nation->nation as $row)
@@ -578,7 +578,7 @@ echo "</td>";
 //Geburtsnation
 echo "<td>Geburtsnation:</td><td><SELECT ".($disabled?'disabled':'')." name='geburtsnation'>";
 echo "<option value=''>-- Keine Auswahl --</option>";
-$nation = new nation($conn);
+$nation = new nation();
 $nation->getAll();
 
 foreach ($nation->nation as $row)
@@ -596,9 +596,9 @@ echo "</td>";
 echo "<td>Sprache:</td><td><SELECT ".($disabled?'disabled':'')." name='sprache'>";
 echo "<option value=''>-- keine Auswahl --</option>";
 $qry = "SELECT * FROM public.tbl_sprache ORDER BY sprache";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($row->sprache==$person->sprache)
 			$selected='selected';
@@ -650,7 +650,7 @@ echo '<table width="100%" ><tr>';
 
 //STUDIENSEMESTER
 echo "<td>Studiensemester:</td><td><SELECT name='studiensemester_kurzbz'>";
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsem->getAll();
 echo "<option value='' >-- offen --</option>";
 foreach ($stsem->studiensemester as $row)
@@ -668,7 +668,7 @@ echo '</td>';
 
 //AUFMERKSAMDURCH
 echo "<td>Aufmerksam durch:</td><td> <SELECT name='aufmerksamdurch_kurzbz'>";
-$aufmerksam = new aufmerksamdurch($conn);
+$aufmerksam = new aufmerksamdurch();
 $aufmerksam->getAll('beschreibung');
 foreach ($aufmerksam->result as $row)
 {
@@ -687,9 +687,9 @@ echo "<td>Kontaktmedium (Woher)</td><td><SELECT name='kontaktmedium_kurzbz'>";
 echo "<option value=''>-- keine Auswahl --</option>";
 $qry = "SELECT * FROM public.tbl_kontaktmedium ORDER BY beschreibung";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($preinteressent->kontaktmedium_kurzbz==$row->kontaktmedium_kurzbz)
 			$selected='selected';
@@ -721,25 +721,10 @@ echo "<td>Einverst&auml;ndnis:</td><td><input type='checkbox' ".($preinteressent
 
 echo '</tr><tr>';
 
-$schule = new firma($conn);
+$schule = new firma();
 if($preinteressent->firma_id!='')
 	$schule->load($preinteressent->firma_id);
-	/*
-//SCHULTYP
-echo "<td>Schultyp:</td><td> <SELECT name='schultyp' id='schultyp' onchange='reloadSchulen()'>";
-echo "<option value=''>-- Alle --</option>";
-$firmentyp = new firma($conn);
-$firmentyp->getFirmenTypen();
-foreach ($firmentyp->result as $row)
-{
-	if($row->firmentyp_kurzbz==$schule->firmentyp_kurzbz)
-		$selected='selected';
-	else
-		$selected='';
-		
-	echo "<option value='$row->firmentyp_kurzbz' $selected>$row->beschreibung</option>";
-}
-echo "</SELECT></td>";*/
+
 echo '<td>Schule ID:</td><td><input type="text" size="3" name="schule_id" id="schule_id" value="'.$preinteressent->firma_id.'" onkeyup="checkschulid(this.value)"></td>';
 
 //SCHULE
@@ -758,9 +743,9 @@ function shortname($name)
 	else 
 		return $name;
 }
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($row->firma_id==$preinteressent->firma_id)
 			$selected='selected';
@@ -800,7 +785,7 @@ echo "</div>";
 echo "<div id='studiengangszuordnung' style='display: ".($selection=='studiengangszuordnung'?'block':'none')."'>";
 
 echo '<table class="liste table-stripeclass:alternate table-autostripe"><tr><th>Studiengang</th><th>Priorit&auml;t</th><th>Freigabe</th><th>&Uuml;bernahme</th><th colspan="2">Aktion</th></tr>';
-$zuordnung = new preinteressent($conn);
+$zuordnung = new preinteressent();
 $zuordnung->loadZuordnungen($preinteressent->preinteressent_id);
 
 foreach ($zuordnung->result as $row)
@@ -808,7 +793,7 @@ foreach ($zuordnung->result as $row)
 	echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?id=$preinteressent->preinteressent_id&studiengang_kz=$row->studiengang_kz&selection=studiengangszuordnung' method='POST'>";
 	echo '<tr>';
 	echo '<td>';
-	$studiengang = new studiengang($conn);
+	$studiengang = new studiengang();
 	$studiengang->load($row->studiengang_kz);
 	echo "$studiengang->kuerzel - $studiengang->bezeichnung";
 	echo '</td>';
@@ -824,9 +809,9 @@ foreach ($zuordnung->result as $row)
 	if($row->freigabedatum=='')
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE person_id='$person->person_id' AND studiengang_kz='$row->studiengang_kz'";
-		if($result_check = pg_query($conn, $qry))
+		if($result_check = $db->db_query($qry))
 		{
-			if($row_check = pg_fetch_object($result_check))
+			if($row_check = $db->db_fetch_object($result_check))
 			{
 				if($row_check->anzahl==0)
 				{
@@ -873,7 +858,7 @@ echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?id=$preinter
 echo '<tr>';
 echo '<td>';
 echo '<SELECT name="studiengang_kz">';
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 
 foreach ($studiengang->result as $rowstg)

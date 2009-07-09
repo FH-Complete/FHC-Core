@@ -15,20 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+ 
+ 
+ 
 /*
  * Fuehrt eine Kollisionspruefung im Stundenplan auf Studentenebene durch
  */
-require_once('../config.inc.php');
-require_once('../../include/studiensemester.class.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/studiengang.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+			
+	require_once('../../include/studiensemester.class.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/studiengang.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $beginn = (isset($_GET['beginn'])?$_GET['beginn']:'');
 $ende = (isset($_GET['ende'])?$_GET['ende']:'');
@@ -36,7 +43,6 @@ $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $dontloadcontent=false;
 
 $user = get_uid();
-#gss loadVariables($conn, $user);
 loadVariables($user);
 if (empty($db_stpl_table))
 	die("Bitte die Variablenwarten! db_stpl_table ist leer");
@@ -64,7 +70,7 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 
 if($beginn=='' || $ende=='')
 {
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem_akt = $stsem_obj->getaktorNext();
 	$stsem_obj->load($stsem_akt);
 	
@@ -75,7 +81,7 @@ if($beginn=='' || $ende=='')
 
 echo 'Studiensemester <SELECT name="studiensemester_kurzbz" onchange="changeStudiensemester(this)">';
 echo "<option value='' beginn='' ende=''>-- Auswahl --</option>";
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->getAll();
 
 foreach($stsem_obj->studiensemester as $stsem)
@@ -93,7 +99,7 @@ echo '</SELECT>';
 echo " Beginn <INPUT type='text' size='10' id='beginn' name='beginn' value='$beginn'>";
 echo " Ende <INPUT type='text' size='10' id='ende' name='ende' value='$ende'>";
 
-$stg = new studiengang($conn);
+$stg = new studiengang();
 $stg->getAll('typ, kurzbzlang', true);
 echo ' Studiengang <SELECT name="stg_kz">';
 echo '<option value="">-- Alle --</option>';
@@ -149,9 +155,9 @@ echo '<tr class="liste">
 	 </thead>
 	 <tbody>';
 	 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo "<tr>";
 		echo "<td class='table-sortable:default' align='center'>$row->datum</td>";
@@ -165,7 +171,7 @@ if($result = pg_query($conn, $qry))
 }
 
 echo '</tbody></table>';
-if(pg_num_rows($result)>=30)
+if($result && $db->db_num_rows($result)>=30)
 	echo 'Info: Es werden nur die ersten 30 Eintr&auml;ge angezeigt!';
 echo '</body></html';
 ?>

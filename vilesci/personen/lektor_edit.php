@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -35,17 +40,14 @@ echo '
 </head>
 <body class="background_main">';
 
-if(!$conn = pg_pconnect(CONN_STRING))
-       die ('Fehler beim Herstellen der DB Connection');
-
 	if (isset($_POST['Save']))
 	{
-		if(doSAVE($conn))
+		if(doSAVE())
 			echo "<script language='Javascript'>window.location.href='lektor_uebersicht.php';</script>";
 	}
 	else if (isset($_GET['new']))
 	{
-		doEDIT($conn,null,true);
+		doEDIT(null,true);
 	}
 	else
 	{
@@ -53,15 +55,15 @@ if(!$conn = pg_pconnect(CONN_STRING))
 		{
 			echo "benötige ID für Lektor";
 		}
-		doEDIT($conn,$_GET['id']);
+		doEDIT($db,$_GET['id']);
 	}
 
 /**
  * Lektor speichern/anlegen
  */
-function doSAVE($conn)
+function doSAVE()
 {
-	$lektor = new mitarbeiter($conn);
+	$lektor = new mitarbeiter();
 	if ($_POST['new']==1)
 	{
 		$lektor->new=true;
@@ -80,15 +82,15 @@ function doSAVE($conn)
 	$lektor->gebort=$_POST['gebort'];
 	//$lektor->gebzeit=$_POST['gebzeit'];
 	//$lektor->anmerkungen=$_POST['anmerkungen'];
-	$lektor->aktiv=($_POST['aktiv']=='1'?true:false);
+	$lektor->aktiv=(isset($_POST['aktiv']) && $_POST['aktiv']=='1'?true:false);
 	//$lektor->email=$_POST['email'];
 	$lektor->alias=$_POST['alias'];
 	$lektor->kurzbz=$_POST['kurzbz'];
 	$lektor->homepage=$_POST['homepage'];
 	// mitarbeiter
 	$lektor->personalnummer=$_POST['personalnummer'];
-	$lektor->lektor=($_POST['lektor']=='1'?true:false);
-	$lektor->fixangestellt=($_POST['fixangestellt']=='t'?true:false);
+	$lektor->lektor=(isset($_POST['lektor']) && $_POST['lektor']=='1'?true:false);
+	$lektor->fixangestellt=(isset($_POST['fixangestellt']) && $_POST['fixangestellt']=='t'?true:false);
 	$lektor->standort_kurzbz=$_POST['standort_kurzbz'];
 	$lektor->telefonklappe=$_POST['telefonklappe'];
 	$lektor->ort_kurzbz=$_POST['raumnr'];
@@ -115,10 +117,11 @@ function doSAVE($conn)
  * MA bearbeiten/anlegen
  * @param string $id optional; wenn nicht angegeben -> neuer datensatz
  */
-function doEDIT($conn,$id='',$new=false,$msg='')
+function doEDIT($db,$id='',$new=false,$msg='')
 {
+				
 	// Mitarbeiterdaten holen
-	$lektor = new mitarbeiter($conn);
+	$lektor = new mitarbeiter();
 	$status_ok=false;
 	if (!$new)
 	{
@@ -161,9 +164,9 @@ function doEDIT($conn,$id='',$new=false,$msg='')
 			<OPTION value="" selected>--Kein Standort--</OPTION>';
 
 		$qry = "SELECT standort_kurzbz FROM public.tbl_standort ORDER BY standort_kurzbz";
-		if($result=pg_query($conn,$qry))
+		if($result=$db->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 				echo "<OPTION value='$row->standort_kurzbz' ". ($lektor->standort_kurzbz==$row->standort_kurzbz?'selected':'').">$row->standort_kurzbz</OPTION>";
 		}
 
@@ -180,9 +183,9 @@ function doEDIT($conn,$id='',$new=false,$msg='')
 			<OPTION value="" selected>--Kein Raum--</OPTION>';
 
 		$qry = "SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv=true ORDER BY ort_kurzbz";
-		if($result=pg_query($conn,$qry))
+		if($result=$db->db_query($qry))
 		{
-			while($row=pg_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 				echo "<OPTION value='$row->ort_kurzbz' ". ($lektor->ort_kurzbz===$row->ort_kurzbz?'selected':'').">$row->ort_kurzbz</OPTION>";
 		}
 	

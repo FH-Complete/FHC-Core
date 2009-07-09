@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,26 +15,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../config.inc.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/person.class.php');
-require_once('../../include/datum.class.php');
-require_once('../../include/kontakt.class.php');
-require_once('../../include/adresse.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/benutzerberechtigung.class.php');
+		require_once('../../include/person.class.php');
+		require_once('../../include/datum.class.php');
+		require_once('../../include/kontakt.class.php');
+		require_once('../../include/adresse.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Connection');
+
 
 $user=get_uid();
 $datum_obj = new datum();
-
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 ?>
@@ -138,8 +140,8 @@ if(isset($_POST['save']))
 	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort |
 	//		Email: $email | Telefon: $telefon | Mobil: $mobil | Letzteausbildung: $letzteausbildung | ausbildungsart: $ausbildungsart |
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
-	$person = new person($conn);
-	pg_query($conn, 'BEGIN');
+	$person = new person();
+	$db->db_query('BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Sonst nicht
 	if($person_id=='0')
@@ -174,7 +176,7 @@ if(isset($_POST['save']))
 		if($person_id=='0')
 			$ueberschreiben='Nein';
 
-		$adr = new adresse($conn);
+		$adr = new adresse();
 		//Adresse neu anlegen
 		if($ueberschreiben=='Nein')
 		{
@@ -236,7 +238,7 @@ if(isset($_POST['save']))
 		//EMail Adresse speichern
 		if($email!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'email';
 			$kontakt->kontakt = $email;
@@ -254,7 +256,7 @@ if(isset($_POST['save']))
 		//Telefonnummer speichern
 		if($telefon!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'telefon';
 			$kontakt->kontakt = $telefon;
@@ -272,7 +274,7 @@ if(isset($_POST['save']))
 		//Mobiltelefonnummer speichern
 		if($mobil!='')
 		{
-			$kontakt = new kontakt($conn);
+			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
 			$kontakt->kontakttyp = 'mobil';
 			$kontakt->kontakt = $mobil;
@@ -291,7 +293,7 @@ if(isset($_POST['save']))
 
 	if(!$error)
 	{
-		pg_query($conn, 'COMMIT');
+		$db->db_query('COMMIT');
 		die("<script language='Javascript'>
 				window.opener.StudentProjektbetreuerMenulistPersonLoad(window.opener.document.getElementById('student-projektbetreuer-menulist-person'), '$nachname');
 				window.opener.MenulistSelectItemOnValue('student-projektbetreuer-menulist-person', $person->person_id);
@@ -300,7 +302,7 @@ if(isset($_POST['save']))
 	}
 	else
 	{
-		pg_query($conn, 'ROLLBACK');
+		$db->db_query('ROLLBACK');
 		echo '<span class="error">'.$errormsg.'</span>';
 	}
 }
@@ -400,10 +402,10 @@ if($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th></tr>';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
 			$qry_stati = "SELECT 'Mitarbeiter' as rolle FROM campus.vw_mitarbeiter WHERE person_id='$row->person_id'
@@ -411,9 +413,9 @@ if($where!='')
 							SELECT (get_rolle_prestudent(prestudent_id, null) || ' ' || UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz)) as rolle FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE person_id='$row->person_id'
 							UNION
 							SELECT 'PreInteressent' as rolle FROM public.tbl_preinteressent WHERE person_id='$row->person_id'";
-			if($result_stati = pg_query($conn, $qry_stati))
+			if($result_stati = $db->db_query($qry_stati))
 			{
-				while($row_stati=pg_fetch_object($result_stati))
+				while($row_stati=$db->db_fetch_object($result_stati))
 				{
 					$status.=$row_stati->rolle.', ';
 				}
@@ -422,8 +424,8 @@ if($where!='')
 					
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
-			if($result_adr = pg_query($conn, $qry_adr))
-				while($row_adr=pg_fetch_object($result_adr))
+			if($result_adr = $db->db_query($qry_adr))
+				while($row_adr=$db->db_fetch_object($result_adr))
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo "<td>$status</td>";
 			echo "</td></tr>";

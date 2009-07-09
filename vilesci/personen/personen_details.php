@@ -15,16 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-/**
- * Changes:	23.10.2004: Anpassung an neues DB-Schema sowie Verwendung der
- *                      'student'-Klasse; Datei ersetzt student_edit_save.php
- *                      (WM)
- */
-require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -34,9 +35,6 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/ort.class.php');
 require_once('../../include/fckeditor/fckeditor.php');
-
-if(!$conn=pg_pconnect(CONN_STRING))
-	die("Fehler beim Connecten zur Datenbank");
 
 echo '
 <html>
@@ -123,9 +121,9 @@ if($uid!='')
 			UNION
 			SELECT person_id, false as mitarbeiter FROM campus.vw_student WHERE uid='".addslashes($uid)."'";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		if($row = pg_fetch_object($result))
+		if($row = $db->db_fetch_object($result))
 		{
 			$is_mitarbeiter = ($row->mitarbeiter=='t'?true:false);
 			$person_id = $row->person_id;
@@ -139,7 +137,7 @@ if($uid!='')
 
 if(isset($_POST['saveperson']))
 {
-	$person = new person($conn);
+	$person = new person();
 	if(!$person->load($person_id))
 		die('Person konnte nicht geladen werden');
 		
@@ -210,7 +208,7 @@ if(isset($_POST['savebenutzer']))
 
 if(isset($_POST['savemitarbeiter']))
 {
-	$mitarbeiter = new mitarbeiter($conn);
+	$mitarbeiter = new mitarbeiter();
 	if(!$mitarbeiter->load($uid))
 		die('Mitarbeiter konnte nicht geladen werden');
 	
@@ -240,7 +238,7 @@ if(isset($_POST['savemitarbeiter']))
 
 if(isset($_POST['savestudent']))
 {
-	$student = new student($conn);
+	$student = new student();
 	if(!$student->load($uid))
 		die('Student konnte nicht geladen werden');
 		
@@ -261,7 +259,7 @@ if(isset($_POST['savestudent']))
 	}	
 }
 
-$person = new person($conn);
+$person = new person();
 if(!$person->load($person_id))
 	die('Person wurde nicht gefunden');
 
@@ -322,7 +320,7 @@ echo "<table><tr><td>
 	<td>Geburtsnation</td>
 	<td><SELECT name='geburtsnation'>
 			<option value=''>-- keine Auswahl --</option>";
-$nation = new nation($conn);
+$nation = new nation();
 $nation->getAll();
 
 foreach ($nation->nation as $row_nation)
@@ -348,7 +346,7 @@ echo "</SELECT>
 <tr>
 	<td>Staatsbuergerschaft</td>
 	<td><SELECT name='staatsbuergerschaft'><option value=''>-- keine Auswahl --</option>";
-$nation = new nation($conn);
+$nation = new nation();
 $nation->getAll();
 
 foreach ($nation->nation as $row_nation)
@@ -368,9 +366,9 @@ echo "
 
 $qry = "SELECT * FROM public.tbl_sprache ORDER BY sprache";
 
-if($result_sprache = pg_query($conn, $qry))
+if($result_sprache = $db->db_query($qry))
 {
-	while($row_sprache = pg_fetch_object($result_sprache))
+	while($row_sprache = $db->db_fetch_object($result_sprache))
 	{
 		if($row_sprache->sprache == $sprache)
 			$selected = 'selected';
@@ -454,10 +452,10 @@ if(isset($uid) && $uid!='')
 	";
 
 	$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
-	if(!$result_benutzer = pg_query($conn, $qry))
+	if(!$result_benutzer = $db->db_query($qry))
 		die('Fehler beim Auslesen der Benutzerdaten');
 	
-	if(!$row_benutzer = pg_fetch_object($result_benutzer))
+	if(!$row_benutzer = $db->db_fetch_object($result_benutzer))
 		die('Fehler beim Auslesen der Benutzerdaten');
 	
 	echo "
@@ -482,7 +480,7 @@ if(isset($uid) && $uid!='')
 	
 	if($is_mitarbeiter)
 	{
-		$mitarbeiter = new mitarbeiter($conn);
+		$mitarbeiter = new mitarbeiter();
 		if(!$mitarbeiter->load($uid))
 			die('Mitarbeiter konnte nicht geladen werden');
 		
@@ -527,7 +525,7 @@ if(isset($uid) && $uid!='')
 				<td>Buero</td>
 				<td><SELECT name='ort_kurzbz'><option value=''>-- keine Auswahl --</option>";
 		
-		$ort = new ort($conn);
+		$ort = new ort();
 		$ort->getAll();
 		foreach ($ort->result as $row_ort)
 		{
@@ -543,9 +541,9 @@ if(isset($uid) && $uid!='')
 				<td>Standort</td>
 				<td><SELECT name='standort_kurzbz'><option value=''>-- keine Auswahl --</option>";
 		$qry = "SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz";
-		if($result_standort = pg_query($conn, $qry))
+		if($result_standort = $db->db_query($qry))
 		{
-			while($row_standort = pg_fetch_object($result_standort))
+			while($row_standort = $db->db_fetch_object($result_standort))
 			{
 				if($row_standort->standort_kurzbz == $standort_kurzbz)
 					$selected = 'selected';
@@ -567,9 +565,9 @@ if(isset($uid) && $uid!='')
 				<td valign='top'>Ausbildung</td>
 				<td valign='top'><SELECT name='ausbildungcode'><option value=''>-- keine Auswahl --</option>";
 		$qry = "SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungcode";
-		if($result_ausbildung = pg_query($conn, $qry))
+		if($result_ausbildung = $db->db_query($qry))
 		{
-			while($row_ausbildung = pg_fetch_object($result_ausbildung))
+			while($row_ausbildung = $db->db_fetch_object($result_ausbildung))
 			{
 				if($row_ausbildung->ausbildungcode == $ausbildungcode)
 					$selected = 'selected';
@@ -591,7 +589,7 @@ if(isset($uid) && $uid!='')
 	}
 	else 
 	{
-		$student = new student($conn);
+		$student = new student();
 		if(!$student->load($uid))
 			die('Fehler beim Laden des Studenten');
 			

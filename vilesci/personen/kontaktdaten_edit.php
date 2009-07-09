@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,28 +15,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../config.inc.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/person.class.php');
-require_once('../../include/datum.class.php');
-require_once('../../include/adresse.class.php');
-require_once('../../include/nation.class.php');
-require_once('../../include/firma.class.php');
-require_once('../../include/kontakt.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+			
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/benutzerberechtigung.class.php');
+		require_once('../../include/person.class.php');
+		require_once('../../include/datum.class.php');
+		require_once('../../include/adresse.class.php');
+		require_once('../../include/nation.class.php');
+		require_once('../../include/firma.class.php');
+		require_once('../../include/kontakt.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der DB Connection');
 
 $user=get_uid();
 $datum_obj = new datum();
-
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 ?>
@@ -94,7 +92,7 @@ if(isset($_GET['deleteadresse']))
 {
 	if(is_numeric($adresse_id))
 	{
-		$adresse_obj = new adresse($conn);
+		$adresse_obj = new adresse();
 		if(!$adresse_obj->delete($adresse_id))
 		{
 			$errormsg = 'Fehler beim Loeschen der Adresse:'.$adresse_obj->errormsg;
@@ -107,7 +105,7 @@ if(isset($_GET['deletekontakt']))
 {
 	if(is_numeric($kontakt_id))
 	{
-		$kontakt_obj = new kontakt($conn);
+		$kontakt_obj = new kontakt();
 		if(!$kontakt_obj->delete($kontakt_id))
 		{
 			$errormsg = 'Fehler beim Loeschen des Kontakts:'.$kontakt_obj->errormsg;
@@ -118,7 +116,7 @@ if(isset($_GET['deletekontakt']))
 //Speichern einer Adresse
 if(isset($_POST['saveadresse']))
 {
-	$adresse_obj = new adresse($conn);
+	$adresse_obj = new adresse();
 
 	if(is_numeric($adresse_id))
 	{
@@ -170,7 +168,7 @@ if(isset($_POST['saveadresse']))
 //Speichern eines Kontaktes
 if(isset($_POST['savekontakt']))
 {
-	$kontakt_obj = new kontakt($conn);
+	$kontakt_obj = new kontakt();
 
 	if(is_numeric($kontakt_id))
 	{
@@ -214,13 +212,13 @@ if(isset($_POST['savekontakt']))
 }
 
 //Person laden
-$person = new person($conn);
+$person = new person();
 if(!$person->load($person_id))
 	die('Person wurde nicht gefunden');
 
 //Nationen laden
 $nation_arr = array();
-$nation = new nation($conn);
+$nation = new nation();
 $nation->getAll();
 
 foreach($nation->nation as $row)
@@ -229,7 +227,7 @@ foreach($nation->nation as $row)
 //Firmen laden
 
 $firma_arr = array();
-$firma = new firma($conn);
+$firma = new firma();
 $firma->getAll();
 
 foreach($firma->result as $row)
@@ -239,7 +237,7 @@ $adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
 
 //Kontakttypen laden
 $kontakttyp_arr = array();
-$kontakt_obj = new kontakt($conn);
+$kontakt_obj = new kontakt();
 $kontakt_obj->getKontakttyp();
 foreach ($kontakt_obj->result as $row)
 	$kontakttyp_arr[]=$row->kontakttyp;
@@ -251,7 +249,7 @@ echo $errormsg.'<br>';
 echo "<h3>Adressen:</h3>";
 echo "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."?person_id=$person_id' method='POST' />";
 echo "<table class='liste'><tr><th>STRASSE</th><th>PLZ</th><th>ORT</th><th>GEMEINDE</th><th>NATION</th><th>TYP</th><th>HEIMAT</th><th>ZUSTELLUNG</th><th>FIRMA</th></tr>";
-$adresse_obj = new adresse($conn);
+$adresse_obj = new adresse();
 $adresse_obj->load_pers($person_id);
 
 foreach ($adresse_obj->result as $row)
@@ -261,8 +259,8 @@ foreach ($adresse_obj->result as $row)
 	echo "<td>$row->plz</td>";
 	echo "<td>$row->ort</td>";
 	echo "<td>$row->gemeinde</td>";
-	echo "<td>".$nation_arr[$row->nation]."</td>";
-	echo "<td>".$adresstyp_arr[$row->typ]."</td>";
+	echo "<td>".(isset($nation_arr[$row->nation])?$nation_arr[$row->nation]:'')."</td>";
+	echo "<td>".(isset($adresstyp_arr[$row->typ])?$adresstyp_arr[$row->typ]:'')."</td>";
 	echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->firma_id!=''?$firma_arr[$row->firma_id]:'')."</td>";
@@ -273,7 +271,7 @@ foreach ($adresse_obj->result as $row)
 $savebuttonvalue='Neu';
 if(isset($_GET['editadresse']))
 {
-	$adresse_obj = new adresse($conn);
+	$adresse_obj = new adresse();
 	if($adresse_obj->load($adresse_id))
 	{
 		$strasse = $adresse_obj->strasse;
@@ -353,7 +351,7 @@ else
 echo "<h3>Kontakte:</h3>";
 echo "<form action='".$_SERVER['PHP_SELF']."?person_id=$person_id' method='POST' />";
 echo "<table class='liste'><tr><th>TYP</th><th>KONTAKT</th><th>ZUSTELLUNG</th><th>ANMERKUNG</th><th>FIRMA</th></tr>";
-$kontakt_obj = new kontakt($conn);
+$kontakt_obj = new kontakt();
 $kontakt_obj->load_pers($person_id);
 
 foreach ($kontakt_obj->result as $row)
@@ -371,7 +369,7 @@ foreach ($kontakt_obj->result as $row)
 $savebuttonvalue='Neu';
 if(isset($_GET['editkontakt']))
 {
-	$kontakt_obj = new kontakt($conn);
+	$kontakt_obj = new kontakt();
 	if($kontakt_obj->load($kontakt_id))
 	{
 		$kontakttyp = $kontakt_obj->kontakttyp;

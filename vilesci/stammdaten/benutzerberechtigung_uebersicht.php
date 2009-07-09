@@ -1,17 +1,42 @@
 <?php
-	require_once('../config.inc.php');
-	require_once('../../include/functions.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+			
+		require_once('../../include/functions.inc.php');
     require_once('../../include/studiengang.class.php');
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
     
 	$htmlstr = "";
 	
 	$sql_query = "select distinct(tbl_benutzerberechtigung.uid), tbl_person.nachname, tbl_person.vorname from tbl_benutzerberechtigung, tbl_benutzer, tbl_person where tbl_benutzerberechtigung.uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id order by tbl_benutzerberechtigung.uid";
 	
-    if(!$erg=pg_query($conn, $sql_query))
+    if(!$erg=$db->db_query($sql_query))
 	{
-		$errormsg='Fehler beim laden der Berechtigungen';
+		$htmlstr='Fehler beim laden der Berechtigungen';
 	}
 	
 	else
@@ -25,7 +50,7 @@
 	    $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
 	    $htmlstr .= "   </tr></thead><tbody>\n";
 	    $i = 0;
-		while($row=pg_fetch_object($erg))
+		while($row=$db->db_fetch_object($erg))
 	    {
 	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";

@@ -15,24 +15,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+
+ 
+ 
 /**
  * Changes:	23.10.2004: Anpassung an neues DB-Schema sowie Verwendung der
  *                      'student'-Klasse; Datei ersetzt student_edit_save.php
  *                      (WM)
  */
-require_once('../config.inc.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/person.class.php');
-require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
-require_once('../../include/studiengang.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-	die("Fehler beim Connecten zur Datenbank");
+	require_once('../../config/vilesci.config.inc.php');
+
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/student.class.php');
+	require_once('../../include/studiengang.class.php');
+
 
 echo '
 <html>
@@ -55,11 +59,11 @@ else
 
 if (isset($_POST['Save']))
 {
-	doSAVE($conn);
+	doSAVE();
 }
 else if (isset($_GET['new']))
 {
-	doEDIT($conn,null,true);
+	doEDIT(null,true);
 
 }
 else
@@ -68,15 +72,15 @@ else
 	{
 		echo "benötige UID für Student";
 	}
-	doEDIT($conn,$_GET['id']);
+	doEDIT($_GET['id']);
 }
 
 /**
  * Daten speichern
  */
-function doSAVE($conn)
+function doSAVE()
 {
-	$student = new student($conn);
+	$student = new student();
 	if($_POST['new'])
 	{
 		$student->new=true;
@@ -135,17 +139,17 @@ function doSAVE($conn)
 		echo "<p>".$student->errormsg."</p>";
 	}
 
-	doEDIT($conn,$student->uid);
+	doEDIT($student->uid);
 }
 
 /**
  * Edit-Formular
  */
-function doEDIT($conn,$id,$new=false)
+function doEDIT($id,$new=false)
 {
 
 	// Studentendaten holen
-	$student = new student($conn);
+	$student = new student();
 	$status_ok=false;
 	if (!$new)
 	{
@@ -188,7 +192,7 @@ function doEDIT($conn,$id,$new=false)
       			<option value="-1">- auswählen -</option>';
 
 		// Auswahl des Studiengangs
-		$stg=new studiengang($conn);
+		$stg=new studiengang();
 		$stg->getAll();
 		foreach($stg->result as $studiengang)
 		{

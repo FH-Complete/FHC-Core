@@ -1,21 +1,55 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+ 
+ 
+ 
 // *************************************
 // * Zeigt alle Lehreinheiten und die
 // * zugehoerigen Gruppen/Lektoren an
 // * Filtermoeglichkeit nach Studiengang,
 // * Semester, Lektor, Studiensemester
 // *************************************
-    require_once('../../config.inc.php');
+
+		require_once('../../../config/vilesci.config.inc.php');
+		require_once('../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+		
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/studiensemester.class.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/lehreinheit.class.php');    
     require_once('../../../include/lehrform.class.php');
-	
-	if (!$conn = @pg_pconnect(CONN_STRING)) 
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+
 
 	$user=get_uid();
+	$stg=(isset($_REQUEST['stg']) ? $_REQUEST['stg'] :'' );
+	$stsem=(isset($_REQUEST['stsem']) ? $_REQUEST['stsem'] :'' );
+	$lektor=(isset($_REQUEST['lektor']) ? $_REQUEST['lektor'] :'' );
+	$stg_kz=(isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] :'' );
+	$sem=(isset($_REQUEST['semester']) ? $_REQUEST['semester'] :0 );	
+	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -39,7 +73,7 @@ function conf_del()
 //Daten Speichern
 if(isset($_GET['edit']) && (isset($_POST['btn_submit']) || (isset($_POST['status']) && $_POST['status']==3)))
 {
-	$le_obj = new lehreinheit($conn);
+	$le_obj = new lehreinheit();
 	if(isset($_GET['le_id']) && $_GET['le_id']!='') //Update eines bestehenden Datensatzes
 	{
 		if(!is_numeric($_GET['le_id']))
@@ -119,11 +153,11 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	{
 		//Datensatz laden
 		$new=false;
-		$le_obj = new lehreinheit($conn, $_GET['le_id']);
+		$le_obj = new lehreinheit($_GET['le_id']);
 	}
 	else 
 	{
-		$le_obj = new lehreinheit($conn);
+		$le_obj = new lehreinheit();
 		$new=true;
 	}
 	
@@ -136,10 +170,8 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	echo "<tr><td>Lvnr</td><td><input type='text' name='lvnr' value='$le_obj->lvnr'></td></tr>";
 	echo "\n";
 
-	if(isset($_POST['studiengang']))
-		$stg_kz=$_POST['studiengang'];
-	if(isset($_POST['semester']))
-		$sem=$_POST['semester'];
+
+	
 	
 	//Wenn kein Studiengang/Semester angegeben ist
 	if(!isset($stg_kz) || !isset($sem) || $stg_kz=='' || $stg_kz==-1 || $sem=='' || $sem==-1)
@@ -147,10 +179,12 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 		if($le_obj->lehrveranstaltung_id!='') //Bei Edit-Mode Studiengang und Semester der Lehreinheit laden
 		{
 			$qry = "SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$le_obj->lehrveranstaltung_id'";
-			$result = pg_query($conn, $qry);
-			$row=pg_fetch_object($result);
-			$stg_kz = $row->studiengang_kz;
-			$semester=$row->semester;
+			if ($result = $db->db_query($qry))
+			{
+				$row=$db->db_fetch_object($result);
+				$stg_kz = $row->studiengang_kz;
+				$semester=$row->semester;
+			}	
 		}
 		else 
 		{
@@ -163,9 +197,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	echo "\n";
 	echo "<tr><td>Studiengang</td><td><select name='studiengang' onChange='javascript: document.form1.status.value=\"2\"; document.form1.submit();'>";
 	$sql_query = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz";
-	$result = pg_query($conn, $sql_query);
+	$result = $db->db_query($sql_query);
 
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		if($stg_kz==$row->studiengang_kz)
 			echo "<option value='$row->studiengang_kz' selected>$row->kurzbz</option>";
@@ -178,8 +212,8 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Semester Drop Down anzeigen
 	echo "<tr><td>Semester</td><td><select name='semester' onChange='javascript: document.form1.status.value=\"2\";document.form1.submit();'>";
 	$sql_query = "SELECT max_semester FROM public.tbl_studiengang where studiengang_kz='$stg_kz'";
-	$result = pg_query($conn, $sql_query);
-	$row = pg_fetch_object($result);
+	$result = $db->db_query($sql_query);
+	$row = $db->db_fetch_object($result);
 	echo "<option value='0'>0</option>";
 	for($i=0;$i<$row->max_semester;$i++)
 	{
@@ -196,9 +230,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	echo "<tr><td>Lehrveranstaltung</td><td><SELECT name='lv_id'>";
 
 	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$stg_kz' AND semester='$semester'";
-	$result = pg_query($conn, $sql_query);
+	$result = $db->db_query($sql_query);
 
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		if($row->lehrveranstaltung_id==$le_obj->lehrveranstaltung_id)
 			echo "<OPTION value='$row->lehrveranstaltung_id' selected>$row->bezeichnung</OPTION>";
@@ -211,9 +245,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	{
 		echo "<tr><td>Lektor</td><td>";
 		$sql_query = "SELECT uid, vorname, nachname FROM campus.vw_mitarbeiter WHERE uid in(SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$le_obj->lehreinheit_id') ORDER BY nachname";
-		$result = pg_query($conn, $sql_query);
+		$result = $db->db_query($sql_query);
 
-		while($row=pg_fetch_object($result))
+		while($row=$db->db_fetch_object($result))
 			echo "$row->nachname $row->vorname ($row->uid)<br>";
 
 		echo "</td></tr>";
@@ -224,9 +258,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	echo "<tr><td>Lehrfach</td><td><select name='lehrfach'>";
 
 	$sql_query = "SELECT lehrfach_id, bezeichnung, kurzbz FROM lehre.tbl_lehrfach WHERE studiengang_kz='$stg_kz' AND semester='$semester' ORDER BY bezeichnung";
-	$result = pg_query($conn, $sql_query);
+	$result = $db->db_query($sql_query);
 	//echo "<option value='0'>--keine Auswahl--</option>";
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{
 		if($le_obj->lehrfach_id==$row->lehrfach_id)
 			echo "<option value='$row->lehrfach_id' selected>$row->kurzbz - $row->bezeichnung</option>";
@@ -240,7 +274,7 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Lehrform Drop Down anzeigen
 	echo "<tr><td>Lehrform</td><td><select name='lehrform'>";
 
-	$form_obj=new lehrform($conn);
+	$form_obj=new lehrform();
 
 	if(!$form_obj->getAll())
 		echo "Fehler beim laden der Lehrform: $form_obj->errormsg";
@@ -259,8 +293,8 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Raumtyp Drop Down anzeigen
 	echo "<tr><td>Raumtyp</td><td><select name='raumtyp'>";
 	$sql_query = "SELECT raumtyp_kurzbz, beschreibung FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz";
-	$result = pg_query($conn, $sql_query);
-	while ($row = pg_fetch_object($result))
+	$result = $db->db_query($sql_query);
+	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->raumtyp==$row->raumtyp_kurzbz)
 			echo "<option value='$row->raumtyp_kurzbz' selected>$row->raumtyp_kurzbz ($row->beschreibung)</option>";
@@ -274,8 +308,8 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//RaumtypAlternativ Drop Down anzeigen
 	echo "<tr><td>Raumtyp Alternativ</td><td><select name='raumtypalternativ'>";
 	$sql_query = "SELECT raumtyp_kurzbz, beschreibung FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz";
-	$result = pg_query($conn, $sql_query);
-	while ($row = pg_fetch_object($result))
+	$result = $db->db_query($sql_query);
+	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->raumtypalternativ==$row->raumtyp_kurzbz)
 			echo "<option value='$row->raumtyp_kurzbz' selected>$row->raumtyp_kurzbz ($row->beschreibung)</option>";
@@ -298,8 +332,8 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Studiensemester Drop Down anzeigen
 	echo "<tr><td>Studiensemester</td><td><select name='studiensemester'>";
 	$sql_query = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester";
-	$result = pg_query($conn, $sql_query);
-	while ($row = pg_fetch_object($result))
+	$result = $db->db_query($sql_query);
+	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->studiensemester_kurzbz==$row->studiensemester_kurzbz)
 			echo "<option value='$row->studiensemester_kurzbz' selected>$row->studiensemester_kurzbz</option>";
@@ -313,8 +347,8 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Sprache Drop Down anzeigen
     echo "<tr><td>Sprache</td><td><select name='sprache'>";
 	$sql_query = "SELECT sprache FROM public.tbl_sprache";
-	$result = pg_query($conn, $sql_query);
-	while ($row = pg_fetch_object($result))
+	$result = $db->db_query($sql_query);
+	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->sprache==$row->sprache)
 			echo "<option value='$row->sprache' selected>$row->sprache</option>";
@@ -348,7 +382,7 @@ else
 		
 	if(!isset($stsem))
 	{
-		$stsem_obj = new studiensemester($conn);
+		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 	}
 	if(!isset($stg))
@@ -376,7 +410,7 @@ else
 					  stundenblockung='". $_POST['stb']."',
 					  updateamum=now(), updatevon='".$user."' 
 					  WHERE lehreinheit_id='". $_GET['leid']."'";
-		if(pg_query($conn,$sql_query))
+		if($db->db_query($sql_query))
 			echo "<br><h2>Update durchgeführt</h2><br>";
 		else 
 			echo "<br><h2>Update Fehlgeschlagen, Bitte erneut versuchen</h2><br>";
@@ -386,7 +420,7 @@ else
 	if(isset($_GET['leid']) && isset($_GET['lehre']) && is_numeric($_GET['leid']))
 	{
 		$sql_query = "UPDATE lehre.tbl_lehreinheit SET lehre=not lehre, updateamum=now(), updatevon='$user' WHERE lehreinheit_id ='".$_GET['leid']."'";
-		if(pg_query($conn,$sql_query))
+		if($db->db_query($sql_query))
 			echo "<br><h2>Update durchgeführt</h2><br>";
 	    else
 	    	echo "<br><h2><font color='#FF0000'>Fehler beim Update</font></h2><br>";
@@ -395,7 +429,7 @@ else
 	//Loeschen einer Lehreinheit
 	if(isset($del) && isset($_GET['le_id']))
 	{
-		$le_obj = new lehreinheit($conn);
+		$le_obj = new lehreinheit();
 		if($le_obj->delete($_GET['le_id']))
 		{
 			echo "<br><h2>DELETE durchgeführt</h2><br>";
@@ -408,7 +442,7 @@ else
 	echo '<table width="600" border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">';
 	//Ausgeben der Studiensemester zb WS2005, SS2006 etc
 	echo "<a href='lv_verteilung.php?stsem=-1&stg=$stg&sem=$sem&lektor=$lektor".(isset($order)?"&order=$order":"")."' class='linkgreen'>Alle </a>";
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem_obj->getAll();
 	foreach($stsem_obj->studiensemester as $row)
 		echo "- <a href='lv_verteilung.php?stsem=$row->studiensemester_kurzbz&stg=$stg&sem=$sem&lektor=$lektor".(isset($order)?"&order=$order":"")."' class='linkgreen'> $row->studiensemester_kurzbz </a>";
@@ -417,7 +451,7 @@ else
 	echo "<form action='lv_verteilung.php?new=true&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&order=$order' method='POST'><input type='submit' value='NEU'></form>";
 	echo "</td></tr></table>";
 	
-	$stg_obj = new studiengang($conn);
+	$stg_obj = new studiengang();
 	$stg_obj->getAll();
 	
 	echo "\n";
@@ -444,7 +478,7 @@ else
 	echo "\n";
 	
 	$sql_query = "SELECT uid, nachname, vorname FROM campus.vw_mitarbeiter WHERE lektor=true ORDER BY nachname, vorname"; 
-	$result = pg_query($conn,$sql_query);
+	$result = $db->db_query($sql_query);
 	echo "\n";
 	echo "<td><form name='f_lek' action='lv_verteilung.php?stsem=$stsem&stg=$stg&sem=$sem".(isset($order)?"&order=$order":"")."' method='POST'>";
 	//Lektor Drop Down anzeigen
@@ -456,7 +490,7 @@ else
 	   
 	//Ausgeben der Lektoren
 	
-	while($row=pg_fetch_object($result))
+	while($row=$db->db_fetch_object($result))
 	{		
 		if($lektor==$row->uid)
 		   echo "<option value='$row->uid' selected>$row->nachname $row->vorname ($row->uid)</option>";
@@ -471,7 +505,7 @@ else
 		//Anzeigen der Semester
 		echo "Semester:</td>";
 		echo "<td><a href='lv_verteilung.php?stsem=$stsem&stg=$stg&sem=-1&lektor=$lektor".(isset($order)?"&order=$order":"")."' class='linkgreen'>Alle </a>";
-		$stg_obj = new studiengang($conn,$stg);
+		$stg_obj = new studiengang($stg);
 		
 		for($i=1;$i<($stg_obj->max_semester+1);$i++)
 		{
@@ -513,7 +547,7 @@ else
 	
 	$qry.=" ORDER BY $order";	
 	//echo $qry;
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
 		echo "\n";
 		echo '<table class="liste">';
@@ -528,7 +562,7 @@ else
 		echo "\n";
 				
 		//Tabellenelemente rausschreiben
-		for($i=0;$row = pg_fetch_object($result);$i++)
+		for($i=0;$row = $db->db_fetch_object($result);$i++)
 		{			
 			echo "\n";
 			echo '  <tr class="liste'.($i%2).'">';
@@ -536,10 +570,10 @@ else
 			echo "<td><a href='lv_verteilung.php?le_id=$row->lehreinheit_id&del=1&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?"&order=$order":"")."' onClick='javascript:return conf_del();' class='linkgreen'>delete</a></td>";
 			echo "<td>";
 			$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_grp = pg_query($conn, $qry))
+			if($result_grp = $db->db_query($qry))
 			{
 				$i=0;
-				while($row_grp=pg_fetch_object($result_grp))
+				while($row_grp=$db->db_fetch_object($result_grp))
 				{
 					if($i!=0)
 						echo ', ';
@@ -548,7 +582,7 @@ else
 						echo $row_grp->gruppe_kurzbz;
 					else 
 					{
-						$stg_obj1 = new studiengang($conn, $row_grp->studiengang_kz);
+						$stg_obj1 = new studiengang($row_grp->studiengang_kz);
 						echo $stg_obj1->kuerzel.$row_grp->semester.$row_grp->verband.$row_grp->gruppe;
 					}
 					
@@ -557,10 +591,10 @@ else
 			echo '</td>';
 			$qry = "SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row->lehreinheit_id'";
 			echo '<td>';
-			if($result_ma = pg_query($conn, $qry))
+			if($result_ma = $db->db_query($qry))
 			{
 				$i=0;
-				while($row_ma = pg_fetch_object($result_ma))
+				while($row_ma = $db->db_fetch_object($result_ma))
 				{
 					if($i!=0)
 						echo ", ";
@@ -574,8 +608,8 @@ else
 			echo "<td nowrap><form action='lv_verteilung.php?leid=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&lvnr=$row->lvnr".(isset($order)?"&order=$order":"")."' method='POST'><input type='text' value='$row->stundenblockung' size='2' name='stb'><input type='submit' value='ok'></form></td>";
 			echo "<td>$row->wochenrythmus</td>";
 			$qry = "SELECT kurzbz FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row->lehrfach_id'";
-			$result_lf = pg_query($conn, $qry);
-			$row_lf=pg_fetch_object($result_lf);
+			$result_lf = $db->db_query($qry);
+			$row_lf=$db->db_fetch_object($result_lf);
 			echo "<td>$row_lf->kurzbz</td>";
 			echo "<td><form action='lv_verteilung.php?leid=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&lehre=$row->le_lehre".(isset($order)?"&order=$order":"")."' method='POST'><input type='image' src='../../../skin/images/".($row->le_lehre=='t'?'true.gif':'false.gif')."'></form></td>";
 			//echo "<td nowrap><form action='lv_verteilung.php?lfnr=$row->lehrfach_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?"&order=$order":"")."' method='POST'><input type='text' value='$row->lehrevz' size='5' name='lvz'><input type='submit' value='ok'></form></td>";

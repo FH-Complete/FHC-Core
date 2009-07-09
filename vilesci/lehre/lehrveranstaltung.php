@@ -15,22 +15,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
-
-$s=new studiengang($conn);
+$s=new studiengang();
 $s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
 
@@ -40,6 +41,7 @@ if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
 	$stg_kz='';
+	
 if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
@@ -59,15 +61,19 @@ $fachbereich_kurzbz = (isset($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachber
 
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
-if($fachbereich_kurzbz=='' && $stg_kz=='')
-	$stg_kz='0';
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
+if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') 
+&& !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') 
+&& !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
 	die('Sie haben keine Berechtigung für diesen Studiengang');
 
+	
+#if($fachbereich_kurzbz=='' && $stg_kz=='')
+#	$stg_kz='0';	
+	
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 {
 	if($rechte->isBerechtigt('admin', $stg_kz, 'suid'))
@@ -76,7 +82,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		if(isset($_POST['lehrevz']))
 		{
 			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!pg_query($conn, $qry))
+			if(!$db->db_query($qry))
 				echo "Fehler beim Speichern!";
 			else
 				echo "Erfolgreich gespeichert";
@@ -86,7 +92,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		if(isset($_GET['aktiv']))
 		{
 			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET aktiv=".($_GET['aktiv']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!pg_query($conn, $qry))
+			if(!$db->db_query($qry))
 				echo "Fehler beim Speichen!";
 			else
 				echo "Erfolgreich gespeichert";
@@ -95,7 +101,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 		if(isset($_POST['orgform']))
 		{
 			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET orgform_kurzbz=".($_POST['orgform']==''?'null':"'".addslashes($_POST['orgform'])."'")." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!pg_query($conn, $qry))
+			if(!$db->db_query($qry))
 				echo "Fehler beim Speichern!";
 			else
 				echo "Erfolgreich gespeichert";
@@ -105,7 +111,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	//LVInfo kopieren
 	if(isset($_POST['source_id']))
 	{
-		$lvinfo = new lvinfo($conn);
+		$lvinfo = new lvinfo();
 		if(!$lvinfo->copy($_POST['source_id'], $_GET['lvid']))
 			echo 'Fehler beim Kopieren';
 		else 
@@ -116,7 +122,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	if(isset($_GET['lehre']))
 	{
 		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehre=".($_GET['lehre']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 			echo "Fehler beim Speichen!";
 		else
 			echo "Erfolgreich gespeichert";
@@ -126,7 +132,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	if(isset($_GET['zeugnis']))
 	{
 		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET zeugnis=".($_GET['zeugnis']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 			echo "Fehler beim Speichen!";
 		else
 			echo "Erfolgreich gespeichert";
@@ -136,7 +142,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	if(isset($_POST['sort']))
 	{
 		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET sort='".addslashes($_POST['sort'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 			echo "Fehler beim Speichern!";
 		else
 			echo "Erfolgreich gespeichert";
@@ -146,7 +152,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	if(isset($_POST['fbk']))
 	{
 		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET koordinator=".($_POST['fbk']==''?'null':"'".addslashes($_POST['fbk'])."'")." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 			echo "Fehler beim Speichern!";
 		else
 			echo "Erfolgreich gespeichert";
@@ -157,7 +163,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	{
 		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET projektarbeit=".($_GET['projektarbeit']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
 		//echo $qry;
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 			echo "Fehler beim Speichen!";
 		else
 			echo "Erfolgreich gespeichert";
@@ -193,9 +199,9 @@ FROM
 	 SELECT koordinator as uid from $tables WHERE $where2) as a USING(uid) ORDER BY nachname, vorname";
 
 $fbk = array();
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$fbk[$row->uid]['vorname']=$row->vorname;
 		$fbk[$row->uid]['nachname']=$row->nachname;
@@ -238,7 +244,7 @@ if($stg_kz!='')
 
 $sql_query.=" AND tbl_lehrveranstaltung.semester='$semester' $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
-if(!$result_lv = pg_query($conn, $sql_query))
+if(!$result_lv = $db->db_query($sql_query))
 	die("Lehrveranstaltung not found!");
 
 //Studiengang DropDown
@@ -268,7 +274,7 @@ $outp.='</SELECT>';
 
 //Fachbereich DropDown
 $outp.= 'Fachbereich <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
-$fachb = new fachbereich($conn);
+$fachb = new fachbereich();
 $fachb->getAll();
 $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
 foreach ($fachb->result as $fb)
@@ -398,9 +404,9 @@ if ($result_lv!=0)
 			echo "<option value=''>-- Keine Auswahl --</option>";
 			
 			$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-			if($result_orgform = pg_query($conn, $qry_orgform))
+			if($result_orgform = $db->db_query($qry_orgform))
 			{
-				while($row_orgform = pg_fetch_object($result_orgform))
+				while($row_orgform = $db->db_fetch_object($result_orgform))
 				{
 					if($row_orgform->orgform_kurzbz==$row->orgform_kurzbz)
 						$selected='selected';
@@ -463,7 +469,7 @@ if ($result_lv!=0)
 		echo "</td>";
 		echo '<td nowrap>';
 		//LVInfo
-		$lvinfo = new lvinfo($conn);
+		$lvinfo = new lvinfo();
 		if(!$lvinfo->exists($row->lehrveranstaltung_id))
 		{
 			echo '

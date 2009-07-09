@@ -1,5 +1,28 @@
 <?php
-	require_once('../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+		require_once('../../config/vilesci.config.inc.php');
+			
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
@@ -10,8 +33,6 @@
 	require_once('../../include/person.class.php');
 	require_once('../../include/benutzer.class.php');
 	
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$reloadstr = "";  // neuladen der liste im oberen frame
 	$htmlstr = "";
@@ -97,28 +118,32 @@
 		}
 	}
 	
-	$fb = new fachbereich($conn);
+	if (!$fb = new fachbereich())
+			die($fb->errormsg);
+			
 	$fb->getAll();
 	foreach($fb->result as $fachbereich)
 	{
 		$fb_arr[] = $fachbereich->fachbereich_kurzbz;
 	}
 
-	$b = new berechtigung($conn);
-	$b->getAll();
+	if (!$b = new berechtigung())
+			die($b->errormsg);
+			
+	$b->getRollen();
 	foreach($b->result as $berechtigung)
 	{
 		$b_arr[] = $berechtigung->berechtigung_kurzbz;
 	}
 	
-	$st = new studiensemester($conn);
+	$st = new studiensemester();
 	$st->getAll();
 	foreach($st->studiensemester as $studiensemester)
 	{
 		$st_arr[] = $studiensemester->studiensemester_kurzbz;
 	}
 	
-	$sg = new studiengang($conn);
+	$sg = new studiengang();
 	$sg->getAll('kurzbzlang', false);
 		
 	

@@ -1,31 +1,62 @@
 <?php
-	include('../config.inc.php');
-	include('../../include/functions.inc.php');
-	if (!$conn = @pg_pconnect($conn_string))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+ 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		include('../../include/functions.inc.php');
+			
+	foreach ($_REQUEST as $key => $value) 
+	{
+			 $key=$value; 
+	}
+	$type=(isset($_REQUEST['type'])?$_REQUEST['type']:''); 
+			
 	if ($type=='new')
 	{
 		$sql_query="INSERT INTO modulzuteilung (lektor_id, modul_id, semester) VALUES ($lektorid,$modulid, $semester)";
 		//echo $sql_query;
-		$result=pg_exec($conn, $sql_query);
+		$result=$db->db_query($sql_query);
 	}
 	if ($type=='del')
 	{
 		$sql_query="DELETE FROM modulzuteilung WHERE id=$id";
 		//echo $sql_query;
-		$result=pg_exec($conn, $sql_query);
+		$result=$db->db_query($sql_query);
 	}
 
 	// Daten für Lektorenauswahl
 	$sql_query="SELECT id, nachname, vornamen, uid FROM lektor ORDER BY upper(nachname), vornamen, uid";
-	$result_lektor=pg_exec($conn, $sql_query);
+	$result_lektor=$db->db_query($sql_query);
 	if(!$result_lektor)
-		die (pg_errormessage($conn));
+		die ($db->db_last_error());
 	// Daten für Modulauswahl
 	$sql_query="SELECT id, kurzbz, bezeichnung FROM einheit ORDER BY kurzbz";
-	$result_modul=pg_exec($conn, $sql_query);
+	$result_modul=$db->db_query($sql_query);
 	if(!$result_modul)
-		die (pg_errormessage($conn));
+		die ($db->db_last_error());
 
 	// Daten für die Zuteilungen
 	if (!isset($order))
@@ -34,9 +65,16 @@
 	$sql_query.=" FROM modulzuteilung, lektor, einheit WHERE modulzuteilung.lektor_id=lektor.id";
 	$sql_query.=" AND modulzuteilung.modul_id=einheit.id ORDER BY $order";
 	//echo $sql_query;
-	if(!($erg=pg_exec($conn, $sql_query)))
-		die(pg_errormessage($conn));
-	$num_rows=pg_numrows($erg);
+	if(!($erg=$db->db_query($sql_query)))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($erg);
+	
+	
+$cfgBorder=1;	
+$cfgThBgcolor='#CCCCCC';
+
+$cfgBgcolorOne='#F4F4F4';
+$cfgBgcolorTwo='#FEFFE6';	
 ?>
 
 <html>
@@ -64,7 +102,7 @@ Anzahl:
 		$bgcolor = $cfgBgcolorOne;
      	$i % 2  ? 0: $bgcolor = $cfgBgcolorTwo;
 
-		$row=pg_fetch_object ($erg, $i);
+		$row=$db->db_fetch_object ($erg, $i);
 
 		?>
 		<tr bgcolor=<?php echo $bgcolor; ?>>
@@ -84,10 +122,10 @@ Anzahl:
   <SELECT name="lektorid">
     <?php
 		// Auswahl des Lektors
-		$num_rows=pg_numrows($result_lektor);
+		$num_rows=$db->db_num_rows($result_lektor);
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($result_lektor, $i);
+			$row=$db->db_fetch_object ($result_lektor, $i);
 			echo "<option value=\"$row->id\">$row->nachname $row->vornamen - $row->uid</option>";
 		}
 		?>
@@ -97,10 +135,10 @@ Anzahl:
   <SELECT name="modulid">
     <?php
 		// Auswahl des Moduls
-		$num_rows=pg_numrows($result_modul);
+		$num_rows=$db->db_num_rows($result_modul);
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($result_modul, $i);
+			$row=$db->db_fetch_object ($result_modul, $i);
 			echo "<option value=\"$row->id\">$row->kurzbz - $row->bezeichnung</option>";
 		}
 		?>

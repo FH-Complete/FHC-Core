@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -33,9 +38,6 @@ require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/firma.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
-
 $user = get_uid();
 
 $rechte = new benutzerberechtigung();
@@ -43,7 +45,7 @@ $rechte->getBerechtigungen($user);
 
 $datum_obj = new datum();
 
-$studiengang = new studiengang($conn);
+$studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 
 echo '<html>
@@ -67,7 +69,7 @@ if(isset($_GET['id']) && is_numeric($_GET['id']))
 else 
 	die('der Parameter id mit der Person_id muss uebergeben werden');
 
-$person = new person($conn);
+$person = new person();
 
 if(!$person->load($id))
 	die('Person wurde nicht gefunden');
@@ -79,7 +81,7 @@ echo "Name: $person->titelpre $person->nachname $person->vorname $person->titelp
 echo "Geburtsdatum: ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."<br>";
 echo "Geschlecht: ".$person->geschlecht."<br>";
 
-$kontakt = new kontakt($conn);
+$kontakt = new kontakt();
 $kontakt->load_pers($person->person_id);
 echo '<h3>Kontaktdaten</h3>';
 echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
@@ -105,7 +107,7 @@ echo '</tbody></table>';
 
 //Nationen laden
 $nation_arr = array();
-$nation = new nation($conn);
+$nation = new nation();
 $nation->getAll();
 
 $nation_arr['']='';
@@ -117,7 +119,7 @@ $adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
 // *** ADRESSEN ***
 echo "<h3>Adressen:</h3>";
 echo "<table class='liste'><tr><th>Strasse</th><th>Plz</th><th>Ort</th><th>Gemeinde</th><th>Nation</th><th>Typ</th><th>Heimat</th><th>Zustellung</th><th>Firma</th></tr>";
-$adresse_obj = new adresse($conn);
+$adresse_obj = new adresse();
 $adresse_obj->load_pers($person->person_id);
 
 
@@ -132,7 +134,7 @@ foreach ($adresse_obj->result as $row)
 	echo "<td>".$adresstyp_arr[$row->typ]."</td>";
 	echo "<td>".($row->heimatadresse?'Ja':'Nein')."</td>";
 	echo "<td>".($row->zustelladresse?'Ja':'Nein')."</td>";
-	$firma=new firma($conn);
+	$firma=new firma();
 	if($row->firma_id!='')
 		$firma->load($row->firma_id);
 	echo "<td>".$firma->name."</td>";
@@ -151,7 +153,7 @@ function CutString($strVal, $limit)
 	}
 }
 
-$preinteressent = new preinteressent($conn);
+$preinteressent = new preinteressent();
 $preinteressent->getPreinteressenten($person->person_id);
 if(count($preinteressent->result)>0)
 {
@@ -180,7 +182,7 @@ if(count($preinteressent->result)>0)
 		echo "<td>".$row->aufmerksamdurch_kurzbz."</td>";
 		echo "<td>".$row->kontaktmedium_kurzbz."</td>";
 		echo '<td>';
-		$preinteressent1 = new preinteressent($conn);
+		$preinteressent1 = new preinteressent();
 		$preinteressent1->loadZuordnungen($row->preinteressent_id);
 		
 		$stgs='';
@@ -193,7 +195,7 @@ if(count($preinteressent->result)>0)
 		echo $stgs;
 		echo '</td>';
 		echo '<td>';
-		$firma = new firma($conn);
+		$firma = new firma();
 		$firma->load($row->firma_id);
 		echo $firma->name;
 		echo '</td>';
@@ -202,7 +204,7 @@ if(count($preinteressent->result)>0)
 	echo '</tbody></table>';
 }
 
-$prestudent = new prestudent($conn);
+$prestudent = new prestudent();
 $prestudent->getPrestudenten($person->person_id);
 if(count($prestudent->result)>0)
 {
@@ -227,15 +229,15 @@ if(count($prestudent->result)>0)
 		$uid='';
 		$gruppe='';
 		$qry ="SELECT * FROM public.tbl_student WHERE prestudent_id='$row->prestudent_id'";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			if(pg_num_rows($result)>1)
+			if($db->db_num_rows($result)>1)
 			{
 				$uid='ACHTUNG: Es gibt mehrere Studenteneinträge die auf diesen Prestudenten zeigen!';
 			}
 			else 
 			{
-				if($row_std = pg_fetch_object($result))
+				if($row_std = $db->db_fetch_object($result))
 				{
 					$uid = $row_std->student_uid;
 					$gruppe = $row_std->semester.$row_std->verband.$row_std->gruppe;
@@ -244,7 +246,7 @@ if(count($prestudent->result)>0)
 		}
 		echo "<td>$uid</td>";
 		echo "<td>$gruppe</td>";
-		$prestudent1 = new prestudent($conn);
+		$prestudent1 = new prestudent();
 		$prestudent1->getLastStatus($row->prestudent_id);	
 		echo "<td>$prestudent1->status_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
@@ -253,9 +255,9 @@ if(count($prestudent->result)>0)
 }
 
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE person_id='$person->person_id'";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	if(pg_num_rows($result)>0)
+	if($db->db_num_rows($result)>0)
 	{
 		echo '<br><h2>Mitarbeiter</h2>';		
 		echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
@@ -268,7 +270,7 @@ if($result = pg_query($conn, $qry))
 					<th>Telefonklappe</th>
 				</tr>
 			</thead><tbody>';
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo "<tr>";
 			echo "<td>$row->uid</td>";

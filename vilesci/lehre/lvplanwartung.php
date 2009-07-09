@@ -15,18 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/studiensemester.class.php');
-
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+		require_once('../../include/studiengang.class.php');
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/studiensemester.class.php');
 
 // Variablen Initialisieren
 	$studiengang_kz=0;
@@ -75,7 +76,7 @@ if(!$conn=pg_pconnect(CONN_STRING))
 			
 			
 //	Studiengang lesen 
-	$s=new studiengang($conn);
+	$s=new studiengang();
 	$s->getAll('typ, kurzbz', false);
 	$studiengang=$s->result;
 
@@ -95,14 +96,15 @@ if(!$conn=pg_pconnect(CONN_STRING))
 		// Termine holen
 		$qry = "SELECT DISTINCT datum, stunde FROM lehre.$stpl_table WHERE lehreinheit_id=".$leid;
 		//echo $qry.'<BR>';
-		if(!$result=pg_query($conn, $qry))
-			die ($qry);
-		while ($row=pg_fetch_object($result))
+		if(!$result=$db->db_query($qry))
+				die ($qry .' '.$db->db_last_error());
+			
+		while ($row=$db->db_fetch_object($result))
 		{
 			$qry = "SELECT DISTINCT ort_kurzbz FROM lehre.".$stpl_table."
 					WHERE lehreinheit_id=$leid AND datum='$row->datum' AND stunde=$row->stunde;";
-			if(!$result_ort=pg_query($conn, $qry))
-				die ("DB Fehler $qry");
+			if(!$result_ort=$db->db_query($qry))
+				die ("DB Fehler $qry" .' '.$db->db_last_error());
 			while ($row_ort=pg_fetch_object($result_ort))
 			{
 				$qry="INSERT INTO lehre.$stpl_table (datum,stunde,ort_kurzbz,unr,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id, insertvon)
@@ -111,13 +113,13 @@ if(!$conn=pg_pconnect(CONN_STRING))
 					$qry.="'$gruppe_kurzbz',$leid,'LVPlanCheck');";
 				else
 					$qry.="NULL,$leid,'LVPlanCheck');";
-				if(!$result_insert=pg_query($conn, $qry))
-					die ("DB Fehler $qry");
+				if(!$result_insert=$db->db_query($qry))
+					die ("DB Fehler $qry" .' '.$db->db_last_error());
 			}
 		}
 	}
 
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$studiensemester = $stsem_obj->getNearest();
 	$where=" studiensemester_kurzbz='".$studiensemester."'";
 	if (!empty($semester))
@@ -132,10 +134,10 @@ if(!$conn=pg_pconnect(CONN_STRING))
 		if(isset($_POST['lehrevz']))
 		{
 			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!pg_query($conn, $qry))
-				echo "Fehler beim Speichern!";
+			if(!$db->db_query($qry))
+					echo "Fehler beim Speichern! " .' '.$db->db_last_error();
 			else
-				echo "Erfolgreich gespeichert";
+					echo "Erfolgreich gespeichert";
 		}
 	} 
 
@@ -144,10 +146,10 @@ if(!$conn=pg_pconnect(CONN_STRING))
 			WHERE $where AND verplant=0 AND planstunden>0 AND lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.$stpl_table)
 			ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;";
 	//echo $sql_query;
-	if(!$result_lv=pg_query($conn, $sql_query))
-		die ("DB Fehler $sql_query");
+	if(!$result_lv=$db->db_query($sql_query))
+		die ("DB Fehler $sql_query"  .' '.$db->db_last_error());
 	if(!$result_lv) 
-		error("Lehrveranstaltung not found!");
+		die("Lehrveranstaltung not found!");
 		
 	$outp='';
 	$s=array();
@@ -190,7 +192,7 @@ echo "<h3>&Uuml;bersicht</h3>
 
 if ($result_lv!=0)
 {
-	$num_rows=pg_num_rows($result_lv);
+	$num_rows=$db->db_num_rows($result_lv);
 
 //  raumtyp raumtypalternativ stundenblockung wochenrythmus semesterstunden  start_kw anmerkung
 	echo "<th class='table-sortable:default'>LE-ID</th><th class='table-sortable:default'>UNR</th><th class='table-sortable:default'>Lehrfach</th><th class='table-sortable:default'>Lektor</th>
@@ -199,7 +201,7 @@ if ($result_lv!=0)
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
 	{
-	   $row=pg_fetch_object($result_lv);
+	   $row=$db->db_fetch_object($result_lv);
 	   echo "<tr>";
 	   echo "<td align='right'>$row->lehreinheit_id</td><td>$row->unr</td><td>$row->lehrfach-$row->lehrform - $row->lehrfach_bez</td><td>$row->lektor</td>";
 	   echo "<td>$row->studiengang-$row->semester$row->verband$row->gruppe</td><td>$row->gruppe_kurzbz</td>";

@@ -15,26 +15,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/stundenplan.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $student_uid = (isset($_GET['uid'])?$_GET['uid']:'');
 $datum = (isset($_GET['datum'])?$_GET['datum']:'');
 $stunde = (isset($_GET['stunde'])?$_GET['stunde']:'');
 
 $user = get_uid();
-#gss loadVariables($conn, $user);
 loadVariables($user);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -52,7 +54,7 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 {
 	if(isset($_GET['id']) && is_numeric($_GET['id']))
 	{
-		$stdplan = new stundenplan($conn, $db_stpl_table);
+		$stdplan = new stundenplan($db_stpl_table);
 		if($stdplan->delete($_GET['id']))
 		{
 			echo 'Eintrag wurde geloescht';
@@ -68,7 +70,7 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 	}
 }
 
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 $stg_arr = array();
 
@@ -97,16 +99,16 @@ if($student_uid!='')
 		 </thead>
 		 <tbody>';
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$gruppen='';
 			$qry = "SELECT distinct studiengang_kz, semester, verband, gruppe, gruppe_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) 
 			        WHERE unr='$row->unr'";
-			if($result_grp = pg_query($conn, $qry))
+			if($result_grp = $db->db_query($qry))
 			{
-				while($row_grp = pg_fetch_object($result_grp))
+				while($row_grp = $db->db_fetch_object($result_grp))
 				{
 					if($row_grp->gruppe_kurzbz!='')
 						$gruppen.="$row_grp->gruppe_kurzbz, ";
@@ -151,9 +153,9 @@ else
 		 </thead>
 		 <tbody>';
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$gruppe='';
 			if($row->gruppe_kurzbz!='')
