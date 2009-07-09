@@ -21,13 +21,11 @@
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
 	require_once('../../vilesci/config.inc.php');
+
 	require_once('../../include/ezcomponents/Base/src/ezc_bootstrap.php');
 	$stsem=0;
 	$studiengang_kz=0;
-	
-	if(!$conn = pg_connect(CONN_STRING))
-		die('Fehler beim der Datenbankverbindung');
-	
+
 	if(!$graph = new ezcGraphLineChart())
 		die('Fehler beim Initialisieren von EZComponents');
 	
@@ -59,9 +57,9 @@ if(trim($typ)=="m")
 			AND ausbildungssemester='1') 
 		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung, public.tbl_studiengang.kurzbz ORDER BY stgkurz";
 		//echo $qry."<br>--<br>";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				$hlp[strtoupper($row->stgkurz)][(substr(trim($stsem),-4)-$i)]=$row->count;
 				$summe[(substr(trim($stsem),-4)-$i)] = $summe[(substr(trim($stsem),-4)-$i)] + $row->count;
@@ -76,9 +74,9 @@ if(trim($typ)=="m")
 			AND studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' 
 			AND rolle_kurzbz='Student' 
 			AND ausbildungssemester='1'";
-		if($result_anzahl=pg_query($conn, $qry_anzahl))
+		if($result_anzahl=$db->db_query($qry_anzahl))
 		{
-			if($row_anzahl=pg_fetch_object($result_anzahl))
+			if($row_anzahl=$db->db_fetch_object($result_anzahl))
 			{
 				$hlp['extern'][(substr(trim($stsem),-4)-$i)]= $row_anzahl->anzahl - $summe[(substr(trim($stsem),-4)-$i)];
 				if($hlp['extern'][(substr(trim($stsem),-4)-$i)]<0)
@@ -125,9 +123,9 @@ if(trim($typ)=="b")
 			AND (studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' OR studiensemester_kurzbz='SS".(substr(trim($stsem),-4)-$i)."') )) as b 
 		GROUP BY studiengang_kz, typ, bezeichnung, kurzbz ORDER BY stgkurz";
 		//echo $qry."<br>--<br>";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				$hlp[strtoupper($row->stgkurz)][(substr(trim($stsem),-4)-$i)]=$row->count;
 				$summe[(substr(trim($stsem),-4)-$i)] = $summe[(substr(trim($stsem),-4)-$i)] + $row->count;
@@ -141,9 +139,9 @@ if(trim($typ)=="b")
 			WHERE studiengang_kz='".$studiengang_kz."' 
 			AND rolle_kurzbz='Absolvent'
 			AND (studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' OR studiensemester_kurzbz='SS".(substr(trim($stsem),-4)-$i)."')";
-		if($result_anzahl=pg_query($conn, $qry_anzahl))
+		if($result_anzahl=$db->db_query($qry_anzahl))
 		{
-			if($row_anzahl=pg_fetch_object($result_anzahl))
+			if($row_anzahl=$db->db_fetch_object($result_anzahl))
 			{
 				$hlp['extern'][(substr(trim($stsem),-4)-$i)]= $row_anzahl->anzahl - $summe[(substr(trim($stsem),-4)-$i)];
 				if($hlp['extern'][(substr(trim($stsem),-4)-$i)]<0)

@@ -484,9 +484,9 @@ if($studiensemester_kurzbz!='')
 	AND tbl_konto.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=tbl_konto.studiengang_kz AND tbl_konto.buchungsnr_verweis IS NOT NULL 
 	AND person_id=tbl_person.person_id)";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($conn, $qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$zeile++;
 			$spalte=0;

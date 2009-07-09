@@ -69,27 +69,6 @@ if($studiensemester_kurzbz != -1)
 		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz ORDER BY count desc"; 
 		
 		//Anzahl der Studenten ohne AbschluÃ¾ auf der FHTW
-		/*$qry_rest="SELECT count(*) as rest FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-			WHERE studiengang_kz='".$row_stg->studiengang_kz."' 
-			AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
-			AND rolle_kurzbz='Student' 
-			AND ausbildungssemester='1' 
-			AND tbl_person.person_id NOT IN (SELECT DISTINCT public.tbl_person.person_id 
-				FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-				JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-				JOIN public.tbl_studiengang USING(studiengang_kz) 
-				WHERE rolle_kurzbz='Absolvent' AND typ!='m' 
-					AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM tbl_person 
-					JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-					JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-					WHERE studiengang_kz='".$row_stg->studiengang_kz."' 
-					AND studiensemester_kurzbz='".$studiensemester_kurzbz."' 
-					AND rolle_kurzbz='Student' 
-					AND ausbildungssemester='1'))";
-		$result_rest=pg_query($conn, $qry_rest);
-		$row_rest=pg_fetch_object($result_rest);*/
 		
 		//Anzahl der Studenten im 1.Semester des MasterStg
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
@@ -169,23 +148,7 @@ if($studiensemester_kurzbz != -1)
 		GROUP BY studiengang_kz, typ, bezeichnung, kurzbz ORDER BY count desc";
 		
 		//Anzahl der Studenten ohne weitere Masterstudien am FHTW
-		/*$qry_rest="SELECT count(*) as anzahl FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-			WHERE studiengang_kz='".$row_stg->studiengang_kz."' 
-			AND rolle_kurzbz='Absolvent'
-			AND public.tbl_person.person_id NOT IN (SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) public.tbl_person.person_id  
-						FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-						JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-						JOIN public.tbl_studiengang USING(studiengang_kz) 
-						WHERE rolle_kurzbz='Student' AND typ='m' 
-							AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
-							JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-							JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
-							WHERE studiengang_kz='".$row_stg->studiengang_kz."'  
-							AND rolle_kurzbz='Absolvent'))";
-		$result_rest=pg_query($conn, $qry_rest);
-		$row_rest=pg_fetch_object($result_rest);*/
+
 		
 		//Anzahl der Absolventen des Studiengangs
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
