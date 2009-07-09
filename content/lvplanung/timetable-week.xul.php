@@ -25,7 +25,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 include('../../config/vilesci.config.inc.php');
 include('../../include/globals.inc.php');
 include('../../include/functions.inc.php');
-include('../../include/berechtigung.class.php');
+#include('../../include/berechtigung.class.php');
 include('../../include/lehreinheit.class.php');
 include('../../include/zeitwunsch.class.php');
 include('../../include/wochenplan.class.php');
