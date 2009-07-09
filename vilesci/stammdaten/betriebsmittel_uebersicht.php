@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,15 +15,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
+ 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require_once('../../include/functions.inc.php');
     require_once('../../include/studiengang.class.php');
     require_once('../../include/benutzerberechtigung.class.php');
-	
+
 	$user = get_uid();
 	
 	$rechte = new benutzerberechtigung();
@@ -31,40 +37,44 @@
 	
 	if(!$rechte->isBerechtigt('admin'))
 		die('Sie haben keine Berechtigung für diese Seite');
-
-	$db = new basis_db();
+	
 	$htmlstr = "";
 	
 	if (isset($_POST['bmsuche']))
 	{
-		$bmsuche=mb_strtoupper($_POST['bmsuche']);
+		$bmsuche=strtoupper($_POST['bmsuche']);
 		$bmsuche = ereg_replace("^0*", "", $bmsuche);
 		
 		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
 					WHERE upper(uid) LIKE '%$bmsuche%' OR upper(nachname) LIKE '%$bmsuche%' OR upper(vorname) LIKE '%$bmsuche%' 
 						OR upper(nummer) LIKE '%$bmsuche%' OR upper(nummerintern) LIKE '%$bmsuche%'
 					LIMIT 30";
+		//echo $sql_query;
 	}
-	else 
-	{
-		$sql_query="SELECT * FROM public.vw_betriebsmittelperson ORDER BY insertamum DESC LIMIT 20";
-	}
-	
+	else
+		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ORDER BY nummer LIMIT 20;';
+
     if(!$erg=$db->db_query($sql_query))
 	{
-		$errormsg='Fehler beim Laden der Berechtigungen';
+		$htmlstr='Fehler beim Laden der Berechtigungen';
 	}
 	else
 	{
-		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+		//$htmlstr = "<table class='liste sortable'>\n";
+		$htmlstr .= "<div style='text-align:right'>";
+		$htmlstr .= "<form name='suche' method='POST' action=''>
+							<input type='text' value=''id='bmsuche' maxlength=12 size=12 name='bmsuche' tabindex='1'/>&nbsp;
+							<input type='submit' name='submit' value='BM-Suche'>
+						</form>";
+		$htmlstr .= "</div>";
+	    	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 		$htmlstr .= "   <thead><tr class='liste'>\n";
-	    $htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
+	    	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
 	    						<th class='table-sortable:default'>NrIntern</th><th class='table-sortable:default'>Person (UID)</th>
 	    						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
-	    $htmlstr .= "   </tr></thead><tbody>\n";
-	    $i = 0;
-	    
-		while($row = $db->db_fetch_object($erg))
+	    	$htmlstr .= "   </tr></thead><tbody>\n";
+	    	$i = 0;
+		while($row=$db->db_fetch_object($erg))
 		{
 			//$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
@@ -81,7 +91,6 @@
 		}
 	    	$htmlstr .= "</tbody></table>\n";
 	}
-	
 ?>
 <html>
 <head>
@@ -101,14 +110,6 @@
 <h2>Betriebsmittel &Uuml;bersicht</h2>
 
 <?php
-//$htmlstr = "<table class='liste sortable'>\n";
-	echo "<div style='text-align:right'>
-			<form name='suche' method='POST' action=''>
-			<input type='text' value=''id='bmsuche' maxlength=12 size=12 name='bmsuche' tabindex='1'/>&nbsp;
-			<input type='submit' name='submit' value='BM-Suche'>
-			</form>
-		</div>
-	    <form name='formular'><input type='hidden' name='check' value=''></form>";
     echo $htmlstr;
 ?>
 
