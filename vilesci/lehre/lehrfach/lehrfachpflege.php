@@ -104,7 +104,7 @@ $qry="SELECT tbl_lehrveranstaltung.bezeichnung as lvbez, tbl_lehrveranstaltung.k
 
 if($result = $db->db_query($qry))
 {
-	echo "<br>Anzahl der Datensätze: ".pg_num_rows($result);
+	echo "<br>Anzahl der Datensätze: ".$db->db_num_rows($result);
 	echo "<table class='liste'><tr><th>ID</th><th>LV-Kürzel</th><th>LV-Bezeichnung</th><th>Stg-Kz</th><th>Sem.</th><th>LF-Kürzel</th><th>LF-Bezeichnung</th><th>Lehrfach-Auswahl</th><th></th></tr>";
 	while($row =$db->db_fetch_object($result))
 	{

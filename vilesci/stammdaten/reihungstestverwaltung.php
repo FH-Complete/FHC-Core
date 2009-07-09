@@ -444,7 +444,7 @@
 						</tr>
 						</thead>
 						<tbody>";
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object($result))
 				{
 					$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
 					echo "

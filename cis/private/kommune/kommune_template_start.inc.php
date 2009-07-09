@@ -31,13 +31,79 @@
 * @return showHTML String mit HTML Ausgabe der Wettbewerbe, Eigene Wettbewerbe 
 *
 */
-function showStartseite($oWettbewerb)
-{
 	// Plausib
+$last=null;
+$oWettbewerb->wbtyp_kurzbz='';
+$oWettbewerb->wettbewerb_kurzbz='';
+kommune_funk_wettbewerb(&$oWettbewerb);	
+kommune_funk_eigene_wettbewerb(&$oWettbewerb);
+#var_dump($oWettbewerb);
 
-	// Initialisierung
-	$showHTML='';
-	// Menue-AnzeigenContent 					
-	return $showHTML;
+$last=null;
+$iTmpWettbewerb=0;
+echo '<table  class="tabcontent">';
+echo '<tr>';
+for ($iTmpZehler=0;$iTmpZehler<count($oWettbewerb->Wettbewerb);$iTmpZehler++) 
+{
+	if ($iTmpWettbewerb!=0 && ($iTmpWettbewerb%constMaxWettbwerbeZeile==0 || $last!=$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz) )
+	{
+		$iTmpWettbewerb=0;
+		echo '</tr><tr>';
+	}	
+	if ($last!=$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz)
+	{
+		$last=$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz;
+		echo '<tr>
+			<td colspan="'.constMaxWettbwerbeZeile.'">
+				<b class="rtop">
+					  <b class="r1" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r2"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r3" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r4" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b>
+				</b>				
+				<table class="tabcontent" cellpadding="0" cellspacing="0"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';">
+					<tr><td>&nbsp;'.$last.'&nbsp;</td></tr>
+				</table>
+				<b class="rbottom">
+					  <b class="r4"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r3" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r2" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r1"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b>
+				</b>
+							
+			</td></tr>';				
+	}
+	
+	if (!empty($oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz))
+	{
+		$oWettbewerb->wbtyp_kurzbz=$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz;
+		$oWettbewerb->wettbewerb_kurzbz=$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz;
+		if ($oWettbewerb->Wettbewerb[$iTmpZehler]->bereits_eingetragen)
+			$oWettbewerb->team_kurzbz=$oWettbewerb->Wettbewerb[$iTmpZehler]->daten_eingetragen[0]->team_kurzbz;
+		else
+			$oWettbewerb->team_kurzbz='';
+			
+		$iTmpWettbewerb++;
+		echo '<td valign="top">
+
+			<b class="rtop">
+			  <b class="r1" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r2"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r3" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r4" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b>
+			</b>
+
+			<table width="100%" cellpadding="0" cellspacing="0" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';">
+				<tr>
+					<td valign="top"><h2>&nbsp;'.$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz.'&nbsp;</h2></td>
+					<td valign="top" rowspan="4" height="70">'.$oWettbewerb->Wettbewerb[$iTmpZehler]->icon_image.'&nbsp;</td>
+				</tr>
+				<tr><td>'.$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerbart.'</td></tr>
+				
+				<tr><td>[&nbsp;<a href="'.kommune_funk_create_url('kommune_team_wartung',$oWettbewerb).'">'.($oWettbewerb->Wettbewerb[$iTmpZehler]->bereits_eingetragen?'meine Daten':'anmelden').'</a>&nbsp;]&nbsp;[&nbsp;<a href="'.kommune_funk_create_url('kommune_team_wartung.inc.php',$oWettbewerb).'">zum&nbsp;Spiel</a>&nbsp;]</td></tr>
+			</table>
+
+			<b class="rbottom">
+				  <b class="r4"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r3" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r2" style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b> <b class="r1"  style="background: #'.$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe.';"></b>
+			</b>
+
+		</td>';
+	}
 }
+if ($iTmpWettbewerb==0) // Kein Tabellenelement angelegt (Nun ein Dummy td anlegen das die Tab.stimmt)
+	echo '<td>&nbsp;</td>';
+echo '<tr>';
+echo '</table>';	
+
 ?>

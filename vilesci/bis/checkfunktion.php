@@ -95,7 +95,7 @@ if($result = $db->db_query($qry))
 				}
 				else
 				{
-					if($row_verw = pg_fetch_object($result_verw))
+					if($row_verw = $db->db_fetch_object($result_verw))
 						$verwendung_id = $row_verw->bisverwendung_id;
 					else
 					{
@@ -104,7 +104,7 @@ if($result = $db->db_query($qry))
 					}
 				}
 
-				if(pg_num_rows($result_verw)>1)
+				if($db->db_num_rows($result_verw)>1)
 				{
 					echo "<br>Es wurde mehr als eine Verwendung bei $row->mitarbeiter_uid gefunden - es wird die Verwendung $verwendung_id verwendet";
 					$verwendung_multiple++;
@@ -174,7 +174,7 @@ if($result = $db->db_query($qry))
 			ORDER BY mitarbeiter_uid, studiengang_kz";
 	if($result = $db->db_query($qry))
 	{
-		$funktion_ohne_lehrauftrag = pg_num_rows($result);
+		$funktion_ohne_lehrauftrag = $db->db_num_rows($result);
 
 		while($row = $db->db_fetch_object($result))
 		{

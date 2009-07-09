@@ -239,7 +239,7 @@ if(isset($_GET['type']) && $_GET['type']=='zusammenlegung')
 		
 		//Versuchen den Personendatensatz zu loeschen
 		//(Falls die Person noch irgendwohin referenziert (Firmenbetreuer, Preinteressent,...)
-		// wird das Loeschen von der DB verhindert, deshalb das @ vor dem pg_query)
+		// wird das Loeschen von der DB verhindert, deshalb das @ vor dem query)
 		$qry = "DELETE FROM public.tbl_person WHERE person_id='$preinteressent->person_id'";
 		@$db->db_query($qry);
 	

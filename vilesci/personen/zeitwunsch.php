@@ -70,7 +70,7 @@
 				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 				if(! $erg_wunsch=$db->db_query($query))
 					die($db->db_last_error());
-				$num_rows_wunsch=pg_num_rows($erg_wunsch);
+				$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
 					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";

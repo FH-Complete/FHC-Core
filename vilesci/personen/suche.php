@@ -157,7 +157,7 @@ if($searchstr!='')
 							WHERE person_id='$row->person_id'";
 					if($result_mitarbeiter = $db->db_query($qry))
 					{
-						if(pg_num_rows($result_mitarbeiter)>0)
+						if($db->db_num_rows($result_mitarbeiter)>0)
 						{
 						
 							while($row_mitarbeiter = $db->db_fetch_object($result_mitarbeiter))

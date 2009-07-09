@@ -496,7 +496,7 @@ class lehreinheit extends basis_db
 		}
 		$erg_stpl=$this->db_result;
 		
-		$anzahl=$this->db_numrows($erg_stpl);
+		$anzahl=$this->db_num_rows($erg_stpl);
 		//Check
 		if ($anzahl==0)
 		{

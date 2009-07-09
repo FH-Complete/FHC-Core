@@ -140,7 +140,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 				$db->db_query($sql_query_upd1);
 				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
 			}
-			if(@pg_query('SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
+			if(@$db->db_query('SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
 			{
 				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
 				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_id='$radio_2' WHERE person_id='$radio_1';";

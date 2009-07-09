@@ -76,7 +76,7 @@ else
 $sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, gruppe_kurzbz LIMIT 100';
 //echo $sql_query.'<BR>';
 $erg_stpl=$db->db_query($sql_query);
-$num_rows_stpl=$db->db_numrows($erg_stpl);
+$num_rows_stpl=$db->db_num_rows($erg_stpl);
 
 //Reservierungen
 $sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM vw_reservierung, vw_mitarbeiter WHERE datum='$datum' AND stunde=$stunde";

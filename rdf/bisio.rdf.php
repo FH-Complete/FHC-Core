@@ -31,6 +31,9 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/bisio.class.php');
 require_once('../include/datum.class.php');
 
+	if (!$db = new basis_db())
+    	  die('Fehler beim Oeffnen der Datenbankverbindung');
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 if(isset($_GET['uid']))
@@ -91,9 +94,9 @@ function draw_content($row)
 	if($row->lehreinheit_id!='')
 	{
 		$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row->lehreinheit_id'";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($conn, $qry))
 		{
-			if($row_lv = pg_fetch_object($result))
+			if($row_lv = $db->db_fetch_object($result))
 			{
 				$lehrveranstaltung_id = $row_lv->lehrveranstaltung_id;
 				$studiensemester_kurzbz = $row_lv->studiensemester_kurzbz;

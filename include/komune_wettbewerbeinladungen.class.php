@@ -34,247 +34,92 @@
 * @return - kein Retourn des Konstruktors
 *
 */
-include_once(dirname(__FILE__)."/postgre_sql.class.php"); 
-class komune_wettbewerbeinladungen extends postgre_sql
+
+
+require_once(dirname(__FILE__).'/basis_db.class.php'); 
+class komune_wettbewerbeinladungen extends basis_db 
 {
-       protected $wettbewerbeinladungen="";
+	   public $result;
+	   public $new=false;      					// boolean
+	   	
+       public $wbtyp_kurzbz;
+       public $wettbewerb_kurzb;
+
+	   public $uid;
+       public $team_kurzbz;
+
+       public $team_forderer="";
+       public $team_gefordert="";
+       public $match_id="";
+
+       public $gefordertvon="";
+       public $gefordertamum="";	   
+
+       public $matchdatumzeit="";
+       public $matchort="";
+
+       public $bestaetigtvon="";
+       public $bestaetigtamum="";
+
+       public $ergebniss="";
+       public $team_sieger="";	   
+
+       public $matchbestaetigtamum="";
+       public $matchbestaetigtvon="";
 	
-       protected $uid="";
-	
-       protected $match_id="";
-       protected $wettbewerb_kurzbz="";
-
-       protected $team_kurzbz="";
-       protected $team_gefordert="";
-
-       protected $gefordertvon="";
-       protected $gefordertamum="";	   
-
-       protected $matchdatumzeit="";
-       protected $matchort="";
-
-       protected $bestaetigtvon="";
-       protected $bestaetigtamum="";
-
-       protected $ergebniss="";
-       protected $team_sieger="";	   
-
-       protected $matchbestaetigtamum="";
-       protected $matchbestaetigtvon="";
-	
-       protected $switchGewinner='';	   
-		
+       public $switchGewinner='';	   
+	   
+	   public $schemaSQL="kommune"; // string Datenbankschema		
 //-----Konstruktor       
-       function komune_wettbewerbeinladungen($connectSQL,$match_id="",$team_forderer="",$team_gefordert="",$wettbewerb_kurzbz="",$uid="") 
+       function __construct($match_id="",$team_forderer="",$team_gefordert="",$wettbewerb_kurzbz="",$uid="",$wbtyp_kurzbz="") 
        {
-           $this->InitWettbewerbeinladungen();   
+	   		parent::__construct();
+	   
+           	$this->InitWettbewerbeinladungen();   
 
-           $this->setConnectSQL($connectSQL);   
-           $this->setMatch_id($match_id);
-           $this->setTeam_forderer($team_forderer);
-           $this->setTeam_gefordert($team_gefordert);
-           $this->setWettbewerb_kurzbz($wettbewerb_kurzbz);
-           $this->setGefordertvon($uid);
+			$this->match_id=$match_id;
+			$this->team_forderer=$team_forderer;
+			$this->team_gefordert=$team_gefordert;
+
+			$this->wbtyp_kurzbz=$wbtyp_kurzbz;
+			$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
+					   
+		   	$this->gefordertvon=$uid;
+
        }
 //-----Initialisierung--------------------------------------------------------------------------------------------
        function InitWettbewerbeinladungen() 
        {
-		$this->setError('');
-		// Ergebniss-Liste der Spiele
-       	$this->setWettbewerbeinladung('');
-		// Liste der Spiele mit Ergebniss "True" , oder Ohne "False"
-		$this->setSwitchGewinner('');
-	
-		// Step 1	
-	       $this->setMatch_id('');
-		$this->setWettbewerb_kurzbz('');
+			$this->new=false;
+			$this->errormsg='';
+			
+	       	$this->result=array();
 
-      		$this->setGefordertvon(''); 
-		$this->setGefordertamum('');		
-
-		$this->setTeam_kurzbz('');
-		$this->setTeam_gefordert('');
-
-		$this->setMatchdatumzeit('');
-		$this->setMatchort('');
-		// Step 2		
-		$this->setBestaetigtvon('');
-		$this->setBestaetigtamum(0);
-		// Step 3		
-		$this->setErgebniss('');
-		$this->setTeam_sieger('');		
-		// Step 4		
-		$this->setMatchbestaetigtamum('');
-		$this->setMatchbestaetigtvon('');
+			$this->wbtyp_kurzbz='';
+	       	$this->wettbewerb_kurzbz='';
+			
+			$this->match_id="";
+			$this->team_forderer="";
+			$this->team_gefordert="";
+			
+			$this->gefordertvon="";
+			$this->gefordertamum="";	   
+			
+			$this->matchdatumzeit="";
+			$this->matchort="";
+			
+			$this->bestaetigtvon="";
+			$this->bestaetigtamum="";
+			
+			$this->ergebniss="";
+			$this->team_sieger="";	   
+			
+			$this->matchbestaetigtamum="";
+			$this->matchbestaetigtvon="";
+			
+			$this->switchGewinner='';	   
+		
        }
-//-----Wettbewerb Matchdaten--------------------------------------------------------------------------------------------
-       function getWettbewerbeinladung() 
-       {
-           return $this->wettbewerbeinladung;
-       }
-       function setWettbewerbeinladung($wettbewerbeinladung) 
-       {
-           $this->wettbewerbeinladung=$wettbewerbeinladung;
-       }
-//-----match_id--------------------------------------------------------------------------------------------
-       function getMatch_id() 
-       {
-           return $this->match_id;
-       }
-       function setMatch_id($match_id) 
-       {
-           $this->match_id=$match_id;
-       }
-//-----gefordertvon--------------------------------------------------------------------------------------------
-       function getGefordertvon() 
-       {
-           return $this->gefordertvon;
-       }
-       function setGefordertvon($gefordertvon) 
-       {
-           $this->gefordertvon=$gefordertvon;
-       }
-
-//-----UID--------------------------------------------------------------------------------------------
-// Match - Wettbewerb uid = Moderator
-       function getUid() 
-       {
-           return $this->uid;
-       }
-       function setUid($uid) 
-       {
-           $this->uid=$uid;
-       }
-
-//-----gefordertam--------------------------------------------------------------------------------------------
-       function getGefordertamum() 
-       {
-           return $this->gefordertamum;
-       }
-       function setGefordertamum($gefordertamum) 
-       {
-           $this->gefordertamum=$gefordertamum;
-       }
-//-----team_forderer--------------------------------------------------------------------------------------------
-       function getTeam_forderer() 
-       {
-           return $this->team_forderer;
-       }
-       function setTeam_forderer($team_forderer) 
-       {
-           $this->team_forderer=$team_forderer;
-       }
-//-----team_kurzbz--kompilitaet------------------------------------------------------------------------------------------
-       function getTeam_kurzbz() 
-       {
-           return $this->getTeam_forderer();
-       }
-       function setTeam_kurzbz($team_kurzbz) 
-       {
-           $this->setTeam_forderer($team_kurzbz);
-       }
-	
-//-----team_gefordert--------------------------------------------------------------------------------------------
-       function getTeam_gefordert() 
-       {
-           return $this->team_gefordert;
-       }
-       function setTeam_gefordert($team_gefordert) 
-       {
-           $this->team_gefordert=$team_gefordert;
-       }	   
-//-----team_sieger--------------------------------------------------------------------------------------------
-       function getTeam_sieger() 
-       {
-           return $this->team_sieger;
-       }
-       function setTeam_sieger($team_sieger) 
-       {
-           $this->team_sieger=$team_sieger;
-       }	   
-//-----wettbewerb_kurzbz--------------------------------------------------------------------------------------------
-       function getWettbewerb_kurzbz() 
-       {
-           return $this->wettbewerb_kurzbz;
-       }
-       function setWettbewerb_kurzbz($wettbewerb_kurzbz="") 
-       {
-           $this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
-       }
-//-----matchdatumzeit--------------------------------------------------------------------------------------------
-       function getMatchdatumzeit() 
-       {
-           return $this->matchdatumzeit;
-       }
-       function setMatchdatumzeit($matchdatumzeit) 
-       {
-           $this->matchdatumzeit=$matchdatumzeit;
-       }	 	   
-//-----matchort--------------------------------------------------------------------------------------------
-       function getMatchort() 
-       {
-           return $this->matchort;
-       }
-       function setMatchort($matchort) 
-       {
-           $this->matchort=$matchort;
-       }	
-//-----ergebniss--------------------------------------------------------------------------------------------
-       function getErgebniss() 
-       {
-           return $this->ergebniss;
-       }
-       function setErgebniss($ergebniss) 
-       {
-           $this->ergebniss=$ergebniss;
-       }	
-//-----bestaetigtvon--------------------------------------------------------------------------------------------
-       function getBestaetigtvon() 
-       {
-           return $this->bestaetigtvon;
-       }
-       function setBestaetigtvon($bestaetigtvon) 
-       {
-           $this->bestaetigtvon=$bestaetigtvon;
-       }	
-//-----bestaetigtamum--------------------------------------------------------------------------------------------
-       function getBestaetigtamum() 
-       {
-           return $this->bestaetigtamum;
-       }
-       function setBestaetigtamum($bestaetigtamum) 
-       {
-           $this->bestaetigtamum=$bestaetigtamum;
-       }	
-//-----matchbestaetigtamum--------------------------------------------------------------------------------------------
-       function getMatchbestaetigtamum() 
-       {
-           return $this->matchbestaetigtamum;
-       }
-       function setMatchbestaetigtamum($matchbestaetigtamum) 
-       {
-           $this->matchbestaetigtamum=$matchbestaetigtamum;
-       }	 	   
-//-----matchbestaetigtvon--------------------------------------------------------------------------------------------
-       function getMatchbestaetigtvon() 
-       {
-           return $this->matchbestaetigtvon;
-       }
-       function setMatchbestaetigtvon($matchbestaetigtvon) 
-       {
-           $this->matchbestaetigtvon=$matchbestaetigtvon;
-       }	
-//-----switchGewinner--------------------------------------------------------------------------------------------
-// Selektion des Datenlesen 0 nur nicht Gewonnene, 1 sind alle Gewonnene , leer alle
-       function getSwitchGewinner() 
-       {
-           return $this->switchGewinner;
-       }
-       function setSwitchGewinner($switchGewinner) 
-       {
-           $this->switchGewinner=$switchGewinner;
-       }
-	
 //-------------------------------------------------------------------------------------------------
        function saveWettbewerbeinladung($team_forderer="",$team_gefordert="",$match_id="")
        {
@@ -294,18 +139,18 @@ class komune_wettbewerbeinladungen extends postgre_sql
 		// Verarbeitungsvariablen	
 		$cSchemaSQL=$this->getschemaSQL();
   	   	$cMatch_id=$this->getMatch_id();			
-       	$cTeam_forderer=$this->getTeam_forderer();			
+       	$this->team_forderer=$this->getTeam_forderer();			
        	$cTeam_gefordert=$this->getTeam_gefordert();		
 			
 		// Plausib - Pruefen ob Eingeladente Team nicht als Array ubergeben wurde ( gebraucht wird nur die Kurzbezeichnung)
-	       if (is_array($cTeam_forderer) && isset($cTeam_forderer['team_forderer']))		
-		      $cTeam_forderer=$cTeam_forderer['team_forderer'];		
-	       elseif (is_array($cTeam_forderer) && isset($cTeam_forderer[0]['team_forderer']) )		
-		      $cTeam_forderer=$cTeam_forderer[0]['team_forderer'];		
-	       elseif (is_array($cTeam_forderer) && isset($cTeam_forderer['team_forderer']))		
-		      $cTeam_forderer=$cTeam_forderer['team_kurzbz'];		
-	       elseif (is_array($cTeam_forderer) && isset($cTeam_forderer[0]['team_forderer']) )		
-		      $cTeam_forderer=$cTeam_forderer[0]['team_forderer'];		
+	       if (is_array($this->team_forderer) && isset($this->team_forderer['team_forderer']))		
+		      $this->team_forderer=$this->team_forderer['team_forderer'];		
+	       elseif (is_array($this->team_forderer) && isset($this->team_forderer[0]['team_forderer']) )		
+		      $this->team_forderer=$this->team_forderer[0]['team_forderer'];		
+	       elseif (is_array($this->team_forderer) && isset($this->team_forderer['team_forderer']))		
+		      $this->team_forderer=$this->team_forderer['team_kurzbz'];		
+	       elseif (is_array($this->team_forderer) && isset($this->team_forderer[0]['team_forderer']) )		
+		      $this->team_forderer=$this->team_forderer[0]['team_forderer'];		
 		
 		// Plausib - Pruefen ob Eingeladene Team nicht als Array ubergeben wurde ( gebraucht wird nur die Kurzbezeichnung)
 	       if (is_array($cTeam_gefordert) && isset($cTeam_gefordert['team_kurzbz']))		
@@ -313,8 +158,8 @@ class komune_wettbewerbeinladungen extends postgre_sql
 	       elseif (is_array($cTeam_gefordert) && isset($cTeam_gefordert[0]['team_kurbz']))		
 		      $cTeam_gefordert=$cTeam_gefordert[0]['team_kurzbz'];		
 		
-		$cTeam_forderer=trim($cTeam_forderer);	  
-		if (empty($cTeam_forderer) )
+		$this->team_forderer=trim($this->team_forderer);	  
+		if (empty($this->team_forderer) )
 		{
 			$this->setError('Kein Einladung (Einladenter fehlt) m&ouml;glich !');
 			return false;
@@ -347,7 +192,7 @@ class komune_wettbewerbeinladungen extends postgre_sql
 			return false;
 		}	
 
-    		$cTmpSQL="BEGIN;  ";
+    		$qry="BEGIN;  ";
 		if ($this->getNewRecord()) // Neuanlage - Insert 
 		{
 			if (!$this->getGefordertamum())
@@ -379,13 +224,13 @@ class komune_wettbewerbeinladungen extends postgre_sql
 					$fildsValue.=(!empty($fildsValue)?',':'').$cTmpWert;
 				}	
 			}
-       		$cTmpSQL=" insert into ".$cSchemaSQL."tbl_match (".$fildsList.") values (".$fildsValue."); ";
+       		$qry=" insert into ".$this->schemaSQL.".tbl_match (".$fildsList.") values (".$fildsValue."); ";
 		}
 		else
 		{
 			if (!$this->getMatch_id())
 				$this->setMatch_id($origWettbewerbeinladungen[0]['match_id']);
-			$cTmpSQL.=" update ".$cSchemaSQL."tbl_match set ";
+			$qry.=" update ".$this->schemaSQL.".tbl_match set ";
 			$fildsValue='';
 			for ($fildIND=0;$fildIND<count($arrTmpTableStrucktur);$fildIND++)
 			{
@@ -413,55 +258,55 @@ class komune_wettbewerbeinladungen extends postgre_sql
 					}
 			       }						
 			}
-			$cTmpSQL.=$fildsValue." where tbl_match.match_id='".$this->getMatch_id()."'; ";  
-			$cWettbewerb_kurzbz=trim($origWettbewerbeinladungen[0]['wettbewerb_kurzbz']);
+			$qry.=$fildsValue." where tbl_match.match_id='".$this->getMatch_id()."'; ";  
+			$this->wettbewerb_kurzbz=trim($origWettbewerbeinladungen[0]['wettbewerb_kurzbz']);
 			$origWettbewerbeinladungen[0]['matchbestaetigtvon']=trim($origWettbewerbeinladungen[0]['matchbestaetigtvon']);
 			$origWettbewerbeinladungen[0]['team_sieger']=trim($origWettbewerbeinladungen[0]['team_sieger']);
 
 			if ($this->getMatchbestaetigtvon() && empty($origWettbewerbeinladungen[0]['matchbestaetigtvon'])
-			&& trim($origWettbewerbeinladungen[0]['team_sieger'])==trim($cTeam_forderer))  // Der Forderer ist der Siehter den Rangtauschen
+			&& trim($origWettbewerbeinladungen[0]['team_sieger'])==trim($this->team_forderer))  // Der Forderer ist der Siehter den Rangtauschen
 			{
 			// Rang des Geforderten ermitteln
-				$cTmpSQL_tmp="select rang from ".$cSchemaSQL."tbl_wettbewerbteam where upper(team_kurzbz)=upper('".$cTeam_gefordert."') and  upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."')   FOR UPDATE ;";
-			       $this->fetch_object($cTmpSQL_tmp);
+				$qry_tmp="select rang from ".$this->schemaSQL.".tbl_wettbewerbteam where upper(team_kurzbz)=upper('".$cTeam_gefordert."') and  upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."')   FOR UPDATE ;";
+			       $this->fetch_object($qry_tmp);
 				$iTmpRangGeforderter=$this->getResultSQL();
 				if (isset($iTmpRangGeforderter->rang))
 					$iTmpRangGeforderter=trim($iTmpRangGeforderter->rang);
 					
 				// Rang des Geforderten ermitteln
-				$cTmpSQL_tmp="select rang from ".$cSchemaSQL."tbl_wettbewerbteam where upper(team_kurzbz)=upper('".$cTeam_forderer."') and  upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."')   FOR UPDATE ;";
+				$qry_tmp="select rang from ".$this->schemaSQL.".tbl_wettbewerbteam where upper(team_kurzbz)=upper('".$this->team_forderer."') and  upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."')   FOR UPDATE ;";
 		
-			       $this->fetch_object($cTmpSQL_tmp);
+			       $this->fetch_object($qry_tmp);
 				$iTmpRangFrorderer=$this->getResultSQL();
 				if (isset($iTmpRangFrorderer->rang))
 					$iTmpRangFrorderer=trim($iTmpRangFrorderer->rang);
 				
-				$cTmpSQL.=" update ".$cSchemaSQL."tbl_wettbewerbteam  ";
-				$cTmpSQL.="set rang=0 ";
-				$cTmpSQL.=" where upper(team_kurzbz)=upper('".$cTeam_gefordert."') and  upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."'); ";
+				$qry.=" update ".$this->schemaSQL.".tbl_wettbewerbteam  ";
+				$qry.="set rang=0 ";
+				$qry.=" where upper(team_kurzbz)=upper('".$cTeam_gefordert."') and  upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."'); ";
 
-				$cTmpSQL.=" update ".$cSchemaSQL."tbl_wettbewerbteam  ";
-				$cTmpSQL.="set rang=".$iTmpRangGeforderter;
-				$cTmpSQL.=" where upper(team_kurzbz)=upper('".$cTeam_forderer."') and upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."'); ";
+				$qry.=" update ".$this->schemaSQL.".tbl_wettbewerbteam  ";
+				$qry.="set rang=".$iTmpRangGeforderter;
+				$qry.=" where upper(team_kurzbz)=upper('".$this->team_forderer."') and upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."'); ";
 
-				$cTmpSQL.=" update ".$cSchemaSQL."tbl_wettbewerbteam  ";
-				$cTmpSQL.="set rang=".$iTmpRangFrorderer;
-				$cTmpSQL.=" where upper(team_kurzbz)=upper('".$cTeam_gefordert."') and  upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."'); ";
+				$qry.=" update ".$this->schemaSQL.".tbl_wettbewerbteam  ";
+				$qry.="set rang=".$iTmpRangFrorderer;
+				$qry.=" where upper(team_kurzbz)=upper('".$cTeam_gefordert."') and  upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."'); ";
 
-				$cTmpSQL.=" update ".$cSchemaSQL."tbl_wettbewerbteam  ";
-				$cTmpSQL.="set punkte=3+punkte ";
-				$cTmpSQL.="where upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."') and upper(team_kurzbz)=upper('".$origWettbewerbeinladungen[0]['team_sieger']."'); ";
+				$qry.=" update ".$this->schemaSQL.".tbl_wettbewerbteam  ";
+				$qry.="set punkte=3+punkte ";
+				$qry.="where upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."') and upper(team_kurzbz)=upper('".$origWettbewerbeinladungen[0]['team_sieger']."'); ";
 
-				$cTmpSQL.=" update ".$cSchemaSQL."tbl_wettbewerbteam  ";
-				$cTmpSQL.="set punkte=1+punkte ";
-				$cTmpSQL.="where upper(wettbewerb_kurzbz)=upper('".$cWettbewerb_kurzbz."') and upper(team_kurzbz)=upper('". ($origWettbewerbeinladungen[0]['team_sieger']==$cTeam_gefordert?$cTeam_forderer:$cTeam_gefordert)."'); ";
+				$qry.=" update ".$this->schemaSQL.".tbl_wettbewerbteam  ";
+				$qry.="set punkte=1+punkte ";
+				$qry.="where upper(wettbewerb_kurzbz)=upper('".$this->wettbewerb_kurzbz."') and upper(team_kurzbz)=upper('". ($origWettbewerbeinladungen[0]['team_sieger']==$cTeam_gefordert?$this->team_forderer:$cTeam_gefordert)."'); ";
 			}	
 		}				
-		$cTmpSQL.=" COMMIT; ";       
-#exit($cTmpSQL);
+		$qry.=" COMMIT; ";       
+#exit($qry);
    // Datenbankabfrage
-            	$this->setStringSQL($cTmpSQL);
-      	   	unset($cTmpSQL);
+            	$this->setStringSQL($qry);
+      	   	unset($qry);
 
             	$this->setResultSQL(null);
 		if (!$this->dbQuery())
@@ -477,347 +322,247 @@ class komune_wettbewerbeinladungen extends postgre_sql
 	}
 
 //-------------------------------------------------------------------------------------------------
-       function loadWettbewerbeinladungen()
+
+       function loadWettbewerbeinladungen($match_id=null,$gefordertvon=null,$team_forderer=null,$team_einladungen=null,$wettbewerb_kurzbz=null,$switchGewinner=null)
        {
-		$this->setError('');
+	   
+	// Initialisierung	
 					  
-       	$cSchemaSQL=$this->getschemaSQL();
-            	
-		$match_id=$this->getMatch_id();
-		$cTeam_forderer=$this->getTeam_forderer();			
-		$cTeam_kurzbz_einladungen=$this->getTeam_gefordert();			
-		$cWettbewerb_kurzbz=$this->getWettbewerb_kurzbz();
-		$cGefordertvon=$this->getGefordertvon();
-
-		$bSwitchGewinner=$this->getSwitchGewinner();
+			$this->result=array();
+			$this->errormsg='';
 		
-		#SELECT TIMESTAMP WITHOUT TIME ZONE 'epoch' + 982384720 * INTERVAL '1 second';
-		#select to_char(TIMESTAMP '2007-03-27 10:48:50.022', 'DD.MM.YYYY');
-		#select to_char(TIMESTAMP '2007-03-27 10:48:50.022', 'HH24:MI:SS');
-	    	$cTmpSQL="";
-		$cTmpSQL.="SELECT * ";
+			if (!is_null($match_id))
+				$this->match_id=$match_id;
+				
+			if (!is_null($gefordertvon))
+				$this->gefordertvon=$gefordertvon;			
+				
+			if (!is_null($team_forderer))
+				$this->team_forderer=$team_forderer;
+	
+			if (!is_null($team_einladungen))
+				$this->team_einladungen=$team_einladungen;			
+	
+			if (!is_null($wettbewerb_kurzbz))
+				$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
 
-			$cTmpSQL.=", to_char(matchdatumzeit, 'DD.MM.YYYY') as \"matchdatum\" ";
-			$cTmpSQL.=", to_char(matchdatumzeit, 'HH24:MI') as \"matchzeit\" ";
+			if (!is_null($switchGewinner))
+				$this->switchGewinner=$switchGewinner;
+            	
+    	$qry="";
+		$qry.="SELECT * ";
 
-			$cTmpSQL.=", to_char(gefordertamum, 'DD.MM.YYYY') as \"gefordertamumdatum\" ";
-			$cTmpSQL.=", to_char(gefordertamum, 'HH24:MI') as \"gefordertamumzeit\" ";
+			$qry.=", to_char(matchdatumzeit, 'DD.MM.YYYY') as \"matchdatum\" ";
+			$qry.=", to_char(matchdatumzeit, 'HH24:MI') as \"matchzeit\" ";
 
-			$cTmpSQL.=", to_char(bestaetigtamum, 'DD.MM.YYYY') as \"bestaetigtdatum\" ";
-			$cTmpSQL.=", to_char(bestaetigtamum, 'HH24:MI') as \"bestaetigtzeit\" ";
+			$qry.=", to_char(gefordertamum, 'DD.MM.YYYY') as \"gefordertamumdatum\" ";
+			$qry.=", to_char(gefordertamum, 'HH24:MI') as \"gefordertamumzeit\" ";
 
-			$cTmpSQL.=", to_char(matchbestaetigtamum, 'DD.MM.YYYY') as \"matchbestaetigtdatum\" ";
-			$cTmpSQL.=", to_char(matchbestaetigtamum, 'HH24:MI') as \"matchbestaetigtzeit\" ";
+			$qry.=", to_char(bestaetigtamum, 'DD.MM.YYYY') as \"bestaetigtdatum\" ";
+			$qry.=", to_char(bestaetigtamum, 'HH24:MI') as \"bestaetigtzeit\" ";
 
-			$cTmpSQL.=" FROM ".$cSchemaSQL."tbl_match ";
+			$qry.=", to_char(matchbestaetigtamum, 'DD.MM.YYYY') as \"matchbestaetigtdatum\" ";
+			$qry.=", to_char(matchbestaetigtamum, 'HH24:MI') as \"matchbestaetigtzeit\" ";
 
-			if (empty($match_id))
-			   	$cTmpSQL.=" WHERE tbl_match.match_id>0 ";
+			$qry.=" FROM ".$this->schemaSQL.".tbl_match ";
+
+			if (empty($this->match_id))
+			   	$qry.=" WHERE tbl_match.match_id>0 ";
 			else
-			   	$cTmpSQL.=" WHERE tbl_match.match_id='".addslashes(trim($match_id))."' ";
-
-#			if (empty($cGefordertvon))
-#			   	$cTmpSQL.=" and tbl_match.gefordertvon='".addslashes(trim($cGefordertvon))."' ";
+			   	$qry.=" WHERE tbl_match.match_id='".addslashes(trim($this->match_id))."' ";
 
 			// Forderer	
-			if (!is_array($cTeam_forderer) && !empty($cTeam_forderer) )
+			if (!is_array($this->team_forderer) && !empty($this->team_forderer) )
 			{
-           		$cTmpSQL.=" AND UPPER(tbl_match.team_forderer)=UPPER('".addslashes(trim($cTeam_forderer))."') ";
+           		$qry.=" AND UPPER(tbl_match.team_forderer)=UPPER('".addslashes(trim($this->team_forderer))."') ";
 			}
-			elseif (is_array($cTeam_forderer) && count($cTeam_forderer)>0 )
+			elseif (is_array($this->team_forderer) && count($this->team_forderer)>0 )
 			{
-				if (isset($cTeam_forderer[0]['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					for ($indZEILE=0;$indZEILE<count($cTeam_forderer);$indZEILE++)
-						$arrTmpTeam_kurzbz[]=trim($cTeam_forderer[$indZEILE]['team_kurzbz']);
-					$cTeam_forderer=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				elseif (isset($cTeam_forderer['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					$arrTmpTeam_kurzbz[]=trim($cTeam_forderer['team_kurzbz']);
-					$cTeam_forderer=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				$cTmpSQL.=" AND UPPER(tbl_match.team_forderer) in ('".strtoupper(implode("','",$cTeam_forderer))."') ";	
+				$qry.=" AND UPPER(tbl_match.team_forderer) in ('".strtoupper(implode("','",$this->team_forderer))."') ";	
 			}
 			// Aaufforderungen - Einladung
 			
-			if (!is_array($cTeam_kurzbz_einladungen) && !empty($cTeam_kurzbz_einladungen) )
+			if (!is_array($this->team_einladungen) && !empty($this->team_einladungen) )
 			{
-	           		$cTmpSQL.=" AND UPPER(tbl_match.team_gefordert)=UPPER('".addslashes(trim($cTeam_kurzbz_einladungen))."') ";
+	           		$qry.=" AND UPPER(tbl_match.team_gefordert)=UPPER('".addslashes(trim($this->team_einladungen))."') ";
 			}
-			elseif (is_array($cTeam_kurzbz_einladungen) && count($cTeam_kurzbz_einladungen)>0 )
+			elseif (is_array($this->team_einladungen) && count($this->team_einladungen)>0 )
 			{
-				if (isset($cTeam_kurzbz_einladungen[0]['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					for ($indZEILE=0;$indZEILE<count($cTeam_kurzbz_einladungen);$indZEILE++)
-						$arrTmpTeam_kurzbz[]=trim($cTeam_kurzbz_einladungen[$indZEILE]['team_kurzbz']);
-					$cTeam_kurzbz_einladungen=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				elseif (isset($cTeam_kurzbz_einladungen['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					$arrTmpTeam_kurzbz[]=trim($cTeam_kurzbz_einladungen['team_kurzbz']);
-					$cTeam_kurzbz_einladungen=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				$cTmpSQL.=" AND UPPER(tbl_match.team_gefordert) in ('".strtoupper(implode("','",$cTeam_kurzbz_einladungen))."') ";	
+				$qry.=" AND UPPER(tbl_match.team_gefordert) in ('".strtoupper(implode("','",$this->team_einladungen))."') ";	
 			}
 			
 			// GEForderte 
 			
-			if (!is_array($cWettbewerb_kurzbz) && !empty($cWettbewerb_kurzbz) )
+			if (!is_array($this->wettbewerb_kurzbz) && !empty($this->wettbewerb_kurzbz) )
 			{
-	           		$cTmpSQL.=" AND UPPER(tbl_match.wettbewerb_kurzbz)=UPPER('".addslashes(trim($cWettbewerb_kurzbz))."') ";
+	           		$qry.=" AND UPPER(tbl_match.wettbewerb_kurzbz)=UPPER('".addslashes(trim($this->wettbewerb_kurzbz))."') ";
 			}
-			elseif (is_array($cWettbewerb_kurzbz) && count($cWettbewerb_kurzbz)>0 )
+			elseif (is_array($this->wettbewerb_kurzbz) && count($this->wettbewerb_kurzbz)>0 )
 			{
-				if (isset($cWettbewerb_kurzbz[0]['wettbewerb_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrWettbewerb_kurzbz=array();
-					for ($indZEILE=0;$indZEILE<count($cWettbewerb_kurzbz);$indZEILE++)
-						$arrWettbewerb_kurzbz[]=trim($cTeam_kurzbz_einladungen[$indZEILE]['wettbewerb_kurzbz']);
-					$cWettbewerb_kurzbz=$arrWettbewerb_kurzbz;
-					unset($arrWettbewerb_kurzbz);	
-				}
-				elseif (isset($cWettbewerb_kurzbz['wettbewerb_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrWettbewerb_kurzbz=array();
-					$arrWettbewerb_kurzbz[]=trim($cTeam_kurzbz_einladungen['wettbewerb_kurzbz']);
-					$cWettbewerb_kurzbz=$arrWettbewerb_kurzbz;
-					unset($arrWettbewerb_kurzbz);	
-				}
-				$cTmpSQL.=" AND UPPER(tbl_match.wettbewerb_kurzbz) in ('".strtoupper(implode("','",$cWettbewerb_kurzbz))."') ";	
+				$qry.=" AND UPPER(tbl_match.wettbewerb_kurzbz) in ('".strtoupper(implode("','",$this->wettbewerb_kurzbz))."') ";	
 			}
 
 		// Listenformen bestimmen 
-       	if ($bSwitchGewinner=='0')
-           		$cTmpSQL.=" AND ( tbl_match.matchbestaetigtvon <='' or (tbl_match.matchbestaetigtvon IS NULL) ) ";
-       	elseif ($bSwitchGewinner=='1')
-           		$cTmpSQL.=" AND tbl_match.matchbestaetigtvon > '' ";
+       	if ($this->switchGewinner=='0')
+           		$qry.=" AND ( tbl_match.matchbestaetigtvon <='' or (tbl_match.matchbestaetigtvon IS NULL) ) ";
+       	elseif ($this->switchGewinner=='1')
+           		$qry.=" AND tbl_match.matchbestaetigtvon > '' ";
 
-    	$cTmpSQL.=" OFFSET 0 LIMIT ALL   FOR SHARE ;";	
-       
-	   // Entfernen der Temporaeren Variablen aus dem Speicher
-       	unset($cSchemaSQL);
-       	unset($cTeam_kurzbz);
-       	unset($cTeam_kurzbz_einladungen);
-       	unset($cWettbewerb_kurzbz);
-       	unset($cGefordertvond);	   
-       // Datenbankabfrage
-       	$this->setStringSQL($cTmpSQL);
-	   	unset($cTmpSQL);
-
-       	$this->setResultSQL(null);
-	   	$this->setWettbewerbeinladung(null);
-
-	   	if (!$this->fetch_all()) 
-			return false;    
-	   	$this->setWettbewerbeinladung($this->getResultSQL());
-       	$this->setResultSQL(null);
-	   
-		return $this->getWettbewerbeinladung();
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->result[]=$row;
+			}
+			return $this->result;
+		}
+		else
+		{
+			if (empty($this->errormsg))
+				$this->errormsg = 'Fehler beim lesen der Wettbewerbstypen';
+			return false;
+		}	
+		return false;	   
        }
 //-------------------------------------------------------------------------------------------------
-       function loadWettbewerbeinladungenForderungstage()
+       function loadWettbewerbeinladungenForderungstage($match_id=null,$gefordertvon=null,$team_forderer=null,$team_einladungen=null,$wettbewerb_kurzbz=null)
        {
-		$this->setError('');
-		$cSchemaSQL=$this->getschemaSQL();
-
-		$match_id=$this->getMatch_id();
-		$cTeam_forderer=$this->getTeam_forderer();			
-		$cTeam_kurzbz_einladungen=$this->getTeam_gefordert();			
-		$cWettbewerb_kurzbz=$this->getWettbewerb_kurzbz();
+			$this->result=array();
+			$this->errormsg='';
 		
-		$cUid=$this->getGefordertvon();
-						
-	    	$cTmpSQL="";
-			$cTmpSQL.="SELECT * ";
+			if (!is_null($match_id))
+				$this->match_id=$match_id;
+				
+			if (!is_null($gefordertvon))
+				$this->gefordertvon=$gefordertvon;			
+				
+			if (!is_null($team_forderer))
+				$this->team_forderer=$team_forderer;
+	
+			if (!is_null($team_einladungen))
+				$this->team_einladungen=$team_einladungen;			
+	
+			if (!is_null($wettbewerb_kurzbz))
+				$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
+			
+	    	$qry="";
+			$qry.="SELECT * ";
+			$qry.=", to_char(matchdatumzeit, 'DD.MM.YYYY') as \"matchdatum\" ";
+			$qry.=", to_char(matchdatumzeit, 'HH24:MI') as \"matchzeit\" ";
 
-			$cTmpSQL.=", to_char(matchdatumzeit, 'DD.MM.YYYY') as \"matchdatum\" ";
-			$cTmpSQL.=", to_char(matchdatumzeit, 'HH24:MI') as \"matchzeit\" ";
+			$qry.=", to_char(gefordertamum, 'DD.MM.YYYY') as \"gefordertamumdatum\" ";
+			$qry.=", to_char(gefordertamum, 'HH24:MI') as \"gefordertamumzeit\" ";
 
-			$cTmpSQL.=", to_char(gefordertamum, 'DD.MM.YYYY') as \"gefordertamumdatum\" ";
-			$cTmpSQL.=", to_char(gefordertamum, 'HH24:MI') as \"gefordertamumzeit\" ";
+			$qry.=", to_char(bestaetigtamum, 'DD.MM.YYYY') as \"bestaetigtdatum\" ";
+			$qry.=", to_char(bestaetigtamum, 'HH24:MI') as \"bestaetigtzeit\" ";
 
-			$cTmpSQL.=", to_char(bestaetigtamum, 'DD.MM.YYYY') as \"bestaetigtdatum\" ";
-			$cTmpSQL.=", to_char(bestaetigtamum, 'HH24:MI') as \"bestaetigtzeit\" ";
-
-			$cTmpSQL.=", to_char(matchbestaetigtamum, 'DD.MM.YYYY') as \"matchbestaetigtdatum\" ";
-			$cTmpSQL.=", to_char(matchbestaetigtamum, 'HH24:MI') as \"matchbestaetigtzeit\" ";
+			$qry.=", to_char(matchbestaetigtamum, 'DD.MM.YYYY') as \"matchbestaetigtdatum\" ";
+			$qry.=", to_char(matchbestaetigtamum, 'HH24:MI') as \"matchbestaetigtzeit\" ";
 		
-		
-			$cTmpSQL.="
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.gefordertamum))) as gefordertamum_diff
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.bestaetigtamum,".$cSchemaSQL."tbl_match.gefordertamum))) as bestaetigtamum_diff
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.matchdatumzeit,".$cSchemaSQL."tbl_match.bestaetigtamum))) as matchdatumzeit_diff 
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.matchbestaetigtamum,".$cSchemaSQL."tbl_match.matchdatumzeit))) as matchbestaetigtamum_diff 
+			$qry.="
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.gefordertamum))) as gefordertamum_diff
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.bestaetigtamum,".$this->schemaSQL.".tbl_match.gefordertamum))) as bestaetigtamum_diff
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.matchdatumzeit,".$this->schemaSQL.".tbl_match.bestaetigtamum))) as matchdatumzeit_diff 
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.matchbestaetigtamum,".$this->schemaSQL.".tbl_match.matchdatumzeit))) as matchbestaetigtamum_diff 
 
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.gefordertamum))) as gefordertamum_tag_diff
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.bestaetigtamum))) as bestaetigtamum_tag_diff
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.matchdatumzeit))) as matchdatumzeit_tag_diff 
-					,1+extract('day' from (age(".$cSchemaSQL."tbl_match.matchbestaetigtamum))) as matchbestaetigtamum_tag_diff 
-
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.gefordertamum))) as gefordertamum_tag_diff
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.bestaetigtamum))) as bestaetigtamum_tag_diff
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.matchdatumzeit))) as matchdatumzeit_tag_diff 
+					,1+extract('day' from (age(".$this->schemaSQL.".tbl_match.matchbestaetigtamum))) as matchbestaetigtamum_tag_diff 
 
 				";
-
 			
-			$cTmpSQL.="  from ".$cSchemaSQL."tbl_wettbewerbtyp,".$cSchemaSQL."tbl_wettbewerb,".$cSchemaSQL."tbl_match
+			$qry.="  from ".$this->schemaSQL.".tbl_wettbewerbtyp,".$this->schemaSQL.".tbl_wettbewerb,".$this->schemaSQL.".tbl_match
 			
-				where ".$cSchemaSQL."tbl_wettbewerbtyp.wbtyp_kurzbz=".$cSchemaSQL."tbl_wettbewerb.wbtyp_kurzbz
-				and ".$cSchemaSQL."tbl_match.wettbewerb_kurzbz=".$cSchemaSQL."tbl_wettbewerb.wettbewerb_kurzbz
-				and (".$cSchemaSQL."tbl_match.matchbestaetigtvon IS NULL or ".$cSchemaSQL."tbl_match.matchbestaetigtvon<='')
-			
+				where ".$this->schemaSQL.".tbl_wettbewerbtyp.wbtyp_kurzbz=".$this->schemaSQL.".tbl_wettbewerb.wbtyp_kurzbz
+				and ".$this->schemaSQL.".tbl_match.wettbewerb_kurzbz=".$this->schemaSQL.".tbl_wettbewerb.wettbewerb_kurzbz
+				and (".$this->schemaSQL.".tbl_match.matchbestaetigtvon IS NULL or ".$this->schemaSQL.".tbl_match.matchbestaetigtvon<='')
 			";
-#				and  ( extract('day' from (age(".$cSchemaSQL."tbl_match.gefordertamum))) >=".$cSchemaSQL."tbl_wettbewerb.forderungstage
-#					 or  extract('day' from (age(".$cSchemaSQL."tbl_match.bestaetigtamum,".$cSchemaSQL."tbl_match.gefordertamum)))>=".$cSchemaSQL."tbl_wettbewerb.forderungstage
-#					 or  extract('day' from (age(".$cSchemaSQL."tbl_match.matchdatumzeit,".$cSchemaSQL."tbl_match.bestaetigtamum)))>=".$cSchemaSQL."tbl_wettbewerb.forderungstage
-#					 or  extract('day' from (age(".$cSchemaSQL."tbl_match.matchbestaetigtamum,".$cSchemaSQL."tbl_match.matchdatumzeit)))>=".$cSchemaSQL."tbl_wettbewerb.forderungstage
-#					 ) 
-		
 
-			if (!empty($match_id))
-			   	$cTmpSQL.=" and tbl_match.match_id='".addslashes(trim($match_id))."' ";
+			if (!empty($this->match_id))
+			   	$qry.=" and tbl_match.match_id='".addslashes(trim($this->match_id))."' ";
 
-			if (!empty($cUid))
-			   	$cTmpSQL.=" and tbl_wettbewerb.uid='".addslashes(trim($cUid))."' ";
+			if (!empty($this->gefordertvon))
+			   	$qry.=" and tbl_wettbewerb.uid='".addslashes(trim($this->gefordertvon))."' ";
 
 				
 			// Forderer	
-			if (!is_array($cTeam_forderer) && !empty($cTeam_forderer) )
+			if (!is_array($this->team_forderer) && !empty($this->team_forderer) )
 			{
-           		$cTmpSQL.=" AND UPPER(tbl_match.team_forderer)=UPPER('".addslashes(trim($cTeam_forderer))."') ";
+           		$qry.=" AND UPPER(tbl_match.team_forderer)=UPPER('".addslashes(trim($this->team_forderer))."') ";
 			}
-			elseif (is_array($cTeam_forderer) && count($cTeam_forderer)>0 )
+			elseif (is_array($this->team_forderer) && count($this->team_forderer)>0 )
 			{
-				if (isset($cTeam_forderer[0]['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					for ($indZEILE=0;$indZEILE<count($cTeam_forderer);$indZEILE++)
-						$arrTmpTeam_kurzbz[]=trim($cTeam_forderer[$indZEILE]['team_kurzbz']);
-					$cTeam_forderer=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				elseif (isset($cTeam_forderer['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					$arrTmpTeam_kurzbz[]=trim($cTeam_forderer['team_kurzbz']);
-					$cTeam_forderer=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				
-				$cTmpSQL.=" AND UPPER(tbl_match.team_forderer) in ('".strtoupper(implode("','",$cTeam_forderer))."') ";	
+				$qry.=" AND UPPER(tbl_match.team_forderer) in ('".strtoupper(implode("','",$this->team_forderer))."') ";	
 			}
+
 			// Aaufforderungen - Einladung
-			
-			if (!is_array($cTeam_kurzbz_einladungen) && !empty($cTeam_kurzbz_einladungen) )
+			if (!is_array($this->team_einladungen) && !empty($this->team_einladungen) )
 			{
-	           		$cTmpSQL.=" AND UPPER(tbl_match.team_gefordert)=UPPER('".addslashes(trim($cTeam_kurzbz_einladungen))."') ";
+	           		$qry.=" AND UPPER(tbl_match.team_gefordert)=UPPER('".addslashes(trim($this->team_einladungen))."') ";
 			}
-			elseif (is_array($cTeam_kurzbz_einladungen) && count($cTeam_kurzbz_einladungen)>0 )
+			elseif (is_array($this->team_einladungen) && count($this->team_einladungen)>0 )
 			{
-				if (isset($cTeam_kurzbz_einladungen[0]['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					for ($indZEILE=0;$indZEILE<count($cTeam_kurzbz_einladungen);$indZEILE++)
-						$arrTmpTeam_kurzbz[]=trim($cTeam_kurzbz_einladungen[$indZEILE]['team_kurzbz']);
-					$cTeam_kurzbz_einladungen=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				elseif (isset($cTeam_kurzbz_einladungen['team_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrTmpTeam_kurzbz=array();
-					$arrTmpTeam_kurzbz[]=trim($cTeam_kurzbz_einladungen['team_kurzbz']);
-					$cTeam_kurzbz_einladungen=$arrTmpTeam_kurzbz;
-					unset($arrTmpTeam_kurzbz);	
-				}
-				$cTmpSQL.=" AND UPPER(tbl_match.team_gefordert) in ('".strtoupper(implode("','",$cTeam_kurzbz_einladungen))."') ";	
+				$qry.=" AND UPPER(tbl_match.team_gefordert) in ('".strtoupper(implode("','",$this->team_einladungen))."') ";	
 			}
 			
-			// GEForderte 
-			
-			if (!is_array($cWettbewerb_kurzbz) && !empty($cWettbewerb_kurzbz) )
+			// Wettbewerb 
+			if (!is_array($this->wettbewerb_kurzbz) && !empty($this->wettbewerb_kurzbz) )
 			{
-	           		$cTmpSQL.=" AND UPPER(tbl_match.wettbewerb_kurzbz)=UPPER('".addslashes(trim($cWettbewerb_kurzbz))."') ";
+	           		$qry.=" AND UPPER(tbl_match.wettbewerb_kurzbz)=UPPER('".addslashes(trim($this->wettbewerb_kurzbz))."') ";
 			}
-			elseif (is_array($cWettbewerb_kurzbz) && count($cWettbewerb_kurzbz)>0 )
+			elseif (is_array($this->wettbewerb_kurzbz) && count($this->wettbewerb_kurzbz)>0 )
 			{
-				if (isset($cWettbewerb_kurzbz[0]['wettbewerb_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrWettbewerb_kurzbz=array();
-					for ($indZEILE=0;$indZEILE<count($cWettbewerb_kurzbz);$indZEILE++)
-						$arrWettbewerb_kurzbz[]=trim($cTeam_kurzbz_einladungen[$indZEILE]['wettbewerb_kurzbz']);
-					$cWettbewerb_kurzbz=$arrWettbewerb_kurzbz;
-					unset($arrWettbewerb_kurzbz);	
-				}
-				elseif (isset($cWettbewerb_kurzbz['wettbewerb_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
-				{
-					$arrWettbewerb_kurzbz=array();
-					$arrWettbewerb_kurzbz[]=trim($cTeam_kurzbz_einladungen['wettbewerb_kurzbz']);
-					$cWettbewerb_kurzbz=$arrWettbewerb_kurzbz;
-					unset($arrWettbewerb_kurzbz);	
-				}
-				$cTmpSQL.=" AND UPPER(tbl_match.wettbewerb_kurzbz) in ('".strtoupper(implode("','",$cWettbewerb_kurzbz))."') ";	
+				$qry.=" AND UPPER(tbl_match.wettbewerb_kurzbz) in ('".strtoupper(implode("','",$this->wettbewerb_kurzbz))."') ";	
 			}
 		
-    		$cTmpSQL.=" OFFSET 0 LIMIT ALL  FOR SHARE OF tbl_match ;";	
-#exit($cTmpSQL.Test($cTeam_kurzbz_einladungen).implode("','",$cTeam_kurzbz_einladungen));
-	
-	   // Entfernen der Temporaeren Variablen aus dem Speicher
-       	unset($cSchemaSQL);
-       	unset($cTeam_kurzbz);
-       	unset($cTeam_kurzbz_einladungen);
-       	unset($cWettbewerb_kurzbz);
-       	unset($cUid);	   
-       // Datenbankabfrage
-       	$this->setStringSQL($cTmpSQL);
-	   	unset($cTmpSQL);
-
-       	$this->setResultSQL(null);
-	   	$this->setWettbewerbeinladung(null);
-
-	   	if (!$this->fetch_all()) 
-			return false;    
-	   	$this->setWettbewerbeinladung($this->getResultSQL());
-       	$this->setResultSQL(null);
-		return $this->getWettbewerbeinladung();
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->result[]=$row;
+			}
+			return $this->result;
+		}
+		else
+		{
+			if (empty($this->errormsg))
+				$this->errormsg = 'Fehler beim lesen der Wettbewerbstypen';
+			return false;
+		}	
+		return false;	
 	   }
 
 //-------------------------------------------------------------------------------------------------
-       function unloadWettbewerbeinladungen()
+       function unloadWettbewerbeinladungen($match_id=null)
        {
-		$this->setError('');
-		$cSchemaSQL=$this->getschemaSQL();
-
-		$match_id=$this->getMatch_id();
-		if (empty($match_id))
+		$this->result=array();
+		$this->errormsg='';
+	
+		if (!is_null($match_id))
+			$this->match_id=$match_id;
+		
+		if (empty($this->match_id) || is_null($this->match_id))
 		{
-			$this->setError('Keine Match ID gefunden!'); 
+			$this->errormsg = 'Keine Match ID gefunden!'; 
 			return false;
 		}	
-	    	$cTmpSQL="";
-		$cTmpSQL.="delete from ".$cSchemaSQL."tbl_match	";		
-		$cTmpSQL.=" * ";
-	   	$cTmpSQL.=" where tbl_match.match_id='".addslashes(trim($match_id))."' ";
-	
-	   // Entfernen der Temporaeren Variablen aus dem Speicher
-       	unset($cSchemaSQL);
-       	unset($match_id);	   
-       // Datenbankabfrage
-       	$this->setStringSQL($cTmpSQL);
-	   	unset($cTmpSQL);
-
-       	$this->setResultSQL(null);
-	   	$this->setWettbewerbeinladung(null);
-	   	if (!$this->fetch_object()) 
-			return false;    
-       	$this->setResultSQL(null);
-		return true;
+		
+	    $qry="";
+		$qry.="delete from ".$this->schemaSQL.".tbl_match	";		
+		$qry.=" * ";
+	   	$qry.=" where tbl_match.match_id='".addslashes(trim($this->match_id))."' ";
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			if (empty($this->errormsg))
+				$this->errormsg = 'Fehler beim lesen der Wettbewerbstypen';
+			return false;
+		}	
+		return false;	
 	   }
 
 	   

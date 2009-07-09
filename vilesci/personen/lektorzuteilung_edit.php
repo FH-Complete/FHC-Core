@@ -116,7 +116,7 @@ Anzahl:
 		$bgcolor = $cfgBgcolorOne;
      	$i % 2  ? 0: $bgcolor = $cfgBgcolorTwo;
 
-		$row=pg_fetch_object ($erg, $i);
+		$row=$db->db_fetch_object ($erg, $i);
 
 		?>
 		<tr bgcolor=<?php echo $bgcolor; ?>>
@@ -138,10 +138,10 @@ Anzahl:
   <SELECT name="lektorid">
     <?php
 		// Auswahl des Lektors
-		$num_rows=pg_numrows($result_lektor);
+		$num_rows=$db->db_num_rows($result_lektor);
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($result_lektor, $i);
+			$row=$db->db_fetch_object ($result_lektor, $i);
 			echo "<option value=\"$row->id\">$row->nachname $row->vornamen - $row->uid</option>";
 		}
 		?>
@@ -151,10 +151,10 @@ Anzahl:
   <SELECT name="lehrfachid">
     <?php
 		// Auswahl des Lehrfach
-		$num_rows=pg_numrows($result_lehrfach);
+		$num_rows=$db->db_num_rows($result_lehrfach);
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($result_lehrfach, $i);
+			$row=$db->db_fetch_object ($result_lehrfach, $i);
 			echo "<option value=\"$row->id\">$row->kurzbz - $row->bezeichnung</option>";
 		}
 		?>
@@ -164,10 +164,10 @@ Anzahl:
   <SELECT name="stgid">
     <?php
 		// Auswahl des Lektors
-		$num_rows=pg_numrows($result_stg);
+		$num_rows=$db->db_num_rows($result_stg);
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=pg_fetch_object ($result_stg, $i);
+			$row=$db->db_fetch_object ($result_stg, $i);
 			echo "<option value=\"$row->id\">$row->kurzbz - $row->bezeichnung</option>";
 		}
 		?>
