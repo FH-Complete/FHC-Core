@@ -1,11 +1,40 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
 /**
  * Changes:	22.10.2004: Anpassung an neues DB-Schema (WM)
  */
-	include('../config.inc.php');
+	
+	
 	include('../../include/functions.inc.php');
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+
+	
 	$sql_query="SELECT uid, titelpre, vorname, nachname, UPPER(typ::varchar(1) || kurzbz) as kurzbz, semester, verband, gruppe, matrikelnr FROM campus.vw_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE true ";
 	if (isset($_GET['stg_kz']))
 		$sql_query.="AND studiengang_kz='".addslashes($_GET['stg_kz'])."' ";
@@ -16,9 +45,9 @@
 	if (isset($_GET['grp']) && is_numeric($_GET['grp']))
 		$sql_query.="AND gruppe=".$_GET['grp']." ";
 	$sql_query.="ORDER BY nachname, kurzbz, semester, verband";
-	if(!($erg=pg_query($conn, $sql_query)))
-		die(pg_errormessage($conn));
-	$num_rows=pg_num_rows($erg);
+	if(!($erg=$db->db_query($sql_query)))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($erg);
 ?>
 
 <html>
@@ -35,7 +64,7 @@ Results: <?php echo $num_rows; ?><br>
 <table border="0">
 <tr><th>Titel</th><th>Vornamen</th><th>Nachname</th><th>STG</th><th>Sem.</th><th>Verband</th><th>Gruppe</th><th>Matrikelnr.</th><th>eMail</th></tr>
 <?php
-	for ($i=0; $row=pg_fetch_object($erg); $i++)
+	for ($i=0; $row=$db->db_fetch_object($erg); $i++)
 	{
 		$zeile=$i % 2;
 

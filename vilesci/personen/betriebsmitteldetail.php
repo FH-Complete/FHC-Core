@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,27 +15,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/betriebsmittelperson.class.php');
-require_once('../../include/betriebsmittel.class.php');
-require_once('../../include/datum.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+			
+	require_once('../../include/studiengang.class.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/betriebsmittelperson.class.php');
+	require_once('../../include/betriebsmittel.class.php');
+	require_once('../../include/datum.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
+	if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	
 
-$user = get_uid();
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if(!$rechte->isBerechtigt('admin', 0, 'suid') && !$rechte->isBerechtigt('support', null, 'suid'))
+			die('Sie haben keine Berechtigung fuer diese Seite  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
-
+	
 $datum_obj = new datum();
    
 echo '<html>
@@ -49,8 +56,6 @@ echo '<html>
 	';
 
 
-if(!$rechte->isBerechtigt('admin', 0, 'suid') && !$rechte->isBerechtigt('support', null, 'suid'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $betriebsmittel_id = (isset($_GET['betriebsmittel_id'])?$_GET['betriebsmittel_id']:'');
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
@@ -59,7 +64,7 @@ $error = false;
 //Speichern der Daten
 if(isset($_POST['save']))
 {
-	$bm = new betriebsmittel($conn);
+	$bm = new betriebsmittel();
 			
 	//Nachschauen ob dieses Betriebsmittel schon existiert
 	if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummerold']))
@@ -116,7 +121,7 @@ if(isset($_POST['save']))
 		}
 					
 		//Zuordnung Betriebsmittel-Person anlegen
-		$bmp = new betriebsmittelperson($conn);
+		$bmp = new betriebsmittelperson();
 		if($_POST['new']=='true')
 		{
 			if($bmp->load($betriebsmittel_id, $_POST['person_id']))
@@ -164,7 +169,7 @@ if(isset($_POST['save']))
 	}
 }
 
-$bm = new betriebsmittelperson($conn);
+$bm = new betriebsmittelperson();
 
 //Laden der Daten
 $new = 'false';
@@ -199,9 +204,9 @@ echo '<table>';
 //Person
 echo '<tr><td>Person</td><td><SELECT name="person_id">';
 $qry = "SELECT distinct tbl_person.* FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) ORDER BY nachname, vorname";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($person_id == $row->person_id)
 			$selected = 'selected';
@@ -215,9 +220,9 @@ echo '</SELECT></td></tr>';
 //TYP
 echo '<tr><td>Typ</td><td><SELECT name="betriebsmitteltyp">';
 $qry = "SELECT * FROM public.tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($row->betriebsmitteltyp==$betriebsmitteltyp)
 			$selected = 'selected';

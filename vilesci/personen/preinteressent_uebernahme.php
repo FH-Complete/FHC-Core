@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -29,8 +34,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/prestudent.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
+
 
 $user = get_uid();
 
@@ -83,9 +87,9 @@ $qry.=" ORDER by kuerzel";
 
 //Drop Down fuer Studiengaenge anzeigen
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiengang: <select name="studiengang_kz">';
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		//wenn kein Studiengang uebergeben wurde dann den ersten nehmen fuer den eine Berechtigung vorhanden ist
 		if($studiengang_kz=='')
@@ -111,14 +115,14 @@ if(isset($_POST['uebertragen']))
 	{
 		if(mb_strstr($param, 'chk_'))
 		{
-			pg_query($conn, 'BEGIN;');
+			$db->db_query('BEGIN;');
 			
 			$id = mb_substr($param, 4);
-			$preinteressent = new preinteressent($conn);
+			$preinteressent = new preinteressent();
 			if($preinteressent->load($id))
 			{
 				//Prestudent anlegen
-				$prestudent = new prestudent($conn);
+				$prestudent = new prestudent();
 				$prestudent->new = true;
 				$prestudent->aufmerksamdurch_kurzbz = $preinteressent->aufmerksamdurch_kurzbz;
 				$prestudent->person_id = $preinteressent->person_id;
@@ -133,7 +137,7 @@ if(isset($_POST['uebertragen']))
 					//Rolle anlegen	
 					$prestudent->studiensemester_kurzbz = $preinteressent->studiensemester_kurzbz;
 					
-					//$preinteressent1 = new preinteressent($conn);
+					//$preinteressent1 = new preinteressent();
 					//$preinteressent1->loadStudiengangszuteilung($preinteressent_id, $studiengang_kz);
 					
 					$prestudent->ausbildungssemester = 1;
@@ -150,36 +154,36 @@ if(isset($_POST['uebertragen']))
 								updateamum='".date('Y-m-d H:i:s')."', 
 								updatevon='".$user."'
 								WHERE studiengang_kz='$studiengang_kz' AND preinteressent_id='$id'";
-						if(pg_query($conn, $qry))
+						if($db->db_query($qry))
 						{
 							$anzahl_uebernommen++;
-							pg_query($conn, 'COMMIT');
+							$db->db_query('COMMIT');
 						}
 						else 
 						{
 							echo "<br>Fehler beim Eintragen des Uebernahmedatums";
 							$anzahl_fehler++;
-							pg_query($conn, 'ROLLBACK');
+							$db->db_query('ROLLBACK');
 						}
 					}
 					else 
 					{
 						echo "<br>Fehler beim Anlegen der Rolle: $prestudent->errormsg";
-						pg_query($conn, 'ROLLBACK');
+						$db->db_query('ROLLBACK');
 						$anzahl_fehler++;
 					}
 				}
 				else 
 				{
 					echo "<br>Fehler beim Speichern des Prestudenteintrages: $prestudent->errormsg";
-					pg_query($conn, 'ROLLBACK');
+					$db->db_query('ROLLBACK');
 					$anzahl_fehler++;
 				}
 			}
 			else 
 			{
 				echo "<br>PreInteressent mit der ID $id konnte nicht geladen werden";
-				pg_query($conn, 'ROLLBACK');
+				$db->db_query('ROLLBACK');
 				$anzahl_fehler++;
 			}
 		}
@@ -206,9 +210,9 @@ if(isset($_GET['type']) && $_GET['type']=='zusammenlegung')
 		//- Personendatensatz des Preinteressenten wird verworfen		
 		//- Uebernahmedatum wird gesetzt
 		
-		pg_query($conn, 'BEGIN;');
+		$db->db_query('BEGIN;');
 		
-		$preinteressent=new preinteressent($conn);
+		$preinteressent=new preinteressent();
 		$preinteressent->load($preinteressent_id);
 		
 		$qry = "UPDATE public.tbl_kontakt SET person_id='$person_id_neu' WHERE person_id='$preinteressent->person_id';
@@ -216,28 +220,28 @@ if(isset($_GET['type']) && $_GET['type']=='zusammenlegung')
 				UPDATE public.tbl_preinteressent SET person_id='$person_id_neu' WHERE preinteressent_id='$preinteressent_id';
 				";
 		
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 		{
-			pg_query($conn, 'ROLLBACK');
+			$db->db_query('ROLLBACK');
 			die('Fehler beim Zusammenlegen der Kontaktdaten');
 		}
 
 		$qry = "UPDATE public.tbl_preinteressentstudiengang SET uebernahmedatum='".date('Y-m-d H:i:s')."',
 				updateamum='".date('Y-m-d H:i:s')."', updatevon='$user'
 				WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='".addslashes($studiengang_kz)."'";
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 		{
-			pg_query($conn, 'ROLLBACK');
+			$db->db_query('ROLLBACK');
 			die('Fehler beim Setzen des Uebernahmedatums');
 		}
 		
-		pg_query($conn, 'COMMIT');
+		$db->db_query('COMMIT');
 		
 		//Versuchen den Personendatensatz zu loeschen
 		//(Falls die Person noch irgendwohin referenziert (Firmenbetreuer, Preinteressent,...)
 		// wird das Loeschen von der DB verhindert, deshalb das @ vor dem pg_query)
 		$qry = "DELETE FROM public.tbl_person WHERE person_id='$preinteressent->person_id'";
-		@pg_query($conn, $qry);
+		@$db->db_query($qry);
 	
 		echo "<b>Personen wurden zusammengelegt</b>";
 	}
@@ -259,13 +263,13 @@ echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-aut
 		</tr>
 	</thead>
 	<tbody>";
-$preinteressent = new preinteressent($conn);
+$preinteressent = new preinteressent();
 $preinteressent->loadFreigegebene($studiengang_kz);
 
 foreach ($preinteressent->result as $row)
 {
 	echo '<tr>';
-	$person = new person($conn);
+	$person = new person();
 	$person->load($row->person_id);
 	echo "<td><input type='checkbox' name='chk_$row->preinteressent_id' checked></td>";
 	echo "<td>$person->nachname</td>";
@@ -282,9 +286,9 @@ foreach ($preinteressent->result as $row)
 	if($person->gebdatum!='')
 		$qry.=" OR (nachname='$person->nachname' AND gebdatum='$person->gebdatum')";
 	$qry.=")";
-	if($result_double = pg_query($conn, $qry))
+	if($result_double = $db->db_query($qry))
 	{
-		if(pg_num_rows($result_double)>0)
+		if($db->db_num_rows($result_double)>0)
 		{
 			//wenn zu dieser Person bereits ein Prestudent oder Benutzer existiert,
 			//dann kann die zusammenlegung nur ueber die administration erfolgen
@@ -293,12 +297,12 @@ foreach ($preinteressent->result as $row)
 					UNION 
 					SELECT person_id FROM public.tbl_benutzer WHERE person_id='$row->person_id'
 					";
-			if($result_anz = pg_query($conn, $qry))
+			if($result_anz = $db->db_query($qry))
 			{
-				if(pg_num_rows($result_anz)==0)
+				if($db->db_num_rows($result_anz)==0)
 				{	
 					echo '<SELECT name="person_id" id="person_id_'.$row->preinteressent_id.'">';
-					while($row_double=pg_fetch_object($result_double))
+					while($row_double=$db->db_fetch_object($result_double))
 					{
 						echo "<OPTION value='$row_double->person_id'>$row_double->nachname $row_double->vorname $row_double->gebdatum ($row_double->person_id)</OPTION>";
 					}
@@ -308,11 +312,11 @@ foreach ($preinteressent->result as $row)
 				}
 				else 
 				{
-					echo 'nur durch Administrator möglich';
+					echo 'nur durch Administrator möglich';  
 				}
 			}
 		}
-	}		
+	}		 
 	
 	echo "</td>";
 	echo '</tr>';

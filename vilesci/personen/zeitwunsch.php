@@ -1,4 +1,33 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+			
+			
 	/**
 	 *	kopiert von stdplan/profile/zeitwuensche.php mit dem Unterschied,
 	 *  dass der User hier parametrisiert ist + Speichern läuft hier über
@@ -6,7 +35,6 @@
 	 *
 	 */
 
-	include('../config.inc.php');
 	include('../../include/functions.inc.php');
 	include('../../include/globals.inc.php');
 
@@ -23,13 +51,11 @@
 		die( "uid nicht gesetzt");
 	}
 
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
 
 	//Stundentabelleholen
-	if(! $result_stunde=pg_exec($conn, "SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
-		die(pg_last_error($conn));
-	$num_rows_stunde=pg_numrows($result_stunde);
+	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+		die($db->db_last_error());
+	$num_rows_stunde=$db->db_num_rows($result_stunde);
 
 	// Zeitwuensche speichern
 	if (isset($_POST['save']))
@@ -42,35 +68,35 @@
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
 				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
-				if(! $erg_wunsch=pg_exec($conn, $query))
-					die(pg_last_error($conn));
+				if(! $erg_wunsch=$db->db_query($query))
+					die($db->db_last_error());
 				$num_rows_wunsch=pg_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
 					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
-					if(!($erg=pg_exec($conn, $query)))
-						die(pg_last_error($conn));
+					if(!($erg=$db->db_query($query)))
+						die($db->db_last_error());
 				}
 				elseif ($num_rows_wunsch==1)
 				{
 					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 					//echo $query;
-					if(!($erg=pg_exec($conn, $query)))
-						die(pg_last_error($conn));
+					if(!($erg=$db->db_query($query)))
+						die($db->db_last_error());
 				}
 				else
 					die("Zuviele Eintraege!");
 			}
 	}
 
-	if(!($erg=pg_exec($conn, "SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
-		die(pg_last_error($conn));
-	$num_rows=pg_numrows($erg);
+	if(!($erg=$db->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
+		die($db->db_last_error());
+	$num_rows=$db->db_num_rows($erg);
 	for ($i=0;$i<$num_rows;$i++)
 	{
-		$tag=pg_result($erg,$i,"tag");
-		$stunde=pg_result($erg,$i,"stunde");
-		$gewicht=pg_result($erg,$i,"gewicht");
+		$tag=$db->db_result($erg,$i,"tag");
+		$stunde=$db->db_result($erg,$i,"stunde");
+		$gewicht=$db->db_result($erg,$i,"gewicht");
 		$wunsch[$tag][$stunde]=$gewicht;
 	}
 	if(!isset($wunsch))
@@ -87,10 +113,10 @@
 
 
 	// Personendaten
-	if(! $result=pg_exec($conn, "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$uid'"))
-		die(pg_last_error($conn));
-	if (pg_numrows($result)==1)
-		$person=pg_fetch_object($result);
+	if(! $result=$db->db_query("SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$uid'"))
+		die($db->db_last_error());
+	if ($db->db_num_rows($result)==1)
+		$person=$db->db_fetch_object($result);
 
 ?>
 
@@ -111,11 +137,11 @@
 	  	echo '<th>Stunde<br>Beginn<br>Ende</th>';
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
-			$beginn=pg_result($result_stunde,$i,'"beginn"');
+			$beginn=$db->db_result($result_stunde,$i,'"beginn"');
 			$beginn=substr($beginn,0,5);
-			$ende=pg_result($result_stunde,$i,'"ende"');
+			$ende=$db->db_result($result_stunde,$i,'"ende"');
 			$ende=substr($ende,0,5);
-			$stunde=pg_result($result_stunde,$i,'"stunde"');
+			$stunde=$db->db_result($result_stunde,$i,'"stunde"');
 			echo "<th><div align=\"center\">$stunde<br>$beginn<br>$ende</div></th>";
 		}
 		?>

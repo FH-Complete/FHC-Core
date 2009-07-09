@@ -1,21 +1,51 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+ 
+ 
+ 
 	/**
 	 *	Raumauslastung
 	 *
 	 */
 
-	require('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+	
 	require('../../include/globals.inc.php');
 	$raum=array();
+
 
 	if (isset($_POST['datum_beginn']))
 		$datum_beginn=$_POST['datum_beginn'];
 	else
-		$datum_beginn='2007-02-12';
+		$datum_beginn=date('Y').'-'.(date('m')>7?'06':'01').'-01';
 	if (isset($_POST['datum_ende']))
 		$datum_ende=$_POST['datum_ende'];
 	else
-		$datum_ende='2007-06-30';
+		$datum_ende=date('Y').'-'.(date('m')>7?'12':'07').'-30';
 	if (isset($_POST['stunde_beginn']))
 		$stunde_beginn=$_POST['stunde_beginn'];
 	else
@@ -30,18 +60,16 @@
 
 	$wochen=round(($ts_ende-$ts_beginn)/(60*60*24*7));
 
-	if (!$conn = pg_pconnect(CONN_STRING))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
-
 	//Stundenplandaten holen
 	$sql_query="SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag FROM lehre.tbl_stundenplan
 					WHERE datum>='$datum_beginn' AND datum<='$datum_ende' AND stunde>=$stunde_beginn AND stunde<=$stunde_ende
 					ORDER BY ort_kurzbz";
-	if(! $result=pg_query($conn, $sql_query))
-		die(pg_last_error($conn));
+
+	if(!$result=$db->db_query($sql_query))
+			die($db->db_last_error());
 	//echo $sql_query;
 	//Aufbereitung
-	while ($row=pg_fetch_object($result))
+	while ($row=$db->db_fetch_object($result))
 	{
 		$raum[$row->ort_kurzbz]->ort=$row->ort_kurzbz;
 		if (!isset($raum[$row->ort_kurzbz]->last[$row->tag][$row->stunde]->anzahl))

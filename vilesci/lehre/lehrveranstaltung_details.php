@@ -15,18 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/lehrveranstaltung.class.php');
 	require_once('../../include/studiengang.class.php');
-
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$user = get_uid();
 	$reloadstr = "";  // neuladen der liste im oberen frame
@@ -47,7 +48,7 @@
 
 	if(isset($_POST["schick"]))
 	{
-		$lv = new lehrveranstaltung($conn);
+		$lv = new lehrveranstaltung();
 
 		if(isset($_POST['lv_id']) && $_POST['lv_id']!='')
 		{
@@ -98,7 +99,7 @@
 		}
 	}
 
-	$sg = new studiengang($conn);
+	$sg = new studiengang();
 	$sg->getAll('typ, kurzbz', false);
 	foreach($sg->result as $studiengang)
 	{
@@ -106,18 +107,18 @@
 	}
 
 	$qry = "SELECT * FROM tbl_sprache ORDER BY sprache";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$sprache_arr[] = $row->sprache;
 		}
 	}
 
 	$qry = "SELECT * FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$lehrform_arr[] = $row->lehrform_kurzbz;
 		}
@@ -125,7 +126,7 @@
 
 	if (isset($_REQUEST['lv_id']) || isset($_REQUEST['neu']))
 	{
-		$lv = new lehrveranstaltung($conn);
+		$lv = new lehrveranstaltung();
 
 		if (isset($_REQUEST['lv_id']))
 		{
@@ -245,9 +246,9 @@
 		$htmlstr .= "	<SELECT name='orgform_kurzbz'>";
 		$htmlstr .= "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-		if($result_orgform = pg_query($conn, $qry_orgform))
+		if($result_orgform = $db->db_query($qry_orgform))
 		{
-			while($row_orgform = pg_fetch_object($result_orgform))
+			while($row_orgform = $db->db_fetch_object($result_orgform))
 			{
 				if($row_orgform->orgform_kurzbz==$lv->orgform_kurzbz)
 					$selected='selected';

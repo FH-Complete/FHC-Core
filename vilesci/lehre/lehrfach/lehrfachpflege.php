@@ -1,4 +1,30 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+		require_once('../../../config/vilesci.config.inc.php');
+		require_once('../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 // *********************************************
 // * Script zeigt alle Lehreinheiten an,
 // * die keinem aktiven Lehrfach zu-
@@ -7,13 +33,10 @@
 // * zugewiesen werden.
 // *********************************************
 	//DB Verbindung herstellen
-	require_once('../../config.inc.php');
+
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/lehrfach.class.php');
-
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:'');
 $i=0;
@@ -39,7 +62,7 @@ if(isset($_GET['lf_id']))
 	$lehreinheit_id=(isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:'');
 	$lf_id=(isset($_GET['lf_id'])?$_GET['lf_id']:'');
 	$qry_upd="UPDATE lehre.tbl_lehreinheit SET lehrfach_id='".$lf_id."' WHERE lehreinheit_id='".$lehreinheit_id."';";
-	if(pg_query($conn, $qry_upd))
+	if($db->db_query($qry_upd))
 	{
 		echo nl2br("\nErfolgreich gespeichert: ".$qry_upd);
 	}
@@ -53,7 +76,7 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 
 echo 'Studiensemester <SELECT name="studiensemester_kurzbz">';
 echo "<option value=''>-- Auswahl --</option>";
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->getAll();
 
 foreach($stsem_obj->studiensemester as $stsem)
@@ -79,15 +102,15 @@ $qry="SELECT tbl_lehrveranstaltung.bezeichnung as lvbez, tbl_lehrveranstaltung.k
 	FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING (lehrfach_id) JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id) JOIN tbl_fachbereich USING (fachbereich_kurzbz)
 	WHERE (NOT tbl_lehrfach.aktiv OR NOT tbl_fachbereich.aktiv) AND studiensemester_kurzbz='".$studiensemester_kurzbz."' ORDER BY studiengang_kz,semester;";
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	echo "<br>Anzahl der Datensätze: ".pg_num_rows($result);
 	echo "<table class='liste'><tr><th>ID</th><th>LV-Kürzel</th><th>LV-Bezeichnung</th><th>Stg-Kz</th><th>Sem.</th><th>LF-Kürzel</th><th>LF-Bezeichnung</th><th>Lehrfach-Auswahl</th><th></th></tr>";
-	while($row = pg_fetch_object($result))
+	while($row =$db->db_fetch_object($result))
 	{
 		$i++;
 		echo "<tr class='liste".($i%2)."'>";
-		echo "<form action='$PHP_SELF'  method='GET'>";
+		echo "<form action='".$_SERVER['PHP_SELF']."'  method='GET'>";
 		echo "<input type='hidden' name='studiensemester' value='".$studiensemester_kurzbz."'>";
 		echo "<input type='hidden' name='lehreinheit_id' value='".$row->lehreinheit_id."'>";
 		echo "<td>".$row->lehreinheit_id."</td>";
@@ -99,9 +122,9 @@ if($result = pg_query($conn, $qry))
 		echo "<td>".$row->bezeichnung."(".$row->fachbereich_kurzbz.")</td>";
 		echo '<td><SELECT name="lf_id">';
 		$qry_lf="SELECT * FROM lehre.tbl_lehrfach WHERE aktiv AND studiengang_kz='".$row->studiengang_kz."' AND semester='".$row->semester."' ORDER BY bezeichnung;";
-		if($result_lf = pg_query($conn, $qry_lf))
+		if($result_lf =$db->db_query($qry_lf))
 		{
-			while($row_lf = pg_fetch_object($result_lf))
+			while($row_lf = $db->db_fetch_object($result_lf))
 			{
 				if($row->bezeichnung==$row_lf->bezeichnung)
 				{

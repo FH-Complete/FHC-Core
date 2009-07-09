@@ -1,9 +1,32 @@
 <?php
-	require_once('../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+ 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	require_once('../../include/functions.inc.php');
-
-	if (!$conn = @pg_pconnect(CONN_STRING))
-	   	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	// Variablen setzen
 	if (isset($_GET['uid']))
@@ -18,24 +41,23 @@
 		if (isset($uid))
 		{
 			$qry = "UPDATE tbl_benutzer SET aktiv=FALSE WHERE uid='$uid';";
-			if(!$result = pg_query($conn, $qry))
-				die (pg_last_error($conn));
+			if(!$result = $db->db_query($qry))
+				die ($db->db_last_error());
 		}
 		else
 			die('UID ist nicht gesetzt.');
 
 	// LDAP Verbindung
-	$ds=ldap_connect("ldap.technikum-wien.at");  // must be a valid LDAP server!
+	$ds=ldap_connect(LDAP_SERVER);  // must be a valid LDAP server!
 	//echo "connect result is " . $ds . "<br />";
 	if ($ds)
 	{
 	    //echo "Binding ...";
-	    $r=ldap_bind($ds);     // this is an "anonymous" bind, typically
-	    // read-only access
-	    //echo "Bind result is " . $r . "<br />";
+	  if (!$r=ldap_bind($ds))     // this is an "anonymous" bind, typically
+		    die("<h4>Unable to connect to LDAP server</h4>");
 	}
 	else
-	    echo "<h4>Unable to connect to LDAP server</h4>";
+	    die("<h4>Unable to connect to LDAP server</h4>");
 
 ?>
 <html>
@@ -55,18 +77,18 @@
 	<?php
 	$qry = "SELECT uid, titelpre,titelpost, nachname, vorname, vornamen, tbl_benutzer.aktiv FROM tbl_benutzer JOIN tbl_person USING (person_id) WHERE tbl_benutzer.aktiv AND uid NOT LIKE '\\\\_%' ";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		echo pg_num_rows($result);
+		echo $db->db_num_rows($result);
 		echo "<table class='liste'>";
 		echo "<tr class='liste'><th>UID</th><th>Titel</th><th>Nachname</th><th>Vorname</th><th>Vornamen</th><th>TitelPost</th><th>Aktiv</th><th>eMail</th><th colspan='3'>Aktion</th></tr>";
 
 		$i=0;
-		while ($row=pg_fetch_object($result))
+		while ($row=$db->db_fetch_object($result))
 		{
 
  			// Search uid entry
-		    $sr=ldap_search($ds, "ou=People, dc=technikum-wien, dc=at", "uid=".$row->uid);
+		    $sr=ldap_search($ds, LDAP_BASE_DN, "uid=".$row->uid);
 			//echo "Search result is " . $sr . "<br />";
 			//echo "Number of entires returned is " . ldap_count_entries($ds, $sr) . "<br />";
 			//echo "Getting entries ...<p>";
@@ -107,7 +129,7 @@
 		echo $i.' Ergebnisse<BR>';
 	}
 	else
-		echo "Fehler beim laden der Mitarbeiter: ".pg_errormessage($conn);
+		echo "Fehler beim laden der Mitarbeiter: ".$db->db_last_error();
 
 	echo "Closing connection";
 	ldap_close($ds);

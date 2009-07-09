@@ -1,4 +1,31 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+		require_once('../../../config/vilesci.config.inc.php');
+		require_once('../../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
 // *****************************************
 // * Script zum Entfernen Doppelter LF
 // * Es werden zwei listen mit LF angezeigt
@@ -7,11 +34,8 @@
 // * es ersetzt wird.
 // ************************************
 	//DB Verbindung herstellen
-	require_once('../../config.inc.php');
+
 	require_once('../../../include/lehrfach.class.php');
-	
-	if (!$conn = @pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	//Initialisierung der Variablen
 	if(!isset($stg_1))
@@ -51,7 +75,7 @@
 			$sql_query_upd1="UPDATE lehre.tbl_lehreinheit SET lehrfach_id='$radio_2' WHERE lehrfach_id='$radio_1';";
 			$sql_query_upd1.=" DELETE FROM lehre.tbl_lehrfach WHERE lehrfach_id='$radio_1';";
 			
-			if(pg_query($conn,$sql_query_upd1))
+			if($db->db_query($sql_query_upd1))
 			{
 				$msg = "Daten Erfolgreich gespeichert<br>";
 			}
@@ -90,8 +114,8 @@
 	 echo "<select name='stg_1'>";
 	 echo "<option value='-1'>--Alle--</option>";
 	 $sql_query_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kurzbz, studiengang_kz FROM public.tbl_studiengang ORDER BY kurzbz";
-	 $result_stg = pg_query($conn,$sql_query_stg);
-	 while($row_stg=pg_fetch_object($result_stg))
+	 $result_stg = $db->db_query($sql_query_stg);
+	 while($row_stg=$db->db_fetch_object($result_stg))
 	 {
 	 	if($row_stg->studiengang_kz==$stg_1)
 	 		echo "<option value='$row_stg->studiengang_kz' selected>$row_stg->kurzbz</option>";
@@ -123,8 +147,8 @@
 	 echo "<select name='stg_2'>";
 	 echo "<option value='-1'>--Alle--</option>";
 	 $sql_query_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kurzbz, studiengang_kz FROM public.tbl_studiengang ORDER BY kurzbz";
-	 $result_stg = pg_query($conn,$sql_query_stg); 
-	 while($row_stg=pg_fetch_object($result_stg))
+	 $result_stg = $db->db_query($sql_query_stg); 
+	 while($row_stg=$db->db_fetch_object($result_stg))
 	 {
 	 	if($row_stg->studiengang_kz == $stg_2)
 	 		echo "<option value='$row_stg->studiengang_kz' selected>$row_stg->kurzbz</option>";
@@ -169,7 +193,7 @@
 	 echo "<th><a href='wartung.php?stg_1=$stg_1&stg_2=$stg_2&sem_1=$sem_1&sem_2=$sem_2&order_1=bezeichnung&order_2=$order_2'>Bezeichnung</a></th>";
 	 echo "<th>Sprache</th></tr>";
 
-	 $lf  = new lehrfach($conn);
+	 $lf  = new lehrfach();
 	 $lf->getTab($stg_1,$sem_1, $order_1);
 	 $i=0;
 	 foreach($lf->lehrfaecher as $l)
@@ -195,7 +219,7 @@
 	 echo "<th><a href='wartung.php?stg_1=$stg_1&stg_2=$stg_2&sem_1=$sem_1&sem_2=$sem_2&order_1=$order_1&order_2=bezeichnung'>Bezeichnung</a></th>";
 	 echo "<th>Sprache</th></tr>";
 
-	 $lf  = new lehrfach($conn);
+	 $lf  = new lehrfach();
 	 $lf->getTab($stg_2,$sem_2, $order_2);
 	 $i=0;
 	 foreach($lf->lehrfaecher as $l)

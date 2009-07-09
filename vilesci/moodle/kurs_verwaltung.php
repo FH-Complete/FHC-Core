@@ -37,7 +37,7 @@
 	require_once('../../config/vilesci.config.inc.php');	
 	require_once('../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
+			die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
 		
 // ---------------- Standart Include Dateien einbinden
 	require_once('../../include/functions.inc.php');
@@ -146,9 +146,10 @@
 				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
 				if ($moodle_id!='')
 					$qry.= " and moodle_id='".addslashes($moodle_id)."'"; 
-				if(!$db->db_query($conn, $qry))
-					$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
-				$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
+				if(!$db->db_query($qry))
+						$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
+				else		
+					$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
 		}	
 		else // Result = 0 ein Fehler im RFC wurde festgestellt
 		{

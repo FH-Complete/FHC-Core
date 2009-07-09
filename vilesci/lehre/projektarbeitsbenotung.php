@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -32,10 +36,9 @@ require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/note.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
-$user = get_uid();
+if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $stg_kz = (isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
 $stsem = (isset($_REQUEST['stsem'])?$_REQUEST['stsem']:'');
@@ -44,11 +47,11 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid'))
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+		die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 if($stsem=='')
 {
-	$stsem_obj = new studiensemester($conn);
+	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 }
 
@@ -78,7 +81,7 @@ if(isset($_POST['savedata']))
 		if(mb_strstr($key, 'note_'))
 		{
 			$id = mb_substr($key, 5);
-			$prj = new projektarbeit($conn);
+			$prj = new projektarbeit();
 			if($prj->load($id))
 			{
 				if($prj->note!=$data)
@@ -106,11 +109,11 @@ if(isset($_POST['savedata']))
 	}
 }
 
-$noten = new note($conn);
+$noten = new note();
 $noten->getAll();
 
 $stg_arr = array();
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
 foreach ($stg_obj->result as $row) 
@@ -129,26 +132,18 @@ else
 
 foreach ($stgs as $kz) 
 {
-	if($stg_kz == $kz)
-		$selected = 'selected';
-	else 
-		$selected = '';
-	echo '<option value="'.$kz.'" '.$selected.'>'.$stg_arr[$kz].'</option>';
+	echo '<option '.($stg_kz==$kz?' selected="selected" ':'').' value="'.$kz.'" >'.$stg_arr[$kz].'</option>';
 }
 echo '</SELECT>';
 
+
 echo ' Studiensemester: <SELECT name="stsem">';
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem_obj->getAll();
 
 foreach ($stsem_obj->studiensemester as $row)
 {
-	if($stsem == $row->studiensemester_kurzbz)
-		$selected = 'selected';
-	else 
-		$selected = '';
-		
-	echo '<option value="'.$row->studiensemester_kurzbz.'" '.$selected.'">'.$row->studiensemester_kurzbz.'</option>';
+	echo '<option '.($stsem==$row->studiensemester_kurzbz?' selected="selected" ':'').'  value="'.$row->studiensemester_kurzbz.'" >'.$row->studiensemester_kurzbz.'</option>';
 }
 echo '</SELECT>';
 
@@ -156,7 +151,7 @@ echo '<input type="submit" value="Anzeigen">';
 echo '</form>';
 echo '<br><br>';
 
-$projekt = new projektarbeit($conn);
+$projekt = new projektarbeit();
 $projekt->getProjektarbeitStudiensemester($stg_kz, $stsem);
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&stsem='.$stsem.'" method="POST" />';
@@ -177,7 +172,7 @@ foreach ($projekt->result as $row)
 {
 	echo '<tr>';
 	
-	$student = new student($conn);
+	$student = new student();
 	$student->load($row->student_uid);
 	echo "<td nowrap>$student->nachname $student->vorname $student->titelpre $student->titelpost</td>";
 	echo "<td>$row->projekttyp_kurzbz</td>";
@@ -186,9 +181,9 @@ foreach ($projekt->result as $row)
 	
 	echo '<td nowrap>';
 	$qry = "SELECT distinct vorname, nachname, titelpre, titelpost, (SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter on(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id LIMIT 1) as uid, betreuerart_kurzbz FROM public.tbl_person JOIN lehre.tbl_projektbetreuer USING(person_id) WHERE projektarbeit_id='".$row->projektarbeit_id."'";
-	if($result_betreuer = pg_query($conn, $qry))
+	if($result_betreuer = $db->db_query($qry))
 	{
-		while($row_betreuer = pg_fetch_object($result_betreuer))
+		while($row_betreuer = $db->db_fetch_object($result_betreuer))
 		{
 			if($row_betreuer->uid!='')
 				echo "<a href='mailto:$row_betreuer->uid@".DOMAIN."' class='Item'>";

@@ -1,4 +1,27 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+ 
 /*******************************************************************************
 	File: 	funktion_det.php
 	Descr: 	Hier werden Personen aufgelistet, die zur in funktion.php ausgewählten
@@ -7,7 +30,11 @@
 	Erstellt am: 25.05.2003 von Christian Paminger, Werner Masik
 	Letzte Änderung: 	28.10.2004 Anpassung an neues DB-Schema (WM)
 ********************************************************************************/
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/funktion.class.php');
@@ -15,7 +42,7 @@ require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/fachbereich.class.php');
 
 // Datenbankverbindung herstellen
-$conn=pg_connect(CONN_STRING);
+
 $user=get_uid();
 $type='';
 if (isset($_POST['type']))
@@ -29,7 +56,7 @@ if ($type=='new' || $type=='editsave')
 {
 	//Einfügen in die Datenbank
 	
-	$funktion=new benutzerfunktion($conn);
+	$funktion=new benutzerfunktion();
 	$funktion->uid=$_POST['uid'];
 	$funktion->funktion_kurzbz=$_POST['kurzbz'];
 	if (isset($_POST['stg_kz']) && $_POST['stg_kz']!=-1)
@@ -73,7 +100,7 @@ if ($type=='new' || $type=='editsave')
 // Eine Funktionszuweisung loeschen
 if ($type=='delete')
 {
-	$funktion=new benutzerfunktion($conn);
+	$funktion=new benutzerfunktion();
 	$bn_funktion_id=$_GET['bn_funktion_id'];
 	if (!is_numeric($bn_funktion_id))
 	{
@@ -90,17 +117,17 @@ if ($type=='delete')
 
 // Daten für Personenauswahl
 $sql_query="SELECT nachname, vorname, uid FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) ORDER BY upper(nachname), vorname, uid";
-$result_person=pg_query($conn, $sql_query);
+$result_person=$db->db_query($sql_query);
 if(!$result_person)
-	die (pg_errormessage($conn));
+	die ($db->db_last_error());
 // Daten für Studiengangauswahl
 $sql_query="SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzbz, bezeichnung FROM public.tbl_studiengang ORDER BY kurzbz";
-$result_stg=pg_query($conn, $sql_query);
+$result_stg=$db->db_query($sql_query);
 if(!$result_stg)
-	die (pg_errormessage($conn));
+	die ($db->db_last_error());
 
 // Instanz von Funktion-Klasse erzeugen
-$funktion=new funktion($conn);
+$funktion=new funktion();
 //print_r($_GET);
 $kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:$_GET['kurzbz']);
 if (!$funktion->load($kurzbz))
@@ -132,12 +159,12 @@ if (!$funktion->load($kurzbz))
 				tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
 				tbl_benutzer.person_id=tbl_person.person_id AND
 				tbl_benutzerfunktion.studiengang_kz=tbl_studiengang.studiengang_kz";
-	
-		if($result = pg_query($conn, $qry))
+
+		if($result = $db->db_query($qry))
 		{			
 			echo "<tr class='liste'><th>Name</th><th>User-ID</th><th>Studiengang</th><th>Fachbereich</th><th colspan=\"2\">Aktion</th></tr>";
 			$j=0;	
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{				
 				$j++;
 				echo "<tr class='liste".($j%2)."'>";
@@ -153,7 +180,7 @@ if (!$funktion->load($kurzbz))
 		} 
 		else
 		{
-			echo "Fehler: ".pg_errormessage($conn);
+			echo "Fehler: ".	$db->db_last_error();
 		}
 	}
 	else
@@ -178,8 +205,8 @@ if (!$funktion->load($kurzbz))
     <SELECT name="uid">
       <?php
 		// Auswahl der Person
-		$num_rows=pg_num_rows($result_person);
-		while($row=pg_fetch_object ($result_person))
+		$num_rows=$db->db_num_rows($result_person);
+		while($row=$db->db_fetch_object ($result_person))
 		{
 			echo "<option value=\"$row->uid\" ";
 			if ($type=='edit' && ($row->uid==$_GET['uid']))
@@ -193,8 +220,8 @@ if (!$funktion->load($kurzbz))
       <option value="-1">- auswählen -</option>
       <?php
 		// Auswahl des Studiengangs
-		$num_rows=pg_num_rows($result_stg);
-		while($row=pg_fetch_object ($result_stg))
+		$num_rows=$db->db_num_rows($result_stg);
+		while($row=$db->db_fetch_object ($result_stg))
 		{
 			echo "<option value=\"$row->studiengang_kz\" ";
 			if (($type=='edit') && ($row->studiengang_kz==$_GET['stg_kz']) && isset($_GET['stg_kz']))
@@ -208,7 +235,7 @@ if (!$funktion->load($kurzbz))
      <option value="-1">- auswählen -</option>
       <?php
       // Auswahl Fachbereich
-      $fachbereich=new fachbereich($conn);
+      $fachbereich=new fachbereich();
       if ($fachbereich->getAll()) 
       {
       	foreach($fachbereich->result as $fb)

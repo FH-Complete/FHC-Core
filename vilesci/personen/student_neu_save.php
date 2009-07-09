@@ -1,11 +1,37 @@
 <?php
-	include('../config.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	include('../../include/functions.inc.php');
 	include('../../include/person.class.php');
 	include('../../include/student.class.php');
 	include ('../../include/studiengang.class.php');
-	if (!$conn = @pg_pconnect($conn_string))
-	   	die("Es konnte keine Verbindung zum Server aufgebaut werden.");
+
+	
 	if ($save=='ok')
 	{
 		$sql_query="INSERT INTO student (uid, titel, vornamen, nachname, gebdatum, gebort, ";
@@ -15,11 +41,11 @@
 		$sql_query.=", '$emailtw', '$emailforw', '$emailalias'";
 		$sql_query.=", '$matrikelnr', '$studiengang_id', '$sem', '$ver', '$grp')";
 
-		$student=new student($conn);
+		$student=new student();
 
 
-		if(!($erg=pg_exec($conn, $sql_query)))
-			die(pg_errormessage($conn));
+		if(!($erg=$db->db_query($sql_query)))
+			die($db->db_last_error());
 		else
 			echo 'Daten wurden erfolgreich gespeichert!<hr>';
 	}
@@ -83,7 +109,7 @@
       <option value="-1">- auswählen -</option>
       <?php
 		// Auswahl des Studiengangs
-		$stg=new studiengang($conn);
+		$stg=new studiengang();
 		$stg_alle=$stg->getAll();
 		foreach($stg_alle as $studiengang)
 		{

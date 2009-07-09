@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -32,8 +37,6 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/log.class.php');
 require_once('../../include/mail.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
 $user = get_uid();
 
@@ -41,7 +44,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $datum_obj = new datum();
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsem_aktuell = $stsem->getaktorNext();
 
 if(isset($_GET['studiengang_kz']))
@@ -136,7 +139,7 @@ if(!$rechte->isBerechtigt('admin', null, 'suid') &&
 //DROP DOWNs anzeigen
 echo "<table width='100%'><tr><td><form action='".$_SERVER['PHP_SELF']."' method='GET'>";
 echo '<table><tr><td>Studiensemester: <SELECT name="studiensemester_kurzbz">';
-$stsem = new studiensemester($conn);
+$stsem = new studiensemester();
 $stsem->getAll();
 echo "<option value='-1' ".($studiensemester_kurzbz=='-1'?'selected':'').">-- alle --</option>";
 echo "<option value='' ".($studiensemester_kurzbz==''?'selected':'').">-- offen --</option>";
@@ -153,7 +156,7 @@ echo '</SELECT>';
 
 echo '&nbsp;&nbsp;&nbsp;Studiengang: <SELECT name="studiengang_kz">';
 echo "<option value=''>-- Alle --</option>";
-$stg = new studiengang($conn);
+$stg = new studiengang();
 $stg->getAll('typ, kurzbz');
 foreach ($stg->result as $row)
 {
@@ -172,9 +175,9 @@ echo '&nbsp;&nbsp;&nbsp;<input type="submit" name="anzeigen" value="Anzeigen"></
 echo '<tr><td>Kontaktmedium: <SELECT name="kontaktmedium">';
 $qry="SELECT * FROM public.tbl_kontaktmedium ORDER BY beschreibung";
 echo "<option value='' >-- Alle --</option>";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		if($row->kontaktmedium_kurzbz==$kontaktmedium)
 			$selected='selected';
@@ -201,7 +204,7 @@ if(isset($_GET['action']))
 {
 	if($_GET['action']=='freigabe')
 	{
-		$preinteressent = new preinteressent($conn);
+		$preinteressent = new preinteressent();
 		$preinteressent->load($_GET['id']);
 		
 		if($preinteressent->studiensemester_kurzbz!='')
@@ -216,19 +219,19 @@ if(isset($_GET['action']))
 						  					WHERE preinteressent_id='".addslashes($_GET['id'])."')
 						  AND freigabedatum is null";
 			//Zuordnungen holen die noch nicht freigegeben wurden und die hoechste Prioritaet haben
-			if($result = pg_query($conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				while($row = pg_fetch_object($result))
+				while($row = $db->db_fetch_object($result))
 				{
 					//Nur diejenigen nehmen die noch nicht als Prestudent vorhanden sind
 					$qry = "SELECT count(*) as anzahl FROM public.tbl_preinteressent JOIN public.tbl_prestudent USING(person_id) WHERE preinteressent_id='$row->preinteressent_id' AND studiengang_kz='$row->studiengang_kz'";
-					if($result_std = pg_query($conn, $qry))
+					if($result_std = $db->db_query($qry))
 					{
-						if($row_std = pg_fetch_object($result_std))
+						if($row_std = $db->db_fetch_object($result_std))
 						{
 							if($row_std->anzahl==0)
 							{
-								$preinteressent = new preinteressent($conn);
+								$preinteressent = new preinteressent();
 								$preinteressent->loadZuordnung($row->preinteressent_id, $row->studiengang_kz);
 								
 								$preinteressent->freigabedatum = date('Y-m-d H:i:s');
@@ -242,10 +245,10 @@ if(isset($_GET['action']))
 													FROM public.tbl_person JOIN public.tbl_preinteressent USING(person_id) 
 													WHERE preinteressent_id='$row->preinteressent_id'";
 									$name='';
-									if($result_person = pg_query($conn, $qry_person))
-										if($row_person = pg_fetch_object($result_person))
+									if($result_person = $db->db_query($qry_person))
+										if($row_person = $db->db_fetch_object($result_person))
 											$name = $row_person->nachname.' '.$row_person->vorname;
-									$stg_obj = new studiengang($conn);
+									$stg_obj = new studiengang();
 									$stg_obj->load($row->studiengang_kz);
 									$to = $stg_obj->email;
 									//$to = 'oesi@technikum-wien.at';
@@ -288,7 +291,7 @@ if(isset($_GET['action']))
 	elseif($_GET['action']=='loeschen')
 	{
 		//Loeschen eines Preinteressenten
-		$preinteressent = new preinteressent($conn);
+		$preinteressent = new preinteressent();
 		if($preinteressent->load($_GET['id']))
 		{
 			if($preinteressent->delete($preinteressent->preinteressent_id))
@@ -314,7 +317,7 @@ if($erfassungsdatum_bis!='' && !$datum_obj->formatDatum($erfassungsdatum_bis))
 if($erfassungsdatum_von!='' && !$datum_obj->formatDatum($erfassungsdatum_von))
 	die('Erf.von Datum ist ungueltig');	
 
-$preinteressent = new preinteressent($conn);
+$preinteressent = new preinteressent();
 //if($filter=='')
 if($datum_obj->formatDatum($filter, 'Y-m-d', true))
 	$filter = $datum_obj->formatDatum($filter, 'Y-m-d', true);
@@ -326,7 +329,7 @@ $preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!
 		$filter = $datum_obj->formatDatum($filter, 'Y-m-d');
 	$preinteressent->loadPreinteressenten(null, null, $filter);
 }*/
-$stg_obj = new studiengang($conn);
+$stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
 function CutString($strVal, $limit)
@@ -368,7 +371,7 @@ echo "<table id='mytab' class='liste table-autosort:4 table-stripeclass:alternat
 foreach ($preinteressent->result as $row)
 {
 	echo '<tr>';
-	$person = new person($conn);
+	$person = new person();
 	$person->load($row->person_id);
 	echo "<td>$person->person_id</td>";
 	echo "<td>$person->nachname</td>";
@@ -382,9 +385,9 @@ foreach ($preinteressent->result as $row)
 	$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
 			ORDER BY zustellung DESC LIMIT 1";
 	echo '<td>';
-	if($result_mail = pg_query($conn, $qry))
+	if($result_mail = $db->db_query($qry))
 	{
-		if($row_mail = pg_fetch_object($result_mail))
+		if($row_mail = $db->db_fetch_object($result_mail))
 		{
 			echo '<a href="mailto:'.$row_mail->kontakt.'" class="Item">'.$row_mail->kontakt.'</a>';
 		}
@@ -392,14 +395,14 @@ foreach ($preinteressent->result as $row)
 	echo '</td>';
 	//Status
 	$status='';
-	$prestudent = new prestudent($conn);
+	$prestudent = new prestudent();
 	if($prestudent->getPrestudenten($row->person_id))
 	{
 		foreach ($prestudent->result as $prestd)
 		{
 			if($status!='')
 				$status.=', ';
-			$prestudent1 = new prestudent($conn);
+			$prestudent1 = new prestudent();
 			$prestudent1->getLastStatus($prestd->prestudent_id);
 			$status.= $prestudent1->status_kurzbz.' ('.$stg_obj->kuerzel_arr[$prestd->studiengang_kz].')';
 		}
@@ -409,7 +412,7 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$status</td>";
 	
 	//Zuordnungen laden und freigegebene Eintraege farblich markieren
-	$freigaben = new preinteressent($conn);
+	$freigaben = new preinteressent();
 	$freigaben->loadZuordnungen($row->preinteressent_id);
 	$freigabe='';
 	$uebernahme='';
@@ -418,9 +421,9 @@ foreach ($preinteressent->result as $row)
 		//auch jene als freigegeben anzeigen die schon im studiengang angelegt sind 
 		//obwohl der preinteressent nicht freigegeben wurde. (bewerbung direkt beim studiengang)
 		$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id='$row->person_id' AND studiengang_kz='$row_freigaben->studiengang_kz'";
-		$result_chkstg = pg_query($conn, $qry);
+		$result_chkstg = $db->db_query($qry);
 		
-		if($row_freigaben->freigabedatum!='' || pg_num_rows($result_chkstg)>0)
+		if($row_freigaben->freigabedatum!='' || ($result_chkstg &&  $db->db_num_rows($result_chkstg)>0))
 			$freigabe.="<font color='#009900'>";
 		else 
 			$freigabe.="<font color='#FF0000'>";

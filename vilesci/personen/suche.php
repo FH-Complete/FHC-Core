@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/person.class.php');
@@ -29,8 +34,6 @@ require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/datum.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Connecten zur DB');
 
 if(isset($_GET['searchstr']))
 	$searchstr = $_GET['searchstr'];
@@ -50,7 +53,7 @@ echo '
 <body class="background_main">
 <h2>Personensuche</h2>';
 	
-$stg = new studiengang($conn);
+$stg = new studiengang();
 $stg->getAll('typ, kurzbz', false);
 
 $stg_arr = array();
@@ -75,18 +78,21 @@ if($searchstr!='')
 			uid ~* '".addslashes($searchstr)."'
 			) ORDER BY nachname, vorname;";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{		
 		// LDAP Verbindung
 		$ds=ldap_connect(LDAP_SERVER);
 		
 		if ($ds)
 		{
-		    $r=ldap_bind($ds);     // this is an "anonymous" bind, typically
+		    if (!$r=ldap_bind($ds))     // this is an "anonymous" bind, typically
+				    die("<h4>Unable to connect to LDAP server</h4>");
+				
 		}
 		else
-		    echo "<h4>Unable to connect to LDAP server</h4>";
-		echo pg_num_rows($result).' Person(en) gefunden<br><br>';
+		    die("<h4>Unable to connect to LDAP server</h4>");
+				
+		echo $db->db_num_rows($result).' Person(en) gefunden<br><br>';
 		echo '<table>';
 		echo '<tr class="liste" align="center">';
 		echo "<td colspan='5'><b>Person</b></td>";
@@ -115,12 +121,12 @@ if($searchstr!='')
 		echo "<td><b>updateVon</b></td>";
 		echo '</tr>';
 		
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$qry = "SELECT * FROM public.tbl_person WHERE person_id='$row->person_id'";
-			if($result_person = pg_query($conn, $qry))
+			if($result_person = $db->db_query($qry))
 			{
-				if($row_person = pg_fetch_object($result_person))
+				if($row_person = $db->db_fetch_object($result_person))
 				{
 					echo '<tr class="liste1">';
 					echo "<td><a href='personen_details.php?person_id=$row_person->person_id'>$row_person->nachname</a></td>";
@@ -149,12 +155,12 @@ if($searchstr!='')
 									tbl_mitarbeiter.updateamum as mupdateamum, tbl_mitarbeiter.updatevon as mupdatevon
 							FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer on(uid=mitarbeiter_uid) 
 							WHERE person_id='$row->person_id'";
-					if($result_mitarbeiter = pg_query($conn, $qry))
+					if($result_mitarbeiter = $db->db_query($qry))
 					{
 						if(pg_num_rows($result_mitarbeiter)>0)
 						{
 						
-							while($row_mitarbeiter = pg_fetch_object($result_mitarbeiter))
+							while($row_mitarbeiter = $db->db_fetch_object($result_mitarbeiter))
 							{
 								$content.= '<tr >';
 								$content.= '<td></td>';
@@ -192,14 +198,14 @@ if($searchstr!='')
 									tbl_student.updateamum as supdateamum, tbl_student.updatevon as supdatevon
 							FROM public.tbl_student JOIN public.tbl_benutzer ON(student_uid=uid) 
 							WHERE person_id='$row->person_id'";
-					if($result_student = pg_query($conn, $qry))
+					if($result_student = $db->db_query($qry))
 					{
-						if(pg_num_rows($result_student))
+						if($db->db_num_rows($result_student))
 						{
 								
-							while($row_student = pg_fetch_object($result_student))
+							while($row_student = $db->db_fetch_object($result_student))
 							{
-								$student = new prestudent($conn);
+								$student = new prestudent();
 								$student->getLastStatus($row_student->prestudent_id);
 								
 								$content.= '<tr>';

@@ -1,22 +1,49 @@
 <?php
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+
+
 /**
  * Changes:	23.10.2004: Anpassung an neues DB-Schema (WM)
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 
-$conn=pg_connect(CONN_STRING);
+
 if (isset($_POST['type']) && $_POST['type']=='save')
 {
 	//Einfügen in die Datenbank
 	$sql_query="INSERT INTO public.tbl_funktion (beschreibung, funktion_kurzbz) VALUES ('".$_POST['bezeichnung']."', '".$_POST['kurzbz']."')";
-	$result=pg_query($conn, $sql_query);
+	$result=$db->db_query($sql_query);
 	if(!$result)
-		echo pg_errormessage()."<br>";
+		echo $db->db_last_error()."<br>";
 }
 $sql_query="SELECT funktion_kurzbz, beschreibung FROM public.tbl_funktion ORDER BY funktion_kurzbz";
-$result_funktion=pg_query($conn, $sql_query);
+$result_funktion=$db->db_query($sql_query);
 if(!$result_funktion)
-	error("funktion not found!");
+	die("funktion not found!" .$db->db_last_error());
 ?>
 
 <html>
@@ -34,23 +61,21 @@ if(!$result_funktion)
 <?php
 if ($result_funktion!=0)
 {
-	$num_rows=pg_num_rows($result_funktion);
-	$num_fields=pg_num_fields($result_funktion);
+	$num_rows=$db->db_num_rows($result_funktion);
+	$num_fields=$db->db_num_fields($result_funktion);
 	
 	echo '<th></th>';
 	for ($i=0;$i<$num_fields; $i++)
-	    echo "<th>".pg_fieldname($result_funktion,$i)."</th>";
+	    echo "<th>".$db->db_field_name($result_funktion,$i)."</th>";
 	echo '</tr>';
 	for ($j=0; $j<$num_rows;$j++)
 	{
-		$row=pg_fetch_row($result_funktion,$j);
+		$row=$db->db_fetch_row($result_funktion,$j);
 		
 		echo "<tr class='liste".($j%2)."'>";
 		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
 	    for ($i=0; $i<$num_fields; $i++)
 			echo "<td>$row[$i]</td>";
-		//echo "<td><a href=\"lehrfach_menu.php?lehrfach_id=$row[0]&type=edit&lehrfach_bz=$row[1]&lehrfach_kzbz=$row[2]&lehrfach_lehrevz=$row[3]\">Edit</a><td>";
-	    //echo "<td><a href=\"einheit_menu.php?einheit_id=$row[0]&type=delete\">Delete</a><td>";
 	    echo "</tr>\n";
 	}
 }

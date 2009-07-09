@@ -15,12 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerlvstudiensemester.class.php');
@@ -29,19 +35,19 @@ require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
 
-$user = get_uid();
+	if (!$user = get_uid())
+			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
-	die('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung für diese Seite  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
@@ -114,9 +120,9 @@ function selectAll()
 
 	$qry = "select tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden from lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung where tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id and tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id and tbl_lehrveranstaltung.studiengang_kz = 0 and tbl_lehrveranstaltung.lehre = TRUE and tbl_lehreinheitmitarbeiter.stundensatz > 0 and tbl_lehreinheitmitarbeiter.semesterstunden > 0 and tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' order by mitarbeiter_uid, lehrveranstaltung_id;";
 		//$qry = "select tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden from lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung where tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id and tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id and tbl_lehrveranstaltung.studiengang_kz = 0 and tbl_lehrveranstaltung.lehre = TRUE and tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' order by mitarbeiter_uid, lehrveranstaltung_id;";
-		if($result = pg_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
-			while($row = pg_fetch_object($result))
+			while($row = $db->db_fetch_object($result))
 			{
 				echo "<tr>";				
 				echo "<td><b>".$row->mitarbeiter_uid."</b></td>";

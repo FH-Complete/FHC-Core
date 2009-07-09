@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,25 +15,30 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+ 
+ 
 /**
  * Zeit eine Liste mit allen Dualen Studenten die noch nicht im
  * Aufbaukurs-Studiengang angelegt wurden
  */
 
-require_once('../config.inc.php');
-require_once('../../include/studiensemester.class.php');
-require_once('../../include/datum.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+			
+	require_once('../../include/studiensemester.class.php');
+	require_once('../../include/datum.class.php');
 
-if(!$conn = pg_pconnect(CONN_STRING))
-	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $datum_obj = new datum();
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getaktorNext();
 
 echo '
@@ -62,14 +67,14 @@ $qry = "SELECT
 
 
 
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
 	$i=0;
 
 	echo '<table>';
 	echo '<tr class="liste"><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>Stg</th></tr>';
 	
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		$i++;
 		echo '<tr class="liste'.($i%2).'">';
@@ -84,7 +89,7 @@ if($result = pg_query($conn, $qry))
 	}
 	
 	echo '</table>';
-	echo '<br>Anzahl:'.pg_num_rows($result);
+	echo '<br>Anzahl:'. ($result?$db->db_num_rows($result):0);
 }
 
 echo '</body></html>';

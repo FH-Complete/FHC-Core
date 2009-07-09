@@ -15,20 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/gruppe.class.php');
-require_once('../../include/person.class.php');
-require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
-
-if(!$conn=pg_pconnect(CONN_STRING))
-   die('Verbindung zur Datenbank konnte nicht hergestellt werden');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/studiengang.class.php');
+		require_once('../../include/gruppe.class.php');
+		require_once('../../include/person.class.php');
+		require_once('../../include/benutzer.class.php');
+		require_once('../../include/student.class.php');
 
 if (isset($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
@@ -65,7 +67,7 @@ if($studiengang_kz==null && isset($_POST['studiengang_kz']))
 	$studiengang_kz = $_POST['studiengang_kz'];
 
 // Studiengang AuswahlFilter
-$stg=new studiengang($conn);
+$stg=new studiengang();
 if ($stg->getAll('kurzbzlang'))
 {
 	echo '- ';
@@ -84,11 +86,11 @@ if ($stg->getAll('kurzbzlang'))
 
 if (isset($_POST['newFrm']) || isset($_GET['newFrm']))
 {
-	doEdit($conn,null,true);
+	doEdit(null,true);
 }
 else if (isset($_GET['edit']))
 {
-	doEdit($conn,addslashes($_GET['kurzbz']),false);
+	doEdit(addslashes($_GET['kurzbz']),false);
 }
 else if (isset($_POST['type']) && $_POST['type']=='save')
 {
@@ -97,7 +99,7 @@ else if (isset($_POST['type']) && $_POST['type']=='save')
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
-	$e=new gruppe($conn);
+	$e=new gruppe();
 	if(!$e->delete($_GET['einheit_id']))
 		echo $e->errormsg;
 	getUebersicht();
@@ -110,8 +112,8 @@ else
 
 function doSave()
 {
-	global $conn;
-	$e=new gruppe($conn);
+
+	$e=new gruppe();
 
 	if ($_POST['new']=='true')
 	{
@@ -143,12 +145,12 @@ function doSave()
 
 
 
-function doEdit($conn,$kurzbz,$new=false)
+function doEdit($kurzbz,$new=false)
 {
     if (!$new)
-		$e=new gruppe($conn,$kurzbz);
+		$e=new gruppe($kurzbz);
 	else
-		$e = new gruppe($conn);
+		$e = new gruppe();
 	?>
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
   		<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
@@ -178,7 +180,7 @@ function doEdit($conn,$kurzbz,$new=false)
       					<option value="-1">- auswählen -</option>
 						<?php
 							// Auswahl des Studiengangs
-							$stg=new studiengang($conn);
+							$stg=new studiengang();
 							$stg->getAll();
 							foreach($stg->result as $studiengang)
 							{
@@ -213,8 +215,11 @@ function doEdit($conn,$kurzbz,$new=false)
 
 function getUebersicht()
 {
-	global $conn,$studiengang_kz,$semester;
-    $gruppe=new gruppe($conn);
+	global $studiengang_kz,$semester;
+	if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+  $gruppe=new gruppe();
 	// Array mit allen Einheiten holen
 	$gruppeen=$gruppe->getgruppe($studiengang_kz,$semester);
 	//print_r($gruppeen);
@@ -232,10 +237,10 @@ function getUebersicht()
 	$i=0;
 	$qry = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang";
 	$stg = array();
-	if(!$result = pg_query($conn, $qry))
-		die('Fehler beim Laden der Studiengaenge');
-	while($row = pg_fetch_object($result))
-		$stg[$row->studiengang_kz] = $row->kuerzel;
+	if(!$result = $db->db_query($qry))
+			die('Fehler beim Laden der Studiengaenge');
+	while($row = $db->db_fetch_object($result))
+			$stg[$row->studiengang_kz] = $row->kuerzel;
 
 	foreach ($gruppe->result as $e)
 	{

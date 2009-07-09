@@ -15,12 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+		require_once('../../config/vilesci.config.inc.php');
+
+#		require_once('../../include/basis_db.class.php');
+#		if (!$db = new basis_db())
+#			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerlvstudiensemester.class.php');
@@ -29,24 +35,24 @@ require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die("Konnte Verbindung zur Datenbank nicht herstellen");
 
+	if (!$user = get_uid())
+			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			
 
-$user = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
-	die('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung für diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
 else
 	$stg_kz=0;
 
-$stsem_obj = new studiensemester($conn);
+$stsem_obj = new studiensemester();
 
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
@@ -89,13 +95,13 @@ else
 
 if (isset($_REQUEST["move"]) && $gruppe != "" && $_REQUEST["move"]== "=>" && $gruppe_neu!="")
 {
-	$b = new benutzergruppe($conn);
+	$b = new benutzergruppe();
 	if ($b->load_uids($gruppe, $stsem))
 	{
 		
 		foreach ($b->uids as $u)
 		{			
-				$bg = new benutzergruppe($conn);
+				$bg = new benutzergruppe();
 				$bg->uid = $u->uid;
 				$bg->gruppe_kurzbz = $gruppe_neu;
 				$bg->updateamum = null;
@@ -115,7 +121,7 @@ $spezgrp = array();
 $spezgrpstr = "";
 if ($gruppe != "")
 {
-	$gu = new benutzergruppe($conn);
+	$gu = new benutzergruppe();
 	if ($gu->load_uids($gruppe, $stsem))
 	{
 		foreach ($gu->uids as $uidliste)
@@ -131,7 +137,7 @@ $spezgrp_neu = array();
 $spezgrpstr_neu = "";
 if ($gruppe_neu != "")
 {
-	$gu = new benutzergruppe($conn);
+	$gu = new benutzergruppe();
 	if ($gu->load_uids($gruppe_neu, $stsem_neu))
 	{
 		foreach ($gu->uids as $uidliste)
@@ -219,7 +225,7 @@ function checkSubmit()
 	
 	echo "<select name='gruppe' onchange='document.auswahl.submit();'>";
 	echo "<option></option>";
-	$grp_obj = new gruppe($conn);
+	$grp_obj = new gruppe();
 	if(!$grp_obj->getgruppe('0',$semester,null,'true'))
 		echo "$lv_obj->errormsg";
 
@@ -268,7 +274,7 @@ function checkSubmit()
 	
 	echo "<select name='gruppe_neu' onchange='document.auswahl.submit();'>";
 	echo "<option></option>";
-	$grp_obj = new gruppe($conn);
+	$grp_obj = new gruppe();
 	if(!$grp_obj->getgruppe('0',$semester_neu,null,'true'))
 		echo "$lv_obj->errormsg";
 

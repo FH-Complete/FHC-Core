@@ -15,28 +15,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/benutzergruppe.class.php');
-require_once('../../include/person.class.php');
-require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
-require_once('../../include/gruppe.class.php');
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
 
-if(!$conn=pg_pconnect(CONN_STRING))
-   die('Fehler beim Aufbau der Datenbankconnection');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/studiengang.class.php');
+	require_once('../../include/benutzergruppe.class.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/student.class.php');
+	require_once('../../include/gruppe.class.php');
 
-$user=get_uid();
-$kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:$_POST['kurzbz']);
 
+	$user=get_uid();
+	
+	$kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
+	if(empty($kurzbz))
+		die('Gruppe wurde nicht &uuml;bergeben <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		
 if (isset($_POST['new']))
 {
-	$e=new benutzergruppe($conn);
+	$e=new benutzergruppe();
 	$e->new=true;
 	$e->gruppe_kurzbz=$kurzbz;
 	$e->updateamum = date('Y-m-d H:i:s');
@@ -48,12 +55,13 @@ if (isset($_POST['new']))
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
-	$e=new benutzergruppe($conn);
+	$e=new benutzergruppe();
 	$e->delete($_GET['uid'], $kurzbz);
 }
-$gruppe = new gruppe($conn);
+
+$gruppe = new gruppe();
 if(!$gruppe->load($kurzbz))
-	die('Gruppe wurde nicht gefunden:'+$kurzbz);
+		die('Gruppe wurde nicht gefunden:'+$kurzbz);
 
 ?>
 <html>
@@ -78,9 +86,9 @@ if(!$gruppe->generiert)
 
 	$qry = "SELECT * FROM campus.vw_benutzer ORDER BY nachname, vorname";
 
-	$result = pg_query($conn, $qry);
+	$result = $db->db_query($qry);
 
-	for ($i=0;$row = pg_fetch_object($result);$i++)
+	for ($i=0;$row = $db->db_fetch_object($result);$i++)
 	{
 		echo "<option value=\"".$row->uid."\">".$row->nachname." ".$row->vorname." - ".$row->uid."</option>";
 	}
@@ -96,14 +104,14 @@ if(!$gruppe->generiert)
 	       " tbl_benutzergruppe.gruppe_kurzbz='".addslashes($kurzbz)."' AND".
 	       " tbl_benutzergruppe.uid = tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id ORDER BY nachname, vorname";
 
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		$num_rows=pg_num_rows($result);
+		$num_rows=$db->db_num_rows($result);
 		echo "Anzahl: $num_rows";
 		echo '<table class="liste">
 			<tr class="liste"><th>UID</th><th>Vornamen</th><th>Nachname</th></tr>';
 
-		for ($j=0; $row = pg_fetch_object($result);$j++)
+		for ($j=0; $row = $db->db_fetch_object($result);$j++)
 		{
 			echo "<tr class='liste".($j%2)."'>";
 		    echo "<td>".$row->uid."</td>";

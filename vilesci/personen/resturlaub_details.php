@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/person.class.php');
 	require_once('../../include/benutzer.class.php');
@@ -28,10 +33,6 @@
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/resturlaub.class.php');
 	require_once('../../include/zeitsperre.class.php');
-
-
-	if (!$conn = pg_pconnect(CONN_STRING))
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$user = get_uid();
 	$reloadstr = "";  // neuladen der liste im oberen frame
@@ -46,7 +47,7 @@
 
 	if(isset($_POST["schick"]) && $_POST['uid']!='')
 	{
-		$zs = new zeitsperre($conn);
+		$zs = new zeitsperre();
 		
 		if(isset($_POST['zeitsperre_id']) && $_POST['zeitsperre_id']!='')
 		{
@@ -90,36 +91,36 @@
 
 
 	$qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$zeitsperre_arr[] = $row->zeitsperretyp_kurzbz;
 		}
 	}
 
 	$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$vertretung_arr[] = $row->uid;
 		}
 	}
 	
 	$qry = "SELECT * FROM campus.tbl_erreichbarkeit ORDER BY erreichbarkeit_kurzbz";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$erreichbarkeit_arr[] = $row->erreichbarkeit_kurzbz;
 		}
 	}
 
 	$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$freigabe_arr[] = $row->uid;
 		}
@@ -127,7 +128,7 @@
 	
 	if (isset($_REQUEST['zeitsperre_id']) || isset($_REQUEST['neu']))
 	{
-		$zs = new zeitsperre($conn);
+		$zs = new zeitsperre();
 		if (isset($_REQUEST['zeitsperre_id']))
 		{
 			$zsid = $_REQUEST['zeitsperre_id'];

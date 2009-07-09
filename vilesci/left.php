@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
 /**
@@ -25,12 +26,20 @@
  * Die Menuepunkt mit den zugehoerigen Links befinden sich in einem
  * Array welches includiert wird.
  */
-	require('../config/vilesci.config.inc.php');
+	require_once('../config/vilesci.config.inc.php');
+	require_once('../include/basis_db.class.php');
+	if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+	
  	require('../include/functions.inc.php');
  	require('../include/benutzerberechtigung.class.php');
  	require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
- 	$uid=get_uid();
- 	//$conn=pg_connect(CONN_STRING) or die('Connection zur Portal Datenbank fehlgeschlagen');
+
+	if (!$uid = get_uid())
+			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			
+	
 	$berechtigung=new benutzerberechtigung();
 	$berechtigung->getBerechtigungen($uid);
 	if (!($berechtigung->isBerechtigt('admin') || 

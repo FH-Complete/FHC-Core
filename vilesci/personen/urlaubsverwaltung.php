@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 Technikum-Wien
+/* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,17 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+
 /**
  *
  * Seite zur Verwaltung der Urlaubs- und Zeitausgleichstage der Mitarbeiter
  */
 
-require_once('../config.inc.php');
+
 require_once('../../include/functions.inc.php');
 require_once('../../include/zeitsperre.class.php');
 require_once('../../include/person.class.php');
@@ -33,9 +40,6 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-
-if(!$conn = @pg_pconnect(CONN_STRING))
-	die('Verbindung zur Datenbank fehlgeschlagen');
 
 $user = get_uid();
 $datum = new datum();
@@ -94,7 +98,7 @@ if($action=='delete')
 {
 	if($zeitsperre_id!='' && is_numeric($zeitsperre_id))
 	{
-		$zeitsperre = new zeitsperre($conn);
+		$zeitsperre = new zeitsperre();
 		if($zeitsperre->delete($zeitsperre_id))
 			$message='Zeitsperre wurde geloescht';
 		else 
@@ -107,7 +111,7 @@ if($action=='delete')
 if(isset($_POST['save']))
 {
 	//Speichern der Daten
-	$zeitsperre = new zeitsperre($conn);
+	$zeitsperre = new zeitsperre();
 	
 	if($zeitsperre_id!='')
 	{
@@ -158,11 +162,11 @@ if($message!='')
 //Zeitsperren des Mitarbeiters anzeigen
 if($uid!='')
 {
-	$mitarbeiter = new mitarbeiter($conn);
+	$mitarbeiter = new mitarbeiter();
 	if(!$mitarbeiter->load($uid))
 		die('Mitarbeiter wurde nicht gefunden');
 
-	$zeitsperre = new zeitsperre($conn);
+	$zeitsperre = new zeitsperre();
 	
 	$zeitsperre->getzeitsperren($uid);
 	echo '<h3>Zeitsperren von <b>'.$mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost.'</b></h3>';
@@ -196,7 +200,7 @@ if($uid!='')
 
 
 	//Editieren und Neu anlegen von Zeitsperren
-	$zeitsperre = new zeitsperre($conn);
+	$zeitsperre = new zeitsperre();
 	echo '<br><br>';
 	if($action=='edit')
 	{	
@@ -215,9 +219,9 @@ if($uid!='')
 	echo '<tr>';
 	echo '<td>Typ</td><td><SELECT name="zeitsperretyp_kurzbz">';
 	$qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY beschreibung";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			echo '<OPTION value="'.$row->zeitsperretyp_kurzbz.'" '.($row->zeitsperretyp_kurzbz==$zeitsperre->zeitsperretyp_kurzbz?'selected':'').'>'.$row->beschreibung.'</OPTION>';
 		}
@@ -229,9 +233,9 @@ if($uid!='')
 	
 	echo '</tr><tr>';
 	$qry = "SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$std_arr[$row->stunde]="$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)";
 		}
@@ -278,9 +282,9 @@ if($uid!='')
 	echo '<td>Erreichbarkeit</td>';
 	$qry = "SELECT * FROM campus.tbl_erreichbarkeit";
 	$erreichbarkeit_arr=array();
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			$erreichbarkeit_arr[$row->erreichbarkeit_kurzbz]=$row->beschreibung;
 		}
@@ -306,9 +310,9 @@ if($uid!='')
 	
 	echo "<OPTION value=''>-- Auswahl --</OPTION>\n";
 	
-	if($result = pg_query($conn, $qry))
+	if($result = $db->db_query($qry))
 	{
-		while($row = pg_fetch_object($result))
+		while($row = $db->db_fetch_object($result))
 		{
 			if($zeitsperre->vertretung_uid == $row->uid)
 				$selected='selected';

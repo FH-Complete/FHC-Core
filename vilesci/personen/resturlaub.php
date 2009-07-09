@@ -15,11 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../config.inc.php');
+
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -27,9 +33,6 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/resturlaub.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-
-if(!$conn=pg_pconnect(CONN_STRING))
-	die("Fehler beim Connecten zur Datenbank");
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -64,15 +67,15 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 	{
 		//echo "<script type='text/javascript'>check=confirm('Wollen Sie diesen Eintrag wirklich löschen?');</script>";
 		$qry="DELETE FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$_GET['uid']."' AND zeitsperre_id='".$_GET['zeitsperre_id']."' ;";
-		if(!pg_query($conn, $qry))
+		if(!$db->db_query($qry))
 		{
 			die("Zeitsperren konnte nicht gelo&uml;scht werden!");
 		}
 	}
-	$ma = new mitarbeiter($conn);
+	$ma = new mitarbeiter();
 	$ma->load($_GET['uid']);
 	
-	$resturlaub = new resturlaub($conn);
+	$resturlaub = new resturlaub();
 	$resturlaub->load($_GET['uid']);
 	echo 'Resturlaubstage von <b>'.$ma->nachname.' '.$ma->vorname.'</b>:<br><br>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?type=save&uid='.$ma->uid.'" method="POST">
@@ -125,14 +128,14 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 		echo "</tr></thead>";
 		echo "<tbody>";
 		$qry="SELECT * FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$uid."' ORDER BY vondatum DESC";
-		if(!$result_urlaub = pg_query($conn, $qry))
+		if(!$result_urlaub = $db->db_query($qry))
 			die("Zeitsperren nicht gefunden!");
-		$num_rows=pg_num_rows($result_urlaub);
+		$num_rows=$db->db_num_rows($result_urlaub);
 		if ($num_rows>0)
 		{
 			for($i=0;$i<$num_rows;$i++)
 			{
-				$row_urlaub=pg_fetch_object($result_urlaub);
+				$row_urlaub=$db->db_fetch_object($result_urlaub);
 				echo "<tr>";
 				echo "<td><a href='resturlaub_details.php?zeitsperre_id=$row_urlaub->zeitsperre_id' target='lv_detail'>edit</a></td>";
 				echo "<td><a href='".$_SERVER['PHP_SELF']."?type=edit&del=true&uid=$uid&zeitsperre_id=$row_urlaub->zeitsperre_id' onclick='return conf_del()' target='uebersicht'>delete</a></td>";
@@ -158,7 +161,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 
 if(isset($_GET['type']) && $_GET['type']=='save')
 {
-	$resturlaub = new resturlaub($conn);
+	$resturlaub = new resturlaub();
 	
 	if($resturlaub->load($_GET['uid']))
 	{
@@ -209,9 +212,9 @@ echo "<thead>
 			<th class='table-sortable:default'>Aktion</th>
 		</tr>
 	</thead>";
-if($result = pg_query($conn, $qry))
+if($result = $db->db_query($qry))
 {
-	while($row = pg_fetch_object($result))
+	while($row = $db->db_fetch_object($result))
 	{
 		echo '<tr>';
 		echo "<td>$row->nachname</td>";
