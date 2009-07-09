@@ -162,7 +162,7 @@ class benutzerberechtigung extends basis_db
 			       " WHERE benutzerberechtigung_id='".addslashes($this->benutzerberechtigung_id)."'";
 		}
 
-		if(pg_query($this->conn,$qry))
+		if(p g_query($this->conn,$qry))
 		{
 			//Log schreiben
 			return true;
@@ -188,7 +188,7 @@ class benutzerberechtigung extends basis_db
 		// Berechtigungen holen
 		$sql_query="DELETE from tbl_benutzerberechtigung where benutzerberechtigung_id = '".$benutzerberechtigung_id."'";
 
-		if(!pg_query($this->conn, $sql_query))
+		if(!p g_query($this->conn, $sql_query))
 		{
 			$this->errormsg='Fehler beim l&ouml;schen';
 			return false;

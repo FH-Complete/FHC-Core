@@ -115,7 +115,7 @@ class aufmerksamdurch extends basis_db
 				'WHERE aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).';';
 		}
 		
-		if(pg_query($this->conn, $qry))
+		if($this->db_query($qry))
 		{
 			return true;		
 		}

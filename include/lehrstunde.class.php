@@ -299,7 +299,7 @@ class lehrstunde extends basis_db
 
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
-				$this->errormsg=pg_last_error($this->conn);
+				$this->errormsg=$this->db_last_error($this->conn);
 				return false;
 			}
 			else 
