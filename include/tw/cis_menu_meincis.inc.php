@@ -1,5 +1,5 @@
 <?php
-	$stsemobj = new studiensemester($db_conn);
+	$stsemobj = new studiensemester();
 	//$stsem = $stsemobj->getAktorNext();
 	$stsem = $stsemobj->getNearest();
 ?>
@@ -47,9 +47,9 @@
 			//Projekt-Zeitaufzeichnung
 			$qry = "SELECT count(*) as anzahl FROM fue.tbl_projektbenutzer WHERE uid='$user'";
 
-			if($result = pg_query($db_conn, $qry))
+			if($result = $db->db_query($qry))
 			{
-				if($row = pg_fetch_object($result))
+				if($row = $db->db_fetch_object($result))
 				{
 					if($row->anzahl>0)
 					{
@@ -90,9 +90,9 @@
 
 							$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, lehreverzeichnis from campus.vw_student_lehrveranstaltung WHERE uid='$user' AND studiensemester_kurzbz='$stsem' AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
 
-							if($result = pg_query($db_conn,$qry))
+							if($result = $db->db_query($qry))
 							{
-								while($row = pg_fetch_object($result))
+								while($row = $db->db_fetch_object($result))
 								{
 									if($row->studiengang_kz==0 && $row->semester==0)
 										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung,$cutlength).'</a></li>';
@@ -183,9 +183,9 @@
 									    mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
 									    tbl_lehrveranstaltung.aktiv AND tbl_lehrveranstaltung.lehre ORDER BY typ, tbl_studiengang.kurzbz, semester, bezeichnung";
 
-							if($result = pg_query($db_conn,$qry))
+							if($result = $db->db_query($qry))
 							{
-								while($row = pg_fetch_object($result))
+								while($row = $db->db_fetch_object($result))
 								{
 									if($row->studiengang_kz==0 && $row->semester==0)
 										echo '<li><a class="Item2" title="'.$row->bezeichnung.'" href="freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'" target="content">FF '.CutString($row->bezeichnung,$cutlength).'</a></li>';
@@ -258,11 +258,11 @@
 				//Untergebene holen
 				$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($user)."'";
 
-				if($result = pg_query($db_conn, $qry))
+				if($result = $db->db_query($qry))
 				{
 					$institut='';
 					$stge='';
-					while($row = pg_fetch_object($result))
+					while($row = $db->db_fetch_object($result))
 					{
 						if($row->funktion_kurzbz=='fbl')
 						{
@@ -291,11 +291,11 @@
 				$qry.=")";
 
 				$untergebene='';
-				if($result = pg_query($db_conn, $qry))
+				if($result = $db->db_query($qry))
 				{
 
 
-					while($row = pg_fetch_object($result))
+					while($row = $db->db_fetch_object($result))
 					{
 						if($untergebene!='')
 							$untergebene.=',';
@@ -307,7 +307,7 @@
 				{
 					$qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene) ORDER BY nachname, vorname";
 
-					if($result = pg_query($db_conn, $qry))
+					if($result = $db->db_query($qry))
 					{
 						echo '
 						<tr>
@@ -327,7 +327,7 @@
 									<ul style="margin-top: 0px; margin-bottom: 0px;">';
 						echo '<li><a class="Item2" href="profile/urlaubsfreigabe.php" target="content">Alle</a></li>';
 
-						while($row = pg_fetch_object($result))
+						while($row = $db->db_fetch_object($result))
 						{
 								echo '<li><a class="Item2" href="profile/urlaubsfreigabe.php?uid='.$row->uid.'" target="content">'."$row->nachname $row->vorname $row->titelpre $row->titelpost".'</a></li>';
 						}
