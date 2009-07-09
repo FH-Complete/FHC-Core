@@ -536,7 +536,7 @@ A:hover {
 
 					if(!$result_path_elements)
 						die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
-					$num_rows_path_elements = $db->db_numrows($result_path_elements);
+					$num_rows_path_elements = $db->db_num_rows($result_path_elements);
 					if(!($num_rows_path_elements > 0))
 					{
 						// Pruefen ob dieser Kurs ein Wahlfach ist
@@ -545,7 +545,7 @@ A:hover {
 							die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
 						if(!$result_path_elements)
 							die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
-						$num_rows_path_elements = $db->db_numrows($result_path_elements);
+						$num_rows_path_elements = $db->db_num_rows($result_path_elements);
 						if(!($num_rows_path_elements > 0))
 						{
 							echo "<tr><td>";

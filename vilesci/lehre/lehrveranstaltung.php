@@ -349,7 +349,7 @@ echo '</td></tr></table>';
 
 if ($result_lv!=0)
 {
-	$num_rows=pg_num_rows($result_lv);
+	$num_rows=$db->db_num_rows($result_lv);
 	echo "<h3>&Uuml;bersicht - $num_rows LVAs</h3>
 	<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
 	<thead>
@@ -374,7 +374,7 @@ if ($result_lv!=0)
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
 	{
-		$row=pg_fetch_object($result_lv);
+		$row=$db->db_fetch_object($result_lv);
 		echo "<tr>";
 		//ID
 		echo "<td align='right'>";

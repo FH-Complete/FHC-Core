@@ -21,14 +21,18 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *
  */
-require_once('../../config/cis.config.inc.php');
-require_once('../../include/globals.inc.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/funktion.class.php');
-require_once('../../include/studiensemester.class.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/lehrveranstaltung.class.php');
+		require_once('../../config/cis.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+		require_once('../../include/globals.inc.php');
+		require_once('../../include/functions.inc.php');
+		require_once('../../include/benutzerberechtigung.class.php');
+		require_once('../../include/funktion.class.php');
+		require_once('../../include/studiensemester.class.php');
+		require_once('../../include/studiengang.class.php');
+		require_once('../../include/lehrveranstaltung.class.php');
 
 	if (!$user=get_uid())
 		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -56,7 +60,7 @@ if(check_lektor($user))
    $is_lector=true;
 else
    $is_lector=false;
-  
+
 if(check_student($user))
    $is_student=true;
 else

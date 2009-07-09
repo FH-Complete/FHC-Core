@@ -101,9 +101,7 @@
 			
 				if ($num_checkmail==0)
 				{
-					//$row_checkmail=pg_fetch_object($result_checkmail,0);
 					$text.="$date\t$row->stunde_id\t$row->semester$row->verband$row->gruppe\r\n";
-					//$text.="$row_checkmail->datum\t$row_checkmail->stunde_id\t$row_checkmail->semester$row_checkmail->verband$row_checkmail->gruppe\t$row_checkmail->ortkurzbz\t$row_checkmail->stgkurzbz\t$row_checkmail->lehrfachkurzbz lektor_id lektorkurzbz 
 					$stundenanzahl++;
 					$sendmail=1;
 				}

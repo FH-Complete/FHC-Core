@@ -105,7 +105,7 @@
 					WHERE lehreinheit_id=$leid AND datum='$row->datum' AND stunde=$row->stunde;";
 			if(!$result_ort=$db->db_query($qry))
 				die ("DB Fehler $qry" .' '.$db->db_last_error());
-			while ($row_ort=pg_fetch_object($result_ort))
+			while ($row_ort=$db->db_fetch_object($result_ort))
 			{
 				$qry="INSERT INTO lehre.$stpl_table (datum,stunde,ort_kurzbz,unr,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id, insertvon)
 						VALUES ('".$row->datum."', $row->stunde,'$row_ort->ort_kurzbz',$unr,'".$lektor_uid."',$studiengang_kz,$semester,'$verband','$gruppe',";

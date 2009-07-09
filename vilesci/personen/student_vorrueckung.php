@@ -350,14 +350,14 @@ echo "<h3>&Uuml;bersicht (".$studiensemester_kurzbz."/".($semester<100?$semester
 //Anzeige Tabelle
 if ($result_std!=0)
 {
-	$num_rows=pg_num_rows($result_std);
+	$num_rows=$db->db_num_rows($result_std);
 	echo 'Anzahl: '.$num_rows;
 	echo "<th class='table-sortable:default'>Nachname</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:default'>STG</th><th class='table-sortable:default'>Sem</th><th class='table-sortable:default'>Ver</th><th class='table-sortable:default'>Grp</th><th class='table-sortable:default'>Status</th><th class='table-sortable:default'>AusbSem</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
 	{
-		$row=pg_fetch_object($result_std,$i);
+		$row=$db->db_fetch_object($result_std,$i);
 		$qry_status="SELECT status_kurzbz, ausbildungssemester FROM public.tbl_prestudentstatus 
 			JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." 
 			AND studiengang_kz=".$row->studiengang_kz."  

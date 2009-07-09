@@ -282,7 +282,7 @@
 			
 							if($result = $db->db_query($qry))
 							{
-								if(pg_numrows($result)==0)
+								if($db->db_num_rows($result)==0)
 								{
 									$qry = "UPDATE sync.tbl_synclehreinheit SET lehreinheit_id='$le_id_bleibt' WHERE lehreinheit_id='$le_id_delete';";
 								}

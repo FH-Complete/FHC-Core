@@ -101,7 +101,7 @@ if(isset($_POST["schick"]))
 				}
 				else 
 				{
-					$row=@pg_fetch_object($result);
+					$row=@$db->db_fetch_object($result);
 					$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
 					if($result_typ=$db->db_query($qry_typ))
 					{

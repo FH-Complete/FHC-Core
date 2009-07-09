@@ -31,7 +31,7 @@
 	
 	if(!($erg_std=$db->db_query("SELECT * FROM stunde ORDER BY id")))
 		die($db->db_last_error());
-	$num_rows_std=pg_numrows($erg_std);
+	$num_rows_std=$db->db_num_rows($erg_std);
 	for ($t=1;$t<7;$t++)
 		for ($i=0;$i<$num_rows_std;$i++)
 		{
@@ -42,7 +42,7 @@
 			$query="SELECT * FROM zeitwunsch WHERE lektor_id=$lkid AND stunde_id=$stunde AND tag=$t";
 			if(!($erg_wunsch=$db->db_query($query)))
 				die($db->db_last_error());
-			$num_rows_wunsch=pg_numrows($erg_wunsch);
+			$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 			if ($num_rows_wunsch==0)
 			{
 				$query="INSERT INTO zeitwunsch (lektor_id, stunde_id, tag, gewicht) VALUES ($lkid, $stunde, $t, $gewicht)";

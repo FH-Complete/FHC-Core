@@ -64,7 +64,7 @@
 	for ($i=0; $i<$num_rows; $i++)
 	{
 		echo "<td nowrap>";
-		$row=pg_fetch_object($erg, $i);
+		$row=$db->db_fetch_object($erg, $i);
 		$stg_kzbz=$row->kurzbz;
 		$stg_kz=$row->studiengang_kz;
 		$sql_query="SELECT DISTINCT semester FROM public.tbl_student WHERE studiengang_kz=$stg_kz ORDER BY semester";

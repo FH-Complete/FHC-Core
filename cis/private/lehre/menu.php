@@ -70,7 +70,7 @@
 		{
 			$sql_query = "SELECT studiengang_kz, semester FROM campus.vw_student WHERE uid='$user' LIMIT 1";
 			$result_student = $db->db_query($sql_query);
-			$num_rows_student = $db->db_numrows($result_student);
+			$num_rows_student = $db->db_num_rows($result_student);
 			if($num_rows_student > 0)
 			{
 				$row = $db->db_fetch_object($result_student, 0);
