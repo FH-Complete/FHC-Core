@@ -35,18 +35,18 @@ echo '<H2>Version 1.2 &rarr; 2.0</H2>';
 // **************** lehre.tbl_prestudentstatus -> tbl_prestudentstatus ************************
 if(!@$db->db_query('SELECT * FROM public.tbl_status LIMIT 1;'))
 {
-	$qry = "ALTER TABLE public.tbl_status RENAME TO tbl_status;
-			ALTER TABLE public.tbl_prestudentstatus RENAME TO tbl_prestudentstatus;
-			ALTER TABLE public.tbl_status RENAME COLUMN status_kurzbz TO status_kurzbz;
-			ALTER TABLE public.tbl_prestudentstatus RENAME COLUMN status_kurzbz TO status_kurzbz;
-			--UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_status' WHERE conname='pk_tbl_status';
-			--UPDATE pg_catalog.pg_constraint SET conname='orgform_prestudentstatus' WHERE conname='orgform_prestudentrolle';
-			--UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_prestudentstatus' WHERE conname='pk_tbl_prestudentstatus';
-			--UPDATE pg_catalog.pg_constraint SET conname='prestudent_prestudentstatus' WHERE conname='prestudent_prestudentrolle';
-			--UPDATE pg_catalog.pg_constraint SET conname='status_prestudentstatus' WHERE conname='rolle_prestudentrolle';
-			--UPDATE pg_catalog.pg_constraint SET conname='studiensemester_prestudentstatus' WHERE conname='studiensemester_prestudentrolle';
+	$qry = "ALTER TABLE public.tbl_rolle RENAME TO tbl_status;
+			ALTER TABLE public.tbl_prestudentrolle RENAME TO tbl_prestudentstatus;
+			ALTER TABLE public.tbl_status RENAME COLUMN rolle_kurzbz TO status_kurzbz;
+			ALTER TABLE public.tbl_prestudentstatus RENAME COLUMN rolle_kurzbz TO status_kurzbz;
+			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_status' WHERE conname='pk_tbl_rolle';
+			UPDATE pg_catalog.pg_constraint SET conname='orgform_prestudentstatus' WHERE conname='orgform_prestudentrolle';
+			UPDATE pg_catalog.pg_constraint SET conname='pk_tbl_prestudentstatus' WHERE conname='pk_tbl_prestudentrolle';
+			UPDATE pg_catalog.pg_constraint SET conname='prestudent_prestudentstatus' WHERE conname='prestudent_prestudentrolle';
+			UPDATE pg_catalog.pg_constraint SET conname='status_prestudentstatus' WHERE conname='rolle_prestudentrolle';
+			UPDATE pg_catalog.pg_constraint SET conname='studiensemester_prestudentstatus' WHERE conname='studiensemester_prestudentrolle';
 			
-			CREATE OR REPLACE FUNCTION get_rolle_prestudent (integer, character varying) returns character varying
+			CREATE OR REPLACE FUNCTION get_rolle_prestudent (integer, character varying) returns character varying as $$
 			DECLARE i_prestudent_id ALIAS FOR $1;
 			DECLARE cv_studiensemester_kurzbz ALIAS FOR $2;
 			DECLARE rec RECORD;
@@ -67,6 +67,7 @@ if(!@$db->db_query('SELECT * FROM public.tbl_status LIMIT 1;'))
 
 			RETURN rec.status_kurzbz;
 			END;
+			$$ LANGUAGE plpgsql;
 			";
 
 	if(!$db->db_query($qry))
@@ -105,7 +106,7 @@ if(!@$db->db_query('SELECT * FROM public.tbl_organisationseinheit LIMIT 1;'))
 			ALTER TABLE public.tbl_organisationseinheit ADD CONSTRAINT organisationseinheit_organisationseinheittyp FOREIGN KEY (organisationseinheittyp_kurzbz) REFERENCES public.tbl_organisationseinheittyp (organisationseinheittyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;			
 			
 			GRANT SELECT on public.tbl_organisationseinheit TO GROUP ".DB_CIS_USER_GROUP.";
-			GRANT SELECT, INSERT, UDPATE, DELETE on public.tbl_organisationseinheit TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, INSERT, UPDATE, DELETE on public.tbl_organisationseinheit TO GROUP ".DB_FAS_USER_GROUP.";
 			
 			GRANT SELECT on public.tbl_organisationseinheittyp TO GROUP ".DB_CIS_USER_GROUP.";
 			GRANT SELECT, INSERT, UPDATE, DELETE on public.tbl_organisationseinheittyp TO GROUP ".DB_FAS_USER_GROUP.";
@@ -188,8 +189,8 @@ if(!@$db->db_query('SELECT * FROM public.tbl_organisationseinheit LIMIT 1;'))
 			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ZentrServices','Infrastruktur','ZentraleServices','Abteilung');
 
 			-- Alle noch nicht eingetragenen Institute und Studiengaenge direkt unter etw haengen
-			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT lower(typ::varchar(1) || kurzbz), 'etw',  lower(typ::varchar(1) || kurzbz), 'Studiengang' FROM public.tbl_studiengang WHERE oe_kurzbz is null;
-			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT fachbereich_kurzbz, 'etw', bezeichnung, 'Institut' FROM public.tbl_fachbereich WHERE oe_kurzbz is null;
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT lower(typ::varchar(1) || kurzbz), 'etw',  lower(typ::varchar(1) || kurzbz), 'Studiengang' FROM public.tbl_studiengang WHERE lower(typ::varchar(1) || kurzbz) not in (SELECT oe_kurzbz FROM public.tbl_organisationseinheit) AND studiengang_kz<>999;
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT fachbereich_kurzbz, 'etw', bezeichnung, 'Institut' FROM public.tbl_fachbereich WHERE fachbereich_kurzbz not in (SELECT oe_kurzbz FROM public.tbl_organisationseinheit);
 
 			-- Eintraege in Tabelle Studiengang und Fachbereich
 			UPDATE public.tbl_studiengang set oe_kurzbz = lower(typ::varchar(1) || kurzbz) WHERE  lower(typ::varchar(1) || kurzbz) in(select oe_kurzbz FROM public.tbl_organisationseinheit);
@@ -197,9 +198,9 @@ if(!@$db->db_query('SELECT * FROM public.tbl_organisationseinheit LIMIT 1;'))
 
 			";
 	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_organisationsform: '.$db->db_last_error().' </strong><br>';
+		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().' </strong><br>';
 	else
-		echo '	public.tbl_organisationsform: Tabelle wurde hinzugef�gt!<br>';
+		echo '	public.tbl_organisationseinheit: Tabelle wurde hinzugef�gt!<br>';
 ;
 }
 
@@ -240,7 +241,6 @@ if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 			WITH (OIDS=FALSE);
 			ALTER TABLE system.tbl_berechtigung ADD CONSTRAINT pk_tbl_berechtigung PRIMARY KEY (berechtigung_kurzbz);
 			
-			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_berechtigung FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -248,22 +248,24 @@ if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 			CREATE TABLE system.tbl_rolle
 			(
  				rolle_kurzbz Character varying(32) NOT NULL,
- 				beschreibung Character varying(256),
- 				art Character varying(5)
+ 				beschreibung Character varying(256)
 			)
 			WITH (OIDS=FALSE);
 			
 			CREATE TABLE system.tbl_rolleberechtigung
 			(
  				berechtigung_kurzbz Character varying(32) NOT NULL,
- 				rolle_kurzbz Character varying(32)
+ 				rolle_kurzbz Character varying(32),
+ 				art Character varying(5)
 			)
 			WITH (OIDS=FALSE);
 
+			
 			ALTER TABLE system.tbl_rolle ADD CONSTRAINT pk_tbl_rolle PRIMARY KEY (rolle_kurzbz);
 			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT pk_tbl_rolleberechtigung PRIMARY KEY(berechtigung_kurzbz, rolle_kurzbz);
 			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_rolle FOREIGN KEY(rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE system.tbl_rolleberechtigung ADD CONSTRAINT rolleberechtigung_berechtigung FOREIGN KEY(berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT benutzerrolle_rolle FOREIGN KEY (rolle_kurzbz) REFERENCES system.tbl_rolle (rolle_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;			
 			
 			GRANT SELECT ON system.tbl_benutzerrolle TO GROUP ".DB_CIS_USER_GROUP.";
 			GRANT SELECT ON system.tbl_berechtigung TO GROUP ".DB_CIS_USER_GROUP.";
@@ -279,7 +281,7 @@ if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 			
 			--- SYNCRONISIEREN
 			
-			INSERT INTO system.tbl_rolle(rolle_kurzbz, beschreibung) SELECT berechtigung_kurzbz, beschreibung FROM public.tbl_berechtigung
+			INSERT INTO system.tbl_rolle(rolle_kurzbz, beschreibung) SELECT berechtigung_kurzbz, beschreibung FROM public.tbl_berechtigung;
 
 			-- Berechtigungen uebernehmen
 			
@@ -296,6 +298,22 @@ if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 
 			--- ALTE TABELLE LOESCHEN
 			DROP TABLE public.tbl_benutzerberechtigung;
+
+			-- Berechtigung anlegen
+			INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) SELECT rolle_kurzbz, beschreibung FROM system.tbl_rolle;
+			
+			-- Berechtigungen zu den Rollen
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) SELECT rolle_kurzbz, rolle_kurzbz, 'suid' FROM system.tbl_rolle;
+			
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('mitarbeiter','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lv-plan','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('raumres','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('assistenz','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('news','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('preinteressent','admin','suid');
+			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('veranstaltung','admin','suid');
+			
 			";
 	
 	if(!$db->db_query($qry))
@@ -314,6 +332,8 @@ if(!@$db->db_query('SELECT oe_kurzbz FROM public.tbl_benutzerfunktion LIMIT 1;')
 			
 			-- studiengang in oe_kurzbz kopieren
 			UPDATE public.tbl_benutzerfunktion SET oe_kurzbz = (SELECT lower(typ::varchar(1) || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz);
+			
+			DROP VIEW public.vw_benutzerfunktion;
 			
 			-- spalte loeschen
 			ALTER TABLE public.tbl_benutzerfunktion DROP COLUMN studiengang_kz;
