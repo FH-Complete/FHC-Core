@@ -15,18 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
+ 
+		require_once('../../config/vilesci.config.inc.php');
+		require_once('../../include/basis_db.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+		require_once('../../include/functions.inc.php');
     require_once('../../include/firma.class.php');
     
-	$db = new basis_db();
-	
+
+    
 	$filter = (isset($_GET['filter'])?$_GET['filter']:'');
 	$firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
 	
@@ -35,16 +39,13 @@
 	if($filter=='')
 		$sql_query = "SELECT * FROM public.tbl_firma WHERE true";
 	else 
-		$sql_query = "SELECT * FROM public.tbl_firma 
-					  WHERE lower(name) like lower('%".addslashes($filter)."%') 
-					  OR lower(adresse) like lower('%".addslashes($filter)."%') 
-					  OR lower(anmerkung) like lower('%".addslashes($filter)."%')";
+		$sql_query = "SELECT * FROM public.tbl_firma WHERE lower(name) like lower('%$filter%') OR lower(adresse) like lower('%$filter%') OR lower(anmerkung) like lower('%$filter%')";
 	if($firmentypfilter!='')
 		$sql_query.=" AND firmentyp_kurzbz='".addslashes($firmentypfilter)."'";
-	
+	//echo $sql_query;
     if(!$erg=$db->db_query($sql_query))
 	{
-		$errormsg='Fehler beim Laden der Firma';
+		$htmlstr='Fehler beim Laden der Firma';
 	}
 	
 	else
@@ -57,6 +58,7 @@
 	    $i = 0;
 		while($row=$db->db_fetch_object($erg))
 	    {
+	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
 	        $htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->firma_id."</a></td>\n";
 			$htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->name."</a></td>\n";
