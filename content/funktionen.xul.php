@@ -64,7 +64,7 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="funktion-treecol-studiengang" label="Studiengang" flex="1" hidden="false"
+			<treecol id="funktion-treecol-oe_kurzbz" label="Organisationseinheit" flex="1" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
@@ -100,7 +100,7 @@ else
 					<treeitem uri="rdf:*">
 						<treerow>
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion" />
-							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#organisationseinheit" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#uid" />
@@ -149,14 +149,14 @@ else
 						</menulist>
 					</row>
 					<row>
-						<label value="Studiengang" control="funktion-menulist-studiengang"/>
-						<menulist id="funktion-menulist-studiengang" disabled="true"
-						          datasources="<?php echo APP_ROOT;?>rdf/studiengang.rdf.php" flex="1"
-						          ref="http://www.technikum-wien.at/studiengang/liste" >
+						<label value="Organisationseinheit" control="funktion-menulist-oe_kurzbz"/>
+						<menulist id="funktion-menulist-oe_kurzbz" disabled="true"
+						          datasources="<?php echo APP_ROOT;?>rdf/organisationseinheit.rdf.php" flex="1"
+						          ref="http://www.technikum-wien.at/organisationseinheit/liste" >
 							<template>
 								<menupopup>
-									<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
-						        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel"
+									<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+						        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
 									  		  uri="rdf:*"/>
 									</menupopup>
 							</template>

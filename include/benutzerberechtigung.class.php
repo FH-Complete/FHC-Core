@@ -24,6 +24,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 require_once(dirname(__FILE__).'/studiengang.class.php');
 require_once(dirname(__FILE__).'/fachbereich.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class benutzerberechtigung extends basis_db
 {
@@ -208,7 +209,7 @@ class benutzerberechtigung extends basis_db
 		
 		$qry = "SELECT 
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
-					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
@@ -220,7 +221,7 @@ class benutzerberechtigung extends basis_db
 				
 				SELECT 
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
-					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
@@ -234,7 +235,7 @@ class benutzerberechtigung extends basis_db
 				
 				SELECT 
 					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
-					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
@@ -273,7 +274,7 @@ class benutzerberechtigung extends basis_db
 	   			$b->funktion_kurzbz=$row->funktion_kurzbz;
 	   			$b->rolle_kurzbz = $row->rolle_kurzbz;
 	   			$b->berechtigung_kurzbz = $row->berechtigung_kurzbz;
-				$b->art=$row->art;
+				$b->art=intersect($row->art, $row->art1);
 				$b->oe_kurzbz = $oe_kurzbz;
 				$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
 				$b->start=$row->start;

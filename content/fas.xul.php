@@ -33,7 +33,10 @@ $error_msg='';
 
 //$error_msg.=loadVariables($user);
 $variable = new variable();
-$variable->loadVariables($user);
+if(!$variable->loadVariables($user))
+{
+	die('Fehler beim Laden der Variablen:'.$variable->errormsg);
+}
 
 //$benutzer = new benutzer($conn);
 //if(!$benutzer->loadVariables($user))

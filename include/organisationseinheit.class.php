@@ -51,6 +51,32 @@ class organisationseinheit extends basis_db
 	}
 
 
+	public function getAll()
+	{
+		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new organisationseinheit();
+				
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+			return false;
+		}
+	}
+	
 	/**
 	 * Laedt eine Organisationseinheit
 	 * @param $oe_kurzbz

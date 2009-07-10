@@ -488,7 +488,7 @@
 				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
-				tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz";
+				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
 	   
 		echo "<tr><td class='tdvertical'><b>Institutskoordinator</b></td><td>";
 	   if($result=$db->db_query($qry))

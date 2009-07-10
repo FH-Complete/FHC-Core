@@ -296,8 +296,9 @@ function show(id)
           <p>Studiengangsleiter:<br>
                 <?php
 
+                $stg_oe_obj = new studiengang($studiengang_kz);
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stgl' LIMIT 1)";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl' LIMIT 1)";
 				if($result_course_leader = $db->db_query($qry))
 				{
 					$num_rows_course_leader = $db->db_num_rows($result_course_leader);
@@ -463,8 +464,8 @@ function show(id)
 			  	echo "</p>";
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
                 //Sekritariat auslesen
-
-				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='ass')";
+				$stg_oe_obj = new studiengang($studiengang_kz);
+				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='ass')";
 
 				if($result_course_secretary = $db->db_query($sql_query))
 				{
@@ -552,9 +553,9 @@ function show(id)
 						echo $row->zusatzinfo_html;
 					}
 				}
-				
+				$stg_oe_obj = new studiengang($studiengang_kz);
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
-				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE studiengang_kz='$studiengang_kz' AND funktion_kurzbz='stdv' AND  tbl_person.aktiv and tbl_person.person_id=public.tbl_benutzer.person_id AND public.tbl_benutzer.aktiv AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
+				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stdv' AND  tbl_person.aktiv and tbl_person.person_id=public.tbl_benutzer.person_id AND public.tbl_benutzer.aktiv AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
 				if($result_course_stdv = $db->db_query($sql_query))
 				{
 					$num_rows_course_stdv = $db->db_num_rows($result_course_stdv);

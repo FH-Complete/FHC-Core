@@ -32,6 +32,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/funktion.class.php');
+require_once('../include/organisationseinheit.class.php');
 
 $rdf_url='http://www.technikum-wien.at/bnfunktion';
 
@@ -47,12 +48,6 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 $benutzerfunktion_id = (isset($_GET['benutzerfunktion_id'])?$_GET['benutzerfunktion_id']:'');
 $stg_arr = array();
 $fkt_arr = array();
-
-$stg = new studiengang();
-$stg->getAll(null, false);
-
-foreach ($stg->result as $row) 
-	$stg_arr[$row->studiengang_kz]=$row->kuerzel;	
 
 $fkt = new funktion();
 $fkt->getAll();
@@ -74,14 +69,15 @@ if($db->db_query($qry))
 {	
 	while($row = $db->db_fetch_object())
 	{
+		$oe = new organisationseinheit($row->oe_kurzbz);
 		echo '
 	      <RDF:li>
 		     <RDF:Description  id="'.$row->benutzerfunktion_id.'"  about="'.$rdf_url.'/'.$row->benutzerfunktion_id.'" >
 		     	<BNFUNKTION:benutzerfunktion_id><![CDATA['.$row->benutzerfunktion_id.']]></BNFUNKTION:benutzerfunktion_id>
 		        <BNFUNKTION:fachbereich_kurzbz><![CDATA['.$row->fachbereich_kurzbz.']]></BNFUNKTION:fachbereich_kurzbz>
 		        <BNFUNKTION:uid><![CDATA['.$row->uid.']]></BNFUNKTION:uid>
-		        <BNFUNKTION:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></BNFUNKTION:studiengang_kz>
-		        <BNFUNKTION:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></BNFUNKTION:studiengang>
+		        <BNFUNKTION:oe_kurzbz><![CDATA['.$row->oe_kurzbz.']]></BNFUNKTION:oe_kurzbz>
+		        <BNFUNKTION:organisationseinheit><![CDATA['.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.']]></BNFUNKTION:organisationseinheit>
 		        <BNFUNKTION:semester><![CDATA['.$row->semester.']]></BNFUNKTION:semester>
 		        <BNFUNKTION:funktion_kurzbz><![CDATA['.$row->funktion_kurzbz.']]></BNFUNKTION:funktion_kurzbz>
 		        <BNFUNKTION:funktion><![CDATA['.$fkt_arr[$row->funktion_kurzbz].']]></BNFUNKTION:funktion>

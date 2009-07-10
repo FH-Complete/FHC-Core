@@ -63,11 +63,12 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	if($semester_aktuell=='')
 		$studiensemester_aktuell='';
+	$stg_oe_obj = new studiengang($row->studiengang_kz);
 	$stgl_query = "SELECT titelpre, titelpost, vorname, nachname 
 					FROM public.tbl_person, public.tbl_benutzer, public.tbl_benutzerfunktion 
 					WHERE tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_benutzerfunktion.uid 
 					AND tbl_benutzerfunktion.funktion_kurzbz = 'stgl' 
-					AND tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
+					AND tbl_benutzerfunktion.oe_kurzbz = '".$stg_oe_obj->oe_kurzbz."'";
 	
 	if($db->db_query($stgl_query))
 		$stgl_row = $db->db_fetch_object();

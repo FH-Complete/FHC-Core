@@ -235,7 +235,7 @@
 				tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
 				(tbl_lehrveranstaltung.koordinator='$user' OR 
-				 (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz FROM public.tbl_benutzerfunktion 
+				 (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
 				 										  WHERE funktion_kurzbz='fbk' AND uid='$uid')
 				 )";
 	if($result = $db->db_query($qry))

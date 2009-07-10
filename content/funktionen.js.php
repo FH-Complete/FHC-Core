@@ -22,15 +22,31 @@
 
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/studiengang.class.php');
 
 $user = get_uid();
 loadVariables($user);
+
 ?>
 // ********** GLOBALE VARIABLEN ********** //
 var FunktionenTreeDatasource=''; // Datasource des Adressen Trees
 var FunktionenSelectID='';
 var FunktionenUID=null;
 
+<?php
+
+// JS-Variable anlegen mit einer Uebersetzungstabellle
+// Studiengang zu Organisationseinheit
+$stg_obj = new studiengang();
+$stg_obj->getAll();
+
+echo 'var organisationseinheit = {';
+$content = '';
+foreach ($stg_obj->result as $stg)
+	$content .= $stg->studiengang_kz.':"'.$stg->oe_kurzbz.'",';
+echo substr($content, 0, mb_strlen($content)-1).'};';
+
+?>
 // ********** LISTENER UND OBSERVER ********** //
 
 // ****
@@ -152,13 +168,13 @@ function FunktionNeu()
 	//Wenn die aktuelle Person ein Student ist,
 	//dann wird Studiengang und 'Studentenvertreter' vorausgewaehlt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		oe_kurzbz='';	
 	else
-		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+		oe_kurzbz = organisationseinheit[ window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value ];
 
-	if(studiengang_kz!='')
+	if(oe_kurzbz!='')
 	{
-		document.getElementById('funktion-menulist-studiengang').value=studiengang_kz;
+		document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
 		document.getElementById('funktion-menulist-funktion').value='stdv';
 	}
 	
@@ -227,7 +243,7 @@ function FunktionDelete()
 function FunktionDetailSpeichern()
 {
 	funktion_kurzbz = document.getElementById('funktion-menulist-funktion').value;
-	studiengang_kz = document.getElementById('funktion-menulist-studiengang').value;
+	oe_kurzbz = document.getElementById('funktion-menulist-oe_kurzbz').value;
 	semester = document.getElementById('funktion-menulist-semester').value;
 	fachbereich_kurzbz = document.getElementById('funktion-menulist-fachbereich').value;
 	neu = document.getElementById('funktion-checkbox-neu').checked;
@@ -249,7 +265,7 @@ function FunktionDetailSpeichern()
 	req.add('type', 'funktionsave');
 
 	req.add('funktion_kurzbz', funktion_kurzbz);
-	req.add('studiengang_kz', studiengang_kz);
+	req.add('oe_kurzbz', oe_kurzbz);
 	req.add('semester', semester);
 	req.add('studiengang_kz_berecht', studiengang_kz_berecht);
 	req.add('fachbereich_kurzbz', fachbereich_kurzbz);
@@ -308,12 +324,12 @@ function FunktionBearbeiten()
 	//Daten holen
 	fachbereich_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fachbereich_kurzbz" ));
 	uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#uid" ));
-	studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
+	oe_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#oe_kurzbz" ));
 	semester = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
 	funktion_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#funktion_kurzbz" ));
 	
 	document.getElementById('funktion-menulist-fachbereich').value=fachbereich_kurzbz;
-	document.getElementById('funktion-menulist-studiengang').value=studiengang_kz;
+	document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
 	document.getElementById('funktion-menulist-semester').value=semester;
 	document.getElementById('funktion-menulist-funktion').value=funktion_kurzbz;
 	document.getElementById('funktion-textbox-benutzerfunktion_id').value=benutzerfunktion_id;
@@ -341,7 +357,7 @@ function FunktionDisableFields(val)
 function FunktionDetailDisableFields(val)
 {
 	document.getElementById('funktion-menulist-fachbereich').disabled=val;
-	document.getElementById('funktion-menulist-studiengang').disabled=val;
+	document.getElementById('funktion-menulist-oe_kurzbz').disabled=val;
 	document.getElementById('funktion-menulist-semester').disabled=val;
 	document.getElementById('funktion-menulist-funktion').disabled=val;
 	document.getElementById('funktion-button-speichern').disabled=val;
@@ -353,7 +369,7 @@ function FunktionDetailDisableFields(val)
 function FunktionDetailResetFields()
 {
 	document.getElementById('funktion-menulist-fachbereich').value='';
-	document.getElementById('funktion-menulist-studiengang').value='0';
+	document.getElementById('funktion-menulist-oe_kurzbz').value='0';
 	document.getElementById('funktion-menulist-semester').value='';
 	document.getElementById('funktion-menulist-funktion').value='ass';
 }
