@@ -24,45 +24,45 @@
  * @create 04-12-2006
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');	
+
 class benutzerfunktion extends basis_db
 {
 
-	var $new;     		// @var boolean
-	var $errormsg; 		// @var string
-	var $result = array(); 	// @var benutzerfunktion Objekt
+	public $new;     			//  boolean
+	public $result = array(); 	//  benutzerfunktion Objekt
 
 	//Tabellenspalten
-	var $benutzerfunktion_id;	// @var serial
-	var $fachbereich_kurzbz;	// @var integer
-	var $uid;				// @var varchar(16)
-	var $studiengang_kz;	// @var integer
-	var $funktion_kurzbz;	// @var varchar(16)
-	var $updateamum;		// @var timestamp
-	var $updatevon=0;		// @var string
-	var $insertamum;		// @var timestamp
-	var $insertvon=0;		// @var string
-	var $ext_id;			// @var bigint
-	var $semester;			// @var smallint
+	public $benutzerfunktion_id;//  serial
+	public $fachbereich_kurzbz;	//  integer
+	public $uid;				//  varchar(16)
+	public $oe_kurzbz;			//  varchar(32)
+	public $funktion_kurzbz;	//  varchar(16)
+	public $updateamum;			//  timestamp
+	public $updatevon=0;		//  string
+	public $insertamum;			//  timestamp
+	public $insertvon=0;		//  string
+	public $ext_id;				//  bigint
+	public $semester;			//  smallint
 
 
-	// **********************************************************
-	// * Konstruktor
-	// * @param $conn Connection zur DB
-	// *        $benutzerfunktion_id ID der zu ladenden Funktion
-	// **********************************************************
-
-	function __construct($benutzerfunktion_id=null)
+	/**
+	 * Konstruktor
+	 * @param $conn Connection zur DB
+	 *        $benutzerfunktion_id ID der zu ladenden Funktion
+	 */
+	public function __construct($benutzerfunktion_id=null)
 	{
 		parent::__construct();
+		
 		if($benutzerfunktion_id != null)
 			$this->load($benutzerfunktion_id);
 	}
 
-	// *********************************************
-	// * Laedt alle verfuegbaren Benutzerfunktionen
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************
-	function getAll()
+	/**
+	 * Laedt alle verfuegbaren Benutzerfunktionen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAll()
 	{
 		$qry = 'SELECT * FROM public.tbl_benutzerfunktion ORDER BY benutzerfunktion_id;';
 
@@ -92,13 +92,14 @@ class benutzerfunktion extends basis_db
 		return true;
 	}
 
-	// *********************************
-	// * Prueft ob der Benutzer $uid die
-	// * Funktion $benutzerfunktion hat
-	// *********************************
-	function benutzerfunktion_exists($uid, $benutzerfunktion)
+	/**
+	 * Prueft ob der Benutzer $uid die
+	 * Funktion $benutzerfunktion hat
+	 */
+	public function benutzerfunktion_exists($uid, $benutzerfunktion)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion 
+				WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
 
 		if($row = $this->db_fetch_object($this->db_query($qry)))
 		{
@@ -114,15 +115,17 @@ class benutzerfunktion extends basis_db
 		}
 	}
 
-	// *********************************
-	// * Laedt eine BenutzerFunktion
-	// * @param uid, funktion_kurzbz, studiengang_kz
-	// * @return false wenn nicht vorhanden oder fehler
-	// *         sonst true
-	// *********************************
-	function getBenutzerFunktion($uid, $funktion_kurzbz, $studiengang_kz)
+	/**
+	 * Laedt eine BenutzerFunktion
+	 * @param uid, funktion_kurzbz, oe_kurzbz
+	 * @return false wenn nicht vorhanden oder fehler
+	 *         sonst true
+	 */
+	public function getBenutzerFunktion($uid, $funktion_kurzbz, $oe_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+				WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' 
+				AND oe_kurzbz='".addslashes($oe_kurzbz)."'";
 
 		if($result = $this->db_query($qry))
 		{
@@ -153,33 +156,33 @@ class benutzerfunktion extends basis_db
 		}
 	}
 	
-	// *********************************
-	// * Laedt mehrere BenutzerFunktionen
-	// * @param funktion_kurzbz, studiengang_kz, semester
-	// * @return false wenn nicht vorhanden oder fehler
-	// *         sonst true
-	// *********************************
-	function getBenutzerFunktionen($funktion_kurzbz, $studiengang_kz='', $semester='')
+	/**
+	 * Laedt mehrere BenutzerFunktionen
+	 * @param funktion_kurzbz, studiengang_kz, semester
+	 * @return false wenn nicht vorhanden oder fehler
+	 *         sonst true
+	 */
+	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz='', $semester='')
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
 				WHERE funktion_kurzbz='".addslashes($funktion_kurzbz)."'";
 
-		if($studiengang_kz!='')
-			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		if($oe_kurzbz!='')
+			$qry.=" AND oe_kurzbz='".addslashes($oe_kurzbz)."'";
 		if($semester!='')
 			$qry.=" AND semester='".addslashes($semester)."'";
 
-		$qry.=" ORDER BY funktion_kurzbz, studiengang_kz, semester";
+		$qry.=" ORDER BY funktion_kurzbz, oe_kurzbz, semester";
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-				$obj = new benutzerfunktion(null, null);
+				$obj = new benutzerfunktion();
 				
 				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
 				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$obj->uid = $row->uid;
-				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->funktion_kurzbz = $row->funktion_kurzbz;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -199,16 +202,16 @@ class benutzerfunktion extends basis_db
 		}
 	}
 
-	// *********************************************************
-	// * Laedt eine Benutzerfunktion
-	// * @param $bnutzerfunktion_id ID der zu ladenden Funktion
-	// * @return true wenn ok, false im Fehlerfall
-	// *********************************************************
-	function load($benutzerfunktion_id)
+	/**
+	 * Laedt eine Benutzerfunktion
+	 * @param $bnutzerfunktion_id ID der zu ladenden Funktion
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($benutzerfunktion_id)
 	{
-		if($benutzerfunktion_id == '')
+		if($benutzerfunktion_id == '' || !is_numeric($benutzerfunktion_id))
 		{
-			$this->errormsg = 'benutzerfunktion_id muß eine gültige Zahl sein';
+			$this->errormsg = 'benutzerfunktion_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
@@ -225,7 +228,7 @@ class benutzerfunktion extends basis_db
 			$this->benutzerfunktion_id = $row->benutzerfunktion_id;
 			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 			$this->uid = $row->uid;
-			$this->studiengang_kz = $row->studiengang_kz;
+			$this->oe_kurzbz = $row->oe_kurzbz;
 			$this->funktion_kurzbz = $row->funktion_kurzbz;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
@@ -242,13 +245,19 @@ class benutzerfunktion extends basis_db
 		return true;
 	}
 
-	// ****************************************************************************
-	// * Loescht einen Datensatz
-	// * @param $fbenutzerfunktion_id id des Datensatzes der geloescht werden soll
-	// * @return true wenn ok, false im Fehlerfall
-	// ****************************************************************************
-	function delete($benutzerfunktion_id)
+	/**
+	 * Loescht einen Datensatz
+	 * @param $fbenutzerfunktion_id id des Datensatzes der geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($benutzerfunktion_id)
 	{
+		if(!is_numeric($benutzerfunktion_id) || $benutzerfunktion_id=='')
+		{
+			$this->errormsg='Benutzerfunktion_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
 		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='$benutzerfunktion_id'";
 		if(!$this->db_query($qry))
 		{
@@ -258,25 +267,13 @@ class benutzerfunktion extends basis_db
 		else
 			return true;
 	}
-	
-	// *******************************************
-	// * Prueft die Gueltigkeit der Variablen
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function addslashes($var)
+		
+	/**
+	 * Speichert den aktuellen Datensatz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
 	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
-	}
-	
-	// *******************************************
-	// * Speichert den aktuellen Datensatz
-	// * @return true wenn ok, false im Fehlerfall
-	// *******************************************
-	function save($new=null)
-	{
-		//Gueltigkeit der Variablen pruefen
-		//if(!$this->checkvars())
-		//	return false;
 		if($new==null)
 			$new = $this->new;
 
@@ -298,11 +295,11 @@ class benutzerfunktion extends basis_db
 					return false;
 				}
 			}
-			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, studiengang_kz, funktion_kurzbz, insertamum, insertvon,
+			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, oe_kurzbz, funktion_kurzbz, insertamum, insertvon,
 				updateamum, updatevon, semester) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
-				$this->addslashes($this->studiengang_kz).', '.
+				$this->addslashes($this->oe_kurzbz).', '.
 				$this->addslashes($this->funktion_kurzbz).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
@@ -325,7 +322,7 @@ class benutzerfunktion extends basis_db
 				'benutzerfunktion_id='.$this->addslashes($this->benutzerfunktion_id).', '.
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'uid='.$this->addslashes($this->uid).', '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
+				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
 				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.

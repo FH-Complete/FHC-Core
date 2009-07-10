@@ -28,6 +28,7 @@ require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/studiengang.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -164,11 +165,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		else
 			die('Student not found');
-		
+		$stg_oe_obj = new studiengang($row->studiengang_kz);
 		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion 
 						WHERE tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_benutzerfunktion.uid 
 						AND tbl_benutzerfunktion.funktion_kurzbz = 'stgl' 
-						AND tbl_benutzerfunktion.studiengang_kz = '".$row->studiengang_kz."'";
+						AND tbl_benutzerfunktion.oe_kurzbz = '".$stg_oe_obj->oe_kurzbz."'";
 		if($db->db_query($stgl_query))
 			$stgl_row = $db->db_fetch_object();
 		else

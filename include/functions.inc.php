@@ -389,4 +389,23 @@ function checkldapuser($username,$password)
 	@ldap_close($connect);
 	return(false);
 }
+
+//Berechnet die Schnittmenge zweier Strings
+function intersect($str1, $str2)
+{
+	if (mb_strlen($str1) > mb_strlen($str2))
+	    $size = mb_strlen($str1);
+	else
+	    $size = mb_strlen($str2);
+	
+	$intersect = null;
+	
+	for ($i=0; $i<$size; $i++) 
+	{
+	    if (mb_substr($str1, $i, 1) == mb_substr($str2, $i, 1))
+	        $intersect.= mb_substr($str1, $i, 1);	
+	}
+	
+	return $intersect;
+}
 ?>

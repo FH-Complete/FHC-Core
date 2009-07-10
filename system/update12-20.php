@@ -189,7 +189,7 @@ if(!@$db->db_query('SELECT * FROM public.tbl_organisationseinheit LIMIT 1;'))
 			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) VALUES('ZentrServices','Infrastruktur','ZentraleServices','Abteilung');
 
 			-- Alle noch nicht eingetragenen Institute und Studiengaenge direkt unter etw haengen
-			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT lower(typ::varchar(1) || kurzbz), 'etw',  lower(typ::varchar(1) || kurzbz), 'Studiengang' FROM public.tbl_studiengang WHERE lower(typ::varchar(1) || kurzbz) not in (SELECT oe_kurzbz FROM public.tbl_organisationseinheit) AND studiengang_kz<>999;
+			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT lower(typ::varchar(1) || kurzbz), 'etw',  UPPER(typ::varchar(1) || kurzbz), 'Studiengang' FROM public.tbl_studiengang WHERE lower(typ::varchar(1) || kurzbz) not in (SELECT oe_kurzbz FROM public.tbl_organisationseinheit) AND studiengang_kz<>999;
 			INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz) SELECT fachbereich_kurzbz, 'etw', bezeichnung, 'Institut' FROM public.tbl_fachbereich WHERE fachbereich_kurzbz not in (SELECT oe_kurzbz FROM public.tbl_organisationseinheit);
 
 			-- Eintraege in Tabelle Studiengang und Fachbereich
@@ -208,6 +208,10 @@ if(!@$db->db_query('SELECT * FROM public.tbl_organisationseinheit LIMIT 1;'))
 if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 {
 	$qry = "CREATE SCHEMA system;
+	
+			GRANT USAGE ON SCHEMA system TO GROUP ".DB_CIS_USER_GROUP.";
+			GRANT USAGE ON SCHEMA system TO GROUP ".DB_FAS_USER_GROUP.";
+			
 			CREATE TABLE system.tbl_benutzerrolle
 			(
  				benutzerberechtigung_id serial NOT NULL,
@@ -314,6 +318,8 @@ if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('preinteressent','admin','suid');
 			INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('veranstaltung','admin','suid');
 			
+			-- Bei alle ohne oe_kurzbz die Organisaitonseinheit auf etw setzen (admins)
+			UPDATE system.tbl_benutzerrolle SET oe_kurzbz='etw' WHERE oe_kurzbz is null;
 			";
 	
 	if(!$db->db_query($qry))

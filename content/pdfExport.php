@@ -245,7 +245,6 @@ if (!isset($_REQUEST["archive"]))
 }
 else
 {
-
 	$uid = $_REQUEST["uid"];
 	$ss = $_REQUEST["ss"];
 	$heute = date('Y-m-d');
@@ -298,21 +297,25 @@ else
 			$proc->importStyleSheet($xsl_doc); // attach the xsl rules
 			
 			$buffer = $proc->transformToXml($xml_doc);
+			
 			if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
 			{
 				echo('Failed to generate PDF');
 			}
 			$file = "/tmp/".$filename.".pdf";
 		}
+		
 		$handle = fopen($file, "rb");
 		$string = fread($handle, filesize($file));
 		fclose($handle);
+		//$string = file_get_contents($file);
 		unlink($file);
-
+		
 		$hex="";
-		for ($i=0;$i<strlen($string);$i++)
-			$hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
+		for ($i=0;$i<mb_strlen($string);$i++)
+			$hex.=(mb_strlen(dechex(ord(mb_substr($string,$i,1)))<2)? "0".dechex(ord(mb_substr($string,$i,1))): dechex(ord(mb_substr($string,$i,1))));
 
+		$hex = base64_encode($string);
 		$akte = new akte();
 		$akte->person_id = $person_id;
 	  	$akte->dokument_kurzbz = "Zeugnis";
@@ -330,9 +333,14 @@ else
 	  	$akte->uid = $uid;
 		$akte->new = true;
 		if (!$akte->save())
-			return true;
-		else
+		{
+			echo 'Erstellen Fehlgeschlagen: '.$akte->errormsg;
 			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 	else
 		echo 'Keine Berechtigung zum Speichern';

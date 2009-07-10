@@ -320,7 +320,7 @@ $error_msg='';
 	}
 	// Studenten holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=tbl_benutzerfunktion.studiengang_kz AND gruppe_kurzbz Like '%_STDV')";
+	$sql_query="SELECT uid, (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.studiengang_kz LIMIT 1) AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.studiengang_kz LIMIT 1) AND gruppe_kurzbz Like '%_STDV')";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))

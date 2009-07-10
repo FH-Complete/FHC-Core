@@ -59,9 +59,9 @@ if ($type=='new' || $type=='editsave')
 	$funktion=new benutzerfunktion();
 	$funktion->uid=$_POST['uid'];
 	$funktion->funktion_kurzbz=$_POST['kurzbz'];
-	if (isset($_POST['stg_kz']) && $_POST['stg_kz']!=-1)
+	if (isset($_POST['oe_kurzbz']) && $_POST['oe_kurzbz']!=-1)
 	{
-		$funktion->studiengang_kz=$_POST['stg_kz'];
+		$funktion->oe_kurzbz=$_POST['oe_kurzbz'];
 		
 		if (isset($_POST['fb_kurzbz']) && $_POST['fb_kurzbz']!=-1)
 		{
@@ -121,7 +121,7 @@ $result_person=$db->db_query($sql_query);
 if(!$result_person)
 	die ($db->db_last_error());
 // Daten für Studiengangauswahl
-$sql_query="SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzbz, bezeichnung FROM public.tbl_studiengang ORDER BY kurzbz";
+$sql_query="SELECT oe_kurzbz, oe_kurzbz as kurzbz, bezeichnung FROM public.tbl_organisationseinheit ORDER BY kurzbz";
 $result_stg=$db->db_query($sql_query);
 if(!$result_stg)
 	die ($db->db_last_error());
@@ -158,7 +158,7 @@ if (!$funktion->load($kurzbz))
 				WHERE funktion_kurzbz='".addslashes($kurzbz)."' AND
 				tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
 				tbl_benutzer.person_id=tbl_person.person_id AND
-				tbl_benutzerfunktion.studiengang_kz=tbl_studiengang.studiengang_kz";
+				tbl_benutzerfunktion.oe_kurzbz=tbl_studiengang.oe_kurzbz";
 
 		if($result = $db->db_query($qry))
 		{			
@@ -172,8 +172,8 @@ if (!$funktion->load($kurzbz))
 				echo "<td>".$row->uid."</td>";
 				echo "<td>".$row->studiengang_kurzbz."</td>";
 				echo "<td>".$row->fachbereich_kurzbz."</td>";
-				echo "<td><a href=\"funktion_det.php?type=edit&kurzbz=$kurzbz&uid=".$row->uid."&bn_funktion_id=$row->benutzerfunktion_id&fb_kurzbz=$row->fachbereich_kurzbz&stg_kz=$row->studiengang_kz\">Edit</a></td>";
-				echo "<td><a href=\"funktion_det.php?type=delete&kurzbz=$kurzbz&uid=".$row->uid."&bn_funktion_id=$row->benutzerfunktion_id&fb_kurzbz=$row->fachbereich_kurzbz&stg_kz=$row->studiengang_kz\">Delete</a></td>";
+				echo "<td><a href=\"funktion_det.php?type=edit&kurzbz=$kurzbz&uid=".$row->uid."&bn_funktion_id=$row->benutzerfunktion_id&fb_kurzbz=$row->fachbereich_kurzbz&oe_kurzbz=$row->oe_kurzbz\">Edit</a></td>";
+				echo "<td><a href=\"funktion_det.php?type=delete&kurzbz=$kurzbz&uid=".$row->uid."&bn_funktion_id=$row->benutzerfunktion_id&fb_kurzbz=$row->fachbereich_kurzbz&oe_kurzbz=$row->oe_kurzbz\">Delete</a></td>";
 		    	echo "</tr>\n";
 
 			}
@@ -215,16 +215,16 @@ if (!$funktion->load($kurzbz))
 		}
 		?>
     </SELECT></td></tr>
-	<tr><td>Studiengang: </td><td>
-    <SELECT name="stg_kz">
+	<tr><td>Organisationseinheit: </td><td>
+    <SELECT name="oe_kurzbz">
       <option value="-1">- auswählen -</option>
       <?php
 		// Auswahl des Studiengangs
 		$num_rows=$db->db_num_rows($result_stg);
 		while($row=$db->db_fetch_object ($result_stg))
 		{
-			echo "<option value=\"$row->studiengang_kz\" ";
-			if (($type=='edit') && ($row->studiengang_kz==$_GET['stg_kz']) && isset($_GET['stg_kz']))
+			echo "<option value=\"$row->oe_kurzbz\" ";
+			if (($type=='edit') && ($row->oe_kurzbz==$_GET['oe_kurzbz']) && isset($_GET['oe_kurzbz']))
 				echo 'selected ';
 			echo ">$row->kurzbz</option>";
 		}

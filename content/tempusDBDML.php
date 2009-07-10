@@ -30,6 +30,7 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/log.class.php');
 require_once('../include/benutzerfunktion.class.php');
 require_once('../include/stundenplan.class.php');
+require_once('../include/studiengang.class.php');
 
 $user = get_uid();
 
@@ -136,8 +137,9 @@ if(!$error)
 			else
 			{
 				$obj = new benutzerfunktion();
+				$stg_obj = new studiengang($_POST['studiengang_kz']);
 				//Benutzerfunktion suchen
-				if($obj->getBenutzerFunktion($_POST['uid'], 'lkt', $_POST['studiengang_kz']))
+				if($obj->getBenutzerFunktion($_POST['uid'], 'lkt', $stg_obj->oe_kurzbz))
 				{
 					//Benutzerfunktion loeschen
 					if($obj->delete($obj->benutzerfunktion_id))

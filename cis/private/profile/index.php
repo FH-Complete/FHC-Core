@@ -278,25 +278,25 @@ function RefreshImage()
 		{
 			//Funktionen
 			$qry = "SELECT 
-						*, tbl_benutzerfunktion.studiengang_kz as studiengang_kz, 
+						*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, 
 						tbl_fachbereich.bezeichnung as bezeichnung, tbl_benutzerfunktion.semester
 					FROM 
 						public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) 
 						LEFT JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-						LEFT JOIN public.tbl_studiengang ON(tbl_benutzerfunktion.studiengang_kz=tbl_studiengang.studiengang_kz) 
+						LEFT JOIN public.tbl_studiengang ON(tbl_benutzerfunktion.oe_kurzbz=tbl_studiengang.oe_kurzbz) 
 					WHERE 
 						uid='$uid' AND 
 						(tbl_fachbereich.aktiv=true OR fachbereich_kurzbz is null) AND 
-						(tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.studiengang_kz is null)";
+						(tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.oe_kurzbz is null)";
 			if($result_funktion = $db->db_query($qry))
 			{
 				if($db->db_num_rows($result_funktion)>0)
 				{
-					echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Funktion</th><th>Studiengang</th><th>Semester</th><th>Institut</th></tr>';
+					echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Funktion</th><th>Organisationseinheit</th><th>Semester</th><th>Institut</th></tr>';
 
 					while($row_funktion = $db->db_fetch_object($result_funktion))
 					{
-						echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".($row_funktion->studiengang_kz!=0?$stg_arr[$row_funktion->studiengang_kz]:'')."</td><td>$row_funktion->semester</td><td>$row_funktion->bezeichnung</td></tr>";
+						echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".$row_funktion->oe_kurzbz."</td><td>$row_funktion->semester</td><td>$row_funktion->bezeichnung</td></tr>";
 					}
 					echo '</table>';
 				}

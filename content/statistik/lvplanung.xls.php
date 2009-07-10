@@ -86,7 +86,7 @@ $qry = "
 SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
 		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
 		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
-		  								        studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND 
+		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
 		  								        funktion_kurzbz='fbk' LIMIT 1
 		  								   )
 							)
@@ -246,7 +246,7 @@ if($result = $db->db_query($qry))
 				(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
 		 		 WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
 		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
-		  								        studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND 
+		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
 		  								        funktion_kurzbz='fbk' LIMIT 1
 		  								   )
 							)

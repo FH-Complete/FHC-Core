@@ -343,7 +343,7 @@ if(!$error)
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
-			$errormsg = 'Keine Berechtigung';
+			$errormsg = 'Keine Berechtigung'.$_POST['studiengang_kz_berecht'];
 			$data = '';
 			$error = true;
 		}
@@ -381,7 +381,7 @@ if(!$error)
 			
 			if(!$error)
 			{
-				$benutzerfunktion->studiengang_kz = $_POST['studiengang_kz'];
+				$benutzerfunktion->oe_kurzbz = $_POST['oe_kurzbz'];
 				$benutzerfunktion->semester = $_POST['semester'];
 				$benutzerfunktion->fachbereich_kurzbz = $_POST['fachbereich_kurzbz'];
 				$benutzerfunktion->uid = $_POST['uid'];

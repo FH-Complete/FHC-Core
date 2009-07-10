@@ -339,7 +339,10 @@ class mitarbeiter extends benutzer
 		}
 
 		if (!is_null($stg_kz))
-			$sql_query.=' AND studiengang_kz='.$stg_kz;
+		{
+			$stg = new studiengang($stg_kz);
+			$sql_query.=' AND oe_kurzbz='.$stg->oe_kurzbz;
+		}
 		
 		$sql_query.=' ORDER BY nachname, vornamen, kurzbz';
 	    
@@ -395,8 +398,8 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz)
 	{
-		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, tbl_benutzerfunktion.studiengang_kz FROM campus.vw_mitarbeiter
-					JOIN public.tbl_benutzerfunktion USING (uid)
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz FROM campus.vw_mitarbeiter
+					JOIN public.tbl_benutzerfunktion USING (uid) JOIN public.tbl_studiengang USING(oe_kurzbz)
 					WHERE true';
 		if(!is_null($lektor))
 		{
@@ -899,7 +902,7 @@ class mitarbeiter extends benutzer
 			$uid=$this->uid;
 		// Suche in Instituten
 		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
-						    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE studiengang_kz=a.studiengang_kz AND funktion_kurzbz='stgl' LIMIT 1)
+						    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=a.oe_kurzbz AND funktion_kurzbz='stgl' LIMIT 1)
 						    ELSE ''
 					   END as vorgesetzter
 						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."'";
@@ -924,14 +927,14 @@ class mitarbeiter extends benutzer
 	}
 	
 	// ************************
-	// * gibt die UIDs der Untergebenen zur�ck
+	// * gibt die UIDs der Untergebenen zurueck
 	// ************************
 	public function getUntergebene($uid=null)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
 		
-		//Alle Studieng�nge und Fachbereiche holen bei denen die Person die Leitung hat
+		//Alle Studiengaenge und Fachbereiche holen bei denen die Person die Leitung hat
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
 				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."'";
 
@@ -950,9 +953,9 @@ class mitarbeiter extends benutzer
 				}
 				elseif($row->funktion_kurzbz=='stgl')
 				{
-					if($stge!='')
-						$stge.=',';
-					$stge.="'".$row->studiengang_kz."'";
+					if($oe!='')
+						$oe.=',';
+					$oe.="'".$row->oe_kurzbz."'";
 				}
 					
 			}
@@ -963,13 +966,13 @@ class mitarbeiter extends benutzer
 		
 		if($institut!='')
 			$qry.=" OR fachbereich_kurzbz in($institut)"; 
-		if($stge!='')
-			$qry.=" OR studiengang_kz in($stge)";
+		if($oe!='')
+			$qry.=" OR oe_kurzbz in($oe)";
 		
 		$qry.=")) ";
 		
 		if($stge!='')
-			$qry.=" OR (funktion_kurzbz='ass' AND studiengang_kz in($stge))";
+			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
 		
 		if($this->db_query($qry))
 		{

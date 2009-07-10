@@ -196,7 +196,7 @@ if($result = $db->db_query($qry))
               <BeschaeftigungsAusmass>".$rowvw->beschausmasscode."</BeschaeftigungsAusmass>
               <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
 				//Studiengangsleiter
-				$qryslt="SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='stgl' AND studiengang_kz<10000;";
+				$qryslt="SELECT tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='stgl' AND studiengang_kz<10000;";
 				if($resultslt=$db->db_query($qryslt))
 				{
 					while($rowslt=$db->db_fetch_object($resultslt))

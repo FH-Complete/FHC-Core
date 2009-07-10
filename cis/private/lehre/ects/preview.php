@@ -225,7 +225,7 @@
 				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
-				tbl_benutzerfunktion.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz ";
+				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) ";
 
 	if(!$res=$db->db_query($qry))
 		die('Fehler ! '.$db->errormsg);

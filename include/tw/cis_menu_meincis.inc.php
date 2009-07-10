@@ -257,7 +257,7 @@
 				//URLAUBE
 				//Untergebene holen
 				$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($user)."'";
-
+				$oe='';
 				if($result = $db->db_query($qry))
 				{
 					$institut='';
@@ -273,9 +273,9 @@
 						}
 						elseif($row->funktion_kurzbz=='stgl')
 						{
-							if($stge!='')
-								$stge.=',';
-							$stge.="'".$row->studiengang_kz."'";
+							if($oe!='')
+								$oe.=',';
+							$oe.="'".$row->oe_kurzbz."'";
 						}
 
 					}
@@ -285,8 +285,8 @@
 
 				if($institut!='')
 					$qry.=" OR fachbereich_kurzbz in($institut)";
-				if($stge!='')
-					$qry.=" OR studiengang_kz in($stge)";
+				if($oe!='')
+					$qry.=" OR oe_kurzbz in($oe)";
 
 				$qry.=")";
 
