@@ -28,16 +28,7 @@
   if (!$db = new basis_db())
   		die('Fehler beim Oeffnen der Datenbankverbindung');
 
-//Hexcode in String umwandeln
-function hexstr($hex)
-{
-    $string="";
-    for ($i=0;$i<strlen($hex)-1;$i+=2)
-        $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-    return $string;
-}
-
-//Hex Dump aus der DB holen
+//base64 Dump aus der DB holen
 $qry = '';
 if(isset($_GET['src']) && $_GET['src']=='frage' && isset($_GET['frage_id']))
 {
@@ -61,8 +52,8 @@ if($qry!='')
 	header("Content-type: image/gif");
 	$result = $db->db_query($qry);
 	$row = $db->db_fetch_object($result);
-	//HEX Werte in Zeichen umwandeln und ausgeben
-	echo hexstr($row->bild);
+	//base64 zurueckwandeln und ausgeben
+	echo base64_decode($row->bild);
 }
 ?>
 	

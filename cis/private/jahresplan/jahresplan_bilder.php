@@ -68,7 +68,7 @@
 	 
 	if (empty($heximg)) // Leeres Images
    	{
-	    $heximg ='4749463839611e000a0080ff00c0c0c000000021f90401000000002c000000001e000a0040020f848fa9cbed0fa39cb4da8bb3debc00003b';
+	    $heximg ='R0lGODlhHgAKAID/AMDAwAAAACH5BAEAAAAALAAAAAAeAAoAQAIPhI+py+0Po5y02ouz3rwAADs=';
 	}
      
 	@ob_end_clean();
@@ -78,10 +78,7 @@
 
 	function jahresplan_hexstr($hex)
 	{
-    	$string="";
-	    for ($i=0;$i<strlen($hex)-1;$i+=2)
-    	    $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-	    return $string;
+	    return base64_decode($hex);
 	}
 
 ?>

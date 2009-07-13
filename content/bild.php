@@ -25,16 +25,7 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 
-//Hexcode in String umwandeln
-function hexstr($hex)
-{
-    $string="";
-    for ($i=0;$i<strlen($hex)-1;$i+=2)
-        $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-    return $string;
-}
-
-//Hex Dump aus der DB holen
+//base64 Dump aus der DB holen
 $qry = '';
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 {
@@ -49,8 +40,8 @@ if($qry!='')
 	//Header fuer Bild schicken
 	header("Content-type: image/gif");
 	$db->db_query($qry);
-	//HEX Werte in Zeichen umwandeln und ausgeben
+	//base64 Werte in Zeichen umwandeln und ausgeben
 	if($row = $db->db_fetch_object())	
-		echo hexstr($row->foto);
+		echo base64_decode($row->foto);
 }
 ?>

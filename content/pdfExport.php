@@ -312,8 +312,8 @@ else
 		unlink($file);
 		
 		$hex="";
-		for ($i=0;$i<mb_strlen($string);$i++)
-			$hex.=(mb_strlen(dechex(ord(mb_substr($string,$i,1)))<2)? "0".dechex(ord(mb_substr($string,$i,1))): dechex(ord(mb_substr($string,$i,1))));
+		//for ($i=0;$i<mb_strlen($string);$i++)
+		//	$hex.=(mb_strlen(dechex(ord(mb_substr($string,$i,1)))<2)? "0".dechex(ord(mb_substr($string,$i,1))): dechex(ord(mb_substr($string,$i,1))));
 
 		$hex = base64_encode($string);
 		$akte = new akte();
