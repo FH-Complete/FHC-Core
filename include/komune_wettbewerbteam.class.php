@@ -35,157 +35,163 @@
 * @return - kein Retourn des Konstruktors
 *
 */
-
-require_once(dirname(__FILE__).'/basis_db.class.php'); 
-class komune_wettbewerbteam extends basis_db 
+require_once(dirname(__FILE__).'/basis_db.class.php');
+class komune_wettbewerbteam  extends basis_db
 {
-		public $result;
-		public $new=false;      					// boolean
-	   	
+	public $new;
+       public $newWettbewerbteam;
+       public $wettbewerbteam;
 
-       	public $wbtyp_kurzbz;
-	   
-// tbl_team			   
-	 	public $team_kurzbz;	//character varying(16)
-		public $bezeichnung;	//character varying(128)
-		public $beschreibung;	//text
-		public $logo;		//text	
+       public $uid;
+       public $team_kurzbz;
+       public $team_kurzbz_old;
+       public $wettbewerb_kurzbz;
 
-//	tbl_teambenutzer 
-		public $uid; // varying(16) 
-		// im tbl_team		public $team_kurzbz //character 
-	   
-//tbl_wettbewerbteam
-		// im tbl_team		public $team_kurzbz;		// character varying(16) 
-		public $rang;				// smallint		  Alter Drop  
-		public $punkte;				// numeric(8,2)   Alter Drop 
-	    public $wettbewerb_kurzb; // character varying(16)
-	   
-	public $schemaSQL="kommune"; // string Datenbankschema
-	   
-//-----Konstruktor    
-       function __construct($wbtyp_kurzbz="",$wettbewerb_kurzbz="",$uid="",$team_kurzbz="") 
+	public $schemaSQL="kommune."; // string Datenbankschema	
+//-----Konstruktor       
+       function __construct($uid="",$team_kurzbz="",$wettbewerb_kurzbz="") 
        {
-	   		parent::__construct();
-			
-			$this->InitWettbewerb();
-			
-			$this->wbtyp_kurzbz=$wbtyp_kurzbz;
-			$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
-			$this->uid=$uid;
-			$this->team_kurzbz=$team_kurzbz;
+		parent::__construct();
+		
+		$this->InitWettbewerbteam();
+	
+		$this->setuid($uid);
+		$this->setTeam_kurzbz($team_kurzbz);
+		$this->setWettbewerb_kurzbz($wettbewerb_kurzbz);
        }
+
 //-----Initialisierung--------------------------------------------------------------------------------------------
-       function InitWettbewerb() 
+       function InitWettbewerbteam() 
        {
-			$this->new=false;
-			$this->errormsg='';
-	       	$this->result=array();
+		$this->setError('');
 
-			$this->wbtyp_kurzbz='';
-	       	$this->wettbewerb_kurzbz='';
-			$this->uid='';
-			
-	
-			$this->team_kurzbz='';	
-			$this->bezeichnung='';	
-			$this->beschreibung='';	
-			$this->logo='';								
-
-			$this->rang='1';	
-			$this->punkte='0';	
+	    	$this->setNewWettbewerbteam('');
+       	$this->setWettbewerbteam('');
+		
+		$this->setuid('');
+		$this->setTeam_kurzbz('');
+		$this->setTeam_kurzbz_old('');
+		$this->setWettbewerb_kurzbz('');
        }
-	   
-//-------------------------------------------------------------------------------------------------
-//	------------------------ Wettbewerbteam
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-       function saveWettbewerbteam()
-       {
-		// Initialisieren
-		$this->errormsg='';
-		$qry="";
-			
-		$fildsList='';
-		$fildsValue='';
-		
-/*		
-	tbl_wettbewerbteam
-		public $team_kurzbz;		// character varying(16) 
-	    public $wettbewerb_kurzb; // character varying(16)
-		public $rang;				// smallint		  Alter Drop  
-		public $punkte;				// numeric(8,2)   Alter Drop 
-*/	   		
-		
-		if (empty($this->wettbewerb_kurzb) || $this->wettbewerb_kurzb==null )
-		{
-			$this->errormsg='Wettbewerb fehlt!';
-			return false;
-		}
-		if (empty($this->team_kurzbz) || $this->team_kurzbz==null )
-		{
-			$this->errormsg='Teambezeichnung fehlt!';
-			return false;
-		}
-		if (!is_numeric($this->rang))
-			$this->rang=
-		if (!is_numeric($this->punkte))
-			$this->punkte=0;
-			
-		if($this->new)
-		{
-
-			$fildsList.='team_kurzbz,';
-			$fildsList.='wettbewerb_kurzb,';
-			$fildsList.='rang,';
-			$fildsList.='punkte';
-
-			$fildsValue.="'".addslashes($this->team_kurzbz)."',"; 
-			$fildsValue.="'".addslashes($this->wettbewerb_kurzb)."',";
-			$fildsValue.="".addslashes($this->rang).",";
-			$fildsValue.="".addslashes($this->punkte)."";
 	
-	   		$qry=" insert into ".$this->schemaSQL.".tbl_wettbewerbtyp (".$fildsList.") values (".$fildsValue."); ";
-		}
-		else
-		{
-			$fildsValue.=(!empty($fildsValue)?',':'')."bezeichnung='".addslashes($this->bezeichnung)."'";
-			$fildsValue.=(!empty($fildsValue)?',':'')."farbe='".addslashes($this->farbe)."'";
+	
+//-----NewRecord--------------------------------------------------------------------------------------------
+       function getNewRecord() 
+       {
+           return $this->new;
+       }
+       function setNewRecord($switch) 
+       {
+           $this->new=$switch;
+       }	
 
-			$qry.=" update ".$this->schemaSQL.".tbl_wettbewerbtyp set ";
-			$qry.=$fildsValue;
-			$qry.=" where wbtyp_kurzbz='".addslashes($this->wbtyp_kurzbz)."' ";
-		}	
-		if($resurce=$this->db_query($qry))
-			return $resurce;
-		else
-		{
-			if (empty($this->errormsg))
-				$this->errormsg = 'Fehler beim speichern des Datensatzes ';
-			return false;
-		}			
-		
-		
-		
-		return false;
-		
+//-----Error--------------------------------------------------------------------------------------------
+       function getError() 
+       {
+           return $this->errormsg;
+       }
+       function setError($err) 
+       {
+           $this->errormsg=$err;
+       }	
+//-----schemaSQL--------------------------------------------------------------------------------------------
+       function getSchemaSQL() 
+       {
+           return $this->schemaSQL;
+       }
+       function setSchemaSQL($schemaSQL) 
+       {
+           	$this->schemaSQL=$schemaSQL;
+       }	
+//-----Neuer Datensatz--------------------------------------------------------------------------------------------
+       function getNewWettbewerbteam()
+       {
+	       return $this->newWettbewerbteam;
+	}	   
+       function setNewWettbewerbteam($newWettbewerbteam)
+       {
+		$this->newWettbewerbteam=$newWettbewerbteam;
+	}	
+//-----Aenderung Datensatz wird wie Neuanlage gehandhabt -------------------------------------------------------------
+       function getUpdWettbewerbteam()
+       {
+	       return $this->newWettbewerbteam;
+	}	   
+       function setUpdWettbewerbteam($newWettbewerbteam)
+       {
+		$this->newWettbewerbteam=trim($newWettbewerbteam);
+	}		   		
+//-----Aktueller Datensatz--------------------------------------------------------------------------------------------
+       function getWettbewerbteam() 
+       {
+           return $this->wettbewerbteam;
+       }
+       function setWettbewerbteam($wettbewerbteam) 
+       {
+           $this->wettbewerbteam=$wettbewerbteam;
+       }
+//-----team_kurzbz--------------------------------------------------------------------------------------------
+       function getTeam_kurzbz() 
+       {
+           return $this->team_kurzbz;
+       }
+       function setTeam_kurzbz($team_kurzbz) 
+       {
+           $this->team_kurzbz=trim($team_kurzbz);
+       }
+//-----team_kurzbz--------------------------------------------------------------------------------------------
+       function getTeam_kurzbz_old() 
+       {
+		return $this->team_kurzbz_old;
+       }
+       function setTeam_kurzbz_old($team_kurzbz_old) 
+       {
+           $this->team_kurzbz_old=trim($team_kurzbz_old);
+       }
+//-----uid--------------------------------------------------------------------------------------------
+       function getUid() 
+       {
+           return $this->uid;
+       }
+       function setUid($uid) 
+       {
+           $this->uid=trim($uid);
+       }	   
+//-----wettbewerb_kurzbz--------------------------------------------------------------------------------------------
+       function getWettbewerb_kurzbz() 
+       {
+           return $this->wettbewerb_kurzbz;
+       }
+       function setWettbewerb_kurzbz($wettbewerb_kurzbz="") 
+       {
+           $this->wettbewerb_kurzbz=trim($wettbewerb_kurzbz);
+       }
+//-------------------------------------------------------------------------------------------------
+       function saveWettbewerbteam($newWettbewerbteam="")
+       {
+		// Initialisierung	
+		$this->setError('');
+
+		// Plausib			
+		if (!empty($newWettbewerbteam)) 
+			$this->setNewWettbewerbteam($newWettbewerbteam);
+
 		if (!is_array($this->getNewWettbewerbteam()))
 		{
-			$this->errormsg='Kein Wettbewerbsteam &uuml;bergeben';
+			$this->setError('Kein Wettbewerbsteam &uuml;bergeben');
 			return false;
 		}	
 		$newWettbewerbteam=$this->getNewWettbewerbteam();
 		
 		// Daten uebernahme 
 		$cSchemaSQL=$this->getSchemaSQL();
-		$this->team_kurzbz=$this->getTeam_kurzbz();		
+		$cTeam_kurzbz=$this->getTeam_kurzbz();		
 
 		 // Aenderungen muessen mit dem Team_kurzbz_old gekennzeichnet werden. Ansonst koennten falsche Daten geaendert werden
-		$this->team_kurzbz_old=$this->getTeam_kurzbz_old();		
+		$cTeam_kurzbz_old=$this->getTeam_kurzbz_old();		
 		
-		$cUserUID=$this->uid; // Vor der Verarbeitung sicherstellen das Alle Anwender gelesen werden 
-		$this->uid='';
+		$cUserUID=$this->getUid(); // Vor der Verarbeitung sicherstellen das Alle Anwender gelesen werden 
+		$this->setUid('');
 		
 		$this->setNewRecord(false);
 		if (!$origWettbewerbteam=$this->loadWettbewerbteam())
@@ -197,18 +203,18 @@ class komune_wettbewerbteam extends basis_db
 		$this->setUid($cUserUID);
 		unset($cUserUID);
 
-		if ($origWettbewerbteam && empty($this->team_kurzbz_old)) // Datenrec bereits vorhanden
+		if ($origWettbewerbteam && empty($cTeam_kurzbz_old)) // Datenrec bereits vorhanden
 		{
-			$this->setError('Das Team '.$this->team_kurzbz.' ist bereits angelegt!');
+			$this->setError('Das Team '.$cTeam_kurzbz.' ist bereits angelegt!');
 			return false;
 		}			 
 		$bTmpNewRecord=$this->getNewRecord(); // Neuanlage Switch sichern
 		
 		
 		// Aus dem Array newWettbewerbteam die Teaminformationen heraus holen
-		$this->wettbewerb_kurzbz=(isset($newWettbewerbteam['wettbewerb_kurzbz']) ? $newWettbewerbteam['wettbewerb_kurzbz'] : '');
-		if (empty($this->wettbewerb_kurzbz)) 
-			$this->wettbewerb_kurzbz=(isset($newWettbewerbteam[0]['wettbewerb_kurzbz']) ? $newWettbewerbteam[0]['wettbewerb_kurzbz'] : '');
+		$cWettbewerb_kurzbz=(isset($newWettbewerbteam['wettbewerb_kurzbz']) ? $newWettbewerbteam['wettbewerb_kurzbz'] : '');
+		if (empty($cWettbewerb_kurzbz)) 
+			$cWettbewerb_kurzbz=(isset($newWettbewerbteam[0]['wettbewerb_kurzbz']) ? $newWettbewerbteam[0]['wettbewerb_kurzbz'] : '');
   	    	$team_bezeichnung=(isset($newWettbewerbteam['bezeichnung']) ? $newWettbewerbteam['bezeichnung'] : '');
 		$team_beschreibung=(isset($newWettbewerbteam['beschreibung']) ? $newWettbewerbteam['beschreibung'] : '');
 
@@ -225,31 +231,26 @@ class komune_wettbewerbteam extends basis_db
 		}	
 		
 		
-		$qry="select * from ".$this->schemaSQL.".tbl_teambenutzer , ".$this->schemaSQL.".tbl_wettbewerbteam "; 
+		$qry="select * from ".$cSchemaSQL."tbl_teambenutzer , ".$cSchemaSQL."tbl_wettbewerbteam "; 
 		$qry.=" where tbl_wettbewerbteam.team_kurzbz =tbl_teambenutzer.team_kurzbz  ";       
-		$qry.=" and not ( UPPER(tbl_teambenutzer.team_kurzbz)=E'".addslashes(trim(strtoupper($this->team_kurzbz_old)))."' and UPPER(tbl_teambenutzer.team_kurzbz)=E'".addslashes(trim(strtoupper($this->team_kurzbz)))."' )  ";       
+		$qry.=" and not ( UPPER(tbl_teambenutzer.team_kurzbz)='".addslashes(trim(strtoupper($cTeam_kurzbz_old)))."' and UPPER(tbl_teambenutzer.team_kurzbz)='".addslashes(trim(strtoupper($cTeam_kurzbz)))."' )  ";       
 		$qry.=" and UPPER(tbl_teambenutzer.uid) in ('".strtoupper(implode("','",$array_userUID))."') "; 
-		$qry.=" and UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=E'".addslashes(trim(strtoupper($this->wettbewerb_kurzbz)))."'  ; ";
+		$qry.=" and UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)='".addslashes(trim(strtoupper($cWettbewerb_kurzbz)))."'  ; ";
    // Datenbankabfrage
-            $this->setStringSQL($qry);
-       	   	unset($qry);
-           	$this->setResultSQL(null);
-	   		if ($this->fetch_all()) 
+		if($this->db_query($qry))
+		{
+			$rows=array();
+			while($row = $this->db_fetch_array())
 			{
-			   	$qry=$this->getResultSQL();
-    		   	$this->setResultSQL(null);
-#				exit(kommune_Test($qry));
-				if (is_array($qry))
-				{
-					for ($zeileIND=0;$zeileIND<count($qry);$zeileIND++)
-						$this->setError(sprintf('Der Spieler %s wurde bereits im Team %s im Wettbewerb %s gefunden ! ',$qry[$zeileIND]['uid'],$qry[$zeileIND]['team_kurzbz'],$qry[$zeileIND]['wettbewerb_kurzbz']));
-					return false;
-				}	
+				$this->setError(sprintf('Der Spieler %s wurde bereits im Team %s im Wettbewerb %s gefunden ! ',$row['uid'],$row['team_kurzbz'],$row['wettbewerb_kurzbz']));
+				return false;
 			}
+			
+		}	
 		
 		$arrTmpCheckUID=array(); // Aus dem Array nur die Belegten UIDs suchen
 		for ($zeileIND=0;$zeileIND<count($array_userUID);$zeileIND++)
-       {
+	       {
 			if (!empty($array_userUID[$zeileIND])) // Leere Daten entfernen (Inputmasken befuellung kann Wahllos erfolgen)
 			{
 				$array_userUID[$zeileIND]=trim($array_userUID[$zeileIND]);
@@ -261,17 +262,20 @@ class komune_wettbewerbteam extends basis_db
 
 		$this->setNewRecord($bTmpNewRecord);
 		
-       	$qry="BEGIN;  ";
+
+		$this->db_query(" BEGIN; ");
+
+       	$qry="";
 		// Neuanlage - Insert 
 		if ($this->getNewRecord())
 		{
-       		$qry.=" INSERT into ".$this->schemaSQL.".tbl_team (team_kurzbz,bezeichnung,beschreibung,logo) VALUES (E'".addslashes(trim($this->team_kurzbz))."',E'".addslashes(trim($team_bezeichnung))."',E'".addslashes(trim($team_beschreibung))."',E'".addslashes(trim($team_logo))."'); ";
+       		$qry.=" INSERT into ".$cSchemaSQL."tbl_team (team_kurzbz,bezeichnung,beschreibung,logo) VALUES ('".addslashes(trim($cTeam_kurzbz))."','".addslashes(trim($team_bezeichnung))."','".addslashes(trim($team_beschreibung))."','".addslashes(trim($team_logo))."'); ";
 			for ($zeileIND=0;$zeileIND<count($array_userUID);$zeileIND++)
 			{
 				if (!empty($array_userUID[$zeileIND]))
-					$qry.=" INSERT into ".$this->schemaSQL.".tbl_teambenutzer (uid, team_kurzbz) VALUES (E'".addslashes(trim($array_userUID[$zeileIND]))."',E'".addslashes(trim($this->team_kurzbz))."'); ";
+					$qry.=" INSERT into ".$cSchemaSQL."tbl_teambenutzer (uid, team_kurzbz) VALUES ('".addslashes(trim($array_userUID[$zeileIND]))."','".addslashes(trim($cTeam_kurzbz))."'); ";
 			}
-			$qry.=" INSERT into ".$this->schemaSQL.".tbl_wettbewerbteam (team_kurzbz, wettbewerb_kurzbz,rang,punkte) VALUES (E'".$this->team_kurzbz."',E'".addslashes(trim($this->wettbewerb_kurzbz))."',(select 1+count(wettbewerb_kurzbz) from ".$this->schemaSQL.".tbl_wettbewerbteam where rang<9999 and upper(wettbewerb_kurzbz)=upper(E'".addslashes(trim($this->wettbewerb_kurzbz))."')),0); ";
+			$qry.=" INSERT into ".$cSchemaSQL."tbl_wettbewerbteam (team_kurzbz, wettbewerb_kurzbz,rang,punkte) VALUES ('".$cTeam_kurzbz."','".addslashes(trim($cWettbewerb_kurzbz))."',(select 1+count(wettbewerb_kurzbz) from ".$cSchemaSQL."tbl_wettbewerbteam where rang<9999 and upper(wettbewerb_kurzbz)=upper('".addslashes(trim($cWettbewerb_kurzbz))."')),0); ";
 			
 		}
 		else
@@ -280,11 +284,11 @@ class komune_wettbewerbteam extends basis_db
 #	  	if ($team_logo==null) $team_logo=(isset($origWettbewerbteam[0]['logo']) ? $origWettbewerbteam[0]['logo'] : null);
 #	  	if ($team_rang==null) $team_rang=(isset($origWettbewerbteam[0]['rang']) ? $origWettbewerbteam[0]['rang'] : null);
 
-	       	$qry.=" UPDATE ".$this->schemaSQL.".tbl_team ";
-		    $qry.=" set team_kurzbz=E'".addslashes(trim($this->team_kurzbz))."',bezeichnung=E'".addslashes(trim($team_bezeichnung))."',beschreibung=E'".addslashes(trim($team_beschreibung))."'".($team_logo!=null?",logo=E'".addslashes(trim($team_logo))."'":"");
-	       	$qry.=" WHERE upper(team_kurzbz)=upper(E'".$this->team_kurzbz_old."'); ";
+	       	$qry.=" UPDATE ".$cSchemaSQL."tbl_team ";
+		    	$qry.=" set team_kurzbz='".addslashes(trim($cTeam_kurzbz))."',bezeichnung='".addslashes(trim($team_bezeichnung))."',beschreibung='".addslashes(trim($team_beschreibung))."'".($team_logo!=null?",logo='".addslashes($team_logo)."'":"");
+	     	 	$qry.=" WHERE upper(team_kurzbz)=upper('".$cTeam_kurzbz_old."'); ";
 
-			$qry.=" UPDATE ".$this->schemaSQL.".tbl_wettbewerbteam set team_kurzbz=E'".addslashes(trim($this->team_kurzbz))."'".($team_rang!=null?",rang=".$team_rang:"")." WHERE upper(team_kurzbz)=upper(E'".$this->team_kurzbz_old."'); ";
+			$qry.=" UPDATE ".$cSchemaSQL."tbl_wettbewerbteam set team_kurzbz='".addslashes(trim($cTeam_kurzbz))."'".($team_rang!=null?",rang=".$team_rang:"")." WHERE upper(team_kurzbz)=upper('".$cTeam_kurzbz_old."'); ";
 
 			// Alle bisher bestehenden DB-Eintraege in Array lesen fuer spaeteren vergleich ob Update/Delete
 			reset($origWettbewerbteam);
@@ -303,12 +307,12 @@ class komune_wettbewerbteam extends basis_db
 				$cTmpUID=trim($array_userUID[$zeileIND]);	
 				if (isset($arrTmpCheckUID->$cTmpUID))
 				{
-		    			  $qry.=" UPDATE ".$this->schemaSQL.".tbl_teambenutzer set team_kurzbz=E'".addslashes(trim($this->team_kurzbz))."' WHERE UPPER(uid)=UPPER(E'".addslashes($cTmpUID)."') AND  upper(team_kurzbz)=upper(E'".$this->team_kurzbz_old."'); ";
+		    			  $qry.=" UPDATE ".$cSchemaSQL."tbl_teambenutzer set team_kurzbz='".addslashes(trim($cTeam_kurzbz))."' WHERE UPPER(uid)=UPPER('".addslashes($cTmpUID)."') AND  upper(team_kurzbz)=upper('".$cTeam_kurzbz_old."'); ";
 					  unset($arrTmpCheckUID->$cTmpUID);
 				}	  
 				elseif (!isset($arrTmpCheckUID->$cTmpUID))
 				{
-					$qry.=" INSERT into ".$this->schemaSQL.".tbl_teambenutzer (uid, team_kurzbz) VALUES (E'".addslashes(trim($cTmpUID))."',E'".addslashes(trim($this->team_kurzbz))."'); ";
+					$qry.=" INSERT into ".$cSchemaSQL."tbl_teambenutzer (uid, team_kurzbz) VALUES ('".addslashes(trim($cTmpUID))."','".addslashes(trim($cTeam_kurzbz))."'); ";
 				}					
 			}	
 
@@ -316,139 +320,99 @@ class komune_wettbewerbteam extends basis_db
 			if (isset($array_userUID)) unset($array_userUID);				
 			// Alle die noch in der DB-Alt Array sind muessen geloeschte sein
 			while (list( $key, $value ) = each($arrTmpCheckUID) )
-				$qry.=" DELETE from ".$this->schemaSQL.".tbl_teambenutzer WHERE UPPER(uid)=UPPER(E'".addslashes($value)."') AND upper(team_kurzbz)=upper(E'".$this->team_kurzbz_old."'); ";
+				$qry.=" DELETE from ".$cSchemaSQL."tbl_teambenutzer WHERE UPPER(uid)=UPPER('".addslashes($value)."') AND upper(team_kurzbz)=upper('".$cTeam_kurzbz_old."'); ";
 
 			if (isset($key)) unset($key);			
 			if (isset($value)) unset($value);			
 			if (isset($arrTmpCheckUID)) unset($arrTmpCheckUID);
 		}	
-		$qry.=" COMMIT; ";       
-# exit("<br />".$qry);
-
-   // Datenbankabfrage
-            $this->setStringSQL($qry);
-       	   	unset($qry);
-
-           	$this->setResultSQL(null);
-             if (!$this->dbQuery())
-	         	return false;
-		if (!$this->loadWettbewerbteam())
+		if($this->db_query($qry))
 		{
-			if ($this->getError()) // Beim Lesen ist ein Fehler aufgetreten
+			$this->db_query(" COMMIT; ");
+			if (!$this->loadWettbewerbteam())
+			{
 				return false;
-			$this->setNewRecord(true);
+			}	
 		}	
-    
-       $this->setResultSQL(null);       
-	   return $this->getWettbewerbteam();
+		else
+		{
+			$this->db_query(" ROLLBACK; ");
+			$this->setError($this->db_last_error());
+			return false;
+		}
+		return $this->getWettbewerbteam();
 	}
 //-------------------------------------------------------------------------------------------------
-       function loadWettbewerbteam($wbtyp_kurzbz=null,$wettbewerb_kurzbz=null,$uid=null,$team_kurzbz=null)
+       function loadWettbewerbteam()
        {
-		// Initialisierung	
-		$this->result=array();
-		$this->errormsg='';
+	    $this->setError('');
 					  
-		if (!is_null($wbtyp_kurzbz))
-			$this->wbtyp_kurzbz=$wbtyp_kurzbz;
+           	$cSchemaSQL=$this->getSchemaSQL();
+           	$tmpUid=$this->getUid();
 
-		if (!is_null($wettbewerb_kurzbz))
-			$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
-
-		if (!is_null($uid))
-			$this->uid=$uid;
+		$cTeam_kurzbz=$this->getTeam_kurzbz_old();			
+		if (empty($cTeam_kurzbz))
+	            $cTeam_kurzbz=$this->getTeam_kurzbz();			
 			
-		if (!is_null($team_kurzbz))
-			$this->team_kurzbz=$team_kurzbz;
+           	$cWettbewerb_kurzbz=$this->getWettbewerb_kurzbz();
               
 	    	$qry="";
-			$qry.="SELECT * FROM ".$this->schemaSQL.".tbl_teambenutzer,".$this->schemaSQL.".tbl_team,".$this->schemaSQL.".tbl_wettbewerbteam ";
+			$qry.="SELECT * FROM ".$cSchemaSQL."tbl_teambenutzer,".$cSchemaSQL."tbl_team,".$cSchemaSQL."tbl_wettbewerbteam ";
 	     
 		   	$qry.=" WHERE UPPER(tbl_team.team_kurzbz)=UPPER(tbl_teambenutzer.team_kurzbz) ";
 			$qry.=" AND UPPER(tbl_wettbewerbteam.team_kurzbz)=UPPER(tbl_team.team_kurzbz) ";
+
 			// Check wie Postgre darauf reagiert Performenc
 			$qry.=" AND UPPER(tbl_wettbewerbteam.team_kurzbz)=UPPER(tbl_teambenutzer.team_kurzbz) ";
 			
-	       	if (!empty($this->team_kurzbz))
-	           		$qry.=" AND UPPER(tbl_teambenutzer.team_kurzbz)=UPPER(E'".$this->team_kurzbz."') ";
-
-		   	if (!empty($this->uid)) 
-				$qry.=" AND UPPER(tbl_teambenutzer.uid)=UPPER(E'".addslashes($this->uid)."') ";
+	       	if (!empty($cTeam_kurzbz))
+	           		$qry.=" AND UPPER(tbl_teambenutzer.team_kurzbz)=UPPER('".$cTeam_kurzbz."') ";
+	     
+		   	if (!empty($tmpUid)) 
+				$qry.=" AND UPPER(tbl_teambenutzer.uid)=UPPER('".addslashes($tmpUid)."') ";
 
 			// Suche nach einem einzigen Wettbewerb
-			if (!is_array($this->wettbewerb_kurzbz) && !empty($this->wettbewerb_kurzbz) )
+			if (!is_array($cWettbewerb_kurzbz) && !empty($cWettbewerb_kurzbz) )
 			{
-				$qry.=" AND UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER(E'".$this->wettbewerb_kurzbz."') ";	
+				$qry.=" AND UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER('".$cWettbewerb_kurzbz."') ";	
 			}
-			elseif (is_array($this->wettbewerb_kurzbz) && count($this->wettbewerb_kurzbz)>0 )
+			elseif (is_array($cWettbewerb_kurzbz) && count($cWettbewerb_kurzbz)>0 )
 			{
-				$qry.=" AND UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz) in (E'".strtoupper(implode("','",$this->wettbewerb_kurzbz))."') ";	
+				if (isset($cWettbewerb_kurzbz[0]['wettbewerb_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
+				{
+					$tmpWETTBEWERB=array();
+					for ($indZEILE=0;$indZEILE<count($selectWETTBEWERB);$indZEILE++)
+						$tmpWETTBEWERB[]=trim($selectWETTBEWERB[$indZEILE]['wettbewerb_kurzbz']);
+					$cWettbewerb_kurzbz=$tmpWETTBEWERB;
+					unset($tmpWETTBEWERB);	
+				}
+				elseif (isset($cWettbewerb_kurzbz['wettbewerb_kurzbz'])) // Check ob nicht kpl. Tablestruck in Array
+				{
+					$tmpWETTBEWERB=array();
+					$tmpWETTBEWERB[]=trim($selectWETTBEWERB['wettbewerb_kurzbz']);
+					$cWettbewerb_kurzbz=$tmpWETTBEWERB;
+					unset($tmpWETTBEWERB);	
+				}
+				$qry.=" AND UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz) in ('".strtoupper(implode("','",$cWettbewerb_kurzbz))."') ";	
 			}
-	    	$qry.="ORDER BY tbl_wettbewerbteam.rang;";	
-	   
-	   // Entfernen der Temporaeren Variablen aus dem Speicher
+	     	$qry.="ORDER BY tbl_wettbewerbteam.rang ;";	
 		if($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			$rows=array();
+			while($row = $this->db_fetch_array())
 			{
-				$this->result[]=$row;
+				$rows[]=$row;
 			}
-			return $this->result;
-		}
+			$this->setWettbewerbteam($rows);
+		}	
 		else
 		{
-			if (empty($this->errormsg))
-				$this->errormsg = 'Fehler beim lesen der Wettbewerbstypen';
+			$this->setError($this->db_last_error());
+
 			return false;
-		}	
-		return false;
+		}
+   		return $this->getWettbewerbteam();
        }
+} // Class komune_wettbewerbteam Ende 
 
-
-//-------------------------------------------------------------------------------------------------
-       function loadMaxRang($wettbewerb_kurzbz=null)
-       {
-		// Initialisierung	
-		$this->result=array();
-		$this->errormsg='';
-					  
-
-		if (!is_null($wettbewerb_kurzbz))
-			$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
-             
-    	$qry="";
-		$qry.="SELECT max(rang) as max FROM ".$this->schemaSQL.".tbl_teambenutzer  ";
-	   	$qry.=" WHERE rang > 0 ";
-		// Suche nach einem einzigen Wettbewerb
-		if (!is_array($this->wettbewerb_kurzbz) && !empty($this->wettbewerb_kurzbz) )
-		{
-			$qry.=" AND UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER(E'".$this->wettbewerb_kurzbz."') ";	
-		}
-		elseif (is_array($this->wettbewerb_kurzbz) && count($this->wettbewerb_kurzbz)>0 )
-		{
-			$qry.=" AND UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz) in (E'".strtoupper(implode("','",$this->wettbewerb_kurzbz))."') ";	
-		}
-
-exit($qry);
-
-	   // Entfernen der Temporaeren Variablen aus dem Speicher
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$this->result=$row->max;
-			}
-			return $this->result;
-		}
-		else
-		{
-			if (empty($this->errormsg))
-				$this->errormsg = 'Fehler beim lesen des letzten Range im Wettbewerb ';
-			return 0;
-		}	
-		return 0;
-       }
-
-	   
-} 
 ?>
