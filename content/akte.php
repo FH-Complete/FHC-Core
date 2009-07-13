@@ -24,16 +24,7 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/akte.class.php');
 
-//Hexcode in String umwandeln
-function hexstr($hex)
-{
-    $string="";
-    for ($i=0;$i<strlen($hex)-1;$i+=2)
-        $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-    return $string;
-}
-
-//Hex Dump aus der DB holen
+//base64 Dump aus der DB holen
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 {
 	$akte = new akte($_GET['id']);
@@ -41,7 +32,7 @@ if(isset($_GET['id']) && is_numeric($_GET['id']))
 	//Header fuer Bild schicken
 	header("Content-type: $akte->mimetype");
 	header('Content-Disposition: attachment; filename="'.$akte->titel.'"');
-	echo hexstr($akte->inhalt);
+	echo base64_decode($akte->inhalt);
 }
 else 
 	echo 'Unkown type';

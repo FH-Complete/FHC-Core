@@ -29,19 +29,11 @@ require_once('../include/akte.class.php');
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 echo "<html><body>";
-//wandelt einen String in HEX-Werte um
-function strhex($string)
-{
-    $hex="";
-    for ($i=0;$i<strlen($string);$i++)
-        $hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-    return $hex;
-}
 
 function resize($filename, $width, $height)
 {
 	$ext = explode('.',$_FILES['bild']['name']);
-    $ext = strtolower($ext[count($ext)-1]);
+    $ext = mb_strtolower($ext[count($ext)-1]);
 
 	// Hoehe und Breite neu berechnen
 	list($width_orig, $height_orig) = getimagesize($filename);
@@ -85,7 +77,7 @@ if(isset($_POST['submitbild']))
 	{
 		//Extension herausfiltern
     	$ext = explode('.',$_FILES['bild']['name']);
-        $ext = strtolower($ext[count($ext)-1]);
+        $ext = mb_strtolower($ext[count($ext)-1]);
 
         $width=101;
 		$height=130;
@@ -122,7 +114,7 @@ if(isset($_POST['submitbild']))
 			
 			$akte->dokument_kurzbz = 'Lichtbil';
 			$akte->person_id = $_GET['person_id'];
-			$akte->inhalt = strhex($content);
+			$akte->inhalt = base64_encode($content);
 			$akte->mimetype = "image/jpg";
 			$akte->erstelltam = date('Y-m-d H:i:s');
 			$akte->gedruckt = false;
@@ -148,13 +140,13 @@ if(isset($_POST['submitbild']))
 			//auslesen
 			$content = fread($fp, filesize($filename));
 			fclose($fp);
-			//in HEX-Werte umrechnen
-			$content = strhex($content);
+			//in base64 umrechnen
+			$content = base64_encode($content);
 
 			$person = new person($conn);
 			if($person->load($_GET['person_id']))
 			{
-				//HEX Wert in die Datenbank speichern
+				//base64 Wert in die Datenbank speichern
 				$person->foto = $content;
 				$person->new = false;				
 				if($person->save())

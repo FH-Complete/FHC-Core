@@ -21,14 +21,7 @@
  */
 // ---------------- Kommunen Standart Include Dateien einbinden
 echo "<html><body>";
-//wandelt einen String in HEX-Werte um
-function strhex($string)
-{
-    $hex="";
-    for ($i=0;$i<strlen($string);$i++)
-        $hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-    return $hex;
-}
+
 $contentOUTPUT='';
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
@@ -44,7 +37,7 @@ if(isset($_POST['submitbild']))
 		//in HEX-Werte umrechnen
 		$contentOUTPUT='';
 		$contentOUTPUT.="<p>Orig.Name :: ".$_FILES['bild']['name'] ."    Type :: ".$_FILES['bild']['type']."</p>";
-		$contentOUTPUT.='<textarea cols="80" rows="10" wrap="soft">'.strhex($content).'</textarea>';
+		$contentOUTPUT.='<textarea cols="80" rows="10" wrap="soft">'.base64_encode($content).'</textarea>';
 	}
 }
 

@@ -1233,7 +1233,7 @@ function kommune_funk_show_wettbewerbeinladungen_forderungstage($oWettbewerb)
 			if ($bTmpFehlerNummerGefunden==2) // matchbestaetigtamum mit matchdatumzeit
 			{
 				$showHTML.='Achtung! Das Spielergebnis wurde noch nicht eingetragen von <b '.$cTmpTeamPopUp1.'>'.$arrTempWettbewerbTermine[$iTmpZehler]["team_forderer"] .'</b>.
-				<br />Das Ergebnis zum Spieldatum '.$arrTempWettbewerbTermine[$iTmpZehler]["matchdatum"].' sollte spätestens vor '. ($arrTempWettbewerbTermine[$iTmpZehler]["matchdatumzeit_tag_diff"] - $arrTempWettbewerbTermine[$iTmpZehler]["forderungstage"]).' Tag(en) erfolgen.';
+				<br />Das Ergebnis zum Spieldatum '.$arrTempWettbewerbTermine[$iTmpZehler]["matchdatum"].' sollte spï¿½testens vor '. ($arrTempWettbewerbTermine[$iTmpZehler]["matchdatumzeit_tag_diff"] - $arrTempWettbewerbTermine[$iTmpZehler]["forderungstage"]).' Tag(en) erfolgen.';
 				$showHTML.='<br />Das <b>Ergebnis '.$arrTempWettbewerbTermine[$iTmpZehler]["ergebniss"].'</b> bitte <b>erfassen</b>! ';
 				$paramURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneEinladenTEAM.'&amp;match_id='.trim($arrTempWettbewerbTermine[$iTmpZehler]["match_id"]).'&amp;wbtyp_kurzbz=&amp;wettbewerb_kurzbz='.trim($arrTempWettbewerbTermine[$iTmpZehler]["wettbewerb_kurzbz"]).'&amp;team_forderer='.trim($arrTempWettbewerbTermine[$iTmpZehler]["team_forderer"]).'&amp;team_gefordert='.trim($arrTempWettbewerbTermine[$iTmpZehler]["team_gefordert"]);
 
@@ -2346,17 +2346,11 @@ function kommune_funk_create_url($workurl="",$oWettbewerb=array(),$spezialparame
 */
 function kommune_strhex($string)
 {
-    $hex="";
-    for ($i=0;$i<strlen($string);$i++)
-        $hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-    return $hex;
+   return base64_encode($string);
 }  
 function kommune_hexstr($hex)
 {
-    $string="";
-    for ($i=0;$i<strlen($hex)-1;$i+=2)
-        $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-    return $string;
+    return base64_decode($hex);
 }
 
 

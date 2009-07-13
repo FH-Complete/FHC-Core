@@ -87,14 +87,8 @@
 					$string = fread($fp, filesize($filename));
 					fclose($fp);
 					if (isset($fp)) unset($fp);
-					//in HEX-Werte umrechnen
-			    		$hex="";
-					for ($i=0;$i<strlen($string);$i++)
-					        $hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-					if (!empty($hex)) 
-					{
-						$_REQUEST["bild"]=$hex;
-					}	
+					
+					$_REQUEST["bild"]=base64_encode($string);
 				}	
 			}
 

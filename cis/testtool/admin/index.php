@@ -40,15 +40,6 @@ $PHP_SELF=$_SERVER['PHP_SELF'];
 
 session_start();
 
-//wandelt einen String in HEX-Werte um
-function strhex($string)
-{
-    $hex='';
-    for ($i=0;$i<mb_strlen($string,'UTF-8');$i++)
-        $hex.=(strlen(dechex(ord($string[$i])),'UTF-8')<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-    return $hex;
-}
-
 $user=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -137,8 +128,8 @@ if(isset($_POST['submitbild']))
 			//auslesen
 			$content = fread($fp, filesize($filename));
 			fclose($fp);
-			//in HEX-Werte umrechnen
-			$content = strhex($content);
+			//base64 codieren
+			$content = base64_encode($content);
 
 			$frage = new frage();
 			if($frage->getFrageSprache($_GET['frage_id'], $sprache))
@@ -176,8 +167,8 @@ if(isset($_POST['submitaudio']))
 			//auslesen
 			$content = fread($fp, filesize($filename));
 			fclose($fp);
-			//in HEX-Werte umrechnen
-			$content = strhex($content);
+			//base64 codieren
+			$content = base64_encode($content);
 
 			$frage = new frage();
 			if($frage->getFrageSprache($_GET['frage_id'], $sprache))
@@ -253,8 +244,8 @@ if(isset($_POST['submitvorschlag']))
 			//auslesen
 			$bildcontent = fread($fp, filesize($filename));
 			fclose($fp);
-			//in HEX-Werte umrechnen
-			$bildcontent = strhex($bildcontent);
+			//base64 codieren
+			$bildcontent = base64_encode($bildcontent);
 		}
 		else
 			echo "<b>Datei ist kein Bild!</b><br />";
@@ -276,8 +267,8 @@ if(isset($_POST['submitvorschlag']))
 			//auslesen
 			$audiocontent = fread($fp, filesize($filename));
 			fclose($fp);
-			//in HEX-Werte umrechnen
-			$audiocontent = strhex($audiocontent);
+			//base64 codieren
+			$audiocontent = base64_encode($audiocontent);
 		}
 		else
 			echo "<b>Datei ist kein Bild!</b><br />";
