@@ -7,7 +7,7 @@
 		$path=$_GET['path'];
 	else
 		$path='../';
-	require ($path.'cis/config.inc.php');
+	require ($path.'config/cis.config.inc.php');
 	//setcookie('stylesheet', DEFAULT_STYLE);
 	//Name des Stylesheets darf nur buchstaben von A-Z enthalten (ohne umlaute)
 	if (isset($_COOKIE['stylesheet']) && preg_match('/^[a-zA-Z]+$/', $_COOKIE['stylesheet']))
