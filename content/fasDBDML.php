@@ -343,7 +343,7 @@ if(!$error)
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
-			$errormsg = 'Keine Berechtigung'.$_POST['studiengang_kz_berecht'];
+			$errormsg = 'Keine Berechtigung';
 			$data = '';
 			$error = true;
 		}

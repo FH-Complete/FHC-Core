@@ -341,6 +341,8 @@ if(!@$db->db_query('SELECT oe_kurzbz FROM public.tbl_benutzerfunktion LIMIT 1;')
 			
 			DROP VIEW public.vw_benutzerfunktion;
 			
+			ALTER TABLE public.tbl_benutzerfunktion ALTER COLUMN oe_kurzbz SET NOT NULL;
+			
 			-- spalte loeschen
 			ALTER TABLE public.tbl_benutzerfunktion DROP COLUMN studiengang_kz;
 			";
