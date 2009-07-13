@@ -331,7 +331,7 @@ class lehrveranstaltung extends basis_db
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function validates()
+	public function validate()
 	{
 		//Laenge Pruefen
 		if(mb_strlen($this->bezeichnung)>128)

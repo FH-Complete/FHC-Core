@@ -173,8 +173,8 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 //Fachbereichskoordinatoren holen
 if($stg_kz!='')
 {
-	$where = "studiengang_kz='$stg_kz'";
-	$where2=$where;
+	$where = "oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz' LIMIT 1)";
+	$where2="studiengang_kz='$stg_kz'";
 	$tables='lehre.tbl_lehrveranstaltung';
 }
 else 
@@ -196,7 +196,7 @@ FROM
 	campus.vw_mitarbeiter JOIN
 	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND $where
 	 UNION
-	 SELECT koordinator as uid from $tables WHERE $where2) as a USING(uid) ORDER BY nachname, vorname";
+	 SELECT koordinator as uid FROM $tables WHERE $where2) as a USING(uid) ORDER BY nachname, vorname";
 
 $fbk = array();
 if($result = $db->db_query($qry))
