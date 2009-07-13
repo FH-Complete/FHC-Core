@@ -68,7 +68,7 @@ function showStartseite($oWettbewerb,$cTmpMenue='')
 */
 function showWettbewerbStatistik($oWettbewerb)
 {
-
+	$db = new basis_db();
 #exit(Test($oWettbewerb->WettbewerbTyp));		
 	$showHTML='';
 	if (!is_array($oWettbewerb->WettbewerbTyp))
@@ -93,9 +93,7 @@ function showWettbewerbStatistik($oWettbewerb)
 	if (!is_array($oWettbewerb->Wettbewerb))
 		return $showHTML;		
 
-	$Wettbewerb=new komune_wettbewerbteam($oWettbewerb->sqlCONN,'','',$oWettbewerb->wettbewerb_kurzbz);
-	$Wettbewerb->setEncodingSQL($oWettbewerb->clientENCODE);
-	$Wettbewerb->setSchemaKommuneSQL($oWettbewerb->sqlSCHEMA);
+	$Wettbewerb=new komune_wettbewerbteam('','',$oWettbewerb->wettbewerb_kurzbz);
 	// Laden alle Teams	
 	$Wettbewerb->InitWettbewerbteam();
 	if ($Wettbewerb->loadWettbewerbteam())
@@ -111,39 +109,49 @@ function showWettbewerbStatistik($oWettbewerb)
 			continue;
 
 		$cSchemaSQL=$Wettbewerb->getSchemaKommuneSQL();		
-    	$cTmpSQL="";
-		$cTmpSQL.="SELECT tbl_wettbewerbteam.wettbewerb_kurzbz,count(distinct tbl_wettbewerbteam.team_kurzbz) as count_team_kurzbz,max(rang) as max_range,max(punkte) as max_punkte FROM ".$oWettbewerb->sqlSCHEMA.".tbl_wettbewerbteam ";
-	   	$cTmpSQL.=" WHERE UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER(E'".trim($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"])."') ";	
-    	$cTmpSQL.=" group by tbl_wettbewerbteam.wettbewerb_kurzbz OFFSET 0 LIMIT 1 ;";	
+    	$qry="";
+		$qry.="SELECT tbl_wettbewerbteam.wettbewerb_kurzbz,count(distinct tbl_wettbewerbteam.team_kurzbz) as count_team_kurzbz,max(rang) as max_range,max(punkte) as max_punkte FROM ".$oWettbewerb->sqlSCHEMA.".tbl_wettbewerbteam ";
+	   	$qry.=" WHERE UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER(E'".trim($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"])."') ";	
+    	$qry.=" group by tbl_wettbewerbteam.wettbewerb_kurzbz OFFSET 0 LIMIT 1 ;";	
 		
 		$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']=array();
-       	$Wettbewerb->setResultSQL(null);
-	   	if (!$Wettbewerb->fetch_all($cTmpSQL)) 
-			$oWettbewerb->Error[]=$Wettbewerb->getError();
-		else	
-		   	$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']=$Wettbewerb->getResultSQL();
-
+		if($db->db_query($qry))
+		{
+			$rows=array();
+			while($row = $db->db_fetch_array())
+			{
+				$oWettbewerb->Wettbewerb[$iTmpZehler]['teams'][]=$row;
+			}
+		}	
+		else
+		{
+			$$oWettbewerb->Error[]= $db->db_last_error();
+			return false;
+		}		
 		if (isset($oWettbewerb->Wettbewerb[$iTmpZehler]['teams'][0]))
 		   	$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']=$oWettbewerb->Wettbewerb[$iTmpZehler]['teams'][0];
-			
-#$showHTML.=$cTmpSQL.Test($oWettbewerb->Wettbewerb[$iTmpZehler]['teams']);	
 
 		$cSchemaSQL=$Wettbewerb->getSchemaKommuneSQL();		
-	    	$cTmpSQL="";
-			$cTmpSQL.="SELECT * FROM ".$oWettbewerb->sqlSCHEMA.".tbl_wettbewerbteam ";
-		   	$cTmpSQL.=" WHERE UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER(E'".trim($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"])."') ";	
-		   	$cTmpSQL.=" AND ( tbl_wettbewerbteam.rang=1 or (tbl_wettbewerbteam.punkte>0 and tbl_wettbewerbteam.punkte=".(isset($oWettbewerb->Wettbewerb[$iTmpZehler]['teams']["punkte"])?$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']["punkte"]:0)." ))";	
-
-	    	$cTmpSQL.=" OFFSET 0 LIMIT 2 ;";	
+	    	$qry="";
+			$qry.="SELECT * FROM ".$oWettbewerb->sqlSCHEMA.".tbl_wettbewerbteam ";
+		   	$qry.=" WHERE UPPER(tbl_wettbewerbteam.wettbewerb_kurzbz)=UPPER(E'".trim($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"])."') ";	
+		   	$qry.=" AND ( tbl_wettbewerbteam.rang=1 or (tbl_wettbewerbteam.punkte>0 and tbl_wettbewerbteam.punkte=".(isset($oWettbewerb->Wettbewerb[$iTmpZehler]['teams']["punkte"])?$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']["punkte"]:0)." ))";	
+	    	$qry.=" OFFSET 0 LIMIT 2 ;";	
 		
 		$oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner']=array();
-       	$Wettbewerb->setResultSQL(null);
-	   	if (!$Wettbewerb->fetch_all($cTmpSQL)) 
-			$oWettbewerb->Error[]=$Wettbewerb->getError();
-		else	
-		   	$oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner']=$Wettbewerb->getResultSQL();
-
-#$showHTML.=$cTmpSQL.Test($oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner']);	
+		if($db->db_query($qry))
+		{
+			$rows=array();
+			while($row = $db->db_fetch_array())
+			{
+				$oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner'][]=$row;
+			}
+		}	
+		else
+		{
+			$$oWettbewerb->Error[]= $db->db_last_error();
+			return false;
+		}		
 
 		if (isset($oWettbewerb->Wettbewerb[$iTmpZehler]['teams']['max_punkte']) && $iTmpAktivste<$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']['max_punkte'])
 		{
@@ -151,10 +159,7 @@ function showWettbewerbStatistik($oWettbewerb)
 			$iTmpAktivsteTeam=($oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner'][0]['punkte']==$oWettbewerb->Wettbewerb[$iTmpZehler]['teams']['max_punkte']?$oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner'][0]:(isset($oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner'][1]['team_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['gewinner'][1]:array()));
 			$iTmpAktivste=array_merge($iTmpAktivste,$iTmpAktivsteTeam,$oWettbewerb->Wettbewerb[$iTmpZehler]);
 		}
-		
-#$showHTML.=$cTmpSQL.Test($iTmpAktivste);	
 	}
-#exit(Test($iTmpAktivsteTeam));
 
 	if (isset($Wettbewerb)) 
 		unset($Wettbewerb);	
@@ -169,9 +174,7 @@ function showWettbewerbStatistik($oWettbewerb)
 			$showHTML.='<th colspan="5" style="color:back;background-color:#C0C0C0;">der Aktivste in den Wettbewerben</th>';
 		$showHTML.='</tr>'; 
 
-
 	$cTmpFarbe=(isset($oWettbewerb->WettbewerbTyp[$iTmpZehler]["farbe"]) && !empty($oWettbewerb->WettbewerbTyp[$iTmpZehler]["farbe"])?$oWettbewerb->WettbewerbTyp[$iTmpZehler]["farbe"]:'transparent');
-	#$oWettbewerb->WettbewerbTyp[$iTmpZehler]["wbtyp_kurzbz"]=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]["wbtyp_kurzbz"]);
 
 	$cTmpFarbe=(isset($iTmpAktivste["farbe"]) && !empty($iTmpAktivste["farbe"])?$iTmpAktivste["farbe"]:'');
 
@@ -225,7 +228,6 @@ function showWettbewerbStatistik($oWettbewerb)
 		// Kennzeichen ob ein Record in tbl_wettbewerb angelegt wurde ist wbtyp_kurzbz 
 		if (empty($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"])) // wbtyp_kurzbz=(leer=keine wettbewerbe)
 		{
-#			$showHTML.='<tr><td style="background : White;" colspan="10">Es sind noch keine Gruppen verf&uuml;gbar!</td></tr>'; 
 			continue;
 		}
 		
@@ -244,8 +246,6 @@ function showWettbewerbStatistik($oWettbewerb)
 		
 		$cTmpTeamPopUpID2='sTeam2'.$iTmpZehler;
 		$cTmpTeamPopUp2=' onmouseover="show_layer(\''.$cTmpTeamPopUpID2.'\');" onmouseout="hide_layer(\''.$cTmpTeamPopUpID2.'\');" ';
-			
-				
 		
 		$showHTMLicon.='<div style="display:none;z-index:98;" id="'.$cTmpIconPopUpID.'">'.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]["icon_image"])?$oWettbewerb->Wettbewerb[$iTmpZehler]["icon_image"].'<br />':'').'</div>';
 		$showHTMLspiele.='<div style="display:none;z-index:99;" id="'.$cTmpSpielePopUpID.'">'.kommune_funk_show_wettbewerbteam_spiele($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"],'',$oWettbewerb).'</div>';

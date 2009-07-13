@@ -49,30 +49,25 @@ function showPyramide($oWettbewerb)
     		$showHTML.='</h1>';
 		// Wettbewerb PopUp
 		$showHTML.='<div id="'.$cTmpWettbewerbPopUpID.'" style="display:none;position: absolute;z-index:99;">';
-			if (isset($oWettbewerb->Wettbewerb) && is_array($oWettbewerb->Wettbewerb) && isset($oWettbewerb->Wettbewerb[0]))
-				$showHTML.=kommune_funk_popup_wettbewerb($oWettbewerb->Wettbewerb[0],$oWettbewerb,'pyramide');
+			$showHTML.=kommune_funk_popup_wettbewerb($oWettbewerb->Wettbewerb[0],$oWettbewerb,'pyramide');
 		$showHTML.='</div>';
 
 		// Moderator
-		$cTmpName='';
-		if (isset($oWettbewerb->Wettbewerb) && is_array($oWettbewerb->Wettbewerb) && isset($oWettbewerb->Wettbewerb[0]))
-		{
-			$cTmpName=$oWettbewerb->Wettbewerb[0]->uid;
-			$pers=kommune_funk_benutzerperson($oWettbewerb->Wettbewerb[0]->uid,$oWettbewerb);
-			if (isset($pers->nachname)) 
-				$cTmpName=$pers->langname;
-		}
-		if (empty($cTmpName))
-			$cTmpName=$oWettbewerb->userUID;
+		$cTmpName=$oWettbewerb->Wettbewerb[0]["uid"];
+		$pers=kommune_funk_benutzerperson($oWettbewerb->Wettbewerb[0]["uid"],$oWettbewerb);
+		if (isset($pers->nachname)) 
+			$cTmpName=$pers->langname;
+
 		$cTmpPersPopUpID='sPers';
 		$cTmpPersPopUp=' onmouseover="show_layer(\''.$cTmpPersPopUpID.'\');" onmouseout="hide_layer(\''.$cTmpPersPopUpID.'\');" ';
 			
-		$cTmpFarbe=(isset($oWettbewerb->Wettbewerb[0]->farbe) && !empty($oWettbewerb->Wettbewerb[0]->farbe)?' style="color:#'.$oWettbewerb->Wettbewerb[0]->farbe.';" ':'');
+		$cTmpFarbe=(isset($oWettbewerb->Wettbewerb[0]["farbe"]) && !empty($oWettbewerb->Wettbewerb[0]["farbe"])?' style="color:#'.$oWettbewerb->Wettbewerb[0]["farbe"].';" ':'');
 		$showHTML.='<h3><a '.$cTmpFarbe.' href="#" '.$cTmpPersPopUp.'>Moderator '.$cTmpName.'</a></h3>';
 			$showHTML.='<div id="'.$cTmpPersPopUpID.'" style="display:none;position: absolute;z-index:99;">';
-			if (isset($oWettbewerb->Wettbewerb) && is_array($oWettbewerb->Wettbewerb) && isset($oWettbewerb->Wettbewerb[0]))
-				$showHTML.=kommune_funk_popup_benutzer($oWettbewerb->Wettbewerb[0]->uid,$oWettbewerb);
+			$showHTML.=kommune_funk_popup_benutzer($oWettbewerb->Wettbewerb[0]["uid"],$oWettbewerb);
 	    	$showHTML.='</div>';
+
+
 	$showHTML.='</div>';
 	// Header  Ende
 

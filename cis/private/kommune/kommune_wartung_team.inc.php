@@ -311,8 +311,7 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 function showTeamWartung_Bildupload($oWettbewerb)
 {
      // Plausib der UploadDaten      
-   	if (isset($_POST['submitTeamLogo']) 
-	&& (isset($_FILES['TeamLogoBild']['tmp_name']) && !empty($_FILES['TeamLogoBild']['tmp_name'])) )
+   	if ((isset($_FILES['TeamLogoBild']['tmp_name']) && !empty($_FILES['TeamLogoBild']['tmp_name'])) )
 	{
 		$filename=$_FILES['TeamLogoBild']['tmp_name'];
 		if (!is_file($filename)) return '';
@@ -350,9 +349,7 @@ function showTeamWartung_Datenverarbeiten($oWettbewerb)
 		return $oWettbewerb->Error[]='Bitte Eingabe pr&uuml;fen (Kurzbezeichnung darf nicht <b>Leer</b> oder <b>"'.constEingabeFehlt.'"</b> sein! )';
 
 	// Datenwartung - Neuanlage,Aenderung
-	$WettbewerbTeam= new komune_wettbewerbteam($oWettbewerb->sqlCONN,'','','');
-   	$WettbewerbTeam->setEncodingSQL($oWettbewerb->clientENCODE);
-	$WettbewerbTeam->setSchemaSQL($oWettbewerb->sqlSCHEMA);
+	$WettbewerbTeam= new komune_wettbewerbteam('','','');
 	
 	$WettbewerbTeam->setTeam_kurzbz($oWettbewerb->team_kurzbz);
 	$WettbewerbTeam->setTeam_kurzbz_old($oWettbewerb->team_kurzbz_old);
@@ -360,6 +357,7 @@ function showTeamWartung_Datenverarbeiten($oWettbewerb)
 
 	// Request, und die Wettbewerbdaten als Array der Classe uebergeben 		
 	$arrTmpWettbewerbteam=array_merge($oWettbewerb->Wettbewerb[0],$_REQUEST);
+	
 	$WettbewerbTeam->setNewWettbewerbteam($arrTmpWettbewerbteam);
 #	$WettbewerbTeam->getNewWettbewerbteam();			
 

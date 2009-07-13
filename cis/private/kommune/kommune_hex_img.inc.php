@@ -25,17 +25,23 @@
 // um und gibt das ein Bild zurueck.
 // Aufruf mit <img src='kommune_hex_img.php?src=frage&frage_id=1
 
+function createIMGfromHEX($oWettbewerb)
+{
 // ---------------- Check DB ist Online, und eine Verbindung ist moeglich
     //Hex Dump Blank als Default
     $heximg ='';
 
-
+    $wbtyp_kurzbz = (isset($_REQUEST['wbtyp_kurzbz']) ? $_REQUEST['wbtyp_kurzbz'] : '');
+    $team_kurzbz = (isset($_REQUEST['team_kurzbz']) ? $_REQUEST['team_kurzbz'] : '');
+    $wettbewerb_kurzbz = (isset($_REQUEST['wettbewerb_kurzbz']) ? $_REQUEST['wettbewerb_kurzbz'] : '');
+	
     $personen_id = (isset($_REQUEST['src']) ? $_REQUEST['src'] : '');
     if (empty($personen_id)) $personen_id = (isset($_REQUEST['person']) ? $_REQUEST['person'] : '');
     if (empty($personen_id)) $personen_id = (isset($_REQUEST['personid']) ? $_REQUEST['personid'] : '');
     if (empty($personen_id)) $personen_id = (isset($_REQUEST['person_id']) ? $_REQUEST['person_id'] : '');
     $person_id=trim($personen_id);
 
+	
 	
      $selBILD=0;	
      if (isset($personen_id) && !empty($personen_id))
@@ -46,29 +52,43 @@
 			$oWettbewerb->PersonenBenutzer[$pers->uid]=$pers;
 		if (isset($pers->foto))
 			$heximg=$pers->foto;
+			
      }
-     elseif(isset($oWettbewerb->team_kurzbz) && !empty($oWettbewerb->team_kurzbz))
+     elseif(isset($team_kurzbz) && !empty($team_kurzbz))
      {
-	  // WettbewerbTeam Classe initialisieren
 		$selBILD=2;	 
-	   	$WettbewerbTeam= new komune_wettbewerbteam('',$oWettbewerb->team_kurzbz,$oWettbewerb->wettbewerb_kurzbz);
-		if ($WettbewerbTeam->loadWettbewerbteam())
-			$arrTempWettbewerbTeam=$WettbewerbTeam->result;
-    		else
-  			exit($WettbewerbTeam->errormsg);	
-		if (isset($arrTempWettbewerbTeam[0]->logo))	
-			$heximg=$arrTempWettbewerbTeam[0]->logo;
+		if (isset($oWettbewerb->TeamBenutzer[$team_kurzbz][0]['logo']))
+			$heximg=$oWettbewerb->TeamBenutzer[$team_kurzbz][0]['logo'];
+		else
+		{
+		  // WettbewerbTeam Classe initialisieren
+		   	$WettbewerbTeam= new komune_wettbewerbteam('',$oWettbewerb->team_kurzbz,$oWettbewerb->wettbewerb_kurzbz);
+			if ($WettbewerbTeam->loadWettbewerbteam())
+				$arrTempWettbewerbTeam=$WettbewerbTeam->getWettbewerbteam();
+    			else
+	  			exit($WettbewerbTeam->errormsg);	
+				
+			if (isset($arrTempWettbewerbTeam[0]['logo']))	
+				$heximg=$arrTempWettbewerbTeam[0]['logo'];
+		}		
      }
-     elseif(isset($oWettbewerb->wettbewerb_kurzbz) && !empty($oWettbewerb->wettbewerb_kurzbz))
+     elseif(isset($wettbewerb_kurzbz) && !empty($wettbewerb_kurzbz))
      {
 		$selBILD=3;	 
-		$Wettbewerb= new komune_wettbewerb($oWettbewerb->wbtyp_kurzbz,$oWettbewerb->wettbewerb_kurzbz);
-		if ($Wettbewerb->loadWettbewerb())
-			$arrTempWettbewerbTeam=$Wettbewerb->result;
+		if (isset($oWettbewerb->Wettbewerb[0]))
+			$heximg=$oWettbewerb->Wettbewerb[0]['icon'];
+		elseif (isset($oWettbewerb->Wettbewerb[$wettbewerb_kurzbz]))
+			$heximg=$oWettbewerb->Wettbewerb[$wettbewerb_kurzbz]['icon'];
 		else
-			exit($Wettbewerb->errormsg);
-		if (isset($arrTempWettbewerbTeam[0]->icon))
-			$heximg=$arrTempWettbewerbTeam[0]->icon;
+		{
+			$Wettbewerb= new komune_wettbewerb($oWettbewerb->wbtyp_kurzbz,$oWettbewerb->wettbewerb_kurzbz);
+			if ($Wettbewerb->loadWettbewerb())
+				$arrTempWettbewerbTeam=$Wettbewerb->getWettbewerb();
+			else
+				exit($Wettbewerb->getError());
+			if (isset($arrTempWettbewerbTeam[0]['icon']))
+				$heximg=$arrTempWettbewerbTeam[0]['icon'];
+		}				
      }
      else 
      {
@@ -78,8 +98,8 @@
 #exit($selBILD.Test($oWettbewerb));		 
      if (empty($heximg))
 	    $heximg ='4749463839611e000a0080ff00c0c0c000000021f90401000000002c000000001e000a0040020f848fa9cbed0fa39cb4da8bb3debc00003b';
-
    	@ob_end_clean();
    	header("Content-type: image/gif");
 	exit(kommune_hexstr($heximg));
-       
+}       
+?>
