@@ -27,17 +27,8 @@
   if (!$db = new basis_db())
   		die('Fehler beim Oeffnen der Datenbankverbindung');
 
-//Hexcode in String umwandeln
-function hexstr($hex)
-{
-    $string="";
-    for ($i=0;$i<strlen($hex)-1;$i+=2)
-        $string.=chr(hexdec($hex[$i].$hex[$i+1]));
-    return $string;
-}
-
 //default bild (ein weisser pixel)
-$cTmpHEX='ffd8ffe000104a46494600010101004800480000ffe100164578696600004d4d002a00000008000000000000fffe0017437265617465642077697468205468652047494d50ffdb0043000503040404030504040405050506070c08070707070f0b0b090c110f1212110f111113161c1713141a1511111821181a1d1d1f1f1f13172224221e241c1e1f1effdb0043010505050706070e08080e1e1411141e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1effc00011080001000103012200021101031101ffc4001500010100000000000000000000000000000008ffc40014100100000000000000000000000000000000ffc40014010100000000000000000000000000000000ffc40014110100000000000000000000000000000000ffda000c03010002110311003f00b2c007ffd9';
+$cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';
 //Hex Dump aus der DB holen
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 {
@@ -55,7 +46,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 		
 //die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
 //von pdfs kommen kann.
-$im = @imagecreatefromstring(hexstr($cTmpHEX));
+$im = @imagecreatefromstring(base64_decode($cTmpHEX));
 if($im!==false)
 {
 	@ob_clean();
