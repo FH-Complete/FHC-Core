@@ -49,9 +49,7 @@ function showTeamEinladung($oWettbewerb)
 	$showHTML='';
 	
 	// Wettbewerb-Teams
- 	$WettbewerbTeam= new komune_wettbewerbteam($oWettbewerb->sqlCONN,'','',$oWettbewerb->wettbewerb_kurzbz);
-  	$WettbewerbTeam->setEncodingSQL($oWettbewerb->clientENCODE);
-	$WettbewerbTeam->setSchemaKommuneSQL($oWettbewerb->sqlSCHEMA);	
+ 	$WettbewerbTeam= new komune_wettbewerbteam('','',$oWettbewerb->wettbewerb_kurzbz);
 
 	// Einladung AN
 	$WettbewerbTeam->InitWettbewerbteam();
@@ -72,25 +70,26 @@ function showTeamEinladung($oWettbewerb)
 		$oWettbewerb->Error[]=$WettbewerbTeam->getError();
 
 	if (isset($WettbewerbTeam)) unset($WettbewerbTeam);
-	
 
 	// -------------------------- Verarbeitung Request
 	// Submit Verarbeiten :: Check - Request - Datenverarbeitung
-    	$cTmpSubmitVerarbeitung = (isset($_REQUEST['einladen']) ? $_REQUEST['einladen']:'');
+
+   	$cTmpSubmitVerarbeitung = (isset($_REQUEST['einladen']) ? $_REQUEST['einladen']:'');
+		
+#	echo $cTmpSubmitVerarbeitung;		
+#	var_dump($_REQUEST);
+#	exit;			
+		
 	if ($cTmpSubmitVerarbeitung)
 		showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung);
-#	else
-#	{
-#		$WettbewerbTeam->setSwitchGewinner(0);
-#	}		
+
 	// -------------------------- HTML Anzeige 
 	// Header
 	if (empty($oWettbewerb->match_id))
 	    	$showHTML.='<h1 style="text-align:center;"> Wettbewerb-Forderung (Einladung) </h1>';
 	else
 	    	$showHTML.='<h1 style="text-align:center;"> Wettbewerb-Daten </h1>';
-
-
+			
 	// -------------------------- TEAM Information HTML Anzeige 
 	$showHTML.='<table summary="Anzeige der Spieler oder Team">';
 	$showHTML.='<tr>';
@@ -125,14 +124,9 @@ function showTeamEinladung($oWettbewerb)
 	// -------------------------- INPUT HTML Anzeige 
 	$showHTML.='<h3> bearbeiten aktuelles Match </h3>';
 	$showHTML.=showTeamEinladung_show($oWettbewerb);
+	
 	$showHTML.=kommune_funk_create_href(constKommuneAnzeigeDEFAULT,array(),array(),'<img  style="vertical-align:bottom;" alt="weiter" height="18" src="../../../skin/images/moreright.gif" border="0" />&nbsp;zur&nbsp;Startseite&nbsp;','&nbsp;zur&nbsp;Startseite&nbsp;');
 
-/*	
-	// -------------------------- STATUS HTML Anzeige 
-	$showHTML.='<h3> Matchliste </h3>';
-	$showStatus=true; // Alle Statusinformationen anzeigen
-	$showHTML.=kommune_funk_show_spielergebnis($oWettbewerb,$showStatus);	
-*/	
 	// Wettbewerbsinformation Ende
 	return $showHTML;
 
@@ -151,7 +145,10 @@ function showTeamEinladung($oWettbewerb)
 function showTeamEinladung_show($oWettbewerb)
 {
 	$showHTML='';
-	if (!isset($oWettbewerb->EigeneWettbewerbe[0]['team_kurzbz']))
+	
+	
+	if (!isset($oWettbewerb->EigeneWettbewerbe[0]['team_kurzbz'])
+	&& !isset($oWettbewerb->EinladungAnTeam[0]['team_kurzbz']) )
 		return $showHTML;
 
 	// Ermitteln Spieler / Team welche gerade Online die Daten bearbeiten
@@ -159,9 +156,7 @@ function showTeamEinladung_show($oWettbewerb)
 	$bTmpGeforderter=false;
 
 	// Wettbewerb-Teams
- 	$WettbewerbTeam= new komune_wettbewerbteam($oWettbewerb->sqlCONN,'','',$oWettbewerb->wettbewerb_kurzbz);
-  	$WettbewerbTeam->setEncodingSQL($oWettbewerb->clientENCODE);
-	$WettbewerbTeam->setSchemaKommuneSQL($oWettbewerb->sqlSCHEMA);	
+ 	$WettbewerbTeam= new komune_wettbewerbteam('','',$oWettbewerb->wettbewerb_kurzbz);
 
 	// Ermitteln welcher Wettbewer gerade Online ist : Check mit Forder,EInladung
 	$WettbewerbTeam->InitWettbewerbteam();
@@ -183,6 +178,7 @@ function showTeamEinladung_show($oWettbewerb)
 	$paramURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneEinladenTEAM.'&amp;team_kurzbz='.trim($oWettbewerb->team_kurzbz).'&amp;team_gefordert='.trim($oWettbewerb->team_kurzbz_einladung).'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz);
 	$showHTML.='<form action="'.$paramURL.'" enctype="multipart/form-data" method="post">';
 	$showHTML.='<fieldset>';
+
 
 	
 	// Match Ende
@@ -359,11 +355,10 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 	$showHTML='';
 	if ( !$cTmpSubmitVerarbeitung)
 		return $showHTML;	
-
-	$WettbewerbTeameinladen= new komune_wettbewerbeinladungen($oWettbewerb->sqlCONN,$oWettbewerb->match_id,$oWettbewerb->team_kurzbz,$oWettbewerb->team_kurzbz_einladung,$oWettbewerb->wettbewerb_kurzbz,'');
-	$WettbewerbTeameinladen->setEncodingSQL($oWettbewerb->clientENCODE);
-	$WettbewerbTeameinladen->setSchemaKommuneSQL($oWettbewerb->sqlSCHEMA);	
+	
 		
+	$WettbewerbTeameinladen= new komune_wettbewerbeinladungen($oWettbewerb->match_id,$oWettbewerb->team_kurzbz,$oWettbewerb->team_kurzbz_einladung,$oWettbewerb->wettbewerb_kurzbz,'');
+			
 	// Teil1 Foderung anlegen / aendern
 	if ($cTmpSubmitVerarbeitung==1) // Bestaetigen der Einladung
 	{
@@ -417,7 +412,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 
 			$paramURL=constKommuneParmSetWork.'='.constKommuneEinladenTEAM.'&amp;team_kurzbz='.trim($oWettbewerb->team_kurzbz_einladung).'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz);
 			$paramURL=''; // ohne Parameter
-			$cTmpURL=mb_ereg_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
+			$cTmpURL=str_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
 
 			$iTmpAnzahlTeam=1;
 			if (isset($oWettbewerb->Team[trim($oWettbewerb->team_kurzbz_einladung)][0]['team_kurzbz']))
@@ -442,10 +437,16 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 	if (empty($oWettbewerb->match_id)) // Ab Verarbeitungsteil 2 muss die MatchID dabei sein
 		return $oWettbewerb->Error[]="Bei der Verarbeitung ist ein Fehler aufgetreten. Die MatchID wurde nicht gefunden.";
 
+
+
+		
+		
 	if ($cTmpSubmitVerarbeitung==99) // Bestaetigen der Einladung
 	{
 			$bSwitchWork=true;		
 			$WettbewerbTeameinladen->InitWettbewerbeinladungen();	
+
+			$WettbewerbTeameinladen->setWettbewerb_kurzbz($oWettbewerb->wettbewerb_kurzbz);
 
 			$WettbewerbTeameinladen->setMatch_id($oWettbewerb->match_id);			
 
@@ -506,14 +507,19 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 	}
 	elseif ($cTmpSubmitVerarbeitung==2) // Bestaetigen der Einladung
 	{
+	
+	
 			$WettbewerbTeameinladen->InitWettbewerbeinladungen();	
+
+			$WettbewerbTeameinladen->setWettbewerb_kurzbz($oWettbewerb->wettbewerb_kurzbz);
 			$WettbewerbTeameinladen->setTeam_forderer($oWettbewerb->team_kurzbz);
 			$WettbewerbTeameinladen->setTeam_gefordert($oWettbewerb->team_kurzbz_einladung);
-						
 			$WettbewerbTeameinladen->setBestaetigtamum(Time());	
  			$WettbewerbTeameinladen->setBestaetigtvon($oWettbewerb->userUID);	
 			$WettbewerbTeameinladen->setMatch_id($oWettbewerb->match_id);			
 
+			
+			
 			if ($WettbewerbTeameinladen->saveWettbewerbeinladung())
 				$oWettbewerb->Einladung=$WettbewerbTeameinladen->getWettbewerbeinladung();
 			else
@@ -529,7 +535,10 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			if (isset($pers->langname)) 
 				$cTmpName=$pers->langname;
 				
+#var_dump($oWettbewerb->Einladung);				
+				
 			$cTmpName2=trim($oWettbewerb->Einladung[0]['gefordertvon']);
+			
 			$pers=kommune_funk_benutzerperson($cTmpName2,$oWettbewerb);
 			if (isset($pers->langname)) 
 				$cTmpName2=$pers->langname;				
@@ -549,10 +558,13 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 	if ($cTmpSubmitVerarbeitung==3) // Ergebnis eintragen Forderer
 	{
 
+			$WettbewerbTeameinladen->InitWettbewerbeinladungen();	
+
+			$WettbewerbTeameinladen->setWettbewerb_kurzbz($oWettbewerb->wettbewerb_kurzbz);
+
 	    	$cTmpTeam_sieger = (isset($_REQUEST['team_sieger']) ? $_REQUEST['team_sieger']:'');
    			$cTmpErgebniss = (isset($_REQUEST['ergebniss']) ? $_REQUEST['ergebniss']:'');
 		
-			$WettbewerbTeameinladen->InitWettbewerbeinladungen();	
 			$WettbewerbTeameinladen->setTeam_forderer($oWettbewerb->team_kurzbz);
 			$WettbewerbTeameinladen->setTeam_gefordert($oWettbewerb->team_kurzbz_einladung);
 			
@@ -579,7 +591,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 				
 			$paramURL=constKommuneParmSetWork.'='.constKommuneEinladenTEAM.'&amp;team_kurzbz='.trim($oWettbewerb->team_kurzbz_einladung).'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz);
 			$paramURL=''; // ohne Parameter
-			$cTmpURL=mb_ereg_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
+			$cTmpURL=str_replace($_SERVER["QUERY_STRING"],$paramURL,$_SERVER["HTTP_REFERER"]);
 			
 			$betreff='Das Ergebnis im Wettbewerb '.$oWettbewerb->wettbewerb_kurzbz;
 			
@@ -606,6 +618,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$bSwitchWork=true;		
 			$WettbewerbTeameinladen->InitWettbewerbeinladungen();	
 
+			$WettbewerbTeameinladen->setWettbewerb_kurzbz($oWettbewerb->wettbewerb_kurzbz);			
 			$WettbewerbTeameinladen->setTeam_forderer($oWettbewerb->team_kurzbz);
 			$WettbewerbTeameinladen->setTeam_gefordert($oWettbewerb->team_kurzbz_einladung);
 			$WettbewerbTeameinladen->setMatchbestaetigtamum(Time());	
@@ -668,7 +681,6 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungVonTeam[0]['uid'],$betreff,$text,$oWettbewerb->userUID,$oWettbewerb);
 			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->userUID,$betreff,$text,$oWettbewerb->EinladungVonTeam[0]['uid'],$oWettbewerb);
 			// Moderator Information
-	#???		$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Wettbewerb[0]['uid'],$betreff." [Moderatorinformtion]",$text,$oWettbewerb->EinladungVonTeam[0]['uid'],$oWettbewerb);
 			return true;
 		}
 	return false;	
