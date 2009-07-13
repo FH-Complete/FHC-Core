@@ -47,7 +47,27 @@
 	if(isset($_GET['short']))
 		$short = $_GET['short'];
 
-
+	if(isset($_GET['subdir']))
+		$subdir = $_GET['subdir'];
+	if(isset($_POST['overwrite']))
+		$overwrite = $_POST['overwrite'];
+	if(isset($_POST['create_dir']))
+		$create_dir = $_POST['create_dir'];
+	if(isset($_POST['new_dir_name_text']))
+		$new_dir_name_text = $_POST['new_dir_name_text'];
+	if(isset($_POST['rename_dir']))
+		$rename_dir = $_POST['rename_dir'];
+	if(isset($_POST['confirm_rename']))
+		$confirm_rename = $_POST['confirm_rename'];
+	if(isset($_POST['link_cut']))
+		$link_cut = $_POST['link_cut'];
+	if(isset($_POST['delete_dir']))
+		$delete_dir = $_POST['delete_dir'];
+	if(isset($_POST['rename_file']))
+		$rename_file = $_POST['rename_file'];
+	if(isset($_POST['delete_file']))
+		$delete_file = $_POST['delete_file'];
+	
 	$rechte = new benutzerberechtigung();
 
 	$rechte->getBerechtigungen($user);
@@ -115,6 +135,8 @@
 
 			return confirm("Wollen Sie die ausgewaehlten Verzeichnisse wirklich loeschen? Dieser Vorgang ist unwiderruflich!");
 		}
+		else
+			return true;
 	}
 
 	function ConfirmFile(handle)
@@ -125,6 +147,8 @@
 
 			return confirm("Wollen Sie die ausgewaehlten Dateien wirklich loeschen? Dieser Vorgang ist unwiderruflich!");
 		}
+		else
+			return true;
 	}
 	
 	function checkvz(id)
@@ -140,6 +164,8 @@
 			alert('Der Verzeichnisname darf kein "&" beinhalten');
 			return false;
 		}
+		
+		return true;
 	}
 </script>
 
@@ -571,29 +597,30 @@ A:hover {
 
 						  $numoffile = 5;
 
-						  if(isset($upload) && $upload == "Upload")
+						  if(isset($_POST['upload']) && $_POST['upload'] == "Upload")
 						  {
 						      for($i = 0; $i < $numoffile; $i++)
 							  {
 							  	  $file = "userfile_$i";
-
-								  if(isset($$file))
+								
+								  if(isset($_FILES[$file]))
 								  {
-								  	  $file_name = $file.'_name';
+								  	  $file_name = $_FILES[$file]['name'];
 
-								  	  if($$file_name != "")
+								  	  if($file_name != "")
 									  {
 										  if(isset($subdir) && $subdir != "")
 										  {
-										  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$subdir.'/'.$$file_name;
+										  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$subdir.'/'.$file_name;
 										  }
 										  else
 										  {
-										  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$$file_name;
+										  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$file_name;
 										  }
-
+										
 										  if(!file_exists($uploadfile))
 										  {
+										  	
 											  if(isset($subdir) && $subdir != "")
 											  {
 											  	  if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
@@ -604,7 +631,7 @@ A:hover {
 												  {
 												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
 													  {
-													  	 if(copy($$file, $uploadfile))
+													  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 													  	 {
 													  	 	 exec('chmod 644 "'.$uploadfile.'"');
 															 if($islector)
@@ -627,7 +654,7 @@ A:hover {
 											  {
 											  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
 												  {
-													  if(copy($$file, $uploadfile))
+													  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 													  {
 													  	  exec('chmod 644 "'.$uploadfile.'"');
 														  if($islector)
@@ -660,7 +687,7 @@ A:hover {
 													  {
 														  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
 														  {
-														  	   if(copy($$file, $uploadfile))
+														  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  	   {
 														  	   	   exec('chmod 644 "'.$uploadfile.'"');
 																   if($islector)
@@ -683,7 +710,7 @@ A:hover {
 												  {
 												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
 													  {
-														  if(copy($$file, $uploadfile))
+														  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  {
 														  	  exec('chmod 644 "'.$uploadfile.'"');
 															  if($islector)
@@ -999,9 +1026,10 @@ A:hover {
 								if($entry != "." && $entry != ".." && @is_dir($dest_dir->path.'/'.$entry))
 								{
 									$dir_empty = false;
-									$check_state = '_check_state_'.$dir_count;
+									if(isset($_POST['_check_state_'.$dir_count]))
+										$check_state = $_POST['_check_state_'.$dir_count];
 
-									if(isset($$check_state))
+									if(isset($check_state))
 									{
 										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_$dir_count\" checked>&nbsp;</font>";
 									}
@@ -1044,27 +1072,29 @@ A:hover {
 										}
 									}
 
-									$new_dir_name_ = "new_dir_name".$dir_count;
+									
+									if(isset($_POST["new_dir_name".$dir_count]))
+										$new_dir_name_ = $_POST["new_dir_name".$dir_count];
 
-									if(isset($rename_dir) && isset($$check_state))
+									if(isset($rename_dir) && isset($check_state))
 									{
 										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"text\" name=\"new_dir_name$dir_count\" id='dir_rename_text' value=\"$entry\">&nbsp;<input type=\"submit\" name=\"confirm_rename\" value=\"OK\" onclick=\"return checkvz('dir_rename_text')\"></font>";
 									}
-									else if(isset($confirm_rename) && isset($$check_state))
+									else if(isset($confirm_rename) && isset($check_state))
 									{
-										if(isset($$new_dir_name_) && $$new_dir_name_ != "")
+										if(isset($new_dir_name_) && $new_dir_name_ != "")
 										{
-											if(!@is_dir($dest_dir->path.'/'.$$new_dir_name_) && !@file_exists($dest_dir->path.'/'.$$new_dir_name_))
+											if(!@is_dir($dest_dir->path.'/'.$new_dir_name_) && !@file_exists($dest_dir->path.'/'.$new_dir_name_))
 											{
-												rename($dest_dir->path.'/'.$entry, $dest_dir->path.'/'.$$new_dir_name_);
+												rename($dest_dir->path.'/'.$entry, $dest_dir->path.'/'.$new_dir_name_);
 
 												$b_refresh_dir = true;
 
-												unset($$check_state);
+												unset($check_state);
 											}
 											else
 											{
-												unset($$check_state);
+												unset($check_state);
 
 												$b_refresh_dir = true;
 											}
@@ -1072,7 +1102,7 @@ A:hover {
 
 										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_dir\" value=\"Umbenennen\">&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"L&ouml;schen\" onClick=\"del=true;\"></font>";
 									}
-									else if(isset($delete_dir) && isset($$check_state))
+									else if(isset($delete_dir) && isset($check_state))
 									{
 										if(@is_dir($dest_dir->path.'/'.$entry))
 										{
@@ -1080,7 +1110,7 @@ A:hover {
 											exec('rm -r "'.$dest_dir->path.'/'.$entry.'"');
 										}
 
-										unset($$check_state);
+										unset($check_state);
 									}
 									else
 									{
@@ -1264,9 +1294,10 @@ A:hover {
 								if(!@is_dir($dest_dir->path.'/'.$entry) && substr($entry,0,1)!=".")
 								{
 									$null_file = false;
-									$check_state = '_check_state_'.$file_count;
+									if(isset($_POST['_check_state_'.$file_count]))
+										$check_state = $_POST['_check_state_'.$file_count];
 
-									if(isset($$check_state))
+									if(isset($check_state))
 									{
 										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_$file_count\" checked>&nbsp;</font>";
 									}
@@ -1281,25 +1312,26 @@ A:hover {
 									$link_path = str_replace("+","%20",$link_path);
 									echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"$link_path\" target=\"_blank\">&nbsp;<img src=\"../../../skin/images/file.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
 
-									$new_file_name_ = "new_file_name".$file_count;
+									if(isset($_POST['new_file_name'.$file_count]))
+										$new_file_name_ = $_POST['new_file_name'.$file_count];
 
-									if(isset($rename_file) && isset($$check_state))
+									if(isset($rename_file) && isset($check_state))
 									{
 										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"text\" name=\"new_file_name$file_count\" value=\"$entry\">&nbsp;<input type=\"submit\" name=\"confirm_rename\" value=\"OK\"></font>";
 									}
-									else if(isset($confirm_rename) && isset($$check_state))
+									else if(isset($confirm_rename) && isset($check_state))
 									{
-										if(isset($$new_file_name_) && $$new_file_name_ != "")
+										if(isset($new_file_name_) && $new_file_name_ != "")
 										{
-											if(!@file_exists($dest_dir->path.'/'.$$new_file_name_) && !@is_dir($dest_dir->path.'/'.$$new_file_name_))
+											if(!@file_exists($dest_dir->path.'/'.$new_file_name_) && !@is_dir($dest_dir->path.'/'.$new_file_name_))
 											{
-												if(!stristr($$new_file_name_, '.php') && !stristr($$new_file_name_, '.cgi') && !stristr($$new_file_name_, '.pl'))
+												if(!stristr($new_file_name_, '.php') && !stristr($new_file_name_, '.cgi') && !stristr($new_file_name_, '.pl'))
 												{
-													rename($dest_dir->path.'/'.$entry, $dest_dir->path.'/'.$$new_file_name_);
+													rename($dest_dir->path.'/'.$entry, $dest_dir->path.'/'.$new_file_name_);
 
 													$b_refresh_files = true;
 
-													unset($$check_state);
+													unset($check_state);
 												}
 												else
 												{
@@ -1308,7 +1340,7 @@ A:hover {
 											}
 											else
 											{
-												unset($$check_state);
+												unset($check_state);
 
 												$b_refresh_files = true;
 											}
@@ -1316,7 +1348,7 @@ A:hover {
 
 										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_file\" value=\"Umbenennen\">&nbsp;<input type=\"submit\" name=\"delete_file\" value=\"L&ouml;schen\" onClick=\"del=true;\"></font>";
 									}
-									else if(isset($delete_file) && isset($$check_state))
+									else if(isset($delete_file) && isset($check_state))
 									{
 										if(!@is_dir($dest_dir->path.'/'.$entry))
 										{
@@ -1324,7 +1356,7 @@ A:hover {
 											exec('rm -r "'.$dest_dir->path.'/'.$entry.'"');
 										}
 
-										unset($$check_state);
+										unset($check_state);
 									}
 									else
 									{

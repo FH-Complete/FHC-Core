@@ -73,6 +73,7 @@ function ConfirmFile(handle)
 	echo "<tr><td class='tdwidth10'>&nbsp;</td><td>";
 	if(isset($_POST['inhalt']))
 	{
+		$inhalt = $_POST['inhalt'];
 		if($inhalt!="____Ordnerinhalt____")
 		{
 			if(!mb_strstr($inhalt,'..'))
@@ -100,9 +101,10 @@ function ConfirmFile(handle)
 		}
 	}
 
-	if(isset($userfile))
+	if(isset($_POST['upload']))
 	{
-		if(is_uploaded_file($userfile))
+		echo "UPLOAD";
+		if(is_uploaded_file($_FILES['userfile']['tmp_name']))
 		{
 			$fn = $_FILES['userfile']['name']; //Original Dateiname
 
@@ -110,7 +112,7 @@ function ConfirmFile(handle)
 			   !stristr($fn,'.php4') && !stristr($fn, '.php5') &&
 			   !stristr($fn, '.cgi') && !stristr($fn, '.pl'))
 			{
-				if(move_uploaded_file($userfile,$openpath . $fn))
+				if(move_uploaded_file($_FILES['userfile']['tmp_name'],$openpath . $fn))
 					echo "<center>Das File wurde erfolgreich hochgeladen</center>";
 				else
 					echo "<center>Fehler beim Upload! Bitte Versuchen Sie es erneut</center>";
@@ -126,7 +128,7 @@ function ConfirmFile(handle)
 
 	echo "</tr></td>";
 
-	echo "<tr><td class='tdwidth10'>&nbsp;</td><td><form accept-charset="UTF-8" name=\"form1\"  method=\"POST\" action=\"semupload.php?lvid=".$lvid."\"  onSubmit=\"return ConfirmFile(this);\">";
+	echo "<tr><td class='tdwidth10'>&nbsp;</td><td><form accept-charset='UTF-8' name=\"form1\"  method=\"POST\" action=\"semupload.php?lvid=".$lvid."\"  onSubmit=\"return ConfirmFile(this);\">";
 	echo "<select name=\"inhalt\" size=5>";
 	echo "<option selected>____Ordnerinhalt____</option>";
 	//Inhalt des Semesterplan Ordners Auslesen
@@ -144,7 +146,7 @@ function ConfirmFile(handle)
 	echo "</form></td><td>";
 
     //FileAuswahlfeld
-	echo '<tr><td class="tdwidth10">&nbsp;</td><td><br><form accept-charset="UTF-8" enctype="multipart/form-data" method="POST" action="semupload.php?lvid='.$lvid.'">';
+	echo '<tr><td class="tdwidth10">&nbsp;</td><td><br><form enctype="multipart/form-data" method="POST" action="semupload.php?lvid='.$lvid.'">';
 	echo ' <input type="file" name="userfile" size="30">';
 	echo ' <input type="submit" name="upload" value="Upload">';
 	echo '</form></td><td>';
