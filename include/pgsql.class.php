@@ -122,5 +122,17 @@ class basis_db extends db
 		else
 			return pg_field_name($result, $i);
 	}
+
+	function db_free_result($result = null)
+	{
+		if(is_null($result))
+		{
+			return pg_free_result($this->db_result);
+		}
+		else 
+		{
+			return pg_free_result($result);
+		}			
+	}	
 }
 ?>
