@@ -485,6 +485,7 @@ if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diesen Bereich');
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
@@ -574,6 +575,7 @@ foreach($stsem_obj->studiensemester as $studiensemester)
 	$stsem_content.= "<OPTION value='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
 }
 $stsem_content.= "</SELECT>\n";
+
 
 if(!$rechte->isBerechtigt('admin',0) &&
    !$rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) &&
