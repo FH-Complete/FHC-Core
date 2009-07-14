@@ -155,21 +155,53 @@ class organisationseinheit extends basis_db
 	{
 		$childs[] = $oe_kurzbz;
 		
-		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz = '$oe_kurzbz'";
-		
-		if($this->db_query($qry))
+		$dbversion = $this->db_version();
+		if($dbversion['server']>=8.4)
 		{
-			$myresult = $this->db_result;
-			while($row = $this->db_fetch_object($myresult))
+			//ab PostgreSQL Version 8.4 wird die Rekursion von der DB aufgeloest
+			$qry = "
+			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+			(
+				SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+				WHERE oe_kurzbz='".addslashes($oe_kurzbz)."'
+				UNION ALL
+				SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+				WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+			)
+			SELECT oe_kurzbz
+			FROM oes
+			GROUP BY oe_kurzbz;";
+			if($myresult = $this->db_query($qry))
 			{
-				$childs = array_merge($childs, $this->getChilds($row->oe_kurzbz));
+				while($row = $this->db_fetch_object($myresult))
+				{
+					$childs[] = $row->oe_kurzbz;
+				}
 			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der Childs';
+			}
+			return $childs;
 		}
 		else 
-		{
-			$this->errormsg = 'Fehler beim Ermitteln der Childs';
+		{		
+			//vor 8.4 muss die Rekursion in PHP aufgeloest werden
+			$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz = '$oe_kurzbz'";
+		
+			if($myresult = $this->db_query($qry))
+			{
+				while($row = $this->db_fetch_object($myresult))
+				{
+					$childs = array_merge($childs, $this->getChilds($row->oe_kurzbz));
+				}
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der Childs';
+			}
+			return $childs;
 		}
-		return array_unique($childs);
 	}
 	
 	/**

@@ -356,7 +356,6 @@ class benutzerberechtigung extends basis_db
 				WHERE tbl_benutzerfunktion.uid='".addslashes($uid)."'
 				ORDER BY negativ DESC";
 					
-		
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg='Fehler beim Laden der Berechtigungen';
