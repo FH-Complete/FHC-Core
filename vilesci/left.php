@@ -86,7 +86,7 @@
 
 <div class="logo" style="background-color:#FFFFFF;">
 	<a href="index.html" target="_top">
-		<img border="0" src="../skin/images/Vilesci_klein.gif" alt="VileSci (FASonline)" title="VileSci" />
+		<img border="0" src="../skin/images/vilesci_logo.png" alt="VileSci (FASonline)" width="240px" title="VileSci" />
 	</a>
 </div>
 
