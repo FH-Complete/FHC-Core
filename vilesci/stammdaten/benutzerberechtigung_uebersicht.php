@@ -20,28 +20,29 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-			
-		require_once('../../include/functions.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
+	require_once('../../include/functions.inc.php');
     require_once('../../include/studiengang.class.php');
     
+   	if (!$db = new basis_db())
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
 	$htmlstr = "";
 	
-	$sql_query = "select distinct(tbl_benutzerberechtigung.uid), tbl_person.nachname, tbl_person.vorname from tbl_benutzerberechtigung, tbl_benutzer, tbl_person where tbl_benutzerberechtigung.uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id order by tbl_benutzerberechtigung.uid";
+	$sql_query = "SELECT distinct(tbl_benutzerrolle.uid), tbl_person.nachname, tbl_person.vorname 
+				  FROM system.tbl_benutzerrolle, public.tbl_benutzer, public.tbl_person 
+				  WHERE tbl_benutzerrolle.uid = tbl_benutzer.uid 
+				  	AND tbl_benutzer.person_id = tbl_person.person_id 
+				  ORDER BY tbl_benutzerrolle.uid";
 	
     if(!$erg=$db->db_query($sql_query))
 	{
-		$htmlstr='Fehler beim laden der Berechtigungen';
+		$htmlstr='Fehler beim Laden der Berechtigungen';
 	}
 	
 	else
 	{
-		//$htmlstr = "<table class='liste sortable'>\n";
+		$htmlstr .= "<div style='float:left'><a href='berechtigungrolle.php' target='main'>Rollen Administrieren</a></div>";
 		$htmlstr .= "<div style='text-align:right'>";
 		$htmlstr .= "<form name='neuform' action='benutzerberechtigung_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
 		$htmlstr .= "</div>";
@@ -67,7 +68,7 @@
 ?>
 <html>
 <head>
-<title>Studieng&auml;nge Uebersicht</title>
+<title>Berechtigungen Uebersicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">

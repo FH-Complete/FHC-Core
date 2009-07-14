@@ -276,6 +276,8 @@ if(!@$db->db_query('SELECT * FROM system.tbl_berechtigung LIMIT 1;'))
 			GRANT SELECT ON system.tbl_rolle TO GROUP ".DB_CIS_USER_GROUP.";
 			GRANT SELECT ON system.tbl_rolleberechtigung TO GROUP ".DB_CIS_USER_GROUP.";
 			
+			GRANT SELECT, UPDATE ON system.tbl_benutzerrolle_benutzerberechtigung_id_seq TO GROUP ".DB_FAS_USER_GROUP.";
+			GRANT SELECT, UPDATE ON system.tbl_benutzerrolle_benutzerberechtigung_id_seq TO GROUP ".DB_CIS_USER_GROUP.";
 			
 			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_benutzerrolle TO GROUP ".DB_FAS_USER_GROUP.";
 			GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_berechtigung TO GROUP ".DB_FAS_USER_GROUP.";
