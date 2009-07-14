@@ -477,8 +477,8 @@ function StudentAbschlusspruefungSpeichern()
 	req.add('abschlussbeurteilung_kurzbz', abschlussbeurteilung_kurzbz);
 	req.add('notekommpruef', notekommpruef);
 	req.add('akadgrad_id', akadgrad_id);
-	req.add('datum', datum);
-	req.add('sponsion', sponsion);
+	req.add('datum', ConvertDateToISO(datum));
+	req.add('sponsion', ConvertDateToISO(sponsion));
 	req.add('pruefungstyp_kurzbz', pruefungstyp_kurzbz);
 	req.add('anmerkung', anmerkung);
 	req.add('abschlusspruefung_id', abschlusspruefung_id);

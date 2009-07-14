@@ -21,11 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -37,6 +33,8 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/log.class.php');
 require_once('../../include/mail.class.php');
 
+if (!$db = new basis_db())
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user = get_uid();
 
@@ -393,6 +391,7 @@ foreach ($preinteressent->result as $row)
 		}
 	}
 	echo '</td>';
+	
 	//Status
 	$status='';
 	$prestudent = new prestudent();
@@ -409,6 +408,7 @@ foreach ($preinteressent->result as $row)
 	}
 	if($status=='')
 		$status='Preinteressent';
+	
 	echo "<td>$status</td>";
 	
 	//Zuordnungen laden und freigegebene Eintraege farblich markieren

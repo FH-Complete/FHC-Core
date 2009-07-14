@@ -3734,7 +3734,7 @@ function StudentPruefungDetailSpeichern()
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
 	req.add('pruefungstyp_kurzbz', pruefungstyp_kurzbz);
 	req.add('note', note);
-	req.add('datum', datum);
+	req.add('datum', ConvertDateToISO(datum));
 	req.add('anmerkung', anmerkung);
 	req.add('neu', neu);
 	req.add('pruefung_id', pruefung_id);

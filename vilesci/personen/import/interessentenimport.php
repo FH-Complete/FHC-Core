@@ -547,7 +547,7 @@ if(isset($_POST['save']))
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
 		$person->geschlecht = $geschlecht;
-		$person->gebdatum = $geburtsdatum;
+		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
 		$person->geburtsnation = 'A';
 		$person->staatsbuergerschaft = 'A';
 		$person->aktiv = true;

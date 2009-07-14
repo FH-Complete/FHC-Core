@@ -313,8 +313,8 @@ function setOrtData()
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-//if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
-//	die('Sie haben keine Berechtigung fuer diese Seite');
+if(!$rechte->isBerechtigt('admin', null, 'suid') && !$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $where = '';
 $error = false;
@@ -402,7 +402,7 @@ if(isset($_POST['save']))
 		$person->vorname = $vorname;
 		$person->titelpost = $titelpost;
 		$person->geschlecht = $geschlecht;
-		$person->gebdatum = $geburtsdatum;
+		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
 		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;
