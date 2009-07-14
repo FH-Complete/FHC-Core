@@ -133,5 +133,10 @@ class basis_db extends db
 			return pg_free_result($result);
 		}			
 	}	
+	
+	function db_version()
+	{
+		return pg_version(basis_db::$db_conn);
+	}
 }
 ?>

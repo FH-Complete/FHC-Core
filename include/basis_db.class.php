@@ -24,6 +24,7 @@ abstract class db extends basis
 	abstract function db_affected_rows($result=null);
 	abstract function db_last_error();
 	abstract function db_free_result($result=null);	
+	abstract function db_version();
 }
 
 require_once(DB_SYSTEM.'.class.php');
