@@ -527,11 +527,11 @@ function StudentProjektarbeitSpeichern()
 	req.add('firma_id', firma_id);
 	req.add('note', note);
 	req.add('punkte', punkte);
-	req.add('beginn', beginn);
-	req.add('ende', ende);
+	req.add('beginn', ConvertDateToISO(beginn));
+	req.add('ende', ConvertDateToISO(ende));
 	req.add('faktor', faktor);
 	req.add('freigegeben', freigegeben);
-	req.add('gesperrtbis', gesperrtbis);
+	req.add('gesperrtbis', ConvertDateToISO(gesperrtbis));
 	req.add('stundensatz', stundensatz);
 	req.add('gesamtstunden', gesamtstunden);
 	req.add('themenbereich', themenbereich);

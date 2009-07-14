@@ -152,7 +152,7 @@ if(isset($_POST['save']))
 		$person->vorname = $vorname;
 		$person->titelpost = $titelpost;
 		$person->geschlecht = $geschlecht;
-		$person->gebdatum = $geburtsdatum;
+		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
 		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;

@@ -795,7 +795,7 @@ function MitarbeiterSave()
 	req.add('vorname', vorname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
-	req.add('geburtsdatum', geburtsdatum);
+	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
 	req.add('geburtsort', geburtsort);
 	req.add('geburtszeit', geburtszeit);
 	req.add('anmerkungen', anmerkungen);
@@ -1167,8 +1167,8 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	req.add('hauptberufcode', hauptberufcode);
 	req.add('hauptberuflich', hauptberuflich);
 	req.add('habilitation', habilitation);
-	req.add('beginn', beginn);
-	req.add('ende', ende);
+	req.add('beginn', ConvertDateToISO(beginn));
+	req.add('ende', ConvertDateToISO(ende));
 	req.add('vertragsstunden', vertragsstunden);
 
 	var response = req.executePOST();
@@ -1613,8 +1613,8 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	req.add('studiengang_kz_old', studiengang_kz_old);
 	req.add('besqualcode', besqualcode);
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
-	req.add('beginn', beginn);
-	req.add('ende', ende);
+	req.add('beginn', ConvertDateToISO(beginn));
+	req.add('ende', ConvertDateToISO(ende));
 
 	var response = req.executePOST();
 
