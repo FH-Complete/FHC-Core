@@ -21,8 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-			
+	require_once('../../config/vilesci.config.inc.php');		
 	require_once('../../include/globals.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
@@ -33,44 +32,37 @@
 	require_once('../../include/person.class.php');
 	require_once('../../include/benutzer.class.php');
 	
+	$user = get_uid();
 
-	$reloadstr = "";  // neuladen der liste im oberen frame
-	$htmlstr = "";
-	$errorstr = ""; //fehler beim insert
-	$sel = "";
-	$chk = "";
-	$fb_arr = array();
-	$sg_arr = array();
-	$b_arr = array();
+	$reloadstr = '';  // neuladen der liste im oberen frame
+	$htmlstr = '';
+	$errorstr = ''; //fehler beim insert
+	$sel = '';
+	$chk = '';
+	$oe_arr = array();
+	$rolle_arr = array();
+	$berechtigung_arr = array();
 	$st_arr = array();
 	
-	$benutzerberechtigung_id = "";
-	$art = "";
-	$fachbereich_kurzbz = "";
-	$studiengang_kz ="";
-	$studiengang_kurzbz = "";
-	$berechtigung_kurzbz = "";
-	$uid = "";
-	$studiensemester_kz = "";
-	$start = "";
-	$ende = "";
+	$benutzerberechtigung_id = '';
+	$art = '';
+	$oe_kurzbz = '';
+	$studiengang_kurzbz = '';
+	$berechtigung_kurzbz = '';
+	$uid = '';
+	$studiensemester_kz = '';
+	$start = '';
+	$ende = '';
 	$neu = false;
+	$negativ = false;
 
-	if(isset($_POST["del"]))
+	if(isset($_POST['del']))
 	{
-		$benutzerberechtigung_id = $_POST["benutzerberechtigung_id"];
-		$art = $_POST["art"];
-		$fachbereich_kurzbz = $_POST["fachbereich_kurzbz"];
-		$studiengang_kz = $_POST["studiengang_kz"];
-		$berechtigung_kurzbz = $_POST["berechtigung_kurzbz"];
-		$uid = $_POST["uid"];
-		$studiensemester_kurzbz = $_POST["studiensemester_kurzbz"];
-		$start = $_POST["start"];
-		$ende = $_POST["ende"];
+		$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
 		
 		$ber = new benutzerberechtigung();
 		if(!$ber->delete($benutzerberechtigung_id))
-			$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
+			$errorstr .= 'Datensatz konnte nicht gel&ouml;scht werden!';
 		
 		$reloadstr .= "<script type='text/javascript'>\n";
 		$reloadstr .= "	parent.uebersicht.location.href='benutzerberechtigung_uebersicht.php';";
@@ -78,37 +70,52 @@
 
 	}
 	
-	if(isset($_POST["schick"]))
+	if(isset($_POST['schick']))
 	{
-		$benutzerberechtigung_id = $_POST["benutzerberechtigung_id"];
-		$art = $_POST["art"];
-		$fachbereich_kurzbz = $_POST["fachbereich_kurzbz"];
-		$studiengang_kz = $_POST["studiengang_kz"];
-		$berechtigung_kurzbz = $_POST["berechtigung_kurzbz"];
-		$uid = $_POST["uid"];
-		$studiensemester_kurzbz = $_POST["studiensemester_kurzbz"];
-		$start = $_POST["start"];
-		$ende = $_POST["ende"];
+		$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
+		$art = $_POST['art'];
+		$oe_kurzbz = $_POST['oe_kurzbz'];
+		$berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
+		$rolle_kurzbz = $_POST['rolle_kurzbz'];
+		$uid = $_POST['uid'];
+		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+		$start = $_POST['start'];
+		$ende = $_POST['ende'];
 		
 		$ber = new benutzerberechtigung();
-		if (isset($_POST["neu"]))
+		if (isset($_POST['neu']))
+		{
+			$ber->insertamum=date('Y-m-d H:i:s');
+			$ber->insertvon = $user;
 			$ber->new = true;
+		}
+		else 
+		{
+			if(!$ber->load($benutzerberechtigung_id))
+				die('Fehler beim Laden der Berechtigung');
+		}
+		if (isset($_POST['negativ']))
+			$ber->negativ = true;
+		else 
+			$ber->negativ = false;
 		
 		$ber->benutzerberechtigung_id = $benutzerberechtigung_id;
 		$ber->art = $art;
-		$ber->fachbereich_kurzbz = $fachbereich_kurzbz;
-		$ber->studiengang_kz = $studiengang_kz;
+		$ber->oe_kurzbz = $oe_kurzbz;
 		$ber->berechtigung_kurzbz = $berechtigung_kurzbz;
+		$ber->rolle_kurzbz = $rolle_kurzbz;
 		$ber->uid = $uid;
 		$ber->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$ber->start = $start;
 		$ber->ende = $ende;
+		$ber->updateamum = date('Y-m-d H:i:s');
+		$ber->updatevon = $user;
 		
 		if(!$ber->save()){
 			if (!$ber->new)
-				$errorstr .= "Datensatz konnte nicht upgedatet werden!";
+				$errorstr .= "Datensatz konnte nicht upgedatet werden!".$ber->errormsg;
 			else
-				$errorstr .= "Datensatz konnte nicht gespeichert werden!";
+				$errorstr .= "Datensatz konnte nicht gespeichert werden!".$ber->errormsg;
 		}
 		if ($ber->new)
 		{
@@ -118,22 +125,19 @@
 		}
 	}
 	
-	if (!$fb = new fachbereich())
-			die($fb->errormsg);
-			
-	$fb->getAll();
-	foreach($fb->result as $fachbereich)
-	{
-		$fb_arr[] = $fachbereich->fachbereich_kurzbz;
-	}
-
 	if (!$b = new berechtigung())
 			die($b->errormsg);
 			
 	$b->getRollen();
 	foreach($b->result as $berechtigung)
 	{
-		$b_arr[] = $berechtigung->berechtigung_kurzbz;
+		$rolle_arr[] = $berechtigung->rolle_kurzbz;
+	}
+	
+	$b->getBerechtigungen();
+	foreach($b->result as $berechtigung)
+	{
+		$berechtigung_arr[] = $berechtigung->berechtigung_kurzbz;
 	}
 	
 	$st = new studiensemester();
@@ -143,13 +147,12 @@
 		$st_arr[] = $studiensemester->studiensemester_kurzbz;
 	}
 	
-	$sg = new studiengang();
-	$sg->getAll('kurzbzlang', false);
+	$oe = new organisationseinheit();
+	$oe->getAll();
 		
-	
-	if (isset($_REQUEST["uid"]))
+	if (isset($_REQUEST['uid']))
 	{
-		$uid = $_REQUEST["uid"];
+		$uid = $_REQUEST['uid'];
 		
 		$ben = new benutzer();
 		if (!$ben->load($uid))
@@ -157,12 +160,12 @@
 		else
 		{
 			$rights = new benutzerberechtigung();
-			$rights->getberechtigungen($uid,$all=true);
+			$rights->loadBenutzerRollen($uid);
 	
 			$htmlstr .= "<br><div class='kopf'>Berechtigungen <b>".$uid."</b></div>\n";
 			$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 			$htmlstr .= "<tr></tr>\n";
-			$htmlstr .= "<tr><td>Kurzbz</td><td>Art</td><td>Studiengang</td><td>Fachbereich</td><td>Semester</td><td>Start</td><td>Ende</td><td></td><td></td><td></td></tr>\n";
+			$htmlstr .= "<tr><td>Rolle</td><td>Berechtigung</td><td>Art</td><td>Organisationseinheit</td><td>Semester</td><td>Neg</td><td>Start</td><td>Ende</td><td></td><td></td><td></td></tr>\n";
 			foreach($rights->berechtigungen as $b)
 			{
 				$htmlstr .= "<form action='benutzerberechtigung_details.php' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";
@@ -170,46 +173,50 @@
 				$htmlstr .= "<input type='hidden' name='uid' value='".$b->uid."'>\n";
 				$htmlstr .= "	<tr id='".$b->benutzerberechtigung_id."'>\n";
 				
-				$htmlstr .= "		<td><select name='berechtigung_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
+				//Rolle
+				$htmlstr .= "		<td><select name='rolle_kurzbz' id='rolle_kurzbz_$b->benutzerberechtigung_id' onchange='markier(\"".$b->benutzerberechtigung_id."\"); setnull(\"berechtigung_kurzbz_$b->benutzerberechtigung_id\");'>\n";
 				$htmlstr .= "			<option value=''></option>\n";
-				for ($i = 0; $i < sizeof($b_arr); $i++)
+				for ($i = 0; $i < sizeof($rolle_arr); $i++)
 				{
-					if ($b->berechtigung_kurzbz == $b_arr[$i])
+					if ($b->rolle_kurzbz == $rolle_arr[$i])
 						$sel = " selected";
 					else
 						$sel = "";
-					$htmlstr .= "				<option value='".$b_arr[$i]."' ".$sel.">".$b_arr[$i]."</option>";
+					$htmlstr .= "				<option value='".$rolle_arr[$i]."' ".$sel.">".$rolle_arr[$i]."</option>";
 				}
 				$htmlstr .= "		</select></td>\n";
 				
+				//Berechtigung
+				$htmlstr .= "		<td><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_$b->benutzerberechtigung_id' onchange='markier(\"".$b->benutzerberechtigung_id."\"); setnull(\"rolle_kurzbz_$b->benutzerberechtigung_id\");''>\n";
+				$htmlstr .= "			<option value=''></option>\n";
+				for ($i = 0; $i < sizeof($berechtigung_arr); $i++)
+				{
+					if ($b->berechtigung_kurzbz == $berechtigung_arr[$i])
+						$sel = " selected";
+					else
+						$sel = "";
+					$htmlstr .= "				<option value='".$berechtigung_arr[$i]."' ".$sel.">".$berechtigung_arr[$i]."</option>";
+				}
+				$htmlstr .= "		</select></td>\n";
+				
+				//Art
 				$htmlstr .= "		<td><input type='text' name='art' value='".$b->art."' size='5' maxlength='5' onchange='markier(\"".$b->benutzerberechtigung_id."\")'></td>\n";
 				
-				$htmlstr .= "		<td><select name='studiengang_kz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
+				//Organisationseinheit
+				$htmlstr .= "		<td><select name='oe_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
 				$htmlstr .= "			<option value=''></option>\n";
 	
-				foreach ($sg->result as $sgkey)
+				foreach ($oe->result as $oekey)
 				{
-					if ($b->studiengang_kz == $sgkey->studiengang_kz && $b->studiengang_kz != null)
+					if ($b->oe_kurzbz == $oekey->oe_kurzbz && $b->oe_kurzbz != null)
 						$sel = " selected";
 					else
 						$sel = "";
-					$htmlstr .= "				<option value='".$sgkey->studiengang_kz."' ".$sel.">".$sg->kuerzel_arr[$sgkey->studiengang_kz]." (".$sgkey->kurzbzlang.")</option>";
+					$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$sel.">".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
 				}
 				$htmlstr .= "		</select></td>\n";
 				
-				
-				$htmlstr .= "		<td><select name='fachbereich_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
-				$htmlstr .= "			<option value=''></option>\n";
-				for ($i = 0; $i < sizeof($fb_arr); $i++)
-				{
-					if ($b->fachbereich_kurzbz == $fb_arr[$i])
-						$sel = " selected";
-					else
-						$sel = "";
-					$htmlstr .= "				<option value='".$fb_arr[$i]."' ".$sel.">".$fb_arr[$i]."</option>";
-				}
-				$htmlstr .= "		</select></td>\n";
-				
+				//Studiensemester	
 				$htmlstr .= "		<td><select name='studiensemester_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
 				$htmlstr .= "			<option value=''></option>\n";
 				for ($i = 0; $i < sizeof($st_arr); $i++)
@@ -222,12 +229,13 @@
 				}
 				$htmlstr .= "		</select></td>\n";
 				
+				
+				$htmlstr .= "		<td><input type='checkbox' name='negativ' ".($b->negativ?'checked="checked"':'')." onchange='markier(\"".$b->benutzerberechtigung_id."\")'></td>\n";				
 				$htmlstr .= "		<td><input type='text' name='start' value='".$b->start."' size='10' maxlength='10' onchange='markier(\"".$b->benutzerberechtigung_id."\")'></td>\n";
 				$htmlstr .= "		<td><input type='text' name='ende' value='".$b->ende."' size='10' maxlength='10' onchange='markier(\"".$b->benutzerberechtigung_id."\")'></td>\n";
 				
 				$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
 				$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen'></td>";
-				$htmlstr .= "		<td><input type='reset' name='reset' value='C' onmouseup='unmarkier(\"".$b->benutzerberechtigung_id."\")'></td>";
 				$htmlstr .= "	</tr>\n";
 				$htmlstr .= "</form>\n";
 		
@@ -239,38 +247,42 @@
 			$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 			$htmlstr .= "	<tr id='neu'>\n";
 			
-			$htmlstr .= "		<td><select name='berechtigung_kurzbz' onchange='markier(\"neu\")'>\n";
+			//Rolle
+			$htmlstr .= "		<td><select name='rolle_kurzbz' id='rolle_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"berechtigung_kurzbz_neu\");'>\n";
 			$htmlstr .= "			<option value=''></option>\n";
-			for ($i = 0; $i < sizeof($b_arr); $i++)
+			for ($i = 0; $i < sizeof($rolle_arr); $i++)
 			{
 				
 				$sel = "";
-				$htmlstr .= "				<option value='".$b_arr[$i]."' ".$sel.">".$b_arr[$i]."</option>";
+				$htmlstr .= "				<option value='".$rolle_arr[$i]."' ".$sel.">".$rolle_arr[$i]."</option>";
 			}
 			$htmlstr .= "		</select></td>\n";
 			
+			//Berechtigung_kurzbz
+			$htmlstr .= "		<td><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"rolle_kurzbz_neu\");'>\n";
+			$htmlstr .= "			<option value=''></option>\n";
+			for ($i = 0; $i < sizeof($berechtigung_arr); $i++)
+			{
+				$sel = "";
+				$htmlstr .= "				<option value='".$berechtigung_arr[$i]."' ".$sel.">".$berechtigung_arr[$i]."</option>";
+			}
+			$htmlstr .= "		</select></td>\n";
+			
+			//Art
 			$htmlstr .= "		<td><input type='text' name='art' value='' size='5' maxlength='5' onchange='markier(\"neu\")'></td>\n";
 			
-			$htmlstr .= "		<td><select name='studiengang_kz' onchange='markier(\"neu\")'>\n";
+			//Organisationseinheit
+			$htmlstr .= "		<td><select name='oe_kurzbz' onchange='markier(\"neu\")'>\n";
 			$htmlstr .= "			<option value=''></option>\n";
 			
-			foreach ($sg->result as $sgkey)
+			foreach ($oe->result as $oekey)
 			{
 				$sel = "";
-				$htmlstr .= "				<option value='".$sgkey->studiengang_kz."' ".$sel.">".$sg->kuerzel_arr[$sgkey->studiengang_kz]." (".$sgkey->kurzbzlang.")</option>";
+				$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$sel.">".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
 			}
 			$htmlstr .= "		</select></td>\n";
 			
-			
-			$htmlstr .= "		<td><select name='fachbereich_kurzbz' onchange='markier(\"neu\")'>\n";
-			$htmlstr .= "			<option value=''></option>\n";
-			for ($i = 0; $i < sizeof($fb_arr); $i++)
-			{
-				$sel = "";
-				$htmlstr .= "				<option value='".$fb_arr[$i]."' ".$sel.">".$fb_arr[$i]."</option>";
-			}
-			$htmlstr .= "		</select></td>\n";
-			
+			//Studiensemester			
 			$htmlstr .= "		<td><select name='studiensemester_kurzbz' onchange='markier(\"neu\")'>\n";
 			$htmlstr .= "			<option value=''></option>\n";
 			for ($i = 0; $i < sizeof($st_arr); $i++)
@@ -280,12 +292,13 @@
 			}
 			$htmlstr .= "		</select></td>\n";
 			
+
+			
+			$htmlstr .= "		<td><input type='checkbox' name='negativ' onchange='markier(\"neu\")'></td>\n";
 			$htmlstr .= "		<td><input type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
 			$htmlstr .= "		<td><input type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
 			
 			$htmlstr .= "		<td><input type='submit' name='schick' value='neu'></td>";
-			$htmlstr .= "		<td></td>";
-			$htmlstr .= "		<td><input type='reset' name='reset' value='C' onmouseup='unmarkier(\"neu\")'></td>";
 			$htmlstr .= "	</tr>\n";
 			$htmlstr .= "</form>\n";
 			
@@ -300,7 +313,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<title>Studiengang - Details</title>
+<title>Berechtigung - Details</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
@@ -321,36 +335,6 @@ function markier(id)
 function unmarkier(id)
 {
 	document.getElementById(id).style.background = "#eeeeee";
-}
-
-function unchanged()
-{
-	document.studiengangform.reset();
-	document.studiengangform.schick.disabled = true;
-	document.getElementById("submsg").style.visibility="hidden";
-	checkmail();
-	checkdate(document.studiengangform.bescheidvom);
-	checkdate(document.studiengangform.titelbescheidvom);
-	checkrequired(document.studiengangform.kurzbz);
-	checkrequired(document.studiengangform.bezeichnung);
-	checkrequired(document.studiengangform.studiengang_kz);
-}
-
-function checkmail()
-{
-	if((document.studiengangform.email.value != "")&&(!emailCheck(document.studiengangform.email.value)))
-	{
-		//document.studiengangform.schick.disabled = true;
-		document.studiengangform.email.className="input_error";
-		return false;
-	}
-	else
-	{
-		document.studiengangform.email.className = "input_ok";
-		//document.studiengangform.schick.disabled = false;
-		//document.getElementById("submsg").style.visibility="visible";
-		return true;
-	}
 }
 
 function checkdate(feld)
@@ -384,27 +368,9 @@ function checkrequired(feld)
 		return true;
 	}
 }
-
-function submitable()
+function setnull(id)
 {
-	mail = checkmail();
-	date1 = checkdate(document.studiengangform.bescheidvom);
-	date2 = checkdate(document.studiengangform.titelbescheidvom);
-	required1 = checkrequired(document.studiengangform.kurzbz);
-	required2 = checkrequired(document.studiengangform.bezeichnung);
-	required3 = checkrequired(document.studiengangform.studiengang_kz);
-
-	if((!mail) || (!date1) || (!date2) || (!required1) || (!required2) || (!required3))
-	{
-		document.studiengangform.schick.disabled = true;
-		document.getElementById("submsg").style.visibility="hidden";
-	}
-	else
-	{
-		document.studiengangform.schick.disabled = false;
-		document.getElementById("submsg").style.visibility="visible";
-
-	}
+	document.getElementById(id).selectedIndex=0;
 }
 </script>
 </head>

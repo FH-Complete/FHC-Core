@@ -73,7 +73,47 @@ class benutzerberechtigung extends basis_db
 	 */
 	public function load($benutzerberechtigung_id)
 	{
-		return false;
+		if(!is_numeric($benutzerberechtigung_id) || $benutzerberechtigung_id=='')
+		{
+			$this->errormsg = 'benutzerberechtigung_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM system.tbl_benutzerrolle WHERE benutzerberechtigung_id='$benutzerberechtigung_id'";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->benutzerberechtigung_id = $benutzerberechtigung_id;
+				$this->rolle_kurzbz = $row->rolle_kurzbz;
+				$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$this->uid = $row->uid;
+				$this->funktion_kurzbz = $row->funktion_kurzbz;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->art = $row->art;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				$this->negativ = ($row->negativ=='t'?true:false);
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Es wurde kein Eintrag mit dieser ID gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Berechtigung';
+			return false;
+		}
 	}
 
 	/**
@@ -89,24 +129,9 @@ class benutzerberechtigung extends basis_db
 			return false;
 		}
 
-		if(mb_strlen($this->fachbereich_kurzbz)>16)
+		if(mb_strlen($this->berechtigung_kurzbz)>32)
 		{
-			$this->errormsg = 'fachbereich_kurzbz darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if($this->studiengang_kz!='' && !is_numeric($this->studiengang_kz))
-		{
-			$this->errormsg = 'Studiengangskennzahl muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(mb_strlen($this->berechtigung_kurzbz)>16)
-		{
-			$this->errormsg = 'Berechtigung_kurzbz darf nicht laenger als 16 Zeichen sein';
-			return false;
-		}
-		if($this->berechtigung_kurzbz=='')
-		{
-			$this->errormsg = 'Berechtigung_kurzbz muss angegeben werden';
+			$this->errormsg = 'Berechtigung_kurzbz darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->uid)>32)
@@ -114,12 +139,42 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if($this->uid=='')
+		
+		if($this->rolle_kurzbz=='' && $this->berechtigung_kurzbz=='')
 		{
-			$this->errormsg = 'UID muss angegeben werden';
+			$this->errormsg = 'Es muss entweder eine Rolle oder eine Berechtigung angegeben werden';
 			return false;
 		}
-
+		
+		if($this->rolle_kurzbz!='' && $this->berechtigung_kurzbz!='')
+		{
+			$this->errormsg = 'Rolle und Berechtigung kann nicht gleichzeitig angegeben werden';
+			return false;
+		}
+		
+		if($this->uid=='' && $this->funktion_kurzbz=='')
+		{
+			$this->errormsg = 'Ess muss entweder eine UID oder eine Funktion_kurzbz angegeben werden';
+			return false;
+		}
+		
+		if($this->uid!='' && $this->funktion_kurzbz!='')
+		{
+			$this->errormsg = 'UID und Funktion_kurzbz kann nicht gleichzeitig angegeben werden';
+			return false;
+		}
+		
+		if($this->funktion_kurzbz!='' && $this->oe_kurzbz!='')
+		{
+			$this->errormsg = 'Wenn eine Funktion_kurzbz angegeben wird, darf keine Organisationseinheit eingetragen sein';
+			return false;
+		}
+		
+		if($this->art=='')
+		{
+			$this->errormsg = 'Art darf nicht leer sein';
+			return false;
+		}
 		return true;
 	}
 	
@@ -135,68 +190,125 @@ class benutzerberechtigung extends basis_db
 		if(!$this->validate())
 			return false;
 
-		/*
 		if($this->new)
 		{
-			$qry = 'INSERT INTO public.tbl_benutzerberechtigung (art, fachbereich_kurzbz, studiengang_kz, berechtigung_kurzbz,
-			                                              uid, studiensemester_kurzbz, start, ende)
-			        VALUES('.$this->addslashes($this->art).','.
-					$this->addslashes($this->fachbereich_kurzbz).','.
-					$this->addslashes($this->studiengang_kz).','.
+			$qry = 'INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz, 
+						oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, insertamum, insertvon)
+			        VALUES('.$this->addslashes($this->rolle_kurzbz).','.
 					$this->addslashes($this->berechtigung_kurzbz).','.
 					$this->addslashes($this->uid).','.
+					$this->addslashes($this->funktion_kurzbz).','.
+					$this->addslashes($this->oe_kurzbz).','.
+					$this->addslashes($this->art).','.
 					$this->addslashes($this->studiensemester_kurzbz).','.
 					$this->addslashes($this->start).','.
-					$this->addslashes($this->ende).');';
+					$this->addslashes($this->ende).','.
+					($this->negativ?'true':'false').','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{
-			$qry = 'UPDATE public.tbl_benutzerberechtigung SET'.
+			$qry = 'UPDATE system.tbl_benutzerrolle SET'.
+				   ' rolle_kurzbz='.$this->addslashes($this->rolle_kurzbz).','.
+				   ' berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).','.
+				   ' uid='.$this->addslashes($this->uid).','.
+				   ' funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).','.
+				   ' oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
 			       ' art='.$this->addslashes($this->art).','.
-			       ' fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).','.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).','.
-			       ' uid='.$this->addslashes($this->uid).','.
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).','.
 			       ' start='.$this->addslashes($this->start).','.
-			       ' ende='.$this->addslashes($this->ende).
+			       ' ende='.$this->addslashes($this->ende).','.
+			       ' negativ='.($this->negativ?'true':'false').','.
+			       ' updateamum='.$this->addslashes($this->updateamum).','.
+			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE benutzerberechtigung_id='".addslashes($this->benutzerberechtigung_id)."'";
 		}
 
-		if(p g_query($this->conn,$qry))
+		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Benutzerberechtigung:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Benutzerberechtigung:'.$qry.$this->db_last_error();
 			return false;
 		}
-		*/
-		return false;
 	}
 
 	/**
-	 * Speichert Benutzerberechtigung in die Datenbank
-	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	 * angelegt, ansonsten der Datensatz upgedated
+	 * Loescht einen Eintrag aus der Tabelle benutzerrolle
+	 * @param benutzerberechtigung_id
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
-	function delete($benutzerberechtigung_id)
+	public function delete($benutzerberechtigung_id)
 	{
-		/*
-		// Berechtigungen holen
-		$sql_query="DELETE from tbl_benutzerberechtigung where benutzerberechtigung_id = '".$benutzerberechtigung_id."'";
-
-		if(!p g_query($this->conn, $sql_query))
+		if(!is_numeric($benutzerberechtigung_id) || $benutzerberechtigung_id=='')
 		{
-			$this->errormsg='Fehler beim l&ouml;schen';
+			$this->errormsg = 'benutzerberechtigung_id ist ungültig';
 			return false;
-		}*/
-		return false;
+		}
+		
+		// Berechtigungen loeschen
+		$sql_query="DELETE FROM system.tbl_benutzerrolle where benutzerberechtigung_id = '$benutzerberechtigung_id'";
+
+		if(!$this->db_query($sql_query))
+		{
+			$this->errormsg='Fehler beim Löschen';
+			return false;
+		}
+		return true;
 	}
 
+	/**
+	 * Laedt die Benutzerrollen zu einer UID
+	 *
+	 * @param unknown_type $uid
+	 */
+	public function loadBenutzerRollen($uid=null, $funktion_kurzbz=null)
+	{
+		$qry = 'SELECT * FROM system.tbl_benutzerrolle WHERE ';
+		
+		if(!is_null($uid))
+			$qry.= " uid='".addslashes($uid)."'";
+		elseif(!is_null($funktion_kurzbz))
+			$qry.= " funktion_kurzbz='".addslashes($funktion_kurzbz)."'";
+		else 
+		{
+			$this->errormsg = 'Entweder UID oder funktion_kurzbz muss uebergeben werden';
+			return false;
+		}
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new benutzerberechtigung();
+				
+				$obj->benutzerberechtigung_id = $row->benutzerberechtigung_id;
+				$obj->rolle_kurzbz = $row->rolle_kurzbz;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->uid = $row->uid;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->art = $row->art;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->negativ = ($row->negativ=='t'?true:false);
+				$obj->udpateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->berechtigungen[] = $obj;
+			}
+		}
+	}
+	
 	/**
 	 * Laedt die Berechtigungen eines Users
 	 * @param $uid

@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class berechtigung extends basis_db
 {
-	public $berechtigungen=array();
+	public $result=array();
 	public $new;
 
 	public $rolle_kurzbz;
@@ -85,6 +85,7 @@ class berechtigung extends basis_db
 				
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->rolle_kurzbz = $row->rolle_kurzbz;
+				$obj->art = $row->art;
 				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;
@@ -94,6 +95,100 @@ class berechtigung extends basis_db
 		else 
 		{
 			$this->errormsg = 'Fehler beim Laden der Berechtigungen';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Berechtigungen
+	 *
+	 * @return boolean
+	 */
+	public function getBerechtigungen()
+	{
+		$this->result=array();
+		$qry = 'SELECT * FROM system.tbl_berechtigung ORDER BY berechtigung_kurzbz';
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new berechtigung();
+				
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Berechtigungen';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht eine rolleberechtigung zuordnung
+	 *
+	 * @param $rolle_kurzbz
+	 * @param $berechtigung_kurzbz
+	 */
+	public function deleteRolleBerechtigung($rolle_kurzbz, $berechtigung_kurzbz)
+	{
+		$qry = "DELETE FROM system.tbl_rolleberechtigung WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."' AND berechtigung_kurzbz='".addslashes($berechtigung_kurzbz)."';";
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Löschen der Zuordnung:'.$this->db_last_error();
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert eine RolleBerechtigung Zuordnung
+	 *
+	 */
+	public function saveRolleBerechtigung()
+	{
+		$qry = "SELECT 1 FROM system.tbl_rolleberechtigung 
+				WHERE rolle_kurzbz='".addslashes($this->rolle_kurzbz)."'
+				AND berechtigung_kurzbz='".addslashes($this->berechtigung_kurzbz)."'";
+		
+		if($this->db_query($qry))
+		{
+			if($this->db_num_rows()>0)
+			{
+				//Update
+				$qry = "UPDATE system.tbl_rolleberechtigung SET art='".addslashes($this->art)."' WHERE rolle_kurzbz='".addslashes($this->rolle_kurzbz)."' AND berechtigung_kurzbz='".addslashes($this->berechtigung_kurzbz)."';";
+			}
+			else 
+			{
+				//Insert
+				$qry = "INSERT INTO system.tbl_rolleberechtigung (rolle_kurzbz, berechtigung_kurzbz, art) VALUES('".
+						addslashes($this->rolle_kurzbz)."','".
+						addslashes($this->berechtigung_kurzbz)."','".
+						addslashes($this->art)."');";
+			}
+			
+			if($this->db_query($qry))
+			{
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler beim Speichern: '.$this->db_last_error();
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Speichern der Zuteilung:'.$this->db_last_error();
 			return false;
 		}
 	}
