@@ -102,7 +102,6 @@ $menu=array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
-			'Neu'=>array('name'=>'Neu', 'link'=>'personen/lektor_edit.php?new=1', 'target'=>'main'),
 			'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
 			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main'),
 			'Resturlaub'=>array('name'=>'Urlaub', 'link'=>'personen/resturlaub_frameset.html', 'target'=>'main')
