@@ -88,12 +88,12 @@ if(isset($_GET['kontaktmedium']))
 else 
 	$kontaktmedium = null;
 if(isset($_GET['erfassungsdatum_bis']) && $_GET['erfassungsdatum_bis']!='')
-	$erfassungsdatum_bis = $_GET['erfassungsdatum_bis'];
+	$erfassungsdatum_bis = $datum_obj->formatDatum($_GET['erfassungsdatum_bis'],'Y-m-d');
 else
 	$erfassungsdatum_bis=null;
 	
 if(isset($_GET['erfassungsdatum_von']) && $_GET['erfassungsdatum_von']!='')
-	$erfassungsdatum_von = $_GET['erfassungsdatum_von'];
+	$erfassungsdatum_von = $datum_obj->formatDatum($_GET['erfassungsdatum_von'],'Y-m-d');
 else
 	$erfassungsdatum_von=null;
 	

@@ -22,7 +22,8 @@
 /*
  * Benoetigt functions.inc.php
  */
-require_once('basis_db.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
 class person extends basis_db
 {
