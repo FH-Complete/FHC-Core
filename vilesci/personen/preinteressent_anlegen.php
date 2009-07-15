@@ -34,7 +34,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/nation.class.php');
 
 if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user=get_uid();
 $datum_obj = new datum();
@@ -110,7 +110,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 {
 	header('Content-Type: text/html; charset=UTF-8');
 	
-	echo getOrtDropDown($_GET['plz'], utf8_decode($_GET['gemeinde']));
+	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
 	exit;
 }
 ?>

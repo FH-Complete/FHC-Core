@@ -139,8 +139,8 @@ if (!isset($pers_uid))
 	$pers_uid=$uid;
 
 // Datums Format
-if(!$db->db_query("SET datestyle TO ISO;"))
-	$error_msg=$db->db_last_error();
+//if(!$db->db_query("SET datestyle TO ISO;"))
+//	$error_msg=$db->db_last_error();
 
 // ****************************************************************************
 // Variablen fuer Aktionen setzen

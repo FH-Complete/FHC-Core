@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
 class preinteressent extends basis_db
 {
@@ -417,7 +418,12 @@ class preinteressent extends basis_db
 		
 		if($filter!='')
 		{
-			$qry.=" AND (lower(nachname) like lower('%".addslashes($filter)."%') OR lower(vorname) like lower('%".addslashes($filter)."%') OR erfassungsdatum like '".addslashes($filter)."' OR lower(kontakt) like lower('%".addslashes($filter)."%'))";
+			$datum_obj = new datum();
+		
+			$qry.=" AND (lower(nachname) like lower('%".addslashes($filter)."%') OR lower(vorname) like lower('%".addslashes($filter)."%') OR lower(kontakt) like lower('%".addslashes($filter)."%')";
+			if($filter = $datum_obj->formatDatum($filter))
+				$qry.=" OR erfassungsdatum = '".addslashes($filter)."'";
+			$qry.=")";
 		}
 		if($nichtfreigegeben==true)
 			$qry.=" AND tbl_preinteressentstudiengang.freigabedatum is null";

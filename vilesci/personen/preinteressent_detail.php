@@ -305,7 +305,7 @@ if(isset($_POST['save_preinteressent']))
 	$preinteressent->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 	$preinteressent->aufmerksamdurch_kurzbz = $_POST['aufmerksamdurch_kurzbz'];
 	$preinteressent->firma_id = $_POST['firma'];
-	$preinteressent->erfassungsdatum = $_POST['erfassungsdatum'];
+	$preinteressent->erfassungsdatum = $datum_obj->formatDatum($_POST['erfassungsdatum'],'Y-m-d');
 	$preinteressent->einverstaendnis = isset($_POST['einverstaendnis']);
 	if(isset($_POST['absagedatum']) && $preinteressent->absagedatum=='')
 		$preinteressent->absagedatum = date('Y-m-d H:i:s');
@@ -337,7 +337,7 @@ if(isset($_POST['saveperson']))
 	$person->nachname = $_POST['nachname'];
 	$person->vorname = $_POST['vorname'];
 	$person->vornamen = $_POST['vornamen'];
-	$person->gebdatum = $_POST['gebdatum'];
+	$person->gebdatum = $datum_obj->formatDatum($_POST['gebdatum'],'Y-m-d');
 	$person->gebort = $_POST['gebort'];
 	$person->gebzeit = $_POST['gebzeit'];
 	$person->anmerkungen = $_POST['anmerkungen'];
