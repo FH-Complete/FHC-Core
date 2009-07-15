@@ -41,7 +41,7 @@ class antwort extends basis_db
 	{
 		parent::__construct();
 		
-		if(!is_null(antwort_id))
+		if(!is_null($antwort_id))
 			$this->load($antwort_id);
 	}
 	
