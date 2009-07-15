@@ -902,7 +902,7 @@ class mitarbeiter extends benutzer
 			$uid=$this->uid;
 		// Suche in Instituten
 		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
-						    WHEN studiengang_kz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=a.oe_kurzbz AND funktion_kurzbz='stgl' LIMIT 1)
+						    WHEN oe_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=a.oe_kurzbz AND funktion_kurzbz='stgl' LIMIT 1)
 						    ELSE ''
 					   END as vorgesetzter
 						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."'";
