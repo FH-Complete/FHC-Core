@@ -937,11 +937,11 @@ class mitarbeiter extends benutzer
 		//Alle Studiengaenge und Fachbereiche holen bei denen die Person die Leitung hat
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
 				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."'";
-
+		
 		if($this->db_query($qry))
 		{
 			$institut='';
-			$stge='';
+			$oe='';
 			while($row = $this->db_fetch_object())
 			{
 				if($row->funktion_kurzbz=='fbl')
@@ -971,7 +971,7 @@ class mitarbeiter extends benutzer
 		
 		$qry.=")) ";
 		
-		if($stge!='')
+		if($oe!='')
 			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
 		
 		if($this->db_query($qry))
