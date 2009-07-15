@@ -433,9 +433,9 @@ if($frage->frage_id!='')
 		
 		echo '<br/>';
 		if($vorschlag->bild!='')
-			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id&amp;sprache=$sprache' /><br/>";
+			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id&amp;sprache=".$_SESSION['sprache']."' /><br/>";
 		if($vorschlag->audio!='')
-			echo '<embed autostart="false" src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$sprache.'" height="20" width="100"/><br />';
+			echo '<embed autostart="false" src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="100"/><br />';
 		if($vorschlag->text!='')
 			echo $vorschlag->text.'<br/>';
 		echo "</td>";
