@@ -1,10 +1,8 @@
 <?php
-require('../../../config.inc.php');
-
-		require_once('../../../../config/vilesci.config.inc.php');
-		require_once('../../../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../../../config/vilesci.config.inc.php');
+require_once('../../../../include/basis_db.class.php');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 
 
@@ -24,15 +22,15 @@ $error=false;
 $fausgabe='<table>';
 
 
-define("DB_SERVER","192.168.101.230:1433");
-define("DB_USER","sa");
-define("DB_PASSWD","P1ss0ff");
-define("DB_DB","asco4");
+define("MDB_SERVER","192.168.101.230:1433");
+define("MDB_USER","sa");
+define("MDB_PASSWD","P1ss0ff");
+define("MDB_DB","asco4");
 
 // zugriff auf mssql-datenbank
-if (!$conn_ext=mssql_connect (DB_SERVER, DB_USER, DB_PASSWD))
+if (!$conn_ext=mssql_connect (MDB_SERVER, MDB_USER, MDB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
-mssql_select_db(DB_DB, $conn_ext);
+mssql_select_db(MDB_DB, $conn_ext);
 
 //letzte Nummer
 $sql_query="SELECT max(asco.employee.reference) AS last_keynr FROM asco.employee;";
