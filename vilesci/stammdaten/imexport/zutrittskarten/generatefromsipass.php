@@ -1,15 +1,36 @@
 <?php
+/* Copyright (C) 2009 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ */
+/**
+ * Generiert ein Updatefile fuer das Zutrittskartensystem
+ */
 require_once('../../../../config/vilesci.config.inc.php');
 require_once('../../../../include/basis_db.class.php');
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-
 
 // Mail Headers festlegen
 $headers= "MIME-Version: 1.0\r\n";
 $headers.="Content-Type: text/html; charset=UTF-8\r\n";
-
 
 $sipass=array();
 $i=0;
@@ -22,15 +43,15 @@ $error=false;
 $fausgabe='<table>';
 
 
-define("MDB_SERVER","192.168.101.230:1433");
-define("MDB_USER","sa");
-define("MDB_PASSWD","P1ss0ff");
-define("MDB_DB","asco4");
+define("SIPASS_DB_SERVER","192.168.101.230:1433");
+define("SIPASS_DB_USER","sa");
+define("SIPASS_DB_PASSWD","P1ss0ff");
+define("SIPASS_DB_DB","asco4");
 
 // zugriff auf mssql-datenbank
-if (!$conn_ext=mssql_connect (MDB_SERVER, MDB_USER, MDB_PASSWD))
+if (!$conn_ext=mssql_connect (SIPASS_DB_SERVER, SIPASS_DB_USER, SIPASS_DB_PASSWD))
 	die('Fehler beim Verbindungsaufbau!');
-mssql_select_db(MDB_DB, $conn_ext);
+mssql_select_db(SIPASS_DB_DB, $conn_ext);
 
 //letzte Nummer
 $sql_query="SELECT max(asco.employee.reference) AS last_keynr FROM asco.employee;";
@@ -141,6 +162,10 @@ if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
+		//Nachname und Vorname auf LATIN9 konvertieren
+		$row->lastname = iconv('UTF-8','ISO-8859-15',$row->lastname);
+		$row->firstname = iconv('UTF-8','ISO-8859-15',$row->firstname);
+		
 		$update=false;
 		$stg_kurzbz=strtoupper(trim($row->typ).trim($row->kurzbz));
 		$row->cardnumber=(int)$row->cardnumber;
