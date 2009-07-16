@@ -21,11 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -33,7 +29,9 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/resturlaub.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
@@ -60,7 +58,7 @@ function conf_del()
 ';
 
 $user = get_uid();
-
+$uid=(isset($_GET['uid'])?$_GET['uid']:'');
 if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 {
 	if(isset($_GET['del']) && isset($_GET['zeitsperre_id']))

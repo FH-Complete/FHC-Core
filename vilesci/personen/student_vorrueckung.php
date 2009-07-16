@@ -90,7 +90,9 @@ if (isset($_GET['studiensemester_kurzbz']) || isset($_POST['studiensemester_kurz
 }
 else
 {
-	$studiensemester_kurzbz=$ss->getakt();
+	if (!$studiensemester_kurzbz=$ss->getakt())
+		$studiensemester_kurzbz=$ss->getaktorNext();
+	
 }
 //ausgangssemester für vorrückung
 if (isset($_GET['studiensemester_kurzbz_akt']) || isset($_POST['studiensemester_kurzbz_akt']))
@@ -99,7 +101,8 @@ if (isset($_GET['studiensemester_kurzbz_akt']) || isset($_POST['studiensemester_
 }
 else
 {
-	$studiensemester_kurzbz_akt=$studiensemester_kurzbz;
+#	$studiensemester_kurzbz_akt=$studiensemester_kurzbz;
+	$studiensemester_kurzbz_akt=$ss->getPrevious();
 }
 //zielsemester für vorrückung
 if (isset($_GET['studiensemester_kurzbz_zk']) || isset($_POST['studiensemester_kurzbz_zk']))
