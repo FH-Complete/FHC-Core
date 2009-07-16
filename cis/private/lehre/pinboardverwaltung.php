@@ -116,11 +116,8 @@
 		$datum_obj = new datum();
 		if(isset($_POST['datum']) && !$datum_obj->checkDatum($_POST['datum']))
 			$error.=(!empty($error)?'<br>':'').$_POST['datum'].' Datum ist falsch ';
-		if(isset($_POST['datum_bis']) && !$datum_obj->checkDatum($_POST['datum_bis']))
+		if(isset($_POST['datum_bis']) && !empty($_POST['datum_bis']) &&  !$datum_obj->checkDatum($_POST['datum_bis']))
 			$error.=(!empty($error)?'<br>':'').$_POST['datum_bis'].' Datum Bis ist falsch ';
-
-
-			
 			
 		$news->datum = trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:date('d.m.Y')));
 		$news->datum_bis = trim((isset($_REQUEST['datum_bis']) ? $_REQUEST['datum_bis']:null));
@@ -134,7 +131,7 @@
 		$news->insertvon=$user;
 		$news->insertamum=date('Y-m-d H:i:s');	
 				
-		if($news->save())
+		if(!$error && $news->save())
 		{
 			if(isset($news_id) && $news_id != "")
 				$error.=(!empty($error)?'<br>':'').'Die Nachricht wurde erfolgreich ge&auml;ndert!';		
@@ -251,7 +248,7 @@
 			return 'Datum ' + Datum.value + ' ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: <?php echo date('d.m.Y');?>)';
 		}
 	      	var Tag, Monat,Jahr,Date; 
-		Date=Datum.value;
+			Date=Datum.value;
 	      	Tag=Date.substring(0,2); 
 	      	Monat=Date.substring(3,5); 
 	      	Jahr=Date.substring(6,10); 
