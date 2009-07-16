@@ -57,7 +57,7 @@ class studiengang extends basis_db
 
 	public $studiengang_typ_arr = array();
 	public $kuerzel_arr = array();
-
+	public $moodle;				// boolean
 	
 	/**
 	 * Konstruktor
@@ -124,7 +124,9 @@ class studiengang extends basis_db
 
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
-            	$this->aktiv=$row->aktiv;
+            	$this->aktiv=($row->aktiv=='t'?true:false);
+            	$this->moodle=($row->moodle=='t'?true:false);
+				
 			}
 		}
 		else
@@ -155,7 +157,7 @@ class studiengang extends basis_db
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
-		}
+		} 
 
 		while($row = $this->db_fetch_object())
 		{
@@ -189,7 +191,8 @@ class studiengang extends basis_db
 
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
-            $stg_obj->aktiv=$row->aktiv;
+            $stg_obj->aktiv=($row->aktiv=='t'?true:false);
+			$stg_obj->moodle=($row->moodle=='t'?true:false);
 			
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
