@@ -195,48 +195,4 @@
 	</body>
 		</html>';
 	exit($content);
-#-------------------------------------------------------------------------------------------	
-# Testfunktion zur Anzeige einer übergebenen Variable oder Array, Default ist GLOBALS
-function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
-{
-
-    $tmpArrayString='';
-    if (!is_array($arr) && !is_object($arr)) return $arr;
-    if (is_array($arr) && count($arr)<1 && $displayShow) return '';
-    if (is_array($arr) && count($arr)<1 && $displayShow) return "<br /><b>function Test (???)</b><br />";
-   
-    $lfdnr=$lfd + 1; 
-    $tmpAnzeigeStufe='';
-    for ($i=1;$i<$lfdnr;$i++) $tmpAnzeigeStufe.="=";
-    $tmpAnzeigeStufe.="=>";
-	while (list( $tmp_key, $tmp_value ) = each($arr) ) 
-	{
-       	if (!$onlyRoot && (is_array($tmp_value) || is_object($tmp_value)) && count($tmp_value) >0) 
-       	{
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe <b>$tmp_key</b>".Test($tmp_value,$lfdnr);
-       	} else if ( (is_array($tmp_value) || is_object($tmp_value)) ) 
-       	{
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
-		} else if ($tmp_value!='') 
-		{
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe $tmp_key :== ".$tmp_value;
-		} else {
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe $tmp_key :-- (is Empty :: $tmp_value)";
-		}  
-    }
-     if ($lfd!='') { return $tmpArrayString; }
-     if (!$displayShow) { return $tmpArrayString; }
-       
-    $tmpArrayString.="<br />";
-    $tmpArrayString="<br /><hr /><br />******* START *******<br />".$tmpArrayString."<br />******* ENDE *******<br /><hr /><br />";
-	if (defined('Sprache_ISO')) 
-	{
-	    $tmpArrayString.="<br />Language:: ".Sprache_ISO;
-	}    
-    $tmpArrayString.="<br />Server:: ".$_SERVER['PHP_SELF']."<br />";
-	return "$tmpArrayString";
-
-
-}
-
 ?>
