@@ -94,9 +94,10 @@
 	{
 		// SQL Select-String
 		$qry = "SELECT distinct tbl_person.person_id,tbl_person.nachname,tbl_person.vorname,tbl_person.aktiv,tbl_benutzer.uid
-			FROM public.tbl_person 
-			LEFT JOIN public.tbl_benutzer ON tbl_benutzer.person_id=tbl_person.person_id 
-			WHERE (
+			FROM public.tbl_person ,public.tbl_benutzer
+			
+			WHERE  tbl_benutzer.person_id=tbl_person.person_id 
+			and (		
 			tbl_person.nachname ~* '".addslashes($cSearchstr)."' OR 
 			tbl_person.vorname ~* '".addslashes($cSearchstr)."' OR
 			tbl_benutzer.alias ~* '".addslashes($cSearchstr)."' OR
@@ -104,9 +105,9 @@
 			tbl_person.vorname || ' ' || tbl_person.nachname = '".addslashes($cSearchstr)."' OR 
 			tbl_benutzer.uid ~* '".addslashes($cSearchstr)."'
 			) 
-			and tbl_benutzer.uid >'' 
-			and tbl_benutzer.uid IS NOT NULL 
 			ORDER BY nachname, vorname;";
+#			and tbl_benutzer.uid >'' 
+#			and tbl_benutzer.uid IS NOT NULL 
 
 			if($result = $db->db_query($qry))
 			{	
@@ -143,10 +144,10 @@
 
 						// Listenzeile
 						$content.= '<tr '.$showCSS.'>';
-							$content.= '<td '.$showCSS.'>'.$row->nachname.'</td>';
+							$content.= '<td '.$showCSS.'><a href="../personen/personen_details.php?person_id='.$row->person_id.'">'.$row->nachname.'</a></td>';
 							$content.= '<td '.$showCSS.'>'.$row->vorname.'</td>';
 							$content.= '<td '.$showCSS.'>'.$row->uid.'</td>';
-							$content.= '<td '.$showCSS.'>'.(mb_strtoupper($row->aktiv)=='T' || mb_strtoupper($row->aktiv)=='TRUE' ?'aktiv':'deaktiviert').'</td>';
+							$content.= '<td '.$showCSS.'>'.(!empty($row->aktiv) && mb_strtoupper($row->aktiv)!='F' && mb_strtoupper($row->aktiv)!='FALSE' ?'aktiv':'deaktiviert').'</td>';
 							$arrMoodleUser=array();	
 							$objMoodle->errormsg='';
 							$objMoodle->mdl_user_id='';
