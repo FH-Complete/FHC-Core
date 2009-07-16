@@ -89,18 +89,21 @@
 
 		$news->news_id = $news_id;
 		$news->betreff = trim((isset($_REQUEST['betreff']) ? $_REQUEST['betreff']:''));
-		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:''));
+		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:$user));
 		$news->text = trim((isset($_REQUEST['text']) ? $_REQUEST['text']:''));
 		
 		$news->studiengang_kz=0;
 		$news->semester=0;
 		$news->fachbereich_kurzbz=null;
-			
+
 		$news->datum = trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:date('d.m.Y')));
 		$news->datum_bis = trim((isset($_REQUEST['datum_bis']) ? $_REQUEST['datum_bis']:null));
 		$news->uid=$user;
 		$news->updatevon=$user;
 		$news->updateamum=date('Y-m-d H:i:s');	
+		
+		$news->insertvon=$user;
+		$news->insertamum=date('Y-m-d H:i:s');			
 		
 #		var_dump($news);
 		if($news->save())
