@@ -24,6 +24,9 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
+if (!function_exists('xu_load_extension'))
+	include_once(dirname(__FILE__)."/xmlrpcutils/utils.php");
+
 class moodle_course extends basis_db
 {
 	private $conn_moodle;
@@ -1413,10 +1416,6 @@ class moodle_course extends basis_db
 				return false;
 			}		
 		
-		
-			if (!function_exists('xu_load_extension'))
-				include_once(dirname(__FILE__)."/xmlrpcutils/utils.php");
-						
 		    // Aktuellen Moodle Server ermitteln.
 			if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
 			{
