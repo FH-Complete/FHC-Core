@@ -21,11 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
  
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			 
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/betriebsmittel.class.php');
 	require_once('../../include/betriebsmittelperson.class.php');
 	require_once('../../include/globals.inc.php');
@@ -35,6 +31,8 @@
 	require_once('../../include/person.class.php');
 	require_once('../../include/benutzer.class.php');
 	require_once('../../include/studiensemester.class.php');
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	
 
 	$user = get_uid();
@@ -65,16 +63,18 @@
 	$bmreservieren=isset($_POST["bmreservieren"])?$_POST["bmreservieren"]:'';
 	$bmort_kurzbz=isset($_POST["bmort_kurzbz"])?$_POST["bmort_kurzbz"]:'';
 	$bmext_id=isset($_POST["bmext_id"])?$_POST["bmext_id"]:'';
-     	$bmupdatevon=isset($_POST["bmupdatevon"])?$_POST["bmupdatevon"]:'';
-     	$bminsertvon=isset($_POST["bminsertvon"])?$_POST["bminsertvon"]:'';
+  
+   	$bmupdatevon=isset($_POST["bmupdatevon"])?$_POST["bmupdatevon"]:$user;
+   	$bminsertvon=isset($_POST["bminsertvon"])?$_POST["bminsertvon"]:$user;
 	
 	$bmpausgegebenam=isset($_POST["bmpausgegebenam"])?$_POST["bmpausgegebenam"]:'';
 	$bmpretouram=isset($_POST["bmpretouram"])?$_POST["bmpretouram"]:'';
 	$bmpkaution=isset($_POST["bmpkaution"])?$_POST["bmpkaution"]:'';
 	$bmpanmerkung=isset($_POST["bmpanmerkung"])?$_POST["bmpanmerkung"]:'';
 	$bmpext_id=isset($_POST["bmpext_id"])?$_POST["bmpext_id"]:'';
-     	$bmpupdatevon=isset($_POST["bmpupdatevon"])?$_POST["bmpupdatevon"]:'';
-     	$bmpinsertvon=isset($_POST["bmpinsertvon"])?$_POST["bmpinsertvon"]:'';
+
+   	$bmpupdatevon=isset($_POST["bmpupdatevon"])?$_POST["bmpupdatevon"]:$user;
+   	$bmpinsertvon=isset($_POST["bmpinsertvon"])?$_POST["bmpinsertvon"]:$user;
 	
 	if(isset($_GET['standard']))
 	{
@@ -124,6 +124,7 @@
 			$bm->insertvon=$bminsertvon;
 			$bm->updatevon=$bmupdatevon;
 			$bm->ext_id=$bmext_id;
+			
 			if(!$bm->save())
 			{
 				$reloadstr.="<br>Aktualisierung des Betriebsmittel-Datensatzes fehlgeschlagen!";
@@ -159,33 +160,40 @@
 	
 	if (isset($person_id) && isset($betriebsmittel_id))
 	{
-		$bm=new betriebsmittel();
-		$bm->load($betriebsmittel_id);
-		$bmp=new betriebsmittelperson();
-		$bmp->load($betriebsmittel_id,$person_id);
+
+		$bm=new betriebsmittel($betriebsmittel_id);
+		$bmp=new betriebsmittelperson($betriebsmittel_id,$person_id);
+	
+	
 	
 		$htmlstr .= "<table style='padding-top:10px;'>\n";
 		$htmlstr .= "<form action='' method='POST'>\n";
 		$htmlstr .= "	<tr>\n";
 		$htmlstr .= "		<td><b>BM-ID </b><input type='hidden' name='bmbetriebsmittel' value='$bm->betriebsmittel_id'>".$bm->betriebsmittel_id."</td>\n";
 		$htmlstr .= "		<td><b>Betriebsmitteltyp </b><input type='text' name='bmbetriebsmitteltyp' value='".$bm->betriebsmitteltyp."' size='15' maxlength='64'></td>\n";
+
 		$htmlstr .= "		<td><b>Nummer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type='text' name='bmnummer' value='".$bm->nummer."' size='15' maxlength='64'></td>\n";
 		$htmlstr .= "		<td><b>Nummer intern </b><input type='text' name='bmnummerintern' value='".$bm->nummerintern."' size='15' maxlength='64'></td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "		<td><b>Beschreibung </b><input type='text' name='bmbeschreibung' value='".$bm->beschreibung."' size='15' maxlength='64'></td>\n";
 		$htmlstr .= "		<td><b>Ort Kurzbz &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-					<input type='text' name='bmort_kurzbz' value='".$bm->ort_kurzbz."' size='15' maxlength='64'></td>\n";
+							<input type='text' name='bmort_kurzbz' value='".$bm->ort_kurzbz."' size='15' maxlength='64'></td>\n";
 		$htmlstr .= "		<td><b>reservieren </b><input type='text' name='bmreservieren' value='".$bm->reservieren."' size='15' maxlength='64'></td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "		<td><b>insertamum </b>".$bm->insertamum."</td>\n";
-		$htmlstr .= "		<td><b>insertvon </b><input type='hidden' name='bminsertvon' value='$bm->insertvon'>".$bm->insertvon."</td>\n";
+		$htmlstr .= "		<td><b>insertvon </b><input type='hidden' name='bminsertvon' value='".$bm->insertvon."'>".$bm->insertvon."</td>\n";
+
 		$htmlstr .= "		<td><b>updateamum </b>".$bm->updateamum."</td>\n";
-		$htmlstr .= "		<td><b>updatevon </b><input type='hidden' name='bmupdatevon' value='$bm->updatevon'>".$bm->updatevon."</td>\n";
-		$htmlstr .= "		<td><b>ext_id </b><input type='hidden' name='bmext_id' value='$bm->ext_id'>".$bm->ext_id."</td>\n";
+		$htmlstr .= "		<td><b>updatevon </b><input type='hidden' name='bmupdatevon' value='".$user."'>".$bm->updatevon."</td>\n";
+		$htmlstr .= "		<td><b>ext_id </b><input type='hidden' name='bmext_id' value='".$bm->ext_id."'>".$bm->ext_id."</td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "		<td>&nbsp;</td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "	</tr>\n";
+		
+
+		
+		
 		$htmlstr .= "	<tr>\n";
 		$htmlstr .= "		<td><b>P-ID </b><input type='hidden' name='bmpperson_id' value='$bmp->person_id'>".$bmp->person_id."</td>\n";
 		$htmlstr .= "		<td><b>ausgegeben am </b><input type='text' name='bmpausgegebenam' value='".$bmp->ausgegebenam."' size='15' maxlength='64'></td>\n";
@@ -197,7 +205,7 @@
 		$htmlstr .= "		<td><b>insertamum </b>".$bmp->insertamum."</td>\n";
 		$htmlstr .= "		<td><b>insertvon </b><input type='hidden' name='bmpinsertvon' value='$bm->insertvon'>".$bmp->insertvon."</td>\n";
 		$htmlstr .= "		<td><b>updateamum </b>".$bmp->updateamum."</td>\n";
-		$htmlstr .= "		<td><b>updatevon </b><input type='hidden' name='bmpupdatevon' value='$bm->updatevon'>".$bmp->updatevon."</td>\n";
+		$htmlstr .= "		<td><b>updatevon </b><input type='hidden' name='bmpupdatevon' value='$user'>".$bmp->updatevon."</td>\n";
 		$htmlstr .= "		<td><b>ext_id </b><input type='hidden' name='bmpext_id' value='$bm->ext_id'>".$bmp->ext_id."</td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";

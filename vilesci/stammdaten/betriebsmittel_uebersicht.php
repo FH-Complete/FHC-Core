@@ -50,6 +50,14 @@ else
   		<input type="submit" value="Suchen">
   	</form>';	
 
+	$htmlstr .= "<div style='text-align:right'>";
+		$htmlstr .= "<form name='suche' method='POST' action=''>
+							<input type='text' value=''id='bmsuche' maxlength=12 size=12 name='bmsuche' tabindex='1'/>&nbsp;
+							<input type='submit' name='submit' value='BM-Suche'>
+						</form>";
+		$htmlstr .= "</div>";
+	    	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>\n";	
+	
 if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 {	
 	if (isset($_POST['bmsuche']))
@@ -67,14 +75,12 @@ if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 	{
 		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
 		if(!empty($searchstr))
-			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
+			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummerintern  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
 		$sql_query.="	ORDER BY nummer ";
 		 if(empty($searchstr))
 			 $sql_query.=" LIMIT 100 ";
 
 	}	
-
-	
 	
     if(!$erg=$db->db_query($sql_query))
 	{
@@ -82,15 +88,7 @@ if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 	}
 	else
 	{
-		//$htmlstr = "<table class='liste sortable'>\n";
-		$htmlstr .= "<div style='text-align:right'>";
-		$htmlstr .= "<form name='suche' method='POST' action=''>
-							<input type='text' value=''id='bmsuche' maxlength=12 size=12 name='bmsuche' tabindex='1'/>&nbsp;
-							<input type='submit' name='submit' value='BM-Suche'>
-						</form>";
-		$htmlstr .= "</div>";
-	    	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
-		$htmlstr .= "   <thead><tr class='liste'>\n";
+		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>   <thead><tr class='liste'>\n";
 	    	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
 	    						<th class='table-sortable:default'>NrIntern</th><th class='table-sortable:default'>Person (UID)</th>
 	    						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
