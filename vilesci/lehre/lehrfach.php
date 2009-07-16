@@ -283,7 +283,7 @@ if($rechte->isBerechtigt('admin',0))
 		echo '<tr><td><i>Farbe</i></td><td>';
 	    echo '<input type="text" name="farbe" id="farbe" size="30" maxlength="7" value="'.$lf->farbe.'"></td></tr>';
 	
-		echo '<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lf->aktiv=='t'?'checked':'').' />';
+		echo '<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lf->aktiv?'checked':'').' />';
 	    echo '<tr><td>Sprache</td><td><select name="sprache">';
 	
 		$qry1="SELECT * FROM public.tbl_sprache";
@@ -449,7 +449,6 @@ if(!isset($_GET['type']))
 				<td>$row->fach</td>
 				<td>$row->bezeichnung</td>
 				<td>$row->farbe</td>".
-				//"<td>".($row->aktiv=='t'?'Ja':'Nein')."</td>".
 				"<td><form action=\"lehrfach.php?lehrfach_nr=$row->nummer&type=aktiv&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\" method='POST'><input type='image' src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></form></td>".
 				"<td>$row->fachbereich</td>
 				<td>$row->sprache</td>
