@@ -31,14 +31,11 @@
 //DB Verbindung herstellen
 
 		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
-			
 		require_once('../../include/lehrveranstaltung.class.php');
 		require_once('../../include/studiengang.class.php');
 		require_once('../../include/functions.inc.php');
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 
 $msg='';
@@ -52,25 +49,24 @@ $user = get_uid();
 
 
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
-{
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
-}
 else
-{
 	$stg_kz=0;
-}
+if(!is_numeric($stg_kz))
+	$stg_kz=0;
+
+
 if (isset($_GET['semester']) || isset($_POST['semester']))
 {
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 	if($semester>(isset($_GET['max'])?$_GET['max']:$_POST['max']))
-	{
 		$semester=(isset($_GET['max'])?$_GET['max']:$_POST['max']);
-	}
 }
 else
-{
 	$semester=0;
-}
+if(!is_numeric($semester))
+	$semester=0;
+
 
 if (isset($_GET['order_1']) || isset($_POST['order_1']))
 {
@@ -105,14 +101,7 @@ else
 	$radio_2=-1;
 }
 
-if(!is_numeric($stg_kz))
-{
-	$stg_kz=0;
-}
-if(!is_numeric($semester))
-{
-	$semester=0;
-}
+
 
 $s=array();
 foreach ($studiengang as $stg)

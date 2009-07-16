@@ -20,15 +20,13 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
+	require_once('../../config/vilesci.config.inc.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/studiengang.class.php');
+    	require_once('../../include/benutzerberechtigung.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
-		require_once('../../include/functions.inc.php');
-    require_once('../../include/studiengang.class.php');
-    require_once('../../include/benutzerberechtigung.class.php');
-    
+		    
 
 	if (!$user = get_uid())
 			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -37,10 +35,23 @@
 	$rechte->getBerechtigungen($user);
 	if(!$rechte->isBerechtigt('admin'))
 			die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
+if(isset($_GET['searchstr']))
+	$searchstr = $_GET['searchstr'];
+else 
+	$searchstr = '';
 	
-	$htmlstr = "";
+$htmlstr = "";	
 	
+	$htmlstr.='
+	<form accept-charset="UTF-8" name="search" method="GET">
+  		Bitte Suchbegriff eingeben: 
+  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+  		<input type="submit" value="Suchen">
+  	</form>';	
+	
+	
+if(isset($_GET['searchstr']))
+{	
 	$sql_query = "SELECT 
 					distinct(tbl_variable.uid), tbl_person.nachname, tbl_person.vorname 
 				  FROM 
@@ -48,6 +59,13 @@
 				  WHERE 
 				  	tbl_variable.uid = tbl_benutzer.uid AND
 				  	tbl_benutzer.person_id = tbl_person.person_id 
+				and (nachname ~* '".addslashes($searchstr)."' OR 
+				vorname ~* '".addslashes($searchstr)."' OR
+				alias ~* '".addslashes($searchstr)."' OR
+				nachname || ' ' || vorname = '".addslashes($searchstr)."' OR 
+				vorname || ' ' || nachname = '".addslashes($searchstr)."' OR 
+				tbl_variable.uid ~* '".addslashes($searchstr)."')
+									
 				  ORDER BY 
 				  	nachname";
 	
@@ -78,6 +96,7 @@
 	    }
 	    $htmlstr .= "</tbody></table>\n";
 	}
+}	
 ?>
 <html>
 <head>
