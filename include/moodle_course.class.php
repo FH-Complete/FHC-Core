@@ -1415,7 +1415,7 @@ class moodle_course extends basis_db
 		
 		
 			if (!function_exists('xu_load_extension'))
-				include_once("xmlrpcutils/utils.php");
+				include_once(dirname(__FILE__)."/xmlrpcutils/utils.php");
 						
 		    // Aktuellen Moodle Server ermitteln.
 			if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
