@@ -108,7 +108,7 @@ foreach ($sg->result as $twraum)
 	}
 	$reslink = "?toggle=true&rres=".$twraum->ort_kurzbz."&rlehre=NULL&raktiv=NULL";
 	$htmlstr .= "	    <td align='center'><a href='".$reslink."'><img src='../../skin/images/".$resbild."'></a></td>\n";
-	if($twraum->aktiv=='t')
+	if($twraum->aktiv)
 	{
 		$aktivbild = "true.gif";	
 	}
