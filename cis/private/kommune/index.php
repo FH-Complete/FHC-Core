@@ -57,7 +57,7 @@
          
          
 // ---------------- CIS Include Dateien einbinden
-	require_once('../../config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
 // ---------------- Datenbank-Verbindung 
@@ -69,6 +69,8 @@
 	
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
+	
+	include_once('../../../include/mail.class.php');
 
 // Kommunen Allg.Funktionen		
 	include_once('kommune_funktionen.inc.php');
@@ -76,8 +78,6 @@
 
 	// Initialisieren Anzeige-Variable
 	$showHTML='';
-		 
-		 
 		 
 // Kommunen - Wettbewerb - Datenobjekt -----------------------------------------------------------------------------------------------------------
 	// Datenobjekt - Alle Daten je Parameter werden gesammelt fuer die neachste Funktionn
@@ -92,12 +92,14 @@
 	
 // AktiverAnwender-----------------------------------------------------------------------------------------------------------
 	$userUID=(isset($_REQUEST['userUID']) ? $_REQUEST['userUID'] :get_uid() );
-#	$userUID='pam';
+	$userUID='pam';
 #	$userUID='oesi';
 #	$userUID='ruhan';
 #	$userUID='kindlm';
 	
 	$oWettbewerb->userUID=$userUID;
+	
+	
 	$pers=kommune_funk_benutzerperson($oWettbewerb->userUID,$oWettbewerb);
 	if (isset($pers->nachname)) $oWettbewerb->PersonenBenutzer[$oWettbewerb->userUID]=$pers;
 	
@@ -456,6 +458,7 @@ if (!window.Weite && document.body && document.body.offsetWidth)
 	// Daten Anzeige und Verarbeitung
      	$showHTML.=showMenueFunktion($oWettbewerb);
 	// Fehler - Error Ausgabe
+	
 	
 	$showHTML.='<div id="errorKommune">';
 	for ($iTmpZehler=0;$iTmpZehler<count($oWettbewerb->Error);$iTmpZehler++)

@@ -44,7 +44,7 @@
 	$datum_obj = new datum();
 
 	//Stundentabelleholen
-	if(! $result_stunde=$db->db_query("SET search_path TO campus; SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 		die($db->db_last_error());
 	$num_rows_stunde=$db->db_num_rows($result_stunde);
 
@@ -58,19 +58,19 @@
 				//echo $$var;
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
-				$query="SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
+				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 				if(! $erg_wunsch=$db->db_query($query))
 					die($db->db_last_error());
 				$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
+					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
+					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
 					//echo $query;
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
@@ -80,7 +80,7 @@
 			}
 	}
 
-	if(!($erg=$db->db_query("SELECT * FROM tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
+	if(!($erg=$db->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
 		die($db->db_last_error());
 	$num_rows=$db->db_num_rows($erg);
 	for ($i=0;$i<$num_rows;$i++)
@@ -94,7 +94,7 @@
 
 
 	// Personendaten
-	if(! $result=$db->db_query("SELECT * FROM vw_benutzer WHERE uid='$uid'"))
+	if(! $result=$db->db_query("SELECT * FROM campus.vw_benutzer WHERE uid='$uid'"))
 		die($db->db_last_error());
 	if ($db->db_num_rows($result)==1)
 		$person=$db->db_fetch_object($result);

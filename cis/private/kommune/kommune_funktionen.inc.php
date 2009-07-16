@@ -51,7 +51,7 @@ function showMenueFunktion($oWettbewerb)
 	$cTmpName=$oWettbewerb->userUID;
 	$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 	if (isset($pers->langname)) 
-		$cTmpName=$pers->langname;
+			$cTmpName=$pers->langname;
 
 	// Startseite ( Immer )
 	$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;|&nbsp;':'');
@@ -74,7 +74,6 @@ function showMenueFunktion($oWettbewerb)
      #$cTmpMenue='';
      switch (trim($oWettbewerb->workSITE)) 
      {
-     
         case constKommuneWartungWettbewerbtyp:     
 	       $includeFILE=strtolower($oWettbewerb->workSITE.".inc.php"); 
        	if (file_exists($includeFILE))// Check ob das Verarbeitungs-Include File vorhanden ist
@@ -85,12 +84,10 @@ function showMenueFunktion($oWettbewerb)
        	if (file_exists($includeFILE))// Check ob das Verarbeitungs-Include File vorhanden ist
 		    include_once($includeFILE);
 		exit;
-		
         case constKommuneEinladenTEAM:
               // Wettbewerbteam zum Wettbewerb anzeigen 
 		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;|':'');		
 		$cTmpMenue.='<a href="#" onclick="'.$cTmpIDausblenden.'show_layer(\'idWBEinladung\');">';
-
 			$cTmpMenue.='<input type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4pt;border:0px solid transparent;text-decoration:none; background-color: transparent;" onclick="this.checked=false;" onblur="this.checked=false;" name="callEinladungbearbeiten" />Einladungbearbeiten&nbsp;';
 		$cTmpMenue.='</a>';
 		$showHTML.='<div id="idWBEinladung">'.showTeamEinladung($oWettbewerb).'</div>';
@@ -112,15 +109,10 @@ function showMenueFunktion($oWettbewerb)
 		$showHTML.='<div id="idWBPyramide">'.showPyramide($oWettbewerb).'</div>';
 		break;
 	}
-		
 
-	$iTmpAnzahl=(!is_array($oWettbewerb->EigeneWettbewerbe) || count($oWettbewerb->EigeneWettbewerbe)<1?0:count($oWettbewerb->EigeneWettbewerbe)); 
+	$iTmpAnzahl=(!is_array($oWettbewerb->Wettbewerb) || count($oWettbewerb->Wettbewerb)<1?0:count($oWettbewerb->Wettbewerb)); 
 	if ($iTmpAnzahl!=0)
 	{
-#		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;|&nbsp;':'');
-#		$cTmpMenue.='<a href="#" onclick="'.$cTmpIDausblenden.'show_layer(\'idWBListe\');">';
-#			$cTmpMenue.='<input type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4pt;border:0px solid transparent;text-decoration:none; background-color: transparent;" onclick="this.checked=false;" onblur="this.checked=false;" name="callWettbewerbe" />Wettbewerbe&nbsp;('.$iTmpAnzahl.')&nbsp;';
-#		$cTmpMenue.='</a>';
 		$showHTML.='<div id="idWBListe" '.($oWettbewerb->workSITE==constKommuneAnzeigeDEFAULT?'':' style="display:none"').' ><h1>Wettbewerbe</h1>'.kommune_funk_showWettbewerbe($oWettbewerb).'</div>';
 	}	
 
@@ -290,9 +282,9 @@ function kommune_funk_eigene_wettbewerb($oWettbewerb)
             		{
 				if (trim($oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"])==trim($oWettbewerb->EigeneWettbewerbe[$iTmpZehlerEX]["wettbewerb_kurzbz"]) )
  	        	 	{
-            			$oWettbewerb->Wettbewerb[$iTmpZehler]["bereits_eingetragen"]="*";
-	             		$oWettbewerb->Wettbewerb[$iTmpZehler]["daten_eingetragen"]=$oWettbewerb->EigeneWettbewerbe[$iTmpZehlerEX];
-				break; // Datensatz gefunden. Suche kann beendet werden
+	            			$oWettbewerb->Wettbewerb[$iTmpZehler]["bereits_eingetragen"]="*";
+		             		$oWettbewerb->Wettbewerb[$iTmpZehler]["daten_eingetragen"]=$oWettbewerb->EigeneWettbewerbe[$iTmpZehlerEX];
+					break; // Datensatz gefunden. Suche kann beendet werden
           		   	}
 	             }       
 		} 
@@ -389,7 +381,7 @@ function kommune_funk_showWettbewerbe($oWettbewerb)
 			$showHTML.='<span>';
 				$showHTML.='<img height="16" '.$cTmpWettbewerbPopUp.' title="Detailinformationen '.$oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"].'" style="vertical-align: bottom;" alt="infoWettbewerb'.$iTmpZehler.'" src="../../../skin/images/icon_voransicht.gif" border="0" />&nbsp;';
 				$cTmpHREF=kommune_funk_create_href(constKommuneAnzeigeWETTBEWERBTEAM,'',array('wettbewerb_kurzbz'=>$oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"]),'<img height="16" title="weiter zu '.$oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"].'" style="vertical-align: bottom;" alt="openWettbewerb'.$iTmpZehler.'" src="../../../skin/images/open.gif" border="0" />&nbsp;weiter&nbsp;'.$oWettbewerb->Wettbewerb[$iTmpZehler]["wettbewerb_kurzbz"].'&nbsp;','weiter');
-				$showHTML.=$cTmpHREF.'&nbsp;'.$oWettbewerb->Wettbewerb[$iTmpZehler]["bereits_eingetragen"];
+				$showHTML.=$cTmpHREF.'&nbsp;'.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]["bereits_eingetragen"])?$oWettbewerb->Wettbewerb[$iTmpZehler]["bereits_eingetragen"]:'');
 
 			$showHTML.='</span>';			
 
@@ -2164,8 +2156,10 @@ function kommune_funk_sendmail($empf='',$betreff='',$text='',$abs='',$oWettbewer
 
 #G erald
 #$empf='simane@technikum-wien.at';
-
-	if (!@mail($empf, $betreff, $text, "From: ".(defined('CAMPUS_NAME')?CAMPUS_NAME.' ':'').$oWettbewerb->wettbewerb_kurzbz.' '.$cTmpName." <$abs>"))
+	$from="From: ".(defined('CAMPUS_NAME')?CAMPUS_NAME.' ':'').$oWettbewerb->wettbewerb_kurzbz.' '.$cTmpName." <$abs>";
+#	if (!@mail($empf, $betreff, $text, $from))
+	$mail_obj=new mail($empf, $from, $betreff, $text);
+	if ($mail_obj->send())
 		return "eMail Versand an $empf mit Betreff:$betreff konnte nicht erfolgreich beendet werden!";
 
    	return 'eMail wurde erfolgreich gesendet an '.$empf; // Init
@@ -2256,9 +2250,7 @@ function kommune_funk_pers_langname($userUID="",$pers="")
               $content=kommune_strhex($content); //in HEX-Werte umrechnen
               if(empty($content)) return '';
 
-	          $selectWETTBEWERBTYPE = (isset($_REQUEST[constKommuneParmWettbewerbTyp]) ? $_REQUEST[constKommuneParmWettbewerbTyp] : '');
-
-              $qry="SET search_path TO kommune;"; 
+	            $selectWETTBEWERBTYPE = (isset($_REQUEST[constKommuneParmWettbewerbTyp]) ? $_REQUEST[constKommuneParmWettbewerbTyp] : '');
               switch (strtolower($userSETWORK)) 
               {
               // Teams (mit n User) Neuanlage zu Wettbewerb
@@ -2269,7 +2261,7 @@ function kommune_funk_pers_langname($userUID="",$pers="")
                case constKommuneWartungUID:
                      $team_kurzbz=(isset($_REQUEST['team_kurzbz']) ? $_REQUEST['team_kurzbz'] : '');
                      $selectTEAM=(isset($_REQUEST['team_kurzbz_orig']) ? $_REQUEST['team_kurzbz_orig'] : $team_kurzbz);
-                     $qry.="BEGIN;UPDATE tbl_team set logo='$content' WHERE UPPER(team_kurzbz)=UPPER('$selectTEAM');COMMIT;";
+                     $qry.="BEGIN;UPDATE kommune.tbl_team set logo='$content' WHERE UPPER(team_kurzbz)=UPPER('$selectTEAM');COMMIT;";
                      break;
        //  User-Teams zu einem Wettbewerb anzeigen ( Pyramide = Rang )
                case constKommuneAnzeigeWETTBEWERBTEAM:
@@ -2277,7 +2269,7 @@ function kommune_funk_pers_langname($userUID="",$pers="")
                      break;
                case constKommuneAnzeigeDEFAULT:
                    	$selectWETTBEWERB = (isset($_REQUEST[constKommuneParmWettbewerbArt]) ? $_REQUEST[constKommuneParmWettbewerbArt] : '');
-                   	$qry.="BEGIN;UPDATE tbl_wettbewerb set icon='$content' WHERE UPPER(wettbewerb_kurzbz)=UPPER('$selectWETTBEWERB');COMMIT;";
+                   	$qry.="BEGIN;UPDATE kommune.tbl_wettbewerb set icon='$content' WHERE UPPER(wettbewerb_kurzbz)=UPPER('$selectWETTBEWERB');COMMIT;";
                    	break;
               default: // Keine Verarbeitung
                    return ''; 

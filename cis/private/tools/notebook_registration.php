@@ -11,28 +11,29 @@
 	 * 	   gebeten dies wieder in ordnung zu bringen
 	 */
 	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
+	
+	require_once('../../../include/basis_db.class.php');
+	if (!$db = new basis_db())
+	      die('Fehler beim Oeffnen der Datenbankverbindung');
   
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/File/SearchReplace.php');
 	require_once('../../../include/File/Match.php');
 
-
 	if (!$user=get_uid())
 		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 
-	if(!isset($txtUID))
-		$txtUID='';
-	if(!isset($txtPassword))
-		$txtPassword='';
+	
+	$mac_result = trim((isset($_REQUEST['mac_result']) ? $_REQUEST['mac_result']:''));
+	$txtUID = trim((isset($_REQUEST['txtUID']) ? $_REQUEST['txtUID']:''));
+	$txtPassword = trim((isset($_REQUEST['txtPassword']) ? $_REQUEST['txtPassword']:''));
 
 	if(check_lektor($user))
-       $is_lector=true;
-  else
-        $is_lector=false;
+       	$is_lector=true;
+  	else
+	        $is_lector=false;
+		 
 	function ip_increment($ip = "")
 	{
 		$ip = split("\.", $ip);

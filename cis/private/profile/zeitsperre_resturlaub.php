@@ -23,11 +23,7 @@
 // * @brief bietet die Moeglichkeit zur Anzeige und
 // * Aenderung der Zeitwuensche und Zeitsperren
 
-  require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-
+	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/zeitsperre.class.php');
 	require_once('../../../include/datum.class.php');
@@ -37,9 +33,11 @@
 	require_once('../../../include/mitarbeiter.class.php');
 	require_once('../../../include/mail.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
-
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+      
 	$uid = get_uid();
-	
+
 	$PHP_SELF = $_SERVER['PHP_SELF'];
 
 	if(isset($_GET['type']))
@@ -178,19 +176,20 @@ function checkdatum()
 
 <?php
 
+ 
 //Zeitsperre Speichern
 if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_sperre'))
 {
 	$error=false;
 	$error_msg='';
 	//von-datum pruefen
-	if(isset($_POST['vondatum']) && !ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['vondatum']))
+	if(isset($_POST['vondatum']) && !$datum_obj->checkDatum($_POST['vondatum']))
 	{
 		$error=true;
 		$error_msg .= 'Von-Datum ist ung&uuml;ltig ';
 	}
-	//bis-datum pruefen
-	if(isset($_POST['bisdatum']) && !ereg("([0-9]{2}).([0-9]{2}).([0-9]{4})",$_POST['bisdatum']))
+	//bis-datum pruefen $datum_obj->formatDatum($_POST['bisdatum']
+	if(isset($_POST['bisdatum']) && !$datum_obj->checkDatum($_POST['bisdatum']))
 	{
 		$error=true;
 		$error_msg .= 'Bis-Datum ist ung&uuml;ltig ';
@@ -282,9 +281,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
 		$zeitsperre->mitarbeiter_uid = $uid;
 		$zeitsperre->bezeichnung = $_POST['bezeichnung'];
-		$zeitsperre->vondatum = $_POST['vondatum'];
+		$zeitsperre->vondatum = $datum_obj->formatDatum($_POST['vondatum']);
 		$zeitsperre->vonstunde = $_POST['vonstunde'];
-		$zeitsperre->bisdatum = $_POST['bisdatum'];
+		$zeitsperre->bisdatum = $datum_obj->formatDatum($_POST['bisdatum']);
 		$zeitsperre->bisstunde = $_POST['bisstunde'];
 		$zeitsperre->erreichbarkeit_kurzbz = $_POST['erreichbarkeit'];
 		$zeitsperre->vertretung_uid = $_POST['vertretung_uid'];

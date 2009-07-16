@@ -30,15 +30,13 @@
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			$db=false;
-
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
-	
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+				
 	//require_once('../../../include/Excel/excel.php');
 if(!isset($_POST['uid']))
 {

@@ -27,7 +27,7 @@
 	require_once('../../../include/functions.inc.php');
 	if (!$user=get_uid())
 		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
-	
+	require_once('../../../include/datum.class.php');
 // ---------------- Classen Datenbankabfragen und Funktionen 
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
@@ -93,9 +93,9 @@
 
 		$news->news_id = $news_id;
 		$news->betreff = trim(isset($_REQUEST['betreff']) ? $_REQUEST['betreff']:'');
-		$news->verfasser =trim(isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:'');
+		$news->verfasser =trim(isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:$user);
 		$news->text = trim(isset($_REQUEST['text']) ? $_REQUEST['text']:'');
-	
+
 		$news->studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:0));
 		$news->semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
 
@@ -112,12 +112,28 @@
 				$news->fachbereich_kurzbz = '';
 		}	
 			
+		
+		$datum_obj = new datum();
+		if(isset($_POST['datum']) && !$datum_obj->checkDatum($_POST['datum']))
+			$error.=(!empty($error)?'<br>':'').$_POST['datum'].' Datum ist falsch ';
+		if(isset($_POST['datum_bis']) && !$datum_obj->checkDatum($_POST['datum_bis']))
+			$error.=(!empty($error)?'<br>':'').$_POST['datum_bis'].' Datum Bis ist falsch ';
+
+
+			
+			
 		$news->datum = trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:date('d.m.Y')));
 		$news->datum_bis = trim((isset($_REQUEST['datum_bis']) ? $_REQUEST['datum_bis']:null));
+
+		
+
 		$news->uid=$user;
 		$news->updatevon=$user;
 		$news->updateamum=date('Y-m-d H:i:s');	
 		
+		$news->insertvon=$user;
+		$news->insertamum=date('Y-m-d H:i:s');	
+				
 		if($news->save())
 		{
 			if(isset($news_id) && $news_id != "")
