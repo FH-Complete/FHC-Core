@@ -28,7 +28,7 @@
 	require_once('../../../include/functions.inc.php');
 	if (!$user=get_uid())
 		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
+	require_once('../../../include/datum.class.php');
 // ---------------- Classen Datenbankabfragen und Funktionen 
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
@@ -96,8 +96,17 @@
 		$news->semester=0;
 		$news->fachbereich_kurzbz=null;
 
+		
+		$datum_obj = new datum();
+		if(isset($_POST['datum']) && !$datum_obj->checkDatum($_POST['datum']))
+			$error.=(!empty($error)?'<br>':'').$_POST['datum'].' Datum ist falsch ';
+		if(isset($_POST['datum_bis']) && !empty($_POST['datum_bis']) &&  !$datum_obj->checkDatum($_POST['datum_bis']))
+			$error.=(!empty($error)?'<br>':'').$_POST['datum_bis'].' Datum Bis ist falsch ';
+					
+		
 		$news->datum = trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:date('d.m.Y')));
 		$news->datum_bis = trim((isset($_REQUEST['datum_bis']) ? $_REQUEST['datum_bis']:null));
+		
 		$news->uid=$user;
 		$news->updatevon=$user;
 		$news->updateamum=date('Y-m-d H:i:s');	
@@ -106,7 +115,7 @@
 		$news->insertamum=date('Y-m-d H:i:s');			
 		
 #		var_dump($news);
-		if($news->save())
+		if(!$error && $news->save())
 		{
 			if(isset($news_id) && $news_id != "")
 				$error.=(!empty($error)?'<br>':'').'Die Nachricht wurde erfolgreich ge&auml;ndert!';		

@@ -321,8 +321,8 @@ class news extends basis_db
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->verfasser).', '.
-				$this->addslashes($this->datum).', '.
-				$this->addslashes($this->datum_bis).', '.
+				$this->addslashes($this->getSQLDate($this->datum)).', '.
+				$this->addslashes($this->getSQLDate($this->datum_bis)).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
@@ -348,8 +348,8 @@ class news extends basis_db
 				'uid='.$this->addslashes($this->uid).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
 				'verfasser='.$this->addslashes($this->verfasser).', '.
-				'datum='.$this->addslashes($this->datum).', '.
-				'datum_bis='.$this->addslashes($this->datum_bis).', '.
+				'datum='.$this->addslashes($this->getSQLDate($this->datum)).', '.
+				'datum_bis='.$this->addslashes($this->getSQLDate($this->datum_bis)).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
@@ -367,5 +367,39 @@ class news extends basis_db
 			return false;
 		}		
 	}
+	
+	
+	/**
+	 * Ermittelt das Datumsformat fuer SQL
+	 * @param $datum das konvertiert werden soll
+	 * @return Datum wenn ok, false im Fehlerfall
+	 */
+	public function getSQLDate($datum)
+	{
+		if ( is_null($datum) || empty($datum) )
+			return $datum;
+	
+		$date=explode('.',$datum);
+		if (@checkdate($date[1], $date[0], $date[2]))
+		{
+			 return $date[2].'-'.$date[1].'-'.$date[0];	
+		}	 	
+		if (@checkdate($date[2], $date[0], $date[1]))
+		{
+			 return $date[0].'-'.$date[1].'-'.$date[2];	
+		}	 	
+
+		$date=explode('-',$datum);
+		if (@checkdate($date[1], $date[0], $date[2]))
+		{
+			 return $date[2].'-'.$date[1].'-'.$date[0];	
+		}	 	
+		if (@checkdate($date[2], $date[0], $date[1]))
+		{
+			 return $date[0].'-'.$date[1].'-'.$date[2];	
+		}	 	
+		return false;
+	
+	}	
 }
 ?>
