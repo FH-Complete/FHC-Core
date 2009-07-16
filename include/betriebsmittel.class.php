@@ -39,9 +39,9 @@ class betriebsmittel extends basis_db
 	public $ort_kurzbz;			// string
 	public $ext_id;				// integer
 	public $insertamum;			// timestamp
-	public $insertvon;			// bigint
+	public $insertvon;			// string
 	public $updateamum;			// timestamp
-	public $updatevon;			// bigint
+	public $updatevon;			// string
 	
 	/**
 	 * Konstruktor
@@ -74,6 +74,7 @@ class betriebsmittel extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
+				
 				$this->betriebsmittel_id = $row->betriebsmittel_id;
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
@@ -82,11 +83,11 @@ class betriebsmittel extends basis_db
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->updateamum = $row->updateamum;
-				$this->udpatevon = $row->updatevon;
+				$this->updatevon = $row->updatevon;
 				$this->insertvon = $row->insertvon;
 				$this->insertamum = $row->insertamum;
 				$this->ext_id = $row->ext_id;
-				return true;				
+				return $this->result=$row;				
 			}
 			else 
 			{
@@ -159,7 +160,7 @@ class betriebsmittel extends basis_db
 				'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)

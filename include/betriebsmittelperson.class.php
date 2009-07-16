@@ -106,7 +106,7 @@ class betriebsmittelperson extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->ext_id = $row->ext_id;
-				return true;
+				return $this->result=$row;	
 			}
 			else 
 			{
