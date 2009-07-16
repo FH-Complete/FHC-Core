@@ -22,14 +22,12 @@
  */
  
 		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
+		require_once('../../include/functions.inc.php');
+	    	require_once('../../include/studiengang.class.php');
+		require_once('../../include/benutzerberechtigung.class.php');
 		if (!$db = new basis_db())
 				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-		require_once('../../include/functions.inc.php');
-    require_once('../../include/studiengang.class.php');
-    require_once('../../include/benutzerberechtigung.class.php');
-
 	$user = get_uid();
 	
 	$rechte = new benutzerberechtigung();
@@ -40,20 +38,44 @@
 	
 	$htmlstr = "";
 	
+if(isset($_GET['searchstr']))
+	$searchstr = $_GET['searchstr'];
+else 
+	$searchstr = '';
+	
+	$htmlstr.='
+	<form accept-charset="UTF-8" name="search" method="GET">
+  		Bitte Suchbegriff eingeben: 
+  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+  		<input type="submit" value="Suchen">
+  	</form>';	
+
+if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
+{	
 	if (isset($_POST['bmsuche']))
 	{
 		$bmsuche=strtoupper($_POST['bmsuche']);
 		$bmsuche = ereg_replace("^0*", "", $bmsuche);
 		
 		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
-					WHERE upper(uid) LIKE '%$bmsuche%' OR upper(nachname) LIKE '%$bmsuche%' OR upper(vorname) LIKE '%$bmsuche%' 
-						OR upper(nummer) LIKE '%$bmsuche%' OR upper(nummerintern) LIKE '%$bmsuche%'
+					WHERE upper(uid) LIKE '%".addslashes($bmsuche)."%' OR upper(nachname) LIKE '%".addslashes($bmsuche)."%' OR upper(vorname) LIKE '%".addslashes($bmsuche)."%' 
+						OR upper(nummer) LIKE '%".addslashes($bmsuche)."%' OR upper(nummerintern) LIKE '%".addslashes($bmsuche)."%'
 					LIMIT 30";
 		//echo $sql_query;
 	}
 	else
-		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ORDER BY nummer LIMIT 20;';
+	{
+		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
+		if(!empty($searchstr))
+			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
+		$sql_query.="	ORDER BY nummer ";
+		 if(empty($searchstr))
+			 $sql_query.=" LIMIT 100 ";
 
+	}	
+
+	
+	
     if(!$erg=$db->db_query($sql_query))
 	{
 		$htmlstr='Fehler beim Laden der Berechtigungen';
@@ -91,6 +113,7 @@
 		}
 	    	$htmlstr .= "</tbody></table>\n";
 	}
+}	
 ?>
 <html>
 <head>
