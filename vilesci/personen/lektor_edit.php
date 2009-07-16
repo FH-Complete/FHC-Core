@@ -21,16 +21,14 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
+	require_once('../../config/vilesci.config.inc.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/mitarbeiter.class.php');
 		if (!$db = new basis_db())
 				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-require_once('../../include/functions.inc.php');
-require_once('../../include/person.class.php');
-require_once('../../include/benutzer.class.php');
-require_once('../../include/mitarbeiter.class.php');
-
 echo '
 <html>
 <head>
@@ -43,7 +41,7 @@ echo '
 	if (isset($_POST['Save']))
 	{
 		if(doSAVE())
-			echo "<script language='Javascript'>window.location.href='lektor_uebersicht.php';</script>";
+			echo "<script language='Javascript'>window.location.href='lektor_uebersicht.php?searchstr=".(isset($_POST['uid'])?$_POST['uid']:$_GET['uid'])."';</script>";
 	}
 	else if (isset($_GET['new']))
 	{

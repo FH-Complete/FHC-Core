@@ -29,25 +29,20 @@
 		include('../../include/functions.inc.php');
 
 
-	foreach ($_REQUEST as $key => $value) 
-	{
-			 $key=$value; 
-	}
+
 	if(isset($_GET['uid']) && isset($_GET['del']))
 	{
 		//$sql_query = "Delete from tbl_person where uid='".$_GET["uid"]."';";
 		//echo $sql_query;
 		echo 'Loeschen noch nicht implementiert';
 	}
-
 	if(isset($_GET['fix']) && isset($_GET['uid']))
 	{
 		$sql_query = "UPDATE public.tbl_mitarbeiter SET fixangestellt=". ($_GET['fix']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
 		//echo $sql_query;
 		if(!($erg=$db->db_query($sql_query)))
 			die($db->db_last_error());
-		}
-
+	}
 	if(isset($_GET['lek']) && isset($_GET['uid']))
 	{
 		$sql_query = "UPDATE public.tbl_mitarbeiter SET lektor=". ($_GET['lek']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
@@ -77,7 +72,26 @@ function confdel()
 
 
 <?php
+
+
+if(isset($_GET['searchstr']))
+	$searchstr = $_GET['searchstr'];
+else 
+	$searchstr = '';
+	
+echo '
+	<form accept-charset="UTF-8" name="search" method="GET">
+  		Bitte Suchbegriff eingeben: 
+  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+  		<input type="submit" value="Suchen">
+  	</form>';	
+if(!isset($_GET['searchstr']))	
+	exit;
+
 	$qry = "SELECT * FROM campus.vw_mitarbeiter";
+	if(!empty($searchstr))
+			$qry.=" where uid  ~* '".addslashes($searchstr)."'   OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
+	
 	if(isset($order))
 		$qry .= " ORDER BY $order";
 	else
