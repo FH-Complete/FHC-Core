@@ -40,7 +40,13 @@ $htmlstr='
   		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
   		<input type="submit" value="Suchen">
   	</form>';
-
+		
+$htmlstr .= "<div style='float:left'><a href='berechtigungrolle.php' target='main'>Rollen Administrieren</a></div>";
+$htmlstr .= "<div style='text-align:right'>";
+$htmlstr .= "<form name='neuform' action='benutzerberechtigung_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
+$htmlstr .= "</div>";
+$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>\n";
+		
 if(isset($_GET['searchstr']))
 {	
 	
@@ -68,12 +74,7 @@ if(isset($_GET['searchstr']))
 	
 	else
 	{
-		$htmlstr .= "<div style='float:left'><a href='berechtigungrolle.php' target='main'>Rollen Administrieren</a></div>";
-		$htmlstr .= "<div style='text-align:right'>";
-		$htmlstr .= "<form name='neuform' action='benutzerberechtigung_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
-		$htmlstr .= "</div>";
-	    $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
-		$htmlstr .= "   <thead><tr class='liste'>\n";
+		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>   <thead><tr class='liste'>\n";
 	    $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
 	    $htmlstr .= "   </tr></thead><tbody>\n";
 	    $i = 0;
