@@ -23,11 +23,10 @@
 	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
-    	require_once('../../include/benutzerberechtigung.class.php');
+    require_once('../../include/benutzerberechtigung.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		    
-
 	if (!$user = get_uid())
 			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 			
@@ -48,7 +47,10 @@ $htmlstr = "";
   		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
   		<input type="submit" value="Suchen">
   	</form>';	
-	
+		$htmlstr .= "<div style='text-align:right'>";
+		$htmlstr .= "<form name='neuform' action='variablen_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
+		$htmlstr .= "</div>";
+	  $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>\n";	
 	
 if(isset($_GET['searchstr']))
 {	
@@ -75,18 +77,12 @@ if(isset($_GET['searchstr']))
 	}	
 	else
 	{
-		//$htmlstr = "<table class='liste sortable'>\n";
-		$htmlstr .= "<div style='text-align:right'>";
-		$htmlstr .= "<form name='neuform' action='variablen_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
-		$htmlstr .= "</div>";
-	  $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
-		$htmlstr .= "   <thead><tr class='liste'>\n";
+		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'><thead><tr class='liste'>\n";
 	  $htmlstr .= "       <th class='table-sortable:default'>UID</th><th class='table-sortable:default'>Vorname</th><th class='table-sortable:alphanumeric'>Nachname</th>";
 	  $htmlstr .= "   </tr></thead><tbody>\n";
 	  $i = 0;
 		while($row=$db->db_fetch_object($erg))
 	    {
-	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 					$htmlstr .= "   <tr>\n";
 	        $htmlstr .= "       <td>".$row->uid."</td>\n";
 					$htmlstr .= "       <td>".$row->vorname."</td>\n";
