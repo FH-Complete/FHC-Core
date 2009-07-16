@@ -35,31 +35,30 @@
 #	require_once('../config.inc.php');
 // ---------------- Vilesci Include Dateien einbinden
 	require_once('../../config/vilesci.config.inc.php');	
-	require_once('../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
 		
 // ---------------- Standart Include Dateien einbinden
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
 	include_once('../../include/moodle_course.class.php');
-	
-	
+
+	require_once('../../include/studiensemester.class.php');
+	require_once('../../include/studiengang.class.php');	
+
+
 // ***********************************************************************************************	
 // Variable Initialisieren
 // ***********************************************************************************************
 	// AusgabeStream
 	$content='';
-	// Vergleichsdatum Jahr und Monat fuer Studiensemester (Select-Auswahl)
-	$cYYYYMM=date("Ym", mktime(0,0,0,date("m"),date("d"),date("y")));
-
-	
 // ***********************************************************************************************
 // POST oder GET Parameter einlesen 
 // ***********************************************************************************************
 // @$studiensemester_kurzbz Studiensemester xxJJJJ - xx fuer SS Sommer  oder WW Winter
-	$studiensemester_kurzbz=(isset($_REQUEST['studiensemester_kurzbz'])?trim($_REQUEST['studiensemester_kurzbz']):'');
+	$stsem = new studiensemester();
+	if (!$stsem_aktuell = $stsem->getakt())
+		$stsem_aktuell = $stsem->getaktorNext();
+	$studiensemester_kurzbz=(isset($_REQUEST['studiensemester_kurzbz'])?trim($_REQUEST['studiensemester_kurzbz']):$stsem_aktuell);
 // @$studiengang_kz Studiengang
 	$studiengang_kz=(isset($_REQUEST['studiengang_kz'])?trim($_REQUEST['studiengang_kz']):'');
 // @$semester Semester des Studienganges 
@@ -84,79 +83,19 @@
 // ***********************************************************************************************
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
-	$objMoodle = new moodle_course();	
+
 	
 // ***********************************************************************************************
 //	Verarbeitung einer Moodle-Kurs Loeschaktion
 // ***********************************************************************************************
-	
+	$objMoodle = new moodle_course();		
 	if ($mdl_course_id!='' && $studiensemester_kurzbz!='') // Kurs wird zum bearbeiten (loeschen) freigegeben
 	{
-		include("../../include/xmlrpcutils/utils.php");
-	    // Aktuellen Moodle Server ermitteln.
-		if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
-		{
-			$host = mb_eregi_replace('https://','',mb_eregi_replace('http://','',mb_eregi_replace('/moodle','',mb_eregi_replace('/moodle/','',MOODLE_PATH))));
-		}
-		elseif ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" ) // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
-		{
-			$host = 'dav.technikum-wien.at';
-		}	
-		elseif ($_SERVER["HTTP_HOST"]=="calva.technikum-wien.at" ) // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
-		{
-			$host = 'calva.technikum-wien.at';
-		}	
-		else // Produktivessystem
-		{
-			$host = 'cis.technikum-wien.at';
-		}	
-#exit($host);
-
-	// Variable Daten Initialisieren
-		$uri = "/moodle/xmlrpc/xmlrpc.php";
-		$method = "DeleteCourseByID";
-		$args['CourseID']="$mdl_course_id";
-		$port=$_SERVER["SERVER_PORT"];
-		if ($debug_switch)
-		{
-			$content.="<br />Host:$host , Port:$port , Uri:$uri , Method:$method <br />";
-		}
-		$callspec = array(
-			'method' => $method,
-			'host' => $host,
-			'port' => $port,
-			'uri' => $uri,
-			'user' => (isset($_SERVER["PHP_AUTH_USER"])?$_SERVER["PHP_AUTH_USER"]:""),
-			'pass' => (isset($_SERVER["PHP_AUTH_PW"])?$_SERVER["PHP_AUTH_PW"]:""),
-			'secure' =>false,
-			'debug' => $debug_switch, 
-			'args' => $args);
-		$result = xu_rpc_http_concise($callspec);
-		// Return Information
-		// $result[0] = Status true/false
-		// $result[1] = Informationstext
-		// $result[2] = Ausgabetext von Moodle
-		if (!is_array($result)) // Server wurde nicht erreicht.
-		{
-				$content.="Fehler xmlrpc call $result";
-		}	
-		else if ($result[0]==1) // Methodenaufruf erfolgreich	
-		{
-				#$content.=(isset($result[1])?$result[1]:"Moodel-Kurs gel&ouml;scht ");
-				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='".addslashes($mdl_course_id)."' ";
-				if ($moodle_id!='')
-					$qry.= " and moodle_id='".addslashes($moodle_id)."'"; 
-				if(!$db->db_query($qry))
-						$content.="<p>Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre.</p>";
-				else		
-					$content.="<h3>Moodlekurs $mdl_course_id wurde gel&ouml;scht.</h3>";
-		}	
-		else // Result = 0 ein Fehler im RFC wurde festgestellt
-		{
-			$content.=(isset($result[1])?$result[1]:"Fehler beim Kurs l&ouml;schen ");
-		}	
+		if ($objMoodle->deleteKurs($mdl_course_id,$moodle_id,$debug_switch))
+			$content.='<h3>'.$objMoodle->errormsg.'</h3>';
+		else
+			$content.='<p>'.$objMoodle->errormsg.'</p>';
 	}
-
 
 
 // ***********************************************************************************************
@@ -167,32 +106,33 @@
 	$content.='
 		<form accept-charset="UTF-8" name="'.$cFormName.'" method="GET">	
 			<table><tr>';
-
 	// Studiensemester public.tbl_studiensemester_kurzbz
 		$content.='<td>Studiensemester</td><td><select onchange="document.'.$cFormName.'.submit();" name="studiensemester_kurzbz">';
-		$sql_query = "SELECT studiensemester_kurzbz,to_char(start,'YYYYMM') as \"startYYYYMM\",to_char(ende,'YYYYMM') as \"endeYYYYMM\" FROM public.tbl_studiensemester order by start; ";
-		if ($result = $db->db_query($sql_query))
+		$stsem->getAll();
+		foreach ($stsem->studiensemester as $row)	
 		{
-			while ($row = $db->db_fetch_object($result))
-			{
-			// Gibt es noch keinen POST/GET Parameterwert den aktuellen Studiensemesterwert nehmen zum Positionieren in der Selektliste 
-			if (empty($studiensemester_kurzbz) && $cYYYYMM>=$row->startYYYYMM  && $cYYYYMM<=$row->endeYYYYMM) 
-				$studiensemester_kurzbz=$row->studiensemester_kurzbz;
-
 			$content.='<option value="'.$row->studiensemester_kurzbz.'" '.(("$studiensemester_kurzbz"=="$row->studiensemester_kurzbz")?' selected="selected" ':'').'>&nbsp;'.$row->studiensemester_kurzbz.'&nbsp;</option>';
-			}
-		}	
+		}
 		$content.='</select></td>';
 	
 	// Studiengang public.tbl_studiengang_kz
 		$content.='<td>Studiengang</td><td><select onchange="document.'.$cFormName.'.submit();" name="studiengang_kz"><option value="">&nbsp;Alle&nbsp;</option>';		
-		$sql_query = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kurzkz,kurzbzlang FROM public.tbl_studiengang where public.tbl_studiengang.moodle='t' ORDER BY kurzkz,kurzbzlang;";
-		if ($result = $db->db_query($sql_query))
+		$stg = new studiengang();
+		$stg->getAll('typ, kurzbz',true);
+
+		$max_semester=0;
+		foreach ($stg->result as $row)
 		{
-			while($row=$db->db_fetch_object($result))
-			{
-				$content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kurzkz.'-'.$row->kurzbzlang.'&nbsp;</option>';
-			}
+				if (!$row->moodle)
+					continue;
+					
+				if (empty($studiengang_kz) && !isset($_REQUEST['studiengang_kz']) )
+					$studiengang_kz=$row->studiengang_kz;
+					
+				if ($studiengang_kz==$row->studiengang_kz)
+					$max_semester=$row->max_semester;
+					
+				$content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.'&nbsp;</option>';
 		}	
 		$content.='</select></td>';
 
@@ -200,15 +140,10 @@
 		$content.='<td>Semster</td><td><select onchange="document.'.$cFormName.'.submit();" name="semester"><option value="">&nbsp;Alle&nbsp;</option>';			
 		if ($studiengang_kz!='')
 		{
-			$sql_query = "SELECT max_semester FROM public.tbl_studiengang where studiengang_kz='".addslashes($studiengang_kz)."' OFFSET 0 LIMIT 1 ;";
-			$result = $db->db_query($sql_query);
-			if ($row = $db->db_fetch_object($result))
-			{
-				for($i=0;$i<=$row->max_semester;$i++)
+				for($i=0;$i<=$max_semester;$i++)
 				{
 					$content.='<option value="'.($i).'" '.(("$semester"=="$i")?' selected="selected" ':'').'>&nbsp;'.($i).'&nbsp;</option>';
 				}
-			}	
 		}
 		$content.='</select></td>';
 
@@ -242,7 +177,7 @@
 				$content.='<th>&nbsp;Lehrveranstaltung&nbsp;</th>';
 				$content.='<th>&nbsp;Kurzbz.&nbsp;</th>';
 				$content.='<th>&nbsp;LV&nbsp;Id&nbsp;</th>';
-				$content.='<th>&nbsp;StudiengangKz&nbsp;</th>';
+				$content.='<th>&nbsp;Stg&nbsp;</th>';
 				$content.='<th>&nbsp;Kursbezeichnung&nbsp;</th>';
 				$content.='<th>&nbsp;ID&nbsp;</th>';
 				$content.='<td>&nbsp;Benotungen&nbsp;</td>';				
@@ -317,46 +252,4 @@
 	</body>
 		</html>';
 	exit($content);
-
-
-
-#-------------------------------------------------------------------------------------------	
-# Testfunktion zur Anzeige einer übergebenen Variable oder Array, Default ist GLOBALS
-function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
-{
-
-    $tmpArrayString='';
-    if (!is_array($arr) && !is_object($arr)) return $arr;
-    if (is_array($arr) && count($arr)<1 && $displayShow) return '';
-    if (is_array($arr) && count($arr)<1 && $displayShow) return "<br /><b>function Test (???)</b><br />";
-   
-    $lfdnr=$lfd + 1; 
-    $tmpAnzeigeStufe='';
-    for ($i=1;$i<$lfdnr;$i++) $tmpAnzeigeStufe.="=";
-    $tmpAnzeigeStufe.="=>";
-	while (list( $tmp_key, $tmp_value ) = each($arr) ) 
-	{
-       	if (!$onlyRoot && (is_array($tmp_value) || is_object($tmp_value)) && count($tmp_value) >0) 
-       	{
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe <b>$tmp_key</b>".Test($tmp_value,$lfdnr);
-       	} else if ( (is_array($tmp_value) || is_object($tmp_value)) ) 
-       	{
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
-		} else if ($tmp_value!='') 
-		{
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe $tmp_key :== ".$tmp_value;
-		} else {
-                   $tmpArrayString.="<br />$tmpAnzeigeStufe $tmp_key :-- (is Empty :: $tmp_value)";
-		}  
-    }
-     if ($lfd!='') { return $tmpArrayString; }
-     if (!$displayShow) { return $tmpArrayString; }
-       
-    $tmpArrayString.="<br />";
-    $tmpArrayString="<br /><hr /><br />******* START *******<br />".$tmpArrayString."<br />******* ENDE *******<br /><hr /><br />";
-    $tmpArrayString.="<br />Server:: ".$_SERVER['PHP_SELF']."<br />";
-	return "$tmpArrayString";
-
-
-}	
 ?>
