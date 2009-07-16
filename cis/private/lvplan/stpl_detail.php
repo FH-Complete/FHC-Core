@@ -10,13 +10,12 @@
  *****************************************************************************/
 
 
-	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/ort.class.php');
+require_once('../../../include/functions.inc.php');
+
   if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
-  
-  require_once('../../../include/ort.class.php');
-  require_once('../../../include/functions.inc.php');
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
@@ -41,14 +40,9 @@ if (isset($_GET['gruppe_kurzbz']))
 	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
 
 
-// Datums Format und search_path
-if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
-	die($db->db_last_error());
-
 $stsem = getStudiensemesterFromDatum($datum);
-	
 //Stundenplan
-$sql_query='SELECT vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
+$sql_query='SELECT campus.vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
 $sql_query.=", (SELECT count(*) FROM public.tbl_studentlehrverband 
 				WHERE studiengang_kz=vw_stundenplan.studiengang_kz AND semester=vw_stundenplan.semester
 				AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
@@ -56,7 +50,7 @@ $sql_query.=", (SELECT count(*) FROM public.tbl_studentlehrverband
 				AND studiensemester_kurzbz='$stsem') as anzahl_lvb
 			, (SELECT count(*) FROM public.tbl_benutzergruppe 
 				WHERE gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz AND studiensemester_kurzbz='$stsem') as anzahl_grp";
-$sql_query.=' FROM (vw_stundenplan JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN vw_mitarbeiter USING (uid)';
+$sql_query.=' FROM (campus.vw_stundenplan JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN campus.vw_mitarbeiter USING (uid)';
 $sql_query.=" WHERE datum='$datum' AND stunde=$stunde";
 if ($type=='lektor')
     $sql_query.=" AND vw_stundenplan.uid='$pers_uid' ";
@@ -79,7 +73,7 @@ $erg_stpl=$db->db_query($sql_query);
 $num_rows_stpl=$db->db_num_rows($erg_stpl);
 
 //Reservierungen
-$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM vw_reservierung, vw_mitarbeiter WHERE datum='$datum' AND stunde=$stunde";
+$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM campus.vw_reservierung, campus.vw_mitarbeiter WHERE datum='$datum' AND stunde=$stunde";
 if (isset($ort_kurzbz))
     $sql_query.=" AND vw_reservierung.ort_kurzbz='$ort_kurzbz'";
 if ($type=='lektor')

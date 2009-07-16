@@ -20,28 +20,24 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
 
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 	$uid=get_uid();
 	
 	if (isset($_GET['id']))
 		$id=$_GET['id'];
-
+	else if (isset($_POST['id']))
+		$id=$_POST['id'];
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 	
-	// Datums Format und search_path
-	if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
-		die($db->db_last_error());
-
 	if (isset($id))
 	{
-		$sql_query="DELETE FROM tbl_reservierung WHERE reservierung_id=$id";
+		$sql_query="DELETE FROM campus.tbl_reservierung WHERE reservierung_id=$id";
 		$erg=$db->db_query($sql_query);
 	}
 
@@ -67,16 +63,18 @@
 	$datum=date("Y-m-d",$datum);
 	
 	//EIGENE
-	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' AND uid='$uid'";
+	$sql_query="SELECT * FROM campus.vw_reservierung WHERE datum>='$datum' AND uid='$uid'";
 	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
-	$erg_res=$db->db_query($sql_query);
+	if (!$erg_res=$db->db_query($sql_query))
+		die($db->db_last_error());
+
 	$num_rows_res=$db->db_num_rows($erg_res);
 	
 	if ($num_rows_res>0)
 	{
 		echo 'Eigene Reservierungen:<br>';
 		echo '<table border="0">';
-		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
+		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th><th>Aktion</th></tr>';
 		for ($i=0; $i<$num_rows_res; $i++)
 		{
 			$zeile=$i % 2;
@@ -100,20 +98,23 @@
 			echo '</tr>';
 		}
 		echo '</table>';
+		flush();
 	}
-	
+
 	echo '<br><br>';
+	flush();
+
 	//ALLE
-	$sql_query="SELECT * FROM vw_reservierung WHERE datum>='$datum' ";
+	$sql_query="SELECT * FROM campus.vw_reservierung WHERE datum>='$datum' ";
 	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
-	$erg_res=$db->db_query($sql_query);
+	if (!$erg_res=$db->db_query($sql_query))
+		die($db->db_last_error());
 	$num_rows_res=$db->db_num_rows($erg_res);
-	
 	if ($num_rows_res>0)
 	{
 		echo 'Alle Reservierungen:<br>';
 		echo '<table border="0">';
-		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
+		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th><th>Aktion</th></tr>';
 		for ($i=0; $i<$num_rows_res; $i++)
 		{
 			$zeile=$i % 2;
@@ -137,6 +138,7 @@
 			echo '</tr>';
 		}
 		echo '</table>';
+		flush();
 	}
 ?>
 </body>

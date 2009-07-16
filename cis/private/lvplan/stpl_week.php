@@ -42,17 +42,16 @@
 //$ort_kurzbz='EDV6.08';
 //$datum=1102260015;
 
-	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+require_once('../../../config/cis.config.inc.php');
 //require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+  
 $uid=get_uid();
+
 
 // Deutsche Umgebung
 //$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
@@ -129,12 +128,6 @@ if ($berechtigung->isBerechtigt('raumres'))
 else
 	$raumres=false;
 
-// Datums Format
-if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
-{
-	die($db->db_last_error());
-}
-
 // Authentifizierung
 if (check_student($uid))
 	$user='student';
@@ -154,8 +147,11 @@ if (!isset($pers_uid))
 	$pers_uid=$uid;
 
 //echo $uid.':'.$user_uid;
-//var_dump($_POST);
-
+#var_dump($_GET);
+if (isset($_POST['reserve']))
+	$reserve=$_POST['reserve'];
+else if (isset($_GET['reserve']))
+	$reserve=$_GET['reserve'];	
 // Reservieren
 if (isset($reserve) && ($user=='lektor' || $raumres))
 {
@@ -163,6 +159,7 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 	{
 		die($db->db_last_error());
 	}
+
 	$num_rows_std=$db->db_num_rows($erg_std);
 	$count=0;
 	for ($t=1;$t<7;$t++)
@@ -173,17 +170,31 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 			//echo $$var;
 			if (isset($_POST[$var]))
 				$$var=$_POST[$var];
+			else if (isset($_GET[$var]))
+				$$var=$_GET[$var];				
 			if (isset($$var))
 			{
 				$datum_res=$$var;
+				#$datum_res=$datum_obj->formatDatum($datum_res);
 				//echo $datum_res;
-				$query="INSERT INTO campus.tbl_reservierung
+				$query="SELECT * FROM campus.tbl_reservierung where ort_kurzbz='$ort_kurzbz' and datum='$datum_res' and  stunde='$stunde'";
+				if(!$suchen_std=$db->db_query($query))
+					die($db->db_last_error());
+				$gef=$db->db_num_rows($suchen_std);		
+				if (!$gef)
+				{
+					echo $query="INSERT INTO campus.tbl_reservierung
 							(datum, uid, ort_kurzbz, stunde, beschreibung, titel, studiengang_kz )
 						VALUES
-							('$datum_res', '$user_uid', '$ort_kurzbz', $stunde, '$beschreibung', '$titel', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
-				//echo $query;
-				if(!($erg=$db->db_query($query)))
-					echo $db->db_last_error();
+							('$datum_res', '$uid', '$ort_kurzbz', $stunde, '".$_REQUEST['beschreibung']."', '".$_REQUEST['titel']."', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
+					//echo $query;
+					if(!($erg=$db->db_query($query)))
+						echo $db->db_last_error();
+				}	
+				else
+				{
+					echo "<br>$ort_kurzbz bereits reserviert von ".$db->db_result($suchen_std,0,'"uid"')." $datum_res - Stunde $stunde <br>";
+				}	
 				$count++;
 			}
 		}
@@ -222,7 +233,7 @@ if (! $stdplan->draw_header())
 $stdplan->draw_week($raumres,$uid);
 
 if (isset($count))
-	echo "Es wurden $count Stunden reserviert!<BR>";
+	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";
 ?>
 <HR>
 <P>Fehler und Feedback bitte an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>">LV-Koordinationsstelle</A>.</P>
