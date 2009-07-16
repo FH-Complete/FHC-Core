@@ -173,14 +173,14 @@
   		<!-- FuE -->
   		
 		<tr>
-          	<td class="tdwrap"><a href="http://www.technikum-wien.at/insight/forschung_und_entwicklung/" class="MenuItem" onClick="js_toggle_container('FuE');" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;F &amp; E</a></td>
+          	<td class="tdwrap"><a href="http://www.technikum-wien.at/fh/forschung___entwicklung/" class="MenuItem" onClick="js_toggle_container('FuE');" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;F &amp; E</a></td>
         </tr>
 		<tr>
           	<td class="tdwrap">
 		  		<table class="tabcontent" id="FuE" style="display: none;">
 			  	<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="http://www.technikum-wien.at/insight/forschung_und_entwicklung/f_e_projekte/" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;F&amp;E Projekte</a></td>
+					<td class="tdwrap"><a class="Item" href="http://www.technikum-wien.at/fh/forschung___entwicklung/forschungsaktivitaeten/" target="_blank"><img src="../skin/images/menu_item.gif" width="7" height="9">&nbsp;F&amp;E Projekte</a></td>
 			  	</tr>
 		  		</table>
 		  	</td>
