@@ -25,10 +25,6 @@
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-				
 	require_once('../../../../include/functions.inc.php');
 	require_once('../../../../include/lehrveranstaltung.class.php');
 	require_once('../../../../include/studiengang.class.php');
@@ -48,7 +44,10 @@
 	require_once('../../../../include/mitarbeiter.class.php');
 	require_once('../../../../include/moodle_course.class.php');
 	require_once('../../../../include/mail.class.php');
-
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+		
+		
 $debg=(isset($_REQUEST['debug'])?$_REQUEST['debug']:'');	
 $lvid=(isset($_GET['lvid'])?$_GET['lvid']:'');
 $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
@@ -564,7 +563,6 @@ echo ' <tr>';
 $stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
-
 $stsem_obj->getAll();
 
 //Studiensemester DropDown

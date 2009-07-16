@@ -87,23 +87,26 @@
 
 		$news->news_id = $news_id;
 		$news->betreff = trim((isset($_REQUEST['betreff']) ? $_REQUEST['betreff']:''));
-		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:''));
+		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:$user));
 		$news->text = trim((isset($_REQUEST['text']) ? $_REQUEST['text']:''));
 		
-		$news->studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:0));
+		$news->studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:'0'));
 		$news->semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
 
 		$news->fachbereich_kurzbz=(isset($_REQUEST['fachbereich_kurzbz']) && !empty($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachbereich_kurzbz']:null);
 		
 		$chksenat=(isset($_REQUEST['chksenat']) ?true :false);
-		if(isset($chksenat))
+		if(isset($chksenat) && $chksenat)
 			$news->fachbereich_kurzbz = 'Senat';
 		else
 			$news->fachbereich_kurzbz = '';
+	
 			
 		$news->datum = trim((isset($_REQUEST['datum']) ? $_REQUEST['datum']:date('d.m.Y')));
 		$news->datum_bis = trim((isset($_REQUEST['datum_bis']) ? $_REQUEST['datum_bis']:null));
 		$news->uid=$user;
+		$news->insertvon=$user;
+		$news->insertamum=date('Y-m-d H:i:s');	
 		$news->updatevon=$user;
 		$news->updateamum=date('Y-m-d H:i:s');	
 		
@@ -144,6 +147,7 @@
 		if (!$news->load($news_id))
 			$error.=(!empty($error)?'<br>':'').$news->errormsg;	
 	}	
+	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
@@ -375,7 +379,7 @@
 					echo '  <table class="tabcontent">';
 					echo '    <tr>';
 					echo '      <td nowarp title="Studiengang_kz:'.$row->studiengang_kz ,', Semester:'. $row->semester .', Fachbereich_kurzbz:'.$row->fachbereich_kurzbz.'">';
-					echo $datum.'&nbsp;'.$row->verfasser;
+					echo $datum.'&nbsp;'.$row->verfasser .'&nbsp;'.$row->fachbereich_kurzbz;
 					echo '      </td>';
 					echo '		<td align="right" nowrap>';
 					echo '		  <a onClick="editEntry('.$row->news_id.');">Editieren</a>, <a onClick="deleteEntry('.$row->news_id.');">L&ouml;schen</a>, <a href="#top" >Top</a>';

@@ -33,7 +33,7 @@
 // ------------------------------------------------------------------------------------------
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-			$db=false;
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 			
 	require_once('../../../include/functions.inc.php');

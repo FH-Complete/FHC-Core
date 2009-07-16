@@ -31,18 +31,13 @@
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-  $error=0;	
-	if (!$db = new basis_db())
-    {
-			$db=false;
-      $error=1;
-    }			
-			
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
-
+	if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
+			
+  	$error=0;	
     if(isset($_GET['stg_kz']))
     	$stg_kz=$_GET['stg_kz'];
     else
