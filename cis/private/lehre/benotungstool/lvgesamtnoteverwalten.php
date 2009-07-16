@@ -800,8 +800,8 @@ echo '<table>';
 						//Noten aus Moodle
 						if (!isset($moodle_course))
 							$moodle_course = new moodle_course();
-
-						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,false))
+							
+						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,$debg))
 							$mdldaten=''; 
 					}	
 					// Verarbeiten die Kursdaten
