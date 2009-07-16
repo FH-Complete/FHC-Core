@@ -1140,6 +1140,7 @@ class moodle_course extends basis_db
 			return false;
 		}
 	}
+
 	
 	/**
 	 * Laedt die Noten zu einem Moodle Course ID
@@ -1147,17 +1148,21 @@ class moodle_course extends basis_db
 	 *        
 	 * @return objekt mit den Noten der Teilnehmer dieses Kurses
 	 */
-	public function loadNoten($lehrveranstaltung_id='', $studiensemester_kurzbz='',$student_uid='',$bDetailinfo=false,$bServerinfo=false)
+	public function loadNoten($lehrveranstaltung_id=null, $studiensemester_kurzbz=null,$student_uid='',$bDetailinfo=false,$bServerinfo=false)
 	{
 	
-		// Init
-		$this->lehrveranstaltung_id=trim($lehrveranstaltung_id);
-		$this->studiensemester_kurzbz=trim($studiensemester_kurzbz);
-
-		$student_uid=trim($student_uid);
 
 		$this->errormsg='';		
 		$this->result=null;	
+	
+		// Init
+		if (!is_null($lehrveranstaltung_id))
+			$this->lehrveranstaltung_id=trim($lehrveranstaltung_id);
+		if (!is_null($studiensemester_kurzbz))	
+			$this->studiensemester_kurzbz=trim($studiensemester_kurzbz);
+		$student_uid=trim($student_uid);
+
+
 					
 		// plausib
 		if (empty($this->lehrveranstaltung_id) 
@@ -1195,13 +1200,13 @@ class moodle_course extends basis_db
 		if ($this->studiensemester_kurzbz)
 			$qry.= " and tbl_moodle.studiensemester_kurzbz ='".addslashes($this->studiensemester_kurzbz)."' "; 
 
-		
 		if(!$result_moodle=$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Lesen der Moodle Kurse , '.$this->errormsg;
 			return false;
 		}	
 
+		
 		// init
 		$_lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
 		$_lehrveranstaltung = array(); // Gesamte Information der Lehreinheit und Moodle IDs
@@ -1227,6 +1232,7 @@ class moodle_course extends basis_db
 			$this->errormsg='Es wurde kein passenden Moodle-Kurs gefunden';
 			return false;
 		}
+		
 		// --------------------------------------------------------------------
 		//
 		// Suchen Studenten Lehreinheiten zu Moodle - LE  
@@ -1255,69 +1261,28 @@ class moodle_course extends basis_db
 			return false;
 		}		
 		
-		
-		if (!function_exists('xu_load_extension'))
-			include_once("xmlrpcutils/utils.php");
-
-					
-	    // Aktuellen Moodle Server ermitteln.
-		if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
-		{
-			$host = str_replace('https://','',str_replace('http://','',str_replace('/moodle','',str_replace('/moodle/','',MOODLE_PATH))));
-		}
-		elseif ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" || $_SERVER["HTTP_HOST"]=="calva.technikum-wien.at") // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
-		{
-			$host = $_SERVER["HTTP_HOST"];
-		}	
-		else // Produktivessystem
-		{
-			$host = 'cis.technikum-wien.at';
-		}	
-		
-		$port = '';
-		$uri = "/moodle/xmlrpc/xmlrpc.php";
-		$method = "NotenCourseByID";
-		
-		
 		$last_moodle_id=false;
 		while($row = $this->db_fetch_object($result_moodle))
 		{
+		
 			// Von der Lehreinheit kann der Moodle-Kurs ermittelt werden
 			$this->mdl_course_id=trim($_lehreinheit_kpl[$row->lehreinheit_id]->mdl_course_id);
 			if ($last_moodle_id==$this->mdl_course_id)	
 				continue;
-
 			$last_moodle_id=$this->mdl_course_id;
+
+			// XML RPC - Call
+			$method = "NotenCourseByID";
 			
 			$m_user=array();
 			$m_user['CourseID']=$this->mdl_course_id;
-			
 			$mdl_username=trim($student_uid);
 			$m_user['UserId']=$mdl_username;
 			
-#			'user' => (isset($_SERVER['PHP_AUTH_USER'])?$_SERVER['PHP_AUTH_USER']:'') ,
-#			'pass' => (isset($_SERVER['PHP_AUTH_PW'])?$_SERVER['PHP_AUTH_PW']:''),
-
-			$output=array('encoding' => 'UTF-8' );
-			$result=false;
-			$callspec = array(
-			'method' => $method,
-			'host' => $host,
-			'port' => $port,
-			'uri' => $uri,
-			'user' => '' ,
-			'pass' =>'',
-			'secure' => false,
-			'debug' => $bServerinfo,
-			'args' => $m_user,
-			'output'=>$output);
-			$result = xu_rpc_http_concise($callspec);
-			if (!is_array($result)) 
-			{
-				$this->errormsg ="Fehler xmlrpc call ";
+			if (!$result=$this->callMoodleXMLRPC($method,$m_user,$bServerinfo)) 
 				return false;
-			}	
-			else if ($result[0]==1) 	
+
+			if ($result[0]==1) 	
 			{
 
 				$error=(isset($result[1])?$result[1]:"Kurs Info ");
@@ -1372,4 +1337,127 @@ class moodle_course extends basis_db
 		}
 		return $this->result;
 	}	// Ende moodle Noten 
+	
+	/**
+	 * Loescht einen Moodle Course im Moodel und in der DB
+	 * @param mdl_course_id
+	 * @param bServerinfo Detail xmlrpc Debug informationen
+	 *        
+	 * @return objekt mit den Noten der Teilnehmer dieses Kurses
+	 */
+	public function deleteKurs($mdl_course_id=null,$moodle_id=null,$bServerinfo=false)
+	{
+		$this->errormsg='';
+		$this->result=array();
+			
+		if (!is_null($mdl_course_id))
+			$this->mdl_course_id=$mdl_course_id;
+
+
+		if (!is_null($moodle_id))
+			$this->moodle_id=$moodle_id;
+
+		if (is_null($this->mdl_course_id) || empty($this->mdl_course_id) || !is_numeric($this->mdl_course_id))
+		{
+			$this->errormsg='Moodle Kurs ID fehlt';
+			return false;
+		}	
+
+	// Variable Daten Initialisieren
+		$args=array();
+		$args['CourseID']=$this->mdl_course_id;
+		$method = "DeleteCourseByID";		
+
+		if (!$result=$this->callMoodleXMLRPC($method,$args,$bServerinfo)) 
+			return false;
+			
+		if (isset($result[1]))
+			$this->errormsg=$result[1];
+
+		if ($result[0]==1) // Methodenaufruf erfolgreich	
+		{
+				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='". addslashes($this->mdl_course_id) ."' ";
+				if (!is_null($this->moodle_id) && $this->moodle_id!='')
+					$qry.= " and moodle_id='".addslashes($this->moodle_id)."'"; 
+				if(!$this->db_query($qry))
+				{
+						$this->errormsg=$this->errormsg." Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre. ";
+						return false;
+				}		
+		}	
+		else // Result = 0 ein Fehler im RFC wurde festgestellt
+		{
+			$this->errormsg=(isset($result[1])?$result[1]:" - Fehler beim Kurs ".$this->mdl_course_id." l&ouml;schen ");
+			return false;
+		}		
+		
+		if (empty($this->errormsg))	
+			$this->errormsg.="Moodlekurs ".$this->mdl_course_id." wurde gel&ouml;scht.";	
+		return true;	
+	
+	}	
+	
+	/**
+	 * ruft eine XMLRPC Methode im Moodle auf 
+	 * @param methode
+	 * @param argumente - parameter	 
+	 * @param server debug informationen 
+	 *        
+	 * @return objekt mit den Noten der Teilnehmer dieses Kurses
+	 */
+	public function callMoodleXMLRPC($method=null,$args=null,$debug=false)
+	{	
+		if (is_null($method) || empty($method))
+			{
+				$this->errormsg ="Fehler xmlrpc call - Methode fehlt";
+				return false;
+			}		
+		
+		
+			if (!function_exists('xu_load_extension'))
+				include_once("xmlrpcutils/utils.php");
+						
+		    // Aktuellen Moodle Server ermitteln.
+			if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
+			{
+				$host = str_replace('https://','',str_replace('http://','',str_replace('/moodle','',str_replace('/moodle/','',MOODLE_PATH))));
+			}
+			elseif ($_SERVER["HTTP_HOST"]=="dav.technikum-wien.at" || $_SERVER["HTTP_HOST"]=="calva.technikum-wien.at") // Vilesci config.inc.php nicht erweitert HTTP_HOST pruefen
+			{
+				$host = $_SERVER["HTTP_HOST"];
+			}	
+			else // Produktivessystem
+			{
+				$host = 'cis.technikum-wien.at';
+			}	
+			$port = '';
+			$uri = "/moodle/xmlrpc/xmlrpc.php";
+			
+			// Ausgabeeinstellungen
+			$output=array('encoding' => 'UTF-8' );
+
+
+			
+			$result=false;
+			$callspec = array(
+			'user' => (isset($_SERVER['PHP_AUTH_USER'])?$_SERVER['PHP_AUTH_USER']:'') ,
+			'pass' => (isset($_SERVER['PHP_AUTH_PW'])?$_SERVER['PHP_AUTH_PW']:''),
+			'method' => $method,
+			'host' => $host,
+			'port' => $port,
+			'uri' => $uri,
+			'secure' => false,
+			'debug' => $debug,
+			'args' => (!is_null($args)?$args:''),
+			'output'=>$output);
+
+			$result = xu_rpc_http_concise($callspec);
+			if (!is_array($result)) 
+			{
+				$this->errormsg ="Fehler xmlrpc call ";
+				return false;
+			}		
+			return $result;
+		}	
+	
 } // Ende moodle_course class
