@@ -22,16 +22,11 @@
  */
 
 		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
 
 /**
  *
  * Seite zur Verwaltung der Urlaubs- und Zeitausgleichstage der Mitarbeiter
  */
-
 
 require_once('../../include/functions.inc.php');
 require_once('../../include/zeitsperre.class.php');
@@ -40,7 +35,9 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-
+		if (!$db = new basis_db())
+				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
 $user = get_uid();
 $datum = new datum();
 
@@ -170,7 +167,7 @@ if($uid!='')
 	
 	$zeitsperre->getzeitsperren($uid);
 	echo '<h3>Zeitsperren von <b>'.$mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost.'</b></h3>';
-	echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>";
+	echo "<table class='liste table-autosort: table-stripeclass:alternate table-autostripe'>";
 	echo '
 	<thead>
 		<tr class="liste">
