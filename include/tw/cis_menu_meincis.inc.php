@@ -46,7 +46,6 @@
 
 			//Projekt-Zeitaufzeichnung
 			$qry = "SELECT count(*) as anzahl FROM fue.tbl_projektbenutzer WHERE uid='$user'";
-
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -173,7 +172,7 @@
 					  	<td class='tdwrap'>
 							<ul style="margin-top: 0px; margin-bottom: 0px;">
 							<?php
-							$qry = "SELECT distinct tbl_lehrveranstaltung.bezeichnung,typ, tbl_studiengang.kurzbz, tbl_lehrveranstaltung.studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz
+ 							$qry = "SELECT distinct tbl_lehrveranstaltung.bezeichnung,typ, tbl_studiengang.kurzbz, tbl_lehrveranstaltung.studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz
 									FROM 
 										lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, 
 										lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
