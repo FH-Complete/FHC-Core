@@ -21,9 +21,6 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		
 		require_once('../../include/functions.inc.php');
 		require_once('../../include/studiengang.class.php');
@@ -32,10 +29,16 @@
 		require_once('../../include/benutzer.class.php');
 		require_once('../../include/student.class.php');
 
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
 if (isset($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
+else if(isset($_POST['studiengang_kz']))
+	$studiengang_kz = $_POST['studiengang_kz'];	
 else
 	$studiengang_kz=null;
+	
 if (isset($_GET['sem']))
 
 	$sem=$_GET['sem'];
@@ -63,16 +66,21 @@ function conf_del()
 <body>
 <H1>Gruppen Verwaltung</H1>
 <?php
-if($studiengang_kz==null && isset($_POST['studiengang_kz']))
-	$studiengang_kz = $_POST['studiengang_kz'];
+
 
 // Studiengang AuswahlFilter
 $stg=new studiengang();
 if ($stg->getAll('kurzbzlang'))
 {
 	echo '- ';
+
+		echo '<a href="?studiengang_kz=">Alle</a> - ';	
+	
 	foreach($stg->result AS $sg)
 	{
+		if (is_null($studiengang_kz))
+			$studiengang_kz=$sg->studiengang_kz;
+	
 		echo '<a href="?studiengang_kz='.$sg->studiengang_kz.'">';
 		if ($studiengang_kz==$sg->studiengang_kz)
 			echo '<u>';

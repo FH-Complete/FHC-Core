@@ -80,7 +80,10 @@ if(!is_numeric($stg_kz))
 if (isset($_REQUEST["stsem_neu"]))
 	$stsem_neu = $_REQUEST["stsem_neu"];
 else
-	$stsem_neu = $stsem_obj->getakt();
+{
+	if (!$stsem_neu = $stsem_obj->getakt())
+		$stsem_neu = $stsem_obj->getaktorNext();
+}	
 
 if (isset($_REQUEST["gruppe_neu"]))
 	$gruppe_neu = $_REQUEST["gruppe_neu"];

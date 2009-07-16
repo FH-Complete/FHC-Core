@@ -52,7 +52,10 @@ $stsem_obj = new studiensemester();
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
 else
-	$stsem = $stsem_obj->getakt();
+{
+	if (!$stsem = $stsem_obj->getakt())
+		$stsem = $stsem_obj->getaktorNext();
+}
 
 
 

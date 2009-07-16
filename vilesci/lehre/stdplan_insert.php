@@ -273,9 +273,10 @@ if ($type=="save")
 		{
 			$time=mktime(0, 0, 0, $date[mon], $date[mday], $date[year]);
 			$date=getdate($time+(604800*$_POST['rythmus']));
-			$datum=$date[mday].".".$date[mon].".".$date[year];
+			$datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
-		$sql_query="set datestyle to german;SELECT stundenplandev_id FROM tbl_stundenplandev WHERE datum='$datum' AND stunde='$std' AND ort_kurzbz='".$_POST['ortid']."'";
+   
+		$sql_query="SELECT stundenplandev_id FROM tbl_stundenplandev WHERE datum='$datum' AND stunde='$std' AND ort_kurzbz='".$_POST['ortid']."'";
 		if ($_POST['unr']=='')
 			$sql_query.=" AND unr IS NOT NULL";
 		else
@@ -299,7 +300,7 @@ if ($type=="save")
 		{
 			$time=mktime(0, 0, 0, $date[mon], $date[mday], $date[year]);
 			$date=getdate($time+(604800*$_POST['rythmus']));
-			$datum=$date[mday].".".$date[mon].".".$date[year];
+      $datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
 		$sql_query="SELECT stundenplandev_id FROM tbl_stundenplandev WHERE datum='$datum' AND stunde='$std' AND uid='".$_POST['$lektorid']."'";
 		$result=$db->db_query($sql_query);
@@ -320,7 +321,7 @@ if ($type=="save")
 		{
 			$time=mktime(0, 0, 0, $date[mon], $date[mday], $date[year]);
 			$date=getdate($time+(604800*$_POST['rythmus']));
-			$datum=$date[mday].".".$date[mon].".".$date[year];
+			$datum=$date[year]."-".$date[mon]."-".$date[mday];
 		}
 		$sql_query="SELECT semester, verband, gruppe, tbl_stundenplandev.studiengang_kz,tbl_studiengang.kurzbz FROM tbl_stundenplandev JOIN tbl_studiengang using(studiengang_kz) WHERE datum='$datum' AND stunde='$std' AND studiengang_kz='".$_POST['stgid']."' AND semester='$semester' AND (verband='".$_POST['verband']."' OR verband=NULL) AND (gruppe='".$_POST['gruppe']."' OR gruppe=NULL)";
 		$result=$db->db_query($sql_query);
@@ -345,7 +346,7 @@ if ($type=="save")
 			{
 				$time=mktime(0, 0, 0, $date[mon], $date[mday], $date[year]);
 				$date=getdate($time+(604800*$_POST['rythmus']));
-				$datum=$date[mday].".".$date[mon].".".$date[year];
+				$datum=$date[year]."-".$date[mon]."-".$date[mday];
 			}
 			// todo: unr als string?
 			$sql_query="INSERT INTO tbl_stundenplandev (studiengang_kz, semester, verband, gruppe, lehrfach_nr, uid, ort_kurzbz, datum, stunde,einheit_kurzbz,unr,updateamum,updatevon, lehrform_kurzbz) ".
