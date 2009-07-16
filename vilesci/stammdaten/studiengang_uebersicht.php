@@ -55,7 +55,7 @@
 		$htmlstr .= "       <td>".$stg->typ."</td>\n";
         $htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->bezeichnung."</a></td>\n";
 		
-		if($stg->aktiv=='t')
+		if($stg->aktiv)
 			$aktivbild = "true.gif";	
 		else
 			$aktivbild = "false.gif";
