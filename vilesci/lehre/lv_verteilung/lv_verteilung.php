@@ -30,25 +30,32 @@
 // * Semester, Lektor, Studiensemester
 // *************************************
 
-		require_once('../../../config/vilesci.config.inc.php');
-		require_once('../../../include/basis_db.class.php');
+	require_once('../../../config/vilesci.config.inc.php');
+    	require_once('../../../include/functions.inc.php');
+    	require_once('../../../include/studiensemester.class.php');
+    	require_once('../../../include/studiengang.class.php');
+    	require_once('../../../include/lehreinheit.class.php');    
+    	require_once('../../../include/lehrform.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		
-		
-    require_once('../../../include/functions.inc.php');
-    require_once('../../../include/studiensemester.class.php');
-    require_once('../../../include/studiengang.class.php');
-    require_once('../../../include/lehreinheit.class.php');    
-    require_once('../../../include/lehrform.class.php');
-
 
 	$user=get_uid();
-	$stg=(isset($_REQUEST['stg']) ? $_REQUEST['stg'] :'' );
-	$stsem=(isset($_REQUEST['stsem']) ? $_REQUEST['stsem'] :'' );
-	$lektor=(isset($_REQUEST['lektor']) ? $_REQUEST['lektor'] :'' );
-	$stg_kz=(isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] :'' );
-	$sem=(isset($_REQUEST['semester']) ? $_REQUEST['semester'] :0 );	
+
+	
+
+	$stg=(isset($_REQUEST['stg']) ? $_REQUEST['stg'] :-1 );
+	$stsem=(isset($_REQUEST['stsem']) ? $_REQUEST['stsem'] :-1 );
+	if (!isset($_REQUEST['stsem']))
+	{
+		$stsem_obj = new studiensemester();
+		if (!$stsem = $stsem_obj->getakt())
+			$stsem = $stsem_obj->getaktorNext();
+	}
+
+	$lektor=(isset($_REQUEST['lektor']) ? $_REQUEST['lektor'] :-1 );
+	$stg_kz=(isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] :-1 );
+	$sem=(isset($_REQUEST['semester']) ? $_REQUEST['semester'] :(isset($_REQUEST['sem']) ? $_REQUEST['sem'] :-1 ) );	
 	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -293,7 +300,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Raumtyp Drop Down anzeigen
 	echo "<tr><td>Raumtyp</td><td><select name='raumtyp'>";
 	$sql_query = "SELECT raumtyp_kurzbz, beschreibung FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz";
-	$result = $db->db_query($sql_query);
+	if (!$result = $db->db_query($sql_query))
+		die($db->db_last_error());
+	
 	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->raumtyp==$row->raumtyp_kurzbz)
@@ -308,7 +317,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//RaumtypAlternativ Drop Down anzeigen
 	echo "<tr><td>Raumtyp Alternativ</td><td><select name='raumtypalternativ'>";
 	$sql_query = "SELECT raumtyp_kurzbz, beschreibung FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz";
-	$result = $db->db_query($sql_query);
+	if (!$result = $db->db_query($sql_query))
+		die($db->db_last_error());
+
 	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->raumtypalternativ==$row->raumtyp_kurzbz)
@@ -332,7 +343,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Studiensemester Drop Down anzeigen
 	echo "<tr><td>Studiensemester</td><td><select name='studiensemester'>";
 	$sql_query = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester";
-	$result = $db->db_query($sql_query);
+	if (!$result = $db->db_query($sql_query))
+		die($db->db_last_error());
+
 	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->studiensemester_kurzbz==$row->studiensemester_kurzbz)
@@ -347,7 +360,9 @@ if(isset($_GET['edit']) || isset($_GET['new']))
 	//Sprache Drop Down anzeigen
     echo "<tr><td>Sprache</td><td><select name='sprache'>";
 	$sql_query = "SELECT sprache FROM public.tbl_sprache";
-	$result = $db->db_query($sql_query);
+	if (!$result = $db->db_query($sql_query))
+		die($db->db_last_error());
+
 	while ($row = $db->db_fetch_object($result))
 	{
 		if($le_obj->sprache==$row->sprache)
@@ -423,7 +438,7 @@ else
 		if($db->db_query($sql_query))
 			echo "<br><h2>Update durchgeführt</h2><br>";
 	    else
-	    	echo "<br><h2><font color='#FF0000'>Fehler beim Update</font></h2><br>";
+	    	echo "<br><h2><font color='#FF0000'>Fehler beim Update ".$db->db_last_error()."</font></h2><br>";
 	}
 
 	//Loeschen einer Lehreinheit
@@ -461,7 +476,7 @@ else
 	echo "<tr><td><form name='f_stg' action='lv_verteilung.php?stsem=$stsem&lektor=$lektor".(isset($order)?"&order=$order":"")."' method='POST'>";
 	echo "<SELECT name='stg' onChange='javascript:document.f_stg.submit();'>";
 	
-	if($stg==-1)
+	if($stg==-1 || $lektor==-1)
 		echo "<option value='-1' selected>--Alle anzeigen--</option>";
 	else 
 		echo "<option value='-1'>--Alle anzeigen--</option>";
@@ -479,6 +494,9 @@ else
 	
 	$sql_query = "SELECT uid, nachname, vorname FROM campus.vw_mitarbeiter WHERE lektor=true ORDER BY nachname, vorname"; 
 	$result = $db->db_query($sql_query);
+	if (!$result = $db->db_query($sql_query))
+		die($db->db_last_error());
+	
 	echo "\n";
 	echo "<td><form name='f_lek' action='lv_verteilung.php?stsem=$stsem&stg=$stg&sem=$sem".(isset($order)?"&order=$order":"")."' method='POST'>";
 	//Lektor Drop Down anzeigen
@@ -527,100 +545,102 @@ else
 	   echo " Lektor: $lektor";
 	   
 	echo "<br>";
-	//Tabelle aufbauen
-	
-	//Daten holen
-	$qry = "SELECT tbl_lehreinheit.lehre as le_lehre, * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE true";
-	
-	if($lektor!=-1)
-		$qry = "SELECT tbl_lehreinheit.lehre as le_lehre,* FROM lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheitmitarbeiter WHERE
-				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				mitarbeiter_uid='$lektor'";
+	//Tabelle aufbauen wenn nicht erster aufruf
+
+		//Daten holen
+		$qry = "SELECT tbl_lehreinheit.lehre as le_lehre, * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE true";
+		if($lektor!=-1)
+			$qry = "SELECT tbl_lehreinheit.lehre as le_lehre,* FROM lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheitmitarbeiter WHERE
+					tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+					tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+					mitarbeiter_uid='$lektor'";
+			
+		if($stsem!=-1)
+			$qry.=" AND studiensemester_kurzbz='$stsem'";
+		if($sem!=-1)
+			$qry.=" AND semester='$sem'";
+		if($stg!=-1)
+			$qry.=" AND studiengang_kz='$stg'";
 		
-	if($stsem!=-1)
-		$qry.=" AND studiensemester_kurzbz='$stsem'";
-	if($sem!=-1)
-		$qry.=" AND semester='$sem'";
-	if($stg!=-1)
-		$qry.=" AND studiengang_kz='$stg'";
-	
-	$qry.=" ORDER BY $order";	
-	//echo $qry;
-	if($result = $db->db_query($qry))
-	{
-		echo "\n";
-		echo '<table class="liste">';
-		echo "\n";
-		echo '  <tr class="liste">';
-		//Kopfzeile der Tabelle
-		echo "<td>&nbsp;</td><td>&nbsp;</td><td>Gruppen</td>";
-		//echo "<td><a href='lv_verteilung.php?stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&order=lektor'>Lektor</a></td>";
-		echo "<td>Lektor</td>";
-		echo "<td>Raumtyp</td><td>Blockung</td><td>WR</td><td>LF</td><td>Lehre</td>";
-		echo "<td>LVbezeichnung</tr>";
-		echo "\n";
-				
-		//Tabellenelemente rausschreiben
-		for($i=0;$row = $db->db_fetch_object($result);$i++)
-		{			
+		$qry.=" ORDER BY $order";	
+		//echo $qry;
+		if(!$result = $db->db_query($qry))
+			die($db->db_last_error());
+		if ($db->db_num_rows($result))
+		{
 			echo "\n";
-			echo '  <tr class="liste'.($i%2).'">';
-			echo "<td><a href='lv_verteilung.php?edit=true&le_id=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?'&order='.$order:'')."' class='linkgreen'>edit</a></td>";
-			echo "<td><a href='lv_verteilung.php?le_id=$row->lehreinheit_id&del=1&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?"&order=$order":"")."' onClick='javascript:return conf_del();' class='linkgreen'>delete</a></td>";
-			echo "<td>";
-			$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
-			if($result_grp = $db->db_query($qry))
-			{
-				$i=0;
-				while($row_grp=$db->db_fetch_object($result_grp))
-				{
-					if($i!=0)
-						echo ', ';
-					$i=1;
-					if($row_grp->gruppe_kurzbz!='')
-						echo $row_grp->gruppe_kurzbz;
-					else 
-					{
-						$stg_obj1 = new studiengang($row_grp->studiengang_kz);
-						echo $stg_obj1->kuerzel.$row_grp->semester.$row_grp->verband.$row_grp->gruppe;
-					}
+			echo '<table class="liste">';
+			echo "\n";
+			echo '  <tr class="liste">';
+			//Kopfzeile der Tabelle
+			echo "<td>&nbsp;</td><td>&nbsp;</td><td>Gruppen</td>";
+			//echo "<td><a href='lv_verteilung.php?stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&order=lektor'>Lektor</a></td>";
+			echo "<td>Lektor</td>";
+			echo "<td>Raumtyp</td><td>Blockung</td><td>WR</td><td>LF</td><td>Lehre</td>";
+			echo "<td>LVbezeichnung</tr>";
+			echo "\n";
 					
-				}
-			}
-			echo '</td>';
-			$qry = "SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row->lehreinheit_id'";
-			echo '<td>';
-			if($result_ma = $db->db_query($qry))
-			{
-				$i=0;
-				while($row_ma = $db->db_fetch_object($result_ma))
+			//Tabellenelemente rausschreiben
+			for($i=0;$row = $db->db_fetch_object($result);$i++)
+			{			
+				echo "\n";
+				echo '  <tr class="liste'.($i%2).'">';
+				echo "<td><a href='lv_verteilung.php?edit=true&le_id=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?'&order='.$order:'')."' class='linkgreen'>edit</a></td>";
+				echo "<td><a href='lv_verteilung.php?le_id=$row->lehreinheit_id&del=1&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?"&order=$order":"")."' onClick='javascript:return conf_del();' class='linkgreen'>delete</a></td>";
+				echo "<td>";
+				$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+				if($result_grp = $db->db_query($qry))
 				{
-					if($i!=0)
-						echo ", ";
-					echo $row_ma->mitarbeiter_uid;
-					$i=1;
+					$i=0;
+					while($row_grp=$db->db_fetch_object($result_grp))
+					{
+						if($i!=0)
+							echo ', ';
+						$i=1;
+						if($row_grp->gruppe_kurzbz!='')
+							echo $row_grp->gruppe_kurzbz;
+						else 
+						{
+							$stg_obj1 = new studiengang($row_grp->studiengang_kz);
+							echo $stg_obj1->kuerzel.$row_grp->semester.$row_grp->verband.$row_grp->gruppe;
+						}
+						
+					}
 				}
+				echo '</td>';
+				$qry = "SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row->lehreinheit_id'";
+				echo '<td>';
+				if($result_ma = $db->db_query($qry))
+				{
+					$i=0;
+					while($row_ma = $db->db_fetch_object($result_ma))
+					{
+						if($i!=0)
+							echo ", ";
+						echo $row_ma->mitarbeiter_uid;
+						$i=1;
+					}
+				}
+				echo '</td>';
+				echo "<td nowrap>$row->raumtyp / $row->raumtypalternativ</td>";
+				//echo "<td>$row->stundenblockung</td>";
+				echo "<td nowrap><form action='lv_verteilung.php?leid=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&lvnr=$row->lvnr".(isset($order)?"&order=$order":"")."' method='POST'><input type='text' value='$row->stundenblockung' size='2' name='stb'><input type='submit' value='ok'></form></td>";
+				echo "<td>$row->wochenrythmus</td>";
+				$qry = "SELECT kurzbz FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row->lehrfach_id'";
+				$result_lf = $db->db_query($qry);
+				$row_lf=$db->db_fetch_object($result_lf);
+				echo "<td>$row_lf->kurzbz</td>";
+				echo "<td><form action='lv_verteilung.php?leid=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&lehre=$row->le_lehre".(isset($order)?"&order=$order":"")."' method='POST'><input type='image' src='../../../skin/images/".($row->le_lehre=='t'?'true.gif':'false.gif')."'></form></td>";
+				//echo "<td nowrap><form action='lv_verteilung.php?lfnr=$row->lehrfach_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?"&order=$order":"")."' method='POST'><input type='text' value='$row->lehrevz' size='5' name='lvz'><input type='submit' value='ok'></form></td>";
+				echo "<td>$row->bezeichnung</td>";
+				echo "</tr>";
 			}
-			echo '</td>';
-			echo "<td nowrap>$row->raumtyp / $row->raumtypalternativ</td>";
-			//echo "<td>$row->stundenblockung</td>";
-			echo "<td nowrap><form action='lv_verteilung.php?leid=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&lvnr=$row->lvnr".(isset($order)?"&order=$order":"")."' method='POST'><input type='text' value='$row->stundenblockung' size='2' name='stb'><input type='submit' value='ok'></form></td>";
-			echo "<td>$row->wochenrythmus</td>";
-			$qry = "SELECT kurzbz FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row->lehrfach_id'";
-			$result_lf = $db->db_query($qry);
-			$row_lf=$db->db_fetch_object($result_lf);
-			echo "<td>$row_lf->kurzbz</td>";
-			echo "<td><form action='lv_verteilung.php?leid=$row->lehreinheit_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem&lehre=$row->le_lehre".(isset($order)?"&order=$order":"")."' method='POST'><input type='image' src='../../../skin/images/".($row->le_lehre=='t'?'true.gif':'false.gif')."'></form></td>";
-			//echo "<td nowrap><form action='lv_verteilung.php?lfnr=$row->lehrfach_id&stg=$stg&stsem=$stsem&lektor=$lektor&sem=$sem".(isset($order)?"&order=$order":"")."' method='POST'><input type='text' value='$row->lehrevz' size='5' name='lvz'><input type='submit' value='ok'></form></td>";
-			echo "<td>$row->bezeichnung</td>";
-			echo "</tr>";
 		}
-	}
-	else 
-	{
-		echo "<br>Keine Daten mit diesen Kriterien Vorhanden";
-	}
+		else 
+		{
+			echo "<br>Keine Daten mit diesen Kriterien Vorhanden";
+		}
+		
 }
 ?>
 </body>

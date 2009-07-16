@@ -51,12 +51,14 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
 	die('Sie haben keine Berechtigung für diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $stsem_obj = new studiensemester();
-
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
 else
-	$stsem = $stsem_obj->getakt();
-
+{
+	if (!$stsem = $stsem_obj->getakt())
+		$stsem = $stsem_obj->getaktorNext();
+}
+	
 if (isset($_REQUEST["lvid"]))
 	$lvid = $_REQUEST["lvid"];
 else
@@ -224,12 +226,7 @@ function selectAll()
 
 	foreach($stsem_obj->studiensemester AS $strow)
 	{
-		if ($stsem == $strow->studiensemester_kurzbz)
-			$sel = " selected";
-		else
-			$sel = "";
-		echo "	 <option value='".$strow->studiensemester_kurzbz."'".$sel.">".$strow->studiensemester_kurzbz."</option>";
-
+		echo "	 <option value='".$strow->studiensemester_kurzbz."' " .($stsem==$strow->studiensemester_kurzbz?' selected="selected" ':'').">".$strow->studiensemester_kurzbz."</option>";
 	}
 	echo "</select>";
 	echo "</td></tr>";
