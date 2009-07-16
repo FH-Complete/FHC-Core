@@ -548,7 +548,7 @@ class wochenplan extends basis_db
 		$datum=$datum_mon=$this->datum;
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
-	  		echo '		<tr><td>'.date("l",$datum).'<br>'.date("j. M y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
+	  		echo '<tr><td>'.strftime("%A",$datum).'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
 			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
 				$row = $this->db_fetch_object($result_stunde, $k);
@@ -1616,8 +1616,9 @@ class wochenplan extends basis_db
 
 					$row = $this->db_fetch_object($this->stunde, $k);
 					$start_time=$row->beginn;
+					
 					// Blockungen erkennen
-					if (($this->std_plan[$i][$j][0]->unr == $this->std_plan[$i][$j+1][0]->unr) && $this->std_plan[$i][$j][0]!=0 && $k<($num_rows_stunde-1))
+					if (($this->std_plan[$i][$j][0]->unr == $this->std_plan[$i][$j+1][0]->unr) && $this->std_plan[$i][$j][0]!='0' && $k<($num_rows_stunde-1))
 					{
 						$row = $this->db_fetch_object($this->stunde, ++$k);
 						$end_time=$row->ende;
