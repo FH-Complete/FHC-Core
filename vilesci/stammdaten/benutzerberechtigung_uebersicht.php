@@ -29,11 +29,37 @@
 		
 	$htmlstr = "";
 	
+	if(isset($_GET['searchstr']))
+		$searchstr = $_GET['searchstr'];
+	else 
+		$searchstr = '';
+		
+$htmlstr='
+	<form accept-charset="UTF-8" name="search" method="GET">
+  		Bitte Suchbegriff eingeben: 
+  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+  		<input type="submit" value="Suchen">
+  	</form>';
+
+if(isset($_GET['searchstr']))
+{	
+	
 	$sql_query = "SELECT distinct(tbl_benutzerrolle.uid), tbl_person.nachname, tbl_person.vorname 
 				  FROM system.tbl_benutzerrolle, public.tbl_benutzer, public.tbl_person 
 				  WHERE tbl_benutzerrolle.uid = tbl_benutzer.uid 
 				  	AND tbl_benutzer.person_id = tbl_person.person_id 
-				  ORDER BY tbl_benutzerrolle.uid";
+				";					
+		if($searchstr!='')
+		{	
+			$sql_query.= " and (
+			nachname ~* '".addslashes($searchstr)."' OR 
+			vorname ~* '".addslashes($searchstr)."' OR
+			alias ~* '".addslashes($searchstr)."' OR
+			nachname || ' ' || vorname = '".addslashes($searchstr)."' OR 
+			vorname || ' ' || nachname = '".addslashes($searchstr)."' OR 
+			tbl_benutzerrolle.uid ~* '".addslashes($searchstr)."' )";					
+		}
+		$sql_query.= " ORDER BY tbl_benutzerrolle.uid";
 	
     if(!$erg=$db->db_query($sql_query))
 	{
@@ -63,7 +89,7 @@
 	    }
 	    $htmlstr .= "</tbody></table>\n";
 	}
-
+}
 
 ?>
 <html>
