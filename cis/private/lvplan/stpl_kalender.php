@@ -29,21 +29,14 @@
  * Update: 			10.9.2005 von Christian Paminger
  *****************************************************************************/
 
-	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+require_once('../../../config/cis.config.inc.php');
 
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/studiensemester.class.php');
-
-// Datums Format und search_path
-if(!$erg_std=$db->db_query("SET datestyle TO ISO; SET search_path TO campus;"))
-	die($db->db_last_error());
-
+  if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
 
 //Startwerte setzen
 if (!isset($_GET['db_stpl_table']))
@@ -72,6 +65,7 @@ $target=(isset($_GET['target'])?$_GET['target']:null);
 // UID bestimmen
 $uid = get_uid();
 
+
 // Beginn Ende setzen
 if (!isset($begin))
 {
@@ -81,6 +75,8 @@ if (!isset($begin))
 	$begin=datum::mktime_fromdate($objSS->start);
 	$ende=datum::mktime_fromdate($objSS->ende);
 }
+
+
 
 // for spezial friends
 if ($uid=='maderdon')
@@ -99,14 +95,19 @@ $name='FH-Kalender_'.$mon.'_'.$jahr;
 if (isset($target))
 	$name.='_'.$target;
 
+
+
 // doing some DOS-CRLF magic...
 $crlf=crlf();
 
 // Funktion zum Konvertieren des gesamten Outputs nach UTF8
 function converttoutf8($buffer)
 {
+  return $buffer;
 	return utf8_encode($buffer);
 }
+
+
 
 // Check Type
 // Print in csv-file
@@ -155,8 +156,11 @@ if (!isset($begin) || !isset($ende))
 	}
 	else
 	{
-		$result_semester=$db->db_query("SELECT start,ende FROM tbl_studiensemester WHERE studiensemester_kurzbz=(SELECT wert FROM tbl_variable WHERE name='semester_aktuell' AND uid='$uid');");
-		if ($db->db_num_rows($result_semester)>0)
+    $query="SELECT start,ende FROM campus.tbl_studiensemester WHERE studiensemester_kurzbz=(SELECT wert FROM public.tbl_variable WHERE name='semester_aktuell' AND uid='$uid');";
+		if (!$result_semester=$db->db_query($query))
+		    die($db->db_last_error());
+
+    if ($db->db_num_rows($result_semester)>0)
 		{
 			$begin=strtotime($db->db_result($result_semester,0,'start'));
 			$ende=strtotime($db->db_result($result_semester,0,'ende'));
@@ -165,7 +169,7 @@ if (!isset($begin) || !isset($ende))
 		{
 			die('Studiensemester konnte nicht gefunden werden!');
 		}
-		$result_semester=$db->db_query("SELECT wert FROM tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
+		$result_semester=$db->db_query("SELECT wert FROM public.tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
 		if ($db->db_num_rows($result_semester)>0)
 			$db_stpl_table=$db->db_result($result_semester,0,'wert');
 		else
@@ -177,6 +181,7 @@ if ($ende-$begin>31536000)
 {
 	die("Datumsbereich ist zu grosz!");
 }
+
 
 if (!isset($type))
 	if ($pers_uid=check_student($uid))
@@ -240,7 +245,7 @@ while ($begin<$ende)
 		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
 	}
 	else
-		$stdplan->draw_week(false);
+		  $stdplan->draw_week(false);
 }
 
 // Print in csv-file

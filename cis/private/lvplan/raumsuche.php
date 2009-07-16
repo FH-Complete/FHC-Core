@@ -134,8 +134,9 @@ if($sent)
 			echo "<br>BIS-Zeit muss im Format hh:mm (12:30) angegeben werden";
 			$error = true;
 		}
+		
 		//Datum pruefen
-		if(!preg_match('/^([0-9]){2}\.([0-9]){2}\.([0-9]){4}$/', $datum))
+		if(!$datum_obj->checkDatum($datum))
 		{
 			echo "<br>Das angegebene Datum ist ungueltig! Bitte geben Sie das Datum im Format dd.mm.YYYY (31.12.2008) ein";
 			$error = true;
@@ -144,10 +145,10 @@ if($sent)
 	if(!$error)
 	{
 		$ort = new ort();
-		$ort->search($datum, $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
+		$ort->search($datum_obj->formatDatum($datum), $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
 		
 		echo '<br><table>';
-		echo '<tr class="liste"><td>Raum</td><td>Bezeichnung</td><td>Nummer</td><td>Personen</td></tr>';
+		echo '<tr class="liste"><th>Raum</th><th>Bezeichnung</th><td>Nummer</th><th>Personen</th><th>Aktion</th></tr>';
 		$i=0;
 		$datum_sec = $datum_obj->mktime_datum($datum)-1;
 		foreach ($ort->result as $row)
@@ -160,6 +161,7 @@ if($sent)
 			echo "<td>$row->max_person</td>";
 			echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>zur Reservierung</a></td>";
 			echo '</tr>';
+			flush();
 		}
 		echo '</table>';
 	}
