@@ -108,40 +108,47 @@ class FO_LayoutObject extends FO_FlowContainer {
 		  				$anzahl_lines=0;
 		  				//sonderzeichen konvertieren
 		  				$line = $this->convert($block->nodeValue);
+		  				
+		  				//Damit bei den Fussnoten am Zeugnis das Sonderzeichen nicht als 5 Zeichen gezaehlt wird
+		  				//wird hier einfach das erste Zeichen ersetzt
+		  				$line = '1'.substr($line, 1);
 		  				//Zeilenumbrueche loeschen
 		  				$line = str_replace("\n",'', trim($line));
 		  				//Lines nach Newlines splitten
 		  				$lines = explode('\n', $line);
 		  				foreach ($lines as $line)
 		  				{
-			  				do
-			  				{
-			  					/*$x = $this->getContext("x");
-								$x2 = $this->getContext("startx");
-								if (!$x2) {
-								  $x2 = $x;
-								}*/
-								//echo "x2:$x2<br>";
-								
-			  					$w = $content_width-1;
-			  					
-			  					//Anzahl der zeichen holen die in dieser zeile noch platz haben
-				  				$noc = $pdf->GetNumberOfChars($w, $line, $font_size);
-				  				//wenn das wort nicht abgeteilt werden kann dann ueber den rand hinausschreiben
-				  				if($noc==-1)
-				  					$noc = strlen($line);
-				  				//Zeile abteilen
-				  				$showLine = substr($line, 0, $noc);
-				  				
-				  				$output.= "w=$w noc=$noc fontsize=$font_size<br>$showLine ($line)";
-				  				
-								$textWidth = $pdf->GetStringWidth($showLine);
-								//Rest der Line als neue Line
-								$line = trim(substr($line, $noc));
-								//Anzahl der verbleibenden zeichen ermitteln
-								$width = $pdf->GetNumberOfChars($w, $line, $font_size);
-								$anzahl_lines++;
-			  				} while($width>0);
+		  					if($line!='')
+		  					{
+				  				do
+				  				{
+				  					/*$x = $this->getContext("x");
+									$x2 = $this->getContext("startx");
+									if (!$x2) {
+									  $x2 = $x;
+									}*/
+									//echo "x2:$x2<br>";
+									
+				  					$w = $content_width-1;
+				  					
+				  					//Anzahl der zeichen holen die in dieser zeile noch platz haben
+					  				$noc = $pdf->GetNumberOfChars($w, $line, $font_size);
+					  				//wenn das wort nicht abgeteilt werden kann dann ueber den rand hinausschreiben
+					  				if($noc==-1)
+					  					$noc = strlen($line);
+					  				//Zeile abteilen
+					  				$showLine = substr($line, 0, $noc);
+					  				
+					  				$output.= "w=$w noc=$noc fontsize=$font_size<br>$showLine ($line)";
+					  				
+									//$textWidth = $pdf->GetStringWidth($showLine);
+									//Rest der Line als neue Line
+									$line = trim(substr($line, $noc));
+									//Anzahl der verbleibenden zeichen ermitteln
+									$width = strlen($line); //$pdf->GetNumberOfChars($w, $line, $font_size);
+									$anzahl_lines++;
+				  				} while($width>0);
+		  					}
 		  				}
 						$output.= " Breaks $anzahl_lines <br><br>";
 						//Wenn die Anzahl der benoetigten Zeilen in dieser Zelle

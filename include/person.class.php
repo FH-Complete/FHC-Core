@@ -218,8 +218,14 @@ class person extends basis_db
 			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
+		
 		if($this->svnr!='')
 		{
+			if(mb_strlen($this->svnr)!=10)
+			{
+				$this->errormsg = 'Sozialversicherungsnummer muss 10stellig sein';
+				return false;
+			}
 			//SVNR mit Pruefziffer pruefen
 			//Die 4. Stelle in der SVNR ist die Pruefziffer
 			//(Summe von (gewichtung[i]*svnr[i])) modulo 11 ergibt diese Pruefziffer

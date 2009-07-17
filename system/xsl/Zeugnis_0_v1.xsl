@@ -238,7 +238,7 @@
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row line-height="12pt">
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="10pt" content-width="85mm">
+				<fo:block font-size="10pt" content-width="95mm">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
@@ -274,7 +274,7 @@
 	<xsl:template match="fussnote">
 		<fo:table-row line-height="11pt">
 			<fo:table-cell border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="58mm">
+				<fo:block font-size="9pt" content-width="95mm">
 					<xsl:value-of select="fussnotenzeichen"/>
 					<xsl:text> </xsl:text>
 					<fo:inline font-weight="bold">

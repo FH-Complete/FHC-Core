@@ -178,7 +178,7 @@ class MyPdf extends FPDF {
     //oesi - add parameter width for set the content-width of fo:block
     if($width!=NULL)
     {
-    	$pw = $x+$width;
+    	$pw = $xNewLine+$width;
     }
     else
     	$pw = $this->GetPageWidth();
@@ -371,7 +371,7 @@ class MyPdf extends FPDF {
       }
   }
 
-  // Draws a cubic Bézier curve from last draw point
+  // Draws a cubic Bï¿½zier curve from last draw point
   // Parameters:
   // - x1, y1: Control point 1
   // - x2, y2: Control point 2
@@ -397,7 +397,7 @@ class MyPdf extends FPDF {
   // - style: Style of ellipse (draw and/or fill: D, F, DF, FD, C (D + close))
   // - line_style: Line style for ellipse. Array like for SetLineStyle
   // - fill_color: Fill color. Array with components (red, green, blue)
-  // - nSeg: Ellipse is made up of nSeg Bézier curves
+  // - nSeg: Ellipse is made up of nSeg Bï¿½zier curves
   function Ellipse($x0, $y0, $rx, $ry = 0, $angle = 0, $astart = 0, $afinish = 360, $style = '', $fill_color = null, $nSeg = 8) {
     if ($rx) {
       if (!(false === strpos($style, 'F')) && $fill_color) {
@@ -507,7 +507,7 @@ class MyPdf extends FPDF {
   // - style: Style of circle (draw and/or fill) (D, F, DF, FD, C (D + close))
   // - line_style: Line style for circle. Array like for SetLineStyle
   // - fill_color: Fill color. Array with components (red, green, blue)
-  // - nSeg: Ellipse is made up of nSeg Bézier curves
+  // - nSeg: Ellipse is made up of nSeg Bï¿½zier curves
   function Circle($x0, $y0, $r, $astart = 0, $afinish = 360, $style = '', $fill_color = null, $nSeg = 8) {
     $this->Ellipse($x0, $y0, $r, 0, 0, $astart, $afinish, $style, $line_style, $fill_color, $nSeg);
   }
@@ -520,7 +520,7 @@ class MyPdf extends FPDF {
     $this->_out(sprintf('%.2f %.2f m', $x * $this->k, ($this->h - $y) * $this->k));
   }
   
-  // Draws a Bézier curve from last draw point
+  // Draws a Bï¿½zier curve from last draw point
   // Parameters:
   // - x1, y1: Control point 1
   // - x2, y2: Control point 2
@@ -530,7 +530,7 @@ class MyPdf extends FPDF {
   }  
 
   
-  // Draws a cubic Bézier curve from last draw point
+  // Draws a cubic Bï¿½zier curve from last draw point
   // Parameters:
   // - x2, y2: Control point 2
   // - x3, y3: End point
@@ -539,7 +539,7 @@ class MyPdf extends FPDF {
     $this->_out(sprintf('%.2f %.2f %.2f %.2f v', $x2 * $this->k, ($this->h - $y2) * $this->k, $x3 * $this->k, ($this->h - $y3) * $this->k));
   }
 
-  // Draws a cubic Bézier curve from last draw point
+  // Draws a cubic Bï¿½zier curve from last draw point
   // Parameters:
   // - x1, y1: Control point 1
   // - x3, y3: End point
@@ -566,7 +566,7 @@ class MyPdf extends FPDF {
   // - style: Style of ellipse (draw and/or fill: D, F, DF, FD, C (D + close))
   // - line_style: Line style for ellipse. Array like for SetLineStyle
   // - fill_color: Fill color. Array with components (red, green, blue)
-  // - nSeg: Ellipse is made up of nSeg Bézier curves
+  // - nSeg: Ellipse is made up of nSeg Bï¿½zier curves
   function _Ellipse($x0, $y0, $rx, $ry = 0, $angle = 0, $astart = 0, $afinish = 360, $nSeg = 8) {
     if ($rx) {
       if (!$ry)
