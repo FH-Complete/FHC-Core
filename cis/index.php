@@ -35,16 +35,17 @@ require_once('../config/cis.config.inc.php');
 </head>
 <body>
 <table class="tabcontent">
+	 
 	  <tr>
-	    <td width="170" class="tdwrap">
-			<a href="index.html" target="_top">
-				<div class="home_logo">&nbsp;</div>
-			</a>
+	    <td width="170" class="tdwrap" onclick="self.location.href='index.php'">
+			<div class="home_logo">&nbsp;</div>
 	    </td>
+		
         <td id="header">
     	    	<div class="header_line" ></div>
         </td>
  	</tr>
+
    	 <tr>
 			<td id="footer">&nbsp;</td>
     	    <td><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
