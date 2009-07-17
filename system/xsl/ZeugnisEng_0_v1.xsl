@@ -123,12 +123,14 @@
 							<fo:table-row line-height="14pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 									<fo:block font-size="12pt" font-weight="bold">
-										 Subject
+										 Subject\n
+										 
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
 									<fo:block font-size="12pt" font-weight="bold" content-width="20mm" text-align="center">
-										Grade
+										Grade\n
+										
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
@@ -252,7 +254,7 @@
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row line-height="12pt">
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="10pt" content-width="85mm">
+				<fo:block font-size="10pt" content-width="95mm">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
@@ -303,7 +305,7 @@
 	<xsl:template match="fussnote">
 		<fo:table-row line-height="11pt">
 			<fo:table-cell border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="58mm">
+				<fo:block font-size="9pt" content-width="95mm">
 					<xsl:value-of select="fussnotenzeichen"/>
 					<xsl:text> </xsl:text>
 					<fo:inline font-weight="bold">

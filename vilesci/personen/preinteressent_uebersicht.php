@@ -368,6 +368,7 @@ echo "<table id='mytab' class='liste table-autosort:4 table-stripeclass:alternat
 
 foreach ($preinteressent->result as $row)
 {
+	flush();
 	echo '<tr>';
 	$person = new person();
 	$person->load($row->person_id);
