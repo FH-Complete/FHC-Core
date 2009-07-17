@@ -27,11 +27,6 @@
  * Array welches includiert wird.
  */
 	require_once('../config/vilesci.config.inc.php');
-	require_once('../include/basis_db.class.php');
-	if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-	
  	require('../include/functions.inc.php');
  	require('../include/benutzerberechtigung.class.php');
  	require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
@@ -84,10 +79,8 @@
 
 <body  style="background-color:#eeeeee;">
 
-<div class="logo" style="background-color:#FFFFFF;">
-	<a href="index.html" target="_top">
-		<img border="0" src="../skin/images/vilesci_logo.png" alt="VileSci (FASonline)" width="240px" title="VileSci" />
-	</a>
+<div class="logo" style="background-color:#FFFFFF;"  onclick="self.location.href='index.php'">
+		<img border="0" src="../skin/images/vilesci_logo.png" alt="VileSci (FASonline)" width="239px" title="VileSci" >
 </div>
 
 
@@ -234,7 +227,7 @@ foreach($menu AS $m)
 					if (isset($m2['name']))
 						echo $m2['name'];
 					if (isset($m2['link']))
-						echo '</a><BR />';
+						echo '</a><br>';
 				}
 			echo "\n\t</SPAN>\n\t</DIV>\n";
 		}
@@ -242,7 +235,7 @@ foreach($menu AS $m)
 }
 
 ?>
-<hr />
+<hr>
 <a href="index.html" target="_top"><img title="'.$m2['name'].'" src="../skin/images/application_home.png" alt="page go" border="0">&nbsp;Home</a>
 </body>
 </html>

@@ -59,6 +59,6 @@ else
 	//diese werden dann einfach so angezeigt.
 	@ob_clean();
    	header("Content-type: image/gif");
-	echo hexstr($cTmpHEX);
+	exit(base64_decode($cTmpHEX));
 }
 ?>

@@ -24,24 +24,20 @@
 // Aufruf mit <img src='bild.php?src=frage&frage_id=1
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
-
 //base64 Dump aus der DB holen
-$qry = '';
+$cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 {
 	$qry = "SELECT foto FROM public.tbl_person WHERE person_id='".addslashes($_GET['person_id'])."'";
-}
-else 
-	echo 'Unkown type';
-
-if($qry!='')
-{
 	$db = new basis_db();
-	//Header fuer Bild schicken
-	header("Content-type: image/gif");
-	$db->db_query($qry);
-	//base64 Werte in Zeichen umwandeln und ausgeben
-	if($row = $db->db_fetch_object())	
-		echo base64_decode($row->foto);
+	if($result = $db->db_query($qry))
+	{
+		if($row = $db->db_fetch_object($result))	
+			$cTmpHEX=$row->foto;
+	}		
 }
+//Header fuer Bild schicken
+header("Content-type: image/gif");
+//base64 Werte in Zeichen umwandeln und ausgeben
+exit(base64_decode($cTmpHEX));
 ?>
