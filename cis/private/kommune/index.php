@@ -92,7 +92,7 @@
 	
 // AktiverAnwender-----------------------------------------------------------------------------------------------------------
 	$userUID=(isset($_REQUEST['userUID']) ? $_REQUEST['userUID'] :get_uid() );
-	$userUID='pam';
+#	$userUID='pam';
 #	$userUID='oesi';
 #	$userUID='ruhan';
 #	$userUID='kindlm';
