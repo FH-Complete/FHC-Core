@@ -182,7 +182,7 @@
 					}	 
 				 	?>
 				</select>
-				<input class="ausblenden"  name="userSel" value="<?php echo $oWettbewerb->workSITE; ?>" />
+				<input class="ausblenden"  name="<?php echo constKommuneParmSetWork;?>" value="<?php echo $oWettbewerb->workSITE; ?>" />
 			&nbsp;
 	</h1>
 	</form>

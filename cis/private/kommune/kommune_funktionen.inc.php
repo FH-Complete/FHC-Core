@@ -380,7 +380,7 @@ function kommune_funk_showWettbewerbe($oWettbewerb)
 
 		} // ende Gruppenwechsel	
 		elseif ($iTmpZehler!=0 && ($itmpCount_wbtyp_kurzbz%$tmpAnzahlBewerbeRow)==0 )
-			$showHTML.='</tr><tr>'; 
+			$showHTML.='</tr><tr><td colspan="'.$tmpAnzahlBewerbeRow.'">&nbsp;<hr></td></tr><tr>'; 
 			
 		$itmpCount_wbtyp_kurzbz++;
 		
