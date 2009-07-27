@@ -222,8 +222,8 @@ class komune_wettbewerbteam  extends basis_db
 		$team_rang=(isset($newWettbewerbteam['rang']) ? $newWettbewerbteam['rang'] : null);
 		
 		// Ermitteln der Tabelle der Teamspieler
-		if (isset($newWettbewerbteam['array_userUID']))
-			$array_userUID=$newWettbewerbteam['array_userUID'];
+		if (isset($newWettbewerbteam['array_user']))
+			$array_userUID=$newWettbewerbteam['array_user'];
 		else
 		{
 			$this->setError('Die Spieler / Team wurde nicht gefunden! ');

@@ -37,13 +37,24 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 class komune_wettbewerb extends basis_db
 {
-	public $new;
+		
 	
       	public $wettbewerb;
       	public $wbtyp_kurzbz;
       	public $wettbewerb_kurzb;
 		   
-	public $schemaSQL="kommune."; // string Datenbankschema
+		public $result;
+		public $new=false;      					// boolean
+	   	
+		public $regeln;
+		public $forderungstage;
+
+		public $teamgroesse;
+		public $uid;
+		public $icon;	
+		   
+		   
+		public $schemaSQL="kommune."; // string Datenbankschema
 	
 //-----Konstruktor    
        function __construct($wbtyp_kurzbz="",$wettbewerb_kurzbz="") 
@@ -63,6 +74,23 @@ class komune_wettbewerb extends basis_db
 	       	$this->setWettbewerb('');
 	       	$this->setWbtyp_kurzbz(''); 
 	       	$this->setWettbewerb_kurzbz('');
+			
+			
+			
+			$this->new=false;
+
+	       	$this->result=array();
+
+			$this->wbtyp_kurzbz='';
+	       	$this->wettbewerb_kurzbz='';
+			
+	       	$this->regeln='';
+	       	$this->forderungstage=1;
+
+	       	$this->teamgroesse=1;
+	       	$this->uid='';
+	       	$this->icon='';		
+						
        }
 //-----NewRecord--------------------------------------------------------------------------------------------
        function getNewRecord() 
@@ -118,6 +146,127 @@ class komune_wettbewerb extends basis_db
        {
            $this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
        }
+	   
+	   
+
+//-------------------------------------------------------------------------------------------------
+//	------------------------ Wettbewerbstypen
+//-------------------------------------------------------------------------------------------------
+      
+//-------------------------------------------------------------------------------------------------
+	/**
+	 * Speichert bzw. Aendert eine Veranstaltungskategorie
+	 * @return true wenn ok, false im Fehlerfall
+	 */	
+	public function saveWettbewerbTyp()
+    	{
+		// Initialisieren
+		$this->errormsg='';
+		$qry="";
+			
+		$fildsList='';
+		$fildsValue='';
+		
+		
+		if (empty($this->wbtyp_kurzbz) || $this->wbtyp_kurzbz==null )
+		{
+			$this->errormsg='Wettbewerb - Typ fehlt!';
+			return false;
+		}
+
+		if (empty($this->bezeichnung))
+		{
+			$this->errormsg='Wettbewerbstyp - Bezeichnung fehlt!';
+			return false;
+		}
+		
+		if($this->new)
+		{
+
+			$fildsList.='wbtyp_kurzbz,';
+			$fildsList.='bezeichnung,';
+			$fildsList.='farbe';
+
+			$fildsValue.="'".addslashes($this->wbtyp_kurzbz)."',"; 
+			$fildsValue.="'".addslashes($this->bezeichnung)."',";
+			$fildsValue.="'".addslashes($this->farbe)."'";
+	
+	   		$qry=" insert into ".$this->schemaSQL."tbl_wettbewerbtyp (".$fildsList.") values (".$fildsValue."); ";
+		}
+		else
+		{
+			if ($this->bezeichnung)
+				$fildsValue.=(!empty($fildsValue)?',':'')."bezeichnung='".addslashes($this->bezeichnung)."'";
+			$fildsValue.=(!empty($fildsValue)?',':'')."farbe='".addslashes($this->farbe)."'";
+
+			$qry.=" update ".$this->schemaSQL."tbl_wettbewerbtyp set ";
+			$qry.=$fildsValue;
+			$qry.=" where wbtyp_kurzbz='".addslashes($this->wbtyp_kurzbz)."' ";
+		}	
+		if($resurce=$this->db_query($qry))
+			return $resurce;
+		else
+		{
+			if (empty($this->errormsg))
+				$this->errormsg = 'Fehler beim speichern des Datensatzes ';
+			return false;
+		}	
+	}
+
+//-------------------------------------------------------------------------------------------------
+	/**
+	 * Loescht eine Veranstaltungskategorie
+	 * @return true wenn ok, false im Fehlerfall
+	 */	      
+	   public function deleteWettbewerbTyp($wbtyp_kurzbz="")
+       {
+
+			// Initialisieren
+			$qry="";
+			$this->errormsg='';
+	
+			// Parameter
+			if (!empty($wbtyp_kurzbz))
+				$this->wbtyp_kurzbz=$wbtyp_kurzbz;
+	
+			// Plausib
+			if (empty($this->wbtyp_kurzbz) || $this->wbtyp_kurzbz==null )
+			{
+				$this->errormsg='Wettbewerb - Typ fehlt!';
+				return false;
+			}
+			
+			// Abfrage
+			$qry.=" BEGIN; ";
+			$qry.=" delete from ".$this->schemaSQL.".tbl_wettbewerb ";
+			if (is_array($this->wbtyp_kurzbz))
+				$qry.=" where wbtyp_kurzbz in ('".implode("','",$this->wbtyp_kurzbz)."') ";
+			else	
+				$qry.=" where wbtyp_kurzbz='".addslashes($this->wbtyp_kurzbz)."' ";
+			$qry.="; ";
+			
+			$qry.=" delete from ".$this->schemaSQL."tbl_wettbewerbtyp ";
+			if (is_array($this->wbtyp_kurzbz))
+				$qry.=" where wbtyp_kurzbz in ('".implode("','",$this->wbtyp_kurzbz)."') ";
+			else	
+				$qry.=" where wbtyp_kurzbz='".addslashes($this->wbtyp_kurzbz)."' ";
+				
+			if($this->db_query($qry))
+			{
+				if($this->db_query('COMMIT;'))
+					return true;
+				else
+					return false;	
+			}	
+			else
+			{
+				$this->db_query('ROLLBACK;');
+				if (empty($this->errormsg))
+					$this->errormsg = 'Fehler beim Veranstaltungskategorie löschen';
+				return false;
+			}	
+		}	   
+	   
 //-------------------------------------------------------------------------------------------------
        function loadWettbewerbTyp()
        {
@@ -169,6 +318,177 @@ class komune_wettbewerb extends basis_db
 		return $this->getWettbewerb();
        }
 
+	   
+	   
+	   
+//-------------------------------------------------------------------------------------------------
+//	------------------------ Wettbewerbe
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+	/**
+	 * Speichert bzw. Aendert eine Veranstaltungskategorie
+	 * @return true wenn ok, false im Fehlerfall
+	 */	
+	public function saveWettbewerb()
+    	{
+		// Initialisieren
+		$this->errormsg='';
+		$qry="";
+			
+		$fildsList='';
+		$fildsValue='';
+		
+		
+		// Plausib
+		if (empty($this->wbtyp_kurzbz) || $this->wbtyp_kurzbz==null )
+		{
+			$this->errormsg='Wettbewerb - Type fehlt!';
+			return false;
+		}
+		if (empty($this->wettbewerb_kurzbz) || $this->wettbewerb_kurzbz==null )
+		{
+			$this->errormsg='Wettbewerb - Kurzbz. fehlt!';
+			return false;
+		}
+
+		if (empty($this->regeln))
+		{
+			$this->errormsg='Wettbewerb - Regeln fehlen!';
+			return false;
+		}
+
+		if (empty($this->forderungstage) || is_null($this->forderungstage) )
+			$this->forderungstage=7;
+
+		if (!is_numeric($this->forderungstage) )
+		{
+			$this->errormsg='Forderungstage nur Nummerisch';
+			return false;
+		}
+
+
+		if (empty($this->teamgroesse) || is_null($this->teamgroesse))
+			$this->teamgroesse=1;
+
+		if (!is_numeric($this->teamgroesse) )
+		{
+			$this->errormsg='Forderungstage nur Nummerisch';
+			return false;
+		}
+
+		if($this->new)
+		{
+
+			$fildsList.='wbtyp_kurzbz,';
+			$fildsList.='wettbewerb_kurzbz,';
+			$fildsList.='regeln,';
+			$fildsList.='forderungstage,';
+
+			$fildsList.='teamgroesse,';
+			$fildsList.='uid,';
+			$fildsList.='icon';
+			
+			$fildsValue.="'".addslashes($this->wbtyp_kurzbz)."',"; 
+			$fildsValue.="'".addslashes($this->wettbewerb_kurzbz)."',"; 
+			
+			$fildsValue.="'".addslashes($this->regeln)."',";
+			$fildsValue.="".addslashes($this->forderungstage).",";
+	
+			$fildsValue.="".addslashes($this->teamgroesse).",";
+			$fildsValue.="'".addslashes($this->uid)."',";
+			
+			$fildsValue.="'".addslashes($this->icon)."'";
+			
+	   		$qry=" insert into ".$this->schemaSQL."tbl_wettbewerb (".$fildsList.") values (".$fildsValue."); ";
+		}
+		else
+		{
+			if (!is_null($this->regeln) && $this->regeln)
+				$fildsValue.=(!empty($fildsValue)?',':'')."regeln='".addslashes($this->regeln)."'";
+				
+			if (!is_null($this->forderungstage) && $this->forderungstage)
+				$fildsValue.=(!empty($fildsValue)?',':'')."forderungstage=".addslashes($this->forderungstage)."";
+			if (!is_null($this->teamgroesse) && $this->teamgroesse)
+				$fildsValue.=(!empty($fildsValue)?',':'')."teamgroesse=".addslashes($this->teamgroesse)."";
+			if (!is_null($this->icon) && $this->icon)
+				$fildsValue.=(!empty($fildsValue)?',':'')."icon='".addslashes($this->icon)."'";
+						
+			$fildsValue.=(!empty($fildsValue)?',':'')."uid='".addslashes($this->uid)."'";
+
+			$qry.=" update ".$this->schemaSQL."tbl_wettbewerb set ";
+			$qry.=$fildsValue;
+			$qry.=" where wbtyp_kurzbz='".addslashes($this->wbtyp_kurzbz)."' and wettbewerb_kurzbz='".addslashes($this->wettbewerb_kurzbz)."' ";
+		}	
+
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			if (empty($qry))
+				$this->errormsg = 'Fehler beim speichern des Datensatzes ';
+			$this->errormsg .=' '.$qry;
+			return false;
+		}	
+	}
+
+//-------------------------------------------------------------------------------------------------
+	/**
+	 * Loescht eine Veranstaltungskategorie
+	 * @return true wenn ok, false im Fehlerfall
+	 */	      
+	   public function deleteWettbewerb($wbtyp_kurzbz="",$wettbewerb_kurzbz=null)
+       {
+
+			// Initialisieren
+			$qry="";
+
+			$this->result=array();
+			$this->errormsg='';
+
+			// Parameter
+			if (!is_null($wbtyp_kurzbz))
+				$this->wbtyp_kurzbz=$wbtyp_kurzbz;
+			if (!is_null($wettbewerb_kurzbz))
+				$this->wettbewerb_kurzbz=$wettbewerb_kurzbz;
+	
+			// Plausib
+			if (empty($this->wbtyp_kurzbz) || $this->wbtyp_kurzbz==null )
+			{
+				$this->errormsg='Wettbewerb - Typ fehlt!';
+				return false;
+			}
+			if (empty($this->wettbewerb_kurzbz) || $this->wettbewerb_kurzbz==null )
+			{
+				$this->errormsg='Wettbewerb - Kurzbz. fehlt!';
+				return false;
+			}
+			
+			// Abfrage
+			$qry.=" delete from ".$this->schemaSQL."tbl_wettbewerb ";
+			if (is_array($this->wbtyp_kurzbz))
+				$qry.=" where wbtyp_kurzbz in ('".implode("','",$this->wbtyp_kurzbz)."') ";
+			else	
+				$qry.=" where wbtyp_kurzbz='".addslashes($this->wbtyp_kurzbz)."' ";
+			
+			if (is_array($this->wettbewerb_kurzbz))
+				$qry.=" and wettbewerb_kurzbz in ('".implode("','",$this->wettbewerb_kurzbz)."') ";
+			else	
+				$qry.=" and wettbewerb_kurzbz='".addslashes($this->wettbewerb_kurzbz)."' ";
+
+			if($this->db_query($qry))
+			{
+				return true;	
+			}	
+			else
+			{
+				if (empty($this->errormsg))
+					$this->errormsg = 'Fehler beim Veranstaltungskategorie löschen';
+				return false;
+			}	
+		}	   
+	   
+	   
        function loadWettbewerb()
        {
 		$cSchemaSQL=$this->getSchemaSQL();
