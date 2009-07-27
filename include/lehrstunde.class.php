@@ -303,7 +303,7 @@ class lehrstunde extends basis_db
 				return false;
 			}
 			else 
-				$num_rows_einheit=$db->db_num_rows($result_einheit);
+				$num_rows_einheit=$this->db_num_rows($result_einheit);
 		}
 
 		///////////////////////////////////////////////////////////////////////
