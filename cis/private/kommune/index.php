@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,14 +29,16 @@
 
 // Max. Wettbewerbe je Zeile am Starttemplate	
    if (!defined('constMaxWettbwerbeZeile')) define('constMaxWettbwerbeZeile',5 );
-   
+// Hoehe der Benutzer Foto
+   if (!defined('constBenutzerFotoHigh')) define('constBenutzerFotoHigh',60 );
+  
 // Pflichteingabefelder Defaultwert   
    if (!defined('constEingabeFehlt')) define('constEingabeFehlt','Eingabe !' );
-   
-   
-// HREF Parameter fuer die Include Auswahl
-   if (!defined('constKommuneParmSetWork')) define('constKommuneParmSetWork','userSel' );
+
 // ------ Anzeige - Display Include HTML Datenerzeugen
+   // Auswahl Kommunen Template :: Anzeigenauswahl ::  Definition mit constKommuneParmSetWork
+   if (!defined('constKommuneParmSetWork')) define('constKommuneParmSetWork','usersel');
+   
    // Auswahl Kommunen Template :: Anzeigenauswahl ::  Definition mit constKommuneParmSetWork
    if (!defined('constKommuneAnzeigeDEFAULT')) define('constKommuneAnzeigeDEFAULT','kommune_template_start');
    // Anzeige Wettbewerb Team(s) in Pyramidenform
@@ -69,7 +72,7 @@
 	
 	include_once('../../../include/person.class.php');
 	include_once('../../../include/benutzer.class.php');
-	
+	include_once('../../../include/benutzerberechtigung.class.php');
 	include_once('../../../include/mail.class.php');
 
 // Kommunen Allg.Funktionen		
@@ -79,11 +82,12 @@
 	// Initialisieren Anzeige-Variable
 	$showHTML='';
 		 
+		 
 // Kommunen - Wettbewerb - Datenobjekt -----------------------------------------------------------------------------------------------------------
 	// Datenobjekt - Alle Daten je Parameter werden gesammelt fuer die neachste Funktionn
 	$oWettbewerb= new stdClass;
 
-	$oWettbewerb->clientENCODE='UTF8';
+#	$oWettbewerb->clientENCODE='UTF8';
 	$oWettbewerb->sqlSCHEMA='kommune';
 
 	// Parameter Applikation - Template Auswahl
@@ -91,18 +95,24 @@
 	$oWettbewerb->workSITE = (!empty($oWettbewerb->workSITE) ? trim($oWettbewerb->workSITE):constKommuneAnzeigeDEFAULT);
 	
 // AktiverAnwender-----------------------------------------------------------------------------------------------------------
-	$userUID=(isset($_REQUEST['userUID']) ? $_REQUEST['userUID'] :get_uid() );
-#	$userUID='pam';
-#	$userUID='oesi';
-#	$userUID='ruhan';
-#	$userUID='kindlm';
+	$user=(isset($_REQUEST['user']) ? $_REQUEST['user'] :get_uid() );
+#	$user='pam';
+#	$user='oesi';
+#	$user='ruhan';
+#	$user='kindlm';
 	
-	$oWettbewerb->userUID=$userUID;
-	
-	
-	$pers=kommune_funk_benutzerperson($oWettbewerb->userUID,$oWettbewerb);
-	if (isset($pers->nachname)) $oWettbewerb->PersonenBenutzer[$oWettbewerb->userUID]=$pers;
-	
+	$oWettbewerb->user=$user;
+	if (!kommune_funk_benutzerperson($oWettbewerb->user,@$oWettbewerb))
+		die(kommune_funk_show_error($oWettbewerb));
+		
+	$benutzerberechtigung = new benutzerberechtigung($user);
+	$benutzerberechtigung->getBerechtigungen($user,true);
+	// Nur Lektoren oder Mitarbeiter duerfen alle Termine sehen , Studenten nur Freigegebene Kategorien
+	if($benutzerberechtigung->fix || $benutzerberechtigung->lektor)
+		$oWettbewerb->wartungsberechtigt=true;
+	else
+		$oWettbewerb->wartungsberechtigt=false;		
+		
 // Teams -------------------------------------------------------------------------------------------------------------------
 	// Parameter Team (zum Wettbewerb)
   	$oWettbewerb->team_kurzbz=(isset($_REQUEST['team_kurzbz']) ? $_REQUEST['team_kurzbz']:'');
@@ -160,16 +170,16 @@
 	// ---------------- Kommunen Standart Include Dateien einbinden
 	//  Anzeige Templates mittels Include Laden 
     	if (trim($oWettbewerb->workSITE)!=constKommuneAnzeigeDEFAULT
-    	&& trim($oWettbewerb->workSITE)!=constKommuneWartungWettbewerbtyp
-    	&& trim($oWettbewerb->workSITE)!=constKommuneWartungWettbewerb	) 
+		&& trim($oWettbewerb->workSITE)!=constKommuneWartungWettbewerb	
+    	&& trim($oWettbewerb->workSITE)!=constKommuneWartungWettbewerbtyp	) 
 	{
-	       $includeFILE=strtolower($oWettbewerb->workSITE.".inc.php"); 
-       	if (file_exists($includeFILE))// Check ob das Verarbeitungs-Include File vorhanden ist
-		    include_once($includeFILE);
+	       	$includeFILE=strtolower($oWettbewerb->workSITE.".inc.php"); 
+      	 	if (file_exists($includeFILE))// Check ob das Verarbeitungs-Include File vorhanden ist
+		 	   include_once($includeFILE);
 	}
 		
 	// Fuer die Bildfunktion werden keine Datenbenoetigt, und nach Verarbeitung beenden
-    	if (trim($oWettbewerb->workSITE)==constKommuneDisplayIMAGE) 
+    if (trim($oWettbewerb->workSITE)==constKommuneDisplayIMAGE) 
 	{	
 		createIMGfromHEX(&$oWettbewerb);
 		exit;
@@ -178,28 +188,20 @@
 	// Fuer die Bildfunktion werden keine Datenbenoetigt, und nach Verarbeitung beenden
     	if (trim($oWettbewerb->workSITE)==constKommuneUserXML) 
 	{	
-		if (empty($userUID))
+		if (empty($user))
 			exit('<noInfo>Keine Daten </noInfo>');
-		exit( (isset($pers->nachname)?$pers->nachname:"$userUID falsch!"));
+		exit( (isset($pers->nachname)?$pers->nachname:"$user falsch!"));
 	}		
 // -------------------------------------------------------------------------------------------------------------------------
 // HTML Ausgabe Datenstrom Teil I Header
-
-	$cTmpCharSet=(defined('HTML_HEADER_CHARSET')?HTML_HEADER_CHARSET:'UTF-8');
-	if (stristr($oWettbewerb->clientENCODE,"UTF8"))
-		$cTmpCharSet="UTF-8";
-	elseif (stristr($oWettbewerb->clientENCODE,"UTF16"))
-		$cTmpCharSet="UTF-16";
-
-	
-	$showHTML='<?xml version="1.0" encoding="'.$cTmpCharSet.'" standalone="yes"?>
+	$showHTML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="'.(defined('HTML_HEADER_LANGUAGE_ISO')?HTML_HEADER_LANGUAGE_ISO:'DE').'" lang="'.(defined('HTML_HEADER_LANGUAGE_ISO')?HTML_HEADER_LANGUAGE_ISO:'DE').'">
+	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="DE" lang="DE">
 	<head>
 		<title>Kommune '.$oWettbewerb->workSITE.'</title>
 		<meta name="description" content="Kommune - Wettbewerbe '.$oWettbewerb->workSITE.'" />
 		<meta name="keywords" content="Kommune,Wettbewerbe,'.$oWettbewerb->workSITE.'" />
-		<meta http-equiv="Content-Type" content="text/html;charset='.$cTmpCharSet.'" />
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 		
 		<meta http-equiv="expires" content="-1" />
 		<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
@@ -208,7 +210,16 @@
 		<meta http-equiv="Content-Script-Type" content="text/javascript" />
 		<meta http-equiv="Content-Style-Type" content="text/css" />
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css" />
-
+<style type="text/css">
+	<!-- 
+	form {display:inline;}
+	.cursor_hand {cursor:pointer;vertical-align: top;white-space : nowrap;}
+	.ausblenden {display:none;}
+	.footer_zeile {color: silver;}
+		
+		
+	-->
+	</style>
 	<script language="JavaScript1.2" type="text/javascript">
 	<!--
 	function show_layer(x,obj)
@@ -245,7 +256,7 @@
 					position=Hoehe-DivHeight;
 					document.getElementById(x).style.top=position + "px";
 				}	
-
+				
 				if ( (left + DivWidth) >Weite)
 				{
 					position=Weite-DivWidth;
@@ -348,7 +359,7 @@ function checkTeamAnzahl(obj,nameID,anz)
 
 
 
-function doIt(userUID,nameID)
+function doIt(user,nameID)
 {
 //	alert(document.getElementById(nameID).innerHTML);
 //erstellen des requests
@@ -383,7 +394,7 @@ function doIt(userUID,nameID)
        //anfrage erstellen (GET, url ist localhost, request ist asynchron      
 
 	var callURL=\''.(isset($_SERVER["HTTP_REFERER"])?str_replace(strstr($_SERVER["HTTP_REFERER"],'?'),'',$_SERVER["HTTP_REFERER"]):'').'\';       
-	callURL=callURL+\'?userSel='.constKommuneUserXML.'&client_encode=UTF8&userUID=\'+userUID;
+	callURL=callURL+\'?userSel='.constKommuneUserXML.'&client_encode=UTF8&user=\'+user;
 	req.open("GET", callURL , true);
 
        //Beim abschliessen des request wird diese Funktion ausgeführt
@@ -401,9 +412,9 @@ function doIt(userUID,nameID)
                             	break;
                            default:
 							if (document.getElementById(nameID).value)
-							  	document.getElementById(nameID).value="bitte warten! Suche nach "+userUID;    
+							  	document.getElementById(nameID).value="bitte warten! Suche nach "+user;    
 							else
-							  	document.getElementById(nameID).innerHTML="bitte warten! Suche nach "+userUID;    
+							  	document.getElementById(nameID).innerHTML="bitte warten! Suche nach "+user;    
                             break;     
                         }
                     };
@@ -455,19 +466,26 @@ if (!window.Weite && document.body && document.body.offsetWidth)
 	kommune_funk_anwenderteams(&$oWettbewerb); // TeamAnwender	
 	kommune_funk_teambenutzer(&$oWettbewerb); // Team, TeamBenutzer	
 	
-	// Daten Anzeige und Verarbeitung
-     	$showHTML.=showMenueFunktion($oWettbewerb);
-	// Fehler - Error Ausgabe
-	
-	
-	$showHTML.='<div id="errorKommune">';
-	for ($iTmpZehler=0;$iTmpZehler<count($oWettbewerb->Error);$iTmpZehler++)
+
+		
+   	if (trim($oWettbewerb->workSITE)==constKommuneWartungWettbewerb	
+   	|| trim($oWettbewerb->workSITE)==constKommuneWartungWettbewerbtyp	) 
 	{
-		if (!empty($oWettbewerb->Error[$iTmpZehler]))	
-			$showHTML.='<p style="color: red;">'. $oWettbewerb->Error[$iTmpZehler].'</p>';
-	}
-	$showHTML.='</div>';
+		
+		echo '[&nbsp;'.kommune_funk_create_href(constKommuneAnzeigeDEFAULT,array(),array(),'<input  type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4pt;border:0px solid transparent;text-decoration:none; background-color: transparent;" onclick="this.checked=false;" onblur="this.checked=false;" name="callStartseite" />Startseite','Startseite&nbsp;').'&nbsp;]';
+
+	      	$includeFILE=strtolower($oWettbewerb->workSITE.".inc.php"); 
+      	 	if (file_exists($includeFILE))// Check ob das Verarbeitungs-Include File vorhanden ist
+		 	   include_once($includeFILE);
+	}	
+	else
+		// Daten Anzeige und Verarbeitung
+   		$showHTML.=showMenueFunktion($oWettbewerb);
+		
+	// Fehler - Error Ausgabe
+	$showHTML.='<div id="errorKommune">'.kommune_funk_show_error($oWettbewerb).'</div>';
 
 	$showHTML.='</body></html>';
 	exit($showHTML);
+
 ?>

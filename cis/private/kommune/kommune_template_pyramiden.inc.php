@@ -352,7 +352,7 @@ function showPyramideHTML($oWettbewerb=array())
 * @findUIDinPyramide Suchen Zeile und Spalte einer bestimmten Anwender UID in einem Spiel 
 *
 * @param arrayPYRAMIDE Liste der UIDs in Pyramidenform je Spiel
-* @param userUID Anwender UID nach der in der Pyramide gesucht wird 
+* @param user Anwender UID nach der in der Pyramide gesucht wird 
 *
 * @return Retour wird ein Array mit UID,Zeile,Splate der gefundenen Position geliefert
 *
@@ -375,7 +375,7 @@ function findUIDinPyramide($arrayPYRAMIDE,$arrayWETTBEWERBUSER)
 				$wettbewerbTEAM_KURZBZ=trim($arrayPYRAMIDE[$zeileIND][$spaltenIND]["team_kurzbz"]);
        			if ($spielerTEAM_KURZBZ==$wettbewerbTEAM_KURZBZ)
 				{ 
-       			 	$arrayPyramidePositionUID=array($wettbewerbTEAM_KURZBZ,$zeileIND,$spaltenIND,$GLOBALS["userUID"],"team_kurzbz"=>$wettbewerbTEAM_KURZBZ,"zeileIND"=>$zeileIND,"spaltenIND"=>$spaltenIND,"userUID"=>$GLOBALS["userUID"]);
+       			 	$arrayPyramidePositionUID=array($wettbewerbTEAM_KURZBZ,$zeileIND,$spaltenIND,$GLOBALS["user"],"team_kurzbz"=>$wettbewerbTEAM_KURZBZ,"zeileIND"=>$zeileIND,"spaltenIND"=>$spaltenIND,"user"=>$GLOBALS["user"]);
        			 	$arrayPYRAMIDE[$zeileIND][$spaltenIND]["EIGENER_EINTRAG"]="X";
 					$zeileIND=count($arrayPYRAMIDE); // Schleifenbedingung 1 auf True setzten
        			 	break; // diese Schleife beenden 

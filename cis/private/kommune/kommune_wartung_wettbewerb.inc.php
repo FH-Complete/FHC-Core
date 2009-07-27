@@ -31,7 +31,7 @@
 *
 *
 */
-	if (!isset($oWettbewerb->admin) || !$oWettbewerb->admin)
+	if (!isset($oWettbewerb) || !isset($oWettbewerb->wartungsberechtigt) || !$oWettbewerb->wartungsberechtigt)
 		die('Sie sind nicht berechtigt f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 // ------------------------------------------------------------------------------------------
 // Datenverarbeiten	
@@ -177,8 +177,8 @@
 					reset($oWettbewerb->WettbewerbTyp);
 					for ($iTmpZehler2=0;$iTmpZehler2<count($oWettbewerb->WettbewerbTyp);$iTmpZehler2++) 
 					{ 
-						$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz);
-						echo '<option '.(!empty($oWettbewerb->WettbewerbTyp[$iTmpZehler2]->farbe)?' style="background-color:#'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->farbe.'" ':'').'   '.(isset($_REQUEST['wbtyp_kurzbz_sel']) && !empty($_REQUEST['wbtyp_kurzbz_sel']) && $_REQUEST['wbtyp_kurzbz_sel']==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz?' selected="selected" ':'') .' value="'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz.'">'.trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz).'</option>';
+						$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']);
+						echo '<option '.(!empty($oWettbewerb->WettbewerbTyp[$iTmpZehler2]['farbe'])?' style="background-color:#'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['farbe'].'" ':'').'   '.(isset($_REQUEST['wbtyp_kurzbz_sel']) && !empty($_REQUEST['wbtyp_kurzbz_sel']) && $_REQUEST['wbtyp_kurzbz_sel']==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']?' selected="selected" ':'') .' value="'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz'].'">'.trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']).'</option>';
 					}	 
 				 	?>
 				</select>
@@ -210,18 +210,18 @@
 		$iTmpWettbewerb=0;
 		 for ($iTmpZehler=-1;$iTmpZehler<count($oWettbewerb->Wettbewerb);$iTmpZehler++) 
 		 { 
-		 	if ($iTmpZehler!= -1 && empty($oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz))
+		 	if ($iTmpZehler!= -1 && empty($oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz']))
 				continue;
 			
 			$iTmpWettbewerb++;
-		
+		/*
  			 if (isset($oWettbewerb->Wettbewerb[$iTmpZehler]))
 			 {
 			 	$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz=trim($oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz);
 			 	$oWettbewerb->Wettbewerb[$iTmpZehler]->regeln=trim($oWettbewerb->Wettbewerb[$iTmpZehler]->regeln);
 			 	$oWettbewerb->Wettbewerb[$iTmpZehler]->farbe=trim($oWettbewerb->Wettbewerb[$iTmpZehler]->farbe);
 			}	
-			
+		*/	
 		?>
 			     
 		<form name="selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
@@ -233,26 +233,26 @@
 					reset($oWettbewerb->WettbewerbTyp);
 					for ($iTmpZehler2=0;$iTmpZehler2<count($oWettbewerb->WettbewerbTyp);$iTmpZehler2++) 
 					{ 
-						$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz);
-						echo '<option '.(!empty($oWettbewerb->WettbewerbTyp[$iTmpZehler2]->farbe)?' style="background-color:#'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->farbe.'" ':'').'   '.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz) && $iTmpZehler != -1 && $oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz?' selected="selected" ':(!empty($oWettbewerb->wbtyp_kurzbz) && $oWettbewerb->wbtyp_kurzbz==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz?' selected="selected" ':( $iTmpZehler == -1 && $work=='save' && isset($_REQUEST["wbtyp_kurzbz"]) && $_REQUEST["wbtyp_kurzbz"]==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz?' selected="selected" ':''))) .' value="'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz.'">'.trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]->wbtyp_kurzbz).'</option>';
+						$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']);
+						echo '<option '.(!empty($oWettbewerb->WettbewerbTyp[$iTmpZehler2]['farbe'])?' style="background-color:#'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['farbe'].'" ':'').'   '.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wbtyp_kurzbz']) && $iTmpZehler != -1 && $oWettbewerb->Wettbewerb[$iTmpZehler]['wbtyp_kurzbz']==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']?' selected="selected" ':(!empty($oWettbewerb->wbtyp_kurzbz) && $oWettbewerb->wbtyp_kurzbz==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']?' selected="selected" ':( $iTmpZehler == -1 && $work=='save' && isset($_REQUEST['wbtyp_kurzbz']) && $_REQUEST['wbtyp_kurzbz']==$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']?' selected="selected" ':''))) .' value="'.$oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz'].'">'.trim($oWettbewerb->WettbewerbTyp[$iTmpZehler2]['wbtyp_kurzbz']).'</option>';
 					}	 
 				 	?>
 				</select>
 				
 				
-				<input class="ausblenden" name="wbtyp_kurzbz_old" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz)?$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz:'');?>" />
+				<input class="ausblenden" name="wbtyp_kurzbz_old" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wbtyp_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['wbtyp_kurzbz']:'');?>" />
 			</td>
 	
 			<td>
-				<input class="pflichtfeld" type="text" name="wettbewerb_kurzbz" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz)?$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz:($work=='save' && isset($_REQUEST["wettbewerb_kurzbz"])?$_REQUEST["wettbewerb_kurzbz"]:constEingabeFehlt));?>" size="17" maxlength="16" onblur="if (this.value=='') {this.value=this.defaultValue;}" onfocus="if (this.value=='<?php echo constEingabeFehlt; ?>') { this.value='';}" />
-				<input class="ausblenden" name="wettbewerb_kurzbz_old" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz)?$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz:'');?>" />
+				<input class="pflichtfeld" type="text" name="wettbewerb_kurzbz" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz']:($work=='save' && isset($_REQUEST["wettbewerb_kurzbz"])?$_REQUEST["wettbewerb_kurzbz"]:constEingabeFehlt));?>" size="17" maxlength="16" onblur="if (this.value=='') {this.value=this.defaultValue;}" onfocus="if (this.value=='<?php echo constEingabeFehlt; ?>') { this.value='';}" />
+				<input class="ausblenden" name="wettbewerb_kurzbz_old" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz']:'');?>" />
 			</td>
 
 
-			<td><input name="regeln" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->regeln)?$oWettbewerb->Wettbewerb[$iTmpZehler]->regeln:($work=='save' && isset($_REQUEST["regeln"])?$_REQUEST["regeln"]:''));?>" size="20" maxlength="240" /></td>
-			<td><input name="forderungstage" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->regeln)?$oWettbewerb->Wettbewerb[$iTmpZehler]->forderungstage:($work=='save' && isset($_REQUEST["forderungstage"])?$_REQUEST["forderungstage"]:7));?>" size="3" maxlength="5" /></td>
-			<td><input name="teamgroesse" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->teamgroesse)?$oWettbewerb->Wettbewerb[$iTmpZehler]->teamgroesse:($work=='save' && isset($_REQUEST["teamgroesse"])?$_REQUEST["teamgroesse"]:1));?>" size="3" maxlength="5" /></td>
-			<td><input class="pflichtfeld" name="uid" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->uid)?$oWettbewerb->Wettbewerb[$iTmpZehler]->uid:($work=='save' && isset($_REQUEST["uid"])?$_REQUEST["uid"]:$oWettbewerb->user));?>" size="10" maxlength="20" /></td>
+			<td><input name="regeln" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['regeln'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['regeln']:($work=='save' && isset($_REQUEST["regeln"])?$_REQUEST["regeln"]:''));?>" size="20" maxlength="240" /></td>
+			<td><input name="forderungstage" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['forderungstage'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['forderungstage']:($work=='save' && isset($_REQUEST["forderungstage"])?$_REQUEST["forderungstage"]:7));?>" size="3" maxlength="5" /></td>
+			<td><input name="teamgroesse" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['teamgroesse'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['teamgroesse']:($work=='save' && isset($_REQUEST["teamgroesse"])?$_REQUEST["teamgroesse"]:1));?>" size="3" maxlength="5" /></td>
+			<td><input class="pflichtfeld" name="uid" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['uid'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['uid']:($work=='save' && isset($_REQUEST["uid"])?$_REQUEST["uid"]:$oWettbewerb->user));?>" size="10" maxlength="20" /></td>
 
 			<td><?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]->foto_image)?$oWettbewerb->Wettbewerb[$iTmpZehler]->foto_image:''); ?></td>
 			
@@ -260,20 +260,20 @@
 			<td>
 				 <input size="8" maxlength="140" type="file" id="uploadicon" name="uploadicon" alt="suche" title="suchen" style="font-size:xx-small;" />
 
-				 <input class="ausblenden" name="icon" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->icon)?$oWettbewerb->Wettbewerb[$iTmpZehler]->icon:($work=='save' && isset($_REQUEST["icon"])?$_REQUEST["icon"]:''));?>" />				
+				 <input class="ausblenden" name="icon" value="<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['icon'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['icon']:($work=='save' && isset($_REQUEST["icon"])?$_REQUEST["icon"]:''));?>" />				
 			</td>
 			
 			<td>
 				<input class="ausblenden" name="wbtyp_kurzbz_sel" value="<?php echo (isset($_REQUEST['wbtyp_kurzbz_sel']) && !empty($_REQUEST['wbtyp_kurzbz_sel'])?$_REQUEST['wbtyp_kurzbz_sel']:''); ?>" />
-				<input class="ausblenden" name="userSel" value="<?php echo $oWettbewerb->workSITE; ?>" />
+				<input class="ausblenden" name="<?php echo constKommuneParmSetWork;?>" value="<?php echo $oWettbewerb->workSITE; ?>" />
 				<input class="ausblenden" name="work" value="?" />
-				<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]->icon_image)?$oWettbewerb->Wettbewerb[$iTmpZehler]->icon_image:'');?>
+				<?php echo (isset($oWettbewerb->Wettbewerb[$iTmpZehler]) && isset($oWettbewerb->Wettbewerb[$iTmpZehler]['icon_image'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['icon_image']:'');?>
 			</td>
 			
 			<td class="cursor_hand" onclick="if (window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.wbtyp_kurzbz.value=='<?php echo constEingabeFehlt; ?>')  {window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.wbtyp_kurzbz.focus();return false;};if (window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.wettbewerb_kurzbz.value=='<?php echo constEingabeFehlt; ?>')  {window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.wettbewerb_kurzbz.focus();return false;};if (window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.regeln.value.length<1) {window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.regeln.focus();return false;}; window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='save';window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" >speichern <img height="14px" border="0" alt="sichern - save" src="../../../skin/images/date_edit.png" />&nbsp;</td>
 			<td <?php echo ($iTmpZehler<0?' class="ausblenden" ':''); ?> class="cursor_hand" onclick="window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='del';window.document.selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" >l&ouml;schen <img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/date_delete.png" />&nbsp;</td>
 		
-			<td valign="top"><?php echo ($iTmpZehler<0?'':'<a href="'.$_SERVER['PHP_SELF'].'?userSel=kommune_wartung_team&amp;wbtyp_kurzbz='.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz)?$oWettbewerb->Wettbewerb[$iTmpZehler]->wbtyp_kurzbz:'').'&amp;wettbewerb_kurzbz='.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz)?$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz:'').'" target="_self"  title="zum Wettbewerb '.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz)?$oWettbewerb->Wettbewerb[$iTmpZehler]->wettbewerb_kurzbz:'').'"><img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/application_form_edit.png" /></a>'); ?>&nbsp;</td>
+			<td valign="top"><?php echo ($iTmpZehler<0?'':'<a href="'.$_SERVER['PHP_SELF'].'?userSel=kommune_wartung_team&amp;wbtyp_kurzbz='.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wbtyp_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['wbtyp_kurzbz']:'').'&amp;wettbewerb_kurzbz='.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz']:'').'" target="_self"  title="zum Wettbewerb '.(isset($oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz'])?$oWettbewerb->Wettbewerb[$iTmpZehler]['wettbewerb_kurzbz']:'').'"><img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/application_form_edit.png" /></a>'); ?>&nbsp;</td>
 		
 		
 		</tr>

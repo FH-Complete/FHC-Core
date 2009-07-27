@@ -36,7 +36,7 @@ function showTeamEinladung($oWettbewerb)
 
 	if (empty($oWettbewerb->team_kurzbz) && isset($oWettbewerb->EigeneWettbewerbe[0]))
 		$oWettbewerb->team_kurzbz=$oWettbewerb->EigeneWettbewerbe[0]['team_kurzbz'];
-	if (empty($oWettbewerb->team_kurzbz) && empty($oWettbewerb->userUID))	   	
+	if (empty($oWettbewerb->team_kurzbz) && empty($oWettbewerb->user))	   	
 		return "Keine Angaben &uuml;ber das Team gefunden!";
 	if (empty($oWettbewerb->wettbewerb_kurzbz))	   	
 		return "Keine Angaben &uuml;ber den Wettbewerb gefunden!";
@@ -162,7 +162,7 @@ function showTeamEinladung_show($oWettbewerb)
 	$WettbewerbTeam->InitWettbewerbteam();
 	$WettbewerbTeam->setTeam_kurzbz(trim($oWettbewerb->team_kurzbz_einladung));
 	$WettbewerbTeam->setWettbewerb_kurzbz(trim($oWettbewerb->wettbewerb_kurzbz));
-	$WettbewerbTeam->setUID($oWettbewerb->userUID);
+	$WettbewerbTeam->setUID($oWettbewerb->user);
 
 	if ($WettbewerbTeam->loadWettbewerbteam())
 		$bTmpGeforderter=true;
@@ -380,7 +380,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 		$WettbewerbTeameinladen->setMatchdatumzeit($cTmpMatchdatumzeit);	
  		$WettbewerbTeameinladen->setMatchort($cTmpMatchort);	
 		$WettbewerbTeameinladen->setGefordertamum(Time());	
-		$WettbewerbTeameinladen->setGefordertvon($oWettbewerb->userUID);
+		$WettbewerbTeameinladen->setGefordertvon($oWettbewerb->user);
 		$WettbewerbTeameinladen->setMatch_id($oWettbewerb->match_id);
 		if (empty($oWettbewerb->match_id))
 			$WettbewerbTeameinladen->setSwitchGewinner(0);
@@ -399,7 +399,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 		
 			$betreff='Neue Forderung im Wettbewerb '.$oWettbewerb->wettbewerb_kurzbz;
 	
-			$cTmpName=trim($oWettbewerb->userUID);
+			$cTmpName=trim($oWettbewerb->user);
 			$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 			if (isset($pers->langname)) 
 				$cTmpName=$pers->langname;
@@ -455,7 +455,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
  			$WettbewerbTeameinladen->setTeam_sieger($oWettbewerb->team_kurzbz);	
 			
 			$WettbewerbTeameinladen->setBestaetigtamum(Time());	
- 			$WettbewerbTeameinladen->setBestaetigtvon($oWettbewerb->userUID);	
+ 			$WettbewerbTeameinladen->setBestaetigtvon($oWettbewerb->user);	
 
 			$WettbewerbTeameinladen->setErgebniss('abgelehnt');
 
@@ -465,7 +465,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 				$oWettbewerb->Error[]=$WettbewerbTeameinladen->getError();
 			
 			$WettbewerbTeameinladen->setMatchbestaetigtamum(Time());	
- 			$WettbewerbTeameinladen->setMatchbestaetigtvon($oWettbewerb->userUID);	
+ 			$WettbewerbTeameinladen->setMatchbestaetigtvon($oWettbewerb->user);	
 		
 			if ($WettbewerbTeameinladen->saveWettbewerbeinladung())
 				$oWettbewerb->Einladung=$WettbewerbTeameinladen->getWettbewerbeinladung();
@@ -478,7 +478,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			if (isset($oWettbewerb->Team[trim($oWettbewerb->team_kurzbz_einladung)][0]['team_kurzbz']))
 				$iTmpAnzahlTeam=count($oWettbewerb->Team[trim($oWettbewerb->team_kurzbz_einladung)][0]);
 
-			$cTmpName=trim($oWettbewerb->userUID);
+			$cTmpName=trim($oWettbewerb->user);
 			$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 			if (isset($pers->langname)) 
 				$cTmpName=$pers->langname;
@@ -498,10 +498,10 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$text.="Die Einladung wurde abgelehnt von ".$cTmpName."\nam ".$oWettbewerb->Einladung[0]['bestaetigtdatum']." um ".$oWettbewerb->Einladung[0]['bestaetigtzeit'] ." erfasst."."\n";
 			// Einladung an Spieler/Team Information
 
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungVonTeam[0]['uid'],$betreff,$text,$oWettbewerb->userUID,$oWettbewerb);
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->userUID,$betreff,$text,$oWettbewerb->EinladungVonTeam[0]['uid'],$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungVonTeam[0]['uid'],$betreff,$text,$oWettbewerb->user,$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->user,$betreff,$text,$oWettbewerb->EinladungVonTeam[0]['uid'],$oWettbewerb);
 			// Moderator Information
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Wettbewerb[0]['uid'],$betreff." [Moderatorinformtion]",$text,$oWettbewerb->userUID,$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Wettbewerb[0]['uid'],$betreff." [Moderatorinformtion]",$text,$oWettbewerb->user,$oWettbewerb);
 			
 			return true;
 	}
@@ -515,7 +515,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$WettbewerbTeameinladen->setTeam_forderer($oWettbewerb->team_kurzbz);
 			$WettbewerbTeameinladen->setTeam_gefordert($oWettbewerb->team_kurzbz_einladung);
 			$WettbewerbTeameinladen->setBestaetigtamum(Time());	
- 			$WettbewerbTeameinladen->setBestaetigtvon($oWettbewerb->userUID);	
+ 			$WettbewerbTeameinladen->setBestaetigtvon($oWettbewerb->user);	
 			$WettbewerbTeameinladen->setMatch_id($oWettbewerb->match_id);			
 
 			
@@ -530,7 +530,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			if (isset($oWettbewerb->Team[trim($oWettbewerb->team_kurzbz_einladung)][0]['team_kurzbz']))
 				$iTmpAnzahlTeam=count($oWettbewerb->Team[trim($oWettbewerb->team_kurzbz_einladung)][0]);
 							
-			$cTmpName=trim($oWettbewerb->userUID);
+			$cTmpName=trim($oWettbewerb->user);
 			$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 			if (isset($pers->langname)) 
 				$cTmpName=$pers->langname;
@@ -550,7 +550,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$text.=$oWettbewerb->Einladung[0]['matchort']." den Wettbewerb ".$oWettbewerb->wettbewerb_kurzbz ." auszutragen."."\n\n";
 			$text.="Die Einladung wurde von ".$cTmpName."\nam ".$oWettbewerb->Einladung[0]['bestaetigtdatum']." um ".$oWettbewerb->Einladung[0]['bestaetigtzeit'] ." erfasst."."\n";
 			// Einladung an Spieler/Team Information
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Einladung[0]['gefordertvon'],$betreff,$text,$oWettbewerb->userUID,$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Einladung[0]['gefordertvon'],$betreff,$text,$oWettbewerb->user,$oWettbewerb);
 
 		return true;
 	}
@@ -579,7 +579,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			if (isset($WettbewerbTeameinladen)) unset($WettbewerbTeameinladen);	
 					
 
-			$cTmpName=trim($oWettbewerb->userUID);
+			$cTmpName=trim($oWettbewerb->user);
 			$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 			if (isset($pers->langname)) 
 				$cTmpName=$pers->langname;
@@ -609,7 +609,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$text.="\n\nErgebnis wurde eingetragen von ".$cTmpName."\n\nam ". $cTmpCheckHeute. ", um ".$cTmpCheckZeit.".\n\n\n";
 
 			// Einladung an Spieler/Team Information
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungAnTeam[0]['uid'],$betreff,$text,$oWettbewerb->userUID,$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungAnTeam[0]['uid'],$betreff,$text,$oWettbewerb->user,$oWettbewerb);
 
 		return true;		
 	}
@@ -622,7 +622,7 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$WettbewerbTeameinladen->setTeam_forderer($oWettbewerb->team_kurzbz);
 			$WettbewerbTeameinladen->setTeam_gefordert($oWettbewerb->team_kurzbz_einladung);
 			$WettbewerbTeameinladen->setMatchbestaetigtamum(Time());	
- 			$WettbewerbTeameinladen->setMatchbestaetigtvon($oWettbewerb->userUID);	
+ 			$WettbewerbTeameinladen->setMatchbestaetigtvon($oWettbewerb->user);	
 			$WettbewerbTeameinladen->setMatch_id($oWettbewerb->match_id);			
 
 			if ($WettbewerbTeameinladen->saveWettbewerbeinladung())
@@ -671,15 +671,15 @@ function showTeamEinladung_submit($oWettbewerb,$cTmpSubmitVerarbeitung=false)
 			$cTmpCheckZeit = date("H:i",time());
 
 			
-			$cTmpName=trim($oWettbewerb->userUID);
+			$cTmpName=trim($oWettbewerb->user);
 			$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 			if (isset($pers->langname)) 
 				$cTmpName=$pers->langname;			
 			$text.="Das Ergebnis wurde bestaetigt von ".$cTmpName."\n\nam ". $cTmpCheckHeute. ", um ".$cTmpCheckZeit.".\n";
 
 			// Ergebnis bestaetigt - Information an Spieler/Team senden
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungVonTeam[0]['uid'],$betreff,$text,$oWettbewerb->userUID,$oWettbewerb);
-			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->userUID,$betreff,$text,$oWettbewerb->EinladungVonTeam[0]['uid'],$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->EinladungVonTeam[0]['uid'],$betreff,$text,$oWettbewerb->user,$oWettbewerb);
+			$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->user,$betreff,$text,$oWettbewerb->EinladungVonTeam[0]['uid'],$oWettbewerb);
 			// Moderator Information
 			return true;
 		}
