@@ -112,7 +112,7 @@
 				
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
-	          		<td class="tdwrap"><a class="Item" href="public/tw_international.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;TW International</a></td>
+	          		<td class="tdwrap"><a class="Item" href="public/tw_international.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;FHTW International</a></td>
 	  			</tr>
 	  			<tr>
 	  				<!--
