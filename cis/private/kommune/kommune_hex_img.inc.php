@@ -97,7 +97,8 @@ function createIMGfromHEX($oWettbewerb)
      }     
 #exit($selBILD.Test($oWettbewerb));		 
      if (empty($heximg))
-	    $heximg ='4749463839611e000a0080ff00c0c0c000000021f90401000000002c000000001e000a0040020f848fa9cbed0fa39cb4da8bb3debc00003b';
+	    $heximg ='R0lGODlhHgAKAID/AMDAwAAAACH5BAEAAAAALAAAAAAeAAoAQAIPhI+py+0Po5y02ouz3rwAADs=';
+		
    	@ob_end_clean();
    	header("Content-type: image/gif");
 	exit(kommune_hexstr($heximg));

@@ -48,7 +48,7 @@ function showMenueFunktion($oWettbewerb)
 	//		wird nur angezeigt wenn Daten fuer die Auswahl vorhanden sind 
 	//
 	
-	$cTmpName=$oWettbewerb->userUID;
+	$cTmpName=$oWettbewerb->user;
 	$pers=kommune_funk_benutzerperson($cTmpName,$oWettbewerb);
 	if (isset($pers->langname)) 
 			$cTmpName=$pers->langname;
@@ -57,6 +57,8 @@ function showMenueFunktion($oWettbewerb)
 	$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;|&nbsp;':'');
 	$cTmpMenue.=kommune_funk_create_href(constKommuneAnzeigeDEFAULT,array(),array(),'<input  type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4pt;border:0px solid transparent;text-decoration:none; background-color: transparent;" onclick="this.checked=false;" onblur="this.checked=false;" name="callStartseite" />Startseite','Startseite&nbsp;');
 
+	
+	
 	// Variable MenueEintraege
 	$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;|&nbsp;':'');
 	if (trim($oWettbewerb->workSITE)==constKommuneSTATISTIK)
@@ -168,6 +170,20 @@ function showMenueFunktion($oWettbewerb)
 		$showHTML.='<div id="idWBSpiele" style="display:none"><h1 '.$cTmpFarbe.'>Ergebnisse '.$oWettbewerb->wettbewerb_kurzbz.'</h1>'.kommune_funk_show_spielergebnis($oWettbewerb).'</div>';
 	}	
 
+	if ($oWettbewerb->wartungsberechtigt)
+	{
+		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;]&nbsp;':'');
+		
+		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;[&nbsp;':'');
+		
+		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;Wartung&nbsp;::&nbsp;':'');
+		$cTmpMenue.=kommune_funk_create_href('kommune_wartung_wettbewerbtypen',array(),array(),'<input type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4pt;border:0px solid transparent;text-decoration:none; background-color: transparent;" onclick="this.checked=false;" onblur="this.checked=false;" name="callWettbewerbtypen" />Wettbewerbtypen','Wettbewerbtypen&nbsp;');
+		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;&nbsp;|&nbsp;':'');
+		$cTmpMenue.=kommune_funk_create_href('kommune_wartung_wettbewerb',array(),array(),'<input type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4pt;border:0px solid transparent;text-decoration:none; background-color: transparent;" onclick="this.checked=false;" onblur="this.checked=false;" name="callWettbewerb" />Wettbewerb','Wettbewerb&nbsp;');
+		$cTmpMenue.=(!empty($cTmpMenue)?'&nbsp;':'');
+	}	
+	
+	
 	if (empty($cTmpMenue))
 		return '<div style="text-align:center;"><br />Keine Wettbewerbe zurzeit Online.<br />Bitte etwas Geduld.<br />Danke</div>';
 	
@@ -244,7 +260,7 @@ function kommune_funk_wettbewerb($oWettbewerb)
 function kommune_funk_eigene_wettbewerb($oWettbewerb)
 {
 	// --- Wettbewerbe zum angemeldeten User (EINGETRAGEN)                
-	$Wettbewerb=new komune_wettbewerbteam($oWettbewerb->userUID,$oWettbewerb->team_kurzbz,$oWettbewerb->wettbewerb_kurzbz);
+	$Wettbewerb=new komune_wettbewerbteam($oWettbewerb->user,$oWettbewerb->team_kurzbz,$oWettbewerb->wettbewerb_kurzbz);
 
 	$oWettbewerb->EigeneWettbewerbe=array();
 	if ($Wettbewerb->loadWettbewerbteam())
@@ -685,7 +701,7 @@ function kommune_funk_anwenderteams($oWettbewerb)
 	$Wettbewerb=new komune_wettbewerbteam('','','');
 
 	$Wettbewerb->InitWettbewerbteam();
-	$Wettbewerb->setUid($oWettbewerb->userUID);
+	$Wettbewerb->setUid($oWettbewerb->user);
 	$Wettbewerb->setWettbewerb_kurzbz($oWettbewerb->wettbewerb_kurzbz);
 	
 	if ($Wettbewerb->loadWettbewerbteam())
@@ -1210,7 +1226,7 @@ function kommune_funk_show_wettbewerbeinladungen_forderungstage($oWettbewerb)
 						// Einladung an Spieler/Team Information
 						$oWettbewerb->Error[]=kommune_funk_sendmail($arrTempWettbewerbTermine[$iTmpZehler]['team_forderer'],$betreff,$text,$arrTempWettbewerbTermine[$iTmpZehler]['uid'],$oWettbewerb);
 						$oWettbewerb->Error[]=kommune_funk_sendmail($arrTempWettbewerbTermine[$iTmpZehler]['team_gefordert'],$betreff,$text,$arrTempWettbewerbTermine[$iTmpZehler]['uid'],$oWettbewerb);
-						$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->userUID,$betreff,$text,$arrTempWettbewerbTermine[$iTmpZehler]['uid'],$oWettbewerb);
+						$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->user,$betreff,$text,$arrTempWettbewerbTermine[$iTmpZehler]['uid'],$oWettbewerb);
 						
 					}						
 					else
@@ -1721,7 +1737,7 @@ function kommune_funk_show_spielergebnis($oWettbewerb,$showStatus=false)
 *
 * @kommune_funk_popup_benutzer Aufbau einer bisher gespielten Wettbewerbe
 *
-* @param $cUid UserUID Anwenderkurzzeichen 
+* @param $cUid user Anwenderkurzzeichen 
 * @param $oWettbewerb Objekt mit allen Daten zur Selektion wie Wettbewerbe,Personen,Teams,Matches
 *
 * @return HTML String Benutzeruebersicht
@@ -1770,38 +1786,38 @@ function kommune_funk_popup_benutzer($cUid,$oWettbewerb)
 * @kommune_funk_benutzerperson ermittelt zu einer UID die Person, und speichert diese im Objekt
 *
 * @param $oWettbewerb Objekt mit allen Daten zur Selektion wie Wettbewerbe,Personen,Teams,Matches
-* @param $cUid UserUID Anwenderkurzzeichen 
+* @param $cUid user Anwenderkurzzeichen 
 *
 * @return HTML Liste der Ergebnisse der Wettbewerbe
 *
 */
-function kommune_funk_benutzerperson($userUID,$oWettbewerb)
+function kommune_funk_benutzerperson($user,$oWettbewerb)
 {
-	$userUID=trim($userUID);
-	if (empty($userUID))
+	$user=trim($user);
+	if (empty($user))
 		return 'keine Benutzer UID &uuml;bergeben';
 		
-	if (isset($oWettbewerb->PersonenBenutzer[$userUID])) // Wurde bereits gefunden
+	if (isset($oWettbewerb->PersonenBenutzer[$user])) // Wurde bereits gefunden
 	{
-		$pers=$oWettbewerb->PersonenBenutzer[$userUID];
+		$pers=$oWettbewerb->PersonenBenutzer[$user];
 		if (!isset($pers->langname))
-			$pers->langname=kommune_funk_pers_langname($userUID,$pers);	
-		$oWettbewerb->PersonenBenutzer[$userUID]=$pers;
+			$pers->langname=kommune_funk_pers_langname($user,$pers);	
+		$oWettbewerb->PersonenBenutzer[$user]=$pers;
 		return $pers;
 	}
 	
-	$pers = new benutzer($userUID); // Lesen PersonenBenutzer
+	$pers = new benutzer($user); // Lesen PersonenBenutzer
 	if (!isset($pers->nachname))
-		return $userUID;
+		return $user;
 		
-	$pers->langname=kommune_funk_pers_langname($userUID,$pers);
+	$pers->langname=kommune_funk_pers_langname($user,$pers);
 	$pers->foto_image='';
 	if (!empty($pers->foto))
 	{
 		$paramURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneDisplayIMAGE.'&amp;timecheck'.time().'&amp;person_id='.$pers->person_id.(strlen($pers->foto)<1000?'&amp;heximg='.$pers->foto:'');
    		$pers->foto_image='<img height="70"  border="0" alt="'.$pers->langname.' '.$pers->person_id.'" src="'.$paramURL.'" />';
 	}
-	$oWettbewerb->PersonenBenutzer[$userUID]=$pers;
+	$oWettbewerb->PersonenBenutzer[$user]=$pers;
 	return $pers;
 }	
 
@@ -2137,7 +2153,7 @@ function kommune_funk_sendmail($empf='',$betreff='',$text='',$abs='',$oWettbewer
 
 // Absender 
 	if (empty($abs)) // wenn kein Absender vorhanden ist : den Aktuellangemeldete Anwender nehmen
-		$abs=$oWettbewerb->userUID;
+		$abs=$oWettbewerb->user;
 	$abs=trim($abs);
 			
 	$cTmpName=str_replace(stristr($abs,"@"),'',$abs); // Es wurde eine eMailadresse uebergeben, wir brauchen die UID
@@ -2197,14 +2213,14 @@ function kommune_funk_create_emailaccount($cUID)
 * @return RETURN wird das Erfolgreiche bzw. der Fehler der Datenbankaktion geliefert
 *
 */
-function kommune_funk_pers_langname($userUID="",$pers="")
+function kommune_funk_pers_langname($user="",$pers="")
 {           
 	if (!isset($pers->nachname)) // Plausib : wurde kein Datenobjekt der Person uebergeben
 	{
 		if (!empty($pers) && !is_array($pers)) // Es wurde was uebergeben (Retour dieser Information)
 				return $pers;
 		else	
-			return $userUID;
+			return $user;
 	}	
 	$cTmpLangName='';  
 	$cTmpLangName.=(isset($pers->anrede) ? $pers->anrede.' ':'');
@@ -2328,6 +2344,31 @@ function kommune_funk_create_url($workurl="",$oWettbewerb=array(),$spezialparame
 			$cTmpUrl.='&amp;'.$key.'='.$value;
 	}		
 	return $cTmpUrl; 
+}
+
+#-------------------------------------------------------------------------------------------	
+/* 
+*
+* @kommune_funk_create_url Erzeugt eine URL fuer Kommune-Wettbewerb
+*
+* @param $workurl welche Seite soll aufgerufen werden. Default die Startseite
+* @param $oWettbewerb Array mit den Wettbewerb,Team,Wettbewerber und Benutzerdaten
+* @param $spezialparameter Array mit weiteren Parameter
+*
+* @return URL als String
+*
+*/
+function kommune_funk_show_error($oWettbewerb=array())
+{
+	$cTmpString='';
+	if (!is_array($oWettbewerb->Error) || count($oWettbewerb->Error)<1)
+		return $cTmpString;
+	for ($iTmpZehler=0;$iTmpZehler<count($oWettbewerb->Error);$iTmpZehler++)
+	{
+		if (!empty($oWettbewerb->Error[$iTmpZehler]))
+			$cTmpString.='<p>'.$oWettbewerb->Error[$iTmpZehler].'</p>';
+	}
+	return $cTmpString;	
 }
 /* 
 *-------------------------------------------------------------------------------------------	

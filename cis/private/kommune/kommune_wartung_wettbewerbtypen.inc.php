@@ -31,7 +31,7 @@
 *
 *
 */
-	if (!isset($oWettbewerb->admin) || !$oWettbewerb->admin)
+	if (!isset($oWettbewerb) || !isset($oWettbewerb->wartungsberechtigt) || !$oWettbewerb->wartungsberechtigt)
 		die('Sie sind nicht berechtigt f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 // ------------------------------------------------------------------------------------------
 // Datenverarbeiten	
@@ -130,15 +130,20 @@
 		</tr>
 			
 		<?php 
+		
 			 // Zaehler = -1 fuer die Neuanlage  	
-			 for ($iTmpZehler=-1;$iTmpZehler<count($oWettbewerb->WettbewerbTyp);$iTmpZehler++) { 
+			 for ($iTmpZehler=-1;$iTmpZehler<count($oWettbewerb->WettbewerbTyp);$iTmpZehler++) 
+			 { 
 			 
- 			 if (isset($oWettbewerb->WettbewerbTyp[$iTmpZehler]))
-			 {
-			 	$oWettbewerb->WettbewerbTyp[$iTmpZehler]->wbtyp_kurzbz=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]->wbtyp_kurzbz);
-			 	$oWettbewerb->WettbewerbTyp[$iTmpZehler]->bezeichnung=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]->bezeichnung);
-			 	$oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe);
-			}	
+ 			 	if (isset($oWettbewerb->WettbewerbTyp[$iTmpZehler]))
+				{
+					
+					$oWettbewerb->WettbewerbTyp[$iTmpZehler]=(object)$oWettbewerb->WettbewerbTyp[$iTmpZehler];
+					
+				 	$oWettbewerb->WettbewerbTyp[$iTmpZehler]->wbtyp_kurzbz=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]->wbtyp_kurzbz);
+				 	$oWettbewerb->WettbewerbTyp[$iTmpZehler]->bezeichnung=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]->bezeichnung);
+				 	$oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe=trim($oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe);
+				}	
 		?>
 			     
 		<form name="selWettbewerbtypen<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
@@ -154,7 +159,7 @@
 			<td><input  <?php echo (isset($oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe)?' style="background-color:#'.$oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe.';"':'');?> name="farbe" onchange="if (this.value=='') {this.style.backgroundColor='transparent';} else {this.style.backgroundColor='#' + this.value;}" value="<?php echo (isset($oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe)?$oWettbewerb->WettbewerbTyp[$iTmpZehler]->farbe:'');?>" size="7" maxlength="6" /></td>
 
 			<td>
-				<input class="ausblenden" size="30" name="userSel" value="<?php echo $oWettbewerb->workSITE; ?>" />
+				<input class="ausblenden" size="30" name="<?php echo constKommuneParmSetWork;?>" value="<?php echo $oWettbewerb->workSITE; ?>" />
 				<input class="ausblenden" size="10" name="work" value="?" />
 				<?php echo (isset($oWettbewerb->WettbewerbTyp[$iTmpZehler]->bild_image)?$oWettbewerb->WettbewerbTyp[$iTmpZehler]->bild_image:'');?>
 			</td>

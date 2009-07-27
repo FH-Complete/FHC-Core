@@ -64,7 +64,7 @@ function showTeamWartung($oWettbewerb)
 	// Header Ende
 	
 	// Plausib	
-	if (empty($oWettbewerb->team_kurzbz) && empty($oWettbewerb->userUID))	   	
+	if (empty($oWettbewerb->team_kurzbz) && empty($oWettbewerb->user))	   	
 		return $showHTML.="Keine Angaben &uuml;ber das Team gefunden!";
 
 	if (empty($oWettbewerb->wettbewerb_kurzbz))	   	
@@ -78,7 +78,7 @@ function showTeamWartung($oWettbewerb)
 
 	// Datenspeicherung  
 	// 	 Submit wurde gedrueckt
-	if (isset($_REQUEST['array_userUID']))
+	if (isset($_REQUEST['array_user']))
 	{
 		// Bilderupload
 		showTeamWartung_Bildupload($oWettbewerb);
@@ -91,16 +91,16 @@ function showTeamWartung($oWettbewerb)
 	// Pruefen ob nach dem Speichern (Submit) ein Fehler ( Kein DatenArray)
 	// aufgetreten ist. Bei einem Fehler muessen die Request-Daten
 	// in die Tabellen zurueck geladen werden fuer die Inputfeld-Werte 
-	if (isset($_REQUEST['array_userUID']) && !is_array($arrTmpWettbewerteam) )
+	if (isset($_REQUEST['array_user']) && !is_array($arrTmpWettbewerteam) )
 	{
 		$oWettbewerb->Team[$oWettbewerb->team_kurzbz]=$_REQUEST;
-		for ($zeileIND=0;$zeileIND<count($_REQUEST['array_userUID']);$zeileIND++)
-			$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"]=$_REQUEST['array_userUID'][$zeileIND];
+		for ($zeileIND=0;$zeileIND<count($_REQUEST['array_user']);$zeileIND++)
+			$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"]=$_REQUEST['array_user'][$zeileIND];
 	}	
 
 	// Keine Request, und keine bestehenden Daten -> Login User in die Tabellen laden
 	if (!isset($oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][0]["uid"]) ) // Neuanlage (es wurde noch nicht Submit gedrueckt)
-		$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][0]["uid"]=$oWettbewerb->userUID;
+		$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][0]["uid"]=$oWettbewerb->user;
 
 	// Ausgabe des Template
 	$showHTML.=showTeamWartung_erzeugen_HTML($oWettbewerb);
@@ -122,14 +122,14 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 #exit(kommune_Test($oWettbewerb->Wettbewerb[0]));
 	// Form Start
 	$cTmpURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneWartungUID.'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz);
-	$showHTML.='<form onsubmit="return checkTeamAnzahl(this,\'array_userUID[]\',\''.$oWettbewerb->Wettbewerb[0]["teamgroesse"].'\');" target="_self" method="post" name="kommunen_work" action="'.$cTmpURL.'" enctype="multipart/form-data">';              
+	$showHTML.='<form onsubmit="return checkTeamAnzahl(this,\'array_user[]\',\''.$oWettbewerb->Wettbewerb[0]["teamgroesse"].'\');" target="_self" method="post" name="kommunen_work" action="'.$cTmpURL.'" enctype="multipart/form-data">';              
 
 	$showHTML.='<div>'; // Zusammenfassung der kpl. Eingabe
 
 
 	$cTmpWetbewerbUSERok='';
 	if ( isset($oWettbewerb->Wettbewerb) && isset($oWettbewerb->Wettbewerb[0]) && isset($oWettbewerb->Wettbewerb[0]["daten_eingetragen"]) 
-	&& trim($oWettbewerb->Wettbewerb[0]["daten_eingetragen"]["uid"])!=trim($oWettbewerb->userUID)  )
+	&& trim($oWettbewerb->Wettbewerb[0]["daten_eingetragen"]["uid"])!=trim($oWettbewerb->user)  )
 		$cTmpWetbewerbUSERok=' style="display:none" ';
 	if (empty($oWettbewerb->team_kurzbz) || $oWettbewerb->team_kurzbz==constEingabeFehlt)
 		$cTmpWetbewerbUSERok='';
@@ -140,12 +140,12 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 	if (!empty($cTmpWetbewerbUSERok))
 	 	return kommune_funk_show_wettbewerbteam($oWettbewerb->Wettbewerb[0]["daten_eingetragen"],$oWettbewerb,$cSeitenKey,$iPopUp);
  		
-#exit($cTmpWetbewerbUSERok.$oWettbewerb->userUID.Test($oWettbewerb->Wettbewerb[0]["daten_eingetragen"]));
+#exit($cTmpWetbewerbUSERok.$oWettbewerb->user.Test($oWettbewerb->Wettbewerb[0]["daten_eingetragen"]));
 		
 	$cTmpURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneWartungUID.'&amp;wbtyp_kurzbz='.trim($oWettbewerb->wbtyp_kurzbz).'&amp;wettbewerb_kurzbz='.trim($oWettbewerb->wettbewerb_kurzbz.'&amp;del=1');
 	
 	// Form Titleanzeige				
-	$cTmpHeaderWorkInfo="Datenwartung von ".$oWettbewerb->userUID;
+	$cTmpHeaderWorkInfo="Datenwartung von ".$oWettbewerb->user;
 
 	$showHTML.='<fieldset><legend>'.$cTmpHeaderWorkInfo.'</legend>';
 	
@@ -163,12 +163,12 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 
 					<tr>
 						<td style="text-align:right;vertical-align: top;"><label title="Bezeichnung" for="bezeichnung">Bezeichnung</label>:</td>
-						<td><textarea style="white-space : nowrap;overflow: hidden;" title="Bezeichnung" id="bezeichnung" name="bezeichnung" cols="64" rows="2" >'.(isset($_REQUEST['array_userUID']) && isset($_REQUEST['bezeichnung']) ? $_REQUEST['bezeichnung'] : (isset($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['bezeichnung']) ? $oWettbewerb->Team[$oWettbewerb->team_kurzbz]['bezeichnung'] :'')).'</textarea></td>
+						<td><textarea style="white-space : nowrap;overflow: hidden;" title="Bezeichnung" id="bezeichnung" name="bezeichnung" cols="64" rows="2" >'.(isset($_REQUEST['array_user']) && isset($_REQUEST['bezeichnung']) ? $_REQUEST['bezeichnung'] : (isset($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['bezeichnung']) ? $oWettbewerb->Team[$oWettbewerb->team_kurzbz]['bezeichnung'] :'')).'</textarea></td>
 					</tr>
 
 					<tr>
 						<td style="text-align:right;vertical-align: top;"><label title="Beschreibung" for="beschreibung">Beschreibung</label>:</td>
-						<td><textarea style="white-space : nowrap;overflow: hidden;" title="Beschreibung" id="beschreibung" name="beschreibung" cols="64" rows="4">'.(isset($_REQUEST['array_userUID']) && isset($_REQUEST['beschreibung']) ? $_REQUEST['beschreibung'] : (isset($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['beschreibung']) ? $oWettbewerb->Team[$oWettbewerb->team_kurzbz]['beschreibung'] :'')).'</textarea></td>
+						<td><textarea style="white-space : nowrap;overflow: hidden;" title="Beschreibung" id="beschreibung" name="beschreibung" cols="64" rows="4">'.(isset($_REQUEST['array_user']) && isset($_REQUEST['beschreibung']) ? $_REQUEST['beschreibung'] : (isset($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['beschreibung']) ? $oWettbewerb->Team[$oWettbewerb->team_kurzbz]['beschreibung'] :'')).'</textarea></td>
 					</tr>   
 					           
 					<tr>
@@ -193,7 +193,7 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 				$showHTML.=$oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo_image'];
 			elseif (isset($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo']) && !empty($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo']) ) 
 			{
-				$paramURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneDisplayIMAGE.'&amp;timecheck'.time().(strlen($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo'])<2000?'&amp;heximg='.$oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo']:'').'&amp;team_kurzbz='.$oWettbewerb->team_kurzbz.'&amp;wettbewerb_kurzbz='.$oWettbewerb->wettbewerb_kurzbz;
+				$paramURL=$_SERVER['PHP_SELF'].'?'.constKommuneParmSetWork.'='.constKommuneDisplayIMAGE.'&amp;timecheck'.time().(strlen($oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo'])<600?'&amp;heximg='.$oWettbewerb->Team[$oWettbewerb->team_kurzbz]['logo']:'').'&amp;team_kurzbz='.$oWettbewerb->team_kurzbz.'&amp;wettbewerb_kurzbz='.$oWettbewerb->wettbewerb_kurzbz;
 				if (!empty($oWettbewerb->Team[$oWettbewerb->team_kurzbz]["logo"]))
 		   			$showHTML.=$oWettbewerb->Team[$oWettbewerb->team_kurzbz]["logo_image"]='<img onmouseover="this.src=\''.$paramURL.'\'" height="80" border="0" alt="'.$oWettbewerb->team_kurzbz.'"  src="'.$paramURL.'" />';
 			}
@@ -214,7 +214,7 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 			$showHTML.='<legend>Teilnehmer '.(isset($oWettbewerb->Wettbewerb[0]["wettbewerbart"])?$oWettbewerb->Wettbewerb[0]["wettbewerbart"]:'').'</legend>';
    	    	$showHTML.='<table summary="Wettbewerb Team Informationen">';              
 	       $showHTML.='<tr>
-		   		<th style="vertical-align: bottom;"><label title="Spieler Kurzzeichen" for="array_userUID">Spieler</label></th>
+		   		<th style="vertical-align: bottom;"><label title="Spieler Kurzzeichen" for="array_user">Spieler</label></th>
 				<th style="vertical-align: bottom;" colspan="2">Namen</th>
 		     </tr>';   
 					 
@@ -237,8 +237,8 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 		$showHTML.='<tr>';
 		  	$showHTML.='<td>';
 		// Wenn der gefundene Anwender gleich der Angemeldete ist die Daten fuer Eingabe sperren
-		if (trim($oWettbewerb->userUID)==trim($oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"]))
-			$showHTML.=$iTmpCounter.')&nbsp;<b onmouseover="show_layer(\'bild'.$zeileIND.'\');" onmouseout="hide_layer(\'bild'.$zeileIND.'\');">'.$oWettbewerb->userUID.'</b><input id="array_userUID" style="display:none" size="17" maxlength="16" name="array_userUID[]" value="'.$oWettbewerb->userUID.'" />';              
+		if (trim($oWettbewerb->user)==trim($oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"]))
+			$showHTML.=$iTmpCounter.')&nbsp;<b onmouseover="show_layer(\'bild'.$zeileIND.'\');" onmouseout="hide_layer(\'bild'.$zeileIND.'\');">'.$oWettbewerb->user.'</b><input id="array_user" style="display:none" size="17" maxlength="16" name="array_user[]" value="'.$oWettbewerb->user.'" />';              
 		else
 		{
 			if (!empty($cTmpWetbewerbUSERok))
@@ -250,7 +250,7 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 				<input title="Anwender Spieler Kurzzeichen '.(isset($pers->person_id)?$pers->person_id:$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"]) .'" onclick="show_layer(\'bild'.$zeileIND.'\');"
 					 onchange="clear_layer(\'alt'.$zeileIND.'\');clear_layer(\'persimage'.$zeileIND.'\');if(this.value!=\'\') doIt(this.value,\'alt'.$zeileIND.'\');" 
 					 onblur="hide_layer(\'bild'.$zeileIND.'\');"
-					 size="17" maxlength="16" id="array_userUID" name="array_userUID[]" value="'.$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"].'" />
+					 size="17" maxlength="16" id="array_user" name="array_user[]" value="'.$oWettbewerb->TeamBenutzer[$oWettbewerb->team_kurzbz][$zeileIND]["uid"].'" />
 					';
 			}		
 		}					
@@ -277,7 +277,7 @@ function showTeamWartung_erzeugen_HTML($oWettbewerb)
 		{
 	        $showHTML.='<tr>';
 	             	$showHTML.='<td style="vertical-align: bottom;">';
-				$showHTML.=$zeileIND.')&nbsp;<input onchange="if(this.value!=\'\') doIt(this.value,\'neu'.$zeileIND.'\');"  size="17" maxlength="16" id="array_userUID" name="array_userUID[]" value="" />';
+				$showHTML.=$zeileIND.')&nbsp;<input onchange="if(this.value!=\'\') doIt(this.value,\'neu'.$zeileIND.'\');"  size="17" maxlength="16" id="array_user" name="array_user[]" value="" />';
 			$showHTML.='</td>';
 			$showHTML.='<td id="neu'.$zeileIND.'">Neuer Mitspieler</td><td>&nbsp;</td><td>&nbsp;</td>';              
 		$showHTML.='</tr>';
@@ -353,7 +353,7 @@ function showTeamWartung_Datenverarbeiten($oWettbewerb)
 	
 	$WettbewerbTeam->setTeam_kurzbz($oWettbewerb->team_kurzbz);
 	$WettbewerbTeam->setTeam_kurzbz_old($oWettbewerb->team_kurzbz_old);
-	$WettbewerbTeam->setUid($oWettbewerb->userUID); // keine Einschraenkung auf angemeldeten Anwender
+	$WettbewerbTeam->setUid($oWettbewerb->user); // keine Einschraenkung auf angemeldeten Anwender
 
 	// Request, und die Wettbewerbdaten als Array der Classe uebergeben 		
 	$arrTmpWettbewerbteam=array_merge($oWettbewerb->Wettbewerb[0],$_REQUEST);
@@ -386,7 +386,7 @@ function showTeamWartung_Datenverarbeiten($oWettbewerb)
 			$cTmpName=$pers->langname;
 			
 		// Angemeldeter Anwender - Name
-		$cTmpName2=$oWettbewerb->userUID;
+		$cTmpName2=$oWettbewerb->user;
 		$pers=kommune_funk_benutzerperson($cTmpName2,$oWettbewerb);
 		if (isset($pers->langname) && !empty($pers->langname)) 
 			$cTmpName2=$pers->langname;
@@ -397,7 +397,7 @@ function showTeamWartung_Datenverarbeiten($oWettbewerb)
 		$text.="Sie erhalten dieses email als Moderator des Wettbewerbs \"".$oWettbewerb->wettbewerb_kurzbz."\"\n\n";
 		
 		$text.=$cTmpName2."( Kurzzeichen ".$oWettbewerb->team_kurzbz.") ,\n hat sich im Wettbewerb ".$oWettbewerb->wettbewerb_kurzbz." registriert.\n\n\n\n";
-		$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Wettbewerb[0]['uid'],$betreff,$text,$oWettbewerb->userUID,$oWettbewerb);
+		$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->Wettbewerb[0]['uid'],$betreff,$text,$oWettbewerb->user,$oWettbewerb);
 
 		// Info vom Moderator an Anwender
 		$betreff="Ihr Eintrag im Wettbewerb ".$oWettbewerb->wettbewerb_kurzbz." wurde angenommen.";
@@ -410,7 +410,7 @@ function showTeamWartung_Datenverarbeiten($oWettbewerb)
 		$text.="Ihr Moderator ".$cTmpName.". im Wettbewerb ".$oWettbewerb->wettbewerb_kurzbz."\n\n". 
 		$text.="Viel Spaß wünscht das gesamte Team.\n\n". 
 		
-		$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->userUID,$betreff,$text,$oWettbewerb->Wettbewerb[0]['uid'],$oWettbewerb);
+		$oWettbewerb->Error[]=kommune_funk_sendmail($oWettbewerb->user,$betreff,$text,$oWettbewerb->Wettbewerb[0]['uid'],$oWettbewerb);
 	}		
 
 	
