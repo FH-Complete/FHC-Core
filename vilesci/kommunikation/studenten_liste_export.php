@@ -7,12 +7,21 @@
 		require_once('../../include/basis_db.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	
+		if (isset($_REQUEST['einheitid']))
+			$einheitid=$_REQUEST['einheitid'];
+
+		if (isset($_REQUEST['stgid']))
+			$stgid=$_REQUEST['stgid'];
 			
+		$sem=(isset($_REQUEST['sem'])?$_REQUEST['sem']:0);
+		$grp=(isset($_REQUEST['grp'])?$_REQUEST['grp']:'');
  
 	if (!isset($einheitid))
 		$name=$stg_kzbz.$sem.$ver.$grp.'.txt';
 	else
 		$name='modul_id'.$einheitid.'.txt';
+
 	header("Content-disposition: filename=$name");
 	header("Content-type: application/octetstream");
 	header("Pragma: no-cache");
@@ -28,12 +37,14 @@
 	}
 
 	if(isset($stgid))
-	$sql_query='SELECT uid, nachname, vorname FROM campus.vw_student '.
+		$sql_query='SELECT uid, nachname, vorname FROM campus.vw_student '.
 	           'WHERE studiengang_kz='.$stgid.' AND semester='.$sem.
                ' AND verband=\''.strtoupper($ver).'\' AND gruppe='.$grp.
                ' ORDER BY nachname';
+	
 	if (isset($einheitid))
 		$sql_query='SELECT uid, nachname, vorname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz=\''.$einheitid.'\' ORDER BY nachname';
+	
 	//echo $sql_query;
 	if(!($result=$db->db_query($sql_query)))
 		die($db->db_db_last_error());
