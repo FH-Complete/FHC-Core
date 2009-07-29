@@ -1571,7 +1571,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('studiensemester_old', studiensemester_old);
 	req.add('ausbildungssemester_old', ausbildungssemester_old);
 	req.add('ausbildungssemester', ausbildungssemester);
-	req.add('datum', datum);
+	req.add('datum', ConvertDateToISO(datum));
 	req.add('orgform_kurzbz', orgform_kurzbz);
 
 	var response = req.executePOST();
