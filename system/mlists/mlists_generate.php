@@ -305,6 +305,7 @@ $error_msg='';
 	// **************************************************************
 	// StudentenvertreterVerteiler abgleichen
 	// Studenten holen die nicht mehr in den Verteiler gehoeren
+	
 	echo 'Studentenvertreterverteiler werden abgeglichen!<BR>';
 	flush();
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE gruppe_kurzbz LIKE '%_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND studiengang_kz=tbl_gruppe.studiengang_kz) AND tbl_gruppe.studiengang_kz!='0'";
@@ -318,6 +319,7 @@ $error_msg='';
 		echo '-';
 		flush();
 	}
+
 	// Studenten holen die nicht im Verteiler sind
 	echo '<BR>';
 	$sql_query="SELECT uid, (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.studiengang_kz LIMIT 1) AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.studiengang_kz LIMIT 1) AND gruppe_kurzbz Like '%_STDV')";
