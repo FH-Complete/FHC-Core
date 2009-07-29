@@ -1,5 +1,5 @@
 <?php
-require_once('basis.class.php');
+require_once(dirname(__FILE__).'/basis.class.php');
 
 abstract class db extends basis
 {
@@ -27,6 +27,6 @@ abstract class db extends basis
 	abstract function db_version();
 }
 
-require_once(DB_SYSTEM.'.class.php');
+require_once(dirname(__FILE__).'/'.DB_SYSTEM.'.class.php');
  
 ?>
