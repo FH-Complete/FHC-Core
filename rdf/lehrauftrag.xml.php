@@ -89,8 +89,8 @@ $stgl='';
 $db = new basis_db();
 if($studiengang_kz!='')
 {
-	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer WHERE
-			funktion_kurzbz='stgl' AND studiengang_kz='".addslashes($studiengang_kz)."'
+	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer, public.tbl_studiengang WHERE
+			funktion_kurzbz='stgl' AND tbl_studiengang.studiengang_kz='".addslashes($studiengang_kz)."' AND tbl_studiengang.oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz
 			AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
 	if($db->db_query($qry))
 	{
