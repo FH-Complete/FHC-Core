@@ -183,7 +183,7 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 				$gef=$db->db_num_rows($suchen_std);		
 				if (!$gef)
 				{
-					echo $query="INSERT INTO campus.tbl_reservierung
+					$query="INSERT INTO campus.tbl_reservierung
 							(datum, uid, ort_kurzbz, stunde, beschreibung, titel, studiengang_kz )
 						VALUES
 							('$datum_res', '$uid', '$ort_kurzbz', $stunde, '".$_REQUEST['beschreibung']."', '".$_REQUEST['titel']."', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
