@@ -300,7 +300,7 @@ class studentnote extends basis_db
 			$punkte_eingetragen = 0;
 			$punkte_gesamt = 0;
 			$mitarbeit = 0;
-			$ueb = new uebung($this->conn);
+			$ueb = new uebung();
 			
 			//Eingetragen diese Kreuzerlliste
 			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$student_uid' AND vorbereitet=true";
