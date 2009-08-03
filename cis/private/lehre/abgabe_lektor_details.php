@@ -240,7 +240,7 @@ if(isset($_POST["schick"]))
 	}
 	unset($_POST["schick"]);
 }
-//Löschen eines Termines
+//Loeschen eines Termines
 if(isset($_POST["del"]))
 {
 	if($datum)
@@ -393,7 +393,7 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "</form>\n";
 	}	
 	
-//Eingabezeile für neuen Termin
+//Eingabezeile fuer neuen Termin
 $htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";

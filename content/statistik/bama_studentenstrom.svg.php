@@ -21,14 +21,12 @@
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
 	require_once('../../vilesci/config.inc.php');
-
+	require_once('../../include/basis_db.class.php');
 	require_once('../../include/ezcomponents/Base/src/ezc_bootstrap.php');
-	require_once('../../include/benutzerberechtigung.class.php');
+
 	
 	$db = new basis_db();
 	$user = get_uid();
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
 	$stsem=0;
 	$studiengang_kz=0;
 
