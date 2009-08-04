@@ -72,7 +72,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 		$ueb_1 = new uebung($uebung_id_source);
 		$lehreinheit_id=$ueb_1->lehreinheit_id;
 		$nummer_source = $ueb_1->nummer;
-		$qry = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_id_source."' and lehreinheit_id = '".$lehreinheit_id_target."'";
+		$qry = "SELECT * from campus.tbl_uebung where nummer = '".$nummer_source."' and lehreinheit_id = '".$lehreinheit_id_target."'";
 		//echo $qry;
 		if($result1 = $db->db_query($qry))	
 		{
