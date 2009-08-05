@@ -20,13 +20,13 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
-	require_once('../../vilesci/config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/basis_db.class.php');
 	require_once('../../include/ezcomponents/Base/src/ezc_bootstrap.php');
 
 	
 	$db = new basis_db();
-	$user = get_uid();
+	//$user = get_uid();
 	$stsem=0;
 	$studiengang_kz=0;
 
@@ -49,15 +49,15 @@ if(trim($typ)=="m")
 		//Anzahl pro Studiengang
 		$qry = "SELECT DISTINCT count(*)as count, studiengang_kz, typ||kurzbz as stgkurz  
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 		JOIN public.tbl_studiengang USING(studiengang_kz) 
-		WHERE rolle_kurzbz='Absolvent' AND typ!='m' 
+		WHERE status_kurzbz='Absolvent' AND typ!='m' 
 			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 			WHERE studiengang_kz=".$studiengang_kz."  
 			AND studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' 
-			AND rolle_kurzbz='Student' 
+			AND status_kurzbz='Student' 
 			AND ausbildungssemester='1') 
 		GROUP BY studiengang_kz, typ, public.tbl_studiengang.bezeichnung, public.tbl_studiengang.kurzbz ORDER BY stgkurz";
 		//echo $qry."<br>--<br>";
@@ -73,10 +73,10 @@ if(trim($typ)=="m")
 		//Gesamtanzahl
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
 		JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 		WHERE studiengang_kz=".$studiengang_kz."  
 			AND studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' 
-			AND rolle_kurzbz='Student' 
+			AND status_kurzbz='Student' 
 			AND ausbildungssemester='1'";
 		if($result_anzahl=$db->db_query($qry_anzahl))
 		{
@@ -116,14 +116,14 @@ if(trim($typ)=="b")
 		$qry = "SELECT DISTINCT count(*)as count, studiengang_kz, typ||kurzbz as stgkurz FROM 
 		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ, tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz   
 		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 		JOIN public.tbl_studiengang USING(studiengang_kz) 
-		WHERE rolle_kurzbz='Student' AND typ='m' 
+		WHERE status_kurzbz='Student' AND typ='m' 
 			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 			WHERE studiengang_kz='".$studiengang_kz."'  
-			AND rolle_kurzbz='Absolvent'
+			AND status_kurzbz='Absolvent'
 			AND (studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' OR studiensemester_kurzbz='SS".(substr(trim($stsem),-4)-$i)."') )) as b 
 		GROUP BY studiengang_kz, typ, bezeichnung, kurzbz ORDER BY stgkurz";
 		//echo $qry."<br>--<br>";
@@ -139,9 +139,9 @@ if(trim($typ)=="b")
 		//Gesamtanzahl
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentrolle ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentrolle.prestudent_id) 
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
 			WHERE studiengang_kz='".$studiengang_kz."' 
-			AND rolle_kurzbz='Absolvent'
+			AND status_kurzbz='Absolvent'
 			AND (studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' OR studiensemester_kurzbz='SS".(substr(trim($stsem),-4)-$i)."')";
 		if($result_anzahl=$db->db_query($qry_anzahl))
 		{
@@ -187,6 +187,5 @@ if(trim($typ)=="b")
 		ksort($data, SORT_NUMERIC);
 		$graph->data[$status] = new ezcGraphArrayDataSet( $data );
 	}
-	
 	$graph->renderToOutput( 500, 500);
 ?>
