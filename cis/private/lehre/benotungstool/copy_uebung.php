@@ -124,7 +124,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			if (!$ueb_1_target->save($new))
 			{
 				$error = 1;
-				echo "<span class='error'>Haupt&Uuml;bung konnte nicht kopiert werden!</span>";
+				echo "<span class='error'>Haupt&uuml;bung konnte nicht kopiert werden!</span>";
 			}
 				
 			else
@@ -187,7 +187,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 						if (!$ueb_2_target->save($new))
 						{
 							$error = 1;
-							echo "<span class='error'>Ãœbung konnte nicht kopiert werden!</span>";
+							echo "<span class='error'>&Uuml;bung konnte nicht kopiert werden!</span>";
 						}
 						
 						//angabedatei syncen
@@ -272,7 +272,7 @@ if($uebung_id_source!='' && $lehreinheit_id_target!='')
 			
 		if ($error == 0)
 		{
-			echo "&Uuml;bung erfolgreich kopiert! (%Uuml;: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
+			echo "&Uuml;bung erfolgreich kopiert! (&Uuml;: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
 			echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'" class="Item">noch eine &Uuml;bung kopieren</a>';
 		}
 			
