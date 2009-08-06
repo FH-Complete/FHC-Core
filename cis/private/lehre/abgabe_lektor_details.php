@@ -288,8 +288,16 @@ if(isset($_POST["del"]))
 }
 
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
+$studentenname='';
+$qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='$uid'";
+$result_nam=$db->db_query($qry_nam);
+while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
+{
+	$studentenname=$row_nam->studnam;
+}
 $htmlstr .= "<table width=100%>\n";
-$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td>";
+//$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td>";
+$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td>";
 $htmlstr .= "<td width=10% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' title='Benotungsformular' target='_blank' method='GET'>";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
