@@ -22,8 +22,8 @@
  */
 /*******************************************************************************************************
  *			abgabe_lektor_benotung
- *     abgabe_lektor_benotung ist die Benotungsoberfläche des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ *     abgabe_lektor_benotung ist die BenotungsoberflÃ¤che des Abgabesystems 
+ * 			fÃ¼r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
  	require_once('../../config/cis.config.inc.php');
@@ -204,7 +204,7 @@ else
 	$pdf->MultiCell(159,14,date('d.m.Y',mktime(0, 0, 0, date("m")  , date("d"), date("Y"))),1,'R',0);
 	
 	//Feld Beurteilung
-	//Zeile Überschrift
+	//Zeile Ãœberschrift
 	$pdf->SetFont('Arial','',9);
 	$maxY=$pdf->GetY()+2;
 	$maxX=30;
@@ -228,14 +228,14 @@ else
 	$pdf->MultiCell(53,12,'    Punkte             *          Gewicht',0,'C',0);
 	$pdf->SetXY($maxX,$maxY);
 	$pdf->MultiCell(53,36,'',1,'L',0);
-	//Zeile Qualität
+	//Zeile QualitÃ¤t
 	$pdf->SetFont('Arial','',9);
 	if($stgtyp=='Bachelor')
 	{
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - wissenschaftlich fundierte,\n     systematische, ingenieurmäßige\n     Vorgangsweise\n   - Ist der eigene Beitrag\n     deutlich sichtbar?\n   - Qualität der Lösung",0,'L',0);
+		$pdf->MultiCell(159,12,"QualitÃ¤t des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - wissenschaftlich fundierte,\n     systematische, ingenieurmÃ¤ÃŸige\n     Vorgangsweise\n   - Ist der eigene Beitrag\n     deutlich sichtbar?\n   - QualitÃ¤t der LÃ¶sung",0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -264,7 +264,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - Projektmäßige Vorgehensweise\n   - Wissenschaftlich - systematische\n     Methoden in der Analyse\n     bzw. Lösungsfindung",0,'L',0);
+		$pdf->MultiCell(159,12,"QualitÃ¤t des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - ProjektmÃ¤ÃŸige Vorgehensweise\n   - Wissenschaftlich - systematische\n     Methoden in der Analyse\n     bzw. LÃ¶sungsfindung",0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -324,7 +324,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Form / Stil\n   - Hat die Diplomarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache: benötigte Überarbeitung\n     seitens der Betreuerin / \n     des Betreuers",0,'L',0);
+		$pdf->MultiCell(159,12,"Form / Stil\n   - Hat die Diplomarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache: benÃ¶tigte Ãœberarbeitung\n     seitens der Betreuerin / \n     des Betreuers",0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -358,7 +358,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Qualität der Hintergrundinformation\n   - werden Gesamtzusammenhänge\n     erkannt, wird Bedeutung\n     und Gewicht der Einflussfaktoren\n     /Daten/Informationen richtig\n     bewertet\n   - Intelligente Darstellung des\n     relevanten Stands der Technik\n     und des Firmenumfelds\n   - Aufdecken und Darstellen von\n     größeren (z.B. wirtschaftlichen\n     oder sozialen) Zusammenhängen\n     und entsprechende Diskussion",0,'L',0);
+		$pdf->MultiCell(159,12,"QualitÃ¤t der Hintergrundinformation\n   - werden GesamtzusammenhÃ¤nge\n     erkannt, wird Bedeutung\n     und Gewicht der Einflussfaktoren\n     /Daten/Informationen richtig\n     bewertet\n   - Intelligente Darstellung des\n     relevanten Stands der Technik\n     und des Firmenumfelds\n   - Aufdecken und Darstellen von\n     grÃ¶ÃŸeren (z.B. wirtschaftlichen\n     oder sozialen) ZusammenhÃ¤ngen\n     und entsprechende Diskussion",0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,156,'',1,'L',0);
 		$maxX +=159;
@@ -497,7 +497,7 @@ else
 		<title>DA/BA-Benotung</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-9" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<style type="text/css">			
 			.textInput,textarea 
 			{
@@ -558,7 +558,7 @@ else
 			{
 				if(document.getElementById("summe2").value=="NaN")
 				{
-					alert("Eingabe ungültig! Bitte nur Ziffern eingeben.");
+					alert("Eingabe ungÃ¼ltig! Bitte nur Ziffern eingeben.");
 					document.getElementById("drucken").disabled=false;
 					return false;
 				}
@@ -739,7 +739,7 @@ else
 			Hat die Diplomarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
-			Sprache: benötigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
+			Sprache: benÃ¶tigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
 			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
 			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
 			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
@@ -771,7 +771,7 @@ else
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<td width='40%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
-			Werden Gesamtzusammenhänge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
+			Werden GesamtzusammenhÃ¤nge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
 			Intelligente Darstellung des relevanten Stands der Technik und des Firmenumfelds<br>
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
 			<td width='30%'><textarea name='hintergrund' value='".$hintergrund."' cols='50'  rows='10' 
