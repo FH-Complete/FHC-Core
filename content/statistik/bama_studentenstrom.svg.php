@@ -186,6 +186,6 @@ if(trim($typ)=="b")
 		reset($keys);		
 		ksort($data, SORT_NUMERIC);
 		$graph->data[$status] = new ezcGraphArrayDataSet( $data );
-	}
+	} 
 	$graph->renderToOutput( 500, 500);
 ?>
