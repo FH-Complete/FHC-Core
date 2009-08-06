@@ -32,6 +32,10 @@ hr
 	color:#CCCCCC;
 	height:1px;
 }
+img
+{
+	border: 0;
+}
 @media screen {
 #menue
 {
