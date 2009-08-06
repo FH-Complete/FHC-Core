@@ -26,11 +26,11 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
- 	require_once('../../../config/cis.config.inc.php');
+ 	require_once('../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
+	require_once('../../include/basis_db.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
 			 
@@ -666,7 +666,7 @@ else
 				
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
-		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='note' onsubmit='return inputcheck()'>";
+		$htmlstr .= "<form action=".$_SERVER['PHP_SELF']." method='POST' name='note' onsubmit='return inputcheck()'>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$uid.", ".$row->vorname." ".$row->nachname."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
