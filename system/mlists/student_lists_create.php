@@ -88,7 +88,7 @@
 					if ($grp=='1')
 						$sql_query='SELECT uid, nachname, vorname FROM campus.vw_student WHERE aktiv AND studiengang_kz='.$stgid.' AND semester='.$sem." AND (verband='".strtoupper($ver)."' OR verband='' OR verband=' ') AND (gruppe='".$grp."' OR gruppe='' OR gruppe=' ') AND uid NOT LIKE '\\\\_%' ORDER BY nachname";
 					else
-						$sql_query='SELECT uid, nachname, vorname FROM campus.vw_student WHERE aktiv AND studiengang_kz='.$stgid.' AND semester='.$sem.' AND verband=\''.strtoupper($ver).'\' AND gruppe='.$grp." AND uid NOT LIKE '\\\\_%' ORDER BY nachname";
+						$sql_query='SELECT uid, nachname, vorname FROM campus.vw_student WHERE aktiv AND studiengang_kz='.$stgid.' AND semester='.$sem.' AND verband=\''.strtoupper($ver).'\' AND gruppe=\''.$grp."' AND uid NOT LIKE '\\\\_%' ORDER BY nachname";
 					
 					if(!($result_student = $db->db_query($sql_query)))
 						die($db->db_last_error());
