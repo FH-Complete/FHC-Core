@@ -102,8 +102,8 @@
 
 	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
 	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN public.tbl_student on(uid=student_uid)
-	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null)
-	        tbl_benutzer.aktiv ORDER BY nachname, vorname";
+	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null) 
+	        AND tbl_benutzer.aktiv ORDER BY nachname, vorname";
 
 	if($result = $db->db_query($qry))
 	{
