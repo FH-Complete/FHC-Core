@@ -206,7 +206,7 @@
 				$reihungstest->studiengang_kz = $_POST['studiengang_kz'];
 				$reihungstest->ort_kurzbz = $_POST['ort_kurzbz'];
 				$reihungstest->anmerkung = $_POST['anmerkung'];
-				$reihungstest->datum = $_POST['datum'];
+				$reihungstest->datum = $datum_obj->formatDatum($_POST['datum']);
 				$reihungstest->uhrzeit = $_POST['uhrzeit'];
 				$reihungstest->updateamum = date('Y-m-d H:i:s');
 				$reihungstest->udpatevon = $user;
