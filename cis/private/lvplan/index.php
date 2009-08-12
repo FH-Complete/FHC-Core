@@ -21,7 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
  
-	require_once('../../../config/vilesci.config.inc.php');
+	require_once('../../../config/cis.config.inc.php');
   require_once('../../../include/basis_db.class.php');
   if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
