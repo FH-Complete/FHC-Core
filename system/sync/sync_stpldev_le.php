@@ -90,12 +90,14 @@ $message_tmp=$count_upd.' Datens&auml;tze wurden ge&auml;ndert.<BR>
 			'.$count_err.' Fehler sind dabei aufgetreten!<BR><BR>';
 echo '<BR>'.$message_tmp;
 $message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></HTML>';
-$mail = new mail('pam@technikum-wien.at','stpl@technikum-wien.at','Stundenplan update',$message);
+$mail = new mail('pam@technikum-wien.at','stpl@technikum-wien.at','Stundenplan update','');
+$mail->setHTMLContent($message);
 $mail->send();
 
 $message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
 
-$mail = new mail('stpl@technikum-wien.at','stpl@technikum-wien.at','Stundenplan update',$message);
+$mail = new mail('stpl@technikum-wien.at','stpl@technikum-wien.at','Stundenplan update','');
+$mail->setHTMLContent($message);
 $mail->send();
 ?>
 </body>
