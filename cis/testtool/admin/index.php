@@ -25,11 +25,13 @@
 
 header('Content-type: application/xhtml+xml');
 
+
   require_once('../../../config/cis.config.inc.php');
   require_once('../../../include/basis_db.class.php');
   if (!$db = new basis_db())
+  {
       die('Fehler beim Oeffnen der Datenbankverbindung');
-
+  }
 
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/frage.class.php');
@@ -44,31 +46,49 @@ $user=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin'))
+{
 	die('Sie haben keine Berechtigung fuer diese Seite');
+}
 
 if(isset($_GET['gebiet_id']))
+{
 	$gebiet_id = $_GET['gebiet_id'];
+}
 else
+{
 	$gebiet_id = '';
+}
 
 if(isset($_GET['nummer']))
+{
 	$nummer = $_GET['nummer'];
+}
 else
+{
 	$nummer = '';
+}
 
 if(isset($_GET['frage_id']))
+{
 	$frage_id = $_GET['frage_id'];
+}
 else
+{
 	$frage_id = '';
+}
 
 if(isset($_GET['vorschlag_id']))
+{
 	$vorschlag_id = $_GET['vorschlag_id'];
+}
 else
+{
 	$vorschlag_id = '';
+}
 
 $save_vorschlag_error=false;
 ?>
-<?xml version="1.0" ?>
+<?xml version="1.0"  encoding="utf-8"?>
 
 <?xml-stylesheet type="text/xsl" href="http://www.w3.org/Math/XSL/mathml.xsl"?>
 

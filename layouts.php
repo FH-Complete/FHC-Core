@@ -40,7 +40,7 @@
 		}
 	}
 
-	echo "<h3> Wählen Sie Ihr persönliches Layout! </h3>";
+	echo "<h3> W&auml;hlen Sie Ihr pers&ouml;nliches Layout! </h3>";
 	echo "<table>";
 
 	for($i = 0; $i <count($files_erg); $i++)
