@@ -22,13 +22,13 @@
  */
 		
 /*******************************************************************************************************
- *				abgabe_lektor
- * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
+ *				abgabe_assistenz
+ * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 //echo Test($_REQUEST);
 
-	require_once('../../config/cis.config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/basis_db.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -97,7 +97,7 @@ echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<title>Abgabe Lektor Details</title>
+<title>Abgabe Assistenz Details</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -110,7 +110,7 @@ echo '
 </script>
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
-<h3>Abgabe Lektorenbereich</h3>';
+<h3>Abgabe Assistenzbereich</h3>';
 
 // Speichern eines Termines
 if(isset($_POST["schick"]))
@@ -170,7 +170,7 @@ if(isset($_POST["schick"]))
 			}
 			if($command=='update')
 			{
-				//Terminänderung
+				//TerminÃ¤nderung
 				//Ermittlung der alten Daten
 				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
 				if(!$result_old=$db->db_query($qry_old))
@@ -229,7 +229,7 @@ if(isset($_POST["schick"]))
 	}
 	unset($_POST["schick"]);
 }
-//Löschen eines Termines
+//LÃ¶schen eines Termines
 if(isset($_POST["del"]))
 {
 	if($datum)
@@ -254,7 +254,7 @@ if(isset($_POST["del"]))
 				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
 				if(!$result=$db->db_query($qry))
 				{
-					echo "<font color=\"#FF0000\">Fehler beim Löschen des Termins!</font><br>&nbsp;";
+					echo "<font color=\"#FF0000\">Fehler beim L&ouml;schen des Termins!</font><br>&nbsp;";
 				}
 			}
 		}
@@ -361,7 +361,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		}
 		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
 		{
-			$htmlstr .= "		<td><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zusätzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
+			$htmlstr .= "		<td><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zusÃ¤tzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
 		}
 		else 
 		{
@@ -373,7 +373,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		$htmlstr .= "</form>\n";
 	}	
 	
-//Eingabezeile für neuen Termin
+//Eingabezeile fÃ¼r neuen Termin
 $htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";

@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 		
@@ -26,8 +26,7 @@
  * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
  * 			            für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
-
-	require_once('../../config/cis.config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/basis_db.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -40,7 +39,7 @@
 	require_once('../../include/mitarbeiter.class.php');
 
 	if (!$getuid = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 				
 	$htmlstr = "";
 	$erstbegutachter='';
@@ -55,7 +54,7 @@
 	$rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
-	die('Sie haben keine Berechtigung f�r diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	die('Sie haben keine Berechtigung für diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
 $sql_query = "SELECT * 
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit  

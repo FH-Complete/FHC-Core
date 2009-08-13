@@ -33,14 +33,15 @@
 #	require_once('../config.inc.php');
 	require_once('../../config/vilesci.config.inc.php');	
 	require_once('../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
+
 		
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
 	require_once('../../include/moodle_user.class.php');
 
+		if (!$db = new basis_db())
+		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
 // ***********************************************************************************************	
 // Variable Initialisieren
 // ***********************************************************************************************
@@ -62,7 +63,6 @@
 // ***********************************************************************************************
 	// Classen Instanzen
 	$objMoodle = new moodle_user();	
-
 // ***********************************************************************************************
 //	Verarbeitung einer Moodle-Account Anlageaktion
 // ***********************************************************************************************

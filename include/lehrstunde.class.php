@@ -339,7 +339,7 @@ class lehrstunde extends basis_db
 				
 				for ($i=0;$i<$num_rows_einheit;$i++)
 				{
-					$row=$db->db_fetch_object($result_einheit,$i);
+					$row=$this->db_fetch_object($result_einheit,$i);
 					$sql_query.=" OR gruppe_kurzbz='$row->gruppe_kurzbz'";
 				}
 				$sql_query.=')';

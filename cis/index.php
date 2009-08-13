@@ -66,7 +66,7 @@ require_once('../config/cis.config.inc.php');
   	</frameset>
 	<noframes>
 		<body>
-		<p>Diese Seite verwendet Frames. Frames werden von Ihrem Browser aber nicht	unterstützt.</p>
+		<p>Diese Seite verwendet Frames. Frames werden von Ihrem Browser aber nicht	unterstÃ¼tzt.</p>
 		</body>
 	</noframes>
 </frameset> -->
