@@ -530,7 +530,8 @@ if ($sendmail)
 {
 	foreach ($message as $msg)
 	{
-		$mail = new mail($msg->mailadress,'stpl@technikum-wien.at','Stundenplan update',$msg->message_begin.$msg->message);
+		$mail = new mail($msg->mailadress,'stpl@technikum-wien.at','Stundenplan update','');
+		$mail->setHTMLContent($msg->message_begin.$msg->message);
 		if ($mail->send())
 		{
 			echo 'Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
@@ -551,11 +552,13 @@ $message_tmp=$count_upd.' Datens&auml;tze wurden ge&auml;ndert.<BR>
 echo '<BR>'.$message_tmp;
 
 $message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></HTML>';
-$mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'Stundenplan update',$message_sync);
+$mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'Stundenplan update','');
+$mail->setHTMLContent($message_sync);
 $mail->send();
 
 $message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
-$mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'Stundenplan update', $message_stpl);
+$mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'Stundenplan update', '');
+$mail->setHTMLContent($message_stpl);
 $mail->send();
 ?>
 </body>
