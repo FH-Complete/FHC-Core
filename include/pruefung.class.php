@@ -298,7 +298,7 @@ class pruefung extends basis_db
 				AND tbl_pruefung.note = tbl_note.note
 				AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
 		if ($pruefungstyp != null)
-			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".addslashes(pruefungstyp)."'";
+			$qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".addslashes($pruefungstyp)."'";
 		if ($lv_id != null)
 			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lv_id)."'";
 		if ($stsem != null)
