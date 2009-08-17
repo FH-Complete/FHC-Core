@@ -25,18 +25,17 @@
 
 header('Content-type: application/xhtml+xml');
 
-
-  require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-  {
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  }
-
+require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/frage.class.php');
 require_once('../../../include/vorschlag.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+  
+if (!$db = new basis_db())
+{
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+}
+
 
 $PHP_SELF=$_SERVER['PHP_SELF'];
 
@@ -90,7 +89,7 @@ $save_vorschlag_error=false;
 ?>
 <?xml version="1.0"  encoding="utf-8"?>
 
-<?xml-stylesheet type="text/xsl" href="http://www.w3.org/Math/XSL/mathml.xsl"?>
+<?xml-stylesheet type="text/xsl" href="../mathml.xsl"?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
