@@ -169,21 +169,22 @@
 			$save_error=false;
 			$save_log_error=false;
 			//Deutsch
-			$lv_obj_sav->lehrziele=mb_eregi_replace(".", "<br>", mb_eregi_replace("\r\n", "<br>", $lehrziele_de));
-			$lv_obj_sav->lehrinhalte=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrinhalte_de));
-			$lv_obj_sav->voraussetzungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $voraussetzungen_de));
-			$lv_obj_sav->unterlagen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $unterlagen_de));
-			$lv_obj_sav->pruefungsordnung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_de));
-			$lv_obj_sav->anmerkungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $anmerkungen_de));
-			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de));
+			$lv_obj_sav->lehrziele=mb_eregi_replace("\.", "<br>", mb_eregi_replace("\r\n", "<br>", $lehrziele_de));
+			$lv_obj_sav->lehrinhalte=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrinhalte_de));
+			$lv_obj_sav->voraussetzungen=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $voraussetzungen_de));
+			$lv_obj_sav->unterlagen=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $unterlagen_de));
+			$lv_obj_sav->pruefungsordnung=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_de));
+			$lv_obj_sav->anmerkungen=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $anmerkungen_de));
+			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de));
+			
 			$lv_obj_sav->genehmigt = ($freig_de?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->sprache=ATTR_SPRACHE_DE;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
-			$lv_obj_sav->methodik = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_de));
-			//$lv_obj_sav->titel = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_de));
+			$lv_obj_sav->methodik = mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_de));
+			//$lv_obj_sav->titel = mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_de));
 
 			$lv_obj1 = new lvinfo();
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
@@ -200,21 +201,21 @@
 					$save_log_error=true;
 
 			//Englisch
-			$lv_obj_sav->lehrziele=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrziele_en));
-			$lv_obj_sav->lehrinhalte=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrinhalte_en));
-			$lv_obj_sav->voraussetzungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $voraussetzungen_en));
-			$lv_obj_sav->unterlagen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $unterlagen_en));
-			$lv_obj_sav->pruefungsordnung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_en));
-			$lv_obj_sav->anmerkungen=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $anmerkungen_en));
-			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en));
+			$lv_obj_sav->lehrziele=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrziele_en));
+			$lv_obj_sav->lehrinhalte=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $lehrinhalte_en));
+			$lv_obj_sav->voraussetzungen=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $voraussetzungen_en));
+			$lv_obj_sav->unterlagen=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $unterlagen_en));
+			$lv_obj_sav->pruefungsordnung=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_en));
+			$lv_obj_sav->anmerkungen=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $anmerkungen_en));
+			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en));
 			$lv_obj_sav->genehmigt = ($freig_en?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->sprache=ATTR_SPRACHE_EN;
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
-			$lv_obj_sav->methodik = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_en));
-			//$lv_obj_sav->titel = mb_eregi_replace(".", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_en));
+			$lv_obj_sav->methodik = mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $methodik_en));
+			//$lv_obj_sav->titel = mb_eregi_replace("\.", "<br>",mb_eregi_replace("\r\n", "<br>", $titel_en));
 
 			$lv_obj1 = new lvinfo();
 			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
