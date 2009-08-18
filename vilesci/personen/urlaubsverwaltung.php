@@ -138,7 +138,7 @@ if(isset($_POST['save']))
 		$zeitsperre->vertretung_uid = $vertretung_uid;
 		$zeitsperre->erreichbarkeit_kurzbz = $erreichbarkeit_kurzbz;
 		$zeitsperre->updateamum = date('Y-m-d H:i:s');
-		$zeitsperre->udpatevon = $user;
+		$zeitsperre->updatevon = $user;
 		
 		if($zeitsperre->save())
 		{
