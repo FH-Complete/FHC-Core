@@ -384,7 +384,7 @@ class beispiel extends basis_db
 				$this->vorbereitet = ($row->vorbereitet=='t'?true:false);
 				$this->probleme = ($row->probleme=='t'?true:false);
 				$this->updateamum = $row->updateamum;
-				$this->udpatevon = $row->updatevon;
+				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				return true;

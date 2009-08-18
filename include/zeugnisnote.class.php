@@ -305,7 +305,7 @@ class zeugnisnote extends basis_db
 				$obj->uebernahmedatum = $row->uebernahmedatum;
 				$obj->benotungsdatum = $row->benotungsdatum;
 				$obj->updateamum = $row->updateamum;
-				$obj->udpatevon = $row->updatevon;
+				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;

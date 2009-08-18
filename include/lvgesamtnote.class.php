@@ -279,7 +279,7 @@ class lvgesamtnote extends basis_db
 				$obj->freigabevon_uid = $row->freigabevon_uid;
 				$obj->benotungsdatum = $row->benotungsdatum;
 				$obj->updateamum = $row->updateamum;
-				$obj->udpatevon = $row->updatevon;
+				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->note_bezeichnung = $row->note_bezeichnung;

@@ -89,7 +89,7 @@ class bankverbindung extends basis_db
 				$this->typ = $row->typ;
 				$this->verrechnung = ($row->verrechnung=='t'?true:false);
 				$this->updateamum = $row->updateamum;
-				$this->udpatevon = $row->updatevon;
+				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
@@ -308,7 +308,7 @@ class bankverbindung extends basis_db
 				$obj->typ = $row->typ;
 				$obj->verrechnung = ($row->verrechnung=='t'?true:false);
 				$obj->updateamum = $row->updateamum;
-				$obj->udpatevon = $row->updatevon;
+				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;

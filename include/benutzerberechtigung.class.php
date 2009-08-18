@@ -299,7 +299,7 @@ class benutzerberechtigung extends basis_db
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				$obj->negativ = ($row->negativ=='t'?true:false);
-				$obj->udpateamum = $row->updateamum;
+				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
