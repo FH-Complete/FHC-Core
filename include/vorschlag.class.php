@@ -270,16 +270,15 @@ class vorschlag extends basis_db
 		else 
 			$qry.=" ORDER BY nummer";
 
-		if($this->db_query($qry))
+		if($result = $this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			while($row = $this->db_fetch_object($result))
 			{
 				$vs = new vorschlag();
 				$vs->vorschlag_id = $row->vorschlag_id;
 				$vs->frage_id = $row->frage_id;
 				$vs->nummer = $row->nummer;
 				$vs->punkte = $row->punkte;
-			
 				$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
 						WHERE vorschlag_id='".addslashes($row->vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
 				if($this->db_query($qry))
@@ -291,7 +290,6 @@ class vorschlag extends basis_db
 						$vs->audio = $row_sprache->audio;
 					}
 				}
-
 				$this->result[] = $vs;
 
 			}
