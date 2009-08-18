@@ -209,7 +209,7 @@
 				$reihungstest->datum = $datum_obj->formatDatum($_POST['datum']);
 				$reihungstest->uhrzeit = $_POST['uhrzeit'];
 				$reihungstest->updateamum = date('Y-m-d H:i:s');
-				$reihungstest->udpatevon = $user;
+				$reihungstest->updatevon = $user;
 				
 				if($reihungstest->save())
 				{
