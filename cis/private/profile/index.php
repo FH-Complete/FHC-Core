@@ -158,7 +158,7 @@ function RefreshImage()
 		
 		$person->kurzbeschreibung = $result;
 		$person->updateamum = date('Y-m-d H:i:s');
-		$person->udpatevon = $uid;
+		$person->updatevon = $uid;
 		if($person->save())
 			echo '<b>Kurzbeschreibung wurde erfolgreich gespeichert</b>';
 		else 

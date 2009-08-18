@@ -87,7 +87,7 @@ else
 
 $save_vorschlag_error=false;
 ?>
-<?xml version="1.0"  encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <?xml-stylesheet type="text/xsl" href="../mathml.xsl"?>
 
@@ -112,6 +112,7 @@ font-size: 10pt;
 </head>
 
 <body>
+
 <h1>
 	<div style="float:left">Testtool - Administrationsseite</div>
 	<div style="text-align:right; padding-right: 5px;"><a href="auswertung.php" class="Item">Auswertung</a> | <a href="Testtool.pdf" class="Item" target="_blank">Hilfe</a></div>

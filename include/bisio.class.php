@@ -307,7 +307,7 @@ class bisio extends basis_db
 				$io->zweck_bezeichnung = $row->zweck_bezeichnung;
 				$io->student_uid = $row->student_uid;
 				$io->updateamum = $row->updateamum;
-				$io->udpatevon = $row->updatevon;
+				$io->updatevon = $row->updatevon;
 				$io->insertamum = $row->insertamum;
 				$io->insertvon = $row->insertvon;
 				$io->ext_id = $row->ext_id;
