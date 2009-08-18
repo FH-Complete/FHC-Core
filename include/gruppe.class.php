@@ -403,7 +403,7 @@ class gruppe extends basis_db
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
-			       " WHERE gruppe_kurzbz=".$this->addslashes(mb_strtoupper($this->gruppe_kurzbz)).";";
+			       " WHERE gruppe_kurzbz=".$this->addslashes($this->gruppe_kurzbz).";";
 		}
 
 		if($this->db_query($qry))
