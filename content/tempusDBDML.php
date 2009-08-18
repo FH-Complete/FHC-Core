@@ -169,10 +169,10 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='deletestundenplaneintrag')
 	{
 		//Loescht einen Eintrag aus der Stundenplantabelle
-		loadVariables($conn, get_uid());
+		loadVariables(get_uid());
 		if(isset($_POST['stundenplan_id']) && is_numeric($_POST['stundenplan_id']))
 		{
-			$stundenplan = new stundenplan($conn, $db_stpl_table, null, true);
+			$stundenplan = new stundenplan($db_stpl_table);
 			if($stundenplan->delete($_POST['stundenplan_id']))
 			{
 				$return = true;
