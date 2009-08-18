@@ -1,13 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>CIS - FH Technikum Wien</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="skin/style.css.php" rel="stylesheet" type="text/css">
-	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
-</head>
-
-<body id="inhalt">
 <?php
 	if(isset($_GET['stylesheet']))
 	{
@@ -23,7 +13,18 @@
 		$style = $_COOKIE['stylesheet'];
 	else
 		$style =null;
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>CIS - FH Technikum Wien</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
 
+<body id="inhalt">
+<?php
 	//echo $_COOKIE['stylesheet'];
 	$dir = "skin/styles/";
 	$files = scandir($dir);
