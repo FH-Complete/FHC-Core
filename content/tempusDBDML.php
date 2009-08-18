@@ -95,9 +95,10 @@ if(!$error)
 			}
 			else
 			{
+				$stg = new studiengang($_POST['studiengang_kz']);
 				$obj = new benutzerfunktion();
 				$obj->uid = $_POST['uid'];
-				$obj->studiengang_kz = $_POST['studiengang_kz'];
+				$obj->oe_kurzbz = $stg->oe_kurzbz;
 				$obj->funktion_kurzbz = 'lkt';
 				$obj->updateamum = date('Y-m-d H:i:s');
 				$obj->updatevon = $user;
