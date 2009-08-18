@@ -284,7 +284,7 @@ function STPLDetailSave(dialog)
 	req.add('gruppe', gruppe);
 	req.add('gruppe_kurzbz', gruppe_kurzbz);
 	req.add('ort_kurzbz', ort_kurzbz);
-	req.add('datum', datum);
+	req.add('datum', ConvertDateToISO(datum));
 	req.add('stunde', stunde);
 	req.add('titel', titel);
 	req.add('anmerkung', anmerkung);
