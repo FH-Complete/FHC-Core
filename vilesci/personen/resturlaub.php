@@ -182,8 +182,8 @@ if(isset($_GET['type']) && $_GET['type']=='save')
 	$resturlaub->urlaubstageprojahr = $_POST['anspruch'];
 	if($resturlaub->urlaubstageprojahr=='')
 		$resturlaub->urlaubstageprojahr=0;
-	$resturlaub->udpateamum = date('Y-m-d H:i:s');
-	$resturlaub->udpatevon = $user;
+	$resturlaub->updateamum = date('Y-m-d H:i:s');
+	$resturlaub->updatevon = $user;
 	
 	if($resturlaub->save())
 	{
