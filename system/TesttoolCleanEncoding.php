@@ -25,6 +25,8 @@ if($db->db_query($qry))
 	echo "Aktualiserung erfolgreich";
 else 
 	echo "Fehler beim Aktualisieren:".$db->db_last_error();
+	
+$db->db_query('COMMIT;');
 ?>
 </body>
 </html>
