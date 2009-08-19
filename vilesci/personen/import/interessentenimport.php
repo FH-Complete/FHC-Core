@@ -344,6 +344,29 @@ $geburtsdatum = (isset($_REQUEST['geburtsdatum'])?$_REQUEST['geburtsdatum']:'');
 $adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
 $adresse_nation = (isset($_REQUEST['adresse_nation'])?$_REQUEST['adresse_nation']:'A');
 $plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
+
+//Wenn die Daten aus dem Mail Importiert werden, sind diese LATIN9 konvertiert 
+//und muessen zuerst nach UTF8 konvertiert werden
+function utf8($string)
+{
+	//echo "ENCODIONG: ".mb_detect_encoding($string,"UTF-8,ISO-8859-15");
+	if(mb_detect_encoding($string, "UTF-8,ISO-8859-15")=='ISO-8859-15')
+		return utf8_encode($string);
+	else 
+		return $string;
+}
+
+$titel = utf8($titel);
+$titelpost = utf8($titelpost);
+$anrede = utf8($anrede);
+$nachname = utf8($nachname);
+$vorname = utf8($vorname);
+$geschlecht = utf8($geschlecht);
+$geburtsdatum = utf8($geburtsdatum);
+$adresse = utf8($adresse);
+$adresse_nation = utf8($adresse_nation);
+$plz = utf8($plz);
+
 if($adresse_nation=='A')
 {
 	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
