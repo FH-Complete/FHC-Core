@@ -143,7 +143,7 @@ if(isset($_POST['submitbild']))
 			//in base64 umrechnen
 			$content = base64_encode($content);
 
-			$person = new person($conn);
+			$person = new person();
 			if($person->load($_GET['person_id']))
 			{
 				//base64 Wert in die Datenbank speichern
