@@ -251,11 +251,14 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 		$error_msg.=$lehrstunde->errormsg;
 	}
 	
-	$reservierung=new reservierung();
-	foreach ($res_id as $reservierung_id)
+	if(isset($res_id))
 	{
-		$reservierung->delete($reservierung_id);
-		$error_msg.=$reservierung->errormsg;
+		$reservierung=new reservierung();
+		foreach ($res_id as $reservierung_id)
+		{
+			$reservierung->delete($reservierung_id);
+			$error_msg.=$reservierung->errormsg;
+		}
 	}
 }
 // ******************** Lehrveranstaltung setzen ******************************
