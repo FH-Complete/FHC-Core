@@ -105,15 +105,15 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
        <?php
        		$stsemobj = new studiensemester();
        		$stsemobj->getAll();
-       		foreach ($stsemobj->result as $stsem)
+       		foreach ($stsemobj->studiensemester as $stsem)
        		{
   				echo "
 			<menuitem
 				id = 'menu-properies-studiensemester-name'
-				label = '$stsem'
+				label = '$stsem->studiensemester_kurzbz'
 				type = 'radio'
 				command = 'menu-properties-studiensemester:command'
-				checked = ".($semester_aktuell==$stsem?"'true' ":"'false'")." />";
+				checked = ".($semester_aktuell==$stsem->studiensemester_kurzbz?"'true' ":"'false'")." />";
        		}
        ?>
 
