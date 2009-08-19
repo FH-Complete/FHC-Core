@@ -341,7 +341,7 @@ class mitarbeiter extends benutzer
 		if (!is_null($stg_kz))
 		{
 			$stg = new studiengang($stg_kz);
-			$sql_query.=' AND oe_kurzbz='.$stg->oe_kurzbz;
+			$sql_query.=" AND oe_kurzbz='".$stg->oe_kurzbz."'";
 		}
 		
 		$sql_query.=' ORDER BY nachname, vornamen, kurzbz';

@@ -22,13 +22,12 @@
  */
  
 	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
+  	require_once('../../../include/basis_db.class.php');
+  	require_once('../../../include/functions.inc.php');
+  	
+	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
   
-	//include('../../../include/globals.inc.php');
-	include_once('../../../include/functions.inc.php');
-
 	if (!$uid=get_uid())
 		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
@@ -73,6 +72,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Lehrveranstaltungsplan</title>
 <script language="JavaScript">
 <!--
