@@ -60,7 +60,7 @@ function resize($filename, $width, $height)
 	imagejpeg($image_p, $filename, 80);
 		
 	imagedestroy($image_p);
-	imagedestroy($image);
+	@imagedestroy($image);
 }
 
 $user = get_uid();

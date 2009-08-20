@@ -245,10 +245,14 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 {
 	$lehrstunde=new lehrstunde();
-	foreach ($stpl_id as $stundenplan_id)
+	
+	if(isset($stpl_id))
 	{
-		$lehrstunde->delete($stundenplan_id,$db_stpl_table);
-		$error_msg.=$lehrstunde->errormsg;
+		foreach ($stpl_id as $stundenplan_id)
+		{
+			$lehrstunde->delete($stundenplan_id,$db_stpl_table);
+			$error_msg.=$lehrstunde->errormsg;
+		}
 	}
 	
 	if(isset($res_id))
