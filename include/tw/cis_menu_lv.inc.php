@@ -77,8 +77,8 @@
 		</td>
 	    <td class="tdvertical" align="center">
 		  <?php
-			if (!isset($DOC_ROOT) && isset($_SERVER["DOCUMENT_ROOT"]) )
-				$DOC_ROOT=$_SERVER["DOCUMENT_ROOT"];
+			//if (!isset($DOC_ROOT) && isset($_SERVER["DOCUMENT_ROOT"]) )
+			//	$DOC_ROOT=$_SERVER["DOCUMENT_ROOT"];
 			if (!isset($DOC_ROOT) || empty($DOC_ROOT))
 					$DOC_ROOT='../../..';
 
