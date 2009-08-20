@@ -80,8 +80,8 @@ class ferien extends basis_db
 			$f->studiengang_kz = $row->studiengang_kz;
 			$f->vondatum=$row->vondatum;
 			$f->bisdatum=$row->bisdatum;
-			$f->vontimestamp=mktime(0,0,0,mb_substr($row->vondatum,5,2),mb_substr($row->vondatum,8),mb_substr($row->vondatum,0,4));;
-			$f->bistimestamp=mktime(23,59,59,mb_substr($row->bisdatum,5,2),mb_substr($row->bisdatum,8),mb_substr($row->bisdatum,0,4));;
+			$f->vontimestamp=mktime(0,0,0,mb_substr($row->vondatum,5,2),mb_substr($row->vondatum,8),mb_substr($row->vondatum,0,4));
+			$f->bistimestamp=mktime(23,59,59,mb_substr($row->bisdatum,5,2),mb_substr($row->bisdatum,8),mb_substr($row->bisdatum,0,4));
 			// in array speichern
 			$this->ferien[]=$f;
 		}

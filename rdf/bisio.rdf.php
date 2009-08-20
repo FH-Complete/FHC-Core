@@ -87,14 +87,14 @@ else
 
 function draw_content($row)
 {		
-	global $rdf_url, $datum, $conn;
+	global $rdf_url, $datum, $db;
 	$lehrveranstaltung_id='';
 	$studiensemester_kurzbz = '';
 	
 	if($row->lehreinheit_id!='')
 	{
 		$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row->lehreinheit_id'";
-		if($result = $db->db_query($conn, $qry))
+		if($result = $db->db_query($qry))
 		{
 			if($row_lv = $db->db_fetch_object($result))
 			{
