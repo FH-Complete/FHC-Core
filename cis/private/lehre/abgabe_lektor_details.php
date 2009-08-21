@@ -218,7 +218,7 @@ if(isset($_POST["schick"]))
 						{
 								$row_typ->bezeichnung='';
 						}
-						$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung",
+						$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin&auml;nderung Bachelor-/Diplomarbeitsbetreuung",
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 					}
 				}
@@ -302,6 +302,7 @@ $htmlstr .= "<td width=10% align=center><form action='../../../include/".EXT_FKT
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+$htmlstr .= "<a href='../../cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;&nbsp;";
 $htmlstr .= "<input type='submit' name='note' value='benoten'></form></td>";
 $htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
 $htmlstr .= "<input type='submit' name='ephorus' value='Plagiatspr&uuml;fung'></form></td></tr>";
