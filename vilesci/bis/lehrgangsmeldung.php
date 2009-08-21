@@ -22,8 +22,8 @@
  */
  
 		require_once('../../config/vilesci.config.inc.php');
-		require('../../include/studiensemester.class.php');
-		require('../../include/datum.class.php');
+		require_once('../../include/studiensemester.class.php');
+		require_once('../../include/datum.class.php');
 
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -111,7 +111,7 @@ else
 {
 	echo "Ung&uuml;ltiges Semester!";
 }
-//ausgewÃ¤hlter Lehrgang
+//ausgewÃƒÂ¤hlter Lehrgang
 if(isset($_GET['stg_kz']))
 {
 	if($_GET['stg_kz']<0)
@@ -201,7 +201,6 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 	ORDER BY student_uid, nachname, vorname
 	";
 
-
 if($result = $db->db_query($qry))
 {
 
@@ -253,25 +252,25 @@ if($result = $db->db_query($qry))
 		{
 				$error_log.=(!empty($error_log)?', ':'')."Nachname ('".$row->nachname."')";
 		}
-		//SVNR muÃƒÅ¸ 10-stellig sein
+		//SVNR muÃƒÆ’Ã…Â¸ 10-stellig sein
 		if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 		{
 				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
 		}
-		//Ersatzkennzeichen muÃƒÅ¸ 10-stellig sein
+		//Ersatzkennzeichen muÃƒÆ’Ã…Â¸ 10-stellig sein
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && mb_strlen(trim($row->ersatzkennzeichen))!=10)
 		{
 				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
 		}
-		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - auÃƒÅ¸er bei 01.01. und 01.07.
+		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - auÃƒÆ’Ã…Â¸er bei 01.01. und 01.07.
 		if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 		{
-				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enthÃƒÂ¤lt Geburtsdatum (".$row->gebdatum.") nicht";
+				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enthÃƒÆ’Ã‚Â¤lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		//Vergleich der letzten 6 Stellen des Ersatzkennzeichen mit Geburtsdatum
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enthÃƒÂ¤lt Geburtsdatum (".$row->gebdatum.") nicht";
+				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enthÃƒÆ’Ã‚Â¤lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 		{
@@ -455,7 +454,7 @@ if($result = $db->db_query($qry))
 				}
 			}
 		}
-		//bei Absolventen das Beendigungsdatum (Sponsion oder AbschlussprÃƒÂ¼fung) ÃƒÂ¼berprÃƒÂ¼fen
+		//bei Absolventen das Beendigungsdatum (Sponsion oder AbschlussprÃƒÆ’Ã‚Â¼fung) ÃƒÆ’Ã‚Â¼berprÃƒÆ’Ã‚Â¼fen
 
 		if($aktstatus=='Absolvent')
 		{
@@ -510,9 +509,9 @@ if($result = $db->db_query($qry))
             	  <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
 				if(($row->svnr!='')&&($row->ersatzkennzeichen!=''))
 				{
-					/*$datei.="
-		          <Vorname>".$row->vorname."</Vorname>
-		          <Familienname>".$row->nachname."</Familienname>";*/
+					//$datei.="
+		          //<Vorname>".$row->vorname."</Vorname>
+		          //<Familienname>".$row->nachname."</Familienname>";
 					$datei.="
 		          <SVNR>".$row->svnr."</SVNR>";
 					$datei.="
@@ -527,9 +526,9 @@ if($result = $db->db_query($qry))
 					}
 					if($row->ersatzkennzeichen!='')
 					{
-						/*$datei.="
-                  <Vorname>".$row->vorname."</Vorname>
-                  <Familienname>".$row->nachname."</Familienname>";*/
+						//$datei.="
+                  //<Vorname>".$row->vorname."</Vorname>
+                  //<Familienname>".$row->nachname."</Familienname>";
 						$datei.="
                   <ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 					}
@@ -551,7 +550,7 @@ if($result = $db->db_query($qry))
 					$datei.="
 	          <ZugangDatum></ZugangDatum>";
 				}
-				//!!!stgart fÃ¼r Lehrgang Ã¼berprÃ¼fen!!!
+				//!!!stgart fÃƒÂ¼r Lehrgang ÃƒÂ¼berprÃƒÂ¼fen!!!
 			          if($stgart==2)
 			          {
 			          		$datei.="
@@ -613,4 +612,7 @@ if($result = $db->db_query($qry))
 	}
 
 	//echo $datei;
+	
 }
+
+?>
