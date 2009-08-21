@@ -77,10 +77,8 @@
 		</td>
 	    <td class="tdvertical" align="center">
 		  <?php
-			//if (!isset($DOC_ROOT) && isset($_SERVER["DOCUMENT_ROOT"]) )
-			//	$DOC_ROOT=$_SERVER["DOCUMENT_ROOT"];
 			if (!isset($DOC_ROOT) || empty($DOC_ROOT))
-					$DOC_ROOT='../../..';
+				$DOC_ROOT='../../..';
 
 		  	$dir_name=$DOC_ROOT.'/documents';
 			if(!is_dir($dir_name))
@@ -88,15 +86,14 @@
 					exec('mkdir -m 775 "'.$dir_name.'"');
 					exec('sudo chown www-data:teacher "'.$dir_name.'"');
 			}					
-			
-			if (!is_dir($DOC_ROOT.'/documents')) // Entwicklung - Documents im eigenen Verz.	  
-					$DOC_ROOT='../../..';
-				
+							
+		  	/*
 		  	if(!@is_dir($DOC_ROOT.'/documents'))
 			{
 					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents'.'"');
 					exec('sudo chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');				
-			}					
+			}
+			*/					
 					
 		  //SEMESTERPLAN
 		  	$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan';
