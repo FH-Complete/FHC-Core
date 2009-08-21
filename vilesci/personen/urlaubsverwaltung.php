@@ -131,9 +131,9 @@ if(isset($_POST['save']))
 	{
 		$zeitsperre->zeitsperretyp_kurzbz=$zeitsperretyp_kurzbz;
 		$zeitsperre->bezeichnung = $bezeichnung;
-		$zeitsperre->vondatum = $vondatum;
+		$zeitsperre->vondatum = $datum->formatDatum($vondatum);
 		$zeitsperre->vonstunde = $vonstunde;
-		$zeitsperre->bisdatum = $bisdatum;
+		$zeitsperre->bisdatum = $datum->formatDatum($bisdatum);
 		$zeitsperre->bisstunde = $bisstunde;
 		$zeitsperre->vertretung_uid = $vertretung_uid;
 		$zeitsperre->erreichbarkeit_kurzbz = $erreichbarkeit_kurzbz;
