@@ -276,8 +276,9 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td></tr>";
-$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br>";
-$htmlstr .= "</tr>\n";
+$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br></td><td align='right'>";
+$htmlstr .= "<a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;&nbsp;";
+$htmlstr .= "</td></tr>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "<br><b>Termine:</b>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";

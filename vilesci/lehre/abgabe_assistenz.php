@@ -54,7 +54,7 @@
 	$rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
-	die('Sie haben keine Berechtigung für diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
 $sql_query = "SELECT * 
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit  
@@ -154,7 +154,7 @@ else
 	
 		if($muid != NULL && $muid !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>".$erstbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
 		}
 		else
 		{
@@ -162,7 +162,7 @@ else
 		}
 		if($muid != NULL && $muid !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:$muid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>".$zweitbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><a href='mailto:$muid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
 		}
 		else
 		{
