@@ -230,13 +230,28 @@ if(isset($_POST['submitdata']))
 			$frage->text = $_POST['text'];
 			$frage->sprache = $sprache;
 
-			if($frage->save_fragesprache())
+			$xml = '<?xml version="1.0" encoding="utf-8"?><root>'.$frage->text.'</root>';
+			libxml_use_internal_errors(true);
+			if(simplexml_load_string($xml))
 			{
-				echo "<b>Daten gespeichert</b><br />";
-				$nummer = $frage->nummer;
+				if($frage->save_fragesprache())
+				{
+					echo "<b>Daten gespeichert</b><br />";
+					$nummer = $frage->nummer;
+				}
+				else 
+					echo '<b>Fehler:'.$frage->errormsg.'</b><br />';
 			}
 			else 
-				echo '<b>Fehler:'.$frage->errormsg.'</b><br />';
+			{
+				$frage_error_text = $frage->text;
+				echo '<b>Fehler: Text ist kein gueltiges XML:<span class="error"><br />';
+				foreach (libxml_get_errors() as $error) 
+				{
+        			echo $error->message.'<br />';
+    			}
+				echo '</span></b><br />';
+			}
 		}
 		else
 			echo '<b>'.$frage->errormsg.'</b><br />';
@@ -333,22 +348,37 @@ if(isset($_POST['submitvorschlag']))
 		$vorschlag->updateamum = date('Y-m-d H:i:s');
 		$vorschlag->updatevon = $user;
 		
-		if($vorschlag->save())
-		{
-			if($vorschlag->save_vorschlagsprache())
+		$xml = '<?xml version="1.0" encoding="utf-8"?><root>'.$vorschlag->text.'</root>';
+		libxml_use_internal_errors(true);
+		if(simplexml_load_string($xml))
+		{			
+			if($vorschlag->save())
 			{
-				echo "<b>Vorschlag gespeichert</b><br />";
+				if($vorschlag->save_vorschlagsprache())
+				{
+					echo "<b>Vorschlag gespeichert</b><br />";
+				}
+				else 
+				{
+					$save_vorschlag_error=true;
+					echo "Fehler beim Speichern von Vorschlagsprache: $vorschlag->errormsg<br />";
+				}
 			}
-			else 
+			else
 			{
 				$save_vorschlag_error=true;
-				echo "Fehler beim Speichern von Vorschlagsprache: $vorschlag->errormsg<br />";
+				echo '<b>'.$vorschlag->errormsg.'</b><br />';
 			}
 		}
-		else
+		else 
 		{
-			$save_vorschlag_error=true;
-			echo '<b>'.$vorschlag->errormsg.'</b><br />';
+			$vorschlag_error_text = $vorschlag->text;
+			echo '<b>Fehler: Text ist kein gueltiges XML:<span class="error"><br />';
+			foreach (libxml_get_errors() as $error) 
+			{
+    			echo $error->message.'<br />';
+			}
+			echo '</span></b><br />';
 		}
 	}
 	else
@@ -513,6 +543,7 @@ if($frage_id!='')
 	$frage->load($frage_id);
 	$frage->getFrageSprache($frage_id, $sprache);
 	
+	
 	echo "<table><tr><td>";
 	//Fragen
 	echo "<table>";
@@ -553,7 +584,9 @@ if($frage_id!='')
 	echo "<form method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
-	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='40' rows='20' oninput='preview()'><![CDATA[$frage->text]]></textarea>\n</td></tr>";
+	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
+	
+	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='40' rows='20' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Level <input type='text' name='level' value='$frage->level' size='1' />
 			Nummer <input type='text' name='nummer' value='$frage->nummer' size='1' /></td>
