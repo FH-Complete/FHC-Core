@@ -132,7 +132,7 @@ if($uid==null)
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 						tbl_lehrveranstaltung.studiengang_kz=".addslashes($studiengang_kz)." AND
 						tbl_projektbetreuer.stunden!='0' AND tbl_projektbetreuer.faktor!='0' AND tbl_projektbetreuer.stundensatz!='0'
-					) as mitarbeiter";
+					) as mitarbeiter ORDER BY mitarbeiter_uid";
 	
 	if($db->db_query($qry))
 	{

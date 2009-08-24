@@ -20,16 +20,16 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	require_once('../../config/vilesci.config.inc.php');
+	require_once('../../include/studiengang.class.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/fachbereich.class.php');
+	require_once('../../include/lvinfo.class.php');
+
+	if (!$db = new basis_db())
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-require_once('../../include/studiengang.class.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/fachbereich.class.php');
-require_once('../../include/lvinfo.class.php');
 
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
@@ -319,6 +319,7 @@ echo '<html>
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 	<script language="Javascript">
+	var isaktiv="'.$isaktiv.'";
 	function checksubmit()
 	{
 		//alert(document.getElementById("select_stg_kz").value+" : "+document.getElementById("select_fachbereich_kurzbz").value);
