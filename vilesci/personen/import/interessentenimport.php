@@ -45,32 +45,37 @@ function getGemeindeDropDown($postleitzahl)
 {
 	global $_REQUEST, $gemeinde;
 	$db = new basis_db();
-	
+
 	$found=false;
 	$firstentry='';
 	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
-	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
+
 	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
-	if($db->db_query($qry))
+	if($postleitzahl<10000)
 	{
-		while($row = $db->db_fetch_object())
+		$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
+		
+		if($db->db_query($qry))
 		{
-			if($firstentry=='')
-				$firstentry=$row->name;
-			if($gemeinde_x=='')
-				$gemeinde_x=$row->name;
-			
-			if($row->name==$gemeinde_x)
+			while($row = $db->db_fetch_object())
 			{
-				$selected='selected';
-				$found=true;
+				if($firstentry=='')
+					$firstentry=$row->name;
+				if($gemeinde_x=='')
+					$gemeinde_x=$row->name;
+				
+				if($row->name==$gemeinde_x)
+				{
+					$selected='selected';
+					$found=true;
+				}
+				else
+					$selected='';
+				echo "<option value='$row->name' $selected>$row->name</option>";
 			}
-			else
-				$selected='';
-			echo "<option value='$row->name' $selected>$row->name</option>";
 		}
 	}
-	
+		
 	echo '</SELECT>';
 	if(!$found && (isset($importort) && $importort!=''))
 	{
@@ -92,22 +97,25 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 	global $_REQUEST;
 	$db = new basis_db();
 	
-	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
-	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
-			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
 	echo '<SELECT id="ort" name="ort">';
-	if($db->db_query($qry))
-	{
-		while($row = $db->db_fetch_object())
-		{
-			if($row->ortschaftsname==$ort)
-				$selected='selected';
-			else 
-				$selected='';
-			echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
-		}
-	}
 	
+	if($postleitzahl< 10000)
+	{
+		$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+		$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
+				WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
+		if($db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object())
+			{
+				if($row->ortschaftsname==$ort)
+					$selected='selected';
+				else 
+					$selected='';
+				echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+			}
+		}
+	}	
 	echo '</SELECT>';
 }
 if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
@@ -377,6 +385,9 @@ else
 	$ort = (isset($_REQUEST['ort_txt'])?$_REQUEST['ort_txt']:'');
 	$gemeinde = (isset($_REQUEST['gemeinde_txt'])?$_REQUEST['gemeinde_txt']:'');
 }
+
+$gemeinde = utf8($gemeinde);
+$ort = utf8($ort);
 //wenn die Gemeinde leer ist und im Ort etwas steht
 //dann umdrehen (Das passiert wenn die Daten aus dem Mail von der www importiert werden)
 if($gemeinde=='' && $ort!='')
@@ -402,6 +413,9 @@ $incoming = (isset($_REQUEST['incoming'])?true:false);
 $orgform_kurzbz = (isset($_REQUEST['orgform_kurzbz'])?$_REQUEST['orgform_kurzbz']:'');
 //end Parameter
 $geburtsdatum_error=false;
+
+$ausbildungsart = utf8($ausbildungsart);
+$anmerkungen = utf8($anmerkungen);
 
 // ****
 // * Generiert die Matrikelnummer
@@ -933,7 +947,12 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum_orig.'" /> (Format: dd.mm.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
-echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
+
+if(isset($adresse_nation) && $adresse_nation=='A' && isset($plz) && $plz>10000)
+	$nationstyle='style="border: 1px solid red"';
+else 
+	$nationstyle='';
+echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()" '.$nationstyle.'>';
 $nation =  new nation();
 $nation->getAll();
 foreach ($nation->nation as $row)
