@@ -932,8 +932,10 @@ function StatistikPrintNotenspiegel(typ)
 	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["sem"] : "sem";
 	var semester=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+	var orgform=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ,'Notenspiegel');
+	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ+'&orgform='+orgform,'Notenspiegel');
 }
 
 // ****
