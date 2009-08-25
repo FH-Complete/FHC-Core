@@ -25,6 +25,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
 require_once('../../include/note.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/Excel/excel.php');
@@ -43,6 +44,8 @@ $typ = isset($_GET['typ'])?$_GET['typ']:'';
 
 if($semester=='')
 	die('Bitte ein Semester auswaehlen');
+	
+$orgform = isset($_GET['orgform'])?$_GET['orgform']:'';
 
 $stg = new studiengang();
 $stg_arr = array();
@@ -167,6 +170,16 @@ if($typ=='xls')
 	$anzahlgewichtet=0;
 	foreach ($result_student as $row_student)
 	{
+		if($orgform!='')
+		{
+			//Wenn der Student nicht die passende orgform hat (VZ,BB,FST, etc)
+			//dann nicht anzeigen
+			$prestudent = new prestudent();
+			$prestudent->getLastStatus($row_student->prestudent_id);
+			
+			if($prestudent->orgform_kurzbz!=$orgform)
+				continue;
+		}
 		$zeile++;
 		$spalte=0;
 		
@@ -316,7 +329,7 @@ else
 	
 	echo "<h2>Notenspiegel $stg->kuerzel $semester</h2>";
 	
-	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>Personenkennzeichen</th>';
+	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>Nr</th><th>Name</th><th>PersonenKz</th>';
 	while($row_lva = $db->db_fetch_object($result_lva))
 	{
 		echo "<th>".$stg_arr[$row_lva->studiengang_kz]."$row_lva->semester $row_lva->bezeichnung ($row_lva->ects ECTS)</th>";
@@ -331,6 +344,16 @@ else
 	$anzahlgewichtet=0;
 	foreach ($result_student as $row_student)
 	{
+		if($orgform!='')
+		{
+			//Wenn der Student nicht die passende orgform hat (VZ,BB,FST, etc)
+			//dann nicht anzeigen
+			$prestudent = new prestudent();
+			$prestudent->getLastStatus($row_student->prestudent_id);
+			
+			if($prestudent->orgform_kurzbz!=$orgform)
+				continue;
+		}
 		$i++;
 		echo "<tr><td>$i</td><td>$row_student->nachname $row_student->vorname</td><td>$row_student->matrikelnr</td>";
 		
