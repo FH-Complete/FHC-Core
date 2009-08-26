@@ -676,7 +676,10 @@ class wochenplan extends basis_db
 				else
 				{
 					echo '				<td align="center"><br>';
-					if (($raumres || $this->user=='lektor') && $this->type=='ort' && ($datum>=$datum_res_lektor_start && $datum<=$datum_res_lektor_ende))
+					$datum_res_lektor_start_m = date('Y-m-d', $datum_res_lektor_start);
+					$datum_res_lektor_ende_m = date('Y-m-d', $datum_res_lektor_ende);
+					$datum_m = date('Y-m-d',$datum);
+					if (($raumres || $this->user=='lektor') && $this->type=='ort' && ($datum_m>=$datum_res_lektor_start_m && $datum_m<=$datum_res_lektor_ende_m))
 						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
 					echo '</td>'.$this->crlf;
 				}

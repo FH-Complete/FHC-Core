@@ -162,19 +162,16 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 
 	$num_rows_std=$db->db_num_rows($erg_std);
 	$count=0;
-	for ($t=1;$t<7;$t++)
+	for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
+	{
 		for ($j=0;$j<$num_rows_std;$j++)
 		{
 			$stunde=$db->db_result($erg_std,$j,'"stunde"');
 			$var='reserve'.$t.'_'.$stunde;
-			//echo $$var;
-			if (isset($_POST[$var]))
-				$$var=$_POST[$var];
-			else if (isset($_GET[$var]))
-				$$var=$_GET[$var];				
-			if (isset($$var))
+				
+			if (isset($_REQUEST[$var]))
 			{
-				$datum_res=$$var;
+				$datum_res=$_REQUEST[$var];
 				#$datum_res=$datum_obj->formatDatum($datum_res);
 				//echo $datum_res;
 				$query="SELECT * FROM campus.tbl_reservierung where ort_kurzbz='$ort_kurzbz' and datum='$datum_res' and  stunde='$stunde'";
@@ -198,6 +195,7 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 				$count++;
 			}
 		}
+	}
 }
 
 // Stundenplan erstellen
