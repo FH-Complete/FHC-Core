@@ -2802,14 +2802,29 @@ if(!$error)
 						}
 						else
 						{
-							if($projektarbeit->delete($_POST['projektarbeit_id']))
+							$qry = "SELECT count(*) as anzahl FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$_POST['projektarbeit_id']."';";
+							if($result = $db->db_query($qry))
 							{
-								$return = true;
-							}
-							else
-							{
-								$errormsg = $projektarbeit->errormsg;
-								$return = false;
+								if($row = $db->db_fetch_object($result))
+								{
+									if($row->anzahl>0)
+									{
+										$errormsg = 'Diese Projektarbeit kann nicht gelöscht werden, da bereits AbgabeTermine bzw Abgaben vorhanden sind';
+										$return = false;
+									}
+									else 
+									{
+										if($projektarbeit->delete($_POST['projektarbeit_id']))
+										{
+											$return = true;
+										}
+										else
+										{
+											$errormsg = $projektarbeit->errormsg;
+											$return = false;
+										}
+									}
+								}
 							}
 						}
 					}
