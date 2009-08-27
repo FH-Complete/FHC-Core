@@ -49,6 +49,8 @@ require_once('../../include/datum.class.php');
 require_once('../../include/aufmerksamdurch.class.php');
 require_once('../../include/studiengang.class.php');
 
+$ausgeschieden=array();
+
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
@@ -235,7 +237,20 @@ if($stsem!='')
 	}
 	else 
 		$stgwhere='';
-	
+		
+	$i=0;
+	$qry="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='$stsem'";
+	if($result = $db->db_query($qry))
+	{
+		While ($row = $db->db_fetch_object($result))
+		{
+			$ausgeschieden[$i]=$row->prestudent_id;
+			$i++;
+		}
+	}
+	//echo $qry;
+	//var_dump($ausgeschieden);
+		
 	//Bewerberdaten holen
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
 
@@ -288,7 +303,20 @@ if($stsem!='')
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
 					) AS aufgenommener_w,
-					
+									
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' 
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')     
+					) AS aufgenommenerber,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					) AS aufgenommenerber_m,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					) AS aufgenommenerber_w, 
+						
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
 					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND tbl_benutzer.aktiv
 				) AS student1sem,
@@ -325,6 +353,7 @@ if($stsem!='')
 						<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung (m/w)</th>
 						<th class='table-sortable:numeric'>Bewerber (m/w)</th>
 						<th class='table-sortable:numeric'>Aufgenommener (m/w)</th>
+						<th class='table-sortable:numeric'>Aufgenommener bereinigt (m/w)</th>
 						<th class='table-sortable:numeric'>Student 1S (m/w)</th>
 						<th class='table-sortable:numeric'>Student 3S (m/w)</th>
 					</tr>
@@ -346,6 +375,9 @@ if($stsem!='')
 		$aufgenommener_sum = 0;
 		$aufgenommener_m_sum = 0;
 		$aufgenommener_w_sum = 0;
+		$aufgenommenerber_sum = 0;
+		$aufgenommenerber_m_sum = 0;
+		$aufgenommenerber_w_sum = 0;
 		$student1sem_sum = 0;
 		$student1sem_m_sum = 0;
 		$student1sem_w_sum = 0;
@@ -363,6 +395,7 @@ if($stsem!='')
 			$content.= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
 			$content.= "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
 			$content.= "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
+			$content.= "<td align='center'>$row->aufgenommenerber ($row->aufgenommenerber_m / $row->aufgenommenerber_w)</td>";
 			$content.= "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
 			$content.= "<td align='center'>$row->student3sem ($row->student3sem_m / $row->student3sem_w)</td>";
 			$content.= "</tr>";
@@ -383,6 +416,9 @@ if($stsem!='')
 			$aufgenommener_sum += $row->aufgenommener;
 			$aufgenommener_m_sum += $row->aufgenommener_m;
 			$aufgenommener_w_sum += $row->aufgenommener_w;
+			$aufgenommenerber_sum += $row->aufgenommenerber;
+			$aufgenommenerber_m_sum += $row->aufgenommenerber_m;
+			$aufgenommenerber_w_sum += $row->aufgenommenerber_w;
 			$student1sem_sum += $row->student1sem;
 			$student1sem_m_sum += $row->student1sem_m;
 			$student1sem_w_sum += $row->student1sem_w;
@@ -399,6 +435,7 @@ if($stsem!='')
 		$content.= "<td align='center'>$interessentenrtanmeldung_sum ($interessentenrtanmeldung_m_sum / $interessentenrtanmeldung_w_sum)</td>";
 		$content.= "<td align='center'>$bewerber_sum ($bewerber_m_sum / $bewerber_w_sum)</td>";
 		$content.= "<td align='center'>$aufgenommener_sum ($aufgenommener_m_sum / $aufgenommener_w_sum)</td>";
+		$content.= "<td align='center'>$aufgenommenerber_sum ($aufgenommenerber_m_sum / $aufgenommenerber_w_sum)</td>";
 		$content.= "<td align='center'>$student1sem_sum ($student1sem_m_sum / $student1sem_w_sum)</td>";
 		$content.= "<td align='center'>$student3sem_sum ($student3sem_m_sum / $student3sem_w_sum)</td>";
 		$content.= "</tr>";
@@ -479,6 +516,19 @@ if($stsem!='')
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
 					AND orgform_kurzbz='FST') AS aufgenommener_fst,
+					
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					AND orgform_kurzbz='VZ') AS aufgenommenerber_vz,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					AND orgform_kurzbz='BB') AS aufgenommenerber_bb,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					AND orgform_kurzbz='FST') AS aufgenommenerber_fst,
 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
@@ -519,6 +569,7 @@ if($stsem!='')
 							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB / FST</th>
 							<th class='table-sortable:numeric'>Bewerber 1S VZ / BB / FST</th>
 							<th class='table-sortable:numeric'>Aufgenommener VZ / BB / FST</th>
+							<th class='table-sortable:numeric'>Aufgenommener bereinigt VZ / BB / FST</th>
 							<th class='table-sortable:numeric'>Student 1S VZ / BB / FST</th>
 							<th class='table-sortable:numeric'>Student 3S VZ / BB / FST</th>
 						</tr>
@@ -541,6 +592,9 @@ if($stsem!='')
 			$aufgenommener_vz_sum = 0;
 			$aufgenommener_bb_sum = 0;
 			$aufgenommener_fst_sum = 0;
+			$aufgenommenerber_vz_sum = 0;
+			$aufgenommenerber_bb_sum = 0;
+			$aufgenommenerber_fst_sum = 0;
 			$student1sem_vz_sum = 0;
 			$student1sem_bb_sum = 0;
 			$student1sem_fst_sum = 0;
@@ -558,6 +612,7 @@ if($stsem!='')
 				$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb / $row->interessentenrtanmeldung_fst</td>";
 				$content.= "<td align='center'>$row->bewerber_vz / $row->bewerber_bb / $row->bewerber_fst</td>";
 				$content.= "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb / $row->aufgenommener_fst</td>";
+				$content.= "<td align='center'>$row->aufgenommenerber_vz / $row->aufgenommenerber_bb / $row->aufgenommenerber_fst</td>";
 				$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb / $row->student1sem_fst</td>";
 				$content.= "<td align='center'>$row->student3sem_vz / $row->student3sem_bb / $row->student3sem_fst</td>";
 				$content.= "</tr>";
@@ -578,6 +633,9 @@ if($stsem!='')
 				$aufgenommener_vz_sum += $row->aufgenommener_vz;
 				$aufgenommener_bb_sum += $row->aufgenommener_bb;
 				$aufgenommener_fst_sum += $row->aufgenommener_fst;
+				$aufgenommenerber_vz_sum += $row->aufgenommenerber_vz;
+				$aufgenommenerber_bb_sum += $row->aufgenommenerber_bb;
+				$aufgenommenerber_fst_sum += $row->aufgenommenerber_fst;
 				$student1sem_vz_sum += $row->student1sem_vz;
 				$student1sem_bb_sum += $row->student1sem_bb;
 				$student1sem_fst_sum += $row->student1sem_fst;
@@ -593,6 +651,7 @@ if($stsem!='')
 			$content.= "<td align='center'>$interessentenrtanmeldung_vz_sum / $interessentenrtanmeldung_bb_sum / $interessentenrtanmeldung_fst_sum</td>";
 			$content.= "<td align='center'>$bewerber_vz_sum / $bewerber_bb_sum / $bewerber_fst_sum</td>";
 			$content.= "<td align='center'>$aufgenommener_vz_sum / $aufgenommener_bb_sum / $aufgenommener_fst_sum</td>";
+			$content.= "<td align='center'>$aufgenommenerber_vz_sum / $aufgenommenerber_bb_sum / $aufgenommenerber_fst_sum</td>";
 			$content.= "<td align='center'>$student1sem_vz_sum / $student1sem_bb_sum / $student1sem_fst_sum</td>";
 			$content.= "<td align='center'>$student3sem_vz_sum / $student3sem_bb_sum / $student3sem_fst_sum</td>";
 			$content.= "</tfoot></tr>";
@@ -724,6 +783,22 @@ if($stsem!='')
 					) AS aufgenommener_w,
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' 
+					AND studiensemester_kurzbz='$stsem' AND datum<='$datum'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					) AS aufgenommenerber,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' 
+					AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND datum<='$datum'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					) AS aufgenommenerber_m,
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' 
+					AND studiensemester_kurzbz='$stsem' AND geschlecht='w' AND datum<='$datum'
+					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
+					) AS aufgenommenerber_w,
+					
+				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' 
 					AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND datum<='$datum'
 				) AS student1sem,
@@ -765,6 +840,7 @@ if($stsem!='')
 						<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung (m/w)</th>
 						<th class='table-sortable:numeric'>Bewerber (m/w)</th>
 						<th class='table-sortable:numeric'>Aufgenommener (m/w)</th>
+						<th class='table-sortable:numeric'>Aufgenommener bereinigt(m/w)</th>
 						<th class='table-sortable:numeric'>Student 1S (m/w)</th>
 						<th class='table-sortable:numeric'>Student 3S (m/w)</th>
 					</tr>
@@ -783,6 +859,9 @@ if($stsem!='')
 		$aufgenommener_sum = 0;
 		$aufgenommener_m_sum = 0;
 		$aufgenommener_w_sum = 0;
+		$aufgenommenerber_sum = 0;
+		$aufgenommenerber_m_sum = 0;
+		$aufgenommenerber_w_sum = 0;
 		$student1sem_sum = 0;
 		$student1sem_m_sum = 0;
 		$student1sem_w_sum = 0;
@@ -800,6 +879,7 @@ if($stsem!='')
 			$content.= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
 			$content.= "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
 			$content.= "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
+			$content.= "<td align='center'>$row->aufgenommenerber ($row->aufgenommenerber_m / $row->aufgenommenerber_w)</td>";
 			$content.= "<td align='center'>$row->student1sem ($row->student1sem_m / $row->student1sem_w)</td>";
 			$content.= "<td align='center'>$row->student3sem ($row->student3sem_m / $row->student3sem_w)</td>";
 			$content.= "</tr>";
@@ -817,6 +897,9 @@ if($stsem!='')
 			$aufgenommener_sum += $row->aufgenommener;
 			$aufgenommener_m_sum += $row->aufgenommener_m;
 			$aufgenommener_w_sum += $row->aufgenommener_w;
+			$aufgenommenerber_sum += $row->aufgenommenerber;
+			$aufgenommenerber_m_sum += $row->aufgenommenerber_m;
+			$aufgenommenerber_w_sum += $row->aufgenommenerber_w;
 			$student1sem_sum += $row->student1sem;
 			$student1sem_m_sum += $row->student1sem_m;
 			$student1sem_w_sum += $row->student1sem_w;
@@ -833,6 +916,7 @@ if($stsem!='')
 		$content.= "<td align='center'>$interessentenrt_sum ($interessentenrt_m_sum / $interessentenrt_w_sum)</td>";
 		$content.= "<td align='center'>$bewerber_sum ($bewerber_m_sum / $bewerber_w_sum)</td>";
 		$content.= "<td align='center'>$aufgenommener_sum ($aufgenommener_m_sum / $aufgenommener_w_sum)</td>";
+		$content.= "<td align='center'>$aufgenommenerber_sum ($aufgenommenerber_m_sum / $aufgenommenerber_w_sum)</td>";
 		$content.= "<td align='center'>$student1sem_sum ($student1sem_m_sum / $student1sem_w_sum)</td>";
 		$content.= "<td align='center'>$student3sem_sum ($student3sem_m_sum / $student3sem_w_sum)</td>";
 		$content.= "</tr>";
@@ -893,7 +977,7 @@ else
 	//Mail versenden
 	echo 'Bewerberstatistik.php - Sende Mail ...';
 	$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at, russ@technikum-wien.at, ott@technikum-wien.at, vilesci@technikum-wien.at, lehner@technikum-wien.at, teschl@technikum-wien.at, maderdon@technikum-wien.at';
-	$mailobj = new mail($to, 'vilesci@technikum-wien.at','Bewerberstatistik','Sie muessen diese Mail als HTML-Mail anzeigen um die Statistik zu sehen');
+	$mailobj = new mail($to, 'vilesci@technikum-wien.at','Bewerberstatistik','Sie muessen diese Mail als HTML-Mail anzeigen, um die Statistik zu sehen');
 	$mailobj->setHTMLContent($content);
 	
 	if($mailobj->send())
