@@ -20,16 +20,16 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-require_once('PEAR.php');
-require_once('BIFFwriter.php');
-require_once('Workbook.php');
-require_once('Format.php');
-require_once('Worksheet.php');
-require_once('Parser.php');
-require_once('OLE.php');
-require_once('PPS.php');
-require_once('Root.php');
-require_once('File.php');
-require_once('Writer.php');
+require_once(dirname(__FILE__).'/PEAR.php');
+require_once(dirname(__FILE__).'/BIFFwriter.php');
+require_once(dirname(__FILE__).'/Workbook.php');
+require_once(dirname(__FILE__).'/Format.php');
+require_once(dirname(__FILE__).'/Worksheet.php');
+require_once(dirname(__FILE__).'/Parser.php');
+require_once(dirname(__FILE__).'/OLE.php');
+require_once(dirname(__FILE__).'/PPS.php');
+require_once(dirname(__FILE__).'/Root.php');
+require_once(dirname(__FILE__).'/File.php');
+require_once(dirname(__FILE__).'/Writer.php');
 
 ?>
