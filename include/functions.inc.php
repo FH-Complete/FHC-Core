@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 // Auth: Benutzer des Webportals
 function get_uid()
 {
-	return mb_strtolower(trim($_SERVER['REMOTE_USER']));
+	return (isset($_SERVER['REMOTE_USER'])?mb_strtolower(trim($_SERVER['REMOTE_USER'])):'');
 	// fuer Testzwecke
 	//return 'oesi';
 	//return 'pam';
