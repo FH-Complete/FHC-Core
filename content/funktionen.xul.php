@@ -182,14 +182,24 @@ else
 					<row>
 						<label value="Institut" id="funktion-label-fachbereich" control="funktion-menulist-fachbereich"/>
 						<menulist id="funktion-menulist-fachbereich" disabled="true"
+								  xmlns:FACHBEREICH="http://www.technikum-wien.at/fachbereich/rdf#"
 						          datasources="<?php echo APP_ROOT;?>/rdf/fachbereich.rdf.php?optional=true" flex="1"
 						          ref="http://www.technikum-wien.at/fachbereich/liste" >
 							<template>
-								<menupopup>
-									<menuitem value="rdf:http://www.technikum-wien.at/fachbereich/rdf#kurzbz"
-						        		      label="rdf:http://www.technikum-wien.at/fachbereich/rdf#bezeichnung"
-									  		  uri="rdf:*"/>
+								<rule FACHBEREICH:aktiv="false">
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/fachbereich/rdf#kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/fachbereich/rdf#bezeichnung"
+										  		  uri="rdf:*" style="text-decoration:line-through;"/>
 									</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/fachbereich/rdf#kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/fachbereich/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+									</menupopup>
+								</rule>
 							</template>
 						</menulist>
 					</row>
