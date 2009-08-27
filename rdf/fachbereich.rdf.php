@@ -78,6 +78,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
     		<FACHBEREICH:bezeichnung>-- keine Auswahl --</FACHBEREICH:bezeichnung>
     		<FACHBEREICH:farbe></FACHBEREICH:farbe>
     		<FACHBEREICH:studiengang_kz></FACHBEREICH:studiengang_kz>
+    		<FACHBEREICH:aktiv></FACHBEREICH:aktiv>
       	</RDF:Description>
   </RDF:li>
 	  <?php
@@ -94,6 +95,7 @@ if($db->db_query($qry))
 	    		<FACHBEREICH:bezeichnung><?php echo $row->bezeichnung  ?></FACHBEREICH:bezeichnung>
 	    		<FACHBEREICH:farbe><?php echo $row->farbe  ?></FACHBEREICH:farbe>
 	    		<FACHBEREICH:studiengang_kz><?php echo $row->studiengang_kz  ?></FACHBEREICH:studiengang_kz>
+	    		<FACHBEREICH:aktiv><?php echo ($row->aktiv=='t'?'true':'false')  ?></FACHBEREICH:aktiv>
 	      	</RDF:Description>
 	  </RDF:li>
 		  <?php
