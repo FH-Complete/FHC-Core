@@ -148,15 +148,15 @@
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="https://cis.technikum-wien.at/opus/htdocs/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Publikationsdatenbank</a></td>
-						</tr>
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="public/bibliothek_elektronischeressourcen.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Elektronische Ressourcen</a></td>
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="public/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="https://cis.technikum-wien.at/opus/htdocs/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Publikationsdatenbank</a></td>
 						</tr>
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
