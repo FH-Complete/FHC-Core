@@ -271,7 +271,7 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 			tbl_studentlehrverband.studiensemester_kurzbz='$stsem' AND
 			tbl_student.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
 			tbl_lehreinheitgruppe.gruppe_kurzbz is null AND
-			trim(tbl_studentlehrverband.semester)=trim(tbl_lehreinheitgruppe.semester) AND
+			tbl_studentlehrverband.semester=tbl_lehreinheitgruppe.semester AND
 			(
 				(
 				  (
