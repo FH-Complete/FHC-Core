@@ -97,6 +97,7 @@ $db = new basis_db();
 						<menupopup>
 							<menuitem value="Interessent" label="Interessent"/>
 							<menuitem value="Bewerber" label="Bewerber"/>
+							<menuitem value="Aufgenommener" label="Aufgenommener"/>
 							<menuitem value="Student" label="Student"/>
 							<menuitem value="Unterbrecher" label="Unterbrecher"/>
 							<menuitem value="Diplomand" label="Diplomand"/>

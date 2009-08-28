@@ -238,7 +238,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					$cDebug.='<td title="Third">'.$tmp_value['ThirdLevel'].'</td>';
 					$cDebug.='<td title="Fourth">'.$tmp_value['FourthLevel'].'</td>';
 					$cDebug.='<td title="Href">'.$tmp_value['APPHref'].'</td>';
-					$cDebug.='<td title="Icon">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'blank.png\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'</td>';
+					$cDebug.='<td title="Icon">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'../../../skin/images/blank.gif\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'</td>';
 					$cDebug.='<td title="Error">'.$tmp_value['Error'].'</td>';
 				$cDebug.='</tr>';
 			}
