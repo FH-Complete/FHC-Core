@@ -726,6 +726,19 @@ if($stsem!='')
 	$datum = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d'), date('Y')-1));
 	$datum_obj = new datum();
 	
+	$i=0;
+	$qry="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='$stsem'";
+	if($result = $db->db_query($qry))
+	{
+		While ($row = $db->db_fetch_object($result))
+		{
+			$ausgeschieden[$i]=$row->prestudent_id;
+			$i++;
+		}
+	}
+	//echo $qry;
+	//var_dump($ausgeschieden);
+	
 	$content.='
 	<br><br>
 	<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.$datum_obj->formatDatum($datum,'d.m.Y').'</span></h2><br>
