@@ -113,6 +113,10 @@ if($result_ext = mssql_query($qry,$conn_ext))
 		$i++;
 	}
 }
+else 
+{
+	die("SiPass-Abfrage fehlgeschlagen!");
+}
 
 //mehrfach vergebene karten
 $qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as nummer2, bmp.vorname as vorname2, bmp.ausgegebenam as ausgegebenam2, bmp.insertamum AS insertamum2,
@@ -141,6 +145,10 @@ if($result = $db->db_query($qry))
 		}
 	}
 	$fausgabe.='</table>';
+}
+else 
+{
+	die("Abfrage mehrfach vergebener Karten fehlgeschlagen!");
 }
 
 //Osobsky Michael studiert BEE und MIE - wird daher nicht synchronisiert
@@ -278,6 +286,10 @@ if($result = $db->db_query($qry))
 			}
 		}
 	}
+}
+else 
+{
+	die("FAS-Abfrage fehlgeschlagen!");
 }
 $ausdruck='';
 for($j=0;$j<$i;$j++)
