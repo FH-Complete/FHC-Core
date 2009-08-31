@@ -72,6 +72,10 @@ if($result = mssql_query($qry,$conn_ext))
 		$custom[$row->emp_id][$row->field_id]=$row->char_value;
 	}
 }
+else 
+{
+	die("Einlesen der SiPass-custom-data fehlgeschlagen!");
+}
 
 $qry="SELECT * FROM asco.employee LEFT OUTER JOIN asco.access_groups ON (asco.employee.acc_grp_id=asco.access_groups.acc_grp_id)";
 if($result_ext = mssql_query($qry,$conn_ext))
