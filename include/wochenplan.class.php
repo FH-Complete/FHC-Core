@@ -470,7 +470,7 @@ class wochenplan extends basis_db
 				echo '			<OPTION value="stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'&datum='.$this->datum.'"';
 				if ($row->ort_kurzbz==$this->ort_kurzbz)
 					echo ' selected ';
-				echo ">$row->ort_kurzbz</option>".$this->crlf;
+				echo ">$row->ort_kurzbz ($row->bezeichnung)</option>".$this->crlf;
 			}
 			echo '		</SELECT>'.$this->crlf;
 			if (isset($next_ort))

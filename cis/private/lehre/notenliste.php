@@ -127,7 +127,7 @@ else
 
 	//Lehrveranstaltungen und Noten holen
 	$qry = "SELECT
-				tbl_lehrveranstaltung.bezeichnung, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote, tbl_zeugnisnote.benotungsdatum
+				tbl_lehrveranstaltung.bezeichnung, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote, tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
 			LEFT OUTER JOIN
@@ -151,22 +151,27 @@ else
 			$i++;
 			$tbl.= "<tr class='liste".($i%2)."'><td>$row->bezeichnung</td>";
 			$tbl.= "<td>";
-			//lv-Note ausgeben
-			switch($row->lvnote)
+			
+			//Nur freigegebene Noten anzeigen
+			if($row->freigabedatum>=$row->lvbenotungsdatum)
 			{
-				case  1: $tbl.= "Sehr gut"; 						break;
-				case  2: $tbl.= "Gut";							break;
-				case  3: $tbl.= "Befriedigend";					break;
-				case  4: $tbl.= "Gen&uuml;gend";					break;
-				case  5: $tbl.= "Nicht Gen&uuml;gend";			break;
-				case  6: $tbl.= "Angerechnet";					break;
-				case  7: $tbl.= "Nicht Beurteilt";				break;
-				case  8: $tbl.= "Teilgenommen";					break;
-				case  9: $tbl.= "Noch nicht eingetragen";			break;
-				case 10: $tbl.= "Bestanden";						break;
-				case 11: $tbl.= "Approbiert";						break;
-				case 12: $tbl.= "erfolgreich Absolviert";			break;
-				case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
+				//lv-Note ausgeben
+				switch($row->lvnote)
+				{
+					case  1: $tbl.= "Sehr gut"; 						break;
+					case  2: $tbl.= "Gut";							break;
+					case  3: $tbl.= "Befriedigend";					break;
+					case  4: $tbl.= "Gen&uuml;gend";					break;
+					case  5: $tbl.= "Nicht Gen&uuml;gend";			break;
+					case  6: $tbl.= "Angerechnet";					break;
+					case  7: $tbl.= "Nicht Beurteilt";				break;
+					case  8: $tbl.= "Teilgenommen";					break;
+					case  9: $tbl.= "Noch nicht eingetragen";			break;
+					case 10: $tbl.= "Bestanden";						break;
+					case 11: $tbl.= "Approbiert";						break;
+					case 12: $tbl.= "erfolgreich Absolviert";			break;
+					case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
+				}
 			}
 			$tbl.= "</td>";
 			if ($row->note != $row->lvnote && $row->lvnote != NULL)

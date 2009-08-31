@@ -58,7 +58,7 @@
 	if(!$result_stg)
 		die ("Studiengang not found!");
 	$num_rows_stg=$db->db_num_rows($result_stg);
-	$sql_query="SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
+	$sql_query="SELECT ort_kurzbz, bezeichnung FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
 	$result_ort=$db->db_query($sql_query);
 	if(!$result_ort)
 	  	die("ort not found!");
@@ -123,12 +123,12 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			<BR>
 			Saal:
 			<select name="select" onChange="MM_jumpMenu('self',this,0)">
-        		<option value="stpl_wekk.php" selected>... ??? ...</option>
+        		<option value="stpl_week.php" selected>... ??? ...</option>
         	  	<?php
 				for ($i=0;$i<$num_rows_ort;$i++)
 				{
 					$row=$db->db_fetch_object ($result_ort, $i);
-					echo "<option value=\"stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz</option>";
+					echo "<option value=\"stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz ($row->bezeichnung)</option>";
 				}
 				?>
 			</select>

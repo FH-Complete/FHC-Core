@@ -233,8 +233,8 @@
 			
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
 			{
-				$prestudent->rt_punkte1 = $rtpunkte;
-				$prestudent->punkte = $prestudent->rt_punkte1 + $prestudent->rt_punkte2;
+				$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
+				$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
 				
 				$prestudent->save(false);
 			}
@@ -264,8 +264,8 @@
 						$pruefling = new pruefling();
 						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
 						
-						$prestudent->rt_punkte1 = $rtpunkte;
-						$prestudent->punkte = $prestudent->rt_punkte1 + $prestudent->rt_punkte2;
+						$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
+						$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
 						
 						$prestudent->save(false);
 					}
