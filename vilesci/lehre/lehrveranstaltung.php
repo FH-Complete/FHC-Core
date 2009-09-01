@@ -141,7 +141,7 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	//Sort Speichern
 	if(isset($_POST['sort']))
 	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET sort='".addslashes($_POST['sort'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
+		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET sort=".($_POST['sort']!=''?"'".addslashes($_POST['sort'])."'":'null')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
 		if(!$db->db_query($qry))
 			echo "Fehler beim Speichern!";
 		else
@@ -217,11 +217,11 @@ if(!$rechte->isBerechtigt('admin'))
 	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
 else 
 {
-	if($isaktiv=='aktiv')
+	if($isaktiv=='true')
 	{
 		$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';	
 	}
-	elseif($isaktiv=='naktiv')
+	elseif($isaktiv=='false')
 	{
 		$aktiv = ' AND tbl_lehrveranstaltung.aktiv=false';
 	}
@@ -297,8 +297,8 @@ if($rechte->isBerechtigt('admin'))
 	//Aktiv DropDown
 	$outp.= 'Aktiv <SELECT name="isaktiv" id="isaktiv">';
 	$outp.= "<OPTION value=''".($isaktiv==''?' selected':'').">-- Alle --</OPTION>";
-	$outp.= "<OPTION value='aktiv '".($isaktiv=='aktiv'?'selected':'').">-- Aktiv --</OPTION>";
-	$outp.= "<OPTION value='naktiv '".($isaktiv=='naktiv'?'selected':'').">-- Nicht aktiv --</OPTION>";
+	$outp.= "<OPTION value='true '".($isaktiv=='true'?'selected':'').">-- Aktiv --</OPTION>";
+	$outp.= "<OPTION value='false '".($isaktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
 	$outp.= '</SELECT>';
 }
 else 
@@ -308,10 +308,10 @@ else
 $outp.= '<input type="submit" value="Anzeigen">';
 $outp .="</form>";
 
-echo "<H2>Lehrveranstaltung Verwaltung (".(isset($s[$stg_kz]->kurzbz)?$s[$stg_kz]->kurzbz:$fachbereich_kurzbz)." - ".$semester.")</H2>";
 
 
-echo '<html>
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+	<html>
 	<head>
 	<title>Lehrveranstaltung Verwaltung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -338,6 +338,7 @@ echo '<html>
 	</head>
 	<body class="Background_main">
 	';
+echo "<H2>Lehrveranstaltung Verwaltung (".(isset($s[$stg_kz]->kurzbz)?$s[$stg_kz]->kurzbz:$fachbereich_kurzbz)." - ".$semester.")</H2>";
 
 echo '<table width="100%"><tr><td>';
 echo $outp;
@@ -430,30 +431,30 @@ if ($result_lv!=0)
 		//ECTS
 		echo "<td>$row->ects</td>";
 		//Lehre
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre&isaktiv=$isaktiv'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
 		//LehreVz
 		echo "<td  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
-			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form>";
+			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form>";
 		else
 			echo $row->lehreverzeichnis;
 		echo "</td>";
 		//Aktiv
 		echo "<td align='center'  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
-			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv&isaktiv=$isaktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
 		else
 			echo ($row->aktiv?'Ja':'Nein');
 		echo "</td>";
 		//Sort
 		echo "<td style='white-space:nowrap;'>";
 		echo "<div style='display: none'>$row->sort</div>";
-		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester' method='POST'><input type='text' value='$row->sort' size='4' name='sort'><input type='submit' value='ok'></form>";
+		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv' method='POST'><input type='text' value='$row->sort' size='4' name='sort'><input type='submit' value='ok'></form>";
 		echo "</td>";
 		//Zeugnis
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis'><img src='../../skin/images/".($row->zeugnis=='t'?'true.gif':'false.gif')."'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis&isaktiv=$isaktiv'><img src='../../skin/images/".($row->zeugnis=='t'?'true.gif':'false.gif')."'></a></td>";
 		//Projektarbeit
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.gif':'false.gif')."'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit&isaktiv=$isaktiv'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.gif':'false.gif')."'></a></td>";
 		//FBK
 		echo "<td style='white-space:nowrap;'>";
 		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz&isaktiv=$isaktiv' method='POST'><SELECT name='fbk'>";
