@@ -59,8 +59,8 @@ $ANZAHL_ZEILEN_PRO_SEITE=25;
 //abgeschnitten und '...' angehaengt
 function CutString($strVal, $limit)
 {
-	if(strlen($strVal) > $limit+3)
-		return substr($strVal, 0, $limit) . "...";
+	if(mb_strlen($strVal) > $limit+3)
+		return mb_substr($strVal, 0, $limit) . "...";
 	else
 		return $strVal;
 }

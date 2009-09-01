@@ -26,21 +26,20 @@
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+		
 // ---------------- Diverse Funktionen und UID des Benutzers ermitteln
 	require_once('../../../include/functions.inc.php');
-	if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
-
-	
-    require_once('../../../include/benutzerberechtigung.class.php');
+	require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/studiensemester.class.php');
     require_once('../../../include/lehrveranstaltung.class.php');
     require_once('../../../include/studiengang.class.php');
     require_once('../../../include/moodle_course.class.php');
+
+   	if (!$db = new basis_db())
+		die('Fehler beim Herstellen der Datenbankverbindung');
+
+    if (!$user=get_uid())
+		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
 
 	// Init
 	$user_is_allowed_to_upload=false;
@@ -186,7 +185,9 @@ function hideSemPlanHelp(){
 		}
 			
 		//Berechtigungen auf Fachbereichsebene
-	  $qry = "SELECT distinct fachbereich_kurzbz, studiengang_kz FROM campus.vw_lehreinheit WHERE lehrveranstaltung_id='$lvid'";
+	  $qry = "SELECT distinct fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz 
+	  		FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+	  		WHERE lehrveranstaltung_id='$lvid'";
 	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
 	  	$qry .= " AND studiensemester_kurzbz='$angezeigtes_stsem'";
 

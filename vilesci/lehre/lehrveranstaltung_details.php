@@ -275,6 +275,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Studiengang - Details</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
