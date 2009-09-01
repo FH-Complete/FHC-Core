@@ -63,6 +63,7 @@ class wochenplan extends basis_db
 	public $ort_bezeichnung;
 	public $ort_planbezeichnung;
 	public $ort_ausstattung;
+	public $ort_max_person;
 
 	public $gruppe_kurzbz;
 	public $gruppe_bezeichnung;
@@ -225,7 +226,7 @@ class wochenplan extends basis_db
 		//ortdaten ermitteln
 		if ($this->type=='ort')
 		{
-			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
+			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
 			//echo $sql_query;
 			if (!$this->db_query($sql_query))
 				$this->errormsg=$this->db_last_error();
@@ -235,6 +236,7 @@ class wochenplan extends basis_db
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->ort_planbezeichnung = $row->planbezeichnung;
 				$this->ort_ausstattung = $row->ausstattung;
+				$this->ort_max_person = $row->max_person;
 				$this->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
 			}
 		}
@@ -390,7 +392,7 @@ class wochenplan extends basis_db
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort')
-			echo '<strong>Ort: </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.$this->ort_planbezeichnung.'<br>'.$this->ort_ausstattung.'<br>';
+			echo '<strong>Ort: </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung.'<br>';
 		echo '</P>'.$this->crlf;
 		echo '			<div valign="bottom" align="center">'.$this->crlf;
 
@@ -1056,7 +1058,7 @@ class wochenplan extends basis_db
 		// Initatialisierung der Variablen
 		$lehrverband=array();
 		// Name der View
-		$stpl_view=VIEW_BEGIN.$db_stpl_table;
+		$stpl_view='lehre.'.VIEW_BEGIN.$db_stpl_table;
 		$stpl_view_id=$db_stpl_table.TABLE_ID;
 		//Kalenderdaten setzen
 		$this->datum=montag($datum);
