@@ -92,8 +92,8 @@
 		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:$user));
 		$news->text = trim((isset($_REQUEST['text']) ? $_REQUEST['text']:''));
 		
-		$news->studiengang_kz=0;
-		$news->semester=0;
+		$news->studiengang_kz='0';
+		$news->semester='0';
 		$news->fachbereich_kurzbz=null;
 
 		
