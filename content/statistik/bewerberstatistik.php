@@ -305,17 +305,26 @@ if($stsem!='')
 					) AS aufgenommener_w,
 									
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' 
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')     
-					) AS aufgenommenerber,
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')     ";
+				}
+					$qry.=") AS aufgenommenerber,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					) AS aufgenommenerber_m,
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='m' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.=") AS aufgenommenerber_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
-					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					) AS aufgenommenerber_w, 
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' AND geschlecht='w' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.=") AS aufgenommenerber_w, 
 						
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
 					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND tbl_benutzer.aktiv
@@ -518,17 +527,26 @@ if($stsem!='')
 					AND orgform_kurzbz='FST') AS aufgenommener_fst,
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					AND orgform_kurzbz='VZ') AS aufgenommenerber_vz,
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.="AND orgform_kurzbz='VZ') AS aufgenommenerber_vz,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					AND orgform_kurzbz='BB') AS aufgenommenerber_bb,
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.="AND orgform_kurzbz='BB') AS aufgenommenerber_bb,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					AND orgform_kurzbz='FST') AS aufgenommenerber_fst,
+					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.="AND orgform_kurzbz='FST') AS aufgenommenerber_fst,
 
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
@@ -727,7 +745,7 @@ if($stsem!='')
 	$datum_obj = new datum();
 	
 	$i=0;
-	$qry="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='$stsem'";
+	$qry="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='$stsem' AND datum<='$datum'";
 	if($result = $db->db_query($qry))
 	{
 		While ($row = $db->db_fetch_object($result))
@@ -797,19 +815,28 @@ if($stsem!='')
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' 
-					AND studiensemester_kurzbz='$stsem' AND datum<='$datum'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					) AS aufgenommenerber,
+					AND studiensemester_kurzbz='$stsem' AND datum<='$datum' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.=") AS aufgenommenerber,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' 
-					AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND datum<='$datum'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					) AS aufgenommenerber_m,
+					AND studiensemester_kurzbz='$stsem' AND geschlecht='m' AND datum<='$datum' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.=") AS aufgenommenerber_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' 
-					AND studiensemester_kurzbz='$stsem' AND geschlecht='w' AND datum<='$datum'
-					AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  
-					) AS aufgenommenerber_w,
+					AND studiensemester_kurzbz='$stsem' AND geschlecht='w' AND datum<='$datum' ";
+				if(count($ausgeschieden)>0)
+				{
+						$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
+				}
+					$qry.=") AS aufgenommenerber_w,
 					
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' 
