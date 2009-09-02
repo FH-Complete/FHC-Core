@@ -20,25 +20,21 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/lehrfach.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
+if(!is_numeric($stg_kz) && $stg_kz!='')
+	$stg_kz='0';
 
-	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
-	if(!is_numeric($stg_kz) && $stg_kz!='')
-		$stg_kz='0';
-	
-	$gg='';
-
+$gg='';
 
 $f=new fachbereich();
 $f->getAll();
@@ -244,7 +240,7 @@ if($rechte->isBerechtigt('admin',0))
 		echo "</SELECT></td></tr>";
 		
 		echo "<tr><td>Semester:</td><td> <SELECT name='semester'>";
-		for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
+		for ($i=0;$i<=$s[$lf->studiengang_kz]->max_sem;$i++)
 		{
 			if($i==$lf->semester)
 				$selected='selected';
