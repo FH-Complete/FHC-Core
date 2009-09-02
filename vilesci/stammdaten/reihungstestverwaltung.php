@@ -20,11 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/reihungstest.class.php');
@@ -34,8 +30,10 @@
 	require_once('../../include/pruefling.class.php');
 	require_once('../../include/person.class.php');
 	require_once('../../include/prestudent.class.php');
-	
 	require_once('../../include/Excel/excel.php');
+	
+	if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	
 	$user = get_uid();
 	$datum_obj = new datum();
@@ -62,13 +60,13 @@
 		{
 			// Creating a workbook
 			$workbook = new Spreadsheet_Excel_Writer();
-			
+			$workbook->setVersion(8);
 			// sending HTTP headers
 			$workbook->send("Anwesenheitsliste_Reihungstest_".$reihungstest->datum.".xls");
 			
 			// Creating a worksheet
 			$worksheet =& $workbook->addWorksheet("Reihungstest");
-			
+			$worksheet->setInputEncoding('utf-8');
 			//Formate Definieren
 			$format_bold =& $workbook->addFormat();
 			$format_bold->setBold();
