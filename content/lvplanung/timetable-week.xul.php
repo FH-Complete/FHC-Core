@@ -122,6 +122,7 @@ if (!isset($semester_aktuell) && $semesterplan)
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php"/>
 <?php
 if (isset($semesterplan) && $semesterplan)
 	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.js.php"/>';

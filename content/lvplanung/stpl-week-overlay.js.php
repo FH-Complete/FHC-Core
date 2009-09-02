@@ -52,7 +52,7 @@ function onJumpNow()
     //Sekunden seit 1.1.1970
     datum = d.getTime()/1000;
 	//alert(datum);
-	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
@@ -76,7 +76,7 @@ function onJumpDate(wochen)
 	// neues Datum berechnen. Eine Woche sind 604800 Sekunden.
 	datum+=(604800*wochen)+1;
 
-	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
@@ -103,7 +103,7 @@ function onJumpDateRel(evt)
 	// neues Datum berechnen. Eine Woche sind 604800 Sekunden.
 	datum+=(604800*wochen)+1;
 
-	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
@@ -135,7 +135,7 @@ function onLVAdoStpl(evt)
 			aktion+="_search";
 	var idList=evt.target.getAttribute("idList");
 
-	var attributes="?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
 	attributes+=idList+"&aktion="+aktion+"&time="+oneDate.getTime();
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes+"&bla=";
@@ -199,7 +199,7 @@ function onStplDelete(aktion)
 	var doIt=true;
 	doIt=confirm('Es werden die gewaehlten Eintraege aus dem Stundenplan geloescht!\nSind Sie sicher?')
 
-	var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
+	var attributes="\n?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 	attributes+=idList+"&aktion="+aktion;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
@@ -222,8 +222,9 @@ function onStplDetail(event)
 	var pers_uid=event.target.getAttribute("pers_uid");
 	var ort_kurzbz=event.target.getAttribute("ort_kurzbz");
 
-	var attributes="?type="+type+"&datum="+datum+"&stunde="+stunde+"&ort_kurzbz="+ort_kurzbz+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&ort_kurzbz="+ort_kurzbz;
+	var attributes="?type="+type+"&datum="+datum+"&stunde="+stunde+"&ort_kurzbz="+encodeURIComponent(ort_kurzbz)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&ort_kurzbz="+encodeURIComponent(ort_kurzbz);
 	//alert(attributes);
+	//debug('stpl-week-overlay onStplDetail Attribute:'+attributes);
 	attributes+=idList;
 	var url = "<?php echo APP_ROOT; ?>rdf/lehrstunde.rdf.php";
 	url+=attributes;
