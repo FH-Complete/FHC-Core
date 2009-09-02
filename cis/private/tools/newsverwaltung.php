@@ -88,7 +88,7 @@
 		$news->news_id = $news_id;
 		$news->betreff = trim((isset($_REQUEST['betreff']) ? $_REQUEST['betreff']:''));
 		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:$user));
-		$news->text = trim((isset($_REQUEST['text']) ? $_REQUEST['text']:''));
+		$news->text = str_replace("\r\n","<br>",trim((isset($_REQUEST['text']) ? $_REQUEST['text']:'')));
 		
 		$news->studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:'0'));
 		$news->semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
@@ -317,7 +317,7 @@
 				</td>
 			  </tr>
 			  <tr>
-			  	<td><textarea class="TextBox" style="color:black;background-color:#FFFCF2;border : 1px solid Black;width: 99%; heigth: 166px;"   name="text" rows="10" cols="100" maxlength="1999"><?php if(isset($news_id) && $news_id != "") echo mb_eregi_replace("<br>", "\r\n", $news->text); ?></textarea></td>
+			  	<td><textarea class="TextBox" style="color:black;background-color:#FFFCF2;border : 1px solid Black;width: 99%; heigth: 166px;"   name="text" rows="10" cols="100" maxlength="1999"><?php if(isset($news_id) && $news_id != "") echo str_replace("<br>", "\r\n", $news->text); ?></textarea></td>
 			  </tr>
 			  <tr>
 			  	<td id="error" class="error">&nbsp;<?php echo $error; ?></td>

@@ -90,7 +90,7 @@
 		$news->news_id = $news_id;
 		$news->betreff = trim((isset($_REQUEST['betreff']) ? $_REQUEST['betreff']:''));
 		$news->verfasser =trim((isset($_REQUEST['verfasser']) ? $_REQUEST['verfasser']:$user));
-		$news->text = trim((isset($_REQUEST['text']) ? $_REQUEST['text']:''));
+		$news->text = str_replace("\r\n","<br>",trim((isset($_REQUEST['text']) ? $_REQUEST['text']:'')));
 		
 		$news->studiengang_kz='0';
 		$news->semester='0';
