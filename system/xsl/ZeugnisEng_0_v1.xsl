@@ -90,7 +90,7 @@
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell>
-									<fo:block font-family="sans-serif" font-size="12pt" content-width="100mm" text-align="left">
+									<fo:block font-family="sans-serif" font-size="12pt" content-width="150mm" text-align="left">
 										<fo:inline font-weight="900">
 											<xsl:value-of select="name"/>
 										</fo:inline>
@@ -254,7 +254,7 @@
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row line-height="12pt">
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="10pt" content-width="95mm">
+				<fo:block font-size="10pt" content-width="97mm">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
