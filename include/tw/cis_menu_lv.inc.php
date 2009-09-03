@@ -334,7 +334,7 @@
 		//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
 		if($studiengang_kz!='0')
 		{
-			echo '<a href="news://cis.technikum-wien.at/'.mb_strtolower($stg_obj->kurzbzlang).'.'.$semester.'sem.'.mb_strtolower($short_short_name).'" class="Item">
+			echo '<a href="news://news.technikum-wien.at/'.mb_strtolower($stg_obj->kurzbzlang).'.'.$semester.'sem.'.mb_strtolower($short_short_name).'" class="Item">
 					<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
 					<strong>Newsgroups</strong>
 				</a>';

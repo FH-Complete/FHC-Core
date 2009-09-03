@@ -2566,7 +2566,7 @@ if(!$error)
 							else
 								$checkdatum = $zeugnisnote->uebernahmedatum;
 
-							if($datum_obj->mktime_fromtimestamp($checkdatum)>$datum_obj->mktime_datum($_POST['datum']))
+							if($datum_obj->mktime_fromtimestamp($checkdatum)>$datum_obj->mktime_fromdate($_POST['datum']))
 							{
 								if($zeugnisnote->note!=$_POST['note'])
 								{
@@ -2594,7 +2594,7 @@ if(!$error)
 							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
 							$zeugnisnote->note = $_POST['note'];
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
-							$zeugnisnote->benotungsdatum = date('Y-m-d',$datum_obj->mktime_datum($_POST['datum']));
+							$zeugnisnote->benotungsdatum = date('Y-m-d',$datum_obj->mktime_fromdate($_POST['datum']));
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 							$zeugnisnote->updatevon = $user;
 
