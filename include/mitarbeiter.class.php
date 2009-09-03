@@ -142,9 +142,9 @@ class mitarbeiter extends benutzer
 			$this->errormsg = "kurzbz darf nicht laenger als 8 Zeichen sein\n";
 			return false;
 		}
-		if(mb_strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>16)
 		{
-			$this->errormsg = "Ort_kurzbz darf nicht laenger als 8 Zeichen sein\n";
+			$this->errormsg = "Ort_kurzbz darf nicht laenger als 16 Zeichen sein\n";
 			return false;
 		}
 		if(!is_bool($this->lektor))
