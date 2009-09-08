@@ -109,7 +109,16 @@ $error_msg='';
 	// Personen holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND funktion_kurzbz='ass')";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe 
+				WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND 
+				uid NOT IN (SELECT mitarbeiter_uid 
+							FROM 
+								public.tbl_mitarbeiter 
+								JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
+								JOIN public.tbl_benutzerfunktion USING(uid) 
+							WHERE aktiv AND funktion_kurzbz='ass' AND
+							(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+							(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()))";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
@@ -122,7 +131,19 @@ $error_msg='';
 	}
 	// Personen holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT distinct mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND tbl_benutzerfunktion.funktion_kurzbz='ass' AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	$sql_query="SELECT distinct mitarbeiter_uid AS uid 
+				FROM 
+					public.tbl_mitarbeiter 
+					JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
+					JOIN public.tbl_benutzerfunktion USING(uid) 
+				WHERE 
+					aktiv AND 
+					tbl_benutzerfunktion.funktion_kurzbz='ass' AND 
+					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
+					mitarbeiter_uid NOT LIKE '\\\\_%' AND 
+					mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe 
+											WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
@@ -141,7 +162,17 @@ $error_msg='';
 	// Personen holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND funktion_kurzbz='stgl')";
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe 
+				WHERE 
+					UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND 
+					uid NOT IN (SELECT mitarbeiter_uid 
+								FROM 
+									public.tbl_mitarbeiter 
+									JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
+									JOIN public.tbl_benutzerfunktion USING(uid) 
+								WHERE aktiv AND funktion_kurzbz='stgl' AND
+								(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()))";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
@@ -154,7 +185,17 @@ $error_msg='';
 	}
 	// Personen holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_benutzerfunktion USING(uid) WHERE aktiv AND tbl_benutzerfunktion.funktion_kurzbz='stgl' AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	$sql_query="SELECT mitarbeiter_uid AS uid 
+				FROM 
+					public.tbl_mitarbeiter 
+					JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
+					JOIN public.tbl_benutzerfunktion USING(uid) 
+				WHERE 
+					aktiv AND 
+					tbl_benutzerfunktion.funktion_kurzbz='stgl' AND 
+					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
+					mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))

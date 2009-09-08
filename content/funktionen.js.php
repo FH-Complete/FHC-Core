@@ -178,6 +178,13 @@ function FunktionNeu()
 		document.getElementById('funktion-menulist-funktion').value='stdv';
 	}
 	
+	var Datum = new Date()
+	var Jahr = Datum.getFullYear()
+	var Tag = Datum.getDate()
+	var Monat = Datum.getMonth()+1
+
+	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
+	document.getElementById('funktion-box-datum_bis').value='';
 	FunktionToggleFachbereich();
 }
 
@@ -242,12 +249,14 @@ function FunktionDelete()
 // ****
 function FunktionDetailSpeichern()
 {
-	funktion_kurzbz = document.getElementById('funktion-menulist-funktion').value;
-	oe_kurzbz = document.getElementById('funktion-menulist-oe_kurzbz').value;
-	semester = document.getElementById('funktion-menulist-semester').value;
-	fachbereich_kurzbz = document.getElementById('funktion-menulist-fachbereich').value;
-	neu = document.getElementById('funktion-checkbox-neu').checked;
-	benutzerfunktion_id = document.getElementById('funktion-textbox-benutzerfunktion_id').value;
+	var funktion_kurzbz = document.getElementById('funktion-menulist-funktion').value;
+	var oe_kurzbz = document.getElementById('funktion-menulist-oe_kurzbz').value;
+	var semester = document.getElementById('funktion-menulist-semester').value;
+	var fachbereich_kurzbz = document.getElementById('funktion-menulist-fachbereich').value;
+	var neu = document.getElementById('funktion-checkbox-neu').checked;
+	var benutzerfunktion_id = document.getElementById('funktion-textbox-benutzerfunktion_id').value;
+	var datum_von = document.getElementById('funktion-box-datum_von').value;
+	var datum_bis = document.getElementById('funktion-box-datum_bis').value;
 		
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
@@ -272,6 +281,8 @@ function FunktionDetailSpeichern()
 	req.add('uid', FunktionenUID);
 	req.add('neu', neu);
 	req.add('benutzerfunktion_id', benutzerfunktion_id);
+	req.add('datum_von', ConvertDateToISO(datum_von));
+	req.add('datum_bis', ConvertDateToISO(datum_bis));
 	
 	var response = req.executePOST();
 
@@ -305,6 +316,9 @@ function FunktionBearbeiten()
 	
 	tree = document.getElementById('funktion-tree');
 	
+	if (tree.currentIndex==-1) 
+		return;
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["funktion-treecol-benutzerfunktion_id"] : "funktion-treecol-benutzerfunktion_id";
 	var benutzerfunktion_id=tree.view.getCellText(tree.currentIndex,col);
@@ -322,11 +336,13 @@ function FunktionBearbeiten()
 	var predicateNS = "http://www.technikum-wien.at/bnfunktion/rdf";
 
 	//Daten holen
-	fachbereich_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fachbereich_kurzbz" ));
-	uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#uid" ));
-	oe_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#oe_kurzbz" ));
-	semester = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
-	funktion_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#funktion_kurzbz" ));
+	var fachbereich_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fachbereich_kurzbz" ));
+	var uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#uid" ));
+	var oe_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#oe_kurzbz" ));
+	var semester = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#semester" ));
+	var funktion_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#funktion_kurzbz" ));
+	var datum_von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_von" ));
+	var datum_bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_bis" ));
 	
 	document.getElementById('funktion-menulist-fachbereich').value=fachbereich_kurzbz;
 	document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
@@ -334,6 +350,8 @@ function FunktionBearbeiten()
 	document.getElementById('funktion-menulist-funktion').value=funktion_kurzbz;
 	document.getElementById('funktion-textbox-benutzerfunktion_id').value=benutzerfunktion_id;
 	document.getElementById('funktion-checkbox-neu').checked = false;
+	document.getElementById('funktion-box-datum_von').value=datum_von;
+	document.getElementById('funktion-box-datum_bis').value=datum_bis;
 	
 	FunktionDetailDisableFields(false);
 	FunktionToggleFachbereich();
@@ -361,6 +379,8 @@ function FunktionDetailDisableFields(val)
 	document.getElementById('funktion-menulist-semester').disabled=val;
 	document.getElementById('funktion-menulist-funktion').disabled=val;
 	document.getElementById('funktion-button-speichern').disabled=val;
+	document.getElementById('funktion-box-datum_von').disabled=val;
+	document.getElementById('funktion-box-datum_bis').disabled=val;
 }
 
 // ****
@@ -369,45 +389,53 @@ function FunktionDetailDisableFields(val)
 function FunktionDetailResetFields()
 {
 	document.getElementById('funktion-menulist-fachbereich').value='';
-	document.getElementById('funktion-menulist-oe_kurzbz').value='0';
+	document.getElementById('funktion-menulist-oe_kurzbz').selectedIndex=0;
 	document.getElementById('funktion-menulist-semester').value='';
 	document.getElementById('funktion-menulist-funktion').value='ass';
+	
+	var Datum = new Date();
+	var Jahr = Datum.getFullYear();
+	var Tag = Datum.getDate();
+	var Monat = Datum.getMonth()+1;
+	
+	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
+	document.getElementById('funktion-box-datum_bis').value='';
 }
 
 // ****
-// * FachbereichsDropDown steht nur bei manchen Funktionen zur Verfuegung
+// * Fachbereichs und Semester DropDown nur Anzeigen, wenn die entsprechenden Attribute
+// * der Funktion auf true gesetzt sind
 // ****
 function FunktionToggleFachbereich()
 {
-	fkt = document.getElementById('funktion-menulist-funktion').value;
+	var menulist = document.getElementById('funktion-menulist-funktion');
 	
-	var hidd=false;
+	//ersten selektierten Eintrag holen
+	var children = menulist.getElementsByAttribute('selected','true');
+	children = children[0];
 	
-	switch(fkt)
-	{
-		case 'ass':
-		case 'infr':
-		case 'rek':
-		case 'lkt':
-		case 'stdv':
-		case 'stgl':
-		case 'stglstv':
-		case 'vrek':
-		case 'stud':
-		case 'prl':
-		case 'oeh-kandidatur':
-					hidd = true;
-					break;
+	//Attribute semester und fachbereich auslesen
+	var semester = children.getAttribute('semester');
+	var fachbereich  = children.getAttribute('fachbereich');
+
+	//Felder sichtbar/unsichtbar setzen
+	var semesterhidden=false;
+	var fachbereichhidden=false;
+	
+	if(semester=='true')
+		semesterhidden=false;
+	else
+		semesterhidden=true;
 		
-		case 'fbk':
-		case 'fbl':
-					hidd = false;
-					break;
-		default: 
-				hidd=false;
-				break;
-	}
+	if(fachbereich=='true')
+		fachbereichhidden=false;
+	else
+		fachbereichhidden=true;
 	
-	document.getElementById('funktion-menulist-fachbereich').hidden=hidd;
-	document.getElementById('funktion-label-fachbereich').hidden=hidd;
+	document.getElementById('funktion-menulist-fachbereich').hidden=fachbereichhidden;
+	document.getElementById('funktion-label-fachbereich').hidden=fachbereichhidden;
+	
+	document.getElementById('funktion-menulist-semester').hidden=semesterhidden;
+	document.getElementById('funktion-label-semester').hidden=semesterhidden;
+	
 }

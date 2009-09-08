@@ -122,28 +122,36 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			die('Student not found');
 		
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname 
-						FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion 
-						WHERE tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_benutzerfunktion.uid 
-						AND tbl_benutzerfunktion.funktion_kurzbz = 'stgl' 
-						AND tbl_benutzerfunktion.oe_kurzbz = '".addslashes($stg_oe_obj->oe_kurzbz)."'";
+		$stgl_query = "SELECT 
+							titelpre, titelpost, vorname, nachname 
+						FROM 
+							tbl_person, tbl_benutzer, tbl_benutzerfunktion 
+						WHERE 
+							tbl_person.person_id = tbl_benutzer.person_id AND 
+							tbl_benutzer.uid = tbl_benutzerfunktion.uid AND 
+							tbl_benutzerfunktion.funktion_kurzbz = 'stgl' AND 
+							tbl_benutzerfunktion.oe_kurzbz = '".addslashes($stg_oe_obj->oe_kurzbz)."' AND
+							(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+							(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		
 		if($stgl_result = $db->db_query($stgl_query))
 				$stgl_row = $db->db_fetch_object($stgl_result);
 		else
 			die('Stgl not found');
-						
+
+		/*	
 		if($row->semester!=0)
 			$bezeichnung = $row->semester.'. Semester';
 		else 
-		{
+		{*/
 			//Wenn das Semester 0 ist, dann wird das Semester aus der Rolle geholt. (Ausnahme: Incoming)
 			//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
 			$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
 					WHERE 
 					prestudent_id='".addslashes($row->prestudent_id)."' AND 
 					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-					status_kurzbz!='Incoming' LIMIT 1";
+					status_kurzbz!='Incoming'
+					ORDER BY DATUM DESC LIMIT 1";
 			if($result_sem = $db->db_query($qry))
 			{
 				if($row_sem = $db->db_fetch_object($result_sem))
@@ -156,7 +164,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 			else
 				$bezeichnung = '';
-		}
+		//}
 			
 		$xml .= "\n	<zeugnis>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";

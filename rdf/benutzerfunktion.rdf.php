@@ -33,6 +33,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/funktion.class.php');
 require_once('../include/organisationseinheit.class.php');
+require_once('../include/datum.class.php');
 
 $rdf_url='http://www.technikum-wien.at/bnfunktion';
 
@@ -48,7 +49,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 $benutzerfunktion_id = (isset($_GET['benutzerfunktion_id'])?$_GET['benutzerfunktion_id']:'');
 $stg_arr = array();
 $fkt_arr = array();
-
+$datum_obj = new datum();
 $fkt = new funktion();
 $fkt->getAll();
 
@@ -81,6 +82,10 @@ if($db->db_query($qry))
 		        <BNFUNKTION:semester><![CDATA['.$row->semester.']]></BNFUNKTION:semester>
 		        <BNFUNKTION:funktion_kurzbz><![CDATA['.$row->funktion_kurzbz.']]></BNFUNKTION:funktion_kurzbz>
 		        <BNFUNKTION:funktion><![CDATA['.$fkt_arr[$row->funktion_kurzbz].']]></BNFUNKTION:funktion>
+		        <BNFUNKTION:datum_von><![CDATA['.$datum_obj->convertISODate($row->datum_von).']]></BNFUNKTION:datum_von>
+		        <BNFUNKTION:datum_von_iso><![CDATA['.$row->datum_von.']]></BNFUNKTION:datum_von_iso>
+		        <BNFUNKTION:datum_bis><![CDATA['.$datum_obj->convertISODate($row->datum_bis).']]></BNFUNKTION:datum_bis>
+		        <BNFUNKTION:datum_bis_iso><![CDATA['.$row->datum_bis.']]></BNFUNKTION:datum_bis_iso>
 		     </RDF:Description>
 		  </RDF:li>';
 	}

@@ -55,6 +55,8 @@ if($db->db_query($qry))
 		     <RDF:Description  id="'.$row->funktion_kurzbz.'"  about="'.$rdf_url.'/'.$row->funktion_kurzbz.'" >
 		     	<FUNKTION:funktion_kurzbz><![CDATA['.$row->funktion_kurzbz.']]></FUNKTION:funktion_kurzbz>
 		        <FUNKTION:beschreibung><![CDATA['.$row->beschreibung.']]></FUNKTION:beschreibung>
+		        <FUNKTION:fachbereich><![CDATA['.($row->fachbereich=='t'?'true':'false').']]></FUNKTION:fachbereich>
+		        <FUNKTION:semester><![CDATA['.($row->semester=='t'?'true':'false').']]></FUNKTION:semester>
 		     </RDF:Description>
 		  </RDF:li>';
 	}

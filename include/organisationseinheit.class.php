@@ -37,6 +37,7 @@ class organisationseinheit extends basis_db
 	public $oe_parent_kurzbz;
 	public $bezeichnung;
 	public $organisationseinheittyp_kurzbz;
+	public $aktiv;
 	
 	/**
 	 * Konstruktor
@@ -65,6 +66,7 @@ class organisationseinheit extends basis_db
 				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = ($row->aktiv=='t'?true:false);
 				
 				$this->result[] = $obj;
 			}
@@ -104,6 +106,7 @@ class organisationseinheit extends basis_db
 			$this->bezeichnung = $row->bezeichnung;
 			$this->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 			$this->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+			$this->aktiv = ($row->aktiv=='t'?true:false);
 		}
 		else
 		{
@@ -133,6 +136,7 @@ class organisationseinheit extends basis_db
 				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = ($row->aktiv=='t'?true:false);
 				
 				$this->result[] = $obj;
 			}

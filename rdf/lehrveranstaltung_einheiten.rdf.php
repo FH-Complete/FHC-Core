@@ -145,6 +145,8 @@ if(!$result = $db->db_query($qry))
 							tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
 							tbl_lehreinheit.studiensemester_kurzbz=tbl_studiensemester.studiensemester_kurzbz AND
 							tbl_benutzerfunktion.oe_kurzbz=tbl_studiengang.oe_kurzbz AND
+							(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+							(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 							tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz ORDER BY tbl_studiensemester.ende DESC LIMIT 1 ) ";
 		
 		if(!$result_fbk = $db->db_query($qry_fbk))
