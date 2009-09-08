@@ -623,9 +623,17 @@ class mitarbeiter extends benutzer
 		if($fix=='false')
 			$qry .= " AND fixangestellt=false";
 		if($stgl)
-			$qry .= " AND funktion_kurzbz='stgl'";
+		{
+			$qry .= " AND funktion_kurzbz='stgl' 
+					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+		}
 		if($fbl)
-			$qry .= " AND funktion_kurzbz='fbl'";
+		{
+			$qry .= " AND funktion_kurzbz='fbl'
+					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+		}
 		if($aktiv=='true')
 			$qry .= " AND tbl_benutzer.aktiv=true";
 		if($aktiv=='false')
@@ -845,6 +853,8 @@ class mitarbeiter extends benutzer
 		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE funktion_kurzbz='oezuordnung' AND fachbereich_kurzbz='".addslashes($institut)."' 
+					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 					ORDER BY nachname, vorname";
 
 		if($this->db_query($sql_query))
@@ -901,11 +911,24 @@ class mitarbeiter extends benutzer
 		if (is_null($uid))
 			$uid=$this->uid;
 		// Suche in Instituten
-		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='fbl' LIMIT 1)
-						    WHEN oe_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=a.oe_kurzbz AND funktion_kurzbz='stgl' LIMIT 1)
+		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion 
+																	  WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND 
+																	  		funktion_kurzbz='fbl' AND 
+																	  		(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+																			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
+																	  LIMIT 1)
+							WHEN oe_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion 
+															 WHERE oe_kurzbz=a.oe_kurzbz AND 
+															 	   funktion_kurzbz='stgl' AND 
+															 	   (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+																   (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
+															 LIMIT 1)
 						    ELSE ''
 					   END as vorgesetzter
-						FROM public.tbl_benutzerfunktion a WHERE funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."'";
+						FROM public.tbl_benutzerfunktion a WHERE 
+						funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."' AND
+						(a.datum_von is null OR a.datum_von<=now()) AND
+						(a.datum_bis is null OR a.datum_bis>=now())";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -936,7 +959,9 @@ class mitarbeiter extends benutzer
 		
 		//Alle Studiengaenge und Fachbereiche holen bei denen die Person die Leitung hat
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."'";
+				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."' AND
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		
 		if($this->db_query($qry))
 		{
@@ -974,6 +999,8 @@ class mitarbeiter extends benutzer
 		if($oe!='')
 			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
 		
+		$qry.= " AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

@@ -65,6 +65,8 @@
 <td class="tdvertical" width="94%"><div align="center">
 
 <?php
+	if(isset($_REQUEST['lv']))
+		$lv = $_REQUEST['lv'];
 	$language='';
 	
 	if(isset($_GET['language']))
@@ -161,7 +163,7 @@
 	$titel_en = $lv_obj->bezeichnung_english;
 
 	if (!isset($lv))
-			$lv=0;
+		$lv=0;
 		
 	
 	//Zugeteilte Fachbereiche auslesen
@@ -203,7 +205,10 @@
 	while($row = $db->db_fetch_object($res))
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
-	$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche)";
+	$qry="SELECT vorname, nachname, fachbereich_kurzbz FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
+			WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche) AND 
+			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 	
 	if(!$res=$db->db_query($qry))
 		die('Fehler '.$db->errormsg);
@@ -225,6 +230,8 @@
 				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) ";
 
 	if(!$res=$db->db_query($qry))

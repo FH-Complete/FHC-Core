@@ -25,54 +25,46 @@
 /**
  * Changes:	23.10.2004: Anpassung an neues DB-Schema (WM)
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+if (!$db = new basis_db())
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-
-if (isset($_POST['type']) && $_POST['type']=='save')
-{
-	//Einfügen in die Datenbank
-	$sql_query="INSERT INTO public.tbl_funktion (beschreibung, funktion_kurzbz) VALUES ('".$_POST['bezeichnung']."', '".$_POST['kurzbz']."')";
-	$result=$db->db_query($sql_query);
-	if(!$result)
-		echo $db->db_last_error()."<br>";
-}
 $sql_query="SELECT funktion_kurzbz, beschreibung FROM public.tbl_funktion ORDER BY funktion_kurzbz";
 $result_funktion=$db->db_query($sql_query);
 if(!$result_funktion)
 	die("funktion not found!" .$db->db_last_error());
 ?>
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-	<title>Funktionen</title>
+	<title>Funktion</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-</head>
-
+	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <body>
-<H1>Funktionen</H1>
+<H2>Funktionen</H2>
 <h3>&Uuml;bersicht</h3>
-<table class="liste">
-<tr class="liste">
+<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+
 <?php
 if ($result_funktion!=0)
 {
 	$num_rows=$db->db_num_rows($result_funktion);
 	$num_fields=$db->db_num_fields($result_funktion);
-	
+
+	echo '<thead>
+			<tr>';
 	echo '<th></th>';
 	for ($i=0;$i<$num_fields; $i++)
-	    echo "<th>".$db->db_field_name($result_funktion,$i)."</th>";
-	echo '</tr>';
+	    echo "<th class='table-sortable:default'>".$db->db_field_name($result_funktion,$i)."</th>";
+	echo '</tr></thead><tbody>';
 	for ($j=0; $j<$num_rows;$j++)
 	{
 		$row=$db->db_fetch_row($result_funktion,$j);
 		
-		echo "<tr class='liste".($j%2)."'>";
+		echo "<tr>";
 		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
 	    for ($i=0; $i<$num_fields; $i++)
 			echo "<td>$row[$i]</td>";
@@ -82,17 +74,7 @@ if ($result_funktion!=0)
 else
 	echo "Kein Eintrag gefunden!";
 ?>
+</tbody>
 </table>
-<hr>
-<form action="funktion.php" method="post" name="lehrfach_neu" id="lehrfach_neu">
-  <p><b>Neue Funktion:</b>
-    <i>Kurzbezeichnung</i>
-    <input type="text" name="kurzbz" size="10" maxlength="10">
-	<i>Beschreibung</i>
-    <input type="text" name="bezeichnung" size="20" maxlength="50">
-    <input type="hidden" name="type" value="save">
-    <input type="submit" name="save" value="Speichern">
-  </p>
-</form>
 </body>
 </html>

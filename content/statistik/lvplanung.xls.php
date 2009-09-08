@@ -87,7 +87,10 @@ SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(pe
 		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
 		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
 		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' LIMIT 1
+		  								        funktion_kurzbz='fbk' AND
+		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
+											LIMIT 1
 		  								   )
 							)
 			) as koordinator,
@@ -247,7 +250,10 @@ if($result = $db->db_query($qry))
 		 		 WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
 		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
 		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' LIMIT 1
+		  								        funktion_kurzbz='fbk' AND 
+		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+											LIMIT 1
 		  								   )
 							)
 				) as koordinator, nachname, tbl_lehrfach.bezeichnung, 

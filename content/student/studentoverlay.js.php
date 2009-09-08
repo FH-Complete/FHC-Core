@@ -3401,7 +3401,7 @@ function StudentNotenDelete()
 	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	stsem = tree.view.getCellText(tree.currentIndex,col);
 	
-	if(confirm('Wollen Sie diese Note wirklich l�schen'))
+	if(confirm('Wollen Sie diese Note wirklich löschen'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');

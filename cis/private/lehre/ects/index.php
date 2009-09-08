@@ -463,7 +463,24 @@
 		echo "</td></tr>";
 
 	   //FB Leiter auslesen
-	   $qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id)";
+	   $qry = "SELECT 
+	   				distinct vorname, nachname 
+	   			FROM 
+	   				public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
+	   			WHERE 
+	   				funktion_kurzbz='fbl' AND 
+	   				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
+	   				fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz 
+	   										FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
+	   										WHERE lehrveranstaltung_id='$lv' AND 
+	   										studiensemester_kurzbz=(SELECT studiensemester_kurzbz 
+	   																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+	   																WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' 
+	   																ORDER BY ende DESC LIMIT 1
+	   																) 
+	   										AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id
+	   									  )";
 	   
 	   echo "<tr><td class='tdvertical'><b>Institutsleiter</b></td><td>";
 	   if($result=$db->db_query($qry))
@@ -488,6 +505,8 @@
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
 	   

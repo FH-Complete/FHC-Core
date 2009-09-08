@@ -19,12 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  */
-
-	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitsperre.class.php');
@@ -33,6 +28,9 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 $user = get_uid();
 

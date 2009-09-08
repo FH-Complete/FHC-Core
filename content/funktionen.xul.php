@@ -31,6 +31,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -92,6 +93,14 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion_kurzbz" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="funktion-treecol-datum_von" label="GueltigVon" flex="1" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von_iso" onclick="FunktionTreeSort()"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="funktion-treecol-datum_bis" label="GueltigBis" flex="1" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis_iso" onclick="FunktionTreeSort()"/>
+			<splitter class="tree-splitter"/>
 		</treecols>
 	
 		<template>
@@ -107,6 +116,8 @@ else
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#benutzerfunktion_id" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang_kz" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion_kurzbz" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis" />
 						</treerow>
 					</treeitem>
 				</treechildren>
@@ -143,6 +154,8 @@ else
 								<menupopup>
 									<menuitem value="rdf:http://www.technikum-wien.at/funktion/rdf#funktion_kurzbz"
 						        		      label="rdf:http://www.technikum-wien.at/funktion/rdf#beschreibung"
+						        		      fachbereich="rdf:http://www.technikum-wien.at/funktion/rdf#fachbereich"
+						        		      semester="rdf:http://www.technikum-wien.at/funktion/rdf#semester"
 									  		  uri="rdf:*"/>
 								</menupopup>
 							</template>
@@ -151,19 +164,29 @@ else
 					<row>
 						<label value="Organisationseinheit" control="funktion-menulist-oe_kurzbz"/>
 						<menulist id="funktion-menulist-oe_kurzbz" disabled="true"
+								  xmlns:ORGANISATIONSEINHEIT="http://www.technikum-wien.at/organisationseinheit/rdf#"
 						          datasources="<?php echo APP_ROOT;?>rdf/organisationseinheit.rdf.php" flex="1"
 						          ref="http://www.technikum-wien.at/organisationseinheit/liste" >
 							<template>
-								<menupopup>
-									<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
-						        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
-									  		  uri="rdf:*"/>
-									</menupopup>
+								<rule ORGANISATIONSEINHEIT:aktiv='false'>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
+										  		  uri="rdf:*" style="text-decoration:line-through;"/>
+										</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</rule>
 							</template>
 						</menulist>
 					</row>
 					<row>
-						<label value="Semester" control="funktion-menulist-semester"/>
+						<label id="funktion-label-semester" value="Semester" control="funktion-menulist-semester"/>
 						<menulist id="funktion-menulist-semester" disabled="true">
 							<menupopup>
 								<menuitem value="" label="-- Keine Auswahl --"/>
@@ -202,6 +225,18 @@ else
 								</rule>
 							</template>
 						</menulist>
+					</row>
+					<row>
+						<label value="Gültig von" control="funktion-box-datum_von"/>
+						<hbox>
+							<box class="Datum" id="funktion-box-datum_von" disabled="true"/>
+						</hbox>
+					</row>
+					<row>
+						<label value="Gültig bis" control="funktion-box-datum_bis"/>
+						<hbox>
+							<box class="Datum" id="funktion-box-datum_bis" disabled="true"/>
+						</hbox>
 					</row>
 				</rows>
 			</grid>

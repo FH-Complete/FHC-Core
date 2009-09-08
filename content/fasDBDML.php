@@ -353,7 +353,7 @@ if(!$error)
 			if(isset($_POST['neu']) && $_POST['neu']=='true')
 			{
 				$benutzerfunktion->new = true;
-				$bentuzerfunktion->insertamum=date('Y-m-d H:i:s');
+				$benutzerfunktion->insertamum=date('Y-m-d H:i:s');
 				$benutzerfunktion->insertvon = $user;
 			}
 			else 
@@ -388,6 +388,8 @@ if(!$error)
 				$benutzerfunktion->funktion_kurzbz = $_POST['funktion_kurzbz'];
 				$benutzerfunktion->updateamum = date('Y-m-d H:i:s');
 				$benutzerfunktion->updatevon = $user;
+				$benutzerfunktion->datum_von = $_POST['datum_von'];
+				$benutzerfunktion->datum_bis = $_POST['datum_bis'];
 				
 				if($benutzerfunktion->save())
 				{

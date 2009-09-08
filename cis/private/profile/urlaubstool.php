@@ -20,17 +20,18 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/zeitsperre.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/resturlaub.class.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/mitarbeiter.class.php');
-	require_once('../../../include/mail.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/zeitsperre.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/resturlaub.class.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/mail.class.php');
+
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 $content_resturlaub = '';
 $content = '';

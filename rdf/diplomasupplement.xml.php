@@ -166,7 +166,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 		}
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl'";
+		$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) 
+				WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl' AND
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		if($db->db_query($qry))
 		{
 			if($row1 = $db->db_fetch_object())

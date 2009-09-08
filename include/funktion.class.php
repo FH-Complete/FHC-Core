@@ -35,7 +35,8 @@ class funktion extends basis_db
 	public $beschreibung;		//  string
 	public $aktiv;				//  boolean
 	public $ext_id;				//  bigint
-
+	public $fachbereich;		//  boolean
+	public $semester;			//  boolean
 
 	/**
 	 * Konstruktor
@@ -72,9 +73,11 @@ class funktion extends basis_db
 		{
 			$funktion_obj = new funktion();
 
-			$funktion_obj->funktion_kurzbz 	= $row->funktion_kurzbz;
-			$funktion_obj->beschreibung    	= $row->beschreibung;
-			$funktion_obj->aktiv           		= $row->aktiv;
+			$funktion_obj->funktion_kurzbz = $row->funktion_kurzbz;
+			$funktion_obj->beschreibung = $row->beschreibung;
+			$funktion_obj->aktiv = $row->aktiv;
+			$funktion_obj->fachbereich = ($row->fachbereich=='t'?true:false);
+			$funktion_obj->semester = ($row->semester=='t'?true:false);
 
 			$this->result[] = $funktion_obj;
 		}
@@ -118,9 +121,11 @@ class funktion extends basis_db
 
 		if($row = $this->db_fetch_object())
 		{
-			$this->funktion_kurzbz	= $row->funktion_kurzbz;
-			$this->beschreibung		= $row->beschreibung;
-			$this->aktiv			= $row->aktiv;
+			$this->funktion_kurzbz = $row->funktion_kurzbz;
+			$this->beschreibung = $row->beschreibung;
+			$this->aktiv = $row->aktiv;
+			$this->fachbereich = ($row->fachbereich=='t'?true:false);
+			$this->semester = ($row->semester=='t'?true:false);
 		}
 		else
 		{
@@ -168,9 +173,11 @@ class funktion extends basis_db
 				return false;
 			}
 			//Neuen Datensatz anlegen
-			$qry = 'INSERT INTO public.tbl_funktion (funktion_kurzbz, beschreibung, aktiv) VALUES ('.
+			$qry = 'INSERT INTO public.tbl_funktion (funktion_kurzbz, beschreibung, fachbereich, semester, aktiv) VALUES ('.
 				$this->addslashes($this->funktion_kurzbz).', '.
 				$this->addslashes($this->beschreibung).', '.
+				($this->fachbereich?'true':'false').','.
+				($this->semester?'true':'false').','.
 				($this->aktiv?'true':'false').'); ';
 		}
 		else
@@ -186,6 +193,8 @@ class funktion extends basis_db
 
 			$qry = 'UPDATE public.tbl_funktion SET '.
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
+				'fachbereich='.($this->fachbereich?'true':'false').','.
+				'semester='.($this->semester?'true':'false').','.
 				'aktiv='.($this->aktiv?'true':'false') .' '.
 				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
 		}

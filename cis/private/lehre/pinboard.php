@@ -298,7 +298,7 @@ function show(id)
 
                 $stg_oe_obj = new studiengang($studiengang_kz);
                 //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl' LIMIT 1)";
+				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) LIMIT 1)";
 				if($result_course_leader = $db->db_query($qry))
 				{
 					$num_rows_course_leader = $db->db_num_rows($result_course_leader);
@@ -381,7 +381,7 @@ function show(id)
 			  	echo "<p>Stellvertreter:<br>";
 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' LIMIT 1) AND funktion_kurzbz='stglstv' LIMIT 1)";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' LIMIT 1) AND funktion_kurzbz='stglstv'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) LIMIT 1)";
 
 				if($result_course_leader_deputy = $db->db_query($sql_query))
 				{
@@ -465,8 +465,8 @@ function show(id)
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
                 //Sekritariat auslesen
 				$stg_oe_obj = new studiengang($studiengang_kz);
-				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='ass')";
-
+				$sql_query = "SELECT distinct * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid in (SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='ass' AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null))";
+				
 				if($result_course_secretary = $db->db_query($sql_query))
 				{
 					$num_rows_course_secretary = $db->db_num_rows($result_course_secretary);
@@ -666,7 +666,7 @@ function show(id)
             <tr>
               <td class="tdwrap">
                 <?php
-					echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="news://cis.technikum-wien.at/'.strtolower($short_long).'" class="Item" target="_blank">Newsgroups</a>';
+					echo '<img src="../../../skin/images/seperator.gif">&nbsp;<a href="news://news.technikum-wien.at/'.strtolower($short_long).'" class="Item" target="_blank">Newsgroups</a>';
 
 				?>
               </td>

@@ -89,9 +89,18 @@ $stgl='';
 $db = new basis_db();
 if($studiengang_kz!='')
 {
-	$qry = "SELECT titelpre, vorname, nachname, titelpost FROM public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer, public.tbl_studiengang WHERE
-			funktion_kurzbz='stgl' AND tbl_studiengang.studiengang_kz='".addslashes($studiengang_kz)."' AND tbl_studiengang.oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz
-			AND tbl_benutzerfunktion.uid=tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id";
+	$qry = "SELECT 
+				titelpre, vorname, nachname, titelpost 
+			FROM 
+				public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer, public.tbl_studiengang 
+			WHERE
+				funktion_kurzbz='stgl' AND 
+				tbl_studiengang.studiengang_kz='".addslashes($studiengang_kz)."' AND 
+				tbl_studiengang.oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz AND 
+				tbl_benutzerfunktion.uid=tbl_benutzer.uid AND 
+				tbl_benutzer.person_id=tbl_person.person_id AND
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 	if($db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object())

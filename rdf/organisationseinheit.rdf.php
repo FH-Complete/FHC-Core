@@ -57,6 +57,7 @@ foreach ($org->result as $oe)
     		<ORGANISATIONSEINHEIT:oe_parent_kurzbz><![CDATA['.$oe->oe_parent_kurzbz.']]></ORGANISATIONSEINHEIT:oe_parent_kurzbz>
     		<ORGANISATIONSEINHEIT:bezeichnung><![CDATA['.$oe->bezeichnung.']]></ORGANISATIONSEINHEIT:bezeichnung>
     		<ORGANISATIONSEINHEIT:organisationseinheittyp_kurzbz><![CDATA['.$oe->organisationseinheittyp_kurzbz.']]></ORGANISATIONSEINHEIT:organisationseinheittyp_kurzbz>
+    		<ORGANISATIONSEINHEIT:aktiv><![CDATA['.($oe->aktiv?'true':'false').']]></ORGANISATIONSEINHEIT:aktiv>
       	</RDF:Description>
   </RDF:li>';
 }

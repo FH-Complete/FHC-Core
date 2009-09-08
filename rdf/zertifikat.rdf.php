@@ -166,10 +166,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			die('Student not found');
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$stgl_query = "SELECT titelpre, titelpost, vorname, nachname FROM tbl_person, tbl_benutzer, tbl_benutzerfunktion 
-						WHERE tbl_person.person_id = tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_benutzerfunktion.uid 
-						AND tbl_benutzerfunktion.funktion_kurzbz = 'stgl' 
-						AND tbl_benutzerfunktion.oe_kurzbz = '".$stg_oe_obj->oe_kurzbz."'";
+		$stgl_query = "SELECT 
+							titelpre, titelpost, vorname, nachname 
+						FROM 
+							tbl_person, tbl_benutzer, tbl_benutzerfunktion 
+						WHERE 
+							tbl_person.person_id = tbl_benutzer.person_id AND 
+							tbl_benutzer.uid = tbl_benutzerfunktion.uid AND 
+							tbl_benutzerfunktion.funktion_kurzbz = 'stgl' AND 
+							tbl_benutzerfunktion.oe_kurzbz = '".$stg_oe_obj->oe_kurzbz."' AND
+							(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+							(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		if($db->db_query($stgl_query))
 			$stgl_row = $db->db_fetch_object();
 		else
@@ -183,7 +190,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
-		$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname."</studiengangsleiter>";
+		if(isset($stgl_row->nachname))
+			$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname."</studiengangsleiter>";
+		else 
+			$xml .= "		<studiengangsleiter></studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		

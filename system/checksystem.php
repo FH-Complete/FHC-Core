@@ -38,16 +38,41 @@ echo '<H2>DB-Updates!</H2>';
 // ********************** Pruefungen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
-/*
-if(!$result = @$db->db_query("SELECT nachname FROM public.tbl_person LIMIT 1;"))
+
+if(!$result = @$db->db_query("SELECT aktiv FROM public.tbl_organisationseinheit LIMIT 1;"))
 {
-	$qry = '--UPDATE';
+	$qry = 'ALTER TABLE public.tbl_organisationseinheit ADD COLUMN aktiv boolean;
+			UPDATE public.tbl_organisationseinheit SET aktiv=true;
+			ALTER TABLE public.tbl_organisationseinheit ALTER COLUMN aktiv SET DEFAULT true;
+			ALTER TABLE public.tbl_organisationseinheit ALTER COLUMN aktiv SET NOT NULL;';
 	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
+		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
 	else 
-		echo ' public.tbl_person: Tabellen hinzugefuegt!<br>';
+		echo ' public.tbl_organisationseinheit: Spalte aktiv hinzugefuegt!<br>';
 }
-*/
+
+if(!$result = @$db->db_query("SELECT fachbereich FROM public.tbl_funktion LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_funktion ADD COLUMN fachbereich boolean;
+			UPDATE public.tbl_funktion SET fachbereich=false;
+			ALTER TABLE public.tbl_funktion ALTER COLUMN fachbereich SET DEFAULT false;
+			ALTER TABLE public.tbl_funktion ALTER COLUMN fachbereich SET NOT NULL;
+			
+			ALTER TABLE public.tbl_funktion ADD COLUMN semester boolean;
+			UPDATE public.tbl_funktion SET semester=false;
+			ALTER TABLE public.tbl_funktion ALTER COLUMN semester SET DEFAULT false;
+			ALTER TABLE public.tbl_funktion ALTER COLUMN semester SET NOT NULL;
+			
+			UPDATE public.tbl_funktion SET semester=true WHERE funktion_kurzbz='stdv';
+			UPDATE public.tbl_funktion SET semester=true WHERE funktion_kurzbz='oeh-kandidatur';			
+			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbk';
+			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbl';";
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_funktion: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_funktion: Spalte funktion und semester hinzugefuegt!<br>';
+}
+
 
 $tabellen=array(
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
@@ -137,8 +162,7 @@ $tabellen=array(
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam"),
-	"public.tbl_benutzerberechtigung"  => array("benutzerberechtigung_id","art","fachbereich_kurzbz","studiengang_kz","berechtigung_kurzbz","uid","studiensemester_kurzbz","start","ende","updateamum","updatevon","insertamum","insertvon"),
-	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","studiengang_kz","funktion_kurzbz","semester","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"public.tbl_betriebsmittel"  => array("betriebsmittel_id","beschreibung","betriebsmitteltyp","nummer","nummerintern","reservieren","ort_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -149,10 +173,10 @@ $tabellen=array(
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
-	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id"),
+	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_firma"  => array("firma_id","name","adresse","email","telefon","fax","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
-	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv"),
+	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","firma_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
@@ -163,6 +187,8 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_kurzbz","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_kurzbz","telefonklappe"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
+	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv"),
+	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung"),
 	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
@@ -177,7 +203,7 @@ $tabellen=array(
 	"public.tbl_standort"  => array("standort_kurzbz","adresse_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle","sprache","testtool_sprachwahl"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
@@ -186,7 +212,7 @@ $tabellen=array(
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
 	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon"),
-	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab"),
+	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
 	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester"),
@@ -194,6 +220,10 @@ $tabellen=array(
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
+	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon"),
+	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
+	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
+	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 );
 
 $tabs=array_keys($tabellen);

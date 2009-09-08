@@ -32,7 +32,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <head>
 <title>Koordinatorstunden</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
+<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+</head>
+<body>';
 
 $user = get_uid();
 loadVariables($user);
@@ -43,7 +47,7 @@ if(isset($_GET['fachbereich_kurzbz']))
 else 
 	die('Falsche Parameteruebergabe');
 	
-echo '<h1>Koordinatorstunden - Fachbereich '.$fachbereich_kurzbz.'</h1>';
+echo '<h2>Koordinatorstunden - Fachbereich '.$fachbereich_kurzbz.'</h2>';
 
 $stg_arr = array();
 $data = array();
@@ -83,7 +87,9 @@ $qry = "SELECT
 			tbl_benutzer.person_id=tbl_person.person_id AND
 			tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
 			tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
-			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'
+			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 		ORDER BY tbl_lehreinheit.lehreinheit_id, nachname, vorname
 		";
 
@@ -108,19 +114,30 @@ if($db->db_query($qry))
 	}
 }
 
-echo '<table class="liste"><tr class="liste"><th>Name</th><th>Studiengang</th><th>Stunden</th></tr>';
+echo '<br /><table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+		<thead>
+			<tr class="liste">
+				<th class="table-sortable:default">Name</th>
+				<th class="table-sortable:default">Studiengang</th>
+				<th class="table-sortable:numeric">Stunden</th>
+			</tr>
+		</thead>
+		<tbody>';
 
 $i=0;
 foreach ($name as $uid=>$row) 
 {		
 	foreach ($data[$uid] as $stg=>$row2)	
 	{
-		echo '<tr class="liste'.($i%2).'"><td>'.$name[$uid]['vorname'].' '.$name[$uid]['nachname'].
-			 '</td><td>'.$stg_arr[$stg].'</td><td>'.$row2.'</td></tr>';
+		echo '<tr>
+				<td>'.$name[$uid]['vorname'].' '.$name[$uid]['nachname'].'</td>
+				<td>'.$stg_arr[$stg].'</td>
+				<td>'.$row2.'</td>
+			  </tr>';
 		$i++;
 	}
 }
-echo '</table>';
+echo '</tbody></table>';
 ?>
 </body>
 </html>

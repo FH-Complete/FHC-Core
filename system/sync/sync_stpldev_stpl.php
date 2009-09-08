@@ -530,7 +530,7 @@ if ($sendmail)
 {
 	foreach ($message as $msg)
 	{
-		$mail = new mail($msg->mailadress,'stpl@technikum-wien.at','Stundenplan update','');
+		$mail = new mail($msg->mailadress,'no-reply@technikum-wien.at','Stundenplan update','');
 		$mail->setHTMLContent($msg->message_begin.$msg->message);
 		if ($mail->send())
 		{
