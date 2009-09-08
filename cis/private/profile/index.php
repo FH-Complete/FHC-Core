@@ -21,17 +21,16 @@
  *          Gerald Simane-Sequens <	gerald.simane-sequens@technikum-wien.at>.
  */
 	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/globals.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/fckeditor/fckeditor.php');
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/safehtml/safehtml.class.php');
-		
+
+	if (!$db = new basis_db())
+		die('Fehler beim Oeffnen der Datenbankverbindung');
+      
 	$uid=get_uid();
 	$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
 	if(isset($_GET['uid']))
@@ -278,16 +277,20 @@ function RefreshImage()
 		{
 			//Funktionen
 			$qry = "SELECT 
-						*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, 
+						*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
 						tbl_fachbereich.bezeichnung as bezeichnung, tbl_benutzerfunktion.semester
 					FROM 
-						public.tbl_benutzerfunktion JOIN public.tbl_funktion USING(funktion_kurzbz) 
+						public.tbl_benutzerfunktion 
+						JOIN public.tbl_funktion USING(funktion_kurzbz) 
+						JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 						LEFT JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
 						LEFT JOIN public.tbl_studiengang ON(tbl_benutzerfunktion.oe_kurzbz=tbl_studiengang.oe_kurzbz) 
 					WHERE 
 						uid='$uid' AND 
 						(tbl_fachbereich.aktiv=true OR fachbereich_kurzbz is null) AND 
-						(tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.oe_kurzbz is null)";
+						(tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.oe_kurzbz is null) AND
+						(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+						(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 			if($result_funktion = $db->db_query($qry))
 			{
 				if($db->db_num_rows($result_funktion)>0)
@@ -296,7 +299,7 @@ function RefreshImage()
 
 					while($row_funktion = $db->db_fetch_object($result_funktion))
 					{
-						echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td>".$row_funktion->oe_kurzbz."</td><td>$row_funktion->semester</td><td>$row_funktion->bezeichnung</td></tr>";
+						echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->bezeichnung</td></tr>";
 					}
 					echo '</table>';
 				}

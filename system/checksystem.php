@@ -66,7 +66,8 @@ if(!$result = @$db->db_query("SELECT fachbereich FROM public.tbl_funktion LIMIT 
 			UPDATE public.tbl_funktion SET semester=true WHERE funktion_kurzbz='stdv';
 			UPDATE public.tbl_funktion SET semester=true WHERE funktion_kurzbz='oeh-kandidatur';			
 			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbk';
-			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbl';";
+			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbl';
+			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='oezuordnung';";
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_funktion: '.$db->db_last_error().'</strong><br>';
 	else 
