@@ -64,6 +64,7 @@ $sql_query = "SELECT *
 			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
 			LEFT JOIN public.tbl_studiengang using(studiengang_kz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
+			AND tbl_benutzer.aktiv 
 			AND lehre.tbl_projektarbeit.note IS NULL 
 			AND public.tbl_studiengang.studiengang_kz='$stg_kz'   
 			ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy 
