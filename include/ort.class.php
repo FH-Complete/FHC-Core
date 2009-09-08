@@ -161,9 +161,9 @@ class ort extends basis_db
 			$this->errormsg = 'Planbezeichnung darf nicht laenger als 30 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->ort_kurzbz)>8)
+		if(mb_strlen($this->ort_kurzbz)>16)
 		{
-			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 8 Zeichen sein';
+			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if($this->ort_kurzbz == '')
