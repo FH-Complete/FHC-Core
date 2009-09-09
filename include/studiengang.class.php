@@ -307,7 +307,7 @@ class studiengang extends basis_db
 				'telefon='.$this->addslashes($this->telefon).', '.
 				'orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).', '.
 				'aktiv='.$this->addslashes($this->aktiv).', '.
-				'oe_kurzbz='.$this->oe_kurzbz.','.
+				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
 				'zusatzinfo_html='.$this->addslashes($this->zusatzinfo_html).' '.
 				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
 		}

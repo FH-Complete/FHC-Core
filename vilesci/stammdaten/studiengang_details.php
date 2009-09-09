@@ -64,6 +64,7 @@
 	$ext_id = '';
 	$aktiv = "t";
 	$neu = "true";
+	$oe_kurzbz='';
 	
 	if(isset($_POST["schick"]))
 	{
@@ -86,6 +87,7 @@
 		$bescheidgz = $_POST["bescheidgz"];
 		$bescheidvom = $_POST["bescheidvom"];
 		$organisationsform = $_POST["organisationsform"];
+		$oe_kurzbz = $_POST["oe_kurzbz"];
 		$titelbescheidvom = $_POST["titelbescheidvom"];
 		$zusatzinfo_html = $_POST['zusatzinfo_html'];
 		if(isset($_POST["aktiv"]))
@@ -116,8 +118,9 @@
 		$sg_update->orgform_kurzbz = $organisationsform;
 		$sg_update->titelbescheidvom = $titelbescheidvom;
 		$sg_update->zusatzinfo_html = $zusatzinfo_html;
-		$sg_update->aktiv = $aktiv;
+		$sg_update->aktiv = ($aktiv=='t'?true:false);
 		$sg_update->ext_id = $ext_id;
+		$sg_update->oe_kurzbz = $oe_kurzbz;
 
 		if ($_POST["neu"] == "true")
 			$sg_update->new = 1;
@@ -162,6 +165,7 @@
 		$zusatzinfo_html = $sg->zusatzinfo_html;
 		$ext_id = $sg->ext_id;
 		$aktiv = $sg->aktiv;
+		$oe_kurzbz = $sg->oe_kurzbz;
 		$neu = "false";
 	}
 	
@@ -308,6 +312,7 @@
 	$htmlstr .= "					<td>Titelbescheidvom</td>\n";
 	$htmlstr .= "					<td><input class='detail' type='text' name='titelbescheidvom' size='16' maxlength='10' value='".$titelbescheidvom."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
+	
 	$htmlstr .= "			</table>\n";
 
 	$htmlstr .= "		</td>\n";
@@ -342,7 +347,7 @@
 
 	$htmlstr .= "	</tr>";
 	$htmlstr .= "	<tr>";
-	$htmlstr .= "		<td colspan='3'>";
+	$htmlstr .= "		<td colspan='2'>";
 	$htmlstr .= "			<table>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Zusatzinfo</td>\n";
@@ -350,6 +355,22 @@
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "			</table>\n";
 	$htmlstr .= "		</td>";
+	$htmlstr .= "		<td valign='top'>Organisationseinheit<br>\n";
+	$htmlstr .= "		<SELECT name='oe_kurzbz' onchange='submitable()'>";
+	$qry = "SELECT oe_kurzbz, organisationseinheittyp_kurzbz, bezeichnung FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, bezeichnung";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			if($row->oe_kurzbz == $oe_kurzbz)
+				$selected = 'selected';
+			else 
+				$selected = '';
+			
+			$htmlstr .= "			<option value='$row->oe_kurzbz' $selected>$row->organisationseinheittyp_kurzbz $row->bezeichnung</option>";
+		}
+	}
+	$htmlstr .= "                  </SELECT></td>\n";
 	$htmlstr .= "	</tr>";
 	$htmlstr .= "</table>\n";
 	$htmlstr .= "<br>\n";
