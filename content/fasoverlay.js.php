@@ -805,7 +805,7 @@ function StatistikPrintLVPlanungExcel()
 		var col;
 		col = tree.columns ? tree.columns["uid"] : "uid";
 		var uid=tree.view.getCellText(tree.currentIndex,col);
-		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung..xls.php?uid='+uid+'&studiensemester_kurzbz='+studiensemester;
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?uid='+uid+'&studiensemester_kurzbz='+studiensemester;
 	}
 	window.open(url,'LV-Planung');
 }

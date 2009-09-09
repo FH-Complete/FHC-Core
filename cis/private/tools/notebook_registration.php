@@ -253,7 +253,7 @@
 			else if ($error == 3)
 				echo '<h3>Die MAC Adresse ist bereits in Verwendung, bitte melden Sie sich bei der ITS <a href="mailto:its@technikum-wien.at">its@technikum-wien.at</a></h3>';
 
-		  	if(isset($mac_result))
+		  	if(isset($mac_result) && $mac_result!='')
 			{
 				if($mac_result == 0)
 				{
