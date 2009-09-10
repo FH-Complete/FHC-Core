@@ -319,7 +319,7 @@
 	{
 		$veranstaltung=array();
 	}
-
+	
 #	var_dump($veranstaltung);
 #	exit;
 
