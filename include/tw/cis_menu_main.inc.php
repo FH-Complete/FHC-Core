@@ -328,7 +328,7 @@
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/softgrid2.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;SoftGrid</a></td>
+				<td class="tdwrap"><a class="Item" href="private/info/softgrid2.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;App-V&nbsp;(SoftGrid)</a></td>
 			</tr>
 			<tr>
   					<td class="tdwidth10" nowrap>&nbsp;</td>
