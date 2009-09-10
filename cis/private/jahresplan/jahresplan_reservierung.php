@@ -331,7 +331,7 @@
 		{	
 			$showHTML.='
 			<tr '.($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ').'>
-			<form name="selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle" target="_self" action="'. $_SERVER['PHP_SELF'] .'"  method="post" enctype="multipart/form-data">
+			<form  accept-charset="UTF-8" name="selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle" target="_self" action="'. $_SERVER['PHP_SELF'] .'"  method="post" enctype="multipart/form-data">
 				<td align="center"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">alle</a></td>
 				<td>'. implode("</td><td>",explode('|',$lastkey)).'</td>
 					<td colspan="5">

@@ -87,7 +87,6 @@
 					$string = fread($fp, filesize($filename));
 					fclose($fp);
 					if (isset($fp)) unset($fp);
-					
 					$_REQUEST["bild"]=base64_encode($string);
 				}	
 			}
@@ -220,7 +219,7 @@
 		
 		?>
 			     
-		<form name="selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
+		<form accept-charset="UTF-8" name="selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 		<tr <?php echo ($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ');?> >
 	
 			<td>

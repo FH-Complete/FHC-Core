@@ -391,7 +391,7 @@
   <fieldset>
     <legend><?php echo (!empty($veranstaltung_id)?"Datenpflege ID $veranstaltung_id":' Neuanlage '); ?><font style="font-size:xx-small;">&nbsp;durch&nbsp;<?php echo $userNAME; ?>&nbsp;</font></legend>
 
-		<form name="selVeranstaltung" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
+		<form accept-charset="UTF-8" name="selVeranstaltung" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 			<table cellpadding="10" cellspacing="0">
 	
 				<tr>
