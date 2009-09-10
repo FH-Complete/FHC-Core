@@ -640,32 +640,31 @@ function jahresplan_veranstaltungskategorie_kalendererzeugen($veranstaltung_tabe
 		$iTmpInitDay=mktime(0, 0, 0, $iTmpMonat  ,1, $Jahr);
 		if ($iTmpTagNr!=1)
 		{
-			$iTmpInitDay=mktime(0, 0, 0, $iTmpMonat  ,(1 - ($iTmpTagNr==0?7:$iTmpTagNr) )+1, $Jahr);
+			$iTmpInitDay=mktime(0, 0, 0, $iTmpMonat  ,(1 - ($iTmpTagNr==0?7:$iTmpTagNr)) + 1, $Jahr);
+			if (empty($iTmpInitDay))
+				die("<p>Fehler bei Monat $iTmpZwMonat ,Tag  (1 - ($iTmpTagNr==0?7:$iTmpTagNr) )+1, Jahr  $Jahr </p>");
+			
 		}
 
 		// KalenderInit
 		if ($iTmpMinKW>$iTmpMaxKW)
 		{
-		  	for ($iTmpWoche=$iTmpMinKW;$iTmpWoche<=53;$iTmpWoche++)
+			$iTmpWoche=$iTmpMinKW;
+			$veranstaltung_kalender[$Jahr]['VerarbeitenWochen'][$iTmpMonat][]=$iTmpWoche;
+			for ($iTmpTag=0;$iTmpTag<7;$iTmpTag++)
 			{
-				$iTmpWoche=$iTmpMinKW;
-				$veranstaltung_kalender[$Jahr]['VerarbeitenWochen'][$iTmpMonat][]=$iTmpWoche;
-				for ($iTmpTag=0;$iTmpTag<7;$iTmpTag++)
-				{
-					$iTmpZwTag=(int)date('d',$iTmpInitDay);
-					$iTmpZwMonat=(int)date('m',$iTmpInitDay);
-					$iTmpZwWoche=(int)date('W',$iTmpInitDay);
-					$iTmpZwWochentag=(int)date('w',$iTmpInitDay);
-					$iTmpZwWochentagname=date('D',$iTmpInitDay);
-					$iTmpZw_jjjjmmtt=date('Ymd',$iTmpInitDay);
+				$iTmpZwTag=(int)date('d',$iTmpInitDay);
+				$iTmpZwMonat=(int)date('m',$iTmpInitDay);
+				$iTmpZwWoche=(int)date('W',$iTmpInitDay);
+				$iTmpZwWochentag=(int)date('w',$iTmpInitDay);
+				$iTmpZwWochentagname=date('D',$iTmpInitDay);
+				$iTmpZw_jjjjmmtt=date('Ymd',$iTmpInitDay);
 	
-					$veranstaltung_kalender[$Jahr][$iTmpMonat]['WochenTimestamp'][$iTmpWoche][$iTmpTag]=$iTmpInitDay;
-					$veranstaltung_kalender[$Jahr][$iTmpMonat]['WochenTimestampDatum'][$iTmpWoche][$iTmpTag]=$iTmpZw_jjjjmmtt;
-					$veranstaltung_kalender[$Jahr][$iTmpMonat]['WochenTag'][$iTmpWoche][$iTmpZwWochentag]=array();
-					if (!$iTmpInitDay=mktime(0, 0, 0, $iTmpZwMonat ,$iTmpZwTag +1, date('Y',$iTmpInitDay)))
-						break;	
-				}
-			}	
+				$veranstaltung_kalender[$Jahr][$iTmpMonat]['WochenTimestamp'][$iTmpWoche][$iTmpTag]=$iTmpInitDay;
+				$veranstaltung_kalender[$Jahr][$iTmpMonat]['WochenTimestampDatum'][$iTmpWoche][$iTmpTag]=$iTmpZw_jjjjmmtt;
+				$veranstaltung_kalender[$Jahr][$iTmpMonat]['WochenTag'][$iTmpWoche][$iTmpZwWochentag]=array();
+				$iTmpInitDay=mktime(0, 0, 0, $iTmpZwMonat ,($iTmpZwTag + 1), date('Y',$iTmpInitDay));
+			}
 			$iTmpMinKW=1;
 		}
 
