@@ -195,17 +195,25 @@ if(count($preinteressent->result)>0)
 		echo $stgs;
 		echo '</td>';
 		echo '<td>';
-		$firma = new firma();
-		$firma->load($row->firma_id);
-		$adresse = new adresse();
-		$adresse->load_firma($row->firma_id);
-		if(isset($adresse->result[0]))
+		if($row->firma_id)
 		{
-			$plz = $adresse->result[0]->plz;
-			$ort = $adresse->result[0]->ort;
+			$firma = new firma();
+			$firma->load($row->firma_id);
+			$adresse = new adresse();
+			$adresse->load_firma($row->firma_id);
+			if(isset($adresse->result[0]))
+			{
+				$plz = $adresse->result[0]->plz;
+				$ort = $adresse->result[0]->ort;
+			}
+			else 
+			{
+				$plz='';
+				$ort='';
+			}
+				
+			echo $plz.' '.$ort.' '.$firma->name." ($firma->firmentyp_kurzbz)";
 		}
-			
-		echo '<a href="../stammdaten/firma_details.php?firma_id='.$firma->firma_id.'" class="Item">'.$plz.' '.$ort.' '.$firma->name." ($firma->firmentyp_kurzbz)</a>";
 		echo '</td>';
 		echo '</tr>';
 	}

@@ -293,7 +293,7 @@ foreach ($preinteressent->result as $row)
 			$ort = $adresse->result[0]->ort;
 		}
 			
-		echo '<br /><b>Schule:</b> <a href="../stammdaten/firma_details.php?firma_id='.$firma->firma_id.'" class="Item">'.$plz.' '.$ort.' '.$firma->name." ($firma->firmentyp_kurzbz)</a>";
+		echo '<br /><b>Schule:</b>'.$plz.' '.$ort.' '.$firma->name." ($firma->firmentyp_kurzbz)";
 	}
 	echo "</td>";
 	echo "<td>";
