@@ -92,7 +92,7 @@
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Ing. Lechner Martin, BSc</td>
+			  <td width="260" class='tdwrap'>Stroppa Alexander</td>
 			  <td width="50" class='tdwrap'>240</td>
 			  <td class='tdwrap'></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -193,6 +193,13 @@
 			<tr>
 		      <td width="260" class='tdwrap'>Weigl Harald</td>
 		      <td width="50" class='tdwrap'>253</td>
+			  <td  class='tdwrap'></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+			</tr>
+			<tr>
+		      <td width="260" class='tdwrap'>Jozsa Franz</td>
+		      <td width="50" class='tdwrap'>&nbsp;</td>
 			  <td  class='tdwrap'></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>

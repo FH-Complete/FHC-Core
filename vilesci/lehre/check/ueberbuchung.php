@@ -137,10 +137,11 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				AND studiengang_kz='".addslashes($studiengang_kz)."' AND
 				semester='".addslashes($semester)."'";
-		if($verband!='')
-			$qry.=" AND verband='".addslashes($verband)."'";
-		if($gruppe!='')
-			$qry.=" AND gruppe='".addslashes($gruppe)."'";
+		if(trim($verband)!='')
+			$qry.=" AND trim(verband)=trim('".addslashes($verband)."')";
+		if(trim($gruppe)!='')
+			$qry.=" AND trim(gruppe)=trim('".addslashes($gruppe)."')";
+		
 	}
 	else 
 	{
@@ -177,7 +178,18 @@ if($result = $db->db_query($qry))
 				$gruppen = mb_substr($gruppen, 0, mb_strlen($gruppen)-2);
 				if($anzahl_studenten>$ort[$lastort]->max_person)
 				{
-					echo "<tr><td>$lastdatum</td><td>$laststunde</td><td>$lastort</td><td>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td></tr>";
+					$diff = $anzahl_studenten-$ort[$lastort]->max_person;
+					
+					$style='';
+					if($diff>=2)
+						$style='style="background-color: ff6c00;"';
+					if($diff>=4)
+						$style='style="background-color: ff5400;"';
+					if($diff>=6)
+						$style='style="background-color: e83700;"';
+					if($diff>=8)
+						$style='style="background-color: a00404;"';
+					echo "<tr><td>$lastdatum</td><td>$laststunde</td><td>$lastort</td><td $style>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td></tr>";
 				}
 				$anzahl_studenten=0;
 				$gruppen='';

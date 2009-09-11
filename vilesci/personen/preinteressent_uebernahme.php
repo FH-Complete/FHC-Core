@@ -21,18 +21,19 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/preinteressent.class.php');
 require_once('../../include/person.class.php');
+require_once('../../include/firma.class.php');
+require_once('../../include/adresse.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/prestudent.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 
 
@@ -276,7 +277,25 @@ foreach ($preinteressent->result as $row)
 	echo "<td>$person->vorname</td>";
 	echo "<td>$person->gebdatum</td>";
 	echo "<td>$row->studiensemester_kurzbz</td>";
-	echo "<td>$row->anmerkung</td>";
+	echo "<td>$row->anmerkung";
+	
+	if($row->firma_id!='')
+	{
+		$plz='';
+		$ort='';
+		$firma = new firma();
+		$firma->load($row->firma_id);
+		$adresse = new adresse();
+		$adresse->load_firma($row->firma_id);
+		if(isset($adresse->result[0]))
+		{
+			$plz = $adresse->result[0]->plz;
+			$ort = $adresse->result[0]->ort;
+		}
+			
+		echo '<br /><b>Schule:</b> <a href="../stammdaten/firma_details.php?firma_id='.$firma->firma_id.'" class="Item">'.$plz.' '.$ort.' '.$firma->name." ($firma->firmentyp_kurzbz)</a>";
+	}
+	echo "</td>";
 	echo "<td>";
 	
 	//Suchen ob diese Person schon existiert
