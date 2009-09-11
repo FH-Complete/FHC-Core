@@ -84,7 +84,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-statistic-lehrauftragsliste:command" oncommand="StatistikPrintLehrauftragsliste();"/>
   <command id="menu-statistic-projektarbeit:command" oncommand="StatistikPrintProjektarbeit();"/>
   <command id="menu-statistic-abschlusspruefung:command" oncommand="StatistikPrintAbschlusspruefung();"/>
-  <command id="menu-statistic-bewerberstatistik:command" oncommand="StatistikPrintBewerberstatistik();"/>
+  <command id="menu-statistic-bewerberstatistik-html:command" oncommand="StatistikPrintBewerberstatistik('');"/>
+  <command id="menu-statistic-bewerberstatistik-excel:command" oncommand="StatistikPrintBewerberstatistik('xls');"/>
   <command id="menu-statistic-abgaengerstatistik:command" oncommand="StatistikPrintAbgaengerstatistik();"/>
   <command id="menu-statistic-fehlendedokumente:command" oncommand="StatistikPrintFehlendeDokumente();"/>
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
@@ -372,12 +373,22 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 						';
 					}
 					?>
-					 <menuitem
-		               id        =  "menu-statistic-bewerberstatistik"
-		               key       =  "menu-statistic-bewerberstatistik:key"
-		               label     = "&menu-statistic-bewerberstatistik.label;"
-		               command   =  "menu-statistic-bewerberstatistik:command"
-		               accesskey = "&menu-statistic-bewerberstatistik.accesskey;"/>
+					<menu id="menu-statistic-substatistik-bewerberstatistik" label="&menu-statistic-substatistik-bewerberstatistik.label;" accesskey="&menu-statistic-substatistik-bewerberstatistik.accesskey;">
+						<menupopup id="menu-statistic-substatistik-bewerberstatistik-popup">
+				             <menuitem
+				               id        =  "menu-statistic-bewerberstatistik-html"
+				               key       =  "menu-statistic-bewerberstatistik-html:key"
+				               label     = "&menu-statistic-bewerberstatistik-html.label;"
+				               command   =  "menu-statistic-bewerberstatistik-html:command"
+				               accesskey = "&menu-statistic-bewerberstatistik-html.accesskey;"/>
+				             <menuitem
+				               id        =  "menu-statistic-bewerberstatistik-excel"
+				               key       =  "menu-statistic-bewerberstatistik-excel:key"
+				               label     = "&menu-statistic-bewerberstatistik-excel.label;"
+				               command   =  "menu-statistic-bewerberstatistik-excel:command"
+				               accesskey = "&menu-statistic-bewerberstatistik-excel.accesskey;"/>
+		               </menupopup>
+					</menu>
 					<menuitem
 		               id        =  "menu-statistic-abgaengerstatistik"
 		               key       =  "menu-statistic-abgaengerstatistik:key"

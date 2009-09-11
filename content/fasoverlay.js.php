@@ -941,11 +941,13 @@ function StatistikPrintNotenspiegel(typ)
 // ****
 // * Liefert eine statistik ueber die Anzahl der Interessenten/Bewerber Studenten
 // ****
-function StatistikPrintBewerberstatistik()
+function StatistikPrintBewerberstatistik(typ)
 {
 	var stsem = getStudiensemester();
 
-	window.open('<?php echo APP_ROOT ?>content/statistik/bewerberstatistik.php?stsem='+stsem,'Bewerberstatistik');
+	if(typ=='xls')
+		typ='&excel=true';
+	window.open('<?php echo APP_ROOT ?>content/statistik/bewerberstatistik.php?stsem='+stsem+typ,'Bewerberstatistik');
 }
 
 // ****
