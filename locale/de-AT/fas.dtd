@@ -106,9 +106,16 @@
 <!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
 <!ENTITY menu-statistic-notenspiegel.accesskey	"H">
 
-<!ENTITY menu-statistic-bewerberstatistik.key		"E">
-<!ENTITY menu-statistic-bewerberstatistik.label		"Bewerberstatistik">
-<!ENTITY menu-statistic-bewerberstatistik.accesskey	"E">
+<!ENTITY menu-statistic-substatistik-bewerberstatistik.label		"Bewerberstatistik">
+<!ENTITY menu-statistic-substatistik-bewerberstatistik.accesskey	"B">
+
+<!ENTITY menu-statistic-bewerberstatistik-html.key			"H">
+<!ENTITY menu-statistic-bewerberstatistik-html.label		"HTML">
+<!ENTITY menu-statistic-bewerberstatistik-html.accesskey	"H">
+
+<!ENTITY menu-statistic-bewerberstatistik-excel.key			"E">
+<!ENTITY menu-statistic-bewerberstatistik-excel.label		"EXCEL">
+<!ENTITY menu-statistic-bewerberstatistik-excel.accesskey	"E">
 
 <!ENTITY menu-statistic-substatistik.key		"S">
 <!ENTITY menu-statistic-substatistik.label		"Statistik">
