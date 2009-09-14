@@ -982,6 +982,15 @@ function StatistikPrintAbsolventenstatistik()
 }
 
 // ****
+// * Liefert eine Statistik ueber die Anzahl der Absolventen
+// ****
+function StatistikPrintAbsolventenZahlen()
+{
+	window.open('<?php echo APP_ROOT ?>content/statistik/absolventenzahlen.php','Absolventenzahlen');
+}
+
+
+// ****
 // * Liefert eine statistik ueber die Anzahl und Verteilung der Studenten auf die Studiengaenge
 // ****
 function StatistikPrintStudentenstatistik()

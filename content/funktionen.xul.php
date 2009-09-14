@@ -93,11 +93,11 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion_kurzbz" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="funktion-treecol-datum_von" label="GueltigVon" flex="1" hidden="true"
+			<treecol id="funktion-treecol-datum_von" label="GueltigVon" flex="1" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von_iso" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="funktion-treecol-datum_bis" label="GueltigBis" flex="1" hidden="true"
+			<treecol id="funktion-treecol-datum_bis" label="GueltigBis" flex="1" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis_iso" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
