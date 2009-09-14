@@ -110,7 +110,7 @@ function check_lektor_lehrveranstaltung($uid, $lehrveranstaltung_id, $studiensem
 		// Wenn kein ergebnis return 0 sonst ID
 		if ($num_rows>0)
 		{
-			$row = $db>db_fetch_object();
+			$row = $db->db_fetch_object();
 			return $row->mitarbeiter_uid;
 		}
 		else
