@@ -257,8 +257,8 @@ if($typ=='xls')
 		if($summeects!=0)
 			$gewichtetenote /= $summeects;
 		
-		$worksheet->write($zeile,++$spalte,$schnitt, $format_number);
-		$worksheet->write($zeile,++$spalte,$gewichtetenote, $format_number);
+		$worksheet->write($zeile,++$spalte,sprintf("%.2f",$schnitt), $format_number);
+		$worksheet->write($zeile,++$spalte,sprintf("%.2f",$gewichtetenote), $format_number);
 		$summegewichtet+=$gewichtetenote;
 		$anzahlgewichtet++;
 	}
@@ -288,17 +288,17 @@ if($typ=='xls')
 			$summe_schnitt +=$schnitt;
 			$anzahl_schnitt++;
 		}
-		$worksheet->write($zeile,++$spalte,$schnitt, $format_number);
+		$worksheet->write($zeile,++$spalte,sprintf("%.2f",$schnitt), $format_number);
 	}
 	
 	if($anzahl_schnitt!=0)
 		$schnitt = $summe_schnitt/$anzahl_schnitt;
 	else 
 		$schnitt=0;
-	$worksheet->write($zeile,++$spalte,$schnitt, $format_number);
+	$worksheet->write($zeile,++$spalte,sprintf("%.2f",$schnitt), $format_number);
 	if($anzahlgewichtet!=0)
 		$summegewichtet = $summegewichtet/$anzahlgewichtet;
-	$worksheet->write($zeile,++$spalte,$summegewichtet, $format_number);
+	$worksheet->write($zeile,++$spalte,sprintf("%.2f", $summegewichtet), $format_number);
 	
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
