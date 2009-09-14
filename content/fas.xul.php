@@ -96,6 +96,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-statistic-substatistik-alvsstatistik-html:command" oncommand="StatistikPrintALVSStatistik('');"/>  
   <command id="menu-statistic-substatistik-lvplanunggesamtsj-excel:command" oncommand="StatistikPrintLvPlanungGesamtSJ();"/>  
   <command id="menu-statistic-absolventenstatistik:command" oncommand="StatistikPrintAbsolventenstatistik();"/>
+  <command id="menu-statistic-absolventenzahlen:command" oncommand="StatistikPrintAbsolventenZahlen();"/>
   <command id="menu-statistic-studentenstatistik:command" oncommand="StatistikPrintStudentenstatistik();"/>
   <command id="menu-statistic-oehbeitraege:command" oncommand="StatistikPrintOehBeitrag();"/>
   <command id="menu-statistic-mitarbeiterstatistik:command" oncommand="StatistikPrintMitarbeiterstatistik();"/>
@@ -401,25 +402,31 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 		               label     = "&menu-statistic-absolventenstatistik.label;"
 		               command   =  "menu-statistic-absolventenstatistik:command"
 		               accesskey = "&menu-statistic-absolventenstatistik.accesskey;"/>
-		               <menuitem
+					<menuitem
+		               id        =  "menu-statistic-absolventenzahlen"
+		               key       =  "menu-statistic-absolventenzahlen:key"
+		               label     = "&menu-statistic-absolventenzahlen.label;"
+		               command   =  "menu-statistic-absolventenzahlen:command"
+		               accesskey = "&menu-statistic-absolventenzahlen.accesskey;"/>
+					<menuitem
 		               id        =  "menu-statistic-studentenstatistik"
 		               key       =  "menu-statistic-studentenstatistik:key"
 		               label     = "&menu-statistic-studentenstatistik.label;"
 		               command   =  "menu-statistic-studentenstatistik:command"
 		               accesskey = "&menu-statistic-studentenstatistik.accesskey;"/>
-		               <menuitem
+					<menuitem
 		               id        =  "menu-statistic-lektorenstatistik"
 		               key       =  "menu-statistic-lektorenstatistik:key"
 		               label     = "&menu-statistic-lektorenstatistik.label;"
 		               command   =  "menu-statistic-lektorenstatistik:command"
 		               accesskey = "&menu-statistic-lektorenstatistik.accesskey;"/>
-		               <menuitem
+					<menuitem
 		               id        =  "menu-statistic-mitarbeiterstatistik"
 		               key       =  "menu-statistic-mitarbeiterstatistik:key"
 		               label     = "&menu-statistic-mitarbeiterstatistik.label;"
 		               command   =  "menu-statistic-mitarbeiterstatistik:command"
 		               accesskey = "&menu-statistic-mitarbeiterstatistik.accesskey;"/>
-		               <menuitem
+					<menuitem
 		               id        =  "menu-statistic-stromanalyse"
 		               key       =  "menu-statistic-stromanalyse:key"
 		               label     = "&menu-statistic-stromanalyse.label;"

@@ -1,5 +1,5 @@
-<!ENTITY window.title			"FASo"> 
-<!ENTITY window.version			"1.2 vom 18.Oktober 2007"> 
+<!ENTITY window.title			"FASOnline"> 
+<!ENTITY window.version			"2.0 vom 20.Juli 2009"> 
 
 <!-- MENUE -->
 
@@ -158,6 +158,10 @@
 <!ENTITY menu-statistic-absolventenstatistik.key		"B">
 <!ENTITY menu-statistic-absolventenstatistik.label		"Absolventenstatistik">
 <!ENTITY menu-statistic-absolventenstatistik.accesskey	"B">
+
+<!ENTITY menu-statistic-absolventenzahlen.key		"Z">
+<!ENTITY menu-statistic-absolventenzahlen.label		"Absolventenzahlen">
+<!ENTITY menu-statistic-absolventenzahlen.accesskey	"Z">
 
 <!ENTITY menu-statistic-lektorenstatistik.key		"L">
 <!ENTITY menu-statistic-lektorenstatistik.label		"Lektorenstatistik">
