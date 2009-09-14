@@ -22,8 +22,8 @@
  */
 /*******************************************************************************************************
  *			abgabe_lektor_benotung
- *     abgabe_lektor_benotung ist die Benotungsoberfläche des Abgabesystems 
- * 			für Diplom- und Bachelorarbeiten
+ *     abgabe_lektor_benotung ist die Benotungsoberfl�che des Abgabesystems 
+ * 			f�r Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
  	require_once('../../config/cis.config.inc.php');
@@ -68,9 +68,11 @@ $weight2='';
 $weight3='';	
 $stgbezeichnung='';
 $stgtyp='';
+$projekttyp_kurzbz='';
 
 $projektarbeit_id='';
 $uid='';
+$matrikelnr='';
 $titel='';
 $beurteiler='';
 $ende='';
@@ -92,9 +94,11 @@ else
 {
 	$projektarbeit_id=(isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
 	$uid=(isset($_POST['uid'])?$_POST['uid']:'-1');
+	$matrikelnr=(isset($_POST['matrikelnr'])?$_POST['matrikelnr']:'-1');
 	$titel=(isset($_POST['titel'])?$_POST['titel']:'');
 	$studiengang=(isset($_POST['studiengang'])?$_POST['studiengang']:'');
 	$stgtyp=(isset($_POST['stgtyp'])?$_POST['stgtyp']:'');
+	$projekttyp_kurzbz=(isset($_POST['projekttyp_kurzbz'])?$_POST['projekttyp_kurzbz']:'');
 	$autor=(isset($_POST['autor'])?$_POST['autor']:'');
 	$perskz=(isset($_POST['perskz'])?$_POST['perskz']:'');
 	
@@ -230,12 +234,13 @@ else
 	$pdf->MultiCell(53,36,'',1,'L',0);
 	//Zeile Qualität
 	$pdf->SetFont('Arial','',9);
-	if($stgtyp=='Bachelor')
+	if($projekttyp_kurzbz=='Bachelor')
+	//if($stgtyp=='Bachelor')
 	{
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - wissenschaftlich fundierte,\n     systematische, ingenieurmäßige\n     Vorgangsweise\n   - Ist der eigene Beitrag\n     deutlich sichtbar?\n   - Qualität der Lösung",0,'L',0);
+		$pdf->MultiCell(159,12,mb_convert_encoding("Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - wissenschaftlich fundierte,\n     systematische, ingenieurmäßige\n     Vorgangsweise\n   - Ist der eigene Beitrag\n     deutlich sichtbar?\n   - Qualität der Lösung",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -264,7 +269,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - Projektmäßige Vorgehensweise\n   - Wissenschaftlich - systematische\n     Methoden in der Analyse\n     bzw. Lösungsfindung",0,'L',0);
+		$pdf->MultiCell(159,12,mb_convert_encoding("Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - Projektmäßige Vorgehensweise\n   - Wissenschaftlich - systematische\n     Methoden in der Analyse\n     bzw. Lösungsfindung",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -290,12 +295,13 @@ else
 	}
 	//Zeile Form
 	$pdf->SetFont('Arial','',9);
-	if($stgtyp=='Bachelor')
+	if($projekttyp_kurzbz=='Bachelor')
+	//if($stgtyp=='Bachelor')
 	{
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Form / Stil\n  - Hat die Bachelorarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache",0,'L',0);
+		$pdf->MultiCell(159,12,mb_convert_encoding("Form / Stil\n  - Hat die Bachelorarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -324,7 +330,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Form / Stil\n   - Hat die Diplomarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache: benötigte Überarbeitung\n     seitens der Betreuerin / \n     des Betreuers",0,'L',0);
+		$pdf->MultiCell(159,12,mb_convert_encoding("Form / Stil\n   - Hat die Diplomarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache: benötigte Überarbeitung\n     seitens der Betreuerin / \n     des Betreuers",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -350,7 +356,8 @@ else
 	}
 	//Zeile Hintergrundinfo
 	$pdf->SetFont('Arial','',9);
-	if($stgtyp=='Bachelor')
+	if($projekttyp_kurzbz=='Bachelor')
+	//if($stgtyp=='Bachelor')
 	{
 	}
 	else 
@@ -358,7 +365,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,"Qualität der Hintergrundinformation\n   - werden Gesamtzusammenhänge\n     erkannt, wird Bedeutung\n     und Gewicht der Einflussfaktoren\n     /Daten/Informationen richtig\n     bewertet\n   - Intelligente Darstellung des\n     relevanten Stands der Technik\n     und des Firmenumfelds\n   - Aufdecken und Darstellen von\n     größeren (z.B. wirtschaftlichen\n     oder sozialen) Zusammenhängen\n     und entsprechende Diskussion",0,'L',0);
+		$pdf->MultiCell(159,12,mb_convert_encoding("Qualität der Hintergrundinformation\n   - werden Gesamtzusammenhänge\n     erkannt, wird Bedeutung\n     und Gewicht der Einflussfaktoren\n     /Daten/Informationen richtig\n     bewertet\n   - Intelligente Darstellung des\n     relevanten Stands der Technik\n     und des Firmenumfelds\n   - Aufdecken und Darstellen von\n     größeren (z.B. wirtschaftlichen\n     oder sozialen) Zusammenhängen\n     und entsprechende Diskussion",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,156,'',1,'L',0);
 		$maxX +=159;
@@ -398,7 +405,8 @@ else
 	$pdf->MultiCell(53,12,$summe2,1,'C',0);
 	//Feld Umrechnung Punkte=>Note
 	$pdf->SetFont('Arial','',7);
-	if($stgtyp=='Bachelor')
+	if($projekttyp_kurzbz=='Bachelor')
+	//if($stgtyp=='Bachelor')
 	{
 		$maxY=680;
 	}
@@ -424,7 +432,8 @@ else
 	$maxY=$pdf->GetY();
 	$maxX=160;
 	$pdf->SetXY($maxX,$maxY);
-	if($stgtyp=='Bachelor')
+	if($projekttyp_kurzbz=='Bachelor')
+	//if($stgtyp=='Bachelor')
 	{
 		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Bachelorarbeit gesamt negativ',1,'L',0);
 	}
@@ -438,7 +447,7 @@ else
 	$maxX +=80;
 	$pdf->SetXY($maxX,$maxY);
 	$pdf->MultiCell(80,12,'',1,'C',0);
-	//Zeile Note undUnterschrift
+	//Zeile Note und Unterschrift
 	$pdf->SetFont('Arial','',10);
 	$maxY=760;
 	$maxX=+40;
@@ -558,7 +567,7 @@ else
 			{
 				if(document.getElementById("summe2").value=="NaN")
 				{
-					alert("Eingabe ungültig! Bitte nur Ziffern eingeben.");
+					alert("Eingabe ung�ltig! Bitte nur Ziffern eingeben.");
 					document.getElementById("drucken").disabled=false;
 					return false;
 				}
@@ -663,14 +672,15 @@ else
 		</script>
 		</head>
 		<body class="Background_main"  style="background-color:#eeeeee;" onload="berechne()">';
-				
+		
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
 		$htmlstr .= "<form action=".$_SERVER['PHP_SELF']." method='POST' name='note' onsubmit='return inputcheck()'>";
-		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$uid.", ".$row->vorname." ".$row->nachname."</b></td>";
+		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".$row->vorname." ".$row->nachname."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+		$htmlstr .= "<input type='hidden' name='matrikelnr' value='".$matrikelnr."'>\n";
 		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 		$htmlstr .= "<input type='hidden' name='perskz' value='".$row->matrikelnr."'>\n";
 		$htmlstr .= "<input type='hidden' name='studiengang' value='".$row->stgbezeichnung."'>\n";
@@ -693,7 +703,7 @@ else
 			$stgtyp='';
 		}
 		$htmlstr .= "<input type='hidden' name='stgtyp' value='".$stgtyp."'>\n";
-		
+		$htmlstr .= "<input type='hidden' name='projekttyp_kurzbz' value='".$row->projekttyp_kurzbz."'>\n";
 		$htmlstr .= "</td></tr>";
 		$htmlstr .= "<td>&nbsp;</td><td align='center'>Kurze verbale Beurteilung</td><td align='center'>Punkte (0-100)</td><td align='center'>Gewicht</td><td align='center'>Punkte * Gewicht</td>\n";
 		$htmlstr .= "<tr>\n";
@@ -739,7 +749,7 @@ else
 			Hat die Diplomarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
-			Sprache: benötigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
+			Sprache: ben&ouml;tigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
 			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
 			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
 			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
@@ -771,7 +781,7 @@ else
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<td width='40%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
-			Werden Gesamtzusammenhänge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
+			Werden Gesamtzusammenh�nge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
 			Intelligente Darstellung des relevanten Stands der Technik und des Firmenumfelds<br>
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
 			<td width='30%'><textarea name='hintergrund' value='".$hintergrund."' cols='50'  rows='10' 
