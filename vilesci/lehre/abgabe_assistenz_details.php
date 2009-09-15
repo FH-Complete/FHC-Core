@@ -288,7 +288,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 	$result=$db->db_query($qry);
 	while ($result && $row=$db->db_fetch_object($result))
 	{
-		$htmlstr .= "<form action='$PHP_SELF' method='POST' name='".$row->projektarbeit_id."'>\n";
+		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";

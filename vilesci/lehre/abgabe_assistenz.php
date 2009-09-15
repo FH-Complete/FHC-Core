@@ -173,7 +173,8 @@ else
 		$i++;
 	}
 	$htmlstr .= "</tbody></table>\n";
-	$htmlstr .= "<table><tr><td rowspan=3><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td></tr></table>\n";
+	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren</td></tr><tr><td>&nbsp;</td></tr><tr>\n";
+	$htmlstr .= "<td rowspan=3><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td></tr></table>\n";
 	$htmlstr .= "</form>";
 }
 
@@ -191,6 +192,18 @@ function confdel()
 	if(confirm("Diesen Datensatz wirklick loeschen?"))
 		return true;
 	return false;
+}
+function markiere()
+{
+	var items=document.getElementsByTagName('input');
+	var alle=document.getElementById('alle');
+	for each(item in items)
+	{
+		if(item.type=='checkbox')
+		{
+			item.checked=alle.checked;
+		}
+	}
 }
 </script>
 </head>
