@@ -95,8 +95,8 @@ if (isset($_GET['grp']))
 	$grp=$_GET['grp'];
 else
 	$grp=null;
-if (isset($_GET['einheit']))
-	$einheit=$_GET['einheit'];
+if (isset($_GET['gruppe']))
+	$einheit=$_GET['gruppe'];
 else
 	$einheit=null;
 if (isset($_GET['pers_uid']))
@@ -135,9 +135,44 @@ $rdf_url='http://www.technikum-wien.at/lehrstunde';
 	<RDF:Seq about="<?php echo $rdf_url ?>/alle">
 
 <?php
+$db = new basis_db();
+function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
+{
+	global $db;
+	if($gruppe_kurzbz=='')
+	{
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband 
+				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
+				AND studiengang_kz='".addslashes($studiengang_kz)."' AND
+				semester='".addslashes($semester)."'";
+		if(trim($verband)!='')
+			$qry.=" AND trim(verband)=trim('".addslashes($verband)."')";
+		if(trim($gruppe)!='')
+			$qry.=" AND trim(gruppe)=trim('".addslashes($gruppe)."')";
+		
+	}
+	else 
+	{
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe 
+				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
+				AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+	}
+	if($res_anz = $db->db_query($qry))
+	{
+		if($row_anz = $db->db_fetch_object($res_anz))
+		{
+			return $row_anz->anzahl;
+		}
+	}
+}
+
 if (is_array($lehrstunden->lehrstunden))
+{
 	foreach ($lehrstunden->lehrstunden as $ls)
 	{
+		//Anzahl der Studenten in der Gruppe ermitteln
+		$stsem = getStudiensemesterFromDatum($ls->datum);
+		$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
 		?>
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
@@ -159,11 +194,13 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:studiengang><?php echo $ls->studiengang  ?></LEHRSTUNDE:studiengang>
 				<LEHRSTUNDE:farbe><?php echo $ls->farbe  ?></LEHRSTUNDE:farbe>
 				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
+				<LEHRSTUNDE:anzahlstudenten><![CDATA[<?php echo $anzahl;  ?>]]></LEHRSTUNDE:anzahlstudenten>
   	    	</RDF:Description>
   			</RDF:li>
 			<?php
 		//}
 	}
+}
 ?>
 
   </RDF:Seq>
