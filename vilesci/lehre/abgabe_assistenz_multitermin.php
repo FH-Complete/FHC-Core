@@ -57,10 +57,10 @@ $paabgabe_id = (isset($_POST['paabgabe_id'])?$_POST['paabgabe_id']:'-1');
 $fixtermin = (isset($_POST['fixtermin'])?1:0);
 $datum = (isset($_POST['datum'])?$_POST['datum']:'');
 $kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
-
+$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'');
 
 	if (!$user = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 			
 
 $datum_obj = new datum();
@@ -71,12 +71,15 @@ $error = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
+$datum_obj = new datum();
+$datum=$datum_obj->formatDatum($datum,'Y-m-d');
 //echo $irgendwas."<br>";
 
 if(isset($_POST["schick"]))
 {
 	$termine=explode(";",$irgendwas);
 	//var_dump($termine);
+
 	for($j=0;$j<count($termine)-1;$j++)
 	{
 		$qrychk="SELECT * FROM campus.tbl_paabgabe 
