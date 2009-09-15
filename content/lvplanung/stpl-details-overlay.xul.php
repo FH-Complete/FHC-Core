@@ -118,6 +118,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id"  />
 			<splitter class="tree-splitter"/>
+			<treecol id="anzahlstudenten" label="AnzahlStudenten" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anzahlstudenten"  />
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -140,6 +144,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anzahlstudenten" />
    						</treerow>
 					</treeitem>
 				</treechildren>

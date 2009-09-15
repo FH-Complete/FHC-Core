@@ -1646,7 +1646,7 @@ class wochenplan extends basis_db
 					{
 						//"Betreff","Beginnt am","Beginnt um","Endet am","Endet um","Ganztaegiges Ereignis","Erinnerung Ein/Aus","Erinnerung am","Erinnerung um","Besprechungsplanung","Erforderliche Teilnehmer","Optionale Teilnehmer","Besprechungsressourcen","Abrechnungsinformationen","Beschreibung",
 						//"Kategorien","Ort","Prioritaet","Privat","Reisekilometer","Vertraulichkeit","Zeitspanne zeigen als"
-						echo $this->crlf.'"'.$this->std_plan[$i][$j][0]->lehrfach.($this->std_plan[$i][$j][0]->lehrform!=''?'-'.$this->std_plan[$i][$j][0]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
+						echo $this->crlf.'"'.$this->std_plan[$i][$j][0]->lehrfach.(isset($this->std_plan[$i][$j][0]->lehrform) && $this->std_plan[$i][$j][0]->lehrform!=''?'-'.$this->std_plan[$i][$j][0]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
 						echo $this->crlf.$this->std_plan[$i][$j][0]->lehrfach.$this->crlf.$this->std_plan[$i][$j][0]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][0]->ort.'","StundenplanFH","'.$this->std_plan[$i][$j][0]->ort.'","Normal","Aus",,"Normal","2"';
 					}
 					else if ($target=='ical')

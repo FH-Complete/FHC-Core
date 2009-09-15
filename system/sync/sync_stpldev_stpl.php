@@ -530,7 +530,7 @@ if ($sendmail)
 {
 	foreach ($message as $msg)
 	{
-		$mail = new mail($msg->mailadress,'no-reply@technikum-wien.at','Stundenplan update','');
+		$mail = new mail($msg->mailadress,'no-reply@technikum-wien.at','Stundenplan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 		$mail->setHTMLContent($msg->message_begin.$msg->message);
 		if ($mail->send())
 		{
@@ -552,12 +552,12 @@ $message_tmp=$count_upd.' Datens&auml;tze wurden ge&auml;ndert.<BR>
 echo '<BR>'.$message_tmp;
 
 $message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></HTML>';
-$mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'Stundenplan update','');
+$mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'Stundenplan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 $mail->setHTMLContent($message_sync);
 $mail->send();
 
 $message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
-$mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'Stundenplan update', '');
+$mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'Stundenplan update', 'Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 $mail->setHTMLContent($message_stpl);
 $mail->send();
 ?>
