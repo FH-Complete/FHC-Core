@@ -176,9 +176,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Wie kann ich meine Mails von zu Hause aus abrufen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Verwenden Sie dazu den POP3 Dienst. In Ihrem Mail Client müssen Sie ihren Accountnamen und den POP3
-						Server pop.technikum-wien.at einstellen. Als SMTP Server verwenden Sie den Ihres Providers. 
-						Die FH selbst bietet keinen Wählleitungszugang!\n
+						Eine Anleitung zur Einrichtung Ihres Mail-Clients finden Sie auf https://cis.technikum-wien.at unter dem Punkt FAQ.\n
 						Eine weitere Möglichkeit, von überall Mails abzurufen, ist unser Webmail Service auf https://webmail.technikum-wien.at\n
 					</fo:block>
 					
