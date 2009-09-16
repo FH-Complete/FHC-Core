@@ -99,7 +99,7 @@
 		 table.stundenplan th{color:#FFF;background-color: #009e84;font-weight: bold;border: 1px solid #FFF;font-size:smaller;}
 		 table.stundenplan td{background-color: #FFF;border: 0px;font-size:smaller;}
 		
-		 table.stundenplan .stundenplan_stunden_detail {color:#FFF;vertical-align: top;font-size:xx-small;font-weight: bold;vertical-align: top;padding: 4px 4px 4px 4px;text-align:center;background-color: #009e84;}
+		 table.stundenplan .stundenplan_stunden_detail {	white-space : nowrap;color:#FFF;	vertical-align: top;	font-size:xx-small;	font-weight: bold;	vertical-align: top;	padding: 4px 4px 4px 4px;	text-align:center;	background-color: #009e84;}
 
 		 table.stundenplan .stundenplan_detail_kpl_aktuell {width:14%;	vertical-align: top;	font-size:x-small;	background-color:#0085D0;	border : 1px solid Black;}
 		 table.stundenplan .stundenplan_detail_kpl_normal {width:14%;vertical-align: top;font-size:x-small;background-color: #0085D0;	border : 1px solid #0085D0;}
