@@ -29,5 +29,5 @@ Die folgenden Schritte sind für ein Upgrade von Version 1.2 auf Version 2.0 nöti
 - Fertig!
 
 Die Updatescripte im System Ordner verwenden alle die Config /config/system.config.inc.php
-Dies Scripten TesttoolCleanEncoding.php und hextobase64.php prüfen nicht ob das Script bereits ausgeführt wurde. 
-D.h. Sie dürfen nur einmal gestartet werden, da die Daten sonst doppelt kodiert werden!! 
+Die Scripten TesttoolCleanEncoding.php und hextobase64.php prüfen nicht ob das Script bereits ausgeführt wurde. 
+D.h. sie dürfen nur einmal gestartet werden, da die Daten sonst doppelt kodiert werden!! 
