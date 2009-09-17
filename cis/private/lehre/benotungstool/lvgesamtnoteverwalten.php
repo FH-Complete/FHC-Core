@@ -696,9 +696,9 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			$mit = new mitarbeiter();
 			$mit->load($user);
 
-			$freigeber = "<b>".strtoupper($user)."</b>";
+			$freigeber = "<b>".mb_strtoupper($user)."</b>";
 			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung,'');
-			$htmlcontent="<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>";
+			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>";
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
@@ -872,7 +872,7 @@ echo '<table>';
 					}		
 					else
 					{
-						//den Error nur einmal anzeigen und nicht für jeden Studenten
+						//den Error nur einmal anzeigen und nicht fï¿½r jeden Studenten
 						$moodle_course->errormsg=trim($moodle_course->errormsg);
 						if(!$errorshown && !empty($moodle_course->errormsg) )
 						{
