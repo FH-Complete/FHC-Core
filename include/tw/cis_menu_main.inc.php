@@ -195,17 +195,13 @@
 				</tr>
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Programm 2009/10</a></td>
+					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Programm 2008/09</a></td>
 				</tr>
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
           			<td class="tdwrap"><a target="content" href="private/info/weiterbildung/archiv/archiv.html" class="MenuItem" onClick="js_toggle_container('WeiterbildungArchiv');" style="font-weight: normal;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Archiv</a>
 
 		  			<table class="tabcontent" id="WeiterbildungArchiv" style="display: none;">
-		  				<tr>
-						  	<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/archiv/archiv_09-10.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;2009/10</a></td>
-						</tr>
 		  				<tr>
 						  	<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/archiv/archiv_08-09.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;2008/09</a></td>
@@ -652,6 +648,11 @@
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/info/mail.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Einrichten des Mails</a></td>
 				</tr>
+		  		<tr>
+			  		<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="public/info/handbuecher/index.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Handb&uuml;cher</a></td>
+				</tr>
+
 			  	</table>
 			</td>
 		</tr>
