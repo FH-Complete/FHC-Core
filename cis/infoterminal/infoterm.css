@@ -86,8 +86,8 @@
 		 table.raum_liste_detail .raum_liste_detail_stundenplan_aktuell {height:50px;background-color: #0085D0;	border : 1px solid Black;}
 		 table.raum_liste_detail .raum_liste_detail_stundenplan_normal {height: 50px;background-color: #0085D0;border : 1px solid #0085D0;}
 */
-		 table.raum_liste_detail .raum_liste_detail_stundenplan_aktuell {white-space : nowrap;height:50px;background-color: #0085D0;}
-		 table.raum_liste_detail .raum_liste_detail_stundenplan_normal {white-space : nowrap;height: 50px;background-color: #0085D0;}
+		 table.raum_liste_detail .raum_liste_detail_stundenplan_aktuell {vertical-align: top;white-space : nowrap;height:50px;background-color: #0085D0;}
+		 table.raum_liste_detail .raum_liste_detail_stundenplan_normal {vertical-align: top;white-space : nowrap;height: 50px;background-color: #0085D0;}
 
 	
 		/* Stundenplan */ 
