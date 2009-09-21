@@ -577,3 +577,9 @@ img#layout
 	margin-bottom: 0px;
 	margin-top: 0px;
 }*/
+.error
+{
+	color: #ff0000;
+}
+.ausblenden {display:none;}
+.einblenden {display:block;}	

@@ -585,3 +585,5 @@ td.tdvertical
 {
 	color: #ff0000;
 }
+.ausblenden {display:none;}
+.einblenden {display:block;}	
