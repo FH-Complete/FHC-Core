@@ -69,7 +69,6 @@ class lehreinheit extends basis_db
 	public function __construct($lehreinheit_id=null)
 	{
 		parent::__construct();
-		
 		if($lehreinheit_id!=null)
 			$this->load($lehreinheit_id);
 	}
@@ -133,6 +132,7 @@ class lehreinheit extends basis_db
 	 */
 	public function loadLE($lehreinheit_id)
 	{
+		$this->errormsg ='';
 		if(!is_numeric($lehreinheit_id))
 		{
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
@@ -200,6 +200,9 @@ class lehreinheit extends basis_db
 	 */
 	public function load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz, $uid='', $fachbereich_kurzbz='')
 	{
+		$this->lehreinheiten = array();
+		$this->errormsg ='';
+		
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE 
 				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
 				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
@@ -361,6 +364,8 @@ class lehreinheit extends basis_db
 	 */
 	public function save($new=null)
 	{
+		$this->errormsg ='';
+	
 		if(is_null($new))
 			$new = $this->new;
 
@@ -469,6 +474,9 @@ class lehreinheit extends basis_db
 	 */
 	public function check_lva($datum,$stunde,$ort,$stpl_table)
 	{
+
+		$this->errormsg ='';
+
 		$ignore_reservation=false;
 		$ignore_zeitsperre=false;
 		// Parameter Checken
@@ -599,6 +607,7 @@ class lehreinheit extends basis_db
 	 */
 	public function save_stpl($datum,$stunde,$ort,$stpl_table,$user)
 	{
+		$this->errormsg='';
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
@@ -647,6 +656,9 @@ class lehreinheit extends basis_db
 	 */
 	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null)
 	{
+		$this->errormsg='';
+		$this->lehreinheiten=array();
+		
 		$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
 
 		if (mb_strlen($studiensemester)<=0)
@@ -734,6 +746,7 @@ class lehreinheit extends basis_db
 	 */
 	public function delete($lehreinheit_id)
 	{
+		$this->errormsg='';
 		if(!is_numeric($lehreinheit_id))
 		{
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
