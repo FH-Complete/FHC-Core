@@ -578,3 +578,10 @@ table.sortable thead
 {
     cursor:pointer;
 }
+
+.error
+{
+	color: #ff0000;
+}
+		.ausblenden {display:none;}
+		.einblenden {display:block;}	
