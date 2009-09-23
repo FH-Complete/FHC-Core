@@ -381,7 +381,7 @@ function show(id)
 			  	echo "<p>Stellvertreter:<br>";
 
 			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' LIMIT 10) AND funktion_kurzbz='stglstv'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) LIMIT 10)";
+				$sql_query = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' ) AND funktion_kurzbz='stglstv'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) LIMIT 1)";
 
 				if($result_course_leader_deputy = $db->db_query($sql_query))
 				{
