@@ -64,6 +64,7 @@ else
 	$fixtermin = (isset($_POST['fixtermin'])?1:0);
 	$datum = (isset($_POST['datum'])?$_POST['datum']:'');
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
+	$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'');
 }
 
 $user = get_uid();
