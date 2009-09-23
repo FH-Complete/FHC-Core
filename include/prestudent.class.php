@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/person.class.php');
 
 class prestudent extends person
 {
