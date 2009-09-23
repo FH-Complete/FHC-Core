@@ -461,9 +461,9 @@ function show(id)
 							{
 								echo "Nicht vorhanden";
 							}
+						echo "<br><br>";
 						}
 					}
-					echo "<br>";
 				}
 			  	echo "</p>";
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
