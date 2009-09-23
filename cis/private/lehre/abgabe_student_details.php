@@ -128,18 +128,25 @@ if($command=='add')
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
-		$result=$db->$db->db_query($qry_upd);
+		$result=$db->db_query($qry_upd);
+		$qry="UPDATE campus.tbl_paabgabe SET
+						abgabedatum = now(),
+						updatevon = '".$user."', 
+						updateamum = now() 
+						WHERE paabgabe_id='".$paabgabe_id."'";
+					$result=$db->db_query($qry);
 		$command="update";
 	}
 	else 
 	{
 		echo "<font color=\"#FF0000\">Dateneingabe unvollst&auml;ndig!</font><br>&nbsp;";
+		$command='';
 	}
 }
-if($command=="update" || $error==true)
+if($command=="update" && $error!=true)
 {
 	//Dateiupload bearbeiten
-	if ((isset($_FILES['datei']) and ! $_FILES['datei']['error']) || $error==true)
+	if ((isset($_FILES) and isset($_FILES['datei']) and ! $_FILES['datei']['error']))
 	{
 		if(strtoupper(end(explode(".", $_FILES['datei']['name'])))=='PDF')
 		{
@@ -171,13 +178,13 @@ if($command=="update" || $error==true)
 				}
 				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
 				{
-					$qry="UPDATE campus.tbl_paabgabe SET
+					/*$qry="UPDATE campus.tbl_paabgabe SET
 						abgabedatum = now(),
 						updatevon = '".$user."', 
 						updateamum = now() 
 						WHERE paabgabe_id='".$paabgabe_id."'";
-					$result=$db->db_query($qry);
-					
+					$result=$db->db_query($qry);*/
+
 					echo '
 					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 					<html>
