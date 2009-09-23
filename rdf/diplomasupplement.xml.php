@@ -27,6 +27,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/prestudent.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -85,10 +86,27 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			echo '		<ects_angerechnet></ects_angerechnet>';
 			
-		if($row->organisationsform=='b')
+		if($row->organisationsform=='m')
+		{
+			//Bei Mischformen, die Organisationsform aus dem Status nehmen
+			$prestudent = new prestudent();
+			$prestudent->getLastStatus($row->prestudent_id);
+			switch($prestudent->orgform_kurzbz)
+			{
+				case 'BB': $row->organisationsform = 'b'; break;
+				case 'VZ': $row->organisationsform = 'v'; break;
+				case 'FST': $row->organisationsform = 'f'; break;					
+			}
+				
+		}
+		
+		if($row->organisationsform=='b' || $row->organisationsform=='BB')
 			echo '		<studienart>Berufbegleitendes Studium/Part-time degree programm</studienart>';
-		else 
+		elseif($row->organisationsform=='v' || $row->organisationsform=='VZ')
 			echo '		<studienart>Vollzeitstudium/Full-time degree programm</studienart>';
+		else 
+			echo '		<studienart>Fernstudium/Distance study</studienart>';
+		
 		if($row->typ=='d')
 		{
 			echo '		<zulassungsvoraussetzungen_deutsch><![CDATA[Allgemeine Universitätsreife (vgl. §4 Abs. 3 FHStG idgF),\nBerufsreifeprüfung bzw. Studienberechtigungsprüfung oder\neinschlägige berufliche Qualifikation (Lehrabschluss bzw. Abschluss\neiner berufsbildenden mittleren Schule mit Zusatzprüfungen). Die\nAufnahme erfolgt auf Basis eines Auswahlverfahrens (Werdegang,\nEignungstest, Bewerbungsgespräch).]]></zulassungsvoraussetzungen_deutsch>';
