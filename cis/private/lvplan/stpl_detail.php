@@ -32,8 +32,10 @@ if (isset($_GET['stg_kz']))
 	$stg_kz=$_GET['stg_kz'];
 if (isset($_GET['sem']))
 	$sem=$_GET['sem'];
+	
 if (isset($_GET['ver']))
 	$ver=$_GET['ver'];
+	
 if (isset($_GET['grp']))
 	$grp=$_GET['grp'];
 if (isset($_GET['gruppe_kurzbz']))
@@ -62,10 +64,13 @@ else
     if ($type=='student')
 		$sql_query.=' OR vw_stundenplan.semester='.($sem+1);
 	$sql_query.=')';
-    //if ($ver!='0')
-	//	$sql_query.=" AND (verband='$ver' OR verband IS NULL OR verband='0')";
-    //if ($grp!='0')
-	//	$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0')";
+	
+	// Manfred weiss nicht mehr warum, aber wir aktivieren 23-09-2009
+    
+	if (isset($ver) && $ver!='0')
+		$sql_query.=" AND (verband='$ver' OR verband IS NULL OR verband='0')";
+    if (isset($ver) && $grp!='0')
+		$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0')";
 }
 $sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, gruppe_kurzbz LIMIT 100';
 //echo $sql_query.'<BR>';
