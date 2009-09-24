@@ -157,7 +157,8 @@ else
 
 //Osobsky Michael studiert BEE und MIE - wird daher nicht synchronisiert
 //Incoming Park Dah-We belegt LVs im Haus und in BEE - keine Synchronisation
-$qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
+$qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, 
+			kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
 		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 		EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 		EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
@@ -174,6 +175,35 @@ if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
+		if(trim($row->kurzbzlang)=='AK')
+		{
+			//Da AKs erst bis zur BIS-Meldung abschlißen müssen, hat bei ihnen Bachelorinskription Vorrang
+			$qry1="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName, nummer as CardNumber, 
+						matrikelnr, uid, kurzbzlang, tbl_studiengang.kurzbz,typ, personalnummer, lektor,
+					EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
+					EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
+					EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
+				FROM public.vw_betriebsmittelperson
+					 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
+					 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
+				WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
+					AND kurzbzlang!='AK' AND nummer='$row->cardnumber' AND nachname='$row->lastname' AND vorname='$row->firstname'";
+			if($result1 = $db->db_query($qry1))
+			{
+				if($db->db_num_rows($result1)>0)
+				{
+					if($row1=$db->db_fetch_object($result1))
+					{
+						$row->uid=trim($row1->uid);
+						$row->matrikelnr=trim($row1->matrikelnr);
+						$row->kurzbzlang=$row1->kurzbzlang;
+						$row->kurzbz=$row1->kurzbz;
+						$row->typ=$row1->typ;
+					}
+				}
+			}
+		}
+		
 		//Nachname und Vorname auf LATIN9 konvertieren
 		$row->lastname = iconv('UTF-8','ISO-8859-15',$row->lastname);
 		$row->firstname = iconv('UTF-8','ISO-8859-15',$row->firstname);
@@ -190,7 +220,7 @@ if($result = $db->db_query($qry))
 		for($j=0;$j<$i;$j++)
 		{
 			if($sipass[$j]->card_no==$row->cardnumber)
-			{
+			{				
 				$upd=FALSE;
 				if($sipass[$j]->last_name!=trim($row->lastname) && !strchr($row->lastname,'ß'))
 				{
@@ -227,7 +257,7 @@ if($result = $db->db_query($qry))
 				if(trim($row->matrikelnr)!='' && $sipass[$j]->matrikelnr!=trim($row->matrikelnr))
 				{
 					$sipass[$j]->matrikelnr=trim($row->matrikelnr);
-					$sipass[$j]->update=' matrikelnr';
+					$sipass[$j]->update.=' matrikelnr';
 					$upd=TRUE;
 				}
 				if($row->personalnummer!='' && $row->personalnummer!= NULL)
@@ -235,7 +265,7 @@ if($result = $db->db_query($qry))
 					if($sipass[$j]->acc_grp_name!="Verwaltung" && substr($sipass[$j]->acc_grp_name,0,1)!='#')
 					{
 						$sipass[$j]->acc_grp_name="Verwaltung";
-						$sipass[$j]->update=' acc_grp_name';
+						$sipass[$j]->update.=' acc_grp_name';
 						$upd=TRUE;
 					}
 				}
@@ -245,7 +275,7 @@ if($result = $db->db_query($qry))
 					{
 						$sipass[$j]->acc_grp_name_old=$sipass[$j]->acc_grp_name;
 						$sipass[$j]->acc_grp_name=trim($stg_kurzbz);
-						$sipass[$j]->update=' acc_grp_name';
+						$sipass[$j]->update.=' acc_grp_name';
 						$upd=TRUE;
 					}
 				}
@@ -341,13 +371,17 @@ for($j=0;$j<$i;$j++)
 		}
 	}
 }
-header("Content-Type: text/plain");
+header("Content-Type: text/text");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
 echo $ausdruck;
 
-mail(MAIL_SUPPORT, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe.$ausdruck."</body></html>",
-	"From: vilesci@technikum-wien.at\nX-Mailer: PHP 5.x\nContent-type: text/html; charset=utf-8");
-
+//Mail nur wenn Doppelte gefunden
+if($k>0)
+{
+	//mail(MAIL_SUPPORT, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."<BR><BR>Synchroliste:<BR>".str_replace(array("\n","\r\n"),"<BR>",iconv("iso-8859-1","utf-8",$ausdruck))."</body></html>",
+	mail(MAIL_SUPPORT, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."</body></html>",
+		"From: vilesci@technikum-wien.at\nX-Mailer: PHP 5.x\nContent-type: text/html; charset=utf-8");
+}
 /*
 //------------ Excel init --------------------------
 
