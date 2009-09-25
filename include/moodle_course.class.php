@@ -93,8 +93,56 @@ class moodle_course extends basis_db
 	 * @param mdl_course_id ID des Moodle Kurses
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($mdl_course_id)
+	public function load($mdl_course_id=null)
 	{
+		$this->mdl_fullname = '';
+		$this->mdl_shortname = '';
+			
+		$this->errormsg='';
+		$this->result=array();
+			
+		if (!is_null($mdl_course_id))
+			$this->mdl_course_id=$mdl_course_id;
+		if (is_null($this->mdl_course_id) || empty($this->mdl_course_id) || !is_numeric($this->mdl_course_id))
+		{
+			$this->errormsg='Moodle Kurs ID fehlt';
+			return false;
+		}	
+					
+	// Variable Daten Initialisieren
+		$args=array();
+		$args['CourseID']=$this->mdl_course_id;
+		$method = "ReadCourseByID";		
+		$bServerinfo=false; // Debug
+		$result=$this->callMoodleXMLRPC($method,$args,$bServerinfo); 
+		if (!$result || !is_array($result) || count($result)<1 || !isset($result[0])) 
+		{
+			$this->errormsg='Fehler xmlrpc Aufruf.';
+			return false;
+		}	
+		if (isset($result[1]))
+			$this->errormsg=$result[1];
+		if (!isset($result[0]) || empty($result[0])) // Methodenaufruf nicht erfolgreich	
+			return false;
+		if (isset($result[2]) && is_array($result[2]) ) // Methodenaufruf erfolgreich	
+		{
+
+			$this->result[]=(object)$result[2];
+			$this->result[0]->mdl_fullname=(isset($this->result[0]->fullname)?$this->result[0]->fullname:'Fehler ID '.$this->mdl_course_id);
+			$this->result[0]->mdl_shortname=(isset($this->result[0]->shortname)?$this->result[0]->shortname:'Fehler');
+
+			$this->mdl_fullname=(isset($this->result[0]->fullname)?$this->result[0]->fullname:'Fehler ID '.$this->mdl_course_id);
+			$this->mdl_shortname=(isset($this->result[0]->shortname)?$this->result[0]->shortname:'Fehler');
+
+		}	
+		else // Result = 0 ein Fehler im RFC wurde festgestellt
+		{
+			$this->errormsg=(isset($result[1])?$result[1]:" - Fehler beim Kurs ".$this->mdl_course_id." lesen ");
+			return false;
+		}		
+#		return $this->result;	
+		return true;		
+	
 		$qry = "SELECT * FROM public.mdl_course WHERE id='".addslashes($mdl_course_id)."'";
 		if($result = pg_query($this->conn_moodle, $qry))
 		{
@@ -232,16 +280,9 @@ class moodle_course extends basis_db
 			$obj->lehrveranstaltung_semester=$row->semester;			
 			$obj->lehrveranstaltung_studiengang_kz=$row->studiengang_kz;
 
-			$qry_mdl = "SELECT * FROM public.mdl_course WHERE id='".addslashes($row->mdl_course_id)."'";
-			if($result_mdl = pg_query($this->conn_moodle, $qry_mdl))
-			{
-				if($row_mdl = pg_fetch_object($result_mdl))
-				{
-					$obj->mdl_fullname = $row_mdl->fullname;
-					$obj->mdl_shortname = $row_mdl->shortname;
-				}
-			}
-
+			$obj->mdl_fullname = 'DB fehler ID '.$obj->mdl_course_id;
+			$obj->mdl_shortname =$obj->mdl_fullname;
+			
 			// Anzahl Benotungen
 			$obj->mdl_benotungen = 0;
 			// Anzahl Aktivitaeten und Lehrmaterial
@@ -249,7 +290,27 @@ class moodle_course extends basis_db
 			$obj->mdl_quiz = 0;
 			$obj->mdl_chat = 0;
 			$obj->mdl_forum = 0;
-			$obj->mdl_choice= 0;
+			$obj->mdl_choice= 0;			
+			
+			$moddle= new moodle_course();
+			if ($moddle->load($obj->mdl_course_id))
+			{
+				$obj->mdl_fullname = $moddle->mdl_fullname;
+				$obj->mdl_shortname = $moddle->mdl_shortname;
+			}
+			else
+			{
+				$obj->mdl_fullname =$moddle->errormsg; 
+				$obj->mdl_course_id = 0;
+				$this->result[] = $obj;
+				continue;
+			}
+
+			if(!$detail)
+			{
+				$this->result[] = $obj;
+				continue;
+			}
 			
 			// Anzahl Noten je Kurs und User			
 			$qry_mdl = "SELECT count(*) as anz
@@ -318,9 +379,184 @@ class moodle_course extends basis_db
 			$this->result[] = $obj;
 		}
 		return true;
-					
 	}
 
+// ----------------------------------------------------------------------------------------------------------------
+	/**
+	 * Laedt alle MoodleKurse die zu einer LV/Stsem
+	 * plus die MoodleKurse die auf dessen LE haengen
+	 * @param lehrveranstaltung_id
+	 *        studiensemester_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAllMoodleVariant($mdl_course_id='',$lehrveranstaltung_id='',$studiensemester_kurzbz='',$lehreinheit_id='',$studiengang='',$semester='',$detail=false)
+	{
+		// Initialisierung
+		$this->errormsg = '';
+		$this->result=array();
+
+		$qry = "SELECT distinct tbl_moodle.lehrveranstaltung_id as moodle_lehrveranstaltung_id,tbl_moodle.lehreinheit_id as moodle_lehreinheit_id, tbl_moodle.studiensemester_kurzbz,tbl_lehrveranstaltung.semester
+						,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_lehrveranstaltung.lehrveranstaltung_id,tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester 
+						,tbl_moodle.mdl_course_id,tbl_moodle.lehreinheit_id,tbl_moodle.gruppen
+					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle
+					where tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
+					 and ((tbl_moodle.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+						and tbl_moodle.studiensemester_kurzbz=lehre.tbl_lehreinheit.studiensemester_kurzbz)
+					  OR
+						 (tbl_moodle.lehreinheit_id=tbl_lehreinheit.lehreinheit_id))";
+
+
+		$where='';
+		if ($mdl_course_id!='')
+			$where.=" and tbl_moodle.mdl_course_id='".addslashes($mdl_course_id)."' ";
+			
+
+		if ($lehreinheit_id!='')
+			$where.=" and tbl_moodle.lehreinheit_id='".addslashes($lehreinheit_id)."' ";
+
+		if ($lehrveranstaltung_id!='')
+			$where.=" and tbl_moodle.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' ";
+
+		if ($studiensemester_kurzbz!='')
+			$where.=" and tbl_moodle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ";
+
+		if ($studiengang!='')
+			$where.=" and tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang)."' ";
+
+		if ($semester!='')
+			$where.=" and tbl_lehrveranstaltung.semester='".addslashes($semester)."' ";
+		$qry.=$where;
+
+		$qry.=" order by tbl_moodle.studiensemester_kurzbz,tbl_lehrveranstaltung.semester,tbl_moodle.lehrveranstaltung_id,tbl_moodle.lehreinheit_id,tbl_moodle.mdl_course_id  ";	
+
+		$qry.=";";	
+						
+#echo "<hr>	$qry <hr>";						
+
+		if(!$result = $this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object($result))
+		{
+		
+			$obj = new moodle_course($this->conn_moodle);
+
+			$obj->mdl_course_id = $row->mdl_course_id;
+			$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+			$obj->lehreinheit_id = $row->lehreinheit_id;
+			$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+			$obj->lehrveranstaltung_kurzbz=$row->kurzbz;
+			$obj->lehrveranstaltung_bezeichnung=$row->bezeichnung;
+			$obj->lehrveranstaltung_semester=$row->semester;			
+			$obj->lehrveranstaltung_studiengang_kz=$row->studiengang_kz;
+
+
+			$obj->moodle_lehrveranstaltung_id=$row->moodle_lehrveranstaltung_id;			
+			$obj->moodle_lehreinheit_id=$row->moodle_lehreinheit_id;
+			
+			$obj->mdl_fullname = 'DB fehler ID '.$obj->mdl_course_id;
+			$obj->mdl_shortname =$obj->mdl_fullname;
+			$obj->gruppen=($row->gruppen=='t'?true:false);;
+			
+			// Anzahl Benotungen
+			$obj->mdl_benotungen = 0;
+			// Anzahl Aktivitaeten und Lehrmaterial
+			$obj->mdl_resource = 0;
+			$obj->mdl_quiz = 0;
+			$obj->mdl_chat = 0;
+			$obj->mdl_forum = 0;
+			$obj->mdl_choice= 0;			
+			
+			$moddle= new moodle_course();
+			if ($moddle->load($obj->mdl_course_id))
+			{
+				$obj->mdl_fullname = $moddle->mdl_fullname;
+				$obj->mdl_shortname = $moddle->mdl_shortname;
+			}
+			else
+			{
+				$obj->mdl_course_id = 0;
+				$obj->mdl_fullname =$moddle->errormsg; 
+				$this->result[] = $obj;
+				continue;
+			}
+
+			if(!$detail)
+			{
+				$this->result[] = $obj;
+				continue;
+			}
+			
+						
+			// Anzahl Noten je Kurs und User			
+			$qry_mdl = "SELECT count(*) as anz
+				FROM mdl_grade_grades , mdl_grade_items
+				WHERE mdl_grade_items.itemtype='course'
+				AND mdl_grade_grades.finalgrade IS NOT NULL 
+				AND mdl_grade_grades.itemid=mdl_grade_items.id
+				AND mdl_grade_items.courseid ='".addslashes($row->mdl_course_id)."'; ";
+
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_benotungen = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+			
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_chat WHERE mdl_chat.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_chat = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_resource WHERE mdl_resource.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_resource = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+
+			
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_quiz WHERE mdl_quiz.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_quiz = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_forum WHERE mdl_forum.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_forum = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+			
+			$qry_mdl = "SELECT count(course) as anz FROM public.mdl_choice WHERE mdl_choice.course='".addslashes($row->mdl_course_id)."'; ";
+			if($detail && $result_mdl = pg_query($this->conn_moodle, $qry_mdl))
+			{
+				if($row_mdl = pg_fetch_object($result_mdl))
+				{
+					$obj->mdl_choice = (empty($row_mdl->anz)?0:$row_mdl->anz);
+				}
+			}					
+			$this->result[] = $obj;
+		}
+		return true;
+					
+	}
 	
 	/**
 	 * Schaut ob fuer diese LV/StSem schon ein 
@@ -450,6 +686,316 @@ class moodle_course extends basis_db
 			return false;
 		}
 	}
+	
+/**
+	 * Aendert einen Eintrag in der tbl_moodle an
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function update_vilesci()
+	{
+		if($this->mdl_course_id=='')
+		{
+			$this->errormsg='mdl_course_id muss angegeben sein';
+			return false;
+		}
+		if (is_null($this->new) || empty($this->new))
+			$this->new=false;
+			
+		$qry = 'BEGIN; ';
+		$res=0;
+		
+		if (!$this->new)
+		{
+			$qrySel = 'SELECT 1 FROM lehre.tbl_moodle WHERE mdl_course_id='.$this->addslashes($this->mdl_course_id);
+			if(!$res=$this->db_query($qrySel))
+			{
+				$this->errormsg = 'Fehler bei SELECT Abfrage! '. $this->db_last_error().' in File:='.__FILE__.' Line:='.__LINE__;			
+				return false;
+			}
+			if($this->db_num_rows($res)>0)
+			{
+				if ($this->lehrveranstaltung_id!='' && !is_null($this->lehrveranstaltung_id))
+				{
+					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehreinheit_id is null ; ';
+				}
+				else
+				{
+					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehrveranstaltung_id is null ; ';
+					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehreinheit_id not in ('. (is_array($this->lehreinheit_id)? implode(',',$this->lehreinheit_id) :$this->lehreinheit_id) .') ; ';
+				}
+			}
+		}	
+
+		if ( ($this->lehrveranstaltung_id!='' && !is_null($this->lehrveranstaltung_id))
+		OR !is_array($this->lehreinheit_id)  )
+		{
+			$qrySel = 'SELECT 1 FROM lehre.tbl_moodle WHERE mdl_course_id='.$this->addslashes($this->mdl_course_id);
+			if ($this->new)
+			{
+				if ( $this->lehrveranstaltung_id!='' && !is_null($this->lehrveranstaltung_id) )
+					$qrySel.= ' and lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id);
+				else
+					$qrySel.= ' and lehreinheit_id='.$this->addslashes($this->lehreinheit_id);
+			}
+			
+			if(!$res=$this->db_query($qrySel))
+			{
+				$this->errormsg = 'Fehler beim Select Moodle Lehrveranstaltung ! '.$qrySel.'  '. $this->db_last_error().' in File:='.__FILE__.' Line:='.__LINE__;			
+				$this->db_query('ROLLBACK');		
+				return false;
+
+			}
+			if($this->db_num_rows($res)>0)
+			{
+				$qry.= 'UPDATE lehre.tbl_moodle set
+					 lehreinheit_id='.$this->addslashes($this->lehreinheit_id).',
+					 lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).',
+					 studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).' 
+					 ';
+				if (strlen($this->gruppen) && !is_null($this->gruppen))
+					$qry.= ',gruppen='.($this->gruppen?'true':'false');
+					$qry.= '  where mdl_course_id='.$this->addslashes($this->mdl_course_id).'; ';			
+			}
+			else 
+			{
+				$qry.= 'INSERT INTO lehre.tbl_moodle(mdl_course_id, lehreinheit_id, lehrveranstaltung_id, 
+												studiensemester_kurzbz, insertamum, insertvon, gruppen)
+					VALUES('.
+					$this->addslashes($this->mdl_course_id).','.
+					$this->addslashes($this->lehreinheit_id).','.
+					$this->addslashes($this->lehrveranstaltung_id).','.
+					$this->addslashes($this->studiensemester_kurzbz).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).','.
+					($this->gruppen?'true':'false').'); ';
+			}
+		}
+		// Lehreinheiten anlegen - Array
+		else
+		{
+			foreach ($this->lehreinheit_id as $key=>$value)
+			{
+				$qrySel = 'SELECT 1 FROM lehre.tbl_moodle WHERE mdl_course_id='.$this->addslashes($this->mdl_course_id). ' and lehreinheit_id='.$this->addslashes($value);
+				if(!$res=$this->db_query($qrySel))
+				{
+					$this->errormsg = 'Fehler beim Select Moodle Lehreinheit ! '. $this->db_last_error().' in File:='.__FILE__.' Line:='.__LINE__;			
+					$this->db_query('ROLLBACK');		
+					return false;
+				}
+				if($this->db_num_rows($res)>0)
+				{
+					$qry.= 'UPDATE lehre.tbl_moodle set
+							 lehreinheit_id='.$this->addslashes($value).',
+							 lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).',
+							 studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).' 
+							 ';
+					if (strlen($this->gruppen) && !is_null($this->gruppen))
+						$qry.= ',gruppen='.($this->gruppen?'true':'false');
+					$qry.= '  where mdl_course_id='.$this->addslashes($this->mdl_course_id).'; ';			
+				}
+				else 
+				{
+					$qry.= 'INSERT INTO lehre.tbl_moodle(mdl_course_id, lehreinheit_id, lehrveranstaltung_id, 
+													studiensemester_kurzbz, insertamum, insertvon, gruppen)
+						VALUES('.
+						$this->addslashes($this->mdl_course_id).','.
+						$this->addslashes($value).','.
+						$this->addslashes($this->lehrveranstaltung_id).','.
+						$this->addslashes($this->studiensemester_kurzbz).','.
+						$this->addslashes($this->insertamum).','.
+						$this->addslashes($this->insertvon).','.
+						($this->gruppen?'true':'false').'); ';
+				}
+			}
+	
+		}
+		
+#echo $qry;
+#return false;
+
+		if(!$this->db_query($qry))
+		{
+			$this->db_query('ROLLBACK');		
+			$this->errormsg = 'Fehler beim aendern des Datensatzes! '. $this->db_last_error().' in File:='.__FILE__.' Line:='.__LINE__;			
+			return false;
+		}
+		$this->db_query('COMMIT;');
+		return true;
+
+	}
+
+	/**
+	 * Aendert einen Kurs im Moodle an
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function update_moodle()
+	{
+		if($this->mdl_course_id=='')
+		{
+			$this->errormsg='mdl_course_id muss angegeben sein';
+			return false;
+		}	
+		
+		if( (is_null($this->lehrveranstaltung_id) || $this->lehrveranstaltung_id=='') 
+		&& (is_null($this->lehreinheit_id) && $this->lehreinheit_id==''))
+		{
+			$this->errormsg='LvID oder LeID muss uebergeben werden';
+			return false;
+		}	
+				
+		pg_query($this->conn_moodle, 'BEGIN;');
+		
+		//CourseCategorie ermitteln
+		
+		//lehrveranstalung ID holen falls die nur die lehreinheit_id angegeben wurde
+		if($this->lehrveranstaltung_id=='' || is_null($this->lehrveranstaltung_id))
+		{
+			$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit 
+					WHERE lehreinheit_id='".addslashes($this->lehreinheit_id)."'";
+			if($res=$this->db_query($qry))
+			{
+				if($row = $this->db_fetch_object($res))
+				{
+					$lvid = $row->lehrveranstaltung_id;
+				}
+				else 
+				{
+					pg_query($this->conn_moodle, 'ROLLBACK');
+					$this->errormsg = 'Fehler beim Ermitteln der LehrveranstaltungID';
+					return false;
+				}
+			}
+			else 
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Ermitteln der LehrveranstaltungID';
+				return false;
+			}
+		}
+		else 
+			$lvid = $this->lehrveranstaltung_id;
+		
+		//Studiengang und Semester holen
+		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg 
+				FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE lehrveranstaltung_id='$lvid'";
+		
+		if($res=$this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($res))
+			{
+				$semester = $row->semester;
+				$stg = $row->stg;
+			}
+			else 
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Ermitteln von Studiengang und Semester';
+				return false;
+			}
+		}
+		else 
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim Ermitteln von Studiengang und Semester';
+			return false;
+		}
+	
+		//Studiensemester Categorie holen
+		if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, '0'))
+		{
+			if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, '0'))
+				echo "<br>Fehler beim Anlegen des Studiensemesters";
+		}
+
+		//Studiengang Categorie holen
+		if(!$id_stg = $this->getCategorie($stg, $id_stsem))
+		{
+			if(!$id_stg = $this->createCategorie($stg, $id_stsem))
+				echo "<br>$this->errormsg";
+		}
+
+		//Semester Categorie holen
+		if(!$id_sem = $this->getCategorie($semester, $id_stg))
+		{
+			if(!$id_sem = $this->createCategorie($semester, $id_stg))
+				echo "<br>$this->errormsg";
+		}
+		
+		//CourseCategorie Context holen
+		$this->getContext(40, $id_sem);
+
+
+		$qry = 'UPDATE public.mdl_course set 
+					category='.$this->addslashes($id_sem).',
+					fullname='. $this->addslashes($this->mdl_fullname) .',
+					shortname='.$this->addslashes($this->mdl_shortname).'
+		';
+		$qry.= " WHERE id='".addslashes($this->mdl_course_id)."'; ";	
+				
+#echo $qry;
+#return true;
+
+		if(!$result = pg_query($this->conn_moodle, $qry))
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim Update';
+			return false;
+		}
+
+
+		$qry = "DELETE FROM public.mdl_context where contextlevel='50' and instanceid=".$this->addslashes($this->mdl_course_id)." ;";
+		if(!pg_query($this->conn_moodle, $qry))
+		{
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Entfernen des Context eintrages.  '. pg_last_error();
+				return false;
+		}		
+				
+		//zum vorherigen Pfad die aktuelle id hinzufuegen
+		$path = "(SELECT '$this->mdl_context_path' || '/' || ".$this->mdl_course_id.")";
+		//vorherige tiefe um 1 erhoehen
+		$depth = $this->mdl_context_depth+1;
+		
+		//Context eintragen
+		$qry = "INSERT INTO public.mdl_context(contextlevel, instanceid, path, depth) VALUES('50', ".
+		$this->addslashes($this->mdl_course_id).",".$path.",".$this->addslashes($depth).");";
+		if(pg_query($this->conn_moodle, $qry))
+		{
+			$qry = "SELECT currval('mdl_context_id_seq') as id";
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if($row = pg_fetch_object($result))
+				{
+					$this->mdl_context_id = $row->id;
+				}
+				else 
+				{
+					pg_query($this->conn_moodle, 'ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence ::'. pg_last_error($result).' '. pg_last_error();
+					return false;
+				}
+			}
+			else 
+			{	
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Select der Sequence :'. pg_last_error();
+				return false;
+			}
+		}
+		else 
+		{
+			pg_query($this->conn_moodle, 'ROLLBACK');
+			$this->errormsg = 'Fehler beim INSERT';
+			return false;
+		}
+				
+		
+		pg_query($this->conn_moodle, 'COMMIT;');
+		return true;
+	}
+
+	
 	
 	/**
 	 * Legt einen Kurs im Moodle an
@@ -635,6 +1181,35 @@ class moodle_course extends basis_db
 
 	}
 	
+	
+	/**
+	 * Laedt eine CourseCategorie anhand der Bezeichnung und der
+	 * ParentID
+	 */
+	public function deleteCategorie($bezeichnung, $parent)
+	{
+		if($bezeichnung=='')
+		{
+			$this->errormsg = 'Bezeichnung muss angegeben werden';
+			return false;
+		}
+		if($parent=='')
+		{
+			$this->errormsg = 'getCategorie: parent wurde nicht uebergeben';
+			return false;
+		}
+		$qry = "DELETE FROM public.mdl_course_categories WHERE name='".addslashes($bezeichnung)."' AND parent='".addslashes($parent)."'";
+		
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+				return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim loeschen der KursKategorie';
+			return false;
+		}
+	}
 	
 	/**
 	 * Laedt eine CourseCategorie anhand der Bezeichnung und der
@@ -1341,6 +1916,7 @@ class moodle_course extends basis_db
 		return $this->result;
 	}	// Ende moodle Noten 
 	
+
 	/**
 	 * Loescht einen Moodle Course im Moodel und in der DB
 	 * @param mdl_course_id
@@ -1377,7 +1953,10 @@ class moodle_course extends basis_db
 		if (isset($result[1]))
 			$this->errormsg=$result[1];
 
-		if ($result[0]==1) // Methodenaufruf erfolgreich	
+			
+			
+			
+		if ($result[0]==1 || !$this->load($this->mdl_course_id)) // Methodenaufruf erfolgreich	
 		{
 				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='". addslashes($this->mdl_course_id) ."' ";
 				if (!is_null($this->moodle_id) && $this->moodle_id!='')
@@ -1399,7 +1978,7 @@ class moodle_course extends basis_db
 		return true;	
 	
 	}	
-	
+			
 	/**
 	 * ruft eine XMLRPC Methode im Moodle auf 
 	 * @param methode
