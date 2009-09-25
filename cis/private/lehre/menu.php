@@ -251,7 +251,7 @@ function js_toggle_container(conid)
 		         die('Fehler beim Oeffnen der Lehrveranstaltung'); 
 				 
 			$lv_obj->lehrveranstaltungen=array();
-	        if ($lv_obj->load_lva($studiengang_kz,$semester,null,null,true,'orgform_kurzbz DESC, bezeichnung',true))
+	        if ($lv_obj->load_lva($studiengang_kz,$semester,null,TRUE,TRUE,'orgform_kurzbz DESC, bezeichnung'))
     	    {
 				$lastform=null;
                 foreach ($lv_obj->lehrveranstaltungen as $row)
