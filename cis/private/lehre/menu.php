@@ -247,12 +247,22 @@ function js_toggle_container(conid)
 		</tr>
 
 		<?php
-			$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz='".addslashes($studiengang_kz)."' AND semester='".addslashes($semester)."' AND aktiv AND lehre ORDER BY orgform_kurzbz DESC, bezeichnung";
-			$lastform=null;
-			if($result = $db->db_query($qry))
-			{
-				while($row = $db->db_fetch_object($result))
-				{
+	        if (!$lv_obj = new lehrveranstaltung())
+		         die('Fehler beim Oeffnen der Lehrveranstaltung'); 
+				 
+			$lv_obj->lehrveranstaltungen=array();
+	        if ($lv_obj->load_lva($studiengang_kz,$semester,null,null,true,'orgform_kurzbz DESC, bezeichnung',true))
+    	    {
+				$lastform=null;
+                foreach ($lv_obj->lehrveranstaltungen as $row)
+                {		
+# --- In Classe uebernommen				
+#			$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz='".addslashes($studiengang_kz)."' AND semester='".addslashes($semester)."' AND aktiv AND lehre ORDER BY orgform_kurzbz DESC, bezeichnung";
+#			$lastform=null;
+#			if($result = $db->db_query($qry))
+#			{
+#				while($row = $db->db_fetch_object($result))
+#				{
 					if($row->orgform_kurzbz!=$lastform)
 					{
 						$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz='$row->orgform_kurzbz'";
