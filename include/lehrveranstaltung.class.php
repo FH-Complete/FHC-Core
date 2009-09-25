@@ -184,7 +184,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null, $sort=null)
+	public function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null, $sort=null,$lehre=null)
 	{
 		//Variablen pruefen
 
@@ -193,37 +193,51 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if($semester!=null && (!is_numeric($semester) || $semester==''))
+		if(!is_null($semester) && (!is_numeric($semester) && $semester!=''))
 		{
 			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if($lehre!=null && !is_bool($lehre))
+		if(!is_null($aktiv) && !is_bool($aktiv))
+		{
+			$this->errormsg = 'Aktivkz muss ein boolscher Wert sein';
+			return false;
+		}
+		if(!is_null($lehre) && !is_bool($lehre))
 		{
 			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
 			return false;
 		}
+		
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz='".addslashes($studiengang_kz)."' ";
 
 		//Select Befehl zusammenbauen
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz = '$studiengang_kz'";
-
-		if($lehreverzeichnis!=null)
+		if(!is_null($lehreverzeichnis))
 			$qry .= " AND lehreverzeichnis='$lehreverzeichnis'";
-		if($semester != null)
+		else
+			$qry .= " AND lehreverzeichnis<>'' ";
+					
+		if(!is_null($semester) && $semester!='')
 			$qry .= " AND semester='$semester'";
-		if($lehre!=null)
+		else
+			$qry .= " AND semester is not null ";
+					
+		if(!is_null($lehre))
 			$qry .= " AND lehre=".($lehre?'true':'false');
-		if($aktiv!=null)
-			if ($aktiv)
-				$qry .= " AND aktiv";
+			
+		if(!is_null($aktiv) && $aktiv)
+				$qry .= " AND aktiv ";
 
-		$qry .= " AND semester is not null AND lehreverzeichnis<>''";
-
+		if(!is_null($lehre) && $lehre)
+				$qry .= " AND lehre ";
+		
 		if ($sort == "bezeichnung")
 			$qry .= " ORDER BY bezeichnung";
-		else
+		else if (is_null($sort) || empty($sort))
 			$qry .= " ORDER BY semester, bezeichnung";
-
+		else
+			$qry .= " ORDER BY $sort ";
+		
 		//Datensaetze laden
 		if(!$this->db_query($qry))
 		{
@@ -269,6 +283,7 @@ class lehrveranstaltung extends basis_db
 
 		return true;
 	}
+	
 	
 	/**
 	 * Liefert alle Lehrveranstaltungen eines Studenten (alle Semester)
