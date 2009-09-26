@@ -26,17 +26,20 @@
 *   Jede MoodleID kann invididuell zu einem Studiengang oder Lehreinheit zugeteilt werden.
 */
    header('Content-Type: text/html;charset=UTF-8');
-
    // Ohne einer Moodlekurs ID hier beenden
    $mdl_course_id=(isset($_REQUEST['mdl_course_id'])?trim($_REQUEST['mdl_course_id']):'');
-   if (empty($mdl_course_id))
+   $entfernen=(isset($_REQUEST['entfernen'])?trim($_REQUEST['entfernen']):'');
+   if (empty($mdl_course_id) && !$entfernen)
 	exit();
 
 // ***********************************************************************************************
 // Include Dateien
 // ***********************************************************************************************
         require_once('../../config/vilesci.config.inc.php');
-#        include_once('../../include/basis_db.class.php');
+        include_once('../../include/basis_db.class.php');
+        if (!$db = new basis_db())
+	         die('Fehler beim Oeffnen der Datenbankverbindung');
+
 // ---------------- Standart Include Dateien einbinden
        require_once('../../include/functions.inc.php');
        require_once('../../include/globals.inc.php');
@@ -54,6 +57,19 @@
         if (!$objMoodle = new moodle_course())
 	         die('Fehler beim Oeffnen der Moodleverbindung');
 
+	   $entfernen=(isset($_REQUEST['entfernen'])?trim($_REQUEST['entfernen']):'');
+	   if (!empty($entfernen))
+	   {
+		$lehrveranstaltung_id=(isset($_REQUEST['lehrveranstaltung_id']) && !empty($_REQUEST['lehrveranstaltung_id'])?trim($_REQUEST['lehrveranstaltung_id']):null);
+    		$lehreinheit_id=(isset($_REQUEST['lehreinheit_id']) && !empty($_REQUEST['lehreinheit_id'])?$_REQUEST['lehreinheit_id']:null);
+	       if(!$objMoodle->delete_vilesci($mdl_course_id,$lehrveranstaltung_id,$lehreinheit_id))
+		{
+	             exit('Eintrag wurde in Lehre nicht gel&ouml;scht! '.$objMoodle->errormsg);
+	       }
+	       exit('Eintrag in Lehre gel&ouml;scht! '.$objMoodle->errormsg);
+	   }
+		  
+		  
         if (!$le_obj = new lehreinheit())
 	         die('Fehler beim Oeffnen der Lehreinheit');
 
@@ -69,9 +85,12 @@
         if (!$stsem = new studiensemester())
 	         die('Fehler beim Oeffnen der Studiensemester');
 
+		  
         // @$studiensemester_kurzbz Studiensemester xxJJJJ - xx fuer SS Sommer  oder WW Winter
         if (!$stsem_aktuell = $stsem->getakt())
                 $stsem_aktuell = $stsem->getaktorNext();
+
+
 
 // ***********************************************************************************************
 
@@ -87,7 +106,6 @@
 // ***********************************************************************************************
 // POST oder GET Parameter einlesen
 // ***********************************************************************************************
-
 	// @$mdl_course_id Moodle - ID suche
        $mdl_course_id=(isset($_REQUEST['mdl_course_id'])?trim($_REQUEST['mdl_course_id']):'');
 
@@ -105,7 +123,7 @@
 	//---------------------------------------------------------------------------
 	// Check Moodle
        $mdl_course_stat='';
-       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false))
+       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false,false,false))
 	{
              die('Moodle-Kurs '.$objMoodle->mdl_course_id.' wurde in Lehre nicht gefunden! '.$objMoodle->errormsg);
        }
@@ -128,8 +146,12 @@
 	// es wurden Moodledaten gefunden
         else if ($objMoodle->load($mdl_course_id))
         {
-			$new=true;
+			$objMoodle->result=array();
+			$objMoodle->result[0]= new stdClass(); 
+			$objMoodle->result[0]->fullname=$objMoodle->mdl_fullname;
+			$objMoodle->result[0]->shortname=$objMoodle->mdl_shortname;
 
+			$new=true;
 			$mdl_course_stat='+';
 			$errormsg[]='Neuzuteilung zu Moodlekurs '.$objMoodle->mdl_course_id.' m&ouml;glich';
 			$moodle_id='?';
@@ -162,7 +184,7 @@
 		$sel_lehrveranstaltung_id=(isset($_REQUEST['sel_lehrveranstaltung_id'])?trim($_REQUEST['sel_lehrveranstaltung_id']):$lehrveranstaltung_id);
 		$aendern_lehrveranstaltung_id=(isset($_REQUEST['aendern_lehrveranstaltung_id']) && !empty($_REQUEST['aendern_lehrveranstaltung_id'])?trim($_REQUEST['aendern_lehrveranstaltung_id']):$sel_lehrveranstaltung_id);
 		
-    	$aendern_lehreinheit_id=(isset($_REQUEST['aendern_lehreinheit_id'])?$_REQUEST['aendern_lehreinheit_id']:(isset($_REQUEST['aendern_studiensemester_kurzbz'])?'':$lehreinheit_id));
+    		$aendern_lehreinheit_id=(isset($_REQUEST['aendern_lehreinheit_id'])?$_REQUEST['aendern_lehreinheit_id']:(isset($_REQUEST['aendern_studiensemester_kurzbz'])?'':$lehreinheit_id));
 
 
 		$aendern_bezeichnung=(isset($_REQUEST['aendern_bezeichnung'])?trim($_REQUEST['aendern_bezeichnung']):$bezeichnung);
@@ -268,12 +290,11 @@
         // Lehrveranstaltungen
 		$content.='<th valign="top">&nbsp;Lehrveranstaltung&nbsp;</th>';
         $content.='<td><select onchange="document.'.$cFormName.'.aendern_bezeichnung.value=\'\';document.'.$cFormName.'.aendern_lehrveranstaltung_id.value=this.value;document.'.$cFormName.'.aendern_lehrveranstaltung_id.checked=false;uncheckLE();generateLEText();document.'.$cFormName.'.submit();" name="sel_lehrveranstaltung_id">';
-		$lv_bez='';
-       	$lv_kurz_bez='';
-		$lv_obj->lehrveranstaltungen=array();
-        if ($lv_obj->load_lva($aendern_studiengang_kz, $aendern_semester,null,null,true,'bezeichnung',true))
-        {
-
+	$lv_bez='';
+       $lv_kurz_bez='';
+	$lv_obj->lehrveranstaltungen=array();
+       if ($lv_obj->load_lva_le($aendern_studiengang_kz,$aendern_studiensemester_kurzbz, $aendern_semester,null,null,null,'bezeichnung'))
+       {
                     foreach ($lv_obj->lehrveranstaltungen as $row)
                     {
 
@@ -344,7 +365,7 @@
 									$lehreinheitmitarbeiter->getLehreinheitmitarbeiter($row->lehreinheit_id);
 									foreach ($lehreinheitmitarbeiter->lehreinheitmitarbeiter as $ma)
 									{
-										$lektoren.= '&nbsp;'.$ma->mitarbeiter_uid;
+										$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 									}						
 										
 		                            // LE Text
@@ -456,7 +477,7 @@
 			}
 			$content.='<tr>';
 				$content.='<th valign="top">Lehrveranstaltung</th>
-						<td valign="top">'.(isset($objMoodle->result[0])  && isset($objMoodle->result[0]->lehrveranstaltung_bezeichnung)?$objMoodle->result[0]->lehrveranstaltung_bezeichnung:' - ').'</td>
+						<td valign="top">'.(isset($objMoodle->result[0])  && isset($objMoodle->result[0]->lehrveranstaltung_bezeichnung)?$objMoodle->result[0]->lehrveranstaltung_bezeichnung.'&nbsp;&nbsp;Kurzbz:&nbsp;'.$objMoodle->result[0]->lehrveranstaltung_kurzbz.'&nbsp;,&nbsp;Lehrform Kurzbz:'.($objMoodle->result[0]->lehrveranstaltung_lehrform_kurzbz?$objMoodle->result[0]->lehrveranstaltung_lehrform_kurzbz:' - ').',&nbsp;ID&nbsp;'.$objMoodle->result[0]->lehrveranstaltung_id.'&nbsp;':' - ').'</td>
 						<td valign="top"><input disabled name="lehrveranstaltung_id" value="'.$objMoodle->result[0]->lehrveranstaltung_id.'" type="Checkbox" '.($objMoodle->result[0]->moodle_lehrveranstaltung_id?' checked="checked" ':'').'>&nbsp;ID&nbsp;'.$objMoodle->result[0]->lehrveranstaltung_id.'</td>
 						';
 			$content.='<th valign="top">Lehreinheiten</th>';
@@ -487,7 +508,7 @@
 					$lehreinheitmitarbeiter->getLehreinheitmitarbeiter($row->lehreinheit_id);
 					foreach ($lehreinheitmitarbeiter->lehreinheitmitarbeiter as $ma)
 					{
-						$lektoren.= '&nbsp;'.$ma->mitarbeiter_uid;
+						$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 					}			
 					$content.='<tr>';
                           		$content.='<td>'.$row->lehrform_kurzbz.'&nbsp;</td><td>'.$gruppen.'&nbsp;</td><td>ID&nbsp;'.$row->lehreinheit_id.'&nbsp;</td>';
@@ -618,86 +639,96 @@
 
 	    	$bWartung=(isset($_REQUEST['aenderung']) && !empty($_REQUEST['aenderung'])?true:false);
 	    	$bKopieren=(isset($_REQUEST['kopieren']) && !empty($_REQUEST['kopieren'])?true:false);
-			
-			
-			$aendern_studiensemester_kurzbz=(isset($_REQUEST['aendern_studiensemester_kurzbz'])?trim($_REQUEST['aendern_studiensemester_kurzbz']):'');
+		$aendern_studiensemester_kurzbz=(isset($_REQUEST['aendern_studiensemester_kurzbz'])?trim($_REQUEST['aendern_studiensemester_kurzbz']):'');
 	    	$aendern_studiengang_kz=(isset($_REQUEST['aendern_studiengang_kz'])?trim($_REQUEST['aendern_studiengang_kz']):'');
 	    	$aendern_semester=(isset($_REQUEST['aendern_semester'])?trim($_REQUEST['aendern_semester']):'');
 
-	    	$aendern_lehrveranstaltung_id=(isset($_REQUEST['aendern_lehrveranstaltung_id'])?trim($_REQUEST['aendern_lehrveranstaltung_id']):(isset($_REQUEST['aendern_studiensemester_kurzbz'])?'':''));
-			$sel_lehrveranstaltung_id=(isset($_REQUEST['sel_lehrveranstaltung_id'])?trim($_REQUEST['sel_lehrveranstaltung_id']):'');
+		$sel_lehrveranstaltung_id=(isset($_REQUEST['sel_lehrveranstaltung_id'])?trim($_REQUEST['sel_lehrveranstaltung_id']):$lehrveranstaltung_id);
+		$aendern_lehrveranstaltung_id=(isset($_REQUEST['aendern_lehrveranstaltung_id']) && !empty($_REQUEST['aendern_lehrveranstaltung_id'])?trim($_REQUEST['aendern_lehrveranstaltung_id']):$sel_lehrveranstaltung_id);
 
 	    	$aendern_lehreinheit_id=(isset($_REQUEST['aendern_lehreinheit_id'])?$_REQUEST['aendern_lehreinheit_id']:(isset($_REQUEST['aendern_studiensemester_kurzbz'])?'':''));
 
-			$aendern_bezeichnung=(isset($_REQUEST['aendern_bezeichnung'])?trim($_REQUEST['aendern_bezeichnung']):'');
-			$aendern_kurzbezeichnung=(isset($_REQUEST['aendern_kurzbezeichnung'])?trim($_REQUEST['aendern_kurzbezeichnung']):'');
-			$aendern_gruppen=(isset($_REQUEST['aendern_gruppen']) && !empty($_REQUEST['aendern_gruppen'])?true:(isset($_REQUEST['aendern_gruppen'])?1:0));
+		$aendern_bezeichnung=(isset($_REQUEST['aendern_bezeichnung'])?trim($_REQUEST['aendern_bezeichnung']):'');
+		$aendern_kurzbezeichnung=(isset($_REQUEST['aendern_kurzbezeichnung'])?trim($_REQUEST['aendern_kurzbezeichnung']):'');
+		$aendern_gruppen=(isset($_REQUEST['aendern_gruppen']) && !empty($_REQUEST['aendern_gruppen'])?true:(isset($_REQUEST['aendern_gruppen'])?1:0));
 
 
 		//  Original Moodlekurs lesen
-	       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false))
-			{
+	       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false,false,false))
+		{
                     die('Moodle-Kurs '.$objMoodle->mdl_course_id.' wurde in Lehre nicht gefunden! '.$objMoodle->errormsg);
-       		}
+       	}
 
-			if(isset($objMoodle->result) && isset($objMoodle->result[0]))
+		if(isset($objMoodle->result) && isset($objMoodle->result[0]))
 	    	{
-				$new=false;
-				$objMoodle->new=false;
+			$new_lehre_moodle_kurs=false;
+			$objMoodle->new=false;
 	    	}
 	    	else if ($objMoodle->load($mdl_course_id) && !$bKopieren)
 	    	{
-				$new=true;
-				$objMoodle->new=true; // Datensatz anlegen
-			}
-			else
+			$new_lehre_moodle_kurs=true;
+			$objMoodle->new=true; // Datensatz anlegen
+		}
+		else
+		{
+	             	  die('Moodle-Kurs '.$mdl_course_id.' wurde nicht gefunden! '.$objMoodle->errormsg);
+		}
+		
+		
+		if ($bKopieren)
+		{
+			if ($new_lehre_moodle_kurs)
 			{
-              	  die('Moodle-Kurs '.$mdl_course_id.' wurde nicht gefunden! '.$objMoodle->errormsg);
+	             	  die('nur bestehende Moodle-Kurse k&ouml;nnen kopiert werden ');
 			}
+			$objMoodle->new=true; // Datensatz anlegen
+		}
 
 
-			if ($aendern_lehrveranstaltung_id)
-			{
-				$objMoodle->lehrveranstaltung_id=$aendern_lehrveranstaltung_id;
-				$objMoodle->lehreinheit_id=null;
-			}
-			else if ((!is_array($aendern_lehreinheit_id) && !empty($aendern_lehreinheit_id))
-				 || (is_array($aendern_lehreinheit_id) && count($aendern_lehreinheit_id)>0) )
-			{
-				$objMoodle->lehrveranstaltung_id=null;
-				$objMoodle->lehreinheit_id=$aendern_lehreinheit_id;
-			 }
-			 else
-			 {
-		  	    $errormsg[]='LV oder LE wurde nicht ausgew&auml;hlt!';
-				return false;
-			 }
+		if ($aendern_lehrveranstaltung_id)
+		{
+			$objMoodle->lehrveranstaltung_id=$aendern_lehrveranstaltung_id;
+			$objMoodle->lehreinheit_id=null;
+		}
+		else if ((!is_array($aendern_lehreinheit_id) && !empty($aendern_lehreinheit_id))
+			 || (is_array($aendern_lehreinheit_id) && count($aendern_lehreinheit_id)>0) )
+		{
+			$objMoodle->lehrveranstaltung_id=null;
+			$objMoodle->lehreinheit_id=$aendern_lehreinheit_id;
+		 }
+		 else
+		 {
+	  	    $errormsg[]='LV oder LE wurde nicht ausgew&auml;hlt!';
+			return false;
+		 }
 
 
-			$objMoodle->mdl_course_id=$mdl_course_id;
-			$objMoodle->studiensemester_kurzbz=$aendern_studiensemester_kurzbz;
+		$objMoodle->mdl_course_id=$mdl_course_id;
+		$objMoodle->studiensemester_kurzbz=$aendern_studiensemester_kurzbz;
 
 		// Kurztext des Moodlekurses neu ermitteln
-			$objMoodle->mdl_fullname=$aendern_bezeichnung;
-			$objMoodle->mdl_shortname=$aendern_kurzbezeichnung;
-			$objMoodle->insertamum=(!$new && isset($objMoodle->result[0]->insertamum)?$objMoodle->result[0]->insertamum:date('Y-m-d H:i:s'));
-			if (!$user=get_uid())
-			{
-				$errormsg[]='Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !';
-				return false;
-			}
-			$objMoodle->insertvon=(!$new && isset($objMoodle->result[0]->insertvon)?$objMoodle->result[0]->insertvon:$user);
-			$objMoodle->gruppen=($aendern_gruppen?1:0);
+		$objMoodle->mdl_fullname=$aendern_bezeichnung;
+		$objMoodle->mdl_shortname=$aendern_kurzbezeichnung;
+		$objMoodle->insertamum=(!$new_lehre_moodle_kurs && isset($objMoodle->result[0]->insertamum)?$objMoodle->result[0]->insertamum:date('Y-m-d H:i:s'));
+		if (!$user=get_uid())
+		{
+			$errormsg[]='Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !';
+			return false;
+		}
+		
+		$objMoodle->insertvon=(!$new_lehre_moodle_kurs && isset($objMoodle->result[0]->insertvon)?$objMoodle->result[0]->insertvon:$user);
+		$objMoodle->gruppen=($aendern_gruppen?1:0);
 
 
-			if (!$objMoodle->update_vilesci())
-			{
-         	  	$errormsg[]='Fehler Vilesci Moodle-Kurs '.$mdl_course_id.' '.$objMoodle->result[0]->mdl_fullname.' zugeordnet '.$objMoodle->errormsg;
-				return false;
-			}
-			$errormsg[]='Vilesci Moodle-Kurs '.$mdl_course_id.' '.$aendern_bezeichnung.' '.$aendern_kurzbezeichnung.($objMoodle->new?' angelegt ':' geaendert ').$objMoodle->errormsg;
-			if ($bKopieren || $new)
-				return true;
+		if (!$objMoodle->update_vilesci())
+		{
+         	 	$errormsg[]='Fehler Vilesci Moodle-Kurs '.$mdl_course_id.' '.$objMoodle->result[0]->mdl_fullname.' zugeordnet '.$objMoodle->errormsg;
+			return false;
+		}
+
+		$errormsg[]='Vilesci Moodle-Kurs '.$mdl_course_id.' '.$aendern_bezeichnung.' '.$aendern_kurzbezeichnung.($objMoodle->new?' angelegt ':' geaendert ').$objMoodle->errormsg;
+		if ($bKopieren || $new_lehre_moodle_kurs)
+			return true;
 
 		// Moodle aenderungen nur bei Wechsel der LV
 

@@ -84,7 +84,7 @@
         $errormsg=array();
 
 // @bDebug Anzeige der xml-rfc Daten moegliche Stufen sind 0,1,2,3
-        $bDebug= (isset($_REQUEST['debug'])?$_REQUEST['debug']:0);
+        $bDebug= (isset($_REQUEST['debug']) && !empty($_REQUEST['debug'])?1:0);
 // @$lehrveranstaltung_id Lehrveranstaltung
         $studiensemester_kurzbz=(isset($_REQUEST['studiensemester_kurzbz'])?trim($_REQUEST['studiensemester_kurzbz']):$stsem_aktuell);
 // @$lehreinheit_id Lehreinheit
@@ -101,6 +101,9 @@
 // @bAnzeige der xml-rfc Daten moegliche Stufen sind 0,1,2,3
          $bAnzeige=(isset($_REQUEST['anzeige'])?trim($_REQUEST['anzeige']):false);
 
+// @bAnzeige der xml-rfc Daten moegliche Stufen sind 0,1,2,3
+         $lehre=(isset($_REQUEST['lehre'])?true:(!$bAnzeige?true:false));
+         $aktiv=(isset($_REQUEST['aktiv'])?true:(!$bAnzeige?true:false));
 
 // ***********************************************************************************************
 // Datenbankabfragen
@@ -189,20 +192,20 @@
                 <form accept-charset="UTF-8" name="'.$cFormName.'"  method="POST" target="_self" action="'.$_SERVER['PHP_SELF'].'" >
                         <table class="liste">
                         <tr>
-                                <th>&nbsp;Studiensemester&nbsp;</th>
-                                <th>&nbsp;Studiengang&nbsp;</th>
-                                <th>&nbsp;Semster&nbsp;</th>
-                                <th>&nbsp;Lehrveranstaltung&nbsp;</th>
-                                <th>&nbsp;Lehreinheiten&nbsp;</th>
-                                <th colspan="3">&nbsp;Moodlekurs&nbsp;</th>
-					<td>&nbsp;</td>
+                           	<th>StSem</th>
+                           	<th>Stg-Kz</th>
+                           	<th>Semster</th>
+                           	<th>Lehrveranstaltung</th>
+                           	<th>Lehreinheiten</th>
+                           	<th>Moodlekurs</th>
+				<td>&nbsp;</td>
                         </tr>';
         //---------------------------------------------------------------------------
 	// Auswahlfelder
 	     $content.='<tr>';
 
         // Studiensemester public.tbl_studiensemester_kurzbz
-                $content.='<td><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiensemester_kurzbz"><option value="">&nbsp;Alle&nbsp;</option>';
+                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiensemester_kurzbz"><option value="">&nbsp;Alle&nbsp;</option>';
                 $stsem->studiensemester=array();
 		  if ($stsem->getAll())
                 {
@@ -219,12 +222,13 @@
 
         //---------------------------------------------------------------------------
         // Studiengang public.tbl_studiengang_kz
-            $content.='<td><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiengang_kz">';
-			if ($studiengang_kz=='*')
-			{
-				$studiengang_kz='';
-           		$content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;-&nbsp;</option>';
-			}
+            $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiengang_kz">';
+		if ($studiengang_kz=='*')
+		{
+			$studiengang_kz='';
+		}  
+		$content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
+
                 $stsem->result=array();
                 if ($stg_obj->getAll('typ, kurzbz',true))
                 {
@@ -242,7 +246,7 @@
                                         $arrStudiengang=$row;
                                         $max_semester=$row->max_semester;
                                 }
-                                $content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.($bDebug?'&nbsp;('.$row->studiengang_kz.')':'').'</option>';
+                                $content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.'&nbsp;-&nbsp;'.$row->studiengang_kz.'&nbsp;</option>';
                         }
                 }
                 else
@@ -254,39 +258,45 @@
 
         //---------------------------------------------------------------------------
         // Semster public.tbl_studiengang_kz - max Semester des Selektierten Studiengangs
-                $content.='<td><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="semester">';
-                $content.='<option value="" '.(empty($semester)?' selected="selected" ':'').'>&nbsp;-&nbsp;</option>';
+                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="semester">';
+                $content.='<option value="" '.(empty($semester)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
                 if ($studiengang_kz!='')
                 {
                         for($i=0;$i<=$max_semester;$i++)
                         {
-                                $content.='<option value="'.($i).'" '.(("$semester"=="$i")?' selected="selected" ':'').'>&nbsp;'.($i).'&nbsp;</option>';
+                                $content.='<option value="'.($i).'" '.(("$semester"=="$i")?' selected="selected" ':'').'>&nbsp;'.($i).'.Semester&nbsp;</option>';
                         }
                 }
                 $content.='</select></td>';
 
         //---------------------------------------------------------------------------
         // Lehrveranstaltungen
-                $content.='<td><select onchange="document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="lehrveranstaltung_id">';
-                $content.='<option value="" '.(empty($lehrveranstaltung_id)?' selected="selected" ':'').'>&nbsp;-&nbsp;</option>';
+                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="lehrveranstaltung_id">';
+                $content.='<option value="" '.(empty($lehrveranstaltung_id)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
                 $lv_obj->lehrveranstaltungen=array();
-                if ($lv_obj->load_lva($studiengang_kz, $semester,null,null,null,'bezeichnung'))
-                {
-                        foreach ($lv_obj->lehrveranstaltungen as $row)
-                        {
-                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.($bDebug?CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz.'&nbsp;(Lv ID '.$row->lehrveranstaltung_id.')': CutString($row->bezeichnung, 35) ) .'</option>';
-                        }
-                }
-                else
-                {
-                        $content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;'.$stg_obj->errormsg.'&nbsp;</option>';
-                        $errormsg[]='Lehrveranstaltungen wurden nicht gefunden! '.$lv_obj->errormsg;
-                }
-                $content.='</select></td>';
+		  if (!empty($studiengang_kz))
+		  {	
+	                if ($lv_obj->load_lva_le($studiengang_kz, $studiensemester_kurzbz, $semester,null,null,null,'bezeichnung'))
+	                {
+	                        foreach ($lv_obj->lehrveranstaltungen as $row)
+	                        {
+	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.($bDebug?CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz.'&nbsp;(Lv ID '.$row->lehrveranstaltung_id.')': CutString($row->bezeichnung, 35) ) .'</option>';
+	                        }
+	                }
+	                else
+	                {
+	                        $content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;'.$stg_obj->errormsg.'&nbsp;</option>';
+	                        $errormsg[]='Lehrveranstaltungen wurden nicht gefunden! '.$lv_obj->errormsg;
+	                }
+		  }	  
+                $content.='</select><br />
+		  &nbsp;nur in Lehre&nbsp;<input type="Checkbox" value="1" name="lehre" '.($lehre?' checked="checked" ':'').' />
+		  &nbsp;nur aktive&nbsp;<input type="Checkbox" value="1" name="aktiv" '.($aktiv?' checked="checked" ':'').' />		  
+		  </td>';
         //---------------------------------------------------------------------------
         // Lehreinheit
-                $content.='<td><select onchange="document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="lehreinheit_id">';
-                $content.='<option value="" '.(empty($lehreinheit_id)?' selected="selected" ':'').'>&nbsp;-&nbsp;</option>';
+                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="lehreinheit_id">';
+                $content.='<option value="" '.(empty($lehreinheit_id)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
                 $le_obj->lehreinheiten=array();
                 if (!empty($lehrveranstaltung_id))
                 {
@@ -311,16 +321,14 @@
                         }
                 }
                 $content.='</select></td>';
-                $content.='<td><b>oder</b></td>';
-
         //---------------------------------------------------------------------------
         // ---- Moodle mdl_course_id
-                $content.='<td>Kurs ID</td><td><input size="4" maxlength="8" name="mdl_course_id" value="'.$mdl_course_id.'">'.$mdl_course_stat;
+                $content.='<td valign="top"><b>oder</b>&nbsp;KursID&nbsp;<input size="4" maxlength="8" name="mdl_course_id" value="'.$mdl_course_id.'">'.$mdl_course_stat;
 
         //---------------------------------------------------------------------------
         // ---- Submitknopf
                 $content.='
-                        <td>
+                        <td valign="top">
                                 <input style="padding: 2px 20px 2px 20px;" name="anzeigen" type="submit" value="anzeigen">
                                 <input style="display:none" type="text" name="anzeige" value="anzeige" />
                                 <input style="display:none" type="text" name="debug" value="'.$bDebug.'" />
@@ -341,10 +349,11 @@
 	                if ($lehreinheit_id)
 	                        $lehrveranstaltung_id='';
 			  #echo "<hr> $mdl_course_id,$studiengang_kz,$lehreinheit_id,$lehrveranstaltung_id,$studiensemester_kurzbz,$semester <hr>";
-	                if(!$objMoodle->getAllMoodleVariant($mdl_course_id,$lehrveranstaltung_id,$studiensemester_kurzbz,$lehreinheit_id,$studiengang_kz,$semester,false))
+	                if(!$objMoodle->getAllMoodleVariant($mdl_course_id,$lehrveranstaltung_id,$studiensemester_kurzbz,$lehreinheit_id,$studiengang_kz,$semester,false,$lehre,$aktiv))
 	                        $errormsg[]=$objMoodle->errormsg;
 		   }
 		// Aufbau der Moodlekurs - Tabelle
+
 		   if (is_array($objMoodle->result) && count($objMoodle->result)>0)
 		   	$content.=writeMoodlekursHTML($objMoodle->result,$bDebug,$errormsg);
         }
@@ -401,26 +410,29 @@
 	      if (!$stsem = new studiensemester())
 	        	die('Fehler beim Oeffnen der Studiensemester');
 
+#$content.=count($objMoodle->result).'<hr>';
                // Header Top mit Anzahl der gelisteten Kurse
-				$content.='<div style="height:300px;overflow:auto;">';
+		$content.='<div style="height:300px;overflow:auto;">';
 				$content.='<table class="liste">';
 
                // Header Teil Information der Funktion
                // Headerinformation der Tabellenfelder
                         $content.='<tr class="liste" align="center">';
-                                $content.='<th colspan="5">&nbsp;Studiengang&nbsp;</th>';
+			   
+                                $content.='<th colspan="2">&nbsp;StSem&nbsp;</th>';
+                                $content.='<th colspan="2">&nbsp;Studiengang&nbsp;</th>';
                                 $content.='<th>&nbsp;Sem&nbsp;</th>';
                                 $content.='<th colspan="2">&nbsp;Lehrveranstaltung&nbsp;</th>';
                                 $content.='<th colspan="2">&nbsp;Lehreinheit&nbsp;</th>';
                                 $content.='<th colspan="2">&nbsp;Moodle Kurs&nbsp;</th>';
-                                $content.='<td>&nbsp;bearbeiten&nbsp;</td>';
+                                $content.='<td colspan="2">&nbsp;bearbeiten&nbsp;</td>';
                         $content.='</tr>';
 
                 // Alle Moodlekurse in einer Schleife anzeigen.
                 for($i=0;$i<count($arrMoodlekurs);$i++)
                 {
 					
-						$cFormName='workMoodleCurseDetail'.$i;
+		$cFormName='workMoodleCurseDetail'.$i;
    
 
 
@@ -448,38 +460,23 @@
                 		         $stg_obj->studiengang_kz=$arrMoodlekurs[$i]->lehrveranstaltung_studiengang_kz;
                               }
 
-				    $content.='<td '.$showCSS.'>'.$stg_obj->kuerzel.'&nbsp;</td>';
-                                $content.='<td '.$showCSS.'>'.$stg_obj->bezeichnung.'&nbsp;('.$stg_obj->kurzbzlang.')&nbsp;</td>';
-                                $content.='<td '.$showCSS.'>'.$stg_obj->studiengang_kz.'&nbsp;</td>';
+				    $content.='<td '.$showCSS.'>'.$stg_obj->kurzbzlang.'&nbsp;</td>';
+                                $content.='<td '.$showCSS.'>'.$stg_obj->bezeichnung.($bDebug?' '.$stg_obj->studiengang_kz:'').'&nbsp;</td>';
                                 $content.='<td '.$showCSS.'>'.$arrMoodlekurs[$i]->lehrveranstaltung_semester.'&nbsp;</td>';
 
 		      // Lehrveranstaltung
-#var_dump($arrMoodlekurs[$i]);
 				if ($arrMoodlekurs[$i]->moodle_lehrveranstaltung_id)
 	               	{
 					$lvID=$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id;
-       	             		if ($lv_obj->load($arrMoodlekurs[$i]->moodle_lehrveranstaltung_id))
-					{
-						$kurzbz='<b>'.$lv_obj->kurzbz.'</b>, '.$lv_obj->bezeichnung;
-					}
-					else
-              	  		{
-                     			$kurzbz='Fehler Lehrveranstaltung '.$lv_obj->errormsg;
-					}
+					$kurzbz='<b>'.$arrMoodlekurs[$i]->lehrveranstaltung_kurzbz.'</b>, '.$arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung.($arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz?', '.$arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz:'');
                     		}
 				else
 				{
-                       		$kurzbz='<b>zur Lehreinheit - '.$lv_obj->kurzbz.'</b>, '.$lv_obj->bezeichnung;
 				     	$lvID='*'.$arrMoodlekurs[$i]->lehrveranstaltung_id;
-       	                	if (!$lv_obj->load($arrMoodlekurs[$i]->lehrveranstaltung_id))
-              	    	   	{
-                       			$kurzbz='Fehler Lehrveranstaltung '.$lv_obj->errormsg;
-					}
+                       		$kurzbz='<b>zur Lehreinheit - '.$arrMoodlekurs[$i]->lehrveranstaltung_kurzbz.'</b>, '.$arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung.($arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz?', '.$arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz:'');;
 				}
-#	var_dump($lv_obj);
-                		$content.='<td colspan="2" title="'.(isset($lv_obj->bezeichnung)?$lv_obj->bezeichnung.' Kurzbz:'.$lv_obj->kurzbz.' LV Kurzbz:'.$lv_obj->lehrform_kurzbz.' ID:'.$lv_obj->lehrveranstaltung_id:$lv_obj->errormsg).'" '.$showCSS.'>';
+                		$content.='<td colspan="2" title="'.(isset($arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung)?$arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung.' Kurzbz:'.$arrMoodlekurs[$i]->lehrveranstaltung_kurzbz.' LV Kurzbz:'.$arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz.' ID:'.$arrMoodlekurs[$i]->lehrveranstaltung_id:'').'" '.$showCSS.'>';
 				$content.=$kurzbz. ($bDebug?' '.$lvID:'').'&nbsp;</td>';
-
 
                                 // Lehreinheit
 			  $leID=$arrMoodlekurs[$i]->lehreinheit_id;
@@ -503,7 +500,7 @@
 				}
 				else
 				{
-                            	$gruppen='Fehler Lehreinheit '.$lv_obj->errormsg;
+                            	$gruppen='Fehler Lehreinheit '.$legrp_obj->errormsg;
 				}
                          }
 			    else
@@ -520,22 +517,52 @@
                                 $content.='<td  onclick="document.'.$cFormName.'.submit();" '.$showCSS.'>'.$arrMoodlekurs[$i]->mdl_shortname.'&nbsp;</td>';
                                 $content.='<td onclick="document.'.$cFormName.'.submit();" '.$showCSS.'>'.$arrMoodlekurs[$i]->mdl_course_id.'&nbsp;</td>';
                         // Bearbeitung Submit
+
+					$cFormNameDel=$cFormName.'del';					    
+
 					if ($arrMoodlekurs[$i]->mdl_course_id)
 					{
-	                              $content.= '<td style="cursor: pointer;" onclick="document.'.$cFormName.'.submit();">';
+	                              $content.= '<td valign="top" title="&Auml;ndert den Kurs in der Lehre und auch den Moodle Kurs. Entfernt den Kurs aus der Lehre."  style="cursor: pointer;" onclick="document.'.$cFormName.'.submit();">';
 	       	                         $content.='<form style="display: inline;border:0px;" name="'.$cFormName.'" method="POST" target="zuteilung_warten" action="zuteilung_warten.php">';
+          		                       $content.= '<input style="display:none" type="text" name="lehrveranstaltung_id" value="'.$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="lehreinheit_id" value="'.$arrMoodlekurs[$i]->moodle_lehreinheit_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$arrMoodlekurs[$i]->mdl_course_id.'" />';
                                             $content.= '<input style="display:none" type="text" name="wartung" value="wartung" />';
                                             $content.= '<input style="display:none" type="text" name="debug" value="'.$bDebug.'" />';
-                                            $content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';
+                                            $content.= '<img height="15" src="../../skin/images/edit.png" border="0" title="MoodleKurs aendern" alt="edit.png" />';
                                             $content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
                                             $content.= '&auml;ndern';
               	                   $content.='</form>';
                      	           $content.= '</td>';
+
+	                              $content.= '<td valign="top" title="Entfernt den Kurs aus der Lehre. Der Moodle Kurs bleibt bestehen." style="cursor: pointer;" onclick="if (!window.confirm(\'L&ouml;schen Moodlekurs '.$arrMoodlekurs[$i]->mdl_course_id.', '.$arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung.' ? \')) {return false;}; document.'.$cFormNameDel.'.submit();">';
+	       	                     $content.='<form style="display: inline;border:0px;" name="'.$cFormNameDel.'" method="POST" target="zuteilung_warten" action="zuteilung_warten.php">';
+          		                       $content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$arrMoodlekurs[$i]->moodle_mdl_course_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="lehrveranstaltung_id" value="'.$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="lehreinheit_id" value="'.$arrMoodlekurs[$i]->moodle_lehreinheit_id.'" />';
+                                            $content.= '<input style="display:none" type="text" name="entfernen" value="entfernen" />';
+                                            $content.= '<input style="display:none" type="text" name="debug" value="'.$bDebug.'" />';
+                                            $content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';
+                                            $content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
+                                            $content.= 'entfernen<br /> aus Lehre';
+              	                   $content.='</form>';
+                     	           $content.= '</td>';
+					    
 					}
 					else
 					{
-						$content.= '<td>&nbsp;</td>';
+	                              $content.= '<td valign="top" title="Entfernt den Kurs aus der Lehre." style="cursor: pointer;" onclick="if (!window.confirm(\'L&ouml;schen Moodlekurs '.$arrMoodlekurs[$i]->mdl_course_id.', '.$arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung.' ? \')) {return false;}; document.'.$cFormNameDel.'.submit();">';
+	       	                         $content.='<form style="display: inline;border:0px;" name="'.$cFormNameDel.'" method="POST" target="zuteilung_warten" action="zuteilung_warten.php">';
+          		                       $content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$arrMoodlekurs[$i]->moodle_mdl_course_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="lehrveranstaltung_id" value="'.$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="lehreinheit_id" value="'.$arrMoodlekurs[$i]->moodle_lehreinheit_id.'" />';
+                                            $content.= '<input style="display:none" type="text" name="entfernen" value="entfernen" />';
+                                            $content.= '<input style="display:none" type="text" name="debug" value="'.$bDebug.'" />';
+                                            $content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';
+                                            $content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
+                                            $content.= 'entfernen';
+              	                   $content.='</form>';
+                     	           $content.= '</td>';
 					}
                         $content.='</tr>';
 
@@ -544,7 +571,7 @@
 					<table id="detail'.$i.'" class="ausblenden" >
 						<tr><td>&nbsp;</td></tr>';
 
-			   		$content.='<tr onclick="document.getElementById(\'detail'.$i.'\').className=\'ausblenden\'">
+			   		$content.='<tr>
 							<td colspan="3" class="topbar" colspan="2">Detailanzeige Moodelkurs '.$arrMoodlekurs[$i]->mdl_course_id.'</td>
 					</tr>';
                      // Moodle
@@ -573,7 +600,7 @@
 
 					$content.='<tr>';
 	                            $content.='<td></td><th>&nbsp;Lehrveranstaltung&nbsp;</th>';
-           	                	$content.='<td>'.(isset($lv_obj->bezeichnung)?$lv_obj->bezeichnung.'&nbsp;&nbsp;Kurzbz:&nbsp;'.$lv_obj->kurzbz.'&nbsp;,&nbsp;Lehrform Kurzbz:'.$lv_obj->lehrform_kurzbz:$lv_obj->errormsg).',&nbsp;ID&nbsp;'.$arrMoodlekurs[$i]->lehrveranstaltung_id.'&nbsp;</td>';
+           	                	$content.='<td>'.(isset($arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung)?$arrMoodlekurs[$i]->lehrveranstaltung_bezeichnung.'&nbsp;&nbsp;Kurzbz:&nbsp;'.$arrMoodlekurs[$i]->lehrveranstaltung_kurzbz.'&nbsp;,&nbsp;Lehrform Kurzbz:'.($arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz?$arrMoodlekurs[$i]->lehrveranstaltung_lehrform_kurzbz:' - '):'').',&nbsp;ID&nbsp;'.$arrMoodlekurs[$i]->lehrveranstaltung_id.'&nbsp;</td>';
 					$content.='</tr>';
 
 					$content.='<tr>';
@@ -607,7 +634,7 @@
 									$lehreinheitmitarbeiter->getLehreinheitmitarbeiter($row->lehreinheit_id);
 									foreach ($lehreinheitmitarbeiter->lehreinheitmitarbeiter as $ma)
 									{
-										$lektoren.= '&nbsp;'.$ma->mitarbeiter_uid;
+										$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 									}
 									
 			                        $content.=$row->lehrform_kurzbz.'&nbsp;'.$gruppen.'&nbsp;ID&nbsp;'.$row->lehreinheit_id.'&nbsp;'.$lektoren;
@@ -626,9 +653,9 @@
 					$content.='<tr>';
 					if ($arrMoodlekurs[$i]->mdl_course_id)
 					{
-					    $cFormName='workMoodleCurseDetail'.$i;
+					#    $cFormName='workMoodleCurseDetail'.$i;
              	$content.= '<th colspan="3" style="cursor: pointer;" onclick="document.'.$cFormName.'.submit();">';	
-                $content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';
+                $content.= '<img height="15" src="../../skin/images/edit.png" border="0" title="MoodleKurs entfernen" alt="edit.png" />';
     	          $content.= '<input onclick="this.checked=false;" onblur="this.checked=false;" type="checkbox" value="" style="'.(!stristr($_SERVER['HTTP_USER_AGENT'],'OPERA') && !stristr($_SERVER['HTTP_USER_AGENT'],'Safari')?'display:none;':'').'font-size: 4px;border:0px solid transparent;text-decoration:none; background-color: transparent;" name="check_va_detail_kal'.$i.'" />';
            	    $content.= '&auml;ndern';
               $content.= '</th>';
