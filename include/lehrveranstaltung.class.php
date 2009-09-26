@@ -184,7 +184,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null, $sort=null,$lehre=null)
+	public function load_lva($studiengang_kz, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null, $sort=null)	 
 	{
 		//Variablen pruefen
 
@@ -224,7 +224,7 @@ class lehrveranstaltung extends basis_db
 					
 		if(!is_null($lehre))
 			$qry .= " AND lehre=".($lehre?'true':'false');
-			
+
 		if(!is_null($aktiv) && $aktiv)
 				$qry .= " AND aktiv ";
 
@@ -237,7 +237,7 @@ class lehrveranstaltung extends basis_db
 			$qry .= " ORDER BY semester, bezeichnung";
 		else
 			$qry .= " ORDER BY $sort ";
-		
+
 		//Datensaetze laden
 		if(!$this->db_query($qry))
 		{
@@ -284,6 +284,117 @@ class lehrveranstaltung extends basis_db
 		return true;
 	}
 	
+/**
+	 * Liefert alle Lehrveranstaltungen zu einem Studiengang/Semester
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_lva_le($studiengang_kz, $studiensemester_kurzbz=null, $semester=null, $lehreverzeichnis=null, $lehre=null, $aktiv=null, $sort=null)	 
+	{
+		//Variablen pruefen
+
+		if(!is_numeric($studiengang_kz) || $studiengang_kz=='')
+		{
+			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(!is_null($semester) && (!is_numeric($semester) && $semester!=''))
+		{
+			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(!is_null($aktiv) && !is_bool($aktiv))
+		{
+			$this->errormsg = 'Aktivkz muss ein boolscher Wert sein';
+			return false;
+		}
+		if(!is_null($lehre) && !is_bool($lehre))
+		{
+			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
+			return false;
+		}
+		
+		$qry = "SELECT distinct lehre.tbl_lehrveranstaltung.*, tbl_lehreinheit.studiensemester_kurzbz FROM lehre.tbl_lehrveranstaltung,lehre.tbl_lehreinheit  where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id and studiengang_kz='".addslashes($studiengang_kz)."' ";
+
+		//Select Befehl zusammenbauen
+		if(!is_null($lehreverzeichnis))
+			$qry .= " AND lehreverzeichnis='$lehreverzeichnis'";
+		else
+			$qry .= " AND lehreverzeichnis<>'' ";
+					
+		if(!is_null($semester) && $semester!='')
+			$qry .= " AND semester='$semester'";
+		else
+			$qry .= " AND semester is not null ";
+
+		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz='$studiensemester_kurzbz'";
+
+			
+		if(!is_null($lehre))
+			$qry .= " AND lehre=".($lehre?'true':'false');
+
+		if(!is_null($aktiv) && $aktiv)
+				$qry .= " AND aktiv ";
+
+		if(!is_null($lehre) && $lehre)
+				$qry .= " AND lehre ";
+		
+		if ($sort == "bezeichnung")
+			$qry .= " ORDER BY bezeichnung";
+		else if (is_null($sort) || empty($sort))
+			$qry .= " ORDER BY semester, bezeichnung";
+		else
+			$qry .= " ORDER BY $sort ";
+#echo "<hr> $qry <hr>";
+		//Datensaetze laden
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$lv_obj = new lehrveranstaltung();
+
+			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			$lv_obj->studiengang_kz=$row->studiengang_kz;
+			$lv_obj->bezeichnung=$row->bezeichnung;
+			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->lehrform_kurzbz=$row->lehrform_kurzbz;
+			$lv_obj->semester=$row->semester;
+			$lv_obj->ects=$row->ects;
+			$lv_obj->semesterstunden=$row->semesterstunden;
+			$lv_obj->anmerkung=$row->anmerkung;
+			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
+			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->ext_id=$row->ext_id;
+			$lv_obj->insertamum=$row->insertamum;
+			$lv_obj->insertvon=$row->insertvon;
+			$lv_obj->planfaktor=$row->planfaktor;
+			$lv_obj->planlektoren=$row->planlektoren;
+			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->plankostenprolektor=$row->plankostenprolektor;
+			$lv_obj->updateamum=$row->updateamum;
+			$lv_obj->updatevon=$row->updatevon;
+			$lv_obj->sprache=$row->sprache;
+			$lv_obj->sort=$row->sort;
+			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
+			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->koordinator=$row->koordinator;
+			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
+			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
+	
+			$lv_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+
+			$this->lehrveranstaltungen[] = $lv_obj;
+		}
+
+		return true;
+	}
 	
 	/**
 	 * Liefert alle Lehrveranstaltungen eines Studenten (alle Semester)
