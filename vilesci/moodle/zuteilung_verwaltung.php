@@ -572,7 +572,7 @@
 						<tr><td>&nbsp;</td></tr>';
 
 			   		$content.='<tr>
-							<td colspan="3" class="topbar" colspan="2">Detailanzeige Moodelkurs '.$arrMoodlekurs[$i]->mdl_course_id.'</td>
+							<th colspan="3" class="topbar" colspan="2">Detailanzeige Moodelkurs '.$arrMoodlekurs[$i]->mdl_course_id.($arrMoodlekurs[$i]->moodle_lehrveranstaltung_id?' - zur Lehrveranstaltung':' - zur Lehreinheit'). '</th>
 					</tr>';
                      // Moodle
 					$content.='<tr>';

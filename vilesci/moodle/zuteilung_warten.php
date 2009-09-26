@@ -136,6 +136,8 @@
 			$studiengang_kz=$objMoodle->result[0]->lehrveranstaltung_studiengang_kz;
 			$studiensemester_kurzbz=$objMoodle->result[0]->studiensemester_kurzbz;
 			$semester=$objMoodle->result[0]->lehrveranstaltung_semester;
+#moodle_lehrveranstaltung_id
+
 			$lehrveranstaltung_id=$objMoodle->result[0]->lehrveranstaltung_id;
 			$lehreinheit_id=$objMoodle->result[0]->lehreinheit_id;
 			$gruppen=$objMoodle->result[0]->gruppen;
@@ -318,7 +320,10 @@
                 }
                 $content.='</select></td>';
 
-		$bChecked=($aendern_lehrveranstaltung_id?true:false);
+		$aendern_lehrveranstaltung_id=(isset($_REQUEST['aendern_lehrveranstaltung_id']) && !empty($_REQUEST['aendern_lehrveranstaltung_id'])?trim($_REQUEST['aendern_lehrveranstaltung_id']):$sel_lehrveranstaltung_id);
+		
+		$bChecked=((!isset($_REQUEST['aendern_lehrveranstaltung_id']) && isset($objMoodle->result[0]->moodle_lehrveranstaltung_id) && $objMoodle->result[0]->moodle_lehrveranstaltung_id) || (isset($_REQUEST['aendern_lehrveranstaltung_id']) && $aendern_lehrveranstaltung_id)?true:false);
+		
 		$content.='<th title="'.$lv_kurz_bez.'" valign="top"><input onchange="if(this.checked) {uncheckLE();};generateLEText();" name="aendern_lehrveranstaltung_id" value="'.$aendern_lehrveranstaltung_id.'" type="Checkbox" '.($bChecked?' checked="checked" ':'').'>&nbsp;Moodle Kurs f&uuml;r die gesamte LV anlegen</th>';
 	$content.='</tr>';
 
@@ -372,7 +377,10 @@
 									$content.='<tr>';
 										$content.='<td>'.$row->lehrform_kurzbz.'&nbsp;</td><td>'.$gruppen.'&nbsp;</td><td>'.$row->lehreinheit_id.'&nbsp;</td>';
 									$le_gefunden=false;
-									if (!$aendern_lehrveranstaltung_id && isset($aendern_lehreinheit_id) && is_array($aendern_lehreinheit_id))
+
+
+#									$bChecked=((!isset($_REQUEST['aendern_lehrveranstaltung_id']) && isset($objMoodle->result[0]->moodle_lehrveranstaltung_id) && $objMoodle->result[0]->moodle_lehrveranstaltung_id) || (isset($_REQUEST['aendern_lehrveranstaltung_id']) && $aendern_lehrveranstaltung_id)?false:true);
+									if (isset($_REQUEST['aendern_lehrveranstaltung_id']) && !$aendern_lehrveranstaltung_id && isset($aendern_lehreinheit_id) && is_array($aendern_lehreinheit_id))
 									{
 										reset($aendern_lehreinheit_id);
 										for ($ii=0;$ii<count($aendern_lehreinheit_id);$ii++)
@@ -381,7 +389,7 @@
 												$le_gefunden=true;
 										}
 									}
-									else if ($new || $aendern_lehrveranstaltung_id)
+									else if ($new || (isset($_REQUEST['aendern_lehrveranstaltung_id']) && $aendern_lehrveranstaltung_id) )
 									{
 										$le_gefunden=false;
 									}
