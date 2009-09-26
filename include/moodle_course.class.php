@@ -109,6 +109,50 @@ class moodle_course extends basis_db
 			return false;
 		}	
 					
+		$qry = "SELECT * FROM public.mdl_course WHERE id='".addslashes($mdl_course_id)."'";
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				$this->mdl_fullname = $row->fullname;
+				$this->mdl_shortname = $row->shortname;
+				$this->mdl_course_id = $row->id;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Kurs wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Kurses';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt einen MoodleKurs
+	 * @param mdl_course_id ID des Moodle Kurses
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadMoodle($mdl_course_id=null)
+	{
+		$this->mdl_fullname = '';
+		$this->mdl_shortname = '';
+			
+		$this->errormsg='';
+		$this->result=array();
+			
+		if (!is_null($mdl_course_id))
+			$this->mdl_course_id=$mdl_course_id;
+		if (is_null($this->mdl_course_id) || empty($this->mdl_course_id) || !is_numeric($this->mdl_course_id))
+		{
+			$this->errormsg='Moodle Kurs ID fehlt';
+			return false;
+		}	
+					
 	// Variable Daten Initialisieren
 		$args=array();
 		$args['CourseID']=$this->mdl_course_id;
@@ -142,30 +186,7 @@ class moodle_course extends basis_db
 		}		
 #		return $this->result;	
 		return true;		
-	
-		$qry = "SELECT * FROM public.mdl_course WHERE id='".addslashes($mdl_course_id)."'";
-		if($result = pg_query($this->conn_moodle, $qry))
-		{
-			if($row = pg_fetch_object($result))
-			{
-				$this->mdl_fullname = $row->fullname;
-				$this->mdl_shortname = $row->shortname;
-				$this->mdl_course_id = $row->id;
-				return true;
-			}
-			else 
-			{
-				$this->errormsg = 'Kurs wurde nicht gefunden';
-				return false;
-			}
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden des Kurses';
-			return false;
-		}
-	}
-	
+}
 	/**
 	 * Laedt alle MoodleKurse die zu einer LV/Stsem
 	 * plus die MoodleKurse die auf dessen LE haengen
@@ -389,7 +410,7 @@ class moodle_course extends basis_db
 	 *        studiensemester_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAllMoodleVariant($mdl_course_id='',$lehrveranstaltung_id='',$studiensemester_kurzbz='',$lehreinheit_id='',$studiengang='',$semester='',$detail=false)
+	public function getAllMoodleVariant($mdl_course_id='',$lehrveranstaltung_id='',$studiensemester_kurzbz='',$lehreinheit_id='',$studiengang='',$semester='',$detail=false,$lehre=true,$aktiv=true)
 	{
 		// Initialisierung
 		$this->errormsg = '';
@@ -407,29 +428,72 @@ class moodle_course extends basis_db
 
 
 		$where='';
+		
 		if ($mdl_course_id!='')
 			$where.=" and tbl_moodle.mdl_course_id='".addslashes($mdl_course_id)."' ";
-			
-
+		
 		if ($lehreinheit_id!='')
-			$where.=" and tbl_moodle.lehreinheit_id='".addslashes($lehreinheit_id)."' ";
+			$where.=" tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."' ";
 
 		if ($lehrveranstaltung_id!='')
-			$where.=" and tbl_moodle.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' ";
+			$where.=" and tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' ";
 
 		if ($studiensemester_kurzbz!='')
-			$where.=" and tbl_moodle.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ";
+			$where.=" and tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ";
 
 		if ($studiengang!='')
 			$where.=" and tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang)."' ";
 
 		if ($semester!='')
 			$where.=" and tbl_lehrveranstaltung.semester='".addslashes($semester)."' ";
+
+		if ($lehre)
+			$where.=" and tbl_lehrveranstaltung.lehre ";
+
+		if ($aktiv)
+			$where.=" and tbl_lehrveranstaltung.aktiv ";
+
+		$qry ='';
+		$qry.=' SELECT distinct tbl_moodle.studiensemester_kurzbz
+		,tbl_lehrveranstaltung.studiengang_kz
+		,tbl_lehrveranstaltung.semester
+		,tbl_moodle.mdl_course_id 
+		,tbl_lehrveranstaltung.lehrveranstaltung_id
+		,tbl_moodle.lehreinheit_id  as moodle_lehreinheit_id 
+		,tbl_moodle.lehrveranstaltung_id as moodle_lehrveranstaltung_id
+		,tbl_moodle.lehreinheit_id as lehreinheit_id,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_moodle.gruppen
+		,tbl_lehrveranstaltung.lehrform_kurzbz,tbl_lehrveranstaltung.orgform_kurzbz
+		,tbl_moodle.moodle_id
+		 FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle 
+		
+		where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_moodle.lehrveranstaltung_id
+		and tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_moodle.lehrveranstaltung_id
+		and tbl_moodle.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz
+		and tbl_moodle.lehreinheit_id is null 
+		';
 		$qry.=$where;
+		
+		$qry.=' UNION ';
+		$qry.=' SELECT distinct tbl_moodle.studiensemester_kurzbz
+		,tbl_lehrveranstaltung.studiengang_kz
+		,tbl_lehrveranstaltung.semester
+		,tbl_moodle.mdl_course_id
+		,tbl_lehrveranstaltung.lehrveranstaltung_id
+		,tbl_moodle.lehreinheit_id as moodle_lehreinheit_id
+		,tbl_moodle.lehrveranstaltung_id as moodle_lehrveranstaltung_id
+		,tbl_moodle.lehreinheit_id as lehreinheit_id,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_moodle.gruppen
+		,tbl_lehrveranstaltung.lehrform_kurzbz,tbl_lehrveranstaltung.orgform_kurzbz
+		,tbl_moodle.moodle_id
+		 FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle 
+		
+		where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
+		and tbl_moodle.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
+		and tbl_moodle.lehrveranstaltung_id is null 
+		';
+		$qry.=$where;
+		
+		$qry.=' order by 1,2,3,4,5,6,7;	';
 
-		$qry.=" order by tbl_moodle.studiensemester_kurzbz,tbl_lehrveranstaltung.semester,tbl_moodle.lehrveranstaltung_id,tbl_moodle.lehreinheit_id,tbl_moodle.mdl_course_id  ";	
-
-		$qry.=";";	
 						
 #echo "<hr>	$qry <hr>";						
 
@@ -452,12 +516,14 @@ class moodle_course extends basis_db
 			$obj->lehrveranstaltung_bezeichnung=$row->bezeichnung;
 			$obj->lehrveranstaltung_semester=$row->semester;			
 			$obj->lehrveranstaltung_studiengang_kz=$row->studiengang_kz;
+			$obj->lehrveranstaltung_lehrform_kurzbz=$row->lehrform_kurzbz;
 
+			$obj->lehrveranstaltung_orgform_kurzbz=$row->orgform_kurzbz;
 
 			$obj->moodle_lehrveranstaltung_id=$row->moodle_lehrveranstaltung_id;			
 			$obj->moodle_lehreinheit_id=$row->moodle_lehreinheit_id;
-			
-			$obj->mdl_fullname = 'DB fehler ID '.$obj->mdl_course_id;
+			$obj->moodle_mdl_course_id = $row->mdl_course_id;			
+			$obj->mdl_fullname = 'Moodle Kurs nicht vorhanden ID '.$obj->mdl_course_id;
 			$obj->mdl_shortname =$obj->mdl_fullname;
 			$obj->gruppen=($row->gruppen=='t'?true:false);;
 			
@@ -686,7 +752,43 @@ class moodle_course extends basis_db
 			return false;
 		}
 	}
-	
+/**
+	 * Entfernt einen Eintrag in der tbl_moodle an
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete_vilesci($mdl_course_id=null,$lehrveranstaltung_id=null,$lehreinheit_id=null)
+	{
+		$this->errormsg = '';
+		if (!is_null($mdl_course_id) && !empty($mdl_course_id))
+			$this->mdl_course_id=$mdl_course_id;
+		if (!is_null($lehrveranstaltung_id) && !empty($lehrveranstaltung_id))
+			$this->lehrveranstaltung_id=$lehrveranstaltung_id;
+		if (!is_null($lehreinheit_id) && !empty($lehreinheit_id))
+			$this->lehreinheit_id=$lehreinheit_id;
+		$where='';
+		if (!is_null($this->mdl_course_id) && !empty($this->mdl_course_id))
+			$where.=($where?' and ':' where '). ' mdl_course_id='.$this->addslashes($this->mdl_course_id);	
+		else			
+			$where.=($where?' and ':' where '). ' mdl_course_id=0';	
+		if (!is_null($this->lehrveranstaltung_id) && !empty($this->lehrveranstaltung_id))
+			$where.=($where?' and ':' where '). ' lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id);	
+		if (!is_null($this->lehreinheit_id) && !empty($this->lehreinheit_id))
+			$where.=($where?' and ':' where '). ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id);	
+		if (empty($where))
+		{
+			$this->errormsg='mdl_course_id oder LV oder LE muss angegeben sein';
+			return false;	
+		}	
+
+		$qry='DELETE FROM lehre.tbl_moodle '.$where;
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim loeschen Moodle Lehrveranstaltung ! '.$qry.'  '. $this->db_last_error().' in File:='.__FILE__.' Line:='.__LINE__;			
+			return false;
+		}	
+
+		return true;
+	}	
 /**
 	 * Aendert einen Eintrag in der tbl_moodle an
 	 * @return true wenn ok, false im Fehlerfall
