@@ -64,6 +64,7 @@ $kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 
 $user = get_uid();
 $datum_obj = new datum();
+$datum=$datum_obj->formatDatum($datum,'Y-m-d');
 $error='';
 $neu = (isset($_GET['neu'])?true:false);
 $stg_arr = array();
