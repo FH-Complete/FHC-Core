@@ -1185,6 +1185,7 @@ if($erg=$db_obj->db_query($qry))
 		{
 			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!');
 			$mail->send();
+			$die;
 		}
 		//begutachter
 		$begutachter1="";
@@ -1218,6 +1219,7 @@ if($erg=$db_obj->db_query($qry))
 		{
 			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!');
 			$mail->send();
+			$die;
 		}
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
@@ -1252,6 +1254,7 @@ if($erg=$db_obj->db_query($qry))
 			{
 				$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!');
 				$mail->send();
+				$die;
 			}
 		}
 		//Institute
@@ -1539,6 +1542,7 @@ else
 {
 	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht geöffnet werden!');
 	$mail->send();
+	die();
 }
 
 
