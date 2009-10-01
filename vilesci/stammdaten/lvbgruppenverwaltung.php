@@ -48,7 +48,7 @@ function replicateKurzbz()
 </head>
 
 <body class="background_main">
-<h2>Lehrverbandsgruppen - Verwaltung</h2>
+<h2>Gruppen - Verwaltung</h2>
 
 <?php
 
@@ -84,7 +84,7 @@ foreach($stud->result as $row)
 		if($studiengang_kz=='')
 			$studiengang_kz=$row->studiengang_kz;
 		
-		echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+		echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
 	}
 }
 
