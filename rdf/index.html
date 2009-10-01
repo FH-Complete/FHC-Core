@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head></head>
-
+<html>
+<head>
+</head>
 <body>
 <h1 style="text-align: center;">RDF-Spezifikationen am Technikum Wien</h1>
 <br>
@@ -13,56 +14,104 @@ mehr oder anders zu verwenden sind.<br>
 <h2>Student</h2>
 <span style="font-weight: bold;">Aufruf:</span>
 student.rdf.php?studiengang_kz=...&amp;semester=...&amp;verband=...&amp;gruppe=...&amp;gruppe_kurzbz=...&amp;uid=...&amp;studiensemester_kurzbz=...<br>
-Beispiel: <a target="_blank" href="student.rdf.php?studiengang_kz=227&amp;semester=1&amp;studiensemester_kurzbz=WS2008&amp;typ=student">student.rdf.php?studiengang_kz=227&amp;semester=1&amp;studiensemester_kurzbz=WS2008&typ=student</a><br>
+Beispiel: <a target="_blank"
+ href="student.rdf.php?studiengang_kz=227&amp;semester=1&amp;studiensemester_kurzbz=WS2008&amp;typ=student">student.rdf.php?studiengang_kz=227&amp;semester=1&amp;studiensemester_kurzbz=WS2008&amp;typ=student</a><br>
 <span style="font-weight: bold;"><br>
 Parameter</span>: <br>
 <ul>
   <li>studiengang_kz: Studiengangskennzahl<br>
   </li>
-  <li>studiensemester_kurzbz: Studiensemester (WS2008, SS2009, WS2009,...)<br>
-  </li>
-  <li>typ: student<br>
+  <li>studiensemester_kurzbz: Studiensemester (WS2008, SS2009,
+WS2009,...)<br>
   </li>
   <li>semester: Semester (optional)<br>
   </li>
   <li>verband: Verband (optional)</li>
   <li>gruppe: Gruppe (optional)</li>
   <li>gruppe_kurzbz: Spezialgruppen, Module, ... (optional)</li>
-  <li>uid: UID eines bestimmten Studenten (Wenn gesetzt werden alle anderen Parameter nicht verwendet)</li>
-  <li>typ: Typ der gelieferten Personen (student, prestudent, interressent, bewerber, aufgenommen, warteliste, absage, zgv, reihungstestangeledet, reihungstestnichtangemeldet)</li>
+  <li>uid: UID eines bestimmten Studenten (Wenn gesetzt werden alle
+anderen Parameter nicht verwendet)</li>
+  <li>typ: Typ der gelieferten Personen (student, prestudent,
+interressent, bewerber, aufgenommen, warteliste, absage, zgv,
+reihungstestangeledet, reihungstestnichtangemeldet, absolvent)</li>
   <li>prestudent_id: Prestudent_id</li>
-  <li>xmlformat: Wenn xmlformat=xml dann wird ein XML statt dem RDF geliefert</li>
+  <li>xmlformat: Wenn xmlformat=xml dann wird ein XML statt dem RDF
+geliefert</li>
   <li>filter: Alle Personen die filter im Nachnamen enthalten</li>
 </ul>
 <span style="font-weight: bold;"><br>
 Attribute:</span><br>
 <ul>
-  <li>uid</li>
-  <li>titel</li>
+</ul>
+<ul>
+  <li>person_id</li>
+  <li>titelpre</li>
+  <li>titelpost</li>
   <li>vornamen</li>
+  <li>vorname</li>
   <li>nachname</li>
-  <li>matrikelnummer</li>
   <li>geburtsdatum</li>
-  <li>email</li>
+  <li>geburtsdatum_iso</li>
   <li>homepage</li>
-  <li>aktiv</li>
   <li>gebort</li>
   <li>gebzeit</li>
-  <li>foto</li>
   <li>anmerkungen</li>
-  <li>updateamum</li>
-  <li>updatevon</li>
-  <li>gruppe</li>
-  <li>verband</li>
+  <li>anrede</li>
+  <li>svnr</li>
+  <li>ersatzkennzeichen</li>
+  <li>familienstand</li>
+  <li>geschlecht</li>
+  <li>anzahlkinder</li>
+  <li>staatsbuergerschaft</li>
+  <li>geburtsnation</li>
+  <li>sprache</li>
+  <li>status</li>
+  <li>orgform</li>
+  <li>mail_privat</li>
+  <li>mail_intern</li>
+  <li>aktiv</li>
+  <li>uid</li>
+  <li>matrikelnummer</li>
+  <li>alias</li>
   <li>semester</li>
+  <li>verband</li>
+  <li>gruppe</li>
+  <li>studiengang_kz_student</li>
+  <li>prestudent_id</li>
+  <li>studiengang_kz_prestudent</li>
   <li>studiengang_kz</li>
-  <li>stg_bezeichnung</li>
+  <li>aufmerksamdurch_kurzbz</li>
+  <li>studiengang</li>
+  <li>berufstaetigkeit_code</li>
+  <li>ausbildungcode</li>
+  <li>zgv_code</li>
+  <li>zgvort</li>
+  <li>zgvdatum</li>
+  <li>zgvdatum_iso</li>
+  <li>zgvmas_code</li>
+  <li>zgvmaort</li>
+  <li>zgvmadatum</li>
+  <li>zgvmadatum_iso</li>
+  <li>aufnahmeschluessel</li>
+  <li>facheinschlberuf</li>
+  <li>reihungstest_id</li>
+  <li>anmeldungreihungstest</li>
+  <li>anmeldungreihungstest_iso</li>
+  <li>reihungstestangetreten</li>
+  <li>punkte</li>
+  <li>punkte1</li>
+  <li>punkte2</li>
+  <li>bismelden</li>
+  <li>dual</li>
+  <li>dual_bezeichnung</li>
+  <li>anmerkungpre</li>
 </ul>
-<br>
 <h2>Lehrstunde</h2>
 <span style="font-weight: bold;">Aufruf:</span>
 lehrstunde.rdf.php?datum=...&amp;datum_bis=...stg_kz=...&amp;sem=...&amp;ver=...&amp;grp=...&amp;einheit=...<br>
-Beispiel: <a target="_blank" href="lehrstunde.rdf.php?datum=2006-03-20&amp;type=verband&amp;stg_kz=258">lehrstunde.rdf.php?datum=2006-03-20&amp;type=verband&amp;stg_kz=258</a><span style="font-weight: bold;"><br>
+Beispiel: <a target="_blank"
+ href="lehrstunde.rdf.php?datum=2006-03-20&amp;type=verband&amp;stg_kz=258">lehrstunde.rdf.php?datum=2006-03-20&amp;type=verband&amp;stg_kz=258</a><span
+ style="font-weight: bold;"><br>
 <br>
 Parameter</span>: <br>
 <ul>
@@ -99,22 +148,23 @@ Attribute:</span><br>
   <li>studiengang</li>
   <li>farbe</li>
   <li>anmerkung</li>
-</ul><br>
+</ul>
+<br>
 <h2>LVInfo</h2>
-Liefert das RDF für die Lehrveranstaltungsinformationen<br>
-<span style="font-weight: bold;">Aufruf:</span> lvinfo.rdf.php?stg_kz=...&amp;semester=...<br>
-
-Beispiel: <a target="_blank" href="lvinfo.rdf.php?stg_kz=258&amp;semester=2">lvinfo.rdf.php?stg_kz=258&amp;semester=2</a><span style="font-weight: bold;"><br>
+Liefert das RDF f&Atilde;&frac14;r die Lehrveranstaltungsinformationen<br>
+<span style="font-weight: bold;">Aufruf:</span>
+lvinfo.rdf.php?stg_kz=...&amp;semester=...<br>
+Beispiel: <a target="_blank"
+ href="lvinfo.rdf.php?stg_kz=258&amp;semester=2">lvinfo.rdf.php?stg_kz=258&amp;semester=2</a><span
+ style="font-weight: bold;"><br>
 <br>
 Parameter</span>: <br>
-
 <ul>
-<li>stg_kz - Studiengangskennzahl</li>
-<li>semester - Semester (optional)</li>
+  <li>stg_kz - Studiengangskennzahl</li>
+  <li>semester - Semester (optional)</li>
 </ul>
 <span style="font-weight: bold;">
 Attribute:</span><br>
-
 <ul>
   <li>lehrveranstaltung_id</li>
   <li>kurzbz</li>
@@ -136,5 +186,33 @@ Attribute:</span><br>
   <li>anmerkungen</li>
   <li>kurzbeschreibung</li>
 </ul>
-
-</body></html>
+<br>
+<h2>Kontakt</h2>
+Liefert die Kontaktdaten von Personen<br>
+<span style="font-weight: bold;">Aufruf:</span> <br>
+&nbsp;&nbsp;&nbsp; kontakt.rdf.php?person_id=...<br>
+&nbsp;&nbsp;&nbsp; kontakt.rdf.php?kontakt_id=...<br>
+Beispiel: <a target="_blank" href="kontakt.rdf.php?person_id=5">kontakt.rdf.php?person_id=5</a><span
+ style="font-weight: bold;"><br>
+<br>
+Parameter</span>: <br>
+<ul>
+  <li>person_id oder<br>
+  </li>
+  <li>kontakt_id</li>
+</ul>
+<span style="font-weight: bold;">
+Attribute:</span><br>
+<ul>
+  <li>kontakt_id</li>
+  <li>person_id</li>
+  <li>firma_id</li>
+  <li>firma_name</li>
+  <li>kontakttyp</li>
+  <li>anmerkung</li>
+  <li>kontakt</li>
+  <li>zustellung</li>
+  <li>updateamum</li>
+</ul>
+</body>
+</html>
