@@ -293,7 +293,7 @@ function show(id)
 	  	<td class="tdvertical"><?php print_STGnews($studiengang_kz, (int)$semester, $showall, $fachbereich_kurzbz); ?><a href='<?php echo $_SERVER['REQUEST_URI']."&showall"; ?>' class='Item'>Archiv</a></td>
 
 		<td>&nbsp;</td>
-		<td class="tdvertical">
+		<td class="tdvertical" valign="top">
           <p>Studiengangsleiter:<br>
                 <?php
 
