@@ -66,11 +66,13 @@ else
 	$sql_query.=')';
 	
 	// Manfred weiss nicht mehr warum, aber wir aktivieren 23-09-2009
-    
+	// 01-10-2009: jetzt weiss ers wieder Grund: Student sieht sonst die uebergeordneten nicht
+    /*
 	if (isset($ver) && $ver!='0')
 		$sql_query.=" AND (verband='$ver' OR verband IS NULL OR verband='0')";
     if (isset($ver) && $grp!='0')
 		$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0')";
+	*/
 }
 $sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, gruppe_kurzbz LIMIT 100';
 //echo $sql_query.'<BR>';
