@@ -625,7 +625,7 @@ class mitarbeiter extends benutzer
 		}
 		if($fbl)
 		{
-			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz) 
+			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich fb WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz AND fb.aktiv) 
 					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		}
