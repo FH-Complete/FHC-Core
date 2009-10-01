@@ -29,6 +29,8 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/fachbereich.class.php');
+require_once('../include/mitarbeiter.class.php');
+
 
 // header für no cache
 header("Cache-Control: no-cache");
@@ -89,24 +91,13 @@ $stgl='';
 $db = new basis_db();
 if($studiengang_kz!='')
 {
-	$qry = "SELECT 
-				titelpre, vorname, nachname, titelpost 
-			FROM 
-				public.tbl_benutzerfunktion, public.tbl_person, public.tbl_benutzer, public.tbl_studiengang 
-			WHERE
-				funktion_kurzbz='stgl' AND 
-				tbl_studiengang.studiengang_kz='".addslashes($studiengang_kz)."' AND 
-				tbl_studiengang.oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz AND 
-				tbl_benutzerfunktion.uid=tbl_benutzer.uid AND 
-				tbl_benutzer.person_id=tbl_person.person_id AND
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
-	if($db->db_query($qry))
+	$studiengang = new studiengang();
+	$stgleiter = $studiengang->getLeitung($studiengang_kz);
+	
+	foreach ($stgleiter as $stgleiter_uid)
 	{
-		if($row = $db->db_fetch_object())
-		{
-			$stgl = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
-		}
+		$row = new mitarbeiter($stgleiter_uid);
+		$stgl .= trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
 	}
 }
 

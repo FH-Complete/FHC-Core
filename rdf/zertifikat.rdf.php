@@ -29,6 +29,7 @@ require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/mitarbeiter.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -166,21 +167,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			die('Student not found');
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$stgl_query = "SELECT 
-							titelpre, titelpost, vorname, nachname 
-						FROM 
-							tbl_person, tbl_benutzer, tbl_benutzerfunktion 
-						WHERE 
-							tbl_person.person_id = tbl_benutzer.person_id AND 
-							tbl_benutzer.uid = tbl_benutzerfunktion.uid AND 
-							tbl_benutzerfunktion.funktion_kurzbz = 'stgl' AND 
-							tbl_benutzerfunktion.oe_kurzbz = '".$stg_oe_obj->oe_kurzbz."' AND
-							(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-							(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
-		if($db->db_query($stgl_query))
-			$stgl_row = $db->db_fetch_object();
-		else
-			die('Stgl not found');
+		$stgleiter = $stg_oe_obj->getLeitung($row->studiengang_kz);
+		$stgl='';
+		foreach ($stgleiter as $stgleiter_uid)
+		{
+			$stgl_ma = new mitarbeiter($stgleiter_uid);
+			$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
+		}
 		
 		$xml .= "\n	<zertifikat>";
 		$xml .= "		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
@@ -190,10 +183,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
-		if(isset($stgl_row->nachname))
-			$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname."</studiengangsleiter>";
-		else 
-			$xml .= "		<studiengangsleiter></studiengangsleiter>";
+		$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		

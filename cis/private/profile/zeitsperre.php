@@ -22,16 +22,17 @@
 // **
 // * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
 
-  require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/globals.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/mitarbeiter.class.php');
-	require_once('../../../include/studiensemester.class.php');
-	require_once('../../../include/zeitsperre.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/fachbereich.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/globals.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/zeitsperre.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/fachbereich.class.php');
+require_once('../../../include/organisationseinheit.class.php');
 
 	$uid = get_uid();
 
@@ -52,10 +53,10 @@
 	else
 		$funktion=null;
 
-	if(isset($_GET['institut']))
-		$institut = $_GET['institut'];
+	if(isset($_GET['organisationseinheit']))
+		$organisationseinheit = $_GET['organisationseinheit'];
 	else
-		$institut = null;
+		$organisationseinheit = null;
 
 	$stge=array();
 	if(isset($_GET['stg_kz']))
@@ -72,8 +73,8 @@
 	// Link fuer den Export
 	$export_link='zeitsperre_export.php?';
 
-	if(!is_null($institut))
-		$export_link.="institut=$institut";
+	if(!is_null($organisationseinheit))
+		$export_link.="organisationseinheit=$organisationseinheit";
 	else
 	{
 		if ($fix==true)
@@ -108,9 +109,9 @@
 	// Lektoren holen
 	$ma=new mitarbeiter();
 
-	if(!is_null($institut))
+	if(!is_null($organisationseinheit))
 	{
-		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);
+		$mitarbeiter = $ma->getMitarbeiterOrganisationseinheit($organisationseinheit);
 	}
 	else
 	{
@@ -134,32 +135,31 @@
 		<table class="tabcontent">
 			<tr>
 				<td>&nbsp;Zeitsperren <?php echo $studiensemester; ?></td>
-				<td align="right">
-					<A class="hilfe" onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" target="_blank">HELP&nbsp;</A>
-				</td>
+				
 			</tr>
 		</table>
 	</H2>
 
 	<H3>Zeitsperren von <?php echo $datum_beginn.' bis '.$datum_ende; ?></H3>
 	<?php
-		if(isset($_GET['institut']))
+		if(isset($_GET['organisationseinheit']))
 		{
 			echo '<br>';
-			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">Institut: <SELECT name="institut">';
-			$fachbereich = new fachbereich();
-			$fachbereich->getAll();
-			echo "<option value='' ".(is_null($institut)?'selected':'').">-- Auswahl --</option>";
-			foreach ($fachbereich->result as $fb)
+			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">Organisationseinheit: <SELECT name="organisationseinheit">';
+			$oe_obj = new organisationseinheit();
+			$oe_obj->getAll();
+
+			echo "<option value='' ".(is_null($organisationseinheit)?'selected':'').">-- Auswahl --</option>";
+			foreach ($oe_obj->result as $oe)
 			{
-				if($fb->aktiv)
+				if($oe->aktiv)
 				{
-					if($fb->fachbereich_kurzbz==$institut)
+					if($oe->oe_kurzbz==$organisationseinheit)
 						$selected='selected';
 					else
 						$selected='';
 
-					echo "<option value='$fb->fachbereich_kurzbz' $selected>$fb->bezeichnung</option>";
+					echo "<option value='$oe->oe_kurzbz' $selected>$oe->organisationseinheittyp_kurzbz $oe->bezeichnung</option>";
 				}
 			}
 			echo '</SELECT><input style="display:none;" type="Text" name="days" value="'.$days.'"><input type="submit" value="Anzeigen"></FORM>';
@@ -187,27 +187,30 @@
 
 	<?php
 	$zs=new zeitsperre();
-	foreach ($mitarbeiter as $ma)
+	if(is_array($mitarbeiter))
 	{
-		if($ma->aktiv)
+		foreach ($mitarbeiter as $ma)
 		{
-			$zs->getzeitsperren($ma->uid, false);
-			echo '<tr>';
-			echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
-			for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+			if($ma->aktiv)
 			{
-				$tag=date('d',$ts);
-				$monat=date('M',$ts);
-				$wt=date('w',$ts);
-				if ($wt==0 || $wt==6)
-					$class=' class="feiertag" ';
-				else
-					$class='';
-				$grund=$zs->getTyp($ts);
-				$erbk=$zs->getErreichbarkeit($ts);
-				echo '<td '.$class.' style="white-space: nowrap;">'.$grund.'<br>'.$erbk.'</td>';
+				$zs->getzeitsperren($ma->uid, false);
+				echo '<tr>';
+				echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
+				for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+				{
+					$tag=date('d',$ts);
+					$monat=date('M',$ts);
+					$wt=date('w',$ts);
+					if ($wt==0 || $wt==6)
+						$class=' class="feiertag" ';
+					else
+						$class='';
+					$grund=$zs->getTyp($ts);
+					$erbk=$zs->getErreichbarkeit($ts);
+					echo '<td '.$class.' style="white-space: nowrap;">'.$grund.'<br>'.$erbk.'</td>';
+				}
+				echo '</tr>';
 			}
-			echo '</tr>';
 		}
 	}
 	?>

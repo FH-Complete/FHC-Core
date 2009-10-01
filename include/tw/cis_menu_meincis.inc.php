@@ -234,11 +234,11 @@
 							<?php
 							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter'))
 								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
-							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('stgl') || $fkt->checkFunktion('ass'))
+							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('Leitung') || $fkt->checkFunktion('ass'))
 							{
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true&lektor=true" target="content">Fixe Lektoren</a></li>';
-								echo '<li><a class="Item2" href="profile/zeitsperre.php?institut=" target="content">Institut</a></li>';
+								echo '<li><a class="Item2" href="profile/zeitsperre.php?organisationseinheit=" target="content">Organisationseinheiten</a></li>';
 							}
 							$stge=$rechte->getStgKz('admin');
 							foreach($stg_obj->result as $row)
@@ -255,53 +255,18 @@
 			<?php
 				//URLAUBE
 				//Untergebene holen
-				$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($user)."'";
-				$oe='';
-				if($result = $db->db_query($qry))
+				$mitarbeiter = new mitarbeiter();
+				$mitarbeiter->getUntergebene($user);
+				$untergebene = '';
+				
+				foreach ($mitarbeiter->untergebene as $u_uid)
 				{
-					$institut='';
-					$stge='';
-					while($row = $db->db_fetch_object($result))
-					{
-						if($row->funktion_kurzbz=='fbl')
-						{
-							if($institut!='')
-								$institut.=',';
-
-							$institut.="'".addslashes($row->fachbereich_kurzbz)."'";
-						}
-						elseif($row->funktion_kurzbz=='stgl')
-						{
-							if($oe!='')
-								$oe.=',';
-							$oe.="'".$row->oe_kurzbz."'";
-						}
-
-					}
+					if($untergebene!='')
+						$untergebene.=',';
+						
+					$untergebene.="'".addslashes($u_uid)."'";
 				}
-
-				$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (false ";
-
-				if($institut!='')
-					$qry.=" OR fachbereich_kurzbz in($institut)";
-				if($oe!='')
-					$qry.=" OR oe_kurzbz in($oe)";
-
-				$qry.=")";
-
-				$untergebene='';
-				if($result = $db->db_query($qry))
-				{
-
-
-					while($row = $db->db_fetch_object($result))
-					{
-						if($untergebene!='')
-							$untergebene.=',';
-						$untergebene.="'".addslashes($row->uid)."'";
-					}
-				}
-
+				
 				if($untergebene!='')
 				{
 					$qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene) ORDER BY nachname, vorname";

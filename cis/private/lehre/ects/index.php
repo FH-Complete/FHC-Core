@@ -441,7 +441,7 @@
 		echo "<Form name='editFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
 
 		echo "<table class='tabcontent'>";
-		echo "<tr><td width='200'><b>ECTS - Credits</b></td><td width='200'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>Bei Fehlern in den Fixfeldern bitte an die <a class='Item' href='mailto:$stg_obj1->email'>zust&auml;ndige Assistentin</a> wenden.</td></tr>";
+		echo "<tr><td width='200'><b>ECTS - Credits</b></td><td width='400'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>Bei Fehlern in den Fixfeldern bitte an die <a class='Item' href='mailto:$stg_obj1->email'>zust&auml;ndige Assistentin</a> wenden.</td></tr>";
 
 		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
@@ -453,8 +453,8 @@
 		{
 			while($row=$db->db_fetch_object($result))
 			{
-				if(!in_array("$row->vorname $row->nachname",$helparray))//damit ein Name nicht doppelt vorkommt
-					$helparray[] = "$row->vorname $row->nachname";
+				if(!in_array("$row->titelpre $row->vorname $row->nachname $row->titelpost",$helparray))//damit ein Name nicht doppelt vorkommt
+					$helparray[] = "$row->titelpre $row->vorname $row->nachname $row->titelpost";
 			}
 		}
 
@@ -463,31 +463,34 @@
 		echo "</td></tr>";
 
 	   //FB Leiter auslesen
-	   $qry = "SELECT 
-	   				distinct vorname, nachname 
+	   $qry = "	SELECT 
+	   				distinct titelpre, titelpost, vorname, nachname 
 	   			FROM 
 	   				public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
 	   			WHERE 
-	   				funktion_kurzbz='fbl' AND 
+	   				funktion_kurzbz='Leitung' AND 
 	   				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
-	   				fachbereich_kurzbz in (SELECT distinct fachbereich_kurzbz 
-	   										FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach 
-	   										WHERE lehrveranstaltung_id='$lv' AND 
-	   										studiensemester_kurzbz=(SELECT studiensemester_kurzbz 
-	   																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
-	   																WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' 
-	   																ORDER BY ende DESC LIMIT 1
-	   																) 
-	   										AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id
-	   									  )";
+	   				oe_kurzbz in (SELECT distinct oe_kurzbz 
+									FROM 
+										lehre.tbl_lehreinheit 
+										JOIN lehre.tbl_lehrfach USING(lehrfach_id)
+										JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
+									WHERE 
+										lehrveranstaltung_id='$lv' AND 
+										studiensemester_kurzbz=(SELECT studiensemester_kurzbz 
+																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+																WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' 
+																ORDER BY ende DESC LIMIT 1
+																)	   											
+								  )";
 	   
 	   echo "<tr><td class='tdvertical'><b>Institutsleiter</b></td><td>";
 	   if($result=$db->db_query($qry))
 	   {
 	   	   while($row=$db->db_fetch_object($result))
 	   	   {
-	   	   	   echo "$row->vorname $row->nachname<br>";
+	   	   	   echo "$row->titelpre $row->vorname $row->nachname $row->titelpost<br>";
 	   	   }
 	   }
 
@@ -496,7 +499,7 @@
 	   //FB Koordinator auslesen
 		//$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
 	   $qry = "SELECT 
-				distinct vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
+				distinct on(tbl_benutzerfunktion.uid) titelpre, titelpost, vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
 			WHERE
@@ -515,7 +518,7 @@
 	   {
 	   	   while($row=$db->db_fetch_object($result))
 	   	   {
-	   	   	   echo "$row->vorname $row->nachname<br>";
+	   	   	   echo "$row->titelpre $row->vorname $row->nachname $row->titelpost<br>";
 	   	   }
 	   }
 

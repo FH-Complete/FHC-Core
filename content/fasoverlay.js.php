@@ -746,7 +746,11 @@ function StatistikPrintLVPlanung()
 		var uid=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?uid='+uid;
 	}
-	window.open(url,'LV-Planung');
+	
+	if(typeof(url)!='undefined')
+		window.open(url,'LV-Planung');
+	else
+		alert('Bitte waehlen sie ein(en) Verband, Institut oder Lektor aus');
 }
 
 // ****
@@ -807,7 +811,11 @@ function StatistikPrintLVPlanungExcel()
 		var uid=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?uid='+uid+'&studiensemester_kurzbz='+studiensemester;
 	}
-	window.open(url,'LV-Planung');
+	
+	if(typeof(url)!='undefined')
+		window.open(url,'LV-Planung');
+	else
+		alert('Bitte waehlen sie ein(en) Verband, Institut oder Lektor aus');
 }
 
 // ****

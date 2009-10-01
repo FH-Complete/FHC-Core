@@ -54,6 +54,7 @@
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/news.class.php');
+	require_once('../../../include/mitarbeiter.class.php');
 
 		// Open der NEWs-Classe
 	if (!$news = new news())
@@ -296,85 +297,77 @@ function show(id)
           <p>Studiengangsleiter:<br>
                 <?php
 
-                $stg_oe_obj = new studiengang($studiengang_kz);
-                //Studiengangsleiter auslesen
-				$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE campus.vw_mitarbeiter.aktiv and uid=(SELECT uid FROM public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) LIMIT 1)";
-				if($result_course_leader = $db->db_query($qry))
-				{
-					$num_rows_course_leader = $db->db_num_rows($result_course_leader);
-					if($num_rows_course_leader > 0)
-					{
-						$row_course_leader = $db->db_fetch_object($result_course_leader, 0);
-					}
-				}
-
-                echo "<b>";
-
-                if(isset($row_course_leader) && $row_course_leader != "")
-				{
-					if(!($row_course_leader->vorname == "" && $row_course_leader->nachname == ""))
-					{
-						echo $row_course_leader->titelpre.' '.$row_course_leader->vorname.' '.$row_course_leader->nachname.' '.$row_course_leader->titelpost;
-					}
-					else
-					{
-						echo "Nicht definiert";
-					}
-				}
-				else
-				{
-					echo "Nicht definiert";
-				}
-
-                echo "</b><br>";
-
-				if(isset($row_course_leader) && $row_course_leader != "")
-				{
-					if($row_course_leader->uid != "")
-					{
-						echo "<a href=\"mailto:$row_course_leader->uid@".DOMAIN."\" class=\"Item\">$row_course_leader->uid@".DOMAIN."</a>";
-					}
-					else
-					{
-						echo "E-Mail nicht definiert";
-					}
-				}
-				else
-				{
-					echo "E-Mail nicht definiert";
-				}
-
-                echo "<br>";
-			  	echo "Tel.:";
-
-			  	if(isset($row_course_leader) && $row_course_leader != "")
-				{
-					if($row_course_leader->telefonklappe != "")
-					{
-						$hauptnummer='';
-						$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
-								WHERE standort_kurzbz='".addslashes($row_course_leader->standort_kurzbz)."' AND
-								tbl_adresse.adresse_id=tbl_standort.adresse_id AND
-								tbl_adresse.firma_id=tbl_firma.firma_id";
-						if($result_standort = $db->db_query($qry_standort))
+                $stg_oe_obj = new studiengang();                
+                $stgl = $stg_oe_obj->getLeitung($studiengang_kz);
+                
+                if(count($stgl)>0)
+                {
+	                foreach ($stgl as $uid) 
+	                {
+		                $row_course_leader = new mitarbeiter($uid);
+		
+		                echo "<b>";
+		
+		                echo $row_course_leader->titelpre.' '.$row_course_leader->vorname.' '.$row_course_leader->nachname.' '.$row_course_leader->titelpost;
+						
+		
+		                echo "</b><br>";
+		
+						if(isset($row_course_leader) && $row_course_leader != "")
 						{
-							if($row_standort = $db->db_fetch_object($result_standort))
+							if($row_course_leader->uid != "")
 							{
-								$hauptnummer = $row_standort->nummer;
+								echo "<a href=\"mailto:$row_course_leader->uid@".DOMAIN."\" class=\"Item\">$row_course_leader->uid@".DOMAIN."</a>";
+							}
+							else
+							{
+								echo "E-Mail nicht definiert";
 							}
 						}
-						
-						echo $hauptnummer.' - '.$row_course_leader->telefonklappe;
-					}
-					else
-					{
-						echo "Nicht vorhanden";
-					}
-				}
-				else
-				{
-					echo "Nicht vorhanden";
-				}
+						else
+						{
+							echo "E-Mail nicht definiert";
+						}
+		
+		                echo "<br>";
+					  	echo "Tel.:";
+		
+					  	if(isset($row_course_leader) && $row_course_leader != "")
+						{
+							if($row_course_leader->telefonklappe != "")
+							{
+								$hauptnummer='';
+								$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
+										WHERE standort_kurzbz='".addslashes($row_course_leader->standort_kurzbz)."' AND
+										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
+										tbl_adresse.firma_id=tbl_firma.firma_id";
+								if($result_standort = $db->db_query($qry_standort))
+								{
+									if($row_standort = $db->db_fetch_object($result_standort))
+									{
+										$hauptnummer = $row_standort->nummer;
+									}
+								}
+								
+								echo $hauptnummer.' - '.$row_course_leader->telefonklappe;
+							}
+							else
+							{
+								echo "Nicht vorhanden";
+							}
+						}
+						else
+						{
+							echo "Nicht vorhanden";
+						}
+	                }
+                }
+                else 
+                {
+                	echo '<b>Nicht definiert</b><br>
+                		 E-Mail nicht definiert<br>
+                		 Tel.: Nicht vorhanden';
+                }
 
 			  	echo "</p>";
 			  	echo "<p></p>";
@@ -461,7 +454,7 @@ function show(id)
 							{
 								echo "Nicht vorhanden";
 							}
-						echo "<br><br>";
+						echo "<br>";
 						}
 					}
 				}

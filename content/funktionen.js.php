@@ -32,6 +32,7 @@ loadVariables($user);
 var FunktionenTreeDatasource=''; // Datasource des Adressen Trees
 var FunktionenSelectID='';
 var FunktionenUID=null;
+var FunktionBezeichnungChanged=false;
 
 <?php
 
@@ -185,6 +186,7 @@ function FunktionNeu()
 
 	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
 	document.getElementById('funktion-box-datum_bis').value='';
+	document.getElementById('funktion-textbox-bezeichnung').value='';
 	FunktionToggleFachbereich();
 }
 
@@ -257,6 +259,7 @@ function FunktionDetailSpeichern()
 	var benutzerfunktion_id = document.getElementById('funktion-textbox-benutzerfunktion_id').value;
 	var datum_von = document.getElementById('funktion-box-datum_von').value;
 	var datum_bis = document.getElementById('funktion-box-datum_bis').value;
+	var bezeichnung = document.getElementById('funktion-textbox-bezeichnung').value;
 		
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
@@ -283,6 +286,7 @@ function FunktionDetailSpeichern()
 	req.add('benutzerfunktion_id', benutzerfunktion_id);
 	req.add('datum_von', ConvertDateToISO(datum_von));
 	req.add('datum_bis', ConvertDateToISO(datum_bis));
+	req.add('bezeichnung', bezeichnung);
 	
 	var response = req.executePOST();
 
@@ -298,6 +302,7 @@ function FunktionDetailSpeichern()
 	}
 	else
 	{
+		FunktionBezeichnungChanged=false;
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		FunktionenSelectID=val.dbdml_data;
 		FunktionenTreeDatasource.Refresh(false);
@@ -343,6 +348,7 @@ function FunktionBearbeiten()
 	var funktion_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#funktion_kurzbz" ));
 	var datum_von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_von" ));
 	var datum_bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_bis" ));
+	var bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
 	
 	document.getElementById('funktion-menulist-fachbereich').value=fachbereich_kurzbz;
 	document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
@@ -352,7 +358,9 @@ function FunktionBearbeiten()
 	document.getElementById('funktion-checkbox-neu').checked = false;
 	document.getElementById('funktion-box-datum_von').value=datum_von;
 	document.getElementById('funktion-box-datum_bis').value=datum_bis;
+	document.getElementById('funktion-textbox-bezeichnung').value=bezeichnung;
 	
+	FunktionBezeichnungChanged=true;
 	FunktionDetailDisableFields(false);
 	FunktionToggleFachbereich();
 }
@@ -381,6 +389,7 @@ function FunktionDetailDisableFields(val)
 	document.getElementById('funktion-button-speichern').disabled=val;
 	document.getElementById('funktion-box-datum_von').disabled=val;
 	document.getElementById('funktion-box-datum_bis').disabled=val;
+	document.getElementById('funktion-textbox-bezeichnung').disabled=val;
 }
 
 // ****
@@ -400,6 +409,8 @@ function FunktionDetailResetFields()
 	
 	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
 	document.getElementById('funktion-box-datum_bis').value='';
+	document.getElementById('funktion-textbox-bezeichnung').value='';
+	FunktionBezeichnungChanged=false;
 }
 
 // ****
@@ -416,7 +427,16 @@ function FunktionToggleFachbereich()
 	
 	//Attribute semester und fachbereich auslesen
 	var semester = children.getAttribute('semester');
-	var fachbereich  = children.getAttribute('fachbereich');
+	var fachbereich = children.getAttribute('fachbereich');
+	var bezeichnung = children.label;
+	
+	//wenn in der Bezeichung noch nichts drinnen steht, dann die Funktion in die Bezeichnung schreiben
+	var tbbezeichnung = document.getElementById('funktion-textbox-bezeichnung')
+	
+	if(!FunktionBezeichnungChanged)
+	{
+		tbbezeichnung.value=bezeichnung;
+	}
 
 	//Felder sichtbar/unsichtbar setzen
 	var semesterhidden=false;
@@ -438,4 +458,9 @@ function FunktionToggleFachbereich()
 	document.getElementById('funktion-menulist-semester').hidden=semesterhidden;
 	document.getElementById('funktion-label-semester').hidden=semesterhidden;
 	
+}
+
+function FunktionBezeichnungChange()
+{
+	FunktionBezeichnungChanged=true;
 }

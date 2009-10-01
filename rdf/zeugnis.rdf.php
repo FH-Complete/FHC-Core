@@ -32,6 +32,7 @@ require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/mitarbeiter.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -121,50 +122,35 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			die('Student not found');
 		
-		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$stgl_query = "SELECT 
-							titelpre, titelpost, vorname, nachname 
-						FROM 
-							tbl_person, tbl_benutzer, tbl_benutzerfunktion 
-						WHERE 
-							tbl_person.person_id = tbl_benutzer.person_id AND 
-							tbl_benutzer.uid = tbl_benutzerfunktion.uid AND 
-							tbl_benutzerfunktion.funktion_kurzbz = 'stgl' AND 
-							tbl_benutzerfunktion.oe_kurzbz = '".addslashes($stg_oe_obj->oe_kurzbz)."' AND
-							(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-							(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+		$studiengang = new studiengang();
+		$stgleiter = $studiengang->getLeitung($row->studiengang_kz);
+		$stgl='';
+		foreach ($stgleiter as $stgleiter_uid)
+		{
+			$stgl_ma = new mitarbeiter($stgleiter_uid);
+			$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
+		}
 		
-		if($stgl_result = $db->db_query($stgl_query))
-				$stgl_row = $db->db_fetch_object($stgl_result);
-		else
-			die('Stgl not found');
-
-		/*	
-		if($row->semester!=0)
-			$bezeichnung = $row->semester.'. Semester';
-		else 
-		{*/
-			//Wenn das Semester 0 ist, dann wird das Semester aus der Rolle geholt. (Ausnahme: Incoming)
-			//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
-			$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
-					WHERE 
-					prestudent_id='".addslashes($row->prestudent_id)."' AND 
-					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-					status_kurzbz!='Incoming'
-					ORDER BY DATUM DESC LIMIT 1";
-			if($result_sem = $db->db_query($qry))
+		//Wenn das Semester 0 ist, dann wird das Semester aus der Rolle geholt. (Ausnahme: Incoming)
+		//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
+		$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
+				WHERE 
+				prestudent_id='".addslashes($row->prestudent_id)."' AND 
+				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+				status_kurzbz!='Incoming'
+				ORDER BY DATUM DESC LIMIT 1";
+		if($result_sem = $db->db_query($qry))
+		{
+			if($row_sem = $db->db_fetch_object($result_sem))
 			{
-				if($row_sem = $db->db_fetch_object($result_sem))
-				{
-					$row->semester = $row_sem->semester;
-					$bezeichnung = $row_sem->semester.'. Semester';
-				}
-				else 
-					$bezeichnung = '';
+				$row->semester = $row_sem->semester;
+				$bezeichnung = $row_sem->semester.'. Semester';
 			}
-			else
+			else 
 				$bezeichnung = '';
-		//}
+		}
+		else
+			$bezeichnung = '';
 			
 		$xml .= "\n	<zeugnis>";
 		$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
@@ -192,7 +178,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
-		$xml .= "		<studiengangsleiter>".$stgl_row->titelpre." ".$stgl_row->vorname." ".$stgl_row->nachname.($stgl_row->titelpost!=''?", ".$stgl_row->titelpost:'')."</studiengangsleiter>";
+		$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
 		

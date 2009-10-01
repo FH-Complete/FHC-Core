@@ -28,19 +28,14 @@
    			03-02-2006 Anpassung an die neue Datenbank
 */
 
-	require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
-	require_once('../../../../include/studiensemester.class.php');
-	require_once('../../../../include/lehrveranstaltung.class.php');
-	require_once('../../../../include/lvinfo.class.php');
-	require_once('../../../../include/studiengang.class.php');
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/lehrveranstaltung.class.php');
+require_once('../../../../include/lvinfo.class.php');
+require_once('../../../../include/studiengang.class.php');
 
+if (!$db = new basis_db())
+			die('Fehler beim Herstellen der Datenbankverbindung');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -205,8 +200,15 @@
 	while($row = $db->db_fetch_object($res))
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
-	$qry="SELECT vorname, nachname, fachbereich_kurzbz FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
-			WHERE funktion_kurzbz='fbl' AND fachbereich_kurzbz in($fachbereiche) AND 
+	$qry="
+		SELECT 
+			vorname, nachname, tbl_fachbereich.fachbereich_kurzbz 
+		FROM 
+			public.tbl_benutzerfunktion 
+			JOIN public.tbl_fachbereich USING(oe_kurzbz)
+			JOIN campus.vw_mitarbeiter USING(uid) 
+		WHERE 
+			funktion_kurzbz='Leitung' AND tbl_fachbereich.fachbereich_kurzbz in($fachbereiche) AND 
 			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 	

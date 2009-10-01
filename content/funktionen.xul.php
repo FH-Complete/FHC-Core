@@ -73,6 +73,10 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
+			<treecol id="funktion-treecol-bezeichnung" label="Bezeichnung" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#bezeichnung" onclick="FunktionTreeSort()"/>
+			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-fachbereich" label="Institut" flex="1" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" onclick="FunktionTreeSort()"/>
@@ -111,6 +115,7 @@ else
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#organisationseinheit" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#bezeichnung" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#uid" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#benutzerfunktion_id" />
@@ -225,6 +230,10 @@ else
 								</rule>
 							</template>
 						</menulist>
+					</row>
+					<row>
+						<label value="Bezeichnung" control="funktion-textbox-bezeichnung"/>
+						<textbox id="funktion-textbox-bezeichnung" disabled="true" maxlength="64" onchange="FunktionBezeichnungChange()"/>
 					</row>
 					<row>
 						<label value="Gültig von" control="funktion-box-datum_von"/>

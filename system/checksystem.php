@@ -38,7 +38,6 @@ echo '<H2>DB-Updates!</H2>';
 // ********************** Pruefungen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
-
 if(!$result = @$db->db_query("SELECT aktiv FROM public.tbl_organisationseinheit LIMIT 1;"))
 {
 	$qry = 'ALTER TABLE public.tbl_organisationseinheit ADD COLUMN aktiv boolean;
@@ -67,13 +66,66 @@ if(!$result = @$db->db_query("SELECT fachbereich FROM public.tbl_funktion LIMIT 
 			UPDATE public.tbl_funktion SET semester=true WHERE funktion_kurzbz='oeh-kandidatur';			
 			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbk';
 			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='fbl';
-			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='oezuordnung';";
+			UPDATE public.tbl_funktion SET fachbereich=true WHERE funktion_kurzbz='oezuordnung';
+			
+			UPDATE public.tbl_benutzerfunktion SET oe_kurzbz='Systementwicklung' WHERE oe_kurzbz='Systementwicklg';
+			UPDATE public.tbl_benutzerfunktion SET oe_kurzbz='Unternehmenskommunikation' WHERE oe_kurzbz='Unternehmenskomm';
+			UPDATE public.tbl_organisationseinheit SET aktiv=false WHERE oe_kurzbz='Unternehmenskomm';
+			UPDATE public.tbl_fachbereich SET aktiv=false WHERE oe_kurzbz='Unternehmenskomm';
+			UPDATE public.tbl_organisationseinheit SET aktiv=false WHERE oe_kurzbz='Systementwicklg';
+			UPDATE public.tbl_fachbereich SET aktiv=false WHERE oe_kurzbz='Systementwicklg';
+			";
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_funktion: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo ' public.tbl_funktion: Spalte funktion und semester hinzugefuegt!<br>';
 }
 
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE table_name='tbl_benutzerfunktion' AND constraint_name='organisationseinheit_benutzerfunktion'"))
+{
+	if(!$row = $db->db_fetch_object($result))
+	{
+		$qry = "UPDATE public.tbl_benutzerfunktion SET oe_kurzbz='etw' WHERE oe_kurzbz='0';
+				ALTER TABLE public.tbl_benutzerfunktion ADD CONSTRAINT organisationseinheit_benutzerfunktion FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_benutzerfunktion: '.$db->db_last_error().'</strong><br>';
+		else 
+			echo ' public.tbl_benutzerfunktion: FK-Constraint zur tbl_organisationseinheit hinzugefuegt!<br>';
+	}
+}
+
+if(!@$db->db_query("SELECT bezeichnung FROM public.tbl_benutzerfunktion;"))
+{
+	$qry = "
+	-- Spalte Bezeichnung anlegen
+	ALTER TABLE public.tbl_benutzerfunktion ADD COLUMN bezeichnung varchar(64);
+	-- Bezeichnung fuellen
+	UPDATE public.tbl_benutzerfunktion SET bezeichnung=(SELECT beschreibung FROM public.tbl_funktion WHERE funktion_kurzbz=tbl_benutzerfunktion.funktion_kurzbz);
+
+	-- OE-Zuordnung und FBL auf OE umstellen
+	UPDATE public.tbl_benutzerfunktion SET oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_fachbereich 
+													  WHERE fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz)
+	WHERE (tbl_benutzerfunktion.funktion_kurzbz='oezuordnung' OR tbl_benutzerfunktion.funktion_kurzbz='fbl') AND tbl_benutzerfunktion.fachbereich_kurzbz is not null;
+		
+	-- Funktionseintrag aktualisieren
+	UPDATE public.tbl_funktion SET fachbereich=false WHERE (funktion_kurzbz='oezuordnung' OR funktion_kurzbz='fbl');
+	
+	-- Fachbereich Feld leeren
+	UPDATE public.tbl_benutzerfunktion SET fachbereich_kurzbz=null WHERE (funktion_kurzbz='oezuordnung' OR funktion_kurzbz='fbl');
+	
+	-- Stg und Fbl auf Leiter aendern
+	UPDATE public.tbl_benutzerfunktion SET funktion_kurzbz='Leitung' WHERE funktion_kurzbz='stgl' OR funktion_kurzbz='fbl';
+	
+	-- Funktion stgl und fbl entfernen
+	DELETE FROM public.tbl_funktion WHERE funktion_kurzbz='fbl' OR funktion_kurzbz='stgl';
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_benutzerfunktion: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_benutzerfunktion: bezeichnung hinzugefuegt, Stgl und Fbl durch Leitung ersetzt, oezuordnung korrigiert<br>';
+}
+echo '<br>';
 
 $tabellen=array(
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
@@ -163,7 +215,7 @@ $tabellen=array(
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam"),
-	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"public.tbl_betriebsmittel"  => array("betriebsmittel_id","beschreibung","betriebsmitteltyp","nummer","nummerintern","reservieren","ort_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),

@@ -21,16 +21,15 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
@@ -101,9 +100,9 @@ $qry = "SELECT
 			) as lvs_sommersemester,
 			(
 				SELECT 
-					fachbereich_kurzbz
+					tbl_fachbereich.fachbereich_kurzbz
 				FROM 
-					public.tbl_benutzerfunktion
+					public.tbl_benutzerfunktion JOIN public.tbl_fachbereich USING(oe_kurzbz)
 				WHERE
 					uid=tbl_mitarbeiter.mitarbeiter_uid AND
 					funktion_kurzbz='oezuordnung'
