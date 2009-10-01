@@ -348,6 +348,43 @@ class studiengang extends basis_db
 		}
 
 	}
-
+	
+	/**
+	 * Liefert die UIDs der Studiengangsleiter
+	 *
+	 * @param $studiengang_kz wenn gesetzt werden die Leiter dieses Studienganges geliefert
+	 * 						  wenn null werden alle Stgl zurueckgeliefert
+	 */
+	public function getLeitung($studiengang_kz=null)
+	{
+		$stgl = array();
+		
+		$qry = "SELECT 
+					uid
+				FROM 
+					public.tbl_benutzerfunktion 
+					JOIN public.tbl_studiengang USING(oe_kurzbz) 
+				WHERE 
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=now()) AND
+					(datum_bis is null OR datum_bis>=now())";
+		
+		if(!is_null($studiengang_kz))
+			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$stgl[] = $row->uid;
+			}
+			return $stgl;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Studiengangsleiter';
+			return false;
+		}
+	}
 }
 ?>

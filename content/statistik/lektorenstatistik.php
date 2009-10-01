@@ -204,12 +204,7 @@ else
 					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ws)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ws,
 					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ss)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ss
 				FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
-		/*
-		Mitarbeiter laut institutszuordnung
-		(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='oezuordnung' AND fixangestellt AND aktiv) as fix,
-		(SELECT count(*) FROM public.tbl_benutzerfunktion JOIN public.tbl_mitarbeiter on (uid=mitarbeiter_uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND funktion_kurzbz='oezuordnung' AND NOT fixangestellt AND aktiv) as extern,
-		*/
-		//echo '<pre>'.$qry.'</pre><br><br>';
+		
 		if($db->db_query($qry))
 		{
 			$gesamt_fix=0;

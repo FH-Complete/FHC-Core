@@ -52,7 +52,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 	echo "<h2>Mitarbeiterstatistik (Hauptzuordnung) - ".$fachbereich->bezeichnung.'</h2>';
 	$qry = "SELECT distinct uid, nachname, vorname, titelpre, titelpost 
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
-			WHERE fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' 
+			WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' 
 			AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv 
 			ORDER BY nachname, vorname";
 	
@@ -84,7 +84,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 	
 	$qry = "SELECT distinct uid, nachname, vorname, titelpre, titelpost 
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
-			WHERE fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' 
+			WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' 
 			AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv
 			ORDER BY nachname, vorname";
 	
@@ -137,11 +137,11 @@ else
 				<tbody>
 				
 			 ";
-	//Bachelor
+	
 	$qry = "SELECT 
 				bezeichnung, fachbereich_kurzbz,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as fix,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as extern
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as fix,
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as extern
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	
 	if($result = $db->db_query($qry))

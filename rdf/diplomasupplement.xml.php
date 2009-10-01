@@ -28,6 +28,7 @@ require_once('../include/datum.class.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/mitarbeiter.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -184,17 +185,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 		}
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$qry = "SELECT * FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion USING(uid) 
-				WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stgl' AND
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
-		if($db->db_query($qry))
+		$stgleiter = $stg_oe_obj->getLeitung($row->studiengang_kz);
+		$stgl='';
+		foreach ($stgleiter as $stgleiter_uid)
 		{
-			if($row1 = $db->db_fetch_object())
-			{
-				echo "		<stgl>$row1->titelpre $row1->vorname $row1->nachname $row1->titelpost</stgl>";
-			}
+			$stgl_ma = new mitarbeiter($stgleiter_uid);
+			$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 		}
+		
+		echo "		<stgl>$stgl</stgl>";
 		
 		$qry = "SELECT telefonklappe FROM public.tbl_mitarbeiter JOIN tbl_benutzerfunktion ON(uid=mitarbeiter_uid) WHERE funktion_kurzbz='ass' AND oe_kurzbz='$stg_oe_obj->oe_kurzbz'";
 		if($db->db_query($qry))

@@ -74,25 +74,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	if($db->db_query($qry_semester))
 		if($row_semester = $db->db_fetch_object())
 			$row->semester=$row_semester->semester;
-	/*
-	$stg_oe_obj = new studiengang($row->studiengang_kz);
-	$stgl_query = "SELECT 
-						titelpre, titelpost, vorname, nachname 
-					FROM 
-						public.tbl_person, public.tbl_benutzer, public.tbl_benutzerfunktion 
-					WHERE 
-						tbl_person.person_id = tbl_benutzer.person_id AND 
-						tbl_benutzer.uid = tbl_benutzerfunktion.uid AND 
-						tbl_benutzerfunktion.funktion_kurzbz = 'stgl' AND 
-						tbl_benutzerfunktion.oe_kurzbz = '".$stg_oe_obj->oe_kurzbz."' AND
-						(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-						(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 	
-	if($db->db_query($stgl_query))
-		$stgl_row = $db->db_fetch_object();
-	else
-		die('Studiengangsleiter wurde nicht gefunden');
-	*/
 	$xml .= "	<studienerfolg>";
 	$xml .= "		<logopath>".DOC_ROOT."skin/images/</logopath>";
 	$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";

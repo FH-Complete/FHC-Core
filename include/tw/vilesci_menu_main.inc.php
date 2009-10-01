@@ -28,38 +28,22 @@ $menu=array
 	//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
 	'Lehre'=> 		array
 	(
-		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support', 'lehre'),
-		'Gruppenverwaltung'=>array('name'=>'Gruppenverwaltung', 'permissions'=>array('admin','lv-plan','support'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
-
+		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support', 'lehre'), 'image'=>'x-office-presentation.png',
+		'link'=>'left.php?categorie=Lehre', 'target'=>'nav',
+		'Gruppenverwaltung'=>array('name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
+		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+		'Lehrfach'=>array('name'=>'Lehrfach', 'link'=>'lehre/lehrfach.php', 'target'=>'main'),
+		
 		'Moodle'=>array
 		(
 			'name'=>'Moodle', 'permissions'=>array('admin','lv-plan','support'),
-			'Kursverwaltung'=>array('name'=>'Kursentfernen', 'link'=>'moodle/kurs_verwaltung.php', 'target'=>'main'),
+			'Kursverwaltung'=>array('name'=>'Kurs entfernen', 'link'=>'moodle/kurs_verwaltung.php', 'target'=>'main'),
 			'Account'=>array('name'=>'Account', 'link'=>'moodle/account_verwaltung.php', 'target'=>'main'),
 			'Zuteilung Verwalten'=>array('name'=>'Zuteilung Verwalten', 'link'=>'moodle/zuteilung_verwaltung.php', 'target'=>'main')			
 		),
+				
 		
-		'Lehrveranstaltung'=>array
-		(
-			'name'=>'Lehrveranstaltung', 'permissions'=>array('admin','lv-plan','support'),
-			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
-			'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/lv_wartung.php', 'target'=>'main')
-		),
-		'Lehrfach'=>array
-		(
-			'name'=>'Lehrfach', 'permissions'=>array('admin','lv-plan','support'),
-			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lehrfach.php', 'target'=>'main'),
-			'Wartung'=>array('name'=>'Wartung', 'link'=>'lehre/lehrfach/wartung.php', 'target'=>'main'),
-			'Lehrfachpflege'=>array('name'=>'Lehrfachpflege', 'link'=>'lehre/lehrfach/lehrfachpflege.php', 'target'=>'main')
-		),
-		'Lehreinheit'=>array
-		(
-			'name'=>'Lehreinheit', 'permissions'=>array('admin','lv-plan','support'),
-			'Verwaltung'=>array('name'=>'Verwaltung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
-			'Wartung'=>array('name'=>'Wartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
-			'Vorrueckung'=>array('name'=>'Vorrueckung', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
-			'Kreuzerllisten kopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>'https://cis.technikum-wien.at/cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank')
-		),
+		
 		'Freifach'=>array
 		(
 			'name'=>'Freifach', 'permissions'=>array('admin','lv-plan','support', 'lehre'),
@@ -86,7 +70,8 @@ $menu=array
 	),
 	'Personen'=> 	array
 	(
-		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true',
+		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png',
+		'link'=>'left.php?categorie=Personen', 'target'=>'nav',
 		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
 		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
 		'Gruppen'=>array
@@ -98,7 +83,6 @@ $menu=array
 		'Benutzer'=>array
 		(
 			'name'=>'Benutzer','permissions'=>array('admin','lv-plan','support'),
-			'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main'),
 			'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main')
 		),
 		'Mitarbeiter'=>array
@@ -109,50 +93,93 @@ $menu=array
 			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main'),
 			'Resturlaub'=>array('name'=>'Urlaub', 'link'=>'personen/resturlaub_frameset.html', 'target'=>'main')
 		),
-		'Studenten'=>array
+		/*'Studenten'=>array
 		(
 			'name'=>'Studenten','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/studenten_uebersicht.php', 'target'=>'main'),
-			'Neu'=>array('name'=>'Neu', 'link'=>'personen/student_edit.php?new=1', 'target'=>'main'),
-			'Vorrückung'=>array('name'=>'Vorrückung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
-		),
+			//'Neu'=>array('name'=>'Neu', 'link'=>'personen/student_edit.php?new=1', 'target'=>'main'),
+			//'Vorrückung'=>array('name'=>'Vorrückung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
+		),*/
 		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
 		'Preinteressenten'=>array('name'=>'Preinteressenten', 'link'=>'personen/preinteressent_frameset.html', 'target'=>'_blank','permissions'=>array('admin','lv-plan','support','preinteressent'))
 	),
 	'Stammdaten'=>	array
 	(
-		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
-		'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main'),
-		'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main'),
-		'Studiengang'=>array('name'=>'Studiengang', 'link'=>'stammdaten/studiengang_frameset.html', 'target'=>'main'),
-		'Ort'=>array('name'=>'Ort (Raum)', 'link'=>'stammdaten/raum_frameset.html', 'target'=>'main'),
+		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'folder.png',
+		'link'=>'left.php?categorie=Stammdaten', 'target'=>'nav',
+		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main'),
+		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main'),
+		
+		'User'=>array
+		(
+			'name'=>'User',
+			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main'),
+			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main'),
+		),
 		'Kommunikation'=>array
 		(
 			'name'=>'Kommunikation',
 			'Kontakte'=>array('name'=>'Kontakte', 'link'=>'kommunikation/kontakt.php', 'target'=>'main'),
 			'Mail-Verteiler'=>array('name'=>'Mail-Verteiler', 'link'=>'kommunikation/index.html', 'target'=>'main'),
 		),
-		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main'),
-		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main'),
+		'Studiengang'=>array('name'=>'Studiengang', 'link'=>'stammdaten/studiengang_frameset.html', 'target'=>'main'),
+		'Ort'=>array('name'=>'Ort (Raum)', 'link'=>'stammdaten/raum_frameset.html', 'target'=>'main'),
 		'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main'),
-		'Organisationseinheiten'=>array('name'=>'Organisationseinheiten', 'link'=>'stammdaten/organisationseinheiten.php', 'target'=>'main'),
 		'ImExport'=>array
 		(
 			'name'=>'ImExport',
 			'Zutrittskarten'=>array('name'=>'Zutrittskarten', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main')
 		)
 	),
-	'Vorrueckung'=>	array
+	'Wartung'=>	array
 	(
-		'name'=>'Vorrueckung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
-		'Lehreinheiten'=>array('name'=>'Lehreinheiten', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
-		'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')
+		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'edit-clear.png',
+		'link'=>'left.php?categorie=Wartung', 'target'=>'nav',
+		'Vorrueckung'=>	array
+		(
+			'name'=>'Vorrueckung', 'permissions'=>array('admin','lv-plan','support'),
+			'Lehreinheiten'=>array('name'=>'Lehreinheiten', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
+			'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')
+		),
+		'LVWartung'=>array('name'=>'LVwartung', 'link'=>'stammdaten/lv_wartung.php', 'target'=>'main'),
+		'LehrfachWartung'=>array('name'=>'Lehrfachwartung', 'link'=>'lehre/lehrfach/wartung.php', 'target'=>'main'),
+		'Lehrfachpflege'=>array('name'=>'Lehrfachpflege', 'link'=>'lehre/lehrfach/lehrfachpflege.php', 'target'=>'main'),
+		'LehreinheitWartung'=>array('name'=>'Lehreinheitwartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
+		'lvverteilung'=>array('name'=>'LVVerteilung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
+		'Kreuzerllistekopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>'https://cis.technikum-wien.at/cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank'),
+		'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main'),
+		
+
 	),
 	'Auswertung'=>	array
 	(
-		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'),
+		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'statistic.png',
+		'link'=>'left.php?categorie=Auswertung', 'target'=>'nav',
 		'Raumauslastung'=>array('name'=>'Raumauslastung', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
-		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main')
+		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
+		'Organisationseinheiten'=>array('name'=>'Organisationseinheiten', 'link'=>'stammdaten/organisationseinheiten.php', 'target'=>'main'),
+	),
+	'Admin'=>	array
+	(
+		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'emblem-system.png',
+		'link'=>'left.php?categorie=Admin', 'target'=>'nav',
+		'Tools'=>	array
+		(
+			'name'=>'Tools', 'permissions'=>array('admin'),
+			'phpPgAdmin'=>array('name'=>'phpPgAdmin', 'link'=>'https://vilesci.technikum-wien.at/phppgadmin/index.php', 'target'=>'_blank'),
+			'phpMyAdmin'=>array('name'=>'phpMyAdmin', 'link'=>'https://vilesci.technikum-wien.at/phpmyadmin/index.php', 'target'=>'_blank'),
+			'SiPassDB'=>array('name'=>'SiPass Datenbank', 'link'=>'admin/sipassdb.php', 'target'=>'main'),
+			'ServerTests'=>array('name'=>'Server-Tests', 'link'=>'admin/test/index.html', 'target'=>'main'),
+			'htaccessGenerator'=>array('name'=>'.htaccess-Generator', 'link'=>'admin/htaccess/access.php', 'target'=>'main'),
+		),
+		'FAS-Installation'=>array('name'=>'FAS-Installation', 'link'=>'admin/fasinstall.html', 'target'=>'main'),
+		'ViReferenz'=>array('name'=>'VI-Kurzreferenz', 'link'=>'admin/VI-Kurzreferenz.html', 'target'=>'main'),
+	),
+	'SD-Tools'=>	array
+	(
+		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'network-workgroup.png',
+		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
 	)
+	
 );
 ?>

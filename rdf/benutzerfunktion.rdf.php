@@ -86,6 +86,7 @@ if($db->db_query($qry))
 		        <BNFUNKTION:datum_von_iso><![CDATA['.$row->datum_von.']]></BNFUNKTION:datum_von_iso>
 		        <BNFUNKTION:datum_bis><![CDATA['.$datum_obj->convertISODate($row->datum_bis).']]></BNFUNKTION:datum_bis>
 		        <BNFUNKTION:datum_bis_iso><![CDATA['.$row->datum_bis.']]></BNFUNKTION:datum_bis_iso>
+		        <BNFUNKTION:bezeichnung><![CDATA['.$row->bezeichnung.']]></BNFUNKTION:bezeichnung>
 		     </RDF:Description>
 		  </RDF:li>';
 	}

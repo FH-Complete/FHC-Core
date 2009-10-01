@@ -390,6 +390,7 @@ if(!$error)
 				$benutzerfunktion->updatevon = $user;
 				$benutzerfunktion->datum_von = $_POST['datum_von'];
 				$benutzerfunktion->datum_bis = $_POST['datum_bis'];
+				$benutzerfunktion->bezeichnung = $_POST['bezeichnung'];
 				
 				if($benutzerfunktion->save())
 				{
@@ -399,7 +400,7 @@ if(!$error)
 				else 
 				{
 					$return = false;
-					$errormsg = 'Fehler beim Speichern:'.$benutzerfunktion->errormsg.' "'.$_POST['fachbereich_kurzbz'].' "';
+					$errormsg = 'Fehler beim Speichern:'.$benutzerfunktion->errormsg;
 				}
 			}
 		}

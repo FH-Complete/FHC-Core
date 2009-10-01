@@ -220,9 +220,6 @@ function RefreshImage()
 		{
 			echo "Alias: <a class='Item' href='mailto:$email_alias@".DOMAIN."'>$email_alias@".DOMAIN."</a>";
 		}
-				
-		if($email!='')
-			echo "<br>Extern: $email";
         
         echo '</P>';
 
@@ -278,28 +275,25 @@ function RefreshImage()
 			//Funktionen
 			$qry = "SELECT 
 						*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
-						tbl_fachbereich.bezeichnung as bezeichnung, tbl_benutzerfunktion.semester
+						 tbl_benutzerfunktion.semester, tbl_benutzerfunktion.bezeichnung as bf_bezeichnung
 					FROM 
 						public.tbl_benutzerfunktion 
 						JOIN public.tbl_funktion USING(funktion_kurzbz) 
 						JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-						LEFT JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-						LEFT JOIN public.tbl_studiengang ON(tbl_benutzerfunktion.oe_kurzbz=tbl_studiengang.oe_kurzbz) 
 					WHERE 
 						uid='$uid' AND 
-						(tbl_fachbereich.aktiv=true OR fachbereich_kurzbz is null) AND 
-						(tbl_studiengang.aktiv=true OR tbl_benutzerfunktion.oe_kurzbz is null) AND
 						(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 						(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+			
 			if($result_funktion = $db->db_query($qry))
 			{
 				if($db->db_num_rows($result_funktion)>0)
 				{
-					echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Funktion</th><th>Organisationseinheit</th><th>Semester</th><th>Institut</th></tr>';
+					echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Bezeichnung</th><th>Organisationseinheit</th><th>Semester</th><th>Institut</th></tr>';
 
 					while($row_funktion = $db->db_fetch_object($result_funktion))
 					{
-						echo "<tr class='liste1'><td>$row_funktion->beschreibung</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->bezeichnung</td></tr>";
+						echo "<tr class='liste1'><td>$row_funktion->bf_bezeichnung</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
 					}
 					echo '</table>';
 				}

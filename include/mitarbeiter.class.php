@@ -19,14 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/*
- * Benoetigt: person.class.php
- *            benutzer.class.php
- *            functions.inc.php
- */
-require_once('person.class.php');
-require_once('benutzer.class.php');
-require_once('functions.inc.php');
+require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/benutzer.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class mitarbeiter extends benutzer
 {
@@ -50,10 +45,10 @@ class mitarbeiter extends benutzer
 	public $vorgesetzte=array();
 	public $untergebene=array();
 
-	// *************************************************************************
-	// * Konstruktor - laedt optional einen Mitarbeiter
-	// * @param $uid            Mitarbeiter der geladen werden soll (default=null)
-	// *************************************************************************
+	/**
+	 * Konstruktor - laedt optional einen Mitarbeiter
+	 * @param $uid Mitarbeiter der geladen werden soll (default=null)
+	 */
 	public function __construct($uid=null)
 	{
 		parent::__construct();
@@ -111,10 +106,10 @@ class mitarbeiter extends benutzer
 		}
 	}
 
-	// ************************************************
-	// * ueberprueft die Variablen auf Gueltigkeit
-	// * @return true wenn gueltig, false im Fehlerfall
-	// ************************************************
+	/**
+	 * ueberprueft die Variablen auf Gueltigkeit
+	 * @return true wenn gueltig, false im Fehlerfall
+	 */
 	protected function validate()
 	{
 		//if(mb_strlen($this->uid)>16)
@@ -172,10 +167,10 @@ class mitarbeiter extends benutzer
 	}
 
 
-	// *************************************************
-	// * Speichert die Mitarbeiterdaten in die Datenbank
-	// * @return true wenn ok, false im Fehlerfall
-	// *************************************************
+	/**
+	 * Speichert die Mitarbeiterdaten in die Datenbank
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function save($new=null, $savebenutzer=true)
 	{
 		//Variablen checken
@@ -521,11 +516,11 @@ class mitarbeiter extends benutzer
 		return $result;
 	}
 
-	// ******************************************
-	// * Laedt alle Mitarbeiter einer Lehreinheit
-	// * @param lehreinheit_id
-	// * @return true wenn ok, false wenn Fehler
-	// ******************************************
+	/**
+	 * Laedt alle Mitarbeiter einer Lehreinheit
+	 * @param lehreinheit_id
+	 * @return true wenn ok, false wenn Fehler
+	 */
 	public function getMitarbeiterFromLehreinheit($lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
@@ -562,11 +557,11 @@ class mitarbeiter extends benutzer
 		}
 	}
 
-	// *************************************************
-	// * Laedt alle Mitarbeiter einer Lehrveranstaltung
-	// * @param lehrveranstaltung_id
-	// * @return true wenn ok, false wenn Fehler
-	// *************************************************
+	/**
+	 * Laedt alle Mitarbeiter einer Lehrveranstaltung
+	 * @param lehrveranstaltung_id
+	 * @return true wenn ok, false wenn Fehler
+	 */
 	public function getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
@@ -624,13 +619,13 @@ class mitarbeiter extends benutzer
 			$qry .= " AND fixangestellt=false";
 		if($stgl)
 		{
-			$qry .= " AND funktion_kurzbz='stgl' 
+			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz) 
 					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		}
 		if($fbl)
 		{
-			$qry .= " AND funktion_kurzbz='fbl'
+			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz) 
 					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		}
@@ -706,9 +701,9 @@ class mitarbeiter extends benutzer
 		}
 	}
 
-	// ****
-	// * Prueft ob die Kurzbz bereits existiert
-	// ****
+	/**
+	 * Prueft ob die Kurzbz bereits existiert
+	 */
 	public function kurzbz_exists($kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE kurzbz='".addslashes($kurzbz)."'";
@@ -735,10 +730,10 @@ class mitarbeiter extends benutzer
 
 	}
 
-	// *************************************
-	// * Laedt die Mitarbeiter deren
-	// * Nachname mit $filter beginnt
-	// *************************************
+	/**
+	 * Laedt die Mitarbeiter deren
+	 * Nachname mit $filter beginnt
+	 */
 	public function getMitarbeiterFilter($filter)
 	{
 		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter).".*'";
@@ -848,11 +843,11 @@ class mitarbeiter extends benutzer
 	 * gibt array mit allen Mitarbeitern zurueck
 	 * @return array mit Mitarbeitern
 	 */
-	public function getMitarbeiterInstitut($institut)
+	public function getMitarbeiterOrganisationseinheit($oe_kurzbz)
 	{
 		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
-					WHERE funktion_kurzbz='oezuordnung' AND fachbereich_kurzbz='".addslashes($institut)."' 
+					WHERE funktion_kurzbz='oezuordnung' AND oe_kurzbz='".addslashes($oe_kurzbz)."'  AND
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 					ORDER BY nachname, vorname";
@@ -902,7 +897,7 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * gibt UID des Vorgesetzten zurueck
+	 * Gibt ein Array mit den UIDs der Vorgesetzten zurück
 	 * @return uid
 	 */
 	public function getVorgesetzte($uid=null)
@@ -910,25 +905,24 @@ class mitarbeiter extends benutzer
 		$return=false;
 		if (is_null($uid))
 			$uid=$this->uid;
-		// Suche in Instituten
-		$qry = "SELECT CASE WHEN fachbereich_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion 
-																	  WHERE fachbereich_kurzbz=a.fachbereich_kurzbz AND 
-																	  		funktion_kurzbz='fbl' AND 
-																	  		(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-																			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
-																	  LIMIT 1)
-							WHEN oe_kurzbz is not null THEN (SELECT uid FROM public.tbl_benutzerfunktion 
-															 WHERE oe_kurzbz=a.oe_kurzbz AND 
-															 	   funktion_kurzbz='stgl' AND 
-															 	   (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-																   (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
-															 LIMIT 1)
-						    ELSE ''
-					   END as vorgesetzter
-						FROM public.tbl_benutzerfunktion a WHERE 
-						funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."' AND
-						(a.datum_von is null OR a.datum_von<=now()) AND
-						(a.datum_bis is null OR a.datum_bis>=now())";
+		
+		$qry = "SELECT 
+					uid  as vorgesetzter
+				FROM 
+					public.tbl_benutzerfunktion
+				WHERE 
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=now()) AND
+					(datum_bis is null OR datum_bis>=now()) AND
+					oe_kurzbz in (SELECT oe_kurzbz 
+								  FROM public.tbl_benutzerfunktion 
+								  WHERE 
+									funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."' AND
+									(datum_von is null OR datum_von<=now()) AND
+									(datum_bis is null OR datum_bis>=now())
+								  );";
+		
+		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -949,48 +943,34 @@ class mitarbeiter extends benutzer
 		return $return;
 	}
 	
-	// ************************
-	// * gibt die UIDs der Untergebenen zurueck
-	// ************************
+	/**
+	 * Gibt ein Array mit den UIDs der Untergebenen zurueck
+	 */
 	public function getUntergebene($uid=null)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
 		
-		//Alle Studiengaenge und Fachbereiche holen bei denen die Person die Leitung hat
+		// Organisationseinheiten holen von denen die Person die Leitung hat
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE (funktion_kurzbz='fbl' OR funktion_kurzbz='stgl') AND uid='".addslashes($uid)."' AND
+				WHERE funktion_kurzbz='Leitung' AND uid='".addslashes($uid)."' AND
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		
 		if($this->db_query($qry))
 		{
-			$institut='';
 			$oe='';
 			while($row = $this->db_fetch_object())
 			{
-				if($row->funktion_kurzbz=='fbl')
-				{
-					if($institut!='')
-						$institut.=',';
-					
-					$institut.="'".addslashes($row->fachbereich_kurzbz)."'";
-				}
-				elseif($row->funktion_kurzbz=='stgl')
-				{
-					if($oe!='')
-						$oe.=',';
-					$oe.="'".$row->oe_kurzbz."'";
-				}
-					
+				if($oe!='')
+					$oe.=',';
+				$oe.="'".addslashes($row->oe_kurzbz)."'";
 			}
 		}
 		
-		//Alle Personen holen die diesen Studiengaengen/Fachbereichen untergeordnet sind
+		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
 		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='oezuordnung' AND (false ";
 		
-		if($institut!='')
-			$qry.=" OR fachbereich_kurzbz in($institut)"; 
 		if($oe!='')
 			$qry.=" OR oe_kurzbz in($oe)";
 		
@@ -1001,6 +981,7 @@ class mitarbeiter extends benutzer
 		
 		$qry.= " AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

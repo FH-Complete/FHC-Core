@@ -45,6 +45,7 @@ class benutzerfunktion extends basis_db
 	public $semester;			//  smallint
 	public $datum_von;			//  date
 	public $datum_bis;			//  date
+	public $bezeichnung;		//  varchar(64)
 
 
 	/**
@@ -90,6 +91,7 @@ class benutzerfunktion extends basis_db
 			$pfunktion_obj->semester = $row->semester;
 			$pfunktion_obj->datum_von = $row->datum_von;
 			$pfunktion_obj->datum_bis = $row->datum_bis;
+			$pfunktion_obj->bezeichnung = $row->bezeichnung;
 
 			$this->result[] = $pfunktion_obj;
 		}
@@ -147,6 +149,7 @@ class benutzerfunktion extends basis_db
 				$this->semester = $row->semester;
 				$this->datum_von = $row->datum_von;
 				$this->datum_bis = $row->datum_bis;
+				$this->bezeichnung = $row->bezeichnung;
 				return true;
 			}
 			else
@@ -197,6 +200,7 @@ class benutzerfunktion extends basis_db
 				$obj->semester = $row->semester;
 				$obj->datum_von = $row->datum_von;
 				$obj->datum_bis = $row->datum_bis;
+				$obj->bezeichnung = $row->bezeichnung;
 				
 				$this->result[] = $obj;
 				
@@ -245,6 +249,7 @@ class benutzerfunktion extends basis_db
 			$this->semester = $row->semester;
 			$this->datum_von = $row->datum_von;
 			$this->datum_bis = $row->datum_bis;
+			$this->bezeichnung = $row->bezeichnung;
 		}
 		else
 		{
@@ -306,7 +311,7 @@ class benutzerfunktion extends basis_db
 				}
 			}
 			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, oe_kurzbz, funktion_kurzbz, insertamum, insertvon,
-				updateamum, updatevon, semester, datum_von, datum_bis) VALUES ('.
+				updateamum, updatevon, semester, datum_von, datum_bis, bezeichnung) VALUES ('.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->oe_kurzbz).', '.
@@ -317,7 +322,8 @@ class benutzerfunktion extends basis_db
 				$this->addslashes($this->updatevon).', '.
 				$this->addslashes($this->semester).','.
 				$this->addslashes($this->datum_von).','.
-				$this->addslashes($this->datum_bis).'); ';
+				$this->addslashes($this->datum_bis).','.
+				$this->addslashes($this->bezeichnung).'); ';
 		}
 		else
 		{
@@ -342,6 +348,7 @@ class benutzerfunktion extends basis_db
 				'updatevon='.$this->addslashes($this->updatevon).',  '.
 				'datum_von='.$this->addslashes($this->datum_von).',  '.
 				'datum_bis='.$this->addslashes($this->datum_bis).',  '.
+				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'semester='.$this->addslashes($this->semester).'  '.
 				'WHERE benutzerfunktion_id = '.$this->addslashes($this->benutzerfunktion_id).';';
 		}
