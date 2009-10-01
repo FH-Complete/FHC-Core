@@ -523,6 +523,9 @@ class prestudent extends person
 				else 
 					$qry .= " AND a.rolle IN('Interessent', 'Bewerber', 'Aufgenommener', 'Wartender', 'Abgewiesener')";
 				break;
+			case "absolvent":
+				$qry.=" AND a.rolle='Absolvent'";
+				break;
 			default: 
 				break;		
 		}
