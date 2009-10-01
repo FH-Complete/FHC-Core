@@ -23,48 +23,49 @@
 // * @brief bietet die Moeglichkeit zur Anzeige und
 // * Aenderung der Zeitwuensche und Zeitsperren
 
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/zeitsperre.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/resturlaub.class.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/mitarbeiter.class.php');
-	require_once('../../../include/mail.class.php');
-	require_once('../../../include/benutzerberechtigung.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-      
-	$uid = get_uid();
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/zeitsperre.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/resturlaub.class.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/mail.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
-	$PHP_SELF = $_SERVER['PHP_SELF'];
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+  
+$uid = get_uid();
 
-	if(isset($_GET['type']))
-		$type=$_GET['type'];
+$PHP_SELF = $_SERVER['PHP_SELF'];
 
-	//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitsperren 
-	//des uebergebenen Users anzeigen
-	if(isset($_GET['uid']))
+if(isset($_GET['type']))
+	$type=$_GET['type'];
+
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitsperren 
+//des uebergebenen Users anzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	if($rechte->isBerechtigt('admin'))
 	{
-		$rechte = new benutzerberechtigung();
-		$rechte->getBerechtigungen($uid);
-		if($rechte->isBerechtigt('admin'))
-		{
-			$uid = $_GET['uid'];
-		}
-		else 
-		{
-			die('Fuer diese Aktion benoetigen Sie Administratorenrechte');
-		}
+		$uid = $_GET['uid'];
 	}
-	$datum_obj = new datum();
-	$ma= new mitarbeiter();
+	else 
+	{
+		die('Fuer diese Aktion benoetigen Sie Administratorenrechte');
+	}
+}
+$datum_obj = new datum();
+$ma= new mitarbeiter();
 
-	//Stundentabelleholen
-	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
-		die($db->db_last_error());
-	$num_rows_stunde=$db->db_num_rows($result_stunde);
+//Stundentabelleholen
+if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+	die($db->db_last_error());
+$num_rows_stunde=$db->db_num_rows($result_stunde);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
