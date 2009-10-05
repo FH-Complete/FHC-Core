@@ -35,18 +35,27 @@
 		$searchstr = '';
 		
 $htmlstr='
-	<form accept-charset="UTF-8" name="search" method="GET">
-  		Bitte Suchbegriff eingeben: 
-  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
-  		<input type="submit" value="Suchen">
-  	</form>';
+<table width="100%">
+<tr>
+	<td>
+		<form accept-charset="UTF-8" name="search" method="GET">
+	  		Bitte Suchbegriff eingeben: 
+	  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+	  		<input type="submit" value="Suchen">
+	  	</form>
+	</td>
+	<td align="right">
+		<form name="neuform" action="benutzerberechtigung_details.php" target="vilesci_detail">
+			UID <input type="text" value="" name="uid">&nbsp;
+			<input type="submit" name="neuschick" value="anlegen">
+		</form>
+	</td>
+</tr>
+</table>
+	';
 		
-$htmlstr .= "<div style='float:left'><a href='berechtigungrolle.php' target='main'>Rollen Administrieren</a></div>";
-$htmlstr .= "<div style='text-align:right'>";
-$htmlstr .= "<form name='neuform' action='benutzerberechtigung_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
-$htmlstr .= "</div>";
-$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>\n";
-		
+$htmlstr .= "<div style='float:left'><a href='berechtigungrolle.php' target='main'>Rollen Administrieren</a></div>";		
+
 if(isset($_GET['searchstr']))
 {	
 	

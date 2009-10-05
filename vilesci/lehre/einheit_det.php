@@ -20,26 +20,23 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzergruppe.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/gruppe.class.php');
 
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/studiengang.class.php');
-	require_once('../../include/benutzergruppe.class.php');
-	require_once('../../include/person.class.php');
-	require_once('../../include/benutzer.class.php');
-	require_once('../../include/student.class.php');
-	require_once('../../include/gruppe.class.php');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
+$user=get_uid();
 
-	$user=get_uid();
-	
-	$kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
-	if(empty($kurzbz))
-		die('Gruppe wurde nicht &uuml;bergeben <a href="javascript:history.back()">Zur&uuml;ck</a>');
+$kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
+if(empty($kurzbz))
+	die('Gruppe wurde nicht &uuml;bergeben <a href="javascript:history.back()">Zur&uuml;ck</a>');
 		
 if (isset($_POST['new']))
 {
@@ -69,9 +66,11 @@ if(!$gruppe->load($kurzbz))
 <title>Gruppen Details</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 </head>
 <body>
-<H1>Gruppe <?php echo $kurzbz ?></H1>
+<H2>Gruppe <?php echo $kurzbz ?></H2>
 
 <?php
 echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
@@ -100,20 +99,27 @@ if(!$gruppe->generiert)
 	</FORM>
 	<HR>';
 }
-	$qry = "SELECT * FROM public.tbl_benutzergruppe, public.tbl_benutzer, public.tbl_person WHERE".
-	       " tbl_benutzergruppe.gruppe_kurzbz='".addslashes($kurzbz)."' AND".
-	       " tbl_benutzergruppe.uid = tbl_benutzer.uid AND tbl_benutzer.person_id=tbl_person.person_id ORDER BY nachname, vorname";
+	$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN public.tbl_benutzer USING(uid) JOIN public.tbl_person USING(person_id) WHERE".
+	       " tbl_benutzergruppe.gruppe_kurzbz='".addslashes($kurzbz)."'".
+	       " ORDER BY nachname, vorname";
 
 	if($result = $db->db_query($qry))
 	{
 		$num_rows=$db->db_num_rows($result);
 		echo "Anzahl: $num_rows";
-		echo '<table class="liste">
-			<tr class="liste"><th>UID</th><th>Vornamen</th><th>Nachname</th></tr>';
+		echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
+				<thead>
+				<tr class='liste'>
+					<th>UID</th>
+					<th>Vornamen</th>
+					<th>Nachname</th>
+				</tr>
+				</thead>
+				<tbody>";
 
 		for ($j=0; $row = $db->db_fetch_object($result);$j++)
 		{
-			echo "<tr class='liste".($j%2)."'>";
+			echo "<tr>";
 		    echo "<td>".$row->uid."</td>";
 			echo "<td>".$row->vorname."</td>";
 			echo "<td>".$row->nachname."</td>";
@@ -121,11 +127,13 @@ if(!$gruppe->generiert)
 				echo '<td class="button"><a href="einheit_det.php?uid='.$row->uid.'&type=delete&kurzbz='.$kurzbz.'">Delete</a></td>';
 		    echo "</tr>\n";
 		}
+		echo '</tbody>
+		</table>';
 	}
 	else
 		die('Fehler beim Laden der Benutzer');
 
 ?>
-</table>
+
 </body>
 </html>

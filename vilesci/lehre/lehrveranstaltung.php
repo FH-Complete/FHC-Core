@@ -431,7 +431,7 @@ if ($result_lv!=0)
 		//ECTS
 		echo "<td>$row->ects</td>";
 		//Lehre
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre&isaktiv=$isaktiv'><img src='../../skin/images/".($row->lehre=='t'?'true.gif':'false.gif')."'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre&isaktiv=$isaktiv'><img src='../../skin/images/".($row->lehre=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//LehreVz
 		echo "<td  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
@@ -442,7 +442,7 @@ if ($result_lv!=0)
 		//Aktiv
 		echo "<td align='center'  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
-			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv&isaktiv=$isaktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv&isaktiv=$isaktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 		else
 			echo ($row->aktiv?'Ja':'Nein');
 		echo "</td>";
@@ -452,9 +452,9 @@ if ($result_lv!=0)
 		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv' method='POST'><input type='text' value='$row->sort' size='4' name='sort'><input type='submit' value='ok'></form>";
 		echo "</td>";
 		//Zeugnis
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis&isaktiv=$isaktiv'><img src='../../skin/images/".($row->zeugnis=='t'?'true.gif':'false.gif')."'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis&isaktiv=$isaktiv'><img src='../../skin/images/".($row->zeugnis=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//Projektarbeit
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit&isaktiv=$isaktiv'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.gif':'false.gif')."'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit&isaktiv=$isaktiv'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//FBK
 		echo "<td style='white-space:nowrap;'>";
 		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz&isaktiv=$isaktiv' method='POST'><SELECT name='fbk'>";

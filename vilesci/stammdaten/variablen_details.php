@@ -20,184 +20,180 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/globals.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/variable.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/studiensemester.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	
+if (!$user = get_uid())
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 		
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if(!$rechte->isBerechtigt('admin'))
+	die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	require_once('../../include/globals.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/variable.class.php');
-	require_once('../../include/person.class.php');
-	require_once('../../include/benutzer.class.php');
-	require_once('../../include/studiensemester.class.php');
+$reloadstr = "";  // neuladen der liste im oberen frame
+$htmlstr = "";
+$errorstr = ""; //fehler beim insert
 	
+$name = isset($_REQUEST['name'])?$_REQUEST['name']:'';
+$uid = isset($_REQUEST['uid'])?$_REQUEST['uid']:'';
+$wert = isset($_REQUEST['wert'])?$_REQUEST['wert']:'';
 
-	if (!$user = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	if(!$rechte->isBerechtigt('admin'))
-			die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
+if(isset($_GET['standard']))
+{
+	$stsem_obj = new studiensemester();
+	$stsem = $stsem_obj->getaktorNext();
 	
-	$reloadstr = "";  // neuladen der liste im oberen frame
-	$htmlstr = "";
-	$errorstr = ""; //fehler beim insert
-		
-	$name = isset($_REQUEST['name'])?$_REQUEST['name']:'';
-	$uid = isset($_REQUEST['uid'])?$_REQUEST['uid']:'';
-	$wert = isset($_REQUEST['wert'])?$_REQUEST['wert']:'';
-	
-	if(isset($_GET['standard']))
+	$qrys = array(
+				"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
+				"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
+				"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
+				"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
+				"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
+				"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
+				);
+				
+	$error = false;
+	foreach ($qrys as $qry)
 	{
-		$stsem_obj = new studiensemester();
-		$stsem = $stsem_obj->getaktorNext();
-		
-		$qrys = array(
-					"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
-					"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
-					"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
-					"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
-					"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
-					"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
-					);
-					
-		$error = false;
-		foreach ($qrys as $qry)
+		if(!@$db->db_query($qry))
 		{
-			if(!@$db->db_query($qry))
-			{
-				$error = true;
-			}
-		}
-		
-		if($error)
-			$errorstr.="Es konnten nicht alle Werte angelegt werden";
-		
-		$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
-		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
-		$reloadstr .= "</script>\n";
-	}
-	if(isset($_POST["del"]))
-	{
-		if($name!='' && $uid!='')
-		{
-			$variable = new variable();
-			if(!$variable->delete($name, $uid))
-				$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
-			else 
-			{
-				$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
-				$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
-				$reloadstr .= "</script>\n";
-			}
-		}
-		else 
-		{
-			die('Falsche Parameteruebergabe');
+			$error = true;
 		}
 	}
 	
-	if(isset($_POST["schick"]))
+	if($error)
+		$errorstr.="Es konnten nicht alle Werte angelegt werden";
+	
+	$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
+	$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
+	$reloadstr .= "</script>\n";
+}
+if(isset($_POST["del"]))
+{
+	if($name!='' && $uid!='')
 	{
-		$variable=new variable();
-		
-		if($variable->load($uid, $name))
-			$varialbe->new = false;
+		$variable = new variable();
+		if(!$variable->delete($name, $uid))
+			$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
 		else 
-			$variable->new = true;
-		
-		$variable->name = $name;
-		$variable->uid = $uid;
-		$variable->wert = $wert;
-		
-		if ($variable->save())
 		{
-			$reloadstr .= "<script type='text/javascript'>\n";
+			$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
 			$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
 			$reloadstr .= "</script>\n";
 		}
 	}
-	
-	$qry = "SELECT distinct name FROM public.tbl_variable order by name";
-	if($result = $db->db_query($qry))
+	else 
 	{
-		while($row = $db->db_fetch_object($result))
-		{
-			$namen[] = $row->name;
-		}
+		die('Falsche Parameteruebergabe');
 	}
+}
+
+if(isset($_POST["schick"]))
+{
+	$variable=new variable();
 	
-	if ($uid!='')
+	if($variable->load($uid, $name))
+		$varialbe->new = false;
+	else 
+		$variable->new = true;
+	
+	$variable->name = $name;
+	$variable->uid = $uid;
+	$variable->wert = $wert;
+	
+	if ($variable->save())
 	{
-				
-		$ben = new benutzer();
-		if (!$ben->load($uid))
-			$htmlstr .= "<br><div class='kopf'>Benutzer <b>".$uid."</b> existiert nicht</div>";
-		else
+		$reloadstr .= "<script type='text/javascript'>\n";
+		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
+		$reloadstr .= "</script>\n";
+	}
+}
+
+$qry = "SELECT distinct name FROM public.tbl_variable order by name";
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$namen[] = $row->name;
+	}
+}
+
+if ($uid!='')
+{
+			
+	$ben = new benutzer();
+	if (!$ben->load($uid))
+		$htmlstr .= "<br><div class='kopf'>Benutzer <b>".$uid."</b> existiert nicht</div>";
+	else
+	{
+		$var = new variable();
+		$var->getVars($uid);
+
+		$htmlstr .= "<br><div class='kopf'>Variablen für <b>".$uid."</b></div>\n";
+		$htmlstr .= "<table style='padding-top:10px;'>\n";
+		$htmlstr .= "<tr></tr>\n";
+		$htmlstr .= "<tr><td>Name</td><td>Wert</td></tr>\n";
+		foreach($var->variables as $v)
 		{
-			$var = new variable();
-			$var->getVars($uid);
-	
-			$htmlstr .= "<br><div class='kopf'>Variablen für <b>".$uid."</b></div>\n";
-			$htmlstr .= "<table style='padding-top:10px;'>\n";
-			$htmlstr .= "<tr></tr>\n";
-			$htmlstr .= "<tr><td>Name</td><td>Wert</td></tr>\n";
-			foreach($var->variables as $v)
-			{
-				$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST'>\n";
-				$htmlstr .= "<input type='hidden' name='uid' value='".$v->uid."'>\n";
-				$htmlstr .= "	<tr>\n";
-				$htmlstr .= "		<td><select name='name'>\n";
-				
-				foreach($namen as $val)
-				{
-					if ($val == $v->name)
-						$sel = " selected";
-					else
-						$sel = "";
-					$htmlstr .= "				<option value='".$val."' ".$sel.">".$val."</option>";
-				}
-				$htmlstr .= "		</select></td>\n";
-				
-				$htmlstr .= "		<td><input type='text' name='wert' value='".$v->wert."' size='15' maxlength='64'></td>\n";
-				
-				$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
-				$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen'></td>";
-				$htmlstr .= "	</tr>\n";
-				$htmlstr .= "</form>\n";
-		
-			}
-			
-			
 			$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST'>\n";
-			$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+			$htmlstr .= "<input type='hidden' name='uid' value='".$v->uid."'>\n";
 			$htmlstr .= "	<tr>\n";
 			$htmlstr .= "		<td><select name='name'>\n";
 			
 			foreach($namen as $val)
 			{
-				$htmlstr .= "				<option value='".$val."'>".$val."</option>";
+				if ($val == $v->name)
+					$sel = " selected";
+				else
+					$sel = "";
+				$htmlstr .= "				<option value='".$val."' ".$sel.">".$val."</option>";
 			}
 			$htmlstr .= "		</select></td>\n";
 			
-			$htmlstr .= "		<td><input type='text' name='wert' value='' size='15' maxlength='64'></td>\n";
+			$htmlstr .= "		<td><input type='text' name='wert' value='".$v->wert."' size='15' maxlength='64'></td>\n";
 			
-			$htmlstr .= "		<td><input type='submit' name='schick' value='neu'></td>";
+			$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
+			$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen'></td>";
 			$htmlstr .= "	</tr>\n";
 			$htmlstr .= "</form>\n";
-			
-			$htmlstr .= "</table>\n";
-			
-			$htmlstr .="<br><br><a href='".$_SERVER['PHP_SELF']."?standard=true&uid=$uid'>Standardwerte anlegen</a>";
+	
 		}
-
+		
+		
+		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST'>\n";
+		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+		$htmlstr .= "	<tr>\n";
+		$htmlstr .= "		<td><select name='name'>\n";
+		
+		foreach($namen as $val)
+		{
+			$htmlstr .= "				<option value='".$val."'>".$val."</option>";
+		}
+		$htmlstr .= "		</select></td>\n";
+		
+		$htmlstr .= "		<td><input type='text' name='wert' value='' size='15' maxlength='64'></td>\n";
+		
+		$htmlstr .= "		<td><input type='submit' name='schick' value='neu'></td>";
+		$htmlstr .= "	</tr>\n";
+		$htmlstr .= "</form>\n";
+		
+		$htmlstr .= "</table>\n";
+		
+		$htmlstr .="<br><br><a href='".$_SERVER['PHP_SELF']."?standard=true&uid=$uid'>Standardwerte anlegen</a>";
 	}
-	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
+
+}
+$htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">

@@ -89,7 +89,6 @@ $menu=array
 		(
 			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
-			'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
 			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main'),
 			'Resturlaub'=>array('name'=>'Urlaub', 'link'=>'personen/resturlaub_frameset.html', 'target'=>'main')
 		),
@@ -116,12 +115,12 @@ $menu=array
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main'),
 			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main'),
 		),
-		'Kommunikation'=>array
+		/*'Kommunikation'=>array
 		(
 			'name'=>'Kommunikation',
 			'Kontakte'=>array('name'=>'Kontakte', 'link'=>'kommunikation/kontakt.php', 'target'=>'main'),
 			'Mail-Verteiler'=>array('name'=>'Mail-Verteiler', 'link'=>'kommunikation/index.html', 'target'=>'main'),
-		),
+		),*/
 		'Studiengang'=>array('name'=>'Studiengang', 'link'=>'stammdaten/studiengang_frameset.html', 'target'=>'main'),
 		'Ort'=>array('name'=>'Ort (Raum)', 'link'=>'stammdaten/raum_frameset.html', 'target'=>'main'),
 		'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main'),
@@ -158,6 +157,7 @@ $menu=array
 		'Raumauslastung'=>array('name'=>'Raumauslastung', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
 		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
 		'Organisationseinheiten'=>array('name'=>'Organisationseinheiten', 'link'=>'stammdaten/organisationseinheiten.php', 'target'=>'main'),
+		'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
 	),
 	'Admin'=>	array
 	(

@@ -20,17 +20,17 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		
-		require_once('../../include/functions.inc.php');
-		require_once('../../include/studiengang.class.php');
-		require_once('../../include/gruppe.class.php');
-		require_once('../../include/person.class.php');
-		require_once('../../include/benutzer.class.php');
-		require_once('../../include/student.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/gruppe.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 if (isset($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
@@ -50,12 +50,19 @@ if (isset($_GET['ss']))
 	$ss=$_GET['ss'];
 else
 	$ss=null;
+	
+$uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
 ?>
 <html>
 <head>
 <title>Gruppe-Verwaltung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 function conf_del()
 {
@@ -64,33 +71,32 @@ function conf_del()
 </script>
 </head>
 <body>
-<H1>Gruppen Verwaltung</H1>
+<H2>Gruppen - Verwaltung</H2>
 <?php
 
+//Studiengang Drop Down anzeigen
+$stud = new studiengang();
+if(!$stud->getAll('typ, kurzbzlang'))
+	echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
 
 // Studiengang AuswahlFilter
-$stg=new studiengang();
-if ($stg->getAll('kurzbzlang'))
-{
-	echo '- ';
+echo '<form accept-charset="UTF-8" name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
+echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
 
-		echo '<a href="?studiengang_kz=">Alle</a> - ';	
-	
-	foreach($stg->result AS $sg)
+foreach($stud->result as $row)
+{
+	if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || 
+	   $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
 	{
-		if (is_null($studiengang_kz))
-			$studiengang_kz=$sg->studiengang_kz;
-	
-		echo '<a href="?studiengang_kz='.$sg->studiengang_kz.'">';
-		if ($studiengang_kz==$sg->studiengang_kz)
-			echo '<u>';
-		echo $sg->kurzbzlang.' ('.$sg->typ.$sg->kurzbz.')';
-		if ($studiengang_kz==$sg->studiengang_kz)
-			echo '</u>';
-		echo '</a> - ';
+		if($studiengang_kz=='')
+			$studiengang_kz=$row->studiengang_kz;
+		
+		echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
 	}
-	echo '<BR/>';
 }
+
+echo '</SELECT>';
+echo '</form>';
 
 if (isset($_POST['newFrm']) || isset($_GET['newFrm']))
 {
@@ -227,39 +233,42 @@ function getUebersicht()
 	if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-  $gruppe=new gruppe();
+	$gruppe=new gruppe();
 	// Array mit allen Einheiten holen
 	$gruppeen=$gruppe->getgruppe($studiengang_kz,$semester);
-	//print_r($gruppeen);
-	?>
-<h3>&Uuml;bersicht</h3>
+	
+	echo '<h3>&Uuml;bersicht</h3>';
 
-<table class='liste'>
-
-<?php
+	echo "<table  class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>";
 
 	$num_rows=count($gruppeen);
 	$foo = 0;
-	echo "<tr class='liste'><th>Kurzbz.</th><th>Bezeichnung</th><th>Stg.</th><th>Sem.</th><th>Mailgrp</th><th>Anzahl</th><th colspan=\"3\">Aktion</th></tr>";
+	echo "<thead>
+			<tr class='liste'>
+				<th class='table-sortable:default'>Kurzbz.</th>
+				<th class='table-sortable:default'>Bezeichnung</th>
+				<th class='table-sortable:default'>Stg.</th>
+				<th class='table-sortable:default'>Sem.</th>
+				<th class='table-sortable:default'>Mailgrp</th>
+				<th class='table-sortable:default'>Anzahl</th>
+				<th colspan=\"3\">Aktion</th>
+			</tr>
+			</thead><tbody>";
 
 	$i=0;
-	$qry = "SELECT studiengang_kz, UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang";
-	$stg = array();
-	if(!$result = $db->db_query($qry))
-			die('Fehler beim Laden der Studiengaenge');
-	while($row = $db->db_fetch_object($result))
-			$stg[$row->studiengang_kz] = $row->kuerzel;
-
+	$stg = new studiengang();
+	$stg->getAll(null, false);
+	
 	foreach ($gruppe->result as $e)
 	{
 		$i++;
 		$c=$i%2;
 
-		echo '<tr class="liste'.$c.'">';
+		echo '<tr>';
 
 		echo "<td>$e->gruppe_kurzbz </td>";
 		echo "<td>$e->bezeichnung </td>";
-		echo "<td>".$stg[$e->studiengang_kz]."</td>";
+		echo "<td>".$stg->kuerzel_arr[$e->studiengang_kz]."</td>";
 		echo "<td>$e->semester </td>";
 		echo "<td>".($e->mailgrp?'Ja':'Nein')."</td>";
 		echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>";
@@ -268,12 +277,9 @@ function getUebersicht()
 	   	echo "<td class='button'><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
 	   	echo "</tr>\n";
 	}
-?>
-</table>
-<?php
-
+	
+	echo '</tbody></table>';
 }
-
 
 ?>
 
