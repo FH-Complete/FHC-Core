@@ -115,35 +115,35 @@
         $mdl_course_stat='';
         if (!empty($mdl_course_id))
         {
-									$bAnzeige=true;
-						  		if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false))
-						     	{
-											$bAnzeige=false;
-							    	 	$errormsg[]='Problem beim Lehre Moodle-Kurs '.addslashes($mdl_course_id).' lesen '.$objMoodle->errormsg;
-									}
-									// Lehre Moodle-Kurs gefunden
-									if(isset($objMoodle->result) && isset($objMoodle->result[0]))
-						      {
-						      	  $mdl_course_stat='*';
-						          $moodle_id=$objMoodle->result[0]->moodle_id;
-						          $lehrveranstaltung_id=$objMoodle->result[0]->moodle_lehrveranstaltung_id;
-						          $lehreinheit_id=$objMoodle->result[0]->moodle_lehreinheit_id;
-						          $studiensemester_kurzbz=$objMoodle->result[0]->studiensemester_kurzbz;
-									}
-									// suchen Kurs in Moodle direkt - neue Vilesci - Lehre anlage notwendig
-						      else
-						      {
-						      		$bAnzeige=false;
-							  	   	// Wenn kein Eintrag in der Lehre vorhanden ist pruefen ob ein Moodlekurs vorhanden ist
-                      if ($objMoodle->load($mdl_course_id))
-                      {
-                           $mdl_course_stat='+';
-									   	}
-                      else
-                      {
-                           $errormsg[]='Moodle-Kurs wurde nicht gefunden '.addslashes($mdl_course_id).' '.$objMoodle->errormsg;
-                      }
-	               }
+					$bAnzeige=true;
+				  	if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false))
+				    {
+							$bAnzeige=false;
+					   	 	$errormsg[]='Problem beim Lehre Moodle-Kurs '.addslashes($mdl_course_id).' lesen '.$objMoodle->errormsg;
+					}
+					// Lehre Moodle-Kurs gefunden
+					if(isset($objMoodle->result) && isset($objMoodle->result[0]))
+				    {
+				      	  $mdl_course_stat='*';
+				          $moodle_id=$objMoodle->result[0]->moodle_id;
+				          $lehrveranstaltung_id=$objMoodle->result[0]->moodle_lehrveranstaltung_id;
+				          $lehreinheit_id=$objMoodle->result[0]->moodle_lehreinheit_id;
+				          $studiensemester_kurzbz=$objMoodle->result[0]->studiensemester_kurzbz;
+					}
+					// suchen Kurs in Moodle direkt - neue Vilesci - Lehre anlage notwendig
+				    else
+				    {
+				    	$bAnzeige=false;
+					   	// Wenn kein Eintrag in der Lehre vorhanden ist pruefen ob ein Moodlekurs vorhanden ist
+                	     if ($objMoodle->load($mdl_course_id))
+                    	 {
+                        	   $mdl_course_stat='+';
+						 }	   
+	                      else
+    	                  {
+        		               $errormsg[]='Moodle-Kurs wurde nicht gefunden '.addslashes($mdl_course_id).' '.$objMoodle->errormsg;
+                	      }
+	               	}
       	}
 
 //---------------------------------------------------------------------------
@@ -205,33 +205,34 @@
 	     $content.='<tr>';
 
         // Studiensemester public.tbl_studiensemester_kurzbz
-                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiensemester_kurzbz"><option value="">&nbsp;Alle&nbsp;</option>';
-                $stsem->studiensemester=array();
-		  if ($stsem->getAll())
-                {
-                        foreach ($stsem->studiensemester as $row)
-                        {
-                                $content.='<option value="'.$row->studiensemester_kurzbz.'" '.(("$studiensemester_kurzbz"=="$row->studiensemester_kurzbz")?' selected="selected" ':'').'>&nbsp;'.$row->studiensemester_kurzbz.'&nbsp;</option>';
-                        }
-                }
-                else
-                {
-                        $errormsg[]='Studiensemester wurden nicht gefunden! '.$stsem->errormsg;
-                }
-                $content.='</select></td>';
+         $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiensemester_kurzbz">';
+ 	     $content.='<option value="">&nbsp;Alle&nbsp;</option>';
+         $stsem->studiensemester=array();
+		 if ($stsem->getAll())
+         {
+              foreach ($stsem->studiensemester as $row)
+              {
+                     $content.='<option value="'.$row->studiensemester_kurzbz.'" '.(("$studiensemester_kurzbz"=="$row->studiensemester_kurzbz")?' selected="selected" ':'').'>&nbsp;'.$row->studiensemester_kurzbz.'&nbsp;</option>';
+              }
+         }
+         else
+         {
+               $errormsg[]='Studiensemester wurden nicht gefunden! '.$stsem->errormsg;
+         }
+         $content.='</select></td>';
 
         //---------------------------------------------------------------------------
         // Studiengang public.tbl_studiengang_kz
-            $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiengang_kz">';
-		if ($studiengang_kz=='*')
-		{
-			$studiengang_kz='';
-		}  
-		$content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
+        	$content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id.value=\'\';document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="studiengang_kz">';
+			if ($studiengang_kz=='*')
+			{
+				$studiengang_kz='';
+			}  
+			$content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
 
-                $stsem->result=array();
-                if ($stg_obj->getAll('typ, kurzbz',true))
-                {
+            $stsem->result=array();
+            if ($stg_obj->getAll('typ, kurzbz',true))
+            {
                         $max_semester=0;
                         $arrStudiengang='';
                         foreach ($stg_obj->result as $row)
@@ -246,7 +247,7 @@
                                         $arrStudiengang=$row;
                                         $max_semester=$row->max_semester;
                                 }
-                                $content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.'&nbsp;-&nbsp;'.$row->studiengang_kz.'&nbsp;</option>';
+                                $content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.'&nbsp;</option>';
                         }
                 }
                 else
@@ -264,7 +265,14 @@
                 {
                         for($i=0;$i<=$max_semester;$i++)
                         {
-                                $content.='<option value="'.($i).'" '.(("$semester"=="$i")?' selected="selected" ':'').'>&nbsp;'.($i).'.Semester&nbsp;</option>';
+                                $content.='<option value="'.($i).'" '.(("$semester"=="$i")?' selected="selected" ':'').'>&nbsp;'.($i).'&nbsp;</option>';
+                        }
+                }
+                else
+                {
+                        for($i=0;$i<=9;$i++)
+                        {
+                                $content.='<option value="'.($i).'" '.(("$semester"=="$i")?' selected="selected" ':'').'>&nbsp;'.($i).'&nbsp;</option>';
                         }
                 }
                 $content.='</select></td>';
@@ -274,13 +282,13 @@
                 $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehreinheit_id.value=\'\';document.'.$cFormName.'.mdl_course_id.value=\'\';document.'.$cFormName.'.submit();" name="lehrveranstaltung_id">';
                 $content.='<option value="" '.(empty($lehrveranstaltung_id)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
                 $lv_obj->lehrveranstaltungen=array();
-		  if (!empty($studiengang_kz))
-		  {	
+		  		if (!empty($studiengang_kz))
+		  		{	
 	                if ($lv_obj->load_lva_le($studiengang_kz, $studiensemester_kurzbz, $semester,null,null,null,'bezeichnung'))
 	                {
 	                        foreach ($lv_obj->lehrveranstaltungen as $row)
 	                        {
-	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.($bDebug?CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz.'&nbsp;(Lv ID '.$row->lehrveranstaltung_id.')': CutString($row->bezeichnung, 35) ) .'</option>';
+	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz.'&nbsp;'.$row->lehrveranstaltung_id.'</option>';
 	                        }
 	                }
 	                else
@@ -288,7 +296,7 @@
 	                        $content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;'.$stg_obj->errormsg.'&nbsp;</option>';
 	                        $errormsg[]='Lehrveranstaltungen wurden nicht gefunden! '.$lv_obj->errormsg;
 	                }
-		  }	  
+		 	 	}	  
                 $content.='</select><br />
 		  &nbsp;nur in Lehre&nbsp;<input type="Checkbox" value="1" name="lehre" '.($lehre?' checked="checked" ':'').' />
 		  &nbsp;nur aktive&nbsp;<input type="Checkbox" value="1" name="aktiv" '.($aktiv?' checked="checked" ':'').' />		  
@@ -348,7 +356,7 @@
 		   {
 	                if ($lehreinheit_id)
 	                        $lehrveranstaltung_id='';
-			  #echo "<hr> $mdl_course_id,$studiengang_kz,$lehreinheit_id,$lehrveranstaltung_id,$studiensemester_kurzbz,$semester <hr>";
+#echo "<hr> $mdl_course_id,$studiengang_kz,$lehreinheit_id,$lehrveranstaltung_id,$studiensemester_kurzbz,$semester <hr>";
 	                if(!$objMoodle->getAllMoodleVariant($mdl_course_id,$lehrveranstaltung_id,$studiensemester_kurzbz,$lehreinheit_id,$studiengang_kz,$semester,false,$lehre,$aktiv))
 	                        $errormsg[]=$objMoodle->errormsg;
 		   }
