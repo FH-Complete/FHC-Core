@@ -445,7 +445,7 @@ if(!isset($_GET['type']))
 				<td>$row->fach</td>
 				<td>$row->bezeichnung</td>
 				<td>$row->farbe</td>".
-				"<td><form action=\"lehrfach.php?lehrfach_nr=$row->nummer&type=aktiv&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\" method='POST'><input type='image' src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></form></td>".
+				"<td valign='middle' align='center'><form style='margin:0; padding:0' action=\"lehrfach.php?lehrfach_nr=$row->nummer&type=aktiv&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\" method='POST'><input type='image' src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20' style='border:0px;'></form></td>".
 				"<td>$row->fachbereich</td>
 				<td>$row->sprache</td>
 				<td>";

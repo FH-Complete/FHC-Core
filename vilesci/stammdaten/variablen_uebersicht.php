@@ -20,20 +20,23 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/studiengang.class.php');
-    require_once('../../include/benutzerberechtigung.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		    
-	if (!$user = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	if(!$rechte->isBerechtigt('admin'))
-			die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	    
+if (!$user = get_uid())
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('admin'))
+		die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
 if(isset($_GET['searchstr']))
 	$searchstr = $_GET['searchstr'];
 else 
@@ -41,17 +44,26 @@ else
 	
 $htmlstr = "";	
 	
-	$htmlstr.='
-	<form accept-charset="UTF-8" name="search" method="GET">
-  		Bitte Suchbegriff eingeben: 
-  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
-  		<input type="submit" value="Suchen">
-  	</form>';	
-		$htmlstr .= "<div style='text-align:right'>";
-		$htmlstr .= "<form name='neuform' action='variablen_details.php' target='vilesci_detail'><input type='text' value='' name='uid'>&nbsp;<input type='submit' name='neuschick' value='go'></form>";
-		$htmlstr .= "</div>";
-	  $htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>\n";	
-	
+$htmlstr.='
+<table width="100%">
+<tr>
+	<td>
+		<form accept-charset="UTF-8" name="search" method="GET">
+			Bitte Suchbegriff eingeben: 
+			<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+			<input type="submit" value="Suchen">
+		</form>
+	</td>
+	<td align="right">
+		<form name="neuform" action="variablen_details.php" target="vilesci_detail">
+			UID <input type="text" value="" name="uid">&nbsp;
+			<input type="submit" name="neuschick" value="anlegen">
+		</form>
+	</td>
+</tr>
+</table>
+';	
+
 if(isset($_GET['searchstr']))
 {	
 	$sql_query = "SELECT 

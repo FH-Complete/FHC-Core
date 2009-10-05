@@ -21,67 +21,45 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
  
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/functions.inc.php');
-	    	require_once('../../include/studiengang.class.php');
-		require_once('../../include/benutzerberechtigung.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-	$user = get_uid();
-	
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	
-	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Berechtigung für diese Seite');
-	
-	$htmlstr = "";
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('admin'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+$htmlstr = "";
 	
 if(isset($_GET['searchstr']))
 	$searchstr = $_GET['searchstr'];
 else 
 	$searchstr = '';
 	
-	$htmlstr.='
-	<form accept-charset="UTF-8" name="search" method="GET">
-  		Bitte Suchbegriff eingeben: 
-  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
-  		<input type="submit" value="Suchen">
-  	</form>';	
+$htmlstr.='
+<form accept-charset="UTF-8" name="search" method="GET">
+		Bitte Suchbegriff eingeben: 
+		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+		<input type="submit" value="Suchen">
+	</form>';	
 
-	$htmlstr .= "<div style='text-align:right'>";
-		$htmlstr .= "<form name='suche' method='POST' action=''>
-							<input type='text' value=''id='bmsuche' maxlength=12 size=12 name='bmsuche' tabindex='1'/>&nbsp;
-							<input type='submit' name='submit' value='BM-Suche'>
-						</form>";
-		$htmlstr .= "</div>";
-	    	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>\n";	
-	
-if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
-{	
-	if (isset($_POST['bmsuche']))
-	{
-		$bmsuche=strtoupper($_POST['bmsuche']);
-		$bmsuche = ereg_replace("^0*", "", $bmsuche);
-		
-		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
-					WHERE upper(uid) LIKE '%".addslashes($bmsuche)."%' OR upper(nachname) LIKE '%".addslashes($bmsuche)."%' OR upper(vorname) LIKE '%".addslashes($bmsuche)."%' 
-						OR upper(nummer) LIKE '%".addslashes($bmsuche)."%' OR upper(nummerintern) LIKE '%".addslashes($bmsuche)."%'
-					LIMIT 30";
-		//echo $sql_query;
-	}
-	else
-	{
-		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
-		if(!empty($searchstr))
-			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummerintern  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
-		$sql_query.="	ORDER BY nummer ";
-		 if(empty($searchstr))
-			 $sql_query.=" LIMIT 100 ";
+if(isset($_GET['searchstr']))
+{
+	$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
+	if(!empty($searchstr))
+		$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummerintern  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
+	$sql_query.="	ORDER BY nummer ";
+	if(empty($searchstr))
+		$sql_query.=" LIMIT 100 ";
 
-	}	
-	
     if(!$erg=$db->db_query($sql_query))
 	{
 		$htmlstr='Fehler beim Laden der Berechtigungen';
@@ -89,27 +67,27 @@ if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 	else
 	{
 		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>   <thead><tr class='liste'>\n";
-	    	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
-	    						<th class='table-sortable:default'>NrIntern</th><th class='table-sortable:default'>Person (UID)</th>
-	    						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
-	    	$htmlstr .= "   </tr></thead><tbody>\n";
-	    	$i = 0;
+    	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
+    						<th class='table-sortable:default'>NrIntern</th><th class='table-sortable:default'>Person (UID)</th>
+    						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
+    	$htmlstr .= "   </tr></thead><tbody>\n";
+    	$i = 0;
+    	
 		while($row=$db->db_fetch_object($erg))
 		{
-			//$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 			$htmlstr .= "   <tr>\n";
-		    	$htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
+		    $htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
 			$htmlstr .= '       <td>
 									<a href="betriebsmittel_details.php?betriebsmittel_id='.$row->betriebsmittel_id.'&person_id='.$row->person_id.'" 
 										target="betriebsmittel_details">'.$row->nummer."</a></td>\n";
 			$htmlstr .= "       <td>".$row->nummerintern."</td>\n";
 			$htmlstr .= "       <td>$row->nachname $row->vorname &nbsp; ( $row->uid )</td>\n";
-		    	$htmlstr .= "       <td>".$row->ausgegebenam."</td>\n";
+	    	$htmlstr .= "       <td>".$row->ausgegebenam."</td>\n";
 			$htmlstr .= "       <td>$row->retouram</td>\n";
-		    	$htmlstr .= "   </tr>\n";
-		    	$i++;
+	    	$htmlstr .= "   </tr>\n";
+	    	$i++;
 		}
-	    	$htmlstr .= "</tbody></table>\n";
+	    $htmlstr .= "</tbody></table>\n";
 	}
 }	
 ?>

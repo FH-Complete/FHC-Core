@@ -432,7 +432,7 @@ if($result = $db->db_query($qry))
 						{
 							echo "&nbsp;&nbsp;&nbsp;&nbsp;|-";
 							if($admin)
-								echo " <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+								echo " <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 							echo " <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz ($row_gruppe->bezeichnung)</a><br>";
 						}
 					}
@@ -451,7 +451,7 @@ if($result = $db->db_query($qry))
 			//Semester ausgeben
 			echo '<a name="'.$row->semester.'" />';
 			if($admin)
-				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 			echo "<b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->semester ($row->bezeichnung)</a></b>";
 		}
 		elseif(trim($row->gruppe)=='')
@@ -471,7 +471,7 @@ if($result = $db->db_query($qry))
 			//Verband
 			echo "&nbsp;&nbsp;&nbsp;&nbsp;|- ";
 			if($admin)
-				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 			echo "<b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->verband ($row->bezeichnung)</a></b> ";
 		}
 		else
@@ -479,7 +479,7 @@ if($result = $db->db_query($qry))
 			//Gruppe
 			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|- ";
 			if($admin)
-				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.gif':'false.gif')."'></a>";
+				echo "<a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&aktiv=".($row->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 			echo "<b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$row->semester&verband=$row->verband&gruppe=$row->gruppe&type=edit' class='Item'>$row->gruppe ($row->bezeichnung)</a></b>";
 		}
 		
@@ -514,7 +514,7 @@ if($result = $db->db_query($qry))
 		{
 			while($row_gruppe = $db->db_fetch_object($result_gruppe))
 			{
-				echo "&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.gif':'false.gif')."'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz</a></b><br>";
+				echo "&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.png':'false.png')."' height='20'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz</a></b><br>";
 			}
 		}
 		

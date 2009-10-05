@@ -20,48 +20,47 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-		require_once('../../include/functions.inc.php');
-		require_once('../../include/ort.class.php');
-    	
-	if (isset($_GET["toggle"]))
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/ort.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+if (isset($_GET["toggle"]))
+{
+	if ($_GET["rlehre"] != "" && $_GET["rlehre"] != NULL)
 	{
-		if ($_GET["rlehre"] != "" && $_GET["rlehre"] != NULL)
+		$rlehre = $_GET["rlehre"];
+		$sg_update = new ort();
+		$qry = "UPDATE public.tbl_ort SET lehre = NOT lehre WHERE ort_kurzbz='".$rlehre."';";
+		if(!$db->db_query($qry))
 		{
-			$rlehre = $_GET["rlehre"];
-			$sg_update = new ort();
-			$qry = "UPDATE public.tbl_ort SET lehre = NOT lehre WHERE ort_kurzbz='".$rlehre."';";
-			if(!$db->db_query($qry))
-			{
-				die('Fehler beim Speichern des Datensatzes');
-			}	
-		}
-		if ($_GET["rres"] != "" && $_GET["rres"] != NULL)
-		{
-			$rres = $_GET["rres"];
-			$sg_update = new ort();
-			$qry = "UPDATE public.tbl_ort SET reservieren = NOT reservieren WHERE ort_kurzbz='".$rres."';";
-			if(!$db->db_query($qry))
-			{
-				die('Fehler beim Speichern des Datensatzes');
-			}	
-		}
-		if ($_GET["raktiv"] != "" && $_GET["raktiv"] != NULL)
-		{
-			$raktiv = $_GET["raktiv"];
-			$sg_update = new ort();
-			$qry = "UPDATE public.tbl_ort SET aktiv = NOT aktiv WHERE ort_kurzbz='".$raktiv."';";
-			if(!$db->db_query($qry))
-			{
-				die('Fehler beim Speichern des Datensatzes');
-			}	
-		}
+			die('Fehler beim Speichern des Datensatzes');
+		}	
 	}
-	
+	if ($_GET["rres"] != "" && $_GET["rres"] != NULL)
+	{
+		$rres = $_GET["rres"];
+		$sg_update = new ort();
+		$qry = "UPDATE public.tbl_ort SET reservieren = NOT reservieren WHERE ort_kurzbz='".$rres."';";
+		if(!$db->db_query($qry))
+		{
+			die('Fehler beim Speichern des Datensatzes');
+		}	
+	}
+	if ($_GET["raktiv"] != "" && $_GET["raktiv"] != NULL)
+	{
+		$raktiv = $_GET["raktiv"];
+		$sg_update = new ort();
+		$qry = "UPDATE public.tbl_ort SET aktiv = NOT aktiv WHERE ort_kurzbz='".$raktiv."';";
+		if(!$db->db_query($qry))
+		{
+			die('Fehler beim Speichern des Datensatzes');
+		}	
+	}
+}
+
 $sg = new ort();
 if (!$sg->getAll('ort_kurzbz',false))
     die($sg->errormsg);
@@ -90,34 +89,34 @@ foreach ($sg->result as $twraum)
 	$htmlstr .= "       <td>".$twraum->max_person."</td>\n";
 	if($twraum->lehre=='t')
 	{
-		$lehrebild = "true.gif";	
+		$lehrebild = "true.png";	
 	}
 	else
 	{
-		$lehrebild = "false.gif";
+		$lehrebild = "false.png";
 	}
 	$lehrelink = "?toggle=true&rlehre=".$twraum->ort_kurzbz."&rres=NULL&raktiv=NULL";
-	$htmlstr .= "	    <td align='center'><a href='".$lehrelink."'><img src='../../skin/images/".$lehrebild."'></a></td>\n";
+	$htmlstr .= "	    <td align='center'><a href='".$lehrelink."'><img src='../../skin/images/".$lehrebild."' height='20'></a></td>\n";
 	if($twraum->reservieren=='t')
 	{
-		$resbild = "true.gif";	
+		$resbild = "true.png";	
 	}
 	else
 	{
-		$resbild = "false.gif";
+		$resbild = "false.png";
 	}
 	$reslink = "?toggle=true&rres=".$twraum->ort_kurzbz."&rlehre=NULL&raktiv=NULL";
-	$htmlstr .= "	    <td align='center'><a href='".$reslink."'><img src='../../skin/images/".$resbild."'></a></td>\n";
+	$htmlstr .= "	    <td align='center'><a href='".$reslink."'><img src='../../skin/images/".$resbild."' height='20'></a></td>\n";
 	if($twraum->aktiv)
 	{
-		$aktivbild = "true.gif";	
+		$aktivbild = "true.png";	
 	}
 	else
 	{
-		$aktivbild = "false.gif";
+		$aktivbild = "false.png";
 	}
 	$aktivlink = "?toggle=true&raktiv=".$twraum->ort_kurzbz."&rres=NULL&rlehre=NULL";
-	$htmlstr .= "	    <td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."'></a></td>\n";
+	$htmlstr .= "	    <td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."' height='20'></a></td>\n";
 	$htmlstr .= "       <td>".$twraum->kosten."</td>\n";
 	$htmlstr .= "       <td>".$twraum->stockwerk."</td>\n";
 	$htmlstr .= "   </tr>\n";

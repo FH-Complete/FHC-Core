@@ -32,17 +32,12 @@
  	require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
 
 	if (!$uid = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 			
 	
 	$berechtigung=new benutzerberechtigung();
 	$berechtigung->getBerechtigungen($uid);
-	if (!($berechtigung->isBerechtigt('admin') || 
-		  $berechtigung->isBerechtigt('support') || 
-		  $berechtigung->isBerechtigt('preinteressent') || 
-		  $berechtigung->isBerechtigt('lehre') || 
-		  $berechtigung->isBerechtigt('lv-plan') ))
-		die ('Keine Berechtigung!');
+
 	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -78,119 +73,59 @@
 
 
 <body  style="background-color:#eeeeee;">
-
+<!--
 <div class="logo" style="background-color:#FFFFFF;"  onclick="self.location.href='index.php'">
 		<img border="0" src="../skin/images/vilesci_logo.png" alt="VileSci (FASonline)" width="239px" title="VileSci" >
 </div>
-
+-->
 
 <?php
-function checkpermission($permissions)
+if(isset($_GET['categorie']))
 {
-	global $berechtigung;
+	$categorie=$_GET['categorie'];
 	
-	$permission=false;
-	foreach ($permissions as $perm)
+	function checkpermission($permissions)
 	{
-		if($berechtigung->isBerechtigt($perm))
+		global $berechtigung;
+		
+		$permission=false;
+		foreach ($permissions as $perm)
 		{
-			$permission=true;
+			if($berechtigung->isBerechtigt($perm))
+			{
+				$permission=true;
+			}
 		}
+		return $permission;
 	}
-	return $permission;
-}
-
-if ($berechtigung->isBerechtigt('admin'))
-{
-
-
-	echo '
-	<div class="logo">
-		<div>
-			<a href="admin/menu.html" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;Admin</a>
-		</div>
-		<div>
-			<a href="https://sdtools.technikum-wien.at" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;SDTools</a>
-		</div>
-	</div>		
-		';
-		
-
-}
-foreach($menu AS $m)
-{
-	$opener=false;
-	$hide=false;
-	if (isset($m['opener']))
-		if ($m['opener']=='true')
-			$opener=true;
-	if (isset($m['hide']))
-		if ($m['hide']=='true')
-			$hide=true;
-
-	if (isset($m['permissions']) && !checkpermission($m['permissions']))
-		continue;
-	
-	if ($opener)
+	/*
+	if ($berechtigung->isBerechtigt('admin'))
 	{
-		echo '<SPAN style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')">';
-		if ($hide)
-			echo '<img src="../skin/images/page_go.png" alt="page go" border="0">&nbsp;';
-		else
-			echo '<img src="../skin/images/page_green.png" alt="page close" border="0">&nbsp;';
-		echo '</SPAN>';
-	}
-	else
-		echo '&curren; ';
-
-	if (isset($m['link']))
-		echo '<a href="'.$m['link'].'" ';
-	if (isset($m['target']))
-		echo 'target="'.$m['target'].'" ';
-	if (isset($m['link']))
-		echo '>';
-
-	if (isset($m['name']) && isset($m['link']))
-		echo '<u><strong>'.$m['name'].'</strong></u>';
-	else if (isset($m['name']) )
-		echo '<u><strong  style="cursor: pointer;" id="'.$m['name'].'_dot" onclick="js_toggle_container('."'".$m['name']."'".')">'.$m['name'].'</strong></u>';
-		
-	if (isset($m['link']))
-		echo '</a>';
-		
-	if ($hide)
-		$display='none';
-	else
-		$display='block';
-	echo "\n<DIV >\n".'<SPAN id="'.$m['name'].'" style="display:'.$display.'">';
-	foreach($m AS $m1)
+	
+	
+		echo '
+		<div class="logo">
+			<div>
+				<a href="admin/menu.html" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;Admin</a>
+			</div>
+			<div>
+				<a href="https://sdtools.technikum-wien.at" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;SDTools</a>
+			</div>
+		</div>		
+			';
+			
+	
+	}*/
+	$menu = $menu[$categorie];
+	echo '<h2>'.$menu['name'].'</h2>';
+	$umbruch=true;
+	
+	foreach($menu AS $m1)
+	{
 		if (is_array($m1) && isset($m1['name']))
 		{
-			$opener=false;
-			$hide=false;
-			if (isset($m1['opener']))
-				if ($m1['opener']=='true')
-					$opener=true;
-			if (isset($m1['hide']))
-				if ($m1['hide']=='true')
-					$hide=true;
-					
 			if (isset($m1['permissions']) && !checkpermission($m1['permissions']))
 				continue;
-				
-			if ($opener)
-			{
-				echo "\n\t".'<SPAN style="cursor: pointer;" onclick="js_toggle_container('."'".$m1['name']."'".')">';
-				if ($hide)
-					echo '<img src="../skin/images/page_go.png" alt="page go" border="0">&nbsp;';
-				else
-					echo '<img src="../skin/images/page_green.png" alt="page close" border="0">&nbsp;';
-				echo "\n\t\t</SPAN>";
-			}
-			else if (isset($m1['link']))
-				echo "\t &nbsp;&nbsp;&nbsp;<img src=\"../skin/images/bullet_go.png\" alt=\"page go\" border=\"0\">";
-			else
-				echo "\t &nbsp;&nbsp;&nbsp;&nbsp;";
 			
 			if (isset($m1['link']))
 				echo '<a href="'.$m1['link'].'" ';
@@ -198,28 +133,28 @@ foreach($menu AS $m)
 				echo 'target="'.$m1['target'].'" ';
 			if (isset($m1['link']))
 				echo '>';
-			if (isset($m1['name']) && $opener )
-				echo '<strong>'.$m1['name'].'</strong>';
-			else if (isset($m1['name']) && !isset($m1['link']) )
-				echo '<strong style="font-size: smaller;">'.$m1['name'].'</strong>';
+			
+			if (isset($m1['name']) && !isset($m1['link']) )
+			{
+				if($umbruch)
+					echo '<br />';
+				echo '<strong style="font-size: smaller;">'.$m1['name'].'</strong><br />';
+			}
 			else
-				echo '<strong>'.$m1['name'].'</strong>';
+				echo $m1['name'];
 				
 			if (isset($m1['link']))
 				echo '</a>';
-			if ($hide)
-				$display='none';
-			else
-				$display='block';
-						
-			echo "\n\t<DIV>\n\t".'<SPAN id="'.$m1['name'].'" style="display:'.$display.'">';
+			
+			$umbruch=true;
 			foreach($m1 AS $m2)
+			{
 				if (is_array($m2)  && isset($m2['name']))
 				{
 					if (isset($m2['permissions']) && !checkpermission($m2['permissions']))
 						continue;
 					if (isset($m2['link']))
-						echo "\n\t\t".'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$m2['link'].'" ';
+						echo "\n\t\t".'<a href="'.$m2['link'].'" ';
 					if (isset($m2['target']))
 						echo 'target="'.$m2['target'].'" ';
 					if (isset($m2['link']))
@@ -228,14 +163,19 @@ foreach($menu AS $m)
 						echo $m2['name'];
 					if (isset($m2['link']))
 						echo '</a><br>';
+					$umbruch=false;
 				}
-			echo "\n\t</SPAN>\n\t</DIV>\n";
+			}
+			
+	
+				echo '<br>';
 		}
-	echo "\n</SPAN>\n</DIV>\n";
+	}
 }
-
 ?>
+<!--
 <hr>
 <a href="index.html" target="_top"><img title="'.$m2['name'].'" src="../skin/images/application_home.png" alt="page go" border="0">&nbsp;Home</a>
+-->
 </body>
 </html>

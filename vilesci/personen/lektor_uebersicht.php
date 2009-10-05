@@ -21,42 +21,37 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-		include('../../include/functions.inc.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+include('../../include/functions.inc.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 
-
-	if(isset($_GET['uid']) && isset($_GET['del']))
-	{
-		//$sql_query = "Delete from tbl_person where uid='".$_GET["uid"]."';";
-		//echo $sql_query;
-		echo 'Loeschen noch nicht implementiert';
-	}
-	if(isset($_GET['fix']) && isset($_GET['uid']))
-	{
-		$sql_query = "UPDATE public.tbl_mitarbeiter SET fixangestellt=". ($_GET['fix']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
-		//echo $sql_query;
-		if(!($erg=$db->db_query($sql_query)))
+if(isset($_GET['fix']) && isset($_GET['uid']))
+{
+	$sql_query = "UPDATE public.tbl_mitarbeiter SET fixangestellt=". ($_GET['fix']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
+	//echo $sql_query;
+	if(!($erg=$db->db_query($sql_query)))
+		die($db->db_last_error());
+}
+if(isset($_GET['lek']) && isset($_GET['uid']))
+{
+	$sql_query = "UPDATE public.tbl_mitarbeiter SET lektor=". ($_GET['lek']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
+	//echo $sql_query;
+	if(!($erg=$db->db_query($sql_query)))
 			die($db->db_last_error());
-	}
-	if(isset($_GET['lek']) && isset($_GET['uid']))
-	{
-		$sql_query = "UPDATE public.tbl_mitarbeiter SET lektor=". ($_GET['lek']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
-		//echo $sql_query;
-		if(!($erg=$db->db_query($sql_query)))
-				die($db->db_last_error());
 
-	}
+}
 ?>
 <html>
 <head>
-<title>Mitarbeiter Uebersicht</title>
+<title>Mitarbeiter Übersicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 function confdel()
 {
@@ -68,8 +63,7 @@ function confdel()
 </head>
 
 <body class="background_main">
-<h1>Mitarbeiter &Uuml;bersicht</h1><br>
-
+<h2>Mitarbeiter &Uuml;bersicht</h2><br>
 
 <?php
 
@@ -99,12 +93,26 @@ if(!isset($_GET['searchstr']))
 
 	if($result = $db->db_query($qry))
 	{
-		echo "<table class='liste'>";
-		echo "<tr class='liste'><th><a href='lektor_uebersicht.php?order=uid'>UID</a></th><th>Titel</th><th>Vorname</th><th><a href='lektor_uebersicht.php?order=nachname'>Nachname</a></th><th><a href='lektor_uebersicht.php?order=fixangestellt DESC, nachname'>Fix</a></th><th>Lkt</th><th>Raum</th><th>Standort</th><th>Tel</th><th>eMail</th><th colspan='3'>Aktion</th></tr>";
+		echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>";
+		echo "<thead>
+				<tr>
+					<th class='table-sortable:default'>UID</th>
+					<th class='table-sortable:default'>Titel</th>
+					<th class='table-sortable:default'>Vorname</th>
+					<th class='table-sortable:default'>Nachname</th>
+					<th class='table-sortable:default'>Fix</th>
+					<th class='table-sortable:default'>Lkt</th>
+					<th class='table-sortable:default'>Raum</th>
+					<th class='table-sortable:default'>Standort</th>
+					<th class='table-sortable:default'>Tel</th>
+					<th class='table-sortable:default'>eMail</th>
+					<th colspan='2'>Aktion</th>
+				</tr>
+			</thead><tbody>";
 
 		for ($i=0; $row=$db->db_fetch_object($result); $i++)
 		{
-			echo "<tr class='liste". ($i%2) ."'>";
+			echo '<tr>';
 			if((isset($fix) || isset($lek))&& isset($uid) && $uid==$row->uid) //Anker setzen
 				echo "<td nowrap>".$row->uid."<a name='anker1'></a></td>";
 			else
@@ -113,16 +121,14 @@ if(!isset($_GET['searchstr']))
 			echo "<td nowrap>".$row->titelpre."</td>";
 			echo "<td nowrap>".$row->vorname."</td>";
 			echo "<td nowrap>".$row->nachname."</td>";
-			echo "<td nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&fix=".$row->fixangestellt . (isset($order)?'&order='.$order:'') ."'><img src='../../skin/images/".($row->fixangestellt=='t'?'true':'false').".gif'></a></td>";
-			echo "<td nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&lek=".$row->lektor . (isset($order)?'&order='.$order:'') ."'><img src='../../skin/images/".($row->lektor=='t'?'true':'false').".gif'></a></td>";
+			echo "<td valign='middle' align='center' nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&fix=".$row->fixangestellt . (isset($order)?'&order='.$order:'') ."&searchstr=".$searchstr."'><img src='../../skin/images/".($row->fixangestellt=='t'?'true':'false').".png' height='20'></a></td>";
+			echo "<td valign='middle' align='center' nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&lek=".$row->lektor . (isset($order)?'&order='.$order:'') ."&searchstr=".$searchstr."'><img src='../../skin/images/".($row->lektor=='t'?'true':'false').".png' height='20'></a></td>";
 
 			echo "<td nowrap>".$row->ort_kurzbz."</td>";
 			echo "<td nowrap>".$row->standort_kurzbz."</td>";
 			echo "<td nowrap>".$row->telefonklappe."</td>";
-			//echo "<td nowrap><a href='#' onClick='javascript:document.form1.uid=".$lektoren[$i]->uid.";document.form1.fix=".$lektoren[$i]->fixangestellt .";document.form1.order=". (isset($order)?$order:'') .";'><img src='../../skin/images/".$lektoren[$i]->fixangestellt.".gif'></a></td>";
-			//echo "<td nowrap><a href='#' onClick='javascript:document.form1.uid=".$lektoren[$i]->uid.";document.form1.fix=".$lektoren[$i]->fixangestellt .";document.form1.order=". (isset($order)?$order:'') .";'lek=".$lektoren[$i]->lektor . (isset($order)?'&order='.$order:'') ."'><img src='../../skin/images/".$lektoren[$i]->lektor.".gif'></a></td>";
-
-			$email=$row->uid.'@technikum-wien.at';
+			
+			$email=$row->uid.'@'.DOMAIN;
 			echo "<td nowrap><a href='mailto:$email'>$email</a></td>";
 			echo "<td nowrap class='button'><a href='lektor_edit.php?id=".$row->uid."'>Edit</a></td>";
 			echo "<td nowrap class='button'>";
@@ -130,14 +136,13 @@ if(!isset($_GET['searchstr']))
 			{
 				echo "<a href='zeitwunsch.php?uid=".$row->uid."&vorname=".rawurlencode($row->vorname)."&nachname=".rawurlencode($row->nachname)."&titel=".rawurlencode($row->titelpre)." class='linkblue'>Zeitwunsch</a>";
 			}
-			echo "</td>";
-			echo "<td nowrap class='button'><a href='lektor_uebersicht.php?del=1&uid=".$row->uid."' onClick='javascript: return confdel();'>Delete</a></td>";
-			echo "</tr>";
+			echo '</td>';
+			echo '</tr>';
 		}
 		echo "</table>";
 	}
 	else
-		echo "Fehler beim laden der Mitarbeiter: ".$db->db_last_error();
+		echo "Fehler beim Laden der Mitarbeiter: ".$db->db_last_error();
 
 	if(isset($_GET['fix']) || isset($_GET['lek'])) //Zum Anker hüpfen
 	{
