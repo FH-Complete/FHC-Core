@@ -53,6 +53,7 @@ $return = false;
 $errormsg = 'unknown';
 $data = '';
 $error = false;
+$warnung = false;
 
 loadVariables($user);
 
@@ -139,6 +140,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Laden:'.$lem->errormsg;
 				$error = true;
 			}
+			$semesterstunden_alt=$lem->semesterstunden;
 
 			if(!$error)
 			{
@@ -185,60 +187,83 @@ if(!$error)
 						$error = true;
 					}
 				}
-
+				
+				$fixangestellt=false;
 				if(!$error)
 				{
-					if($lem->save())
+					//Pruefen ob die erlaubte Semesterstundenanzahl ueberschritten wurde.
+					//Wenn ja dann ein Warning zurueckliefern
+					$ma = new mitarbeiter();
+					$ma->load($lem->mitarbeiter_uid);
+					$fixangestellt=$ma->fixangestellt;
+					
+					//Maximale Stundenanzahl ermitteln
+					if($fixangestellt)
+						$max_stunden = WARN_SEMESTERSTD_FIX;
+					else
 					{
-						//Pruefen ob die erlaubte Semesterstundenanzahl ueberschritten wurde.
-						//Wenn ja dann ein Warning zurueckliefern
-
-						//Maximale Stundenanzahl ermitteln
-						$ma = new mitarbeiter();
-						$ma->load($lem->mitarbeiter_uid);
-
-						if($ma->fixangestellt)
-							$max_stunden = WARN_SEMESTERSTD_FIX;
-						else
-							$max_stunden = WARN_SEMESTERSTD_FREI;
-
-						//Summer der Stunden ermitteln
-						$le = new lehreinheit();
-						$le->load($lem->lehreinheit_id);
-
-						$qry = "SELECT
-									sum(semesterstunden) as summe
-								FROM
-									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-								WHERE
-									mitarbeiter_uid='$lem->mitarbeiter_uid' AND
-									studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
-									faktor>0 AND
-									stundensatz>0 AND
-									bismelden";
-
-						if($db->db_query($qry))
+						$max_stunden = WARN_SEMESTERSTD_FREI;
+					}
+					
+					//Summe der Stunden ermitteln
+					$le = new lehreinheit();
+					$le->load($lem->lehreinheit_id);
+	
+					$qry = "SELECT
+								(sum(semesterstunden)-$semesterstunden_alt+$lem->semesterstunden) as summe
+							FROM
+								lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							WHERE
+								mitarbeiter_uid='$lem->mitarbeiter_uid' AND
+								studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+								faktor>0 AND
+								stundensatz>0 AND
+								bismelden";
+	
+					if($db->db_query($qry))
+					{
+						if($row = $db->db_fetch_object())
 						{
-							if($row = $db->db_fetch_object())
+							if($row->summe>=$max_stunden)
 							{
-								if($row->summe>=$max_stunden)
+								if(!$fixangestellt)
 								{
 									//Warnung wenn die Stundenzahl ueberschritten wurde
 									$return = false;
 									$error = true;
-									$errormsg = "Daten wurden gespeichert.\n\nWarnung: Die maximal erlaubte Semesterstundenanzahl von $max_stunden Stunden wurde ueberschritten";
+									$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
 								}
-								else
+								else 
 								{
 									$return = true;
-									$error=false;
+									$error = false;
+									$warnung = true;
+									$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
+								}	
+								
+								$errormsg.="Der Lektor ist in folgenden Instituten zugeteilt:\n";
+								//Liste mit den Stunden in den jeweiligen Instituten anzeigen
+								$qry = "SELECT sum(semesterstunden) as summe, tbl_fachbereich.bezeichnung
+										FROM
+											lehre.tbl_lehreinheitmitarbeiter 
+											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+											JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+											JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
+										WHERE
+											mitarbeiter_uid='$lem->mitarbeiter_uid' AND
+											studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+											faktor>0 AND
+											stundensatz>0 AND
+											bismelden
+										GROUP BY tbl_fachbereich.bezeichnung";
+								
+								if($result = $db->db_query($qry))
+								{
+									while($row = $db->db_fetch_object($result))
+									{
+										$errormsg .=$row->summe.' Stunden im Institut '.$row->bezeichnung."\n";
+									}
 								}
-							}
-							else
-							{
-								$return = false;
-								$error=true;
-								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 							}
 						}
 						else
@@ -246,6 +271,32 @@ if(!$error)
 							$return = false;
 							$error=true;
 							$errormsg='Fehler beim Ermitteln der Gesamtstunden';
+						}
+					
+					}
+					else
+					{
+						$return = false;
+						$error=true;
+						$errormsg='Fehler beim Ermitteln der Gesamtstunden';
+					}
+				}
+				
+				if(!$error)
+				{
+					if($lem->save())
+					{
+						//Fixangestellte bekommen eine Warnung wenn die Stunden ueberschritten wurden. Es wird aber
+						//trotzdem gespeichert
+						if($warnung)
+						{
+							$return=false;
+							$error = true;							
+						}
+						else 
+						{
+							$return = true;
+							$error = false;
 						}
 					}
 					else

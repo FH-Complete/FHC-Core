@@ -162,15 +162,32 @@ if(!$error)
 		{
 			//Loescht Adressen aus der DB
 			$adresse = new adresse();
-	
-			if($adresse->delete($_POST['adresse_id']))
-			{
-				$return = true;
-			}
-			else
+			if(!$adresse->load($_POST['adresse_id']))
 			{
 				$return = false;
 				$errormsg = $adresse->errormsg;
+			}
+			else 
+			{
+				if($adresse->heimatadresse)
+				{
+					//Heimatadressen nicht loeschen, da es sonst zu Problemen bei der BIS-Meldung kommt falls diese Adresse
+					//schon einmal gemeldet wurde
+					$return = false;
+					$errormsg = 'Heimatadressen dürfen nicht gelöscht werden, da diese für die BIS-Meldung relevant sind. Um die Adresse dennoch zu löschen, entfernen sie das Hackerl bei Heimatadresse!';
+				}
+				else 
+				{
+					if($adresse->delete($_POST['adresse_id']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $adresse->errormsg;
+					}
+				}
 			}
 		}
 	}
