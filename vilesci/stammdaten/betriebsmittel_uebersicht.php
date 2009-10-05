@@ -45,20 +45,45 @@ else
 	$searchstr = '';
 	
 $htmlstr.='
-<form accept-charset="UTF-8" name="search" method="GET">
+<table width="100%">
+<tr>
+<td>
+	<form accept-charset="UTF-8" name="search" method="GET">
 		Bitte Suchbegriff eingeben: 
 		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
 		<input type="submit" value="Suchen">
-	</form>';	
-
-if(isset($_GET['searchstr']))
+	</form>
+</td>
+<td align="right">
+	<form name="suche" method="POST" action="">
+		Kartennummer (Lesegerät): <input type="text" value="" id="bmsuche" maxlength=12 size=12 name="bmsuche" tabindex="1"/>&nbsp;
+		<input type="submit" name="submit" value="Suchen">
+	</form>
+</td>
+</tr></table>';	
+	
+if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 {
-	$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
-	if(!empty($searchstr))
-		$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummerintern  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
-	$sql_query.="	ORDER BY nummer ";
-	if(empty($searchstr))
-		$sql_query.=" LIMIT 100 ";
+	if (isset($_POST['bmsuche']))
+	{
+		$bmsuche=strtoupper($_POST['bmsuche']);
+		$bmsuche = ereg_replace("^0*", "", $bmsuche);
+		
+		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
+					WHERE upper(uid) LIKE '%".addslashes($bmsuche)."%' OR upper(nachname) LIKE '%".addslashes($bmsuche)."%' OR upper(vorname) LIKE '%".addslashes($bmsuche)."%' 
+						OR upper(nummer) LIKE '%".addslashes($bmsuche)."%' OR upper(nummerintern) LIKE '%".addslashes($bmsuche)."%'
+					LIMIT 30";
+		//echo $sql_query;
+	}
+	else
+	{
+		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
+		if(!empty($searchstr))
+			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummerintern  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
+		$sql_query.="	ORDER BY nummer ";
+		if(empty($searchstr))
+			$sql_query.=" LIMIT 100 ";
+	}
 
     if(!$erg=$db->db_query($sql_query))
 	{
