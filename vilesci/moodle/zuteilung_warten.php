@@ -310,7 +310,7 @@
 								$aendern_bezeichnung=$row->bezeichnung;
 						}
 
-	                    $content.='<option value="'.$row->lehrveranstaltung_id.'" '.("$sel_lehrveranstaltung_id"=="$row->lehrveranstaltung_id"?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 35).'&nbsp;'.($row->kurzbz?CutString($row->kurzbz,7).', ':'').'&nbsp;(LvID '.$row->lehrveranstaltung_id.($row->lehrform_kurzbz?CutString(', '.$row->lehrform_kurzbz,5):'').')</option>';
+	                    $content.='<option value="'.$row->lehrveranstaltung_id.'" '.("$sel_lehrveranstaltung_id"=="$row->lehrveranstaltung_id"?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 35).'&nbsp;'.($row->kurzbz?CutString($row->kurzbz,7).', ':'').'&nbsp;'.$row->lehrveranstaltung_id.($row->lehrform_kurzbz?CutString(', '.$row->lehrform_kurzbz,5):'').'</option>';
                     }
                 }
                 else
