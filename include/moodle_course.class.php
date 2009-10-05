@@ -416,7 +416,7 @@ class moodle_course extends basis_db
 		$this->errormsg = '';
 		$this->result=array();
 
-		$qry = "SELECT distinct tbl_moodle.lehrveranstaltung_id as moodle_lehrveranstaltung_id,tbl_moodle.lehreinheit_id as moodle_lehreinheit_id, tbl_moodle.studiensemester_kurzbz,tbl_lehrveranstaltung.semester
+/*		$qry = "SELECT distinct tbl_moodle.lehrveranstaltung_id as moodle_lehrveranstaltung_id,tbl_moodle.lehreinheit_id as moodle_lehreinheit_id, tbl_moodle.studiensemester_kurzbz,tbl_lehrveranstaltung.semester
 						,tbl_lehrveranstaltung.bezeichnung,tbl_lehrveranstaltung.kurzbz,tbl_lehrveranstaltung.lehrveranstaltung_id,tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester 
 						,tbl_moodle.mdl_course_id,tbl_moodle.lehreinheit_id,tbl_moodle.gruppen
 					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit,lehre.tbl_moodle
@@ -425,15 +425,13 @@ class moodle_course extends basis_db
 						and tbl_moodle.studiensemester_kurzbz=lehre.tbl_lehreinheit.studiensemester_kurzbz)
 					  OR
 						 (tbl_moodle.lehreinheit_id=tbl_lehreinheit.lehreinheit_id))";
-
-
+*/
 		$where='';
-		
 		if ($mdl_course_id!='')
 			$where.=" and tbl_moodle.mdl_course_id='".addslashes($mdl_course_id)."' ";
 		
 		if ($lehreinheit_id!='')
-			$where.=" tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."' ";
+			$where.=" and tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."' ";
 
 		if ($lehrveranstaltung_id!='')
 			$where.=" and tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' ";
