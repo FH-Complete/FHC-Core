@@ -493,7 +493,7 @@
 					<table class="tabcontent" id="QM_DE" style="display: none">
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch_V3_Sept. 08.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
 			  			</tr>
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
