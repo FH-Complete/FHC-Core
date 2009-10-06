@@ -111,24 +111,28 @@ function displayh($arr)
 			$style = 'style="border: 1px solid gray; font-weight:bold; padding-right: 10px;padding-left: 10px; margin:0;"';
 		else 
 			$style = 'style="padding-left: 10px;padding-right: 10px;"';
-			
-		echo '<tr><td valign="center" '.$style.'>';
-	
+		
 		$obj = new organisationseinheit();
 		$obj->load($key);
 		
-		if($obj->organisationseinheittyp_kurzbz=='Institut')
-			echo $obj->oe_kurzbz;
-		else
-			echo $obj->bezeichnung;
-		echo '</td>';	
-		$style = 'style="border: 1px solid gray; font-weight:bold; padding: 0px; margin:0;"';
-		echo '<td valign="center" '.$style.'>';
+		if($obj->aktiv)
+		{	
+			echo '<tr><td valign="center" '.$style.'>';
 		
-		if(is_array($val) && count($val)>0)
-			displayh($val);
+			echo $obj->organisationseinheittyp_kurzbz.' - ';
+			if($obj->organisationseinheittyp_kurzbz=='Institut')
+				echo $obj->oe_kurzbz;
+			else
+				echo $obj->bezeichnung;
+			echo '</td>';	
+			$style = 'style="border: 1px solid gray; font-weight:bold; padding: 0px; margin:0;"';
+			echo '<td valign="center" '.$style.'>';
 			
-		echo '</td></tr>';
+			if(is_array($val) && count($val)>0)
+				displayh($val);
+				
+			echo '</td></tr>';
+		}
 	}
 	echo '</table>';
 }
