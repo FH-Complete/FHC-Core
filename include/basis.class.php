@@ -1181,15 +1181,14 @@ class basis {
     return $result;
   }
   
-	// ************************************************
-	// * wenn $var '' ist wird NULL zurueckgegeben
-	// * wenn $var !='' ist werden Datenbankkritische
-	// * Zeichen mit Backslash versehen und das Ergbnis
-	// * unter Hochkomma gesetzt.
-	// ************************************************
+	/**
+	 * wenn $var '' ist wird NULL zurueckgegeben
+	 * wenn $var !='' ist werden Datenbankkritische
+	 * Zeichen mit Backslash versehen und das Ergbnis
+	 * unter Hochkomma gesetzt.
+	 */
 	protected function addslashes($var)
 	{
-		//TODO: diese Funktion gehoert ausgelagert in die BasisKlasse
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 
