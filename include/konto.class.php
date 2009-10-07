@@ -452,11 +452,13 @@ class konto extends basis_db
 	 */
 	public function checkStudienbeitrag($uid, $stsem)
 	{
-		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer 
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
 					WHERE 
 						tbl_konto.studiensemester_kurzbz = '".addslashes($stsem)."' 
 						AND tbl_benutzer.uid = '".addslashes($uid)."' 
+						AND tbl_benutzer.uid = tbl_student.student_uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id 
+						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
 		
 		if($this->db_query($subqry))
