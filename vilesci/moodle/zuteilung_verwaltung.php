@@ -192,13 +192,13 @@
                 <form accept-charset="UTF-8" name="'.$cFormName.'"  method="POST" target="_self" action="'.$_SERVER['PHP_SELF'].'" >
                         <table class="liste">
                         <tr>
-                           	<th>StSem</th>
-                           	<th>Stg-Kz</th>
-                           	<th>Semster</th>
+                           	<th>Studiensem</th>
+                           	<th>StgKz</th>
+                           	<th>Sem</th>
                            	<th>Lehrveranstaltung</th>
                            	<th>Lehreinheiten</th>
                            	<th>Moodlekurs</th>
-				<td>&nbsp;</td>
+							<td>&nbsp;</td>
                         </tr>';
         //---------------------------------------------------------------------------
 	// Auswahlfelder
@@ -247,7 +247,7 @@
                                         $arrStudiengang=$row;
                                         $max_semester=$row->max_semester;
                                 }
-                                $content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.'&nbsp;</option>';
+                                $content.='<option value="'.$row->studiengang_kz.'" '.(("$studiengang_kz"=="$row->studiengang_kz")?' selected="selected" ':'').'>&nbsp;'.$row->kuerzel.'&nbsp;('.$row->kurzbzlang.')&nbsp;</option>';
                         }
                 }
                 else
@@ -298,7 +298,7 @@
 	                }
 		 	 	}	  
                 $content.='</select><br />
-		  &nbsp;nur in Lehre&nbsp;<input type="Checkbox" value="1" name="lehre" '.($lehre?' checked="checked" ':'').' />
+		  &nbsp;nur in Lehre&nbsp;<input title="nur mit Verplanter Lehreinheiten" type="Checkbox" value="1" name="lehre" '.($lehre?' checked="checked" ':'').' />
 		  &nbsp;nur aktive&nbsp;<input type="Checkbox" value="1" name="aktiv" '.($aktiv?' checked="checked" ':'').' />		  
 		  </td>';
         //---------------------------------------------------------------------------
