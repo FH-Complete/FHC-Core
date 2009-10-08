@@ -97,6 +97,7 @@
 // Variable Initialisieren
 
 // ***********************************************************************************************
+#var_dump($_REQUEST);
 
         // AusgabeStream
 
@@ -124,11 +125,11 @@
 	// Check Moodle
        $mdl_course_stat='';
        if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false,false,false))
-	{
+		{
              die('Moodle-Kurs '.$objMoodle->mdl_course_id.' wurde in Lehre nicht gefunden! '.$objMoodle->errormsg);
        }
 	// es wurden Vilescidaten gefunden
-	if(isset($objMoodle->result) && isset($objMoodle->result[0]))
+		if(isset($objMoodle->result) && isset($objMoodle->result[0]))
       	{
 			$new=false;
 			$mdl_course_stat='*';
@@ -324,8 +325,10 @@
 		
 		$bChecked=((!isset($_REQUEST['aendern_lehrveranstaltung_id']) && isset($objMoodle->result[0]->moodle_lehrveranstaltung_id) && $objMoodle->result[0]->moodle_lehrveranstaltung_id) || (isset($_REQUEST['aendern_lehrveranstaltung_id']) && $aendern_lehrveranstaltung_id)?true:false);
 		
-		$content.='<th title="'.$lv_kurz_bez.'" valign="top"><input onchange="if(this.checked) {uncheckLE();};generateLEText();" name="aendern_lehrveranstaltung_id" value="'.$aendern_lehrveranstaltung_id.'" type="Checkbox" '.($bChecked?' checked="checked" ':'').'>&nbsp;Moodle Kurs f&uuml;r die gesamte LV anlegen</th>';
+		$content.='<th  '.($bChecked?' class="error" ':'').' valign="top" title="'.$lv_kurz_bez.'" valign="top"><input onchange="if(this.checked) {uncheckLE();};generateLEText();" name="aendern_lehrveranstaltung_id" value="'.$aendern_lehrveranstaltung_id.'" type="Checkbox" '.($bChecked?' checked="checked" ':'').'>&nbsp;Moodle Kurs f&uuml;r gesamte LV</th>';
 	$content.='</tr>';
+
+
 
         //---------------------------------------------------------------------------
         // Lehreinheit
@@ -373,12 +376,7 @@
 										$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 									}						
 										
-		                            // LE Text
-									$content.='<tr>';
-										$content.='<td>'.$row->lehrform_kurzbz.'&nbsp;</td><td>'.$gruppen.'&nbsp;</td><td>'.$row->lehreinheit_id.'&nbsp;</td>';
 									$le_gefunden=false;
-
-
 #									$bChecked=((!isset($_REQUEST['aendern_lehrveranstaltung_id']) && isset($objMoodle->result[0]->moodle_lehrveranstaltung_id) && $objMoodle->result[0]->moodle_lehrveranstaltung_id) || (isset($_REQUEST['aendern_lehrveranstaltung_id']) && $aendern_lehrveranstaltung_id)?false:true);
 									if (isset($_REQUEST['aendern_lehrveranstaltung_id']) && !$aendern_lehrveranstaltung_id && isset($aendern_lehreinheit_id) && is_array($aendern_lehreinheit_id))
 									{
@@ -402,8 +400,12 @@
 												$le_gefunden=true;
 										}
 									}
+
+									$content.='<tr '.($le_gefunden?' class="error" ':' ').' >';
+		                            // LE Text
+										$content.='<td>'.$row->lehrform_kurzbz.'&nbsp;</td><td>'.$gruppen.'&nbsp;</td><td>'.$row->lehreinheit_id.'&nbsp;</td>';
 		                            // LE Checkbox
-									$content.='<td valign="top"><input onchange="if(this.checked) {document.'.$cFormName.'.aendern_lehrveranstaltung_id.checked=false;};generateLEText();"  id="aendern_lehreinheit_id[]" name="aendern_lehreinheit_id[]" value="'.$row->lehreinheit_id.'" type="Checkbox" '.($le_gefunden?' checked="checked" ':'').'>&nbsp;'.$lektoren.'</td>';
+									$content.='<td><input '.($le_gefunden?' checked="checked" ':' ').'  onchange="if(this.checked) {document.'.$cFormName.'.aendern_lehrveranstaltung_id.checked=false;};generateLEText();"  id="aendern_lehreinheit_id[]" name="aendern_lehreinheit_id[]" value="'.$row->lehreinheit_id.'" type="Checkbox">&nbsp;'.$lektoren.'</td>';
 								$content.='</tr>';
 								}
 						}	
@@ -420,8 +422,8 @@
 						<tr>
 
 						<th align="left">Moodle :
-						<br />Kurs-Bezeichnung :&nbsp;<input name="aendern_bezeichnung" maxlength="254" size="60" type="Text" value="'. $aendern_bezeichnung.'">
-						<br />Kurz-Bezeichnung.:&nbsp;<input name="aendern_kurzbezeichnung" maxlength="254" size="60" type="Text" value="'. $aendern_kurzbezeichnung.'">
+						<br />Kursbez.:&nbsp;<input name="aendern_bezeichnung" maxlength="254" size="60" type="Text" value="'. $aendern_bezeichnung.'">
+						<br />Kurzbez.:&nbsp;<input name="aendern_kurzbezeichnung" maxlength="254" size="60" type="Text" value="'. $aendern_kurzbezeichnung.'">
 						</th>
 						<td>&nbsp;</td>
 						<th>Gruppen übernehmen: <input type="checkbox" value="1" name="aendern_gruppen" '.($aendern_gruppen?' checked="checked" ':'').' ><br /></th>
@@ -486,7 +488,7 @@
 			$content.='<tr>';
 				$content.='<th valign="top">Lehrveranstaltung</th>
 						<td valign="top">'.(isset($objMoodle->result[0])  && isset($objMoodle->result[0]->lehrveranstaltung_bezeichnung)?$objMoodle->result[0]->lehrveranstaltung_bezeichnung.'&nbsp;&nbsp;Kurzbz:&nbsp;'.$objMoodle->result[0]->lehrveranstaltung_kurzbz.'&nbsp;,&nbsp;Lehrform Kurzbz:'.($objMoodle->result[0]->lehrveranstaltung_lehrform_kurzbz?$objMoodle->result[0]->lehrveranstaltung_lehrform_kurzbz:' - ').',&nbsp;ID&nbsp;'.$objMoodle->result[0]->lehrveranstaltung_id.'&nbsp;':' - ').'</td>
-						<td valign="top"><input disabled name="lehrveranstaltung_id" value="'.$objMoodle->result[0]->lehrveranstaltung_id.'" type="Checkbox" '.($objMoodle->result[0]->moodle_lehrveranstaltung_id?' checked="checked" ':'').'>&nbsp;ID&nbsp;'.$objMoodle->result[0]->lehrveranstaltung_id.'</td>
+						<td valign="top" '.($objMoodle->result[0]->moodle_lehrveranstaltung_id?' class="error" ':'').'><input disabled name="lehrveranstaltung_id" value="'.$objMoodle->result[0]->lehrveranstaltung_id.'" type="Checkbox" '.($objMoodle->result[0]->moodle_lehrveranstaltung_id?' checked="checked" ':'').'>&nbsp;</td>
 						';
 			$content.='<th valign="top">Lehreinheiten</th>';
 			$content.='<td><table>';
@@ -518,8 +520,6 @@
 					{
 						$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 					}			
-					$content.='<tr>';
-                          		$content.='<td>'.$row->lehrform_kurzbz.'&nbsp;</td><td>'.$gruppen.'&nbsp;</td><td>ID&nbsp;'.$row->lehreinheit_id.'&nbsp;</td>';
 						$le_gefunden=false;
 						reset($objMoodle->result);
 						for ($ii=0;$ii<count($objMoodle->result);$ii++)
@@ -527,7 +527,9 @@
 								if ($objMoodle->result[$ii]->moodle_lehreinheit_id==$row->lehreinheit_id)
 									$le_gefunden=true;
 						}
-						$content.='<td valign="top"><input id="lehreinheit_id" disabled name="lehreinheit_id[]" value="'.$row->lehreinheit_id.'" type="Checkbox" '.($le_gefunden?' checked="checked" ':'').'>&nbsp;'.$lektoren.'</td>';
+					$content.='<tr '.($le_gefunden?' class="error" ':' ').'>';
+                   		$content.='<td>'.$row->lehrform_kurzbz.'&nbsp;</td><td>'.$gruppen.'&nbsp;</td><td>ID&nbsp;'.$row->lehreinheit_id.'&nbsp;</td>';
+						$content.='<td valign="top"><input '.($le_gefunden?' checked="checked" ':'').' id="lehreinheit_id" disabled name="lehreinheit_id[]" value="'.$row->lehreinheit_id.'" type="Checkbox" >&nbsp;'.$lektoren.'</td>';
 				 $content.='</tr>';
 			}
 				$content.='</table></td>';
@@ -596,6 +598,7 @@
 					}
 				}
 			}
+
 			//-->
 		</script>
         </head>
@@ -609,24 +612,18 @@
         exit;
 
 // ***********************************************************************************************
-//      String auf Laenge abschneiden
+//      Submit - Datenverarbeiten
 // ***********************************************************************************************
-        function CutString($strVal, $limit)
-        {
-                if(strlen($strVal) > $limit+3)
-                {
-                        return substr($strVal, 0, $limit) . "...";
-                }
-                else
-                {
-                        return $strVal;
-                }
-        }
-
-
-		function moodlekurswartung($mdl_course_id,&$errormsg)
+	function moodlekurswartung($mdl_course_id,&$errormsg)
+	{
+		if (!$user=get_uid())
 		{
+			$errormsg[]='Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !';
+			return false;
+		}		
 
+		
+		
 	        if (!$objMoodle = new moodle_course())
 		         die('Fehler beim Oeffnen der Moodleverbindung');
 
@@ -647,39 +644,40 @@
 
 	    	$bWartung=(isset($_REQUEST['aenderung']) && !empty($_REQUEST['aenderung'])?true:false);
 	    	$bKopieren=(isset($_REQUEST['kopieren']) && !empty($_REQUEST['kopieren'])?true:false);
-		$aendern_studiensemester_kurzbz=(isset($_REQUEST['aendern_studiensemester_kurzbz'])?trim($_REQUEST['aendern_studiensemester_kurzbz']):'');
+			$aendern_studiensemester_kurzbz=(isset($_REQUEST['aendern_studiensemester_kurzbz'])?trim($_REQUEST['aendern_studiensemester_kurzbz']):'');
 	    	$aendern_studiengang_kz=(isset($_REQUEST['aendern_studiengang_kz'])?trim($_REQUEST['aendern_studiengang_kz']):'');
 	    	$aendern_semester=(isset($_REQUEST['aendern_semester'])?trim($_REQUEST['aendern_semester']):'');
 
-		$sel_lehrveranstaltung_id=(isset($_REQUEST['sel_lehrveranstaltung_id'])?trim($_REQUEST['sel_lehrveranstaltung_id']):$lehrveranstaltung_id);
-		$aendern_lehrveranstaltung_id=(isset($_REQUEST['aendern_lehrveranstaltung_id']) && !empty($_REQUEST['aendern_lehrveranstaltung_id'])?trim($_REQUEST['aendern_lehrveranstaltung_id']):$sel_lehrveranstaltung_id);
+			$sel_lehrveranstaltung_id=(isset($_REQUEST['sel_lehrveranstaltung_id'])?trim($_REQUEST['sel_lehrveranstaltung_id']):$lehrveranstaltung_id);
+			$aendern_lehrveranstaltung_id=(isset($_REQUEST['aendern_lehrveranstaltung_id']) && !empty($_REQUEST['aendern_lehrveranstaltung_id'])?trim($_REQUEST['aendern_lehrveranstaltung_id']):$sel_lehrveranstaltung_id);
 
 	    	$aendern_lehreinheit_id=(isset($_REQUEST['aendern_lehreinheit_id'])?$_REQUEST['aendern_lehreinheit_id']:(isset($_REQUEST['aendern_studiensemester_kurzbz'])?'':''));
 
-		$aendern_bezeichnung=(isset($_REQUEST['aendern_bezeichnung'])?trim($_REQUEST['aendern_bezeichnung']):'');
-		$aendern_kurzbezeichnung=(isset($_REQUEST['aendern_kurzbezeichnung'])?trim($_REQUEST['aendern_kurzbezeichnung']):'');
-		$aendern_gruppen=(isset($_REQUEST['aendern_gruppen']) && !empty($_REQUEST['aendern_gruppen'])?true:(isset($_REQUEST['aendern_gruppen'])?1:0));
+			$aendern_bezeichnung=(isset($_REQUEST['aendern_bezeichnung'])?trim($_REQUEST['aendern_bezeichnung']):'');
+			$aendern_kurzbezeichnung=(isset($_REQUEST['aendern_kurzbezeichnung'])?trim($_REQUEST['aendern_kurzbezeichnung']):'');
+			$aendern_gruppen=(isset($_REQUEST['aendern_gruppen']) && !empty($_REQUEST['aendern_gruppen'])?true:(isset($_REQUEST['aendern_gruppen'])?1:0));
 
 
 		//  Original Moodlekurs lesen
-	       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false,false,false))
-		{
+	   if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false,false,false))
+	   {
                     die('Moodle-Kurs '.$objMoodle->mdl_course_id.' wurde in Lehre nicht gefunden! '.$objMoodle->errormsg);
-       	}
-
+       }
+		// Kurs wurde gefunden
 		if(isset($objMoodle->result) && isset($objMoodle->result[0]))
-	    	{
+	    {
 			$new_lehre_moodle_kurs=false;
 			$objMoodle->new=false;
-	    	}
-	    	else if ($objMoodle->load($mdl_course_id) && !$bKopieren)
-	    	{
+	    }
+		// Es gibt im Moodle den Kurs
+	    else if ($objMoodle->load($mdl_course_id) && !$bKopieren)
+	    {
 			$new_lehre_moodle_kurs=true;
 			$objMoodle->new=true; // Datensatz anlegen
 		}
 		else
 		{
-	             	  die('Moodle-Kurs '.$mdl_course_id.' wurde nicht gefunden! '.$objMoodle->errormsg);
+	           die('Moodle-Kurs '.$mdl_course_id.' wurde nicht gefunden! '.$objMoodle->errormsg);
 		}
 		
 		
@@ -692,24 +690,27 @@
 			$objMoodle->new=true; // Datensatz anlegen
 		}
 
+#echo $aendern_lehrveranstaltung_id;		
+#var_dump($aendern_lehreinheit_id);
 
-		if ($aendern_lehrveranstaltung_id)
-		{
-			$objMoodle->lehrveranstaltung_id=$aendern_lehrveranstaltung_id;
-			$objMoodle->lehreinheit_id=null;
-		}
-		else if ((!is_array($aendern_lehreinheit_id) && !empty($aendern_lehreinheit_id))
-			 || (is_array($aendern_lehreinheit_id) && count($aendern_lehreinheit_id)>0) )
+		// Lehreinheiten 
+		if ((!is_array($aendern_lehreinheit_id) && !empty($aendern_lehreinheit_id))
+		 || (is_array($aendern_lehreinheit_id) && count($aendern_lehreinheit_id)>0) )
 		{
 			$objMoodle->lehrveranstaltung_id=null;
 			$objMoodle->lehreinheit_id=$aendern_lehreinheit_id;
 		 }
+		 // Lehrveranstaltung
+		else if ($aendern_lehrveranstaltung_id)
+		{
+			$objMoodle->lehrveranstaltung_id=$aendern_lehrveranstaltung_id;
+			$objMoodle->lehreinheit_id=null;
+		}
 		 else
 		 {
 	  	    $errormsg[]='LV oder LE wurde nicht ausgew&auml;hlt!';
 			return false;
 		 }
-
 
 		$objMoodle->mdl_course_id=$mdl_course_id;
 		$objMoodle->studiensemester_kurzbz=$aendern_studiensemester_kurzbz;
@@ -718,19 +719,13 @@
 		$objMoodle->mdl_fullname=$aendern_bezeichnung;
 		$objMoodle->mdl_shortname=$aendern_kurzbezeichnung;
 		$objMoodle->insertamum=(!$new_lehre_moodle_kurs && isset($objMoodle->result[0]->insertamum)?$objMoodle->result[0]->insertamum:date('Y-m-d H:i:s'));
-		if (!$user=get_uid())
-		{
-			$errormsg[]='Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !';
-			return false;
-		}
-		
 		$objMoodle->insertvon=(!$new_lehre_moodle_kurs && isset($objMoodle->result[0]->insertvon)?$objMoodle->result[0]->insertvon:$user);
 		$objMoodle->gruppen=($aendern_gruppen?1:0);
 
 
 		if (!$objMoodle->update_vilesci())
 		{
-         	 	$errormsg[]='Fehler Vilesci Moodle-Kurs '.$mdl_course_id.' '.$objMoodle->result[0]->mdl_fullname.' zugeordnet '.$objMoodle->errormsg;
+         	$errormsg[]='Fehler Vilesci Moodle-Kurs '.$mdl_course_id.' '.$objMoodle->result[0]->mdl_fullname.' zugeordnet '.$objMoodle->errormsg;
 			return false;
 		}
 
@@ -757,5 +752,19 @@
 			}
 		return true;
 	}
+// ***********************************************************************************************
+//      String auf Laenge abschneiden
+// ***********************************************************************************************
+   function CutString($strVal, $limit)
+   {
+                if(strlen($strVal) > $limit+3)
+                {
+                        return substr($strVal, 0, $limit) . "...";
+                }
+                else
+                {
+                        return $strVal;
+                }
+   }
 
 ?>
