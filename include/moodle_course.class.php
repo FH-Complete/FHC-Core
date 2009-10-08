@@ -801,7 +801,8 @@ class moodle_course extends basis_db
 		if (is_null($this->new) || empty($this->new))
 			$this->new=false;
 			
-		$qry = 'BEGIN; ';
+		$this->db_query('BEGIN;');			
+		$qry = '';
 		$res=0;
 		
 		if (!$this->new)
@@ -816,12 +817,11 @@ class moodle_course extends basis_db
 			{
 				if ($this->lehrveranstaltung_id!='' && !is_null($this->lehrveranstaltung_id))
 				{
-					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehreinheit_id is null ; ';
+					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehreinheit_id = '.$this->addslashes($this->lehrveranstaltung_id) .' ; ';
 				}
 				else
 				{
-					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehrveranstaltung_id is null ; ';
-					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehreinheit_id not in ('. (is_array($this->lehreinheit_id)? implode(',',$this->lehreinheit_id) :$this->lehreinheit_id) .') ; ';
+					$qry.= 'DELETE from lehre.tbl_moodle where mdl_course_id='.$this->addslashes($this->mdl_course_id).' and not lehreinheit_id in ('. (is_array($this->lehreinheit_id)? implode(',',$this->lehreinheit_id) :$this->lehreinheit_id) .') ; ';
 				}
 			}
 		}	
@@ -852,7 +852,7 @@ class moodle_course extends basis_db
 					 lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).',
 					 studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).' 
 					 ';
-				if (strlen($this->gruppen) && !is_null($this->gruppen))
+				if (!is_null($this->gruppen))
 					$qry.= ',gruppen='.($this->gruppen?'true':'false');
 					$qry.= '  where mdl_course_id='.$this->addslashes($this->mdl_course_id).'; ';			
 			}
@@ -885,13 +885,14 @@ class moodle_course extends basis_db
 				if($this->db_num_rows($res)>0)
 				{
 					$qry.= 'UPDATE lehre.tbl_moodle set
-							 lehreinheit_id='.$this->addslashes($value).',
 							 lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).',
 							 studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).' 
 							 ';
-					if (strlen($this->gruppen) && !is_null($this->gruppen))
+					if (!is_null($this->gruppen))
 						$qry.= ',gruppen='.($this->gruppen?'true':'false');
-					$qry.= '  where mdl_course_id='.$this->addslashes($this->mdl_course_id).'; ';			
+					$qry.= '  where mdl_course_id='.$this->addslashes($this->mdl_course_id);	
+					$qry.= '  and  lehreinheit_id='.$this->addslashes($value).'; ';						
+							
 				}
 				else 
 				{
@@ -907,18 +908,16 @@ class moodle_course extends basis_db
 						($this->gruppen?'true':'false').'); ';
 				}
 			}
-	
 		}
 		
-#echo $qry;
-#return false;
-
 		if(!$this->db_query($qry))
 		{
 			$this->db_query('ROLLBACK');		
 			$this->errormsg = 'Fehler beim aendern des Datensatzes! '. $this->db_last_error().' in File:='.__FILE__.' Line:='.__LINE__;			
 			return false;
 		}
+
+#echo $qry;
 		$this->db_query('COMMIT;');
 		return true;
 
@@ -2052,9 +2051,6 @@ class moodle_course extends basis_db
 			
 		if (isset($result[1]))
 			$this->errormsg=$result[1];
-
-			
-			
 			
 		if ($result[0]==1 || !$this->load($this->mdl_course_id)) // Methodenaufruf erfolgreich	
 		{
