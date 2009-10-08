@@ -91,8 +91,8 @@ $stgl='';
 $db = new basis_db();
 if($studiengang_kz!='')
 {
-	$studiengang = new studiengang();
-	$stgleiter = $studiengang->getLeitung($studiengang_kz);
+	$studiengang_obj = new studiengang();
+	$stgleiter = $studiengang_obj->getLeitung($studiengang_kz);
 	
 	foreach ($stgleiter as $stgleiter_uid)
 	{
