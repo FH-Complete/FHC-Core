@@ -171,7 +171,7 @@ $error_msg='';
 									JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
 									JOIN public.tbl_benutzerfunktion USING(uid) 
 									JOIN public.tbl_studiengang USING(oe_kurzbz)
-								WHERE tbl_benutzer.aktiv AND funktion_kurzbz='Leitung' AND
+								WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg') AND
 								(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()))";
 	if(!($result = $db->db_query($sql_query)))

@@ -294,7 +294,7 @@ function show(id)
 
 		<td>&nbsp;</td>
 		<td class="tdvertical" valign="top">
-          <p>Studiengangsleiter:<br>
+          <p>Studiengangsleitung:<br>
                 <?php
 
                 $stg_oe_obj = new studiengang();                
@@ -370,95 +370,179 @@ function show(id)
                 }
 
 			  	echo "</p>";
-			  	echo "<p></p>";
-			  	echo "<p>Stellvertreter:<br>";
+			  
 
-			  	//Studiengangsleiter Stellvertreter auselesen
-				$sql_query = "SELECT vw_mitarbeiter.* FROM campus.vw_mitarbeiter, public.tbl_benutzerfunktion WHERE campus.vw_mitarbeiter.aktiv and vw_mitarbeiter.uid=tbl_benutzerfunktion.uid and oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' ) AND funktion_kurzbz='stglstv'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) ";
+			  	//geschaeftsf. Leitung auselesen
+				$sql_query = "SELECT vw_mitarbeiter.* FROM campus.vw_mitarbeiter, public.tbl_benutzerfunktion WHERE campus.vw_mitarbeiter.aktiv and vw_mitarbeiter.uid=tbl_benutzerfunktion.uid and oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' ) AND funktion_kurzbz='gLtg'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) ";
 
 				if($result_course_leader_deputy = $db->db_query($sql_query))
 				{
 					$num_rows_course_leader_deputy = $db->db_num_rows($result_course_leader_deputy);
 					if($num_rows_course_leader_deputy > 0)
 					{
-#						$row_course_leader_deputy = $db->db_fetch_object($result_course_leader_deputy, 0);
-#					}
-#				}
-#                echo "<b>";
-					while($row_course_leader_deputy = $db->db_fetch_object($result_course_leader_deputy))
-					{
-		                echo "<b>";
-						
-			                if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
-							{
-								if(!($row_course_leader_deputy->vorname == "" && $row_course_leader_deputy->nachname == ""))
+						echo "<p></p>";
+					  	echo "<p>geschäftsf. Leitung:<br>";
+						while($row_course_leader_deputy = $db->db_fetch_object($result_course_leader_deputy))
+						{
+			                echo "<b>";
+							
+				                if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
 								{
-									echo $row_course_leader_deputy->titelpre.' '.$row_course_leader_deputy->vorname.' '.$row_course_leader_deputy->nachname.' '.$row_course_leader_deputy->titelpost;
+									if(!($row_course_leader_deputy->vorname == "" && $row_course_leader_deputy->nachname == ""))
+									{
+										echo $row_course_leader_deputy->titelpre.' '.$row_course_leader_deputy->vorname.' '.$row_course_leader_deputy->nachname.' '.$row_course_leader_deputy->titelpost;
+									}
+									else
+									{
+										echo "Nicht definiert";
+									}
 								}
 								else
 								{
 									echo "Nicht definiert";
 								}
-							}
-							else
-							{
-								echo "Nicht definiert";
-							}
-			
-			                echo "</b><br>";
-			
-							if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
-							{
-								if($row_course_leader_deputy->uid != "")
+				
+				                echo "</b><br>";
+				
+								if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
 								{
-									echo "<a href=\"mailto:$row_course_leader_deputy->uid@".DOMAIN."\" class=\"Item\">$row_course_leader_deputy->uid@".DOMAIN."</a>";
+									if($row_course_leader_deputy->uid != "")
+									{
+										echo "<a href=\"mailto:$row_course_leader_deputy->uid@".DOMAIN."\" class=\"Item\">$row_course_leader_deputy->uid@".DOMAIN."</a>";
+									}
+									else
+									{
+										echo "E-Mail nicht definiert";
+									}
 								}
 								else
 								{
 									echo "E-Mail nicht definiert";
 								}
-							}
-							else
-							{
-								echo "E-Mail nicht definiert";
-							}
-			
-			                echo "<br>";
-			  				echo "Tel.:";
-			
-			  				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
-							{
-								if($row_course_leader_deputy->telefonklappe != "")
+				
+				                echo "<br>";
+				  				echo "Tel.:";
+				
+				  				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
 								{
-									$hauptnummer='';
-									$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
-											WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
-											tbl_adresse.adresse_id=tbl_standort.adresse_id AND
-											tbl_adresse.firma_id=tbl_firma.firma_id";
-									if($result_standort = $db->db_query($qry_standort))
+									if($row_course_leader_deputy->telefonklappe != "")
 									{
-										if($row_standort = $db->db_fetch_object($result_standort))
+										$hauptnummer='';
+										$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
+												WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
+												tbl_adresse.adresse_id=tbl_standort.adresse_id AND
+												tbl_adresse.firma_id=tbl_firma.firma_id";
+										if($result_standort = $db->db_query($qry_standort))
 										{
-											$hauptnummer = $row_standort->nummer;
+											if($row_standort = $db->db_fetch_object($result_standort))
+											{
+												$hauptnummer = $row_standort->nummer;
+											}
 										}
+				
+										echo $hauptnummer.' - '.$row_course_leader_deputy->telefonklappe;
 									}
-			
-									echo $hauptnummer.' - '.$row_course_leader_deputy->telefonklappe;
+									else
+									{
+										echo "Nicht vorhanden";
+									}
 								}
 								else
 								{
 									echo "Nicht vorhanden";
 								}
-							}
-							else
-							{
-								echo "Nicht vorhanden";
-							}
-						echo "<br>";
+							echo "<br>";
 						}
+						echo "</p>";
 					}
 				}
-			  	echo "</p>";
+			  	
+			  	
+				
+			  	//Studiengangsleiter Stellvertreter auselesen
+				$sql_query = "SELECT vw_mitarbeiter.* FROM campus.vw_mitarbeiter, public.tbl_benutzerfunktion WHERE campus.vw_mitarbeiter.aktiv and vw_mitarbeiter.uid=tbl_benutzerfunktion.uid and oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz='$studiengang_kz' ) AND funktion_kurzbz='stvLtg'  AND (datum_von<=now() OR datum_von is null) AND (datum_bis>=now() OR datum_bis is null) ";
+
+				if($result_course_leader_deputy = $db->db_query($sql_query))
+				{
+					$num_rows_course_leader_deputy = $db->db_num_rows($result_course_leader_deputy);
+					if($num_rows_course_leader_deputy > 0)
+					{
+						echo "<p>Stellvertreter:<br>";
+						while($row_course_leader_deputy = $db->db_fetch_object($result_course_leader_deputy))
+						{
+			                echo "<b>";
+							
+				                if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
+								{
+									if(!($row_course_leader_deputy->vorname == "" && $row_course_leader_deputy->nachname == ""))
+									{
+										echo $row_course_leader_deputy->titelpre.' '.$row_course_leader_deputy->vorname.' '.$row_course_leader_deputy->nachname.' '.$row_course_leader_deputy->titelpost;
+									}
+									else
+									{
+										echo "Nicht definiert";
+									}
+								}
+								else
+								{
+									echo "Nicht definiert";
+								}
+				
+				                echo "</b><br>";
+				
+								if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
+								{
+									if($row_course_leader_deputy->uid != "")
+									{
+										echo "<a href=\"mailto:$row_course_leader_deputy->uid@".DOMAIN."\" class=\"Item\">$row_course_leader_deputy->uid@".DOMAIN."</a>";
+									}
+									else
+									{
+										echo "E-Mail nicht definiert";
+									}
+								}
+								else
+								{
+									echo "E-Mail nicht definiert";
+								}
+				
+				                echo "<br>";
+				  				echo "Tel.:";
+				
+				  				if(isset($row_course_leader_deputy) && $row_course_leader_deputy != "")
+								{
+									if($row_course_leader_deputy->telefonklappe != "")
+									{
+										$hauptnummer='';
+										$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
+												WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
+												tbl_adresse.adresse_id=tbl_standort.adresse_id AND
+												tbl_adresse.firma_id=tbl_firma.firma_id";
+										if($result_standort = $db->db_query($qry_standort))
+										{
+											if($row_standort = $db->db_fetch_object($result_standort))
+											{
+												$hauptnummer = $row_standort->nummer;
+											}
+										}
+				
+										echo $hauptnummer.' - '.$row_course_leader_deputy->telefonklappe;
+									}
+									else
+									{
+										echo "Nicht vorhanden";
+									}
+								}
+								else
+								{
+									echo "Nicht vorhanden";
+								}
+							echo "<br>";
+						}
+						echo "</p>";
+					}
+				}
+			  	
 			  	echo "<p>Sekretariat:</font><font face='Arial, Helvetica, sans-serif' size='2'>";
                 //Sekritariat auslesen
 				$stg_oe_obj = new studiengang($studiengang_kz);

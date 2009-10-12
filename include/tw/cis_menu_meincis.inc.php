@@ -246,7 +246,7 @@
 							<?php
 							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter'))
 								echo '<li><a class="Item2" href="profile/resturlaub.php" target="content">Resturlaub</a></li>';
-							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stglstv')|| $fkt->checkFunktion('Leitung') || $fkt->checkFunktion('ass'))
+							if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') || $fkt->checkFunktion('stvLtg')|| $fkt->checkFunktion('gLtg')|| $fkt->checkFunktion('Leitung') || $fkt->checkFunktion('ass'))
 							{
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true" target="content">Fix-Angestellte</a></li>';
 								echo '<li><a class="Item2" href="profile/zeitsperre.php?fix=true&lektor=true" target="content">Fixe Lektoren</a></li>';
