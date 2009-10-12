@@ -153,7 +153,7 @@ class organisationseinheit extends basis_db
 	 * Liefert die ChildNodes einer Organisationseinheit
 	 *
 	 * @param $oe_kurzbz
-	 * @return Array mit den Childs inkl derm Uebergebenen Element
+	 * @return Array mit den Childs inkl dem Uebergebenen Element
 	 */
 	public function getChilds($oe_kurzbz)
 	{
