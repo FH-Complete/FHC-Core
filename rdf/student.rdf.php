@@ -448,7 +448,7 @@ if($xmlformat=='rdf')
 	}
 	elseif(in_array($typ, array('prestudent', 'interessenten','bewerber','aufgenommen',
 	                      'warteliste','absage','zgv','reihungstestangemeldet',
-	                      'reihungstestnichtangemeldet','absolvent')))
+	                      'reihungstestnichtangemeldet','absolvent','diplomand')))
 	{
 		$prestd = new prestudent();
 

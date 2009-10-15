@@ -72,6 +72,7 @@ $worksheet->write(2,++$i,"Personalnr", $format_bold);
 $worksheet->write(2,++$i,"Titel", $format_bold);
 $worksheet->write(2,++$i,"Vorname", $format_bold);
 $worksheet->write(2,++$i,"Familienname", $format_bold);
+$worksheet->write(2,++$i,"Fixangestellt", $format_bold);
 $worksheet->write(2,++$i,"Stunden", $format_bold);
 $worksheet->write(2,++$i,"Kosten", $format_bold);
 
@@ -79,7 +80,7 @@ $worksheet->write(2,++$i,"Kosten", $format_bold);
 $qry = "SELECT * FROM (
 		SELECT 
 			tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, 
-			tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
+			tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid, tbl_mitarbeiter.fixangestellt,
 			tbl_lehreinheitmitarbeiter.faktor as faktor, tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
 			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden
 		FROM 
@@ -102,7 +103,7 @@ if($semester!='')
 $qry.= " UNION 
 		 SELECT 
 		 	tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
-		 	tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
+		 	tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid, tbl_mitarbeiter.fixangestellt,
 			0 as faktor, 0 as stundensatz,
 			0 as semesterstunden
 		 FROM 
@@ -143,6 +144,7 @@ if($result = $db->db_query($qry))
 		}
 		$liste[$row->mitarbeiter_uid]['personalnummer'] = $row->personalnummer;
 		$liste[$row->mitarbeiter_uid]['titelpre'] = $row->titelpre;
+		$liste[$row->mitarbeiter_uid]['fixangestellt'] = $row->fixangestellt;
 		$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 		$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
 	}
@@ -184,6 +186,8 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$i,$row['vorname']);
 		//Nachname
 		$worksheet->write($zeile,++$i,$row['nachname']);		
+		//Fixangestellt
+		$worksheet->write($zeile,++$i,($row['fixangestellt']=='t'?'Ja':'Nein'));		
 		//Stunden
 		$worksheet->write($zeile,++$i,$row['gesamtstunden']);
 		//Kosten
@@ -195,7 +199,7 @@ if($result = $db->db_query($qry))
 	}
 	
 	//Gesamtkosten anzeigen
-	$worksheet->writeNumber($zeile,6,$gesamtkosten, $format_number_bold);
+	$worksheet->writeNumber($zeile,7,$gesamtkosten, $format_number_bold);
 }
 	
 	$workbook->close();

@@ -530,10 +530,12 @@ class prestudent extends person
 			case "absolvent":
 				$qry.=" AND a.rolle='Absolvent'";
 				break;
+			case "diplomand":
+				$qry.=" AND a.rolle='Diplomand'";
+				break;
 			default: 
 				break;		
 		}
-		
 
 		if($this->db_query($qry))
 		{

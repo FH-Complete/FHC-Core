@@ -182,7 +182,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
 		
-		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".addslashes($uid_arr[$i])."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND projekttyp_kurzbz in('Bachelor', 'Diplom')";
+		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".addslashes($uid_arr[$i])."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND projekttyp_kurzbz in('Bachelor', 'Diplom') ORDER BY beginn ASC, projektarbeit_id ASC";
 		if($result_proj = $db->db_query($qry_proj))
 		{
 			while($row_proj = $db->db_fetch_object($result_proj))
