@@ -511,7 +511,7 @@
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/vorlagen/Ground_Rules.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
 			  			</tr>
-			  			<tr>
+			  			<tr style="display:none;">
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/beschluesse_regelungen.php?lang=" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Beschl&uuml;sse und Regelungen </a></td>
 				  		</tr>
@@ -543,7 +543,7 @@
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/vorlagen_en/Ground Rules.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
 			  			</tr>
-			  			<tr>
+			  			<tr style="display:none;">
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/beschluesse_regelungen.php?lang=en" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Resolutions and Regulations</a></td>
 				  		</tr>
