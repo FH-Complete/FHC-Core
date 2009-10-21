@@ -348,7 +348,7 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol."' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 		$htmlstr .= "			<option value=''>&nbsp;</option>";
-		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
+		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end'";
 		$result_typ=@$db->db_query($qry_typ);
 		while ($row_typ=@$db->db_fetch_object($result_typ))
 		{
