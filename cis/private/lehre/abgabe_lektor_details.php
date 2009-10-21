@@ -347,8 +347,8 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "		</td>\n";
 		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol."' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
-		$htmlstr .= "			<option value=''>&nbsp;</option>";
-		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end'";
+		//$htmlstr .= "			<option value=''>&nbsp;</option>";
+		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
 		$result_typ=@$db->db_query($qry_typ);
 		while ($row_typ=@$db->db_fetch_object($result_typ))
 		{
@@ -358,7 +358,10 @@ $result=@$db->db_query($qry);
 			}
 			else 
 			{
-				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
+				if($row_typ->paabgabetyp_kurzbz!='end')
+				{
+					$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
+				}
 			}
 		}		
 		$htmlstr .= "		</select></td>\n";
@@ -417,7 +420,7 @@ $htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 $htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
-$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
+$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end'";
 $result_typ=$db->db_query($qry_typ);
 while ($row_typ=@$db->db_fetch_object($result_typ))
 {
