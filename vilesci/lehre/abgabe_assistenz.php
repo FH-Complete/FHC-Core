@@ -95,19 +95,22 @@ else
 	{
 		$erstbegutachter='';
 		$zweitbegutachter='';
+		$muid='';
+		$muid2='';
 		//Betreuer suchen
-		$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, public.tbl_mitarbeiter.mitarbeiter_uid
+		$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, 
+		public.tbl_mitarbeiter.mitarbeiter_uid
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-		WHERE projektarbeit_id='$row->projektarbeit_id'  
+		WHERE projektarbeit_id='$row->projektarbeit_id' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
 		UNION
 		SELECT '' as first,trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as second, public.tbl_mitarbeiter.mitarbeiter_uid
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-		WHERE projektarbeit_id='$row->projektarbeit_id' 
+		WHERE projektarbeit_id='$row->projektarbeit_id'  AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
 		";
 
@@ -119,7 +122,7 @@ else
 		{
 			while($row_betr=$db->db_fetch_object($betr))
 			{
-				if($row_betr->first!='')
+				if($row_betr->first!='' && $row_betr->mitarbeiter_uid!=NULL)
 				{
 					if(trim($erstbegutachter==''))
 					{
@@ -132,10 +135,11 @@ else
 						$muid.=", ".$row_betr->mitarbeiter_uid."@".DOMAIN;
 					}
 				}
+				//Anzeige nur von 
 				if($row_betr->second!='')
 				{
 					$zweitbegutachter=$row_betr->second;
-					$muid=$row_betr->mitarbeiter_uid;
+					$muid2=$row_betr->mitarbeiter_uid;
 				}
 									
 			}
@@ -161,9 +165,9 @@ else
 		{
 			$htmlstr .= "       <td>".$erstbegutachter."</td>\n";
 		}
-		if($muid != NULL && $muid !='')
+		if($muid2 != NULL && $muid2 !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:$muid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><a href='mailto:$muid2@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
 		}
 		else
 		{

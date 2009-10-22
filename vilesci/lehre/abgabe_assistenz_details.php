@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 		
@@ -128,7 +128,8 @@ if(isset($_POST["schick"]))
 			if($command=='insert')
 			{
 				$qrychk="SELECT * FROM campus.tbl_paabgabe 
-					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
+					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' 
+					AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
 				if($result=$db->db_query($qrychk))
 				{
 					if($db->db_num_rows($result)>0)
@@ -157,8 +158,10 @@ if(isset($_POST["schick"]))
 							{
 								$row_typ->bezeichnung='';
 							}
-							//$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-							//"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
+							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
+							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 						}
 						$command='';
 					}
@@ -170,7 +173,7 @@ if(isset($_POST["schick"]))
 			}
 			if($command=='update')
 			{
-				//TerminÃ¤nderung
+				//Terminänderung
 				//Ermittlung der alten Daten
 				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
 				if(!$result_old=$db->db_query($qry_old))
@@ -217,6 +220,8 @@ if(isset($_POST["schick"]))
 						{
 							$row_typ->bezeichnung='';
 						}
+						$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin&auml;nderung Bachelor-/Diplomarbeitsbetreuung",
+						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nDir Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 					}
 				}
 				$command='';
@@ -229,7 +234,7 @@ if(isset($_POST["schick"]))
 	}
 	unset($_POST["schick"]);
 }
-//LÃ¶schen eines Termines
+//Löschen eines Termines
 if(isset($_POST["del"]))
 {
 	if($datum)
@@ -255,6 +260,16 @@ if(isset($_POST["del"]))
 				if(!$result=$db->db_query($qry))
 				{
 					echo "<font color=\"#FF0000\">Fehler beim L&ouml;schen des Termins!</font><br>&nbsp;";
+				}
+				else 
+				{
+					$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin Bachelor-/Diplomarbeitsbetreuung",
+					"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang hat einen Termin entfernt:\n".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_old->kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+					$mail->setReplyTo($user."@".DOMAIN);
+					if(!$mail->send())
+					{
+						echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+					}
 				}
 			}
 		}
@@ -369,12 +384,10 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
 		$htmlstr .= "	</tr>\n";
-		
-		
 		$htmlstr .= "</form>\n";
 	}	
 	
-//Eingabezeile fÃ¼r neuen Termin
+//Eingabezeile für neuen Termin
 $htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
