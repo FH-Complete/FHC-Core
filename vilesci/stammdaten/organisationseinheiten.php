@@ -68,6 +68,7 @@ $oe->getHeads();
 foreach ($oe->result as $result)
 {
 	$arr = array();
+	$arr1 = array();
 	//Array mit den Kindelementen erzeugen
 	$arr = getChilds($result->oe_kurzbz);
 	

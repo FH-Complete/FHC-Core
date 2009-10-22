@@ -151,6 +151,28 @@ class berechtigung extends basis_db
 	}
 	
 	/**
+	 * Loescht eine Rolle
+	 *
+	 * @param $rolle_kurzbz
+	 */
+	public function deleteRolle($rolle_kurzbz)
+	{
+		$qry = "DELETE FROM system.tbl_rolleberechtigung WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."';
+				DELETE FROM system.tbl_benutzerrolle WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."';
+				DELETE FROM system.tbl_rolle WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."';";
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Löschen der Zuordnung:'.$this->db_last_error();
+			return false;
+		}
+	}
+	
+	/**
 	 * Speichert eine RolleBerechtigung Zuordnung
 	 *
 	 */
@@ -189,6 +211,39 @@ class berechtigung extends basis_db
 		else 
 		{
 			$this->errormsg = 'Fehler beim Speichern der Zuteilung:'.$this->db_last_error();
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert eine Rolle
+	 *
+	 */
+	public function saveRolle($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+			
+		if($new)
+		{
+			$qry = "INSERT INTO system.tbl_rolle(rolle_kurzbz, beschreibung) VALUES(".
+					$this->addslashes($this->rolle_kurzbz).','.
+					$this->addslashes($this->beschreibung).');';
+		}
+		else 
+		{
+			$qry = 'UPDATE system.tbl_rolle 
+					SET beschreibung='.$this->addslashes($this->beschreibung).'
+					WHERE rolle_kurzbz='.$this->addslashes($this->rolle_kurzbz).';';
+		}
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Speichern: '.$this->db_last_error();
 			return false;
 		}
 	}

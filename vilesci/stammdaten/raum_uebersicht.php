@@ -23,12 +23,24 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/ort.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/ort'))
+	die('Sie haben keine Rechte fuer diese Seite');
+
 if (isset($_GET["toggle"]))
 {
+	if(!$rechte->isBerechtigt('basis/ort', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
 	if ($_GET["rlehre"] != "" && $_GET["rlehre"] != NULL)
 	{
 		$rlehre = $_GET["rlehre"];

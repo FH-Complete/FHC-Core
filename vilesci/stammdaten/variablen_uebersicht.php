@@ -34,8 +34,8 @@ if (!$user = get_uid())
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if(!$rechte->isBerechtigt('basis/variable'))
+		die('Sie haben keine Berechtigung fuer diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 if(isset($_GET['searchstr']))
 	$searchstr = $_GET['searchstr'];

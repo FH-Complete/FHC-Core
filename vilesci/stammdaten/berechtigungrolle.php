@@ -27,13 +27,11 @@
     
     $user = get_uid();
     
-    /*
     $rechte = new benutzerberechtigung();
     $rechte->getBerechtigungen($user);
     
-    if(!$rechte->isBerechtigt('admin'))
-    	die('Sie müssen Administratorrechte besitzen, um diese Seite anzuzeigen');
-    */
+    if(!$rechte->isBerechtigt('basis/berechtigung'))
+    	die('Sie habe keine Rechte um diese Seite anzuzeigen');
 ?>
 <html>
 <head>
@@ -42,6 +40,17 @@
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script language="Javascript">
+function confdel()
+{
+	var value=prompt('Achtung! Sie sind dabei eine Rolle zu löschen. Die Zuordnungen gehen dadurch verloren! Um diese Rolle wirklich zu Löschen tippen Sie "LÖSCHEN" in das untenstehende Feld.');
+	
+	if(value=='LÖSCHEN')
+		return true;
+	else
+		return false;
+}
+</script>
 </head>
 
 <body class="background_main">
@@ -130,6 +139,39 @@ if(isset($_GET['rolle_kurzbz']))
 }
 else 
 {
+	if(isset($_POST['save']))
+	{
+		if(isset($_POST['kurzbz']) && isset($_POST['beschreibung']))
+		{
+			$berechtigung = new berechtigung();
+			$berechtigung->rolle_kurzbz = $_POST['kurzbz'];
+			$berechtigung->beschreibung = $_POST['beschreibung'];
+			$berechtigung->new = true;
+			
+			if($berechtigung->saveRolle())
+			{
+				echo 'Daten wurden gespeichert';
+			}
+			else 
+			{
+				echo 'Fehler beim Speichern:'.$berechtigung->errormsg;
+			}
+		}
+		else 
+		{
+			echo 'Zum Speichern der Daten muss die kurzbz und die Beschreibung angegeben werden';
+		}
+	}
+	
+	if(isset($_GET['delete']) && isset($_GET['kurzbz']))
+	{
+		$berechtigung = new berechtigung();
+		if($berechtigung->deleteRolle($_GET['kurzbz']))
+			echo 'Rolle wurde entfernt';
+		else 
+			echo 'Fehler beim Löschen:'.$berechtigung->errormsg;
+	}
+	
 	//Tabelle mit Rollen anzeigen
 	$berechtigung = new berechtigung();
 	$berechtigung->getRollen();
@@ -140,7 +182,7 @@ else
 				<tr>
 					<th class="table-sortable:default">Kurzbz</th>
 					<th class="table-sortable:default">Beschreibung</th>
-					<th>Berechtigungen zuordnen</th></tr>
+					<th colspan="2">Aktion</th></tr>
 			</thead>
 			<tbody>';
 	
@@ -149,10 +191,17 @@ else
 		echo '<tr>';
 		echo '<td>',$rolle->rolle_kurzbz,'</td>';
 		echo '<td>',$rolle->beschreibung,'</td>';
-		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?rolle_kurzbz='.$rolle->rolle_kurzbz.'">bearbeiten</a></td>';
+		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?rolle_kurzbz='.$rolle->rolle_kurzbz.'">Berechtigungen zuordnen</a></td>';
+		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?kurzbz='.$rolle->rolle_kurzbz.'&delete=true" onclick="return confdel()">Rolle löschen</a></td>';
 		echo '</td>';	
 	}
 	echo '</tbody></table>';
+	
+	echo '<br><form method="POST">
+			Kurzbz: <input type="text" name="kurzbz" value="" />
+			Beschreibung: <input type="text" name="beschreibung" value="" />
+			&nbsp;<input type="submit" name="save" value="Anlegen"/>
+		</form>';
 }
 ?>
 

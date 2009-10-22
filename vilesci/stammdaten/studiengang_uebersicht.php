@@ -20,19 +20,30 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-	
-		require_once('../../include/functions.inc.php');
-    require_once('../../include/studiengang.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-    
+	$user = get_uid();
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	
+	if(!$rechte->isBerechtigt('basis/studiengang'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
+	
 	if (isset($_GET["toggle"]) && ($_GET["kz"] != ""))
 	{
 		$kennzahl = intval($_GET["kz"]);
-		$sg_update = new studiengang();
-		if(!$sg_update->toggleAktiv($kennzahl))
-			die($sg_update->errormsg);
-	
+		if($rechte->isBerechtigt('basis/studiengang', $kennzahl, 'suid'))
+		{
+			$sg_update = new studiengang();
+			if(!$sg_update->toggleAktiv($kennzahl))
+				die($sg_update->errormsg);
+		}
+		else 
+			die('Sie haben keine Rechte fuer diese Aktion');
 	}
 	
     $sg = new studiengang();
@@ -42,28 +53,27 @@
     //$htmlstr = "<table class='liste sortable'>\n";
     $htmlstr = "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "   <thead><tr class='liste'>\n";
-    $htmlstr .= "       <th class='table-sortable:numeric' onmouseup='document.formular.check.value=0'>Kz</th><th class='table-sortable:default'>Kurzbez</th><th class='table-sortable:default'>KurzLang</th> <th class='table-sortable:default'>Typ</th><th class='table-sortable:alphanumeric'>Bezeichnung</th><th>Aktiv</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Email</th>";
+    $htmlstr .= "       <th class='table-sortable:numeric' onmouseup='document.formular.check.value=0'>Kz</th><th class='table-sortable:default'>Kurzbz</th><th class='table-sortable:default'>KurzbzLang</th> <th class='table-sortable:default'>Typ</th><th class='table-sortable:alphanumeric'>Bezeichnung</th><th>Aktiv</th><th class='table-sortable:default'>Email</th>";
     $htmlstr .= "   </tr></thead><tbody>\n";
     $i = 0;
     foreach ($sg->result as $stg)
     {
         //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 		$htmlstr .= "   <tr>\n";
-		$htmlstr .= "       <td>".$stg->studiengang_kz."</td>\n";
+		$htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->studiengang_kz."</a></td>\n";
         $htmlstr .= "       <td>".$stg->kurzbz."</td>\n";
         $htmlstr .= "       <td>".$stg->kurzbzlang."</td>\n";
 		$htmlstr .= "       <td>".$stg->typ."</td>\n";
         $htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->bezeichnung."</a></td>\n";
 		
 		if($stg->aktiv)
-			$aktivbild = "true.gif";	
+			$aktivbild = "true.png";	
 		else
-			$aktivbild = "false.gif";
+			$aktivbild = "false.png";
 
 		$aktivlink = "?toggle=true&kz=".$stg->studiengang_kz;
 		
-		$htmlstr .= "		<td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."'></a></td>\n";
-        $htmlstr .= "       <td>".$stg->telefon."</td>\n";
+		$htmlstr .= "		<td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."' height='20px'></a></td>\n";
         $htmlstr .= "       <td><a href='mailto:".$stg->email."'>".$stg->email."</a></td>\n";
         $htmlstr .= "   </tr>\n";
         $i++;
