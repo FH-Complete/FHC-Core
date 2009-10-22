@@ -125,6 +125,36 @@ if(!@$db->db_query("SELECT bezeichnung FROM public.tbl_benutzerfunktion;"))
 	else 
 		echo ' public.tbl_benutzerfunktion: bezeichnung hinzugefuegt, Stgl und Fbl durch Leitung ersetzt, oezuordnung korrigiert<br>';
 }
+
+if($result = $db->db_query("Select count(*) as anzahl FROM pg_class WHERE relname ='idx_stundenplandev_lehreinheit_id'"))
+{
+	if(!$row = $db->db_fetch_object($result))
+	{
+		if($row->anzahl==0)
+		{
+			$qry = "CREATE INDEX idx_stundenplandev_lehreinheit_id ON lehre.tbl_stundenplandev (lehreinheit_id);";
+			if(!$db->db_query($qry))
+				echo '<strong>lehre.tbl_stundenplandev: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo ' lehre.tbl_stundenplandev: Index auf lehreinheit_id angelegt!<br>';
+		}
+	}
+}
+
+if($result = $db->db_query("Select count(*) as anzahl FROM pg_class WHERE relname ='idx_stundenplan_lehreinheit_id'"))
+{
+	if(!$row = $db->db_fetch_object($result))
+	{
+		if($row->anzahl==0)
+		{
+			$qry = "CREATE INDEX idx_stundenplan_lehreinheit_id ON lehre.tbl_stundenplan (lehreinheit_id);";
+			if(!$db->db_query($qry))
+				echo '<strong>lehre.tbl_stundenplan: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo ' lehre.tbl_stundenplan: Index auf lehreinheit_id angelegt!<br>';
+		}
+	}
+}
 echo '<br>';
 
 $tabellen=array(
