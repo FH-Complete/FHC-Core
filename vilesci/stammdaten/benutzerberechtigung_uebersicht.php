@@ -20,19 +20,52 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-    require_once('../../include/studiengang.class.php');
-    
-   	if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
-	$htmlstr = "";
-	
-	if(isset($_GET['searchstr']))
-		$searchstr = $_GET['searchstr'];
-	else 
-		$searchstr = '';
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+echo '<html>
+<head>
+<title>Berechtigungen Uebersicht</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+function confdel()
+{
+	if(confirm("Diesen Datensatz wirklick loeschen?"))
+	  return true;
+	return false;
+}
+
+
+</script>
+
+</head>
+
+<body class="background_main">
+<h2>Benutzerberechtigungen &Uuml;bersicht</h2>';
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+$user = get_uid();
+
+//Rechte pruefen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/berechtigung'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+$htmlstr = "";
+
+if(isset($_GET['searchstr']))
+	$searchstr = $_GET['searchstr'];
+else 
+	$searchstr = '';
 		
 $htmlstr='
 <table width="100%">
@@ -101,33 +134,6 @@ if(isset($_GET['searchstr']))
 	}
 }
 
-?>
-<html>
-<head>
-<title>Berechtigungen Uebersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript" type="text/javascript">
-function confdel()
-{
-	if(confirm("Diesen Datensatz wirklick loeschen?"))
-	  return true;
-	return false;
-}
-
-
-</script>
-
-</head>
-
-<body class="background_main">
-<h2>Benutzerberechtigungen &Uuml;bersicht</h2>
-
-
-
-<?php 
     echo $htmlstr;
 ?>
 

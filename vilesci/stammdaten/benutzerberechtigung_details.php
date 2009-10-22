@@ -33,6 +33,12 @@
 	require_once('../../include/benutzer.class.php');
 	
 	$user = get_uid();
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	
+	if(!$rechte->isBerechtigt('basis/berechtigung'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
 
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
@@ -72,56 +78,63 @@
 	
 	if(isset($_POST['schick']))
 	{
-		$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
-		$art = $_POST['art'];
-		$oe_kurzbz = $_POST['oe_kurzbz'];
-		$berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
-		$rolle_kurzbz = $_POST['rolle_kurzbz'];
-		$uid = $_POST['uid'];
-		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-		$start = $_POST['start'];
-		$ende = $_POST['ende'];
-		
-		$ber = new benutzerberechtigung();
-		if (isset($_POST['neu']))
+		if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
 		{
-			$ber->insertamum=date('Y-m-d H:i:s');
-			$ber->insertvon = $user;
-			$ber->new = true;
+			$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
+			$art = $_POST['art'];
+			$oe_kurzbz = $_POST['oe_kurzbz'];
+			$berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
+			$rolle_kurzbz = $_POST['rolle_kurzbz'];
+			$uid = $_POST['uid'];
+			$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+			$start = $_POST['start'];
+			$ende = $_POST['ende'];
+			
+			$ber = new benutzerberechtigung();
+			if (isset($_POST['neu']))
+			{
+				$ber->insertamum=date('Y-m-d H:i:s');
+				$ber->insertvon = $user;
+				$ber->new = true;
+			}
+			else 
+			{
+				if(!$ber->load($benutzerberechtigung_id))
+					die('Fehler beim Laden der Berechtigung');
+			}
+			if (isset($_POST['negativ']))
+				$ber->negativ = true;
+			else 
+				$ber->negativ = false;
+			
+			$ber->benutzerberechtigung_id = $benutzerberechtigung_id;
+			$ber->art = $art;
+			$ber->oe_kurzbz = $oe_kurzbz;
+			$ber->berechtigung_kurzbz = $berechtigung_kurzbz;
+			$ber->rolle_kurzbz = $rolle_kurzbz;
+			$ber->uid = $uid;
+			$ber->studiensemester_kurzbz = $studiensemester_kurzbz;
+			$ber->start = $start;
+			$ber->ende = $ende;
+			$ber->updateamum = date('Y-m-d H:i:s');
+			$ber->updatevon = $user;
+			
+			if(!$ber->save()){
+				if (!$ber->new)
+					$errorstr .= "Datensatz konnte nicht upgedatet werden!".$ber->errormsg;
+				else
+					$errorstr .= "Datensatz konnte nicht gespeichert werden!".$ber->errormsg;
+			}
+			if ($ber->new)
+			{
+				$reloadstr .= "<script type='text/javascript'>\n";
+				$reloadstr .= "	parent.uebersicht.location.href='benutzerberechtigung_uebersicht.php';";
+				$reloadstr .= "</script>\n";
+			}
 		}
 		else 
 		{
-			if(!$ber->load($benutzerberechtigung_id))
-				die('Fehler beim Laden der Berechtigung');
-		}
-		if (isset($_POST['negativ']))
-			$ber->negativ = true;
-		else 
-			$ber->negativ = false;
-		
-		$ber->benutzerberechtigung_id = $benutzerberechtigung_id;
-		$ber->art = $art;
-		$ber->oe_kurzbz = $oe_kurzbz;
-		$ber->berechtigung_kurzbz = $berechtigung_kurzbz;
-		$ber->rolle_kurzbz = $rolle_kurzbz;
-		$ber->uid = $uid;
-		$ber->studiensemester_kurzbz = $studiensemester_kurzbz;
-		$ber->start = $start;
-		$ber->ende = $ende;
-		$ber->updateamum = date('Y-m-d H:i:s');
-		$ber->updatevon = $user;
-		
-		if(!$ber->save()){
-			if (!$ber->new)
-				$errorstr .= "Datensatz konnte nicht upgedatet werden!".$ber->errormsg;
-			else
-				$errorstr .= "Datensatz konnte nicht gespeichert werden!".$ber->errormsg;
-		}
-		if ($ber->new)
-		{
-			$reloadstr .= "<script type='text/javascript'>\n";
-			$reloadstr .= "	parent.uebersicht.location.href='benutzerberechtigung_uebersicht.php';";
-			$reloadstr .= "</script>\n";
+			$errorstr.='Fehler beim Speichern: Sie haben keine Berechtigung zum Speichern';
 		}
 	}
 	

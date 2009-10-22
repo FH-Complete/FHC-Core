@@ -20,16 +20,23 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-	require_once('../../include/globals.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/studiengang.class.php');
-	require_once('../../include/erhalter.class.php');
+require_once('../../config/vilesci.config.inc.php');		
+require_once('../../include/globals.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/erhalter.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
+	if (!$db = new basis_db())
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		
+	$user = get_uid();
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	
+	if(!$rechte->isBerechtigt('basis/studiengang'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
 	
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
@@ -69,6 +76,10 @@
 	if(isset($_POST["schick"]))
 	{
 		$studiengang_kz = $_POST["studiengang_kz"];
+		
+		if(!$rechte->isBerechtigt('basis/studiengang', $studiengang_kz, 'su'))
+			die('Sie haben keine Rechte fuer diese Aktion');
+		
 		$kurzbz = $_POST["kurzbz"];
 		$kurzbzlang = $_POST["kurzbzlang"];
 		$typ = $_POST["typ"];
@@ -139,6 +150,7 @@
 	if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= "true")))
 	{
 		$studiengang_kz = $_REQUEST["studiengang_kz"];
+			
 		$sg = new studiengang($studiengang_kz);
 		if ($sg->errormsg!='')
 			die($sg->errormsg);

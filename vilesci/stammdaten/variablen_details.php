@@ -37,8 +37,8 @@ if (!$user = get_uid())
 		
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin'))
-	die('Sie haben keine Berechtigung für diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if(!$rechte->isBerechtigt('basis/variable'))
+	die('Sie haben keine Berechtigung fuer diese Seite. !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $reloadstr = "";  // neuladen der liste im oberen frame
 $htmlstr = "";
@@ -50,76 +50,93 @@ $wert = isset($_REQUEST['wert'])?$_REQUEST['wert']:'';
 
 if(isset($_GET['standard']))
 {
-	$stsem_obj = new studiensemester();
-	$stsem = $stsem_obj->getaktorNext();
-	
-	$qrys = array(
-				"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
-				"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
-				"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
-				"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
-				"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
-				"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
-				);
-				
-	$error = false;
-	foreach ($qrys as $qry)
-	{
-		if(!@$db->db_query($qry))
+	if($rechte->isBerechtigt('basis/variable', null, 'suid'))
+	{		
+		$stsem_obj = new studiensemester();
+		$stsem = $stsem_obj->getaktorNext();
+		
+		$qrys = array(
+					"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
+					"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
+					"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
+					"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
+					"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
+					"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
+					);
+					
+		$error = false;
+		foreach ($qrys as $qry)
 		{
-			$error = true;
+			if(!@$db->db_query($qry))
+			{
+				$error = true;
+			}
 		}
+		
+		if($error)
+			$errorstr.="Es konnten nicht alle Werte angelegt werden";
+		
+		$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
+		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
+		$reloadstr .= "</script>\n";
 	}
-	
-	if($error)
-		$errorstr.="Es konnten nicht alle Werte angelegt werden";
-	
-	$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
-	$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
-	$reloadstr .= "</script>\n";
+	else 
+	{
+		$errorstr.='Sie haben keine Berechtigung fuer diesen Vorgang';
+	}
 }
 if(isset($_POST["del"]))
 {
-	if($name!='' && $uid!='')
+	if($rechte->isBerechtigt('basis/variable', null, 'suid'))
 	{
-		$variable = new variable();
-		if(!$variable->delete($name, $uid))
-			$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
+		if($name!='' && $uid!='')
+		{
+			$variable = new variable();
+			if(!$variable->delete($name, $uid))
+				$errorstr .= "Datensatz konnte nicht gel&ouml;scht werden!";
+			else 
+			{
+				$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
+				$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
+				$reloadstr .= "</script>\n";
+			}
+		}
 		else 
 		{
-			$reloadstr .= "<script type='text/javascript' language='JavaScript'>\n";
+			die('Falsche Parameteruebergabe');
+		}
+	}
+	else 
+		$errorstr.='Sie haben keine Berechtigung fuer diesen Vorgang';
+}
+
+if(isset($_POST["schick"]))
+{
+	if($rechte->isBerechtigt('basis/variable', null, 'suid'))
+	{
+		$variable=new variable();
+		
+		if($variable->load($uid, $name))
+			$varialbe->new = false;
+		else 
+			$variable->new = true;
+		
+		$variable->name = $name;
+		$variable->uid = $uid;
+		$variable->wert = $wert;
+		
+		if ($variable->save())
+		{
+			$reloadstr .= "<script type='text/javascript'>\n";
 			$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
 			$reloadstr .= "</script>\n";
 		}
 	}
 	else 
-	{
-		die('Falsche Parameteruebergabe');
-	}
+		$errorstr.='Sie haben keine Berechtigung fuer diesen Vorgang';
 }
 
-if(isset($_POST["schick"]))
-{
-	$variable=new variable();
-	
-	if($variable->load($uid, $name))
-		$varialbe->new = false;
-	else 
-		$variable->new = true;
-	
-	$variable->name = $name;
-	$variable->uid = $uid;
-	$variable->wert = $wert;
-	
-	if ($variable->save())
-	{
-		$reloadstr .= "<script type='text/javascript'>\n";
-		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
-		$reloadstr .= "</script>\n";
-	}
-}
-
-$qry = "SELECT distinct name FROM public.tbl_variable order by name";
+$qry = "SELECT distinct name FROM public.tbl_variable ORDER BY name";
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
@@ -208,7 +225,7 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 
 function confdel()
 {
-	if(confirm("Diesen Datensatz wirklick loeschen?"))
+	if(confirm("Diesen Datensatz wirklich loeschen?"))
 	  return true;
 	return false;
 }
