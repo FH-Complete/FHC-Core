@@ -313,7 +313,7 @@ $htmlstr .= "</table>\n";
 $htmlstr .= "<br><b>Abgabetermine:</b>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 $htmlstr .= "<tr></tr>\n";
-$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
+$htmlstr .= "<tr><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
 $result=@$db->db_query($qry);
 	while ($row=@$db->db_fetch_object($result))
 	{
@@ -343,8 +343,8 @@ $result=@$db->db_query($qry);
 		{
 			$bgcol='#00FF00';
 		}
-		$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-		$htmlstr .= "		</td>\n";
+		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
+		//$htmlstr .= "		</td>\n";
 		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol."' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 		//$htmlstr .= "			<option value=''>&nbsp;</option>";
@@ -415,7 +415,7 @@ $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 $htmlstr .= "<input type='hidden' name='command' value='insert'>\n";
 $htmlstr .= "<tr id='".$projektarbeit_id."'>\n";
 
-$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
+//$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 
 $htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
 

@@ -291,7 +291,7 @@ if($command!="add")
 	$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr .= "<tr></tr>\n";
 	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
-	$htmlstr .= "<tr><td>fix</td><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload</td><td></td></tr>\n";
+	$htmlstr .= "<tr><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload</td><td></td></tr>\n";
 	$result=@$db->db_query($qry);
 		while ($row=@$db->db_fetch_object($result))
 		{
@@ -330,8 +330,8 @@ if($command!="add")
 			{
 				$bgcol='#00FF00';
 			}
-			$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." disabled>";
-			$htmlstr .= "		</td>\n";
+			//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." disabled>";
+			//$htmlstr .= "		</td>\n";
 			$htmlstr .= "		<td align='center' style='background-color:".$bgcol."'>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>\n";
 			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row->paabgabetyp_kurzbz."'";
 			$result_typ=$db->db_query($qry_typ);
@@ -339,8 +339,16 @@ if($command!="add")
 			$htmlstr .= "              <td>$row_typ->bezeichnung</td>\n";
 			$htmlstr .= "		<td width='250'>$row->kurzbz</td>\n";		
 			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
-			$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";			
-			$htmlstr .= "		<td><input type='submit' name='schick' value='abgeben' title='ausgew&auml;hlte Datei hochladen'></td>";
+			$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";
+			//Überschrittene Termine
+			if($row->datum>date('Y-m-d'))
+			{
+				$htmlstr .= "		<td><input type='submit' name='schick' value=' abgeben ' title='ausgew&auml;hlte Datei hochladen'></td>";
+			}
+			else 
+			{
+				$htmlstr .= "		<td>Termin vorbei</td>";
+			}
 			$htmlstr .= "	</tr>\n";
 			
 			$htmlstr .= "</form>\n";
