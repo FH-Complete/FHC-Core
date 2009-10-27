@@ -216,7 +216,7 @@ function markiere()
 
 <body class="background_main">
 <?php 
-echo "<h2>Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz)</h2>";
+echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz)</h2>";
 
 
     echo $htmlstr;
