@@ -31,7 +31,6 @@
 $error_log='';
 $error_log1='';
 $error_log_all="";
-$stgart='';
 $fehler='';
 $maxsemester=0;
 $v='';
@@ -111,7 +110,7 @@ else
 {
 	echo "Ung&uuml;ltiges Semester!";
 }
-//ausgewÃƒÂ¤hlter Lehrgang
+//ausgewählter Lehrgang
 if(isset($_GET['stg_kz']))
 {
 	if($_GET['stg_kz']<0)
@@ -146,7 +145,7 @@ if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))
 	{
-		$stgart=$row->typ;
+		//$stgart=$row->typ;
 		$stgemail=$row->email;
 		if(strlen(trim($row->erhalter_kz))==1)
 		{
@@ -160,21 +159,9 @@ if($result = $db->db_query($qry))
 		{
 			$erhalter=$row->erhalter_kz;
 		}
-		if($row->typ=='b')
+		if($row->lgartcode<'1' || $row->lgartcode>'3')
 		{
-			$stgart=1;
-		}
-		elseif($row->typ=='m')
-		{
-			$stgart=2;
-		}
-		elseif($row->typ=='d')
-		{
-			$stgart=3;
-		}
-		else
-		{
-			echo "<H2>Es wurde keine Lehrgangart ausgew&auml;hlt!</H2>";
+			echo "<H2>Es wurde keine gültige Lehrgangart ausgew&auml;hlt!</H2>";
 			exit;
 		}
 	}
@@ -211,10 +198,10 @@ if($result = $db->db_query($qry))
   <LehrgangMeldung>
       <LehrgangStamm>
          <LehrgangNr>".($stg_kz*(-1))."</LehrgangNr>
-         <LehrgangArtCode>".$stgart."</LehrgangArtCode>";
+         <LehrgangArtCode>".$row->lgartcode."</LehrgangArtCode>";
 	while($row = $db->db_fetch_object($result))
   	{
-      		//Plausichecks
+      	//Plausichecks
 		$qryadr="SELECT * from public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id='".$row->pers_id."';";
 		$results=$db->db_query($qryadr);
 
@@ -252,25 +239,25 @@ if($result = $db->db_query($qry))
 		{
 				$error_log.=(!empty($error_log)?', ':'')."Nachname ('".$row->nachname."')";
 		}
-		//SVNR muÃƒÆ’Ã…Â¸ 10-stellig sein
+		//SVNR muß¸ 10-stellig sein
 		if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 		{
 				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
 		}
-		//Ersatzkennzeichen muÃƒÆ’Ã…Â¸ 10-stellig sein
+		//Ersatzkennzeichen muß 10-stellig sein
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && mb_strlen(trim($row->ersatzkennzeichen))!=10)
 		{
 				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
 		}
-		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - auÃƒÆ’Ã…Â¸er bei 01.01. und 01.07.
+		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - ausser bei 01.01. und 01.07.
 		if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 		{
-				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enthÃƒÆ’Ã‚Â¤lt Geburtsdatum (".$row->gebdatum.") nicht";
+				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		//Vergleich der letzten 6 Stellen des Ersatzkennzeichen mit Geburtsdatum
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enthÃƒÆ’Ã‚Â¤lt Geburtsdatum (".$row->gebdatum.") nicht";
+				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 		{
@@ -316,7 +303,7 @@ if($result = $db->db_query($qry))
 					$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 			}
 		}
-		if($stgart==2)
+		if($row->lgartcode==2)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
@@ -373,8 +360,7 @@ if($result = $db->db_query($qry))
 							}
 						}
 					}
-					if($rowstatus->status_kurzbz=="Student" || $rowstatus->status_kurzbz=="Outgoing"
-						|| $rowstatus->status_kurzbz=="Incoming" || $rowstatus->status_kurzbz=='Praktikant'
+					if($rowstatus->status_kurzbz=="Student" || $rowstatus->status_kurzbz=='Praktikant'
 						|| $rowstatus->status_kurzbz=="Diplomand")
 					{
 						$status=1;
@@ -429,11 +415,7 @@ if($result = $db->db_query($qry))
 								}
 							}
 						}
-						if($rowstatus->status_kurzbz=="Incoming")
-						{
-							$status=1;
-						}
-						else if($rowstatus->status_kurzbz=="Absolvent" )
+						if($rowstatus->status_kurzbz=="Absolvent" )
 						{
 							$status=3;
 						}
@@ -454,7 +436,7 @@ if($result = $db->db_query($qry))
 				}
 			}
 		}
-		//bei Absolventen das Beendigungsdatum (Sponsion oder AbschlussprÃƒÆ’Ã‚Â¼fung) ÃƒÆ’Ã‚Â¼berprÃƒÆ’Ã‚Â¼fen
+		//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
 
 		if($aktstatus=='Absolvent')
 		{
@@ -550,8 +532,8 @@ if($result = $db->db_query($qry))
 					$datei.="
 	          <ZugangDatum></ZugangDatum>";
 				}
-				//!!!stgart fÃƒÂ¼r Lehrgang ÃƒÂ¼berprÃƒÂ¼fen!!!
-			          if($stgart==2)
+				//!!!stgart für Lehrgang überprüfen!!!
+			          if($row->lgartcode==2)
 			          {
 			          		$datei.="
 	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>";
