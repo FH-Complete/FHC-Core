@@ -145,7 +145,7 @@ if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))
 	{
-		//$stgart=$row->typ;
+		$stgart=$row->typ;
 		$stgemail=$row->email;
 		if(strlen(trim($row->erhalter_kz))==1)
 		{
@@ -303,7 +303,7 @@ if($result = $db->db_query($qry))
 					$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 			}
 		}
-		if($row->lgartcode==2)
+		if($stgart==2)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
@@ -533,7 +533,7 @@ if($result = $db->db_query($qry))
 	          <ZugangDatum></ZugangDatum>";
 				}
 				//!!!stgart für Lehrgang überprüfen!!!
-			          if($row->lgartcode==2)
+			          if($stgart==2)
 			          {
 			          		$datei.="
 	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>";
