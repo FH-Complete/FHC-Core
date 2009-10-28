@@ -1,0 +1,2 @@
+content   fasonline jar:chrome/fasonline.jar!/content/
+skin      fasonline classic/1.0 jar:chrome/fasonline.jar!/skin/

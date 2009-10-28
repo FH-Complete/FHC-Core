@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+	<Description about="urn:mozilla:install-manifest">
+		<em:id>fasonline@technikum-wien.at</em:id>
+		<em:name>FAS Online</em:name>
+		<em:version>2.0</em:version>
+		<em:type>2</em:type>
+		<em:description>Freies Administrationssystem fuer Fachhochschulen</em:description>
+		<em:creator>Fachhochschule Technikum Wien</em:creator>
+		<em:developer>Christian Paminger</em:developer>
+		<em:developer>Andreas Oesterreicher</em:developer>
+		<em:developer>Rudolf Hangl</em:developer>
+		<em:developer>Gerald Simane-Sequens</em:developer>
+
+		<em:homepageURL>http://fhcomplete.technikum-wien.at/</em:homepageURL>
+	
+		<!-- Front End Integration Hooks (used by Extension Manager)-->
+		<em:iconURL>chrome://fasonline/skin/fasonline.png</em:iconURL>
+
+		<em:file>
+			<Description about="urn:mozilla:extension:file:fasonline.jar">
+			<em:package>content/</em:package>
+			<em:skin>skin/</em:skin>
+			</Description>
+		</em:file>
+		<!-- Target Application this extension can install into, 
+		with minimum and maximum supported versions. --> 
+	
+	<!-- FireFox -->
+	<em:targetApplication>
+		<Description>
+		<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+		<em:minVersion>3.0.9</em:minVersion>
+		<em:maxVersion>3.6b1pre</em:maxVersion>
+		</Description>
+	</em:targetApplication>
+	
+	<!-- SeaMonkey -->
+	<em:targetApplication>
+		<Description>
+		<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
+		<em:minVersion>2.0b1pre</em:minVersion>
+		<em:maxVersion>2.1a1pre</em:maxVersion>
+		</Description>
+	</em:targetApplication>
+	</Description>
+</RDF>
