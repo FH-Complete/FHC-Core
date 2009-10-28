@@ -155,6 +155,37 @@ if($result = $db->db_query("Select count(*) as anzahl FROM pg_class WHERE relnam
 		}
 	}
 }
+
+if(!$result = @$db->db_query("SELECT * FROM bis.tbl_lgartcode LIMIT 1"))
+{
+	$qry = '
+		CREATE TABLE bis.tbl_lgartcode
+		(
+		 "lgartcode" Integer NOT NULL,
+		 "kurzbz" Character varying(32),
+		 "bezeichnung" Character varying(256),
+		 "beantragung" Boolean NOT NULL
+		)
+		WITH (OIDS=FALSE);
+		
+		ALTER TABLE public.tbl_studiengang ADD COLUMN lgartcode integer;
+		
+		ALTER TABLE "bis"."tbl_lgartcode" ADD CONSTRAINT "pk_tbl_lgartcode" PRIMARY KEY ("lgartcode");
+		ALTER TABLE "public"."tbl_studiengang" ADD CONSTRAINT "lgartcode_studiengang" FOREIGN KEY ("lgartcode") REFERENCES "bis"."tbl_lgartcode" ("lgartcode") ON DELETE RESTRICT ON UPDATE CASCADE;
+		
+		GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_lgartcode TO "admin";
+		GRANT SELECT ON bis.tbl_lgartcode TO "web";
+		
+		INSERT INTO bis.tbl_lgartcode (lgartcode, kurzbz, bezeichnung, beantragung) VALUES(1, \'LG - MA; MBA\', \'LG zur Weiterbildung - MA; MBA\',true);
+		INSERT INTO bis.tbl_lgartcode (lgartcode, kurzbz, bezeichnung, beantragung) VALUES(2, \'LG - akademische/r ...\', \'LG zur Weiterbildung - akademische/r ...\',true);
+		INSERT INTO bis.tbl_lgartcode (lgartcode, kurzbz, bezeichnung, beantragung) VALUES(3, \'LG - sonstiger\', \'LG zur Weiterbildung - sonstiger\',false);
+		';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_lgartcode: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' bis.tbl_lgartcode: Lehrgangsart hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -171,6 +202,7 @@ $tabellen=array(
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
+	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
@@ -286,7 +318,7 @@ $tabellen=array(
 	"public.tbl_standort"  => array("standort_kurzbz","adresse_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","organisationsform","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
