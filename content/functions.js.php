@@ -72,6 +72,7 @@ function gettimestamp()
 // *
 // * obj.dbdml_return ... Returnwert des Scripts
 // * obj.dbdml_errormsg ... Errormessage
+// * obj.dbdml_warning ... Warnhinweis
 // * obj.dbdml_data ... zusaetzliche Daten vom Script. zB ID des angelegten Datansatzes
 // ****
 function ParseReturnValue(response)
@@ -93,6 +94,7 @@ function ParseReturnValue(response)
 		this.dbdml_return = false;
 	this.dbdml_errormsg = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#errormsg" ));
 	this.dbdml_data = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#data" ));
+	this.dbdml_warning = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#warning" ));
 	//debug('data:'+this.dbdml_data+' errormsg:'+this.dbdml_errormsg+' return:'+this.dbdml_return );
 }
 

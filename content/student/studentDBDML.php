@@ -63,6 +63,7 @@ $db = new basis_db();
 
 $return = false;
 $errormsg = 'unknown';
+$warning = '';
 $data = '';
 $error = false;
 
@@ -391,6 +392,34 @@ if(!$error)
 
 			if(!$error)
 			{
+				if($prestudent->reihungstest_id=='' && $_POST['reihungstest_id']!='')
+				{
+					$stg = new studiengang($prestudent->studiengang_kz);
+					$datum_obj = new datum();
+					//Hinweis anzeigen, falls diese Person bereits in einem anderen Studiengang (des gleichen typs (b,m,d)
+					//einen RT absolviert hat bzw angemeldet ist
+					$qry = "SELECT tbl_studiengang.kurzbzlang, tbl_reihungstest.datum 
+							FROM 
+								public.tbl_prestudent 
+								JOIN public.tbl_studiengang USING(studiengang_kz) 
+								LEFT JOIN public.tbl_reihungstest USING(reihungstest_id) 
+							WHERE 
+								person_id='".addslashes($prestudent->person_id)."' 
+								AND reihungstest_id is not null 
+								AND tbl_studiengang.typ='".$stg->typ."'";
+					
+					if($result = $db->db_query($qry))
+					{
+						if($db->db_num_rows($result)>0)
+						{
+							$warning.= "Hinweis: Diese Person hat bereits Reihungstestzuordnungen in anderen Studiengängen:\n\n";
+							while($row = $db->db_fetch_object($result))
+							{
+								$warning.= $row->kurzbzlang.' am '.$datum_obj->formatDatum($row->datum,'d.m.Y')."\n";
+							}
+						}
+					}
+				}
 				$prestudent->prestudent_id = $_POST['prestudent_id'];
 				$prestudent->aufmerksamdurch_kurzbz = $_POST['aufmerksamdurch_kurzbz'];
 				$prestudent->person_id = $_POST['person_id'];
@@ -3070,6 +3099,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     	<RDF:Description RDF:about="http://www.technikum-wien.at/dbdml/0" >
     		<DBDML:return>'.($return?'true':'false').'</DBDML:return>
         	<DBDML:errormsg><![CDATA['.$errormsg.']]></DBDML:errormsg>
+        	<DBDML:warning><![CDATA['.$warning.']]></DBDML:warning>
         	<DBDML:data><![CDATA['.$data.']]></DBDML:data>
         </RDF:Description>
 	</RDF:li>
