@@ -1230,29 +1230,6 @@ function BISMitarbeiterCheckFunktion()
 }
 
 // ****
-// * oeffnet Script zum Checken der Studentendaten
-// ****
-function BISStudentenPlausicheck()
-{
-	var tree=document.getElementById('tree-verband');
-
-	//Wenn nichts markiert wurde -> beenden
-	if(tree.currentIndex==-1)
-	{
-		alert('Bitte einen Studiengang auswaehlen');
-		return;
-	}
-
-	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
-
-	if(stg_kz!='')
-		window.open('<?php echo APP_ROOT ?>vilesci/bis/studentenmeldung.php?plausi=J&stg_kz='+stg_kz,'Datencheck','');
-	else
-		alert('Bitte einen Studiengang auswaehlen');
-}
-
-// ****
 // * oeffnet Script zum BIS-Export der Studentendaten
 // ****
 function BISStudentenExport()
@@ -1270,9 +1247,20 @@ function BISStudentenExport()
 	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
 
 	if(stg_kz!='')
-		window.open('<?php echo APP_ROOT ?>vilesci/bis/studentenmeldung.php?stg_kz='+stg_kz,'StudentenMeldung','');
+	{
+		if(stg_kz>=0)
+		{
+			window.open('<?php echo APP_ROOT ?>vilesci/bis/studentenmeldung.php?stg_kz='+stg_kz,'StudentenMeldung','');
+		}
+		else
+		{
+			window.open('<?php echo APP_ROOT ?>vilesci/bis/lehrgangsmeldung.php?stg_kz='+stg_kz,'Lehrgangsmeldung','');
+		}
+	}
 	else
+	{
 		alert('Bitte einen Studiengang auswaehlen');
+	}
 }
 
 // ****
