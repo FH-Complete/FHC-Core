@@ -129,7 +129,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
   <command id="menu-bis-mitarbeiter-checkfunktion:command" oncommand="BISMitarbeiterCheckFunktion();"/>
-  <command id="menu-bis-studenten-plausibilitaetspruefung:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
   <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
   <command id="menu-help-manual:command" oncommand="OpenManual()"/>
@@ -661,12 +660,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 			</menu>
 			<menu id="menu-bis-studenten" label="&menu-bis-studenten.label;" accesskey="&menu-bis-studenten.accesskey;">
          		<menupopup id="menu-bis-studenten-popup">
-         			<menuitem
-		               id        =  "menu-bis-studenten-plausibilitaetspruefung"
-		               key       =  "menu-bis-studenten-plausibilitaetspruefung:key"
-		               label     = "&menu-bis-studenten-plausibilitaetspruefung.label;"
-		               command   =  "menu-bis-studenten-plausibilitaetspruefung:command"
-		               accesskey = "&menu-bis-studenten-plausibilitaetspruefung.accesskey;"/>
 		            <menuitem
 		               id        =  "menu-bis-studenten-export"
 		               key       =  "menu-bis-studenten-export:key"
