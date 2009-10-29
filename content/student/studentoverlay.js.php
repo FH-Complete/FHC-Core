@@ -1462,6 +1462,9 @@ function StudentPrestudentSave()
 	}
 	else
 	{
+		if(val.dbdml_warning!='')
+			alert(val.dbdml_warning+"\n\nDaten wurden gespeichert");
+		
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 		StudentSelectID=document.getElementById('student-prestudent-textbox-prestudent_id').value;
