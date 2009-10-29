@@ -1131,17 +1131,18 @@ function indexdatei($source_opus, $fd)
 
 
 //****************************************************************************************************
-//Einlesen Projektarbeiten
+//Einlesen Projektarbeiten (nur Diplomarbeiten)
 //****************************************************************************************************
 $qry="SELECT tbl_fachbereich.bezeichnung as fb_bez, tbl_lehrveranstaltung.studiengang_kz as stg_kz, * FROM lehre.tbl_projektarbeit 
 	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
 	JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-	WHERE tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5 
+	WHERE tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5 AND projekttyp_kurzbz='Diplom'
 	AND abgabedatum>".mktime(0, 0, 0, date('m')-3, date('d'), date('Y'));
 
 //AND tbl_projektarbeit.freigegeben 
+
 
 if($erg=$db_obj->db_query($qry))
 {
