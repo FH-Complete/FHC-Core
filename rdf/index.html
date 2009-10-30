@@ -1,15 +1,22 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>RDF-Spezifikationen FHComplete</title>
 </head>
 <body>
-<h1 style="text-align: center;">RDF-Spezifikationen am Technikum Wien</h1>
+<h1 style="text-align: center;">RDF-Spezifikationen - FHComplete</h1>
 <br>
 Diese Seite beschreibt den Inhalt und die Verwendung aller vorhandenen
-RDF-Files am Technikum Wien. Die gesamte RDF-Struktur ist gerade im
+RDF-Files des FHComplete Systems. Die gesamte RDF-Struktur ist gerade im
 Aufbau und kann sich deshalb jederzeit &auml;ndern. Es sei darauf
 hingewiesen, dass die RDF-Files von heute, morgen vielleicht gar nicht
 mehr oder anders zu verwenden sind.<br>
+Um die Last auf unseren Servern zu minimieren, empfehlen wir, die Daten
+1x pro Monat/Woche/Nacht in ihr eigenes System zu syncronisieren.<br>
+<br>
+Ein Beispiel wie sie die RDFs per PHP auslesen k&ouml;nnen finden Sie <a
+ href="PHPRequest.txt">hier</a><br>
 <br>
 <h2>Student</h2>
 <span style="font-weight: bold;">Aufruf:</span>
@@ -33,7 +40,8 @@ WS2009,...)<br>
 anderen Parameter nicht verwendet)</li>
   <li>typ: Typ der gelieferten Personen (student, prestudent,
 interressent, bewerber, aufgenommen, warteliste, absage, zgv,
-reihungstestangeledet, reihungstestnichtangemeldet, absolvent, diplomand)</li>
+reihungstestangeledet, reihungstestnichtangemeldet, absolvent,
+diplomand)</li>
   <li>prestudent_id: Prestudent_id</li>
   <li>xmlformat: Wenn xmlformat=xml dann wird ein XML statt dem RDF
 geliefert</li>
@@ -151,7 +159,7 @@ Attribute:</span><br>
 </ul>
 <br>
 <h2>LVInfo</h2>
-Liefert das RDF f&Atilde;&frac14;r die Lehrveranstaltungsinformationen<br>
+Liefert das RDF fuer die Lehrveranstaltungsinformationen<br>
 <span style="font-weight: bold;">Aufruf:</span>
 lvinfo.rdf.php?stg_kz=...&amp;semester=...<br>
 Beispiel: <a target="_blank"
