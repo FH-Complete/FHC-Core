@@ -1,0 +1,24 @@
+<?php
+//Username
+$user='user';
+
+//Passwort
+$pass='password';
+
+//URL zum RDF
+$url = 'https://cis.technikum-wien.at/rdf/student.rdf.php?studiengang_kz=227&semester=1&studiensemester_kurzbz=WS2008&typ=student';
+
+
+$auth = base64_encode($user.':'.$pass);
+$header = array("Authorization: Basic $auth");
+$opts = array( 'http' => array ('method'=>'GET', 'header'=>$header));
+$ctx = stream_context_create($opts);
+
+//RDF holen
+$xml = file_get_contents($url,false,$ctx);
+
+//Weiterverarbeitung mit SimpleXML etc
+//...
+
+echo htmlentities($xml);
+?>
