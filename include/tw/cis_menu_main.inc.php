@@ -426,7 +426,7 @@
 					</tr>
 					<tr>
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/benutzungsordnung_bibliothek.doc" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bibliotheksordnung</a></td>
+						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung_Bibliothek.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bibliotheksordnung</a></td>
 					</tr>
 					<tr>
 					  	<td class="tdwidth10" nowrap>&nbsp;</td>

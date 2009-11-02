@@ -273,6 +273,38 @@ $error_msg='';
 		flush();
 	}
 
+	// **************************************************************
+	// Verteiler fuer alle externen Lektoren abgleichen
+	$mlist_name='tw_ext_lkt';
+	setGeneriert($mlist_name);
+	// Lektoren holen die nicht mehr in den Verteiler gehoeren
+	echo '<BR>'.$mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE aktiv AND NOT fixangestellt AND lektor)";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row=$db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	// Lektoren holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE NOT fixangestellt AND lektor AND aktiv AND mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+
 
 	// **************************************************************
 	// Lektoren-Verteiler innerhalb der Studiengaenge abgleichen
@@ -280,7 +312,7 @@ $error_msg='';
 	echo '<BR>Lektoren-Verteiler der Studiengaenge werden abgeglichen!<BR>';
 	flush();
 	$sql_query="SELECT uid, gruppe_kurzbz FROM public.tbl_benutzergruppe
-		WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt')
+		WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_ext_lkt')
 		AND (uid,UPPER(gruppe_kurzbz)) NOT IN
 		(SELECT mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')
 			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
@@ -314,7 +346,7 @@ $error_msg='';
 		mitarbeiter_uid NOT LIKE '\\\\_%' AND tbl_studiengang.studiengang_kz!=0 AND
 		(mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')) NOT IN
 		(SELECT uid, UPPER(gruppe_kurzbz) FROM public.tbl_benutzergruppe
-			WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt'))";
+			WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_ext_lkt'))";
 	//echo $sql_query;
 	if(!($result=$db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error().$sql_query;
