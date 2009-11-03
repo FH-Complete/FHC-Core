@@ -315,11 +315,16 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						//$to = 'oesi@technikum-wien.at';
 						$benutzer = new benutzer();
 						$benutzer->load($uid);
+						if($datum_obj->formatDatum($zeitsperre->vondatum, 'm')>=9)
+							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y')+1;
+						else 
+							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
+						
 						$message = "Dies ist eine automatische Mail! \n".
 								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
 								   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
 								   "Sie können diesen unter folgender Adresse freigeben:\n".
-								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
+								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
 						$from='vilesci@'.DOMAIN;
 						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
 						if($mail->send())

@@ -232,12 +232,21 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		$benutzer->load($uid);
 		$message = "Dies ist eine automatische Mail! \n".
 				   "$benutzer->nachname $benutzer->vorname hat neuen Urlaub eingetragen:\n";
-				   for($i=0;$i<count($akette);$i++)
-				   {
-				   	$message.="Von ".date("d.m.Y", strtotime($akette[$i]))." bis ".date("d.m.Y", strtotime($ekette[$i]))."\n";
-				   }
-				   $message.="\nSie können diesen unter folgender Adresse freigeben:\n".
-				   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".date("Y", strtotime($akette[0]));
+				   
+		for($i=0;$i<count($akette);$i++)
+		{
+			$message.="Von ".date("d.m.Y", strtotime($akette[$i]))." bis ".date("d.m.Y", strtotime($ekette[$i]))."\n";
+		}
+		
+		//Ab September wird das neue Jahr uebergeben
+		if(date("m",strtotime($akette[0]))>=9)
+	   		$jahr = date("Y", strtotime($akette[0]))+1;
+	   	else 
+	   		$jahr = date("Y", strtotime($akette[0]));
+	   
+		$message.="\nSie können diesen unter folgender Adresse freigeben:\n".
+		APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
+		
 		$mail = new mail($to, 'vilesci@'.DOMAIN,'Freigabeansuchen Urlaub', $message);
 		if($mail->send())
 		{
