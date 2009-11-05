@@ -21,17 +21,15 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
  
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/firma.class.php');
 	require_once('../../include/adresse.class.php');
 	require_once('../../include/nation.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
 	
+	if (!$db = new basis_db())
+		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	// ******* INIT ********
 	$user = get_uid();
@@ -40,7 +38,7 @@
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
-	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('preinteressent') && !$rechte->isBerechtigt('assistenz'))
+	if(!$rechte->isBerechtigt('basis/firma'))
 		die('Sie haben keine Berechtigung für diese Seite');
 	
 	$htmlstr = '';
@@ -72,6 +70,9 @@
 	//Loeschen einer Adresse
 	if(isset($_GET['deleteadresse']))
 	{
+		if(!$rechte->isBerechtigt('basis/firma',null, 'suid'))
+			die('Sie haben keine Berechtigung fuer diese Aktion');
+			
 		if(is_numeric($adresse_id))
 		{
 			$adresse_obj = new adresse();
@@ -85,6 +86,9 @@
 	//Speichern einer Adresse
 	if(isset($_POST['saveadresse']))
 	{
+		if(!$rechte->isBerechtigt('basis/firma',null,'suid'))
+			die('Sie haben keine Berechtigung fuer diese Aktion');
+		
 		$adresse_obj = new adresse();
 	
 		if(is_numeric($adresse_id))
@@ -137,6 +141,9 @@
 	// Speichern der Firmendaten
 	if(isset($_POST['save']))
 	{
+		if(!$rechte->isBerechtigt('basis/firma',null, 'suid'))
+			die('Sie haben keine Berechtigung fuer diese Aktion');
+		
 		$firma = new firma();
 		
 		if($firma_id!='')
