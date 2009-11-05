@@ -20,21 +20,211 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
-/**
- * Stellt die Abhaengigkeiten Organisationseinheiten grafisch dar.
- */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/fachbereich.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/studiengang.class.php');
 
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/organisationseinheit'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
+echo '
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Organisationseinheiten - Übersicht</title>
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<meta http-equiv="content-type" content="text/html" charset="UTF-8" />
-</head>
-<body class="Background_main">
-	<h2>Organisationseinheiten - Übersicht</h2><br />';
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+		<script src="../../include/js/jquery.js" language="Javascript"></script>
+		<script src="../../include/js/jquery-ui.js" language="Javascript"></script>
+		
+		<script language="Javascript">
+			$(function() {
+				$("a.ui-widget-content").draggable({revert: true, helper: \'clone\'});
+				$("a.ui-widget-content").droppable({
+					over: function(event, ui) {
+						$(this).css("color","red");
+					},
+					out: function(event, ui) {
+						$(this).css("color","#336699");
+					},
+					drop: function(event, ui) {
+						$(this).css("color","#336699");
+						var kurzbz = encodeURIComponent(ui.helper[0].id);
+						var parent_kurzbz = encodeURIComponent(this.id);
+						window.location.href="'.$_SERVER['PHP_SELF'].'?action=updateparent&kurzbz="+kurzbz+"&parent_kurzbz="+parent_kurzbz;
+					}
+				});
+		
+			});
+		</script>
+		<style>
+		td
+		{
+			font-size: small;
+			margin: 0px;
+			padding: 2px;
+		}
+		a:hover
+		{
+			color:#336611;
+		}
+		</style>
+	</head>
+<body>
+
+<h2>Organisationseinheiten</h2>
+<table width="100%">
+	<tr>
+		<td><span style="font-size: small">Zuordnung kann per Drag&amp;Drop geändert werden!</font></td>
+		<td align="right"><a href="'.$_SERVER['PHP_SELF'].'?action=neu">Neue Organisationseinheit anlegen</a></td>
+	</tr>
+</table>
+';
+
+//Parent durch Drag&Drop Updaten
+if(isset($_GET['action']) && $_GET['action']=='updateparent')
+{
+	if(!$rechte->isBerechtigt('basis/organisationseinheit', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	$oe = new organisationseinheit($_GET['kurzbz']);
+	
+	$oe->oe_parent_kurzbz = $_GET['parent_kurzbz'];
+	if(!$oe->save())
+	{
+		echo 'Fehler:'.$oe->errormsg;
+	}
+}
+
+//Speichern der Daten
+if(isset($_POST['save']))
+{
+	if(!$rechte->isBerechtigt('basis/organisationseinheit', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	if(!isset($_POST['oe_kurzbz']) 
+	|| !isset($_POST['oe_kurzbz_orig']) 
+	|| !isset($_POST['oe_parent_kurzbz']) 
+	|| !isset($_POST['bezeichnung']) 
+	|| !isset($_POST['organisationseinheittyp_kurzbz']))
+	{
+		die('Fehler bei der Parameteruebergabe');
+	}
+	else 
+	{
+		if($_POST['oe_kurzbz_orig']=='')
+		{
+			$new = true;
+			$oe = new organisationseinheit();
+		}
+		else
+		{
+			$new = false;
+			$oe = new organisationseinheit($_POST['oe_kurzbz_orig']);
+		}
+			
+		$oe->oe_kurzbz_orig = $_POST['oe_kurzbz_orig'];
+		$oe->oe_kurzbz = $_POST['oe_kurzbz'];
+		$oe->oe_parent_kurzbz = $_POST['oe_parent_kurzbz'];
+		$oe->bezeichnung = $_POST['bezeichnung'];
+		$oe->organisationseinheittyp_kurzbz = $_POST['organisationseinheittyp_kurzbz'];
+		$oe->aktiv = isset($_POST['aktiv']);
+		
+		if($oe->save($new))
+		{
+			echo '<br><b>Daten erfolgreich gespeichert</b>';
+		}
+		else 
+		{
+			echo '<br><span class="error">Fehler: '.$oe->errormsg.'</span>';
+		}
+	}
+}
+
+//Formular zum Editieren und NEU anlegen anzeigen
+if(isset($_GET['action']) && ($_GET['action']=='edit' || $_GET['action']=='neu'))
+{
+	if(!$rechte->isBerechtigt('basis/organisationseinheit', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	if($_GET['action']=='edit')
+		$oe = new organisationseinheit($_GET['kurzbz']);
+	else
+		$oe = new organisationseinheit();
+	
+	echo '
+	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+		<table>
+			<tr>
+				<td>Kurzbz</td><td>';
+	echo '<input type="text" name="oe_kurzbz" value="'.$oe->oe_kurzbz.'" />';
+	echo '<input type="hidden" name="oe_kurzbz_orig" value="'.$oe->oe_kurzbz.'" />';
+	echo '</td>
+			</tr>
+			<tr>
+				<td>Parent</td>
+				<td>';
+	
+	//Parent DropDown
+	echo '<SELECT name="oe_parent_kurzbz">
+	<OPTION value="">-- keine Auswahl --</OPTION>';
+	
+	$hlp = new organisationseinheit();
+	$hlp->getAll();
+	foreach($hlp->result as $row)
+	{
+		if($row->oe_kurzbz==$oe->oe_parent_kurzbz)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</OPTION>';
+	}
+	echo '</SELECT>';
+	echo '
+				</td>
+			</tr>
+			<tr>
+				<td>Bezeichnung</td><td><input type="text" size="50" name="bezeichnung" value="'.$oe->bezeichnung.'"></td>
+			</tr>
+			<tr>
+				<td>Typ</td><td>';
+	
+	//TYP DropDown
+	echo '<SELECT name="organisationseinheittyp_kurzbz">';
+	$hlp = new organisationseinheit();
+	$hlp->getTypen();
+	foreach($hlp->result as $row)
+	{
+		if($row->organisationseinheittyp_kurzbz==$oe->organisationseinheittyp_kurzbz)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo '<OPTION value="'.$row->organisationseinheittyp_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.'</OPTION>';
+	}
+	echo '</SELECT>';
+	
+	echo '</td>
+			</tr>
+			<tr>
+				<td>Aktiv</td><td><input type="checkbox" name="aktiv" '.($oe->aktiv?'checked':'').'></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td><td><input type="submit" name="save" value="Speichern" /></td>
+			</tr>
+		</table>
+	</form>
+	';
+}
 
 //Benutzerdefiniert Sortierfunktion damit die Eintraege mit 
 //Kindelementen nach oben sortiert werden
@@ -61,26 +251,35 @@ function mysort($a, $b)
 	}
 }
 
+//Uebersicht anzeigen
 //Alle obersten Organisationseinheiten holen
 $oe = new organisationseinheit();
 $oe->getHeads();
 
+echo "\n";
+echo '<table style="text-align: center; padding:5;" cellspacing=5 cellpadding=5><tr>';
 foreach ($oe->result as $result)
 {
+	echo '<td valign="top" >';
 	$arr = array();
 	$arr1 = array();
+	
 	//Array mit den Kindelementen erzeugen
 	$arr = getChilds($result->oe_kurzbz);
-	
 	//Sortieren damit die Eintraege mit Kindern weiter oben stehen
 	uasort($arr,'mysort');
 	
 	//Parent hinzufuegen
 	$arr1[$result->oe_kurzbz] = $arr;
+	echo "\n";
 	
 	//Anzeigen
-	displayh($arr1);
+	display($arr1);
+	echo '</td>';
+	
 }
+echo "\n";
+echo '</tr></table>';
 
 //Liefert die Kindelemente einer Organisationseinheit in 
 //einem verschachteltem Array zurueck
@@ -102,40 +301,75 @@ function getChilds($foo)
 }
 
 //Zeigt das Array in einer Verschachtelten Tabelle an
-function displayh($arr)
+function display($arr)
 {
-	echo '<table style="text-align: left; padding:0;" cellspacing=0 cellpadding=0>';
+	//Wenn eines der Element noch Unterelemente hat, dann das Array sortieren, damit
+	//die Eintraege mit den Untereintraegen zuerst kommen
+	$sort = false;
+	foreach ($arr as $row)
+	{
+		if(count($row)>0)
+			$sort=true;
+	}
+	if($sort)
+	{
+		uasort($arr,'mysort');
+		$style='background-color: #F5F5F5;';
+	}
+	else 
+	{
+		$style='background-color: #b1b1b1;';
+		
+	}
+	echo "\n   ";
+	echo '<table style="'.$style.'" cellspacing=0 cellpadding=5><tr>';
+	$td=false;
 	foreach ($arr as $key=>$val) 
 	{
-		//wenn noch Kindelemente dranhaengen dann einen Rahmen zeichen, sonst nicht
-		if(is_array($val) && count($val)>0)
-			$style = 'style="border: 1px solid gray; font-weight:bold; padding-right: 10px;padding-left: 10px; margin:0;"';
-		else 
-			$style = 'style="padding-left: 10px;padding-right: 10px;"';
-		
 		$obj = new organisationseinheit();
 		$obj->load($key);
-		
+
+		//inaktive OEs farblich markieren
 		if($obj->aktiv)
-		{	
-			echo '<tr><td valign="center" '.$style.'>';
+			$aktivstyle='';
+		else 
+			$aktivstyle='background-color: pink;';
 		
-			echo $obj->organisationseinheittyp_kurzbz.' - ';
-			if($obj->organisationseinheittyp_kurzbz=='Institut')
-				echo $obj->oe_kurzbz;
-			else
-				echo $obj->bezeichnung;
-			echo '</td>';	
-			$style = 'style="border: 1px solid gray; font-weight:bold; padding: 0px; margin:0;"';
-			echo '<td valign="center" '.$style.'>';
+		if(is_array($val) && count($val)>0)
+			echo '<td valign="top"><div style="background-color: #b1b1b1; padding: 0px; margin:0px"><br><span style="font-weight: bold;">';
+		else 
+		{
+			if(!$td)
+			{
+				echo '<td nowrap valign="top">';
+				$td=true;
+			}
+			else 
+				echo '<br>';
+		}
+		//echo '<span class="ui-widget-content" style=" padding: 0px; margin:0px;'.$aktivstyle.'" >';
+		echo '<a href="'.$_SERVER['PHP_SELF'].'?action=edit&kurzbz='.$obj->oe_kurzbz.'" class="Item ui-widget-content" id="'.$obj->oe_kurzbz.'">';
+		echo $obj->organisationseinheittyp_kurzbz.' - ';
+		if($obj->organisationseinheittyp_kurzbz=='Institut')
+			echo $obj->oe_kurzbz;
+		else
+			echo $obj->bezeichnung;
+		echo '</a>';
+		//echo '</span>';
+		if(is_array($val) && count($val)>0)
+		{
+			echo '</span><br><br>';
 			
-			if(is_array($val) && count($val)>0)
-				displayh($val);
-				
-			echo '</td></tr>';
+			display($val);
+			echo '</div></td>';
 		}
 	}
-	echo '</table>';
+	if($td)
+		echo '</td>';
+	echo "</tr>\n   </table>";
 }
-echo '</body></html>';
+
+echo '
+</body>
+</html>';
 ?>

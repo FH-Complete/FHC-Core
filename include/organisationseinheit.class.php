@@ -39,6 +39,9 @@ class organisationseinheit extends basis_db
 	public $organisationseinheittyp_kurzbz;
 	public $aktiv;
 	
+	public $oe_kurzbz_orig;
+	public $beschreibung;
+	
 	/**
 	 * Konstruktor
 	 * @param $oe_kurzbz Kurzbz der Organisationseinheit
@@ -231,6 +234,90 @@ class organisationseinheit extends basis_db
 			$this->errormsg = 'Fehler beim Ermitteln der Childs';
 		}
 		return $childs;
+	}
+	
+	/**
+	 * Speichert eine Organisationseinheit
+	 *
+	 * @param $new
+	 */
+	public function save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+			
+		if($new)
+		{
+			//Neu anlegen
+			$qry = 'INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, 
+																organisationseinheittyp_kurzbz, aktiv) VALUES('.
+					$this->addslashes($this->oe_kurzbz).','.
+					$this->addslashes($this->oe_parent_kurzbz).','.
+					$this->addslashes($this->bezeichnung).','.
+					$this->addslasheS($this->organisationseinheittyp_kurzbz).','.
+					($this->aktiv?'true':'false').');';
+		}
+		else 
+		{
+			if($this->oe_kurzbz=='')
+			{
+				$this->errormsg = 'Kurzbezeichnung darf nicht leer sein';
+				return false;
+			}
+			
+			if($this->oe_kurzbz_orig=='')
+			{
+				$this->oe_kurzbz_orig=$this->oe_kurzbz;
+			}
+			
+			$qry = 'UPDATE public.tbl_organisationseinheit SET '.
+					' oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
+					' oe_parent_kurzbz='.$this->addslashes($this->oe_parent_kurzbz).','.
+					' bezeichnung='.$this->addslashes($this->bezeichnung).','.
+					' organisationseinheittyp_kurzbz='.$this->addslashes($this->organisationseinheittyp_kurzbz).','.
+					' aktiv='.($this->aktiv?'true':'false').
+					" WHERE oe_kurzbz='".addslashes($this->oe_kurzbz_orig)."';";
+		}
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Organisationseinheit';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt alle Organisationseinheittypen
+	 *
+	 * @return boolean
+	 */
+	public function getTypen()
+	{
+		$qry = "SELECT * FROM public.tbl_organisationseinheittyp ORDER BY bezeichnung";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new organisationseinheit();
+				
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Typen';
+			return false;
+		}
 	}
 }
 ?>

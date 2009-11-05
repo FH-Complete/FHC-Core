@@ -62,16 +62,24 @@
 	<!--		  		<td class="tdwrap"></td>
 					<td><a href="private/info/oeh/index.php" target="content" class="Item" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Wahl</a></td>
 	-->
-		  			<td class="tdwrap"></td>
-					<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate 2009</a>
-					</td>
-		  		</tr>
+					<td class="tdwrap"></td>
+					<td><a target="content" href="private/info/oeh/index.php" class="MenuItem" onClick="js_toggle_container('oeh');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;ÖH</a>
+				  	<table class="tabcontent" id="oeh" style="display: visible">
+						<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate 2009</a></td>
+				  		</tr>
 				
-		  		<tr>
-		  			<td class="tdwrap"></td>
-					<td><a href="private/info/oeh/wahlen.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Herbstwahlen 2009 </a>
-					</td>
-		  		</tr>
+				  		<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/wahlen.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Herbstwahlen 2009 </a></td>
+				  		</tr>
+				  		<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/bewerber.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Kandidaturen </a></td>
+				  		</tr>
+				  	</table>
+				 </tr>
 
 				
 		  		<tr>
