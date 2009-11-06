@@ -22,6 +22,7 @@ http://xslf2pdf.tegonal.com
 */ ?>
 <?PHP
 $max_line_height_for_that_row=0;
+$max_line_height_for_that_cell=0;
 
 class FO_Block extends FO_LayoutObject{
   
@@ -54,12 +55,16 @@ class FO_Block extends FO_LayoutObject{
   	if($node->parentNode->nodeName!='fo:table-cell')
   		$height_of_current_row=0;
     $this->initAttribute($node, "text-align");
+    $this->initAttribute($node, "vertical-align");
     $this->initAttribute($node, "content-width");
   }
 
   function processContent($text) {
   	global $max_line_height_for_that_row;
+  	global $max_line_height_for_that_cell;
     $talign = $this->getContext("text-align");
+    //oesi - add attribute vertical-align
+    $valign = $this->getContext("vertical-align");
     //oesi - add attribute content-width
     $colwidth = $this->getContext("content-width");
     switch ($talign) {
@@ -86,10 +91,41 @@ class FO_Block extends FO_LayoutObject{
     //    echo "Draw at:$x:$x2:$y<br>";
     $pdf = $this->getPdf();
     $lineHeight = $this->getContext("line-height");
-            
+        
+    //oesi - bei vertikaler Zentrierung wird die y koordinate angepasst (Nur bei Tabellen)
+    switch ($valign) 
+    {
+	    case "center":
+	      //Innerhalb der Zeile zentrieren
+	      $y = ($y - ($lineHeight - ($pdf->FontSizePt/72*25.4)) / 2);
+	      
+	      //innerhalb der ganzen TabellenZelle zentrieren
+	      if($max_line_height_for_that_row>1 && $max_line_height_for_that_row!=$max_line_height_for_that_cell)
+	      	$y += ($lineHeight/2*($max_line_height_for_that_row-$max_line_height_for_that_cell));
+	      break;
+	    
+	    case "bottom":
+	      //Innerhalb der Zeile zentrieren
+	      $y = ($y - ($lineHeight - ($pdf->FontSizePt/72*25.4)) / 2);
+	      
+	      //ans untere ende der TabellenZelle schieben
+	      if($max_line_height_for_that_row>1 && $max_line_height_for_that_row!=$max_line_height_for_that_cell)
+	      	$y += ($lineHeight*($max_line_height_for_that_row-$max_line_height_for_that_cell));
+	      break;
+	    case "top":
+	      //Innerhalb der Zeile zentrieren
+	      $y = ($y - ($lineHeight - ($pdf->FontSizePt/72*25.4)) / 2);
+	      break;
+	    default:
+	    	//Hier lasse ich die zentrierung in der Zeile weg, weil ich nicht genau weiss, welche folgeschaeden dadurch 
+	    	//verursacht werden. Eigentlich muesste die Zentrierung der Zeile aber immer stattfinden, egal ob vertical-align
+	    	//gesetzt ist oder nicht.
+    }
+    
     list($width, $height, $nb, $sx, $sy, $lx, $ly) = 
 	    $pdf->Text2($x2, $y, $text, $align, $lineHeight, $x, $colwidth);
-//echo "Wrote block:$colwidth:$height:$lineHeight:".$pdf->FontSize.":".$pdf->FontSizePt."$text<br>";
+	
+	//echo "Wrote block:$colwidth:$height:$lineHeight:".$pdf->FontSize.":".$pdf->FontSizePt."$text<br>";
 
 	//oesi - wenn die hoehe einer Spalte groesser ist, dann muss der Border
 	//fuer die ganze row groesser gezeichnet werden.
