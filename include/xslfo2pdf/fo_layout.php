@@ -72,6 +72,91 @@ class FO_LayoutObject extends FO_FlowContainer {
   	return str_replace('EURO',chr(128),utf8_decode($str));
   }
 	
+   //Spaltenhoehe Berechnen
+  function BerechneZellenHoehe($cell, $anzahl_lines_max)
+  {
+  	$pdf = $this->getPdf();
+  	$output = '';
+	 if($cell->childNodes)
+	 {
+  		foreach($cell->childNodes as $block)
+  		{
+  			//Blockelement heraussuchen
+  			if($block->nodeName=='fo:block')
+  			{
+  				//Width des block Elements holen
+  				if($block->attributes->getNamedItem('content-width'))
+  				{
+  					//Schriftgroesse des Elements holen bzw des uebergeordneten
+  					if($block->attributes->getNamedItem('font-size'))
+  						$font_size=$block->attributes->getNamedItem('font-size')->nodeValue;
+  					else 
+  						$font_size=$this->getContext("font-size");
+  					
+  					//wenn schriftgroesse in pt angegeben ist dann in mm umrechnen
+  					if(strstr($font_size,'pt'))
+  						$font_size = $font_size/72*25.4;
+	  		 		$content_width = $block->attributes->getNamedItem('content-width')->nodeValue;
+	  				//$output .= $block->nodeValue;
+	  				
+	  				$anzahl_lines=0;
+	  				//sonderzeichen konvertieren
+	  				$line = $this->convert($block->nodeValue);
+	  				
+	  				//Damit bei den Fussnoten am Zeugnis das Sonderzeichen nicht als 5 Zeichen gezaehlt wird
+	  				//wird hier einfach das erste Zeichen ersetzt
+	  				$line = '1'.substr($line, 1);
+	  				//Zeilenumbrueche loeschen
+	  				$line = str_replace("\n",'', trim($line));
+	  				//Lines nach Newlines splitten
+	  				$lines = explode('\n', $line);
+	  				foreach ($lines as $line)
+	  				{
+	  					if($line!='')
+	  					{
+			  				do
+			  				{
+			  					/*$x = $this->getContext("x");
+								$x2 = $this->getContext("startx");
+								if (!$x2) {
+								  $x2 = $x;
+								}*/
+								//echo "x2:$x2<br>";
+								
+			  					$w = $content_width-1;
+			  					
+			  					//Anzahl der zeichen holen die in dieser zeile noch platz haben
+				  				$noc = $pdf->GetNumberOfChars($w, $line, $font_size);
+				  				//wenn das wort nicht abgeteilt werden kann dann ueber den rand hinausschreiben
+				  				if($noc==-1)
+				  					$noc = strlen($line);
+				  				//Zeile abteilen
+				  				$showLine = substr($line, 0, $noc);
+				  				
+				  				$output.= "w=$w noc=$noc fontsize=$font_size<br>$showLine ($line)";
+				  				
+								//$textWidth = $pdf->GetStringWidth($showLine);
+								//Rest der Line als neue Line
+								$line = trim(substr($line, $noc));
+								//Anzahl der verbleibenden zeichen ermitteln
+								$width = strlen($line); //$pdf->GetNumberOfChars($w, $line, $font_size);
+								$anzahl_lines++;
+			  				} while($width>0);
+	  					}
+	  				}
+					$output.= " Breaks $anzahl_lines <br><br>";
+					//Wenn die Anzahl der benoetigten Zeilen in dieser Zelle
+					//Groesser als die bisher groesste ist dann aendern
+					if($anzahl_lines_max<$anzahl_lines)
+	  					$anzahl_lines_max = $anzahl_lines;
+	  				break;
+  				}
+  			}
+  		}
+	}
+	return $anzahl_lines_max;
+  }
+  
   //oesi - Bei Tabellen wird die Hoehe der Row im vorhinein berechnet
   function BerechneTabellenHoehe($child)
   {
@@ -83,90 +168,17 @@ class FO_LayoutObject extends FO_FlowContainer {
   	//alle Zellen durchlaufen
   	foreach($child->childNodes as $cell)
   	{
-  		if($cell->childNodes)
-  		{
-	  		foreach($cell->childNodes as $block)
-	  		{
-	  			//Blockelement heraussuchen
-	  			if($block->nodeName=='fo:block')
-	  			{
-	  				//Width des block Elements holen
-	  				if($block->attributes->getNamedItem('content-width'))
-	  				{
-	  					//Schriftgroesse des Elements holen bzw des uebergeordneten
-	  					if($block->attributes->getNamedItem('font-size'))
-	  						$font_size=$block->attributes->getNamedItem('font-size')->nodeValue;
-	  					else 
-	  						$font_size=$this->getContext("font-size");
-	  					
-	  					//wenn schriftgroesse in pt angegeben ist dann in mm umrechnen
-	  					if(strstr($font_size,'pt'))
-	  						$font_size = $font_size/72*25.4;
-		  		 		$content_width = $block->attributes->getNamedItem('content-width')->nodeValue;
-		  				//$output .= $block->nodeValue;
-		  				
-		  				$anzahl_lines=0;
-		  				//sonderzeichen konvertieren
-		  				$line = $this->convert($block->nodeValue);
-		  				
-		  				//Damit bei den Fussnoten am Zeugnis das Sonderzeichen nicht als 5 Zeichen gezaehlt wird
-		  				//wird hier einfach das erste Zeichen ersetzt
-		  				$line = '1'.substr($line, 1);
-		  				//Zeilenumbrueche loeschen
-		  				$line = str_replace("\n",'', trim($line));
-		  				//Lines nach Newlines splitten
-		  				$lines = explode('\n', $line);
-		  				foreach ($lines as $line)
-		  				{
-		  					if($line!='')
-		  					{
-				  				do
-				  				{
-				  					/*$x = $this->getContext("x");
-									$x2 = $this->getContext("startx");
-									if (!$x2) {
-									  $x2 = $x;
-									}*/
-									//echo "x2:$x2<br>";
-									
-				  					$w = $content_width-1;
-				  					
-				  					//Anzahl der zeichen holen die in dieser zeile noch platz haben
-					  				$noc = $pdf->GetNumberOfChars($w, $line, $font_size);
-					  				//wenn das wort nicht abgeteilt werden kann dann ueber den rand hinausschreiben
-					  				if($noc==-1)
-					  					$noc = strlen($line);
-					  				//Zeile abteilen
-					  				$showLine = substr($line, 0, $noc);
-					  				
-					  				$output.= "w=$w noc=$noc fontsize=$font_size<br>$showLine ($line)";
-					  				
-									//$textWidth = $pdf->GetStringWidth($showLine);
-									//Rest der Line als neue Line
-									$line = trim(substr($line, $noc));
-									//Anzahl der verbleibenden zeichen ermitteln
-									$width = strlen($line); //$pdf->GetNumberOfChars($w, $line, $font_size);
-									$anzahl_lines++;
-				  				} while($width>0);
-		  					}
-		  				}
-						$output.= " Breaks $anzahl_lines <br><br>";
-						//Wenn die Anzahl der benoetigten Zeilen in dieser Zelle
-						//Groesser als die bisher groesste ist dann aendern
-						if($anzahl_lines_max<$anzahl_lines)
-		  					$anzahl_lines_max = $anzahl_lines;
-		  				break;
-	  				}
-	  			}
-	  		}
-  		}
+  		$anzahl_lines_max = $this->BerechneZellenHoehe($cell, $anzahl_lines_max);
   	}  		
   	//Groesse der Zellen in Globale Variable schreiben
   	$max_line_height_for_that_row = $anzahl_lines_max;
   	//echo $output." - Line breaks $anzahl_lines_max times<br>";
   }
   
+ 
+  		
   function parse(DOMNode $node) {
+  	global $max_line_height_for_that_cell;
     //set default attributes
     $this->initDefaultAttributes($node);
     $this->initAttributes($node);
@@ -211,6 +223,9 @@ class FO_LayoutObject extends FO_FlowContainer {
       		//oesi - Bei Table-rows im vorhinein die hoehe berechnen
       		if($child->nodeName=='fo:table-row')
       			$this->BerechneTabellenHoehe($child);
+      		//oesi - Bei Table-cell im vorhinein die hoehe berechnen
+      		if($child->nodeName=='fo:table-cell')
+      			$max_line_height_for_that_cell = $this->BerechneZellenHoehe($child,0);
 			$this->processChildNode($child, $this->getChildNodes());
       	}
     }
