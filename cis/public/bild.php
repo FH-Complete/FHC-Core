@@ -39,17 +39,21 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 		if($row = $db->db_fetch_object($result))
 		{
 			if($row->foto!='')
-				$cTmpHEX=$row->foto;
+		  		$cTmpHEX=$row->foto;
 		}
 	}
 }
+#exit($cTmpHEX);
 		
 //die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
 //von pdfs kommen kann.
 $im = @imagecreatefromstring(base64_decode($cTmpHEX));
-if($im!==false)
+if($im!=false)
 {
-	@ob_clean();
+	
+  exit('dfsd');
+  
+  @ob_clean();
 	header("Content-type: image/jpeg");
 	exit(imagejpeg($im));
 }
@@ -57,8 +61,9 @@ else
 {
 	//bei manchen Bildern funktioniert die konvertierung nicht
 	//diese werden dann einfach so angezeigt.
-	@ob_clean();
+	  @ob_clean();
    	header("Content-type: image/gif");
-	exit(base64_decode($cTmpHEX));
+	  exit(base64_decode($cTmpHEX));
+    
 }
 ?>

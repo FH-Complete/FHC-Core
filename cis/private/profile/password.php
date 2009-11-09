@@ -26,8 +26,8 @@
 	}
    }
 ?>
-<font class="h1"><b>Änderung des Technikum Wien Passwortes</b></font>
-<p>Sie können mit diesem Formular Ihr Technikum Wien Passwort ändern.<br>
+<font class="h1"><b>Änderung des FH Technikum Wien Passwortes</b></font>
+<p>Sie können mit diesem Formular Ihr FH Technikum Wien Passwort ändern.<br>
 Es wird sowohl Ihr Windows als auch Ihr Unix bzw. Mail Passwort geändert!</p>
 <form method="POST" action="changepass.php">
   <table><tr><td>Username:</td>
