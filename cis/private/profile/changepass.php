@@ -82,7 +82,7 @@
 	}
 	else
 	{
-		echo "Der Technikum Wien LDAP Server ist zur Zeit nicht erreichbar!";
+		echo "Der FH Technikum Wien LDAP Server ist zur Zeit nicht erreichbar!";
 	}
 	echo '<meta http-equiv="refresh" content="5; URL=https://cis.technikum-wien.at/profile/password.php">';
 ?>
