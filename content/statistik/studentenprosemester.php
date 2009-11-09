@@ -39,8 +39,7 @@ foreach ($studiengang->result as $row)
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel.' ('.$row->kurzbzlang.')';
 
 $qry = "
-	SELECT
-		stdlvb.studiengang_kz,
+	SELECT stdlvb.studiengang_kz,
 		count(*) AS all,
 		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=1 AND studiengang_kz=stdlvb.studiengang_kz ) AS s1,
 		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=2 AND studiengang_kz=stdlvb.studiengang_kz ) AS s2,
@@ -51,12 +50,14 @@ $qry = "
 		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=7 AND studiengang_kz=stdlvb.studiengang_kz ) AS s7,
 		(SELECT count(*) FROM tbl_studentlehrverband WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND semester=8 AND studiengang_kz=stdlvb.studiengang_kz ) AS s8
 	FROM
-		tbl_studentlehrverband stdlvb JOIN tbl_studiengang USING(studiengang_kz)
+		tbl_studentlehrverband stdlvb JOIN tbl_studiengang USING(studiengang_kz) 
 	WHERE
-		studiensemester_kurzbz='".addslashes($stsem)."' AND semester>0 AND semester<9 AND aktiv
+		studiensemester_kurzbz='".addslashes($stsem)."' AND semester>0 AND semester<9 AND aktiv 
+		
 	GROUP BY typ, kurzbz, studiengang_kz
 	ORDER BY typ, kurzbz, studiengang_kz
 ";
+
 if(!$result = $db->db_query($qry))
 	die('Fehler bei Datenbankabfrage');
 
@@ -128,11 +129,7 @@ else
 	</style>
 	</head>
 	<body class="Background_main">';
-
-
-
-	echo "<h2>Studenten / Semester</h2>";
-
+	echo "<h2>Studenten / Semester (inkl. Absolventen,Diplomanten,Abbrecher,Unterbrecher,...)</h2>";
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>'.$stsem.'</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>Gesamt</th></tr>';
 
 	while($row = $db->db_fetch_object($result))
