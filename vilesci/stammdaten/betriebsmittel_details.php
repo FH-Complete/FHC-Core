@@ -39,10 +39,8 @@
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
-	
-	
-	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Rechte für diese Seite');
+	if(!$rechte->isBerechtigt('basis/betriebsmittel'))
+		die('Sie haben keine Rechte fuer diese Seite');
 	
 	$reloadstr = "";  // neuladen der liste im oberen frame
 	$htmlstr = "";
@@ -75,42 +73,13 @@
 
    	$bmpupdatevon=isset($_POST["bmpupdatevon"])?$_POST["bmpupdatevon"]:$user;
    	$bmpinsertvon=isset($_POST["bmpinsertvon"])?$_POST["bmpinsertvon"]:$user;
-	
-	if(isset($_GET['standard']))
-	{
-		$stsem_obj = new studiensemester();
-		$stsem = $stsem_obj->getaktorNext();
 		
-		$qrys = array(
-			"Insert into public.tbl_variable(name, uid, wert) values('semester_aktuell','$uid','$stsem');",
-			"Insert into public.tbl_variable(name, uid, wert) values('db_stpl_table','$uid','stundenplandev');",
-			"Insert into public.tbl_variable(name, uid, wert) values('ignore_kollision','$uid','false');",
-			"Insert into public.tbl_variable(name, uid, wert) values('kontofilterstg','$uid','false');",
-			"Insert into public.tbl_variable(name, uid, wert) values('ignore_zeitsperre','$uid','false');",
-			"Insert into public.tbl_variable(name, uid, wert) values('ignore_reservierung','$uid','false');"
-			);
-					
-		$error = false;
-		foreach ($qrys as $qry)
-		{
-			if(!$db->db_query($qry))
-			{
-				$error = true;
-			}
-		}
-		
-		if($error)
-		{
-			$errorstr.="Es konnten nicht alle Werte angelegt werden";
-		}
-		
-		$reloadstr .= "<script type='text/javascript'>\n";
-		$reloadstr .= "	parent.uebersicht.location.href='variablen_uebersicht.php';";
-		$reloadstr .= "</script>\n";
-	}
-	
 	if(isset($_POST["schick"]))
 	{
+		
+		if(!$rechte->isBerechtigt('basis/betriebsmittel', null, 'suid'))
+			die('Sie haben keine Rechte fuer diese Aktion');
+		
 		if($betriebsmittel_id!='')
 		{
 			$bm=new betriebsmittel();
@@ -221,6 +190,7 @@
 <html>
 <head>
 <title>Betriebsmitel-Details</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
