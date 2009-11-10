@@ -34,8 +34,8 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin'))
-	die('Sie haben keine Berechtigung für diese Seite');
+if(!$rechte->isBerechtigt('basis/betriebsmittel'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $htmlstr = "";
 	
