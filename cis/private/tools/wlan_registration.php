@@ -20,7 +20,7 @@
 	  	<td>
 		  <p>
 		  	Die WLAN-Registration entfällt durch den Einsatz von OpenVPN im WLAN Netzwerk.
-		  	<br /><br /><a class="Item" href="http://helios.technikum-wien.at/" target="_blank">Details zum Verbinden mittels OpenVPN (nur aus dem Technikum-Wien LAN, bzw. dem TWWLAN erreichbar)</a>
+		  	<br /><br /><a class="Item" href="http://helios.technikum-wien.at/" target="_blank">Details zum Verbinden mittels OpenVPN (nur aus dem FH Technikum-Wien LAN, bzw. dem TWWLAN erreichbar)</a>
 
 			<br /><br />Bei etwaigen Problemen stehen wir Ihnen gerne per Mail unter <a class="Item" href="mailto:wlan@technikum-wien.at">wlan@technikum-wien.at</a> zur Verfügung.
 		</td>
