@@ -52,14 +52,13 @@ if($result = $db->db_query($qry))
 {
 	if($db->db_num_rows($result)>0)
 	{
-##		$message = "Dies ist eine automatische Mail!\n";
+		//$message = "Dies ist eine automatische Mail!\n";
 		$message = "Dies ist eine automatische Nachricht!\n\n";
 		$message .= "Folgende Studenten/Mitarbeiter wurden im FAS deaktiviert: \n\n";
 		while($row = $db->db_fetch_object($result))
 		{
 			$message .= " - $row->titelpre $row->vorname $row->nachname $row->titelpost ( $row->uid )\n";
 		}
-
 		$message = "\n";
 		$message = "Mit freundlichen Grüßen\n";
 		$message = "Fachhochschule Technikum Wien\n";
@@ -83,10 +82,12 @@ if($result = $db->db_query($qry))
 	
 */	
 $qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam=CURRENT_DATE- interval '1 week'";
+##$qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false limit 120";
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
+/*	
 		$message = "Dies ist eine automatische Nachricht!\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
 		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
@@ -115,8 +116,53 @@ if($result = $db->db_query($qry))
 		$message .= "Mit freundlichen Grüßen\n";
 		$message .= "Fachhochschule Technikum Wien\n";
 		$message .= "Höchstädtplatz 5\n";
-		$message .= "1200 Wien\n";				
+		$message .= "1200 Wien\n";		
+*/				
 
+		if($row->mitarbeiter!='')
+		{
+			//Mitarbeiter
+			$message = "Dies ist eine automatische Nachricht!\n";
+			$message .= "\n";
+			$message .= "Ihr Benutzerdatensatz wurde deaktiviert! Damit wurden Sie auch aus allen Email-Verteilern gelöscht. Wenn innerhalb einer Frist von 12 Monaten nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+			$message .= "-	Ihr Account wird gelöscht werden\n";
+			$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
+			$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
+			$message .= "\n";
+			$message .= "Sollte es sich bei der Deaktivierung um einen Irrtum handeln, wenden Sie sich bitte an die KollegInnen in der Personalabteilung:\n";
+			$message .= "Nicole Sagmeister, nicole.sagmeister@technikum-wien.at\n";
+			$message .= "Mag. Orestis Kazamias, orestis.kazamias@technikum-wien.at\n";
+			$message .= "\n";
+			$message .= "Mit freundlichen Grüßen\n";
+			$message .= "\n";
+			$message .= "Fachhochschule Technikum Wien\n";
+			$message .= "Höchstädtplatz 5\n";
+			$message .= "1200 Wien \n";
+			$message .= "\n";
+			$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.";
+		}
+		else
+		{
+			//Student
+			$message = "Dies ist eine automatische Nachricht!\n";
+			$message .= "\n";
+			$message .= "Ihr Benutzerdatensatz wurde deaktiviert! Damit wurden Sie auch aus allen Email-Verteilern gelöscht. Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+			$message .= "-	Ihr Account wird gelöscht werden\n";
+			$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
+			$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
+			$message .= "\n";
+			$message .= "Sollte es sich bei der Deaktivierung um einen Irrtum handeln, wenden Sie sich bitte umgehend an Ihre Studiengangsassistenz.\n";
+			$message .= "\n";
+			$message .= "Mit freundlichen Grüßen\n";
+			$message .= "\n";
+			$message .= "Fachhochschule Technikum Wien\n";
+			$message .= "Höchstädtplatz 5\n";
+			$message .= "1200 Wien\n";
+			$message .= "\n";
+			$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
+		}
+
+		
 		$to = $row->uid.'@'.DOMAIN;
 		//$to = 'oesi@technikum-wien.at';
 		//$to = 'sequens@technikum-wien.at';
@@ -133,14 +179,17 @@ if($result = $db->db_query($qry))
 	
 */	
 
+
+
 //**************** Abbrecher
 $qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_ABBRECHER_WEEKS." week'
-		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'";
+		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'  ";
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
+/*	
 		$message = "Dies ist eine automatische Nachricht!\n\n";
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
 		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
@@ -149,19 +198,36 @@ if($result = $db->db_query($qry))
 		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.\n";
 		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.\n";
-		
 		$message .= "\n";
-
 		$message .= "Mit freundlichen Grüßen\n";
 		$message .= "Fachhochschule Technikum Wien\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "1200 Wien\n";		
-
+*/
+		$message = "Dies ist eine automatische Nachricht!\n";
+		$message .= "\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz".(DEL_ABBRECHER_WEEKS > 1?" wird in den nächsten ".DEL_ABBRECHER_WEEKS." Wochen ":" wird nach einer Woche ")."deaktiviert werden! Damit werden Sie auch aus allen Email-Verteilern gelöscht werden. Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+		$message .= "-	Ihr Account wird gelöscht werden\n";
+		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
+		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
+		$message .= "\n";
+		$message .= "Sollte es sich bei der bevorstehenden Deaktivierung um einen Irrtum handeln, wenden Sie sich bitte an Ihre Studiengangsassistenz.\n";
+		$message .= "\n";
+		$message .= "Mit freundlichen Grüßen\n";
+		$message .= "\n";
+		$message .= "Fachhochschule Technikum Wien\n";
+		$message .= "Höchstädtplatz 5\n";
+		$message .= "1200 Wien \n";
+		$message .= "\n";
+		$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
+		
+		
 		$to = $row->uid.'@'.DOMAIN;
 		//$to = 'oesi@technikum-wien.at';
 		//$to = 'sequens@technikum-wien.at';
 		
-		$mail = new mail($to, 'vilesci@'.DOMAIN, 'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
+		$mail = new mail($to,'vilesci@'.DOMAIN,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
+		$mail->send();
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
 }
@@ -174,8 +240,8 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
+/*	
 		$message = "Dies ist eine automatische Nachricht!\n\n";
-
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
 		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
 		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
@@ -184,13 +250,28 @@ if($result = $db->db_query($qry))
 		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.\n\n";
 		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.\n";
 		$message .= "\n";
-
 		$message .= "Mit freundlichen Grüßen\n";
 		$message .= "Fachhochschule Technikum Wien\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "1200 Wien\n";		
-
-
+*/
+		$message = "Dies ist eine automatische Nachricht!\n";
+		$message .= "\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz".(DEL_STUDENT_WEEKS > 1?" wird in den nächsten ".DEL_STUDENT_WEEKS." Wochen ":" wird nach einer Woche ")."deaktiviert werden! Damit werden Sie auch aus allen Email-Verteilern gelöscht werden. Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+		$message .= "-	Ihr Account wird gelöscht werden\n";
+		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
+		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
+		$message .= "\n";
+		$message .= "Sollte es sich bei der bevorstehenden Deaktivierung um einen Irrtum handeln, wenden Sie sich bitte an Ihre Studiengangsassistenz.\n";
+		$message .= "\n";
+		$message .= "Mit freundlichen Grüßen\n";
+		$message .= "\n";
+		$message .= "Fachhochschule Technikum Wien\n";
+		$message .= "Höchstädtplatz 5\n";
+		$message .= "1200 Wien \n";
+		$message .= "\n";
+		$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
+		
 		$to = $row->uid.'@'.DOMAIN;
 		//$to = 'oesi@technikum-wien.at';
 		//$to = 'sequens@technikum-wien.at';
@@ -204,13 +285,14 @@ if($result = $db->db_query($qry))
 
 //**************** Mitarbeiter
 $qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE
-		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_MITARBEITER_WEEKS." week'";
+		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_MITARBEITER_WEEKS." week' ";
+
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
+/*	
 		$message = "Dies ist eine automatische Nachricht!\n\n";
-		
 		$message .= "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?\n\n";
 		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.\n";
 		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
@@ -221,13 +303,30 @@ if($result = $db->db_query($qry))
 		$message .= "Nicole Sagmeister - sagmeister@technikum-wien.at\n";
 		$message .= "Orestis Kazamias - kazamias@technikum-wien.at\n\n";
 		$message .= "\n";
-
 		$message .= "Mit freundlichen Grüßen\n";
 		$message .= "Fachhochschule Technikum Wien\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "1200 Wien\n";		
-
-
+*/
+		$message = "Dies ist eine automatische Nachricht!\n";
+		$message .= "\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz".(DEL_MITARBEITER_WEEKS > 1?" wird in den nächsten ".DEL_MITARBEITER_WEEKS." Wochen ":" wird nach einer Woche ")."deaktiviert werden! Damit werden Sie auch aus allen Email-Verteilern gelöscht werden. Wenn innerhalb einer Frist von 12 Monaten nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+		$message .= "-	Ihr Account wird gelöscht werden\n";
+		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
+		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
+		$message .= "\n";
+		$message .= "Sollte es sich bei der bevorstehenden Deaktivierung um einen Irrtum handeln, wenden Sie sich bitte umgehend an die KollegInnen in der Personalabteilung:\n";
+		$message .= "Nicole Sagmeister, nicole.sagmeister@technikum-wien.at\n";
+		$message .= "Mag. Orestis Kazamias, orestis.kazamias@technikum-wien.at\n";
+		$message .= "\n";
+		$message .= "Mit freundlichen Grüßen\n";
+		$message .= "\n";
+		$message .= "Fachhochschule Technikum Wien\n";
+		$message .= "Höchstädtplatz 5\n";
+		$message .= "1200 Wien \n";
+		$message .= "\n";
+		$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
+		
 		$to = $row->uid.'@'.DOMAIN;
 		//$to = 'oesi@technikum-wien.at';
 		//$to = 'sequens@technikum-wien.at';
@@ -238,9 +337,8 @@ if($result = $db->db_query($qry))
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
 	}
 }
-
 echo nl2br($text);
-//$text='';
+		//$text='';
 if($text!='')
 {
 	$mail = new mail(MAIL_IT.', tw_ht@technikum-wien.at, schmuderm@technikum-wien.at, vilesci@technikum-wien.at', 'vilesci@'.DOMAIN, 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text);
