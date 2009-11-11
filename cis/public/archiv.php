@@ -35,7 +35,7 @@
   for ($i=1999;$i<Date('Y');$i++)
   {
 
-  		$cSuchVerzeichnis='../cis'.$i.$cMonat;
+  		$cSuchVerzeichnis='../../cis'.$i.$cMonat;
 		//echo "<br>Check $cSuchVerzeichnis ::: ";
   		if (is_dir($cSuchVerzeichnis))
 		{
@@ -104,7 +104,7 @@
 
 		for ($i=$iStartJahr;$i<=$iEndeJahr;$i++)
 		{
-			$cSuchVerzeichnis='../cis'.$i.$cMonat;
+			$cSuchVerzeichnis='../../cis'.$i.$cMonat;
 			echo '<tr><td><a href="'.$cSuchVerzeichnis.'" target="_parent">Archiv '.$i.'</a></td></tr>';
 		}
 ?>	  
