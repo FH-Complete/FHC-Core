@@ -32,7 +32,7 @@ require_once('../include/mail.class.php');
 
 $db = new basis_db();
 $text='';
-
+$wochen_zum_entfernen=1;
 echo '
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<html>
@@ -47,7 +47,6 @@ echo '
 
 //Information an Bibliothek wenn ein Account deaktiviert wurde
 $qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter, titelpre, vorname, nachname, titelpost FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) WHERE tbl_benutzer.aktiv=false AND updateaktivam=CURRENT_DATE- interval '3 days'";
-
 if($result = $db->db_query($qry))
 {
 	if($db->db_num_rows($result)>0)
@@ -81,7 +80,8 @@ if($result = $db->db_query($qry))
 	-----               Alle die vor einer Woche inaktiv gesetzt wurden darueber informieren
 	
 */	
-$qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam=CURRENT_DATE- interval '1 week'";
+
+$qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam=CURRENT_DATE- interval '".$wochen_zum_entfernen." week'";
 ##$qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter FROM public.tbl_benutzer WHERE aktiv=false limit 120";
 if($result = $db->db_query($qry))
 {
@@ -206,7 +206,7 @@ if($result = $db->db_query($qry))
 */
 		$message = "Dies ist eine automatische Nachricht!\n";
 		$message .= "\n";
-		$message .= "ACHTUNG: Ihr Benutzerdatensatz".(DEL_ABBRECHER_WEEKS > 1?" wird in den nächsten ".DEL_ABBRECHER_WEEKS." Wochen ":" wird nach einer Woche ")."deaktiviert werden! Damit werden Sie auch aus allen Email-Verteilern gelöscht werden. Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz wurde vor ".(DEL_ABBRECHER_WEEKS > 1?DEL_ABBRECHER_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
 		$message .= "-	Ihr Account wird gelöscht werden\n";
 		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
 		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
@@ -257,7 +257,7 @@ if($result = $db->db_query($qry))
 */
 		$message = "Dies ist eine automatische Nachricht!\n";
 		$message .= "\n";
-		$message .= "ACHTUNG: Ihr Benutzerdatensatz".(DEL_STUDENT_WEEKS > 1?" wird in den nächsten ".DEL_STUDENT_WEEKS." Wochen ":" wird nach einer Woche ")."deaktiviert werden! Damit werden Sie auch aus allen Email-Verteilern gelöscht werden. Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz  wurde vor ".DEL_STUDENT_WEEKS > 1?DEL_STUDENT_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
 		$message .= "-	Ihr Account wird gelöscht werden\n";
 		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
 		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
@@ -310,7 +310,7 @@ if($result = $db->db_query($qry))
 */
 		$message = "Dies ist eine automatische Nachricht!\n";
 		$message .= "\n";
-		$message .= "ACHTUNG: Ihr Benutzerdatensatz".(DEL_MITARBEITER_WEEKS > 1?" wird in den nächsten ".DEL_MITARBEITER_WEEKS." Wochen ":" wird nach einer Woche ")."deaktiviert werden! Damit werden Sie auch aus allen Email-Verteilern gelöscht werden. Wenn innerhalb einer Frist von 12 Monaten nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz  wurde vor ".DEL_MITARBEITER_WEEKS > 1?DEL_MITARBEITER_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
 		$message .= "-	Ihr Account wird gelöscht werden\n";
 		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
 		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
