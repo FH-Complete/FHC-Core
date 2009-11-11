@@ -28,9 +28,11 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/resturlaub.class.php');
+require_once('../../include/zeitsperre.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -58,18 +60,28 @@ function conf_del()
 ';
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
 $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 {
 	if(isset($_GET['del']) && isset($_GET['zeitsperre_id']))
 	{
-		//echo "<script type='text/javascript'>check=confirm('Wollen Sie diesen Eintrag wirklich löschen?');</script>";
-		$qry="DELETE FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$_GET['uid']."' AND zeitsperre_id='".$_GET['zeitsperre_id']."' ;";
-		if(!$db->db_query($qry))
+		if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+			die('Sie haben keine Berechtigung fuer diese Aktion');
+		
+		$zs_obj = new zeitsperre();
+		
+		if(!$zs_obj->delete($_GET['zeitsperre_id']))
 		{
 			die("Zeitsperren konnte nicht gelo&uml;scht werden!");
 		}
 	}
+	
 	$ma = new mitarbeiter();
 	$ma->load($_GET['uid']);
 	
@@ -101,64 +113,62 @@ if(isset($_GET['type']) && $_GET['type']=='edit' && isset($_GET['uid']))
 				</tr>
 			</table>
 		  </form>';
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	if($rechte->isBerechtigt('admin', '0', 'suid'))
+	
+	echo "<h3>Übersicht Zeitsperren</h3>";
+	echo "<input type='button' onclick='parent.lv_detail.location=\"resturlaub_details.php?neu=true&uid=$uid\"' value='Neu'/>";
+	echo"<table class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>
+	<thead>
+	<tr class='liste'>";
+	echo "<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th class='table-sortable:default'>ID</th>
+		  <th class='table-sortable:default'>Kurzbz</th>
+		  <th class='table-sortable:default'>Bezeichnung</th>
+		  <th class='table-sortable:default'>Von-Datum</th>
+		  <th class='table-sortable:default'>Von-Stunde</th>
+		  <th class='table-sortable:default'>Bis-Datum</th>
+		  <th class='table-sortable:default'>Bis-Stunde</th>
+		  <th class='table-sortable:default'>Vertretung</th>
+		  <th class='table-sortable:default'>Erreichbarkeit</th>
+		  <th class='table-sortable:default'>Freigabe</th>
+		  <th class='table-sortable:default'>Freigabedatum</th>\n";
+	echo "</tr></thead>";
+	echo "<tbody>";
+	$zeitsperre = new zeitsperre();
+	$zeitsperre->getzeitsperren($uid);
+	
+	if (count($zeitsperre->result>0))
 	{
-		echo "<h3>Übersicht Zeitsperren</h3>";
-		echo "<input type='button' onclick='parent.lv_detail.location=\"resturlaub_details.php?neu=true&uid=$uid\"' value='Neu'/>";
-		echo"<table class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>
-		<thead>
-		<tr class='liste'>";
-		echo "<th>&nbsp;</th>
-			<th>&nbsp;</th>
-			<th class='table-sortable:default'>ID</th>
-			  <th class='table-sortable:default'>Kurzbz</th>
-			  <th class='table-sortable:default'>Bezeichnung</th>
-			  <th class='table-sortable:default'>Von-Datum</th>
-			  <th class='table-sortable:default'>Von-Stunde</th>
-			  <th class='table-sortable:default'>Bis-Datum</th>
-			  <th class='table-sortable:default'>Bis-Stunde</th>
-			  <th class='table-sortable:default'>Vertretung</th>
-			  <th class='table-sortable:default'>Erreichbarkeit</th>
-			  <th class='table-sortable:default'>Freigabe</th>
-			  <th class='table-sortable:default'>Freigabedatum</th>\n";
-		echo "</tr></thead>";
-		echo "<tbody>";
-		$qry="SELECT * FROM campus.tbl_zeitsperre WHERE mitarbeiter_uid='".$uid."' ORDER BY vondatum DESC";
-		if(!$result_urlaub = $db->db_query($qry))
-			die("Zeitsperren nicht gefunden!");
-		$num_rows=$db->db_num_rows($result_urlaub);
-		if ($num_rows>0)
+		foreach($zeitsperre->result as $row_urlaub)
 		{
-			for($i=0;$i<$num_rows;$i++)
-			{
-				$row_urlaub=$db->db_fetch_object($result_urlaub);
-				echo "<tr>";
-				echo "<td><a href='resturlaub_details.php?zeitsperre_id=$row_urlaub->zeitsperre_id' target='lv_detail'>edit</a></td>";
-				echo "<td><a href='".$_SERVER['PHP_SELF']."?type=edit&del=true&uid=$uid&zeitsperre_id=$row_urlaub->zeitsperre_id' onclick='return conf_del()' target='uebersicht'>delete</a></td>";
-				echo "<td>".$row_urlaub->zeitsperre_id."</td>";
-				echo "<td>".$row_urlaub->zeitsperretyp_kurzbz."</td>";
-				echo "<td>".$row_urlaub->bezeichnung."</td>";
-				echo "<td>".$row_urlaub->vondatum."</td>";
-				echo "<td>".$row_urlaub->vonstunde."</td>";
-				echo "<td>".$row_urlaub->bisdatum."</td>";
-				echo "<td>".$row_urlaub->bisstunde."</td>";
-				echo "<td>".$row_urlaub->vertretung_uid."</td>";
-				echo "<td>".$row_urlaub->erreichbarkeit_kurzbz."</td>";
-				echo "<td>".$row_urlaub->freigabevon."</td>";
-				echo "<td>".$row_urlaub->freigabeamum."</td>";
-				echo "</td></tr>";
-			}
+			echo "<tr>";
+			echo "<td><a href='resturlaub_details.php?zeitsperre_id=$row_urlaub->zeitsperre_id' target='lv_detail'>edit</a></td>";
+			echo "<td><a href='".$_SERVER['PHP_SELF']."?type=edit&del=true&uid=$uid&zeitsperre_id=$row_urlaub->zeitsperre_id' onclick='return conf_del()' target='uebersicht'>delete</a></td>";
+			echo "<td>".$row_urlaub->zeitsperre_id."</td>";
+			echo "<td>".$row_urlaub->zeitsperretyp_kurzbz."</td>";
+			echo "<td>".$row_urlaub->bezeichnung."</td>";
+			echo "<td>".$row_urlaub->vondatum."</td>";
+			echo "<td>".$row_urlaub->vonstunde."</td>";
+			echo "<td>".$row_urlaub->bisdatum."</td>";
+			echo "<td>".$row_urlaub->bisstunde."</td>";
+			echo "<td>".$row_urlaub->vertretung_uid."</td>";
+			echo "<td>".$row_urlaub->erreichbarkeit_kurzbz."</td>";
+			echo "<td>".$row_urlaub->freigabevon."</td>";
+			echo "<td>".$row_urlaub->freigabeamum."</td>";
+			echo "</td></tr>";
 		}
-		else
-			echo "<tr><td colspan=5>Kein Eintrag gefunden!</td></tr>";
 	}
+	else
+		echo "<tr><td colspan=5>Kein Eintrag gefunden!</td></tr>";
+
 	exit;
 }
 
 if(isset($_GET['type']) && $_GET['type']=='save')
 {
+	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$resturlaub = new resturlaub();
 	
 	if($resturlaub->load($_GET['uid']))
