@@ -675,6 +675,11 @@
 					<td class="tdwrap"><a class="Item" href="public/info/handbuecher/index.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Handb&uuml;cher</a></td>
 				</tr>
 
+		  		<tr>
+			  		<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="public/archiv.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Liste der Archiv-Links LV-Info</a></td>
+				</tr>				
+				
 			  	</table>
 			</td>
 		</tr>
