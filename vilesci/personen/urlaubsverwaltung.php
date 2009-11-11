@@ -20,14 +20,11 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-		require_once('../../config/vilesci.config.inc.php');
-
 /**
  *
  * Seite zur Verwaltung der Urlaubs- und Zeitausgleichstage der Mitarbeiter
  */
-
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/zeitsperre.class.php');
 require_once('../../include/person.class.php');
@@ -35,8 +32,9 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 $user = get_uid();
 $datum = new datum();
@@ -81,7 +79,7 @@ echo '<html>
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin'))
+if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 //Formular zur Eingabe der UID
@@ -93,6 +91,9 @@ echo '</form>';
 //Loeschen von Zeitsperren
 if($action=='delete')
 {
+	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+		die('Sie haben keine Berechtigung für diese Aktion');
+	
 	if($zeitsperre_id!='' && is_numeric($zeitsperre_id))
 	{
 		$zeitsperre = new zeitsperre();
@@ -107,6 +108,9 @@ if($action=='delete')
 
 if(isset($_POST['save']))
 {
+	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+		die('Sie haben keine Berechtigung für diese Aktion');
+	
 	//Speichern der Daten
 	$zeitsperre = new zeitsperre();
 	
@@ -324,4 +328,6 @@ if($uid!='')
 	echo '</td></tr></table>';
 	echo '</form>';
 }
+
+echo '</body></html>';
 ?>
