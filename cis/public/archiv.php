@@ -32,7 +32,12 @@
   $cMonat='08';
 
 // bsp. Verzeichnis der Archivierung fuer das Jahr 2006  http://cis.technikum-wien.at/cis200608/
-  for ($i=1999;$i<Date('Y');$i++)
+
+  $iEnde=Date('Y')-1;
+  if (Date('m') > 8)
+	  $iEnde=Date('Y');
+  
+  for ($i=1999;$i<=Date('Y');$i++)
   {
 
   		$cSuchVerzeichnis='../../cis'.$i.$cMonat;
