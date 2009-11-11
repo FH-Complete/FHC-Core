@@ -257,7 +257,7 @@ if($result = $db->db_query($qry))
 */
 		$message = "Dies ist eine automatische Nachricht!\n";
 		$message .= "\n";
-		$message .= "ACHTUNG: Ihr Benutzerdatensatz  wurde vor ".DEL_STUDENT_WEEKS > 1?DEL_STUDENT_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz  wurde vor ".(DEL_STUDENT_WEEKS > 1?DEL_STUDENT_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
 		$message .= "-	Ihr Account wird gelöscht werden\n";
 		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
 		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
@@ -310,7 +310,7 @@ if($result = $db->db_query($qry))
 */
 		$message = "Dies ist eine automatische Nachricht!\n";
 		$message .= "\n";
-		$message .= "ACHTUNG: Ihr Benutzerdatensatz  wurde vor ".DEL_MITARBEITER_WEEKS > 1?DEL_MITARBEITER_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
+		$message .= "ACHTUNG: Ihr Benutzerdatensatz  wurde vor ".(DEL_MITARBEITER_WEEKS > 1?DEL_MITARBEITER_WEEKS." Wochen ":"einer Woche ")."deaktiviert! Damit werden Sie auch aus allen Email-Verteilern gelöscht. Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:\n";
 		$message .= "-	Ihr Account wird gelöscht werden\n";
 		$message .= "-	Ihre Mailbox mit sämtlichen Mails wird gelöscht werden\n";
 		$message .= "-	Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht werden\n";
