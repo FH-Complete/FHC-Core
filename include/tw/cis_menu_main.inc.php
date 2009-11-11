@@ -678,7 +678,7 @@
 		  		<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="public/archiv.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Archiv-Links LV-Info</a></td>
-				</tr>				
+				</tr>				 
 				
 			  	</table>
 			</td>
