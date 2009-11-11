@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+	    Alexander Nimmervoll	< nimm@technikum-wien.at >
  */
 /**
  * Generiert ein Updatefile fuer das Zutrittskartensystem
@@ -28,17 +29,12 @@ require_once('../../../../include/basis_db.class.php');
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-// Mail Headers festlegen
-$headers= "MIME-Version: 1.0\r\n";
-$headers.="Content-Type: text/html; charset=UTF-8\r\n";
-
 $sipass=array();
 $i=0;
 $k=0;
 $key_nummer=0;
 $update=false;
 $custom=array(array());
-$doppelte=array();
 $error=false;
 $fausgabe='<table>';
 
@@ -81,12 +77,14 @@ $qry="SELECT * FROM asco.employee LEFT OUTER JOIN asco.access_groups ON (asco.em
 if($result_ext = mssql_query($qry,$conn_ext))
 {
 	while($row=mssql_fetch_object($result_ext))
-	{
+	{	
+
+		//if ((int)$row->card_no==2147483647)  print "######".$row->emp_id." ####".$row->card_no."\n";
 		$sipass[$i]->command='';
 		$sipass[$i]->reference=$row->reference;
 		$sipass[$i]->last_name=$row->last_name;
 		$sipass[$i]->first_name=$row->first_name;
-		$sipass[$i]->card_no=(int)$row->card_no;
+		$sipass[$i]->card_no=$row->card_no;
 		$sipass[$i]->start_date=date('d.m.Y',strtotime($row->start_date));
 		$sipass[$i]->end_date=date('d.m.Y',strtotime($row->end_date));
 		$sipass[$i]->acc_grp_name=$row->acc_grp_name;
@@ -122,120 +120,82 @@ else
 	die("SiPass-Abfrage fehlgeschlagen!");
 }
 
-//mehrfach vergebene karten
-$qry="SELECT bmp.person_id as person2, bmp.nachname as nachname2,bmp.nummer as nummer2, bmp.vorname as vorname2, bmp.ausgegebenam as ausgegebenam2, bmp.insertamum AS insertamum2,
-		public.vw_betriebsmittelperson.person_id AS person1, public.vw_betriebsmittelperson.nachname as nachname1, public.vw_betriebsmittelperson.nummer as nummer1,
-		public.vw_betriebsmittelperson.vorname as vorname1, public.vw_betriebsmittelperson.ausgegebenam as ausgegebenam1, public.vw_betriebsmittelperson.insertamum AS insertamum1
-	 FROM public.vw_betriebsmittelperson bmp
-	 JOIN public.vw_betriebsmittelperson ON (bmp.nummer::bigint=public.vw_betriebsmittelperson.nummer::bigint)
-	 WHERE (trim(bmp.nachname)!=trim(public.vw_betriebsmittelperson.nachname) OR (trim(bmp.vorname)!=trim(public.vw_betriebsmittelperson.vorname)))
-	 AND public.vw_betriebsmittelperson.betriebsmitteltyp='Zutrittskarte' AND bmp.betriebsmitteltyp='Zutrittskarte'
-	 AND public.vw_betriebsmittelperson.benutzer_aktiv AND public.vw_betriebsmittelperson.retouram IS NULL AND bmp.benutzer_aktiv AND bmp.retouram IS NULL
-	 AND bmp.person_id<public.vw_betriebsmittelperson.person_id
-	 ORDER BY bmp.nachname;";
-if($result = $db->db_query($qry))
-{
-	$fausgabe.='<tr><th>PersonID</th><th>Nachname</th><th>vorname</th><th>BetriebsmittelNr</th><th>AusgabeAm</th><th>InsertAmUm</th></tr>';
-	while($row=$db->db_fetch_object($result))
-	{
-		//echo "<br>".$row->person2.", ".$row->nachname2.", ".$row->vorname2.", ".$row->nummer2.", ".$row->person1.", ".$row->nachname1.", ".$row->vorname1.", ".$row->nummer1;
-		//$error=true;
-		if(!in_array($row->nummer1,$doppelte))
-		{
-			$doppelte[$k]=$row->nummer1;
-			$fausgabe.='<tr><td>'.$row->person1.'</td><td>'.$row->nachname1.'</td><td>'.$row->vorname1.'</td><td>'.$row->nummer1.'</td><td>'.$row->ausgegebenam1.'</td><td>'.$row->insertamum1.'</td></tr>';
-			$fausgabe.='<tr><td>'.$row->person2.'</td><td>'.$row->nachname2.'</td><td>'.$row->vorname2.'</td><td>'.$row->nummer2.'</td><td>'.$row->ausgegebenam2.'</td><td>'.$row->insertamum2.'</td></tr><tr></tr>';
-			$k++;
-		}
-	}
-	$fausgabe.='</table>';
-}
-else 
-{
-	die("Abfrage mehrfach vergebener Karten fehlgeschlagen!");
-}
+$ldap_host="pdc1.technikum-wien.at";
+$ldap_port=389;
+$ldap_basedn="ou=People,dc=technikum-wien,dc=at";
 
-//Osobsky Michael studiert BEE und MIE - wird daher nicht synchronisiert
-//Incoming Park Dah-We belegt LVs im Haus und in BEE - keine Synchronisation
-$qry="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName,nummer as CardNumber, matrikelnr, uid, 
-			kurzbzlang,tbl_studiengang.kurzbz,typ, personalnummer, lektor,
-		EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
-		EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
-		EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
-	FROM public.vw_betriebsmittelperson
-		 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
-		 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
-	WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
-	AND NOT(trim(upper(nachname))='OSOBSKY' AND trim(upper(vorname))='MICHAEL')
-	AND NOT(trim(upper(nachname))='PARK' AND trim(upper(vorname))='DAH-WE')
-	ORDER  BY vw_betriebsmittelperson.person_id,nummer,personalnummer,matrikelnr";
-//abhanden gekommene karten???
 
-if($result = $db->db_query($qry))
+$ldap_conn = ldap_connect("pdc1.technikum-wien.at",389);
+ldap_set_option($ldap_conn,LDAP_OPT_PROTOCOL_VERSION,3);
+$ldap_result = ldap_bind($ldap_conn);
+
+$ldap_search="(departmentNumber=*)";
+$ldap_result=ldap_search($ldap_conn, $ldap_basedn, $ldap_search);
+
+for ($ldapentry=ldap_first_entry($ldap_conn,$ldap_result);$ldapentry!=false;$ldapentry=ldap_next_entry($ldap_conn,$ldapentry))
 {
-	while($row=$db->db_fetch_object($result))
-	{
-		if(trim($row->kurzbzlang)=='AK')
-		{
-			//Da AKs erst bis zur BIS-Meldung abschlißen müssen, hat bei ihnen Bachelorinskription Vorrang
-			$qry1="SELECT DISTINCT ON (vw_betriebsmittelperson.person_id, nummer) nachname as LastName, vorname as FirstName, nummer as CardNumber, 
-						matrikelnr, uid, kurzbzlang, tbl_studiengang.kurzbz,typ, personalnummer, lektor,
-					EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
-					EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
-					EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
-				FROM public.vw_betriebsmittelperson
-					 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
-					 LEFT OUTER JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
-				WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
-					AND kurzbzlang!='AK' AND nummer='$row->cardnumber' AND nachname='$row->lastname' AND vorname='$row->firstname'";
-			if($result1 = $db->db_query($qry1))
-			{
-				if($db->db_num_rows($result1)>0)
-				{
-					if($row1=$db->db_fetch_object($result1))
-					{
-						$row->uid=trim($row1->uid);
-						$row->matrikelnr=trim($row1->matrikelnr);
-						$row->kurzbzlang=$row1->kurzbzlang;
-						$row->kurzbz=$row1->kurzbz;
-						$row->typ=$row1->typ;
-					}
-				}
-			}
-		}
-		
-		//Nachname und Vorname auf LATIN9 konvertieren
-		$row->lastname = iconv('UTF-8','ISO-8859-15',$row->lastname);
-		$row->firstname = iconv('UTF-8','ISO-8859-15',$row->firstname);
-		
+     $uids=ldap_get_values($ldap_conn,$ldapentry,"uid");
+     $uid=$uids[0];
+
+     $sns=ldap_get_values($ldap_conn,$ldapentry,"sn");
+     $sn=$sns[0];
+
+     $givennames=ldap_get_values($ldap_conn,$ldapentry,"givenname");
+     $givenname=$givennames[0];
+
+     $gids=ldap_get_values($ldap_conn,$ldapentry,"gidnumber");
+     $gid=$gids[0];
+
+     $emplnrs=ldap_get_attributes($ldap_conn,$ldapentry);
+     if (isset($emplnrs["employeenumber"]))
+     {
+        $matrikelnummer=ldap_get_values($ldap_conn,$ldapentry,"employeenumber");
+	$matrikelnr=$matrikelnummer[0];
+     }
+     else 
+     {
+	$matrikelnr='';
+     }
+    
+     $ous=@ldap_get_values($ldap_conn,$ldapentry,"ou");
+     $stg_kurzbz="";
+     if ($ous)
+     {
+        for ($k=0;$k<$ous["count"];$k++)
+        {
+		if (strlen($ous[$k])==3) $stg_kurzbz=$ous[$k];
+        }
+     }
+
+     $ldapnumbers=ldap_get_values($ldap_conn,$ldapentry,"departmentnumber");
+
+     for ($n=0; $n < $ldapnumbers["count"]; $n++)
+     {
 		$update=false;
-		$stg_kurzbz=strtoupper(trim($row->typ).trim($row->kurzbz));
-		$row->cardnumber=(int)$row->cardnumber;
-		//doppelte ueberspringen
-		if(in_array($row->cardnumber,$doppelte))
-		{
-			continue;
-		}
+		$cardnumber=ereg_replace("^0*","",$ldapnumbers[$n]);
+
 		//überprüfen, ob bereits vorhanden
 		for($j=0;$j<$i;$j++)
 		{
-			if($sipass[$j]->card_no==$row->cardnumber)
-			{				
+			if($sipass[$j]->card_no==$cardnumber)
+			{
 				$upd=FALSE;
-				if($sipass[$j]->last_name!=trim($row->lastname) && !strchr($row->lastname,'ß'))
+				if($sipass[$j]->last_name!=trim($sn))
 				{
 					$sipass[$j]->last_name_old=$sipass[$j]->last_name;
-					$sipass[$j]->last_name=trim($row->lastname);
+					$sipass[$j]->last_name=trim($sn);
 					$sipass[$j]->update.=' last_name';
 					$upd=TRUE;
 				}
-				if($sipass[$j]->first_name!=trim($row->firstname))
+				if($sipass[$j]->first_name!=trim($givenname))
 				{
 					$sipass[$j]->first_name_old=$sipass[$j]->first_name;
-					$sipass[$j]->first_name=trim($row->firstname);
+					$sipass[$j]->first_name=trim($givenname);
 					$sipass[$j]->update.=' first_name';
 					$upd=TRUE;
 				}
+
+				/*
 				if($sipass[$j]->start_date!=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr)))
 				{
 					$sipass[$j]->start_date=date('d.m.Y',strtotime($row->tag.'.'.$row->monat.'.'.$row->jahr));
@@ -248,19 +208,20 @@ if($result = $db->db_query($qry))
 					$sipass[$j]->update.=' end_date';
 					$upd=TRUE;
 				}
-				if($sipass[$j]->uid!=trim($row->uid))
+				*/
+				if($sipass[$j]->uid!=trim($uid))
 				{
-					$sipass[$j]->uid=trim($row->uid);
+					$sipass[$j]->uid=trim($uid);
 					$sipass[$j]->update.=' uid';
 					$upd=TRUE;
 				}
-				if(trim($row->matrikelnr)!='' && $sipass[$j]->matrikelnr!=trim($row->matrikelnr))
+				if(trim($matrikelnr)!='' && $sipass[$j]->matrikelnr!=trim($matrikelnr))
 				{
-					$sipass[$j]->matrikelnr=trim($row->matrikelnr);
+					$sipass[$j]->matrikelnr=trim($matrikelnr);
 					$sipass[$j]->update.=' matrikelnr';
 					$upd=TRUE;
 				}
-				if($row->personalnummer!='' && $row->personalnummer!= NULL)
+				if($gid==101 || $gid==120)
 				{
 					if($sipass[$j]->acc_grp_name!="Verwaltung" && substr($sipass[$j]->acc_grp_name,0,1)!='#')
 					{
@@ -295,25 +256,26 @@ if($result = $db->db_query($qry))
 		if(!$update)
 		{
 			//wenn nicht gefunden, dann append
-			if($row->lastname!='' && $row->firstname!='' && $row->cardnumber!='' &&$row->tag!='' && $row->monat!='' && $row->jahr!='')
+			if($sn!='' && $givenname!='' && $cardnumber!='') //&&$row->tag!='' && $row->monat!='' && $row->jahr!='')
 			{
 				$sipass[$i]->command="A";
 				$sipass[$i]->reference=$key_nummer;
-				$sipass[$i]->last_name=trim($row->lastname);
-				$sipass[$i]->first_name=trim($row->firstname);
-				$sipass[$i]->card_no=str_replace(" ","",$row->cardnumber);
-				$sipass[$i]->start_date=$row->tag.'.'.$row->monat.'.'.$row->jahr;
-				$sipass[$i]->end_date=$row->tag.'.'.$row->monat.'.'.($row->jahr+5);
-				$sipass[$i]->uid=trim($row->uid);
-				$sipass[$i]->matrikelnr=trim($row->matrikelnr);
-				if($row->personalnummer!='' && $row->personalnummer!= NULL)
+				$sipass[$i]->last_name=trim($sn);
+				$sipass[$i]->first_name=trim($givenname);
+				$sipass[$i]->card_no=str_replace(" ","",$cardnumber);
+				$sipass[$i]->start_date=date("d.m.Y");
+				$sipass[$i]->uid=trim($uid);
+				$sipass[$i]->matrikelnr=trim($matrikelnr);
+				if($gid==101 || $gid==120)
 				{
 					$sipass[$i]->acc_grp_name="Verwaltung";
-
+					$sipass[$i]->end_date=date("d.m.Y",mktime(0, 0, 0, date("m"),   date("d"),   date("Y")+20));
+					
 				}
 				else
 				{
 					$sipass[$i]->acc_grp_name=$stg_kurzbz;
+					$sipass[$i]->end_date=date("d.m.Y",mktime(0, 0, 0, date("m"),   date("d"),   date("Y")+5));
 				}
 				$key_nummer++;
 				$i++;
@@ -321,10 +283,7 @@ if($result = $db->db_query($qry))
 		}
 	}
 }
-else 
-{
-	die("FAS-Abfrage fehlgeschlagen!");
-}
+
 $ausdruck='';
 for($j=0;$j<$i;$j++)
 {
@@ -359,14 +318,14 @@ for($j=0;$j<$i;$j++)
 			if (isset($sipass[$j]->last_name_old))
 				$ausdruck.=$sipass[$j]->last_name_old;		// Text3 // alter Vorname
 			$ausdruck.="\t";
-			if (isset($sipass[$j]->fist_name_old))
-				$ausdruck.=$sipass[$j]->fist_name_old;		// Text4 // alter Nachname
+			if (isset($sipass[$j]->first_name_old))
+				$ausdruck.=$sipass[$j]->first_name_old;		// Text4 // alter Nachname
 			$ausdruck.="\t";
 			if (isset($sipass[$j]->acc_grp_name_old))
 				$ausdruck.=$sipass[$j]->acc_grp_name_old;	// Text5 // alte Accessgroup
 			$ausdruck.="\t";
 			if (isset($sipass[$j]->update))
-				$ausdruck.=$sipass[$j]->update;			// Text6 // alte Accessgroup
+				$ausdruck.=$sipass[$j]->update;			// Text6 // Update
 			$ausdruck.="\n";
 		}
 	}
@@ -375,50 +334,4 @@ header("Content-Type: text/text");
 header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
 echo $ausdruck;
 
-//Mail nur wenn Doppelte gefunden
-if($k>0)
-{
-	//mail(MAIL_SUPPORT, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."<BR><BR>Synchroliste:<BR>".str_replace(array("\n","\r\n"),"<BR>",iconv("iso-8859-1","utf-8",$ausdruck))."</body></html>",
-	mail(MAIL_SUPPORT, 'Mehrfach eingetragenen Zutrittskarten', "<html><body>".$fausgabe."</body></html>",
-		"From: vilesci@technikum-wien.at\nX-Mailer: PHP 5.x\nContent-type: text/html; charset=utf-8");
-}
-/*
-//------------ Excel init --------------------------
-
-// Creating a workbook
-$workbook = new Spreadsheet_Excel_Writer();
-// sending HTTP headers
-$workbook->send("SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".xls");
-// Creating a worksheet
-$worksheet =& $workbook->addWorksheet("SiPassZutrittskartenUpdate");
-
-// set width of columns
-$worksheet->setColumn(0,0,2); 			// erste Spalte auf width=2
-$worksheet->setColumn(0,1,8); 			// zweite Spalte auf width=8
-$worksheet->setColumn(0,2,20);
-$worksheet->setColumn(0,3,20);
-$worksheet->setColumn(0,4,12);
-$worksheet->setColumn(0,5,10);
-$worksheet->setColumn(0,6,10);
-
-
-$z=0; 							// Start bei Zeile 0
-
-for($j=0;$j<$i;$j++)
-{
-	if(trim($sipass[$j][0]!=''))
-	{
-		$worksheet->write($z,0, $sipass[$j][0]);
-		$worksheet->write($z,1, $sipass[$j][1]);
-		$worksheet->write($z,2, $sipass[$j][2]);
-		$worksheet->write($z,3, $sipass[$j][3]);
-		$worksheet->write($z,4, $sipass[$j][4]);
-		$worksheet->write($z,5, $sipass[$j][5]);
-		$worksheet->write($z,6, $sipass[$j][6]);
-		$z++;
-	}
-}
-
-$workbook->close();
-*/
 ?>
