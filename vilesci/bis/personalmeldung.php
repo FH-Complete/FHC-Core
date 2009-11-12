@@ -21,15 +21,12 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/datum.class.php');
 
-
-		require('../../include/studiensemester.class.php');
-		require('../../include/datum.class.php');
-
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $error_log='';
 $error_log1='';
@@ -49,7 +46,7 @@ $mitarbeiterzahl=0;
 $echt=0;
 $frei=0;
 
-$nichtmelden = array(11,91,92,94,999,203);
+$nichtmelden = array(11,91,92,94,999,203,145,204);
 
 $datumobj=new datum();
 
@@ -113,6 +110,7 @@ if($result = $db->db_query($qry))
    <PersonalMeldung>";
 	while($row = $db->db_fetch_object($result))
 	{
+		$person_content='';
 		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."';";
 		if($resultet=$db->db_query($qryet))
 		{
@@ -135,7 +133,7 @@ if($result = $db->db_query($qry))
 		{
 				$error_log.=($error_log!=''?', ':'')."HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
 		}
-		$datei.="
+		$person_content.="
      <Person>
       <PersonalNummer>".sprintf("%015s",$row->personalnummer)."</PersonalNummer>
       <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
@@ -146,140 +144,148 @@ if($result = $db->db_query($qry))
 		{
 			if($db->db_num_rows($resultvw)>0)
 			{
-				$datei.="
+				$person_content.="
        <Habilitation>J</Habilitation>";
 			}
 			else
 			{
-				$datei.="
+				$person_content.="
        <Habilitation>N</Habilitation>";
 			}
 		}
 		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND (ende is null OR ende>'$bisprevious') AND beginn<'$bisdatum';";
 		if($resultvw=$db->db_query($qryvw))
 		{
-			while($rowvw=$db->db_fetch_object($resultvw))
+			if($db->db_num_rows($resultvw)>0)
 			{
-				if($rowvw->ba1code=='' || $rowvw->ba1code==NULL)
+				while($rowvw=$db->db_fetch_object($resultvw))
 				{
-						$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart1 ('".$rowvw->ba1code."')";
-				}
-				if($rowvw->ba2code=='' || $rowvw->ba2code==NULL)
-				{
-						$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart2 ('".$rowvw->ba2code."')";
-				}
-				if($rowvw->beschausmasscode=='' || $rowvw->beschausmasscode==NULL)
-				{
-						$error_log.=($error_log!=''?', ':'')."BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
-				}
-				if($rowvw->verwendung_code=='' || $rowvw->verwendung_code==NULL)
-				{
-						$error_log.=($error_log!=''?', ':'')."VerwendungsCode ('".$rowvw->verwendung_code."')";
-				}
-				if(!$rowvw->hauptberuflich && ($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL))
-				{
-						$error_log.=($error_log!=''?', ':'')."Hauptberuf ('".$rowvw->hauptberufcode."')";
-				}
-				if($rowvw->ba1code==3)
-				{
-					$echt++;
-				}
-				if($rowvw->ba1code==4)
-				{
-					$frei++;
-				}
-				$mitarbeiterzahl++;
-				$datei.="
+					if($rowvw->ba1code=='' || $rowvw->ba1code==NULL)
+					{
+							$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart1 ('".$rowvw->ba1code."')";
+					}
+					if($rowvw->ba2code=='' || $rowvw->ba2code==NULL)
+					{
+							$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart2 ('".$rowvw->ba2code."')";
+					}
+					if($rowvw->beschausmasscode=='' || $rowvw->beschausmasscode==NULL)
+					{
+							$error_log.=($error_log!=''?', ':'')."BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
+					}
+					if($rowvw->verwendung_code=='' || $rowvw->verwendung_code==NULL)
+					{
+							$error_log.=($error_log!=''?', ':'')."VerwendungsCode ('".$rowvw->verwendung_code."')";
+					}
+					if(!$rowvw->hauptberuflich && ($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL))
+					{
+							$error_log.=($error_log!=''?', ':'')."Hauptberuf ('".$rowvw->hauptberufcode."')";
+					}
+					if($rowvw->ba1code==3)
+					{
+						$echt++;
+					}
+					if($rowvw->ba1code==4)
+					{
+						$frei++;
+					}
+					$mitarbeiterzahl++;
+					$person_content.="
        <Verwendung>
               <BeschaeftigungsArt1>".$rowvw->ba1code."</BeschaeftigungsArt1>
               <BeschaeftigungsArt2>".$rowvw->ba2code."</BeschaeftigungsArt2>
               <BeschaeftigungsAusmass>".$rowvw->beschausmasscode."</BeschaeftigungsAusmass>
               <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
-				//Studiengangsleiter
-				$qryslt="SELECT tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='Leitung' AND studiengang_kz<10000;";
-				if($resultslt=$db->db_query($qryslt))
-				{
-					while($rowslt=$db->db_fetch_object($resultslt))
+					//Studiengangsleiter
+					$qryslt="SELECT tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='Leitung' AND studiengang_kz<10000;";
+					if($resultslt=$db->db_query($qryslt))
 					{
-						if($rowslt->studiengang_kz=='' || $rowslt->studiengang_kz==NULL)
+						while($rowslt=$db->db_fetch_object($resultslt))
 						{
-								$error_log=($error_log!=''?', ':'')."StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
-						}
-						if(!in_array($rowslt->studiengang_kz, $nichtmelden))
-						{
-						$datei.="
-                     <StgLeitung>
-                          <StgKz>".sprintf("%04s",$rowslt->studiengang_kz)."</StgKz>
-                     </StgLeitung>";
-						}
-					}
-				}
-				//Funktionen
-				$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".$rowvw->bisverwendung_id."' AND studiengang_kz>0 AND studiengang_kz<10000;";
-				if($resultfkt=$db->db_query($qryfkt))
-				{
-					while($rowfkt=$db->db_fetch_object($resultfkt))
-					{
-						if($rowfkt->studiengang_kz=='' || $rowfkt->studiengang_kz==NULL)
-						{
-								$error_log.=($error_log!=''?', ':'')."StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
-						}
-						if($rowfkt->sws=='' || $rowfkt->sws==NULL)
-						{
-								$error_log.=($error_log!=''?', ':'')."SWS ('".$rowfkt->sws."')";
-						}
-						if($rowvw->hauptberuflich=='' || $rowvw->hauptberuflich==NULL)
-						{
-								$error_log.=($error_log!=''?', ':'')."Hauptberuflich ('".$rowvw->hauptberuflich."')";
-						}
-						if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich=='f')
-						{
-								$error_log.=($error_log!=''?', ':'')."HauptberufCode ('".$rowvw->hauptberufcode."')";
-						}
-						if (isset($eteam[$rowfkt->studiengang_kz]))
-						{
-							if(($eteam[$rowfkt->studiengang_kz]=='' || $eteam[$rowfkt->studiengang_kz]==NULL))
+							if($rowslt->studiengang_kz=='' || $rowslt->studiengang_kz==NULL)
 							{
-									$error_log.=($error_log!=''?', ':'')."BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
+									$error_log=($error_log!=''?', ':'')."StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
+							}
+							if(!in_array($rowslt->studiengang_kz, $nichtmelden))
+							{
+							$person_content.="
+	                     <StgLeitung>
+	                          <StgKz>".sprintf("%04s",$rowslt->studiengang_kz)."</StgKz>
+	                     </StgLeitung>";
 							}
 						}
-						$datei.="
-                    <Funktion>
-                       <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
-                       <SWS>".$rowfkt->sws."</SWS>";
-						if($rowvw->hauptberuflich=='t')
-						{
-							$datei.="
-                       <Hauptberuflich>J</Hauptberuflich>";
-						}
-						else
-						{
-							$datei.="
-                       <Hauptberuflich>N</Hauptberuflich>
-                       <HauptberufCode>".$rowvw->hauptberufcode."</HauptberufCode>";
-						}
-						if(isset($eteam[$rowfkt->studiengang_kz]))
-						{
-							$datei.="
-                       <Entwicklungsteam>J</Entwicklungsteam>
-                       <BesondereQualifikationCode>".$eteam[$rowfkt->studiengang_kz]."</BesondereQualifikationCode>";
-						}
-						else
-						{
-							$datei.="
-                       <Entwicklungsteam>N</Entwicklungsteam>";
-						}
-					$datei.="
-                    </Funktion>";
 					}
+					//Funktionen
+					$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".$rowvw->bisverwendung_id."' AND studiengang_kz>0 AND studiengang_kz<10000;";
+					if($resultfkt=$db->db_query($qryfkt))
+					{
+						while($rowfkt=$db->db_fetch_object($resultfkt))
+						{
+							if($rowfkt->studiengang_kz=='' || $rowfkt->studiengang_kz==NULL)
+							{
+									$error_log.=($error_log!=''?', ':'')."StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
+							}
+							if($rowfkt->sws=='' || $rowfkt->sws==NULL)
+							{
+									$error_log.=($error_log!=''?', ':'')."SWS ('".$rowfkt->sws."')";
+							}
+							if($rowvw->hauptberuflich=='' || $rowvw->hauptberuflich==NULL)
+							{
+									$error_log.=($error_log!=''?', ':'')."Hauptberuflich ('".$rowvw->hauptberuflich."')";
+							}
+							if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich=='f')
+							{
+									$error_log.=($error_log!=''?', ':'')."HauptberufCode ('".$rowvw->hauptberufcode."')";
+							}
+							if (isset($eteam[$rowfkt->studiengang_kz]))
+							{
+								if(($eteam[$rowfkt->studiengang_kz]=='' || $eteam[$rowfkt->studiengang_kz]==NULL))
+								{
+										$error_log.=($error_log!=''?', ':'')."BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
+								}
+							}
+							$person_content.="
+	                    <Funktion>
+	                       <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
+	                       <SWS>".$rowfkt->sws."</SWS>";
+							if($rowvw->hauptberuflich=='t')
+							{
+								$person_content.="
+	                       <Hauptberuflich>J</Hauptberuflich>";
+							}
+							else
+							{
+								$person_content.="
+	                       <Hauptberuflich>N</Hauptberuflich>
+	                       <HauptberufCode>".$rowvw->hauptberufcode."</HauptberufCode>";
+							}
+							if(isset($eteam[$rowfkt->studiengang_kz]))
+							{
+								$person_content.="
+	                       <Entwicklungsteam>J</Entwicklungsteam>
+	                       <BesondereQualifikationCode>".$eteam[$rowfkt->studiengang_kz]."</BesondereQualifikationCode>";
+							}
+							else
+							{
+								$person_content.="
+	                       <Entwicklungsteam>N</Entwicklungsteam>";
+							}
+						$person_content.="
+	                    </Funktion>";
+						}
+					}
+					$person_content.="
+       </Verwendung>";
 				}
-				$datei.="
-             </Verwendung>";
+			}
+			else 
+			{
+				//Keine Verwendung
+				$error_log="$row->mitarbeiter_uid hat keine Verwendung und wird ausgelassen<br>";
 			}
 		}
-		$datei.="
-         </Person>";
-		if($error_log!='' OR $error_log1!='')
+			$person_content.="
+     </Person>";
+		if($error_log!='' || $error_log1!='')
 		{
 			$v.="<u>Bei Mitarbeiter (PersNr, UID, Vorname, Nachname) '".$row->personalnummer."','".$row->mitarbeiter_uid."', '".$row->nachname."', '".$row->vorname."': </u>\n";
 			if($error_log!='')
@@ -290,7 +296,10 @@ if($result = $db->db_query($qry))
 			$v.="\n";
 			$error_log='';
 		}
-		
+		else 
+		{
+			$datei.=$person_content;
+		}
 	}
 	$datei.="
       </PersonalMeldung>
