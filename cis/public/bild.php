@@ -49,10 +49,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 //von pdfs kommen kann.
 $im = @imagecreatefromstring(base64_decode($cTmpHEX));
 if($im!=false)
-{
-	
-  exit('dfsd');
-  
+{  
   @ob_clean();
 	header("Content-type: image/jpeg");
 	exit(imagejpeg($im));

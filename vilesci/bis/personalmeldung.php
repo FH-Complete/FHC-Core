@@ -46,7 +46,7 @@ $mitarbeiterzahl=0;
 $echt=0;
 $frei=0;
 
-$nichtmelden = array(11,91,92,94,999,203,145,204);
+$nichtmelden = array(11,91,92,94,999,203,145,204, 308, 182, 222);
 
 $datumobj=new datum();
 
@@ -110,6 +110,7 @@ if($result = $db->db_query($qry))
    <PersonalMeldung>";
 	while($row = $db->db_fetch_object($result))
 	{
+		$error_person = false;
 		$person_content='';
 		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."';";
 		if($resultet=$db->db_query($qryet))
@@ -280,7 +281,8 @@ if($result = $db->db_query($qry))
 			else 
 			{
 				//Keine Verwendung
-				$error_log="$row->mitarbeiter_uid hat keine Verwendung und wird ausgelassen<br>";
+				$v.="<br><u>$row->mitarbeiter_uid</u> hat keine Verwendung und wird ausgelassen<br>";
+				$error_person = true;
 			}
 		}
 			$person_content.="
@@ -298,7 +300,8 @@ if($result = $db->db_query($qry))
 		}
 		else 
 		{
-			$datei.=$person_content;
+			if(!$error_person)
+				$datei.=$person_content;
 		}
 	}
 	$datei.="
