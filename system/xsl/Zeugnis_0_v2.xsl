@@ -14,7 +14,7 @@
 	<xsl:template match="zeugnis">
 		<fo:page-sequence master-reference="PageMaster">
 			<fo:flow flow-name="xsl-region-body">
-				<fo:block-container position="absolute" top="45mm" left="22mm" height="20mm">
+				<fo:block-container position="absolute" top="45mm" left="17mm" height="20mm">
 					<fo:block text-align="left" line-height="18pt" font-family="sans-serif" font-size="16pt">
 						<fo:inline font-weight="900">
 							<xsl:text>ZEUGNIS \n </xsl:text>
@@ -32,39 +32,42 @@
 						</fo:inline>
 					</fo:block>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="65mm" left="23.5mm" height="20mm">
+				<fo:block-container position="absolute" top="65mm" left="18.5mm" height="20mm">
 					<fo:block text-align="left" line-height="18pt" font-family="sans-serif" font-size="16pt">
 						<xsl:value-of select="studiengang_art"/>-Studiengang
 					</fo:block>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="72mm" left="22mm" height="20mm">
+				<fo:block-container position="absolute" top="72mm" left="17mm" height="20mm">
 					<fo:block text-align="left" line-height="18pt" content-width="80mm" font-family="sans-serif" font-size="16pt">
 						<fo:inline font-weight="900">
 							<xsl:value-of select="studiengang"/>
 						</fo:inline>
 					</fo:block>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="93mm" left="135mm">
-					<fo:block line-height="14pt" font-family="sans-serif" font-size="9pt">
-						<xsl:text>Personenkennzeichen: </xsl:text><xsl:value-of select="matrikelnr"/>
-					</fo:block>
+				
+				<fo:block-container position="absolute" top="93mm" left="19mm" height="10mm">
+					<fo:table table-layout="fixed" border-collapse="collapse">
+						<fo:table-column column-width="172mm"/>
+						<fo:table-body>
+							<fo:table-row line-height="12pt">
+								<fo:table-cell>
+									<fo:block font-size="9pt" content-width="173mm" text-align="right">
+									<xsl:text>Personenkennzeichen: </xsl:text><xsl:value-of select="matrikelnr"/>
+										</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+							<fo:table-row line-height="12pt">
+								<fo:table-cell>
+									<fo:block font-size="9pt" content-width="172mm" text-align="right">
+									<xsl:text>Kennzahl des Studienganges: </xsl:text><xsl:value-of select="studiengang_kz"/>
+										</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
 				</fo:block-container>
-				<!--<fo:block-container position="absolute" top="93mm" left="168mm">
-					<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="9pt">
-						
-					</fo:block>
-				</fo:block-container>-->
-				<fo:block-container position="absolute" top="97mm" left="135.5mm">
-					<fo:block line-height="14pt" font-family="sans-serif" font-size="9pt">
-						<xsl:text>Kennzahl des Studienganges: </xsl:text><xsl:value-of select="studiengang_kz"/>
-					</fo:block>
-				</fo:block-container>
-				<!--<fo:block-container position="absolute" top="97mm" left="178mm">
-					<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="9pt">
-						
-					</fo:block>
-				</fo:block-container>-->
-				<fo:block-container position="absolute" top="117mm" left="24mm" height="10mm">
+			
+				<fo:block-container position="absolute" top="117mm" left="19mm" height="10mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="45mm"/>
 						<fo:table-column column-width="100mm"/>
@@ -107,17 +110,17 @@
 						</fo:table-body>
 					</fo:table>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="137mm" left="24mm">
+				<fo:block-container position="absolute" top="137mm" left="19mm">
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
 						<fo:table-column column-width="0mm"/>
-						<fo:table-column column-width="100mm"/>
+						<fo:table-column column-width="110mm"/>
 						<fo:table-column column-width="20mm"/>
 						<fo:table-column column-width="20mm"/>
 						<fo:table-column column-width="20mm"/>
 						<fo:table-body>
 							<fo:table-row line-height="19pt">
 								<fo:table-cell border-width="0mm" >
-								<fo:block font-size="10pt" font-weight="bold" content-width="100mm"  >
+								<fo:block font-size="10pt" font-weight="bold" >
 										<!-- wenn die erste Spalte eine Hintergrundfarbe hat, dann wird der Text von der Hintergrundfarbe ueberschrieben.
 										     Deshalb gibt es hier eine Dummy-Spalte. Ab der zweiten Spalte funktioniert es dann problemlos
 										     grauslich, funktioniert aber...
@@ -125,7 +128,7 @@
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center"  background-color="#afb8bc" >
-									<fo:block font-size="9pt" font-weight="bold" content-width="100mm" vertical-align="center" >
+									<fo:block font-size="9pt" font-weight="bold" content-width="110mm" vertical-align="center" >
 										Lehrveranstaltung
 										</fo:block>
 								</fo:table-cell>
@@ -179,10 +182,10 @@
 						</fo:table-body>
 					</fo:table>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="250mm" left="24mm" height="10mm">
+				<fo:block-container position="absolute" top="250mm" left="19mm" height="10mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="65mm"/>
-						<fo:table-column column-width="33mm"/>
+						<fo:table-column column-width="42mm"/>
 						<fo:table-column column-width="65mm"/>
 						<fo:table-body>
 							<fo:table-row line-height="12pt">
@@ -244,7 +247,7 @@
 				<!-- Dummy Zelle -->
 			</fo:table-cell>
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="97mm" vertical-align="center">
+				<fo:block font-size="9pt" content-width="109mm" vertical-align="center">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
@@ -283,7 +286,7 @@
 				<!-- Dummy Zelle -->
 			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="95mm">
+				<fo:block font-size="9pt" content-width="109mm">
 					<xsl:value-of select="fussnotenzeichen"/>
 					<xsl:text> </xsl:text>
 					<fo:inline font-weight="bold">
