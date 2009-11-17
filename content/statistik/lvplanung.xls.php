@@ -29,10 +29,13 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 
 $user = get_uid();
+$user='simane';
 loadVariables($user);
 
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
+else if(isset($_POST['studiensemester_kurzbz']))
+	$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 else 
 	die('studiensemester_kurzbz muss uebergeben werden');
 	
@@ -61,6 +64,75 @@ $db = new basis_db();
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
+$qry = "
+SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
+		  								        funktion_kurzbz='fbk' AND
+		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
+											LIMIT 1
+		  								   )
+							)
+			) as koordinator,
+	
+	tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz,
+	tbl_lehrfach.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
+	tbl_lehrveranstaltung.semester as lv_semester, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheitmitarbeiter.faktor,
+	tbl_lehreinheitmitarbeiter.stundensatz, 
+	tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehreinheitmitarbeiter.planstunden,
+	tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ,
+	tbl_lehreinheitmitarbeiter.anmerkung
+	,tbl_lehreinheit.studiensemester_kurzbz
+	,tbl_lehrveranstaltung.ects
+	,tbl_lehrveranstaltung.semesterstunden 
+	,tbl_lehrveranstaltung.semesterstunden  as sws
+	,tbl_lehrveranstaltung.lehrform_kurzbz
+	,tbl_lehrveranstaltung.lehrveranstaltung_id
+	,(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		  WHERE uid=(SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter  WHERE lehre.tbl_lehreinheitmitarbeiter.lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and lehre.tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz='LV-Leitung' LIMIT 1)
+		)as lv_leitung	
+	,(SELECT bezeichnung FROM lehre.tbl_lehrform  WHERE lehre.tbl_lehrform.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz LIMIT 1) as lv_type
+	,tbl_lehrveranstaltung.lehrform_kurzbz
+FROM 
+	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
+	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+	JOIN lehre.tbl_lehrfach USING(lehrfach_id)
+WHERE 
+	tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";	
+
+#	,(SELECT lv_semesterstunden FROM campus.vw_lehreinheit WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id and lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' LIMIT 1) as sws	
+	
+if($studiengang_kz!='')
+	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
+	
+if($institut!='')
+	$qry.=" AND tbl_lehrfach.fachbereich_kurzbz='".addslashes($institut)."'";
+
+if($semester!='')
+	$qry.=" AND tbl_lehrveranstaltung.semesteR='".addslashes($semester)."'";
+	
+if($uid!='')
+	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($uid)."'";
+
+$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung";
+
+/*
+//	exit($qry);
+if($result = $db->db_query($qry))
+{
+	$row = $db->db_fetch_object($result);
+	var_dump($row);
+}
+else
+	echo 'nix<br>';
+var_dump($stg_obj);
+exit;
+*/
+
+
+
 // Creating a workbook
 $workbook = new Spreadsheet_Excel_Writer();
 
@@ -82,45 +154,6 @@ $format_number_bold->setNumFormat('0,0.00');
 $format_number_bold->setBold();
 
 
-$qry = "
-SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
-		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' AND
-		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
-											LIMIT 1
-		  								   )
-							)
-			) as koordinator,
-	tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz,
-	tbl_lehrfach.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
-	tbl_lehrveranstaltung.semester as lv_semester, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheitmitarbeiter.faktor,
-	tbl_lehreinheitmitarbeiter.stundensatz, 
-	tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehreinheitmitarbeiter.planstunden,
-	tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ,
-	tbl_lehreinheitmitarbeiter.anmerkung
-FROM 
-	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
-	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
-	JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-WHERE 
-	tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";	
-	
-if($studiengang_kz!='')
-	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
-	
-if($institut!='')
-	$qry.=" AND tbl_lehrfach.fachbereich_kurzbz='".addslashes($institut)."'";
-
-if($semester!='')
-	$qry.=" AND tbl_lehrveranstaltung.semesteR='".addslashes($semester)."'";
-	
-if($uid!='')
-	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($uid)."'";
-
-$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung";
 $zeile=0;
 $spalte=0;
 $worksheet->write($zeile,$spalte,"Studiengang", $format_bold);
@@ -154,10 +187,28 @@ $maxlength[$spalte]=15;
 $worksheet->write($zeile,++$spalte,"Anmerkung", $format_bold);
 $maxlength[$spalte]=9;
 
+// Neu 13.11.2009 sequens
+
+$worksheet->write($zeile,++$spalte,"LV- Leitung", $format_bold);
+$maxlength[$spalte]=9;
+
+$worksheet->write($zeile,++$spalte,"LV-Nummer", $format_bold);
+$maxlength[$spalte]=9;
+
+$worksheet->write($zeile,++$spalte,"SWS", $format_bold);
+$maxlength[$spalte]=9;
+
+$worksheet->write($zeile,++$spalte,"ECTS", $format_bold);
+$maxlength[$spalte]=9;
+
+$worksheet->write($zeile,++$spalte,"LV-Typ", $format_bold);
+$maxlength[$spalte]=9;
+
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
+
 		$spalte=0;
 		$zeile++;
 		
@@ -241,6 +292,42 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->anmerkung);
 		if($maxlength[$spalte]<mb_strlen($row->anmerkung))
 			$maxlength[$spalte]=mb_strlen($row->anmerkung);
+			
+// Neu 13.11.2009 sequens
+		//LV-Leitung
+		$worksheet->write($zeile,++$spalte,$row->lv_leitung);
+		if($maxlength[$spalte]<mb_strlen($row->lv_leitung))
+			$maxlength[$spalte]=mb_strlen($row->lv_leitung);
+
+		//LV-Nummer
+		$worksheet->write($zeile,++$spalte,$row->lehrveranstaltung_id);
+		if($maxlength[$spalte]<mb_strlen($row->lehrveranstaltung_id))
+			$maxlength[$spalte]=mb_strlen($row->lehrveranstaltung_id);
+
+		//SWS
+
+
+/*		$worksheet->write($zeile,++$spalte,$row->sws);
+		if($maxlength[$spalte]<mb_strlen($row->sws))
+			$maxlength[$spalte]=mb_strlen($row->sws);
+*/
+		$worksheet->write($zeile,++$spalte,$row->semesterstunden);
+		if($maxlength[$spalte]<mb_strlen($row->semesterstunden))
+			$maxlength[$spalte]=mb_strlen($row->semesterstunden);
+			
+			
+		//ECTS
+		$worksheet->write($zeile,++$spalte,$row->ects);
+		if($maxlength[$spalte]<mb_strlen($row->ects))
+			$maxlength[$spalte]=mb_strlen($row->ects);
+
+		//LV-Typ
+		if (empty($row->lv_type) || $row->lehrform_kurzbz=='-' )
+				$row->lv_type='keine';
+		$worksheet->write($zeile,++$spalte,$row->lv_type);
+		if($maxlength[$spalte]<mb_strlen($row->lv_type))
+			$maxlength[$spalte]=mb_strlen($row->lv_type);
+		
 	}
 	
 	//Betreuungen
@@ -271,6 +358,8 @@ if($result = $db->db_query($qry))
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
+
+
 	if($uid!=='')
 	{
 		$mitarbeiter = new mitarbeiter($uid);
@@ -343,5 +432,5 @@ if($result = $db->db_query($qry))
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
 }
-$workbook->close();
+ $workbook->close();
 ?>
