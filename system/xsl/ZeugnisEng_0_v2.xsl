@@ -48,7 +48,17 @@
 				</fo:block-container>
 				<fo:block-container position="absolute" top="65mm" left="18.5mm" height="20mm">
 					<fo:block text-align="left" line-height="18pt" font-family="sans-serif" font-size="16pt">
-						<xsl:value-of select="studiengang_art"/> Degree Program
+						<xsl:choose>
+							<xsl:when test="studiengang_art='Bachelor'">
+								<xsl:text>Bachelor's</xsl:text>
+							</xsl:when>
+							<xsl:when test="studiengang_art='Master'">
+								<xsl:text>Master's</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="studiengang_art"/>
+							</xsl:otherwise>
+						</xsl:choose> Degree Program
 					</fo:block>
 				</fo:block-container>
 				<fo:block-container position="absolute" top="72mm" left="17mm" height="20mm">
@@ -142,7 +152,7 @@
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center"  background-color="#afb8bc" >
 									<fo:block font-size="9pt" font-weight="bold" content-width="110mm" vertical-align="center" >
-										Subject
+										Course
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center" background-color="#afb8bc">
@@ -152,12 +162,12 @@
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center" background-color="#afb8bc">
 									<fo:block font-size="9pt" font-weight="bold" content-width="20mm" text-align="center"  vertical-align="center" >
-										Hours/Week/\nSemester
+										SP/W
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center" background-color="#afb8bc">
 									<fo:block font-size="9pt" font-weight="bold" content-width="20mm" text-align="center"  vertical-align="center" >
-										ECTS Points
+										ECTS\ncredits
 										</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -235,7 +245,7 @@
 								<fo:table-cell border-top-style="dotted">
 									<fo:block font-size="9pt" content-width="65mm" text-align="center">
 										<xsl:value-of select="studiengangsleiter"/>
-										<xsl:text>\nHead of Study Programme</xsl:text>
+										<xsl:text>\nProgram Director</xsl:text>
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell>

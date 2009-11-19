@@ -46,7 +46,7 @@ $menu=array
 		
 		'Freifach'=>array
 		(
-			'name'=>'Freifach', 'permissions'=>array('admin','lv-plan','support', 'lehre'),
+			'name'=>'Freifach', 'permissions'=>array('lehre/freifach'),
 			'Studenten'=>array('name'=>'Studenten', 'link'=>'lehre/freifach.php', 'target'=>'main'),
 			'Lektoren'=>array('name'=>'Lektoren', 'link'=>'lehre/freifach_lektoren.php', 'target'=>'main'),
 			'Studenten Vorrücken'=>array('name'=>'Studenten Vorrücken', 'link'=>'lehre/freifach_studentenvorrueckung.php', 'target'=>'main')
