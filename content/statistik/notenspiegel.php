@@ -58,7 +58,13 @@ $stg->load($studiengang_kz);
 
 $student = new student();
 $result_student = $student->getStudents($studiengang_kz,$semester,null,null,null, $semester_aktuell);
-
+$uids='';
+foreach ($result_student as $row) 
+{
+	if($uids!='')
+		$uids.=',';
+	$uids.="'".addslashes($row->uid)."'";
+}
 $qry = "SELECT 
 			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
 		FROM 
@@ -85,10 +91,10 @@ $qry = "SELECT
 	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
 	    WHERE
 	    	tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-	    	tbl_lehrveranstaltung.semester='".addslashes($semester)."' AND
+	    	tbl_zeugnisnote.student_uid in($uids) AND
 	    	tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($semester_aktuell)."'
 		ORDER BY bezeichnung";
-
+//tbl_lehrveranstaltung.semester='".addslashes($semester)."' AND
 if(!$result_lva = $db->db_query($qry))
 	die('Fehler beim Ermitteln der Lehrveranstaltungen');
 
