@@ -15,18 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-
-#		require_once('../../include/basis_db.class.php');
-#		if (!$db = new basis_db())
-#			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerlvstudiensemester.class.php');
@@ -35,17 +29,14 @@ require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-
-	if (!$user = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
-
+if (!$user = get_uid())
+	die('Keine UID gefunden!  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
-	die('Sie haben keine Berechtigung für diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if(!$rechte->isBerechtigt('lehre/freifach', null, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
@@ -95,13 +86,11 @@ if (isset($_REQUEST["semester_neu"]))
 else
 	$semester_neu = 1;
 
-
 if (isset($_REQUEST["move"]) && $gruppe != "" && $_REQUEST["move"]== "=>" && $gruppe_neu!="")
 {
 	$b = new benutzergruppe();
 	if ($b->load_uids($gruppe, $stsem))
 	{
-		
 		foreach ($b->uids as $u)
 		{			
 				$bg = new benutzergruppe();
@@ -112,13 +101,11 @@ if (isset($_REQUEST["move"]) && $gruppe != "" && $_REQUEST["move"]== "=>" && $gr
 				$bg->insertamum = date('Y-m-d H:i:s');
 				$bg->insertvon = $user;
 				$bg->studiensemester_kurzbz = $stsem_neu;
-				$bg->new = 1;
-				$bg->save(1);
+				$bg->new = true;
+				$bg->save(true);
 		}
 	}
 }
-
-
 
 $spezgrp = array();
 $spezgrpstr = "";
@@ -151,10 +138,8 @@ if ($gruppe_neu != "")
 		}
 	}
 }
-//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
 
 ?>
-
 <html>
 <head>
 <title>Lehrveranstaltung Verwaltung</title>
@@ -288,12 +273,11 @@ function checkSubmit()
 		else
 			$sel = "";
 		echo "	 <option value='".$row->gruppe_kurzbz."'".$sel.">".$row->gruppe_kurzbz."</option>";
-
 	}
+	
 	echo "</select>";
 	
 	echo "<select name='stsem_neu' onchange='document.auswahl.submit();'>";;
-	//$stsem_obj->getAll();	
 
 	foreach($stsem_obj->studiensemester AS $strow)
 	{
@@ -302,8 +286,8 @@ function checkSubmit()
 		else
 			$sel = "";
 		echo "	 <option value='".$strow->studiensemester_kurzbz."'".$sel.">".$strow->studiensemester_kurzbz."</option>";
-
 	}
+	
 	echo "</select>";
 	echo "</td>";	
 	
@@ -324,8 +308,6 @@ function checkSubmit()
 	echo "</tr></table>";
 	echo "</form>";
 ?>
-
-
 <br>
 </body>
 </html>

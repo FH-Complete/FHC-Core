@@ -20,12 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-
-#		require_once('../../include/basis_db.class.php');
-#		if (!$db = new basis_db())
-#			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');		
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerlvstudiensemester.class.php');
@@ -34,11 +29,8 @@ require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-
-	if (!$user = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
-
+if (!$user = get_uid())
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
@@ -47,8 +39,8 @@ else
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre',0))
-	die('Sie haben keine Berechtigung für diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if(!$rechte->isBerechtigt('lehre/freifach'))
+	die('Sie haben keine Berechtigung fuer diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $stsem_obj = new studiensemester();
 if (isset($_REQUEST["stsem"]))
@@ -77,15 +69,14 @@ else
 if(!is_numeric($stg_kz))
 	$stg_kz=0;
 
-
-
-
 if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 {
+	if(!$rechte->isBerechtigt('lehre/freifach', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$b = new benutzerlvstudiensemester();
 	if ($b->get_all_uids($stsem, $lvid))
 	{
-		
 		foreach ($b->uids as $u)
 		{
 			if (isset($_REQUEST["anmeldung_".$u->uid]))
@@ -98,28 +89,31 @@ if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 				$bg->insertamum = date('Y-m-d H:i:s');
 				$bg->insertvon = $user;
 				$bg->studiensemester_kurzbz = $stsem;
-				$bg->new = 1;
-				$bg->save(1);
+				$bg->new = true;
+				$bg->save(true);
 			}
 		}
 	}
 }
 
 if ($gruppe != "" && isset($_REQUEST["grp_aus"]))
+{
+	if(!$rechte->isBerechtigt('lehre/freifach', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	$gu = new benutzergruppe();
+	if ($gu->load_uids($gruppe, $stsem))
 	{
-		$gu = new benutzergruppe();
-		if ($gu->load_uids($gruppe, $stsem))
+		foreach ($gu->uids as $uidliste)
 		{
-			foreach ($gu->uids as $uidliste)
+			if (isset($_REQUEST["gruppe_".$uidliste->uid]))
 			{
-				if (isset($_REQUEST["gruppe_".$uidliste->uid]))
-				{
-					$bg = new benutzergruppe();
-					$bg->delete($uidliste->uid, $gruppe);
-				}
+				$bg = new benutzergruppe();
+				$bg->delete($uidliste->uid, $gruppe);
 			}
 		}
 	}
+}
 
 $spezgrp = array();
 $spezgrpstr = "";
@@ -132,14 +126,12 @@ if ($gruppe != "")
 		{
 			$spezgrp[] = $uidliste->uid;
 			$spezgrpstr .= "<br><input type='checkbox' name='gruppe_".$uidliste->uid."'>".$uidliste->uid;
-			//echo "<br>".$u->uid;
 		}
 	}
 }
-//(uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
+
 
 ?>
-
 <html>
 <head>
 <title>Lehrveranstaltung Verwaltung</title>
@@ -254,10 +246,8 @@ function selectAll()
 		}
 	}
 	if ($anz > 0)
-	{	
-		
+	{		
 		echo "<br><hr><input type='checkbox' onclick='selectAll();' name='toggle'>de/select all *** Angemeldet: <b>".$anz."</b> Studierende ***";
-		
 	}	
 	echo "</td><td valign='top'>";
 	
