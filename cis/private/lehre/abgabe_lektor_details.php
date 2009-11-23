@@ -161,6 +161,14 @@ if(isset($_POST["schick"]))
 							}
 							$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
 							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							if(!$mail->send())
+							{
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+							}
+							else 
+							{
+								echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+							}
 						}
 						$command='';
 					}
@@ -221,6 +229,14 @@ if(isset($_POST["schick"]))
 						}
 						$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin&auml;nderung Bachelor-/Diplomarbeitsbetreuung",
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+						if(!$mail->send())
+						{
+							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+						}
+						else 
+						{
+							echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+						}
 					}
 				}
 				$command='';
@@ -275,7 +291,11 @@ if(isset($_POST["del"]))
 					$mail->setReplyTo($user."@".DOMAIN);
 					if(!$mail->send())
 					{
-						echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+						echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+					}
+					else 
+					{
+						echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 					}
 				}
 			}
@@ -341,7 +361,14 @@ $result=@$db->db_query($qry);
 		}
 		else 
 		{
-			$bgcol='#00FF00';
+			if($row->abgabedatum>$row->datum)
+			{
+				$bgcol='#EA7B7B';
+			}
+			else 
+			{
+				$bgcol='#00FF00';
+			}
 		}
 		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
 		//$htmlstr .= "		</td>\n";
@@ -358,7 +385,7 @@ $result=@$db->db_query($qry);
 			}
 			else 
 			{
-				if($row_typ->paabgabetyp_kurzbz!='end')
+				if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
 				{
 					$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
 				}
@@ -420,7 +447,7 @@ $htmlstr .= "<tr id='".$projektarbeit_id."'>\n";
 $htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
-$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end'";
+$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end' AND paabgabetyp_kurzbz!='enda' AND paabgabetyp_kurzbz!='note'";
 $result_typ=$db->db_query($qry_typ);
 while ($row_typ=@$db->db_fetch_object($result_typ))
 {

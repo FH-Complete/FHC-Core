@@ -85,10 +85,10 @@ else
 				<th class='table-sortable:default'>Sem.</th>
 				<th class='table-sortable:default'>Vorname</th>
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
-	$htmlstr .= "<th>Typ</th>
+	$htmlstr .= "<th class='table-sortable:default'>Typ</th>
 				<th>Titel</th>
-				<th>1.Begutachter</th>
-				<th>2.Begutachter</th>";
+				<th class='table-sortable:alphanumeric'>1.Begutachter</th>
+				<th class='table-sortable:alphanumeric'>2.Begutachter</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
@@ -99,7 +99,7 @@ else
 		$muid2='';
 		$mituid='';
 		//Betreuer suchen
-		$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, 
+		$qry_betr="SELECT trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, 
 		public.tbl_mitarbeiter.mitarbeiter_uid
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
@@ -107,7 +107,7 @@ else
 		WHERE projektarbeit_id='$row->projektarbeit_id' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
 		UNION
-		SELECT '' as first,trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as second, public.tbl_mitarbeiter.mitarbeiter_uid
+		SELECT '' as first,trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second, public.tbl_mitarbeiter.mitarbeiter_uid
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
@@ -178,7 +178,14 @@ else
 					}
 					else 
 					{
-						$bgcol='#00FF00';
+						if($row_end->abgabedatum>$row_end->datum)
+						{
+							$bgcol='#EA7B7B';
+						}
+						else 
+						{
+							$bgcol='#00FF00';
+						}
 					}
 					if($bgcol!='')
 					{
@@ -266,7 +273,7 @@ function markiere()
 
 <body class="background_main">
 <?php 
-echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz)</h2>";
+echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz)</h2>";
 
 
     echo $htmlstr;

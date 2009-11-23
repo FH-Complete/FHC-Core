@@ -33,6 +33,7 @@
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/datum.class.php');
+	require_once('../../../include/mail.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
@@ -44,6 +45,7 @@ if(!isset($_POST['uid']))
 	$projektarbeit_id = (isset($_GET['projektarbeit_id'])?$_GET['projektarbeit_id']:'-1');
 	$titel = (isset($_GET['titel'])?$_GET['titel']:'-1');
 	$betreuer = (isset($_GET['betreuer'])?$_GET['betreuer']:'-1');
+	$bid = (isset($_GET['bid'])?$_GET['bid']:'-1');
 
 	$command = '';
 	$paabgabe_id = '';
@@ -63,6 +65,7 @@ else
 {
 	$uid = (isset($_POST['uid'])?$_POST['uid']:'-1');
 	$projektarbeit_id = (isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
+	$bid = (isset($_POST['bid'])?$_POST['bid']:'-1');
 	$titel = (isset($_POST['titel'])?$_POST['titel']:'');
 	$command = (isset($_POST['command'])?$_POST['command']:'');
 	$paabgabe_id = (isset($_POST['paabgabe_id'])?$_POST['paabgabe_id']:'-1');
@@ -81,12 +84,12 @@ else
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
 }
 
-if($uid=='-1')
+$user = get_uid();
+if($uid=='-1' || $uid!=$user)
 {
 	exit;		
 }	
 	
-$user = get_uid();
 $datum_obj = new datum();
 $error='';
 $neu = (isset($_GET['neu'])?true:false);
@@ -128,14 +131,21 @@ if($command=='add')
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".$projektarbeit_id."'";
-		$result=$db->db_query($qry_upd);
-		$qry="UPDATE campus.tbl_paabgabe SET
-						abgabedatum = now(),
-						updatevon = '".$user."', 
-						updateamum = now() 
-						WHERE paabgabe_id='".$paabgabe_id."'";
-					$result=$db->db_query($qry);
-		$command="update";
+		if($result=$db->db_query($qry_upd))
+		{
+			$qry="UPDATE campus.tbl_paabgabe SET
+							abgabedatum = now(),
+							updatevon = '".$user."', 
+							updateamum = now() 
+							WHERE paabgabe_id='".$paabgabe_id."'";
+						$result=$db->db_query($qry);
+			$command="update";
+		}
+		else 
+		{
+			echo "<font color=\"#FF0000\">DB: Update fehlgeschlagen!</font><br>&nbsp;";
+			$command='';
+		}
 	}
 	else 
 	{
@@ -251,6 +261,47 @@ if($command=="update" && $error!=true)
 					echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
 				}
 			}
+			//E-Mail an 1.Begutachter
+			if($bid!='' && $bid!=NULL)
+			{
+				$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
+					public.tbl_mitarbeiter.mitarbeiter_uid, anrede 
+					FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
+					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
+					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
+					WHERE public.tbl_person.person_id='$bid'";
+				if(!$betr=$db->db_query($qry_betr))
+				{
+					echo "<font color=\"#FF0000\">Fehler beim Laden der Betreuer!</font><br>&nbsp;";
+				}
+				else
+				{
+					if($row_betr=$db->db_fetch_object($betr))
+					{
+						$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+						if(!$result_std=$db->db_query($qry_std))
+						{
+							echo "<font color=\"#FF0000\">Datensatz konnte nicht gefunden werden!</font><br>&nbsp;";
+						}
+						else
+						{
+							$row_std=$db->db_fetch_object($result_std);
+							
+							$mail = new mail($qry_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Bachelor-/Diplomarbeitsbetreuung",
+							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n".($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							$mail->setReplyTo($user."@".DOMAIN);
+							if(!$mail->send())
+							{
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter!</font><br>&nbsp;";	
+							}
+						}
+					}
+					else 
+					{
+						echo "<font color=\"#FF0000\">Betreuer nicht gefunden. Kein Mail verschickt!</font><br>&nbsp;";
+					}
+				}
+			}
 		}
 		else 
 		{
@@ -290,7 +341,7 @@ if($command!="add")
 	$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br><b>Abgabetermine:</b></div>\n";
 	$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr .= "<tr></tr>\n";
-	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
+	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' AND paabgabetyp_kurzbz!='note' ORDER BY datum;";
 	$htmlstr .= "<tr><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload</td><td></td></tr>\n";
 	$result=@$db->db_query($qry);
 		while ($row=@$db->db_fetch_object($result))
@@ -310,6 +361,7 @@ if($command!="add")
 			$htmlstr .= "<input type='hidden' name='abstract_en' value='".$abstract_en."'>\n";
 			$htmlstr .= "<input type='hidden' name='seitenanzahl' value='".$seitenanzahl."'>\n";
 			$htmlstr .= "<input type='hidden' name='sprache' value='".$sprache."'>\n";
+			$htmlstr .= "<input type='hidden' name='bid' value='".$bid."'>\n";
 			$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 			if(!$row->abgabedatum)
 			{
@@ -328,7 +380,14 @@ if($command!="add")
 			}
 			else 
 			{
-				$bgcol='#00FF00';
+				if($row->abgabedatum>$row->datum)
+				{
+					$bgcol='#EA7B7B';
+				}
+				else 
+				{
+					$bgcol='#00FF00';
+				}
 			}
 			//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." disabled>";
 			//$htmlstr .= "		</td>\n";
@@ -341,14 +400,14 @@ if($command!="add")
 			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
 			$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";
 			//Überschrittene Termine
-			if($row->datum>date('Y-m-d'))
-			{
+			//if($row->datum>date('Y-m-d'))
+			//{
 				$htmlstr .= "		<td><input type='submit' name='schick' value=' abgeben ' title='ausgew&auml;hlte Datei hochladen'></td>";
-			}
-			else 
-			{
-				$htmlstr .= "		<td>Termin vorbei</td>";
-			}
+			//}
+			//else 
+			//{
+			//	$htmlstr .= "		<td>Termin vorbei</td>";
+			//}
 			$htmlstr .= "	</tr>\n";
 			
 			$htmlstr .= "</form>\n";
