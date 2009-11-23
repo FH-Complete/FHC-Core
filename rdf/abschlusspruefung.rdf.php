@@ -176,7 +176,7 @@ if($db->db_query($qry))
 		<pruefer2_nachname><![CDATA['.$pruefer2.']]></pruefer2_nachname>
 		<pruefer3><![CDATA['.$row->pruefer3.']]></pruefer3>
 		<pruefer3_nachname><![CDATA['.$pruefer3.']]></pruefer3_nachname>
-		<abschlussbeurteilung_kurzbz><![CDATA['.$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz].']]></abschlussbeurteilung_kurzbz>
+		<abschlussbeurteilung_kurzbz><![CDATA['.($row->abschlussbeurteilung_kurzbz!=''?$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]:'').']]></abschlussbeurteilung_kurzbz>
 		<akadgrad_id><![CDATA['.$row->akadgrad_id.']]></akadgrad_id>
 		<datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></datum>
 		<datum_iso><![CDATA['.$row->datum.']]></datum_iso>

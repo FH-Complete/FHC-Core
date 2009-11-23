@@ -51,15 +51,29 @@ echo '
 
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
+$qry='';
 if($gemeinde=='')
-	$qry = "SELECT distinct on (name) * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' ORDER BY name";
+{
+	if(is_numeric($plz) && $plz<32000) //smallint
+	{
+		$qry = "SELECT distinct on (name) * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' ORDER BY name";
+	}
+}
 else 
-	$qry = "SELECT * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' AND name='".addslashes($gemeinde)."' ORDER BY name";
+{
+	$qry = "SELECT * FROM bis.tbl_gemeinde WHERE ";
+	if(is_numeric($plz) && $plz<32000) //smallint
+	{
+		$qry.="plz='".addslashes($plz)."' AND ";
+	}
+	$qry.="name='".addslashes($gemeinde)."' ORDER BY name";
+}
 $db = new basis_db();
 
-if($db->db_query($qry))
+
+if($qry!='' && $result = $db->db_query($qry))
 {
-	while($row = $db->db_fetch_object())
+	while($row = $db->db_fetch_object($result))
 	{
 		
 		echo '

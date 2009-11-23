@@ -38,31 +38,6 @@ $datum_obj = new datum();
 
 loadVariables($user);
 
-// Clean stuff from a string
- function clean_string($string)
- {
- 	$trans = array("ä" => "ae",
- 				   "Ä" => "Ae",
- 				   "ö" => "oe",
- 				   "Ö" => "Oe",
- 				   "ü" => "ue",
- 				   "Ü" => "Ue",
- 				   "á" => "a",
- 				   "à" => "a",
- 				   "é" => "e",
- 				   "è" => "e",
- 				   "ó" => "o",
- 				   "ò" => "o",
- 				   "ì" => "i",
- 				   "í" => "i",
- 				   "ú" => "u",
- 				   "ù" => "u",
- 				   "ß" => "ss");
-	$string = strtr($string, $trans);
-    return ereg_replace("[^a-zA-Z0-9]", "", $string);
-    //[:space:]
- }
-
 function getGemeindeDropDown($postleitzahl)
 {
 	global $_REQUEST, $gemeinde;
@@ -73,23 +48,26 @@ function getGemeindeDropDown($postleitzahl)
 	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
 	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
-	if($db->db_query($qry))
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
-		while($row = $db->db_fetch_object())
+		if($db->db_query($qry))
 		{
-			if($firstentry=='')
-				$firstentry=$row->name;
-			if($gemeinde_x=='')
-				$gemeinde_x=$row->name;
-			
-			if($row->name==$gemeinde_x)
+			while($row = $db->db_fetch_object())
 			{
-				$selected='selected';
-				$found=true;
+				if($firstentry=='')
+					$firstentry=$row->name;
+				if($gemeinde_x=='')
+					$gemeinde_x=$row->name;
+				
+				if($row->name==$gemeinde_x)
+				{
+					$selected='selected';
+					$found=true;
+				}
+				else
+					$selected='';
+				echo "<option value='$row->name' $selected>$row->name</option>";
 			}
-			else
-				$selected='';
-			echo "<option value='$row->name' $selected>$row->name</option>";
 		}
 	}
 	
@@ -118,18 +96,20 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
 			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
 	echo '<SELECT id="ort" name="ort">';
-	if($db->db_query($qry))
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
-		while($row = $db->db_fetch_object())
+		if($db->db_query($qry))
 		{
-			if($row->ortschaftsname==$ort)
-				$selected='selected';
-			else 
-				$selected='';
-			echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+			while($row = $db->db_fetch_object())
+			{
+				if($row->ortschaftsname==$ort)
+					$selected='selected';
+				else 
+					$selected='';
+				echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+			}
 		}
-	}
-	
+	}	
 	echo '</SELECT>';
 }
 if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
@@ -424,8 +404,8 @@ if(isset($_POST['save']))
 	//UID generieren
 	if(!$error)
 	{		
-		$nachname_clean = mb_strtolower(clean_string($nachname));
-		$vorname_clean = mb_strtolower(clean_string($vorname));
+		$nachname_clean = mb_strtolower(convertProblemChars($nachname));
+		$vorname_clean = mb_strtolower(convertProblemChars($vorname));
 		$uid='';
 		
 		$uid = generateMitarbeiterUID($vorname_clean, $nachname_clean, $lektor);
@@ -444,8 +424,8 @@ if(isset($_POST['save']))
 	{
 		$kurzbz='';
  		$mitarbeiter = new mitarbeiter();
- 		$nachname_clean = clean_string($nachname);
- 		$vorname_clean = clean_string($vorname);
+ 		$nachname_clean = convertProblemChars($nachname);
+ 		$vorname_clean = convertProblemChars($vorname);
  		for($nn=6,$vn=2;$nn!=0;$nn--,$vn++)
  		{
  			$kurzbz = mb_substr($nachname_clean,0,$nn);
@@ -466,8 +446,8 @@ if(isset($_POST['save']))
 	//Alias generieren
 	if(!$error)
 	{
-		$nachname_clean = mb_strtolower(clean_string($nachname));
-		$vorname_clean = mb_strtolower(clean_string($vorname));
+		$nachname_clean = mb_strtolower(convertProblemChars($nachname));
+		$vorname_clean = mb_strtolower(convertProblemChars($vorname));
 		$bn = new benutzer();
 		
 		if(!$bn->alias_exists($vorname_clean.'.'.$nachname_clean))

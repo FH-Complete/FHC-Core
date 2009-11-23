@@ -49,23 +49,26 @@ function getGemeindeDropDown($postleitzahl)
 	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
 	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
-	if($result = $db->db_query($qry))
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
-		while($row = $db->db_fetch_object($result))
+		if($result = $db->db_query($qry))
 		{
-			if($firstentry=='')
-				$firstentry=$row->name;
-			if($gemeinde_x=='')
-				$gemeinde_x=$row->name;
-			
-			if($row->name==$gemeinde_x)
+			while($row = $db->db_fetch_object($result))
 			{
-				$selected='selected';
-				$found=true;
+				if($firstentry=='')
+					$firstentry=$row->name;
+				if($gemeinde_x=='')
+					$gemeinde_x=$row->name;
+				
+				if($row->name==$gemeinde_x)
+				{
+					$selected='selected';
+					$found=true;
+				}
+				else
+					$selected='';
+				echo "<option value='$row->name' $selected>$row->name</option>";
 			}
-			else
-				$selected='';
-			echo "<option value='$row->name' $selected>$row->name</option>";
 		}
 	}
 	
@@ -92,15 +95,18 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
 			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
 	echo '<SELECT id="ort" name="ort">';
-	if($result = $db->db_query($qry))
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
-		while($row = $db->db_fetch_object($result))
+		if($result = $db->db_query($qry))
 		{
-			if($row->ortschaftsname==$ort)
-				$selected='selected';
-			else 
-				$selected='';
-			echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+			while($row = $db->db_fetch_object($result))
+			{
+				if($row->ortschaftsname==$ort)
+					$selected='selected';
+				else 
+					$selected='';
+				echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+			}
 		}
 	}
 	

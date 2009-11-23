@@ -130,7 +130,7 @@ if($studiensemester_kurzbz!='')
 	$maxlength[$spalte]=9;
 	
 		
-	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant (auch wenn im gleichen Semester Absolvent oder Abbrecher)
+	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
 		geburtsnation AS nation, titelpre, uid || '@technikum-wien.at' AS email, 
 		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
@@ -143,13 +143,15 @@ if($studiensemester_kurzbz!='')
 		(SELECT ort FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_ort, 
 		(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse, 
 		titelpost 
-		FROM tbl_person 
-		JOIN tbl_benutzer using(person_id) 
-		JOIN tbl_student on(uid=student_uid)
-		JOIN tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
+		FROM public.tbl_person 
+		JOIN public.tbl_benutzer using(person_id) 
+		JOIN public.tbl_student on(uid=student_uid)
+		JOIN public.tbl_prestudent using(prestudent_id)
+		JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
 		WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-		AND (status_kurzbz='Student' OR status_kurzbz='Diplomand' OR status_kurzbz='Praktikant')
-		AND studiengang_kz<999 ";
+		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') in('Student','Diplomand','Praktikant')
+		AND tbl_student.studiengang_kz<999 AND tbl_prestudent.bismelden=true";
+	// AND tbl_benutzer.aktiv=true
 
 	if($result = $db->db_query($qry))
 	{
@@ -289,7 +291,7 @@ if($studiensemester_kurzbz!='')
 	$worksheet2->write($zeile,++$spalte,'Titelpost',$format_bold);
 	$maxlength[$spalte]=9;
 	
-	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant (auch wenn im gleichen Semester Absolvent oder Abbrecher), die bezahlt haben
+	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant, die bezahlt haben
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
 	geburtsnation AS nation, titelpre, uid || '@technikum-wien.at' AS email, 
 	(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
@@ -302,17 +304,20 @@ if($studiensemester_kurzbz!='')
 	(SELECT ort FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_ort, 
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse, 
 	titelpost 
-	FROM tbl_person 
-	JOIN tbl_konto as ka using(person_id) 
-	JOIN tbl_konto as kb using(person_id) 
-	JOIN tbl_benutzer using(person_id) 
-	JOIN tbl_student on(uid=student_uid)
-	JOIN tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-	WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND (status_kurzbz='Student' OR status_kurzbz='Diplomand' OR status_kurzbz='Praktikant')
+	FROM public.tbl_person 
+	JOIN public.tbl_konto as ka using(person_id) 
+	JOIN public.tbl_konto as kb using(person_id) 
+	JOIN public.tbl_benutzer using(person_id) 
+	JOIN public.tbl_student on(uid=student_uid)
+	JOIN public.tbl_prestudent using(prestudent_id)
+	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
+	WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
+	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') in('Student','Diplomand','Praktikant')
 	AND tbl_student.studiengang_kz<999 AND
 	ka.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
 	AND kb.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
-	AND kb.buchungsnr_verweis=ka.buchungsnr ";
+	AND kb.buchungsnr_verweis=ka.buchungsnr";
+	//AND tbl_benutzer.aktiv=true
 
 	if($result = $db->db_query($qry))
 	{
