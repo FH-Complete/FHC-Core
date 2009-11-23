@@ -143,6 +143,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			
 		}
 		
+		$akadgrad_id='';
 		$qry = "SELECT bezeichnung, akadgrad_id FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
 		if($db->db_query($qry))
 		{
@@ -152,16 +153,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$akadgrad_id = $row1->akadgrad_id;
 			}
 		}
-		
+				
 		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id='$akadgrad_id'";
 		$titel = '';
 		$titel_kurzbz = '';
-		if($db->db_query($qry))
+		if($akadgrad_id!='')
 		{
-			if($row_titel = $db->db_fetch_object())
+			if($db->db_query($qry))
 			{
-				$titel = $row_titel->titel;
-				$titel_kurzbz = $row_titel->akadgrad_kurzbz;
+				if($row_titel = $db->db_fetch_object())
+				{
+					$titel = $row_titel->titel;
+					$titel_kurzbz = $row_titel->akadgrad_kurzbz;
+				}
 			}
 		}
 		echo '		<titel>'.$titel.'</titel>';

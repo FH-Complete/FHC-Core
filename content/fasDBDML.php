@@ -109,24 +109,33 @@ if(!$error)
 			//Wenn die Nation Oesterreich ist, dann muss die Gemeinde in der Tabelle Gemeinde vorkommen
 			if($_POST['nation']=='A')
 			{
-				$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."') AND plz='".addslashes($_POST['plz'])."'";
-				if($db->db_query($qry))
+				if(is_numeric($_POST['plz']) && $_POST['plz']<32000)
 				{
-					if($row = $db->db_fetch_object())
+					$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."') AND plz='".addslashes($_POST['plz'])."'";
+					if($db->db_query($qry))
 					{
-						$adresse->gemeinde = $row->name;	
+						if($row = $db->db_fetch_object())
+						{
+							$adresse->gemeinde = $row->name;	
+						}
+						else
+						{
+							$error = true;
+							$errormsg = 'Gemeinde ist ungueltig';
+							$return = false;
+						}
 					}
 					else
 					{
 						$error = true;
-						$errormsg = 'Gemeinde ist ungueltig';
+						$errormsg = 'Fehler beim Ermitteln der Gemeinde';
 						$return = false;
 					}
 				}
-				else
+				else 
 				{
 					$error = true;
-					$errormsg = 'Fehler beim Ermitteln der Gemeinde';
+					$errormsg = 'Postleitzahl ist fuer diese Nation ungueltig';
 					$return = false;
 				}
 			}

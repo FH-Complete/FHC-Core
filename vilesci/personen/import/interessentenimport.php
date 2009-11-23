@@ -51,7 +51,7 @@ function getGemeindeDropDown($postleitzahl)
 	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 
 	echo '<SELECT id="gemeinde" name="gemeinde" onchange="loadOrtData()">';
-	if($postleitzahl<10000)
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
 		$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
 		
@@ -99,7 +99,7 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 	
 	echo '<SELECT id="ort" name="ort">';
 	
-	if($postleitzahl< 10000)
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
 		$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
 		$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 

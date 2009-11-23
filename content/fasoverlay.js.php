@@ -1284,7 +1284,7 @@ function OpenManual()
 // ****
 function OpenToDoDialog()
 {
-	window.open('<?php echo APP_ROOT ?>content/ToDo_FASo.html','ToDo','height=600,width=600,left=150,top=150,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('http://fhcomplete.technikum-wien.at/mantis/login.php?username=anonymous&return=%2Fmantis%2Froadmap_page.php%3F','ToDo','height=600,width=800,left=150,top=150,hotkeys=0,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes,dependent=yes');
 }
 
 // ****
