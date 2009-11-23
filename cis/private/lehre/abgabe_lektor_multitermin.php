@@ -120,6 +120,14 @@ if(isset($_POST["schick"]))
 						$row_std=$db->db_fetch_object($result_std);
 						$mail = new mail($row_std->uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+						if(!$mail->send())
+						{
+							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden! ($row_std->uid)</font><br>&nbsp;";	
+						}
+						else 
+						{
+							echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+						}
 					}
 				}
 				$command='';
@@ -161,7 +169,10 @@ $htmlstr='';
 		$result_typ=$db->db_query($qry_typ);
 		while ($row_typ=@$db->db_fetch_object($result_typ))
 		{
-			$htmlstr .= "		<option value='".$row_typ->paabgabetyp_kurzbz."'>".$row_typ->bezeichnung."</option>";
+			if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
+			{
+				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
+			}
 		}		
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
