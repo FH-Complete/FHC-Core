@@ -833,7 +833,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	$downloadname = mb_ereg_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
 	
 	echo "
-	<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='$uebung_obj->bezeichnung'></td><td>$error_thema</td></tr>
+	<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='".htmlentities($uebung_obj->bezeichnung,ENT_QUOTES,'UTF-8')."'></td><td>$error_thema</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>";
 	
@@ -923,7 +923,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 			echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>Beispiel bearbeiten</td></tr>\n";
 			echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
 
-			echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' maxlength='32' value='$beispiel_obj->bezeichnung'>";
+			echo "<tr><td>Bezeichnung <input type='text' name='bezeichnung' maxlength='32' value='".htmlentities($beispiel_obj->bezeichnung,ENT_QUOTES,'UTF-8')."'>";
 			echo "&nbsp;Punkte <input type='text' size='2' name='punkte' value='$beispiel_obj->punkte'></td></tr>";
 			echo "<tr><td align='right'><input type='submit' name='beispiel_edit' value='Ändern'></td></tr>";
 
@@ -949,7 +949,7 @@ else
 		$liste_obj->load($liste_id);
 	
 		echo "
-		<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='$liste_obj->bezeichnung'></td><td>$error_thema</td></tr><tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$liste_obj->gewicht'></td><td>$error_gewicht</td></tr>
+		<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='".htmlentities($liste_obj->bezeichnung,ENT_QUOTES,'UTF-8')."'></td><td>$error_thema</td></tr><tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$liste_obj->gewicht'></td><td>$error_gewicht</td></tr>
 		<tr><td>Positiv </td><td><input type='checkbox' name='positiv' ".($liste_obj->positiv?'checked':'')."></td></tr>
 		<tr><td colspan=2 align='right'><input type='submit' name='liste_edit' value='Speichern'></td></tr>
 		</table>
@@ -1045,7 +1045,7 @@ else
 				//Falls ja wird diese nicht in der Combo angezeigt
 				foreach ($copy_le_content as $id=>$bezeichnung)
 				{
-					$qry = "SELECT uebung_id FROM campus.tbl_uebung WHERE lehreinheit_id='$id' AND bezeichnung='$row->bezeichnung'";
+					$qry = "SELECT uebung_id FROM campus.tbl_uebung WHERE lehreinheit_id='$id' AND bezeichnung='".addslashes($row->bezeichnung)."'";
 					//echo $qry;
 					if($result_vorhanden = $db->db_query($qry))
 					{
@@ -1204,7 +1204,7 @@ else
 	<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
 	<table >
 	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Abgabe anlegen</td><td></td></tr>
-	<tr><td>Thema</td><td align='right'><input type='text' name='thema' maxlength='32' value='$thema'></td><td><span class='error'>$error_thema</td></tr>
+	<tr><td>Thema</td><td align='right'><input type='text' name='thema' maxlength='32' value='".htmlentities($thema,ENT_QUOTES,'UTF-8')."'></td><td><span class='error'>$error_thema</td></tr>
 	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
 	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
 	<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='$gewicht'></td><td>$error_gewicht</td></tr>
