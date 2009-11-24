@@ -147,7 +147,7 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 2.5 \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Im Unterricht/in den Prüfungen verwendete Sprachen \n Language(s) of instruction/examination</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> <xsl:value-of select="sprache_deutsch" />\n <xsl:value-of select="sprache_englisch" /></fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:text> </xsl:text><xsl:value-of select="sprache_deutsch" />\n <xsl:value-of select="sprache_englisch" /></fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
