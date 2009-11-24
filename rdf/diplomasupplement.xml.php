@@ -79,6 +79,32 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<studiengang_kz>'.sprintf("%04s",   $row->studiengang_kz).'</studiengang_kz>';
 		echo '		<studiengang_bezeichnung_deutsch>'.$row->bezeichnung.'</studiengang_bezeichnung_deutsch>';
 		echo '		<studiengang_bezeichnung_englisch>'.$row->english.'</studiengang_bezeichnung_englisch>';
+		
+		//Unterrichtssprache
+		$sprache_deutsch='';
+		$sprache_englisch='';
+		$qry_sprache = "SELECT sprache FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='".addslashes($row->studiengang_kz)."' AND aktiv GROUP BY sprache ORDER BY sprache DESC";
+		if($result_sprache = $db->db_query($qry_sprache))
+		{
+			while($row_sprache = $db->db_fetch_object($result_sprache))
+			{
+				if($sprache_englisch!='')
+					$sprache_englisch.=', ';
+				if($sprache_deutsch!='')
+					$sprache_deutsch.=', ';
+				
+				$sprache_englisch .= $row_sprache->sprache;
+				
+				switch ($row_sprache->sprache)
+				{
+					case 'German': $sprache_deutsch .= 'Deutsch'; break;
+					case 'English': $sprache_deutsch .= 'Englisch'; break;
+				}
+			}
+		}
+		echo '		<sprache_deutsch>'.$sprache_deutsch.'</sprache_deutsch>';
+		echo '		<sprache_englisch>'.$sprache_englisch.'</sprache_englisch>';
+		
 		echo '		<semester>'.$row->max_semester.'</semester>';
 		echo '		<jahre>'.($row->max_semester/2.0).'</jahre>';
 		echo '		<ects>'.($row->max_semester*30+$angerechnete_sws).'</ects>';
