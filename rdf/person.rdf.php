@@ -55,7 +55,14 @@ echo '
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
 $filter = utf8_encode($filter);
-$qry = "SELECT distinct person_id, vorname, nachname, titelpre, titelpost FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*' ORDER BY nachname, vorname, titelpre, titelpost";
+$qry = "SELECT 
+			distinct person_id, vorname, nachname, titelpre, titelpost,
+			CASE 
+				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Mitarbeiter'
+				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Student'
+				ELSE 'Person'
+			END as status
+		FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*' ORDER BY nachname, vorname, titelpre, titelpost";
 
 if(isset($_GET['nurmittitel']))
 {
@@ -74,6 +81,7 @@ if($result = $db->db_query($qry))
 	        	<PERSON:vorname><![CDATA['.$row->vorname.']]></PERSON:vorname>
 	        	<PERSON:nachname><![CDATA['.$row->nachname.']]></PERSON:nachname>
 	    		<PERSON:anzeigename><![CDATA['.$row->nachname.' '.$row->vorname.' '.$row->titelpre.' '.$row->titelpost.']]></PERSON:anzeigename>
+	    		<PERSON:status><![CDATA['.$row->status.']]></PERSON:status>
 	      	</RDF:Description>
 	      </RDF:li>
 		';

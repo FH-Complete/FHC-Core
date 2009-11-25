@@ -409,7 +409,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<template>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
-								        		      label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
+								        		      label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename ( rdf:http://www.technikum-wien.at/person/rdf#status )"
 											  		  uri="rdf:*"/>
 										</menupopup>
 									</template>
