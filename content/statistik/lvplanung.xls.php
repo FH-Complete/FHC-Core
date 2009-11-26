@@ -29,7 +29,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 
 $user = get_uid();
-$user='simane';
+
 loadVariables($user);
 
 if(isset($_GET['studiensemester_kurzbz']))

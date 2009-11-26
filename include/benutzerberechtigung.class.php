@@ -609,6 +609,10 @@ class benutzerberechtigung extends basis_db
 			else
 				$in = ' AND oe_kurzbz IN('.mb_substr($in,0, mb_strlen($in)-1).')';
 		}
+		else 
+		{
+			$in='';
+		}
 		
 		if($not!='')
 			$not = ' AND oe_kurzbz NOT IN('.mb_substr($not,0, mb_strlen($not)-1).')';
