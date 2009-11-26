@@ -355,7 +355,7 @@ if($result = $db->db_query($qry))
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 
