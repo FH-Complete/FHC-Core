@@ -333,7 +333,7 @@ $htmlstr .= "</table>\n";
 $htmlstr .= "<br><b>Abgabetermine:</b>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 $htmlstr .= "<tr></tr>\n";
-$htmlstr .= "<tr><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
+$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
 $result=@$db->db_query($qry);
 	while ($row=@$db->db_fetch_object($result))
 	{
@@ -349,14 +349,17 @@ $result=@$db->db_query($qry);
 			if ($row->datum<=date('Y-m-d'))
 			{
 				$bgcol='#FF0000';
+				$fcol='#FFFFFF';
 			}
 			elseif (($row->datum>date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
 			{
 				$bgcol='#FFFF00';
+				$fcol='#000000';
 			}
 			else 
 			{
 				$bgcol='#FFFFFF';
+				$fcol='#000000';
 			}
 		}
 		else 
@@ -364,15 +367,26 @@ $result=@$db->db_query($qry);
 			if($row->abgabedatum>$row->datum)
 			{
 				$bgcol='#EA7B7B';
+				$fcol='#FFFFFF';
 			}
 			else 
 			{
 				$bgcol='#00FF00';
+				$fcol='#FFFFFF';
 			}
 		}
 		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-		//$htmlstr .= "		</td>\n";
-		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol."' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
+		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
+		if($row->fixtermin=='t')
+		{
+			$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='Fixer Abgabetermin' border=0></td>";
+		}
+		else 
+		{
+			$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='Variabler Abgabetermin' border=0></td>";
+		}
+		$htmlstr .= "		</td>\n";
+		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol." ' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 		//$htmlstr .= "			<option value=''>&nbsp;</option>";
 		$qry_typ="SELECT * FROM campus.tbl_paabgabetyp";
@@ -392,7 +406,7 @@ $result=@$db->db_query($qry);
 			}
 		}		
 		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
+		$htmlstr .= "		<td><input type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";		
 		if($user==$row->insertvon)
 		{		
@@ -443,8 +457,9 @@ $htmlstr .= "<input type='hidden' name='command' value='insert'>\n";
 $htmlstr .= "<tr id='".$projektarbeit_id."'>\n";
 
 //$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
+$htmlstr .= "<td>&nbsp;&nbsp;</td>";
 
-$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
+$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 $qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end' AND paabgabetyp_kurzbz!='enda' AND paabgabetyp_kurzbz!='note'";

@@ -128,7 +128,10 @@ if($studiensemester_kurzbz!='')
 	$maxlength[$spalte]=9;
 	$worksheet->write($zeile,++$spalte,'Titelpost',$format_bold);
 	$maxlength[$spalte]=9;
-	
+	$worksheet->write($zeile,++$spalte,'Semester',$format_bold);
+	$maxlength[$spalte]=16;
+	$worksheet->write($zeile,++$spalte,'Status',$format_bold);
+	$maxlength[$spalte]=20;
 		
 	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
@@ -142,7 +145,8 @@ if($studiensemester_kurzbz!='')
 		(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_plz, 
 		(SELECT ort FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_ort, 
 		(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse, 
-		titelpost 
+		titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') as status, 
+		(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=public.tbl_prestudent.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ORDER BY datum desc LIMIT 1) AS semester  
 		FROM public.tbl_person 
 		JOIN public.tbl_benutzer using(person_id) 
 		JOIN public.tbl_student on(uid=student_uid)
@@ -236,6 +240,14 @@ if($studiensemester_kurzbz!='')
 			$worksheet->write($zeile,++$spalte, $row->titelpost);
 			if(mb_strlen($row->titelpost)>$maxlength[$spalte])
 				$maxlength[$spalte]=mb_strlen($row->titelpost);	
+				
+			$worksheet->write($zeile,++$spalte, $row->semester);
+			if(mb_strlen($row->semester)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->semester);	
+				
+			$worksheet->write($zeile,++$spalte, $row->status);
+			if(mb_strlen($row->status)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->status);	
 		}
 	}
 	
@@ -290,6 +302,10 @@ if($studiensemester_kurzbz!='')
 	$maxlength[$spalte]=9;
 	$worksheet2->write($zeile,++$spalte,'Titelpost',$format_bold);
 	$maxlength[$spalte]=9;
+	$worksheet2->write($zeile,++$spalte,'Semester',$format_bold);
+	$maxlength[$spalte]=16;
+	$worksheet2->write($zeile,++$spalte,'Status',$format_bold);
+	$maxlength[$spalte]=20;
 	
 	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant, die bezahlt haben
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
@@ -303,7 +319,8 @@ if($studiensemester_kurzbz!='')
 	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_plz, 
 	(SELECT ort FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_ort, 
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse, 
-	titelpost 
+	titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') as status, 
+	(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=public.tbl_prestudent.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ORDER BY datum desc LIMIT 1) AS semester  
 	FROM public.tbl_person 
 	JOIN public.tbl_konto as ka using(person_id) 
 	JOIN public.tbl_konto as kb using(person_id) 
@@ -402,7 +419,15 @@ if($studiensemester_kurzbz!='')
 				
 			$worksheet2->write($zeile,++$spalte, $row->titelpost);
 			if(mb_strlen($row->titelpost)>$maxlength[$spalte])
-				$maxlength[$spalte]=mb_strlen($row->titelpost);	
+				$maxlength[$spalte]=mb_strlen($row->titelpost);
+			
+			$worksheet2->write($zeile,++$spalte, $row->semester);
+			if(mb_strlen($row->semester)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->semester);	
+				
+			$worksheet2->write($zeile,++$spalte, $row->status);
+			if(mb_strlen($row->status)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->status);			
 		}
 	}
 	

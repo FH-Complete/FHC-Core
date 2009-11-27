@@ -57,7 +57,7 @@ if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('a
 	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
 $sql_query = "SELECT * 
-			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit  
+			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,* FROM lehre.tbl_projektarbeit  
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
 			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
@@ -98,20 +98,23 @@ else
 		$muid='';
 		$muid2='';
 		$mituid='';
+		$stgbez=$row->stgbez;
 		//Betreuer suchen
 		$qry_betr="SELECT trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, 
-		public.tbl_mitarbeiter.mitarbeiter_uid
+		public.tbl_mitarbeiter.mitarbeiter_uid, '' as kontakt 
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-		WHERE projektarbeit_id='$row->projektarbeit_id' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
+		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)    
+		WHERE projektarbeit_id='$row->projektarbeit_id' 
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
 		UNION
-		SELECT '' as first,trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second, public.tbl_mitarbeiter.mitarbeiter_uid
+		SELECT '' as first, trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second, 
+		public.tbl_mitarbeiter.mitarbeiter_uid, 
+		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' LIMIT 1) as kontakt 
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-		WHERE projektarbeit_id='$row->projektarbeit_id'  AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
+		WHERE projektarbeit_id='$row->projektarbeit_id' 
 		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
 		";
 
@@ -136,12 +139,21 @@ else
 						$erstbegutachter.=", ".$row_betr->first;
 						$muid.=", ".$row_betr->mitarbeiter_uid."@".DOMAIN;
 					}
-				}
-				//Anzeige nur von 
+				} 
 				if($row_betr->second!='')
 				{
 					$zweitbegutachter=$row_betr->second;
-					$muid2=$row_betr->mitarbeiter_uid;
+					if($row_betr->mitarbeiter_uid!='' && $row_betr->mitarbeiter_uid!=NULL)
+					{
+						$muid2=$row_betr->mitarbeiter_uid."@".DOMAIN;
+					}
+					else 
+					{
+						if($row_betr->kontakt!='' && $row_betr->kontakt!=NULL)
+						{
+							$muid2=$row_betr->kontakt;
+						}
+					}
 				}
 									
 			}
@@ -206,7 +218,7 @@ else
 				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
 			}
 		}
-		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
+		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
@@ -218,7 +230,7 @@ else
 	
 		if($muid != NULL && $muid !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
 		}
 		else
 		{
@@ -226,7 +238,7 @@ else
 		}
 		if($muid2 != NULL && $muid2 !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:$muid2@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><a href='mailto:".$muid2."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
 		}
 		else
 		{
@@ -236,6 +248,7 @@ else
 		$i++;
 	}
 	$htmlstr .= "</tbody></table>\n";
+	$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
 	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren</td></tr><tr><td>&nbsp;</td></tr><tr>\n";
 	$htmlstr .= "<td rowspan=3><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td></tr></table>\n";
 	$htmlstr .= "</form>";
@@ -273,7 +286,7 @@ function markiere()
 
 <body class="background_main">
 <?php 
-echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz)</h2>";
+echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</h2>";
 
 
     echo $htmlstr;
