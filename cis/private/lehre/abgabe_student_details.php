@@ -368,14 +368,17 @@ if($command!="add")
 				if ($row->datum<=date('Y-m-d'))
 				{
 					$bgcol='#FF0000';
+					$fcol='#FFFFFF';
 				}
 				elseif (($row->datum>date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
 				{
 					$bgcol='#FFFF00';
+					$fcol='#000000';
 				}
 				else 
 				{
 					$bgcol='#FFFFFF';
+					$fcol='#000000';
 				}
 			}
 			else 
@@ -383,15 +386,25 @@ if($command!="add")
 				if($row->abgabedatum>$row->datum)
 				{
 					$bgcol='#EA7B7B';
+					$fcol='#FFFFFF';
 				}
 				else 
 				{
 					$bgcol='#00FF00';
+					$fcol='#FFFFFF';
 				}
 			}
 			//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." disabled>";
-			//$htmlstr .= "		</td>\n";
-			$htmlstr .= "		<td align='center' style='background-color:".$bgcol."'>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>\n";
+			if($row->fixtermin=='t')
+			{
+				$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='Fixer Abgabetermin' border=0></td>";
+			}
+			else 
+			{
+				$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='Variabler Abgabetermin' border=0></td>";
+			}
+			$htmlstr .= "		</td>\n";
+			$htmlstr .= "		<td align='center' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol."'>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>\n";
 			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row->paabgabetyp_kurzbz."'";
 			$result_typ=$db->db_query($qry_typ);
 			$row_typ=$db->db_fetch_object($result_typ);
@@ -400,14 +413,14 @@ if($command!="add")
 			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
 			$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";
 			//Überschrittene Termine
-			//if($row->datum>date('Y-m-d'))
-			//{
+			if($row->fixtermin && $row->datum>date('Y-m-d'))
+			{
 				$htmlstr .= "		<td><input type='submit' name='schick' value=' abgeben ' title='ausgew&auml;hlte Datei hochladen'></td>";
-			//}
-			//else 
-			//{
-			//	$htmlstr .= "		<td>Termin vorbei</td>";
-			//}
+			}
+			else 
+			{
+				$htmlstr .= "		<td>Termin vorbei</td>";
+			}
 			$htmlstr .= "	</tr>\n";
 			
 			$htmlstr .= "</form>\n";

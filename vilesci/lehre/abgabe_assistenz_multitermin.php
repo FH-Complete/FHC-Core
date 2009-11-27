@@ -58,9 +58,28 @@ $fixtermin = (isset($_POST['fixtermin'])?1:0);
 $datum = (isset($_POST['datum'])?$_POST['datum']:'');
 $kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 $paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'');
+$stg_kz = (isset($_POST['stg_kz'])?$_POST['stg_kz']:'');
+$qry_stg="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
+if($result_stg=$db->db_query($qry_stg))
+{
+	if($row_stg=$db->db_fetch_object($result_stg))
+	{
+		$stgbez=$row_stg->bezeichnung;
+	}
+	else 
+	{
+		echo "<font color=\"#FF0000\">Fehler beim Laden des Studiengangs!</font><br>&nbsp;";
+		exit;
+	}
+}
+else 
+{
+	echo "<font color=\"#FF0000\">Studiengang konnte nicht gefunden werden!</font><br>&nbsp;";
+	exit;
+}
 
-	if (!$user = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if (!$user = get_uid())
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 			
 
 $datum_obj = new datum();
@@ -70,6 +89,9 @@ $stg_arr = array();
 $error = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
+	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang');
 
 $datum_obj = new datum();
 $datum=$datum_obj->formatDatum($datum,'Y-m-d');
@@ -123,7 +145,7 @@ if(isset($_POST["schick"]))
 						if($paabgabetyp_kurzbz !='note')
 						{
 							$mail = new mail($row_std->uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Studiengangsassistent(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Studiengangsassistent(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
@@ -151,8 +173,8 @@ if(isset($_POST["schick"]))
 						{
 							if($row_betr=$db->db_fetch_object($betr))
 							{
-								$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang hat einen neuen Termin angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".$row_std->anrede.trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+								$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung im Studiengang $stgbez",
+								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen neuen Termin angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
@@ -202,7 +224,7 @@ $htmlstr='';
 		$htmlstr .= "<tr></tr>\n";
 		$htmlstr .= "<tr><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td></tr>\n";
 		$htmlstr .= "<tr id='termin'>\n";
-		//$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
+		$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 		$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 		$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
