@@ -251,7 +251,7 @@ if(!$result_lv = $db->db_query($sql_query))
 $outp='';
 $s=array();
 $outp.="<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
-$outp.="Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
+$outp.=" Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
 $outp.="<OPTION value='' ".($stg_kz==''?'selected':'').">-- Alle --</OPTION>";
 foreach ($studiengang as $stg)
 {
@@ -267,13 +267,13 @@ $s['']->max_sem=8;
 $outp.='</SELECT>';
 
 //Semester DropDown
-$outp.= 'Semester <SELECT name="semester">';
+$outp.= ' Semester <SELECT name="semester">';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.="<OPTION value='$i' ".($i==$semester?'selected':'').">$i</OPTION>";
 $outp.='</SELECT>';
 
-//Fachbereich DropDown
-$outp.= 'Fachbereich <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
+//Institut DropDown
+$outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurzbz">';
 $fachb = new fachbereich();
 $fachb->getAll();
 $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
@@ -295,7 +295,7 @@ $outp.= '</SELECT>';
 if($rechte->isBerechtigt('admin'))
 {
 	//Aktiv DropDown
-	$outp.= 'Aktiv <SELECT name="isaktiv" id="isaktiv">';
+	$outp.= ' Aktiv <SELECT name="isaktiv" id="isaktiv">';
 	$outp.= "<OPTION value=''".($isaktiv==''?' selected':'').">-- Alle --</OPTION>";
 	$outp.= "<OPTION value='true '".($isaktiv=='true'?'selected':'').">-- Aktiv --</OPTION>";
 	$outp.= "<OPTION value='false '".($isaktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
@@ -370,7 +370,7 @@ if ($result_lv!=0)
 		  <th class='table-sortable:numeric'>Sort</th>
 		  <th class='table-sortable:default'>Zeugnis</th>
 		  <th class='table-sortable:default'>BA/DA</th>
-		  <th class='table-sortable:default'>FBK</th>
+		  <th class='table-sortable:default'>Koordinator</th>
 		  <th class='table-sortable:default'>LVInfo</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
