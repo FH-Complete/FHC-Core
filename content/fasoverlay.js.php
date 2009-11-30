@@ -1099,20 +1099,47 @@ function ExtrasShowLVverwaltung()
 {
 	tree = document.getElementById('tree-verband');
 
-	if(tree.currentIndex==-1)
+	if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-verband'))
 	{
-		alert('Bitte zuerst einen Studiengang auswaehlen');
-		return;
-	}
+		tree = document.getElementById('tree-verband');
 
-	//Studiengang und Semester holen
-	var col;
-	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
-	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	col = tree.columns ? tree.columns["sem"] : "sem";
-	var semester=tree.view.getCellText(tree.currentIndex,col);
+		if(tree.currentIndex==-1)
+		{
+			alert('Bitte zuerst einen Studiengang auswaehlen');
+			return;
+		}
+
+		//Studiengang und Semester holen
+		var col;
+		col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+		var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+		col = tree.columns ? tree.columns["sem"] : "sem";
+		var semester=tree.view.getCellText(tree.currentIndex,col);
+		
+		var url = '<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php?stg_kz='+studiengang_kz+'&semester='+semester;
+	}
+	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-fachbereich'))
+	{
+		tree = document.getElementById('tree-fachbereich');
+
+		if(tree.currentIndex==-1)
+		{
+			alert('Bitte zuerst einen Fachbereich auswaehlen');
+			return;
+		}
+
+		//Fachbereich holen
+		var col;
+		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
+		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php?fachbereich_kurzbz='+fachbereich_kurzbz;
+	}
+	else
+	{
+		var url = '<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php';
+	}
 	
-	window.open('<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php?stg_kz='+studiengang_kz+'&semester='+semester,'Lehrveranstaltungen','');
+	window.open(url,'Lehrveranstaltungen','');
 }
 
 // ****

@@ -404,7 +404,13 @@ if(!$error)
 					$return = false;
 				}
 			}
-			
+
+			if($_POST['funktion_kurzbz']=='fbk' && $_POST['fachbereich_kurzbz']=='')
+			{
+				$error=true;
+				$errormsg='Bei Koordinatoren muss auch ein Institut angegeben werden';
+				$return=false;
+			}
 			if(!$error)
 			{
 				$benutzerfunktion->oe_kurzbz = $_POST['oe_kurzbz'];
