@@ -84,6 +84,7 @@ else
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
 }
 
+//$user='ie07m102';
 $user = get_uid();
 if($uid=='-1' || $uid!=$user)
 {
@@ -287,7 +288,7 @@ if($command=="update" && $error!=true)
 						{
 							$row_std=$db->db_fetch_object($result_std);
 							
-							$mail = new mail($qry_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Bachelor-/Diplomarbeitsbetreuung",
+							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Bachelor-/Diplomarbeitsbetreuung",
 							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n".($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
@@ -305,7 +306,7 @@ if($command=="update" && $error!=true)
 		}
 		else 
 		{
-			echo "Upload keine pdf-Datei! Bitte wiederholen Sie den Fileupload.";
+			echo "Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.";
 		}
 	}
 	$error=false;		
@@ -342,7 +343,7 @@ if($command!="add")
 	$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr .= "<tr></tr>\n";
 	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' AND paabgabetyp_kurzbz!='note' ORDER BY datum;";
-	$htmlstr .= "<tr><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload</td><td></td></tr>\n";
+	$htmlstr .= "<tr><td>fix</td><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload</td><td></td></tr>\n";
 	$result=@$db->db_query($qry);
 		while ($row=@$db->db_fetch_object($result))
 		{
@@ -367,16 +368,19 @@ if($command!="add")
 			{
 				if ($row->datum<=date('Y-m-d'))
 				{
+					//Termin vorbei - weiß auf rot
 					$bgcol='#FF0000';
 					$fcol='#FFFFFF';
 				}
 				elseif (($row->datum>date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
 				{
+					//Termin nahe - schwarz auf gelb
 					$bgcol='#FFFF00';
 					$fcol='#000000';
 				}
 				else 
 				{
+					//"normaler" Termin - schwarz auf weiß
 					$bgcol='#FFFFFF';
 					$fcol='#000000';
 				}
@@ -385,11 +389,13 @@ if($command!="add")
 			{
 				if($row->abgabedatum>$row->datum)
 				{
+					//Abgabe nach Termin - weiß auf hellrot
 					$bgcol='#EA7B7B';
 					$fcol='#FFFFFF';
 				}
 				else 
 				{
+					//Abgabe vor Termin - weiß auf grün
 					$bgcol='#00FF00';
 					$fcol='#FFFFFF';
 				}
@@ -411,15 +417,26 @@ if($command!="add")
 			$htmlstr .= "              <td>$row_typ->bezeichnung</td>\n";
 			$htmlstr .= "		<td width='250'>$row->kurzbz</td>\n";		
 			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
-			$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";
+			
 			//Überschrittene Termine
-			if($row->fixtermin && $row->datum>date('Y-m-d'))
+			if($row->paabgabetyp_kurzbz=='enda')
 			{
-				$htmlstr .= "		<td><input type='submit' name='schick' value=' abgeben ' title='ausgew&auml;hlte Datei hochladen'></td>";
+				//Bei Endabgabe kein Upload - Abgabe erfolgt im Sekretariat
+				$htmlstr .= "		<td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td>";
 			}
 			else 
 			{
-				$htmlstr .= "		<td>Termin vorbei</td>";
+				if($row->fixtermin=='t' && $row->datum>date('Y-m-d'))
+				{
+					//Termin ist überschritten - es wird kein Upload für diesen Termin mehr angeboten
+					$htmlstr .= "		<td>Termin vorbei</td>";
+				}
+				else 
+				{
+					//Datei kann hochgeladen werden
+					$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";
+					$htmlstr .= "		<td><input type='submit' name='schick' value=' abgeben ' title='ausgew&auml;hlte Datei hochladen'></td>";
+				}
 			}
 			$htmlstr .= "	</tr>\n";
 			
