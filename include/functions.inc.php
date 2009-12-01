@@ -589,4 +589,80 @@ function check_utf8($str="")
 	  return $stati;
 }
 
+// ------------------------------------------------------------------------------------------
+//	Konertierungen
+// ------------------------------------------------------------------------------------------
+
+	
+// ------------------------------------------------------------------------------------------
+//	DB Array Konvertieren zu XML
+// ------------------------------------------------------------------------------------------
+	function array_to_xml($rows,$root='root')
+	{
+		if (!count($rows))
+			return '<'.$root.' />'."\r\n";
+			
+		$xml_string='';
+		$xml_string.='<'.$root.'>'."\r\n";
+		reset($rows);
+	
+	  	for ($i=0;$i<count($rows);$i++)
+		{	
+			$xml_string.='<row>'."\r\n";
+			$row=$rows[$i];
+			@reset($row);
+			while (@list( $tmp_key, $tmp_value ) = each($row) ) 
+			{
+				if (!is_numeric($tmp_key))
+				{
+					$xml_string.='<'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.$tmp_key.'>'."\r\n";
+				}	
+				elseif (is_numeric($tmp_key))
+				{
+					$xml_string.='<row'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></row'.$tmp_key.'>'."\r\n";
+				}	
+			}							
+			$xml_string.='</row>'."\r\n";
+		}	
+		$xml_string.='</'.$root.'>'."\r\n";
+		return $xml_string;
+	}
+
+// ------------------------------------------------------------------------------------------
+//  DB Array Konvertieren zu RDF
+// ------------------------------------------------------------------------------------------
+    function array_to_rdf($rows,$root='root',$rdf_uri='rdf')
+    {
+##exit(" $root $rdf_uri ");
+
+                $rdf_server=$_SERVER['SERVER_NAME'];
+                $rdf_string='';
+                if (!count($rows))
+                           return $rdf_string.='<'.strtoupper($rdf_uri).':'.$root.' />'."\r\n";
+                           
+#                      $rdf_string.='<'.strtoupper($rdf_uri).':'.$root.'>'."\r\n";
+                $rdf_string.='<'.strtoupper($rdf_uri).':Seq rdf:about="http://'.$rdf_server.'/'.$root.'/liste">'."\r\n";
+
+                reset($rows);
+                for ($i=0;$i<count($rows);$i++)
+                {           
+                           $rdf_string.='<'.strtoupper($rdf_uri).':li>'."\r\n";
+                           $rdf_string.='<'.strtoupper($rdf_uri).':Description id="'.$i.'" about="http://'.$rdf_server.'/liste'.$i.'">'."\r\n";
+                                                   
+                           $row=$rows[$i];
+                           reset($row);
+                           while (list( $tmp_key, $tmp_value ) = each($row) ) 
+                           {
+                                       if (!is_numeric($tmp_key))
+                                       {
+                                                   $rdf_string.='<'.strtoupper($rdf_uri).':'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.strtoupper($rdf_uri).':'.$tmp_key.'>'."\r\n";
+                                       }           
+                           }                                                                                 
+                           $rdf_string.='</'.strtoupper($rdf_uri).':Description>'."\r\n";
+                          $rdf_string.='</'.strtoupper($rdf_uri).':li>'."\r\n";
+                }           
+#                      $rdf_string.='</'.strtoupper($rdf_uri).':'.$root.'>'."\r\n";
+                $rdf_string.='</'.strtoupper($rdf_uri).':Seq>'."\r\n";
+                return $rdf_string;
+    }           
 ?>
