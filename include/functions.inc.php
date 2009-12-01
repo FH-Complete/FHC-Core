@@ -442,4 +442,42 @@ function convertProblemChars($str)
 
 	return preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));     
 }
+
+//Ersetzt alle Problemzeichen in einem String bevor dieser als xml oder rdf ausgegeben wird
+function xmlclean($string)
+{
+	$mixed = array(
+		chr(000), //null
+		chr(001), //start of heading
+		chr(002), //start of text
+		chr(003), //end of text
+		chr(004), //end of transmission
+		chr(005), //enquiry
+		chr(006), //acknowledge
+		chr(007), //bell
+		chr(010), //backspace
+		chr(013), //vertical-tab
+		chr(014), //NP form feed, new page
+		chr(016), //shift out
+		chr(017), //shift in
+		
+		chr(020), //data link escape
+		chr(021), //device control 1
+		chr(022), //device control 2
+		chr(023), //device control 3
+		chr(024), //device control 4
+		chr(025), //negative acknowledge
+		chr(026), //synchronous idle
+		chr(027), //end of trans. block
+		chr(030), //cancel
+		chr(031), //end of medium
+		chr(032), //substitute
+		chr(033), //escape
+		chr(034), //file separator
+		chr(035), //group separator
+		chr(036), //record separator
+		chr(037), //unit separator
+		);
+	return str_replace($mixed, "", $string);
+}
 ?>
