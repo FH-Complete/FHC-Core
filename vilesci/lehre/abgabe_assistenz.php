@@ -46,10 +46,10 @@
 	$zweitbegutachter='';
 	$fachbereich_kurzbz='';
 
-	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
+	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
 	if(!is_numeric($stg_kz) && $stg_kz!='')
-		$stg_kz='0';
-
+		die('Bitte vor dem Aufruf Studiengang ausw&auml;hlen!');
+	$stgbez='';
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($getuid);
 
