@@ -310,6 +310,10 @@ if(isset($_POST["schick"]))
 							{
 								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
 							}
+							else
+							{
+								echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+							}
 						}
 							
 						//Mail an Erstbegutachter
@@ -333,6 +337,10 @@ if(isset($_POST["schick"]))
 								if(!$mail->send())
 								{
 									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter!</font><br>&nbsp;";	
+								}
+								else 
+								{
+									echo "Mail verschickt an: ".$row_betr->first;
 								}
 							}
 							else 
@@ -391,6 +399,10 @@ if(isset($_POST["del"]))
 						{
 							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
 						}
+						else
+						{
+							echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+						}
 					}
 						
 					//Mail an Erstbegutachter
@@ -415,6 +427,10 @@ if(isset($_POST["del"]))
 							{
 								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter!</font><br>&nbsp;";	
 							}
+							else 
+							{
+								echo "Mail verschickt an: ".$row_betr->first;
+							}
 						}
 						else 
 						{
@@ -430,6 +446,25 @@ if(isset($_POST["del"]))
 		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
 	}
 	unset($_POST["del"]);
+}
+//Bestätigen einer Endabgabe - Endabgabe erfolgt in Sekretariat
+if(isset($_POST["enda"]))
+{
+	//Abgabetermin mit akt. Datum speichern
+	$qry="UPDATE campus.tbl_paabgabe SET
+		abgabedatum = now(), 
+		updatevon = '".$user."', 
+		updateamum = now() 
+		WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+	//echo $qry;	
+	if(!$result=$db->db_query($qry))
+	{
+		echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+	}
+	else 
+	{
+		echo "Endabgabedatum wurde eingetragen.";
+	}
 }
 $studentenname='';
 $qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='$uid'";
@@ -447,7 +482,7 @@ $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br></td>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "<br><b>Termine:</b>\n";
-$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
+$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 $htmlstr .= "<tr></tr>\n";
 $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
 
@@ -533,21 +568,28 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
-		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+				if($row->paabgabetyp_kurzbz=='enda')
 		{
-			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
+			$htmlstr .= "		<td width=50px><input type='submit' name='enda' value='best&auml;tigen' title='Endabgabe best&auml;tigen'></td>";
 		}
 		else 
 		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-		}
-		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
-		{
-			$htmlstr .= "		<td><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zus&auml;tzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
-		}
-		else 
-		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+			if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+			{
+				$htmlstr .= "		<td align=center><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
+			}
+			else 
+			{
+				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+			}
+			if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
+			{
+				$htmlstr .= "		<td align=center><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zus&auml;tzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
+			}
+			else 
+			{
+				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+			}
 		}
 		$htmlstr .= "	</tr>\n";
 		$htmlstr .= "</form>\n";
