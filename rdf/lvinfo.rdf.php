@@ -31,6 +31,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../config/cis.config.inc.php');
 require_once('../include/basis_db.class.php');
+require_once('../include/functions.inc.php');
 
 $rdf_url='http://www.technikum-wien.at/lvinfo';
 
@@ -93,26 +94,26 @@ if($db->db_query($qry))
 	{
 ?>
       	<RDF:Description  id="<?php echo $row->lv_lehrveranstaltung_id.'/'.$row->sprache; ?>"  about="<?php echo $rdf_url.'/'.$row->lv_lehrveranstaltung_id.'/'.$row->sprache; ?>" >
-			<LVINFO:lehrveranstaltung_id><![CDATA[<?php echo $row->lv_lehrveranstaltung_id; ?>]]></LVINFO:lehrveranstaltung_id>
-			<LVINFO:kurzbz><![CDATA[<?php echo $row->lv_kurzbz; ?>]]></LVINFO:kurzbz>
+			<LVINFO:lehrveranstaltung_id><![CDATA[<?php echo xmlclean($row->lv_lehrveranstaltung_id); ?>]]></LVINFO:lehrveranstaltung_id>
+			<LVINFO:kurzbz><![CDATA[<?php echo xmlclean($row->lv_kurzbz); ?>]]></LVINFO:kurzbz>
 			<LVINFO:bezeichnung><![CDATA[<?php echo ($row->sprache=='English'?$row->lv_bezeichnung_english:$row->lv_bezeichnung); ?>]]></LVINFO:bezeichnung>
-			<LVINFO:studiengang_kz><![CDATA[<?php echo $row->lv_studiengang_kz; ?>]]></LVINFO:studiengang_kz>
-			<LVINFO:semester><![CDATA[<?php echo $row->lv_semester; ?>]]></LVINFO:semester>
+			<LVINFO:studiengang_kz><![CDATA[<?php echo xmlclean($row->lv_studiengang_kz); ?>]]></LVINFO:studiengang_kz>
+			<LVINFO:semester><![CDATA[<?php echo xmlclean($row->lv_semester); ?>]]></LVINFO:semester>
 			<LVINFO:lehreverzeichnis>cis.technikum-wien.at/documents/<?php echo $row->stg_kuerzel.'/'.$row->lv_semester.'/'.$row->lv_lehrevz;?></LVINFO:lehreverzeichnis>
-			<LVINFO:unterrichtssprache><![CDATA[<?php echo $row->unterrichtssprache; ?>]]></LVINFO:unterrichtssprache>
-			<LVINFO:ects><![CDATA[<?php echo $row->ects; ?>]]></LVINFO:ects>
-			<LVINFO:semesterstunden><![CDATA[<?php echo $row->lv_semesterstunden; ?>]]></LVINFO:semesterstunden>
-			<LVINFO:sprache><![CDATA[<?php echo $row->sprache; ?>]]></LVINFO:sprache>
+			<LVINFO:unterrichtssprache><![CDATA[<?php echo xmlclean($row->unterrichtssprache); ?>]]></LVINFO:unterrichtssprache>
+			<LVINFO:ects><![CDATA[<?php echo xmlclean($row->ects); ?>]]></LVINFO:ects>
+			<LVINFO:semesterstunden><![CDATA[<?php echo xmlclean($row->lv_semesterstunden); ?>]]></LVINFO:semesterstunden>
+			<LVINFO:sprache><![CDATA[<?php echo xmlclean($row->sprache); ?>]]></LVINFO:sprache>
 			<LVINFO:titel><![CDATA[<?php echo ($row->sprache=='German'?$row->lv_bezeichnung:$row->lv_bezeichnung_english); ?>]]></LVINFO:titel>
-			<LVINFO:lehrziele><![CDATA[<?php echo $row->lehrziele; ?>]]></LVINFO:lehrziele>
-			<LVINFO:lehrinhalte><![CDATA[<?php echo $row->lehrinhalte; ?>]]></LVINFO:lehrinhalte>
-			<LVINFO:methodik><![CDATA[<?php echo $row->methodik; ?>]]></LVINFO:methodik>
-			<LVINFO:voraussetzungen><![CDATA[<?php echo $row->voraussetzungen; ?>]]></LVINFO:voraussetzungen>
-			<LVINFO:unterlagen><![CDATA[<?php echo $row->unterlagen; ?>]]></LVINFO:unterlagen>
-			<LVINFO:pruefungsordnung><![CDATA[<?php echo $row->pruefungsordnung; ?>]]></LVINFO:pruefungsordnung>
-			<LVINFO:anmerkungen><![CDATA[<?php echo $row->anmerkung; ?>]]></LVINFO:anmerkungen>
-			<LVINFO:kurzbeschreibung><![CDATA[<?php echo $row->kurzbeschreibung; ?>]]></LVINFO:kurzbeschreibung>
-			<LVINFO:orgform_kurzbz><![CDATA[<?php echo $row->orgform_kurzbz; ?>]]></LVINFO:orgform_kurzbz>
+			<LVINFO:lehrziele><![CDATA[<?php echo xmlclean($row->lehrziele); ?>]]></LVINFO:lehrziele>
+			<LVINFO:lehrinhalte><![CDATA[<?php echo xmlclean($row->lehrinhalte); ?>]]></LVINFO:lehrinhalte>
+			<LVINFO:methodik><![CDATA[<?php echo xmlclean($row->methodik); ?>]]></LVINFO:methodik>
+			<LVINFO:voraussetzungen><![CDATA[<?php echo xmlclean($row->voraussetzungen); ?>]]></LVINFO:voraussetzungen>
+			<LVINFO:unterlagen><![CDATA[<?php echo xmlclean($row->unterlagen); ?>]]></LVINFO:unterlagen>
+			<LVINFO:pruefungsordnung><![CDATA[<?php echo xmlclean($row->pruefungsordnung); ?>]]></LVINFO:pruefungsordnung>
+			<LVINFO:anmerkungen><![CDATA[<?php echo xmlclean($row->anmerkung); ?>]]></LVINFO:anmerkungen>
+			<LVINFO:kurzbeschreibung><![CDATA[<?php echo xmlclean($row->kurzbeschreibung); ?>]]></LVINFO:kurzbeschreibung>
+			<LVINFO:orgform_kurzbz><![CDATA[<?php echo xmlclean($row->orgform_kurzbz); ?>]]></LVINFO:orgform_kurzbz>
       	</RDF:Description>
 
 <?php
