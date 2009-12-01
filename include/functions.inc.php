@@ -480,4 +480,113 @@ function xmlclean($string)
 		);
 	return str_replace($mixed, "", $string);
 }
+
+
+// ------------------------------------------------------------------------------------------
+//	Stringverkuerzen auf bestimmte laenge 
+// ------------------------------------------------------------------------------------------
+	/**
+	 * Verkuertzt einen String auf eine bestimmte laenge - beachtet werden Wortzeichen
+	 * @param String der die Zeichenkette enthaelt die verkuertzt werden soll
+	 * @param Laenge des Strings der geliefert werden soll (inkl. der Laenge des Fortsetzungszeichen)
+	 * @return Daten Objekt wenn ok, false im Fehlerfall
+	 */
+	 
+function StringCut($str='',$len=0,$checkWortumbruch=false,$fortsetzungszeichen='...')
+{
+	// Plausib
+	if (!is_numeric($len))
+		return $str;
+		
+	$len=intval($len);
+	if ($len  <1 )
+		return $str;
+		
+	if (is_null($checkWortumbruch) || empty($checkWortumbruch))
+		$checkWortumbruch=false;
+		
+	if (is_null($fortsetzungszeichen) || empty($fortsetzungszeichen) || $checkWortumbruch) 
+		$fortsetzungszeichen='';
+	// null oder Leerzeichen beim Fortsetzungszeichen entfernen	
+	$fortsetzungszeichen=trim($fortsetzungszeichen);
+
+	// Pruefen auf UTF-8 und Bearbeitungsfunktionen
+	$utf8=check_utf8($str);
+	if (!function_exists('mb_strlen')) 
+		$utf8=false;
+	if (!function_exists('mb_substr')) 
+		$utf8=false;
+
+	// ist der String nicht laenger als die gewuenschte Lange kann hier beendet werden	
+	if ($utf8)
+		$vLen=mb_strlen($str);
+	else	
+		$vLen=strlen($str);		
+
+	// String ist nicht laenger als die gewuenschte leange - kpl.String retour senden	
+	if ($len>=$vLen)
+		return $str;
+		
+	if (!$checkWortumbruch)
+	{
+		if ($utf8)
+			$vLen=$len-mb_strlen($fortsetzungszeichen,'utf-8');
+		else	
+			$vLen=$len- strlen($fortsetzungszeichen);			
+		// die Laenge vom Fortsetzungszeichen mit berucksichtigen
+		if ($utf8) // Teilstring ermitteln, und Ergebnis zuruck geben
+			return mb_substr($str,0,$vLen,'utf-8').$fortsetzungszeichen;
+		else // Teilstring ermitteln, und Ergebnis zuruck geben
+			return substr($str,0,$vLen).$fortsetzungszeichen;
+	}		
+	
+	
+	if ($utf8) // Teilstring ermitteln, und Ergebnis zuruck geben
+		$vStr=mb_substr($str,0,$len,'utf-8');
+	else	// Teilstring ermitteln, und Ergebnis zuruck geben
+		$vStr=substr($str,0,$len);
+		
+	if ($utf8)
+		$vLen=mb_strlen($vStr);
+	else	
+		$vLen=strlen($vStr);		
+	
+	// Suchen letztes Leerzeichen im String
+	for ($i=$vLen;$i>0;$i--)
+	{
+		if ($utf8)
+		{
+			if (mb_substr($vStr,$i,1,'utf-8')==' ' && $i>0)
+				return $vStr=trim(mb_substr($str,0,$i,'utf-8'));
+		}
+		else
+		{
+			if (substr($vStr,$i,1)==' ' && $i>0)
+				return $vStr=trim(substr($str,0,$i));
+		}	
+	}
+	return $vStr;
+}
+function check_utf8($str="")
+{
+#return true;
+	$cStr=$str;
+	if (strlen($cStr)>3590)
+	{
+		$cStr=substr($cStr,0,3590);
+	}
+     $stati=@preg_match("/^(
+         [\x09\x0A\x0D\x20-\x7E]            # ASCII
+       | [\xC2-\xDF][\x80-\xBF]             # non-overlong 2-byte
+       |  \xE0[\xA0-\xBF][\x80-\xBF]        # excluding overlongs
+       | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}  # straight 3-byte
+       |  \xED[\x80-\x9F][\x80-\xBF]        # excluding surrogates
+       |  \xF0[\x90-\xBF][\x80-\xBF]{2}     # planes 1-3
+       | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
+       |  \xF4[\x80-\x8F][\x80-\xBF]{2}     # plane 16
+      )*$/x",$cStr);
+  
+	  return $stati;
+}
+
 ?>
