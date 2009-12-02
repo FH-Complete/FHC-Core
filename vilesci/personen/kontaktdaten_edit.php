@@ -21,16 +21,15 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-			
-		require_once('../../include/functions.inc.php');
-		require_once('../../include/benutzerberechtigung.class.php');
-		require_once('../../include/person.class.php');
-		require_once('../../include/datum.class.php');
-		require_once('../../include/adresse.class.php');
-		require_once('../../include/nation.class.php');
-		require_once('../../include/firma.class.php');
-		require_once('../../include/kontakt.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/adresse.class.php');
+require_once('../../include/nation.class.php');
+require_once('../../include/firma.class.php');
+require_once('../../include/kontakt.class.php');
 
 
 $user=get_uid();
@@ -83,6 +82,7 @@ $firma_id = (isset($_POST['firma'])?$_POST['firma']:'');
 $zustellung = (isset($_POST['zustellung'])?true:false);
 $anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:false);
 $kontakt = (isset($_POST['kontakt'])?$_POST['kontakt']:false);
+$kontakttyp = (isset($_POST['kontakttyp'])?$_POST['kontakttyp']:false);
 
 if($person_id=='')
 	die('Person_id muss uebergeben werden');

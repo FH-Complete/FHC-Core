@@ -20,20 +20,16 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+require_once('../../config/vilesci.config.inc.php');		
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/kontakt.class.php');
+require_once('../../include/adresse.class.php');
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-		require_once('../../include/functions.inc.php');
-		require_once('../../include/benutzerberechtigung.class.php');
-		require_once('../../include/person.class.php');
-		require_once('../../include/datum.class.php');
-		require_once('../../include/kontakt.class.php');
-		require_once('../../include/adresse.class.php');
-
-
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user=get_uid();
 $datum_obj = new datum();
@@ -53,6 +49,7 @@ function disablefields(obj)
 	else
 		val=true;
 
+	document.getElementById('anrede').disabled=val;
 	document.getElementById('titel').disabled=val;
 	document.getElementById('titelpost').disabled=val;
 	document.getElementById('nachname').disabled=val;
@@ -115,6 +112,7 @@ $where = '';
 $error = false;
 //Parameter
 $titel = (isset($_POST['titel'])?$_POST['titel']:'');
+$anrede = (isset($_POST['anrede'])?$_POST['anrede']:'');
 $titelpost = (isset($_POST['titelpost'])?$_POST['titelpost']:'');
 $nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
 $vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
@@ -147,6 +145,7 @@ if(isset($_POST['save']))
 	if($person_id=='0')
 	{
 		$person->new = true;
+		$person->anrede = $anrede;
 		$person->titelpre = $titel;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
@@ -339,6 +338,7 @@ if($geburtsdatum!='')
 <!--Formularfelder-->
 <table>
 <?php
+echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" value="'.$anrede.'" /></td></tr>';
 echo '<tr><td>Titel(Pre) *</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
