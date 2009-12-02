@@ -1871,9 +1871,9 @@ class moodle_course extends basis_db
 			SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_lehreinheit.lehrveranstaltung_id
 			FROM lehre.tbl_moodle
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-			WHERE tbl_moodle.lehrveranstaltung_id > 0 ";
+			WHERE tbl_lehreinheit.lehrveranstaltung_id > 0 ";
 		if ($this->lehrveranstaltung_id)
-			$qry.= " and tbl_moodle.lehrveranstaltung_id ='".addslashes($this->lehrveranstaltung_id)."' "; 
+			$qry.= " and tbl_lehreinheit.lehrveranstaltung_id ='".addslashes($this->lehrveranstaltung_id)."' "; 
 		if ($this->studiensemester_kurzbz)
 			$qry.= " and tbl_moodle.studiensemester_kurzbz ='".addslashes($this->studiensemester_kurzbz)."' "; 
 
