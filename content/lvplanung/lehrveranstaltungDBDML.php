@@ -91,6 +91,78 @@ function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 	return false;
 }
 
+/**
+ * Prueft ob die Person den Lehrauftrag auf eine Firma ausgestellt bekommt
+ *
+ * @param $mitarbeiter_uid
+ * @return boolean
+ */
+function LehrauftragAufFirma($mitarbeiter_uid)
+{
+	global $db;
+	
+	$qry_firma = "
+				SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) 
+				WHERE uid='".addslashes($mitarbeiter_uid)."'
+				ORDER BY zustelladresse DESC, firma_id LIMIT 1";
+	if($result_firma = $db->db_query($qry_firma))
+	{
+		if($row_firma = $db->db_fetch_object($result_firma))
+		{
+			if($row_firma->firma_id=='')
+				return false;
+			else 
+				return true;
+		}
+		else 
+		{
+			return false;
+		}
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+/**
+ * Liefert eine Liste mit den Gesamtstunden eines Lektors in den einzelnen Instituten
+ *
+ * @param $mitarbeiter_uid
+ * @param $studiensemester_kurzbz
+ * @return string
+ */
+function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
+{
+	global $db;
+	
+	$ret="Der Lektor ist in folgenden Instituten zugeteilt:\n";
+	
+	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
+	$qry = "SELECT sum(semesterstunden) as summe, tbl_fachbereich.bezeichnung
+			FROM
+				lehre.tbl_lehreinheitmitarbeiter 
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+				JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+				JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
+			WHERE
+				mitarbeiter_uid='$mitarbeiter_uid' AND
+				studiensemester_kurzbz='$studiensemester_kurzbz' AND
+				faktor>0 AND
+				stundensatz>0 AND
+				bismelden
+			GROUP BY tbl_fachbereich.bezeichnung";
+	
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$ret .=$row->summe.' Stunden im Institut '.$row->bezeichnung."\n";
+		}
+	}
+	return $ret;
+}
+
 if(!$error)
 {
 
@@ -228,10 +300,13 @@ if(!$error)
 							{
 								if(!$fixangestellt)
 								{
-									//Warnung wenn die Stundenzahl ueberschritten wurde
-									$return = false;
-									$error = true;
-									$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
+									if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
+									{
+										//Warnung wenn die Stundenzahl ueberschritten wurde
+										$return = false;
+										$error = true;
+										$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+									}
 								}
 								else 
 								{
@@ -241,29 +316,7 @@ if(!$error)
 									$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
 								}	
 								
-								$errormsg.="Der Lektor ist in folgenden Instituten zugeteilt:\n";
-								//Liste mit den Stunden in den jeweiligen Instituten anzeigen
-								$qry = "SELECT sum(semesterstunden) as summe, tbl_fachbereich.bezeichnung
-										FROM
-											lehre.tbl_lehreinheitmitarbeiter 
-											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-											JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
-											JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
-										WHERE
-											mitarbeiter_uid='$lem->mitarbeiter_uid' AND
-											studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
-											faktor>0 AND
-											stundensatz>0 AND
-											bismelden
-										GROUP BY tbl_fachbereich.bezeichnung";
-								
-								if($result = $db->db_query($qry))
-								{
-									while($row = $db->db_fetch_object($result))
-									{
-										$errormsg .=$row->summe.' Stunden im Institut '.$row->bezeichnung."\n";
-									}
-								}
+								$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
 							}
 						}
 						else
@@ -363,8 +416,9 @@ if(!$error)
 				$lem->insertvon = $user;
 				$lem->new=true;
 
+				$fixangestellt=false;
 				//Stundensatz aus tbl_mitarbeiter holen
-				$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
+				$qry = "SELECT stundensatz, fixangestellt FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
 				if($db->db_query($qry))
 				{
 					if($row = $db->db_fetch_object($result))
@@ -373,6 +427,7 @@ if(!$error)
 							$lem->stundensatz = $row->stundensatz;
 						else
 							$lem->stundensatz = '0';
+						$fixangestellt = ($row->fixangestellt=='t'?true:false);
 					}
 					else
 					{
@@ -387,55 +442,99 @@ if(!$error)
 					$return=false;
 					$errormsg='Fehler bei einer Datenbankabfrage:'.$db->db_last_error();
 				}
-
-				//Faktor und Semesterstunden aus tbl_lehrveranstaltung holen
-				$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."';";
-				if($db->db_query($qry))
+				
+				$maxstunden=9999;
+				//Bei freien Lektoren muss geprueft werden ob die Stundengrenze erreicht wurde
+				if(!$fixangestellt && !LehrauftragAufFirma($lem->mitarbeiter_uid))
 				{
-					if($row = $db->db_fetch_object())
+					//Summe der Stunden ermitteln
+					$le = new lehreinheit();
+					$le->load($lem->lehreinheit_id);
+	
+					$qry = "SELECT
+								sum(semesterstunden) as summe
+							FROM
+								lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							WHERE
+								mitarbeiter_uid='$lem->mitarbeiter_uid' AND
+								studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+								faktor>0 AND
+								stundensatz>0 AND
+								bismelden";
+					if($result_std = $db->db_query($qry))
 					{
-						if($row->planfaktor!='')
-							$lem->faktor = $row->planfaktor;
-						else
-							$lem->faktor = '1.0';
-						
-						if($row->semesterstunden!='')
+						if($row_std = $db->db_fetch_object($result_std))
 						{
-							$lem->semesterstunden = $row->semesterstunden;
-							$lem->planstunden = $row->semesterstunden;
-						}
-						else	
-						{
-							$lem->planstunden = '0';
-							$lem->semesterstunden = '0';
+							//Grenze ueberschritten
+							if($row_std->summe>=WARN_SEMESTERSTD_FREI)
+							{
+								$return = false;
+								$error = true;
+								$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+								$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
+							}
+							else
+							{
+								//Stunden berechnen die noch maximal unterrichtet werden darf
+								$maxstunden = WARN_SEMESTERSTD_FREI-$row_std->summe;
+							}
 						}
 					}
-					else
-					{
-						$error = true;
-						$return = false;
-						$errormsg = 'Lehrveranstaltung wurde nicht gefunden';
-					}
 				}
-				else
-				{
-					$error = true;
-					$return = false;
-					$errormsg = 'Fehler in einer Datenbankabfrage:'.$db->db_last_error();
-				}
-
+				
 				if(!$error)
 				{
-					if($lem->save())
+					//Faktor und Semesterstunden aus tbl_lehrveranstaltung holen
+					$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."';";
+					if($db->db_query($qry))
 					{
-						$return = true;
-						$error = false;
+						if($row = $db->db_fetch_object())
+						{
+							if($row->planfaktor!='')
+								$lem->faktor = $row->planfaktor;
+							else
+								$lem->faktor = '1.0';
+							
+							if($row->semesterstunden!='')
+							{
+								//wenn es sich um einen freien Lektor handelt, und dieser nicht mehr die volle Stundenanzahl unterrichten
+								//darf, dann werden nur die restlichen zur Verfuegung stehenden Stunden zugeteilt.
+								$lem->semesterstunden = ($row->semesterstunden>$maxstunden?$maxstunden:$row->semesterstunden);
+								$lem->planstunden = ($row->semesterstunden>$maxstunden?$maxstunden:$row->semesterstunden);
+							}
+							else	
+							{
+								$lem->planstunden = '0';
+								$lem->semesterstunden = '0';
+							}
+						}
+						else
+						{
+							$error = true;
+							$return = false;
+							$errormsg = 'Lehrveranstaltung wurde nicht gefunden';
+						}
 					}
 					else
 					{
-						$return = false;
-						$errormsg = $lem->errormsg;
 						$error = true;
+						$return = false;
+						$errormsg = 'Fehler in einer Datenbankabfrage:'.$db->db_last_error();
+					}
+	
+					if(!$error)
+					{
+						if($lem->save())
+						{
+							$return = true;
+							$error = false;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = $lem->errormsg;
+							$error = true;
+						}
 					}
 				}
 			}
