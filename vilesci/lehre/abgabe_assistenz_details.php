@@ -48,6 +48,8 @@ if(!isset($_POST['uid']))
 	$projektarbeit_id = (isset($_GET['projektarbeit_id'])?$_GET['projektarbeit_id']:'-1');
 	$titel = (isset($_GET['titel'])?$_GET['titel']:'-1');
 	$erst = (isset($_GET['erst'])?$_GET['erst']:'');
+	$p2id = (isset($_GET['p2id'])?$_GET['p2id']:'');
+
 
 	$command = '';
 	$paabgabe_id = '';
@@ -97,6 +99,7 @@ else
 	$erst = (isset($_POST['erst'])?$_POST['erst']:'');
 	$stgbez = (isset($_POST['stgbez'])?$_POST['stgbez']:'');
 	$stg_kz = (isset($_POST['stg_kz'])?$_POST['stg_kz']:'');
+	$p2id = (isset($_POST['p2id'])?$_POST['p2id']:'');
 }
 $user = get_uid();
 $datum_obj = new datum();
@@ -107,7 +110,8 @@ $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
 	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang');
 $htmlstr='';
-
+$bezeichnung='';
+$obezeichnung='';
 
 $datum = $datum_obj->formatDatum($datum, $format='Y-m-d');
 if($uid==-1 && $projektarbeit_id==-1&& $titel==-1)
@@ -180,7 +184,7 @@ if(isset($_POST["schick"]))
 						//echo $qry;	
 						if(!$result=$db->db_query($qry))
 						{
-							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
+							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>";	
 						}
 						else 
 						{
@@ -198,11 +202,11 @@ if(isset($_POST["schick"]))
 							if($paabgabetyp_kurzbz!='note')
 							{
 								$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-								"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+								"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat einen neuen Termin angelegt:\n".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
-									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;<br>";	
+									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>";	
 								}
 								else
 								{
@@ -219,27 +223,60 @@ if(isset($_POST["schick"]))
 								WHERE mitarbeiter_uid='$erst'";
 							if(!$betr=$db->db_query($qry_betr))
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Laden der Betreuer!</font><br>&nbsp;";
+								echo "<font color=\"#FF0000\">Fehler beim Laden des Erstbegutachters!</font><br>";
 							}
 							else
 							{
 								if($row_betr=$db->db_fetch_object($betr))
 								{
 									$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
-									"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen neuen Termin angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+									"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen neuen Termin angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":\n".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 									$mail->setReplyTo($user."@".DOMAIN);
 									if(!$mail->send())
 									{
-										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter! ($erst)</font><br>&nbsp;";	
+										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter! ($erst)</font><br>";	
 									}
 									else 
 									{
-										echo "Mail verschickt an: ".$row_betr->first;
+										echo "Mail verschickt an Erstbegutachter: ".$row_betr->first."<br>";
 									}
 								}
 								else 
 								{
-									echo "<font color=\"#FF0000\">Betreuer nicht gefunden. Kein Mail verschickt! ($erst)</font><br>&nbsp;";
+									echo "<font color=\"#FF0000\">Erstbegutachter nicht gefunden. Kein Mail verschickt! ($erst)</font><br>;";
+								}
+							}
+							//Mail an Zweitbegutachter
+							if($p2id!='')
+							{
+								$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
+									anrede, kontakt 
+									FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
+									WHERE person_id='$p2id' AND kontakttyp='email' AND zustellung LIMIT 1";
+								if(!$betr=$db->db_query($qry_betr))
+								{
+									echo "<font color=\"#FF0000\">Fehler beim Laden des Zweitbegutachters!</font><br>";
+								}
+								else
+								{
+									if($row_betr=$db->db_fetch_object($betr))
+									{
+										$mail = new mail($row_betr->kontakt, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
+										"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen neuen Termin angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":\n".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\n--------------------------------------------------------------------------");
+										$mail->setReplyTo($user."@".DOMAIN);
+										if(!$mail->send())
+										{
+											echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>";	
+										}
+										else 
+										{
+											echo "Mail verschickt an Zweitbegutachter(in): ".$row_betr->first."<br>";
+										}
+									}
+									else 
+									{
+										echo "<font color=\"#FF0000\">Zweitbegutachter(in) nicht gefunden. Kein Mail verschickt! ($p2id)</font><br>";
+									}
 								}
 							}
 						}
@@ -268,10 +305,11 @@ if(isset($_POST["schick"]))
 					if($result_told=$db->db_query($qry_told))
 					{
 						$row_told=$db->db_fetch_object($result_told);
+						$obezeichnung=$row_told->bezeichnung;
 					}
 					else 
 					{
-						$row_told->bezeichnung='';
+						$obezeichnung='';
 					}
 					//Termin updaten
 					$qry="UPDATE campus.tbl_paabgabe SET
@@ -286,29 +324,30 @@ if(isset($_POST["schick"]))
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
-						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>";	
 					}
 					else 
 					{
 						//Abgabetyp
 						$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
-						if(!$result=$db->db_query($qry))
+						if($result_told=$db->db_query($qry_told))
 						{
 							$row_typ=$db->db_fetch_object($result_told);
+							$bezeichnung=$row_typ->bezeichnung;
 						}
 						else 
 						{
-							$row_typ->bezeichnung='';
+							$bezeichnung='';
 						}
 						//Mail an Studierenden
 						if($row_old->paabgabetyp_kurzbz !='note')
 						{
-							$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin&auml;nderung Bachelor-/Diplomarbeitsbetreuung",
-							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							$mail = new mail($uid."@".DOMAIN, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung",
+							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat einen Termin geändert:\nVon: ".($row_old->fixtermin=='t'?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$obezeichnung.", ".$row_old->kurzbz."\nAuf: ".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$bezeichnung." ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>";	
 							}
 							else
 							{
@@ -325,27 +364,60 @@ if(isset($_POST["schick"]))
 							WHERE mitarbeiter_uid='$erst'";
 						if(!$betr=$db->db_query($qry_betr))
 						{
-							echo "<font color=\"#FF0000\">Fehler beim Laden der Betreuer!</font><br>&nbsp;";
+							echo "<font color=\"#FF0000\">Fehler beim Laden von Erstbegutachter(in)!</font><br>";
 						}
 						else
 						{
 							if($row_betr=$db->db_fetch_object($betr))
 							{
-								$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin&auml;nderung Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
-								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin geändert f&uuml;r Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+								$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
+								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin geändert für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\nVon: ".($row_old->fixtermin=='t'?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$obezeichnung.", ".$row_old->kurzbz."\nAuf: ".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$bezeichnung." ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
-									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter!</font><br>&nbsp;";	
+									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Erst-)Begutachter(in)!</font><br>";	
 								}
 								else 
 								{
-									echo "Mail verschickt an: ".$row_betr->first;
+									echo "Mail verschickt an Erstbegutachter(in): ".$row_betr->first."<br>";
 								}
 							}
 							else 
 							{
-								echo "<font color=\"#FF0000\">Betreuer nicht gefunden. Kein Mail verschickt!</font><br>&nbsp;";
+								echo "<font color=\"#FF0000\">Erstbegutachter(in) nicht gefunden. Kein Mail verschickt!</font><br>";
+							}
+						}
+						//Mail an Zweitbegutachter
+						if($p2id!='')
+						{
+							$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
+								anrede, kontakt 
+								FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
+								WHERE person_id='$p2id' AND kontakttyp='email' AND zustellung LIMIT 1";
+							if(!$betr=$db->db_query($qry_betr))
+							{
+								echo "<font color=\"#FF0000\">Fehler beim Laden von Zweitbegutachter(in)!</font><br>";
+							}
+							else
+							{
+								if($row_betr=$db->db_fetch_object($betr))
+								{
+									$mail = new mail($row_betr->kontakt, "vilesci@".DOMAIN, "Terminänderung Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
+									"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin geändert für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\nVon: ".($row_old->fixtermin=='t'?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$obezeichnung.", ".$row_old->kurzbz."\nAuf: ".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$bezeichnung." ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+									$mail->setReplyTo($user."@".DOMAIN);
+									if(!$mail->send())
+									{
+										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>";	
+									}
+									else 
+									{
+										echo "Mail verschickt an Zweitbegutachter(in): ".$row_betr->first."<br>";
+									}
+								}
+								else 
+								{
+									echo "<font color=\"#FF0000\">Zweitbegutachter(in) nicht gefunden. Kein Mail verschickt! ($p2id)</font><br>";
+								}
 							}
 						}
 					}
@@ -421,20 +493,53 @@ if(isset($_POST["del"]))
 						if($row_betr=$db->db_fetch_object($betr))
 						{
 							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Termin Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
-							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin entfernt f&uuml;r Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\n".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_old->kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin entfernt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\n".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_old->kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter!</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)!</font><br>&nbsp;";	
 							}
 							else 
 							{
-								echo "Mail verschickt an: ".$row_betr->first;
+								echo "Mail verschickt an: ".$row_betr->first."<br>";
 							}
 						}
 						else 
 						{
-							echo "<font color=\"#FF0000\">Betreuer nicht gefunden. Kein Mail verschickt!</font><br>&nbsp;";
+							echo "<font color=\"#FF0000\">Begutachter(in) nicht gefunden. Kein Mail verschickt!</font><br>&nbsp;";
+						}
+					}
+					//Mail an Zweitbegutachter
+					if($p2id!='')
+					{
+						$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
+							anrede, kontakt 
+							FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
+							WHERE person_id='$p2id' AND kontakttyp='email' AND zustellung LIMIT 1";
+						if(!$betr=$db->db_query($qry_betr))
+						{
+							echo "<font color=\"#FF0000\">Fehler beim Laden von Zweitbegutachter(in)!</font><br>&nbsp;";
+						}
+						else
+						{
+							if($row_betr=$db->db_fetch_object($betr))
+							{
+								$mail = new mail($row_betr->kontakt, "vilesci@".DOMAIN, "Termin Bachelor-/Diplomarbeitsbetreuung bei Studiengang $stgbez",
+								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin entfernt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\n".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_old->kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+								$mail->setReplyTo($user."@".DOMAIN);
+								if(!$mail->send())
+								{
+									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>&nbsp;";	
+								}
+								else 
+								{
+									echo "Mail verschickt an Zweitbetreuer(in): ".$row_betr->first."<br>";
+								}
+							}
+							else 
+							{
+								echo "<font color=\"#FF0000\">Zweitbegutachter(in) nicht gefunden. Kein Mail verschickt! ($p2id)</font><br>&nbsp;";
+							}
 						}
 					}
 				}
@@ -498,6 +603,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		$htmlstr .= "<input type='hidden' name='erst' value='".$erst."'>\n";
 		$htmlstr .= "<input type='hidden' name='stgbez' value='".$stgbez."'>\n";
 		$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
+		$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
 		$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 		if(!$row->abgabedatum)
 		{
@@ -605,6 +711,7 @@ $htmlstr .= "<input type='hidden' name='command' value='insert'>\n";
 $htmlstr .= "<input type='hidden' name='erst' value='".$erst."'>\n";
 $htmlstr .= "<input type='hidden' name='stgbez' value='".$stgbez."'>\n";
 $htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
+$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
 $htmlstr .= "<tr id='".$projektarbeit_id."'>\n";
 
 $htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
