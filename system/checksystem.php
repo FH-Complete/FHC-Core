@@ -186,6 +186,109 @@ if(!$result = @$db->db_query("SELECT * FROM bis.tbl_lgartcode LIMIT 1"))
 	else 
 		echo ' bis.tbl_lgartcode: Lehrgangsart hinzugefuegt!<br>';
 }
+
+if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 1"))
+{
+	$qry = "
+		CREATE SCHEMA wawi;
+		
+		DROP VIEW public.vw_betriebsmittelperson;
+		DROP TABLE campus.tbl_bmreservierung;
+		
+		ALTER TABLE public.tbl_betriebsmittel SET SCHEMA wawi;
+		ALTER TABLE public.tbl_betriebsmittelperson SET SCHEMA wawi;
+		ALTER TABLE public.tbl_betriebsmitteltyp SET SCHEMA wawi;
+		
+		ALTER TABLE wawi.tbl_betriebsmittel DROP COLUMN ort_kurzbz;
+		
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN oe_kurzbz varchar(32);
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN ort_kurzbz varchar(16);
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN hersteller varchar(128);
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN seriennummer varchar(32);
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN bestellung_id bigint;
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN bestelldetail_id bigint;
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN afa smallint;
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN verwendung varchar(256);
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN anmerkung text;
+		
+		COMMENT ON COLUMN wawi.tbl_betriebsmittel.nummer IS 'Zutrittskartennummer, Inventarnummer, ...';
+		COMMENT ON COLUMN wawi.tbl_betriebsmittel.afa IS 'Jahre fuer die AfA';
+		COMMENT ON COLUMN wawi.tbl_betriebsmittel.nummerintern IS '2. Nummer fuer spezielle BM';
+		
+		ALTER TABLE wawi.tbl_betriebsmittelperson ADD COLUMN betriebsmittelperson_id integer;
+		
+		CREATE SEQUENCE wawi.seq_betriebsmittelperson_betriebsmittelperson_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1
+		;
+		
+		UPDATE wawi.tbl_betriebsmittelperson SET betriebsmittelperson_id=nextval('wawi.seq_betriebsmittelperson_betriebsmittelperson_id');
+		ALTER TABLE wawi.tbl_betriebsmittelperson DROP CONSTRAINT pk_tbl_betriebsmittelperson;
+		
+		ALTER TABLE wawi.tbl_betriebsmittelperson ADD CONSTRAINT pk_betriebsmittelperson PRIMARY KEY (betriebsmittelperson_id);
+		ALTER TABLE wawi.tbl_betriebsmittelperson ALTER COLUMN betriebsmittelperson_id SET DEFAULT nextval('wawi.seq_betriebsmittelperson_betriebsmittelperson_id');
+		
+		ALTER TABLE wawi.tbl_betriebsmitteltyp ADD COLUMN typ_code character(2);
+		
+		COMMENT ON COLUMN wawi.tbl_betriebsmitteltyp.typ_code IS 'Fuer Inventarnummerncode';
+		
+		-- Table wawi.tbl_betriebsmittelstatus
+		
+		CREATE TABLE wawi.tbl_betriebsmittelstatus(
+			betriebsmittelstatus_kurzbz Character varying(16) NOT NULL,
+			beschreibung Character varying(256)
+		)
+		WITH (OIDS=FALSE);
+		
+		-- Add keys for table wawi.tbl_betriebsmittelstatus
+		
+		ALTER TABLE wawi.tbl_betriebsmittelstatus ADD CONSTRAINT pk_betriebsmittelstatus PRIMARY KEY (betriebsmittelstatus_kurzbz);
+		ALTER TABLE wawi.tbl_betriebsmittelstatus ADD CONSTRAINT betriebsmittelstatus_kurzbz UNIQUE (betriebsmittelstatus_kurzbz);
+		
+		-- Table tbl_betriebsmittel_betriebsmittelstatus
+		
+		CREATE TABLE wawi.tbl_betriebsmittel_betriebsmittelstatus(
+		 betriebsmittelbetriebsmittelstatus_id Serial NOT NULL,
+		 betriebsmittel_id Integer NOT NULL,
+		 betriebsmittelstatus_kurzbz Character varying(16) NOT NULL,
+		 datum Bigint,
+		 updateamum Timestamp,
+		 updatevon Character varying(32),
+		 insertamum Timestamp,
+		 insertvon Character varying(32)
+		)
+		WITH (OIDS=FALSE);
+		
+		-- Add keys for table tbl_betriebsmittel_betriebsmittelstatus
+		
+		ALTER TABLE wawi.tbl_betriebsmittel_betriebsmittelstatus ADD CONSTRAINT pk_betriebsmittelbetriebsmittelstatus PRIMARY KEY (betriebsmittelbetriebsmittelstatus_id);
+		
+		GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_betriebsmittel_betriebsmittelstatus TO admin;
+		GRANT SELECT ON wawi.tbl_betriebsmittel_betriebsmittelstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_betriebsmittelstatus TO admin;
+		GRANT SELECT ON wawi.tbl_betriebsmittelstatus TO web;
+		GRANT USAGE ON SCHEMA wawi TO web;
+		GRANT USAGE ON SCHEMA wawi TO admin;
+		GRANT SELECT ON wawi.tbl_betriebsmittelperson TO web;
+		
+		
+		
+		CREATE OR REPLACE VIEW public.vw_betriebsmittelperson AS
+		 SELECT tbl_betriebsmittelperson.betriebsmittelperson_id, tbl_betriebsmittelperson.betriebsmittel_id, tbl_betriebsmittelperson.person_id, tbl_betriebsmittelperson.anmerkung, tbl_betriebsmittelperson.kaution, tbl_betriebsmittelperson.ausgegebenam, tbl_betriebsmittelperson.retouram, tbl_betriebsmittelperson.insertamum, tbl_betriebsmittelperson.insertvon, tbl_betriebsmittelperson.updateamum, tbl_betriebsmittelperson.updatevon, tbl_betriebsmittelperson.ext_id, tbl_betriebsmittel.beschreibung, tbl_betriebsmittel.betriebsmitteltyp, tbl_betriebsmittel.nummer, tbl_betriebsmittel.nummerintern, tbl_betriebsmittel.reservieren, tbl_betriebsmittel.ort_kurzbz, tbl_person.staatsbuergerschaft, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung AS anmerkungen, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.familienstand, tbl_person.geschlecht, tbl_person.anzahlkinder, tbl_person.aktiv, tbl_benutzer.uid, tbl_benutzer.aktiv AS benutzer_aktiv, tbl_benutzer.alias
+		   FROM wawi.tbl_betriebsmittelperson
+		   JOIN wawi.tbl_betriebsmittel USING (betriebsmittel_id)
+		   JOIN public.tbl_person USING (person_id)
+		   LEFT JOIN public.tbl_benutzer USING (person_id);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>wawi: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' wawi schema und tabellen wurden angelegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -213,7 +316,6 @@ $tabellen=array(
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
-	"campus.tbl_bmreservierung"  => array("bmreservierung_id","betriebsmittel_id","person_id","uid","datum","stunde","titel","beschreibung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
@@ -280,9 +382,6 @@ $tabellen=array(
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
-	"public.tbl_betriebsmittel"  => array("betriebsmittel_id","beschreibung","betriebsmitteltyp","nummer","nummerintern","reservieren","ort_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_betriebsmittelperson"  => array("betriebsmittel_id","person_id","anmerkung","kaution","ausgegebenam","retouram","insertamum","insertvon","updateamum","updatevon","ext_id"),
-	"public.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -339,6 +438,11 @@ $tabellen=array(
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
+	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","nummerintern"),
+	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon"),
+	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
+	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),
 );
 
 $tabs=array_keys($tabellen);
