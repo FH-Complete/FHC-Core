@@ -21,13 +21,13 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/person.class.php');
-	require_once('../../include/benutzer.class.php');
-	require_once('../../include/mitarbeiter.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/mitarbeiter.class.php');
+	if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 echo '
 <html>
@@ -74,7 +74,7 @@ function doSAVE()
 	// person
 	$lektor->uid=$_POST['uid'];
 	$lektor->titel=$_POST['titel'];
-	$lektor->vornamen=$_POST['vornamen'];
+	$lektor->vorname=$_POST['vorname'];
 	$lektor->nachname=$_POST['nachname'];
 	$lektor->gebdatum=$_POST['gebdatum'];
 	$lektor->gebort=$_POST['gebort'];
@@ -148,7 +148,7 @@ function doEDIT($db,$id='',$new=false,$msg='')
 			<tr><td>UID</td><td><input type="text" name="uid" value="'.$lektor->uid.'"></td></tr>
 			<tr><td>Personalnummer</td><td><input type="text" name="personalnummer" value="'.$lektor->personalnummer.'"></td></tr>
 			<tr><td>Titel</td><td><input type="text" name="titel" value="'.$lektor->titelpre.'"></td></tr>
-			<tr><td>Vornamen</td><td><input type="text" name="vornamen" value="'.$lektor->vorname.'"></td></tr>
+			<tr><td>Vorname</td><td><input type="text" name="vorname" value="'.$lektor->vorname.'"></td></tr>
 			<tr><td>Nachname</td><td><input type="text" name="nachname" value="'.$lektor->nachname.'"></td></tr>
 			<tr><td>Lektor</td><td><input type="checkbox" name="lektor" value="1" '.($lektor->lektor?'checked':'').'></td></tr>
 			<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lektor->aktiv?'checked':'') .'></td></tr>
