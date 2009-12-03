@@ -35,7 +35,7 @@
 			 $key=$value; 
 	}
 	
-	$sql_query="UPDATE lektor SET uid='$uid', titel='$titel', vornamen='$vornamen', nachname='$nachname', ";
+	$sql_query="UPDATE lektor SET uid='$uid', titel='$titel', vorname='$vorname', nachname='$nachname', ";
 	$sql_query.="gebdatum='$gebdatum', gebort='$gebort', gebzeit='00:00', ";
 	$sql_query.="emailtw='$emailtw', emailforw='$emailforw', ";
 	$sql_query.="emailalias='$emailalias', kurzbz='$kurzbz', teltw='$teltw', ";
