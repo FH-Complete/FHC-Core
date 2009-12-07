@@ -36,7 +36,11 @@ require_once('../../include/benutzerberechtigung.class.php');
 	if (isset($_GET["toggle"]) && ($_GET["kz"] != ""))
 	{
 		$kennzahl = intval($_GET["kz"]);
-		if($rechte->isBerechtigt('basis/studiengang', $kennzahl, 'suid'))
+		$stg_hlp = new studiengang();
+		if(!$stg_hlp->load($kennzahl))
+			die('Studiengang nicht gefunden');
+		
+		if($rechte->isBerechtigt('basis/studiengang', $stg_hlp->oe_kurzbz, 'suid'))
 		{
 			$sg_update = new studiengang();
 			if(!$sg_update->toggleAktiv($kennzahl))
@@ -47,7 +51,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 	}
 	
     $sg = new studiengang();
-    if (!$sg->getAll('kurzbzlang',false))
+    if (!$sg->loadArray($rechte->getStgKz('basis/studiengang'),'kurzbzlang',false))
         die($sg->errormsg);
     
     //$htmlstr = "<table class='liste sortable'>\n";

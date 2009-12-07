@@ -46,18 +46,18 @@ class studiengang extends basis_db
 	public $bescheidvom;		// Date
 	public $titelbescheidvom;	// Date
 	public $ext_id;				// bigint
-	public $orgform_kurzbz;
-	public $zusatzinfo_html;
-	public $sprache;
-	public $testtool_sprachwahl;
-	public $studienplaetze;
-	public $oe_kurzbz;
+	public $orgform_kurzbz;		// varchar(3)
+	public $zusatzinfo_html;	// text
+	public $sprache;			// varchar(16)
+	public $testtool_sprachwahl;// boolean
+	public $studienplaetze;		// smallint
+	public $oe_kurzbz;			// varchar(32)
 
-	public $kuerzel;			// = typ + kurzbz (Bsp: BBE)
-
-	public $studiengang_typ_arr = array();
-	public $kuerzel_arr = array();
-	public $moodle;				// boolean
+	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
+	public $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
+	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
+	public $moodle;		// boolean
+	public $lgartcode;	//integer
 	
 	/**
 	 * Konstruktor
@@ -121,7 +121,7 @@ class studiengang extends basis_db
 				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
 				$this->studienplaetze = $row->studienplaetze;
 				$this->oe_kurzbz = $row->oe_kurzbz;
-
+				$this->lgartcode = $row->lgartcode;
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
             	$this->aktiv=($row->aktiv=='t'?true:false);
@@ -148,18 +148,18 @@ class studiengang extends basis_db
 	{
 		$qry = 'SELECT * FROM public.tbl_studiengang';
 		if ($aktiv)
-			$qry.=' WHERE aktiv';
+			$qry.=' WHERE aktiv=true';
 
 		if($order!=null)
 		 	$qry .=" ORDER BY $order";
 
-		if(!$this->db_query($qry))
+		if(!$result = $this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		} 
 
-		while($row = $this->db_fetch_object())
+		while($row = $this->db_fetch_object($result))
 		{
 			$stg_obj = new studiengang();
 
@@ -188,7 +188,7 @@ class studiengang extends basis_db
 			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
 			$stg_obj->studienplaetze = $row->studienplaetze;
 			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
-
+			$stg_obj->lgartcode = $row->lgartcode;
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
             $stg_obj->aktiv=($row->aktiv=='t'?true:false);
@@ -200,7 +200,76 @@ class studiengang extends basis_db
 
 		return true;
 	}
+	
+	/**
+	 * Laedt die Studiengaenge die als Array uebergeben werden
+	 * @param $stgs Array mit den Kennzahlen
+	 * @param $order Sortierreihenfolge
+	 * @param $aktiv wenn true dann nur aktive sonst alle
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadArray($kennzahlen, $order=null, $aktiv=true)
+	{
+		if(count($kennzahlen)==0)
+			return true;
 		
+		$kennzahlen = "'".implode("','",$kennzahlen)."'";
+						
+		$qry = 'SELECT * FROM public.tbl_studiengang WHERE studiengang_kz in('.$kennzahlen.')';
+		if ($aktiv)
+			$qry.=' AND aktiv=true';
+
+		if($order!=null)
+		 	$qry .=" ORDER BY $order";
+
+		if(!$result = $this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		} 
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$stg_obj = new studiengang();
+
+			$stg_obj->studiengang_kz=$row->studiengang_kz;
+			$stg_obj->kurzbz=$row->kurzbz;
+			$stg_obj->kurzbzlang=$row->kurzbzlang;
+			$stg_obj->bezeichnung=$row->bezeichnung;
+			$stg_obj->english=$row->english;
+			$stg_obj->typ=$row->typ;
+			$stg_obj->farbe=$row->farbe;
+			$stg_obj->email=$row->email;
+			$stg_obj->max_semester=$row->max_semester;
+			$stg_obj->max_verband=$row->max_verband;
+			$stg_obj->max_gruppe=$row->max_gruppe;
+			$stg_obj->erhalter_kz=$row->erhalter_kz;
+			$stg_obj->bescheid=$row->bescheid;
+			$stg_obj->bescheidbgbl1=$row->bescheidbgbl1;
+			$stg_obj->bescheidbgbl2=$row->bescheidbgbl2;
+			$stg_obj->bescheidgz=$row->bescheidgz;
+			$stg_obj->bescheidvom=$row->bescheidvom;
+			$stg_obj->ext_id=$row->ext_id;
+			$stg_obj->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
+			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
+			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
+			$stg_obj->sprache = $row->sprache;
+			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+			$stg_obj->studienplaetze = $row->studienplaetze;
+			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
+			$stg_obj->lgartcode = $row->lgartcode;
+            $stg_obj->telefon=$row->telefon;
+            $stg_obj->titelbescheidvom=$row->titelbescheidvom;
+            $stg_obj->aktiv=($row->aktiv=='t'?true:false);
+			$stg_obj->moodle=($row->moodle=='t'?true:false);
+			
+			$this->result[] = $stg_obj;
+			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
+		}
+
+		return true;
+	}
+	
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
@@ -239,22 +308,27 @@ class studiengang extends basis_db
 	
 	/**
 	 * Speichert den aktuellen Datensatz
+	 * @param $new boolean Legt fest ob der Datensatz neu angelegt wird oder nicht
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function save()
+	public function save($new=null)
 	{
+		if(is_null($new))
+			$new = $this->new;
+		
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->validate())
 		{
 			return false;
 		}
 
-		if($this->new)
+		if($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
-				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, oe_kurzbz) VALUES ('.
+				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, 
+				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->kurzbz).', '.
 				$this->addslashes($this->kurzbzlang).', '.
@@ -274,11 +348,16 @@ class studiengang extends basis_db
 				$this->addslashes($this->bescheidgz).', '.
 				$this->addslashes($this->bescheidvom).', '.
 				$this->addslashes($this->titelbescheidvom).', '.
-				$this->addslashes($this->aktiv).', '.
+				($this->aktiv?'true':'false').', '.
 				$this->addslashes($this->ext_id).', '.
 				$this->addslashes($this->orgform_kurzbz).', '.
 				$this->addslashes($this->zusatzinfo_html).', '.
-				$this->addslashes($this->oe_kurzbz).';';
+				$this->addslashes($this->oe_kurzbz).', '.
+				($this->moodle?'true':'false').', '.
+				$this->addslashes($this->sprache).', '.
+				($this->testtool_sprachwahl?'true':'false').', '.
+				$this->addslashes($this->studienplaetze).', '.
+				$this->addslashes($this->lgartcode).');';
 		}
 		else
 		{
@@ -306,9 +385,14 @@ class studiengang extends basis_db
 				'ext_id='.$this->addslashes($this->ext_id).', '.
 				'telefon='.$this->addslashes($this->telefon).', '.
 				'orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).', '.
-				'aktiv='.$this->addslashes($this->aktiv).', '.
+				'aktiv='.($this->aktiv?'true':'false').', '.
 				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
-				'zusatzinfo_html='.$this->addslashes($this->zusatzinfo_html).' '.
+				'zusatzinfo_html='.$this->addslashes($this->zusatzinfo_html).', '.
+				'moodle='.($this->moodle?'true':'false').', '.
+				'sprache='.$this->addslashes($this->sprache).', '.
+				'testtool_sprachwahl='.($this->testtool_sprachwahl?'true':'false').', '.
+				'studienplaetze='.$this->addslashes($this->studienplaetze).', '.
+				'lgartcode='.$this->addslashes($this->lgartcode).' '.
 				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
 		}
 

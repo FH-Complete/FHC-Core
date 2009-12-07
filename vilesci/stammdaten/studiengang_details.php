@@ -20,6 +20,9 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ * Seite zur Wartung der Studiengaenge
+ */
 require_once('../../config/vilesci.config.inc.php');		
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
@@ -40,7 +43,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 	
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
-	$errorstr = ''; //fehler beim insert
+	$errorstr = '';
 	$sel = '';
 	$chk = '';
 
@@ -65,47 +68,67 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$bescheidbgbl2 = '';
 	$bescheidgz = '';
 	$bescheidvom = '';
-	$organisationsform = '';
 	$titelbescheidvom = '';
 	$zusatzinfo_html = '';
 	$ext_id = '';
-	$aktiv = "t";
-	$neu = "true";
+	$aktiv = true;
+	$neu = 'true';
 	$oe_kurzbz='';
+	$moodle = true;
+	$sprache = '';
+	$testtool_sprachwahl = false;
+	$studienplaetze = '';
+	$orgform_kurzbz = '';
+	$lgartcode='';
 	
-	if(isset($_POST["schick"]))
+	if(isset($_POST['schick']))
 	{
-		$studiengang_kz = $_POST["studiengang_kz"];
+		$studiengang_kz = $_POST['studiengang_kz'];
 		
-		if(!$rechte->isBerechtigt('basis/studiengang', $studiengang_kz, 'su'))
-			die('Sie haben keine Rechte fuer diese Aktion');
+		if($_POST['neu']=='true')
+		{
+			if(!$rechte->isBerechtigt('basis/studiengang', null, 'suid'))
+				die('Sie haben keine Rechte fuer diese Aktion');
+		}
+		else 
+		{
+			$stg_hlp = new studiengang();
+			if(!$stg_hlp->load($studiengang_kz))
+				die('Fehler beim Laden des Studienganges: '.$stg_hlp->errormsg);
+			
+			if(!$rechte->isBerechtigt('basis/studiengang', $stg_hlp->oe_kurzbz, 'su'))
+				die('Sie haben keine Rechte fuer diese Aktion');
+		}
 		
-		$kurzbz = $_POST["kurzbz"];
-		$kurzbzlang = $_POST["kurzbzlang"];
-		$typ = $_POST["typ"];
-		$bezeichnung = $_POST["bezeichnung"];
-		$english = $_POST["english"];
-		$farbe = $_POST["farbe"];
-		$email = $_POST["email"];
-		$telefon = $_POST["telefon"];
-		$max_semester = $_POST["max_semester"];
-		$max_verband = $_POST["max_verband"];
-		$max_gruppe = $_POST["max_gruppe"];
-		$erhalter_kz = $_POST["erhalter_kz"];
-		$bescheid = $_POST["bescheid"];
-		$bescheidbgbl1 = $_POST["bescheidbgbl1"];
-		$bescheidbgbl2 = $_POST["bescheidbgbl1"];
-		$bescheidgz = $_POST["bescheidgz"];
-		$bescheidvom = $_POST["bescheidvom"];
-		$organisationsform = $_POST["organisationsform"];
-		$oe_kurzbz = $_POST["oe_kurzbz"];
-		$titelbescheidvom = $_POST["titelbescheidvom"];
+		$kurzbz = $_POST['kurzbz'];
+		$kurzbzlang = $_POST['kurzbzlang'];
+		$typ = $_POST['typ'];
+		$bezeichnung = $_POST['bezeichnung'];
+		$english = $_POST['english'];
+		$farbe = $_POST['farbe'];
+		$email = $_POST['email'];
+		$telefon = $_POST['telefon'];
+		$max_semester = $_POST['max_semester'];
+		$max_verband = $_POST['max_verband'];
+		$max_gruppe = $_POST['max_gruppe'];
+		$erhalter_kz = $_POST['erhalter_kz'];
+		$bescheid = $_POST['bescheid'];
+		$bescheidbgbl1 = $_POST['bescheidbgbl1'];
+		$bescheidbgbl2 = $_POST['bescheidbgbl1'];
+		$bescheidgz = $_POST['bescheidgz'];
+		$bescheidvom = $_POST['bescheidvom'];
+		$oe_kurzbz = $_POST['oe_kurzbz'];
+		$titelbescheidvom = $_POST['titelbescheidvom'];
 		$zusatzinfo_html = $_POST['zusatzinfo_html'];
-		if(isset($_POST["aktiv"]))
-			$aktiv = $_POST["aktiv"];
-		else
-			$aktiv = "f";
-		$ext_id = $_POST["ext_id"];
+		$moodle = isset($_POST['moodle']);
+		$sprache = $_POST['sprache'];
+		$testtool_sprachwahl = isset($_POST['testtool_sprachwahl']);
+		$studienplaetze = $_POST['studienplaetze'];
+		$orgform_kurzbz = $_POST['orgform_kurzbz'];
+		$lgartcode = $_POST['lgartcode'];
+		$aktiv = isset($_POST['aktiv']);
+			
+		$ext_id = $_POST['ext_id'];
 
 		$sg_update = new studiengang();
 		$sg_update->studiengang_kz = $studiengang_kz;
@@ -126,15 +149,20 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$sg_update->bescheidbgbl2 = $bescheidbgbl1;
 		$sg_update->bescheidgz = $bescheidgz;
 		$sg_update->bescheidvom = $bescheidvom;
-		$sg_update->orgform_kurzbz = $organisationsform;
 		$sg_update->titelbescheidvom = $titelbescheidvom;
 		$sg_update->zusatzinfo_html = $zusatzinfo_html;
-		$sg_update->aktiv = ($aktiv=='t'?true:false);
+		$sg_update->aktiv = $aktiv;
 		$sg_update->ext_id = $ext_id;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
-
-		if ($_POST["neu"] == "true")
-			$sg_update->new = 1;
+		$sg_update->moodle = $moodle;
+		$sg_update->sprache = $sprache;
+		$sg_update->testtool_sprachwahl = $testtool_sprachwahl;
+		$sg_update->studienplaetze = $studienplaetze;
+		$sg_update->orgform_kurzbz = $orgform_kurzbz;
+		$sg_update->lgartcode = $lgartcode;
+		
+		if ($_POST['neu'] == 'true')
+			$sg_update->new = true;
 
 		if(!$sg_update->save())
 		{
@@ -147,9 +175,9 @@ require_once('../../include/benutzerberechtigung.class.php');
 
 
 
-	if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= "true")))
+	if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= 'true')))
 	{
-		$studiengang_kz = $_REQUEST["studiengang_kz"];
+		$studiengang_kz = $_REQUEST['studiengang_kz'];
 			
 		$sg = new studiengang($studiengang_kz);
 		if ($sg->errormsg!='')
@@ -172,13 +200,18 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$bescheidbgbl2 = $sg->bescheidbgbl2;
 		$bescheidgz = $sg->bescheidgz;
 		$bescheidvom = $sg->bescheidvom;
-		$organisationsform = $sg->orgform_kurzbz;
 		$titelbescheidvom = $sg->titelbescheidvom;
 		$zusatzinfo_html = $sg->zusatzinfo_html;
 		$ext_id = $sg->ext_id;
 		$aktiv = $sg->aktiv;
 		$oe_kurzbz = $sg->oe_kurzbz;
-		$neu = "false";
+		$neu = 'false';
+		$moodle = $sg->moodle;
+		$sprache = $sg->sprache;
+		$testtool_sprachwahl = $sg->testtool_sprachwahl;
+		$studienplaetze = $sg->studienplaetze;
+		$orgform_kurzbz = $sg->orgform_kurzbz;
+		$lgartcode = $sg->lgartcode;
 	}
 	
 	$erh = new erhalter();
@@ -223,14 +256,14 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$htmlstr .= "					<td><input class='detail' type='text' name='max_gruppe' size='16' maxlength='1' value='".$max_gruppe."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
-	$htmlstr .= "					<td>Organisationsform</td>\n";
-	$htmlstr .= "					<td><SELECT name='organisationsform' onchange='submitable()'>";
+	$htmlstr .= "					<td>OrgformKurzbz</td>\n";
+	$htmlstr .= "					<td><SELECT name='orgform_kurzbz' onchange='submitable()'>";
 	$qry = "SELECT orgform_kurzbz FROM bis.tbl_orgform ORDER BY orgform_kurzbz";
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			if($row->orgform_kurzbz == $organisationsform)
+			if($row->orgform_kurzbz == $orgform_kurzbz)
 				$selected = 'selected';
 			else 
 				$selected = '';
@@ -241,19 +274,36 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$htmlstr .= "                  </SELECT></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
-	$htmlstr .= "					<td>Ext ID</td>\n";
-	$htmlstr .= "					<td><input class='detail' type='text' name='ext_id' size='16' maxlength='16' value='".$ext_id."' onchange='submitable()'></td>\n";
-	$htmlstr .= "				</tr>\n";
-	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Aktiv</td>\n";
 	$htmlstr .= " 					<td>\n";
-	if($aktiv == 't')
+	if($aktiv)
 		$chk = "checked";
 	else
 		$chk = '';
-	$htmlstr .= "						<input type='checkbox' name='aktiv' value='t'".$chk." onchange='submitable()'>";
+	$htmlstr .= "						<input type='checkbox' name='aktiv' ".$chk." onchange='submitable()'>";
 	$htmlstr .= " 					</td>\n";
 	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td valign='top'>Testtool-Sprachwahl</td>\n";
+	$htmlstr .= " 					<td>\n";
+	if($testtool_sprachwahl)
+		$chk = "checked";
+	else
+		$chk = '';
+	$htmlstr .= "						<input type='checkbox' name='testtool_sprachwahl' ".$chk." onchange='submitable()'>";
+	$htmlstr .= " 					</td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td valign='top'>Moodle</td>\n";
+	$htmlstr .= " 					<td>\n";
+	if($moodle == 't')
+		$chk = "checked";
+	else
+		$chk = '';
+	$htmlstr .= "						<input type='checkbox' name='moodle' ".$chk." onchange='submitable()'>";
+	$htmlstr .= " 					</td>\n";
+	$htmlstr .= "				</tr>\n";
+	
 	$htmlstr .= "			</table>\n";
 
 	$htmlstr .= "		</td>\n";
@@ -324,7 +374,44 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$htmlstr .= "					<td>Titelbescheidvom</td>\n";
 	$htmlstr .= "					<td><input class='detail' type='text' name='titelbescheidvom' size='16' maxlength='10' value='".$titelbescheidvom."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
-	
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Sprache</td>\n";
+	$htmlstr .= "					<td><SELECT name='sprache' onchange='submitable()'>";
+	$htmlstr .= "					<option value=''>-- keine Auswahl --</option>";
+	$qry = "SELECT sprache FROM public.tbl_sprache ORDER BY sprache";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			if($row->sprache == $sprache)
+				$selected = 'selected';
+			else 
+				$selected = '';
+			
+			$htmlstr .= "			<option value='$row->sprache' $selected>$row->sprache</option>";
+		}
+	}
+	$htmlstr .= "                  </SELECT></td>\n";
+	$htmlstr .= "				</tr>\n";	
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>LehrgangsartCode</td>\n";
+	$htmlstr .= "					<td><SELECT name='lgartcode' onchange='submitable()'>";
+	$htmlstr .= "					<option value=''>-- keine Auswahl --</option>";
+	$qry = "SELECT * FROM bis.tbl_lgartcode ORDER BY lgartcode";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			if($row->lgartcode == $lgartcode)
+				$selected = 'selected';
+			else 
+				$selected = '';
+			
+			$htmlstr .= "			<option value='$row->lgartcode' $selected>$row->lgartcode - $row->kurzbz</option>";
+		}
+	}
+	$htmlstr .= "                  </SELECT></td>\n";
+	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "			</table>\n";
 
 	$htmlstr .= "		</td>\n";
@@ -349,10 +436,18 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$htmlstr .= " 					<td><input class='detail' type='text' name='telefon' size='50' maxlength='32' value='".$telefon."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Studienplätze</td>\n";
+	$htmlstr .= " 					<td><input class='detail' type='text' name='studienplaetze' size='5' maxlength='5' value='".$studienplaetze."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td>Ext ID</td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='ext_id' size='16' maxlength='16' value='".$ext_id."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Bescheid</td>\n";
 	$htmlstr .= " 					<td><textarea name='bescheid' cols='37' rows='5' onchange='submitable()'>".$bescheid."</textarea></td>\n";
 	$htmlstr .= "				</tr>\n";
-
+	
 	$htmlstr .= "			</table>\n";
 
 	$htmlstr .= "		</td>\n";
@@ -384,6 +479,8 @@ require_once('../../include/benutzerberechtigung.class.php');
 	}
 	$htmlstr .= "                  </SELECT></td>\n";
 	$htmlstr .= "	</tr>";
+
+	
 	$htmlstr .= "</table>\n";
 	$htmlstr .= "<br>\n";
 	$htmlstr .= "<div align='right' id='sub'>\n";

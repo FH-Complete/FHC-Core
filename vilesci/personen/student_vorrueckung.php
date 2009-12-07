@@ -20,29 +20,33 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-/*
-Vorrückung aller AKTIVEN Studenten.
-*/
-
+/**
+ * Vorrückung aller AKTIVEN Studenten.
+ */
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 function myaddslashes($var)
 {
 	return ($var!=''?"'".addslashes($var)."'":'null');
 }
 
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('student/vorrueckung', null, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
 $ausbildungssemester=0;
 $s=new studiengang();
-$s->getAll('typ, kurzbz', true);
+$s->loadArray($rechte->getStgKz('student/vorrueckung'),'typ, kurzbz', true);
 $studiengang=$s->result;
 
 //Einlesen der studiensemester in einen Array
@@ -53,8 +57,6 @@ foreach($ss->studiensemester as $studiensemester)
 	$ss_arr[] = $studiensemester->studiensemester_kurzbz;
 }
 
-$user = get_uid();
-
 //Übergabeparameter
 //studiengang
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
@@ -63,7 +65,7 @@ if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 }
 else
 {
-	$stg_kz=0;
+	$stg_kz=$studiengang[0]->studiengang_kz;
 }
 //semester anzeige
 if (isset($_GET['semester']) || isset($_POST['semester']))
@@ -159,13 +161,21 @@ $outp='';
 // ****************************** Vorrücken ******************************
 if (isset($_POST['vorr']))
 {
-//select für die Vorrückung
-$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
-			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
-			JOIN tbl_benutzer ON (student_uid=uid)
-			JOIN tbl_person USING (person_id)
-			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
-			AND studiensemester_kurzbz='$studiensemester_kurzbz_akt'";
+	$stg_help = new studiengang();
+	if(!$stg_help->load($stg_kz))
+		die("Studiengang mit der Kennzahl $stg_kz kann nicht geladen werden");
+	
+	if(!$rechte->isBerechtigt('student/vorrueckung',$stg_help->oe_kurzbz, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	//select für die Vorrückung
+	$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
+				tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
+				JOIN tbl_benutzer ON (student_uid=uid)
+				JOIN tbl_person USING (person_id)
+				WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
+				AND studiensemester_kurzbz='$studiensemester_kurzbz_akt'";
+	
 	if($semester<100)
 	{
 		$sql_query.="AND tbl_studentlehrverband.semester='$semesterv' "; //semester = 100 wählt alle aus

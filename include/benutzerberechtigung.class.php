@@ -433,8 +433,11 @@ class benutzerberechtigung extends basis_db
 	 * Funktion getBerechtigungen aufgerufen werden.
 	 *
 	 * @param $berechtigung
-	 * @param $oe_kurzbz
-	 * @param $art
+	 * @param $oe_kurzbz 		
+	 * 		derzeit kann hier noch die Studiengangskennzahl uebergeben werden, 
+	 * 		dies wird in Zukunft aber nicht mehr moeglich sein
+	 * @param $art			suid (select|update|insert|delete)
+	 * @param $fachbereich_kurzbz DEPRECATED
 	 * @return true wenn eine Berechtigung entspricht.
 	 */
 	public function isBerechtigt($berechtigung_kurzbz,$oe_kurzbz=null,$art=null, $fachbereich_kurzbz=null)
@@ -484,7 +487,15 @@ class benutzerberechtigung extends basis_db
 			}
 		}
 
-		return false;
+		//wenn ein Doppelpunkt vorkommt, pruefen ob das Uebergeordnete vorhanden ist
+		if($pos=mb_strpos($berechtigung_kurzbz,':')===false)
+		{
+			return false;
+		}
+		else 
+		{
+			return $this->isBerechtigt(substr($berechtigung_kurzbz,0,$pos-1), $oe_kurzbz, $art, $fachbereich_kurzbz);
+		}
 	}
 
 	/**
@@ -545,6 +556,11 @@ class benutzerberechtigung extends basis_db
 				return array();
 			else
 				$in = ' AND oe_kurzbz IN('.mb_substr($in,0, mb_strlen($in)-1).')';
+		}
+		else 
+		{
+			$in='';
+			$not='';
 		}
 		
 		if($not!='')
