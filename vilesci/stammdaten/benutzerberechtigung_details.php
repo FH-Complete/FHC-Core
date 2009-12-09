@@ -217,7 +217,7 @@
 				
 				//Organisationseinheit
 				$htmlstr .= "		<td><select name='oe_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
-				$htmlstr .= "			<option value=''></option>\n";
+				$htmlstr .= "			<option value=''>-- Alle --</option>\n";
 	
 				foreach ($oe->result as $oekey)
 				{
@@ -286,7 +286,7 @@
 			
 			//Organisationseinheit
 			$htmlstr .= "		<td><select name='oe_kurzbz' onchange='markier(\"neu\")'>\n";
-			$htmlstr .= "			<option value=''></option>\n";
+			$htmlstr .= "			<option value=''>-- Alle --</option>\n";
 			
 			foreach ($oe->result as $oekey)
 			{

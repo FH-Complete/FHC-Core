@@ -289,6 +289,24 @@ if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 
 		echo ' wawi schema und tabellen wurden angelegt!<br>';
 }
 
+if($result = $db->db_query("SELECT is_nullable FROM information_schema.columns WHERE table_schema='public' AND table_name='tbl_studiengang'  AND column_name='aktiv'"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->is_nullable=='YES')
+		{
+			$qry = 'ALTER TABLE public.tbl_studiengang ALTER COLUMN aktiv SET NOT NULL;
+					ALTER TABLE public.tbl_studiengang ALTER COLUMN testtool_sprachwahl SET NOT NULL;';
+			
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo 'public.tbl_studiengang: Spalte aktiv und testtool_sprachwahl wurde auf NN gesetzt!<br>';
+		}
+	}
+}
+
+
 echo '<br>';
 
 $tabellen=array(
