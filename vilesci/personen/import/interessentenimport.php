@@ -357,8 +357,7 @@ $plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
 //und muessen zuerst nach UTF8 konvertiert werden
 function utf8($string)
 {
-	//echo "ENCODIONG: ".mb_detect_encoding($string,"UTF-8,ISO-8859-15");
-	if(mb_detect_encoding($string, "UTF-8,ISO-8859-15")=='ISO-8859-15')
+	if(!check_utf8($string))
 		return utf8_encode($string);
 	else 
 		return $string;
