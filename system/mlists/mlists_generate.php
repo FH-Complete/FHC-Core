@@ -194,7 +194,7 @@ $error_msg='';
 					JOIN public.tbl_studiengang USING(oe_kurzbz)
 				WHERE 
 					tbl_benutzer.aktiv AND 
-					tbl_benutzerfunktion.funktion_kurzbz='Leitung' AND 
+					(tbl_benutzerfunktion.funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg') AND 
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 					mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
