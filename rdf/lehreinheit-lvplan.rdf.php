@@ -206,7 +206,8 @@ if ($anz>0)
 		if($filter!='')
 		{
 			if(!strstr(strtolower($lektor), strtolower($filter)) && 
-			   !strstr(strtolower($lehrfach), strtolower($filter)))
+			   !strstr(strtolower($lehrfach), strtolower($filter)) &&
+			   !strstr(strtolower($l->lehrfach_bez[0]), strtolower($filter)))
 			{
 				continue;
 			}
