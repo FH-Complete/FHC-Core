@@ -74,6 +74,12 @@ if (isset($_GET['gruppe']))
 else
 	$gruppe_kurzbz=null;
 
+if (isset($_GET['filter']))
+	$filter=$_GET['filter'];
+else
+	$filter=null;
+
+
 // LVA holen
 $lva=array();
 $lehreinheit=new lehreinheit();
@@ -197,6 +203,14 @@ if ($anz>0)
 		if (count($l->offenestunden)>1)
 			$offenestunden.=' ?';
 	
+		if($filter!='')
+		{
+			if(!strstr(strtolower($lektor), strtolower($filter)) && 
+			   !strstr(strtolower($lehrfach), strtolower($filter)))
+			{
+				continue;
+			}
+		}
 		echo'<RDF:li>
 	      		<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
 			   		<LVA:lvnr>'.$lvnr.'</LVA:lvnr>

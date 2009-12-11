@@ -38,6 +38,7 @@ function auswahlValues()
 
 function onVerbandSelect()
 {
+	document.getElementById('tempus-lva-filter').value='';
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var tree=document.getElementById('tree-verband');
@@ -276,6 +277,7 @@ function onOrtSelect()
 
 function onLektorSelect(event)
 {
+	document.getElementById('tempus-lva-filter').value='';
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var treeLektor=document.getElementById('tree-lektor');

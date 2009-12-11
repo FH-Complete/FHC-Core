@@ -33,6 +33,34 @@ function onLVARefresh()
 	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources+"&bla=");
 }
 
+// LVA-Panel filtern
+function onLVAFilter()
+{
+	var filter=document.getElementById('tempus-lva-filter').value;
+	var vorher='';
+	var nachher='';
+	
+	// LVAs
+	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
+	var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
+	
+	var orig=datasources.substring(0);
+	var idx = datasources.indexOf("&filter=")
+	if(idx!=-1)
+	{
+		idx2=datasources.indexOf("&",idx+9);
+		vorher=datasources.slice(0,idx);
+		if(idx2!=-1)
+			nachher=datasources.slice(idx2);
+		datasources=vorher+nachher;
+	}
+	
+	datasources=datasources+"&filter="+encodeURIComponent(filter);
+	
+	//alert('Orig:'+orig+' Source: '+datasources+' Vorher:'+vorher+' Nachher:'+nachher);
+	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources);
+}
+
 function onJumpNow()
 {
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
