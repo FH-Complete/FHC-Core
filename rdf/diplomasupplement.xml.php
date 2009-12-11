@@ -113,26 +113,25 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			echo '		<ects_angerechnet></ects_angerechnet>';
 			
-		if($row->organisationsform=='m')
+		if($row->orgform_kurzbz=='VBB')
 		{
-			//Bei Mischformen, die Organisationsform aus dem Status nehmen
+			//Bei Mischformen, die OrgForm aus dem Status nehmen
 			$prestudent = new prestudent();
 			$prestudent->getLastStatus($row->prestudent_id);
-			switch($prestudent->orgform_kurzbz)
-			{
-				case 'BB': $row->organisationsform = 'b'; break;
-				case 'VZ': $row->organisationsform = 'v'; break;
-				case 'FST': $row->organisationsform = 'f'; break;					
-			}
-				
+			$row->orgform_kurzbz=$prestudent->orgform_kurzbz;
 		}
 		
-		if($row->organisationsform=='b' || $row->organisationsform=='BB')
-			echo '		<studienart>Berufbegleitendes Studium/Part-time degree programm</studienart>';
-		elseif($row->organisationsform=='v' || $row->organisationsform=='VZ')
-			echo '		<studienart>Vollzeitstudium/Full-time degree programm</studienart>';
-		else 
-			echo '		<studienart>Fernstudium/Distance study</studienart>';
+		switch($row->orgform_kurzbz)
+		{
+			case 'BB':	echo '		<studienart>Berufbegleitendes Studium/Part-time degree programm</studienart>';
+						break;
+			case 'VZ':	echo '		<studienart>Vollzeitstudium/Full-time degree programm</studienart>';
+						break;
+			case 'FST':	echo '		<studienart>Fernstudium/Distance study</studienart>';
+						break;
+			default:	echo '		<studienart></studienart>';
+						break;
+		}
 		
 		if($row->typ=='d')
 		{

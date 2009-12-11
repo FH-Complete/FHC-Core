@@ -59,7 +59,7 @@ class fachbereich extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = 'SELECT * FROM public.tbl_fachbereich order by fachbereich_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_fachbereich ORDER BY fachbereich_kurzbz;';
 
 		if(!$this->db_query($qry))
 		{
@@ -85,6 +85,50 @@ class fachbereich extends basis_db
 		return true;
 	}
 
+	/**
+	 * Laedt die Institute die als Array uebergeben werden
+	 * @param $kurzbzs Array mit den Instituts-Kurzbezeichnungen
+	 * @param $order Sortierreihenfolge
+	 * @param $aktiv wenn true dann nur aktive sonst alle
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadArray($kurzbzs, $order=null, $aktiv=true)
+	{
+		if(count($kurzbzs)==0)
+			return true;
+		
+		$kurzbzs = "'".implode("','",$kurzbzs)."'";
+		$qry = 'SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz in('.$kurzbzs.')';
+		if ($aktiv)
+			$qry.=' AND aktiv=true';
+
+		if($order!=null)
+		 	$qry .=" ORDER BY $order";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$fachb_obj = new fachbereich();
+
+			$fachb_obj->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
+			$fachb_obj->bezeichnung = $row->bezeichnung;
+			$fachb_obj->farbe = $row->farbe;
+			$fachb_obj->studiengang_kz = $row->studiengang_kz;
+			$fachb_obj->ext_id = $row->ext_id;
+			$fachb_obj->aktiv = ($row->aktiv=='t'?true:false);
+			$fachb_obj->oe_kurzbz = $row->oe_kurzbz;
+
+			$this->result[] = $fachb_obj;
+			$this->bezeichnung_arr[$row->fachbereich_kurzbz] = $row->bezeichnung;
+		}
+		return true;
+	}
+	
 	/**
 	 * Laedt einen Fachbereich
 	 * @param $fachb_id ID des zu ladenden Fachbereiches

@@ -126,13 +126,18 @@
 
 	if (isset($_REQUEST['lv_id']) || isset($_REQUEST['neu']))
 	{
-		$lv = new lehrveranstaltung();
-
-		if (isset($_REQUEST['lv_id']))
+		//wenn ein Fehler beim Speichern auftritt, dann sollen die alten Daten nochmals
+		//angezeigt werden.
+		if(!isset($_POST['schick']))
 		{
-			$lvid = $_REQUEST['lv_id'];
-			if (!$lv->load($lvid))
-				$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung <b>".$lvid."</b> existiert nicht</div>";
+			$lv = new lehrveranstaltung();
+	
+			if (isset($_REQUEST['lv_id']))
+			{
+				$lvid = $_REQUEST['lv_id'];
+				if (!$lv->load($lvid))
+					$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung <b>".$lvid."</b> existiert nicht</div>";
+			}
 		}
 
 		$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung</div>\n";
@@ -271,12 +276,11 @@
 	}
 	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Studiengang - Details</title>
+<title>Lehrveranstaltung - Details</title>
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
