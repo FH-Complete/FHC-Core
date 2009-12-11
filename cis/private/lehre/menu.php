@@ -52,9 +52,9 @@
 	$semester=(isset($_REQUEST['semester'])?$_REQUEST['semester']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:null));
 	function CutString($strVal, $limit)
 	{
-		if(strlen($strVal) > $limit+3)
+		if(mb_strlen($strVal) > $limit+3)
 		{
-			return substr($strVal, 0, $limit) . "...";
+			return mb_substr($strVal, 0, $limit) . "...";
 		}
 		else
 		{
