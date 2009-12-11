@@ -108,6 +108,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 			oncommand="onLVARefresh();"
 			tooltiptext="Neu laden"
 		/>
+		<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
 		</toolbar>
 </toolbox>
 
