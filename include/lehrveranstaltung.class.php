@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class lehrveranstaltung extends basis_db
 {
@@ -306,7 +307,7 @@ class lehrveranstaltung extends basis_db
 		}
 		if(!is_null($aktiv) && !is_bool($aktiv))
 		{
-			$this->errormsg = 'Aktivkz muss ein boolscher Wert sein';
+			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
 			return false;
 		}
 		if(!is_null($lehre) && !is_bool($lehre))
@@ -495,11 +496,6 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Planfaktor ist ungueltig';
 			return false;
 		}
-		if($this->semesterstunden!='' && !is_numeric($this->semesterstunden))
-		{
-			$this->errormsg = 'Semesterstunden ist ungueltig';
-			return false;
-		}
 		if($this->planlektoren!='' && !is_numeric($this->planlektoren))
 		{
 			$this->errormsg = 'Planlektoren ist ungueltig';
@@ -513,6 +509,11 @@ class lehrveranstaltung extends basis_db
 		if($this->ects>40)
 		{
 			$this->errormsg = 'ECTS darf nicht groesser als 40 sein';
+			return false;
+		}
+		if($this->semesterstunden!='' && !isint($this->semesterstunden))
+		{
+			$this->errormsg = 'Semesterstunden muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
 		$this->errormsg = '';

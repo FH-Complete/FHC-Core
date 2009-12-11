@@ -390,7 +390,13 @@ function checkldapuser($username,$password)
 	return(false);
 }
 
-//Berechnet die Schnittmenge zweier Strings
+/**
+ * Berechnet die Schnittmenge zweier Strings
+ *
+ * @param $str1
+ * @param $str2
+ * @return intersected string
+ */
 function intersect($str1, $str2)
 {
 	if (mb_strlen($str1) > mb_strlen($str2))
@@ -409,6 +415,13 @@ function intersect($str1, $str2)
 	return $intersect;
 }
 
+/**
+ * Konvertiert Problematische Sonderzeichen in Strings fuer 
+ * Accountnamen und EMail-Aliase
+ *
+ * @param $str
+ * @return bereinigter String
+ */
 function convertProblemChars($str)
 {
 	$enc = 'UTF-8';
@@ -481,17 +494,12 @@ function xmlclean($string)
 	return str_replace($mixed, "", $string);
 }
 
-
-// ------------------------------------------------------------------------------------------
-//	Stringverkuerzen auf bestimmte laenge 
-// ------------------------------------------------------------------------------------------
-	/**
-	 * Verkuertzt einen String auf eine bestimmte laenge - beachtet werden Wortzeichen
-	 * @param String der die Zeichenkette enthaelt die verkuertzt werden soll
-	 * @param Laenge des Strings der geliefert werden soll (inkl. der Laenge des Fortsetzungszeichen)
-	 * @return Daten Objekt wenn ok, false im Fehlerfall
-	 */
-	 
+/**
+ * Verkuertzt einen String auf eine bestimmte laenge - beachtet werden Wortzeichen
+ * @param String der die Zeichenkette enthaelt die verkuertzt werden soll
+ * @param Laenge des Strings der geliefert werden soll (inkl. der Laenge des Fortsetzungszeichen)
+ * @return Daten Objekt wenn ok, false im Fehlerfall
+ */ 
 function StringCut($str='',$len=0,$checkWortumbruch=false,$fortsetzungszeichen='...')
 {
 	// Plausib
@@ -567,9 +575,15 @@ function StringCut($str='',$len=0,$checkWortumbruch=false,$fortsetzungszeichen='
 	}
 	return $vStr;
 }
+
+/**
+ * Prueft ob ein String UTF-8 Kodiert ist
+ *
+ * @param $str
+ * @return true wenn utf8 sonst false
+ */
 function check_utf8($str="")
 {
-#return true;
 	$cStr=$str;
 	if (strlen($cStr)>3590)
 	{
@@ -589,80 +603,92 @@ function check_utf8($str="")
 	  return $stati;
 }
 
-// ------------------------------------------------------------------------------------------
-//	Konertierungen
-// ------------------------------------------------------------------------------------------
+/**
+ * DB Array Konvertieren zu XML
+ *
+ * @param $rows
+ * @param $root
+ * @return XML
+ */
+function array_to_xml($rows,$root='root')
+{
+	if (!count($rows))
+		return '<'.$root.' />'."\r\n";
+		
+	$xml_string='';
+	$xml_string.='<'.$root.'>'."\r\n";
+	reset($rows);
 
-	
-// ------------------------------------------------------------------------------------------
-//	DB Array Konvertieren zu XML
-// ------------------------------------------------------------------------------------------
-	function array_to_xml($rows,$root='root')
-	{
-		if (!count($rows))
-			return '<'.$root.' />'."\r\n";
-			
-		$xml_string='';
-		$xml_string.='<'.$root.'>'."\r\n";
-		reset($rows);
-	
-	  	for ($i=0;$i<count($rows);$i++)
-		{	
-			$xml_string.='<row>'."\r\n";
-			$row=$rows[$i];
-			@reset($row);
-			while (@list( $tmp_key, $tmp_value ) = each($row) ) 
+  	for ($i=0;$i<count($rows);$i++)
+	{	
+		$xml_string.='<row>'."\r\n";
+		$row=$rows[$i];
+		@reset($row);
+		while (@list( $tmp_key, $tmp_value ) = each($row) ) 
+		{
+			if (!is_numeric($tmp_key))
 			{
-				if (!is_numeric($tmp_key))
-				{
-					$xml_string.='<'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.$tmp_key.'>'."\r\n";
-				}	
-				elseif (is_numeric($tmp_key))
-				{
-					$xml_string.='<row'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></row'.$tmp_key.'>'."\r\n";
-				}	
-			}							
-			$xml_string.='</row>'."\r\n";
-		}	
-		$xml_string.='</'.$root.'>'."\r\n";
-		return $xml_string;
+				$xml_string.='<'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.$tmp_key.'>'."\r\n";
+			}	
+			elseif (is_numeric($tmp_key))
+			{
+				$xml_string.='<row'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></row'.$tmp_key.'>'."\r\n";
+			}	
+		}							
+		$xml_string.='</row>'."\r\n";
+	}	
+	$xml_string.='</'.$root.'>'."\r\n";
+	return $xml_string;
+}
+
+/**
+ * DB Array Konvertieren zu RDF
+ *
+ * @param $rows
+ * @param $root
+ * @param $rdf_uri
+ * @return RDF
+ */
+function array_to_rdf($rows,$root='root',$rdf_uri='rdf')
+{
+	$rdf_server=$_SERVER['SERVER_NAME'];
+	$rdf_string='';
+	if (!count($rows))
+		return $rdf_string.='<'.strtoupper($rdf_uri).':'.$root.' />'."\r\n";
+
+	$rdf_string.='<'.strtoupper($rdf_uri).':Seq rdf:about="http://'.$rdf_server.'/'.$root.'/liste">'."\r\n";
+
+	reset($rows);
+	for ($i=0;$i<count($rows);$i++)
+	{           
+		$rdf_string.='<'.strtoupper($rdf_uri).':li>'."\r\n";
+		$rdf_string.='<'.strtoupper($rdf_uri).':Description id="'.$i.'" about="http://'.$rdf_server.'/liste'.$i.'">'."\r\n";
+
+		$row=$rows[$i];
+		reset($row);
+		while (list( $tmp_key, $tmp_value ) = each($row) ) 
+		{
+			if (!is_numeric($tmp_key))
+			{
+				$rdf_string.='<'.strtoupper($rdf_uri).':'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.strtoupper($rdf_uri).':'.$tmp_key.'>'."\r\n";
+			}
+		}
+		$rdf_string.='</'.strtoupper($rdf_uri).':Description>'."\r\n";
+		$rdf_string.='</'.strtoupper($rdf_uri).':li>'."\r\n";
 	}
+	$rdf_string.='</'.strtoupper($rdf_uri).':Seq>'."\r\n";
+	return $rdf_string;
+}
 
-// ------------------------------------------------------------------------------------------
-//  DB Array Konvertieren zu RDF
-// ------------------------------------------------------------------------------------------
-    function array_to_rdf($rows,$root='root',$rdf_uri='rdf')
-    {
-##exit(" $root $rdf_uri ");
+/**
+ * Prueft, ob ein String nur aus ganzen Zahlen besteht
+ *
+ * @param $mixed
+ * @return boolean
+ */
+function isint( $mixed )
+{
+    return ( preg_match( '/^\d*$/'  , $mixed) == 1 );
+}
 
-                $rdf_server=$_SERVER['SERVER_NAME'];
-                $rdf_string='';
-                if (!count($rows))
-                           return $rdf_string.='<'.strtoupper($rdf_uri).':'.$root.' />'."\r\n";
-                           
-#                      $rdf_string.='<'.strtoupper($rdf_uri).':'.$root.'>'."\r\n";
-                $rdf_string.='<'.strtoupper($rdf_uri).':Seq rdf:about="http://'.$rdf_server.'/'.$root.'/liste">'."\r\n";
-
-                reset($rows);
-                for ($i=0;$i<count($rows);$i++)
-                {           
-                           $rdf_string.='<'.strtoupper($rdf_uri).':li>'."\r\n";
-                           $rdf_string.='<'.strtoupper($rdf_uri).':Description id="'.$i.'" about="http://'.$rdf_server.'/liste'.$i.'">'."\r\n";
-                                                   
-                           $row=$rows[$i];
-                           reset($row);
-                           while (list( $tmp_key, $tmp_value ) = each($row) ) 
-                           {
-                                       if (!is_numeric($tmp_key))
-                                       {
-                                                   $rdf_string.='<'.strtoupper($rdf_uri).':'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.strtoupper($rdf_uri).':'.$tmp_key.'>'."\r\n";
-                                       }           
-                           }                                                                                 
-                           $rdf_string.='</'.strtoupper($rdf_uri).':Description>'."\r\n";
-                          $rdf_string.='</'.strtoupper($rdf_uri).':li>'."\r\n";
-                }           
-#                      $rdf_string.='</'.strtoupper($rdf_uri).':'.$root.'>'."\r\n";
-                $rdf_string.='</'.strtoupper($rdf_uri).':Seq>'."\r\n";
-                return $rdf_string;
-    }           
 ?>
