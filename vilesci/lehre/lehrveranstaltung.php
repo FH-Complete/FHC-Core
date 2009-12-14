@@ -20,15 +20,15 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/studiengang.class.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/fachbereich.class.php');
-	require_once('../../include/lvinfo.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/fachbereich.class.php');
+require_once('../../include/lvinfo.class.php');
 
-	if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 
 $s=new studiengang();
@@ -70,10 +70,6 @@ if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid')
 && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
 	die('Sie haben keine Berechtigung für diesen Studiengang');
 
-	
-#if($fachbereich_kurzbz=='' && $stg_kz=='')
-#	$stg_kz='0';	
-	
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 {
 	if($rechte->isBerechtigt('admin', $stg_kz, 'suid'))
@@ -401,7 +397,7 @@ if ($result_lv!=0)
 		echo "<td style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
 		{
-			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'>";
+			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz&isaktiv=$isaktiv' method='POST'>";
 			echo "<SELECT name='orgform'>";
 			echo "<option value=''>-- Keine Auswahl --</option>";
 			
@@ -431,30 +427,30 @@ if ($result_lv!=0)
 		//ECTS
 		echo "<td>$row->ects</td>";
 		//Lehre
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre&isaktiv=$isaktiv'><img src='../../skin/images/".($row->lehre=='t'?'true.png':'false.png')."' height='20'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->lehre=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//LehreVz
 		echo "<td  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
-			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form>";
+			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form>";
 		else
 			echo $row->lehreverzeichnis;
 		echo "</td>";
 		//Aktiv
 		echo "<td align='center'  style='white-space:nowrap;'>";
 		if($rechte->isBerechtigt('admin'))
-			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv&isaktiv=$isaktiv'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
+			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 		else
 			echo ($row->aktiv?'Ja':'Nein');
 		echo "</td>";
 		//Sort
 		echo "<td style='white-space:nowrap;'>";
 		echo "<div style='display: none'>$row->sort</div>";
-		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv' method='POST'><input type='text' value='$row->sort' size='4' name='sort'><input type='submit' value='ok'></form>";
+		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><input type='text' value='$row->sort' size='4' name='sort'><input type='submit' value='ok'></form>";
 		echo "</td>";
 		//Zeugnis
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis&isaktiv=$isaktiv'><img src='../../skin/images/".($row->zeugnis=='t'?'true.png':'false.png')."' height='20'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->zeugnis=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//Projektarbeit
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit&isaktiv=$isaktiv'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.png':'false.png')."' height='20'></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&projektarbeit=$row->projektarbeit&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->projektarbeit=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//FBK
 		echo "<td style='white-space:nowrap;'>";
 		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz&isaktiv=$isaktiv' method='POST'><SELECT name='fbk'>";
