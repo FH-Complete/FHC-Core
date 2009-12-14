@@ -254,6 +254,7 @@ if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 
 		 betriebsmittel_id Integer NOT NULL,
 		 betriebsmittelstatus_kurzbz Character varying(16) NOT NULL,
 		 datum Bigint,
+		 anmerkung text,
 		 updateamum Timestamp,
 		 updatevon Character varying(32),
 		 insertamum Timestamp,
