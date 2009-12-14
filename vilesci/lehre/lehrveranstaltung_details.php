@@ -27,7 +27,6 @@
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
 	
 	$user = get_uid();
 	$reloadstr = "";  // neuladen der liste im oberen frame
@@ -39,12 +38,6 @@
 	$stg_arr = array();
 	$sprache_arr = array();
 	$lehrform_arr = array();
-
-	if(isset($_POST["del"]))
-	{
-
-
-	}
 
 	if(isset($_POST["schick"]))
 	{
@@ -106,7 +99,7 @@
 		$stg_arr[$studiengang->studiengang_kz] = $studiengang->kuerzel;
 	}
 
-	$qry = "SELECT * FROM tbl_sprache ORDER BY sprache";
+	$qry = "SELECT * FROM public.tbl_sprache ORDER BY sprache";
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
