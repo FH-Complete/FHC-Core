@@ -263,6 +263,7 @@ if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 
 		WITH (OIDS=FALSE);
 		
 		ALTER TABLE wawi.tbl_betriebsmittel ALTER COLUMN reservieren SET NOT NULL;
+		ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN leasing_bis date;
 		
 		-- Add keys for table tbl_betriebsmittel_betriebsmittelstatus
 		
