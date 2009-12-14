@@ -253,7 +253,7 @@ if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 
 		 betriebsmittelbetriebsmittelstatus_id Serial NOT NULL,
 		 betriebsmittel_id Integer NOT NULL,
 		 betriebsmittelstatus_kurzbz Character varying(16) NOT NULL,
-		 datum Bigint,
+		 datum date,
 		 anmerkung text,
 		 updateamum Timestamp,
 		 updatevon Character varying(32),
@@ -261,6 +261,8 @@ if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 
 		 insertvon Character varying(32)
 		)
 		WITH (OIDS=FALSE);
+		
+		ALTER TABLE wawi.tbl_betriebsmittel ALTER COLUMN reservieren SET NOT NULL;
 		
 		-- Add keys for table tbl_betriebsmittel_betriebsmittelstatus
 		
