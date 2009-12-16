@@ -348,7 +348,7 @@
 			$reihungstest->uhrzeit = date('H:i:s');
 		}
 	
-		if($rechte->isBerechtigt('admin',0, 'suid'))
+		if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		{
 			echo '<a href="reihungstest_administration.php">Administration</a>';
 		}
