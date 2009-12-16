@@ -44,10 +44,10 @@ session_start();
 $user=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin'))
-{
+
+if(!$rechte->isBerechtigt('basis/testtool', null, 's'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
-}
+
 
 if(isset($_GET['gebiet_id']))
 {
@@ -133,6 +133,9 @@ $sprache = $_SESSION['sprache'];
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
 	if(isset($_FILES['bild']['tmp_name']))
 	{
 		//Extension herausfiltern
@@ -172,6 +175,9 @@ if(isset($_POST['submitbild']))
 //Bei Upload eines Audiofiles
 if(isset($_POST['submitaudio']))
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
 	if(isset($_FILES['audio']['tmp_name']))
 	{
 		//Extension herausfiltern
@@ -212,6 +218,9 @@ if(isset($_POST['submitaudio']))
 //Speichern der Frage-Daten
 if(isset($_POST['submitdata']))
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$frage = new frage();
 	if($frage->load($_GET['frage_id']))
 	{
@@ -263,6 +272,9 @@ if(isset($_POST['submitdata']))
 //Speichern eines Vorschlages
 if(isset($_POST['submitvorschlag']))
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$bildcontent='';
 	if(isset($_FILES['bild']['tmp_name']) && is_uploaded_file($_FILES['bild']['tmp_name']))
 	{
@@ -387,6 +399,9 @@ if(isset($_POST['submitvorschlag']))
 //Vorschlag loeschen
 if(isset($_GET['type']) && $_GET['type']=='delete' && isset($_GET['vorschlag_id']))
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$vs = new vorschlag();
 	if(!$vs->delete($_GET['vorschlag_id']))
 		echo '<b>'.$vs->errormsg.'</b><br />';
@@ -396,6 +411,9 @@ if(isset($_GET['type']) && $_GET['type']=='delete' && isset($_GET['vorschlag_id'
 // anlegen einer neuen Frage
 if(isset($_GET['type']) && $_GET['type']=='neuefrage')
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$frage_obj = new frage();
 	
 	$frage_obj->gebiet_id = $_GET['gebiet_id'];

@@ -20,12 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
@@ -34,7 +29,12 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/ort.class.php');
+require_once('../../include/akte.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fckeditor/fckeditor.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 echo '
 <html>
@@ -70,6 +70,12 @@ function RefreshImage()
 ';
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('student/stammdaten', null, 's') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 's'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $error_person_save = false;
 $error_benutzer_save = false;
@@ -114,6 +120,10 @@ $standort_kurzbz = (isset($_POST['standort_kurzbz'])?$_POST['standort_kurzbz']:'
 $anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 $bismelden = (isset($_POST['bismelden'])?$_POST['bismelden']:'');
 $kurzbeschreibung = (isset($_POST['kurzbeschreibung'])?$_POST['kurzbeschreibung']:'');
+$matrikelnummer = (isset($_POST['matrikelnummer'])?$_POST['matrikelnummer']:'');
+$semester = (isset($_POST['semester'])?$_POST['semester']:'');
+$verband = (isset($_POST['verband'])?$_POST['verband']:'');
+$gruppe = (isset($_POST['gruppe'])?$_POST['gruppe']:'');
 
 if($uid!='')
 {
@@ -137,6 +147,9 @@ if($uid!='')
 
 if(isset($_POST['saveperson']))
 {
+	if(!$rechte->isBerechtigt('student/stammdaten', null, 'su') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
 	$person = new person();
 	if(!$person->load($person_id))
 		die('Person konnte nicht geladen werden');
@@ -177,8 +190,41 @@ if(isset($_POST['saveperson']))
 	
 }
 
+if(isset($_GET['deleteimage']))
+{
+	if(!$rechte->isBerechtigt('student/stammdaten', null, 'su') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	$person = new person();
+	if(!$person->load($person_id))
+		die('Person konnte nicht geladen werden');
+	
+	$person->foto='';
+	if(!$person->save())
+		die('Fehler beim Speichern:'.$person->errormsg);
+	
+	$akte = new akte();
+	if($akte->getAkten($person_id, 'Lichtbil'))
+	{
+		foreach ($akte->result as $row)
+		{
+			$hlp = new akte();
+			if(!$hlp->delete($row->akte_id))
+				echo 'Fehler beim Löschen des Bildes: '.$hlp->errormsg;
+		}
+	}
+	else 
+	{
+		die('Fehler beim Laden der Akten:'.$akte->errormsg);
+	}
+	
+	$msg = '<h3>Bild wurde erfolgreich entfernt</h3>';
+}
 if(isset($_POST['savebenutzer']))
 {
+	if(!$rechte->isBerechtigt('student/stammdaten', null, 'su') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$benutzer = new benutzer();
 	$benutzer->load($uid);
 	
@@ -208,6 +254,9 @@ if(isset($_POST['savebenutzer']))
 
 if(isset($_POST['savemitarbeiter']))
 {
+	if(!$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$mitarbeiter = new mitarbeiter();
 	if(!$mitarbeiter->load($uid))
 		die('Mitarbeiter konnte nicht geladen werden');
@@ -241,7 +290,14 @@ if(isset($_POST['savestudent']))
 	$student = new student();
 	if(!$student->load($uid))
 		die('Student konnte nicht geladen werden');
+
+	$studiengang = new studiengang();
+	if(!$studiengang->load($student->studiengang_kz))
+		die('Fehler beim Laden des Studienganges');
 		
+	if(!$rechte->isBerechtigt('student/stammdaten', $studiengang->oe_kurzbz, 'su'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$student->matrikelnr = $matrikelnummer;
 	$student->semester = $semester;
 	$student->verband = $verband;
@@ -413,6 +469,8 @@ echo "
 		<a href='#foo' onclick='window.open(\"../../content/bildupload.php?person_id=$person_id\",\"BildUpload\", \"height=50,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>Bild hochladen</a>
 		<br><br>
 		<a href='#foo' onclick='RefreshImage(); return false;'>Bild aktualisieren</a>
+		<br><br>
+		<a href='".$_SERVER['PHP_SELF']."?person_id=$person_id&uid=$uid&deleteimage=true'>Bild entfernen</a>
 	</td>
 </tr>
 <tr>
