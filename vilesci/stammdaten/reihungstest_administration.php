@@ -20,19 +20,17 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/datum.class.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/person.class.php');
-	require_once('../../include/prestudent.class.php');
-	require_once('../../include/pruefling.class.php');
-	require_once('../../include/studiengang.class.php');
+require_once('../../config/vilesci.config.inc.php');			
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/person.class.php');
+require_once('../../include/prestudent.class.php');
+require_once('../../include/pruefling.class.php');
+require_once('../../include/studiengang.class.php');
 
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $datum_obj = new datum();
 	
@@ -52,8 +50,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<body class="Background_main">
 	<h2>Reihungstest - Admin</h2>';
 
-if(!$rechte->isBerechtigt('admin', 0, 'suid'))
-	die('Sie haben keine Berechtigung für diese Seite');
+if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
 
 //Anzeigen der kommenden Reihungstesttermine:
 echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen der kommenden Reihungstests</a>';
