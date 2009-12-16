@@ -22,13 +22,12 @@
  */
 
 require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 
+if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
+      
 function sortByField($multArray,$sortField,$desc=true)
 {
 	$tmpKey='';

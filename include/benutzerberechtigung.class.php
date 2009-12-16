@@ -464,26 +464,22 @@ class benutzerberechtigung extends basis_db
 			//Pruefen ob eine negativ-Berechtigung vorhanden ist
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz && $b->negativ && $oe_kurzbz==$b->oe_kurzbz)
 			{
-				if (!is_null($b->starttimestamp) && !is_null($b->endetimestamp))
+				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
+				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
 				{
-					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
-						return false;
-				}
-				else
 					return false;
+				}
 			}
 		
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
 			   && (is_null($art) || mb_strstr($b->art, $art))
 			   && (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz))
 			{
-				if (!is_null($b->starttimestamp) && !is_null($b->endetimestamp))
+				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
+				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
 				{
-					if ($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp)
 						return true;
 				}
-				else
-					return true;
 			}
 		}
 
@@ -526,7 +522,7 @@ class benutzerberechtigung extends basis_db
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
-				&& (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
+				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
 				{
@@ -594,7 +590,7 @@ class benutzerberechtigung extends basis_db
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
-				&& (($timestamp>$b->starttimestamp && $timestamp<$b->endetimestamp) || ($b->starttimestamp==null && $b->endetimestamp==null)))
+				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
 				{

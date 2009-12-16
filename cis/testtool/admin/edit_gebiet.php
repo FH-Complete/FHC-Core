@@ -30,7 +30,7 @@ require_once('../../../include/gebiet.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 
 if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 
 $rechte = new benutzerberechtigung();
@@ -54,7 +54,7 @@ else
 	
 echo '<h1>&nbsp;Gebiet bearbeiten</h1>';
 
-if(!$rechte->isBerechtigt('admin'))
+if(!$rechte->isBerechtigt('basis/testtool'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $gebiet = new gebiet();
@@ -87,6 +87,9 @@ echo '<br /><br />';
 //Speichern der Daten
 if(isset($_POST['speichern']))
 {
+	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
 	$gebiet = new gebiet();
 	if($gebiet->load($gebiet_id))
 	{
