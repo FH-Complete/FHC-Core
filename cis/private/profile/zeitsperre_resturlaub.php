@@ -309,9 +309,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								$to.=',';
 							$to.=trim($vg.'@'.DOMAIN);
 						}
-						$to_len=mb_strlen($to)-1;
-						$to = mb_substr($to, 0,$to_len);
-
+#						$to_len=mb_strlen($to)-1;
+#						$to = mb_substr($to, 0,$to_len);
 						//$to = 'oesi@technikum-wien.at';
 						$benutzer = new benutzer();
 						$benutzer->load($uid);
