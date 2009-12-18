@@ -45,12 +45,20 @@ function crlf()
 	return $crlf;
 }
 
+function check_uid($uid)
+{
+	if(ctype_alnum($uid) && mb_strlen($uid)<=32)
+		return true;
+	else 
+		return false;
+}
+
 function check_lektor($uid)
 {
 	$db = new basis_db();
 	
 	// uid von View 'Lektor' holen
-	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'";
+	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'";
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{

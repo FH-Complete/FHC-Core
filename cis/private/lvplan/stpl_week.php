@@ -1,3 +1,26 @@
+<?php
+/* Copyright (C) 2009 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Gerald Simane-Sequens <gerald.simane@technikum-wien.at>.
+ */
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
@@ -36,22 +59,20 @@
  * Update: 			15.11.2004 von Christian Paminger
  *****************************************************************************/
 
-
-
 //$type='ort';
 //$ort_kurzbz='EDV6.08';
 //$datum=1102260015;
 
 require_once('../../../config/cis.config.inc.php');
-//require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
+require_once('../../../include/reservierung.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
-$uid=get_uid();
 
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+
+$uid=get_uid();
 
 // Deutsche Umgebung
 //$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
@@ -135,9 +156,9 @@ elseif (check_lektor($uid))
 	$user='lektor';
 else
 {
-	//die("Cannot set usertype!");
+	die("Fehler: Ihr User wurde nicht gefunden!");
 	//GastAccountHack
-	$user='student';
+	//$user='student';
 }
 
     // User bestimmen
@@ -146,8 +167,6 @@ if (!isset($type))
 if (!isset($pers_uid))
 	$pers_uid=$uid;
 
-//echo $uid.':'.$user_uid;
-#var_dump($_GET);
 if (isset($_POST['reserve']))
 	$reserve=$_POST['reserve'];
 else if (isset($_GET['reserve']))
@@ -172,21 +191,25 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 			if (isset($_REQUEST[$var]))
 			{
 				$datum_res=$_REQUEST[$var];
-				#$datum_res=$datum_obj->formatDatum($datum_res);
-				//echo $datum_res;
-				$query="SELECT * FROM campus.tbl_reservierung where ort_kurzbz='$ort_kurzbz' and datum='$datum_res' and  stunde='$stunde'";
-				if(!$suchen_std=$db->db_query($query))
-					die($db->db_last_error());
-				$gef=$db->db_num_rows($suchen_std);		
-				if (!$gef)
+
+				$reservierung = new reservierung();
+				
+				if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
 				{
-					$query="INSERT INTO campus.tbl_reservierung
-							(datum, uid, ort_kurzbz, stunde, beschreibung, titel, studiengang_kz )
-						VALUES
-							('$datum_res', '$uid', '$ort_kurzbz', $stunde, '".$_REQUEST['beschreibung']."', '".$_REQUEST['titel']."', 0)"; // semester, verband, gruppe, gruppe_kurzbz,
-					//echo $query;
-					if(!($erg=$db->db_query($query)))
-						echo $db->db_last_error();
+					$reservierung = new reservierung();
+					
+					$reservierung->datum = $datum_res;
+					$reservierung->uid = $uid;
+					$reservierung->ort_kurzbz = $ort_kurzbz;
+					$reservierung->stunde = $stunde;
+					$reservierung->beschreibung = $_REQUEST['beschreibung'];
+					$reservierung->titel = $_REQUEST['titel'];
+					$reservierung->studiengang_kz='0';
+
+					if(!$reservierung->save(true))
+					{
+						echo $reservierung->errormsg;
+					}
 				}	
 				else
 				{
