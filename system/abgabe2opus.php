@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ * Authors: Christian Paminger 		<christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 			<rudolf.hangl@technikum-wien.at>,
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *
  *******************************************************************************************************
@@ -26,23 +26,38 @@
  *******************************************************************************************************/
 
 require_once('../config/cis.config.inc.php');
-require_once('../include/functions.inc.php');
-require_once('../include/studiengang.class.php');
+//require_once('../include/functions.inc.php');
+//require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
-require_once('../include/benutzerberechtigung.class.php');
-require_once('../include/datum.class.php');
+//require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/mail.class.php');
 
-	$db_obj = new basis_db();
+require_once("../opus/lib/stringValidation.php");
+require_once('../opus/lib/opus.class.php');
+
+	//$db_obj = new basis_db();
 		
-	// zugriff auf mssql-datenbank
+	// zugriff auf mysql-datenbank
 	if (!$conn_ext=mysql_pconnect (OPUS_SERVER, OPUS_USER, OPUS_PASSWD))
 		die('Fehler beim Verbindungsaufbau!');
 	mysql_select_db(OPUS_DB, $conn_ext);
+	
+	//zugriff auf pg-datenbank
+	$conn_str='host='.DB_HOST.' port='.DB_PORT.' dbname='.DB_NAME.' user='.DB_USER.' password='.DB_PASSWORD;
+	//Connection Herstellen
+	if(!$db_conn = pg_connect($conn_str))
+		die('Fehler beim Oeffnen der Datenbankverbindung');
+
+$qry = "SET CLIENT_ENCODING TO 'WIN1252';";
+			
+if(!pg_query($db_conn,$qry))
+{
+	die('Encoding konnte nicht gesetzt werden');
+}
 
 $datum_obj = new datum();
 //$jahr='';
-//$source_opus='';
+//$source_opus=''; 
 $fehler='';
 $fehler1='';
 $error=false;
@@ -58,6 +73,7 @@ $stg='';
 $row_opus=0;
 $opus_url=OPUS_PATH_PAA;			
 $url_paa=PAABGABE_PATH;
+$kopiert='';
 
 function indexdatei($source_opus, $fd)
 {
@@ -69,7 +85,7 @@ function indexdatei($source_opus, $fd)
 	$publisher_faculty='';
 	$advisor='';
 	$date_accepted='';
-	require '../opus/lib/opus.class.php';
+	//require_once'../opus/lib/opus.class.php';
 	$opus = new OPUS('../opus/lib/opus.conf');
 	$php = $opus->value("php");
 	$db = $opus->value("db");
@@ -115,7 +131,7 @@ function indexdatei($source_opus, $fd)
 	    $_SESSION["show_connotea"] = true;
 	}*/
 	// Ende Social-Bookmarking-Schnittstellen
-	include ("../opus/lib/stringValidation.php");
+	//require_once("../opus/lib/stringValidation.php");
 	//$source_opus = $_REQUEST['source_opus'];
 	if (!_is_valid($source_opus, 1, 10, "[0-9]+")) 
 	{
@@ -928,6 +944,7 @@ function indexdatei($source_opus, $fd)
 	        fwrite($fd,"<TR> \n<TD class=\"frontdoor\" valign=\"top\">");
 	        fwrite($fd,"<B>$t_datum</B></TD> \n");
 	        fwrite($fd,"<TD></TD><TD class=\"frontdoor\" valign=\"bottom\">");
+	        $datum_obj = new datum();
 	        $datum=$datum_obj->formatDatum($datum, 'd.m.Y');
 	        fwrite($fd,$datum."</TD>\n");
 	        fwrite($fd,"</TR> \n");
@@ -1133,25 +1150,32 @@ function indexdatei($source_opus, $fd)
 //****************************************************************************************************
 //Einlesen Projektarbeiten (nur Diplomarbeiten)
 //****************************************************************************************************
-$qry="SELECT tbl_fachbereich.bezeichnung as fb_bez, tbl_lehrveranstaltung.studiengang_kz as stg_kz, * FROM lehre.tbl_projektarbeit 
+$qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.student_uid as stud_uid, tbl_fachbereich.bezeichnung as fb_bez, 
+	tbl_lehrveranstaltung.studiengang_kz as stg_kz, tbl_projektarbeit.note as note1, tbl_zeugnisnote.note as note2  
+	FROM lehre.tbl_projektarbeit 
 	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
 	JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-	WHERE tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5 AND projekttyp_kurzbz='Diplom'
-	AND abgabedatum>".mktime(0, 0, 0, date('m')-3, date('d'), date('Y'));
+	JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id, studiensemester_kurzbz)
+	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
+	AND to_char(tbl_projektarbeit.abgabedatum,'YMD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 
+	AND tbl_projektarbeit.freigegeben ";
 
-//AND tbl_projektarbeit.freigegeben 
+//echo $qry."<br>";
 
-
-if($erg=$db_obj->db_query($qry))
+if($erg=pg_query($db_conn,$qry))
 {
-	while($row=$db_obj->db_fetch_object($erg))
+	while($row=pg_fetch_object($erg))
 	{
+		if(($row->note1<0 OR $row->note1>4) && ($row->note2<0 OR $row->note2>4))
+		{
+			continue;
+		}
 		$opus_url=OPUS_PATH_PAA;			
 		$url_paa=PAABGABE_PATH;
 		$row->sprache=mb_strtolower(mb_substr($row->sprache,0,3));
-		//echo "--->".$row->projektarbeit_id.", ".$row->projekttyp_kurzbz.", ".$row->student_uid;
+		//echo "--->".$row->projektarbeit_id.", ".$row->projekttyp_kurzbz.", ".$row->stud_uid.", ".$row->abgabedatum."<br>";
 		//****************************************************************************************************
 		//weitere benötigte Daten
 		//****************************************************************************************************
@@ -1159,12 +1183,13 @@ if($erg=$db_obj->db_query($qry))
 		$verfasser="";
 		$qry_std="SELECT * FROM public.tbl_benutzer 
 			JOIN public.tbl_person on(tbl_person.person_id=tbl_benutzer.person_id) 
-			WHERE uid='".$row->student_uid."';";
-		if($result_std=$db_obj->db_query($qry_std))
+			WHERE uid='".$row->stud_uid."';";
+		//echo $qry_std."<br>";
+		if($result_std=pg_query($db_conn,$qry_std))
 		{
-			if($db_obj->db_num_rows($result_std)>0)
+			if(pg_num_rows($result_std)>0)
 			{
-				while($row_std=$db_obj->db_fetch_object($result_std))
+				while($row_std=pg_fetch_object($result_std))
 				{
 					if(trim($verfasser)=='')
 					{
@@ -1184,9 +1209,9 @@ if($erg=$db_obj->db_query($qry))
 		}
 		else 
 		{
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!');
+			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden (sel benutzer)!'."\n".$qry_std);
 			$mail->send();
-			$die;
+			die($qry_std);
 		}
 		//begutachter
 		$begutachter1="";
@@ -1194,11 +1219,12 @@ if($erg=$db_obj->db_query($qry))
 			JOIN public.tbl_person on(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id) 
 			WHERE projektarbeit_id='".$row->projektarbeit_id."'  
 			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbegutachter');";
-		if($result_bet=$db_obj->db_query($qry_bet))
+		//echo $qry_bet."<br>";
+		if($result_bet=pg_query($db_conn,$qry_bet))
 		{
-			if($db_obj->db_num_rows($result_bet)>0)
+			if(pg_num_rows($result_bet)>0)
 			{
-				while($row_bet=$db_obj->db_fetch_object($result_bet))
+				while($row_bet=pg_fetch_object($result_bet))
 				{
 					if(trim($begutachter1)=='')
 					{
@@ -1218,9 +1244,9 @@ if($erg=$db_obj->db_query($qry))
 		}
 		else 
 		{
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!');
-			$mail->send();
-			$die;
+			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!'."\n".$qry_bet);
+			$mail->send($qry_bet);
+			die();
 		}
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
@@ -1229,11 +1255,12 @@ if($erg=$db_obj->db_query($qry))
 				JOIN public.tbl_person on(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id) 
 				WHERE projektarbeit_id='".$row->projektarbeit_id."'  
 				AND (betreuerart_kurzbz='Zweitbetreuer' OR betreuerart_kurzbz='Zweitbegutachter');";
-			if($result_bet=$db_obj->db_query($qry_bet))
+			//echo $qry_bet."<br>";
+			if($result_bet=pg_query($db_conn,$qry_bet))
 			{
-				if($db_obj->db_num_rows($result_bet)>0)
+				if(pg_num_rows($result_bet)>0)
 				{
-					while($row_bet=$db_obj->db_fetch_object($result_bet))
+					while($row_bet=pg_fetch_object($result_bet))
 					{
 						if(trim($begutachter2)=='')
 						{
@@ -1253,9 +1280,9 @@ if($erg=$db_obj->db_query($qry))
 			}
 			else 
 			{
-				$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!');
+				$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!'."\n".$qry_bet);
 				$mail->send();
-				$die;
+				die($qry_bet);
 			}
 		}
 		//Institute
@@ -1283,9 +1310,10 @@ if($erg=$db_obj->db_query($qry))
 				}
 			}
 		}
+		//echo $qry_inst."<br>";
 		if($row->kontrollschlagwoerter==NULL || $row->kontrollschlagwoerter=='' || $row->abstract==NULL || $row->abstract=='' || $row->abstract_en==NULL || $row->abstract_en=='' )
 		{			
-			$fehler.=$row->student_uid.": Projektarbeit (".$row->projekttyp_kurzbz.") ".$row->projektarbeit_id.$fehler;
+			$fehler.=$row->stud_uid.": Projektarbeit (".$row->projekttyp_kurzbz.") ".$row->projektarbeit_id.$fehler;
 			if($row->kontrollschlagwoerter==NULL || $row->kontrollschlagwoerter=='')
 			{
 				$fehler.="\nKontrollierte Schlagwörter nicht eingegeben!";
@@ -1382,12 +1410,11 @@ if($erg=$db_obj->db_query($qry))
 						.$row->projektarbeit_id."', '".$row->sprache."', '".$bereich."', UNIX_TIMESTAMP())";
 					$qry_cre="INSERT INTO opus_autor (source_opus, creator_name, reihenfolge) VALUES ('".$row_opus."', '".$verfasser."', '1')";
 					$qry_inst="INSERT INTO opus_inst (source_opus, inst_nr) VALUES ('".$row_opus."', '".$institut."')";
-					
-					
+										
 					
 					$qry="START TRANSACTION";
 		
-					//echo $qry.$qry_ins.$qry_cre.$qry_inst;
+					//echo $qry."<br>".$qry_ins."<br>".$qry_cre."<br>".$qry_inst;
 					if(!$result=mysql_query($qry))
 					{
 						$fehler1.="\n\nTransaktion nicht begonnen! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
@@ -1423,9 +1450,9 @@ if($erg=$db_obj->db_query($qry))
 									{
 										//Kopieren der Abgabedatei
 										$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and paabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
-										if($result_file=$db_obj->db_query($qry_file))
+										if($result_file=pg_query($db_conn,$qry_file))
 										{
-											if($row_file=$db_obj->db_fetch_object($result_file))
+											if($row_file=pg_fetch_object($result_file))
 											{
 												if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')))
 												{
@@ -1440,10 +1467,10 @@ if($erg=$db_obj->db_query($qry))
 												{
 													mkdir($opus_url."/pdf/", 0775);
 												}
-												//echo "\nQuelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf';
-												copy($url_paa.$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf',$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf');
+												//echo "\nQuelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf';
+												copy($url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf',$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf');
 												//überprüfen, ob Datei wirklich kopiert wurde
-												if(is_file($opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->student_uid.'.pdf'))
+												if(is_file($opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'))
 												{
 													//COMMIT durchführen
 													if(!$result=mysql_query('COMMIT',$conn_ext))
@@ -1465,9 +1492,12 @@ if($erg=$db_obj->db_query($qry))
 												            {
 												            	indexdatei($row_opus, $fd);
 												                fclose($fd);
+												                $kopiert.="OPUS-Nr. $row_opus, von $verfasser, ProjektarbeitID $row->projektarbeit_id\n";
 												                #print ("Indexdatei zu Dokument $source_opus wurde in die Datei <a href=\"$volltext_url/$jahr/$source_opus/index.html\">index.html</a> geschrieben.<P> \n");
 												            }
-												        } else {
+												        } 
+												        else 
+												        {
 												            $fehler1.="\n".$opus_url."/pdf/ nicht vorhanden.\n \n";
 												        }
 													}
@@ -1541,10 +1571,14 @@ if($erg=$db_obj->db_query($qry))
 }
 else 
 {
-	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht geöffnet werden!');
+	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht geöffnet werden!'."\n".$qry);
 	$mail->send();
-	die();
+	die($qry);
 }
-
+if ($kopiert!='' && $kopiert!=NULL)
+{
+	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', "Übertragene Projektarbeiten:\n".$kopiert);
+	$mail->send();
+}
 
 ?>
