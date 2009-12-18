@@ -195,9 +195,9 @@ class wochenplan extends basis_db
 		{
 			$this->link.='&pers_uid='.$this->pers_uid;	//Link erweitern
 			if ($this->type=='student')
-				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen, studiengang_kz, semester, verband, gruppe FROM campus.vw_student WHERE uid='$this->pers_uid'";
+				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen, studiengang_kz, semester, verband, gruppe FROM campus.vw_student WHERE uid='".addslashes($this->pers_uid)."'";
 			else
-				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen FROM campus.vw_mitarbeiter WHERE uid='$this->pers_uid'";
+				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen FROM campus.vw_mitarbeiter WHERE uid='".addslashes($this->pers_uid)."'";
 			//echo $sql_query;
 			if (!$this->db_query($sql_query))
 			{
@@ -221,12 +221,17 @@ class wochenplan extends basis_db
 					$this->grp = $row->gruppe;
 				}
 			}
+			else 
+			{
+				$this->errormsg='User nicht gefunden';
+				return false;
+			}
 		}
 
 		//ortdaten ermitteln
 		if ($this->type=='ort')
 		{
-			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person FROM public.tbl_ort WHERE ort_kurzbz='$this->ort_kurzbz'";
+			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person FROM public.tbl_ort WHERE ort_kurzbz='".addslashes($this->ort_kurzbz)."'";
 			//echo $sql_query;
 			if (!$this->db_query($sql_query))
 				$this->errormsg=$this->db_last_error();
@@ -244,7 +249,7 @@ class wochenplan extends basis_db
 		// Studiengangsdaten ermitteln
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ FROM public.tbl_studiengang WHERE studiengang_kz=$this->stg_kz";
+			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ FROM public.tbl_studiengang WHERE studiengang_kz='".addslashes($this->stg_kz)."'";
 			//echo $sql_query;
 			if(!($this->db_query($sql_query)))
 				die($this->db_last_error());
@@ -1121,32 +1126,32 @@ class wochenplan extends basis_db
 		$raumtyp=array_unique($raumtyp);
 		$rtype='';
 		foreach ($raumtyp as $r)
-			$rtype.=" OR raumtyp_kurzbz='$r'";
+			$rtype.=" OR raumtyp_kurzbz='".addslashes($r)."'";
 		$rtype=mb_substr($rtype,3);
 		//Lektor
 		$lektor=array_unique($lektor);
 		$lkt='';
 		foreach ($lektor as $l)
-			$lkt.=" OR uid='$l'";
+			$lkt.=" OR uid='".addslashes($l)."'";
 		$lkt=mb_substr($lkt,3);
 		// Einheiten
 		$gruppe=array_unique($gruppe);
 		$gruppen='';
 		foreach ($gruppe as $g)
 			if ($g!='')
-				$gruppen.=" OR gruppe_kurzbz='$g'";
+				$gruppen.=" OR gruppe_kurzbz='".addslashes($g)."'";
 		//$gruppen=mb_substr($gruppen,3);
 		//Lehrverband
 		//$lehrverband=array_unique($lehrverband);
 		$lvb='';
 		foreach ($lehrverband as $l)
 		{
-			$lvb.=' OR (studiengang_kz='.$l->stg_kz.' AND semester='.$l->sem;
+			$lvb.=" OR (studiengang_kz='".addslashes($l->stg_kz)."' AND semester='".addslashes($l->sem)."'";
 			if ($l->ver!='' && $l->ver!=' ' && $l->ver!=null)
 			{
-				$lvb.=" AND (verband='$l->ver' OR verband IS NULL OR verband='')";
+				$lvb.=" AND (verband='".addslashes($l->ver)."' OR verband IS NULL OR verband='')";
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
-					$lvb.=" AND (gruppe='$l->grp' OR gruppe IS NULL OR gruppe='')";
+					$lvb.=" AND (gruppe='".addslashes($l->grp)."' OR gruppe IS NULL OR gruppe='')";
 			}
 			//if ($gruppen=='')
 			//	$lvb.=' AND gruppe_kurzbz IS NULL';
@@ -1175,8 +1180,8 @@ class wochenplan extends basis_db
 		}
 		// Stundenplanabfrage bauen (Wo ist Kollision?)
 		$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_view
-			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' AND
-			($lkt $gruppen OR ($lvb) ) AND unr!=$unr"; //AND unr!=$unr"
+			WHERE datum>='".addslashes($this->datum_begin)."' AND datum<'".addslashes($this->datum_end)."' AND
+			($lkt $gruppen OR ($lvb) ) AND unr!='".addslashes($unr)."'";
 		//echo $sql_query;
 		if(!$this->db_query($sql_query))
 			die($this->db_last_error());
@@ -1191,12 +1196,12 @@ class wochenplan extends basis_db
 
 		// Stundenplanabfrage bauen (Wo ist besetzt?)
 		$sql_query="SELECT DISTINCT datum, stunde, ort_kurzbz FROM $stpl_view
-			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' AND unr!=$unr";
+			WHERE datum>='".addslashes($this->datum_begin)."' AND datum<'".addslashes($this->datum_end)."' AND unr!='".addslashes($unr)."'";
 		//echo $sql_query; NATURAL JOIN tbl_ortraumtyp AND ($rtype) "
 		
 		// Reservierungen beruecksichtigen
 		$sql_query.=" UNION SELECT DISTINCT datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
-			WHERE datum>='$this->datum_begin' AND datum<'$this->datum_end' ";
+			WHERE datum>='".addslashes($this->datum_begin)."' AND datum<'".addslashes($this->datum_end)."' ";
 		
 		if(!$this->db_query($sql_query))
 			die($this->db_last_error());
@@ -1260,7 +1265,7 @@ class wochenplan extends basis_db
 		$sql_query='SELECT *, (planstunden-verplant::smallint) AS offenestunden FROM '.$lva_stpl_view.' WHERE';
 		$lvas='';
 		foreach ($lva_id as $id)
-			$lvas.=' OR lehreinheit_id='.$id;
+			$lvas.=" OR lehreinheit_id='".addslashes($id)."'";
 		$lvas=mb_substr($lvas,3);
 		$sql_query.=$lvas;
 		//$this->errormsg.=$sql_query;
@@ -1358,16 +1363,16 @@ class wochenplan extends basis_db
 		$raumtyp=array_unique($raumtyp);
 		$rtype='';
 		foreach ($raumtyp as $r)
-			$rtype.=" OR raumtyp_kurzbz='$r'";
+			$rtype.=" OR raumtyp_kurzbz='".addslashes($r)."'";
 		$raumtypalt=array_unique($raumtypalt);
 		foreach ($raumtypalt as $r)
-			$rtype.=" OR raumtyp_kurzbz='$r'";
+			$rtype.=" OR raumtyp_kurzbz='".addslashes($r)."'";
 		$rtype=mb_substr($rtype,3);
 		//Lektor
 		$lektor=array_unique($lektor);
 		$lkt='';
 		foreach ($lektor as $l)
-			$lkt.=" OR mitarbeiter_uid='$l'";
+			$lkt.=" OR mitarbeiter_uid='".addslashes($l)."'";
 		$lkt=mb_substr($lkt,3);
 		//Dummy Lektor kollidiert nicht
 		$lkt='(('.$lkt.") AND mitarbeiter_uid!='_DummyLektor')";
@@ -1377,7 +1382,7 @@ class wochenplan extends basis_db
 		{
 			$gruppe=array_unique($gruppe);
 			foreach ($gruppe as $g)
-				$gruppen.=" OR gruppe_kurzbz='$g'";
+				$gruppen.=" OR gruppe_kurzbz='".addslashes($g)."'";
 			//$gruppen=mb_substr($gruppen,3);
 		}
 		//Lehrverband
@@ -1385,12 +1390,12 @@ class wochenplan extends basis_db
 		$lvb='';
 		foreach ($lehrverband as $l)
 		{
-			$lvb.=' OR (studiengang_kz='.$l->stg_kz.' AND semester='.$l->sem;
+			$lvb.=" OR (studiengang_kz='".addslashes($l->stg_kz)."' AND semester='".addslashes($l->sem)."'";
 			if ($l->ver!='' && $l->ver!=' ' && $l->ver!=null)
 			{
-				$lvb.=" AND (verband='$l->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+				$lvb.=" AND (verband='".addslashes($l->ver)."' OR verband IS NULL OR verband='' OR verband=' ')";
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
-					$lvb.=" AND (gruppe='$l->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+					$lvb.=" AND (gruppe='".addslashes($l->grp)."' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 			}
 			if ($gruppen=='')
 				$lvb.=' AND gruppe_kurzbz IS NULL';
@@ -1446,12 +1451,11 @@ class wochenplan extends basis_db
 
 			// Stundenplanabfrage bauen (Wo ist Kollision?)
 			$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_table
-				WHERE datum>='$datum_begin' AND datum<'$datum_end' AND
+				WHERE datum>='".addslashes($datum_begin)."' AND datum<'".addslashes($datum_end)."' AND
 				($lkt $gruppen OR ($lvb) )";
 			if (is_numeric($unr))
-				$sql_query.=" AND unr!=$unr";
-			//$this->errormsg.=htmlspecialchars($sql_query);
-			//return false;
+				$sql_query.=" AND unr!='".addslashes($unr)."'";
+			
 			if(!$this->db_query($sql_query))
 			{
 				$this->errormsg = $this->db_last_error().$sql_query;
@@ -1471,14 +1475,14 @@ class wochenplan extends basis_db
 			// Stundenplanabfrage bauen (Wo ist besetzt?)
 			$sql_query="SELECT DISTINCT datum, stunde, ort_kurzbz FROM $stpl_view
 				JOIN public.tbl_ortraumtyp USING (ort_kurzbz)
-				WHERE datum>='$datum_begin' AND datum<'$datum_end' AND
+				WHERE datum>='".addslashes($datum_begin)."' AND datum<'".addslashes($datum_end)."' AND
 				($rtype)";
 			if (is_numeric($unr))
-				$sql_query.=" AND unr!=$unr";
+				$sql_query.=" AND unr!='".addslashes($unr)."'";
 			
 			// Reservierungen beruecksichtigen
 			$sql_query.=" UNION SELECT distinct datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
-						WHERE datum>='$datum_begin' AND datum<'$datum_end'";
+						WHERE datum>='".addslashes($datum_begin)."' AND datum<'".addslashes($datum_end)."'";
 			
 			if(!$this->db_query($sql_query))
 			{

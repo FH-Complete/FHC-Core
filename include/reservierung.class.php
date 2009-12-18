@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
 class reservierung extends basis_db 
 {
@@ -130,10 +131,9 @@ class reservierung extends basis_db
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO campus.tbl_reservierung (reservierung_id, ort_kurzbz, studiengang_kz, uid, stunde, datum, titel,
+			$qry = 'INSERT INTO campus.tbl_reservierung (ort_kurzbz, studiengang_kz, uid, stunde, datum, titel,
 			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz)
-			        VALUES('.$this->addslashes($this->reservierung_id).','.
-					$this->addslashes($this->ort_kurzbz).','.
+			        VALUES('.$this->addslashes($this->ort_kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->uid).','.
 					$this->addslashes($this->stunde).','.
@@ -197,6 +197,49 @@ class reservierung extends basis_db
 			$this->errormsg = 'Fehler beim Loeschen der Reservierung';
 			return false;
 		}
+	}
+	
+	/**
+	 * Prueft ob ein Raum reserviert ist
+	 *
+	 * @param $ort_kurzbz
+	 * @param $datum
+	 * @param $stunde
+	 * @return boolean
+	 */
+	public function isReserviert($ort_kurzbz, $datum, $stunde)
+	{
+		if(!is_numeric($stunde))
+		{
+			$this->errormsg='Stunde muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$datum_obj = new Datum();
+		if(!$datum_obj->checkDatum($datum))
+		{
+			$this->errormsg='Datum hat ein ungueltiges Format';
+			return false;
+		}
+				
+		$qry = "SELECT * FROM campus.tbl_reservierung 
+				WHERE 
+					ort_kurzbz='".addslashes($ort_kurzbz)."' AND 
+					datum='".addslashes($datum)."' AND  
+					stunde='".addslashes($stunde)."'";
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg='Fehler beim Ermitteln der Reservierungen';
+			return false;
+		}
+				
 	}
 }
 ?>

@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2009 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Gerald Simane-Sequens <gerald.simane@technikum-wien.at>.
+ */
 /****************************************************************************
  * Script: 			stpl_detail.php
  * Descr:  			Das Script dient zur Detailanzeige eines Eintrags im Stundenplan.
@@ -9,17 +30,20 @@
  * Update: 			11.11.2004 von Christian Paminger
  *****************************************************************************/
 
-
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/functions.inc.php');
+require_once('../../../include/datum.class.php');
 
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
 	$type=$_GET['type'];
+else 
+	$type='';
+
 if (isset($_GET['datum']))
 	$datum=$_GET['datum'];
 if (isset($_GET['stunde']))
@@ -33,6 +57,12 @@ if (isset($_GET['stg_kz']))
 if (isset($_GET['sem']))
 	$sem=$_GET['sem'];
 	
+if($sem!='' && !is_numeric($sem))
+	die('Semester ist ungueltig');
+
+if($stunde!='' && !is_numeric($stunde))
+	die('Stunde ist ungueltig');
+
 if (isset($_GET['ver']))
 	$ver=$_GET['ver'];
 	
@@ -41,6 +71,9 @@ if (isset($_GET['grp']))
 if (isset($_GET['gruppe_kurzbz']))
 	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
 
+$datum_obj = new datum();
+if(!$datum_obj->checkDatum($datum))
+	die('Datum ist ungueltig');
 
 $stsem = getStudiensemesterFromDatum($datum);
 //Stundenplan
@@ -49,18 +82,21 @@ $sql_query.=", (SELECT count(*) FROM public.tbl_studentlehrverband
 				WHERE studiengang_kz=vw_stundenplan.studiengang_kz AND semester=vw_stundenplan.semester
 				AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
 				AND (gruppe=vw_stundenplan.gruppe OR vw_stundenplan.gruppe is null OR trim(vw_stundenplan.gruppe)='')
-				AND studiensemester_kurzbz='$stsem') as anzahl_lvb
+				AND studiensemester_kurzbz='".addslashes($stsem)."') as anzahl_lvb
 			, (SELECT count(*) FROM public.tbl_benutzergruppe 
-				WHERE gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz AND studiensemester_kurzbz='$stsem') as anzahl_grp";
+				WHERE gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz AND studiensemester_kurzbz='".addslashes($stsem)."') as anzahl_grp";
 $sql_query.=' FROM (campus.vw_stundenplan JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN campus.vw_mitarbeiter USING (uid)';
-$sql_query.=" WHERE datum='$datum' AND stunde=$stunde";
+$sql_query.=" WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
 if ($type=='lektor')
-    $sql_query.=" AND vw_stundenplan.uid='$pers_uid' ";
+    $sql_query.=" AND vw_stundenplan.uid='".addslashes($pers_uid)."' ";
 elseif ($type=='ort')
-    $sql_query.=" AND vw_stundenplan.ort_kurzbz='$ort_kurzbz' ";
+    $sql_query.=" AND vw_stundenplan.ort_kurzbz='".addslashes($ort_kurzbz)."' ";
 else
 {
-    $sql_query.=' AND vw_stundenplan.studiengang_kz='.$stg_kz.' AND (vw_stundenplan.semester='.$sem;
+	if($stg_kz=='' || $sem=='')
+		die('Fehlerhafte Parameteruebergabe');
+	
+    $sql_query.=" AND vw_stundenplan.studiengang_kz='".addslashes($stg_kz)."' AND (vw_stundenplan.semester='".addslashes($sem)."'";
     if ($type=='student')
 		$sql_query.=' OR vw_stundenplan.semester='.($sem+1);
 	$sql_query.=')';
@@ -80,14 +116,14 @@ $erg_stpl=$db->db_query($sql_query);
 $num_rows_stpl=$db->db_num_rows($erg_stpl);
 
 //Reservierungen
-$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM campus.vw_reservierung, campus.vw_mitarbeiter WHERE datum='$datum' AND stunde=$stunde";
+$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM campus.vw_reservierung, campus.vw_mitarbeiter WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
 if (isset($ort_kurzbz))
-    $sql_query.=" AND vw_reservierung.ort_kurzbz='$ort_kurzbz'";
+    $sql_query.=" AND vw_reservierung.ort_kurzbz='".addslashes($ort_kurzbz)."'";
 if ($type=='lektor')
-    $sql_query.=" AND vw_reservierung.uid='$pers_uid' ";
+    $sql_query.=" AND vw_reservierung.uid='".addslashes($pers_uid)."' ";
 $sql_query.=" AND vw_reservierung.uid=vw_mitarbeiter.uid";
 if ($type=='verband' || $type=='student')
-    $sql_query.=" AND studiengang_kz='$stg_kz' AND (semester='$sem' OR semester=0 OR semester IS NULL)";
+    $sql_query.=" AND studiengang_kz='".addslashes($stg_kz)."' AND (semester='".addslashes($sem)."' OR semester=0 OR semester IS NULL)";
 $sql_query.=' ORDER BY  titel LIMIT 100';
 //echo $sql_query.'<BR>';
 $erg_repl=$db->db_query($sql_query);
@@ -102,8 +138,8 @@ $num_rows_repl=$db->db_num_rows($erg_repl);
 </head>
 <body id="inhalt">
 <H2>Lehrveranstaltungsplan &rArr; Details</H2>
-Datum: <?php echo $datum; ?><BR>
-Stunde: <?php echo $stunde; ?><BR><BR>
+Datum: <?php echo htmlentities($datum); ?><BR>
+Stunde: <?php echo htmlentities($stunde); ?><BR><BR>
 
 <table class="stdplan">
 <?php
