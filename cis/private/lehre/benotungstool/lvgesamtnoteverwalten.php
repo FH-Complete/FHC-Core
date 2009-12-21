@@ -20,44 +20,74 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/functions.inc.php');
+require_once('../../../../include/lehrveranstaltung.class.php');
+require_once('../../../../include/studiengang.class.php');
+require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/lehreinheit.class.php');
+require_once('../../../../include/benutzerberechtigung.class.php');
+require_once('../../../../include/uebung.class.php');
+require_once('../../../../include/beispiel.class.php');
+require_once('../../../../include/studentnote.class.php');
+require_once('../../../../include/datum.class.php');
+require_once('../../../../include/legesamtnote.class.php');
+require_once('../../../../include/lvgesamtnote.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/person.class.php');
+require_once('../../../../include/benutzer.class.php');
+require_once('../../../../include/mitarbeiter.class.php');
+require_once('../../../../include/moodle_course.class.php');
+require_once('../../../../include/mail.class.php');
 
- require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/functions.inc.php');
-	require_once('../../../../include/lehrveranstaltung.class.php');
-	require_once('../../../../include/studiengang.class.php');
-	require_once('../../../../include/studiensemester.class.php');
-	require_once('../../../../include/lehreinheit.class.php');
-	require_once('../../../../include/benutzerberechtigung.class.php');
-	require_once('../../../../include/uebung.class.php');
-	require_once('../../../../include/beispiel.class.php');
-	require_once('../../../../include/studentnote.class.php');
-	require_once('../../../../include/datum.class.php');
-	require_once('../../../../include/legesamtnote.class.php');
-	require_once('../../../../include/lvgesamtnote.class.php');
-	require_once('../../../../include/zeugnisnote.class.php');
-	require_once('../../../../include/pruefung.class.php');
-	require_once('../../../../include/person.class.php');
-	require_once('../../../../include/benutzer.class.php');
-	require_once('../../../../include/mitarbeiter.class.php');
-	require_once('../../../../include/moodle_course.class.php');
-	require_once('../../../../include/mail.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-		
-		
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
+
 $debg=(isset($_REQUEST['debug'])?$_REQUEST['debug']:'');	
-$lvid=(isset($_GET['lvid'])?$_GET['lvid']:'');
-$stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
+
+$user = get_uid();
+if(!check_lektor($user))
+	die('Sie haben keine Berechtigung fuer diesen Bereich');
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
+	$lvid = $_GET['lvid'];
+else
+	die('Fehlerhafte Parameteruebergabe');
+
+if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
+	$lehreinheit_id = $_GET['lehreinheit_id'];
+else
+	$lehreinheit_id = '';
+//Laden der Lehrveranstaltung
+$lv_obj = new lehrveranstaltung();
+if(!$lv_obj->load($lvid))
+	die($lv_obj->errormsg);
+
+//Studiengang laden
+$stg_obj = new studiengang($lv_obj->studiengang_kz);
+
+if(isset($_GET['stsem']))
+	$stsem = $_GET['stsem'];
+else
+	$stsem = '';
+
+if($stsem!='' && !check_stsem($stsem))
+	die('Studiensemester ist ungueltig');
+
+$datum_obj = new datum();
+
+$uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
+$uid = (isset($_GET['uid'])?$_GET['uid']:'');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>Kreuzerltool</title>
+<title>Gesamtnote</title>
 <STYLE TYPE="text/css">
 
 .td_datum 
@@ -168,7 +198,7 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 		    stud_uid = uid;
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
-		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
+		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".addslashes($lvid)."&stsem=".addslashes($stsem); ?>';
 		    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
 		    anfrage.open("GET", url, true);
 		    anfrage.onreadystatechange = updateSeite;
@@ -225,7 +255,7 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
 	
-		str += "<tr><td colspan='2'><b>Prüfung für "+uid+" anlegen:</b></td></tr>";
+		str += "<tr><td colspan='2'><b>PrÃ¼fung fÃ¼r "+uid+" anlegen:</b></td></tr>";
 		str += "<tr><td>Datum:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [YYYY-MM-DD]</td>";
 		str += "</tr><tr><td>Note:</td>";
@@ -316,7 +346,7 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 					anlegendiv.style.visibility = "hidden";
 					//if (note == 9)
 					//	note = " ";
-					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
+					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='Ã¤ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
                 }
                 else
          		{
@@ -368,7 +398,7 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 				}
 				catch(e)
 				{
-					alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
+					alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen Ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
 				}
 				var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
 				if (!clip) 
@@ -428,7 +458,7 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 			erzeugeAnfrage(); 
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
-		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
+		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".addslashes($lvid)."&stsem=".addslashes($stsem); ?>';
 		    url += '&submit=1&'+ts;
 		    anfrage.open("POST", url, true);
 		    anfrage.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -479,40 +509,6 @@ $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 <body>
 
 <?php
-$user = get_uid();
-if(!check_lektor($user))
-	die('Sie haben keine Berechtigung fuer diesen Bereich');
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
-
-if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
-	$lvid = $_GET['lvid'];
-else
-	die('Fehlerhafte Parameteruebergabe');
-
-if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
-	$lehreinheit_id = $_GET['lehreinheit_id'];
-else
-	$lehreinheit_id = '';
-//Laden der Lehrveranstaltung
-$lv_obj = new lehrveranstaltung();
-if(!$lv_obj->load($lvid))
-	die($lv_obj->errormsg);
-
-//Studiengang laden
-$stg_obj = new studiengang($lv_obj->studiengang_kz);
-
-if(isset($_GET['stsem']))
-	$stsem = $_GET['stsem'];
-else
-	$stsem = '';
-
-//Vars
-$datum_obj = new datum();
-
-$uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
-$uid = (isset($_GET['uid'])?$_GET['uid']:'');
-
 //wenn eine Uebung oder LE-Gesamtnote existiert die Note aus dem Uebungstool uebernehmen
 //sonst aus dem Moodle
 $qry = "SELECT 
@@ -556,7 +552,7 @@ $htmlOutput='';
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 		echo '<td class="tdwidth10">&nbsp;</td>';
-		echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool</font></td>';
+		echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Gesamtnote</font></td>';
 		echo '<td  class="ContentHeader" align="right">';
 
 //Studiensemester laden
@@ -611,7 +607,7 @@ if(!isset($_GET['standalone']))
 }*/
 
 
-// lvgesamtnote für studenten speichern
+// lvgesamtnote für Studenten speichern
 if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 	
 	$jetzt = date("Y-m-d H:i:s");	
@@ -658,7 +654,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
 
 		// studentenquery					
-		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";
+		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehrveranstaltung_id = '".addslashes($lvid)."' ORDER BY nachname, vorname ";
         if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
@@ -723,7 +719,7 @@ echo '<table width="100%" height="10px"><tr><td>';
 	echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
 echo '</td></tr></table>';
 
-// alle pruefungen für die LV holen
+// alle Pruefungen für die LV holen
 $studpruef_arr = array();
 $pr_all = new Pruefung();
 if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
@@ -769,7 +765,7 @@ echo '<table>';
 			</tr>";
 
 		// studentenquery					
-		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' ORDER BY nachname, vorname ";	
+		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehrveranstaltung_id = '".addslashes($lvid)."' ORDER BY nachname, vorname ";
       	$mdldaten=null;
 	    if($result_stud = $db->db_query($qry_stud))
 		{
@@ -872,7 +868,7 @@ echo '<table>';
 					}		
 					else
 					{
-						//den Error nur einmal anzeigen und nicht f�r jeden Studenten
+						//den Error nur einmal anzeigen und nicht fï¿½r jeden Studenten
 						$moodle_course->errormsg=trim($moodle_course->errormsg);
 						if(!$errorshown && !empty($moodle_course->errormsg) )
 						{
@@ -975,7 +971,7 @@ echo '<table>';
 						
 						echo "<tr><td class='td_datum'>";
 						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
-						echo "<input type='button' name='anlegen' value='ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
+						echo "<input type='button' name='anlegen' value='Ã¤ndern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
 						echo "</td></tr>";
 					}
 					echo "</table>";			

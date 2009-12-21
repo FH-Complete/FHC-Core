@@ -46,12 +46,12 @@ require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 
 
-if(isset($_GET['lvid']))
+if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	$lvid=$_GET['lvid'];
 else 
 	die('lvid muss uebergeben werden');
 	
-if(isset($_GET['stsem']))
+if(isset($_GET['stsem']) && check_stsem($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else 
 	die('Es wurde kein Studiensemester uebergeben');
@@ -133,13 +133,7 @@ if(isset($_POST['neu']))
 		
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
 		$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
-		foreach ($_POST as $key=>$value)
-		{
-			if(mb_strstr($key, 'lehreinheit_'))
-			{
-				$shortname.='/'.$value;
-			}
-		}
+		
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{
@@ -178,6 +172,7 @@ if(isset($_POST['neu']))
 			{
 				if(mb_strstr($key, 'lehreinheit_'))
 				{
+					$shortname.='/'.$value;
 					$lehreinheiten[]=$value;
 				}
 			}
@@ -354,7 +349,10 @@ else
 	}
 	echo '</div>';
 	
-	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$lv->bezeichnung.'">';
+	$studiengang = new studiengang();
+	$studiengang->load($lv->studiengang_kz);
+		
+	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$studiengang->kuerzel.' '.$lv->semester.' - '.$lv->bezeichnung.'">';
 	echo '<br>Gruppen übernehmen: <input type="checkbox" name="gruppen" checked>';
 	echo '<br><br><input type="submit" name="neu" value="Kurs anlegen">
 			</form>';
