@@ -426,13 +426,14 @@
 			
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-			  	<td class="tdwrap"><a href="?DE_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('DE_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Deutsch</a>
-			   	<table class="tabcontent" id="DE_Verwaltungstools" style="display: none">
-					
-		  			<tr>
-					    <td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Verordnungen'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Verordnungen</a>
-						  	<table class="tabcontent" id="Verordnungen" style="display: none">
+			  	<td class="tdwrap"><a href="?AW_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('AW_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9" title="Regulations">&nbsp;Verordnungen</a>
+			   	<table class="tabcontent" id="AW_Verwaltungstools" style="display: none">
+
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+					  	<td class="tdwrap"><a href="?DE_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('DE_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Deutsch</a>
+					   	<table class="tabcontent" id="DE_Verwaltungstools" style="display: none">
+							
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
 								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Hausordnung.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Hausordnung</a></td>
@@ -457,7 +458,7 @@
 							<tr>
 							    <td class="tdwidth10" nowrap>&nbsp;</td>
 								<td class="tdwrap"><a href="?Laborordnung" class="MenuItem" onClick="return(js_toggle_container('Laborordnung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung</a>
-								  	<table class="tabcontent" id="Laborordnung" style="display: none">
+								<table class="tabcontent" id="Laborordnung" style="display: none">
 								  	<tr>
 									  	<td class="tdwidth10" nowrap>&nbsp;</td>
 										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Chemie.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung Chemie</a></td>
@@ -466,27 +467,18 @@
 										<td class="tdwidth10" nowrap>&nbsp;</td>
 										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Roboterlabor.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung Roboter</a></td>
 									</tr>
-									</table>
+								</table>
 							</tr>
-							</table>
+							
+						</table>
 						</td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-
-
-			
-			
-			<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-			  	<td class="tdwrap"><a href="?EN_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('EN_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Englisch</a>
-			   	<table class="tabcontent" id="EN_Verwaltungstools" style="display: none">
+					</tr>							
+							
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+					  	<td class="tdwrap"><a href="?EN_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('EN_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Englisch</a>
+					   	<table class="tabcontent" id="EN_Verwaltungstools" style="display: none">
 					
-		  			<tr>
-					    <td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a href="?Verordnungen_E" class="MenuItem" onClick="return(js_toggle_container('Verordnungen_E'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Regulations</a>
-						  	<table class="tabcontent" id="Verordnungen_E" style="display: none">
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
 								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Hausordnung_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;General rules of conduct</a></td>
@@ -497,7 +489,7 @@
 							</tr>
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
-								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung Bibliothek_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Terms and Conditions</a></td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung Bibliothek_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Terms &amp; Conditions</a></td>
 							</tr>
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -511,7 +503,7 @@
 							<tr>
 							    <td class="tdwidth10" nowrap>&nbsp;</td>
 								<td class="tdwrap"><a href="?Laborordnung_E" class="MenuItem" onClick="return(js_toggle_container('Laborordnung_E'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laboratory Regulations </a>
-								  	<table class="tabcontent" id="Laborordnung_E" style="display: none">
+								<table class="tabcontent" id="Laborordnung_E" style="display: none">
 								  	<tr>
 									  	<td class="tdwidth10" nowrap>&nbsp;</td>
 										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Chemie_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Extract from the Chemistry laboratory regulations </a></td>
@@ -520,15 +512,16 @@
 										<td class="tdwidth10" nowrap>&nbsp;</td>
 										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Roboterlabor_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Robot Laboratory </a></td>
 									</tr>
-									</table>
+								</table>
 							</tr>
-							</table>
+						</table>
 						</td>
 					</tr>
+			
 				</table>
 				</td>
 			</tr>
-			
+
 			
 			
 					
