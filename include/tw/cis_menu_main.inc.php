@@ -423,48 +423,115 @@
 			  	</table>
 			  	</td>
   			</tr>
-  			<tr>
-			    <td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Verordnungen'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Verordnungen</a>
-				  	<table class="tabcontent" id="Verordnungen" style="display: none">
-					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/hausordnung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Hausordnung</a></td>
-					</tr>
-					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/brandschutzordnung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Brandschutzordnung</a></td>
-					</tr>
-					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung_Bibliothek.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bibliotheksordnung</a></td>
-					</tr>
-					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/EDV_Richtlinien.doc" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;EDV Richtlinien</a></td>
-					</tr>
-					<tr>
-					  	<td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Datensicherung_und_Archivierung.doc" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Datensicherung und Archivierung</a></td>
-					</tr>
+			
+			<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+			  	<td class="tdwrap"><a href="?DE_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('DE_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Deutsch</a>
+			   	<table class="tabcontent" id="DE_Verwaltungstools" style="display: none">
 					
-					<tr>
+		  			<tr>
 					    <td class="tdwidth10" nowrap>&nbsp;</td>
-						<td class="tdwrap"><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Laborordnung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung</a>
-						  	<table class="tabcontent" id="Laborordnung" style="display: none">
-						  	<tr>
+						<td class="tdwrap"><a href="?Verordnungen" class="MenuItem" onClick="return(js_toggle_container('Verordnungen'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Verordnungen</a>
+						  	<table class="tabcontent" id="Verordnungen" style="display: none">
+							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
-								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung Chemie</a></td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Hausordnung.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Hausordnung</a></td>
 							</tr>
 							<tr>
-								<td class="tdwidth10" nowrap>&nbsp;</td>
-								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Roboter_Laborordnung.doc" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung Roboter</a></td>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Brandschutzordnung.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Brandschutzordnung</a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung_Bibliothek.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bibliotheksordnung</a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/EDV Richtlinien.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;EDV Richtlinien</a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Datensicherung_Archivierung.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Datensicherung und Archivierung</a></td>
+							</tr>
+							
+							<tr>
+							    <td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a href="?Laborordnung" class="MenuItem" onClick="return(js_toggle_container('Laborordnung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung</a>
+								  	<table class="tabcontent" id="Laborordnung" style="display: none">
+								  	<tr>
+									  	<td class="tdwidth10" nowrap>&nbsp;</td>
+										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Chemie.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung Chemie</a></td>
+									</tr>
+									<tr>
+										<td class="tdwidth10" nowrap>&nbsp;</td>
+										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Roboterlabor.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laborordnung Roboter</a></td>
+									</tr>
+									</table>
 							</tr>
 							</table>
+						</td>
 					</tr>
-					</table>
+				</table>
 				</td>
 			</tr>
+
+
+			
+			
+			<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+			  	<td class="tdwrap"><a href="?EN_Verwaltungstools" class="MenuItem" onClick="return(js_toggle_container('EN_Verwaltungstools'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Englisch</a>
+			   	<table class="tabcontent" id="EN_Verwaltungstools" style="display: none">
+					
+		  			<tr>
+					    <td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a href="?Verordnungen_E" class="MenuItem" onClick="return(js_toggle_container('Verordnungen_E'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Regulations</a>
+						  	<table class="tabcontent" id="Verordnungen_E" style="display: none">
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Hausordnung_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;General rules of conduct</a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Brandschutzordnung_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fire Regulations</a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung Bibliothek_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Terms and Conditions</a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/EDV Richtlinien_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Guidelines for using EDP resources </a></td>
+							</tr>
+							<tr>
+							  	<td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Datensicherung_Archivierung_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Data back-up and archiving guidelines </a></td>
+							</tr>
+							
+							<tr>
+							    <td class="tdwidth10" nowrap>&nbsp;</td>
+								<td class="tdwrap"><a href="?Laborordnung_E" class="MenuItem" onClick="return(js_toggle_container('Laborordnung_E'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Laboratory Regulations </a>
+								  	<table class="tabcontent" id="Laborordnung_E" style="display: none">
+								  	<tr>
+									  	<td class="tdwidth10" nowrap>&nbsp;</td>
+										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Chemie_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Extract from the Chemistry laboratory regulations </a></td>
+									</tr>
+									<tr>
+										<td class="tdwidth10" nowrap>&nbsp;</td>
+										<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Laborordnung Roboterlabor_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Robot Laboratory </a></td>
+									</tr>
+									</table>
+							</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+			
+			
+			
+					
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 		        <td class="tdwrap"><a href="?Location" class="MenuItem" onClick="return(js_toggle_container('Location'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Location</a></td>
