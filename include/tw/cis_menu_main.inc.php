@@ -489,7 +489,7 @@
 							</tr>
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
-								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung Bibliothek_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Terms &amp; Conditions</a></td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung Bibliothek_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Terms &amp; Conditions of Use for the library</a></td>
 							</tr>
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
