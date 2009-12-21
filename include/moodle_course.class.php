@@ -1906,7 +1906,7 @@ class moodle_course extends basis_db
 		}	
 		if (count($_lehreinheit)<1) // Es gibt keine Lehreinheiten
 		{
-			$this->errormsg='Es wurde kein passenden Moodle-Kurs gefunden';
+			$this->errormsg='Es wurde kein passender Moodle-Kurs gefunden';
 			return false;
 		}
 		

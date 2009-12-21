@@ -20,15 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
 require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -41,104 +33,8 @@ require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 
-
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>Kreuzerltool</title>
-<script language="JavaScript" type="text/javascript">
-<!--
-	function MM_jumpMenu(targ, selObj, restore)
-	{
-	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-
-	  if(restore)
-	  {
-	  	selObj.selectedIndex = 0;
-	  }
-	}
-	function confirmdelete()
-	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
-	}
-  //-->
-  
-    var anfrage = null;
-
-    function erzeugeAnfrage(){
-        try {
-        anfrage = new XMLHttpRequest();
-        } catch (versuchmicrosoft) {
-            try {
-                anfrage = new ActiveXObject("Msxml12.XMLHTTP");
-            } catch (anderesmicrosoft){
-                try {
-                    anfrage = new ActiveXObject("Microsoft.XMLHTTP");
-                } catch (fehlschlag){
-                    anfrage = null;
-                }
-
-            }
-        }
-        if (anfrage == null) alert("Fehler beim Erstellen des Anfrageobjekts!");
-    }
-   
-   function saveLENote(uid){
-	note = document.getElementById(uid).note.value;	
-	if ((note < 0) || (note > 5 && note != 8 && note != 7))
-	{
-		alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
-		document.getElementById(uid).note.value="";
-	}
-	else
-	{	
-		erzeugeAnfrage(); 
-	    //note = document.getElementById(uid).note.value;
-	    stud_uid = uid;
-	    var jetzt = new Date();
-		var ts = jetzt.getTime();
-	    var url= '<?php echo "legesamtnoteeintragen.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem"; ?>';
-	    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
-	    anfrage.open("GET", url, true);
-	    anfrage.onreadystatechange = updateSeite;
-	    anfrage.send(null);
-    }
-   }
-   
-   function updateSeite(){
-	    if (anfrage.readyState == 4){
-	        if (anfrage.status == 200) {
-	        	uid = stud_uid;
-				var note = document.getElementById(uid).note.value;
-	            var resp = anfrage.responseText;
-	            if (resp == "neu" || resp == "update")
-	            {
-					            	
-	            	notentd = document.getElementById("note_"+uid);
-	            	while (notentd.childNodes.length>0)
-	            	{
-						notentd.removeChild(notentd.lastChild);
-	            	}
-	            	notenode = document.createTextNode(note);
-                    notentd.appendChild(notenode);
-                 }
-                 else
-                 	{
-	                 	alert(resp);
-	                 	document.getElementById(uid).note.value="";
-                 	}
-	        } else alert("Request status:" + anfrage.status);
-	    }
-	}  
-
-</script>
-</head>
-
-<body>
-<?php
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $user = get_uid();
 if(!check_lektor($user))
@@ -170,12 +66,128 @@ if(isset($_GET['stsem']))
 else
 	$stsem = '';
 
+if($stsem!='' && !check_stsem($stsem))
+	die('Studiensemester ist ungueltig');
+
 //Vars
 $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
+<title>Kreuzerltool</title>
+<script language="JavaScript" type="text/javascript">
+<!--
+	function MM_jumpMenu(targ, selObj, restore)
+	{
+	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
 
+	  if(restore)
+	  {
+	  	selObj.selectedIndex = 0;
+	  }
+	}
+	function confirmdelete()
+	{
+		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+	}
+  
+  
+    var anfrage = null;
+
+    function erzeugeAnfrage()
+    {
+        try 
+        {
+        	anfrage = new XMLHttpRequest();
+        } 
+        catch (versuchmicrosoft) 
+        {
+            try 
+            {
+                anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+            } 
+            catch (anderesmicrosoft)
+            {
+                try 
+                {
+                    anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                catch (fehlschlag)
+                {
+                    anfrage = null;
+                }
+
+            }
+        }
+        if (anfrage == null) 
+        	alert("Fehler beim Erstellen des Anfrageobjekts!");
+    }
+   
+   function saveLENote(uid)
+   {
+		note = document.getElementById(uid).note.value;	
+		if ((note < 0) || (note > 5 && note != 8 && note != 7))
+		{
+			alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
+			document.getElementById(uid).note.value="";
+		}
+		else
+		{	
+			erzeugeAnfrage(); 
+		    //note = document.getElementById(uid).note.value;
+		    stud_uid = uid;
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+		    var url= '<?php echo "legesamtnoteeintragen.php?lvid=".addslashes($lvid)."&lehreinheit_id=".addslashes($lehreinheit_id)."&stsem=".addslashes($stsem); ?>';
+		    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
+		    anfrage.open("GET", url, true);
+		    anfrage.onreadystatechange = updateSeite;
+		    anfrage.send(null);
+		}
+   }
+   
+   function updateSeite()
+   {
+	    if (anfrage.readyState == 4)
+	    {
+	        if (anfrage.status == 200) 
+	        {
+	        	uid = stud_uid;
+				var note = document.getElementById(uid).note.value;
+	            var resp = anfrage.responseText;
+	            if (resp == "neu" || resp == "update")
+	            {
+					            	
+	            	notentd = document.getElementById("note_"+uid);
+	            	while (notentd.childNodes.length>0)
+	            	{
+						notentd.removeChild(notentd.lastChild);
+	            	}
+	            	notenode = document.createTextNode(note);
+                    notentd.appendChild(notenode);
+                 }
+                 else
+                 	{
+	                 	alert(resp);
+	                 	document.getElementById(uid).note.value="";
+                 	}
+	        } 
+	        else 
+	        	alert("Request status:" + anfrage.status);
+	    }
+	}  
+//-->
+</script>
+</head>
+
+<body>
+<?php
 //Kopfzeile
 echo '<table class="tabcontent">';
 echo ' <tr>';
@@ -196,7 +208,7 @@ $stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
 	$selected = ($stsem == $studiensemester->studiensemester_kurzbz?'selected':'');
-	$stsem_content.= "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
+	$stsem_content.= "<OPTION value='legesamtnoteeintragen.php?lvid=$lvid&stsem=$studiensemester->studiensemester_kurzbz' $selected>$studiensemester->studiensemester_kurzbz</OPTION>\n";
 }
 $stsem_content.= "</SELECT>\n";
 
@@ -204,19 +216,19 @@ $stsem_content.= "</SELECT>\n";
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
+			WHERE tbl_lehreinheit.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
+			tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
 }
 else
 {
 	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
+			WHERE tbl_lehreinheit.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='$user') AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
+			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='".addslashes($user)."') AND
+			tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
 
 }
 if($result = $db->db_query($qry))
@@ -230,7 +242,7 @@ if($result = $db->db_query($qry))
 			if($lehreinheit_id=='')
 					$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
 			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
@@ -246,7 +258,7 @@ if($result = $db->db_query($qry))
 				}
 				$lektoren .=')';
 			}
-			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
 			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
@@ -392,71 +404,71 @@ echo "
 				            " ORDER BY nachname, vorname";
 		}
 */
-		// studentenquery		
-		$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."' ORDER BY nachname, vorname";
-    if($result_stud = $db->db_query($qry_stud))
+
+// studentenquery		
+$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehreinheit_id = '".addslashes($lehreinheit_id)."' ORDER BY nachname, vorname";
+
+if($result_stud = $db->db_query($qry_stud))
+{
+	$i=1;
+	while($row_stud = $db->db_fetch_object($result_stud))
+	{
+		$studentnote = new studentnote();
+		$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->uid);
+		//echo $studentnote->debug;
+		$legesamtnote = new legesamtnote($lehreinheit_id);
+		if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
+		{    				
+			$note = null;
+		}
+		else
 		{
-			$i=1;
-			while($row_stud = $db->db_fetch_object($result_stud))
-			{
-				$studentnote = new studentnote();
-				$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->uid);
-				//echo $studentnote->debug;
-   			$legesamtnote = new legesamtnote($lehreinheit_id);
-   			if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
-				{    				
-    				$note = null;
-   			}
-   			else
-   			{
-    				$note = $legesamtnote->note;
-				} 
-				
-				if ($studentnote->studentgesamtnote!=0)
-					$note_calc = round($studentnote->studentgesamtnote,2);
-				else
-					$note_calc = null;
-				echo "
-				<tr class='liste".($i%2)."'>
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
-					<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";					
-				echo "<td>$note_calc</td>";
-				echo "<td align='center'>";
-				if ($studentnote->negativ)
-					echo "<span class='negativ'>neg</span>";
-				echo "</td>";
-				echo "<td align='center'>";
-				if ($studentnote->fehlt)
-					echo "<span class='negativ'>X</span>";
-				else
-					echo "ok";
-				echo "</td>";				
-				if ($note)
-					$note_final = $note;
-				else
-				{						
-					if ($studentnote->negativ)
-						$note_final = 5;
-					else
-					{		
-						$note_final = round($studentnote->studentgesamtnote);
-						if ($note_final == 0)
-							$note_final = null;
-					}
-				}
-				echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
-				if ($note == 5)
-					$negmarkier = " style='color:red; font-weight:bold;'";
-				else
-					$negmarkier = "";	
-				echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";				
-				echo "</tr>";
-				$i++;
+			$note = $legesamtnote->note;
+		} 
+		
+		if ($studentnote->studentgesamtnote!=0)
+			$note_calc = round($studentnote->studentgesamtnote,2);
+		else
+			$note_calc = null;
+		echo "
+		<tr class='liste".($i%2)."'>
+			<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
+			<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
+			<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";					
+		echo "<td>$note_calc</td>";
+		echo "<td align='center'>";
+		if ($studentnote->negativ)
+			echo "<span class='negativ'>neg</span>";
+		echo "</td>";
+		echo "<td align='center'>";
+		if ($studentnote->fehlt)
+			echo "<span class='negativ'>X</span>";
+		else
+			echo "ok";
+		echo "</td>";				
+		if ($note)
+			$note_final = $note;
+		else
+		{						
+			if ($studentnote->negativ)
+				$note_final = 5;
+			else
+			{		
+				$note_final = round($studentnote->studentgesamtnote);
+				if ($note_final == 0)
+					$note_final = null;
 			}
 		}
-//	}
-//}
+		echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
+		if ($note == 5)
+			$negmarkier = " style='color:red; font-weight:bold;'";
+		else
+			$negmarkier = "";	
+		echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";				
+		echo "</tr>";
+		$i++;
+	}
+}
 echo "</table>";
 
 ?>

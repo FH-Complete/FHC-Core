@@ -53,6 +53,11 @@ function check_uid($uid)
 		return false;
 }
 
+function check_stsem($stsem)
+{
+	return preg_match('/^[WS][S][0-9]{4}$/', $stsem);	
+}
+
 function check_lektor($uid)
 {
 	$db = new basis_db();
