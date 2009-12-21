@@ -28,32 +28,30 @@
  * anwesenheitsliste.php?stg_kz=222&sem=1&lvid=1234
  */
 	require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
+	
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
 			
   	$error=0;	
-    if(isset($_GET['stg_kz']))
+    if(isset($_GET['stg_kz']) && is_numeric($_GET['stg_kz']))
     	$stg_kz=$_GET['stg_kz'];
     else
     	$error=2;
 
-    if(isset($_GET['sem']))
+    if(isset($_GET['sem']) && is_numeric($_GET['sem']))
     	$sem = $_GET['sem'];
     else
     	$error=2;
 
-    if(isset($_GET['lvid']))
+    if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
     	$lvid=$_GET['lvid'];
     else
     	$error=2;
     	
-    if(isset($_GET['stsem']))
+    if(isset($_GET['stsem']) && check_stsem($_GET['stsem']))
     	$stsem = $_GET['stsem'];
     else 
     	die('Studiensemester ist ungueltig');
