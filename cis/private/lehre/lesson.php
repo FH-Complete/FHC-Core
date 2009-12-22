@@ -23,11 +23,6 @@
  */
 
 	require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-		
-// ---------------- Diverse Funktionen und UID des Benutzers ermitteln
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
     require_once('../../../include/studiensemester.class.php');
@@ -49,14 +44,12 @@
        $is_lector=true;
 	else
 	   $is_lector=false;
-
 	   
-	   
-	if(!isset($_GET['lvid']))
-		die('Fehlerhafte Parameteruebergabe');
+	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
+		$lvid = $_GET['lvid'];
 	else
-		$lvid = addslashes($_GET['lvid']);
-
+		die('Fehlerhafte Parameteruebergabe');
+	
 	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($lvid);
 	$lv=$lv_obj;
@@ -97,6 +90,7 @@
     -moz-opacity:0.9;
     -khtml-opacity: 0.9;
     opacity: 0.9;
+}
 </style> 
 
 <script language="JavaScript">
@@ -136,7 +130,8 @@ function hideSemPlanHelp(){
 		<?php
 		echo $lv_obj->bezeichnung.' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester;
 
-		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
+		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+				WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
 		$stsem = new studiensemester();
 		if($lv->studiengang_kz==0)
 			$angezeigtes_stsem = $stsem->getNearest();
@@ -150,7 +145,18 @@ function hideSemPlanHelp(){
               <td class="tdvertical">&nbsp;</td>
               <td>';
 
-	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND tbl_person.person_id=tbl_benutzer.person_id AND lehrveranstaltung_id='$lvid' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND studiensemester_kurzbz='$angezeigtes_stsem' ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
+	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, 
+	    			CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter 
+	    		FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person 
+	    		WHERE 
+	    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
+	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND 
+	    			tbl_person.person_id=tbl_benutzer.person_id AND 
+	    			lehrveranstaltung_id='$lvid' AND 
+	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
+	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
+	    			studiensemester_kurzbz='$angezeigtes_stsem' 
+	    		ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
 
 		if(!$result = $db->db_query($qry))
 		{
@@ -188,6 +194,7 @@ function hideSemPlanHelp(){
 	  $qry = "SELECT distinct fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz 
 	  		FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
 	  		WHERE lehrveranstaltung_id='$lvid'";
+
 	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
 	  	$qry .= " AND studiensemester_kurzbz='$angezeigtes_stsem'";
 
