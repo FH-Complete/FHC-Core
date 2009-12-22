@@ -281,43 +281,54 @@ if(!$error)
 					$le = new lehreinheit();
 					$le->load($lem->lehreinheit_id);
 	
-					$qry = "SELECT
-								(sum(semesterstunden)-$semesterstunden_alt+$lem->semesterstunden) as summe
-							FROM
-								lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-							WHERE
-								mitarbeiter_uid='$lem->mitarbeiter_uid' AND
-								studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
-								faktor>0 AND
-								stundensatz>0 AND
-								bismelden";
-	
-					if($db->db_query($qry))
+					//Stundenreduzierung bzw aendern der anderen Daten ist immer moeglich
+					if($semesterstunden_alt<$lem->semesterstunden)
 					{
-						if($row = $db->db_fetch_object())
+						$qry = "SELECT
+									(sum(semesterstunden)-$semesterstunden_alt+$lem->semesterstunden) as summe
+								FROM
+									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+								WHERE
+									mitarbeiter_uid='$lem->mitarbeiter_uid' AND
+									studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+									faktor>0 AND
+									stundensatz>0 AND
+									bismelden";
+		
+						if($db->db_query($qry))
 						{
-							if($row->summe>=$max_stunden)
+							if($row = $db->db_fetch_object())
 							{
-								if(!$fixangestellt)
+								if($row->summe>=$max_stunden)
 								{
-									if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
+									if(!$fixangestellt)
 									{
-										//Warnung wenn die Stundenzahl ueberschritten wurde
-										$return = false;
-										$error = true;
-										$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+										if(!LehrauftragAufFirma($lem->mitarbeiter_uid))
+										{
+											//Warnung wenn die Stundenzahl ueberschritten wurde
+											$return = false;
+											$error = true;
+											$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+										}
 									}
+									else 
+									{
+										$return = true;
+										$error = false;
+										$warnung = true;
+										$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
+									}	
+									
+									$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
 								}
-								else 
-								{
-									$return = true;
-									$error = false;
-									$warnung = true;
-									$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
-								}	
-								
-								$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
 							}
+							else
+							{
+								$return = false;
+								$error=true;
+								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
+							}
+						
 						}
 						else
 						{
@@ -325,13 +336,6 @@ if(!$error)
 							$error=true;
 							$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 						}
-					
-					}
-					else
-					{
-						$return = false;
-						$error=true;
-						$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 					}
 				}
 				
