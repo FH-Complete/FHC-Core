@@ -84,7 +84,7 @@ else
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
 }
 
-//$user='ie07m102';
+//$user='if06b172';
 $user = get_uid();
 if($uid=='-1' || $uid!=$user)
 {
@@ -426,10 +426,10 @@ if($command!="add")
 			}
 			else 
 			{
-				if($row->fixtermin=='t' && $row->datum>date('Y-m-d'))
+				if($row->fixtermin=='t' && $row->datum<date('Y-m-d'))
 				{
 					//Termin ist überschritten - es wird kein Upload für diesen Termin mehr angeboten
-					$htmlstr .= "		<td>Termin vorbei</td>";
+					$htmlstr .= "		<td>$row->datum, ".date('Y-m-d').", Termin vorbei</td>";
 				}
 				else 
 				{
