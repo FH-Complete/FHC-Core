@@ -81,7 +81,7 @@ SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(pe
 	tbl_lehrfach.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
 	tbl_lehrveranstaltung.semester as lv_semester, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheitmitarbeiter.faktor,
 	tbl_lehreinheitmitarbeiter.stundensatz, 
-	tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehreinheitmitarbeiter.planstunden,
+	tbl_lehreinheitmitarbeiter.semesterstunden lemss, tbl_lehreinheitmitarbeiter.planstunden,
 	tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ,
 	tbl_lehreinheitmitarbeiter.anmerkung
 	,tbl_lehreinheit.studiensemester_kurzbz
@@ -111,7 +111,7 @@ if($institut!='')
 	$qry.=" AND tbl_lehrfach.fachbereich_kurzbz='".addslashes($institut)."'";
 
 if($semester!='')
-	$qry.=" AND tbl_lehrveranstaltung.semesteR='".addslashes($semester)."'";
+	$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
 	
 if($uid!='')
 	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($uid)."'";
@@ -195,7 +195,7 @@ $maxlength[$spalte]=9;
 $worksheet->write($zeile,++$spalte,"LV-Nummer", $format_bold);
 $maxlength[$spalte]=9;
 
-$worksheet->write($zeile,++$spalte,"SWS", $format_bold);
+$worksheet->write($zeile,++$spalte,"ALVS", $format_bold);
 $maxlength[$spalte]=9;
 
 $worksheet->write($zeile,++$spalte,"ECTS", $format_bold);
@@ -258,11 +258,11 @@ if($result = $db->db_query($qry))
 		if($maxlength[$spalte]<mb_strlen($gruppe))
 			$maxlength[$spalte]=mb_strlen($gruppe);
 		//Semesterstunden
-		$worksheet->write($zeile,++$spalte,$row->semesterstunden);
-		if($maxlength[$spalte]<mb_strlen($row->semesterstunden))
-			$maxlength[$spalte]=mb_strlen($row->semesterstunden);
+		$worksheet->write($zeile,++$spalte,$row->lemss);
+		if($maxlength[$spalte]<mb_strlen($row->lemss))
+			$maxlength[$spalte]=mb_strlen($row->lemss);
 		
-		$kosten = ($row->stundensatz*$row->semesterstunden*$row->faktor);
+		$kosten = ($row->stundensatz*$row->lemss*$row->faktor);
 		
 		//Kosten
 		$worksheet->write($zeile,++$spalte,$kosten);
