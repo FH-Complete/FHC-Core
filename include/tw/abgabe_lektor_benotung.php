@@ -116,6 +116,13 @@ else
 	$note=(isset($_POST['note'])?$_POST['note']:'');
 	$ende=(isset($_POST['ende'])?$_POST['ende']:'');
 	
+	$qualitaet=mb_convert_encoding(trim($qualitaet),'ISO-8859-15','UTF-8');
+	$form=mb_convert_encoding(trim($form),'ISO-8859-15','UTF-8');
+	$hintergrund=mb_convert_encoding(trim($hintergrund),'ISO-8859-15','UTF-8');
+	$autor=mb_convert_encoding(trim($autor),'ISO-8859-15','UTF-8');
+	$titel=mb_convert_encoding(trim($titel),'ISO-8859-15','UTF-8');
+	
+	
 	//Ausdruck generieren
 	//PDF erzeugen
 	$pdf = new PDF('P','pt');
@@ -493,11 +500,11 @@ else
 	if($row=@$db->db_fetch_object($erg))
 	{
 			// UTF-8 encoden
-		while (list($key, $value) = each($row)) 
+		/*while (list($key, $value) = each($row)) 
 		{
 			if (!empty($value))
 		    	$row->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
-		}
+		}*/
 
 		echo '
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -567,7 +574,7 @@ else
 			{
 				if(document.getElementById("summe2").value=="NaN")
 				{
-					alert("Eingabe ung�ltig! Bitte nur Ziffern eingeben.");
+					alert("Eingabe ung&uuml;ltig! Bitte nur Ziffern eingeben.");
 					document.getElementById("drucken").disabled=false;
 					return false;
 				}
