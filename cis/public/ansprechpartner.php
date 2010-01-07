@@ -32,6 +32,7 @@
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
+<!--
 		  	<tr>
 		  	  <td width="260" class='tdwrap'>Mag. Nestlang Dietmar</td>
 		  	  <td width="50" class='tdwrap'>215</td>
@@ -39,6 +40,13 @@
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>Termin nach Vereinbarung </td>
 		  	</tr>
+-->
+			  <td width="260" class='tdwrap'>Ing. Dipl. Ing. (FH) Paminger Christian (Interremistisch)</td>
+			  <td width="50" class='tdwrap'>245</td>
+			  <td  class='tdwrap'></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+
 		  	<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -145,7 +153,7 @@
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
 			<tr>
-		      	  <td width="260" class='tdwrap'><strong>Softgrid-Virtualisierung</strong></td>
+		   	  <td width="260" class='tdwrap'><strong>Softgrid-Virtualisierung</strong></td>
 			  <td width="50" class='tdwrap'>&nbsp;</td>
 			  <td  class='tdwrap'>&nbsp;</td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -298,12 +306,20 @@
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
+			  <td width="260" class='tdwrap'>Fries Ursula</td>
+			  <td width="50" class='tdwrap'>343</td>
+			  <td  class='tdwrap'></td>
+			  <td class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+		  </tr>
+
+			<tr>
 			  <td width="260" class='tdwrap'>Haas Bettina</td>
 			  <td width="50" class='tdwrap'>257</td>
 			  <td  class='tdwrap'></td>
 			  <td class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
-			  </tr>
+		  </tr>
 			<tr>
 			    <td width="260" class='tdwrap'>Kindl Manfred </td>
 			    <td width="50" class='tdwrap'>256</td>
