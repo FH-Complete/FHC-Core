@@ -319,5 +319,48 @@ class organisationseinheit extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt die Organisationseinheiten die als Array uebergeben werden
+	 * @param $kurzbzs Array mit den kurzbezeichnungen
+	 * @param $order Sortierreihenfolge
+	 * @param $aktiv wenn true dann nur aktive sonst alle
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadArray($kurzbzs, $order=null, $aktiv=true)
+	{
+		if(count($kurzbzs)==0)
+			return true;
+		
+		$kurzbzs = "'".implode("','",$kurzbzs)."'";
+						
+		$qry = 'SELECT * FROM public.tbl_organisationseinheit WHERE oe_kurzbz in('.$kurzbzs.')';
+		if ($aktiv)
+			$qry.=' AND aktiv=true';
+
+		if($order!=null)
+		 	$qry .=" ORDER BY $order";
+
+		if(!$result = $this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		} 
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$obj = new organisationseinheit();
+			
+			$obj->oe_kurzbz = $row->oe_kurzbz;
+			$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+			$obj->bezeichnung = $row->bezeichnung;
+			$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+			$obj->aktiv = ($row->aktiv=='t'?true:false);
+			
+			$this->result[] = $obj;
+		}
+
+		return true;
+	}
 }
 ?>

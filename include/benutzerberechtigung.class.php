@@ -639,5 +639,44 @@ class benutzerberechtigung extends basis_db
 		sort($fachbereich_kurzbz);
 		return $fachbereich_kurzbz;
 	}
+	
+	/**
+	 * Gibt Array mit den Organisationseinheiten zurueck fuer welche die
+	 * Person eine Berechtigung besitzt.
+	 * Optional wird auf Berechtigung eingeschraenkt.
+	 */
+	public function getOEkurzbz($berechtigung_kurzbz=null)
+	{
+		$oe_kurzbz=array();
+		$timestamp=time();
+		$in='';
+		$not='';
+		$all=false;
+		
+		foreach ($this->berechtigungen as $b)
+		{
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
+				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
+			{
+				if($b->negativ)
+				{
+					//Negativ-Recht
+					if(!is_null($b->oe_kurzbz))
+						$not .="'".addslashes($b->oe_kurzbz)."',";
+					else 
+						return array();
+				}
+				else 
+				{
+					$oe_kurzbz[] = $b->oe_kurzbz;
+				}
+			}
+		}
+		
+		$studiengang_kz=array_unique($oe_kurzbz);
+		sort($oe_kurzbz);
+		return $oe_kurzbz;
+	}
+
 }
 ?>
