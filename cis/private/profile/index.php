@@ -28,6 +28,10 @@
 	require_once('../../../include/person.class.php');
 	require_once('../../../include/safehtml/safehtml.class.php');
 
+ 	require_once('../../../include/betriebsmittel.class.php');
+ 	require_once('../../../include/betriebsmittelperson.class.php');
+ 	require_once('../../../include/betriebsmitteltyp.class.php');  
+  
 	if (!$db = new basis_db())
 		die('Fehler beim Oeffnen der Datenbankverbindung');
       
@@ -220,9 +224,7 @@ function RefreshImage()
 		{
 			echo "Alias: <a class='Item' href='mailto:$email_alias@".DOMAIN."'>$email_alias@".DOMAIN."</a>";
 		}
-        
-        echo '</P>';
-
+    echo '</P>';
 		if($hp!='')
 			echo "<P><b>Homepage</b><br><a href='$hp' target='_blank'>$hp</a></p>";
 		echo '<p>';
@@ -298,31 +300,29 @@ function RefreshImage()
 					echo '</table>';
 				}
 			}
-			
-			//Betriebsmittel
-			$qry = "SELECT 
-						tbl_betriebsmittel.betriebsmitteltyp as betriebsmitteltyp, 
-						tbl_betriebsmittel.beschreibung as beschreibung, tbl_betriebsmittel.nummer as nummer, 
-						tbl_betriebsmittelperson.ausgegebenam as ausgegebenam
-					FROM 
-						public.tbl_betriebsmittelperson JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) 
-					WHERE 
-						person_id=(SELECT person_id FROM public.tbl_benutzer WHERE uid='$uid' LIMIT 1) AND 
-						retouram is null";
-			if($result_betriebsmittel = $db->db_query($qry))
-			{
-				if($db->db_num_rows($result_betriebsmittel)>0)
-				{
-					echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
 
-					while($row_bm = $db->db_fetch_object($result_betriebsmittel))
-					{
-						echo "<tr class='liste1'><td>$row_bm->betriebsmitteltyp</td><td>$row_bm->nummer</td><td>$row_bm->ausgegebenam</td></tr>";
-					}
-					echo '</table>';
-				}
-			}
+    		// Betriebsmittel Personen
+    		$oBetriebsmittelperson = new betriebsmittelperson();
+    		$oBetriebsmittelperson->result=array();
+    		$oBetriebsmittelperson->errormsg='';
+    		if ($oBetriebsmittelperson->getBetriebsmittelPerson($person_id))
+        {
+      		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
+    	  	{
+    				echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
+#      var_dump($oBetriebsmittelperson->result);   
+            for ($i=0;$i<count($oBetriebsmittelperson->result);$i++)
+            {
+                if (empty($oBetriebsmittelperson->result[$i]->retouram) )
+                {
+      						echo "<tr class='liste1'><td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp."</td><td>".$oBetriebsmittelperson->result[$i]->nummer."</td><td>".$oBetriebsmittelperson->result[$i]->ausgegebenam."</td></tr>";
+                }
+            }
+    				echo '</table>';
+          }
+        }
 		}
+    
 		if(!$ansicht)
 		{
 			echo "";
