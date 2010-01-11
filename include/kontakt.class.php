@@ -131,6 +131,11 @@ class kontakt extends basis_db
 			$this->errormsg = 'kontakt darf nicht länger als 128 Zeichen sein';
 			return false;
 		}
+		if($this->kontakttyp=='email' && !strstr($this->kontakt, '@'))
+		{
+			$this->errormsg = 'Wenn der Typ E-Mail ausgewählt wurde, muss der Kontakt ein @ enthalten!';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;		
 	}
