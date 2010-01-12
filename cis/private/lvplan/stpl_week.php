@@ -196,26 +196,33 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 				
 				if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
 				{
-					$reservierung = new reservierung();
-					
-					$reservierung->datum = $datum_res;
-					$reservierung->uid = $uid;
-					$reservierung->ort_kurzbz = $ort_kurzbz;
-					$reservierung->stunde = $stunde;
-					$reservierung->beschreibung = $_REQUEST['beschreibung'];
-					$reservierung->titel = $_REQUEST['titel'];
-					$reservierung->studiengang_kz='0';
-
-					if(!$reservierung->save(true))
-					{
-						echo $reservierung->errormsg;
-					}
+					if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
+						echo "<br>Eingabe Titel und Beschreibung fehlt! <br>";
+					else if (empty($_REQUEST['titel']) )
+						echo "<br>Eingabe Titel  fehlt! <br>";
+					else if ( empty($_REQUEST['beschreibung']))
+						echo "<br>Eingabe Beschreibung fehlt! <br>";
+					else
+					{			 
+  					$reservierung = new reservierung();
+	  				$reservierung->datum = $datum_res;
+		  			$reservierung->uid = $uid;
+			  		$reservierung->ort_kurzbz = $ort_kurzbz;
+				  	$reservierung->stunde = $stunde;
+  					$reservierung->beschreibung = $_REQUEST['beschreibung'];
+	  				$reservierung->titel = $_REQUEST['titel'];
+		  			$reservierung->studiengang_kz='0';
+  					if(!$reservierung->save(true))
+	  					echo $reservierung->errormsg;
+            else
+         				$count++;
+            }    
+                
 				}	
 				else
 				{
 					echo "<br>$ort_kurzbz bereits reserviert von ".$db->db_result($suchen_std,0,'"uid"')." $datum_res - Stunde $stunde <br>";
 				}	
-				$count++;
 			}
 		}
 	}
