@@ -519,10 +519,10 @@ class gebiet extends basis_db
 				(
 				SELECT level, frage_id, sum(punkte) as punkte 
 				FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
-				WHERE gebiet_id=22 AND punkte>0 AND level>=2 AND NOT demo 
+				WHERE gebiet_id='".addslashes($gebiet_id)."' AND punkte>0 AND level>='$this->level_start' AND NOT demo 
 				GROUP BY level, frage_id
 				) as a 
-			GROUP by level, punkte";
+			GROUP by level, punkte ORDER BY level";
 			
 			if($this->db_query($qry))
 			{
