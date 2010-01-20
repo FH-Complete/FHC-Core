@@ -45,6 +45,7 @@
 	$erstbegutachter='';
 	$zweitbegutachter='';
 	$fachbereich_kurzbz='';
+	//$p2id='';
 
 	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
 	if(!is_numeric($stg_kz) && $stg_kz!='')
