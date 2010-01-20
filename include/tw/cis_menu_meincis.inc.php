@@ -224,7 +224,23 @@
 				</tr>
 			<?php
 			}
-			
+			$berechtigung_kurzbz = 'lehre/abgabetool:download';
+			if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt($berechtigung_kurzbz))
+			{
+			?>
+				<!--Projektarbeitsabgabe-->
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+				    <td class='tdwrap'>
+				    	<a href="tools/projektabgabe.php" class="Item" target="content">
+				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Projektabgabe&uuml;bersicht
+				    	</a>
+				    </td>
+				</tr>
+				
+			<?php							
+			}
+
 			if ($rechte->isFix())
 			{
 				?>
