@@ -27,8 +27,28 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 //echo Test($_REQUEST);
+require_once('../../config/vilesci.config.inc.php');
+if(isset($_GET['id']) && isset($_GET['uid']) && isset($_GET['pdfread']))
+{
+	//PDF-Ausgabe vom Aufruf Zeile 689
+	if(!is_numeric($_GET['id']) || $_GET['id']=='')
+		die('Fehler bei Parameteruebergabe');
+	
+	$file = $_GET['id'].'_'.$_GET['uid'].'.pdf';
+	$filename = PAABGABE_PATH.$file;
+	//if ($pdf=@readfile($filename))
+	//{
+		header('Content-Type: application/octet-stream');
+		header('Content-disposition: attachment; filename="'.$file.'"');
+		echo readfile($filename);
+		exit(); //Keine weitere Verarbeitung
+	//}
+	//else
+	//{
+	//	exit("Datei $filename konnte nicht gelesen werden!");
+	//} 
+}
 
-	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/basis_db.class.php');
 		if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -39,7 +59,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/mail.class.php');
-
+$fachbereich_kurzbz='';
 $fixtermin=false;
 
 if(!isset($_POST['uid']))
@@ -83,7 +103,9 @@ if(!isset($_POST['uid']))
 		}
 	}
 	else 
+	{
 		exit;
+	}
 }
 else 
 {
@@ -113,25 +135,14 @@ $htmlstr='';
 $bezeichnung='';
 $obezeichnung='';
 
+
 $datum = $datum_obj->formatDatum($datum, $format='Y-m-d');
 if($uid==-1 && $projektarbeit_id==-1&& $titel==-1)
 {
-	//echo "Fehler bei der Daten&uuml;bergabe";
+	echo "Fehler bei der Daten&uuml;bergabe";
 	exit;
 }
 
-if(isset($_GET['id']) && isset($_GET['uid']))
-{
-	if(!is_numeric($_GET['id']) || $_GET['id']=='')
-		die('Fehler bei Parameteruebergabe');
-	
-	$file = $_GET['id'].'_'.$_GET['uid'].'.pdf';
-	$filename = PAABGABE_PATH.$file;
-	header('Content-Type: application/octet-stream');
-	header('Content-disposition: attachment; filename="'.$file.'"');
-	readfile($filename);
-	exit;
-}
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -682,7 +693,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		{
 			if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 			{
-				$htmlstr .= "		<td align=center><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
+				$htmlstr .= "		<td align=center><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid&pdfread=1' target='_blank'><img src='../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
 			}
 			else 
 			{
