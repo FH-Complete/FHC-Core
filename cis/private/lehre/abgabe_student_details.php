@@ -168,13 +168,8 @@ if($command=="update" && $error!=true)
 				move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
 				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
 				{
-					if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
-					{
-	                 	if(copy($_FILES[$file]['tmp_name'], $uploadfile))
-						{
-							exec('chmod 644 "'.$uploadfile.'"');
-						}
-					}
+					exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'.'"');
+
 					$qry="UPDATE campus.tbl_paabgabe SET
 						abgabedatum = now(),
 						updatevon = '".$user."', 
