@@ -70,7 +70,7 @@
                 $stsem_aktuell = $stsem->getaktorNext();	
 	
 	
-#echo "<hr> GET <br> ";	
+##echo "<hr> GET <br> ";	
 #var_dump($_GET);	
 #echo "<hr> POST <br> ";
 #var_dump($_POST);
@@ -103,24 +103,20 @@ if(!$rechte->isBerechtigt('admin'))
 // @studiensemester_kurzbz Studiensemester WSxxxx SSxxxx
         $studiensemester_kurzbz_target=(isset($_GET['studiensemester_kurzbz_target'])?trim($_GET['studiensemester_kurzbz_target']):$stsem_aktuell);
 // $lehrveranstaltung_id Lehrveranstaltung zur Lehreinheit
-	    $lehrveranstaltung_id_target=(isset($_GET['lvid'])?trim($_GET['lvid_target']):(isset($_GET['lehrveranstaltung_id_target'])?trim($_GET['lehrveranstaltung_id_target']):''));
+	    $lehrveranstaltung_id_target=(isset($_GET['lvid_target'])?trim($_GET['lvid_target']):(isset($_GET['lehrveranstaltung_id_target'])?trim($_GET['lehrveranstaltung_id_target']):''));
 // @$studiengang_kz Studiengang
         $studiengang_kz_target=(isset($_GET['studiengang_kz_target'])?trim($_GET['studiengang_kz_target']):227);
 // @$semester Semester des Studienganges
-        $semester_target=(isset($_GET['semester_target'])?trim($_GET['semester_target']):1);
+        $semester_target=(isset($_GET['semester_target'])?trim($_GET['semester_target']):$semester);
 // @$lehreinheit_id_target Lehreinheit
         $lehreinheit_id_target=(isset($_GET['lehreinheit_id_target'])?trim($_GET['lehreinheit_id_target']):'');
-	
 // @$lehreinheit_id_sel Lehreinheit
        $lehreinheit_id_sel=(isset($_GET['lehreinheit_id_sel'])?trim($_GET['lehreinheit_id_sel']):'');
-
 // @$lehreinheit_id_sel Lehreinheit
     $uebung_id_sel=(isset($_GET['uebung_id_sel'])?trim($_GET['uebung_id_sel']):'');
 
 if ($uebung_id_sel!='' && !is_array($uebung_id_sel))
 	$uebung_id_sel=array($uebung_id_sel);
-
-		
 		
 if ($uebung_id_source!='' && !is_array($uebung_id_source))
 	$uebung_id_source=array($uebung_id_source);
@@ -436,10 +432,8 @@ if(isset($_GET['kopieren']))
 					$errormsg[]="&Uuml;bung ".$ueb." wurde nicht kopiert! (&Uuml;: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
 					break;
 				}
-
 			}	
 		}	
-		
 		// Nun alle An Felder - Lehreinheit zum Von kopieren (neue Anzeige)
 		if ($error == 0)
 		{
@@ -450,8 +444,7 @@ if(isset($_GET['kopieren']))
 			$db->db_query('ROLLBACK');			
 		}
 		$errormsg[]='<br><br><a href="'.$_SERVER['PHP_SELF'].'" class="Item">noch eine &Uuml;bung kopieren</a>';
-
-}
+	}
 
 
 	// ***********************************************************************************************
@@ -615,6 +608,9 @@ if(isset($_GET['kopieren']))
                         $le_obj->load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz);
                         foreach ($le_obj->lehreinheiten as $row)
                         {
+								if (empty($lehreinheit_id))
+									$lehreinheit_id=$row->lehreinheit_id;
+						
                                 //Gruppen laden
                           		$gruppen = '';
 					    		if (!$legrp_obj = new lehreinheitgruppe())
@@ -646,7 +642,6 @@ if(isset($_GET['kopieren']))
 
 #var_dump($uebung_id_source);
 		
-		
 				$submitOK=false;				
 				if (!$ueb = new uebung())
 				{
@@ -661,7 +656,6 @@ if(isset($_GET['kopieren']))
 						$errormsg[]=$ueb->errormsg;
 					}	
 				}
-
 
 	            $content.='<td valign="top"><select multiple size="'.count($ueb->uebungen).'" name="uebung_id_source[]">';
 				if (is_array($ueb->uebungen) && count($ueb->uebungen)>0)
@@ -706,9 +700,7 @@ if(isset($_GET['kopieren']))
 			<tr>			
 			';
 			
-
-			
-         $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.submit();" name="studiensemester_kurzbz_target">';
+         $content.='<td valign="top"><select onchange="document.'.$cFormName.'.semester_target.value=\'\';document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.submit();" name="studiensemester_kurzbz_target">';
 # 	     $content.='<option value="">&nbsp;Alle&nbsp;</option>';
          $stsem->studiensemester=array();
 		 if ($stsem->getAll())
@@ -726,7 +718,7 @@ if(isset($_GET['kopieren']))
 
         //---------------------------------------------------------------------------
         // Studiengang public.tbl_studiengang_kz
-        	$content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.submit();" name="studiengang_kz_target">';
+        	$content.='<td valign="top"><select onchange="document.'.$cFormName.'.semester_target.value=\'\';document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.submit();" name="studiengang_kz_target">';
 #			$content.='<option value="" '.(empty($studiengang_kz)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
             $stsem->result=array();
             if ($stg_obj->getAll('typ, kurzbz',true))
@@ -755,10 +747,13 @@ if(isset($_GET['kopieren']))
                 }
                 $content.='</select></td>';
 
+
         //---------------------------------------------------------------------------
         // Semster public.tbl_studiengang_kz - max Semester des Selektierten Studiengangs
-                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.uebung_id_source_target.value=\'\';document.'.$cFormName.'.submit();" name="semester_target">';
+		// document.'.$cFormName.'.uebung_id_source_target.value=\'\';
+        //        $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.submit();" name="semester_target">';
 #                $content.='<option value="" '.(empty($semester)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
+                $content.='<td valign="top"><select onchange="document.'.$cFormName.'.lehrveranstaltung_id_target.value=\'\';document.'.$cFormName.'.lehreinheit_id_target.value=\'\';document.'.$cFormName.'.submit();" name="semester_target">';
                 if ($studiengang_kz_target!='')
                 {
                         for($i=0;$i<=$max_semester;$i++)
@@ -775,6 +770,8 @@ if(isset($_GET['kopieren']))
                 }
                 $content.='</select></td>';
 
+
+##echo "<br> $studiengang_kz_target, $studiensemester_kurzbz_target, $semester_target , $lehrveranstaltung_id_target <br>";
 
         //---------------------------------------------------------------------------
         // Lehrveranstaltungen
@@ -800,6 +797,9 @@ if(isset($_GET['kopieren']))
 		 	 	}	  
                 $content.='</select>
 		  </td>';
+
+#echo "<br> $studiengang_kz_target, $studiensemester_kurzbz_target, $semester_target , $lehrveranstaltung_id_target <br>";
+
         //---------------------------------------------------------------------------
         // Lehreinheit
 		
@@ -807,7 +807,7 @@ if(isset($_GET['kopieren']))
                 $content.='<td valign="top"><select onchange="document.'.$cFormName.'.submit();" name="lehreinheit_id_target">';
 #                $content.='<option value="" '.(empty($lehreinheit_id)?' selected="selected" ':'').'>&nbsp;Alle&nbsp;</option>';
                 $le_obj->lehreinheiten=array();
-                if (!empty($lehrveranstaltung_id))
+                if (!empty($lehrveranstaltung_id_target))
                 {
                         $le_obj->load_lehreinheiten($lehrveranstaltung_id_target, $studiensemester_kurzbz_target);
                         foreach ($le_obj->lehreinheiten as $row)
@@ -842,6 +842,9 @@ if(isset($_GET['kopieren']))
                 $content.='</select></td>';			
 
 			$content.='<td valign="top" align="right">';
+			
+			
+#echo "<br> $studiengang_kz_target, $studiensemester_kurzbz_target, $semester_target , $lehrveranstaltung_id_target <br>";
 			
 				if (!$ueb = new uebung())
 				{
