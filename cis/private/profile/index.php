@@ -111,7 +111,7 @@
 	}
 
 	// Mail-Groups
-	if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid' ORDER BY gruppe_kurzbz")))
+	if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid'  ".(isset($semester)?" and semester=$semester ":'')."  ORDER BY gruppe_kurzbz")))
 		die($db->db_last_error());
 	$nr_mg=$db->db_num_rows($erg_mg);
 	
