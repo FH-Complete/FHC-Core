@@ -111,7 +111,7 @@ else
 	$punkteges2=(isset($_POST['punkteges2'])?$_POST['punkteges2']:'');
 	$punkte3=(isset($_POST['punkte3'])?$_POST['punkte3']:'');
 	$punkteges3=(isset($_POST['punkteges3'])?$_POST['punkteges3']:'');
-	$summe1=(isset($_POST['summe1'])?$_POST['summe1']:'');
+	//$summe1=(isset($_POST['summe1'])?$_POST['summe1']:'');
 	$summe2=(isset($_POST['summe2'])?$_POST['summe2']:'');
 	$note=(isset($_POST['note'])?$_POST['note']:'');
 	$ende=(isset($_POST['ende'])?$_POST['ende']:'');
@@ -403,10 +403,11 @@ else
 	$pdf->MultiCell(371,12,'Gesamtpunkte',1,'L',0);
 	$maxX +=371;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,$summe1,1,'C',0);
+	//$pdf->MultiCell(53,12,$summe1,1,'C',0);
+	$pdf->MultiCell(53,12," ",1,'C',0);
 	$maxX +=53;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,'1',1,'C',0);
+	$pdf->MultiCell(53,12,' ',1,'C',0);
 	$maxX +=53;
 	$pdf->SetXY($maxX,$maxY);
 	$pdf->MultiCell(53,12,$summe2,1,'C',0);
@@ -423,19 +424,19 @@ else
 	}
 	$maxX=160;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'0 - 50 Punkte = 5',1,'C',0);
+	$pdf->MultiCell(80,12,'Ergebnis <=50: 5',1,'C',0);
 	$maxX +=80;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'51 - 64 Punkte = 4',1,'C',0);
+	$pdf->MultiCell(80,12,'50< Ergebnis <65: 4',1,'C',0);
 	$maxX +=80;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'65 - 77 Punkte = 3',1,'C',0);
+	$pdf->MultiCell(80,12,'65<= Ergebnis <78: 3',1,'C',0);
 	$maxX +=80;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'78 - 90 Punkte = 2',1,'C',0);
+	$pdf->MultiCell(80,12,'78<= Ergebnis <90: 2',1,'C',0);
 	$maxX +=80;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'91 - 100 Punkte = 1',1,'C',0);
+	$pdf->MultiCell(80,12,'90<= Ergebnis: 1',1,'C',0);
 	$maxY=$pdf->GetY();
 	$maxX=160;
 	$pdf->SetXY($maxX,$maxY);
@@ -594,9 +595,9 @@ else
 				{
 					echo 'ergebnis=document.getElementById("punkte3").value*document.getElementById("weight3").value;
 					document.getElementById("punkteges3").value=ergebnis.toFixed(2);
-					ergebnis=parseFloat(document.getElementById("punkte1").value)+parseFloat(document.getElementById("punkte2").value)+parseFloat(document.getElementById("punkte3").value);
-					document.getElementById("summe1").value=ergebnis.toFixed(1);
-					ergebnis=parseFloat(document.getElementById("punkteges1").value)+parseFloat(document.getElementById("punkteges2").value)+parseFloat(document.getElementById("punkteges3").value);
+					ergebnis=parseFloat(document.getElementById("punkte1").value)+parseFloat(document.getElementById("punkte2").value)+parseFloat(document.getElementById("punkte3").value);';
+					//echo 'document.getElementById("summe1").value=ergebnis.toFixed(1);';
+					echo 'ergebnis=parseFloat(document.getElementById("punkteges1").value)+parseFloat(document.getElementById("punkteges2").value)+parseFloat(document.getElementById("punkteges3").value);
 					document.getElementById("summe2").value=ergebnis.toFixed(2);
 					if(document.getElementById("punkte1").value<50 || document.getElementById("punkte2").value<50 || document.getElementById("punkte3").value<50)
 					{
@@ -630,9 +631,9 @@ else
 				else
 				{
 					echo '
-					ergebnis=parseFloat(document.getElementById("punkte1").value)+parseFloat(document.getElementById("punkte2").value);
-					document.getElementById("summe1").value=ergebnis.toFixed(1);
-					ergebnis=parseFloat(document.getElementById("punkteges1").value)+parseFloat(document.getElementById("punkteges2").value);
+					ergebnis=parseFloat(document.getElementById("punkte1").value)+parseFloat(document.getElementById("punkte2").value);';
+					//echo 'document.getElementById("summe1").value=ergebnis.toFixed(1);';
+					echo 'ergebnis=parseFloat(document.getElementById("punkteges1").value)+parseFloat(document.getElementById("punkteges2").value);
 					document.getElementById("summe2").value=ergebnis.toFixed(2);
 					if(document.getElementById("punkte1").value<50 || document.getElementById("punkte2").value<50)
 					{
@@ -682,7 +683,7 @@ else
 		
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
-		$htmlstr .= "<form action=".$_SERVER['PHP_SELF']." method='POST' name='note' onsubmit='return inputcheck()'>";
+		$htmlstr .= "<form action=".$_SERVER['PHP_SELF']." method='POST' onsubmit='return inputcheck()'>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".$row->vorname." ".$row->nachname."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
@@ -807,13 +808,14 @@ else
 			<input  type='hidden' name='weight3' value='0' id='weight3'></td>\n";
 		}
 		$htmlstr .= "<td colspan='2'>Gesamtpunkte</td>";
-		$htmlstr .="<td align='center'><input  type='text' name='summe1' value='".$summe1."' id='summe1' style='text-align:right' size='5' maxlength='5' readonly></td>
-			<td align='center'>1</td>
-			<td align='center'><input  type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
+		//$htmlstr .="<td align='center'><input  type='text' name='summe1' value='".$summe1."' id='summe1' style='text-align:right' size='5' maxlength='5' readonly ></td>
+		$htmlstr .="<td align='center'>&nbsp;</td>
+			<td align='center'>&nbsp;</td>";
+		$htmlstr .= "<td align='center'><input  type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
 		$htmlstr .= "<td colspan='4'>Note</td><td align='center'><input  type='text' name='note' value='".$note."' id='note' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
 		$htmlstr .="</table>";
-		$htmlstr .= "<br><table border='1' align='center' width='60%'>";
-		$htmlstr .= "<tr><td>0 - 50 Punkte = 5</td><td>51 - 64 Punkte = 4</td><td>65 - 77 Punkte = 3</td><td>78 - 90 Punkte = 2</td><td>91 - 100 Punkte = 1</td></tr>";
+		$htmlstr .= "<br><table border='1' align='center' width='70%'>";
+		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <90 : Note 2</td><td>90<= Ergebnis : Note 1</td></tr>";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Diplomarbeit gesamt negativ</td></tr>";
@@ -823,7 +825,8 @@ else
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Bachelorarbeit gesamt negativ</td></tr>";
 		}
 		$htmlstr .= "</table>";
-		$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken' onclick='this.disabled=true;'>";
+		//$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken' onclick='this.disabled=true;'>";
+		$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken'>";
 		$htmlstr .="</form>";
 		$htmlstr .="</body></html>";
 		echo $htmlstr;
