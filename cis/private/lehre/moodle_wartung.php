@@ -352,7 +352,7 @@ else
 	$studiengang = new studiengang();
 	$studiengang->load($lv->studiengang_kz);
 		
-	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$studiengang->kuerzel.' '.$lv->semester.' - '.$lv->bezeichnung.'">';
+	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$studiengang->kuerzel.' '.$lv->semester.' '.$stsem.' - '.$lv->bezeichnung.'">';
 	echo '<br>Gruppen übernehmen: <input type="checkbox" name="gruppen" checked>';
 	echo '<br><br><input type="submit" name="neu" value="Kurs anlegen">
 			</form>';
