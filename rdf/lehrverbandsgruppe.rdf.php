@@ -61,24 +61,23 @@ else
 	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));	
 
 //var_dump($berechtigung);
-sort($berechtigt_studiengang);
+array_unique($berechtigt_studiengang);
 $stg_kz_query='';
 if (count($berechtigt_studiengang)>0)
 {
 	if ($berechtigt_studiengang[0]!='')
 	{
 		foreach ($berechtigt_studiengang as $b_stg)
-			$stg_kz_query.=' OR tbl_lehrverband.studiengang_kz='.$b_stg;
-		$stg_kz_query='AND ('.substr($stg_kz_query,3).')';
+			$stg_kz_query.="'".$b_stg."',";
+		$stg_kz_query='AND tbl_studiengang.studiengang_kz IN ('.substr($stg_kz_query,0,strlen($stg_kz_query)-1).')';
 	}
 
 	if (isset($_GET['studiengang_kz']))
 		$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$_GET['studiengang_kz'];
 	
-	$sql_query="SET search_path TO public;
-				SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
-				FROM (tbl_studiengang JOIN tbl_lehrverband USING (studiengang_kz))
-					LEFT OUTER JOIN tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
+	$sql_query="SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
+				FROM (public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
+					LEFT OUTER JOIN public.tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
 				WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
 				ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 }
@@ -86,7 +85,7 @@ else
 {
 	die('Keine Berechtigung');
 }
-//echo $sql_query;
+//die($sql_query);
 if(!$dbo->db_query($sql_query))
 	$error_msg.=$dbo->db_last_error();
 else
