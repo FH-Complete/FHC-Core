@@ -548,7 +548,12 @@ if($frage->frage_id!='')
 		$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 		if($nextfrage)
 		{
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>Weiter &gt;&gt;</a>";
+			if($demo)
+				$value="Demo";
+			else 
+				$value="Weiter";
+			
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value &gt;&gt;</a>";
 		}
 		else
 		{
@@ -562,7 +567,7 @@ if($frage->frage_id!='')
 					if($row->anzahl>1)
 					{
 						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Startseite &gt;&gt;</a>";
 					}
 				}
 			}
@@ -580,7 +585,12 @@ if($frage->frage_id!='')
 		$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 		if($nextfrage)
 		{
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>Weiter &gt;&gt;</a>";
+			if($demo)
+				$value="Demo";
+			else 
+				$value="Weiter";
+			
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value &gt;&gt;</a>";
 		}
 		else
 		{
@@ -598,7 +608,7 @@ if($frage->frage_id!='')
 					if($row->anzahl>1)
 					{
 						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Startseite &gt;&gt;</a>";
 					}
 				}
 			}
