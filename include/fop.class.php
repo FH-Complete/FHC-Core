@@ -47,15 +47,19 @@ class fop
 		$tmpxml = tempnam('/tmp', 'FAS_FOP');
 		$tmpxsl = tempnam('/tmp', 'FAS_FOP');
 		
-		file_put_contents($tmpxml, $xml);
-		file_put_contents($tmpxsl, $xsl);
+		$bytes1 = file_put_contents($tmpxml, $xml);
+		$bytes2 = file_put_contents($tmpxsl, $xsl);
 
 		
 		exec("fop -xml {$tmpxml} -xsl {$tmpxsl} -pdf {$tmppdf} 2>&1", $output);
+		//error_log("FOP Execute: fop -xml {$tmpxml} -xsl {$tmpxsl} -pdf {$tmppdf} 2>&1 b1:$bytes1 b2: $bytes2 Output: ".print_r($output, true));
 		
 		@unlink($tmpxml);
 		@unlink($tmpxsl);
-        
+
+		/*if(count($output)>0)
+			exit(print_r($output, true));*/
+		
 		switch($destination)
 		{
 			case "D": // Download

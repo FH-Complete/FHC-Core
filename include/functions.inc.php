@@ -185,6 +185,22 @@ function montag($datum)
 	return $datum;
 }
 
+/**
+ * Springt zum naechsten Wochentag
+ *
+ * @param $timestamp
+ * @param $weekday Wochentag zu dem gesprungen werden soll (0-6, 0=Sonntag)
+ * @return timestamp
+ */
+function jump_weekday($timestamp, $weekday)
+{
+	$wt = date("w",$timestamp);
+	$jump = 7-$wt+$weekday;
+	if($jump>7)
+		$jump = $jump-7;
+	return jump_day($timestamp, $jump);
+}
+
 function jump_day($datum, $tage)
 {
 	// Ein Tag sind 86400 Sekunden
