@@ -31,6 +31,6 @@
 
 <body>
 <br><br><br>
-<center><b>Die Maximalzeit für dieses Gebiet ist bereits abgelaufen!</b></center>
+<center><b>Die Maximalzeit für dieses Gebiet ist abgelaufen, oder alle Fragen wurden beantwortet!</b></center>
 </body>
 </html>

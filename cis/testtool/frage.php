@@ -297,8 +297,45 @@ if($result_pruefling = $db->db_query($qry_pruefling))
 	}
 }
 
+$fortschrittsbalken='';
+if($levelgebiet)
+{
+	$max = $gebiet->maxfragen;
+	$aktuell=0;
+	$qry = "SELECT count(*) as anzahl FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
+			WHERE pruefling_id='".addslashes($_SESSION['pruefling_id'])."'
+			AND gebiet_id='$gebiet_id'";
+	
+	if($result_aktuell = $db->db_query($qry))
+	{
+		if($row_aktuell = $db->db_fetch_object($result_aktuell))
+		{
+			$aktuell = $row_aktuell->anzahl;
+		}
+	}
+	$psolved = $aktuell/$max*100;
+	//$fortschrittsbalken .= "$aktuell / $max";
+	$fortschrittsbalken .= '
+	<table width="300" style="border: 1px solid black;" cellpadding="0" cellspacing="0" background="../../skin/images/bg_.gif">
+		<tr>
+  			<td valign="top" style="height:1px;font-size:2px;">
+  				<table cellpadding="0" cellspacing="0" style="border:0px;height:1px;font-size:2px;">
+      			<tr>
+	      			<td nowrap="nowrap" style="height:1px;font-size:2px;">
+						<font size="2" face="Arial, Helvetica, sans-serif">
+						<img src="../../skin/images/entry.gif" width="'.($psolved*3).'" height="10" alt="" border="1" />
+						</font>
+					</td>
+				</tr>
+				</table>
+			</td>
+		</tr>
+	</table>';
+	$fortschrittsbalken .= '<span class="smallb"><b> '.$aktuell.' / '.$max.'</b> ['.number_format($psolved,1,'.','').'%]</span>';
+	
+}
 //Zeit des Gebietes holen
-echo '<table width="100%"><tr><td>'.$info.'</td><td align="right">';
+echo '<table width="100%"><tr><td valign="top">'.$info.'</td><td align="center">'.$fortschrittsbalken.'</td><td valign="top" align="right">';
 
 if($demo)
 {
@@ -392,7 +429,18 @@ if($frage->frage_id!='')
 		
 	//Sound einbinden
 	if($frage->audio!='')
-		echo '<embed autostart="false" src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="250"/><br />';
+	{
+		//echo '<embed autostart="false" src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="250"/><br />';
+		echo '
+			<script language="JavaScript" src="audio-player/audio-player.js"></script>
+			<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
+			<param name="movie" value="audio_player/player.swf" />
+			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$frage->frage_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
+			<param name="quality" value="high" />
+			<param name="menu" value="false" />
+			<param name="wmode" value="transparent" />
+			</object>';
+	}
 	echo "$frage->text<br/><br/>\n";
 
 	//Vorschlaege laden
@@ -435,7 +483,18 @@ if($frage->frage_id!='')
 		if($vorschlag->bild!='')
 			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id&amp;sprache=".$_SESSION['sprache']."' /><br/>";
 		if($vorschlag->audio!='')
-			echo '<embed autostart="false" src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="100"/><br />';
+		{
+			//echo '<embed autostart="false" src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="100"/><br />';
+			echo '
+				<script language="JavaScript" src="audio-player/audio-player.js"></script>
+				<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
+				<param name="movie" value="audio_player/player.swf" />
+				<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vs->vorschlag_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
+				<param name="quality" value="high" />
+				<param name="menu" value="false" />
+				<param name="wmode" value="transparent" />
+				</object>';
+		}
 		if($vorschlag->text!='')
 			echo $vorschlag->text.'<br/>';
 		echo "</td>";
@@ -511,6 +570,37 @@ if($frage->frage_id!='')
 			{
 				//Wenns der letzte Eintrag ist, wieder zum ersten springen
 				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+			}
+		}
+	}
+	else 
+	{
+		//Naechste Frage holen und Weiter-Button anzeigen
+		$frage = new frage();
+		$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
+		if($nextfrage)
+		{
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>Weiter &gt;&gt;</a>";
+		}
+		else
+		{
+			if($demo)
+			{
+				//Naechste Frage holen und Weiter-Button anzeigen
+				//$frage = new frage();
+				//$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
+				
+				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
+						WHERE tbl_frage.gebiet_id='".addslashes($gebiet_id)."' 
+						AND demo ";
+				if($row = $db->db_fetch_object($db->db_query($qry)))
+				{
+					if($row->anzahl>1)
+					{
+						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
+						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>Weiter &gt;&gt;</a>";
+					}
+				}
 			}
 		}
 	}
