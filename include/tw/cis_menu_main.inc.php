@@ -165,10 +165,23 @@
 							<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="public/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Online-Katalog / Recherche</a></td>
 						</tr>
+
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_elektronischeressourcen.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Elektronische Ressourcen</a></td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_ebooks.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;eBooks</a></td>
 						</tr>
+
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_e_journals.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;E-Journals</a></td>
+						</tr>
+
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="public/bibliothek_datenbanken.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Datenbanken</a></td>
+						</tr>
+
+
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="public/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
