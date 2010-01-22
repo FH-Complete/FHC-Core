@@ -189,13 +189,14 @@ if(isset($_POST['submitaudio']))
         {
 			$filename = $_FILES['audio']['tmp_name'];
 			//File oeffnen
-			$fp = fopen($filename,'r');
+			$content = file_get_contents($filename);
+			/*$fp = fopen($filename,'r');
 			//auslesen
 			$content = fread($fp, filesize($filename));
-			fclose($fp);
+			fclose($fp);*/
+			//die('<br><br>'.$content);
 			//base64 codieren
 			$content = base64_encode($content);
-
 			$frage = new frage();
 			if($frage->getFrageSprache($_GET['frage_id'], $sprache))
 			{
@@ -594,7 +595,16 @@ if($frage_id!='')
 	}
 	if($frage->audio!='')
 	{
-		echo '<br /><embed autostart="false" src="../sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'" height="20" width="250"/>';
+		//echo '<br /><embed autostart="false" src="../sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'" height="20" width="250"/>';
+		echo '
+			<script language="JavaScript" src="../audio-player/audio-player.js"></script>
+			<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
+			<param name="movie" value="../audio_player/player.swf" />
+			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$frage->frage_id.'%26sprache%3D'.$sprache.'" />
+			<param name="quality" value="high" />
+			<param name="menu" value="false" />
+			<param name="wmode" value="transparent" />
+			</object>';
 	}
 	echo '</td>';
 	//Zusaetzliche EingabeFelder anzeigen
@@ -671,7 +681,18 @@ if($frage_id!='')
 					  <td><img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id&amp;sprache=$sprache' /></td>			
 					  <td>";
 			if($vs->audio!='')
-				echo "<embed autostart='false' src='../sound.php?src=vorschlag&amp;vorschlag_id=".$vs->vorschlag_id."&amp;sprache=".$sprache."' height='20' width='150'/>";
+			{
+				//echo "<embed autostart='false' src='../sound.php?src=vorschlag&amp;vorschlag_id=".$vs->vorschlag_id."&amp;sprache=".$sprache."' height='20' width='150'/>";
+				echo '
+					<script language="JavaScript" src="../audio-player/audio-player.js"></script>
+					<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
+					<param name="movie" value="../audio_player/player.swf" />
+					<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vs->vorschlag_id.'%26sprache%3D'.$sprache.'" />
+					<param name="quality" value="high" />
+					<param name="menu" value="false" />
+					<param name="wmode" value="transparent" />
+					</object>';
+			}
 			echo "	  </td>
 					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id'>edit</a></td>
 					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id&amp;type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td>

@@ -44,12 +44,19 @@ else
 if($qry!='')
 {
 	//Header fuer Sound schicken
-	header("Content-type: audio/mpeg");
-	//header("Content-type: audio/wav");
+	header("Content-type: audio/mp3");
+	//base64 Werte in Zeichen
 	$result = $db->db_query($qry);
 	$row = $db->db_fetch_object($result);
-	//base64 Werte in Zeichen umwandeln und ausgeben
-	echo base64_decode($row->audio);
+	
+	$content = base64_decode($row->audio);
+	
+	$len = strlen($content);
+	header("Content-Length: $len\n");
+	//header("Content-type: audio/wav");
+	
+	//ausgeben
+	echo $content;
 }
 ?>
 	
