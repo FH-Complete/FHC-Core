@@ -352,19 +352,19 @@ function RefreshImage()
   		for($i=0;$i<$nr_mg;$i++)
 		{
 			$row=$db->db_fetch_object($erg_mg,$i);
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($row->gruppe_kurzbz).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($row->gruppe_kurzbz)).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
     		echo "<TD>&nbsp;$row->beschreibung</TD><TD></TD></TR>";
 		}
 		
 		if (isset($matrikelnr))
 		{
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).'_std@'.DOMAIN.'">'.strtolower($stgkz).'_std&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).'_std@'.DOMAIN.'">'.strtolower($stgkz).'_std&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgbez</TD><TD></TD></TR>";
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.'@'.DOMAIN.'">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester</TD><TD></TD></TR>";
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband</TD><TD></TD></TR>";
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
+			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).trim($gruppe).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
     		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
 		}
 
