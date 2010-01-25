@@ -464,7 +464,7 @@ $error_msg='';
 				and tbl_moodle.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz) 
 				OR 	(tbl_lehreinheit.lehreinheit_id=tbl_moodle.lehreinheit_id))
 			 ";
-   	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid IN ($sql_query)";
+   	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN ($sql_query)";
 	if(!$db->db_query($sql_querys))
 	{
 		$error_msg.=$db->db_last_error().' '.$sql_querys;
