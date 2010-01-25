@@ -442,6 +442,54 @@ $error_msg='';
 		flush();
 	}
 
+	
+   	// **************************************************************
+	// Moodle - LektorenVerteiler abgleichen
+	$mlist_name='Moodle-Lektoren';
+	setGeneriert($mlist_name);
+	// Lektoren holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	
+	$sql_query = "SELECT distinct mitarbeiter_uid uid 
+				from lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_moodle ,campus.vw_lehreinheit 
+				where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id 
+				and  vw_lehreinheit.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz
+				and vw_lehreinheit.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id 
+				and vw_lehreinheit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id 
+				and vw_lehreinheit.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz 
+				and vw_lehreinheit.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz 
+				and lower(trim(vw_lehreinheit.lehrfunktion_kurzbz))='lektor' 
+				and ((tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_moodle.lehrveranstaltung_id 
+				and tbl_moodle.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz) 
+				OR 	(tbl_lehreinheit.lehreinheit_id=tbl_moodle.lehreinheit_id))
+			 ";
+   	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid IN ($sql_query)";
+	if(!$db->db_query($sql_querys))
+	{
+		$error_msg.=$db->db_last_error().' '.$sql_querys;
+		echo '-';
+		flush();
+	}
+	
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error().' '.$sql_query;
+	// Lektoren holen die nicht im Verteiler sind
+	echo '<BR>';
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+		{
+			$error_msg.=$db->db_last_error().$sql_query;
+			exit($error_msg);
+		}	
+		echo '-';
+		flush();
+	}	
+
+
+
 	echo $error_msg;
 	?>
 	<BR>
