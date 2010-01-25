@@ -445,7 +445,7 @@ $error_msg='';
 	
    	// **************************************************************
 	// Moodle - LektorenVerteiler abgleichen
-	$mlist_name='Moodle-Lektoren';
+	$mlist_name='moodle_lkt';
 	setGeneriert($mlist_name);
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
