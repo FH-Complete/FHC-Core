@@ -27,6 +27,5 @@
 	[ <a class='Item' href="index.html" target="_top">HOME</a>
 	| <a class='Item' href="private/menu.php" target="menu">Mein CIS</a>
 	| <a class='Item' href="private/lehre/menu.php" target="menu">Lehrveranstaltungen</a>
-	| <a class='Item' href="../layouts.php" target="content">Layouts</a>
 	]
 </div>
