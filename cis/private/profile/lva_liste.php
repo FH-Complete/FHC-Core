@@ -41,6 +41,9 @@
 		$uid=$_GET['uid'];
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
+	
+	$uid='ahofmann';
+	$user=$uid;
 
 	if ($uid!=$user)
 	{
@@ -226,7 +229,7 @@
 	$qry = "SELECT 
 				distinct
 				tbl_lehrveranstaltung.studiengang_kz, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung, 
-				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester
+				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester,tbl_lehrveranstaltung.koordinator
 			FROM 
 				lehre.tbl_lehrveranstaltung, 
 				lehre.tbl_lehreinheit,
@@ -237,12 +240,15 @@
 				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
 				(tbl_lehrveranstaltung.koordinator='$uid' 
 				OR 
-				 (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz 
+				 ( tbl_lehrveranstaltung.koordinator is null and (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz 
 				 																FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
-				 										  WHERE funktion_kurzbz='fbk' AND uid='$uid')
+									 										  WHERE funktion_kurzbz='fbk' AND uid='$uid' 
+														  					and ( tbl_benutzerfunktion.datum_bis is null or now() between tbl_benutzerfunktion.datum_von and tbl_benutzerfunktion.datum_bis )
+																			))
 				 )
 				 order by tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester ,tbl_lehrveranstaltung.bezeichnung
 				 ";
+				 
 				 
 	if($result = $db->db_query($qry))
 	{
@@ -274,24 +280,18 @@
 							tbl_benutzer.person_id=tbl_person.person_id AND
 							tbl_lehreinheit.studiensemester_kurzbz='$stdsem'";
 				$lektoren='';
-				$found=false;
 				if($result_lkt = $db->db_query($qry))
 				{
 					while($row_lkt = $db->db_fetch_object($result_lkt))
 					{
-						if ($uid==$row_lkt->uid)
-							$found=true;
-							
 						if($lektoren!='')
 							$lektoren.=',';
 						$lektoren.=trim($row_lkt->titelpre.' '.$row_lkt->vorname.' '.$row_lkt->nachname.' '.$row_lkt->titelpost);
 					}
 				}
-				if (!$found)
-					continue;
 					
 				echo '<tr valign="top">';
-					echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+					echo '<td title="Kordinator '.$row->koordinator.'  StdgKz '.$row->studiengang_kz .'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
 					echo '<td>'.$row->semester.'</td>';
 					echo '<td>'.$row->fachbereich_kurzbz.'</td>';
 					echo '<td>'.$row->bezeichnung.'</td>';
