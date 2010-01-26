@@ -42,6 +42,10 @@
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 
+$user='ahofmann';
+$uid='ahofmann';
+
+
 	if ($uid!=$user)
 	{
 		//wenn der UID Parameter nicht dem eingeloggten User entspricht wird ein Mail an die Administratoren gesendet.
@@ -50,7 +54,7 @@
 		die("Keine Berechtigung!");
 	}
 
-		//Studiensemester abfragen.
+	//Studiensemester abfragen.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start';
 	$result_stdsem=$db->db_query($sql_query);
 	$num_rows_stdsem=$db->db_num_rows($result_stdsem);
@@ -74,6 +78,7 @@
 		JOIN lehre.tbl_lehrfach USING(lehrfach_id)
 		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
 	$sql_query.=" ORDER BY stg_kurzbz,lv_semester";
+	
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
 ?>
@@ -234,10 +239,15 @@
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
 				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
-				(tbl_lehrveranstaltung.koordinator='$user' OR 
-				 (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
+				(tbl_lehrveranstaltung.koordinator='$uid' 
+				OR 
+				 (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz 
+				 																FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
 				 										  WHERE funktion_kurzbz='fbk' AND uid='$uid')
-				 )";
+				 )
+				 order by tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester ,tbl_lehrveranstaltung.bezeichnung
+				 ";
+				 
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)>0)
@@ -253,13 +263,9 @@
 			echo '</tr>';
 			while($row = $db->db_fetch_object($result))
 			{
-				echo '<tr>';
-				echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
-				echo '<td>'.$row->semester.'</td>';
-				echo '<td>'.$row->fachbereich_kurzbz.'</td>';
-				echo '<td>'.$row->bezeichnung.'</td>';
-				$qry = "SELECT 
-							titelpre, titelpost, vorname, nachname
+			//Fachbereichskoordinatoren holen
+				$qry = "SELECT distinct
+							uid,titelpre, titelpost, vorname, nachname
 						FROM 
 							lehre.tbl_lehreinheitmitarbeiter,
 							public.tbl_benutzer,
@@ -272,16 +278,28 @@
 							tbl_benutzer.person_id=tbl_person.person_id AND
 							tbl_lehreinheit.studiensemester_kurzbz='$stdsem'";
 				$lektoren='';
+				$found=false;
 				if($result_lkt = $db->db_query($qry))
 				{
 					while($row_lkt = $db->db_fetch_object($result_lkt))
 					{
+						if ($uid==$row_lkt->uid)
+							$found=true;
+							
 						if($lektoren!='')
 							$lektoren.=',';
 						$lektoren.=trim($row_lkt->titelpre.' '.$row_lkt->vorname.' '.$row_lkt->nachname.' '.$row_lkt->titelpost);
 					}
 				}
-				echo '<td>'.$lektoren.'</td>';
+				if (!$found)
+					continue;
+					
+				echo '<tr valign="top">';
+					echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+					echo '<td>'.$row->semester.'</td>';
+					echo '<td>'.$row->fachbereich_kurzbz.'</td>';
+					echo '<td>'.$row->bezeichnung.'</td>';
+					echo '<td>'.$lektoren.'</td>';
 				echo '</tr>';
 			}
 			echo '</table>';
