@@ -42,10 +42,6 @@
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 
-$user='ahofmann';
-$uid='ahofmann';
-
-
 	if ($uid!=$user)
 	{
 		//wenn der UID Parameter nicht dem eingeloggten User entspricht wird ein Mail an die Administratoren gesendet.
