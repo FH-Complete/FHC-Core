@@ -397,7 +397,7 @@ class wochenplan extends basis_db
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort')
-			echo '<strong>Ort: </strong>'.(is_file(RAUMINFO_PATH.$this->ort_kurzbz.'.html')?'<a href="'.RAUMINFO_PATH.$this->ort_kurzbz.'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung.'<br>';
+			echo '<strong>Ort: </strong>'.(1==1 || is_file(RAUMINFO_PATH.trim($this->ort_kurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($this->ort_kurzbz).'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung.'<br>';
 		echo '</P>'.$this->crlf;
 		echo '			<div valign="bottom" align="center">'.$this->crlf;
 
