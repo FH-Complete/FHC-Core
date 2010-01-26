@@ -200,7 +200,7 @@ if ($num_rows_repl>0)
     	$beschreibung=$db->db_result($erg_repl,$i,"beschreibung");
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
-        echo '<td >'.$ortkurzbz.'</td>';
+        echo '<td >'.(1==1 || is_file(RAUMINFO_PATH.trim($ortkurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
         echo '<td ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.'</A></td>';
         echo '<td >'.$beschreibung.'</td></tr>';
     }
