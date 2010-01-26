@@ -185,6 +185,12 @@ td.MarkLine
 {
 	background-color: #F2F2F2; 
 }
+
+td.Inaktiv  /*für Inaktive Items bei der Raumbeschreibung*/ {
+  background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiss*/
+  color: #CFCFCF;
+}
+
 /* ---- grau wie #DDDDDD  */
 TR.liste
 {
