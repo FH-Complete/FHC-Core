@@ -275,6 +275,10 @@ td.MarkLine
 {
 	background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiß*/
 }
+td.Inaktiv  /*für Inaktive Items bei der Raumbeschreibung*/ {
+  background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiss*/
+  color: #CFCFCF;
+}
 td.tdwidth10
 {
 	width: 10px;
