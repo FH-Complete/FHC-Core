@@ -1,12 +1,7 @@
 @charset "utf-8";
 /* Allgemein */
 body
-{
-	background-color: White;
-	font-family:  Verdana,Tahoma,Arial, Geneva, Helvetica, sans-serif;
-	/*font-family: Tahoma, Arial, Helvetica, sans-serif;
-	*/
-	font-size: 8px;
+{ 	background-color: White;font-family:  Verdana,Tahoma,Arial, Geneva, Helvetica, sans-serif;font-size: 8px;
 	/*overflow:visible;
 	*/
 	/*IE hack*/
@@ -14,45 +9,14 @@ body
 	voice-family: "\"
 }\"";
 */
-	voice-family: inherit;
-	font-size: small;
+	voice-family: inherit;font-size: small;
 	/*IE hack end*/
 }
-iframe
-{
-	margin:0px;
-	border-width:0px;
-	border-style:none;
-	padding:0px;
-}
-/*
-textarea
-{
-	font-family: Arial, Helvetica, sans-serif;
-}
-form
-{
-	font-family: Arial, Helvetica, sans-serif;
-}
-*/
-
+iframe { margin:0px;	border-width:0px;	border-style:none;	padding:0px;}
 /*   Screens  */
-
-select, input,div,td
-{
-	font-size: x-small;
-}
-hr
-{
-	color:#DDDDDD;
-	height:0.5px;
-}
-
-@media screen {
-iframe
-{
- overflow: auto;
-}
+select, input,div,td{	font-size: x-small;}
+hr{	color:#DDDDDD;	height:0.5px;}
+@media screen {iframe{ overflow: auto;}
 
 #menue
 {
@@ -307,6 +271,10 @@ td.ContentHeader3
 td.MarkLine
 {
 	background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiÃŸ*/
+}
+td.Inaktiv  /*für Inaktive Items bei der Raumbeschreibung*/ {
+  background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiss*/
+  color: #CFCFCF;
 }
 td.tdwidth10
 {
