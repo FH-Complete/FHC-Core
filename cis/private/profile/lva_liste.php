@@ -42,8 +42,8 @@
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 	
-	$uid='ahofmann';
-	$user=$uid;
+##	$uid='ahofmann';
+#	$user=$uid;
 
 	if ($uid!=$user)
 	{
