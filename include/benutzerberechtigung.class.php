@@ -318,7 +318,17 @@ class benutzerberechtigung extends basis_db
 	public function getBerechtigungen($uid,$all=false)
 	{
 		// Berechtigungen holen
-		
+		/*
+		Direkte Berechtigungszuordnung
+		UNION
+		Berechtigung ueber Rolle
+		UNION
+		Berechtigung ueber Funktion
+		UNION
+		Berechtigung ueber Funktion Mitarbeiter
+		UNION 
+		Berechtigung ueber Funktion Student
+		*/
 		$qry = "SELECT 
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
@@ -354,15 +364,45 @@ class benutzerberechtigung extends basis_db
 				FROM 
 					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
 				WHERE tbl_benutzerfunktion.uid='".addslashes($uid)."'
-				ORDER BY negativ DESC";
+				
+				UNION
+				
+				SELECT 
+					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+				FROM 
+					system.tbl_benutzerrolle
+				WHERE 
+					tbl_benutzerrolle.funktion_kurzbz='Mitarbeiter' AND 
+					EXISTS (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."')
 					
-		if(!$this->db_query($qry))
+				UNION
+				
+				SELECT 
+					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+				FROM 
+					system.tbl_benutzerrolle
+				WHERE 
+					tbl_benutzerrolle.funktion_kurzbz='Student' AND 
+					EXISTS (SELECT student_uid FROM public.tbl_student WHERE student_uid='".addslashes($uid)."')
+				
+				
+				ORDER BY negativ DESC";
+		
+		if(!$result = $this->db_query($qry))
 		{
 			$this->errormsg='Fehler beim Laden der Berechtigungen';
 			return false;
 		}
 
-		while($row=$this->db_fetch_object())
+		while($row=$this->db_fetch_object($result))
 		{
 			//wenn die Berechtigung an einer Organisationseinheit haengt, dann werden
 			//auch die Berechtigungen fuer die darunterliegenden Organisationseinheiten angelegt
@@ -405,9 +445,9 @@ class benutzerberechtigung extends basis_db
 				$this->berechtigungen[]=$b;
 			}
 		}
-
+		unset($result);
 		// Attribute des Mitarbeiters holen
-		$sql_query="SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'";
+		$sql_query="SELECT fixangestellt, lektor FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'";
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg='Fehler beim Laden der Berechtigungen';

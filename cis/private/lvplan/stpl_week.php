@@ -144,11 +144,11 @@ if (isset($_POST['titel']))
 
 $berechtigung=new benutzerberechtigung();
 $berechtigung->getBerechtigungen($uid);
-if ($berechtigung->isBerechtigt('raumres'))
+if ($berechtigung->isBerechtigt('lehre/reservierung:begrenzt', null, 'sui'))
 	$raumres=true;
 else
 	$raumres=false;
-
+unset($berechtigung);
 // Authentifizierung
 if (check_student($uid))
 	$user='student';
@@ -172,7 +172,7 @@ if (isset($_POST['reserve']))
 else if (isset($_GET['reserve']))
 	$reserve=$_GET['reserve'];	
 // Reservieren
-if (isset($reserve) && ($user=='lektor' || $raumres))
+if (isset($reserve) && $raumres)
 {
 	if(!$erg_std=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
@@ -204,21 +204,36 @@ if (isset($reserve) && ($user=='lektor' || $raumres))
 						echo "<br>Eingabe Beschreibung fehlt! <br>";
 					else
 					{			 
-  					$reservierung = new reservierung();
-	  				$reservierung->datum = $datum_res;
-		  			$reservierung->uid = $uid;
-			  		$reservierung->ort_kurzbz = $ort_kurzbz;
-				  	$reservierung->stunde = $stunde;
-  					$reservierung->beschreibung = $_REQUEST['beschreibung'];
-	  				$reservierung->titel = $_REQUEST['titel'];
-		  			$reservierung->studiengang_kz='0';
-  					if(!$reservierung->save(true))
-	  					echo $reservierung->errormsg;
-            else
-         				$count++;
-            }    
-                
-				}	
+	  					$reservierung = new reservierung();
+		  				$reservierung->datum = $datum_res;
+				  		$reservierung->ort_kurzbz = $ort_kurzbz;
+					  	$reservierung->stunde = $stunde;
+	  					$reservierung->beschreibung = $_REQUEST['beschreibung'];
+		  				$reservierung->titel = $_REQUEST['titel'];
+		  				$reservierung->insertamum=date('Y-m-d H:i:s');
+		  				$reservierung->insertvon=$uid;
+		  				
+		  				if(isset($_REQUEST['studiengang_kz']))
+		  				{
+		  					$reservierung->studiengang_kz = $_REQUEST['studiengang_kz'];
+		  					$reservierung->semester = $_REQUEST['semester'];
+		  					$reservierung->verband = $_REQUEST['verband'];
+		  					$reservierung->gruppe = $_REQUEST['gruppe'];
+		  					$reservierung->gruppe_kurzbz = $_REQUEST['gruppe_kurzbz'];
+		  					$reservierung->uid = $_REQUEST['user_uid'];
+		  				}
+		  				else
+		  				{
+			  				$reservierung->studiengang_kz='0';
+			  				$reservierung->uid = $uid;
+		  				}
+		  				
+	  					if(!$reservierung->save(true))
+		  					echo $reservierung->errormsg;
+	            		else
+	         				$count++;
+            		}    
+				}
 				else
 				{
 					echo "<br>$ort_kurzbz bereits reserviert von ".$db->db_result($suchen_std,0,'"uid"')." $datum_res - Stunde $stunde <br>";

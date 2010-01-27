@@ -19,30 +19,30 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
-	$uid=get_uid();
-	
-	if (isset($_GET['id']))
-		$id=$_GET['id'];
-	else if (isset($_POST['id']))
-		$id=$_POST['id'];
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($uid);
-	
-	if (isset($id))
-	{
-		$sql_query="DELETE FROM campus.tbl_reservierung WHERE reservierung_id=$id";
-		$erg=$db->db_query($sql_query);
-	}
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
-	
+$uid = get_uid();
+
+if (isset($_GET['id']))
+	$id=$_GET['id'];
+else if (isset($_POST['id']))
+	$id=$_POST['id'];
+
+$datum_obj = new datum();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
 ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -50,21 +50,36 @@
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
-	<H2><table class="tabcontent">
-		<tr>
-		<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Reservierungen</td>
-		<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
-		</tr>
+	<H2>
+		<table class="tabcontent">
+			<tr>
+				<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Reservierungen</td>
+				<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
+			</tr>
 		</table>
 	</H2>
 	<?php
+	//Loeschen von Reservierungen
+	if (isset($id))
+	{
+		if(!is_numeric($id))
+			die('ungueltige ID');
+		$sql_query="DELETE FROM campus.tbl_reservierung WHERE reservierung_id='".addslashes($id)."'";
+		if($db->db_query($sql_query))
+			echo '<b>Reservierung wurde geloescht</b><br>';
+		else 
+			echo '<b>Fehler beim Loeschen der Reservierung!</b><br>';
+	}
+
 	//Aktuelle Reservierungen abfragen.
-	$datum=mktime();
-	$datum=date("Y-m-d",$datum);
+	$datum = mktime();
+	$datum = date("Y-m-d",$datum);
 	
 	//EIGENE
-	$sql_query="SELECT * FROM campus.vw_reservierung WHERE datum>='$datum' AND uid='$uid'";
-	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
+	$sql_query="SELECT * FROM campus.vw_reservierung 
+				WHERE datum>='$datum' AND uid='$uid'
+				ORDER BY  datum, titel, ort_kurzbz, stunde";
+
 	if (!$erg_res=$db->db_query($sql_query))
 		die($db->db_last_error());
 
@@ -74,7 +89,16 @@
 	{
 		echo 'Eigene Reservierungen:<br>';
 		echo '<table border="0">';
-		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th><th>Aktion</th></tr>';
+		echo '
+			<tr class="liste">
+				<th>Datum</th>
+				<th>Titel</th>
+				<th>Stunde</th>
+				<th>Ort</th>
+				<th>Person</th>
+				<th>Beschreibung</th>
+				<th>Aktion</th>
+			</tr>';
 		for ($i=0; $i<$num_rows_res; $i++)
 		{
 			$zeile=$i % 2;
@@ -85,7 +109,12 @@
 			$ort_kurzbz=$db->db_result($erg_res,$i,"ort_kurzbz");
 			$pers_uid=$db->db_result($erg_res,$i,"uid");
 			$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
-			echo '<tr class="liste'.$zeile.'">';
+			$insertamum=$db->db_result($erg_res,$i,"insertamum");
+			$insertvon=$db->db_result($erg_res,$i,"insertvon");
+			$datum1 = $datum_obj->formatDatum($datum1, 'd.m.Y');
+			if($insertamum!='')
+				$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
+			echo '<tr class="liste'.$zeile.'" title="angelegt am '.$insertamum.' von '.$insertvon.'">';
 			echo '<td>'.$datum1.'</td>';
 			echo '<td>'.$titel.'</td>';
 			echo '<td>'.$stunde.'</td>';
@@ -93,8 +122,8 @@
 			echo '<td>'.$pers_uid.'</td>';
 			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
-			if (($pers_uid==$uid)|| $rechte->isBerechtigt('admin', 0, 'suid'))
-				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
+			if (($pers_uid==$uid)|| $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
 		echo '</table>';
@@ -103,43 +132,68 @@
 
 	echo '<br><br>';
 	flush();
-
-	//ALLE
-	$sql_query="SELECT * FROM campus.vw_reservierung WHERE datum>='$datum' ";
-	$sql_query.=" ORDER BY  datum, titel, ort_kurzbz, stunde";
-	if (!$erg_res=$db->db_query($sql_query))
-		die($db->db_last_error());
-	$num_rows_res=$db->db_num_rows($erg_res);
-	if ($num_rows_res>0)
+	
+	if(isset($_GET['alle']))
 	{
-		echo 'Alle Reservierungen:<br>';
-		echo '<table border="0">';
-		echo '<tr class="liste"><th>Datum</th><th>Titel</th><th>Stunde</th><th>Ort</th><th>Person</th><th>Beschreibung</th><th>Aktion</th></tr>';
-		for ($i=0; $i<$num_rows_res; $i++)
+
+		//ALLE
+		$sql_query="SELECT * FROM campus.vw_reservierung 
+					WHERE datum>='$datum'
+					ORDER BY  datum, titel, ort_kurzbz, stunde";
+		if (!$erg_res=$db->db_query($sql_query))
+			die($db->db_last_error());
+		
+		$num_rows_res=$db->db_num_rows($erg_res);
+		if ($num_rows_res>0)
 		{
-			$zeile=$i % 2;
-			$id=$db->db_result($erg_res,$i,"reservierung_id");
-			$datum=$db->db_result($erg_res,$i,"datum");
-			$titel=$db->db_result($erg_res,$i,"titel");
-			$stunde=$db->db_result($erg_res,$i,"stunde");
-			$ort_kurzbz=$db->db_result($erg_res,$i,"ort_kurzbz");
-			$pers_uid=$db->db_result($erg_res,$i,"uid");
-			$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
-			echo '<tr class="liste'.$zeile.'">';
-			echo '<td>'.$datum.'</td>';
-			echo '<td>'.$titel.'</td>';
-			echo '<td>'.$stunde.'</td>';
-			echo '<td>'.$ort_kurzbz.'</td>';
-			echo '<td>'.$pers_uid.'</td>';
-			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
-			$z=$i-1;
-			if (($pers_uid==$uid) || $rechte->isBerechtigt('admin', 0, 'suid'))
-				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
-			echo '</tr>';
+			echo 'Alle Reservierungen:<br>';
+			echo '<table border="0">';
+			echo '
+				<tr class="liste">
+					<th>Datum</th>
+					<th>Titel</th>
+					<th>Stunde</th>
+					<th>Ort</th>
+					<th>Person</th>
+					<th>Beschreibung</th>
+					<th>Aktion</th>
+				</tr>';
+	
+			for ($i=0; $i<$num_rows_res; $i++)
+			{
+				$zeile=$i % 2;
+				$id=$db->db_result($erg_res,$i,"reservierung_id");
+				$datum=$db->db_result($erg_res,$i,"datum");
+				$titel=$db->db_result($erg_res,$i,"titel");
+				$stunde=$db->db_result($erg_res,$i,"stunde");
+				$ort_kurzbz=$db->db_result($erg_res,$i,"ort_kurzbz");
+				$pers_uid=$db->db_result($erg_res,$i,"uid");
+				$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
+				$insertamum=$db->db_result($erg_res,$i,"insertamum");
+				$insertvon=$db->db_result($erg_res,$i,"insertvon");
+				
+				$datum = $datum_obj->formatDatum($datum, 'd.m.Y');
+				if($insertamum!='')
+					$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
+				echo '<tr class="liste'.$zeile.'" title="angelegt am '.$insertamum.' von '.$insertvon.'">';
+				echo '<td>'.$datum.'</td>';
+				echo '<td>'.$titel.'</td>';
+				echo '<td>'.$stunde.'</td>';
+				echo '<td>'.$ort_kurzbz.'</td>';
+				echo '<td>'.$pers_uid.'</td>';
+				echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
+				$z=$i-1;
+				if (($pers_uid==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+					echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
+				echo '</tr>';
+			}
+			echo '</table>';
+			flush();
 		}
-		echo '</table>';
-		flush();
 	}
+	else 
+		echo '<a href="stpl_reserve_list.php?alle=true">Alle Reservierungen anzeigen</a>';
+	
 ?>
 </body>
 </html>

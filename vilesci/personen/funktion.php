@@ -28,7 +28,7 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/basis_db.class.php');
 if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $sql_query="SELECT funktion_kurzbz, beschreibung FROM public.tbl_funktion ORDER BY funktion_kurzbz";
 $result_funktion=$db->db_query($sql_query);
@@ -59,6 +59,7 @@ if ($result_funktion!=0)
 	echo '<th></th>';
 	for ($i=0;$i<$num_fields; $i++)
 	    echo "<th class='table-sortable:default'>".$db->db_field_name($result_funktion,$i)."</th>";
+	echo '<th></th>';
 	echo '</tr></thead><tbody>';
 	for ($j=0; $j<$num_rows;$j++)
 	{
@@ -68,6 +69,8 @@ if ($result_funktion!=0)
 		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
 	    for ($i=0; $i<$num_fields; $i++)
 			echo "<td>$row[$i]</td>";
+			
+		echo "<td><a href=\"../stammdaten/benutzerberechtigung_details.php?funktion_kurzbz=$row[0]\">Berechtigungen</a></td>";
 	    echo "</tr>\n";
 	}
 }

@@ -32,6 +32,8 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/lehrstunde.class.php');
 require_once(dirname(__FILE__).'/ferien.class.php');
 require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
+require_once(dirname(__FILE__).'/studiengang.class.php');
+require_once(dirname(__FILE__).'/mitarbeiter.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 
 class wochenplan extends basis_db
@@ -686,7 +688,7 @@ class wochenplan extends basis_db
 					$datum_res_lektor_start_m = date('Y-m-d', $datum_res_lektor_start);
 					$datum_res_lektor_ende_m = date('Y-m-d', $datum_res_lektor_ende);
 					$datum_m = date('Y-m-d',$datum);
-					if (($raumres || $this->user=='lektor') && $this->type=='ort' && ($datum_m>=$datum_res_lektor_start_m && $datum_m<=$datum_res_lektor_ende_m))
+					if ($raumres && $this->type=='ort' && ($datum_m>=$datum_res_lektor_start_m && $datum_m<=$datum_res_lektor_ende_m))
 						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
 					echo '</td>'.$this->crlf;
 				}
@@ -695,16 +697,135 @@ class wochenplan extends basis_db
 			$datum=jump_day($datum, 1);
 		}
 		echo '	</table>'.$this->crlf;
-		if ($this->user=='lektor' && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
+		if ($raumres && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
-				echo '	<br />Titel: <input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /> '.$this->crlf;
-				echo '	Beschreibung: <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> '.$this->crlf;
-				echo '	<input type="submit" name="reserve" value="Reservieren" />'.$this->crlf;
+			echo '<table><tr>';
+			echo '	<td>Titel:</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
+			echo '	<td>Beschreibung:</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
+			
+			$rechte = new benutzerberechtigung();
+			$rechte->getBerechtigungen($user_uid);
+			
+			//Pruefen ob die erweiterte Reservierungsrechte vorhanden sind
+			if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
+			{
+				//Lektor
+				echo '<td>Lektor</td>
+					  <td><SELECT name="user_uid">'.$this->crlf;
+				
+				$qry = "SELECT uid, kurzbz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
+						WHERE aktiv=true
+						ORDER BY kurzbz, uid";
+				
+				if($result = $this->db_query($qry))
+				{
+					while($row = $this->db_fetch_object($result))
+					{
+						if($row->uid==$user_uid)
+							$selected='selected="selected"';
+						else 
+							$selected='';
+						
+						echo '<OPTION value="'.$row->uid.'" '.$selected.'>'.$row->kurzbz.'</OPTION>'.$this->crlf;
+					}
+				}
+				
+				echo '</SELECT></td>'.$this->crlf;
+				echo '</tr><tr>'.$this->crlf;
+									
+				//Studiengaenge Laden fuer die eine erweiterte Reservierungsberechtigung vorhanden ist
+				$stg = new studiengang();
+				$stg->loadArray($rechte->getStgKz('lehre/reservierung'),'typ, kurzbz',true);
+				
+				//Studiengang
+				echo '<td>Studiengang</td><td> <SELECT name="studiengang_kz">'.$this->crlf;
+				echo '<OPTION value="0">*</OPTION>'.$this->crlf;
+				foreach($stg->result as $row)
+				{
+					echo '<OPTION value="'.$row->studiengang_kz.'">'.$row->kuerzel.' ('.$row->kurzbzlang.')</OPTION>'.$this->crlf;
+				}
+				echo '</SELECT></td>';
+				
+				//Semester
+				echo '<td>Semester </td>
+					<td>
+					<SELECT name="semester" />
+						<OPTION value="">*</OPTION>
+						<OPTION value="1">1</OPTION>
+						<OPTION value="2">2</OPTION>
+						<OPTION value="3">3</OPTION>
+						<OPTION value="4">4</OPTION>
+						<OPTION value="5">5</OPTION>
+						<OPTION value="6">6</OPTION>
+						<OPTION value="7">7</OPTION>
+						<OPTION value="8">8</OPTION>
+					</SELECT>
+					<td>
+					'.$this->crlf;
+				
+				//Verband
+				echo '<td>Verband</td>
+					<td>
+					<SELECT name="verband" />
+						<OPTION value="">*</OPTION>
+						<OPTION value="A">A</OPTION>
+						<OPTION value="B">B</OPTION>
+						<OPTION value="C">C</OPTION>
+						<OPTION value="D">D</OPTION>
+						<OPTION value="F">F</OPTION>
+						<OPTION value="V">V</OPTION>
+					</SELECT>
+					</td>'.$this->crlf;
+				
+				//Gruppe
+				echo '<td>Gruppe</td>
+					<td>
+					<SELECT name="gruppe" />
+						<OPTION value="">*</OPTION>
+						<OPTION value="1">1</OPTION>
+						<OPTION value="2">2</OPTION>
+						<OPTION value="3">3</OPTION>
+						<OPTION value="4">4</OPTION>
+					</SELECT>
+					</td>'.$this->crlf;
+				
+				//Spezialgruppe
+				echo '<td>Spezialgruppe</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
+				echo '<OPTION value="">*</OPTION>'.$this->crlf;
+				
+				//Spezialgruppen aus den Studiengaengen mit erweiterten Reservierungsberechtigung holen
+				$stgs = $rechte->getStgKz('lehre/reservierung');
+				$in='';
+				foreach($stgs as $stg)
+				{
+					$in .= "'".addslashes($stg)."',";
+				}
+				$in = substr($in, 0, -1);
+				$qry = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz in($in) AND lehre=true AND sichtbar=true ORDER BY gruppe_kurzbz";
+				if($result = $this->db_query($qry))
+				{
+					while($row = $this->db_fetch_object($result))
+					{
+						echo '<OPTION value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</OPTION>'.$this->crlf;
+					}
+				}
+				echo '</SELECT></td>'.$this->crlf;
+				
+			}
+			else
+			{
 				echo '	<input type="hidden" name="user_uid" value="'.$this->user_uid.'" />'.$this->crlf;
-				echo '	<input type="hidden" name="ort_kurzbz" value="'.$this->ort_kurzbz.'" />'.$this->crlf;
-				echo '	<input type="hidden" name="datum" value="'.$this->datum.'" />'.$this->crlf;
-				echo '	<input type="hidden" name="type" value="'.$this->type.'" />'.$this->crlf;
-				echo '</form>';
+			}
+			
+			echo '<td>';
+			echo '  <input type="submit" name="reserve" value="Reservieren" />'.$this->crlf;
+			echo '	<input type="hidden" name="ort_kurzbz" value="'.$this->ort_kurzbz.'" />'.$this->crlf;
+			echo '	<input type="hidden" name="datum" value="'.$this->datum.'" />'.$this->crlf;
+			echo '	<input type="hidden" name="type" value="'.$this->type.'" />'.$this->crlf;
+			echo '</td>';
+			
+			echo '</tr></table></form>';
+			echo ' <a href="/cis/private/lvplan/stpl_reserve_list.php">Reservierungen löschen </a>';
 		}
 	}
 
