@@ -227,7 +227,7 @@ class studiengang extends basis_db
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		} 
-
+		
 		while($row = $this->db_fetch_object($result))
 		{
 			$stg_obj = new studiengang();

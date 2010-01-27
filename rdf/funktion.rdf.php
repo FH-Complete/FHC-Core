@@ -43,7 +43,7 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-$qry = 'SELECT * FROM public.tbl_funktion ORDER BY beschreibung';
+$qry = 'SELECT * FROM public.tbl_funktion WHERE aktiv ORDER BY beschreibung';
 $db = new basis_db();
 
 if($db->db_query($qry))

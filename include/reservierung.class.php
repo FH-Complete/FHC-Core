@@ -40,6 +40,8 @@ class reservierung extends basis_db
 	public $verband;			// char(1)
 	public $gruppe;				// char(1)
 	public $gruppe_kurzbz;		// varchar(10)
+	public $insertamum;
+	public $insertvon;
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional eine Reservierung
@@ -132,7 +134,7 @@ class reservierung extends basis_db
 		if($this->new)
 		{
 			$qry = 'INSERT INTO campus.tbl_reservierung (ort_kurzbz, studiengang_kz, uid, stunde, datum, titel,
-			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz)
+			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz, insertamum, insertvon)
 			        VALUES('.$this->addslashes($this->ort_kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
 					$this->addslashes($this->uid).','.
@@ -143,7 +145,9 @@ class reservierung extends basis_db
 					$this->addslashes($this->semester).','.
 					$this->addslashes($this->verband).','.
 					$this->addslashes($this->gruppe).','.
-					$this->addslashes($this->gruppe_kurzbz).');';
+					$this->addslashes($this->gruppe_kurzbz).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';
 		}
 		else
 		{

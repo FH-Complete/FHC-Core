@@ -325,6 +325,27 @@ if(@$db->db_query("SELECT organisationsform FROM public.tbl_studiengang LIMIT 1"
 		echo 'public.tbl_studiengang: Spalte organisationsform entfernt!<br>';
 }
 
+if(@$db->db_query("SELECT insertamum FROM campus.tbl_reservierung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_reservierung ADD COLUMN insertamum timestamp;
+			ALTER TABLE campus.tbl_reservierung ADD COLUMN insertvon varchar(32);
+			DROP VIEW campus.vw_reservierung;
+
+			CREATE VIEW campus.vw_reservierung AS
+				SELECT tbl_reservierung.reservierung_id, tbl_reservierung.ort_kurzbz, tbl_reservierung.studiengang_kz, 
+					tbl_reservierung.uid, tbl_reservierung.stunde, tbl_reservierung.datum, tbl_reservierung.titel, 
+					tbl_reservierung.beschreibung, tbl_reservierung.semester, tbl_reservierung.verband, tbl_reservierung.gruppe, 
+					tbl_reservierung.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_reservierung.insertamum, tbl_reservierung.insertvon
+				FROM campus.tbl_reservierung JOIN public.tbl_studiengang USING (studiengang_kz);
+ 
+			GRANT SELECT ON campus.vw_reservierung TO GROUP web;
+			GRANT SELECT ON campus.vw_reservierung TO GROUP admin;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_reservierung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'campus.tbl_reservierung: Spalte insertamum und insertvon hinzugefuegt!<br>';
+}
 
 echo '<br>';
 
@@ -364,7 +385,7 @@ $tabellen=array(
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
 	"campus.tbl_paabgabetyp"  => array("paabgabetyp_kurzbz","bezeichnung"),
 	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
-	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id"),
+	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_studentuebung"  => array("student_uid","mitarbeiter_uid","abgabe_id","uebung_id","note","mitarbeitspunkte","punkte","anmerkung","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
