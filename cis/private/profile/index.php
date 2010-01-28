@@ -305,6 +305,8 @@ function RefreshImage()
     		$oBetriebsmittelperson = new betriebsmittelperson();
     		$oBetriebsmittelperson->result=array();
     		$oBetriebsmittelperson->errormsg='';
+			if (!defined('WAWI'))
+				$oBetriebsmittelperson->schema_inventar='public';
     		if ($oBetriebsmittelperson->getBetriebsmittelPerson($person_id))
         {
       		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
