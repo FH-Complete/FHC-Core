@@ -160,6 +160,60 @@ class datum
 			return false;
 	}
 	
+
+	
+#------------------------------------------------------------------------------------------------
+	/**
+	 * Prueft und Liefert ein Datum im angegeben Format
+	 *   		fuer die Formatierung wird die Funktion formatDatum verwendet
+	 * @param $datum
+	 * @param $format
+	 * @param $strict wenn das Datum aus einem Suchfeld komment, dann strict auf TRUE setzen da sonst
+	 * 				  Eintraege wie zB 'last Monday' oder 'a' auch in ein Datum umgewandelt werden.
+	 * @return Formatierten Timestamp wenn ok, false im Fehlerfall
+	 */
+	function checkformatDatum($datum, $format='Y-m-d H:i:s', $strict=false) 
+	{
+				
+			@list($day, $month, $year) = @explode(".", $datum);
+			if (@checkdate($month, $day, $year))
+				return $this->formatDatum($datum, $format, $strict);
+			@list($day, $month, $year) = @explode("-", $datum);
+			if (@checkdate($month, $day, $year))
+				return $this->formatDatum($datum, $format, $strict);
+			@list($year, $month, $day) = @explode(".", $datum);
+			if (@checkdate($month, $day, $year))
+				return $this->formatDatum($datum, $format, $strict);
+			@list($year, $month, $day) = @explode("-", $datum);
+			if (@checkdate($month, $day, $year))
+				return $this->formatDatum($datum, $format, $strict);
+				
+			if (strlen($datum)==6)
+			{
+				$year="20".substr($datum,0,2);
+				$month=substr($datum,2,2);
+				$day=substr($datum,4,2);
+				if (@checkdate($month, $day, $year))
+					return $this->formatDatum($datum, $format, $strict);
+			}		
+			else if (strlen($datum)==8)
+			{
+				$year=substr($datum,0,4);
+				$month=substr($datum,4,2);
+				$day=substr($datum,	6,2);
+				if (@checkdate($month, $day, $year))
+					return $this->formatDatum($datum, $format, $strict);
+				
+				$year=substr($datum,5,4);		
+				$month=substr($datum,3,2);
+				$day=substr($datum,	0,2);
+				if (@checkdate($month, $day, $year))
+					return $this->formatDatum($datum, $format, $strict);
+			}		
+			return false;	
+		}		
+
+
 	/**
 	 * Liefert ein Datum im angegeben Format
 	 * ToDo: Liefert aktuellen Timestamp wenn Sonderzeichen uebergeben werden
@@ -221,5 +275,6 @@ class datum
 			
 		return false;
 	}
+	
 }
 ?>
