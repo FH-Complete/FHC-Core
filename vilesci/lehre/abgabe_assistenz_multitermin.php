@@ -39,7 +39,9 @@
 	require_once('../../include/mail.class.php');
 
 $i=0;
-$irgendwas='';
+$zaehl=0;
+
+$irgendwas=''; //projektarbeit-ids der ausgwaehlten projekte
 foreach($_POST as $key=>$value)
 {
 	if(stristr($key, "mc_"))
@@ -49,16 +51,21 @@ foreach($_POST as $key=>$value)
 		$i++;
 	}	
 }
+$i = (isset($_REQUEST['i'])?$_REQUEST['i']:0);
 $irgendwas = (isset($_POST['irgendwas'])?$_POST['irgendwas']:$irgendwas);
 $projektarbeit_id = (isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
 $titel = (isset($_POST['titel'])?$_POST['titel']:'');
-$command = (isset($_POST['command'])?$_POST['command']:'-1');
+//$command = (isset($_POST['command'])?$_POST['command']:'-1');
 $paabgabe_id = (isset($_POST['paabgabe_id'])?$_POST['paabgabe_id']:'-1');
-$fixtermin = (isset($_POST['fixtermin'])?1:0);
-$datum = (isset($_POST['datum'])?$_POST['datum']:'');
-$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
-$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'');
+
+$fixtermin = (isset($_POST['fixtermin'])?$_POST['fixtermin']:array());
+$datum = (isset($_POST['datum'])?$_POST['datum']:array());
+$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:array());
+$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:array());
+
+
 $stg_kz = (isset($_POST['stg_kz'])?$_POST['stg_kz']:'');
+
 $qry_stg="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
 if($result_stg=$db->db_query($qry_stg))
 {
@@ -94,10 +101,31 @@ if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('a
 	die('Sie haben keine Berechtigung für diesen Studiengang');
 
 $datum_obj = new datum();
-$datum=$datum_obj->formatDatum($datum,'Y-m-d');
+for ($x=0;$x<count($paabgabetyp_kurzbz);$x++)
+{
+	$fixtermin[$x] = (isset($fixtermin[$x])&&!empty($fixtermin[$x])?1:0);
+	if(isset($datum[$x])&&!empty($datum[$x]))
+	{
+		@list($day, $month, $year) = @explode(".", $datum[$x]);
+        if (@checkdate($month, $day, $year))
+        {
+			$datum[$x]=$datum_obj->formatDatum($datum[$x],'Y-m-d');
+        }
+        else 
+        {	
+			$error.='Datum '.$datum[$x].' falsch! Kurzbeschreibung:'.$kurzbz[$x];
+			$datum[$x]='';
+        }
+	}
+	else 
+	{
+		$datum[$x]='';	
+		$error.='Datum fehlt! Kurzbeschreibung:'.$kurzbz[$x];
+	}
+}
 //echo $irgendwas."<br>";
 
-if(isset($_POST["schick"]))
+/*if(isset($_POST["schick"]))
 {
 	$termine=explode(";",$irgendwas);
 	//var_dump($termine);
@@ -225,7 +253,7 @@ if(isset($_POST["schick"]))
 						}
 					}
 				}
-				$command='';
+				//$command='';
 			}
 		}
 		else 
@@ -233,7 +261,7 @@ if(isset($_POST["schick"]))
 			echo "Datenbank-Zugriffsfehler!";
 		}
 	}
-}
+}*/
 
 $htmlstr='';
 
@@ -248,19 +276,59 @@ $htmlstr='';
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		</head>
 		<body class="Background_main"  style="background-color:#eeeeee;">
-		<h3>Eingabe eines Termins f&uuml;r mehrere Personen</h3>';
-		//Eingabezeile für neuen Termin
-		$htmlstr .= "<br><b>Abgabetermin:</b>\n";
+		<h3>Eingabe von Terminen f&uuml;r mehrere Personen</h3><br>';
+		$htmlstr .= $error;
+		$error='';
 		$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='multitermin'>\n";
+		$htmlstr .= "<tr></tr>\n";
+		$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td></tr>\n";
+		for ($x=0;$x<count($paabgabetyp_kurzbz);$x++)
+		{
+			if(!isset($datum[$x])||empty($datum[$x]))
+			{
+				continue;
+			}	
+			$htmlstr .= "<tr id='termin".$x."'>\n";
+			if(isset($fixtermin[$x])&&!empty($fixtermin[$x]))
+			{
+				$htmlstr .= "<td><input type='checkbox' checked='checked' name='fixterminx' onclick='if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}'>";
+			}
+			else 
+			{
+				$htmlstr .= "<td><input type='checkbox' name='fixterminx' onclick='if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}'>";
+			}
+			$htmlstr .= "<input type='text'  style='display:none;' id='fixtermin".($x+1)."'  name='fixtermin[]' value='".$fixtermin[$x]."'></td>";
+			$htmlstr .= "		<td><input  type='text' name='datum[]' size='10' maxlegth='10' value='".$datum_obj->formatDatum($datum[$x],'d.m.Y')."'></td>\n";
+			$htmlstr .= "		<td><select name='paabgabetyp_kurzbz[]'>\n";
+			$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
+			$result_typ=$db->db_query($qry_typ);
+			while ($result_typ && $row_typ=$db->db_fetch_object($result_typ))
+			{
+				if($paabgabetyp_kurzbz[$x]==$row_typ->paabgabetyp_kurzbz)
+				{
+					$htmlstr .= "		<option value='".$row_typ->paabgabetyp_kurzbz."' selected>".$row_typ->bezeichnung."</option>";
+				}
+				else 
+				{
+					$htmlstr .= "		<option value='".$row_typ->paabgabetyp_kurzbz."'>".$row_typ->bezeichnung."</option>";
+				}
+			}		
+			$htmlstr .= "		</select></td>\n";
+			$htmlstr .= "		<td><input  type='text' name='kurzbz[]' size='60' maxlegth='256' value='".$kurzbz[$x]."'></td>\n";		
+			$htmlstr .= "		<td>&nbsp;</td>\n";	
+				
+		}
+		//Eingabezeile für neuen Termin
+		//$htmlstr .= "<b>Abgabetermin:</b>\n";
 		$htmlstr .= "<input type='hidden' name='irgendwas' value='".$irgendwas."'>\n";
 		$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
 		$htmlstr .= "<tr></tr>\n";
-		$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td></tr>\n";
-		$htmlstr .= "<tr id='termin'>\n";
-		$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
-		$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
-		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
+		$htmlstr .= "<tr id='termin".($x+1)."'>\n";
+		$htmlstr .= "<td><input type='checkbox' name='fixterminx' onclick='if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}'>";
+		$htmlstr .= "<input type='text' style='display:none;' id='fixtermin".($x+1)."' name='fixtermin[]' value='0'></td>";
+		$htmlstr .= "		<td><input  type='text' name='datum[]' size='10' maxlegth='10'></td>\n";
+		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz[]'>\n";
 		$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
 		$result_typ=$db->db_query($qry_typ);
 		while ($result_typ && $row_typ=$db->db_fetch_object($result_typ))
@@ -268,10 +336,9 @@ $htmlstr='';
 			$htmlstr .= "		<option value='".$row_typ->paabgabetyp_kurzbz."'>".$row_typ->bezeichnung."</option>";
 		}		
 		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
-		$htmlstr .= "		<td>&nbsp;</td>\n";		
-		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='neuen Termin speichern'></td>";
-		
+		$htmlstr .= "		<td><input  type='text' name='kurzbz[]' size='60' maxlegth='256'></td>\n";		
+		$htmlstr .= "		<td><input type='submit' name='plus' value='  +  '></td>";
+		$htmlstr .= "<tr><td>&nbsp;</td><td><input type='submit' name='schick' value='speichern' title='neue(n) Termin(e) speichern'></td></tr>";
 		$htmlstr .= "</tr>\n";
 		$htmlstr .= "</form>\n";
 		$htmlstr .= "</table>\n";
@@ -279,5 +346,4 @@ $htmlstr='';
 		
 		echo $htmlstr;
 		echo '</body></html>';
-
 ?>
