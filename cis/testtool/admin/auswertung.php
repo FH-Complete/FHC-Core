@@ -225,39 +225,47 @@ foreach($stg_obj->result as $row)
 <body>
 
 <h1>Auswertung Reihungstest</h1>
-<form method="POST">
-Reihungstest w&auml;hlen:&nbsp;
-	<SELECT name="reihungstest">';
-		<?php
-		foreach($rtest as $rt)
-		{
-			if(isset($_POST['reihungstest']) && $rt->reihungstest_id==$_POST['reihungstest'])
-				$selected = 'selected';
-			else 
-				$selected = '';
-				
-			echo '<OPTION value="'.$rt->reihungstest_id.'" '.$selected.'>'.$rt->datum.' '.(isset($stg_arr[$rt->studiengang_kz])?$stg_arr[$rt->studiengang_kz]:'').' '.$rt->ort_kurzbz.' '.$rt->anmerkung."</OPTION>\n";
-		}
-		?>
-	</SELECT>
-Studiengang:
-	<SELECT name="studiengang">
-		<OPTION value=''>Alle</OPTION>
-		<?php
-		foreach ($stg_arr as $kz=>$kurzbz)
-		{
-			if(isset($_POST['studiengang']) && $_POST['studiengang']==$kz && $_POST['studiengang']!='')
-				$selected='selected';
-			else 
-				$selected='';
-			
-			echo '<OPTION value="'.$kz.'" '.$selected.'>'.$kurzbz.'</OPTION>';
-		}
-		?>
-	</SELECT>
-	<INPUT type="submit" value="Auswerten" />
-</form>
-
+<table width="100%">
+	<tr>
+		<td>
+			<form method="POST">
+			Reihungstest w&auml;hlen:&nbsp;
+				<SELECT name="reihungstest">';
+					<?php
+					foreach($rtest as $rt)
+					{
+						if(isset($_POST['reihungstest']) && $rt->reihungstest_id==$_POST['reihungstest'])
+							$selected = 'selected';
+						else 
+							$selected = '';
+							
+						echo '<OPTION value="'.$rt->reihungstest_id.'" '.$selected.'>'.$rt->datum.' '.(isset($stg_arr[$rt->studiengang_kz])?$stg_arr[$rt->studiengang_kz]:'').' '.$rt->ort_kurzbz.' '.$rt->anmerkung."</OPTION>\n";
+					}
+					?>
+				</SELECT>
+			Studiengang:
+				<SELECT name="studiengang">
+					<OPTION value=''>Alle</OPTION>
+					<?php
+					foreach ($stg_arr as $kz=>$kurzbz)
+					{
+						if(isset($_POST['studiengang']) && $_POST['studiengang']==$kz && $_POST['studiengang']!='')
+							$selected='selected';
+						else 
+							$selected='';
+						
+						echo '<OPTION value="'.$kz.'" '.$selected.'>'.$kurzbz.'</OPTION>';
+					}
+					?>
+				</SELECT>
+				<INPUT type="submit" value="Auswerten" />
+			</form>
+		</td>
+		<td align="right">
+			<a href="auswertung_detail.php">Auswertung auf Fragenebene</a>
+		</td>
+	</tr>
+</table>
 <?php
 if (isset($_POST['reihungstest']))
 {
