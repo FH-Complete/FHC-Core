@@ -37,6 +37,7 @@
 	require_once('../../include/benutzer.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
 	require_once('../../include/mitarbeiter.class.php');
+	require_once('../../include/variable.class.php');
 
 	if (!$getuid = get_uid())
 			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -51,11 +52,16 @@
 	if(!is_numeric($stg_kz) && $stg_kz!='')
 		die('Bitte vor dem Aufruf Studiengang ausw&auml;hlen!');
 	$stgbez='';
+	
+	$trenner='';
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
 	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	
+$trenner = new variable();
+$trenner->loadVariables($getuid);
 	
 $sql_query = "SELECT * 
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,* FROM lehre.tbl_projektarbeit  
@@ -162,7 +168,7 @@ else
 			}
 		}
 		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
-		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
+		$htmlstr .= "		<td><input type='checkbox' id='mc_".$row->projektarbeit_id."' name='mc_".$row->projektarbeit_id."' ></td>";
 		//Anzeige 
 		$qry_end="SELECT * FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz='end' AND projektarbeit_id='$row->projektarbeit_id' ORDER BY datum DESC";
 		if(!$result_end=$db->db_query($qry_end))
@@ -221,7 +227,7 @@ else
 				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
 			}
 		}
-		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
+		$htmlstr .= "	    <td align= center><input type='hidden' name='st_".$row->projektarbeit_id."' value='$row->uid@".DOMAIN."'><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
@@ -253,8 +259,9 @@ else
 	$htmlstr .= "</tbody></table>\n";
 	$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
 	$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
-	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren</td></tr><tr><td>&nbsp;</td></tr><tr>\n";
-	$htmlstr .= "<td rowspan=3><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td></tr></table>\n";
+	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren  </td></tr><tr><td>&nbsp;</td></tr><tr>\n";
+	$htmlstr .= "<td rowspan=2><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td>";
+	$htmlstr .= "<td rowspan=2><input type='button' name='stmail' value='E-Mail Studierende' title='E-Mail an mehrere Studierende schicken.$stgbez' onclick='stserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
 	$htmlstr .= "</form>";
 }
 
@@ -284,6 +291,31 @@ function markiere()
 			item.checked=alle.checked;
 		}
 	}
+}
+function stserienmail(trenner, stgbez)
+{
+	//alert("test!!!");
+	var studenten=document.getElementsByTagName('input');
+	var adressen='';
+	for each(students in studenten)
+	{
+		if(students.type=='hidden' && students.name.substr(0,3)=="st_")
+		{
+			var id = "mc_"+students.name.substr(3);
+			if(document.getElementById(id).checked)
+			{
+				if(adressen=='')
+				{
+					adressen=students.value;
+				}
+				else
+				{
+					adressen=adressen+trenner+students.value;
+				}
+			}
+		}
+	}
+	window.location.href="mailto:"+adressen+"?subject=Bachelor- bzw. Diplomarbeitsbetreuungen bei Studiengang "+stgbez;
 }
 </script>
 </head>
