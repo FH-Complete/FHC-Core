@@ -238,7 +238,8 @@
 							$verband=strtolower($verband);
 							if($row->studiengang_kz != -1)
 								$row->semester='';
-							$verteiler=trim($kurzbz.$row->semester.$verband.$gruppe).'@'.DOMAIN;
+							$verteiler=trim($kurzbz.$row->semester.$verband.$gruppe);
+							$verteiler.=($verteiler?'@'.DOMAIN:'');
 						}
 						$worksheet->write($zeile,++$spalte,$verteiler);
 						$maxlength[$spalte]=strlen($verteiler);
@@ -470,7 +471,7 @@
 						$gruppe='';
 						$verteiler='';
 						$kurzbz='';
-						if(isset($row->studiengang_kz) && $row->studiengang_kz != -1)
+						if(isset($row->studiengang_kz) && $row->studiengang_kz != -1  && $row->studiengang_kz != '' )
 						{
 							if ($std_obj = new student($row->uid))
 							{
@@ -481,7 +482,8 @@
 							$verband=strtolower($verband);
 							if($row->studiengang_kz != -1)
 								$row->semester='';
-							$verteiler=trim($kurzbz.$row->semester.$verband.$gruppe).'@'.DOMAIN;
+							$verteiler=trim($kurzbz.$row->semester.$verband.$gruppe);
+							$verteiler.=($verteiler?'@'.DOMAIN:'');
 						}
 						$row->kurzbz=$kurzbz;
 						$row->verband=$verband;
