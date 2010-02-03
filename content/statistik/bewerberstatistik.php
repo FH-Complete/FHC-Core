@@ -64,7 +64,7 @@ if(isset($_GET['mail']) || (isset($_SERVER['argv']) && in_array('mail',$_SERVER[
 {
 	$mail=true;
 	$stsem_obj = new studiensemester();
-	$stsem_obj->getNextStudiensemester();
+	$stsem_obj->getNextStudiensemester('WS');
 	$stsem = $stsem_obj->studiensemester_kurzbz;
 }
 else 
