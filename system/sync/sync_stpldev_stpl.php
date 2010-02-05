@@ -75,7 +75,7 @@ $ss->getNearestTillNext();
 $datum_begin=$ss->start;
 $datum_ende=$ss->ende;
 //$datum_begin='2008-01-07';
-$datum_ende='2010-07-05'; // $ss->ende
+//$datum_ende='2010-07-05'; // $ss->ende
 
 // ************* FUNCTIONS **************** //
 
