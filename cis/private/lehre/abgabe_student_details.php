@@ -369,13 +369,13 @@ if($command!="add")
 			$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 			if(!$row->abgabedatum)
 			{
-				if ($row->datum<=date('Y-m-d'))
+				if ($row->datum<date('Y-m-d'))
 				{
 					//Termin vorbei - weiß auf rot
 					$bgcol='#FF0000';
 					$fcol='#FFFFFF';
 				}
-				elseif (($row->datum>date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
+				elseif (($row->datum>=date('Y-m-d')) && ($row->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
 				{
 					//Termin nahe - schwarz auf gelb
 					$bgcol='#FFFF00';
@@ -398,9 +398,9 @@ if($command!="add")
 				}
 				else 
 				{
-					//Abgabe vor Termin - weiß auf grün
+					//Abgabe vor Termin - schwarz auf grün
 					$bgcol='#00FF00';
-					$fcol='#FFFFFF';
+					$fcol='#000000';
 				}
 			}
 			//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." disabled>";

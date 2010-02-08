@@ -94,8 +94,10 @@ else
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
 	$htmlstr .= "<th class='table-sortable:default'>Typ</th>
 				<th>Titel</th>
-				<th class='table-sortable:alphanumeric'>1.Begutachter</th>
-				<th class='table-sortable:alphanumeric'>2.Begutachter</th>";
+				<th class='table-sortable:alphanumeric'>1.Begutachter(in)</th>
+				<th>1</th>
+				<th>2</th>
+				<th class='table-sortable:alphanumeric'>2.Begutachter(in)</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
@@ -144,8 +146,8 @@ else
 					}
 					else 
 					{
-						$erstbegutachter.=", ".$row_betr->first;
-						$muid.=", ".$row_betr->mitarbeiter_uid."@".DOMAIN;
+						$erstbegutachter.=$trenner->variable->emailadressentrennzeichen." ".$row_betr->first;
+						$muid.=$trenner->variable->emailadressentrennzeichen." ".$row_betr->mitarbeiter_uid."@".DOMAIN;
 					}
 				} 
 				if($row_betr->second!='')
@@ -184,11 +186,11 @@ else
 				{
 					if($row_end->abgabedatum==NULL)
 					{
-						if ($row_end->datum<=date('Y-m-d'))
+						if ($row_end->datum<date('Y-m-d'))
 						{
 							$bgcol='#FF0000';
 						}
-						elseif (($row_end->datum>date('Y-m-d')) && ($row_end->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
+						elseif (($row_end->datum>=date('Y-m-d')) && ($row_end->datum<date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+11, date("Y")))))
 						{
 							$bgcol='#FFFF00';
 						}
@@ -239,15 +241,17 @@ else
 	
 		if($muid != NULL && $muid !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><input type='hidden' name='b1_".$row->projektarbeit_id."' value='$muid'><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
 		}
 		else
 		{
 			$htmlstr .= "       <td>".$erstbegutachter."</td>\n";
 		}
+		$htmlstr .= "		<td align='center'><input type='checkbox' id='m1_".$row->projektarbeit_id."' name='m1_".$row->projektarbeit_id."'></td>";
+		$htmlstr .= "		<td align='center'><input type='checkbox' id='m2_".$row->projektarbeit_id."' name='m2_".$row->projektarbeit_id."'></td>";
 		if($muid2 != NULL && $muid2 !='')
 		{
-			$htmlstr .= "       <td><a href='mailto:".$muid2."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><input type='hidden' name='b2_".$row->projektarbeit_id."' value='$muid2'><a href='mailto:".$muid2."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
 		}
 		else
 		{
@@ -261,7 +265,8 @@ else
 	$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
 	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren  </td></tr><tr><td>&nbsp;</td></tr><tr>\n";
 	$htmlstr .= "<td rowspan=2><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td>";
-	$htmlstr .= "<td rowspan=2><input type='button' name='stmail' value='E-Mail Studierende' title='E-Mail an mehrere Studierende schicken.$stgbez' onclick='stserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
+	$htmlstr .= "<td rowspan=2><input type='button' name='stmail' value='E-Mail Studierende' title='E-Mail an mehrere Studierende schicken' onclick='stserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td>";
+	$htmlstr .= "<td rowspan=2><input type='button' name='btmail' value='E-Mail Begutachter(innen)' title='E-Mail an mehrere Begutachter(innen) schicken' onclick='btserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
 	$htmlstr .= "</form>";
 }
 
@@ -294,7 +299,7 @@ function markiere()
 }
 function stserienmail(trenner, stgbez)
 {
-	//alert("test!!!");
+	//E-Mail an mehrere ausgewaehlte Studenten
 	var studenten=document.getElementsByTagName('input');
 	var adressen='';
 	for each(students in studenten)
@@ -310,7 +315,64 @@ function stserienmail(trenner, stgbez)
 				}
 				else
 				{
-					adressen=adressen+trenner+students.value;
+					if(adressen.search(students.value)==-1)
+					{
+						adressen=adressen+trenner+students.value;
+					}
+				}
+			}
+		}
+	}
+	window.location.href="mailto:"+adressen+"?subject=Bachelor- bzw. Diplomarbeitsbetreuungen bei Studiengang "+stgbez;
+}
+function btserienmail(trenner, stgbez)
+{
+	//Mail an mehrere ausgewählte Betreuer
+	var lektoren=document.getElementsByTagName('input');
+	var adressen='';
+	for each(personen in lektoren)
+	{
+		if(personen.type=='hidden' && personen.name.substr(0,3)=="b1_" && personen.value!='')
+		{
+			var id = "m1_"+personen.name.substr(3);
+			if(document.getElementById(id).checked)
+			{
+				temp=personen.value.split(trenner);
+				for(i=0;i<temp.length;i++)
+				{
+					if(adressen=='')
+					{
+						adressen=temp[i];
+					}
+					else
+					{
+						if(adressen.search(temp[i])==-1)
+						{
+							adressen=adressen+trenner+temp[i];
+						}
+					}	
+				}
+			}
+		}
+		if(personen.type=='hidden' && personen.name.substr(0,3)=="b2_" && personen.value!='')
+		{
+			var id = "m2_"+personen.name.substr(3);
+			if(document.getElementById(id).checked)
+			{
+				temp=personen.value.split(trenner);
+				for(i=0;i<temp.length;i++)
+				{
+					if(adressen=='')
+					{
+						adressen=temp[i];
+					}
+					else
+					{
+						if(adressen.search(temp[i])==-1)
+						{
+							adressen=adressen+trenner+temp[i];
+						}
+					}	
 				}
 			}
 		}
