@@ -1013,6 +1013,7 @@ class wochenplan extends basis_db
 							unset($updatevon);
 						$paramList='';
 						$z=0;
+						$reservierung=false;
 						foreach ($this->std_plan[$i][$j] as $lehrstunde)
 							if ($lehrstunde->unr==$unr)
 							{
@@ -1039,7 +1040,10 @@ class wochenplan extends basis_db
 								$updateamum[]=mb_substr($lehrstunde->updateamum,0,16);
 								$updatevon[]=$lehrstunde->updatevon;
 								if ($lehrstunde->reservierung)
+								{
 									$paramList.='&amp;reservierung_id'.$z++.'='.$lehrstunde->stundenplan_id;
+									$reservierung=true;
+								}
 								else
 									$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
 								if(isset($lehrstunde->farbe))
@@ -1131,7 +1135,7 @@ class wochenplan extends basis_db
 						
 						//echo $lf;
 						echo mb_substr($lf, 0,-strlen('<html:br />'));
-						if($titel!='' && $stg_kz!=0)
+						if($titel!='' && !$reservierung)
 						{
 							echo '<image src="../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
 						}
