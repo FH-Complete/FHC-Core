@@ -117,7 +117,6 @@
 	
 //-->
 </script>
-
 </head>
 
 <body id="inhalt">
@@ -325,8 +324,7 @@
 			  		echo "\n";
 			  		foreach($lv_obj->result as $row1)
 			  		{
-
-			  			if((!is_null($row1->semester)) && ($row1->semester != "") && ($row1->semester<=$row->max_semester) && ($row1->semester>'0')) //($row1->semester<'10'))
+			  			if((!is_null($row1->semester)) && !empty($row1->semester) && ($row1->semester != "") && ($row1->semester<=$row->max_semester) && ($row1->semester>'0')) //($row1->semester<'10'))
 			  			{
 			  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND student_uid NOT LIKE '_Dummy%'";
 			  				if(trim($row1->verband)!='')
