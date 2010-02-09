@@ -159,7 +159,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	        				/>
 	        			</hbox>
 	        		</row>
-	    			<row> <!-- style="background-color^: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_farbe^;" -->
+	    			<row>
 	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
 	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
 	       				<label align="right" value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtyp"
@@ -181,7 +181,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    					tooltiptext="Wochenrythmus"/>
 	    			</row>
 	    			<row>
-	    				<label value="Offen: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#offenestunden h"
+	    				<label value="Offen: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#offenestunden / rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#semesterstunden"
 	    					tooltiptext="Stunden: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#verplant / rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#semesterstunden" />
 	    				<label value="Block: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
 	    					tooltiptext="Stundenblockung" />

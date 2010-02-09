@@ -170,10 +170,12 @@ if (is_array($lehrstunden->lehrstunden))
 {
 	foreach ($lehrstunden->lehrstunden as $ls)
 	{
-		//Anzahl der Studenten in der Gruppe ermitteln
-		$stsem = getStudiensemesterFromDatum($ls->datum);
-		$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
-		?>
+		if(is_null($stunde) || $ls->stunde==$stunde)
+		{
+			//Anzahl der Studenten in der Gruppe ermitteln
+			$stsem = getStudiensemesterFromDatum($ls->datum);
+			$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
+			?>
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
   		      	<LEHRSTUNDE:id><?php echo $ls->stundenplan_id  ?></LEHRSTUNDE:id>
@@ -194,11 +196,12 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:studiengang><?php echo $ls->studiengang  ?></LEHRSTUNDE:studiengang>
 				<LEHRSTUNDE:farbe><?php echo $ls->farbe  ?></LEHRSTUNDE:farbe>
 				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
+				<LEHRSTUNDE:titel><![CDATA[<?php echo $ls->titel;  ?>]]></LEHRSTUNDE:titel>
 				<LEHRSTUNDE:anzahlstudenten><![CDATA[<?php echo $anzahl;  ?>]]></LEHRSTUNDE:anzahlstudenten>
   	    	</RDF:Description>
   			</RDF:li>
 			<?php
-		//}
+		}
 	}
 }
 ?>
