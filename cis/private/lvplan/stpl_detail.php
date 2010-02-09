@@ -174,8 +174,13 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td title="<?php echo $ort->bezeichnung;?>"><?php echo $ortkurzbz; ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
-        <td><A class="Item" title="<?php echo $anzahl_lvb.' Studierende';?>" href="mailto:<?php echo $stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN; ?>">
-        <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
+
+       	<td title="<?php echo '.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe:''); ?>">
+			<?php echo (!is_null($semester) && !empty($semester)?'<A class="Item" title="'.$anzahl_lvb.' Studierende'.'" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':''); ?>
+			<?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe;?>
+			<?php echo (!is_null($semester) && !empty($semester)?'</A>':''); ?>
+		</td>
+
         <td><A class="Item" title="<?php echo $anzahl_grp.' Studierende';?>" href="mailto:<?php echo mb_strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
         <?php echo $gruppe_kurzbz; ?></A></td>
 		<td><?php echo $titel; ?></td>
