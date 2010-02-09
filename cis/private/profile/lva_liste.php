@@ -41,10 +41,16 @@
 		$uid=$_GET['uid'];
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
-	
-##	$uid='ahofmann';
-#	$user=$uid;
 
+	
+##	if(defined('MAIL_DEBUG') && MAIL_DEBUG!='') // Testsystem
+#	{	
+#		$stdsem='WS2009';
+#		$uid='ahofmann';
+#		$user=$uid;
+#	}
+	
+	
 	if ($uid!=$user)
 	{
 		//wenn der UID Parameter nicht dem eingeloggten User entspricht wird ein Mail an die Administratoren gesendet.
@@ -60,15 +66,27 @@
 	if (!isset($stdsem))
 		$stdsem=$db->db_result($result_stdsem,0,"studiensemester_kurzbz");
 
+/*
+0000453: Sortierung von LVs - „Meine LV“
+1. Bachelor
+2. Name des Bachelors
+3. Studienjahr
+4. Name der LV
+5. Master
+6. Name des Masters
+7. Studienjahr
+8. Name der LV
 
+*/
 	//Lehrveranstaltungen abfragen.
 	$sql_query="
-		SELECT 
-			*, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
+		SELECT *
+			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
 			tbl_lehrveranstaltung.semester as lv_semester,
 			tbl_lehrfach.kurzbz as lehrfach,
 			tbl_lehrfach.bezeichnung as lehrfach_bez,
 			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
+			tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 			(SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
 		FROM 
 		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
@@ -76,8 +94,8 @@
 		JOIN public.tbl_studiengang USING(studiengang_kz)
 		JOIN lehre.tbl_lehrfach USING(lehrfach_id)
 		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
-	$sql_query.=" ORDER BY stg_kurzbz,lv_semester";
 	
+	$sql_query.=" ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
 ?>
@@ -136,10 +154,12 @@
 			echo '<td>'.$row->lvnr.'</td>';
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->lehrform_kurzbz.'</td>';
-			$qry = "SELECT bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row->lehrveranstaltung_id'";
-			$result_lv = $db->db_query($qry);
-			$row_lv = $db->db_fetch_object($result_lv);
-			echo '<td>'.$row_lv->bezeichnung.'</td>';
+##			$qry = "SELECT bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+#			$result_lv = $db->db_query($qry);
+#			$row_lv = $db->db_fetch_object($result_lv);
+#			echo '<td>'.$row_lv->bezeichnung.'</td>';
+	
+			echo '<td>'.$row->lv_bezeichnung.'</td>';			
 			echo '<td>'.$row->lehrfach_bez.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td>'.$row->stg_kurzbz.'</td>';
