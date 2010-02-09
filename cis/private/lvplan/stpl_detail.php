@@ -175,8 +175,8 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
 
-       	<td title="<?php echo '.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe:''); ?>">
-			<?php echo (!is_null($semester) && !empty($semester)?'<A class="Item" title="'.$anzahl_lvb.' Studierende'.'" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':''); ?>
+       	<td title="<?php echo $stgkurzbz.$semester.mb_strtolower($verband).$gruppe; ?>">
+			<?php echo (!is_null($semester) && !empty($semester)? '<A class="Item" title="'.$anzahl_lvb.' Studierende" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':''); ?>
 			<?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe;?>
 			<?php echo (!is_null($semester) && !empty($semester)?'</A>':''); ?>
 		</td>
