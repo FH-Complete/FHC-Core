@@ -354,7 +354,7 @@ class wochenplan extends basis_db
 				$this->std_plan[$tag][$stunde][$idx]->lehrform=$this->wochenplan->lehrstunden[$i]->lehrform;
 				$this->std_plan[$tag][$stunde][$idx]->lehrfach_id=$this->wochenplan->lehrstunden[$i]->lehrfach_id;
 				$this->std_plan[$tag][$stunde][$idx]->farbe=$this->wochenplan->lehrstunden[$i]->farbe;
-				//$this->std_plan[$tag][$stunde][$idx]->titel=$this->wochenplan->lehrstunden[$i]->titel;
+				$this->std_plan[$tag][$stunde][$idx]->titel=$this->wochenplan->lehrstunden[$i]->titel;
 			}
 			$this->std_plan[$tag][$stunde][$idx]->titel=$this->wochenplan->lehrstunden[$i]->titel;
 			$this->std_plan[$tag][$stunde][$idx]->stundenplan_id=$this->wochenplan->lehrstunden[$i]->stundenplan_id;
@@ -582,6 +582,7 @@ class wochenplan extends basis_db
 						$lektor[]=$lehrstunde->lektor;
 						// Lehrverband
 						$lvb=$lehrstunde->stg.'-'.$lehrstunde->sem;
+						$stg = $lehrstunde->stg_kz;
 						if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
 						{
 							$lvb.=$lehrstunde->ver;
@@ -668,12 +669,19 @@ class wochenplan extends basis_db
 					echo '&ver='.$this->ver;
 					echo '&grp='.$this->grp;
 					echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;		//.'">'
-					echo "','Details', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');";
+					echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');";
 					echo '" title="'.$titel.'" ';
 					echo ' href="#">';
 
 					// Ausgabe
-					echo $lf;
+					//echo $lf;
+					echo mb_substr($lf, 0,-strlen('<BR />'));
+					
+					if($titel!='' && $stg!=0)
+					{
+						echo '<image src="../../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
+					}
+					echo '<BR />';
 					if ($this->type=='ort' || $this->type=='lektor')
 						echo $lvb;
 					if ($this->type!='lektor')
@@ -1114,14 +1122,25 @@ class wochenplan extends basis_db
 							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.$this->ort_kurzbz.'">';
+						
 						echo '<label align="center">'.$blink_ein;
-						echo $lf;
+						
+						//echo $lf;
+						echo mb_substr($lf, 0,-strlen('<html:br />'));
+						if($titel!='' && $stg_kz!=0)
+						{
+							echo '<image src="../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
+						}
+						echo '<html:br />';
 						echo $lvb;
 						if ($this->type!='lektor')
 							echo $lkt;
 						if ($this->type!='ort')
 							echo $orte;
-						echo $blink_aus.'</label></button>';
+						echo $blink_aus;
+						
+						echo '</label>';
+						echo '</button>';
 					}
 				}
 				if (isset($this->std_plan[$i][$j][0]->frei_orte))

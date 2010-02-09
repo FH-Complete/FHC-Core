@@ -60,11 +60,15 @@ $studiengang->load($stundenplan->studiengang_kz);
 
 <window id="stpl-details-dialog" title="Details"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="StplDetailsInit('<?php echo $datum_obj->convertISODate($stundenplan->datum); ?>','<?php echo $stundenplan->mitarbeiter_uid; ?>')"
+        onload="StplDetailsInit('<?php echo $datum_obj->convertISODate($stundenplan->datum); ?>','<?php echo $stundenplan->mitarbeiter_uid; ?>'); document.getElementById('stpl-details-dialog-textbox-titel').focus();"
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
+
+<commandset>
+  <command id="stpl-details-dialog-command-save" oncommand="StplDetailsSpeichern()"/>
+</commandset>
 
 <vbox>
 
@@ -78,6 +82,18 @@ $studiengang->load($stundenplan->studiengang_kz);
 				<column flex="5"/>
 			</columns>
 			<rows>
+				<row>
+					<label value="Titel" />
+					<textbox id="stpl-details-dialog-textbox-titel" value="<?php echo $stundenplan->titel; ?>"  maxlength="32"/>
+      			</row>
+      			<row>
+					<label value="Anmerkung" />
+					<textbox id="stpl-details-dialog-textbox-anmerkung" value="<?php echo $stundenplan->anmerkung; ?>"  maxlength="256"/>
+      			</row>
+				<row>
+					<spacer />
+					<spacer />
+				</row>	
 				<row>
 					<label value="Studiengang"/>
 					<label value="<?php echo $studiengang->kuerzel; ?>" id="stpl-details-dialog-label-studiengang"/>
@@ -136,14 +152,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 					<label value="UNr" />
 					<textbox id="stpl-details-dialog-textbox-unr" value="<?php echo $stundenplan->unr; ?>"/>
       			</row>
-      			<row>
-					<label value="Titel" />
-					<textbox id="stpl-details-dialog-textbox-titel" value="<?php echo $stundenplan->titel; ?>"/>
-      			</row>
-      			<row>
-					<label value="Anmerkung" />
-					<textbox id="stpl-details-dialog-textbox-anmerkung" value="<?php echo $stundenplan->anmerkung; ?>"/>
-      			</row>
+      			
       			<row>
 					<label value="Fix" />
 					<checkbox id="stpl-details-dialog-checkbox-fix" checked="<?php echo ($stundenplan->fix?'true':'false'); ?>"/>
@@ -226,7 +235,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<button id="stpl-details-dialog-button-speichern" oncommand="StplDetailsSpeichern()" label="Speichern" />
+		<button id="stpl-details-dialog-button-speichern" command="stpl-details-dialog-command-save" label="speichern" accesskey="s"/>
 	</hbox>
 </groupbox>
 </vbox>

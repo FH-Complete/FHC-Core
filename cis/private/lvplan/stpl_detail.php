@@ -144,7 +144,7 @@ Stunde: <?php echo htmlentities($stunde); ?><BR><BR>
 <table class="stdplan">
 <?php
 if ($num_rows_stpl>0)
-echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th></tr>';
+echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th><th>Info</th></tr>';
 $ort = new ort();
 for ($i=0; $i<$num_rows_stpl; $i++)
 {
@@ -164,6 +164,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $gruppe_kurzbz=trim($db->db_result($erg_stpl,$i,"gruppe_kurzbz"));
     $anzahl_lvb=trim($db->db_result($erg_stpl,$i,"anzahl_lvb"));
     $anzahl_grp=trim($db->db_result($erg_stpl,$i,"anzahl_grp"));
+	$titel=trim($db->db_result($erg_stpl,$i,"titel"));
     $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
     $ort->load($ortkurzbz);
     ?>
@@ -177,6 +178,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe; ?></A></td>
         <td><A class="Item" title="<?php echo $anzahl_grp.' Studierende';?>" href="mailto:<?php echo mb_strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
         <?php echo $gruppe_kurzbz; ?></A></td>
+		<td><?php echo $titel; ?></td>
         
     </tr>
     <?php

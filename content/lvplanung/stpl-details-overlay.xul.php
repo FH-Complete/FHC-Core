@@ -44,10 +44,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- ************************* -->
 	<vbox id="vboxSTPLDetailsListe">
 		<popupset>
-				<popup id="stpldetail-treestpldetail-popup">
-					<menuitem label="Bearbeiten" oncommand="STPLDetailEdit()" />
-					<menuitem label="Entfernen" oncommand="STPLDetailDelete()" />
-				</popup>
+			<popup id="stpldetail-treestpldetail-popup">
+				<menuitem label="Bearbeiten" oncommand="STPLDetailEdit()" />
+				<menuitem label="Entfernen" oncommand="STPLDetailDelete()" />
+			</popup>
 		</popupset>
 
 		<tree id="treeStplDetails" seltype="single" hidecolumnpicker="false" flex="1"
@@ -56,61 +56,62 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			enableColumnDrag="true"
 			style="margin:0px;"
 			context="stpldetail-treestpldetail-popup"
+			ondblclick="STPLDetailEdit()"
 			>
 		<treecols>
 			<treecol id="lehreinheit_id" label="LE_ID" flex="2" primary="false"
 				class="sortDirectionIndicator" sortActive="true" sortDirection="ascending"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehreinheit_id"  />
-	    	<splitter class="tree-splitter"/>
-	    	<treecol id="stplLektor" label="Lektor" flex="2" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lektor" />
-	    	<splitter class="tree-splitter"/>
-	    	<treecol id="stplLehrfachKurzbz" label="Fach" flex="1" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach" />
-	    	<splitter class="tree-splitter"/>
-			<treecol id="stplLehrform" label="Form" flex="1" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrform" />
-	    	<splitter class="tree-splitter"/>
-			<treecol id="stplLehrfachBezeichnung" label="Lehrfach" flex="20" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach_bez" />
-	    	<splitter class="tree-splitter"/>
-			<treecol id="stpl_studiengang" label="Studiengang" flex="1" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#studiengang" />
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehreinheit_id"  />
 			<splitter class="tree-splitter"/>
-	    	<treecol id="stplSemester" label="S" flex="1" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#sem" />
-	    	<splitter class="tree-splitter"/>
-	    	<treecol id="stplVerband" label="V" flex="1" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ver" />
-	    	<splitter class="tree-splitter"/>
-	    	<treecol id="gruppe" label="G" flex="1" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#grp" />
+			<treecol id="stplLektor" label="Lektor" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lektor" />
 			<splitter class="tree-splitter"/>
-	    	<treecol id="stpl_einheit" label="SpzGrp" flex="3" hidden="false"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe" />
+			<treecol id="stplLehrfachKurzbz" label="Fach" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach" />
 			<splitter class="tree-splitter"/>
-	    	<treecol id="stplOrt" label="Ort" flex="2" hidden="true"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ort_kurzbz" />
+				<treecol id="stplLehrform" label="Form" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrform" />
 			<splitter class="tree-splitter"/>
-			<treecol id="stpl_datum" label="Datum" flex="2" hidden="true"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#datum" />
+				<treecol id="stplLehrfachBezeichnung" label="Lehrfach" flex="20" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach_bez" />
 			<splitter class="tree-splitter"/>
-	    	<treecol id="stpl_stunde" label="Std" flex="1" hidden="true"
-	    		class="sortDirectionIndicator"
-	    		sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
-	    	<splitter class="tree-splitter"/>
-	    	<treecol id="stplUNR" label="UNR" flex="2" hidden="true"
+				<treecol id="stpl_studiengang" label="Studiengang" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#studiengang" />
+				<splitter class="tree-splitter"/>
+			<treecol id="stplSemester" label="S" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#sem" />
+			<splitter class="tree-splitter"/>
+			<treecol id="stplVerband" label="V" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ver" />
+			<splitter class="tree-splitter"/>
+			<treecol id="gruppe" label="G" flex="1" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#grp" />
+				<splitter class="tree-splitter"/>
+			<treecol id="stpl_einheit" label="SpzGrp" flex="3" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe" />
+				<splitter class="tree-splitter"/>
+			<treecol id="stplOrt" label="Ort" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ort_kurzbz" />
+				<splitter class="tree-splitter"/>
+				<treecol id="stpl_datum" label="Datum" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#datum" />
+				<splitter class="tree-splitter"/>
+			<treecol id="stpl_stunde" label="Std" flex="1" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
+			<splitter class="tree-splitter"/>
+			<treecol id="stplUNR" label="UNR" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr"  />
 			<splitter class="tree-splitter"/>
@@ -121,6 +122,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<treecol id="anzahlstudenten" label="AnzahlStudenten" flex="2" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anzahlstudenten"  />
+			<splitter class="tree-splitter"/>
+			<treecol id="stpl-details-overlay-lehrstunde-anmerkung" label="Anmerkung" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung"  />
+			<splitter class="tree-splitter"/>
+			<treecol id="stpl-details-overlay-lehrstunde-titel" label="Titel" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#titel"  />
 			<splitter class="tree-splitter"/>
 		</treecols>
 
@@ -145,6 +154,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anzahlstudenten" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#titel" />
    						</treerow>
 					</treeitem>
 				</treechildren>
