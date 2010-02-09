@@ -575,8 +575,10 @@ class wochenplan extends basis_db
 						unset($lehrverband);
 					if (isset($lehrfach))
 						unset($lehrfach);
+					$reservierung=false;		
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
+					
 						$unr[]=$lehrstunde->unr;
 						// Lektoren
 						$lektor[]=$lehrstunde->lektor;
@@ -599,6 +601,8 @@ class wochenplan extends basis_db
 						$lehrfach[]=$lf;
 						$titel=$lehrstunde->titel;
 						$anmerkung=$lehrstunde->anmerkung;
+						if (!$reservierung)
+							$reservierung=$lehrstunde->reservierung;
 					}
 
 					// Unterrichtsnummer (Kollision?)
@@ -677,7 +681,7 @@ class wochenplan extends basis_db
 					//echo $lf;
 					echo mb_substr($lf, 0,-strlen('<BR />'));
 					
-					if($titel!='' && $stg!=0)
+					if($titel!='' && !$reservierung)
 					{
 						echo '<img src="../../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
 					}
