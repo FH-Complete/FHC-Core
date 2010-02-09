@@ -679,7 +679,7 @@ class wochenplan extends basis_db
 					
 					if($titel!='' && $stg!=0)
 					{
-						echo '<image src="../../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
+						echo '<img src="../../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
 					}
 					echo '<BR />';
 					if ($this->type=='ort' || $this->type=='lektor')
