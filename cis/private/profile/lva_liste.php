@@ -80,8 +80,8 @@
 */
 	//Lehrveranstaltungen abfragen.
 	$sql_query="
-		SELECT *
-			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
+		SELECT 
+			*, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
 			tbl_lehrveranstaltung.semester as lv_semester,
 			tbl_lehrfach.kurzbz as lehrfach,
 			tbl_lehrfach.bezeichnung as lehrfach_bez,
@@ -94,8 +94,7 @@
 		JOIN public.tbl_studiengang USING(studiengang_kz)
 		JOIN lehre.tbl_lehrfach USING(lehrfach_id)
 		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
-	
-	$sql_query.=" ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
+ 	$sql_query.=" ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
 ?>
