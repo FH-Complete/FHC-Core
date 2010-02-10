@@ -38,17 +38,17 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
 	<html>
 	<head>
-	<title>Reihungstest ADMIN</title>
+	<title>Reihungstest Administration</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
 	<body class="Background_main">
-	<h2>Reihungstest - Admin</h2>';
+	<h2>Reihungstest - Administration</h2>';
 
 if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
@@ -251,5 +251,8 @@ foreach ($stg_obj->result as $row)
 }
 echo '</SELECT>
 <input type="submit" name="savedummystg" value="Speichern">
+</form>
 ';
 ?>
+</body>
+</html>

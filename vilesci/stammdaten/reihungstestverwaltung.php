@@ -48,12 +48,15 @@
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
+	if(!$rechte->isBerechtigt('lehre/reihungstest'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
+	
+	$studiengang = new studiengang();
+	$studiengang->getAll('typ, kurzbz', false);
+		
 	if(isset($_GET['excel']))
 	{
-		$studiengang = new studiengang();
-		$studiengang->getAll('typ, kurzbz', false);
-		foreach ($studiengang->result as $stg) 
-			$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;	
+		
 		
 		$reihungstest = new reihungstest();
 		if($reihungstest->load($_GET['reihungstest_id']))
@@ -82,6 +85,8 @@
 			$maxlength[$i] = 12;
 			$worksheet->write(2,++$i,"Studiengang", $format_bold);
 			$maxlength[$i] = 11;
+			$worksheet->write(2,++$i,"bereits absolvierte RTs", $format_bold);
+			$maxlength[$i] = 18;
 			$worksheet->write(2,++$i,"EMail", $format_bold);
 			$maxlength[$i] = 5;
 			$worksheet->write(2,++$i,"STRASSE", $format_bold);
@@ -99,6 +104,23 @@
 				while($row = $db->db_fetch_object($result))
 				{
 					$i=0;
+					$pruefling = new pruefling();
+					
+					$prestudent = new prestudent();
+					$prestudent->getPrestudenten($row->person_id);
+					$rt_in_anderen_stg='';
+					foreach($prestudent->result as $item)
+					{
+						if($item->prestudent_id!=$row->prestudent_id)
+						{
+							$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+							if($erg!=0)
+							{
+								$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."\n";
+							}
+							
+						}
+					}
 					
 					$worksheet->write($zeile,$i, $row->vorname);
 					if(strlen($row->vorname)>$maxlength[$i])
@@ -112,9 +134,13 @@
 					if(strlen($row->gebdatum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($row->gebdatum);
 					
-					$worksheet->write($zeile,++$i,$stg_arr[$row->studiengang_kz]);
-					if(strlen($stg_arr[$row->studiengang_kz])>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($stg_arr[$row->studiengang_kz]);
+					$worksheet->write($zeile,++$i,$studiengang->kuerzel_arr[$row->studiengang_kz]);
+					if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
+						
+					$worksheet->write($zeile,++$i,$rt_in_anderen_stg);
+					if(strlen($rt_in_anderen_stg)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($rt_in_anderen_stg);
 					
 					$worksheet->write($zeile,++$i,$row->email);
 					if(strlen($row->email)>$maxlength[$i])
@@ -154,8 +180,7 @@
 	}
 	else 
 	{
-		echo '
-				<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
 				<html>
 				<head>
 				<title>Reihungstest</title>
@@ -170,6 +195,8 @@
 		// Speichern eines Reihungstesttermines
 		if(isset($_POST['speichern']))
 		{
+			if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'sui'))
+				die('Sie haben keine Berechtigung fuer diese Aktion');
 			$reihungstest = new reihungstest();
 			
 			if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
@@ -233,7 +260,7 @@
 			{
 				$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
 				$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
-				
+				$prestudent->reihungstestangetreten=true;
 				$prestudent->save(false);
 			}
 			else 
@@ -264,6 +291,7 @@
 						
 						$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
 						$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
+						$prestudent->reihungstestangetreten=true;
 						
 						$prestudent->save(false);
 					}
@@ -282,8 +310,8 @@
 		echo '<br><table width="100%"><tr><td>';
 		
 		//Studiengang DropDown
-		$studiengang = new studiengang();
-		$studiengang->getAll('typ, kurzbz', false);
+		//$studiengang = new studiengang();
+		//$studiengang->getAll('typ, kurzbz', false);
 			
 		echo "<SELECT name='studiengang' onchange='window.location.href=this.value'>";
 		if($stg_kz==-1)
@@ -355,7 +383,7 @@
 		
 		//Formular zum Bearbeiten des Reihungstests
 		echo '<HR>';
-		echo "<FORM method='POST'>";
+		echo "<FORM method='POST' action='".$_SERVER['PHP_SELF']."'>";
 		echo "<input type='hidden' value='$reihungstest->reihungstest_id' name='reihungstest_id' />";
 		
 		//Studiengang DropDown
@@ -396,12 +424,12 @@
 			else 
 				$selected='';
 			
-			echo "<OPTION value='$row->ort_kurzbz' $selected>$row->ort_kurzbz</OPTION";
+			echo "<OPTION value='$row->ort_kurzbz' $selected>$row->ort_kurzbz</OPTION>";
 		}
 		echo '</SELECT></td></tr>';
-		echo '<tr><td>Anmerkung</td><td><input type="input" name="anmerkung" value="'.$reihungstest->anmerkung.'"></td></tr>';
-		echo '<tr><td>Datum</td><td><input type="input" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
-		echo '<tr><td>Uhrzeit</td><td><input type="input" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"> (Format: HH:MM:SS)</td></tr>';
+		echo '<tr><td>Anmerkung</td><td><input type="text" name="anmerkung" value="'.$reihungstest->anmerkung.'"></td></tr>';
+		echo '<tr><td>Datum</td><td><input type="text" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
+		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"> (Format: HH:MM:SS)</td></tr>';
 		if(!$neu)
 			$val = 'Änderung Speichern';
 		else 
@@ -437,6 +465,7 @@
 							<th class='table-sortable:default'>Studiengang</th>
 							<th class='table-sortable:default'>Geburtsdatum</th>
 							<th class='table-sortable:default'>EMail</th>
+							<th class='table-sortable:default'>bereits absolvierte RTs</th>
 							<th class='table-sortable:default'>Ergebnis</th>
 							<th class='table-sortable:default'>FAS</th>
 						</tr>
@@ -445,6 +474,21 @@
 				while($row = $db->db_fetch_object($result))
 				{
 					$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+					$prestudent = new prestudent();
+					$prestudent->getPrestudenten($row->person_id);
+					$rt_in_anderen_stg='';
+					foreach($prestudent->result as $item)
+					{
+						if($item->prestudent_id!=$row->prestudent_id)
+						{
+							$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+							if($erg!=0)
+							{
+								$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
+							}
+							
+						}
+					}
 					echo "
 						<tr>
 							<td>$row->vorname</td>
@@ -452,8 +496,9 @@
 							<td>".$stg_arr[$row->studiengang_kz]."</td>
 							<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
 							<td><a href='mailto:$row->email'>$row->email</a></td>
+							<td>$rt_in_anderen_stg</td>
 							<td align='right'>".($rtergebnis==0?'-':number_format($rtergebnis,2,'.',''))."</td>
-							<td align='right'>".($rtergebnis>0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1)."</td>
+							<td align='right'>".($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1)."</td>
 						</tr>";
 					
 					$mailto.= ($mailto!=''?',':'').$row->email;
