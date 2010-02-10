@@ -514,7 +514,7 @@ if($result = $db->db_query($qry))
 		{
 			while($row_gruppe = $db->db_fetch_object($result_gruppe))
 			{
-				echo "&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.png':'false.png')."' height='20'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz</a></b><br>";
+				echo "\n&nbsp;&nbsp;&nbsp;&nbsp;|- <a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$studiengang_kz&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&aktiv=".($row_gruppe->aktiv=='t'?'false':'true')."' class='Item'><img src='../../skin/images/".($row_gruppe->aktiv=='t'?'true.png':'false.png')."' height='20'></a><b><a href='".$_SERVER['PHP_SELF']."?studiengang_kz=$row_gruppe->studiengang_kz&semester=$lastsemester&gruppe_kurzbz=$row_gruppe->gruppe_kurzbz&type=edit' class='Item'>$row_gruppe->gruppe_kurzbz</a></b><br>";
 			}
 		}
 		
