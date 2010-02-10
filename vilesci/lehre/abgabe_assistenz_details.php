@@ -571,15 +571,34 @@ if(isset($_POST["enda"]))
 		abgabedatum = now(), 
 		updatevon = '".$user."', 
 		updateamum = now() 
-		WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+		WHERE paabgabe_id='".$paabgabe_id."'";
 	//echo $qry;	
 	if(!$result=$db->db_query($qry))
 	{
-		echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+		echo "<font color=\"#FF0000\">Terminbest&auml;tigung konnte nicht eingetragen werden!</font><br>&nbsp;";	
 	}
 	else 
 	{
-		echo "Endabgabedatum wurde eingetragen.";
+		echo "Endabgabe-Best&auml;tigungsdatum wurde eingetragen.";
+	}
+}
+//Bestätigen einer Benotung - erfolgt in Sekretariat
+if(isset($_POST["note"]))
+{
+	//Abgabetermin mit akt. Datum speichern
+	$qry="UPDATE campus.tbl_paabgabe SET
+		abgabedatum = now(), 
+		updatevon = '".$user."', 
+		updateamum = now() 
+		WHERE paabgabe_id='".$paabgabe_id."'";
+	//echo $qry;	
+	if(!$result=$db->db_query($qry))
+	{
+		echo "<font color=\"#FF0000\">Terminbest&auml;tigung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+	}
+	else 
+	{
+		echo "Benotung-Best&auml;tigungsdatum wurde eingetragen.";
 	}
 }
 $studentenname='';
@@ -690,9 +709,13 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
-				if($row->paabgabetyp_kurzbz=='enda')
+		if($row->paabgabetyp_kurzbz=='enda' && $row->abgabedatum==NULL)
 		{
 			$htmlstr .= "		<td width=50px><input type='submit' name='enda' value='best&auml;tigen' title='Endabgabe best&auml;tigen'></td>";
+		}
+		elseif($row->paabgabetyp_kurzbz=='note' && $row->abgabedatum==NULL)
+		{
+			$htmlstr .= "		<td width=50px><input type='submit' name='note' value='best&auml;tigen' title='Notenabgabe best&auml;tigen'></td>";
 		}
 		else 
 		{
@@ -777,20 +800,17 @@ function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
     $tmpAnzeigeStufe.="=>";
 
         while (list( $tmp_key, $tmp_value ) = each($arr) )
-
         {
 
         if (!$onlyRoot && (is_array($tmp_value) || is_object($tmp_value)) && count($tmp_value) >0)
 
         {
-
                    $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key</b>".Test($tmp_value,$lfdnr);
 
         } else if ( (is_array($tmp_value) || is_object($tmp_value)) )
 
         {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
+                  $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
 
                 } else if ($tmp_value!='')
 
