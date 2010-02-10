@@ -39,7 +39,12 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 	if (!$db = new basis_db())
 		$db=false;
-
+$aktion='';
+if(isset($_REQUEST['aktion']))
+{
+	$aktion=$_REQUEST['aktion'];
+}
+$zipfile='';
 $stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
 $abgabetyp=(isset($_REQUEST['abgabetyp'])?$_REQUEST['abgabetyp']:'');
 if(!is_numeric($stg_kz) && $stg_kz!='')
@@ -50,6 +55,7 @@ $user = get_uid();
 $rechte =  new benutzerberechtigung();
 $rechte->getBerechtigungen($user);	
 $berechtigung_kurzbz = 'lehre/abgabetool:download';
+
 if(isset($_GET['id']) && isset($_GET['uid']))
 {
 	if($rechte->isBerechtigt($berechtigung_kurzbz))
@@ -67,39 +73,42 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 	{
 		die("Sie haben hierzu keine Berechtigung!");
 	}
-	exit;
+	exit();
 }
-$s = new studiengang();
-$s->loadArray($rechte->getStgKz($berechtigung_kurzbz),'studiengang_kz');
-
-echo'<form method="GET" action="'.$_SERVER['PHP_SELF'].'">';
-
-echo " Studiengang: <SELECT name='stg_kz'>";
-foreach ($s->result as $stg)
+if($aktion!='zip')
 {
-	if($stg->studiengang_kz==$stg_kz)
-		$selected='selected';
-	else 	
-		$selected='';
-	echo '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
-}
-echo "</SELECT>";
-echo "   Abgabetyp: <SELECT name='abgabetyp'>";
-$qry_atyp="SELECT * FROM campus.tbl_paabgabetyp";
-if($result_atyp=$db->db_query($qry_atyp))
-{
-	while($row_atyp=$db->db_fetch_object($result_atyp))
+	$s = new studiengang();
+	$s->loadArray($rechte->getStgKz($berechtigung_kurzbz),'typ,kurzbz');
+	
+	echo'<form method="GET" action="'.$_SERVER['PHP_SELF'].'" name="abgabeFrm">';
+	
+	echo " Studiengang: <SELECT name='stg_kz'>";
+	foreach ($s->result as $stg)
 	{
-		if($row_atyp->paabgabetyp_kurzbz==$abgabetyp)
+		if($stg->studiengang_kz==$stg_kz)
 			$selected='selected';
 		else 	
 			$selected='';
-		echo '<option value="'.$row_atyp->paabgabetyp_kurzbz.'" '.$selected.'>'.$row_atyp->bezeichnung.'</option>';
+		echo '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
 	}
-}
-echo "</SELECT>";
-
-echo "&nbsp;<INPUT type='submit' value='OK'></FORM>";
+	echo "</SELECT><input type=hidden name=aktion value=\"\">";
+	echo "   Abgabetyp: <SELECT name='abgabetyp'>";
+	$qry_atyp="SELECT * FROM campus.tbl_paabgabetyp";
+	if($result_atyp=$db->db_query($qry_atyp))
+	{
+		while($row_atyp=$db->db_fetch_object($result_atyp))
+		{
+			if($row_atyp->paabgabetyp_kurzbz==$abgabetyp)
+				$selected='selected';
+			else 	
+				$selected='';
+			echo '<option value="'.$row_atyp->paabgabetyp_kurzbz.'" '.$selected.'>'.$row_atyp->bezeichnung.'</option>';
+		}
+	}
+	echo "</SELECT>";
+	
+	echo "&nbsp;<INPUT type='submit' value='OK'>&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM>";
+	}
 if($stg_kz!='')
 {
 	$s=new studiengang();
@@ -159,8 +168,18 @@ if($stg_kz!='')
 				$htmlstr .= "<td>".$row->nachname."</td>\n";
 				$htmlstr .= "<td>".$row->projekttyp_kurzbz."</td>\n";
 				$htmlstr .= "<td>".$row->titel."</td>\n";
+				if($aktion=='zip')
+				{
+					if($zipfile=='')
+					{
+						$zipfile = $row->paabgabe_id.'_'.$row->uid.'.pdf';
+					}
+					else 
+					{
+						$zipfile .= " ".$row->paabgabe_id.'_'.$row->uid.'.pdf';
+					}					
+ 				}
 			}
-			
 		}
 	} 
 	else 
@@ -168,19 +187,41 @@ if($stg_kz!='')
 		die("Keine Zugriffsberechtigung!");
 	}
 }
+if($zipfile=='')
+{
+	?>
+	<html>
+	<head>
+	<title>Projektabgabe</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	</head>
+	<body class="background_main">
+	<?php 
+		echo $htmlstr;
+	echo "</body>
+	</html>";
+}
+else
+{
+	//Zip File erstellen
+	chdir(PAABGABE_PATH);
+	$zipausgabe=tempnam("/tmp", "PAA").".zip";
+	exec("zip ".$zipausgabe." ".$zipfile);
+	//echo $zipausgabe;
+	//echo "<br>zip -r ".$zipausgabe." ".$zipfile;
+	if(file_exists($zipausgabe))
+	{
+		header('Content-Type: application/octet-stream');
+		header('Content-disposition: attachment; filename="Abgabe_'.$s->kuerzel.'.zip"');
+		echo file_get_contents($zipausgabe);
+		unlink($zipausgabe);	
+	}
+	else 
+	{
+		echo "<br>Fehler bei der Dateierstellung!";
+	}
+}
 ?>
-<html>
-<head>
-<title>Projektabgabe</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-</head>
-<body class="background_main">
-<?php 
-	echo $htmlstr;
-?>
-
-</body>
-</html>
