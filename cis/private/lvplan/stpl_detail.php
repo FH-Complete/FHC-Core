@@ -171,7 +171,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     <tr class="<?php echo 'liste'.$i%2; ?>">
         <td><?php echo $unr; ?></td>
         <td><A class="Item" href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname; ?></A></td>
-        <td title="<?php echo $ort->bezeichnung;?>"><?php echo $ortkurzbz; ?></td>
+        <td  title="<?php echo $ort->bezeichnung;?>"><?php echo (!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz); ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
 
@@ -207,8 +207,8 @@ if ($num_rows_repl>0)
     	$beschreibung=$db->db_result($erg_repl,$i,"beschreibung");
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
-        echo '<td >'.(1==1 || is_file(RAUMINFO_PATH.trim($ortkurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
-        echo '<td ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.'</A></td>';
+        echo '<td title="'. $bezeichnung.'" >'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
+        echo '<td  ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.'</A></td>';
         echo '<td >'.$beschreibung.'</td></tr>';
     }
     echo '</table>';
