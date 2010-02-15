@@ -55,17 +55,19 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 				<row>
 					<label value="Typ" control="student-konto-neu-menulist-buchungstyp"/>
 					<menulist id="student-konto-neu-menulist-buchungstyp" 
-					          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php?1" flex="1"
+					          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php?aktiv=true" flex="1"
 					          ref="http://www.technikum-wien.at/buchungstyp/liste"
 					          oncommand="StudentKontoNeuDefaultBetrag()" >
 						<template>
-							<menupopup>
+							<rule>
+								<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
 					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
 					        		      standardbetrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardbetrag"
 					        		      standardtext="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardtext"
 								  		  uri="rdf:*"/>
 								</menupopup>
+							</rule>
 						</template>
 					</menulist>
 				</row>

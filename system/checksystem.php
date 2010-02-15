@@ -325,7 +325,7 @@ if(@$db->db_query("SELECT organisationsform FROM public.tbl_studiengang LIMIT 1"
 		echo 'public.tbl_studiengang: Spalte organisationsform entfernt!<br>';
 }
 
-if(@$db->db_query("SELECT insertamum FROM campus.tbl_reservierung LIMIT 1;"))
+if(!@$db->db_query("SELECT insertamum FROM campus.tbl_reservierung LIMIT 1;"))
 {
 	$qry = "ALTER TABLE campus.tbl_reservierung ADD COLUMN insertamum timestamp;
 			ALTER TABLE campus.tbl_reservierung ADD COLUMN insertvon varchar(32);
@@ -345,6 +345,18 @@ if(@$db->db_query("SELECT insertamum FROM campus.tbl_reservierung LIMIT 1;"))
 		echo '<strong>campus.tbl_reservierung: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'campus.tbl_reservierung: Spalte insertamum und insertvon hinzugefuegt!<br>';
+}
+
+if(!@$db->db_query("SELECT aktiv FROM public.tbl_buchungstyp LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_buchungstyp ADD COLUMN aktiv boolean DEFAULT true;
+	UPDATE public.tbl_buchungstyp SET aktiv=true;
+	ALTER TABLE public.tbl_buchungstyp ALTER COLUMN aktiv SET NOT NULL;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_buchungstyp: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_buchungstyp: Spalte aktiv hinzugefuegt!<br>';
 }
 
 echo '<br>';
@@ -440,7 +452,7 @@ $tabellen=array(
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
-	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext"),
+	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id"),

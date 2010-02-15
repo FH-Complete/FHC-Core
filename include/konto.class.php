@@ -56,6 +56,7 @@ class konto extends basis_db
 	public $vornamen;
 	public $standardbetrag;
 	public $standardtext;
+	public $aktiv;
 
 	/**
 	 * Konstruktor
@@ -392,9 +393,13 @@ class konto extends basis_db
 	 * Liefert alle Buchungstypen
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getBuchungstyp()
+	public function getBuchungstyp($aktiv)
 	{
-		$qry = "SELECT * FROM public.tbl_buchungstyp ORDER BY beschreibung";
+		$qry = "SELECT * FROM public.tbl_buchungstyp";
+		
+		if(!is_null($aktiv))
+			$qry.=" WHERE aktiv=".($aktiv?'true':'false');
+		$qry.=" ORDER BY beschreibung";
 
 		if($this->db_query($qry))
 		{
@@ -406,6 +411,7 @@ class konto extends basis_db
 				$typ->beschreibung = $row->beschreibung;
 				$typ->standardbetrag = $row->standardbetrag;
 				$typ->standardtext = $row->standardtext;
+				$typ->aktiv = ($row->aktiv=='t'?true:false);
 
 				$this->result[] = $typ;
 			}
