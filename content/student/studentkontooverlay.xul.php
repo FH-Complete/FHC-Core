@@ -188,14 +188,25 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Typ" control="student-konto-menulist-buchungstyp"/>
 										<menulist id="student-konto-menulist-buchungstyp" disabled="true"
+												xmlns:TYP="http://www.technikum-wien.at/buchungstyp/rdf#"
 										          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php" flex="1"
 										          ref="http://www.technikum-wien.at/buchungstyp/liste" >
 											<template>
-												<menupopup>
+												<rule TYP:aktiv="false">
+													<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
+													  		  uri="rdf:*" style="text-decoration:line-through;"/>
+													</menupopup>
+												</rule>
+												<rule>
+													<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
 										        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
 													  		  uri="rdf:*"/>
 													</menupopup>
+												</rule>
+												
 											</template>
 										</menulist>
 									</row>

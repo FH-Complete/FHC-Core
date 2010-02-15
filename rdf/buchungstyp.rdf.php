@@ -35,7 +35,17 @@ require_once('../include/konto.class.php');
 
 // studiensemester holen
 $typ = new konto();
-$typ->getBuchungstyp();
+
+$aktiv=null;
+if(isset($_GET['aktiv']))
+{
+	if($_GET['aktiv']=='true')
+		$aktiv=true;
+	else 
+		$aktiv=false;
+}
+
+$typ->getBuchungstyp($aktiv);
 
 $rdf_url='http://www.technikum-wien.at/buchungstyp';
 
@@ -56,6 +66,7 @@ foreach ($typ->result as $row)
             <TYP:beschreibung><![CDATA[<?php echo $row->beschreibung ?>]]></TYP:beschreibung>
             <TYP:standardbetrag><![CDATA[<?php echo ($row->standardbetrag!=''?$row->standardbetrag:'-0.00'); ?>]]></TYP:standardbetrag>
             <TYP:standardtext><![CDATA[<?php echo $row->standardtext; ?>]]></TYP:standardtext>
+            <TYP:aktiv><![CDATA[<?php echo ($row->aktiv?'true':'false'); ?>]]></TYP:aktiv>
          </RDF:Description>
       </RDF:li>
 <?php
