@@ -205,6 +205,8 @@ if ($num_rows_repl>0)
    		$pers_nachname=$db->db_result($erg_repl,$i,"nachname");
     	$pers_email=$db->db_result($erg_repl,$i,"uid").'@'.DOMAIN;
     	$beschreibung=$db->db_result($erg_repl,$i,"beschreibung");
+    	$bezeichnung=$db->db_result($erg_repl,$i,"bezeichnung");		
+		
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
         echo '<td title="'. $bezeichnung.'" >'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
