@@ -123,8 +123,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    			<column style="background-color:lightblue; border:1px solid black" />
 	    		</columns>
 	    		<rows>
-	    			<row style="background-color:lightgreen; border:1px solid black">
-	    				<hbox>
+	    			<row>
+	    				<hbox class="StyleBox" flex="1"
+	    					mystyle="background-color: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_farbe">
 	    					<toolbarbutton
 	        					image="../skin/images/lvaSingle.png"
 	        					ondraggesture="nsDragAndDrop.startDrag(event,lvaObserver);"
@@ -142,7 +143,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	        					tooltiptext="Vorschlag/Setzen MultiWeek"
 	        				/>
 	        			</hbox>
-	        			<hbox>
+	        			<hbox class="StyleBox" flex="1"
+	    					mystyle="background-color: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_farbe">
 	        				<toolbarbutton
 		        				image="../skin/images/lvaSingleDel.png"
 	        					onclick="onLVAdoStpl(event);"
@@ -188,6 +190,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    			</row>
 	    		</rows>
 	    	</grid>
+	    	
 	    </rule>
 	</template>
 </vbox>
