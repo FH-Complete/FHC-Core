@@ -40,7 +40,7 @@
 			<xul:spacer flex="1"/>
 			<xul:menulist anonid="binding-menulist-field" style="padding: 1px" editable="true" xbl:inherits="disabled, value" label="">
 				<xul:menupopup>
-					<xul:datepicker anonid="binding-datepicker-field" 
+					<xul:my-datepicker anonid="binding-datepicker-field" 
 								onselect="parentNode.parentNode.parentNode.parentNode.value=this.selection.currentDay+'.'+(parseInt(this.selection.currentMonth)+1)+'.'+this.selection.currentYear"/>
 				</xul:menupopup>		
 			</xul:menulist>
@@ -129,5 +129,18 @@
 			 ]]>
 		</handler>
 	</handlers>
+  </binding>
+  
+  <!--
+  Binding StyleBox
+  in einem Template kann der Style nicht aus einem RDF befuellt werden.
+  An diese Box kann ein Attribute mit Styles aus RDF uebergeben werden
+  -->
+  <binding id="StyleBox">
+  	<content>
+		<xul:box xbl:inherits="label, tooltiptext, tooltip, value, style=mystyle, flex">
+			<children/>
+		</xul:box>
+	</content>
   </binding>
 </bindings>

@@ -2,3 +2,12 @@ box.Datum
 {
     -moz-binding: url('bindings.xml.php#Datum');
 }
+
+hbox.StyleBox
+{
+    -moz-binding: url('bindings.xml.php#StyleBox');
+}
+vbox.StyleBox
+{
+    -moz-binding: url('bindings.xml.php#StyleBox');
+}
