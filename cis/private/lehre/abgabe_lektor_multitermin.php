@@ -93,42 +93,53 @@ if(isset($_POST["schick"]))
 			}
 			else 
 			{
-				//echo "neuer Termin";
-				$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-					VALUES ('".$termine[$j]."', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
-				//echo $qry;	
-				if(!$result=$db->db_query($qry))
+				//pruefen, ob user zweitbetreuer
+				$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$termine[$j]."' AND betreuerart_kurzbz='Zweitbegutachter' 
+					AND person_id=(SELECT person_id FROM campus.vw_mitarbeiter WHERE uid='".$user."')";
+				$result2=$db->db_query($qry2);
+				if($db->db_num_rows($result2)==0)
 				{
-					echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
-				}
-				else 
-				{
-					$row=$db->db_fetch_object($result);
-					$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
-					if($result_typ=$db->db_query($qry_typ))
+					//echo "neuer Termin";
+					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
+						VALUES ('".$termine[$j]."', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+					//echo $qry;	
+					if(!$result=$db->db_query($qry))
 					{
-						$row_typ=$db->db_fetch_object($result_typ);
+						echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
 					}
 					else 
 					{
-						$row_typ->bezeichnung='';
-					}
-					//Student zu projektarbeit_id suchen
-					$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=$termine[$j])";
-					if($result_std=@$db->db_query($qry_std))
-					{
-						$row_std=$db->db_fetch_object($result_std);
-						$mail = new mail($row_std->uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
-						if(!$mail->send())
+						$row=$db->db_fetch_object($result);
+						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+						if($result_typ=$db->db_query($qry_typ))
 						{
-							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden! ($row_std->uid)</font><br>&nbsp;";	
+							$row_typ=$db->db_fetch_object($result_typ);
 						}
 						else 
 						{
-							echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+							$row_typ->bezeichnung='';
+						}
+						//Student zu projektarbeit_id suchen
+						$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=$termine[$j])";
+						if($result_std=@$db->db_query($qry_std))
+						{
+							$row_std=$db->db_fetch_object($result_std);
+							$mail = new mail($row_std->uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
+							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							if(!$mail->send())
+							{
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden! ($row_std->uid)</font><br>&nbsp;";	
+							}
+							else 
+							{
+								echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+							}
 						}
 					}
+				}
+				else 
+				{
+					echo "Zweitbetreuer bei ".$termine[$j]." <br>";	
 				}
 				$command='';
 			}
