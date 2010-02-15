@@ -31,7 +31,7 @@
     require_once('../../../include/benutzer.class.php');
     require_once('../../../include/student.class.php');
 	require_once('../../../include/benutzerfunktion.class.php');
-	
+	$uid=get_uid();
     $cmbLektorMitarbeiter=(isset($_REQUEST['cmbLektorMitarbeiter'])?$_REQUEST['cmbLektorMitarbeiter']:'all');
     $cmbChoice=(isset($_REQUEST['cmbChoice'])?$_REQUEST['cmbChoice']:null);
     $txtSearchQuery=(isset($_REQUEST['txtSearchQuery'])?$_REQUEST['txtSearchQuery']:null);
@@ -328,98 +328,6 @@
 				// **** PDF 
 				if ($do_pdf)
 				{	
-					require_once('../../../include/pdf/fpdf.php');
-					class PDF extends FPDF
-					{
-						//Simple table
-						function BasicTable($header,$data,$items,$rows_anz)
-						{
-						    //Header
-						    foreach($header as $col)
-						        $this->Cell(40,7,$col,1);
-						    $this->Ln();
-						    //Data
-							
-						    foreach($data as $row)
-						    {
-							    foreach($items as $col)
-								{
-									if (!isset($row->$col))
-										die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
-							        $this->Cell(40,6,$row->$col,1);
-								}	
-						        $this->Ln();
-						    }
-						}
-						
-						//Better table
-						function ImprovedTable($header,$data,$items,$rows_anz)
-						{
-						    //Column widths
-						    $w=array(100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100);
-							
-						    //Header
-						    for($i=0;$i<count($header);$i++)
-						        $this->Cell($rows_anz[$items[$i]] *2.5 ,7,$header[$i],1,0,'C');
-						    $this->Ln();
-						    //Data
-						    foreach($data as $row)
-						    {
-						     	$i=0;
-							    foreach($items as $col)
-								{
-									if (!isset($row->$col))
-										die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
-								    $this->Cell($rows_anz[$items[$i]] *2.5,6,$row->$col,'LR');
-									$i++;
-								}
-						        $this->Ln();
-						    }
-						}
-						
-						//Colored table
-						function FancyTable($header,$data,$items,$rows_anz)
-						{
-						    //Colors, line width and bold font
-##						    $this->SetFillColor(95,158,160);
-							
-						    $this->SetFillColor(102,205,170);
-						    $this->SetTextColor(255);
-						    $this->SetDrawColor(128,0,0);
-						    $this->SetLineWidth(.3);
-						    $this->SetFont('','B');
-						    //Header
-						    $w=array(100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100);
-						    for($i=0;$i<count($header);$i++)
-							{
-##						        $this->Cell($w[$i],7,$header[$i],1,0,'C',true);
-						        $this->Cell($rows_anz[$items[$i]] *1.4 ,7,$header[$i],1,0,'C',true);
-							}	
-						    $this->Ln();
-						    //Color and font restoration 95,158,160
-						    $this->SetFillColor(224,235,255);
-							
-						    $this->SetTextColor(0);
-						    $this->SetFont('');
-						    //Data
-						    $fill=false;
-						    foreach($data as $row)
-						    {
-						     	$i=0;
-							    foreach($items as $col)
-								{
-									if (!isset($row->$col))
-										die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
-##								    $this->Cell($w[$i],6,$row->$col,'LR',0,'L',$fill);
-								    $this->Cell($rows_anz[$items[$i]] *1.4 ,6,$row->$col,'LR',0,'L',$fill);
-									$i++;
-								}
-						        $this->Ln();
-						        $fill=!$fill;
-						    }
-						}
-					}					
-					
 					$rows=array();
 					$rows_anz=array();
 					for($i = 0; $i < $num_rows; $i++)
@@ -454,41 +362,43 @@
 						else
 							$mail=(isset($row->emailtw) && $row->emailtw?$row->emailtw:'');
 						$row->email=$mail;
-						$row->ort=(isset($row->ort) && $row->ort?$row->ort:'');
-
-						$kurzbz='';
-						if(isset($row->studiengang_kz) && $row->studiengang_kz != -1)
-						{
-							if ($stg_obj = new studiengang($row->studiengang_kz))
-								$kurzbz=$stg_obj->kuerzel;
-						}
-						else
-							$row->studiengang_kz='';
-						$row->kurzbz=$kurzbz;
-						$row->semester=(isset($row->semester) && $row->semester && $row->semester!= -1?$row->semester:'');
 						
+						$row->ort=(isset($row->ort) && $row->ort?$row->ort:'');
+						$row->semester=(isset($row->semester) && $row->semester && $row->semester!= -1?$row->semester:'-');
+
 						$verband='';
 						$gruppe='';
 						$verteiler='';
 						$kurzbz='';
-						if(isset($row->studiengang_kz) && $row->studiengang_kz != -1  && $row->studiengang_kz != '' )
+						if(isset($row->studiengang_kz) && $row->studiengang_kz != -1)
 						{
-							if ($std_obj = new student($row->uid))
+							if ($stg_obj = new studiengang($row->studiengang_kz))
+#								$kurzbz=$stg_obj->bezeichnung;
+								$kurzbz=$stg_obj->kurzbzlang;
+##var_dump($stg_obj);
+#exit;
+							$row->kurzbz=$kurzbz;
+							if(isset($row->studiengang_kz) && $row->studiengang_kz != -1  && $row->studiengang_kz != ''  && $row->studiengang_kz != '-')
 							{
-								$verband=$std_obj->verband;
-								$gruppe=$std_obj->gruppe;
+								if ($std_obj = new student($row->uid))
+								{
+									$verband=$std_obj->verband;
+									$gruppe=$std_obj->gruppe;
+								}
+								$verband=strtolower($verband);
+								$verteiler=trim(strtolower($kurzbz).$row->semester.$verband.$gruppe);
+								$verteiler.=($verteiler?'@'.DOMAIN:'');
 							}
-							$kurzbz=strtolower($kurzbz);
-							$verband=strtolower($verband);
-							if($row->studiengang_kz != -1)
-								$row->semester='';
-							$verteiler=trim($kurzbz.$row->semester.$verband.$gruppe);
-							$verteiler.=($verteiler?'@'.DOMAIN:'');
 						}
+						else
+							$row->studiengang_kz='-';
+
 						$row->kurzbz=$kurzbz;
 						$row->verband=$verband;
 						$row->gruppe=$gruppe;
 						$row->verteiler=$verteiler;
+						if ($row->verteiler)
+							$row->email=$row->email."\n".$row->verteiler;
 						
 						$row->kz=(isset($row->personenart) && $row->personenart?$row->personenart:'');
 						
@@ -569,14 +479,248 @@
 						$rows[]=$row;
 					}	
 					
+
+					require_once('../../../include/pdf/fpdf.php');
+					class PDF extends FPDF
+					{
+						//Simple table
+						function BasicTable($header,$data,$items,$rows_anz)
+						{
+						    //Header
+						    foreach($header as $col)
+						        $this->Cell(40,7,$col,1);
+						    $this->Ln();
+						    //Data
+						    foreach($data as $row)
+						    {
+							    foreach($items as $col)
+								{
+									if (!isset($row->$col))
+										die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
+							        $this->Cell(40,6,$row->$col,1);
+								}	
+						        $this->Ln();
+						    }
+						}
+						
+						//Better table
+						function ImprovedTable($header,$data,$items,$rows_anz)
+						{
+						    //Header
+						    for($i=0;$i<count($header);$i++)
+						        $this->Cell($rows_anz[$items[$i]] *2.5 ,7,$header[$i],1,0,'C');
+						    $this->Ln();
+						    //Data
+						    foreach($data as $row)
+						    {
+						     	$i=0;
+							    foreach($items as $col)
+								{
+									if (!isset($row->$col))
+										die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
+								    $this->Cell($rows_anz[$items[$i]] *2.5,6,$row->$col,'LR');
+									$i++;
+								}
+						        $this->Ln();
+						    }
+						}
+
+						var $widths;
+						var $aligns;
+						function SetWidths($w)
+						{
+						    //Set the array of column widths
+							if (is_array($w) && isset($w[0]))
+							    $this->widths=$w;
+							else if (is_array($w) )	
+							{
+								$this->widths=array();
+								foreach ($w as $key => $value) 
+									$this->widths[]=$value;
+							}
+							if (!is_array($this->widths) || !isset($this->widths[0]))
+								return;
+							
+						}
+						
+						function SetAligns($a)
+						{
+						    //Set the array of column alignments
+						    $this->aligns=$a;
+						}
+						
+						function Row($data,$fill=false)
+						{
+						
+							if (is_array($data) && isset($data[0]))
+							{
+							    $row_data=$data;
+							}	
+							else if (is_array($data) || is_object($data))	
+							{
+								$row_data=array();
+								foreach ($data as $key => $value) 
+									$row_data[]=$value;
+							}
+							else
+							{
+								$this->Cell(40,10,'Keine Daten uebergeben ');
+								return; 
+							}
+						    //Calculate the height of the row
+						    $nb=0;
+						    for($i=0;$i<count($row_data);$i++)
+						        $nb=max($nb, $this->NbLines($this->widths[$i], $row_data[$i]));
+						    $h=5*$nb;
+						    //Issue a page break first if needed
+						    $this->CheckPageBreak($h);
+						    //Draw the cells of the row
+						    for($i=0;$i<count($row_data);$i++)
+						    {
+						        $w=$this->widths[$i];
+						        $a=isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+						        //Save the current position
+						        $x=$this->GetX();
+						        $y=$this->GetY();
+						        //Draw the border
+						        $this->Rect($x, $y, $w, $h);
+						        //Print the text
+						        $this->MultiCell($w, 5, $row_data[$i], 0, $a,$fill);
+						        //Put the position to the right of the cell
+						        $this->SetXY($x+$w, $y);
+						    }
+						    //Go to the next line
+						    $this->Ln($h);
+						}
+						
+						function CheckPageBreak($h)
+						{
+						    //If the height h would cause an overflow, add a new page immediately
+						    if($this->GetY()+$h>$this->PageBreakTrigger)
+						        $this->AddPage($this->CurOrientation);
+						}
+						
+						function NbLines($w, $txt)
+						{
+						    //Computes the number of lines a MultiCell of width w will take
+						    $cw=&$this->CurrentFont['cw'];
+						    if($w==0)
+						        $w=$this->w-$this->rMargin-$this->x;
+						    $wmax=((($w - 2) *$this->cMargin)*1000 ) / $this->FontSize;
+							
+						    $s=str_replace("\r", '', $txt);
+						    $nb=strlen($s);
+						    if($nb>0 and $s[$nb-1]=="\n")
+						        $nb--;
+						    $sep=-1;
+						    $i=0;
+						    $j=0;
+						    $l=0;
+						    $nl=1;
+						    while($i<$nb)
+						    {
+						        $c=$s[$i];
+						        if($c=="\n")
+						        {
+						            $i++;
+						            $sep=-1;
+						            $j=$i;
+						            $l=0;
+						            $nl++;
+						            continue;
+						        }
+						        if($c==' ')
+						            $sep=$i;
+						        $l+=$cw[$c];
+						        if($l>$wmax)
+						        {
+						            if($sep==-1)
+						            {
+						                if($i==$j)
+						                    $i++;
+						            }
+						            else
+						                $i=$sep+1;
+						            $sep=-1;
+						            $j=$i;
+						            $l=0;
+						            $nl++;
+						        }
+						        else
+						            $i++;
+						    }
+						    return $nl;
+						}
+						//Colored table
+						function FancyTable($header,$data,$items,$rows_anz)
+						{
+						    //Colors, line width and bold font
+						    $this->SetFillColor(102,205,170);
+						    $this->SetTextColor(255);
+						    $this->SetDrawColor(0,0,0);
+						    $this->SetLineWidth(.1);
+						    $this->SetFont('','B');
+				    //Header
+							$width=array();	
+							reset($items);
+						    foreach($items as $col)
+							{
+								if (!isset($rows_anz[$col]))
+									die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
+								$width[]=$rows_anz[$col];
+							}
+							$this->SetWidths($width);
+							$this->SetAligns('C');
+							$row_data=array();
+						    for($i=0;$i<count($header);$i++)
+							{
+								$row_data[]=$header[$i];
+							}	
+							$this->Row($row_data,true);
+				    //Data
+						    //Color and font restoration 95,158,160
+						    $this->SetFillColor(224,235,255);
+						    $this->SetTextColor(0);
+						    $this->SetFont('');
+							$this->SetAligns('L');
+						    $fill=false;
+						    foreach($data as $row)
+						    {
+						     	$i=0;
+								$row_data=array();
+								reset($items);
+							    foreach($items as $col)
+								{
+									if (!isset($row->$col))
+										die("Achtung ! Die Spalte $col wurde nicht in den Daten gefunden.");
+									$row_data[]=$row->$col;
+									$i++;
+								}
+								$fill=false;
+								$this->Row($row_data,$fill);
+						        $fill=!$fill;
+						    }
+						}
+				}	// Ende Extend FPDF Class				
+					
+
 					// Creating a workbook
 					$orientation='l'; // 'p' 
+##					$orientation='p'; // 'p' 					
 					$pdf = new PDF($orientation);
 
+					$pdf->SetTitle('Personensuche '.CAMPUS_NAME);
+					$pdf->SetSubject(CAMPUS_NAME . date('Y-m-d'));					
+					$pdf->SetAuthor(CAMPUS_NAME);						
+					$pdf->SetCreator($uid) ;						
+					
+		
 					//Column titles
-					$header=array('Titel','Vorname','Nachname','Tel.nr','E-Mail Adresse','Raum','Std-Kz','Sem','Hauptverteiler','Kz','Handy','Funktion' );
+					$header=array('Titel','Vorname','Nachname','Tel.nr','E-Mail Adresse / Hauptverteiler','Raum','Studieng','Sem','Personenart','Handy','Funktion' );
 					//Data loading
-					$item=array('titelpre','vorname','nachname','teltw','email','ort','studiengang_kz','semester','verteiler','kz','firmenhandy','funktion' );
+##					$item=array('titelpre','vorname','nachname','teltw','email','ort','studiengang_kz','semester','kz','firmenhandy','funktion' );
+					$item=array('titelpre','vorname','nachname','teltw','email','ort','kurzbz','semester','kz','firmenhandy','funktion' );
+					
 					foreach ($item as $key => $value) 
 					{
 							$anz=strlen($header[$key]);
@@ -584,6 +728,17 @@
 								$rows_anz[$value]=$anz;
 					}
 
+					$rows_anz['titelpre']=10;
+					$rows_anz['nachname']=35;
+					$rows_anz['vorname']=35;
+					$rows_anz['teltw']=25;
+					$rows_anz['firmenhandy']=25;					
+					$rows_anz['kurzbz']=12;
+					$rows_anz['kz']=15;					
+					$rows_anz['semester']=7;
+					$rows_anz['email']=50;
+					$rows_anz['funktion']=45;
+					
 					$pdf->SetFont('Arial','',6);
 					$pdf->AddPage();
 					if (count($rows)>0)
@@ -683,8 +838,8 @@
         <td>&nbsp;</td>
       </tr>
 	  
+  	<form target="_self" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" name="SearchFormular" id="SearchFormular" >
 	  <tr>
-	  	<form target="_self" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" name="SearchFormular" id="SearchFormular" >
 	  	<td nowrap>
 	  	  Suche nach:
 	  	  <input type="text" name="txtSearchQuery" size="45" value="<?php echo $txtSearchQuery; ?>">
@@ -718,21 +873,23 @@
 			  ?>
 	  	  </select>
 	  	  <input onclick="document.SearchFormular.target = '_self';"  type="submit" name="btnSearch" value="Suchen">
+
+	  	  </tr>
+
+		  <tr>
+		<td colspan="6">
 		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		  <input type="hidden" name="do_search">
 		  <input onclick="document.SearchFormular.target = '_blank';" type="Image" src="../../../skin/images/excel.gif" type="submit" name="btnExcel" value="Excel">
-		  <input onclick="document.SearchFormular.target = '_blank';" type="submit" name="do_excel" value="Excel">
+		  <input style="border:0; background-color: transparent;" onclick="document.SearchFormular.target = '_blank';" type="submit" name="do_excel" value="Excel">
 		  &nbsp;&nbsp;&nbsp;
 		  <input onclick="document.SearchFormular.target = '_blank';" type="Image" src="../../../skin/images/pdfs.jpg" height="32" type="submit" name="btnPdf" value="Pdf">
-		  <input onclick="document.SearchFormular.target = '_blank';" type="submit" name="do_pdf" value="Pdf">
+		  <input style="border:0; background-color: transparent;" onclick="document.SearchFormular.target = '_blank';" type="submit" name="do_pdf" value="Pdf">
 		</td>
+	  </tr>
 		</form>
 		
 
-	  </tr>
-	  <tr>
-	  	<td>&nbsp;</td>
-	  </tr>
 	  <tr>
 	  	<td nowrap>
 		<?php
