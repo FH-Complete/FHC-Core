@@ -110,14 +110,21 @@
 		</tr>
 		<?php
 			$lv_obj = new lehrveranstaltung();
-			if(!$lv_obj->load_lva('0',null, null,TRUE,TRUE,'bezeichnung'))
+			if(!$lv_obj->load_lva('0',null, null,true,false,'bezeichnung'))
 				echo "<tr><td>$lv_obj->errormsg</td></tr>";
 
 			foreach($lv_obj->lehrveranstaltungen AS $row)
 			{
 				echo '<tr>';
 				echo '	<td class="tdwrap">';
-				echo "	  <li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"../lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+				echo "	  <li><a  class=\"Item2\" ".(!$row->aktiv?' style="color:gray;" ':' style=" font-weight: bold;" ') ." title=\"".$row->bezeichnung."\" href=\"../lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+/*
+				if ($row->aktiv)
+					echo "	  <li><a  class=\"Item2\"  title=\"".$row->bezeichnung."\" href=\"../lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+				else	
+					echo "	  <li><a  class=\"Item2\"  style=\"color:gray;\" title=\"".$row->bezeichnung."\" href=\"anmeldung.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".CutString($row->bezeichnung, 21)."</a></li>";
+
+*/				
 				echo '	</td>';
 				echo '</tr>';
 			}
