@@ -55,7 +55,8 @@
 									AND public.tbl_benutzer.uid='$getuid')
 			AND public.tbl_benutzer.aktiv 
 			AND lehre.tbl_projektarbeit.note IS NULL 
-			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer') 
+			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' 
+				OR betreuerart_kurzbz='Zweitbegutachter' OR betreuerart_kurzbz='Erstbetreuer') 
 			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 		ORDER BY nachname";
 
@@ -84,7 +85,7 @@ else
 	{
 		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
-		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
+		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";

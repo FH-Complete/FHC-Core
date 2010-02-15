@@ -47,6 +47,7 @@ if(!isset($_POST['uid']))
 	$uid = (isset($_GET['uid'])?$_GET['uid']:'-1');
 	$projektarbeit_id = (isset($_GET['projektarbeit_id'])?$_GET['projektarbeit_id']:'-1');
 	$titel = (isset($_GET['titel'])?$_GET['titel']:'-1');
+	$betreuerart = (isset($_GET['betreuerart'])?$_GET['betreuerart']:'-1');
 
 	$command = '';
 	$paabgabe_id = '';
@@ -65,6 +66,7 @@ else
 	$datum = (isset($_POST['datum'])?$_POST['datum']:'');
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 	$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'');
+	$betreuerart = (isset($_POST['betreuerart'])?$_POST['betreuerart']:'-1');
 }
 
 $user = get_uid();
@@ -325,8 +327,15 @@ $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 //$htmlstr .= "<a href='../../cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;&nbsp;";
 $htmlstr .= "<input type='submit' name='note' value='benoten'></form></td>";
-$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
-$htmlstr .= "<input type='submit' name='ephorus' value='Plagiatspr&uuml;fung'></form></td></tr>";
+if($betreuerart!="Zweitbegutachter")
+{
+	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
+	$htmlstr .= "<input type='submit' name='ephorus' value='Plagiatspr&uuml;fung'></form></td></tr>";
+}
+else 
+{
+	$htmlstr .= "<td>&nbsp;</td></tr>";
+}
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
@@ -342,6 +351,7 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+		$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
 		$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
 		$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
 		if(!$row->abgabedatum)
@@ -413,7 +423,7 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td><input type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";		
-		if($user==$row->insertvon)
+		if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
 		{		
 			$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
 		
@@ -458,6 +468,7 @@ $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbei
 $htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
 $htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
 $htmlstr .= "<input type='hidden' name='command' value='insert'>\n";
 $htmlstr .= "<tr id='".$projektarbeit_id."'>\n";
 
@@ -477,8 +488,14 @@ $htmlstr .= "		</select></td>\n";
 
 $htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
 $htmlstr .= "		<td>&nbsp;</td>\n";		
-$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='neuen Termin speichern'></td>";
-
+if($betreuerart!="Zweitbegutachter")
+{
+	$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='neuen Termin speichern'></td>";
+}
+else 
+{
+	$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+}
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
