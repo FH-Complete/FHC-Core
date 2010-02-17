@@ -288,6 +288,8 @@ if(!$result = @$db->db_query("SELECT * FROM wawi.tbl_betriebsmittelperson LIMIT 
 		   
 		GRANT SELECT, UPDATE ON wawi.tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO web;
 		GRANT SELECT, UPDATE ON wawi.tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO admin;
+		GRANT SELECT, UPDATE ON wawi.seq_betriebsmittelperson_betriebsmittelperson_id TO admin;
+		GRANT SELECT, UPDATE ON wawi.seq_betriebsmittelperson_betriebsmittelperson_id TO web;
 		GRANT SELECT ON public.vw_betriebsmittelperson TO web;
 		GRANT SELECT ON public.vw_betriebsmittelperson TO admin;
 	";
