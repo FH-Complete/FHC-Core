@@ -21,9 +21,6 @@
  */
   	require_once('../../../config/cis.config.inc.php');
   	require_once('../../../include/basis_db.class.php');
-  	if (!$db = new basis_db())
-  	    die('Fehler beim Oeffnen der Datenbankverbindung');
-
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/funktion.class.php');
     require_once('../../../include/studiengang.class.php');
@@ -31,6 +28,11 @@
     require_once('../../../include/benutzer.class.php');
     require_once('../../../include/student.class.php');
 	require_once('../../../include/benutzerfunktion.class.php');
+	require_once('../../../include/globals.inc.php');
+	
+	if (!$db = new basis_db())
+  	    die('Fehler beim Oeffnen der Datenbankverbindung');
+  	
 	$uid=get_uid();
     $cmbLektorMitarbeiter=(isset($_REQUEST['cmbLektorMitarbeiter'])?$_REQUEST['cmbLektorMitarbeiter']:'all');
     $cmbChoice=(isset($_REQUEST['cmbChoice'])?$_REQUEST['cmbChoice']:null);
@@ -54,7 +56,7 @@
 				if($txtSearchQuery == "" || $txtSearchQuery == "*" || $txtSearchQuery == "*.*")
 				{
 					if($cmbChoice == "all")
-						$sql_query.= "SELECT person_id, uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe as teltw,(uid || '@".DOMAIN."') AS emailtw, foto,-1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias, CASE WHEN (fixangestellt) THEN 'Fix' ELSE 'Extern' END as personenart  FROM campus.vw_mitarbeiter ";
+						$sql_query.= "SELECT person_id, uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe as teltw,(uid || '@".DOMAIN."') AS emailtw, foto,-1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias, CASE WHEN (fixangestellt) THEN 'Fix' ELSE 'Extern' END as personenart  FROM campus.vw_mitarbeiter WHERE 1=1 ";
 					else
 						$sql_query.= "SELECT DISTINCT person_id, uid, titelpre, titelpost, nachname, vorname, vornamen, standort_kurzbz, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias, CASE WHEN (fixangestellt) THEN 'Fix' ELSE 'Extern' END as personenart FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE funktion_kurzbz='$cmbChoice' AND aktiv ".$sql_extend_query;
 				}
@@ -68,9 +70,9 @@
 				}
 				
 				if ($cmbLektorMitarbeiter=='Mitarbeiter_Fix')
-					$sql_query.= ($txtSearchQuery == "" || $txtSearchQuery == "*" || $txtSearchQuery == "*.*"?' where ':' and ').' fixangestellt ';
+					$sql_query.= ' AND fixangestellt ';
 				if ($cmbLektorMitarbeiter=='Mitarbeiter_Extern')
-					$sql_query.= ($txtSearchQuery == "" || $txtSearchQuery == "*" || $txtSearchQuery == "*.*"?' where ':' and ').' not fixangestellt ';
+					$sql_query.= ' AND not fixangestellt ';
 			}
 			
 			if ($cmbLektorMitarbeiter=='all')			  
@@ -193,12 +195,12 @@
 								}	
 							}	
 						}
-						$tel=(isset($row->teltw) && $row->teltw?$vorwahl.' - '.$row->teltw:'&nbsp;');
+						$tel=(isset($row->teltw) && $row->teltw?$vorwahl.' - '.$row->teltw:' ');
 
 						$worksheet->write($zeile,++$spalte,$tel);
 						$maxlength[$spalte]=strlen($tel);
 						
-						if ($row->alias)						
+						if ($row->alias && !in_array($row->studiengang_kz,$noalias))						
 							$mail=(isset($row->alias) && $row->alias?$row->alias.'@'.DOMAIN:'');
 						else
 							$mail=(isset($row->emailtw) && $row->emailtw?$row->emailtw:'');
@@ -236,8 +238,8 @@
 							}
 							$kurzbz=strtolower($kurzbz);
 							$verband=strtolower($verband);
-							if($row->studiengang_kz != -1)
-								$row->semester='';
+							//if($row->studiengang_kz != -1)
+							//	$row->semester='';
 							$verteiler=trim($kurzbz.$row->semester.$verband.$gruppe);
 							$verteiler.=($verteiler?'@'.DOMAIN:'');
 						}
@@ -357,14 +359,14 @@
 							}	
 						}
 						$row->teltw=(isset($row->teltw) && $row->teltw?$vorwahl.' - '.$row->teltw:'');
-						if ($row->alias)						
+						if ($row->alias && !in_array($row->studiengang_kz, $noalias))						
 							$mail=(isset($row->alias) && $row->alias?$row->alias.'@'.DOMAIN:'');
 						else
 							$mail=(isset($row->emailtw) && $row->emailtw?$row->emailtw:'');
 						$row->email=$mail;
 						
 						$row->ort=(isset($row->ort) && $row->ort?$row->ort:'');
-						$row->semester=(isset($row->semester) && $row->semester && $row->semester!= -1?$row->semester:'-');
+						//$row->semester=(isset($row->semester) && $row->semester && $row->semester!= -1?$row->semester:'-');
 
 						$verband='';
 						$gruppe='';
@@ -945,7 +947,7 @@
 						}
 						echo '	<td '.($i % 2==0?'':' class="MarkLine" ').' align="left" class="tdwrap">&nbsp;'.(isset($row->teltw) && $row->teltw?$vorwahl.' - '.$row->teltw:'&nbsp;').'</td>';
 
-						if ($row->alias)						
+						if ($row->alias && !in_array($row->studiengang_kz, $noalias))						
 							echo '	<td '.($i % 2==0?'':' class="MarkLine" ').' align="left" class="tdwrap">&nbsp;'.(isset($row->alias) && $row->alias?'<a href="mailto:'.$row->alias.'@'.DOMAIN.'" class="Item">'.$row->alias.'@'.DOMAIN.'</a>':'&nbsp;').'</td>';
 						else
 							echo '	<td '.($i % 2==0?'':' class="MarkLine" ').' align="left" class="tdwrap">&nbsp;'.(isset($row->emailtw) && $row->emailtw?'<a href="mailto:'.$row->emailtw.'" class="Item">'.$row->emailtw.'</a>':'&nbsp;').'</td>';
@@ -973,8 +975,8 @@
 							}
 							$kurzbz=strtolower($kurzbz);
 							$verband=strtolower($verband);
-							if($row->studiengang_kz != -1)
-								$row->semester='';
+							//if($row->studiengang_kz != -1)
+							//	$row->semester='';
 							$verteiler='<a class="Item" href="mailto:'.trim($kurzbz.$row->semester.$verband.$gruppe).'@'.DOMAIN.'">'.trim($kurzbz.$row->semester.$verband.$gruppe).'@'.DOMAIN;
 						}
 						echo '	<td '.($i % 2==0?'':' class="MarkLine" ').' align="left" class="tdwrap">&nbsp;'.($verteiler?$verteiler:'&nbsp;').'</td>';
