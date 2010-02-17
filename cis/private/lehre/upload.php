@@ -633,14 +633,14 @@ A:hover {
 													  {
 													  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 													  	 {
-													  	 	 exec('chmod 644 "'.$uploadfile.'"');
+													  	 	 exec('chmod 664 "'.$uploadfile.'"');
 															 if($islector)
 															 {
-																exec('sudo chown '.$user.':teacher "'.$uploadfile.'"');
+																exec('chgrp teacher "'.$uploadfile.'"');
 															 }
 															 else
 															 {
-																exec('sudo chown '.$user.':student "'.$uploadfile.'"');
+																exec('chgrp student "'.$uploadfile.'"');
 															 }
 													  	 }
 													  }
@@ -656,14 +656,14 @@ A:hover {
 												  {
 													  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 													  {
-													  	  exec('chmod 644 "'.$uploadfile.'"');
+													  	  exec('chmod 664 "'.$uploadfile.'"');
 														  if($islector)
 														  {
-															exec('sudo chown '.$user.':teacher "'.$uploadfile.'"');
+															exec('chgrp teacher "'.$uploadfile.'"');
 														  }
 														  else
 														  {
-															exec('sudo chown '.$user.':student "'.$uploadfile.'"');
+															exec('chgrp student "'.$uploadfile.'"');
 														  }
 													  }
 												  }
@@ -689,14 +689,14 @@ A:hover {
 														  {
 														  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  	   {
-														  	   	   exec('chmod 644 "'.$uploadfile.'"');
+														  	   	   exec('chmod 664 "'.$uploadfile.'"');
 																   if($islector)
 																   {
-																		exec('sudo chown '.$user.':teacher "'.$uploadfile.'"');
+																		exec('chgrp teacher "'.$uploadfile.'"');
 																   }
 																   else
 																   {
-																		exec('sudo chown '.$user.':student "'.$uploadfile.'"');
+																		exec('chgrp student "'.$uploadfile.'"');
 																   }
 														  	   }
 														  }
@@ -712,14 +712,14 @@ A:hover {
 													  {
 														  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  {
-														  	  exec('chmod 644 "'.$uploadfile.'"');
+														  	  exec('chmod 664 "'.$uploadfile.'"');
 															  if($islector)
 															  {
-																exec('sudo chown '.$user.':teacher "'.$uploadfile.'"');
+																exec('chgrp teacher "'.$uploadfile.'"');
 															  }
 															  else
 															  {
-																exec('sudo chown '.$user.':student "'.$uploadfile.'"');
+																exec('chgrp student "'.$uploadfile.'"');
 															  }
 														  }
 													  }
@@ -848,11 +848,11 @@ A:hover {
 
 									if($islector)
 									{
-										exec('sudo chown www-data "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										exec('chgrp teacher "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
 									}
 									else
 									{
-										exec('sudo chown www-data "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										exec('chgrp student "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
 									}
 								}
 							}

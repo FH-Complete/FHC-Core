@@ -676,7 +676,7 @@ function show(id)
 							if(!is_dir('../../../documents/'.strtolower($short)))
 								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
 							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
-							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/lehrziele');
+							exec('chgrp teacher ../../../documents/'.strtolower($short).'/lehrziele');
 						}
 					}
 
