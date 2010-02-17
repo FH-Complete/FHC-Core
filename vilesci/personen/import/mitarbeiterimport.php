@@ -133,6 +133,7 @@ function disablefields(obj)
 	else
 		val=true;
 
+	document.getElementById('anrede').disabled=val;
 	document.getElementById('titel').disabled=val;
 	document.getElementById('titelpost').disabled=val;
 	document.getElementById('nachname').disabled=val;
@@ -283,7 +284,32 @@ function setOrtData()
         } 
         else alert("Request status:" + anfrage.status);
     }
-}	
+}
+
+function AnredeChange()
+{
+	anrede = document.getElementById('anrede').value;
+	
+	if(anrede=='Herr')
+		document.getElementById('geschlecht').value='m';
+	if(anrede=='Frau')
+		document.getElementById('geschlecht').value='w';
+}
+
+function GeschlechtChange()
+{
+	geschlecht = document.getElementById('geschlecht').value;
+	anrede = document.getElementById('anrede');
+	
+	if(anrede.value=='' || anrede.value=='Herr' || anrede.value=='Frau')
+	{
+		if(geschlecht=='m')
+			anrede.value='Herr';
+			
+		if(geschlecht=='w')
+			anrede.value='Frau';
+	}
+}
 </script>
 </head>
 <body>
@@ -300,6 +326,7 @@ $where = '';
 $error = false;
 $importort='';
 //Parameter
+$anrede = (isset($_POST['anrede'])?$_POST['anrede']:'Herr');
 $titel = (isset($_POST['titel'])?$_POST['titel']:'');
 $titelpost = (isset($_POST['titelpost'])?$_POST['titelpost']:'');
 $nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
@@ -377,6 +404,7 @@ if(isset($_POST['save']))
 	else
 	{
 		$person->new = true;
+		$person->anrede = $anrede;
 		$person->titelpre = $titel;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
@@ -674,11 +702,12 @@ if($geburtsdatum!='')
 <!--Formularfelder-->
 <table>
 <?php
+echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
-echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
+echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht" onchange="GeschlechtChange()">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
 echo '<OPTION value="u" '.($geschlecht=='u'?'selected':'').'>unbekannt</OPTION>';
