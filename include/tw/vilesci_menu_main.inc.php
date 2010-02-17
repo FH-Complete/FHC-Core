@@ -160,6 +160,25 @@ $menu=array
 		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
 		'Institute'=>array('name'=>'Institute', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
 	),
+	'Inventar'=>	array
+	(
+		'name'=>'Inventar', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','wawi','support'), 'image'=>'edit-paste.png',
+		'link'=>'left.php?categorie=Inventar', 'target'=>'nav',
+		'Inventar'=>	array
+		(
+			'name'=>'Inventar', 'permissions'=>array('admin','wawi','support'),		
+			'Neu'=>array('name'=>'Neu', 'link'=>'inventar/inventar_pflege.php', 'target'=>'main'),
+			'Suche'=>array('name'=>'Suche', 'link'=>'inventar/inventar.php', 'target'=>'main'),
+			'AfA'=>array('name'=>'AfA', 'link'=>'inventar/inventar_afa.php', 'target'=>'main'),
+			'Inventur'=>array('name'=>'Inventur', 'link'=>'inventar/inventar_inventur.php', 'target'=>'main'),
+			'Etiketten'=>array('name'=>'Etiketten', 'link'=>'inventar/etiketten.php', 'target'=>'main'),
+		),			
+		'WAWI'=>	array
+		(
+			'name'=>'WAWI', 'permissions'=>array('admin','wawi','support'),
+					'Suche'=>array('name'=>'Suche', 'link'=>'inventar/bestellung.php', 'target'=>'main'),
+		),
+	),	
 	'Admin'=>	array
 	(
 		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'emblem-system.png',
