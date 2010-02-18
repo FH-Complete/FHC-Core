@@ -83,7 +83,7 @@
 		  	$dir_name=$DOC_ROOT.'/documents';
 			if(!is_dir($dir_name))
 			{
-					exec('mkdir -m 775 "'.$dir_name.'"');
+					exec('mkdir -m 755 "'.$dir_name.'"');
 					exec('chown www-data:teacher "'.$dir_name.'"');
 			}					
 							
@@ -107,17 +107,17 @@
 			{
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan'))
@@ -187,17 +187,17 @@
 			{
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download'))
@@ -280,17 +280,17 @@
 	{
 		if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 		{
-			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+			exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 			exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 		}
 		if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 		{
-			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+			exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 			exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 		}
 		if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 		{
-			exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+			exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 			exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 		}
 		if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'))
@@ -541,17 +541,17 @@
 			{
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 				{
-					exec('mkdir -m 775 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+					exec('mkdir -m 755 "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 					exec('chown www-data:teacher "'.$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
 				}
 				if(!@is_dir($DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/upload'))
