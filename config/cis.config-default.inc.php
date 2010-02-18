@@ -117,4 +117,7 @@ define('PAABGABE_PATH','/var/www/htdocs/PaUpload/');
 //Pfad von PAAbgabe zum OPUS
 define('OPUS_PATH_PAA','/var/www/htdocs/opus/htdocs/volltexte/');
 
+//Pfad zu den Rauminfos
+define('RAUMINFO_PATH','/documents/rauminfo/');
+
 ?>
