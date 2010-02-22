@@ -6,12 +6,17 @@ mb_internal_encoding("UTF-8");
 mb_regex_encoding("UTF-8");
 setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
 
-
 // Connection Strings zur Datenbank
-define("CONN_STRING","host=localhost dbname=bla user=bla password=bla");
-define("CONN_STRING_MOODLE","host=localhost dbname=bla user=bla password=bla");
-define('CONN_CLIENT_ENCODING','LATIN9' );
+define("DB_SYSTEM","pgsql");
+define("DB_HOST","localhost");
+define("DB_PORT","5433");
+define("DB_NAME","fhcomplete");
+define("DB_USER","bla");
+define("DB_PASSWORD","bla");
+define("DB_CONNECT_PERSISTENT",TRUE);
+define('CONN_CLIENT_ENCODING','UTF-8' );
 
+define("CONN_STRING_MOODLE","host=localhost dbname=bla user=bla password=bla");
 
 define('TABLE_ID','_id');
 define('TABLE_BEGIN','tbl_');

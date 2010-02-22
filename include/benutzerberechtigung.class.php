@@ -307,6 +307,7 @@ class benutzerberechtigung extends basis_db
 				$this->berechtigungen[] = $obj;
 			}
 		}
+		return true;
 	}
 	
 	/**
@@ -404,47 +405,33 @@ class benutzerberechtigung extends basis_db
 
 		while($row=$this->db_fetch_object($result))
 		{
-			//wenn die Berechtigung an einer Organisationseinheit haengt, dann werden
-			//auch die Berechtigungen fuer die darunterliegenden Organisationseinheiten angelegt
-			if($row->oe_kurzbz!='')
-			{
-				$organisationseinheit = new organisationseinheit();
-				$oes = $organisationseinheit->getChilds($row->oe_kurzbz);
-			}
-			else 
-			{
-				$oes[]=$row->oe_kurzbz;	
-			}
+   			$b=new benutzerberechtigung();
+
+   			$b->benutzerberechtigung_id = $row->benutzerberechtigung_id;
+   			$b->uid=$row->uid;
+   			$b->funktion_kurzbz=$row->funktion_kurzbz;
+   			$b->rolle_kurzbz = $row->rolle_kurzbz;
+   			$b->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+			$b->art=intersect($row->art, $row->art1);
+			$b->oe_kurzbz = $row->oe_kurzbz;
+			$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$b->start=$row->start;
+			if ($row->start!=null)
+				$b->starttimestamp=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8),mb_substr($row->start,0,4));
+			else
+				$b->starttimestamp=null;
+			$b->ende=$row->ende;
+			if ($row->ende!=null)
+				$b->endetimestamp=mktime(23,59,59,mb_substr($row->ende,5,2),mb_substr($row->ende,8),mb_substr($row->ende,0,4));
+			$b->negativ = ($row->negativ=='t'?true:false);
+			$b->updateamum = $row->updateamum;
+			$b->updatevon = $row->updatevon;
+			$b->insertamum = $row->insertamum;
+			$b->insertvon = $row->insertvon;
 			
-			foreach ($oes as $oe_kurzbz)
-			{
-	   			$b=new benutzerberechtigung();
-	
-	   			$b->benutzerberechtigung_id = $row->benutzerberechtigung_id;
-	   			$b->uid=$row->uid;
-	   			$b->funktion_kurzbz=$row->funktion_kurzbz;
-	   			$b->rolle_kurzbz = $row->rolle_kurzbz;
-	   			$b->berechtigung_kurzbz = $row->berechtigung_kurzbz;
-				$b->art=intersect($row->art, $row->art1);
-				$b->oe_kurzbz = $oe_kurzbz;
-				$b->studiensemester_kurzbz=$row->studiensemester_kurzbz;
-				$b->start=$row->start;
-				if ($row->start!=null)
-					$b->starttimestamp=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8),mb_substr($row->start,0,4));
-				else
-					$b->starttimestamp=null;
-				$b->ende=$row->ende;
-				if ($row->ende!=null)
-					$b->endetimestamp=mktime(23,59,59,mb_substr($row->ende,5,2),mb_substr($row->ende,8),mb_substr($row->ende,0,4));
-				$b->negativ = ($row->negativ=='t'?true:false);
-				$b->updateamum = $row->updateamum;
-				$b->updatevon = $row->updatevon;
-				$b->insertamum = $row->insertamum;
-				$b->insertvon = $row->insertvon;
-				
-				$this->berechtigungen[]=$b;
-			}
+			$this->berechtigungen[]=$b;
 		}
+		
 		unset($result);
 		// Attribute des Mitarbeiters holen
 		$sql_query="SELECT fixangestellt, lektor FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'";
@@ -498,11 +485,14 @@ class benutzerberechtigung extends basis_db
 			$fb = new fachbereich($fachbereich_kurzbz);
 			$oe_kurzbz = $fb->oe_kurzbz;
 		}
+		$oe = new organisationseinheit();
 		
 		foreach ($this->berechtigungen as $b)
 		{
 			//Pruefen ob eine negativ-Berechtigung vorhanden ist
-			if($b->berechtigung_kurzbz==$berechtigung_kurzbz && $b->negativ && $oe_kurzbz==$b->oe_kurzbz)
+			if($b->berechtigung_kurzbz==$berechtigung_kurzbz 
+				&& $b->negativ 
+				&& (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz)))
 			{
 				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
@@ -513,7 +503,7 @@ class benutzerberechtigung extends basis_db
 		
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
 			   && (is_null($art) || mb_strstr($b->art, $art))
-			   && (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz))
+			   && (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz)))
 			{
 				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
@@ -558,7 +548,8 @@ class benutzerberechtigung extends basis_db
 		$in='';
 		$not='';
 		$all=false;
-		
+		$oe = new organisationseinheit();
+	
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
@@ -568,14 +559,22 @@ class benutzerberechtigung extends basis_db
 				{
 					//Negativ-Recht
 					if(!is_null($b->oe_kurzbz))
-						$not .="'".addslashes($b->oe_kurzbz)."',";
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$not .="'".addslashes($row)."',";
+					}
 					else 
 						return array();
 				}
 				else 
 				{
 					if(!is_null($b->oe_kurzbz))
-						$in .= "'".addslashes($b->oe_kurzbz)."',"; 
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$in .= "'".addslashes($row)."',"; 
+					}
 					else 
 					{
 						//Wenn NULL dann berechtigung auf alles
@@ -626,6 +625,7 @@ class benutzerberechtigung extends basis_db
 		$in='';
 		$not='';
 		$all=false;
+		$oe = new organisationseinheit();
 		
 		foreach ($this->berechtigungen as $b)
 		{
@@ -636,14 +636,22 @@ class benutzerberechtigung extends basis_db
 				{
 					//Negativ-Recht
 					if(!is_null($b->oe_kurzbz))
-						$not .="'".addslashes($b->oe_kurzbz)."',";
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$not .="'".addslashes($row)."',";
+					}
 					else 
 						return array();
 				}
 				else 
 				{
 					if(!is_null($b->oe_kurzbz))
-						$in .= "'".addslashes($b->oe_kurzbz)."',"; 
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$in .= "'".addslashes($row)."',"; 
+					}
 					else 
 					{
 						//Wenn NULL dann berechtigung auf alles
@@ -689,10 +697,9 @@ class benutzerberechtigung extends basis_db
 	{
 		$oe_kurzbz=array();
 		$timestamp=time();
-		$in='';
 		$not='';
 		$all=false;
-		
+		$oe = new organisationseinheit();
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
@@ -702,18 +709,37 @@ class benutzerberechtigung extends basis_db
 				{
 					//Negativ-Recht
 					if(!is_null($b->oe_kurzbz))
-						$not .="'".addslashes($b->oe_kurzbz)."',";
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$not .="'".addslashes($row)."',";
+					}
 					else 
 						return array();
 				}
 				else 
 				{
-					$oe_kurzbz[] = $b->oe_kurzbz;
+					if(!is_null($b->oe_kurzbz))
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$oe_kurzbz[] = $row;
+					}
+					else 
+					{
+						$all=true;
+						break;
+					}
 				}
 			}
 		}
 		
-		$studiengang_kz=array_unique($oe_kurzbz);
+		if($all)
+		{
+			$oe->loadParentsArray();
+			$oe_kurzbz = array_keys(organisationseinheit::$oe_parents_array);
+		}
+		$oe_kurzbz=array_unique($oe_kurzbz);
 		sort($oe_kurzbz);
 		return $oe_kurzbz;
 	}
