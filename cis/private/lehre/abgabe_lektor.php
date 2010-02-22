@@ -71,7 +71,7 @@ else
 	$htmlstr .= "<form name='multitermin' action='abgabe_lektor_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
 	$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
-	$htmlstr .= "<th></th><th class='table-sortable:default'>UID/Personenkennz.</th>
+	$htmlstr .= "<th></th><th class='table-sortable:default'>UID / Personenkennz.</th>
 				<th>Email</th>
 				<th class='table-sortable:default'>Vorname</th>
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
