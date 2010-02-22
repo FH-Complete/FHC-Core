@@ -97,6 +97,7 @@ if(isset($_POST["schick"]))
 				$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$termine[$j]."' AND betreuerart_kurzbz='Zweitbegutachter' 
 					AND person_id=(SELECT person_id FROM campus.vw_mitarbeiter WHERE uid='".$user."')";
 				$result2=$db->db_query($qry2);
+				//zweitbetreuer koennen keine termine eintragen
 				if($db->db_num_rows($result2)==0)
 				{
 					//echo "neuer Termin";

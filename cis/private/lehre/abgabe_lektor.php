@@ -44,15 +44,16 @@
 
 	
 	$sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
-			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
+			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
+			LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
 			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
 			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
-			LEFT JOIN public.tbl_studiengang using(studiengang_kz)
+			LEFT JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz=public.tbl_studiengang.studiengang_kz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
-									WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-									AND public.tbl_benutzer.uid='$getuid')
+				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
+				AND public.tbl_benutzer.uid='$getuid')
 			AND public.tbl_benutzer.aktiv 
 			AND lehre.tbl_projektarbeit.note IS NULL 
 			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' 
@@ -70,7 +71,7 @@ else
 	$htmlstr .= "<form name='multitermin' action='abgabe_lektor_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
 	$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
-	$htmlstr .= "<th></th><th class='table-sortable:default'>UID</th>
+	$htmlstr .= "<th></th><th class='table-sortable:default'>UID/Personenkennz.</th>
 				<th>Email</th>
 				<th class='table-sortable:default'>Vorname</th>
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
@@ -85,7 +86,7 @@ else
 	{
 		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
-		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
+		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a> / ".$row->matrikelnr."</td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
