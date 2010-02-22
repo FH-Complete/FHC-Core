@@ -406,7 +406,7 @@ function js_toggle_container(conid)
 							if(!is_dir($path))
 							{
 								if(!is_dir('../../../documents/'.strtolower($short)))
-									exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
+									exec('mkdir -m 755 "../../../documents/'.strtolower($short).'"');
 								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
 								exec('chgrp teacher ../../../documents/'.strtolower($short).'/download');
 							}

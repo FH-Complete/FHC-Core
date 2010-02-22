@@ -28,6 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class organisationseinheit extends basis_db
 {
+	public static $oe_parents_array=array();
 	public $new;     			// @var boolean
 	public $errormsg; 			// @var string
 	public $result;
@@ -41,6 +42,7 @@ class organisationseinheit extends basis_db
 	
 	public $oe_kurzbz_orig;
 	public $beschreibung;
+	
 	
 	/**
 	 * Konstruktor
@@ -361,6 +363,57 @@ class organisationseinheit extends basis_db
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Laedt die Organisationseinheiten in ein Array
+	 *
+	 */
+	public function loadParentsArray()
+	{
+		$qry = 'SELECT * FROM public.tbl_organisationseinheit';
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				organisationseinheit::$oe_parents_array[$row->oe_kurzbz]=$row->oe_parent_kurzbz;
+			}
+		}
+	}
+	
+	
+	public function isChild($oe_kurzbz, $child)
+	{
+		if(count(organisationseinheit::$oe_parents_array)<=0)
+		{
+			$this->loadParentsArray();
+		}
+		
+		if(!isset(organisationseinheit::$oe_parents_array[$child]))
+		{
+			$this->errormsg = 'Organisationseinheit existiert nicht';
+			return false;
+		}
+		
+		$childs = array_keys(organisationseinheit::$oe_parents_array, $oe_kurzbz);
+
+		foreach ($childs as $row)
+		{
+			if($row==$child)
+			{
+				return true;
+			}
+			else
+			{ 
+				if($this->isChild($row, $child))
+					return true;
+			}
+		}
+		
+		return false;
+			
+		
 	}
 }
 ?>
