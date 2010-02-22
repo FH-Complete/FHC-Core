@@ -115,12 +115,16 @@ else
 	$summe2=(isset($_POST['summe2'])?$_POST['summe2']:'');
 	$note=(isset($_POST['note'])?$_POST['note']:'');
 	$ende=(isset($_POST['ende'])?$_POST['ende']:'');
+	$titelpre=(isset($_POST['titelpre'])?$_POST['titelpre']:'');
+	$titelpost=(isset($_POST['titelpost'])?$_POST['titelpost']:'');
 	
 	$qualitaet=mb_convert_encoding(trim($qualitaet),'ISO-8859-15','UTF-8');
 	$form=mb_convert_encoding(trim($form),'ISO-8859-15','UTF-8');
 	$hintergrund=mb_convert_encoding(trim($hintergrund),'ISO-8859-15','UTF-8');
 	$autor=mb_convert_encoding(trim($autor),'ISO-8859-15','UTF-8');
 	$titel=mb_convert_encoding(trim($titel),'ISO-8859-15','UTF-8');
+	$titelpre=mb_convert_encoding(trim($titelpre),'ISO-8859-15','UTF-8');
+	$titelpost=mb_convert_encoding(trim($titelpost),'ISO-8859-15','UTF-8');
 	
 	
 	//Ausdruck generieren
@@ -194,7 +198,7 @@ else
 	$pdf->MultiCell(80,14,'Autor',1,'L',0);
 	$maxX +=80;
 	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(291,14,$autor,1,'L',0);
+	$pdf->MultiCell(291,14,trim($titelpre." ".$autor." ".$titelpost),1,'L',0);
 	$maxX +=291;
 	$pdf->SetXY($maxX,$maxY);
 	$pdf->MultiCell(159,14,trim('Personenkz.: '),1,'L',0);
@@ -684,7 +688,7 @@ else
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
 		$htmlstr .= "<form action=".$_SERVER['PHP_SELF']." method='POST' onsubmit='return inputcheck()'>";
-		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".$row->vorname." ".$row->nachname."</b></td>";
+		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".trim($row->titelpre." ".$row->vorname." ".$row->nachname." ".$row->titelpost)."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
@@ -692,6 +696,8 @@ else
 		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 		$htmlstr .= "<input type='hidden' name='perskz' value='".$row->matrikelnr."'>\n";
 		$htmlstr .= "<input type='hidden' name='studiengang' value='".$row->stgbezeichnung."'>\n";
+		$htmlstr .= "<input type='hidden' name='titelpre' value='".$row->titelpre."'>\n";
+		$htmlstr .= "<input type='hidden' name='titelpost' value='".$row->titelpost."'>\n";
 		$htmlstr .= "<input type='hidden' name='autor' value='".$row->vorname." ".$row->nachname."'>\n";
 		$htmlstr .= "<input type='hidden' name='ende' value='".$row->ende."'>\n";
 		if($row->stgtyp=='b')
@@ -789,7 +795,7 @@ else
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<td width='40%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
-			Werden Gesamtzusammenh�nge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
+			Werden Gesamtzusammenhänge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
 			Intelligente Darstellung des relevanten Stands der Technik und des Firmenumfelds<br>
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
 			<td width='30%'><textarea name='hintergrund' value='".$hintergrund."' cols='50'  rows='10' 
