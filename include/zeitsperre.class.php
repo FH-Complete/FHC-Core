@@ -339,5 +339,61 @@ class zeitsperre extends basis_db
 		}
 		return $erbk;
 	}
+	
+	/**
+	 * Liefert die Zeitsperren eines Users zu einem bestimmten Datum und Stunde
+	 *
+	 * @param $user
+	 * @param $datum
+	 * @param $stunde
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getSperreByDate($user, $datum, $stunde)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					campus.tbl_zeitsperre 
+				WHERE 
+					vondatum<='$datum' AND bisdatum>='$datum' AND 
+					(vonstunde<='$stunde' OR vonstunde is null) AND 
+					(bisstunde>='$stunde' OR bisstunde is null) AND 
+					mitarbeiter_uid='$user'";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				
+				$obj = new zeitsperre();
+
+				$obj->zeitsperre_id = $row->zeitsperre_id;
+				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->vondatum = $row->vondatum;
+				$obj->vonstunde = $row->vonstunde;
+				$obj->bisdatum = $row->bisdatum;
+				$obj->bisstunde = $row->bisstunde;
+				$obj->erreichbarkeit_kurzbz = $row->erreichbarkeit_kurzbz;
+				$obj->vertretung_uid = $row->vertretung_uid;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->freigabeamum = $row->freigabeamum;
+				$obj->freigabevon = $row->freigabevon;
+
+				$this->result[] = $obj;
+
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Zeitsperren';
+			return false;
+		}
+	}
 }
 ?>
