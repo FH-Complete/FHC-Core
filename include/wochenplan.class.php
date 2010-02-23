@@ -35,6 +35,7 @@ require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
 require_once(dirname(__FILE__).'/studiengang.class.php');
 require_once(dirname(__FILE__).'/mitarbeiter.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/zeitsperre.class.php');
 
 class wochenplan extends basis_db
 {
@@ -927,10 +928,25 @@ class wochenplan extends basis_db
 			echo '</vbox>';
 			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
+				$tooltip='';
 				$row = $this->db_fetch_object($result_stunde, $k);
 				$j=$row->stunde;
 				if (isset($wunsch[$i][$j]))
+				{
 					$index=$wunsch[$i][$j];
+					if($index==-3)
+					{
+						//Wenn eine Zeitsperre eingetragen ist, dann diese im Tooltiptext anzeigen
+						$zeitsperre = new zeitsperre();
+						$zeitsperre->getSperreByDate($this->pers_uid, date('Y-m-d',$datum), $j);
+						foreach($zeitsperre->result as $sperren)
+						{
+							if($tooltip!='')
+								$tooltip.=', ';
+							$tooltip.=$sperren->zeitsperretyp_kurzbz.' - '.$sperren->bezeichnung;
+						}
+					}
+				}
 				else
 					$index=1;
 				if ($index=='')
@@ -939,18 +955,19 @@ class wochenplan extends basis_db
 				if ($isferien)
 				{
 					$bgcolor='#FFFF55';
-					$ferienbezeichnung='';
+					
+					//Wenn Ferien eingetragen sind, dann die Bezeichnung im Tooltiptext anzeigen
 					foreach($ferien->getFerien($datum) as $bezeichnung)
 					{
-						if($ferienbezeichnung!='')
-							$ferienbezeichnung.=', ';
-						$ferienbezeichnung .= $bezeichnung;
+						if($tooltip!='')
+							$tooltip.=', ';
+						$tooltip .= $bezeichnung;
 					}
 				}
 				echo '<vbox style="border:1px solid black; background-color:'.$bgcolor.'"';
-				if($isferien)
+				if($tooltip!='')
 				{
-					echo ' tooltiptext="'.str_replace('"','&quot;',$ferienbezeichnung).'"';
+					echo ' tooltiptext="'.str_replace('"','&quot;',$tooltip).'"';
 				}
 				echo '					
 					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
