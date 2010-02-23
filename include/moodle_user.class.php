@@ -593,7 +593,7 @@ class moodle_user extends basis_db
 						$this->addslashes($username).",".
 						$this->addslashes($vorname).",".
 						$this->addslashes($nachname).",".
-						$this->addslashes($username.'@'.DOMAIN).", 1, 1, 'de_utf8');";
+						$this->addslashes($username.'@'.DOMAIN).", 3, 1, 'de_utf8');";
 				
 				if(pg_query($this->conn_moodle, $qry))
 				{
