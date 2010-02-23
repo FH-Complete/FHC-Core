@@ -937,8 +937,22 @@ class wochenplan extends basis_db
 					$index=1;
 				$bgcolor=$cfgStdBgcolor[$index+3];
 				if ($isferien)
+				{
 					$bgcolor='#FFFF55';
-				echo '<vbox style="border:1px solid black; background-color:'.$bgcolor.'"
+					$ferienbezeichnung='';
+					foreach($ferien->getFerien($datum) as $bezeichnung)
+					{
+						if($ferienbezeichnung!='')
+							$ferienbezeichnung.=', ';
+						$ferienbezeichnung .= $bezeichnung;
+					}
+				}
+				echo '<vbox style="border:1px solid black; background-color:'.$bgcolor.'"';
+				if($isferien)
+				{
+					echo ' tooltiptext="'.str_replace('"','&quot;',$ferienbezeichnung).'"';
+				}
+				echo '					
 					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 					ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
 		  			ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
