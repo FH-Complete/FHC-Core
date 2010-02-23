@@ -205,5 +205,22 @@ class ferien extends basis_db
 				return true;
 		return false;
 	}
+	
+	/**
+	 * Liefert ein Array mit den Ferien zum angegebenen Datum
+	 *
+	 * @param $timestamp
+	 * @return array
+	 */
+	public function getFerien($timestamp)
+	{
+		$ret = array();
+		
+		foreach ($this->ferien AS $f)
+			if ($timestamp>=$f->vontimestamp && $timestamp<=$f->bistimestamp)
+				$ret[]=$f->bezeichnung;
+				
+		return $ret;
+	}
 }
 ?>
