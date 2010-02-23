@@ -124,9 +124,9 @@ if(isset($_GET['stg_kz']))
 }
 else
 {
-	$stg_kz=228;
-	//echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
-	//exit;
+	//$stg_kz=228;
+	echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
+	exit;
 }
 function myaddslashes($var)
 {
