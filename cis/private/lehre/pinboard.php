@@ -673,10 +673,10 @@ function show(id)
 					{
 						if(!is_dir($path))
 						{
-							if(!is_dir('../../../documents/'.strtolower($short)))
-								exec('mkdir -m 755 "../../../documents/'.strtolower($short).'"');
-							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/lehrziele"');
-							exec('chgrp teacher ../../../documents/'.strtolower($short).'/lehrziele');
+							if(!is_dir(DOC_ROOT.'/documents/'.strtolower($short)))
+								exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.strtolower($short).'"');
+							exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.strtolower($short).'/lehrziele"');
+							exec('sudo chown :teacher "'.DOC_ROOT.'/documents/'.strtolower($short).'/lehrziele"');
 						}
 					}
 
@@ -712,10 +712,10 @@ function show(id)
 					{
 						if(!is_dir($path))
 						{
-							if(!is_dir('../../../documents/'.strtolower($short)))
-								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'"');
-							exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
-							exec('sudo chgrp teacher ../../../documents/'.strtolower($short).'/download');
+							if(!is_dir(DOC_ROOT.'/documents/'.strtolower($short)))
+								exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.strtolower($short).'"');
+							exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.strtolower($short).'/download"');
+							exec('sudo chown :teacher "'.DOC_ROOT.'/documents/'.strtolower($short).'/download"');
 						}
 
 					}

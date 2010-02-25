@@ -400,22 +400,7 @@ function js_toggle_container(conid)
 	  			<td class="tdwrap">
 	  		<?php
 	                	$path = '../../../documents/'.strtolower($short).'/download';
-						if(!$dest_dir = is_dir($path))
-						{
-	
-							if(!is_dir($path))
-							{
-								if(!is_dir('../../../documents/'.strtolower($short)))
-									exec('mkdir -m 755 "../../../documents/'.strtolower($short).'"');
-								exec('mkdir -m 775 "../../../documents/'.strtolower($short).'/download"');
-								exec('chgrp teacher ../../../documents/'.strtolower($short).'/download');
-							}
-						}
-						if(is_dir($path))
-						{
-							$dest_dir = @dir($path);
-							echo '<a href="'.$dest_dir->path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
-						}
+						echo '<a href="'.$path.'/" class="MenuItem" target="_blank"><img src="../../../skin/images/seperator.gif">&nbsp;Allgemeiner Download</a>';
 					?>
 				</td>
 			
