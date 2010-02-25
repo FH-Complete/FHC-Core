@@ -77,8 +77,9 @@
     else
     	$is_lector=false;
 
-	$upload_root = "../../../documents";
-
+	$upload_root = DOC_ROOT.'/documents';//"../../../documents";
+	$link_cut = DOC_ROOT.'/documents';
+	
 	if(isset($subdir))
 	{
 		if(substr_count($subdir, '..') > 0 || substr_count($subdir, '.') > 0)
@@ -636,11 +637,11 @@ A:hover {
 													  	 	 exec('chmod 664 "'.$uploadfile.'"');
 															 if($islector)
 															 {
-																exec('chgrp teacher "'.$uploadfile.'"');
+																exec('sudo chown :teacher "'.$uploadfile.'"');
 															 }
 															 else
 															 {
-																exec('chgrp student "'.$uploadfile.'"');
+																exec('sudo chown :student "'.$uploadfile.'"');
 															 }
 													  	 }
 													  }
@@ -659,11 +660,11 @@ A:hover {
 													  	  exec('chmod 664 "'.$uploadfile.'"');
 														  if($islector)
 														  {
-															exec('chgrp teacher "'.$uploadfile.'"');
+															exec('sudo chown :teacher "'.$uploadfile.'"');
 														  }
 														  else
 														  {
-															exec('chgrp student "'.$uploadfile.'"');
+															exec('sudo chown :student "'.$uploadfile.'"');
 														  }
 													  }
 												  }
@@ -692,11 +693,11 @@ A:hover {
 														  	   	   exec('chmod 664 "'.$uploadfile.'"');
 																   if($islector)
 																   {
-																		exec('chgrp teacher "'.$uploadfile.'"');
+																		exec('sudo chown :teacher "'.$uploadfile.'"');
 																   }
 																   else
 																   {
-																		exec('chgrp student "'.$uploadfile.'"');
+																		exec('sudo chown :student "'.$uploadfile.'"');
 																   }
 														  	   }
 														  }
@@ -715,11 +716,11 @@ A:hover {
 														  	  exec('chmod 664 "'.$uploadfile.'"');
 															  if($islector)
 															  {
-																exec('chgrp teacher "'.$uploadfile.'"');
+																exec('sudo chown :teacher "'.$uploadfile.'"');
 															  }
 															  else
 															  {
-																exec('chgrp student "'.$uploadfile.'"');
+																exec('sudo chown :student "'.$uploadfile.'"');
 															  }
 														  }
 													  }
@@ -848,11 +849,11 @@ A:hover {
 
 									if($islector)
 									{
-										exec('chgrp teacher "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										exec('sudo chown :teacher "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
 									}
 									else
 									{
-										exec('chgrp student "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										exec('sudo chown :student "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
 									}
 								}
 							}
@@ -1293,6 +1294,7 @@ A:hover {
 							{
 								if(!@is_dir($dest_dir->path.'/'.$entry) && substr($entry,0,1)!=".")
 								{
+									unset($check_state);
 									$null_file = false;
 									if(isset($_POST['_check_state_'.$file_count]))
 										$check_state = $_POST['_check_state_'.$file_count];
@@ -1307,7 +1309,7 @@ A:hover {
 									}
 									if(!isset($link_cut))
 										$link_cut='';
-									$link_path = mb_substr($dest_dir->path, mb_strlen($link_cut)).'/'.urlencode($entry);
+									$link_path = '../../../documents'.mb_substr($dest_dir->path, mb_strlen($link_cut)).'/'.urlencode($entry);
 									//+ durch %20 ersetzten damit Files mit leerzeichen geoeffnet werden koennen
 									$link_path = str_replace("+","%20",$link_path);
 									echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"$link_path\" target=\"_blank\">&nbsp;<img src=\"../../../skin/images/file.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";

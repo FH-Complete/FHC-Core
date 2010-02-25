@@ -31,7 +31,7 @@
     if(!$stg_obj->load($lv_obj->studiengang_kz))
     	die('Fehler beim Laden des Studienganges');
 
-    $openpath = '../../../documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->semester.'/'.strtolower($lv_obj->lehreverzeichnis).'/semesterplan/';
+    $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->semester.'/'.strtolower($lv_obj->lehreverzeichnis).'/semesterplan/';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -113,7 +113,10 @@ function ConfirmFile(handle)
 			   !stristr($fn, '.cgi') && !stristr($fn, '.pl'))
 			{
 				if(move_uploaded_file($_FILES['userfile']['tmp_name'],$openpath . $fn))
+				{
+					exec('sudo chown www-data:teacher "'.$openpath.$fn.'"');
 					echo "<center>Das File wurde erfolgreich hochgeladen</center>";
+				}
 				else
 					echo "<center>Fehler beim Upload! Bitte Versuchen Sie es erneut</center>";
 			}
