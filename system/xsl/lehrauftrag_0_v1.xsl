@@ -48,7 +48,17 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</fo:block>
 					\n<fo:block font-size="8pt">
 						<fo:inline font-weight="bold">
-							<xsl:value-of select="mitarbeiter/name_gesamt" />
+							<!--<xsl:value-of select="mitarbeiter/name_gesamt" />-->
+							<xsl:choose>
+								<xsl:when test="string-length(mitarbeiter/titelpre)!=0">
+									<xsl:value-of select="mitarbeiter/titelpre" /><xsl:text> </xsl:text>
+								</xsl:when>
+								
+							</xsl:choose>
+							
+							<xsl:value-of select="mitarbeiter/vorname" /><xsl:text> </xsl:text>
+							<xsl:value-of select="mitarbeiter/familienname" /><xsl:text> </xsl:text>
+							<xsl:value-of select="mitarbeiter/titelpost" /><xsl:text> </xsl:text>
 						</fo:inline>
 						\n<xsl:text>SV.Nr.: </xsl:text><xsl:value-of select="mitarbeiter/svnr" />		
 						\n<xsl:text>Personalnummer: </xsl:text><xsl:value-of select="mitarbeiter/personalnummer" />
