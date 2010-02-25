@@ -36,6 +36,7 @@ define('BENOTUNGSTOOL_PATH','/websites/portal/trunk/documents/benotungstool/');
 // XML fuer XSL-Vorlagen
 define('XML_ROOT','http://dav.technikum-wien.at/oesi/portal/trunk/rdf/');
 define('APP_ROOT','http://dav.technikum-wien.at/oesi/portal/trunk/');
+define('DOC_ROOT','/var/www/cis/htdocs');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
