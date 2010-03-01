@@ -348,7 +348,7 @@
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/tools/wlan_registration.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;WLAN-Registration</a></td>
+				<td class="tdwrap"><a class="Item" href="private/tools/wlan_registration.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;WLAN-Zugang</a></td>
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
