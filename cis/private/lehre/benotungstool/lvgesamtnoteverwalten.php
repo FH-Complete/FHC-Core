@@ -651,14 +651,13 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	{
 		$jetzt = date("Y-m-d H:i:s");
 		$neuenoten = 0;
-		$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>";
+		$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>Nachname</b></td><td><b>Vorname</b></td><td><b>Note</b></td></tr>\n";
 
 		// studentenquery					
 		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehrveranstaltung_id = '".addslashes($lvid)."' ORDER BY nachname, vorname ";
         if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
-			
 			while($row_stud = $db->db_fetch_object($result_stud))
 			{	
 				$lvgesamtnote = new lvgesamtnote();
@@ -669,7 +668,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
     					$lvgesamtnote->freigabedatum = $jetzt;
     					$lvgesamtnote->freigabevon_uid = $user;
     					$lvgesamtnote->save($new=null);
-    					$studlist .= "<tr><td>".$row_stud->matrikelnr."</td><td>".$row_stud->nachname."</td><td>".$row_stud->vorname."</td><td>".$lvgesamtnote->note."</td></tr>";
+    					$studlist .= "<tr><td>".trim($row_stud->matrikelnr)."</td><td>".trim($row_stud->nachname)."</td><td>".trim($row_stud->vorname)."</td><td>".trim($lvgesamtnote->note)."</td></tr>\n";
     					$neuenoten++;
     				}
     			}
@@ -694,7 +693,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 
 			$freigeber = "<b>".mb_strtoupper($user)."</b>";
 			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung,'');
-			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>";
+			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>\n".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>";
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
