@@ -135,7 +135,7 @@ class basis
 			return false;
 		}
 		
-		if ($art!='select' && !empty($pSql))
+		if ($art!='select' && empty($pSql))
 			return true;
 
 		if (!$num=$this->db_num_rows($results))
