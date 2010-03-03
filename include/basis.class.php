@@ -99,38 +99,43 @@ class basis
 		}
 
 		// DB Abfrage zusammenbauen
-		$sql.=$art. ' ';
-		if ($art=='select')
-			$sql.=($distinct?' distinct ':'');
-		$sql.=($fields?$fields:' * ');
-		$sql.=($table?' from '.trim($table).' ':'');
-		if (strstr('where',strtolower($where)))
-			$sql.=($where?' '.trim($where).' ':'');
-		else
-			$sql.=($where?' where '.trim($where).' ':'');
-		
-		if ($art=='select')		
+		if (!empty($pSql))
 		{
-			if (strstr('order',strtolower($where)))
-				$sql.=($order?trim($order).' ':'');
-			else
-				$sql.=($order?' order by '.trim($order).' ':'');
-		}	
-		if ($art=='select')	
-		{
-			if (strstr('limit',strtolower($where)))
-				$sql.=($limit?trim($limit).' ':'');
-			else	
-				$sql.=($limit?' limit '.trim($limit).' ':'');
+			$sql=$pSql;
 		}
-		
+		else
+		{
+			$sql.=$art. ' ';
+			if ($art=='select')
+				$sql.=($distinct?' distinct ':'');
+			$sql.=($fields?$fields:' * ');
+			$sql.=($table?' from '.trim($table).' ':'');
+			if (strstr('where',strtolower($where)))
+				$sql.=($where?' '.trim($where).' ':'');
+			else
+				$sql.=($where?' where '.trim($where).' ':'');
+			if ($art=='select')		
+			{
+				if (strstr('order',strtolower($where)))
+					$sql.=($order?trim($order).' ':'');
+				else
+					$sql.=($order?' order by '.trim($order).' ':'');
+			}	
+			if ($art=='select')	
+			{
+				if (strstr('limit',strtolower($where)))
+					$sql.=($limit?trim($limit).' ':'');
+				else		
+					$sql.=($limit?' limit '.trim($limit).' ':'');
+			}
+		}
 		if (!$results=$this->db_query($sql))
 		{
 			$this->errormsg=$this->db_last_error();
 			return false;
 		}
 		
-		if ($art!='select')
+		if ($art!='select' && !empty($pSql))
 			return true;
 
 		if (!$num=$this->db_num_rows($results))
