@@ -103,7 +103,13 @@
 
 	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
-	  		  	
+
+	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester ,tbl_lehreinheit.lehrform_kurzbz
+				 FROM lehre.tbl_lehreinheit 
+				JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) 
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+					  		  	
 	  	if($result = $db->db_query($qry))
 	  	{
 	  		if($db->db_num_rows($result)>0)
