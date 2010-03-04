@@ -30,57 +30,64 @@
  *****************************************************************************/
 
 require_once('../../../config/cis.config.inc.php');
-
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/studiensemester.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
+
+if(!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 //Startwerte setzen
-if (!isset($_GET['db_stpl_table']))
+if(!isset($_GET['db_stpl_table']))
 	$db_stpl_table='stundenplan';
 else
 	$db_stpl_table=$_GET['db_stpl_table'];
-if (isset($_GET['type']))
+	
+if(!in_array($db_stpl_table,array('stundenplan','stundenplandev')))
+	die('db_stpl_table invalid');
+if(isset($_GET['type']))
 	$type=$_GET['type'];
-if (isset($_GET['pers_uid']))
+if(isset($_GET['pers_uid']))
 	$pers_uid=$_GET['pers_uid'];
 $ort_kurzbz=(isset($_GET['ort_kurzbz'])?$_GET['ort_kurzbz']:'');
+$ort_kurzbz=(isset($_GET['ort'])?$_GET['ort']:$ort_kurzbz);
 $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $sem=(isset($_GET['sem'])?$_GET['sem']:'');
 $ver=(isset($_GET['ver'])?$_GET['ver']:'');
 $grp=(isset($_GET['grp'])?$_GET['grp']:'');
 $gruppe_kurzbz=(isset($_GET['einheit'])?$_GET['einheit']:'');
+$gruppe_kurzbz=(isset($_GET['gruppe'])?$_GET['gruppe']:$gruppe_kurzbz);
 if (isset($_GET['begin']))
 	$begin=$_GET['begin'];
 if (isset($_GET['ende']))
 	$ende=$_GET['ende'];
 if (isset($_GET['format']))
 	$format=$_GET['format'];
+else
+	$format='HTML';
 $version=(isset($_GET['version'])?$_GET['version']:2);
 $target=(isset($_GET['target'])?$_GET['target']:null);
 
 // UID bestimmen
 $uid = get_uid();
 
-
 // Beginn Ende setzen
-if (!isset($begin))
+if(!isset($begin))
 {
 	$objSS=new studiensemester();
-	$ss=$objSS->getaktorNext();
+	$ss = $objSS->getaktorNext();
 	$objSS->load($ss);
-	$begin=datum::mktime_fromdate($objSS->start);
-	$ende=datum::mktime_fromdate($objSS->ende);
+	$begin = datum::mktime_fromdate($objSS->start);
+	$ende = datum::mktime_fromdate($objSS->ende);
 }
 
 
 
 // for spezial friends
-if ($uid=='maderdon')
-	if (!isset($_GET['format']))
+if($uid=='maderdon')
+{
+	if(!isset($_GET['format']))
 	{
 		$format='ical';
 		$version=2;
@@ -88,30 +95,20 @@ if ($uid=='maderdon')
 		$begin=1188597600;
 		$ende=1202166000;
 	}
+}
 
 $jahr=date("Y",$begin);
 $mon=date("m",$begin);
 $name='FH-Kalender_'.$mon.'_'.$jahr;
-if (isset($target))
+if(isset($target))
 	$name.='_'.$target;
-
-
 
 // doing some DOS-CRLF magic...
 $crlf=crlf();
 
-// Funktion zum Konvertieren des gesamten Outputs nach UTF8
-function converttoutf8($buffer)
-{
-  return $buffer;
-	return utf8_encode($buffer);
-}
-
-
-
 // Check Type
 // Print in csv-file
-if ($format=='csv')
+if($format=='csv')
 {
 	$name.='.csv';
 	header("Content-disposition: filename=$name");
@@ -124,10 +121,8 @@ if ($format=='csv')
 		echo '"title","category","location","description","keywords","start_date","start_time","end_date","end_time","alarm","recur_type","recur_end_date","recur_interval","recur_data"';
 }
 // Print in ical-file - MR
-else if ($format=='ical')
+elseif($format=='ical')
 {
-	//Bei icals den output buffern und am ende den gesamten output auf utf8 codieren
-	ob_start("converttoutf8");
 	$name.='.ics';
 	header("Content-disposition: filename=$name");
 	header("Content-type: text/calendar");
@@ -143,12 +138,13 @@ else
 	echo '<title>Kalender</title>';
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
 	echo '<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">';
+	echo '<link rel="stylesheet" type="text/css" media="print" href="../../../skin/print.css" />';
 	echo '</head>';
 	echo '<body id="inhalt">';
 }
 
-
-if (!isset($begin) || !isset($ende))
+if(!isset($begin) || !isset($ende))
+{
 	// datum holen falls nicht gesetzt
 	if (!isset($_GET['semesterplan']))
 	{
@@ -156,11 +152,11 @@ if (!isset($begin) || !isset($ende))
 	}
 	else
 	{
-    $query="SELECT start,ende FROM campus.tbl_studiensemester WHERE studiensemester_kurzbz=(SELECT wert FROM public.tbl_variable WHERE name='semester_aktuell' AND uid='$uid');";
-		if (!$result_semester=$db->db_query($query))
+   		$query="SELECT start,ende FROM campus.tbl_studiensemester WHERE studiensemester_kurzbz=(SELECT wert FROM public.tbl_variable WHERE name='semester_aktuell' AND uid='$uid');";
+		if(!$result_semester=$db->db_query($query))
 		    die($db->db_last_error());
 
-    if ($db->db_num_rows($result_semester)>0)
+    	if($db->db_num_rows($result_semester)>0)
 		{
 			$begin=strtotime($db->db_result($result_semester,0,'start'));
 			$ende=strtotime($db->db_result($result_semester,0,'ende'));
@@ -170,91 +166,107 @@ if (!isset($begin) || !isset($ende))
 			die('Studiensemester konnte nicht gefunden werden!');
 		}
 		$result_semester=$db->db_query("SELECT wert FROM public.tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
-		if ($db->db_num_rows($result_semester)>0)
+		if($db->db_num_rows($result_semester)>0)
 			$db_stpl_table=$db->db_result($result_semester,0,'wert');
 		else
 		{
 			die('User nicht vorhanden!');
 		}
 	}
-if ($ende-$begin>31536000)
+}
+
+if($ende-$begin>31536000)
 {
 	die("Datumsbereich ist zu grosz!");
 }
 
-
-if (!isset($type))
-	if ($pers_uid=check_student($uid))
+if(!isset($type))
+{
+	if($pers_uid=check_student($uid))
 		$type='student';
-	elseif ($pers_uid=check_lektor($uid))
+	elseif($pers_uid=check_lektor($uid))
 		$type='lektor';
     else
-    {
         die("Cannot set type!");
-    }
-if (!isset($pers_uid))
-	if ($type=='student')
+}
+
+if(!isset($pers_uid))
+{
+	if($type=='student')
 		$pers_uid=check_student($uid);
-	elseif ($type=='lektor')
+	elseif($type=='lektor')
 		$pers_uid=check_lektor($uid);
+	else
+		$pers_uid='';
+}
 
 // Stundenplanobjekt erzeugen
-$stdplan=new wochenplan($type);
+$stdplan = new wochenplan($type);
 $stdplan->crlf=$crlf;
 
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
+if(!$stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
 {
-		die($stdplan->errormsg);
+	die($stdplan->errormsg);
 }
 
 //Ueberschriften in HTML
-if ($format=='HTML')
+if($format=='HTML')
 {
-	if ($type=='verband' || $type=='einheit')
-		if (count($gruppe_kurzbz)>0)
+	if($type=='verband' || $type=='einheit')
+	{
+		if (strlen($gruppe_kurzbz)>0)
 			echo '<H1>Lehrverband: '.$gruppe_kurzbz.'</H1>';
 		else
 			echo '<H1>Lehrverband: '.$stdplan->stg_kurzbzlang.'-'.$sem.$ver.$grp.'</H1>';
-	if ($type=='ort')
+	}
+	if($type=='ort')
 		echo '<H1>Ort: '.$ort_kurzbz.' - '.$stdplan->ort_bezeichnung.'</H1>';
-	if ($type=='lektor')
-		echo '<H1>Lektor: '.$stdplan->$pers_titel.' '.$stdplan->pers_vornamen.' '.$stdplan->pers_nachname.'</H1>';
+	if($type=='lektor')
+		echo '<H1>Lektor: '.$stdplan->pers_titelpre.' '.$stdplan->pers_vornamen.' '.$stdplan->pers_nachname.' '.$stdplan->pers_titelpost.'</H1>';
 }
 
 
-
+$i=0;
 // Kalender erstellen
-while ($begin<$ende)
+while($begin<$ende)
 {
-	if (!date("w",$begin))
+	$i++;
+	if(!date("w",$begin))
 		$begin=jump_day($begin,1);
+	
 	$stdplan->init_stdplan();
 	$datum=$begin;
 	$begin+=604800;	// eine Woche
 
 	// Stundenplan einer Woche laden
-	if (! $stdplan->load_week($datum,$db_stpl_table))
+	if(!$stdplan->load_week($datum,$db_stpl_table))
 	{
 		die($stdplan->errormsg);
 	}
 
 	// Stundenplan der Woche drucken
-	if ($format=='csv' || $format=='ical')
+	if($format=='csv' || $format=='ical')
 	{		
 		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
 	}
 	else
-		  $stdplan->draw_week(false);
+	{
+		$style='style="padding-top: 10px;" class="page-break-after"';
+
+		echo '<div '.$style.'>';
+		$stdplan->draw_week(false);
+		echo '</div>';
+	}
 }
 
 // Print in csv-file
-if ($format=='csv')
+if($format=='csv')
 {
 	echo $crlf;
 }
 // Print in ical-file
-else if ($format=='ical')
+elseif($format=='ical')
 {
 	echo $crlf.'END:VCALENDAR';
 	ob_end_flush();
@@ -262,7 +274,7 @@ else if ($format=='ical')
 // Print in HTML-File
 else
 {
-	echo '<P>Fehler und Feedback bitte an <A class="Item" href="mailto:'.MAIL_LVPLAN.'">Stundenplan</A></P>';
+	echo '<P class="dont-print">Fehler und Feedback bitte an <A class="Item" href="mailto:'.MAIL_LVPLAN.'">LV-Plan</A></P>';
 	echo '</body></html>';
 }
 ?>

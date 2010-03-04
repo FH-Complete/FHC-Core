@@ -1,0 +1,40 @@
+body 
+{
+	background: white;
+	font-size: 5pt !important;
+	padding:0px;
+	margin:0px;
+	font-family:'Times New Roman',Times,serif;
+}
+
+/* Seitenumbrueche */
+.page-break-after
+{
+	page-break-after:always;
+}
+
+.page-break-before
+{
+	page-break-before:always;
+}
+
+.page-break-after-avoid
+{
+	page-break-after:avoid;
+}
+
+.page-break-before-avoid
+{
+	page-break-before:avoid;
+}
+
+.page-break-inside-avoid
+{
+	page-break-inside: avoid;
+}
+
+/* Elemente ausblenden */
+.dont-print
+{
+	display: none;
+}

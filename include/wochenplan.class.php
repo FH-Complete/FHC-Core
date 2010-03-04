@@ -536,7 +536,7 @@ class wochenplan extends basis_db
 		//Tabelle zeichnen
 		echo '	<table class="stdplan" width="100%" border="1" cellpadding="0" cellspacing="0" name="Stundenplantabelle" align="center">'.$this->crlf;
 		// Kopfzeile darstellen
-	  	echo '		<tr>'.$this->crlf;
+	  	echo '<thead><tr>'.$this->crlf;
 		echo '			<th align="right">Stunde&nbsp;<br>Beginn&nbsp;<br>Ende&nbsp;</th>'.$this->crlf;
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
@@ -548,7 +548,7 @@ class wochenplan extends basis_db
 			$stunde=$row->stunde;
 			echo '			<th><div align="center">'.$stunde.'<br>&nbsp;'.$beginn .'&nbsp;<br>&nbsp;'.$ende.'&nbsp;</div></th>'.$this->crlf;
 		}
-		echo '		</tr>'.$this->crlf;
+		echo '</tr></thead><tbody>'.$this->crlf;
 		// Von Montag bis Samstag
 		$datum_now=mktime();
 		$datum_res_lektor_start=jump_day($datum_now,(RES_TAGE_LEKTOR_MIN)-1);
@@ -709,7 +709,7 @@ class wochenplan extends basis_db
 			echo '		</tr>'.$this->crlf;
 			$datum=jump_day($datum, 1);
 		}
-		echo '	</table>'.$this->crlf;
+		echo '	</tbody></table>'.$this->crlf;
 		if ($raumres && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
 			echo '<table><tr>';
