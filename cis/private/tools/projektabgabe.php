@@ -45,10 +45,13 @@ if(isset($_REQUEST['aktion']))
 	$aktion=$_REQUEST['aktion'];
 }
 $zipfile='';
-$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:0);
-$abgabetyp=(isset($_REQUEST['abgabetyp'])?$_REQUEST['abgabetyp']:'');
+$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
 if(!is_numeric($stg_kz) && $stg_kz!='')
 	exit();
+
+$abgabetyp=(isset($_REQUEST['abgabetyp'])?$_REQUEST['abgabetyp']:'');
+$termin=(isset($_REQUEST['termin'])?$_REQUEST['termin']:'');
+	
 $htmlstr='';
 $datum_obj = new datum();
 $user = get_uid();
@@ -75,51 +78,130 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 	}
 	exit();
 }
+
+if($zipfile=='')
+{
+	?>
+	<html>
+	<head>
+	<title>Projektabgabe</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<script src="../../../include/js/jquery.js" type="text/javascript"></script>
+	<script src="../../../include/js/jquery-ui.js" type="text/javascript"></script>
+	<script src="../../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
+	<script src="../../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
+
+	</head>
+	<body class="background_main">
+	<?php 
+}
+
 if($aktion!='zip')
 {
 	$s = new studiengang();
 	$s->loadArray($rechte->getStgKz($berechtigung_kurzbz),'typ,kurzbz');
-	
+		
 	echo'<form method="GET" action="'.$_SERVER['PHP_SELF'].'" name="abgabeFrm">';
-	
-	echo " Studiengang: <SELECT name='stg_kz'>";
+
+	echo " Studiengang: <SELECT onchange='set_termin();' id='stg_kz' name='stg_kz'>";
+	echo '<option value="" '. (!isset($_REQUEST['stg_kz']) || empty($stg_kz)?' selected ':'') .'>-</option>';
 	foreach ($s->result as $stg)
 	{
-		if($stg->studiengang_kz==$stg_kz)
-			$selected='selected';
-		else 	
-			$selected='';
-		echo '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
+		echo '<option value="'.$stg->studiengang_kz.'" '.(isset($_REQUEST['stg_kz']) && $stg->studiengang_kz==$stg_kz?' selected ':'').'>'.$stg->kuerzel.'</option>';
 	}
 	echo "</SELECT><input type=hidden name=aktion value=\"\">";
-	echo "   Abgabetyp: <SELECT name='abgabetyp'>";
+
+
+	echo "   Abgabetyp: <SELECT onchange='set_termin();' id='abgabetyp' name='abgabetyp'>";
 	$qry_atyp="SELECT * FROM campus.tbl_paabgabetyp";
+	echo '<option value="" '.(!isset($_REQUEST['abgabetyp']) || empty($abgabetyp)?' selected ':'').'>-</option>';
 	if($result_atyp=$db->db_query($qry_atyp))
 	{
 		while($row_atyp=$db->db_fetch_object($result_atyp))
 		{
-			if($row_atyp->paabgabetyp_kurzbz==$abgabetyp)
-				$selected='selected';
-			else 	
-				$selected='';
-			echo '<option value="'.$row_atyp->paabgabetyp_kurzbz.'" '.$selected.'>'.$row_atyp->bezeichnung.'</option>';
+			echo '<option value="'.$row_atyp->paabgabetyp_kurzbz.'" '.($row_atyp->paabgabetyp_kurzbz==$abgabetyp?' selected ':'').'>'.$row_atyp->bezeichnung.'</option>';
 		}
 	}
 	echo "</SELECT>";
 	
-	echo "&nbsp;<INPUT type='submit' value='OK'>&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM>";
+	
+	$qry_termin="	SELECT distinct campus.tbl_paabgabe.datum as termin , to_char(campus.tbl_paabgabe.datum, 'DD-MM-YYYY') as termin_anzeige 
+					FROM lehre.tbl_projektarbeit 
+							JOIN campus.tbl_paabgabe USING(projektarbeit_id)
+							LEFT JOIN public.tbl_benutzer ON(uid=student_uid) 
+							LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
+							LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+							LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+							WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
+							AND public.tbl_benutzer.aktiv 
+							AND lehre.tbl_projektarbeit.note IS NULL 
+						";
+			if ($stg_kz!='')
+				$qry_termin.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
+			if ($abgabetyp!='')
+				$qry_termin.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='$abgabetyp'";
+			$qry_termin.=" ORDER BY termin desc";	
+
+	
+	echo '&nbsp;Termin&nbsp;<select name="termin" id="termin">
+				<option value=""  '. (!isset($_REQUEST['termin']) || empty($termin)?' selected ':'') .'>-</option> ';
+	if($result_termin=$db->db_query($qry_termin))
+	{
+		while($row_termin=$db->db_fetch_object($result_termin))
+		{
+			echo '<option value="'.$row_termin->termin.'" '.($row_termin->termin==$termin?' selected ':'').'>'.$row_termin->termin_anzeige.'</option>';
+		}
 	}
-if($stg_kz!='')
+	echo	'</select>';
+	
+	?>
+					<script type="text/javascript">
+						function set_termin()
+						{
+							$('#termin').children().remove().end();
+							$.ajax
+							(
+								{
+									type: "POST",
+									url: 'projektabgabe_autocomplete.php',
+									dataType: 'json',
+									data: "work=work_termin_select" + "&stg_kz=" + $('#stg_kz').val()  + "&abgabetyp=" +  $('#abgabetyp').val(),
+									success: function(json)
+									{
+										var output = '';
+										for (p in json) 
+										{
+											output += '<option value=\"' + json[p].oTermin + '\">' + json[p].oTerminAnzeige + '</option>\n';
+										}
+										$('#termin').html(output);
+										$('#termin').result(function(event, data, formatted) {}).focus();
+									}
+								}
+							);
+						}
+					</script>	
+<?php
+	echo "&nbsp;<INPUT type='submit' name='ok' value='OK'>&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM>";
+	}
+	
+##if($stg_kz!='' || $abgabetyp!='' || $termin!='')
+if(isset($_REQUEST['ok']))
 {
 	$s=new studiengang();
-	if(!$s->load($stg_kz))
+	if($stg_kz!='' && !$s->load($stg_kz))
 	{
 		die("Studiengang konnte nicht geladen werden!");
 	}
-	if($rechte->isBerechtigt($berechtigung_kurzbz, $s->oe_kurzbz))
+	
+	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt($berechtigung_kurzbz, $s->oe_kurzbz))
 	{
-		$qry="SELECT * 
-			FROM (SELECT public.tbl_studiengang.bezeichnung as stgbez, campus.tbl_paabgabe.datum as termin,* FROM lehre.tbl_projektarbeit 
+		$qry="";
+##		$qry.="SELECT * 	FROM (";
+		$qry.="	SELECT public.tbl_studiengang.bezeichnung as stgbez, campus.tbl_paabgabe.datum as termin,* FROM lehre.tbl_projektarbeit 
 			JOIN campus.tbl_paabgabe USING(projektarbeit_id)
 			LEFT JOIN public.tbl_benutzer ON(uid=student_uid) 
 			LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
@@ -129,10 +211,20 @@ if($stg_kz!='')
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
 			AND public.tbl_benutzer.aktiv 
 			AND lehre.tbl_projektarbeit.note IS NULL 
-			AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
-		$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='$abgabetyp'";
-		$qry.=" ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy 
-		ORDER BY nachname";	
+			";
+			if ($stg_kz!='')
+				$qry.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
+			if ($abgabetyp!='')
+				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='$abgabetyp'";
+			if ($termin!='')
+				$qry.=" AND campus.tbl_paabgabe.datum='$termin'";
+		$qry.=" ORDER BY nachname  ";
+##		$qry.=" ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy ";		
+##		$qry.=" ORDER BY nachname";	
+		if($stg_kz=='' && $abgabetyp=='' && $termin=='')
+		{
+			$qry.=" limit 100 ";				
+		}
 		//echo $qry."<br>";
 		if(!$erg=$db->db_query($qry))
 		{
@@ -162,12 +254,12 @@ if($stg_kz!='')
 				}
 				//$htmlstr .= "<td>link</td>";
 				$htmlstr .= "<td>".$datum_obj->formatDatum($row->termin,'d.m.Y')."</td>";
-				$htmlstr .= "<td>$abgabetyp</td>";
-				$htmlstr .= "<td>$row->uid</td>";
-				$htmlstr .= "<td>".$row->vorname."</td>\n";
-				$htmlstr .= "<td>".$row->nachname."</td>\n";
-				$htmlstr .= "<td>".$row->projekttyp_kurzbz."</td>\n";
-				$htmlstr .= "<td>".$row->titel."</td>\n";
+				$htmlstr .= "<td>".$abgabetyp."&nbsp;</td>";
+				$htmlstr .= "<td>".$row->uid."&nbsp;</td>";
+				$htmlstr .= "<td>".$row->vorname."&nbsp;</td>\n";
+				$htmlstr .= "<td>".$row->nachname."&nbsp;</td>\n";
+				$htmlstr .= "<td>".$row->projekttyp_kurzbz."&nbsp;</td>\n";
+				$htmlstr .= "<td>".$row->titel."&nbsp;</td>\n";
 				if($aktion=='zip')
 				{
 					if($zipfile=='')
@@ -187,20 +279,10 @@ if($stg_kz!='')
 		die("Keine Zugriffsberechtigung!");
 	}
 }
+
 if($zipfile=='')
 {
-	?>
-	<html>
-	<head>
-	<title>Projektabgabe</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-	</head>
-	<body class="background_main">
-	<?php 
-		echo $htmlstr;
+	echo $htmlstr;
 	echo "</body>
 	</html>";
 }
