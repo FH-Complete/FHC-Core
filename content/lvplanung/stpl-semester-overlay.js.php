@@ -41,6 +41,7 @@ function onSTPLSemesterPrint()
 	// Wie ist gerade die Source vom iFrame
 	var iframeTimeTableSemester=document.getElementById('iframeTimeTableSemester');
 	var iframeTimeTableSemesterSource=iframeTimeTableSemester.getAttribute("src");
-	var src=iframeTimeTableSemesterSource.replace("content/timetable-week.xul.php","cis/private/lvplan/stpl_kalender.php");
+	var src=iframeTimeTableSemesterSource.replace("content/lvplanung/timetable-week.xul.php","cis/private/lvplan/stpl_kalender.php");
+	src=src+'&db_stpl_table='+document.getElementById('statusbarpanel-db_table').label;
 	var newWindow=window.open(src, "subWindowTimeTableSemester","");
 }
