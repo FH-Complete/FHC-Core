@@ -621,7 +621,7 @@ else
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<91)
+						else if(document.getElementById("summe2").value<90)
 						{
 							ergebnis=2;
 						}
@@ -657,7 +657,7 @@ else
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<91)
+						else if(document.getElementById("summe2").value<90)
 						{
 							ergebnis=2;
 						}
