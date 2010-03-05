@@ -38,9 +38,11 @@ $erhalter='';
 $zaehl=0;
 $eteam=array();
 $studiensemester=new studiensemester();
-$ssem=$studiensemester->getaktorNext();		//aktuelles Semester
-$psem=$studiensemester->getPrevious();		//voriges Semester
-$bsem=$studiensemester->getBeforePrevious();		//vorjähriges Semester
+if(isset($_GET['stsem']))
+	$stsem = $_GET['stsem'];
+else
+	$stsem=$studiensemester->getaktorNext(1);		//aktuelles Semester
+
 $datei='';
 $mitarbeiterzahl=0;
 $echt=0;
@@ -50,19 +52,16 @@ $nichtmelden = array(11,91,92,94,999,203,145,204, 308, 182, 222);
 
 $datumobj=new datum();
 
-if(mb_strstr($ssem,"WS"))
+if(mb_strstr($stsem,"WS"))
 {
-	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
-	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
+	$studiensemester->load($stsem);
+	$jahr = $datumobj->formatDatum($studiensemester->start, 'Y');
+	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, $jahr));
+	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, $jahr-1));
 }
-/*elseif(mb_strstr($ssem,"SS"))
-{
-	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 04, 15, date("Y")));
-	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")-1));
-}*/
 else
 {
-	echo "Ungültiges Semester!";
+	echo "Fehler: Studiensemester muss ein Wintersemester sein";
 	exit;
 }
 
@@ -71,34 +70,23 @@ if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))
 	{
-		if(strlen(trim($row->erhalter_kz))==1)
-		{
-			$erhalter='00'.trim($row->erhalter_kz);
-		}
-		elseif(strlen(trim($row->erhalter_kz))==2)
-		{
-			$erhalter='0'.trim($row->erhalter_kz);
-		}
-		else
-		{
-			$erhalter=$row->erhalter_kz;
-		}
+		$erhalter = sprintf("%04s",trim($row->erhalter_kz));
 	}
 }
 
-$qry="SELECT DISTINCT ON (UID) * FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
-	JOIN public.tbl_person USING(person_id)
-	WHERE tbl_benutzer.aktiv AND bismelden AND personalnummer>1 AND mitarbeiter_uid!='_DummyLektor'
+$qry="
+	SELECT DISTINCT ON (UID) * 
+	FROM 
+		public.tbl_mitarbeiter 
+		JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+		JOIN public.tbl_person USING(person_id)
+		JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
+	WHERE 
+		bismelden 
+		AND personalnummer>0 
+		AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>'$bisprevious')
 	ORDER BY uid, nachname,vorname
 	";
-
-/*
-	AND (ende>now() OR ende IS NULL)
-	bis.tbl_bisverwendung USING (mitarbeiter_uid)
-	bis.tbl_bisfunktion USING(bisverwendung_id)
-	bis.tbl_entwicklungsteam USING(mitarbeiter_uid)
-	public.tbl_benutzerfunktion
-*/
 
 if($result = $db->db_query($qry))
 {
@@ -140,7 +128,7 @@ if($result = $db->db_query($qry))
       <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
       <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
       <HoechsteAbgeschlosseneAusbildung>".$row->ausbildungcode."</HoechsteAbgeschlosseneAusbildung>";
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND habilitation=true;";
+		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".addslashes($row->mitarbeiter_uid)."' AND habilitation=true;";
 		if($resultvw=$db->db_query($qryvw))
 		{
 			if($db->db_num_rows($resultvw)>0)
@@ -154,7 +142,7 @@ if($result = $db->db_query($qry))
        <Habilitation>N</Habilitation>";
 			}
 		}
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."' AND (ende is null OR ende>'$bisprevious') AND beginn<'$bisdatum';";
+		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".addslashes($row->mitarbeiter_uid)."' AND (ende is null OR ende>'$bisprevious') AND (beginn<'$bisdatum' OR beginn is null);";
 		if($resultvw=$db->db_query($qryvw))
 		{
 			if($db->db_num_rows($resultvw)>0)
@@ -189,7 +177,7 @@ if($result = $db->db_query($qry))
 					{
 						$frei++;
 					}
-					$mitarbeiterzahl++;
+					
 					$person_content.="
        <Verwendung>
               <BeschaeftigungsArt1>".$rowvw->ba1code."</BeschaeftigungsArt1>
@@ -197,7 +185,15 @@ if($result = $db->db_query($qry))
               <BeschaeftigungsAusmass>".$rowvw->beschausmasscode."</BeschaeftigungsAusmass>
               <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
 					//Studiengangsleiter
-					$qryslt="SELECT tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) WHERE uid='".$row->mitarbeiter_uid."' AND funktion_kurzbz='Leitung' AND studiengang_kz<10000;";
+					$qryslt="SELECT 
+								tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz 
+							FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) 
+							WHERE 
+								uid='".addslashes($row->mitarbeiter_uid)."' 
+								AND funktion_kurzbz='Leitung' 
+								AND (datum_von<'$bisdatum' OR datum_von is null) 
+								AND (datum_bis>'$bisprevious' OR datum_bis is NULL)
+								AND studiengang_kz<10000;";
 					if($resultslt=$db->db_query($qryslt))
 					{
 						while($rowslt=$db->db_fetch_object($resultslt))
@@ -285,6 +281,7 @@ if($result = $db->db_query($qry))
 				$error_person = true;
 			}
 		}
+		$mitarbeiterzahl++;
 			$person_content.="
      </Person>";
 		if($error_log!='' || $error_log1!='')
@@ -313,16 +310,17 @@ echo '	<html><head><title>BIS - Meldung Mitarbeiter</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	</head><body>';
-echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft!</H1><br>";
-echo "Anzahl Mitarbeiter: Gesamt: ".$mitarbeiterzahl." / echter Dienstvertrag: ".$echt." / freier Dienstvertrag: ".$frei."<br>";
-echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$ssem."): </H2><br>";
+echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft (f&uuml;r Meldung ".$stsem." / $bisprevious - $bisdatum)</H1><br>";
+echo "Anzahl Mitarbeiter: Gesamt: ".$mitarbeiterzahl." / echter Dienstvertrag: ".$echt." / freier Dienstvertrag: ".$frei."<br><br>";
+echo "<H2>Nicht plausible BIS-Daten</H2><br>";
 echo nl2br($v."<br><br>");
 
 //Tabelle mit Ergebnissen ausgeben
 
 $ddd='bisdaten/bismeldung_mitarbeiter.xml';
-	$dateiausgabe=fopen($ddd,'w');
-	fwrite($dateiausgabe,$datei);
-	fclose($dateiausgabe);
+$dateiausgabe=fopen($ddd,'w');
+fwrite($dateiausgabe,$datei);
+fclose($dateiausgabe);
+
 echo "<a href=$ddd>XML-Datei f&uuml;r Mitarbeiter-BIS-Meldung</a><br><br>";
 ?>
