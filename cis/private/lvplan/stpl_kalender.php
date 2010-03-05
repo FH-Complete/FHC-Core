@@ -269,7 +269,6 @@ if($format=='csv')
 elseif($format=='ical')
 {
 	echo $crlf.'END:VCALENDAR';
-	ob_end_flush();
 }
 // Print in HTML-File
 else
