@@ -20,21 +20,16 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ * Überprüfung der Verwendungsdatensaetze im FASonline
+ *
+ */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+require('../../include/studiensemester.class.php');
 
- 
-//*
-//* Überprüfung der Verwendungsdatensaetze im FASonline
-//*
-//*
-
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
-
-		require('../../include/studiensemester.class.php');
-
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $error_log='';
 $fehler=0;
@@ -56,15 +51,16 @@ function myaddslashes($var)
 }
 
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-	<title>BIS-Meldung - &Uuml;berpr&uuml;fung von Verwendungen</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-</head>
+	<head>
+		<title>BIS-Meldung - &Uuml;berpr&uuml;fung von Verwendungen</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	</head>
 <body>
-<H1>BIS-Verwendungen werden &uuml;berpr&uuml;ft</H1>
-<br>
+	<H1>BIS-Verwendungen werden &uuml;berpr&uuml;ft</H1>
+	<br />
 <?php
 $qry="SELECT * FROM public.tbl_studiensemester";
 if($result = $db->db_query($qry))
@@ -367,6 +363,21 @@ if($resultall = $db->db_query($qryall))
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
 		echo "(ba1code: $rowall->ba1code, ba2code: $rowall->ba2code)";		
+	}
+}
+echo '<br>';
+//9 - inaktive mitarbeiter und bismelden ohne verwendung
+$qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
+	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
+	WHERE bismelden
+	GROUP BY uid,nachname,vorname HAVING count(bisverwendung_id)=0 ORDER by nachname,vorname;';
+if($resultall = $db->db_query($qryall))
+{
+	$num_rows_all=$db->db_num_rows($resultall);
+	echo "<H2>Bei $num_rows_all Mitarbeitern sind keine Verwendungen vorhanden - diese werden nicht BIS gemeldet</H2>";
+	while($rowall=$db->db_fetch_object($resultall))
+	{
+		echo '<br>'.$rowall->nachname.' '.$rowall->vorname."($rowall->uid)";
 	}
 }
 ?>
