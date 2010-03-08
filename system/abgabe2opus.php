@@ -18,7 +18,7 @@
  * Authors: Christian Paminger 		<christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl 			<rudolf.hangl@technikum-wien.at>,
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Gerald Simane-Sequens 	<gerald.simane-sequens@technikum-wien.at>
  *
  *******************************************************************************************************
  *				abgabe2opus.php
@@ -74,6 +74,7 @@ $row_opus=0;
 $opus_url=OPUS_PATH_PAA;			
 $url_paa=PAABGABE_PATH;
 $kopiert='';
+$ii=0;
 
 function indexdatei($source_opus, $fd)
 {
@@ -1157,9 +1158,9 @@ $qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.studen
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
 	JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-	JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id, studiensemester_kurzbz)
+	LEFT JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id, studiensemester_kurzbz, student_uid)
 	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
-	AND to_char(tbl_projektarbeit.abgabedatum,'YMD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 
+	AND to_char(tbl_projektarbeit.abgabedatum,'YYYYMMDD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 
 	AND tbl_projektarbeit.freigegeben ";
 
 //echo $qry."<br>";
@@ -1396,6 +1397,7 @@ if($erg=pg_query($db_conn,$qry))
 				if(mysql_num_rows($result_chk)>0)
 				{
 					//Datensatz bereits eingetragen
+					echo "-->".$qry_chk."<br>";
 				}
 				else 
 				{
