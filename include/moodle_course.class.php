@@ -1566,6 +1566,7 @@ class moodle_course extends basis_db
 				}
 			}
 		}
+		var_dump($courses);
 		return $courses;
 	}
 	

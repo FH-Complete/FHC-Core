@@ -536,6 +536,109 @@ class person extends basis_db
 		}
 		return true;
 	}
+	
+	
+	
+	/**
+	 * Laedt alle standorte zu einer Person die dem Standort zugeordnet sind
+	 * @param $standort_id ID des Standortes
+	 * @param $person_id ID der Person die Zugeordnet ist
+	 * @param $firma_id ID der Firma zu der die standortn geladen werden sollen	 
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_personfunktion($standort_id='',$person_id='',$firma_id='',$funktion_kurzbz='',$personfunktionstandort_id='')
+	{
+		$this->result=array();
+		$this->errormsg = '';
+			
+		//Lesen der Daten aus der Datenbank
+		$qry=" SELECT tbl_person.*
+				,tbl_personfunktionstandort.personfunktionstandort_id,tbl_personfunktionstandort.person_id ,tbl_personfunktionstandort.funktion_kurzbz ,tbl_personfunktionstandort.standort_id
+				,tbl_personfunktionstandort.position,tbl_personfunktionstandort.anrede 
+				,tbl_standort.adresse_id,tbl_standort.kurzbz,tbl_standort.bezeichnung,tbl_standort.firma_id
+				,tbl_funktion.beschreibung as funktion_beschreibung , tbl_funktion.aktiv as funktion_aktiv,tbl_funktion.fachbereich as funktion_fachbereich,tbl_funktion.semester as funktion_semester
+			";
+		$qry.=" FROM public.tbl_person,public.tbl_personfunktionstandort
+				LEFT JOIN public.tbl_standort USING(standort_id) 
+				LEFT JOIN public.tbl_funktion USING(funktion_kurzbz) 
+			";
+		$qry.=" WHERE tbl_person.person_id=tbl_personfunktionstandort.person_id";
 
+		if($personfunktionstandort_id!='')
+			$qry.=" and tbl_personfunktionstandort.personfunktionstandort_id='".addslashes($personfunktionstandort_id)."'";
+		if(is_numeric($standort_id))
+			$qry.=" and tbl_personfunktionstandort.standort_id='".addslashes($standort_id)."'";
+		if(is_numeric($person_id))
+			$qry.=" and tbl_personfunktionstandort.person_id='".addslashes($person_id)."'";
+		if(is_numeric($firma_id))
+			$qry.=" and public.tbl_standort.firma_id='".addslashes($firma_id)."'";
+		if($funktion_kurzbz!='')
+			$qry.=" and tbl_personfunktionstandort.funktion_kurzbz='".addslashes($funktion_kurzbz)."'";
+			
+			
+			
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$adr_obj = new person();
+			$adr_obj->person_id = $row->person_id;
+			$adr_obj->staatsbuergerschaft = $row->staatsbuergerschaft;
+			$adr_obj->geburtsnation = $row->geburtsnation;
+			$adr_obj->sprache = $row->sprache;
+			$adr_obj->anrede = $row->anrede;
+			$adr_obj->titelpost = $row->titelpost;
+			$adr_obj->titelpre = $row->titelpre;
+			$adr_obj->nachname = $row->nachname;
+			$adr_obj->vorname = $row->vorname;
+			$adr_obj->vornamen = $row->vornamen;
+			$adr_obj->gebdatum = $row->gebdatum;
+			$adr_obj->gebort = $row->gebort;
+			$adr_obj->gebzeit = $row->gebzeit;
+			$adr_obj->foto = $row->foto;
+			$adr_obj->anmerkungen = $row->anmerkung;
+			$adr_obj->homepage = $row->homepage;
+			$adr_obj->svnr = $row->svnr;
+			$adr_obj->ersatzkennzeichen = $row->ersatzkennzeichen;
+			$adr_obj->familienstand = $row->familienstand;
+			$adr_obj->geschlecht = $row->geschlecht;
+			$adr_obj->anzahlkinder = $row->anzahlkinder;
+			$adr_obj->aktiv = $row->aktiv;
+			$adr_obj->updateamum = $row->updateamum;
+			$adr_obj->updatevon = $row->updatevon;
+			$adr_obj->insertamum = $row->insertamum;
+			$adr_obj->insertvon = $row->insertvon;
+			$adr_obj->ext_id = $row->ext_id;
+			$adr_obj->kurzbeschreibung = $row->kurzbeschreibung;
+
+				
+			$adr_obj->standort_id		= $row->standort_id;
+			$adr_obj->adresse_id		= $row->adresse_id;
+			$adr_obj->kurzbz			= $row->kurzbz;
+			$adr_obj->bezeichnung		= $row->bezeichnung;
+			$adr_obj->firma_id			= $row->firma_id;
+			
+			$adr_obj->personfunktionstandort_id	= $row->personfunktionstandort_id;
+
+			$adr_obj->funktion_kurzbz	= $row->funktion_kurzbz;
+			
+			$adr_obj->position	= $row->position;
+			$adr_obj->anrede	= $row->anrede;
+			
+			$adr_obj->funktion_beschreibung	= $row->funktion_beschreibung;
+			$adr_obj->funktion_aktiv	= ($row->funktion_aktiv=='t'?true:false);
+			$adr_obj->funktion_fachbereich	= $row->funktion_fachbereich;
+			$adr_obj->funktion_semester	= $row->funktion_semester;			
+
+			$this->result[] = $adr_obj;
+		}
+		return true;
+	}
+
+	
 }
 ?>

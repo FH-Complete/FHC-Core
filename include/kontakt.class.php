@@ -34,6 +34,8 @@ class kontakt extends basis_db
 	public $kontakt_id;	// integer
 	public $person_id;	// integer
 	public $firma_id;		// integer
+	public $standort_id;	// integer
+	
 	public $kontakttyp;	// string
 	public $anmerkung;	// string
 	public $kontakt;		// string
@@ -46,6 +48,14 @@ class kontakt extends basis_db
 	
 	public $beschreibung;
 	public $firma_name;
+
+
+	public $anrede;
+	public $titelpost;
+	public $titelpre;
+	public $nachname;
+	public $vorname;
+	public $vornamen;
 	
 	/**
 	 * Konstruktor
@@ -81,6 +91,7 @@ class kontakt extends basis_db
 			{
 				$this->kontakt_id = $row->kontakt_id;
 				$this->person_id = $row->person_id;
+				$this->standort_id = $row->standort_id;				
 				$this->firma_id = $row->firma_id;
 				$this->firma_name = $row->firma_name;
 				$this->kontakttyp = $row->kontakttyp;
@@ -155,10 +166,10 @@ class kontakt extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-					
-			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, firma_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, firma_id,standort_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->firma_id).', '.
+			     $this->addslashes($this->standort_id).', '.
 			     $this->addslashes($this->kontakttyp).', '.
 			     $this->addslashes($this->anmerkung).', '.
 			     $this->addslashes($this->kontakt).', '.
@@ -177,10 +188,10 @@ class kontakt extends basis_db
 				$this->errormsg = 'kontakt_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
 			$qry='UPDATE public.tbl_kontakt SET '.
 				'person_id='.$this->addslashes($this->person_id).', '. 
 				'firma_id='.$this->addslashes($this->firma_id).', '. 
+				'standort_id='.$this->addslashes($this->standort_id).', '. 				
 				'kontakttyp='.$this->addslashes($this->kontakttyp).', '. 
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
 				'kontakt='.$this->addslashes($this->kontakt).', '. 
@@ -277,6 +288,7 @@ class kontakt extends basis_db
 				
 				$obj->kontakt_id = $row->kontakt_id;
 				$obj->person_id = $row->person_id;
+				$obj->standort_id = $row->standort_id;		
 				$obj->firma_id = $row->firma_id;
 				$obj->firma_name = $row->firma_name;
 				$obj->kontakttyp = $row->kontakttyp;
@@ -290,6 +302,69 @@ class kontakt extends basis_db
 				$obj->ext_id = $row->ext_id;
 				
 				$this->result[] = $obj;
+			}
+			
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	/**
+	 * Laedt alle Kontaktdaten zu einem Standort
+	 * @param standort_id
+	 * @return boolean
+	 */
+	public function load_standort($standort_id='',$firma_id='')
+	{
+		if(!is_numeric($standort_id))
+		{
+			$this->errormsg = 'Standort ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT tbl_kontakt.*, tbl_standort.kurzbz as standort_kurzbz, tbl_standort.bezeichnung as standort_bezeichnung  
+				,tbl_person.anrede,tbl_person.titelpost,tbl_person.titelpre,tbl_person.nachname,tbl_person.vorname,tbl_person.vornamen
+				FROM public.tbl_kontakt 
+				LEFT JOIN public.tbl_standort USING(standort_id,firma_id) 
+				LEFT JOIN public.tbl_person USING(person_id) 
+				WHERE standort_id>0 
+			";
+			if(is_numeric($standort_id))
+				$qry.=" and standort_id='".addslashes($standort_id)."'";
+			if(is_numeric($firma_id))
+				$qry.=" and tbl_kontakt.firma_id='".addslashes($firma_id)."'";
+					
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new kontakt();
+				
+				$obj->kontakt_id = $row->kontakt_id;
+				$obj->person_id = $row->person_id;
+				$obj->standort_id = $row->standort_id;		
+				$obj->firma_id = $row->firma_id;
+				$obj->standort_kurzbz  = $row->standort_kurzbz;
+				$obj->standort_bezeichnung  = $row->standort_bezeichnung;				
+				$obj->kontakttyp = $row->kontakttyp;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->kontakt = $row->kontakt;
+				$obj->zustellung = ($row->zustellung=='t'?true:false);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+				$obj->anrede=$row->anrede;
+				$obj->titelpost=$row->titelpost;
+				$obj->titelpre=$row->titelpre;
+				$obj->nachname=$row->nachname;
+				$obj->vorname=$row->vorname;
+				$obj->vornamen=$row->vornamen;				
+				$this->result[] = $row;
 			}
 			
 			return true;

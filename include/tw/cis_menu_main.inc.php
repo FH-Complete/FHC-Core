@@ -314,7 +314,7 @@
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 				
-			    <td class="tdwrap"><a href="private/info/uternehmenskommunikation.html" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
+			    <td class="tdwrap"><a href="private/info/unternehmenskommunikation.html" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
 <!--
 			    <td class="tdwrap"><a href="../documents/management/" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
 -->
@@ -581,7 +581,7 @@
 					<table class="tabcontent" id="QM_DE" style="display: none">
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.php?lang="><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.php?lang="><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;CRM@FHTW</a></td>
 			  			</tr>
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -611,10 +611,13 @@
   					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class="tdwrap"><a href="private/info/qm/info.html" target="content"  class="MenuItem" onClick="return(js_toggle_container('QM_EN'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;English</a>
 					<table class="tabcontent" id="QM_EN" style="display:none">
-				  		<tr>
+					
+						<!-- EN QM Handbuch CRM@FHTW ist nun in Documents/Support Documents CRM@FHTW-->						
+				  		<tr style="display:none;">
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.php?lang=en" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.php?lang=en" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
 			  			</tr>
+						
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm_en.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Organigram</a></td>
@@ -645,18 +648,18 @@
 		
 		<!-- Hauptmenue -	Unternehmenskommunikation -->
 		<tr>
-          <td class="tdwrap"><a href="private/info/uternehmenskommunikation.html" class="MenuItem" target="content" onClick="js_toggle_container('uternehmenskommunikation');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Uternehmenskommunikation</a></td>
+          <td class="tdwrap"><a href="private/info/unternehmenskommunikation.html" class="MenuItem" target="content" onClick="js_toggle_container('unternehmenskommunikation');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmenskommunikation</a></td>
   		</tr>
 		<tr>
         	<td class="tdwrap">
-		  	<table class="tabcontent" id="uternehmenskommunikation" style="display: none;">
+		  	<table class="tabcontent" id="unternehmenskommunikation" style="display: none;">
 		  	<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/uternehmenskommunikation/logo.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Logo</a></td>
+				<td class="tdwrap"><a class="Item" href="private/info/unternehmenskommunikation/logo.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Logo</a></td>
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="private/info/uternehmenskommunikation/CorporateWordingManual.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Corporate Wording Manual</a></td>
+				<td class="tdwrap"><a href="private/info/unternehmenskommunikation/CorporateWordingManual.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Corporate Wording Manual</a></td>
 			</tr>
 			</table>
 		</td>
