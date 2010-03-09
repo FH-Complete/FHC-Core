@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and.
+ *          Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at>.
  */
 /**
  * Klasse firma
@@ -33,10 +34,6 @@ class firma extends basis_db
 	//Tabellenspalten
 	public $firma_id;		// integer
 	public $name;			// string
-	public $adresse;		// string
-	public $email;			// string
-	public $telefon;		// string
-	public $fax;			// string
 	public $anmerkung;		// string
 	public $ext_id;			// integer
 	public $insertamum;		// timestamp
@@ -45,6 +42,22 @@ class firma extends basis_db
 	public $updatevon;		// bigint
 	public $firmentyp_kurzbz;	
 	public $schule; 		// boolean
+	// Neu in Rel. 2.0 
+	public $steuernummer; 	// string	
+	public $gesperrt; 		// boolean
+	public $aktiv; 			// boolean	
+	public $finanzamt; 		// string	
+	
+	// firma_organisationseinheit
+	public $oe_kurzbz; 		// string
+	public $oe_parent_kurzbz; 	// string
+	public $firma_organisationseinheit_id;	// integer
+	public $organisationseinheittyp_kurzbz; // string
+
+	public $bezeichnung; 		// string
+	public $kundennummer; 		// integer
+	public $oe_aktiv; 			// boolean	
+	public $mailverteiler; 		// string
 
 	/**
 	 * Konstruktor
@@ -79,10 +92,6 @@ class firma extends basis_db
 			{
 				$this->firma_id = $row->firma_id;
 				$this->name = $row->name;
-				$this->adresse = $row->adresse;
-				$this->email  = $row->email;
-				$this->telefon = $row->telefon;
-				$this->fax = $row->fax;
 				$this->anmerkung = $row->anmerkung;
 				$this->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$this->updateamum = $row->updateamum;
@@ -91,6 +100,12 @@ class firma extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->schule = ($row->schule=='t'?true:false);
+	// Neu in Rel. 2.0 
+				$this->steuernummer = $row->steuernummer;				
+				$this->gesperrt = ($row->gesperrt=='t'?true:false);
+				$this->aktiv = ($row->aktiv=='t'?true:false);		
+				$this->finanzamt = $row->finanzamt;				
+				
 				return true;
 			}
 			else 
@@ -143,13 +158,10 @@ class firma extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO public.tbl_firma (name, adresse, email, telefon, fax, anmerkung, 
-					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, schule) VALUES('.
+			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, 
+					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, schule,steuernummer,
+					gesperrt,aktiv,finanzamt) VALUES('.
 			     $this->addslashes($this->name).', '.
-			     $this->addslashes($this->adresse).', '.
-			     $this->addslashes($this->email).', '.
-			     $this->addslashes($this->telefon).', '.
-			     $this->addslashes($this->fax).', '.
 			     $this->addslashes($this->anmerkung).', '.
 			     $this->addslashes($this->firmentyp_kurzbz).', '.
 			     $this->addslashes($this->updateamum).', '.
@@ -157,7 +169,11 @@ class firma extends basis_db
 			     $this->addslashes($this->insertamum).', '.
 			     $this->addslashes($this->insertvon).', '.
 			     $this->addslashes($this->ext_id).','.
-			     ($this->schule?'true':'false').'); ';
+			     ($this->schule?'true':'false').','.
+			     $this->addslashes($this->steuernummer).', '.				 
+			     ($this->gesperrt?'true':'false').','.
+			     ($this->aktiv?'true':'false').','.				 				 
+			     ($this->finanzamt?$this->addslashes($this->finanzamt):'null').' ); '; 			 
 		}
 		else
 		{
@@ -173,15 +189,15 @@ class firma extends basis_db
 			$qry='UPDATE public.tbl_firma SET '.
 				'firma_id='.$this->addslashes($this->firma_id).', '.
 				'name='.$this->addslashes($this->name).', '.
-				'adresse='.$this->addslashes($this->adresse).', '.
-				'email='.$this->addslashes($this->email).', '.
-				'telefon='.$this->addslashes($this->telefon).', '.
-				'fax='.$this->addslashes($this->fax).', '.
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
 				'updateamum= now(), '.
 		     	'updatevon='.$this->addslashes($this->updatevon).', '.
 		     	'firmentyp_kurzbz='.$this->addslashes($this->firmentyp_kurzbz).', '.
-		     	'schule='.($this->schule?'true':'false').' '.
+		     	'schule='.($this->schule?'true':'false').', '.
+		     	'steuernummer='.$this->addslashes($this->steuernummer).', '.
+		     	'gesperrt='.($this->gesperrt?'true':'false').', '.
+		     	'aktiv='.($this->aktiv?'true':'false').', '.
+		     	'finanzamt='.($this->finanzamt?addslashes($this->finanzamt):'null').' '.
 				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
 		}
 		
@@ -262,10 +278,6 @@ class firma extends basis_db
 				
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
-				$fa->adresse = $row->adresse;
-				$fa->email  = $row->email;
-				$fa->telefon = $row->telefon;
-				$fa->fax = $row->fax;
 				$fa->anmerkung = $row->anmerkung;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
@@ -274,6 +286,12 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
+	// Neu in Rel. 2.0 
+				$fa->steuernummer = $row->steuernummer;				
+				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
+				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->finanzamt = $row->finanzamt;				
+			
 				$this->result[] = $fa;
 			}
 			return true;
@@ -332,10 +350,6 @@ class firma extends basis_db
 				
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
-				$fa->adresse = $row->adresse;
-				$fa->email  = $row->email;
-				$fa->telefon = $row->telefon;
-				$fa->fax = $row->fax;
 				$fa->anmerkung = $row->anmerkung;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
@@ -344,6 +358,12 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
+	// Neu in Rel. 2.0 
+				$fa->steuernummer = $row->steuernummer;				
+				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
+				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->finanzamt = $row->finanzamt;				
+				
 				$this->result[] = $fa;
 			}
 			return true;
@@ -354,5 +374,177 @@ class firma extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt alle Firmen Standorte, und Adressen nach Suchstring und/oder eines bestimmen Firmentyps
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function searchFirma($filter='',$firmentyp_kurzbz='')
+	{
+		$this->result = array();
+		$this->errormsg = '';
+	
+		$qry =" SElECT tbl_firma.*  ";
+		$qry.=" ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
+		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";		
+		$qry.=" FROM public.tbl_firma,  public.tbl_standort  ";
+		$qry.=" left outer join public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
+		$qry.=" WHERE tbl_standort.firma_id=tbl_firma.firma_id ";
+
+		if($filter!='')
+			$qry.= " and ( lower(tbl_firma.name) like lower('%$filter%') 
+					OR lower(kurzbz) like lower('%$filter%') 			
+					
+					OR lower(tbl_adresse.name) like lower('%$filter%') 
+					OR lower(plz) like lower('%$filter%') 
+					OR lower(ort) like lower('%$filter%') 
+					OR lower(strasse) like lower('%$filter%') 
+					
+					OR lower(bezeichnung) like lower('%$filter%') 
+					OR lower(anmerkung) like lower('%$filter%')
+					".(is_numeric($filter)?" OR tbl_firma.firma_id='$filter'":'')."
+					 ) ";
+		
+		if($firmentyp_kurzbz!='')
+			$qry.=" and firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
+		$qry.=" ORDER BY name ";
+		if($filter=='' && $firmentyp_kurzbz=='')
+			$qry.=" limit 500 ";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$fa = new firma();
+				
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				$fa->schule = ($row->schule=='t'?true:false);
+	// Neu in Rel. 2.0 
+				$fa->steuernummer = $row->steuernummer;				
+				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
+				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->finanzamt = $row->finanzamt;		
+
+	// Standort
+				$fa->kurzbz = $row->kurzbz;		
+				$fa->adresse_id = $row->adresse_id;		
+				$fa->standort_id = $row->standort_id;		
+				$fa->bezeichnung = $row->bezeichnung;	
+	// Adresse
+				$fa->person_id = $row->person_id;		
+				$fa->adresse_id = $row->adresse_id;		
+				$fa->strasse = $row->strasse;		
+				$fa->plz = $row->plz;	
+				$fa->ort = $row->ort;	
+				$fa->gemeinde = $row->gemeinde;		
+				$fa->nation = $row->nation;		
+				$fa->typ = $row->typ;		
+				$fa->adress_name = $row->adress_name;						
+				$fa->heimatadresse = ($row->heimatadresse=='t'?true:false);	
+				$fa->zustelladresse = ($row->zustelladresse=='t'?true:false);
+				
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}	
+
+	/**
+	 * Laedt alle Firmen -  Organisationseinheiten nach Firmen ID und/oder OE Kurzbz und/oder Zwischentabellen ID 
+	 * @param $firma_id ID die gelesen werden soll
+	 * @param $oe_kurzbz Organisationskurzbezeichnung
+	 * @param $firma_organisationseinheit_id  Zwischentabellen ID 
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_firmaorganisationseinheit($firma_id='',$oe_kurzbz='',$firma_organisationseinheit_id='')
+	{
+		$this->result = array();
+		$this->errormsg = '';
+		if($firma_id && !is_numeric($firma_id))
+		{
+			$this->errormsg = 'Firma_id ist ungueltig';
+			return false;
+		}
+
+		$qry =" select tbl_firma.*  ";
+
+		$qry.=", tbl_firma_organisationseinheit.firma_organisationseinheit_id ,tbl_firma_organisationseinheit.kundennummer ,tbl_firma_organisationseinheit.oe_kurzbz ";
+	
+		$qry.=" ,tbl_organisationseinheit.oe_parent_kurzbz,tbl_organisationseinheit.bezeichnung,tbl_organisationseinheit.bezeichnung ,tbl_organisationseinheit.organisationseinheittyp_kurzbz,tbl_organisationseinheit.aktiv as oe_aktiv,tbl_organisationseinheit.mailverteiler   ";		
+	
+		$qry.=" FROM public.tbl_firma, public.tbl_firma_organisationseinheit ";
+		$qry.=" left outer join public.tbl_organisationseinheit  on ( tbl_organisationseinheit.oe_kurzbz=tbl_firma_organisationseinheit.oe_kurzbz ) ";
+		$qry.=" WHERE tbl_firma.firma_id=tbl_firma_organisationseinheit.firma_id ";
+
+
+		if($firma_organisationseinheit_id!='')
+			$qry.=" and tbl_firma_organisationseinheit.firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";
+		if($firma_id!='')
+			$qry.=" and tbl_firma_organisationseinheit.firma_id='".addslashes($firma_id)."'";
+		if($oe_kurzbz!='')
+			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz='".addslashes($oe_kurzbz)."'";
+			
+		$qry.=" ORDER BY tbl_firma_organisationseinheit.oe_kurzbz ";
+
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$fa = new firma();
+				
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				$fa->schule = ($row->schule=='t'?true:false);
+	// Neu in Rel. 2.0 
+				$fa->steuernummer = $row->steuernummer;				
+				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
+				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->finanzamt = $row->finanzamt;		
+	// firma_organisationseinheit
+				$fa->oe_kurzbz = $row->oe_kurzbz;	
+	// organisationseinheit
+				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;		
+				$fa->oe_parent_kurzbz = $row->oe_parent_kurzbz;		
+				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;		
+				$fa->bezeichnung = $row->bezeichnung;		
+				$fa->kundennummer = $row->kundennummer;						
+				
+				$fa->oe_aktiv = $row->oe_aktiv;		
+				$fa->mailverteiler = $row->mailverteiler;	
+				
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}	
+	
+
+
 }
 ?>

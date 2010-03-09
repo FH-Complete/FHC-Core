@@ -28,7 +28,10 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class betriebsmitteltyp extends basis_db
 {
-	public $new;
+	private $schema_inventar='wawi';
+	
+	public $debug=false;   	// boolean
+	public $new;   	// boolean
 	public $result = array();
 	
 	//Tabellenspalten
@@ -36,6 +39,7 @@ class betriebsmitteltyp extends basis_db
 	public $beschreibung;   	//string
 	public $anzahl; 			//smallint
 	public $kaution;			//numeric(5,2)
+	public $typ_code;			//string(2)	
 	
 	/**
 	 * Konstruktor
@@ -55,9 +59,43 @@ class betriebsmitteltyp extends basis_db
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($betriebsmitteltyp)
-	{			
-		$this->errormsg	= 'Noch nicht implementiert';
-		return false;
+	{		
+		// Initialisieren Variable	
+		$qry='';
+		$where='';
+		$this->result=array();
+		$this->errormsg = '';
+		// Select erzeugen		
+		$qry.=' select * FROM '.$this->schema_inventar.'.tbl_betriebsmitteltyp';
+		$qry.="	where betriebsmitteltyp >'' ";
+
+		// Bedingungen hinzufuegen
+		$where.=" AND trim(UPPER(betriebsmitteltyp)) like '%".mb_strtoupper(trim(addslashes(str_replace(array('*',';',' ',"'",'"'),'%',trim($betriebsmitteltyp)))))."%' " ;
+		$qry.=$where;
+
+		// Sortierung
+		$qry.=' order by betriebsmitteltyp ';
+		
+		// Datenbankabfrage - ausfuehren
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$bmt = new betriebsmitteltyp();
+				$bmt->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$bmt->beschreibung = $row->beschreibung;
+				$bmt->anzahl = $row->anzahl;
+				$bmt->kaution = $row->kaution;
+				$bmt->typ_code = $row->typ_code;
+				$this->result[] = $bmt;
+			}
+			return $this->result;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error():'');
+			return false;
+		}
 	}
 	
 	/**
@@ -66,7 +104,9 @@ class betriebsmitteltyp extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM public.tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
+		$this->result=array();
+		$this->errormsg = '';
+		$qry = "SELECT * FROM ".$this->schema_inventar.".tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
 		
 		if($this->db_query($qry))
 		{
@@ -78,6 +118,7 @@ class betriebsmitteltyp extends basis_db
 				$bmt->beschreibung = $row->beschreibung;
 				$bmt->anzahl = $row->anzahl;
 				$bmt->kaution = $row->kaution;
+				$bmt->typ_code = $row->typ_code;
 				
 				$this->result[] = $bmt;
 			}
@@ -85,7 +126,7 @@ class betriebsmitteltyp extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
+			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error():'');
 			return false;
 		}
 	}
@@ -96,9 +137,10 @@ class betriebsmitteltyp extends basis_db
 	 */
 	public function save()
 	{		
+		$this->errormsg = '';	
 		$dbanzahl=0;
 		$qry='';
-		$qry1='SELECT * FROM public.tbl_betriebsmitteltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+		$qry1='SELECT * FROM '.$this->schema_inventar.'.tbl_betriebsmitteltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 		if($this->db_query($qry1))
 		{
 			if($this->db_num_rows()>0) //eintrag gefunden
@@ -110,18 +152,19 @@ class betriebsmitteltyp extends basis_db
 					else 
 						$dbanzahl=$row1->anzahl;
 
-					$qry='UPDATE public.tbl_betriebsmitteltyp SET '.
+					$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmitteltyp SET '.
 					'anzahl ='.addslashes($dbanzahl)."+".addslashes($this->anzahl).' '.
-					'WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+					'WHERE beschreibung='.$this->addslashes($this->beschreibung).'; ' ;
 				}
 			}
 			else 
 			{
-				$qry='INSERT INTO public.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution) VALUES('.
+				$qry='INSERT INTO '.$this->schema_inventar.'.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution,typ_code) VALUES('.
 					$this->addslashes($this->betriebsmitteltyp).', '.
 					$this->addslashes($this->beschreibung).', '.
 					$this->addslashes($this->anzahl).', '.
-					$this->addslashes($this->kaution).');';
+					$this->addslashes($this->kaution).', '.
+					$this->addslashes($this->typ_code).');';					
 			}
 			
 			if($this->db_query($qry))
@@ -130,15 +173,59 @@ class betriebsmitteltyp extends basis_db
 			}
 			else
 			{			
-				$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes';
+				$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
 				return false;
 			}	
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Zugriff auf den Betriebsmitteltypen-Datensatz';
+			$this->errormsg = 'Fehler beim Zugriff auf den Betriebsmitteltypen-Datensatz '.($this->debug?$this->db_last_error():'');
 			return false;
 		}
+	}
+	
+	/**
+	 * Speichert die Daten in die Datenbank
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function update()
+	{		
+		$this->errormsg = '';	
+		$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmitteltyp SET '.
+				'beschreibung ='.$this->addslashes($this->beschreibung).', '.
+				'anzahl ='.$this->addslashes($this->anzahl).', '.
+				'kaution ='.$this->addslashes($this->kaution).', '.
+				'typ_code ='.$this->addslashes($this->typ_code).' '.
+				'WHERE betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).'; ' ;		
+			if($this->db_query($qry))
+			{
+				return true;
+			}
+			else
+			{			
+				$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
+				return false;
+			}	
+	}
+	/**
+	 * Speichert die Daten in die Datenbank
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function check_beschreibung()
+	{		
+		$this->errormsg = '';	
+		$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmitteltyp SET '.
+					'beschreibung = trim(betriebsmitteltyp) '.
+					' where beschreibung is null ';
+			if($this->db_query($qry))
+			{
+				return true;
+			}
+			else
+			{			
+				$this->errormsg = 'Fehler beim Pruefen der Beschreibung des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
+				return false;
+			}	
 	}
 }
 ?>
