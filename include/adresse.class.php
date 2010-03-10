@@ -327,7 +327,6 @@ class adresse extends basis_db
 					{
 						$this->adresse_id = $row->id;
 						$this->db_query('COMMIT');
-						return true;
 					}
 					else
 					{
@@ -343,14 +342,14 @@ class adresse extends basis_db
 					return false;
 				}
 			}
-			else 
-				return true;
+
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Adress-Datensatzes';
 			return false;
 		}
+		return $this->adresse_id;
 	}
 
 	/**
