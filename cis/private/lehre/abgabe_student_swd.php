@@ -20,6 +20,8 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+
+require_once('../../../config/cis.config.inc.php');
 ?>
 <html>
 <head>
@@ -29,16 +31,34 @@
 <link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
+UTF8 = {
+    encode: function(s)
+    {
+        for(var c, i = -1, l = (s = s.split("")).length, o = String.fromCharCode; ++i < l;
+            s[i] = (c = s[i].charCodeAt(0)) >= 127 ? o(0xc0 | (c >>> 6)) + o(0x80 | (c & 0x3f)) : s[i]
+        );
+        return s.join("");
+    },
+
+    decode: function(s)
+    {
+        for(var a, b, i = -1, l = (s = s.split("")).length, o = String.fromCharCode, c = "charCodeAt"; ++i < l;
+            ((a = s[i][c](0)) & 0x80) && (s[i] = (a & 0xfc) == 0xc0 && ((b = s[i + 1][c](0)) & 0xc0) == 0x80 ?
+            o(((a & 0x03) << 6) + (b & 0x3f)) : o(128), s[++i] = "")
+        );
+        return s.join("");
+    }
+};
 </script>
 </head>
 <body class="background_main">
 <FORM NAME=weiter id=weiter METHOD=POST ACTION="http://www.bsz-bw.de/cgi-bin/oswd-suche.pl">
-<input type="hidden" name="ruecksprung" value="http://dav.technikum-wien.at/ruhan/portal/trunk/cis/private/lehre/abgabe_student_swd.php">
-</form>
 <?php
+echo '<input type="hidden" name="ruecksprung" value="'.APP_ROOT.'/cis/private/lehre/abgabe_student_swd.php">
+</form>';
 if(isset($_POST['subject_swd']))
 {
-	$subject_swd=$_POST['subject_swd'];
+	$subject_swd=iconv("ISO-8859-1", "UTF-8", $_POST['subject_swd']);
 	echo "<script>document.getElementById(\"swd\").value='$subject_swd';</script>";
 	echo "<script>
 		if(opener.document.getElementById('kontrollschlagwoerter').value=='')
@@ -50,7 +70,6 @@ if(isset($_POST['subject_swd']))
 			opener.document.getElementById('kontrollschlagwoerter').value=opener.document.getElementById('kontrollschlagwoerter').value+', $subject_swd';window.close();
 		}
 		</script>";
-	
 }
 else 
 {

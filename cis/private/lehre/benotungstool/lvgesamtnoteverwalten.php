@@ -69,6 +69,8 @@ if(!$lv_obj->load($lvid))
 //Studiengang laden
 $stg_obj = new studiengang($lv_obj->studiengang_kz);
 
+$datum_obj = new datum();
+
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
@@ -255,7 +257,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
 	
-		str += "<tr><td colspan='2'><b>PrÃ¼fung fÃ¼r "+uid+" anlegen:</b></td></tr>";
+		str += "<tr><td colspan='2'><b>Pr&uuml;fung f&uuml;r "+uid+" anlegen:</b></td></tr>";
 		str += "<tr><td>Datum:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [YYYY-MM-DD]</td>";
 		str += "</tr><tr><td>Note:</td>";
@@ -468,7 +470,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 		}
 		else
 		{
-			alert('Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die zwischenablage. Drücken sie danach diesen Knopf erneut um die Noten zu importieren');
+			alert('Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die Zwischenablage. Drücken sie danach diesen Knopf erneut, um die Noten zu importieren');
 		}
 	}
 
@@ -723,13 +725,26 @@ $studpruef_arr = array();
 $pr_all = new Pruefung();
 if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 {
-	if ($pr_all->result)
-	{
+	//if ($pr_all->result)
+	//{
 		foreach ($pr_all->result as $pruefung)
 		{		
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
-			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $pruefung->datum;
-			#echo print_r($studpruef_arr[$pruefung->student_uid]);
+			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($pruefung->datum,'d.m.Y');
+			echo print_r($studpruef_arr[$pruefung->student_uid]);
+		}	
+	//}
+}
+$studpruef_komm = array();
+$pr_komm = new Pruefung();
+if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
+{
+	if ($pr_komm->result)
+	{
+		foreach ($pr_komm->result as $kpruefung)
+		{		
+			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["note"] = $kpruefung->note;
+			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($kpruefung->datum,'d.m.Y');
 		}	
 	}
 }
@@ -754,10 +769,28 @@ echo '<table>';
 				</td>
 				<td class='ContentHeader2'>Zeugnisnote</td>
 				<td class='ContentHeader2' colspan='2'>Nachprüfung</td>
+				<td class='ContentHeader2' colspan='2'>Kommissionelle Prüfung</td>
 			</tr>
 			<tr>
 				<td colspan='9'>&nbsp;</td>
-				<td coslspan='2'><table><tr><td class='td_datum'>Datum</td><td class='td_note'>Note</td></td></td></tr></table></td>
+				<td colspan='2'>
+					<table>
+					<tr>
+						<td class='td_datum'>Datum</td>
+						<td class='td_note'>Note</td>
+						</td></td>
+					</tr>
+					</table>
+				</td>
+				<td colspan='2'>
+					<table>
+					<tr>
+						<td class='td_datum'>Datum</td>
+						<td class='td_note'>Note</td>
+						</td></td>
+					</tr>
+					</table>
+				</td>
 			</tr>
 			<tr>
 				<td colspan='11'>&nbsp;</td>
@@ -954,8 +987,8 @@ echo '<table>';
 					$stylestr ="";
 				echo "<td".$stylestr." align='center'>".$znote."</td>";
 				
-				// Pruefungen ///////////////////////////////////////////////////////////////////////////
-				if (key_exists($row_stud->uid,$studpruef_arr))			
+				// Pruefung 2.Termin ///////////////////////////////////////////////////////////////////////////
+				if (key_exists($row_stud->uid, $studpruef_arr))			
 				{
 					echo "<td colspan='2'>";
 					echo "<span id='span_".$row_stud->uid."'>";
@@ -970,7 +1003,7 @@ echo '<table>';
 						
 						echo "<tr><td class='td_datum'>";
 						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
-						echo "<input type='button' name='anlegen' value='Ã¤ndern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
+						echo "<input type='button' name='anlegen' value='Ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
 						echo "</td></tr>";
 					}
 					echo "</table>";			
@@ -986,7 +1019,35 @@ echo '<table>';
 					else
 						echo "<td colspan='2'></td>";	
 				}
-				
+				// komm Pruefung ///////////////////////////////////////////////////////////////////////////
+				if (key_exists($row_stud->uid,$studpruef_komm))			
+				{
+					echo "<td colspan='2'>";
+					echo "<span id='span_".$row_stud->uid."'>";
+					echo "<table>";
+					$le_id_arr = array();					
+					$le_id_arr = array_keys($studpruef_komm[$row_stud->uid]);
+					foreach ($le_id_arr as $le_id_stud)
+					{					
+						$pr_note = $studpruef_komm[$row_stud->uid][$le_id_stud]["note"];
+						$pr_datum = $studpruef_komm[$row_stud->uid][$le_id_stud]["datum"];
+						$pr_le_id = $le_id_stud;
+						
+						echo "<tr><td class='td_datum'>";
+						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td>";
+						//echo "<td><input type='button' name='anlegen' value='Ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'></td>";					
+						echo "</tr>";
+					}
+					echo "</table>";			
+					echo "</span>";
+					//echo "<div id='nachpruefung_div_".$row_stud->uid."' style='position:relative; top:0px; left 5px; background-color:#cccccc; visibility:collapse;' class='transparent'></div>";
+					echo "</td>";
+					//echo "</form>";
+				}
+				else
+				{
+						echo "<td colspan='2'></td>";	
+				}
 				
 				echo "</tr>";
 				$i++;
