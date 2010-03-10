@@ -185,7 +185,6 @@ class firma extends basis_db
 				$this->errormsg = 'firma_id muss eine gueltige Zahl sein';
 				return false;
 			}
-
 			$qry='UPDATE public.tbl_firma SET '.
 				'firma_id='.$this->addslashes($this->firma_id).', '.
 				'name='.$this->addslashes($this->name).', '.
@@ -229,13 +228,13 @@ class firma extends basis_db
 					return false;
 				}
 			}
-			return true;				
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Firma-Datensatzes';
 			return false;
 		}
+		return $this->firma_id;
 	}
 
 	/**
@@ -250,9 +249,7 @@ class firma extends basis_db
 			$this->errormsg = 'Firma_id ist ungueltig';
 			return false;
 		}
-		
 		$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
-		
 		if($this->db_query($qry))
 			return true;
 		else 
