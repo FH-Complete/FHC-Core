@@ -365,6 +365,7 @@ class pruefung extends basis_db
 			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
 			
 		$qry .= " ORDER BY datum DESC";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
