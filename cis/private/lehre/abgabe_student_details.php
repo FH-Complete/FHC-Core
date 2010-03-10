@@ -432,7 +432,7 @@ if($command!="add")
 				if($row->fixtermin=='t' && $row->datum<date('Y-m-d'))
 				{
 					//Termin ist überschritten - es wird kein Upload für diesen Termin mehr angeboten
-					$htmlstr .= "		<td>$row->datum, ".date('Y-m-d').", Termin vorbei</td>";
+					$htmlstr .= "		<td>&nbsp;&nbsp;</td><td> Termin vorbei</td>";
 				}
 				else 
 				{
