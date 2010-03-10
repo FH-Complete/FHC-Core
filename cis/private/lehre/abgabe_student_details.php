@@ -245,14 +245,21 @@ if($command=="update" && $error!=true)
 				        $htmlstr .= "</SELECT> \n";
 				    }
 				    $htmlstr .= "</td></tr>\n";
-					$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
-						<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
-					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld - bitte immer bef&uuml;llen</td></tr><tr><td>&nbsp;</td></tr>\n";
+					$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td>
+								<td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
+								<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
+					$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td>
+								<td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
+					$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td>
+								<td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
+					$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td>
+								<td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
+					$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td>
+								<td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
+					$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td>
+								<td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
+					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld - bitte immer bef&uuml;llen</td></tr>
+								<tr><td>&nbsp;</td></tr>\n";
 					$htmlstr .= "<tr><td><input type='submit' name='schick' value='abschicken'></td>";
 					$htmlstr .= "</tr>\n";
 					$htmlstr .= "</form>\n";
