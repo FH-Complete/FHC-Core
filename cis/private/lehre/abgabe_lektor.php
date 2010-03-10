@@ -75,11 +75,11 @@ else
 				<th>Email</th>
 				<th class='table-sortable:default'>Vorname</th>
 				<th class='table-sortable:alphanumeric'>Nachname</th>";
-	$htmlstr .= "<th>Typ</th>
-				<th>Stg.</th>
-				<th>Sem.</th>
+	$htmlstr .= "<th class='table-sortable:alphanumeric'>Typ</th>
+				<th class='table-sortable:alphanumeric'>Stg.</th>
+				<th class='table-sortable:alphanumeric'>Sem.</th>
 				<th>Titel</th>
-				<th>Betreuerart</th>";
+				<th class='table-sortable:alphanumeric'>Betreuerart</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
