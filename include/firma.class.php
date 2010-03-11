@@ -248,6 +248,13 @@ class firma extends basis_db
 			$this->errormsg = 'Firma_id ist ungueltig';
 			return false;
 		}
+		$qry = "update public.tbl_firma set aktiv=false,gesperrt=true WHERE firma_id='$firma_id'";
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
+			return false;
+		}
+
 		$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
 		if($this->db_query($qry))
 			return true;
@@ -494,8 +501,6 @@ class firma extends basis_db
 			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz='".addslashes($oe_kurzbz)."'";
 			
 		$qry.=" ORDER BY tbl_firma_organisationseinheit.oe_kurzbz ";
-
-		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -540,6 +545,30 @@ class firma extends basis_db
 		}
 	}	
 	
+	/**
+	 * Loescht den Firma/Organisations Datenensatz mit der ID die uebergeben wird
+	 * @param $firma_organisationseinheit_id ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function deleteorganisationseinheit($firma_organisationseinheit_id)
+	{
+		if(!is_numeric($firma_organisationseinheit_id))
+		{
+			$this->errormsg = 'Organisationseinheit/Firma_id ist ungueltig';
+			return false;
+		}
+		$qry = "delete from public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id>0";
+		if ($firma_organisationseinheit_id)
+			$qry.=" and firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";
+ 			
+		if($this->db_query($qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
+			return false;
+		}
+	}
 
 
 }
