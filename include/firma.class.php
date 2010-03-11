@@ -212,7 +212,6 @@ class firma extends basis_db
 					{
 						$this->firma_id = $row->id;
 						$this->db_query('COMMIT');
-						return true;
 					}
 					else 
 					{
