@@ -387,7 +387,7 @@ class firma extends basis_db
 		$this->result = array();
 		$this->errormsg = '';
 	
-		$qry =" SElECT tbl_firma.*  ";
+		$qry =" SElECT tbl_firma.firma_id,tbl_firma.*  ";
 		$qry.=" ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
 		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";		
 		$qry.=" FROM public.tbl_firma,  public.tbl_standort  ";
