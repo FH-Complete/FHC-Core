@@ -26,6 +26,8 @@
 	require_once('../../include/benutzerberechtigung.class.php');
 	require_once('../../include/betriebsmittelperson.class.php');
 	require_once('../../include/betriebsmittel.class.php');
+	require_once('../../include/betriebsmitteltyp.class.php');
+    
 	require_once('../../include/datum.class.php');
 		if (!$db = new basis_db())
 				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -214,18 +216,30 @@ if($result = $db->db_query($qry))
 	}
 }
 echo '</SELECT></td></tr>';
+
+	$oBetriebsmitteltyp = new betriebsmitteltyp();
+	$oBetriebsmitteltyp->result=array();
+	// Typtable
+	if (!$oBetriebsmitteltyp->getAll())
+		$errormsg[]=$oBetriebsmitteltyp->errormsg;
+
+    
+    
 //TYP
 echo '<tr><td>Typ</td><td><SELECT name="betriebsmitteltyp">';
-$qry = "SELECT * FROM public.tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
-if($result = $db->db_query($qry))
+#$qry = "SELECT * FROM public.t bl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
+#if($result = $db->db_query($qry))
+#{
+#	while($row = $db->db_fetch_object($result))
+if (is_array($oBetriebsmitteltyp->result) && count($oBetriebsmitteltyp->result)>0)
 {
-	while($row = $db->db_fetch_object($result))
+  for ($ind=0;$ind<count($oBetriebsmitteltyp->result);$ind++)
 	{
+    $row=$oBetriebsmitteltyp->result[$ind];
 		if($row->betriebsmitteltyp==$betriebsmitteltyp)
 			$selected = 'selected';
 		else 
 			$selected = '';
-		
 		echo "<option value='$row->betriebsmitteltyp' $selected>$row->betriebsmitteltyp</option>";
 	}
 }
