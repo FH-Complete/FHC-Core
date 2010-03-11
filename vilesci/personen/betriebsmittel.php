@@ -26,10 +26,10 @@
 		if (!$db = new basis_db())
 				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-require_once('../../include/studiengang.class.php');
-require_once('../../include/functions.inc.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/betriebsmittelperson.class.php');
+    require_once('../../include/studiengang.class.php');
+    require_once('../../include/functions.inc.php');
+    require_once('../../include/benutzerberechtigung.class.php');
+    require_once('../../include/betriebsmittelperson.class.php');
 
 
 	if (!$user=get_uid())
@@ -87,15 +87,26 @@ echo '<table width="100%"><tr><td>
 		<input type="submit" value="Suchen" name="suche">
 	  </form></td><td align="right"><a href="betriebsmitteldetail.php" target="detail">NEU</a></td></tr></table><br><br>';
 
+
 if($search!='')
 {
 	//Suche in Datenbank
-	$qry = "SELECT distinct tbl_betriebsmittelperson.*, tbl_betriebsmittel.*, tbl_person.*, tbl_betriebsmittelperson.updateamum as updateamum, tbl_betriebsmittelperson.updatevon as updatevon FROM 
-			public.tbl_betriebsmittelperson 
-			JOIN public.tbl_betriebsmittel USING(betriebsmittel_id) 
-			JOIN public.tbl_person USING(person_id) 
-			LEFT JOIN public.tbl_benutzer USING(person_id) 
+/*
+  	$qry = "SELECT distinct t bl_betriebsmittelperson.*, t bl_betriebsmittel.*, tbl_person.*,  t bl_betriebsmittelperson.updateamum as updateamum, 
+        t bl_betriebsmittelperson.updatevon as updatevon 
+      FROM 	public.t bl_betriebsmittelperson 
+			JOIN public.".t bl_betriebsmittel USING(betriebsmittel_id) 
+			JOIN public.t bl_person USING(person_id) 
+			LEFT JOIN public.t bl_benutzer USING(person_id) 
 			WHERE nummer='".addslashes($search)."' OR uid='".addslashes($search)."'";
+*/
+
+ 	$qry = "SELECT distinct public.vw_betriebsmittelperson.*, public.vw_betriebsmittelperson.updateamum as updateamum, 
+        public.vw_betriebsmittelperson.updatevon as updatevon 
+      FROM 	public.vw_betriebsmittelperson 
+			WHERE nummer='".addslashes($search)."' OR uid='".addslashes($search)."'";
+
+    
 	if($result = $db->db_query($qry))
 	{
 		echo "<b>Datenbank Result</b><br><table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
