@@ -117,10 +117,10 @@ class standort extends basis_db
 
 	/**
 	 * Laedt alle Standort zu der Adress ID  die uebergeben wird
-	 * @param adress_id ID der Adresse zu der die standortn geladen werden sollen
+	 * @param adress_id ID der Adresse zu der die standorte geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_pers($adress_id)
+	public function load_adresse($adress_id)
 	{
 		$this->result=array();
 		$this->errormsg = '';
@@ -161,8 +161,8 @@ class standort extends basis_db
 	}
 	
 	/**
-	 * Laedt alle standortn zu der Firma die uebergeben wird
-	 * @param $firma_id ID der Firma zu der die standortn geladen werden sollen
+	 * Laedt alle standorte zu der Firma die uebergeben wird
+	 * @param $firma_id ID der Firma zu der die standorte geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load_firma($firma_id)
