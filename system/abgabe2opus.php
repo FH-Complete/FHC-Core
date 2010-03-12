@@ -1412,7 +1412,7 @@ if($erg=pg_query($db_conn,$qry))
 						.$row->projektarbeit_id."', '".$row->sprache."', '".$bereich."', UNIX_TIMESTAMP())";
 					$qry_cre="INSERT INTO opus_autor (source_opus, creator_name, reihenfolge) VALUES ('".$row_opus."', '".$verfasser."', '1')";
 					$qry_inst="INSERT INTO opus_inst (source_opus, inst_nr) VALUES ('".$row_opus."', '".$institut."')";
-										
+					$qry_seq="UPDATE seq_temp SET id=".$row_opus;					
 					
 					$qry="START TRANSACTION";
 		
@@ -1447,88 +1447,97 @@ if($erg=pg_query($db_conn,$qry))
 								}
 								else 
 								{
-									//arbeit freigegeben?
-									if($row->freigegeben)
+									if(!$result=mysql_query($qry_seq))
 									{
-										//Kopieren der Abgabedatei
-										$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and paabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
-										if($result_file=pg_query($db_conn,$qry_file))
+										//Sequenz schreiben
+										echo nl2br("\n\nTransaktion abgebrochen!!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext));
+										mysql_query('ROLLBACK',$conn_ext);
+									}
+									else 
+									{
+										//arbeit freigegeben?
+										if($row->freigegeben)
 										{
-											if($row_file=pg_fetch_object($result_file))
+											//Kopieren der Abgabedatei
+											$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and paabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
+											if($result_file=pg_query($db_conn,$qry_file))
 											{
-												if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')))
+												if($row_file=pg_fetch_object($result_file))
 												{
-													mkdir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y'), 0775);
-												}
-												if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus))
-												{
-													mkdir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus, 0775);
-												}
-												$opus_url=$opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus;
-												if(!is_dir($opus_url."/pdf/"))
-												{
-													mkdir($opus_url."/pdf/", 0775);
-												}
-												//echo "\nQuelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf';
-												copy($url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf',$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf');
-												//überprüfen, ob Datei wirklich kopiert wurde
-												if(is_file($opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'))
-												{
-													//COMMIT durchführen
-													if(!$result=mysql_query('COMMIT',$conn_ext))
+													if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')))
 													{
-														mysql_query('ROLLBACK',$conn_ext);
-														$fehler1.="\nCommit nicht ausgef&um;hrt! \n".$row_opus."/".$verfasser."\n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+														mkdir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y'), 0775);
+													}
+													if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus))
+													{
+														mkdir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus, 0775);
+													}
+													$opus_url=$opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus;
+													if(!is_dir($opus_url."/pdf/"))
+													{
+														mkdir($opus_url."/pdf/", 0775);
+													}
+													//echo "\nQuelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf';
+													copy($url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf',$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf');
+													//überprüfen, ob Datei wirklich kopiert wurde
+													if(is_file($opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'))
+													{
+														//COMMIT durchführen
+														if(!$result=mysql_query('COMMIT',$conn_ext))
+														{
+															mysql_query('ROLLBACK',$conn_ext);
+															$fehler1.="\nCommit nicht ausgef&um;hrt! \n".$row_opus."/".$verfasser."\n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+														}
+														else 
+														{
+															if (file_exists($opus_url)) 
+															{
+													            $fd = fopen($opus_url."/index.html", 'w');
+													            if ($fd == 0) 
+													            {
+													                $fehler1.="\nFehler beim Oeffnen des Index-Files \n\n";
+													                exit;
+													            } 
+													            else 
+													            {
+													            	indexdatei($row_opus, $fd);
+													                fclose($fd);
+													                $kopiert.="OPUS-Nr. $row_opus, von $verfasser, ProjektarbeitID $row->projektarbeit_id\n";
+													                #print ("Indexdatei zu Dokument $source_opus wurde in die Datei <a href=\"$volltext_url/$jahr/$source_opus/index.html\">index.html</a> geschrieben.<P> \n");
+													            }
+													        } 
+													        else 
+													        {
+													            $fehler1.="\n".$opus_url."/pdf/ nicht vorhanden.\n \n";
+													        }
+														}
 													}
 													else 
 													{
-														if (file_exists($opus_url)) 
-														{
-												            $fd = fopen($opus_url."/index.html", 'w');
-												            if ($fd == 0) 
-												            {
-												                $fehler1.="\nFehler beim Oeffnen des Index-Files \n\n";
-												                exit;
-												            } 
-												            else 
-												            {
-												            	indexdatei($row_opus, $fd);
-												                fclose($fd);
-												                $kopiert.="OPUS-Nr. $row_opus, von $verfasser, ProjektarbeitID $row->projektarbeit_id\n";
-												                #print ("Indexdatei zu Dokument $source_opus wurde in die Datei <a href=\"$volltext_url/$jahr/$source_opus/index.html\">index.html</a> geschrieben.<P> \n");
-												            }
-												        } 
-												        else 
-												        {
-												            $fehler1.="\n".$opus_url."/pdf/ nicht vorhanden.\n \n";
-												        }
+														mysql_query('ROLLBACK',$conn_ext);
+														$fehler1.="\nDatei wurde nicht kopiert! \n";
 													}
 												}
 												else 
 												{
 													mysql_query('ROLLBACK',$conn_ext);
-													$fehler1.="\nDatei wurde nicht kopiert! \n";
+													$fehler1.="\nAbgabe konnte nicht geladen werden! \n".$row_opus."/".$verfasser."\n".$db->db_last_error();
 												}
-											}
+											} 
 											else 
 											{
 												mysql_query('ROLLBACK',$conn_ext);
-												$fehler1.="\nAbgabe konnte nicht geladen werden! \n".$row_opus."/".$verfasser."\n".$db->db_last_error();
-											}
-										} 
+												$fehler1.="\nEintragung der Abgabe nicht gefunden! \n".$row_opus."/".$verfasser."/".$qry_file."\n".$db->db_last_error();
+											}	
+										}
 										else 
 										{
-											mysql_query('ROLLBACK',$conn_ext);
-											$fehler1.="\nEintragung der Abgabe nicht gefunden! \n".$row_opus."/".$verfasser."/".$qry_file."\n".$db->db_last_error();
-										}	
-									}
-									else 
-									{
-										//COMMIT durchführen
-										if(!$result=mysql_query('COMMIT',$conn_ext))
-										{
-											mysql_query('ROLLBACK',$conn_ext);
-											$fehler1.="\nCommit wurde nicht ausgef&um;hrt! \n".$row_opus."/".$verfasser."\n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+											//COMMIT durchführen
+											if(!$result=mysql_query('COMMIT',$conn_ext))
+											{
+												mysql_query('ROLLBACK',$conn_ext);
+												$fehler1.="\nCommit wurde nicht ausgef&um;hrt! \n".$row_opus."/".$verfasser."\n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+											}
 										}
 									}
 								}
