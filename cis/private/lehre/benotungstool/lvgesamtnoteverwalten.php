@@ -41,6 +41,11 @@ require_once('../../../../include/mitarbeiter.class.php');
 require_once('../../../../include/moodle_course.class.php');
 require_once('../../../../include/mail.class.php');
 
+$summe_stud=0;
+$summe_t2=0;
+$summe_komm=0;
+$summe_ng=0;
+
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
 
@@ -725,16 +730,17 @@ $studpruef_arr = array();
 $pr_all = new Pruefung();
 if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 {
-	//if ($pr_all->result)
-	//{
+	if ($pr_all->result)
+	{
 		foreach ($pr_all->result as $pruefung)
 		{		
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($pruefung->datum,'d.m.Y');
-			echo print_r($studpruef_arr[$pruefung->student_uid]);
+			//echo print_r($studpruef_arr[$pruefung->student_uid]);
 		}	
-	//}
+	}
 }
+$summe_t2=count($studpruef_arr);
 $studpruef_komm = array();
 $pr_komm = new Pruefung();
 if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
@@ -748,7 +754,7 @@ if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
 		}	
 	}
 }
-
+$summe_komm=count($studpruef_komm);
 //Studentenliste
 echo '<table>';
 		echo "<tr>
@@ -803,6 +809,7 @@ echo '<table>';
 		{
 			$i=1;
 			$errorshown=false;
+			$summe_stud=$db->db_num_rows($result_stud);
 			while($row_stud = $db->db_fetch_object($result_stud))
 			{
 				
@@ -986,7 +993,10 @@ echo '<table>';
 				else
 					$stylestr ="";
 				echo "<td".$stylestr." align='center'>".$znote."</td>";
-				
+				if($znote==5 || $znote==7 || $znote==9 || $znote==13 || $znote=='')
+				{
+					$summe_ng++;
+				}
 				// Pruefung 2.Termin ///////////////////////////////////////////////////////////////////////////
 				if (key_exists($row_stud->uid, $studpruef_arr))			
 				{
@@ -1055,8 +1065,18 @@ echo '<table>';
 		}
 //	}
 //}
-echo "</table>
+echo "
+<tr style='font-weight:bold;' align='center'>
+<td class='ContentHeader2' style='font-weight:bold;'>&Sigma;</td>
+<td class='ContentHeader2' style='font-weight:bold;'>$summe_stud</td>
+<td class='ContentHeader2' colspan='6'></td>
+<td class='ContentHeader2' style='color:red; font-weight:bold;'>$summe_ng</td>
+<td class='ContentHeader2' style='font-weight:bold;' colspan='2'>$summe_t2</td>
+<td class='ContentHeader2' style='font-weight:bold;' colspan='2'>$summe_komm</td>
+</tr>
+</table>
 </td></tr>
+
 </table>
 ";
 echo $htmlOutput;
