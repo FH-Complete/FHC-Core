@@ -82,8 +82,12 @@ class kontakt extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name 
-				FROM public.tbl_kontakt LEFT JOIN public.tbl_firma USING(firma_id) WHERE kontakt_id='$kontakt_id'";
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
+				FROM 
+					public.tbl_kontakt
+					LEFT JOIN public.tbl_standort USING(standort_id) 
+					LEFT JOIN public.tbl_firma USING(firma_id) 
+				WHERE kontakt_id='$kontakt_id'";
 		
 		if($this->db_query($qry))
 		{
@@ -166,9 +170,8 @@ class kontakt extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, firma_id,standort_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, standort_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->person_id).', '.
-			     $this->addslashes($this->firma_id).', '.
 			     $this->addslashes($this->standort_id).', '.
 			     $this->addslashes($this->kontakttyp).', '.
 			     $this->addslashes($this->anmerkung).', '.
@@ -190,7 +193,6 @@ class kontakt extends basis_db
 			}
 			$qry='UPDATE public.tbl_kontakt SET '.
 				'person_id='.$this->addslashes($this->person_id).', '. 
-				'firma_id='.$this->addslashes($this->firma_id).', '. 
 				'standort_id='.$this->addslashes($this->standort_id).', '. 				
 				'kontakttyp='.$this->addslashes($this->kontakttyp).', '. 
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
@@ -277,8 +279,8 @@ class kontakt extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name 
-				FROM public.tbl_kontakt LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id='$person_id'";
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id 
+				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id='$person_id'";
 		
 		if($this->db_query($qry))
 		{

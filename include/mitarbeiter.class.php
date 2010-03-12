@@ -35,7 +35,7 @@ class mitarbeiter extends benutzer
 	public $kurzbz;			//varchar(8)
 	public $lektor;			//boolean
 	public $fixangestellt;		//boolean
-	public $standort_kurzbz;   //varchar(16)
+	public $standort_id;   //varchar(16)
 	public $telefonklappe;		//varchar(25)
 	public $ort_kurzbz;		//varchar(8)
 	public $ext_id_mitarbeiter;	//bigint
@@ -81,7 +81,7 @@ class mitarbeiter extends benutzer
 				$this->kurzbz = $row->kurzbz;
 				$this->lektor = ($row->lektor=='t'?true:false);
 				$this->fixangestellt = ($row->fixangestellt=='t'?true:false);
-				$this->standort_kurzbz = $row->standort_kurzbz;
+				$this->standort_id = $row->standort_id;
 				$this->telefonklappe = $row->telefonklappe;
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->stundensatz = $row->stundensatz;
@@ -252,7 +252,7 @@ class mitarbeiter extends benutzer
 			}
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_kurzbz, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden)
+			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden)
 
 			        VALUES('".addslashes($this->uid)."',".
 			 	 	$this->addslashes($this->ausbildungcode).",".
@@ -261,7 +261,7 @@ class mitarbeiter extends benutzer
 			 	 	($this->lektor?'true':'false').','.
 			 	 	$this->addslashes($this->ort_kurzbz).','.
 					($this->fixangestellt?'true':'false').','.
-					$this->addslashes($this->standort_kurzbz).','.
+					$this->addslashes($this->standort_id).','.
 					$this->addslashes($this->telefonklappe).','.
 					$this->addslashes($this->anmerkung).','.
 					$this->addslashes($this->stundensatz).','.
@@ -282,7 +282,7 @@ class mitarbeiter extends benutzer
 			       ' lektor='.($this->lektor?'true':'false').','.
 			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
 			       ' bismelden='.($this->bismelden?'true':'false').','.
-			       ' standort_kurzbz='.$this->addslashes($this->standort_kurzbz).','.
+			       ' standort_id='.$this->addslashes($this->standort_id).','.
 			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
 			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
 			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
@@ -313,7 +313,8 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null)
 	{
-		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
+					homepage, campus.vw_mitarbeiter.updateamum, campus.vw_mitarbeiter.updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE TRUE';
 
@@ -362,7 +363,7 @@ class mitarbeiter extends benutzer
 			$l->gebdatum=$row->gebdatum;
 			$l->gebort=$row->gebort;
 			$l->gebzeit=$row->gebzeit;
-			$l->foto=$row->foto;
+			//$l->foto=$row->foto;
 			$l->anmerkung=$row->anmerkung;
 			$l->aktiv=$row->aktiv=='t'?true:false;
 			$l->homepage=$row->homepage;
@@ -373,7 +374,7 @@ class mitarbeiter extends benutzer
 			$l->kurzbz=$row->kurzbz;
 			$l->lektor=$row->lektor=='t'?true:false;
 			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
-			$l->standort_kurzbz = $row->standort_kurzbz;
+			$l->standort_id = $row->standort_id;
 			$l->telefonklappe=$row->telefonklappe;
 			
 			// Lektor in Array speichern
@@ -467,7 +468,7 @@ class mitarbeiter extends benutzer
 			$l->kurzbz=$row->kurzbz;
 			$l->lektor=$row->lektor=='t'?true:false;
 			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
-			$l->standort_kurzbz = $row->standort_kurzbz;
+			$l->standort_id = $row->standort_id;
 			$l->telefonklappe=$row->telefonklappe;
 			$l->studiengang_kz = $row->studiengang_kz;
 			//$l->ort_kurzbz=$row->ort_kurzbz;
@@ -681,7 +682,7 @@ class mitarbeiter extends benutzer
 				$obj->stundensatz = $row->stundensatz;
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
-				$obj->standort_kurzbz = $row->standort_kurzbz;
+				$obj->standort_id = $row->standort_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
@@ -819,7 +820,7 @@ class mitarbeiter extends benutzer
 				$obj->stundensatz = $row->stundensatz;
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
-				$obj->standort_kurzbz = $row->standort_kurzbz;
+				$obj->standort_id = $row->standort_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->alias = $row->alias;
 				$obj->insertamum = $row->insertamum;
@@ -847,7 +848,8 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterOrganisationseinheit($oe_kurzbz)
 	{
-		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.* FROM campus.vw_mitarbeiter
+		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
+					homepage, updateamum, updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE funktion_kurzbz='oezuordnung' AND oe_kurzbz='".addslashes($oe_kurzbz)."'  AND
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
@@ -872,7 +874,7 @@ class mitarbeiter extends benutzer
 				$l->gebdatum=$row->gebdatum;
 				$l->gebort=$row->gebort;
 				$l->gebzeit=$row->gebzeit;
-				$l->foto=$row->foto;
+				//$l->foto=$row->foto;
 				$l->anmerkung=$row->anmerkung;
 				$l->aktiv=$row->aktiv=='t'?true:false;
 				$l->homepage=$row->homepage;
@@ -883,7 +885,7 @@ class mitarbeiter extends benutzer
 				$l->kurzbz=$row->kurzbz;
 				$l->lektor=$row->lektor=='t'?true:false;
 				$l->fixangestellt=$row->fixangestellt=='t'?true:false;
-				$l->standort_kurzbz = $row->standort_kurzbz;
+				$l->standort_id = $row->standort_id;
 				$l->telefonklappe=$row->telefonklappe;
 
 				// Lektor in Array speichern
