@@ -332,7 +332,7 @@ class firma extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Firmen eines bestimmen Firmentyps
 	 * @return true wenn ok, false im Fehlerfall
@@ -483,15 +483,11 @@ class firma extends basis_db
 		}
 
 		$qry =" select tbl_firma.*  ";
-
 		$qry.=", tbl_firma_organisationseinheit.firma_organisationseinheit_id ,tbl_firma_organisationseinheit.kundennummer ,tbl_firma_organisationseinheit.oe_kurzbz ";
-	
 		$qry.=" ,tbl_organisationseinheit.oe_parent_kurzbz,tbl_organisationseinheit.bezeichnung,tbl_organisationseinheit.bezeichnung ,tbl_organisationseinheit.organisationseinheittyp_kurzbz,tbl_organisationseinheit.aktiv as oe_aktiv,tbl_organisationseinheit.mailverteiler   ";		
-	
 		$qry.=" FROM public.tbl_firma, public.tbl_firma_organisationseinheit ";
 		$qry.=" left outer join public.tbl_organisationseinheit  on ( tbl_organisationseinheit.oe_kurzbz=tbl_firma_organisationseinheit.oe_kurzbz ) ";
 		$qry.=" WHERE tbl_firma.firma_id=tbl_firma_organisationseinheit.firma_id ";
-
 
 		if($firma_organisationseinheit_id!='')
 			$qry.=" and tbl_firma_organisationseinheit.firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";
@@ -530,13 +526,13 @@ class firma extends basis_db
 				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;		
 				$fa->bezeichnung = $row->bezeichnung;		
 				$fa->kundennummer = $row->kundennummer;						
+
+				$fa->oe_aktiv = ($row->oe_aktiv=='t'?true:false);	
+				$fa->mailverteiler = ($row->mailverteiler=='t'?true:false);	
 				
-				$fa->oe_aktiv = $row->oe_aktiv;		
-				$fa->mailverteiler = $row->mailverteiler;	
-				
-				$this->result[] = $fa;
+				$this->result[]=$fa;
 			}
-			return true;
+			return $this->result;
 		}
 		else 
 		{

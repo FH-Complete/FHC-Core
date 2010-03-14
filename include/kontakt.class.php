@@ -319,26 +319,46 @@ class kontakt extends basis_db
 	 * @param standort_id
 	 * @return boolean
 	 */
-	public function load_standort($standort_id='',$firma_id='')
+	public function load_standort($standort_id='',$firma_id='',$kontakt_id='',$person_id='')
 	{
-		if(!is_numeric($standort_id))
+		$this->result=array();
+		$this->errormsg = '';
+
+		if($firma_id!='' && !is_numeric($firma_id))
+		{
+			$this->errormsg = 'Firma ist ungueltig';
+			return false;
+		}
+		if($standort_id!='' && !is_numeric($standort_id))
 		{
 			$this->errormsg = 'Standort ist ungueltig';
 			return false;
 		}
-
-		$qry = "SELECT tbl_kontakt.*, tbl_standort.kurzbz as standort_kurzbz, tbl_standort.bezeichnung as standort_bezeichnung  
-				,tbl_person.anrede,tbl_person.titelpost,tbl_person.titelpre,tbl_person.nachname,tbl_person.vorname,tbl_person.vornamen
-				FROM public.tbl_kontakt 
-				LEFT JOIN public.tbl_standort USING(standort_id,firma_id) 
-				LEFT JOIN public.tbl_person USING(person_id) 
-				WHERE standort_id>0 
+		if($kontakt_id!='' && !is_numeric($kontakt_id))
+		{
+			$this->errormsg = 'Kontakt ist ungueltig';
+			return false;
+		}
+		if($person_id!='' && !is_numeric($person_id))
+		{
+			$this->errormsg = 'Person ist ungueltig';
+			return false;
+		}		
+		$qry = "SELECT tbl_kontakt.*
+				,tbl_standort.firma_id, tbl_standort.kurzbz as standort_kurzbz, tbl_standort.bezeichnung as standort_bezeichnung  
+				FROM public.tbl_kontakt,public.tbl_standort 
+				WHERE tbl_standort.standort_id=tbl_kontakt.standort_id  
 			";
-			if(is_numeric($standort_id))
-				$qry.=" and standort_id='".addslashes($standort_id)."'";
+
 			if(is_numeric($firma_id))
-				$qry.=" and tbl_kontakt.firma_id='".addslashes($firma_id)."'";
-					
+				$qry.=" and tbl_standort.firma_id='".addslashes($firma_id)."'";
+			if(is_numeric($standort_id))
+				$qry.=" and tbl_kontakt.standort_id='".addslashes($standort_id)."'";
+			if(is_numeric($kontakt_id))
+				$qry.=" and tbl_kontakt.kontakt_id='".addslashes($kontakt_id)."'";
+			if(is_numeric($person_id))
+				$qry.=" and tbl_kontakt.person_id='".addslashes($person_id)."'";
+##echo $qry;				
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -360,22 +380,16 @@ class kontakt extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				$obj->anrede=$row->anrede;
-				$obj->titelpost=$row->titelpost;
-				$obj->titelpre=$row->titelpre;
-				$obj->nachname=$row->nachname;
-				$obj->vorname=$row->vorname;
-				$obj->vornamen=$row->vornamen;				
-				$this->result[] = $row;
+
+				$this->result[] = $obj;
 			}
-			
-			return true;
 		}
 		else 
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+		return $this->result;
 	}
 	
 	/**

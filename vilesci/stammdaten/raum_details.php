@@ -56,7 +56,7 @@
 	$kosten = '';
 	$ausstattung = '';
 	$stockwerk = '';
-	$standort_kurzbz = '';
+	$standort_id = '';
 	$telefonklappe = '';
 	
 	$neu = "true";
@@ -75,7 +75,7 @@
 		$kosten = $_POST["kosten"];
 		$ausstattung = $_POST["ausstattung"];
 		$stockwerk = $_POST["stockwerk"];
-		$standort_kurzbz = $_POST["standort_kurzbz"];
+		$standort_id = $_POST["standort_id"];
 		$telefonklappe = $_POST["telefonklappe"];
 
 		
@@ -93,7 +93,7 @@
 		$sg_update->ausstattung = $ausstattung;
 		$sg_update->stockwerk = $stockwerk;
 		$sg_update->telefonklappe = $telefonklappe;
-		$sg_update->standort_kurzbz = $standort_kurzbz;
+		$sg_update->standort_id = $standort_id;
 
 		
 		if ($_POST["neu"] == "true")
@@ -128,7 +128,7 @@
 		$kosten = $sg->kosten;
 		$ausstattung = $sg->ausstattung;
 		$stockwerk = $sg->stockwerk;
-		$standort_kurzbz = $sg->standort_kurzbz;
+		$standort_id = $sg->standort_id;
 		$telefonklappe = $sg->telefonklappe;
 		$neu = "false";
 	}
@@ -166,19 +166,19 @@
 	$htmlstr .= "					<td><input class='detail' type='text' name='stockwerk' size='8' maxlength='5' value='".$stockwerk."' onchange='submitable()'></td>\n";
 	$htmlstr .= "					<td>Standort</td>\n";
 	$htmlstr .= "					<td>";
-	$htmlstr .= "					<SELECT name='standort_kurzbz'>";
+	$htmlstr .= "					<SELECT name='standort_id'>";
 	$htmlstr.="				<OPTION value=''>-- keine Auswahl --</OPTION>\n";
-	$qry = 'SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz';
+	$qry = 'SELECT * FROM public.tbl_standort ORDER BY standort_id';
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			if($row->standort_kurzbz==$standort_kurzbz)
+			if($row->standort_id==$standort_id)
 				$selected='selected';
 			else 
 				$selected='';
 			
-			$htmlstr.="				<OPTION value='$row->standort_kurzbz' $selected>$row->standort_kurzbz</OPTION>\n";
+			$htmlstr.="				<OPTION value='$row->standort_id' $selected>$row->standort_id</OPTION>\n";
 		}
 	}
 	$htmlstr .= "					</SELECT>";

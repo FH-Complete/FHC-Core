@@ -33,55 +33,14 @@
 	//Berechtigung pruefen
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
+	$berechtigung_kurzbz = 'basis/firma';
+	if(!$rechte->isBerechtigt($berechtigung_kurzbz))
+		die('Sie haben keine Berechtigung fuer diese Seite ');
 	
-	if(!$rechte->isBerechtigt('basis/firma'))
-		die('Sie haben keine Berechtigung fuer diese Seite');
-	
+	// Parameter uebernehmen
+	$suchen = (isset($_GET['suchen'])?$_GET['suchen']:null);
 	$filter = (isset($_GET['filter'])?$_GET['filter']:'');
 	$firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
-	
-	$htmlstr = "";
-
-	if($filter=='')
-		$sql_query = "SELECT * FROM public.tbl_firma WHERE true";
-	else 
-		$sql_query = "SELECT * FROM public.tbl_firma WHERE lower(name) like lower('%$filter%') OR lower(adresse) like lower('%$filter%') OR lower(anmerkung) like lower('%$filter%')";
-	if($firmentypfilter!='')
-		$sql_query.=" AND firmentyp_kurzbz='".addslashes($firmentypfilter)."'";
-	//echo $sql_query;
-    if(!$erg=$db->db_query($sql_query))
-	{
-		$htmlstr='Fehler beim Laden der Firma';
-	}
-	
-	else
-	{
-		
-	    $htmlstr .= "</form><table id='t1' class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>\n";
-		$htmlstr .= "   <thead><tr class='liste'>\n";
-	    $htmlstr .= "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Name</th><th class='table-sortable:default'>Adresse</th><th class='table-sortable:default'>Email</th><th class='table-sortable:default'>Telefon</th><th class='table-sortable:default'>Fax</th><th class='table-sortable:default'>Anmerkung</th><th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Schule</th>";
-	    $htmlstr .= "   </tr></thead><tbody>\n";
-	    $i = 0;
-		while($row=$db->db_fetch_object($erg))
-	    {
-	        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
-			$htmlstr .= "   <tr>\n";
-	        $htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->firma_id."</a></td>\n";
-			$htmlstr .= "       <td><a href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->name."</a></td>\n";
-	        $htmlstr .= "       <td>$row->adresse</td>\n";
-	        $htmlstr .= "       <td>$row->email</td>\n";
-	        $htmlstr .= "       <td>$row->telefon</td>\n";
-	        $htmlstr .= "       <td>$row->fax</td>\n";
-	        $htmlstr .= "       <td title='".$row->anmerkung."'>".(strlen($row->anmerkung)>30?substr($row->anmerkung,0,27).'...':$row->anmerkung)."</td>\n";
-	        $htmlstr .= "       <td>$row->firmentyp_kurzbz</td>\n";
-			$htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
-	        $htmlstr .= "   </tr>\n";
-	        $i++;
-	    }
-	    $htmlstr .= "</tbody></table>\n";
-	}
-
-
 ?>
 <html>
 <head>
@@ -92,26 +51,19 @@
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 <!--
-var firmentypfilter='<?php echo $firmentypfilter; ?>';
-var filter = '<?php echo $filter; ?>';
+//var firmentypfilter='<?php echo $firmentypfilter; ?>';
+//var filter = '<?php echo $filter; ?>';
 -->
 </script>
-
 </head>
-
 <body class="background_main">
 <h2>Firmen - &Uuml;bersicht</h2>
-
 <?php 
-	echo '<table width="100%"><tr><td>';
-	echo '<h3>Übersicht</h3>';
-	echo '</td><td align="right">';
-	echo "<input type='button' onclick='parent.detail_firma.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/>";
-	echo '</td></tr></table>';
+echo '<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'; 
 	//Suche
-	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-	echo '<input type="text" name="filter" value="'.$filter.'">';
-	echo 'Typ: <SELECT name="firmentypfilter">
+	echo '<form onsubmit="parent.frames[1].location.href =\'firma_details.php\';parent.frames[2].location.href =\'firma_detailwork.php\';" action="'.$_SERVER['PHP_SELF'].'" method="GET"><td>';
+	echo '&nbsp;Suche: <input type="text" name="filter" value="'.$filter.'">';
+	echo '&nbsp;Typ: <SELECT name="firmentypfilter">
 			<option value="">-- Alle --</option>';
 	$firma = new firma();
 	$firma->getFirmenTypen();
@@ -124,13 +76,80 @@ var filter = '<?php echo $filter; ?>';
 		echo "<option value='$row->firmentyp_kurzbz' $selected>$row->firmentyp_kurzbz</option>";
 	}
 	echo '</SELECT>';
-	echo '<input type="submit" value="Suchen">';
-	echo '</form>';
+	echo '&nbsp;<input type="submit" name="suchen" value="Suchen">';
+	echo '</td></form>';
 	
-	echo $htmlstr;
+	echo "<td align='right'><input type='button' onclick='parent.detail_firma.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/></td>";
+	echo '</tr></table>';
+	echo creatList($suchen,$filter,$firmentypfilter);
+	
 ?>
-
-
-
 </body>
 </html>
+
+<?php
+
+function creatList($suchen,$filter,$firmentypfilter)
+{
+	// Initialisieren HTML Listenausgabe
+	$htmlstr = "";
+	$firma_finanzamt = new firma();
+	$firmentyp_finanzamt='Finanzamt';
+	$firma_finanzamt->errormsg='';
+	$firma_finanzamt->result=array();	
+	if (!is_null($suchen)) // Nur wenn Suchknopf gedrueck wurde
+		$firma_finanzamt->searchFirma($filter,$firmentypfilter);	
+		
+    if($firma_finanzamt->errormsg)
+		return 'Fehler beim Laden der Firma<br>';
+	
+	if ($firma_finanzamt->result)
+	{
+	    $htmlstr .= "</form><table id='t1' class='liste table-autosort:1 table-stripeclass:alternate table-autostripe'>\n";
+		$htmlstr .= "   <thead><tr class='liste'>\n";
+	    $htmlstr .= "       <th class='table-sortable:numeric'>ID</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Name</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Anmerkung</th>";
+		$htmlstr .= "       <th class='table-sortable:default'>Kurzbz.</th>";
+		$htmlstr .= "       <th class='table-sortable:default'>Standort</th>";
+
+	    $htmlstr .= "       <th class='table-sortable:default'>Plz</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Ort</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Strasse</th>";		
+
+	    $htmlstr .= "       <th class='table-sortable:default'>Typ</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Schule</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Gesperrt</th>";		
+	    $htmlstr .= "       <th class='table-sortable:default'>Aktiv</th>";				
+	    $htmlstr .= "       <th class='table-sortable:default'>Ext ID</th>";
+
+	    $htmlstr .= "   </tr></thead><tbody>\n";
+	    $i = 0;
+		foreach ($firma_finanzamt->result as $row)
+	    {
+	// Adresse
+			$row->adresse_neu=$row->plz.' '.$row->ort;			
+			
+			$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
+	        $htmlstr .= "       <td><a onclick=\"parent.frames[2].location.href ='firma_detailwork.php';\" href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->firma_id."</a></td>\n";
+			$htmlstr .= "       <td><a onclick=\"parent.frames[2].location.href ='firma_detailwork.php';\" href='firma_details.php?firma_id=".$row->firma_id."' target='detail_firma'>".$row->name."</a></td>\n";
+	        $htmlstr .= "       <td title='".$row->anmerkung."'>".StringCut($row->anmerkung,27)."</td>\n";
+			$htmlstr .= "       <td>".$row->kurzbz."</td>\n";
+			$htmlstr .= "       <td>".StringCut($row->bezeichnung,27)."</td>\n";
+			// Adresse
+	        $htmlstr .= "       <td>$row->plz</td>\n";
+	        $htmlstr .= "       <td>$row->ort</td>\n";
+	        $htmlstr .= "       <td>$row->strasse</td>\n";
+	        $htmlstr .= "       <td>$row->firmentyp_kurzbz</td>\n";
+			$htmlstr .= "       <td>".($row->gesperrt=='t'?'Ja':'Nein')."</td>\n";			
+			$htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
+			$htmlstr .= "       <td>".($row->aktiv=='t'?'Ja':'Nein')."</td>\n";			
+	        $htmlstr .= "       <td>$row->ext_id</td>\n";
+	        $htmlstr .= "   </tr>\n";
+	        $i++;
+	    }
+	    $htmlstr .= "</tbody></table>\n";
+	}
+	return $htmlstr;
+}
+?>
