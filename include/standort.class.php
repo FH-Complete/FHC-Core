@@ -47,12 +47,20 @@ class standort extends basis_db
 	public $person_id;			//  integer
 	public $funktion_kurzbz;	//  string	
 	public $position;			//  string	
-	public $anrede;				//  string	
+
+	public $person_anrede;		//  string	
+	public $titelpost;			//  string	
+	public $titelpre;			//  string	
+	public $nachname;			//  string	
+	public $vorname;			//  string	
+	public $vornamen;			//  string	
+
 	
 	public $funktion_beschreibung;	//  string	
 	public $funktion_aktiv;			//  boolean	
 	public $funktion_fachbereich;	//  string	
 	public $funktion_semester;		//  string	
+	public $anrede;				//  string	
 
 
 	/**
@@ -207,6 +215,8 @@ class standort extends basis_db
 	}
 
 
+	
+	
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
@@ -240,8 +250,6 @@ class standort extends basis_db
 			$this->errormsg = 'bezeichnung darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
-		
-
 		$this->errormsg = '';
 		return true;
 	}
@@ -254,6 +262,8 @@ class standort extends basis_db
 	 */
 	public function save()
 	{
+		$this->errormsg = '';
+
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
@@ -352,5 +362,242 @@ class standort extends basis_db
 			return false;
 		}
 	}
+	
+	
+
+	/**
+	 * Laedt alle Standort,Funktion zu der Adress ID  die uebergeben wird
+	 * @param adress_id ID der Adresse zu der die standorte geladen werden sollen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_personfunktionstandort($personfunktionstandort_id='',$firma_id='',$standort_id='',$adress_id='',$person_id='')
+	{
+		$this->result=array();
+		$this->errormsg = '';
+	
+		//Pruefen ob xxx_ID  eine gueltige Zahl ist
+		if($firma_id!='' && !is_numeric($firma_id))
+		{
+			$this->errormsg = 'Firma ID muss eine gültige Zahl sein';
+			return false;
+		}
+		if($standort_id!='' && !is_numeric($standort_id))
+		{
+			$this->errormsg = 'Standort ID muss eine gültige Zahl sein';
+			return false;
+		}
+		if($adress_id!='' && !is_numeric($adress_id))
+		{
+			$this->errormsg = 'Adressen ID muss eine gültige Zahl sein';
+			return false;
+		}
+		if($person_id!='' && !is_numeric($person_id))
+		{
+			$this->errormsg = 'Person ID muss eine gültige Zahl sein';
+			return false;
+		}		
+
+		//Pruefen ob pers_id eine gueltige Zahl ist
+		if($personfunktionstandort_id!='' && !is_numeric($personfunktionstandort_id))
+		{
+			$this->errormsg = 'Personfunktionstandort ID muss eine gültige Zahl sein';
+			return false;
+		}
+		
+		//Lesen der Daten aus der Datenbank
+		$qry = "SELECT tbl_standort.* 
+				, personfunktionstandort_id,funktion_kurzbz,position,tbl_personfunktionstandort.anrede
+				,tbl_person.person_id,tbl_person.anrede as person_anrede,tbl_person.titelpost,tbl_person.titelpre,tbl_person.nachname,tbl_person.vorname,tbl_person.vornamen				 
+				FROM public.tbl_standort ,public.tbl_personfunktionstandort,public.tbl_person
+				WHERE  tbl_personfunktionstandort.standort_id=tbl_standort.standort_id
+				AND tbl_person.person_id=tbl_personfunktionstandort.person_id
+			";
+			
+		if ($personfunktionstandort_id!='' && is_numeric($personfunktionstandort_id))
+			$qry.="	AND personfunktionstandort_id='".addslashes($personfunktionstandort_id)."'";
+		if ($firma_id!='' && is_numeric($firma_id))
+			$qry.="	AND tbl_standort.firma_id='".addslashes($firma_id)."'";
+		if ($standort_id!='' && is_numeric($standort_id))
+			$qry.="	AND tbl_standort.standort_id='".addslashes($standort_id)."'";
+		if ($adress_id!='' && is_numeric($adress_id))
+			$qry.="	AND tbl_standort.adress_id='".addslashes($adress_id)."'";
+		if ($person_id!='' && is_numeric($person_id))
+			$qry.="	AND tbl_standort.person_id='".addslashes($person_id)."'";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$adr_obj = new standort();
+
+			$adr_obj->standort_id		= $row->standort_id;
+			$adr_obj->adresse_id		= $row->adresse_id;
+			$adr_obj->kurzbz			= $row->kurzbz;
+			$adr_obj->bezeichnung		= $row->bezeichnung;
+			$adr_obj->updateamum		= $row->updateamum;
+			$adr_obj->updatevon			= $row->updatevon;
+			$adr_obj->insertamum		= $row->insertamum;
+			$adr_obj->insertvon			= $row->insertvon;
+			$adr_obj->ext_id			= $row->ext_id;
+			$adr_obj->firma_id			= $row->firma_id;
+
+			$adr_obj->personfunktionstandort_id=$row->personfunktionstandort_id;
+			$adr_obj->funktion_kurzbz=$row->funktion_kurzbz;
+			$adr_obj->position=$row->position;
+			$adr_obj->anrede=$row->anrede;
+
+
+			
+			$adr_obj->person_id=$row->person_id;
+			$adr_obj->person_anrede=$row->person_anrede;
+			$adr_obj->titelpost=$row->titelpost;
+			$adr_obj->titelpre=$row->titelpre;
+			$adr_obj->nachname=$row->nachname;
+			$adr_obj->vorname=$row->vorname;
+			$adr_obj->vornamen=$row->vornamen;				
+
+			$this->result[] = $adr_obj;
+		}
+		return $this->result;
+	}
+	/**
+	 * Speichert den aktuellen Personfunktionstandort Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $standort_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function savepersonfunktionstandort()
+	{
+		$this->errormsg = '';
+			//Pruefen ob standort_id eine gueltige Zahl ist
+			if($this->personfunktionstandort_id!='' && !is_numeric($this->personfunktionstandort_id))
+			{
+				$this->errormsg = 'personfunktionstandort_id muss eine gültige Zahl sein: '.$this->personfunktionstandort_id."\n";
+				return false;
+			}
+			//Pruefen ob standort_id eine gueltige Zahl ist
+			if(!is_numeric($this->standort_id))
+			{
+				$this->errormsg = 'standort_id muss eine gültige Zahl sein: '.$this->standort_id."\n";
+				return false;
+			}
+			//Pruefen ob standort_id eine gueltige Zahl ist
+			if(!is_numeric($this->person_id))
+			{
+				$this->errormsg = 'person_id muss eine gültige Zahl sein: '.$this->person_id."\n";
+				return false;
+			}
+			//Pruefen ob standort_id eine gueltige Zahl ist
+			if(empty($this->funktion_kurzbz))
+			{
+				$this->errormsg = 'funktion_kurzbz muss eingegeben werden: '.$this->funktion_kurzbz."\n";
+				return false;
+			}
+			
+		if($this->new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='BEGIN;INSERT INTO public.tbl_personfunktionstandort (funktion_kurzbz,person_id,position,anrede,standort_id) 
+				VALUES('.
+			      ($this->funktion_kurzbz!=null?$this->addslashes($this->funktion_kurzbz):'null').', '.				
+			      ($this->person_id!=null?$this->addslashes($this->person_id):'null').', '.				
+			      $this->addslashes($this->position).', '.
+			      $this->addslashes($this->anrede).', '.
+			      ($this->standort_id!=null?$this->addslashes($this->standort_id):'null').');'; 
+		}
+		else
+		{
+			$qry='UPDATE public.tbl_personfunktionstandort SET'.
+				' funktion_kurzbz='.($this->funktion_kurzbz!=null?$this->addslashes($this->funktion_kurzbz):'null').', '.
+				' person_id='.($this->person_id!=null?$this->addslashes($this->person_id):'null').', '.				
+				' position='.$this->addslashes($this->position).', '.
+		      	' anrede='.$this->addslashes($this->anrede).','.
+		      	' standort_id='.($this->standort_id!=null?$this->addslashes($this->standort_id):'null').' '.
+		      	' WHERE personfunktionstandort_id='.$this->personfunktionstandort_id.';';
+		}
+
+		if($this->db_query($qry))
+		{
+			if($this->new)
+			{
+				//naechste ID aus der Sequence holen
+				$qry="SELECT currval('public.tbl_personfunktionstandort_personfunktionstandort_id_seq') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->personfunktionstandort_id = $row->id;
+						$this->db_query('COMMIT');
+						return $this->personfunktionstandort_id;
+					}
+					else
+					{
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Sequence";
+						return false;
+					}
+				}
+				else
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+			else 
+				return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Adress-Datensatzes';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $standort_id ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function deletepersonfunktionstandort($personfunktionstandort_id='',$standort_id='')
+	{
+		//Pruefen ob standort_id eine gueltige Zahl ist
+		if(!is_numeric($personfunktionstandort_id) && $personfunktionstandort_id != '')
+		{
+			$this->errormsg = 'personfunktionstandort_id muss eine gültige Zahl sein'."\n";
+			return false;
+		}
+		if(!is_numeric($standort_id) && $standort_id != '')
+		{
+			$this->errormsg = 'standort_id muss eine gültige Zahl sein'."\n";
+			return false;
+		}
+		
+		if($personfunktionstandort_id != '')
+			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE personfunktionstandort_id='".addslashes($personfunktionstandort_id)."';";
+		else if($standort_id != '')
+			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE standort_id='".addslashes($standort_id)."';";
+		else
+		{
+			$this->errormsg = 'personfunktionstandort_id oder standort_id muss eingegeben werden'."\n";
+			return false;
+		}	
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+			return false;
+		}
+	}
+	
+	
 }
 ?>

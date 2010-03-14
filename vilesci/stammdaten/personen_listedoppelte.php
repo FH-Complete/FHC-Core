@@ -62,8 +62,9 @@ if ((isset($_GET['person2']) || isset($_POST['person2']))&&(isset($_GET['person1
 		$sql_query_upd1.="UPDATE public.tbl_akte SET person_id='$person1' WHERE person_id='$person2';";
 		$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id='$person1' WHERE person_id='$person2';";
 		$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id='$person1' WHERE person_id='$person2';";
-		$sql_query_upd1.="UPDATE public.tbl_betriebsmittelperson SET person_id='$person1' WHERE person_id='$person2';";
 
+ 		$sql_query_upd1.="UPDATE wawi.tbl_betriebsmittelperson SET person_id='$person1' WHERE person_id='$person2';";
+    
 		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$person2';";
 		if($db->db_query($sql_query_upd1))
 		{
