@@ -225,7 +225,7 @@ cellSeparator (default value: "|")
 			if($filter!='')
 				$qry.= " and ( lower(tbl_firma.name) like lower('%$filter%') 
 						OR lower(kurzbz) like lower('%$filter%') 			
-						OR lower(adresse) like lower('%$filter%') 
+						OR lower(tbl_adresse.strasse) like lower('%$filter%') 
 						OR lower(bezeichnung) like lower('%$filter%') 
 						OR lower(anmerkung) like lower('%$filter%')
 						".(is_numeric($filter)?" OR tbl_firma.firma_id='$filter'":'')."
