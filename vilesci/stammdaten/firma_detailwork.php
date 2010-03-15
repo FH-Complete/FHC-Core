@@ -887,7 +887,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 	// Init
 	$htmlstr='';
 	$standort_obj = new standort();
-echo $personfunktionstandort_id;	
+#echo $personfunktionstandort_id;	
 	if($personfunktionstandort_id!='' && is_numeric($personfunktionstandort_id) )
 	{
 		$standort_obj->result=array();
