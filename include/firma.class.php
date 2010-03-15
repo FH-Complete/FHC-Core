@@ -59,6 +59,7 @@ class firma extends basis_db
 	public $oe_aktiv; 			// boolean	
 	public $mailverteiler; 		// string
 
+			
 	/**
 	 * Konstruktor
 	 * @param $firma_id ID der Firma die geladen werden soll (Default=null)
@@ -564,6 +565,83 @@ class firma extends basis_db
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
+	}
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $firma_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveorganisationseinheit()
+	{
+		if($this->new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='INSERT INTO public.tbl_firma_organisationseinheit (firma_id,oe_kurzbz, 
+					bezeichnung,kundennummer, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
+			     $this->addslashes($this->firma_id).', '.
+			     $this->addslashes($this->oe_kurzbz).', '.
+			     $this->addslashes($this->bezeichnung).', '.
+			     $this->addslashes($this->kundennummer).', '.
+			     $this->addslashes($this->updateamum).', '.
+			     $this->addslashes($this->updatevon).', '.
+			     $this->addslashes($this->insertamum).', '.
+			     $this->addslashes($this->insertvon).', '.
+			     $this->addslashes($this->ext_id).' ); '; 			 
+		}
+		else
+		{
+			//Updaten des bestehenden Datensatzes
+
+			//Pruefen ob firma_id eine gueltige Zahl ist
+			if(!is_numeric($this->firma_id))
+			{
+				$this->errormsg = 'firma_id muss eine gueltige Zahl sein';
+				return false;
+			}
+			$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
+				'firma_id='.$this->addslashes($this->firma_id).', '.
+				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
+				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
+				'updateamum= now(), '.
+		     	'updatevon='.$this->addslashes($this->updatevon).', '.
+		     	'ext_id)='.addslashes($this->ext_id).' '.
+				'WHERE firma_organisationseinheit_id='.$this->addslashes($this->firma_organisationseinheit_id).';';
+		}
+		if($this->db_query($qry))
+		{
+			if($this->new)
+			{
+				//Sequence lesen
+				$qry="SELECT currval('public.tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->firma_organisationseinheit_id = $row->id;
+						$this->db_query('COMMIT');
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK');
+					return false;
+				}
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Firma-Datensatzes';
+			return false;
+		}
+		return $this->firma_organisationseinheit_id;
 	}
 
 
