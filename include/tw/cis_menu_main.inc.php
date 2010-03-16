@@ -624,7 +624,10 @@
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Quality management Handbook.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
 			  			</tr>
-						
+						<tr>
+				  			<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.php?lang=en"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;CRM@FHTW</a></td>
+			  			</tr>
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
 							<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm_en.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Organigram</a></td>
