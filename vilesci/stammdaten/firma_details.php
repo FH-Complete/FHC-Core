@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2010 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 	$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
@@ -227,6 +227,7 @@ div.css-panes div {
 
 ##echo "$work <br>";
 
+		//Tabs
 		switch ($work)
 		{
 			case 'standortliste':
@@ -235,6 +236,10 @@ div.css-panes div {
 
 			case 'organisationliste':
 				echo getOrganisationsliste($firma_id,$adresstyp_arr,$user);
+				break;
+				
+			case 'anmerkungsfeld':
+				echo getAnmerkungen($firma_id,$user);
 				break;
 
 			case 'saveFirma':
@@ -253,7 +258,11 @@ div.css-panes div {
 				break;
 		}
 echo  ($errorstr?'<br>'.$errorstr:'');
-
+echo '<script language="JavaScript1.2" type="text/javascript">
+	<!--
+		parent.frames[0].location.reload();
+	-->		
+	</script>';
 ?>	
 
 </body>
@@ -289,7 +298,7 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
 // Firma Detailanzeige
 	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
-	$htmlstr.="<tr><td><table><tr>\n";
+	$htmlstr.="<tr><td><table width='100%'><tr>\n";
 		$htmlstr.="<td>Typ: </td>";		
 		$htmlstr.="<td><select name='typ'>\n";
 
@@ -305,18 +314,22 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Name: </td>";
 		$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="</tr></table></td>";
-		$htmlstr.="<td rowspan='2'><table><tr>\n";	
-		$htmlstr.="<td valign='top'>Anmerkung: </td>";
-		$htmlstr.="<td><textarea cols='40' style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
-		// Unterscheiden der Wartung - Neuanlage = Submit, Aendern = Ajax
+		//$htmlstr.="<td>&nbsp;</td>";	
 		if($firma_id!='' && is_numeric($firma_id) )
-			$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+			$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
 		else
-			$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='submit' name='save' value='anlegen'></td>\n";
+			$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
+		$htmlstr.="</tr></table></td>";
+		//$htmlstr.="<td rowspan='2'><table><tr>\n";	
+		//$htmlstr.="<td valign='top'>Anmerkung: </td>";
+		//$htmlstr.="<td><textarea cols='40' style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
+		// Unterscheiden der Wartung - Neuanlage = Submit, Aendern = Ajax
+		//if($firma_id!='' && is_numeric($firma_id) )
+		//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+		//else
+		//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='submit' name='save' value='anlegen'></td>\n";
 
-	$htmlstr.="</tr></table></td>";	
+	//$htmlstr.="</tr></table></td>";	
 	$htmlstr.="</tr>\n";
 	$htmlstr.="<tr><td><table><tr>\n";	
 		$htmlstr.="<td>Steuernummer: </td>";
@@ -358,6 +371,7 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 		<ul class="css-tabs">
 		     <li><a href="firma_details.php?work=standortliste&firma_id='.$firma_id.'">Standorte</a></li>
 			 <li><a href="firma_details.php?work=organisationliste&firma_id='.$firma_id.'">Organisationseinheit</a></li>
+			 <li><a href="firma_details.php?work=anmerkungsfeld&firma_id='.$firma_id.'">Anmerkungen</a></li>
 		</ul>
 		<div class="css-panes">
 			<div style="display:block"></div>
@@ -463,11 +477,11 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 					<th>Plz</th>
 					<th>Ort</th>
 					<th>Strasse</th>
-					<th>TYP</th>
+					<th>Typ</th>
 					<th><font size="0">Heimatadr.</font></th>
 					<th><font size="0">Zustelladr.</font></th>
 					<th>Ext.Id</th>
-					<td valign="top"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 #var_dump($standort_obj);
 	$i=0;
@@ -520,7 +534,7 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 				$htmlstr.= '<td>'.($adresse_obj->heimatadresse?'Ja':'Nein').'</td>';
 				$htmlstr.= '<td>'.($adresse_obj->zustelladresse?'Ja':'Nein').'</td>';
 				$htmlstr.= '<td>'.$row->ext_id.'</td>';
-				$htmlstr.= "<td><a href='".$_SERVER['PHP_SELF']."?deleteadresse=true&standort_id=$row->standort_id&adresse_id=$adresse_obj->adresse_id&firma_id=$firma_id' onclick='return confdel()'>l&ouml;schen <img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+				$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteadresse=true&standort_id=$row->standort_id&adresse_id=$adresse_obj->adresse_id&firma_id=$firma_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 			}
 			else
 				$htmlstr.= '<td><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&adresse_id='.$row->adresse_id.'">'.$row->kurzbz.'</a></td>';
@@ -544,18 +558,17 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
  
  	// Datenlesen zur Firma	
 	$firma = new firma();
-	if (!$firma->load_firmaorganisationseinheit($firma_id))
+	if (!$firma->get_firmaorganisationseinheit($firma_id))
 		return '<br>Firma ID <b>'.$firma_id.'</b> '.$firma->errormsg;;
 		
 ##	var_dump($firma);
 	$htmlstr.= '<table class="liste">
 				<tr>
-					<th>Kurzbz</th>
-					<th>TYP</th>
-					<th>Bezeichnung</th>
-					<th>Mailverteiler</th>
-					<th>Aktiv</th>
-					<td valign="top"><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id=&oe_kurzbz=&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<th width="30%">Kurzbezeichnung</th>
+					<th width="15%">Typ</th>
+					<th width="25%">Bezeichnung</th>
+					<th width="15%">Kundennummer</th>
+					<td width="15%" align="center" valign="top"><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id=&oe_kurzbz=&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>
 			';
 	$i=0;
@@ -567,15 +580,51 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 			$htmlstr.= '<td>'.$row->organisationseinheittyp_kurzbz.'</td>';
 			$htmlstr.= '<td>'.$row->bezeichnung.'</td>';
 
-			$htmlstr.= '<td>'.($row->mailverteiler?'Ja':'Nein').'</td>';
-			$htmlstr.= '<td>'.($row->oe_aktiv?'Ja':'Nein').'</td>';
+			$htmlstr.= '<td align="center">'.$row->kundennummer.'</td>';
 
-			$htmlstr.= "<td><a href='".$_SERVER['PHP_SELF']."?deleteorganisationseinheit=true&firma_organisationseinheit_id=".$row->firma_organisationseinheit_id."&oe_kurzbz=".$row->oe_kurzbz."&firma_id=".$firma_id."' onclick='return confdel()'>l&ouml;schen <img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+			$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteorganisationseinheit=true&firma_organisationseinheit_id=".$row->firma_organisationseinheit_id."&oe_kurzbz=".$row->oe_kurzbz."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
 	
 	$htmlstr.= '</table>';
 	return $htmlstr;
 }
+// ----------------------------------------------------------------------------------------------------------------------------------
+/*
+	Anmerungen
+*/
+function getAnmerkungen($firma_id,$user)
+{
+	// Init
+	$htmlstr='';
+	// Plausib
+	if (empty($firma_id) || !is_numeric($firma_id) )
+		return 'Firma fehlt.';
+ 
+ 	// Datenlesen zur Firma	
+	$firma = new firma();
+	if($firma_id!='' && is_numeric($firma_id) )
+	{
+		if (!$firma->load($firma_id))
+			return '<br>Firma mit der ID <b>'.$firma_id.'</b> existiert nicht';
+	}
+	else 
+	{
+		return false;
+	}
+	$htmlstr.="<form id='addFirma' name='addAnmerkung' action='firma_details.php' method='POST'>\n";
+	$htmlstr.="<input type='hidden' name='work' value='saveFirma'>\n";	
+	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
 
+	$htmlstr.= "<table class='liste'>";
+	$htmlstr.= "<tr>";
+	$htmlstr.= "<td>Anmerkungen:</td>";
+	if($firma_id!='' && is_numeric($firma_id) )
+		$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+	else
+		$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
+	$htmlstr.= "</tr><tr><td colspan='2'><textarea cols='40' rows='8' style='width:100%' name='anmerkung'>".$firma->anmerkung."</textarea></td></tr>";
+	$htmlstr.="</form>\n";
+	return $htmlstr;
+}
 ?>
