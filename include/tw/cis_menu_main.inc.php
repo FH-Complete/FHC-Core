@@ -311,14 +311,14 @@
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a class="Item" href="private/tools/feedback.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Feedback</a></td>
 			</tr>
-			<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
+			<!--<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>-->
 				
-			    <td class="tdwrap"><a href="private/info/unternehmenskommunikation.html" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
+			    <!--<td class="tdwrap"><a href="private/info/unternehmenskommunikation.html" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>-->
 <!--
 			    <td class="tdwrap"><a href="../documents/management/" class="MenuItem" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Unternehmens-<br>&nbsp;&nbsp;&nbsp;kommunikation</a></td>
 -->
-			</tr>
+			<!--</tr>-->
 			</table>
 		  	</td>
   		</tr>
