@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2010 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -97,7 +97,7 @@ function creatList($suchen,$filter,$firmentypfilter)
 	$firmentyp_finanzamt='Finanzamt';
 	$firma_finanzamt->errormsg='';
 	$firma_finanzamt->result=array();	
-	if (!is_null($suchen)) // Nur wenn Suchknopf gedrueck wurde
+	if (!is_null($suchen)) // Nur wenn Suchknopf gedrueckt wurde
 		$firma_finanzamt->searchFirma($filter,$firmentypfilter);	
 		
     if($firma_finanzamt->errormsg)
@@ -127,7 +127,7 @@ function creatList($suchen,$filter,$firmentypfilter)
 	    $i = 0;
 		foreach ($firma_finanzamt->result as $row)
 	    {
-	// Adresse
+			// Adresse
 			$row->adresse_neu=$row->plz.' '.$row->ort;			
 			
 			$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
