@@ -116,7 +116,7 @@ function checkdatum()
       Monat=Datum.substring(3,5); 
 	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
 	  {	
-		alert('Von-Datum Monat'+ document.getElementById('vondatum').value+ ' ist nicht richtig.);
+		alert('Von-Datum Monat'+ document.getElementById('vondatum').value+ ' ist nicht richtig.');
 		document.getElementById('vondatum').focus();
 	  	return false;
 	  }
@@ -130,7 +130,7 @@ function checkdatum()
       Monat=Datum.substring(3,5); 
 	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
 	  {	
-		alert('Bis-Datum Monat'+ document.getElementById('bisdatum').value+ ' ist nicht richtig.);
+		alert('Bis-Datum Monat'+ document.getElementById('bisdatum').value+ ' ist nicht richtig.');
 		document.getElementById('bisdatum').focus();
 	  	return false;
 	  }
