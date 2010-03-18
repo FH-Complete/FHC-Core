@@ -15,56 +15,144 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
-		 
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-	
-	require_once('../../include/firma.class.php');
+$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
+	 
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
 
-	require_once('../../include/funktion.class.php');
-	
-	require_once('../../include/standort.class.php');
-	require_once('../../include/adresse.class.php');
+require_once('../../include/firma.class.php');
 
-	require_once('../../include/kontakt.class.php');
-	require_once('../../include/person.class.php');
+require_once('../../include/funktion.class.php');
 
-	require_once('../../include/organisationseinheit.class.php');
-	
-	require_once('../../include/nation.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	
-	if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../include/standort.class.php');
+require_once('../../include/adresse.class.php');
 
-	// ******* INIT ********
-	$user = get_uid();
-	//Zugriffsrechte pruefen
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('basis/firma'))
-		die('Sie haben keine Berechtigung für diese Seite');
-	
-	
-	// Parameter einlesen
-	$errorstr='';
+require_once('../../include/kontakt.class.php');
+require_once('../../include/person.class.php');
 
-	$standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
-	$adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
-	$kontakt_id = (isset($_REQUEST['kontakt_id'])?$_REQUEST['kontakt_id']:'');	
-	$oe_kurzbz= (isset($_REQUEST['oe_kurzbz'])?$_REQUEST['oe_kurzbz']:'');	
-	$oe_parent_kurzbz= (isset($_REQUEST['oe_parent_kurzbz'])?$_REQUEST['oe_parent_kurzbz']:'');	
-	$work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
-	$showmenue = (isset($_REQUEST['showmenue'])?$_REQUEST['showmenue']:false);		
-	$personfunktionstandort_id = (isset($_REQUEST['personfunktionstandort_id'])?$_REQUEST['personfunktionstandort_id']:'');	
-	$firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
+require_once('../../include/organisationseinheit.class.php');
 
+require_once('../../include/nation.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+// ******* INIT ********
+$user = get_uid();
+//Zugriffsrechte pruefen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('basis/firma'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+
+// Parameter einlesen
+$errorstr='';
+
+$standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
+$adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
+$kontakt_id = (isset($_REQUEST['kontakt_id'])?$_REQUEST['kontakt_id']:'');	
+$oe_kurzbz= (isset($_REQUEST['oe_kurzbz'])?$_REQUEST['oe_kurzbz']:'');	
+$oe_parent_kurzbz= (isset($_REQUEST['oe_parent_kurzbz'])?$_REQUEST['oe_parent_kurzbz']:'');	
+$work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
+$showmenue = (isset($_REQUEST['showmenue'])?$_REQUEST['showmenue']:false);		
+$personfunktionstandort_id = (isset($_REQUEST['personfunktionstandort_id'])?$_REQUEST['personfunktionstandort_id']:'');	
+$firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
+if(isset($_REQUEST['nation']) && $_REQUEST['nation']=="A" && isset($_REQUEST['gemeinde_combo']) && isset($_REQUEST['ort_combo']))
+{
+	$_REQUEST['gemeinde']=$_REQUEST['gemeinde_combo'];
+	$_REQUEST['ort']=$_REQUEST['ort_combo'];
+}
+
+
+function getGemeindeDropDown($postleitzahl)
+{
+	global $db, $_REQUEST, $gemeinde;
+	$return='';
+	$found=false;
+	$firstentry='';
+	$gemeinde_x = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
+	$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
+	$return.= '<SELECT id="gemeinde_combo" name="gemeinde_combo" onchange="loadOrtData()">';
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
+	{
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				if($firstentry=='')
+					$firstentry=$row->name;
+				if($gemeinde_x=='')
+					$gemeinde_x=$row->name;
+				
+				if($row->name==$gemeinde_x)
+				{
+					$selected='selected';
+					$found=true;
+				}
+				else
+					$selected='';
+				$return.= "<option value='$row->name' $selected>$row->name</option>";
+			}
+		}
+	}
+	
+	$return.= '</SELECT>';
+	if(!$found && (isset($importort) && $importort!=''))
+	{
+		$return.= $importort;
+	}
+	$gemeinde = $gemeinde_x;
+	return $return;
+}
+
+if(isset($_GET['type']) && $_GET['type']=='getgemeindecontent' && isset($_GET['plz']))
+{
+	header('Content-Type: text/html; charset=UTF-8');
+
+	echo getGemeindeDropDown($_GET['plz']);
+	exit;
+}
+
+function getOrtDropDown($postleitzahl, $gemeindename)
+{
+	global $db, $_REQUEST;
+	$return='';
+	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
+	$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
+			WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
+	$return.='<SELECT id="ort_combo" name="ort_combo">';
+	if(is_numeric($postleitzahl) && $postleitzahl<10000)
+	{
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				if($row->ortschaftsname==$ort)
+					$selected='selected';
+				else 
+					$selected='';
+				$return.= "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
+			}
+		}
+	}
+	
+	$return.= '</SELECT>';
+	return $return;
+}
+if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
+{
+	header('Content-Type: text/html; charset=UTF-8');
+	
+	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
+	exit;
+}
 
 	// Defaultwerte 
 	$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
@@ -146,14 +234,144 @@
 		
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
+
 <script src="../../include/js/jquery.js" type="text/javascript"></script>
 <script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-<script src="../../include/js/jquery.tools.min.js" type="text/javascript"></script>
 
 <script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
-<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
+<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+
+<script src="../../include/js/jquery.tools.min.js" type="text/javascript"></script>
+
 
 	<script type="text/javascript" language="JavaScript1.2">
+	
+
+
+// **************************************
+// * XMLHttpRequest Objekt erzeugen
+// **************************************
+var anfrage = null;
+
+function erzeugeAnfrage()
+{
+	try
+	{
+		anfrage = new XMLHttpRequest();
+	}
+	catch (versuchmicrosoft)
+	{
+		try
+		{
+			anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+		}
+		catch (anderesmicrosoft)
+		{
+			try
+			{
+				anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			catch (fehlschlag)
+			{
+				anfrage = null;
+            }
+        }
+    }
+	if (anfrage == null)
+		alert("Fehler beim Erstellen des Anfrageobjekts!");
+}
+
+//Gemeinde DropDown holen wenn Nation Oesterreich
+function loadGemeindeData()
+{
+	if(document.getElementById('nation').value=='A')
+	{
+		anfrage=null;
+		erzeugeAnfrage(); 
+	    var jetzt = new Date();
+		var ts = jetzt.getTime();
+		var plz = document.getElementById('plz').value;
+	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getgemeindecontent"?>';
+	    url += '&plz='+plz+"&"+ts;
+	    anfrage.open("GET", url, true);
+	    anfrage.onreadystatechange = setGemeindeData;
+	    anfrage.send(null);
+	    document.getElementById('gemeinde').style.display='none';
+		document.getElementById('ort').style.display='none';
+	}
+	else
+	{
+		document.getElementById('gemeindediv').innerHTML='';
+		document.getElementById('ortdiv').innerHTML='';
+		document.getElementById('gemeinde').style.display='block';
+		document.getElementById('ort').style.display='block';
+
+	}
+}
+
+function setGemeindeData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var gemeindediv = document.getElementById('gemeindediv');
+			gemeindediv.innerHTML = resp;
+			gemeindediv.style.display = 'block';
+			gemeindediv.style.border = 0;
+			gemeindediv.style.padding = 0;
+			gemeindediv.style.minHeight=0;
+			loadOrtData();
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}
+
+function loadOrtData()
+{
+	if(document.getElementById('gemeinde'))
+	{
+		anfrage=null;
+		//Request erzeugen und die Note speichern
+		erzeugeAnfrage(); 
+	    var jetzt = new Date();
+		var ts = jetzt.getTime();
+		var plz = document.getElementById('plz').value;
+		var gemeinde = document.getElementById('gemeinde_combo').value;
+	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getortcontent"?>';
+	    url += '&plz='+plz+"&gemeinde="+encodeURIComponent(gemeinde)+"&"+ts;
+	    anfrage.open("GET", url, true);
+	    anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	    anfrage.onreadystatechange = setOrtData;
+	    anfrage.send(null);
+	}
+}
+
+function setOrtData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var ortdiv = document.getElementById('ortdiv');
+			ortdiv.innerHTML = resp;
+			ortdiv.style.display = 'block';
+			ortdiv.style.border = 0;
+			ortdiv.style.padding = 0;
+			ortdiv.style.minHeight=0;
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}	
+	
+	
+	
+	
+	
+	
+	
 		function confdel()
 		{
 			if(confirm("Diesen Datensatz wirklich loeschen?"))
@@ -270,6 +488,13 @@ div.css-panes div {
 	min-height:150px;
 	padding:15px 20px;
 	background-color:#ddd;	
+}
+div.css-panes div div{
+	display:block;
+	border:0px solid #666;
+	min-height:0px;
+	padding:0px 0px;
+	background-color:#ddd;
 }
 -->
 </style>
@@ -622,9 +847,8 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 					<th>Kontakt</th>
 					<th>Anmerkung</th>
 					<th>Zustellung</th>
-					<th>Person</th>
 					<th>Ext.Id</th>
-					<td align="center" valign="top"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 
 	$i=0;
@@ -636,9 +860,11 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 			$htmlstr.= '<td>'.$row->kontakttyp.'</td>';
 			$htmlstr.= '<td>'.$row->kontakt.'</td>';
 			$htmlstr.= '<td>'.$row->anmerkung.'</td>';
-			$htmlstr.= '<td>'.($row->zustellung?'Ja':'Nein').'</td>';
-			$htmlstr.= '<td>'.$row->person_id.'</td>';
-			$htmlstr.= '<td>'.$row->ext_id.'</td>';
+			$htmlstr.= '<td align="center">'.($row->zustellung?'Ja':'Nein').'</td>';
+			//$htmlstr.= '<td>'.$row->person_id.'</td>';
+			$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
+			
+			$htmlstr.= '<td align="center"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&kontakt_id='.$row->kontakt_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="editieren"/></a></td>';
 			$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletekontakt=true&firma_id=$firma_id&standort_id=$row->standort_id&kontakt_id=$row->kontakt_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
@@ -855,7 +1081,7 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 					<th>Position</th>
 					<th>Anrede</th>
 					<th>Person</th>
-					<td align="center" valign="top"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 	$i=0;
 	foreach ($standort_obj->result as $row)
@@ -874,6 +1100,8 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		if (empty($person))
 			$person=$row->personen_id;
 		$htmlstr.= '<td>'.$person.'</td>';
+		
+		$htmlstr.= '<td align="center"><a href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="editieren"/></a></td>';
 		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletepersonfunktionstandort=true&standort_id=".$row->standort_id."&personfunktionstandort_id=".$row->personfunktionstandort_id."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
@@ -919,7 +1147,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr.="<tr><td><table><tr>\n";
 
-	//Kontakttype laden
+	//Kontakttypen laden
 	$funktion_obj = new funktion();
 	$funktion_obj->result=array();
 	if (!$funktion_obj->getAll())
@@ -942,57 +1170,56 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Position: </td>";		
-		$htmlstr.="<td><input type='text'id='position'  name='position' value='".$standort_obj->position."' size='30' maxlength='256' /></td>\n";
+		$htmlstr.="<td><input type='text' id='position'  name='position'  value='".$standort_obj->position."' size='30' maxlength='256' /></td>\n";
 		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-									function formatItem(row) 
-									{
-									    return row[0] + ' <li>' + row[1] + '</li> ';
-									}
-									$(document).ready(function() 
-									{
-										  $('#position').autocomplete('stammdaten_autocomplete.php', 
-										  {
-											minChars:1,
-											matchSubset:1,matchContains:1,
-											width:400,
-											formatItem:formatItem,
-											extraParams:{'work':'position'
-											,'funktion_kurzbz':$('#funktion_kurzbz').val()
-											}
-										});
-								  });
-								</script>
+						function formatItem(row) 
+						{
+						    return row[0] + ' <li>' + row[1] + '</li> ';
+						}
+						//$(document).ready(function() 
+						//{
+							  $('#position').autocomplete('stammdaten_autocomplete.php', 
+							  {
+								minChars:1,
+								matchSubset:1,matchContains:1,
+								width:400,
+								formatItem:formatItem,
+								extraParams:{'work':'position'
+								,'funktion_kurzbz':$('#funktion_kurzbz').val()
+								}
+							});
+					  //});
+					</script>
 		";
 		
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Anrede: </td>";		
-		$htmlstr.="<td><input type='text' name='anrede' value='".$standort_obj->anrede."' size='30' maxlength='128' /></td>\n";
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Person: </td>";		
-		$htmlstr.="<td><input type='text' id='person_id' name='person_id' value='".$standort_obj->person_id."' size='10' maxlength='20' /></td>\n";
+		$htmlstr.="<td><input type='text' name='anrede' value='".$standort_obj->anrede."' size='50' maxlength='128' /></td>\n";
+		$htmlstr.="<td>&nbsp;</td></tr>";	
+		$htmlstr.="<tr><td>Person: </td>";		
+		$htmlstr.="<td><input type='text' id='person_id' name='person_id' value='".$standort_obj->person_id."' size='20' maxlength='20' /></td>\n";
 		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-									function formatItem(row) 
-									{
-									    return row[0] + ' <li>' + row[1] + '</li> ';
-									}
-									$(document).ready(function() 
-									{
-										  $('#person_id').autocomplete('stammdaten_autocomplete.php', 
-										  {
-											minChars:2,
-											matchSubset:1,matchContains:1,
-											width:400,
-											formatItem:formatItem,
-											extraParams:{'work':'person'
-											}
-										});
-								  });
-								</script>
+							function formatItem(row) 
+							{
+							    return row[0] + ' <li>' + row[1] + '</li> ';
+							}
+							//$(document).ready(function() 
+							//{
+								$('#person_id').autocomplete('stammdaten_autocomplete.php', 
+								{
+									minChars:2,
+									matchSubset:1,matchContains:1,
+									width:400,
+									formatItem:formatItem,
+									extraParams:{'work':'person'}
+								});
+							//});
+					</script>
 		";
 
 		$htmlstr.="<td>&nbsp;</td>";	
 		$person=($standort_obj->person_anrede?$standort_obj->person_anrede.' ':'').($standort_obj->titelpre?$standort_obj->titelpre.' ':'').($standort_obj->vorname?$standort_obj->vorname.' ':'').($standort_obj->nachname?$standort_obj->nachname.' ':'');
-		$htmlstr.="</tr>".($person?'<tr><td colspan="2"></td><td id="person" colspan="9" align="right">'.$person.'</td></tr>':'')."</table></td>";		
+		$htmlstr.=($person?'<td colspan="2"></td><td id="person" colspan="9" align="right">'.$person.'</td></tr>':'')."</table></td>";		
 	$htmlstr.="</tr>\n";
 				
 	// Submit-Knopf  Zeile
@@ -1106,79 +1333,54 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	foreach($nation->nation as $row)
 			$nation_arr[$row->code]=$row->kurztext;
 
+	//Auswahl Nation
 	$htmlstr.="<tr><td><table><tr>\n";
-				$htmlstr.="<td>Nation: </td>";		
-				$htmlstr.= "<td><SELECT id='nation' name='nation'>";
-				$htmlstr.= "<option ".($nation==''?' selected ':'')." value=''> </option>";				
-				foreach ($nation_arr as $code=>$kurzbz)
-					{
-					$htmlstr.= "<OPTION value='$code' ".($adresse_obj->nation==$code?' selected ':'')." >$kurzbz</OPTION>";
-					}
-				$htmlstr.= "</SELECT></td>";
-				
-			$htmlstr.="<td>Gemeinde: </td>";		
-			$htmlstr.="<td><input type='text' id='gemeinde' name='gemeinde' value='".$adresse_obj->gemeinde."' size='20' maxlength='40' /></td>\n";
-			$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-									function formatItem(row) 
-									{
-									    return row[0] + ' <li>' + row[1] + '</li> ';
-									}
-									$(document).ready(function() 
-									{
-										  $('#gemeinde').autocomplete('stammdaten_autocomplete.php', 
-										  {
-											minChars:2,
-											matchSubst:1,matchContains:1,
-											width:400,
-											formatItem:formatItem,
-											extraParams:{'work':'gemeinde'
-											,'nation':$('#nation').val()
-											}
-										});
-								  });
-								</script>";
-			$htmlstr.="<td>Plz: </td>";		
-			$htmlstr.="<td><input type='text' id='plz' name='plz' value='".$adresse_obj->plz."' size='10' maxlength='15' /></td>\n";
-			$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-									function formatItem(row) 
-									{
-									    return row[0] + ' <li>' + row[1] + '</li> ';
-									}
-									$(document).ready(function() 
-									{
-										  $('#plz').autocomplete('stammdaten_autocomplete.php', 
-										  {
-											minChars:2,
-											matchSubst:1,matchContains:1,
-											width:400,
-											formatItem:formatItem,
-											extraParams:{'work':'plz'
-											,'nation':$('#nation').val()
-											}
-										});
-								  });
-								</script>";
-			$htmlstr.="<td>Ort: </td>";		
-			$htmlstr.="<td><input type='text' name='ort' value='".$adresse_obj->ort."' size='30' maxlength='45' /></td>\n";
-			$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-									function formatItem(row) 
-									{
-									    return row[0] + ' <li>' + row[1] + '</li> ';
-									}
-									$(document).ready(function() 
-									{
-										  $('#ort').autocomplete('stammdaten_autocomplete.php', 
-										  {
-											minChars:2,
-											matchSubst:1,matchContains:1,
-											width:400,
-											formatItem:formatItem,
-											extraParams:{'work':'ort'
-											,'plz':$('#plz').val()
-											}
-										});
-								  });
-								</script>";			
+	$htmlstr.="<td>Nation: </td>";		
+	$htmlstr.= "<td><SELECT id='nation' name='nation' onchange='loadGemeindeData();'>";
+	$htmlstr.= "<option ".($nation==''?' selected ':'')." value=''> </option>";				
+	foreach ($nation_arr as $code=>$kurzbz)
+		{
+		$htmlstr.= "<OPTION value='$code' ".($adresse_obj->nation==$code?' selected ':'')." >$kurzbz</OPTION>";
+		}
+	$htmlstr.= "</SELECT></td>";
+	
+	//Posleitzahl
+	$htmlstr.="<td>Plz: </td>";		
+	$htmlstr.="<td><input type='text' id='plz' name='plz' value='".$adresse_obj->plz."' size='10' maxlength='15'  onblur='loadGemeindeData()' /></td>\n";
+		
+	//Gemeinde
+	$htmlstr.="<td>Gemeinde: </td>";	
+		
+	$htmlstr.="<td><div id='gemeindediv'>";
+	if($adresse_obj->nation=='A' && $adresse_obj->plz!='')
+	{
+		$htmlstr.=getGemeindeDropDown($adresse_obj->plz);
+		$style="style='display:none'";
+	}
+	else 
+	{
+		$style="";
+	}
+	$htmlstr.="</div>";
+	$htmlstr.="<input type='text' id='gemeinde' name='gemeinde' ".$style." value='".$adresse_obj->gemeinde."' size='20' maxlength='40' /></td>\n";
+
+	
+	//Ort		
+	$htmlstr.="<td>Ort: </td>";		
+	$htmlstr.="<td><div id='ortdiv'>";
+	if($adresse_obj->nation=='A' && $adresse_obj->plz!='')
+	{
+		$htmlstr.=getOrtDropDown($adresse_obj->plz, $adresse_obj->gemeinde);
+		$style="style='display:none'";
+	}
+	else 
+	{
+		$style="";
+	}
+	$htmlstr.="</div>";
+	$htmlstr.="<input type='text' name='ort' id='ort' ".$style." value='".$adresse_obj->ort."' size='30' maxlength='45' /></td>\n";
+		
+	
 		$htmlstr.="</tr></table></td>";		
 ##var_dump($adresse_obj);
 	$htmlstr.="<tr><td><table><tr>\n";
@@ -1218,9 +1420,9 @@ function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$r
 	$adresstyp = (isset($_POST['adresstyp'])?$_POST['adresstyp']:'');
 	$strasse = (isset($_POST['strasse'])?$_POST['strasse']:'');
 	$plz = (isset($_POST['plz'])?$_POST['plz']:'');
-	$ort = (isset($_POST['ort'])?$_POST['ort']:'');
+	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
 	$name = (isset($_POST['name'])?$_POST['name']:'');	
-	$gemeinde = (isset($_POST['gemeinde'])?$_POST['gemeinde']:'');
+	$gemeinde = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$nation = (isset($_POST['nation'])?$_POST['nation']:'');
 	$heimatadresse = (isset($_POST['heimatadresse'])?true:false);
 	$zustelladresse = (isset($_POST['zustelladresse'])?true:false);
@@ -1255,10 +1457,10 @@ function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$r
 	$adresse_obj->person_id=null;
 	$adresse_obj->name=$name;
 	$adresse_obj->strasse = $strasse;
+	$adresse_obj->nation = $nation;
 	$adresse_obj->plz = $plz;
 	$adresse_obj->ort = $ort;
 	$adresse_obj->gemeinde = $gemeinde;
-	$adresse_obj->nation = $nation;
 	$adresse_obj->typ = $adresstyp;
 	$adresse_obj->heimatadresse = $heimatadresse;
 	$adresse_obj->zustelladresse = $zustelladresse;

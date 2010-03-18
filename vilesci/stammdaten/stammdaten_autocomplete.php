@@ -32,7 +32,7 @@
 	header('Content-Type: text/html;charset=UTF-8');
 
 // ---------------- Vilesci Include Dateien einbinden
-	require_once('../../config/cis.config.inc.php');
+	require_once('../../config/vilesci.config.inc.php');
   	require_once('../../include/functions.inc.php');
 	include_once('../../include/basis_db.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');	
@@ -80,13 +80,16 @@ cellSeparator (default value: "|")
 	{
 		case 'gemeinde':
 		 	$gemeinde=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$nation=trim((isset($_REQUEST['nation']) ? $_REQUEST['nation']:''));
+		 	if ($nation!='A')
+				exit();
 			if (is_null($gemeinde) || $gemeinde=='')
 				exit();
 				
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($gemeinde))));
-			$pWhere=" upper(position) like '%".addslashes($matchcode)."%' ".($nation?" and nation='".addslashes($nation)."'":'');
-			$pSql="SELECT distinct nation,gemeinde
-					FROM public.tbl_adresse
+			$pWhere=" upper(gemeinde) like '%".addslashes($matchcode)."%' ";
+			$pSql="SELECT distinct gemeinde
+					FROM bis.tbl_gemeinde
 					where ". $pWhere ."
 					ORDER BY nation,gemeinde ";
 
@@ -101,23 +104,26 @@ cellSeparator (default value: "|")
 				
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 			{
-					exit(' |'.$db->errormsg."\n");
+				exit(' |'.$db->errormsg."\n");
 			}
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->gemeinde).'|'.html_entity_decode($oRresult[$i]->nation)."\n";
+				echo html_entity_decode($oRresult[$i]->gemeinde).'|'.html_entity_decode($nation)."\n";
 			break;
 	
 		case 'plz':
 		 	$plz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$nation=trim((isset($_REQUEST['nation']) ? $_REQUEST['nation']:''));
+		 	if ($nation!='A')
+				exit();
 			if (is_null($plz) || $plz=='')
 				exit();
 				
-			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($gemeinde))));
-			$pWhere=" upper(position) like '%".addslashes($matchcode)."%' ".($nation?" and nation='".addslashes($nation)."'":'');
-			$pSql="SELECT distinct nation,plz
-					FROM public.tbl_adresse
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($plz))));
+			$pWhere=" to_char(plz,'999999') like '%".addslashes($matchcode)."%' ";
+			$pSql="SELECT distinct plz
+					FROM bis.tbl_gemeinde
 					where ". $pWhere ."
-					ORDER BY nation,plz ";
+					ORDER BY plz ";
 
 				$pArt='';
 				$pDistinct=true; 
@@ -132,16 +138,19 @@ cellSeparator (default value: "|")
 					exit(' |'.$db->errormsg."\n");
 			}
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->plz).'|'.html_entity_decode($oRresult[$i]->nation)."\n";
+				echo html_entity_decode($oRresult[$i]->plz)."\n";
 			break;
 
 		case 'ort':
-		 	$plz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($plz) || $plz=='')
+		 	$ort=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$nation=trim((isset($_REQUEST['nation']) ? $_REQUEST['nation']:''));
+		 	if ($nation!='A')
+				exit();
+			if (is_null($ort) || $ort=='')
 				exit();
 				
-			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($gemeinde))));
-			$pWhere=" upper(position) like '%".addslashes($matchcode)."%' ".($nation?" and nation='".addslashes($nation)."'":'');
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($ort))));
+			$pWhere=" upper(ort) like '%".addslashes($matchcode)."%' ".($nation?" and nation='".addslashes($nation)."'":'');
 			$pSql="SELECT distinct plz,ort
 					FROM public.tbl_adresse
 					where ". $pWhere ."
@@ -273,7 +282,7 @@ cellSeparator (default value: "|")
 		case 'person':
 		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($person_id) || $person_id=='')
-				exit();
+				exit('person_id wurde nicht übergeben!');
 			
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
 			$pWhere=" aktiv ";

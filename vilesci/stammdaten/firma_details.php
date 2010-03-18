@@ -54,6 +54,7 @@
 	// Defaultwerte 
 	$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
 	$errorstr='';
+	$tabselect=0;
 	
 	//Loeschen einer Adresse
 	if(isset($_GET['deleteadresse']))
@@ -97,6 +98,7 @@
 		}
 		else
 				$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Firma/Organisation : ID fehlt';
+		$tabselect=1;
 	}
 	
 ?>
@@ -107,6 +109,7 @@
 <title>Firma - Details</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
 <script src="../../include/js/jquery.js" type="text/javascript"></script>
@@ -125,9 +128,9 @@
 			return false;
 		}
 
-		function workFirmaDetail(wohin)
+		function workFirmaDetail(wohin,welches)
 		{
-		
+			$('.selector').tabs('option', 'selected', welches);
 		    $("div##"+wohin).show("slow"); // div# langsam oeffnen
 			$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
 			var formdata = $('form#addFirma').serialize(); 
@@ -153,7 +156,9 @@
 		$(function() 
 		{
 			$("ul.css-tabs").tabs("div.css-panes > div", {effect: 'ajax'}).history();
+			$('.selector').tabs('option', 'selected', <?php echo $tabselect ?>)
 		});
+
 	</script>
 
 
@@ -249,7 +254,7 @@ div.css-panes div {
 				if (!$ajax)
 					echo getFirmadetail($firma_id,$adresstyp_arr,$user);
 				else if (is_numeric($status))
-					echo "Daten erfolgreich gespeichert" 								;
+					echo "Daten erfolgreich gespeichert";
 				if (!is_numeric($status))
 					echo $status;
 				break;
@@ -316,7 +321,7 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 		$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
 		//$htmlstr.="<td>&nbsp;</td>";	
 		if($firma_id!='' && is_numeric($firma_id) )
-			$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+			$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 0);\" name='save' value='speichern'></td>\n";
 		else
 			$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
 		$htmlstr.="</tr></table></td>";
@@ -481,10 +486,10 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 					<th><font size="0">Heimatadr.</font></th>
 					<th><font size="0">Zustelladr.</font></th>
 					<th>Ext.Id</th>
-					<td align="center" valign="top"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 #var_dump($standort_obj);
-	$i=0;
+	$i=1;
 	foreach ($standort_obj->result as $row)
 	{
 		
@@ -531,9 +536,10 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 				$htmlstr.= '<td>'.$adresse_obj->ort.'</td>';
 				$htmlstr.= '<td>'.$adresse_obj->strasse.'</td>';
 				$htmlstr.= '<td>'.$adresstyp_arr[$adresse_obj->typ].'</td>';
-				$htmlstr.= '<td>'.($adresse_obj->heimatadresse?'Ja':'Nein').'</td>';
-				$htmlstr.= '<td>'.($adresse_obj->zustelladresse?'Ja':'Nein').'</td>';
-				$htmlstr.= '<td>'.$row->ext_id.'</td>';
+				$htmlstr.= '<td align="center">'.($adresse_obj->heimatadresse?'Ja':'Nein').'</td>';
+				$htmlstr.= '<td align="center">'.($adresse_obj->zustelladresse?'Ja':'Nein').'</td>';
+				$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
+				$htmlstr.= '<td align="center"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&adresse_id='.$adresse_obj->adresse_id.'"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="edit"/></a></td>';
 				$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteadresse=true&standort_id=$row->standort_id&adresse_id=$adresse_obj->adresse_id&firma_id=$firma_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 			}
 			else
@@ -546,7 +552,7 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 }
 // ----------------------------------------------------------------------------------------------------------------------------------
 /*
-	Standortliste
+	Organisationsliste
 */
 function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 {
@@ -568,7 +574,9 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 					<th width="15%">Typ</th>
 					<th width="25%">Bezeichnung</th>
 					<th width="15%">Kundennummer</th>
-					<td width="15%" align="center" valign="top"><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id=&oe_kurzbz=&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td width="15%" align="center" valign="top" colspan="2"><a target="detail_workfirma" 
+						href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id=&oe_kurzbz=&firma_id='.$firma_id.'">
+						<input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>
 			';
 	$i=0;
@@ -581,7 +589,7 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 			$htmlstr.= '<td>'.$row->bezeichnung.'</td>';
 
 			$htmlstr.= '<td align="center">'.$row->kundennummer.'</td>';
-
+			$htmlstr.= '<td align="center"><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id='.$row->firma_organisationseinheit_id.'&oe_kurzbz='.$row->oe_kurzbz.'&firma_id='.$firma_id.'"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="edit"/></a></td>';
 			$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteorganisationseinheit=true&firma_organisationseinheit_id=".$row->firma_organisationseinheit_id."&oe_kurzbz=".$row->oe_kurzbz."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
@@ -591,7 +599,7 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 }
 // ----------------------------------------------------------------------------------------------------------------------------------
 /*
-	Anmerungen
+	Anmerkungen
 */
 function getAnmerkungen($firma_id,$user)
 {
@@ -620,7 +628,7 @@ function getAnmerkungen($firma_id,$user)
 	$htmlstr.= "<tr>";
 	$htmlstr.= "<td>Anmerkungen:</td>";
 	if($firma_id!='' && is_numeric($firma_id) )
-		$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+		$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 2);\" name='save' value='speichern'></td>\n";
 	else
 		$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
 	$htmlstr.= "</tr><tr><td colspan='2'><textarea cols='40' rows='8' style='width:100%' name='anmerkung'>".$firma->anmerkung."</textarea></td></tr>";
