@@ -31,6 +31,9 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/gruppe.class.php');
+
 $error_msg='';
 ?>
 
@@ -459,17 +462,14 @@ $error_msg='';
 				and vw_lehreinheit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id 
 				and vw_lehreinheit.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz 
 				and vw_lehreinheit.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz 
-				and lower(trim(vw_lehreinheit.lehrfunktion_kurzbz))='lektor' 
 				and ((tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_moodle.lehrveranstaltung_id 
 				and tbl_moodle.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz) 
 				OR 	(tbl_lehreinheit.lehreinheit_id=tbl_moodle.lehreinheit_id))
 			 ";
    	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid NOT IN ($sql_query)";
-	if(!$db->db_query($sql_querys))
+	if(!$result = $db->db_query($sql_querys))
 	{
 		$error_msg.=$db->db_last_error().' '.$sql_querys;
-		echo '-';
-		flush();
 	}
 	
 	if(!($result = $db->db_query($sql_query)))
@@ -487,9 +487,90 @@ $error_msg='';
 		echo '-';
 		flush();
 	}	
+	
+	// **************************************************************
+	// Organisationseinheiten-Verteiler
+	
+	$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE aktiv AND mailverteiler";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$mlist_name=strtoupper($row->oe_kurzbz);
 
-
-
+			$grp = new gruppe();
+			if(!$grp->exists($mlist_name))
+			{
+				$grp->gruppe_kurzbz = $mlist_name;
+				$grp->studiengang_kz = '0';
+				$grp->bezeichnung = $row->oe_kurzbz;
+				$grp->beschreibung = 'Personen der Organisationseinheit '.$row->bezeichnung;
+				$grp->semester = '0';
+				$grp->mailgrp = true;
+				$grp->sichtbar = true;
+				$grp->generiert = true;
+				$grp->aktiv = true;
+				$grp->lehre = true;
+				$grp->insertamum = date('Y-m-d H:i:s');
+				$grp->insertvon = 'mlists_generate';
+				
+				if(!$grp->save(true, false))
+					die('Fehler: '.$grp->errormsg);
+			}
+			else 
+			{
+				setGeneriert($mlist_name);
+			}
+			
+			$oe = new organisationseinheit();
+			$childs = $oe->getChilds($row->oe_kurzbz);
+			
+			// Lektoren holen die nicht mehr in den Verteiler gehoeren
+			echo '<br>'.$mlist_name.' wird abgeglichen!<BR>';
+			flush();
+			
+			$oes='';
+			foreach ($childs as $oe_kurzbz)
+			{
+				if($oes!='')
+					$oes.=',';
+				
+				$oes .= "'".addslashes($oe_kurzbz)."'";
+			}
+			
+			$sql_query = "SELECT distinct uid FROM public.tbl_benutzer JOIN public.tbl_benutzerfunktion USING(uid)
+						WHERE oe_kurzbz in($oes) 
+						AND tbl_benutzer.aktiv 
+						AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+						AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+			
+			$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name' AND uid NOT IN ($sql_query)";
+			if(!$db->db_query($sql_querys))
+			{
+				$error_msg.=$db->db_last_error().' '.$sql_querys;
+				echo '-';
+				flush();
+			}
+			
+			$sql_query.=" AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+			if(!($result_oe = $db->db_query($sql_query)))
+				$error_msg.=$db->db_last_error().' '.$sql_query;
+			// Lektoren holen die nicht im Verteiler sind
+			echo '<BR>';
+			while($row_oe = $db->db_fetch_object($result_oe))
+			{
+		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+				if(!$db->db_query($sql_query))
+				{
+					$error_msg.=$db->db_last_error().$sql_query;
+					exit($error_msg);
+				}
+				echo '-';
+				flush();
+			}
+		}
+	}
+	
 	echo $error_msg;
 	?>
 	<BR>

@@ -82,7 +82,7 @@ echo '
 if(!isset($_GET['searchstr']))	
 	exit;
 
-	$qry = "SELECT * FROM campus.vw_mitarbeiter";
+	$qry = "SELECT vw_mitarbeiter.*, tbl_standort.kurzbz as standort_kurzbz FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_standort USING(standort_id)";
 	if(!empty($searchstr))
 			$qry.=" where uid  ~* '".addslashes($searchstr)."'   OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
 	
@@ -130,11 +130,11 @@ if(!isset($_GET['searchstr']))
 			
 			$email=$row->uid.'@'.DOMAIN;
 			echo "<td nowrap><a href='mailto:$email'>$email</a></td>";
-			echo "<td nowrap class='button'><a href='lektor_edit.php?id=".$row->uid."'>Edit</a></td>";
+			echo "<td nowrap class='button'><a href='personen_details.php?uid=".$row->uid."'>Edit</a></td>";
 			echo "<td nowrap class='button'>";
 			if ($row->lektor)
 			{
-				echo "<a href='zeitwunsch.php?uid=".$row->uid."&vorname=".rawurlencode($row->vorname)."&nachname=".rawurlencode($row->nachname)."&titel=".rawurlencode($row->titelpre)." class='linkblue'>Zeitwunsch</a>";
+				echo "<a href='zeitwunsch.php?uid=".$row->uid."' class='linkblue'>Zeitwunsch</a>";
 			}
 			echo '</td>';
 			echo '</tr>';

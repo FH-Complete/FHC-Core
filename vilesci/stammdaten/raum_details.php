@@ -168,7 +168,7 @@
 	$htmlstr .= "					<td>";
 	$htmlstr .= "					<SELECT name='standort_id'>";
 	$htmlstr.="				<OPTION value=''>-- keine Auswahl --</OPTION>\n";
-	$qry = 'SELECT * FROM public.tbl_standort ORDER BY standort_id';
+	$qry = "SELECT * FROM public.tbl_standort JOIN public.tbl_firma USING(firma_id) WHERE firmentyp_kurzbz='Intern'  ORDER BY kurzbz";
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -178,7 +178,7 @@
 			else 
 				$selected='';
 			
-			$htmlstr.="				<OPTION value='$row->standort_id' $selected>$row->standort_id</OPTION>\n";
+			$htmlstr.="				<OPTION value='$row->standort_id' $selected>$row->kurzbz</OPTION>\n";
 		}
 	}
 	$htmlstr .= "					</SELECT>";
@@ -227,9 +227,9 @@
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Lageplan</td>\n";
 	$htmlstr .= " 					<td><textarea name='lageplan' cols='37' rows='5' onchange='submitable()'>".$lageplan."</textarea></td>\n";
-	$htmlstr .= " 					<td>\n</td>\n<td>\n</td>\n";
+	//$htmlstr .= " 					<td>\n</td>\n<td>\n</td>\n";
 	$htmlstr .= "					<td valign='top'>Ausstattung</td>\n";
-	$htmlstr .= " 					<td><textarea name='ausstattung' cols='37' rows='5' onchange='submitable()'>".$ausstattung."</textarea></td>\n";
+	$htmlstr .= " 					<td colspan='2'><textarea name='ausstattung' cols='37' rows='5' onchange='submitable()'>".$ausstattung."</textarea></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "</table>\n";
 	$htmlstr .= "<br>\n";

@@ -27,8 +27,6 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class betriebsmittelperson extends basis_db
 {
-#	public $schema_inventar='public';
-	public $schema_inventar='wawi';
 	public $debug=false;   	// boolean
 
 
@@ -88,7 +86,7 @@ class betriebsmittelperson extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM ".$this->schema_inventar.".tbl_betriebsmittel JOIN ".$this->schema_inventar.".tbl_betriebsmittelperson USING(betriebsmittel_id) 
+		$qry = "SELECT * FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
 				WHERE betriebsmittel_id='".addslashes($betriebsmittel_id)."' AND person_id='".addslashes($person_id)."'";
 		if($this->db_query($qry))
 		{
@@ -186,7 +184,7 @@ class betriebsmittelperson extends basis_db
 		if($new)
 		{
 			//Pruefen ob dieses Betriebsmittel dieser Person schon zugeordnet ist
-			$qry = "SELECT 1 FROM ".$this->schema_inventar.".tbl_betriebsmittelperson 
+			$qry = "SELECT 1 FROM wawi.tbl_betriebsmittelperson 
 					WHERE person_id=".$this->addslashes($this->person_id)." AND 
 						betriebsmittel_id=".$this->addslashes($this->betriebsmittel_id);
 				
@@ -199,7 +197,7 @@ class betriebsmittelperson extends basis_db
 				}
 			}
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO '.$this->schema_inventar.'.tbl_betriebsmittelperson (betriebsmittel_id, person_id, anmerkung, kaution, 
+			$qry='INSERT INTO wawi.tbl_betriebsmittelperson (betriebsmittel_id, person_id, anmerkung, kaution, 
 			ausgegebenam, retouram, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->betriebsmittel_id).', '.
 			     $this->addslashes($this->person_id).', '.
@@ -224,7 +222,7 @@ class betriebsmittelperson extends basis_db
 			if($this->person_id_old=='')
 				$this->person_id_old = $this->person_id;
 			
-			$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmittelperson SET '.
+			$qry='UPDATE wawi.tbl_betriebsmittelperson SET '.
 				'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
 				'person_id='.$this->addslashes($this->person_id).', '. 
 				'anmerkung='.$this->addslashes($this->anmerkung).', '. 
@@ -267,7 +265,7 @@ class betriebsmittelperson extends basis_db
 			$this->errormsg = 'Person_id ist ungueltig';
 			return false;
 		}
-		$qry = 'DELETE FROM '.$this->schema_inventar.'.tbl_betriebsmittelperson 
+		$qry = 'DELETE FROM wawi.tbl_betriebsmittelperson 
 				WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id).($person_id?' and person_id='.$this->addslashes($person_id):'');
 		if($this->db_query($qry))
 			return true;
@@ -292,7 +290,7 @@ class betriebsmittelperson extends basis_db
 			$this->errormsg = 'Person_id ist ungueltig';
 			return false;
 		}
-		$qry = "SELECT * FROM ".$this->schema_inventar.".tbl_betriebsmittel JOIN ".$this->schema_inventar.".tbl_betriebsmittelperson USING(betriebsmittel_id) 
+		$qry = "SELECT * FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
 				WHERE person_id='".addslashes($person_id)."'";
 		if(!is_null($betriebsmitteltyp))
 			$qry.=" AND betriebsmitteltyp='".addslashes($betriebsmitteltyp)."'";
@@ -372,10 +370,10 @@ class betriebsmittelperson extends basis_db
 		
 		$qry='';
 		$qry.='SELECT * ';
-		$qry.=' FROM '.$this->schema_inventar.'.tbl_betriebsmittel JOIN '.$this->schema_inventar.'.tbl_betriebsmittelperson USING(betriebsmittel_id)'; 
+		$qry.=' FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)'; 
 		$qry.=' WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
-		$qry.=' order by ausgegebenam desc, retouram desc ';
-		$qry.=' limit 1';
+		$qry.=' ORDER BY ausgegebenam desc, retouram desc ';
+		$qry.=' LIMIT 1';
 		
 		if($this->db_query($qry))
 		{
@@ -430,9 +428,9 @@ class betriebsmittelperson extends basis_db
 		}
 		$qry='';
 		$qry.='SELECT * ';
-		$qry.=' FROM '.$this->schema_inventar.'.tbl_betriebsmittel JOIN '.$this->schema_inventar.'.tbl_betriebsmittelperson USING(betriebsmittel_id)'; 
+		$qry.=' FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)'; 
 		$qry.=' WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
-		$qry.=' order by ausgegebenam desc, retouram desc';
+		$qry.=' ORDER BY ausgegebenam desc, retouram desc';
 
 		if($this->db_query($qry))
 		{

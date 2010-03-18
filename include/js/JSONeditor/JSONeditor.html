@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<script src="JSONeditor.js"></script>
+<script>
+onload=function(){
+
+	myjson = {"stgs":["256","257","222","546"],"mailtostudent":{"256":true,"257":true,"222":false,"546":false},"stsem":"WS2008"};
+	JSONeditor.start('tree','jform',myjson,false)
+	
+}
+</script>
+</head>
+<body>
+<div style="position:absolute;top:10px;left:10px" id="tree"></div>
+<div style="position:absolute;top:10px;left:400px" id="jform"></div>
+
+</body>
+</html>

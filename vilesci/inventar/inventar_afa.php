@@ -20,40 +20,29 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+	include_once('../../config/vilesci.config.inc.php');
+	include_once('../../include/basis_db.class.php');
+ 	require_once('../../include/functions.inc.php');
+ 	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/mitarbeiter.class.php');
+	require_once('../../include/ort.class.php');
+ 	require_once('../../include/organisationseinheit.class.php');
+ 	require_once('../../include/wawi.class.php');
+ 	require_once('../../include/betriebsmittel.class.php');
+ 	require_once('../../include/betriebsmittelperson.class.php');
+ 	require_once('../../include/betriebsmitteltyp.class.php');
+ 	require_once('../../include/betriebsmittelstatus.class.php');
+ 	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 
-// ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
- 	require_once($path.'include/functions.inc.php');
 	if (!$uid = get_uid())
 			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	require_once($path.'include/benutzerberechtigung.class.php');
 	$oBenutzerberechtigung = new benutzerberechtigung();
 	$oBenutzerberechtigung->errormsg='';
 	$oBenutzerberechtigung->berechtigungen=array();
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-	
-	require_once($path.'include/benutzer.class.php');
-	require_once($path.'include/mitarbeiter.class.php');
-	require_once($path.'include/ort.class.php');
- 	require_once($path.'include/organisationseinheit.class.php');
- 	require_once($path.'include/wawi.class.php');
-
- 	require_once($path.'include/betriebsmittel.class.php');
- 	require_once($path.'include/betriebsmittelperson.class.php');
- 	require_once($path.'include/betriebsmitteltyp.class.php');
- 	require_once($path.'include/betriebsmittelstatus.class.php');
- 	require_once($path.'include/betriebsmittel_betriebsmittelstatus.class.php');
-
 
 // ------------------------------------------------------------------------------------------
 // Initialisierung
@@ -227,14 +216,14 @@
 	<head>
 		<title>Inventar - AfA</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="stylesheet" href="<?php echo $path;?>skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/tablesort/table.css" type="text/css">
-		<script src="<?php echo $path;?>include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
 				
 		<script type="text/javascript">
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
@@ -295,7 +284,7 @@
 		<div>
 		<table class="navbar">
 			<tr>
-					<td><label for="nummer">Inv.nr.</label>&nbsp;
+				<td><label for="nummer">Inv.nr.</label>&nbsp;
 					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="nummer" name="nummer" type="text" size="10" maxlength="30" value="<?php echo $nummer;?>" />&nbsp;
 					<script type="text/javascript">
 						function selectItem(li) 
@@ -565,10 +554,10 @@
 			</div>
 			<script type="text/javascript">
 				var isShow = <?php echo ($extend_search && $extend_search!='false'?'true':'false'); ?>;
-			   $(document).ready(function(){            // Prüft, ob das Dokument geladen ist
+			   $(document).ready(function(){            // Prï¿½ft, ob das Dokument geladen ist
 			   $("div#extend_search_on").click(function(event){  // Bei Klick auf div#
 			      if (isShow == false) {
-			         $("div#ext_search").show("slow");         // div# langsam öffnen
+			         $("div#ext_search").show("slow");         // div# langsam ï¿½ffnen
 			         isShow = true;
 			      } else {
 			         $("div#ext_search").hide("slow");         // div# langsam verbergen
@@ -599,7 +588,7 @@
 
 //Test	$order='order';$nummer='nummer';$ort_kurzbz='ort_kurzbz';$betriebsmittelstatus_kurzbz='betriebsmittelstatus_kurzbz';$betriebsmitteltyp='betriebsmitteltyp';$bestellung_id='bestellung_id';$bestelldetail_id='bestelldetail_id';$bestellnr='bestellnr';$hersteller='hersteller';$afa='afa';$jahr_monat='jahr_monat';$firma_id='firma_id';$afa='afa';$afa='afa';$beschreibung='beschreibung';$oe_kurzbz='oe_kurzbz';$seriennummer='seriennummer';
  	$check=$nummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$afa.$beschreibung.$oe_kurzbz.$seriennummer;
-	$order='tbl_betriebsmittel.nummer'; // Sortierung
+	$order='tbl_betriebsmittel.nummer, tbl_betriebsmittel_betriebsmittelstatus.datum DESC, tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id DESC'; // Sortierung
 
 	$oBetriebsmittel->result=array();
 	$oBetriebsmittel->errormsg='';
@@ -673,11 +662,11 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				// Ort - Inventarstandort
 				$oOrt = new ort($resultBetriebsmittel[$pos]->ort_kurzbz);
 				$OrtBezeichnung=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz:'*'.$resultBetriebsmittel[$pos]->ort_kurzbz);
-				$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.$oOrt->bezeichnung.' '.$oOrt->standort_kurzbz:$resultBetriebsmittel[$pos]->ort_kurzbz.' Kontrolle');
+				$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.$oOrt->bezeichnung:$resultBetriebsmittel[$pos]->ort_kurzbz.' Kontrolle');
 
 				$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;">
 
-					<td><a href="'.$_SERVER["PHP_SELF"].'?nummer='.$resultBetriebsmittel[$pos]->nummer.'&amp;bestellung_id'.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id'.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->nummer.'</a>&nbsp;</td>
+					<td><a href="'.$_SERVER["PHP_SELF"].'?nummer='.$resultBetriebsmittel[$pos]->nummer.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->nummer.'</a>&nbsp;</td>
 
 					<td title="'.$OrtTitel.'">'.$OrtBezeichnung.'&nbsp;</td>
 

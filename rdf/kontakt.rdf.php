@@ -81,6 +81,7 @@ function draw_rdf($row)
             <KONTAKT:person_id><![CDATA['.$row->person_id.']]></KONTAKT:person_id>
             <KONTAKT:firma_id><![CDATA['.$row->firma_id.']]></KONTAKT:firma_id>
             <KONTAKT:firma_name><![CDATA['.$row->firma_name.']]></KONTAKT:firma_name>
+            <KONTAKT:standort_id><![CDATA['.$row->standort_id.']]></KONTAKT:standort_id>
             <KONTAKT:kontakttyp><![CDATA['.$row->kontakttyp.']]></KONTAKT:kontakttyp>
             <KONTAKT:anmerkung><![CDATA['.$row->anmerkung.']]></KONTAKT:anmerkung>
             <KONTAKT:kontakt><![CDATA['.$row->kontakt.']]></KONTAKT:kontakt>

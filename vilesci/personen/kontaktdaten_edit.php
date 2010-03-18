@@ -29,31 +29,130 @@ require_once('../../include/datum.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/firma.class.php');
+require_once('../../include/standort.class.php');
 require_once('../../include/kontakt.class.php');
-
 
 $user=get_uid();
 $datum_obj = new datum();
 loadVariables($user);
 
+if(isset($_GET['getfirma']))
+{
+	$firma = new firma();
+	$firma->searchFirma($_GET['q']);
+	
+	foreach ($firma->result as $row)
+	{
+		echo $row->name.'|'.$row->firma_id."\n";
+	}
+	exit;
+}
+
+if(isset($_GET['getstandort']))
+{
+	if(isset($_GET['firma_id']) && is_numeric($_GET['firma_id']))
+	{
+		$standort = new standort();
+		$standort->load_firma($_GET['firma_id']);
+		$arr = array();
+		foreach($standort->result as $row)
+		{
+			array_push($arr,array('kurzbz'=>$row->bezeichnung,'standort_id'=>$row->standort_id));
+		}
+		echo json_encode($arr);
+	}
+	exit;
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-<script language="Javascript">
-function confdel()
-{
-	return confirm('Wollen Sie diesen Datensatz wirklich loeschen?');
-}
-</script>
-<style>
-td
-{
-	font-size: small;
-}
-</style>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="../../skin/styles/jquery.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery-ui.js" ></script>
+	<script type="text/javascript" src="../../include/js/jquery.autocomplete.js"></script>
+	
+	<script language="Javascript">
+		function confdel()
+		{
+			return confirm('Wollen Sie diesen Datensatz wirklich loeschen?');
+		}
+		$(document).ready(function() 
+		{
+			$("#firma_ac").autocomplete("kontaktdaten_edit.php?getfirma=true", 
+			{
+				width: 500,
+				minChars:2,
+				matchSubset:1,matchContains:1,
+				highlight: false,
+				scroll: true,
+				formatItem: function(row) 
+				{
+					return row[0];
+				},
+				formatResult: function(row) 
+				{
+					return row[0];
+				}
+			}).result(function(event,row) 
+			{
+				$("#firma").val(row[1]);
+			});
+			
+			$("#firma_kontakt_ac").autocomplete("kontaktdaten_edit.php?getfirma=true", 
+			{
+				width: 500,
+				minChars:2,
+				matchSubset:1,matchContains:1,
+				highlight: false,
+				scroll: true,
+				formatItem: function(row) 
+				{
+					return row[0];
+				},
+				formatResult: function(row) 
+				{
+					return row[0];
+				}
+			}).result(function(event,row) 
+			{
+				$("#firma_kontakt").val(row[1]);
+				setstandort();
+			});
+			
+			function setstandort()
+			{
+				$('#standort_kontakt').children().remove().end();
+				$.ajax
+				(
+					{
+						type: "GET",
+						url: 'kontaktdaten_edit.php',
+						dataType: 'json',
+						data: "getstandort=true&firma_id=" + $("#firma_kontakt").val(),
+						success: function(json)
+						{
+							var output = '';
+							for (p in json) 
+							{
+								output += '<option value=\"' + json[p].standort_id + '\">' + json[p].kurzbz + '</option>\n';
+							}
+							$('#standort_kontakt').html(output);
+							$('#standort_kontakt').result(function(event, data, formatted) {}).focus();
+						}
+					}
+				);
+			}
+		});
+	</script>
+	<style>
+		td
+		{
+			font-size: small;
+		}
+	</style>
 </head>
 <body>
 <?php
@@ -78,7 +177,9 @@ $gemeinde = (isset($_POST['gemeinde'])?$_POST['gemeinde']:'');
 $nation = (isset($_POST['nation'])?$_POST['nation']:'');
 $heimatadresse = (isset($_POST['heimatadresse'])?true:false);
 $zustelladresse = (isset($_POST['zustelladresse'])?true:false);
+$standort_id = (isset($_POST['standort_id'])?$_POST['standort_id']:'');
 $firma_id = (isset($_POST['firma'])?$_POST['firma']:'');
+$firma_ac = (isset($_POST['firma_ac'])?$_POST['firma_ac']:'');
 $zustellung = (isset($_POST['zustellung'])?true:false);
 $anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:false);
 $kontakt = (isset($_POST['kontakt'])?$_POST['kontakt']:false);
@@ -148,7 +249,10 @@ if(isset($_POST['saveadresse']))
 		$adresse_obj->typ = $adresstyp;
 		$adresse_obj->heimatadresse = $heimatadresse;
 		$adresse_obj->zustelladresse = $zustelladresse;
-		$adresse_obj->firma_id = $firma_id;
+		if($firma_ac=='')
+			$adresse_obj->firma_id = '';
+		else
+			$adresse_obj->firma_id = $firma_id;
 		$adresse_obj->updateamum = date('Y-m-d H:i:s');
 		$adresse_obj->updatvon = $user;
 
@@ -192,7 +296,8 @@ if(isset($_POST['savekontakt']))
 	if(!$error)
 	{
 		$kontakt_obj->person_id=$person_id;
-		$kontakt_obj->firma_id = $firma_id;
+		//$kontakt_obj->firma_id = $firma_id;
+		$kontakt_obj->standort_id = $standort_id;
 		$kontakt_obj->kontakttyp = $kontakttyp;
 		$kontakt_obj->kontakt = $kontakt;
 		$kontakt_obj->anmerkung = $anmerkung;
@@ -330,18 +435,12 @@ else
 	echo "</SELECT></td>";
 	echo "<td><input type='checkbox' name='heimatadresse' ".($heimatadresse?'checked':'')." /></td>";
 	echo "<td><input type='checkbox' name='zustelladresse' ".($zustelladresse?'checked':'')." /></td>";
-	echo "<td><SELECT name='firma' style='width:200px'>";
-	echo "<OPTION value=''>-- keine Auswahl --</OPTION>";
-	foreach ($firma_arr as $id=>$kurzbz)
+	$firma_obj = new firma();
+	if($firma_id!='')
 	{
-		if($id==$firma_id)
-			$selected='selected';
-		else
-			$selected='';
-
-		echo "<OPTION value='$id' $selected>$kurzbz</OPTION>";
+		$firma_obj->load($firma_id);
 	}
-	echo "</SELECT></td>";
+	echo '<td><input type="text" id="firma_ac" name="firma_ac" value="'.$firma_obj->name.'" /><input type="hidden" id="firma" name="firma" value="'.$firma_id.'" /></td>';
 	echo "<td><input type='submit' name='saveadresse' value='$savebuttonvalue' /></td>";
 
 	echo "</table>";
@@ -377,6 +476,7 @@ if(isset($_GET['editkontakt']))
 		$anmerkung = $kontakt_obj->anmerkung;
 		$kontakt = $kontakt_obj->kontakt;
 		$firma_id = $kontakt_obj->firma_id;
+		$standort_id = $kontakt_obj->standort_id;
 		$savebuttonvalue='Speichern';
 	}
 	else
@@ -390,6 +490,7 @@ else
 	$zustellung=true;
 	$anmerkung='';
 	$firma_id='';
+	$standort_id='';
 }
 	echo "<input type='hidden' name='kontakt_id' value='".$kontakt_id."' />";
 	echo '<tr class="liste1">';
@@ -409,18 +510,30 @@ else
 	echo "<td><input type='text' name='kontakt' value='".$kontakt."' /></td>";
 	echo "<td><input type='checkbox' name='zustellung' ".($zustellung?'checked':'')." /></td>";
 	echo "<td><input type='text' name='anmerkung' value='".$anmerkung."' /></td>";
-	echo "<td><SELECT name='firma'>";
-	echo "<OPTION value=''>-- keine Auswahl --</OPTION>";
-	foreach ($firma_arr as $id=>$kurzbz)
+	$standort = new standort();
+	$firma_obj = new firma();
+	if($standort_id!='')
 	{
-		if($id==$firma_id)
-			$selected='selected';
-		else
-			$selected='';
-
-		echo "<OPTION value='$id' $selected>$kurzbz</OPTION>";
+		$standort->load($standort_id);
+		$firma_obj->load($standort->firma_id);
 	}
-	echo "</SELECT></td>";
+	echo '<td><input type="text" id="firma_kontakt_ac" name="firma_kotankt_ac" value="'.$firma_obj->name.'" /><input type="hidden" id="firma_kontakt" name="firma" value="" />
+	<SELECT id="standort_kontakt" name="standort_id">';
+	if($standort_id!='')
+	{
+		$standort->load_firma($standort->firma_id);
+		echo "<OPTION value='' >-- keine Auswahl --</OPTION>";
+		foreach ($standort->result as $row)
+		{
+			if($row->standort_id==$standort_id)
+				$selected='selected="true"';
+			else 
+				$selected='';
+				
+			echo '<OPTION value="'.$row->standort_id.'" '.$selected.'>'.$row->kurzbz.'</OPTION>';
+		}
+	}
+	echo '</SELECT></td>';
 	echo "<td><input type='submit' name='savekontakt' value='$savebuttonvalue' /></td>";
 
 	echo "</table>";

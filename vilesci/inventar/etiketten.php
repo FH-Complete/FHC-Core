@@ -1,69 +1,79 @@
 <?php
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-			
+/* Copyright (C) 2010 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ */
+/**
+ * Druckt die Inventarpickerl
+ */
+
 //Zebra Etiketen 5cm*2.5cm
-  	$nummer=trim((isset($_REQUEST['nummer']) ? str_replace(array('`','´','*','~'),'+',$_REQUEST['nummer']):''));
+$nummer=trim((isset($_REQUEST['nummer']) ? str_replace(array('`','ï¿½','*','~'),'+',$_REQUEST['nummer']):''));
+
+// Formel: Groesse in cm * 72 dpi / 2,54 = Masse in Pixel; Masse in Pixel * 2,54 / 72 dpi = Groesse in cm
+$dpiDefault=96;	
 	
-	// Formel: Größe in cm * 72 dpi / 2,54 = Maß in Pixel; Maß in Pixel * 2,54 / 72 dpi = Größe in cm
-	$dpiDefault=96;	
-  	
-	$dpi=trim((isset($_REQUEST['dpi']) ? $_REQUEST['dpi']:$dpiDefault));
-	if (!is_numeric($dpi))
-		$dpi=$dpiDefault;
-	$dpi=(int)$dpi;
-	
+$dpi=trim((isset($_REQUEST['dpi']) ? $_REQUEST['dpi']:$dpiDefault));
+if (!is_numeric($dpi))
+	$dpi=$dpiDefault;
+$dpi=(int)$dpi;
+
 // GesamtEtikette	
-	$etikette_druck_height=(int)(2.54 * ($dpi/2.54));		// 2.54 - '72'
-	$etikette_druck_width=(int)(5 * ($dpi/2.54));			// 5cm - '142'
+$etikette_druck_height=(int)(2.54 * ($dpi/2.54));		// 2.54 - '72'
+$etikette_druck_width=(int)(5 * ($dpi/2.54));			// 5cm - '142'
 // Logo 4cm * 1cm
-	$etikette_logo_height=(int)(1 * ($dpi/2.54)); 			// 1cm - '28'
-	$etikette_logo_width=(int)(4 * ($dpi/2.54));			// 4cm - '113'
+$etikette_logo_height=(int)(1 * ($dpi/2.54)); 			// 1cm - '28'
+$etikette_logo_width=(int)(4 * ($dpi/2.54));			// 4cm - '113'
 // Barcode
-	$etikette_height=(int)(1 * ($dpi/2.54));				// 1cm - '28'
-	$etikette_width=(int)((int)(4 * ($dpi/2.54))/100);				// 4cm - '113'
-	
-	$browser=strtolower($_SERVER['HTTP_USER_AGENT']);
-	$output='css';
-	if (!strstr($browser,'msie'))
-		$output='svg';	
+$etikette_height=(int)(1 * ($dpi/2.54));				// 1cm - '28'
+$etikette_width=(int)((int)(4 * ($dpi/2.54))/100);				// 4cm - '113'
+
+$browser=strtolower($_SERVER['HTTP_USER_AGENT']);
+$output='css';
+if (!strstr($browser,'msie'))
+	$output='svg';	
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta http-equiv="pragma" content="no-cache">
-		<meta http-equiv="expires" content="0">
-		<link rel="stylesheet" href="<?php echo $path;?>skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="expires" content="0">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
+
+	<script src="../../include/js/jquery.js" type="text/javascript"></script>
+	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
+	<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
+	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+	<script src="../../include/js/jquery-barcode-1.3.3.js" type="text/javascript"></script>	
+
+	<title>Etiketten</title>
 	
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery-barcode-1.3.3.js" type="text/javascript"></script>	
-	
-	<title><?php echo $nummer;?></title>
-		<style type="text/css" >
-			body {background: #ffffff;}
-			div {text-align:left;background: #ffffff;}
-			div.etikette_kpl {text-align: center;vertical-align: middle;height:<?php echo $etikette_druck_height;?>px;width:<?php echo $etikette_druck_width;?>px;display:inline;background: #FFFFFF;}
-			table.etikette_kpl {height:<?php echo $etikette_druck_height;?>px;width:<?php echo $etikette_druck_width;?>px;display:inline;background:  #FFFFFF; border:1px;}
-			table.etikette_kpl tr {text-align:left;}
-			table.etikette_kpl td {text-align:left;white-space: nowrap;}
-			img.etikette_logo {height:<?php echo $etikette_logo_height;?>px;width:<?php echo $etikette_logo_width;?>px;border:0px;}
-			div.bcTarget {display:inline;height:<?php echo $etikette_logo_height;?>px;width:<?php echo $etikette_logo_width;?>px;border:0px;}
-		</style>
-</head>
 <?php
 	if (empty($nummer))
 	{ 
 	//onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}"
 ?>	
-		<body  onload="window.print();">
+	</head>
+		<body>
+			<h1>Etiketten</h1>
 			<form target="_blank" name="sendform" action="<?php echo $_SERVER["PHP_SELF"];?>" method="post" enctype="application/x-www-form-urlencoded">
 				<label for="nummer">Inventarnummer :</label>&nbsp;
 					<input id="nummer" name="nummer" type="text" size="10" maxlength="30" value="">&nbsp;
@@ -97,8 +107,8 @@
 							// --------------------------------------------------------------------------------						
 							row[0] = row[0].replace('`', '+');
 							row[0] = row[0].replace('`', '+');
-							row[0] = row[0].replace('´', '+');
-							row[0] = row[0].replace('´', '+');
+							row[0] = row[0].replace('ï¿½', '+');
+							row[0] = row[0].replace('ï¿½', '+');
 							row[0] = row[0].replace('*', '+');
 							row[0] = row[0].replace('*', '+');
 							row[0] = row[0].replace('-', '+');							
@@ -151,12 +161,23 @@ fontSize text 10px font size of the HRI
 output text css output type : css, svg or bmp 
 */
 ?>
-<body onclick="window.print();">
+	<style type="text/css" >
+		body {background-color: #ffffff;}
+		div {text-align:left;background: #ffffff;}
+		div.etikette_kpl {text-align: center;vertical-align: middle;height:<?php echo $etikette_druck_height;?>px;width:<?php echo $etikette_druck_width;?>px;display:inline;background: #FFFFFF;}
+		table.etikette_kpl {height:<?php echo $etikette_druck_height;?>px;width:<?php echo $etikette_druck_width;?>px;display:inline;background:  #FFFFFF; border:1px;}
+		table.etikette_kpl tr {text-align:left;}
+		table.etikette_kpl td {text-align:left;white-space: nowrap;}
+		img.etikette_logo {height:<?php echo $etikette_logo_height;?>px;width:<?php echo $etikette_logo_width;?>px;border:0px;}
+		div.bcTarget {display:inline;height:<?php echo $etikette_logo_height;?>px;width:<?php echo $etikette_logo_width;?>px;border:0px;}
+	</style>
+</head>
+<body onload="window.print();">
 	<div>
 		<table class="etikette_kpl">
 			<tr> 
 				<td>
-					<img class="etikette_logo" src="../../skin/images/technikum_logo.gif">
+					<img class="etikette_logo" src="../../skin/images/TWLogo_klein.gif">
 				</td>
 			</tr>
 			<tr>
@@ -173,7 +194,7 @@ output text css output type : css, svg or bmp
 		</table>
 	</div>
 	<noscript>
-		  Bitte Javascript ist nicht aktiv ! Bitte aktivieren.
+		  Javascript ist nicht aktiv ! Bitte aktivieren.
 	</noscript>
 </body>
 </html>

@@ -185,6 +185,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 						<row>
 							<label value="Firma" control="student-projektarbeit-menulist-firma"/>
+							<box class="Firma" id="student-projektarbeit-menulist-firma" />
+							<!--
 							<hbox>
 								<menulist id="student-projektarbeit-menulist-firma" disabled="true"
 								          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
@@ -199,6 +201,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</menulist>
 								<toolbarbutton id="student-projektarbeit-button-firma-refresh" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="StudentProjektarbeitFirmaRefresh()"/>
 							</hbox>
+							-->
 						</row>
 						<row>
 							<label value="Lehrveranstaltung" control="student-projektarbeit-menulist-lehrveranstaltung"/>

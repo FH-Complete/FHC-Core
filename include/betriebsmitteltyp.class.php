@@ -28,8 +28,6 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class betriebsmitteltyp extends basis_db
 {
-	private $schema_inventar='wawi';
-	
 	public $debug=false;   	// boolean
 	public $new;   	// boolean
 	public $result = array();
@@ -66,7 +64,7 @@ class betriebsmitteltyp extends basis_db
 		$this->result=array();
 		$this->errormsg = '';
 		// Select erzeugen		
-		$qry.=' select * FROM '.$this->schema_inventar.'.tbl_betriebsmitteltyp';
+		$qry.=' select * FROM wawi.tbl_betriebsmitteltyp';
 		$qry.="	where betriebsmitteltyp >'' ";
 
 		// Bedingungen hinzufuegen
@@ -106,7 +104,7 @@ class betriebsmitteltyp extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-		$qry = "SELECT * FROM ".$this->schema_inventar.".tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
+		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
 		
 		if($this->db_query($qry))
 		{
@@ -140,7 +138,7 @@ class betriebsmitteltyp extends basis_db
 		$this->errormsg = '';	
 		$dbanzahl=0;
 		$qry='';
-		$qry1='SELECT * FROM '.$this->schema_inventar.'.tbl_betriebsmitteltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+		$qry1='SELECT * FROM wawi.tbl_betriebsmitteltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
 		if($this->db_query($qry1))
 		{
 			if($this->db_num_rows()>0) //eintrag gefunden
@@ -152,14 +150,14 @@ class betriebsmitteltyp extends basis_db
 					else 
 						$dbanzahl=$row1->anzahl;
 
-					$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmitteltyp SET '.
+					$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
 					'anzahl ='.addslashes($dbanzahl)."+".addslashes($this->anzahl).' '.
 					'WHERE beschreibung='.$this->addslashes($this->beschreibung).'; ' ;
 				}
 			}
 			else 
 			{
-				$qry='INSERT INTO '.$this->schema_inventar.'.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution,typ_code) VALUES('.
+				$qry='INSERT INTO wawi.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution,typ_code) VALUES('.
 					$this->addslashes($this->betriebsmitteltyp).', '.
 					$this->addslashes($this->beschreibung).', '.
 					$this->addslashes($this->anzahl).', '.
@@ -191,7 +189,7 @@ class betriebsmitteltyp extends basis_db
 	public function update()
 	{		
 		$this->errormsg = '';	
-		$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmitteltyp SET '.
+		$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
 				'beschreibung ='.$this->addslashes($this->beschreibung).', '.
 				'anzahl ='.$this->addslashes($this->anzahl).', '.
 				'kaution ='.$this->addslashes($this->kaution).', '.
@@ -207,6 +205,7 @@ class betriebsmitteltyp extends basis_db
 				return false;
 			}	
 	}
+	
 	/**
 	 * Speichert die Daten in die Datenbank
 	 * @return true wenn erfolgreich, false im Fehlerfall
@@ -214,18 +213,18 @@ class betriebsmitteltyp extends basis_db
 	public function check_beschreibung()
 	{		
 		$this->errormsg = '';	
-		$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmitteltyp SET '.
+		$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
 					'beschreibung = trim(betriebsmitteltyp) '.
 					' where beschreibung is null ';
-			if($this->db_query($qry))
-			{
-				return true;
-			}
-			else
-			{			
-				$this->errormsg = 'Fehler beim Pruefen der Beschreibung des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
-				return false;
-			}	
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{			
+			$this->errormsg = 'Fehler beim Pruefen der Beschreibung des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
+			return false;
+		}	
 	}
 }
 ?>

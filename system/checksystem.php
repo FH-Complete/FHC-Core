@@ -361,6 +361,474 @@ if(!@$db->db_query("SELECT aktiv FROM public.tbl_buchungstyp LIMIT 1;"))
 		echo 'public.tbl_buchungstyp: Spalte aktiv hinzugefuegt!<br>';
 }
 
+//Firmenverwaltung
+if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_firma ADD COLUMN steuernummer varchar(32);
+	ALTER TABLE public.tbl_firma ADD COLUMN gesperrt boolean DEFAULT false;
+	ALTER TABLE public.tbl_firma ALTER COLUMN gesperrt SET NOT NULL;
+	ALTER TABLE public.tbl_firma ADD COLUMN aktiv boolean DEFAULT true;
+	ALTER TABLE public.tbl_firma ALTER COLUMN aktiv SET NOT NULL;
+	
+	-- Table public.tbl_standort
+	CREATE SEQUENCE public.tbl_standort_standort_id_seq
+		INCREMENT BY 1
+		NO MAXVALUE
+		NO MINVALUE
+		CACHE 1;
+		
+	DROP VIEW campus.vw_mitarbeiter;
+	
+	ALTER TABLE public.tbl_standort ADD COLUMN standort_id integer DEFAULT nextval('public.tbl_standort_standort_id_seq');
+	ALTER TABLE public.tbl_standort RENAME COLUMN standort_kurzbz TO kurzbz;
+	ALTER TABLE public.tbl_standort ADD COLUMN bezeichnung varchar(256);
+	ALTER TABLE public.tbl_standort ADD COLUMN insertvon varchar(32);
+	ALTER TABLE public.tbl_standort ADD COLUMN insertamum timestamp;
+	ALTER TABLE public.tbl_standort ADD COLUMN updatevon varchar(32);
+	ALTER TABLE public.tbl_standort ADD COLUMN updateamum timestamp;
+	ALTER TABLE public.tbl_standort ADD COLUMN ext_id bigint;
+	ALTER TABLE public.tbl_standort ADD COLUMN firma_id integer;
+	ALTER TABLE public.tbl_standort ALTER COLUMN adresse_id DROP NOT NULL;
+	
+	
+	
+	--  Primary key in tbl_standort aendern
+	ALTER TABLE public.tbl_ort DROP CONSTRAINT standort_ort;
+	ALTER TABLE public.tbl_mitarbeiter DROP CONSTRAINT standort_mitarbeiter;
+	ALTER TABLE public.tbl_standort DROP CONSTRAINT pk_tbl_standort;
+	UPDATE public.tbl_standort SET standort_id= nextval('public.tbl_standort_standort_id_seq');
+	ALTER TABLE public.tbl_standort ALTER COLUMN standort_id SET NOT NULL;
+	ALTER TABLE public.tbl_standort ADD CONSTRAINT pk_standort PRIMARY KEY (standort_id);
+	
+	ALTER TABLE public.tbl_standort ALTER COLUMN kurzbz DROP NOT NULL;
+	
+	-- vorhandene Standorte als Firmen anlegen
+	INSERT INTO public.tbl_firmentyp(firmentyp_kurzbz, beschreibung) VALUES('Intern','Intern');
+	
+	INSERT INTO public.tbl_firma(firmentyp_kurzbz, name, schule, steuernummer, anmerkung, gesperrt, aktiv, ext_id)
+	SELECT 'Intern', kurzbz, false, null, null, false, true, standort_id FROM public.tbl_standort;
+	
+	UPDATE public.tbl_standort SET bezeichnung=kurzbz WHERE bezeichnung is null;
+	
+	UPDATE public.tbl_standort SET firma_id=(SELECT firma_id FROM public.tbl_firma where ext_id=standort_id);
+	UPDATE public.tbl_firma SET ext_id=null;
+
+	-- Standorte zu den Firmen anlegen
+	INSERT INTO public.tbl_standort(firma_id, adresse_id, kurzbz, bezeichnung)
+	SELECT firma_id, adresse_id, substring(tbl_firma.name for 16), tbl_firma.name 
+	FROM public.tbl_firma LEFT JOIN public.tbl_adresse USING(firma_id) 
+	WHERE tbl_adresse.person_id is null AND firma_id not in (SELECT firma_id FROM public.tbl_standort);
+	
+	-- fk zum standort in tbl_mitarbeiter aendern
+	ALTER TABLE public.tbl_mitarbeiter ADD COLUMN standort_id integer;
+	UPDATE public.tbl_mitarbeiter SET standort_id=(SELECT standort_id FROM public.tbl_standort where kurzbz=tbl_mitarbeiter.standort_kurzbz);
+	ALTER TABLE public.tbl_mitarbeiter ADD CONSTRAINT fk_mitarbeiter_standort FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_mitarbeiter DROP COLUMN standort_kurzbz;
+	
+	-- fk zum standort in tbl_ort aendern
+	ALTER TABLE public.tbl_ort ADD COLUMN standort_id integer;
+	UPDATE public.tbl_ort SET standort_id=(SELECT standort_id FROM public.tbl_standort WHERE kurzbz=tbl_ort.standort_kurzbz);
+	ALTER TABLE public.tbl_ort ADD CONSTRAINT fk_ort_standort FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_ort DROP COLUMN standort_kurzbz;	
+
+	-- Table public.tbl_personfunktionstandort
+	CREATE SEQUENCE public.tbl_personfunktionstandort_personfunktionstandort_id_seq
+		INCREMENT BY 1
+		NO MAXVALUE
+		NO MINVALUE
+		CACHE 1;
+	
+	CREATE TABLE public.tbl_personfunktionstandort
+	(
+		personfunktionstandort_id integer DEFAULT nextval('public.tbl_personfunktionstandort_personfunktionstandort_id_seq'),
+		funktion_kurzbz varchar(16) NOT NULL,
+		person_id Integer NOT NULL,
+		position varchar(256),
+		anrede varchar(128),
+		standort_id Integer
+	);
+
+	ALTER TABLE public.tbl_personfunktionstandort ALTER COLUMN personfunktionstandort_id SET NOT NULL;
+	ALTER TABLE public.tbl_personfunktionstandort ADD CONSTRAINT pk_personfunktionstandort PRIMARY KEY (personfunktionstandort_id);	
+	ALTER TABLE public.tbl_personfunktionstandort ADD CONSTRAINT fk_funktion_personfunktionstandort FOREIGN KEY (funktion_kurzbz) REFERENCES public.tbl_funktion (funktion_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_personfunktionstandort ADD CONSTRAINT fk_person_personfunktionstandort FOREIGN KEY (person_id) REFERENCES public.tbl_person (person_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_personfunktionstandort ADD CONSTRAINT fk_standort_personfunktionstandort FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	DROP TABLE public.tbl_personfunktionfirma;
+		
+	-- Table public.tbl_tag
+	
+	CREATE TABLE public.tbl_tag
+	(
+		tag varchar(128) NOT NULL
+	);
+	
+	ALTER TABLE public.tbl_tag ADD CONSTRAINT pk_tag PRIMARY KEY (tag);
+	ALTER TABLE public.tbl_tag ADD CONSTRAINT tag UNIQUE (tag);
+	
+	-- Table tbl_firmatag
+	
+	CREATE TABLE public.tbl_firmatag
+	(
+		firma_id Integer NOT NULL,
+		tag varchar(128) NOT NULL,
+		insertamum Timestamp,
+		insertvon varchar(32)
+	);
+
+	ALTER TABLE public.tbl_firmatag ADD CONSTRAINT pk_firmatag PRIMARY KEY (firma_id,tag);
+	ALTER TABLE public.tbl_firmatag ADD CONSTRAINT fk_firmatag_firma FOREIGN KEY (firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE tbl_firmatag ADD CONSTRAINT fk_tag_firmatag FOREIGN KEY (tag) REFERENCES public.tbl_tag (tag) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		
+	-- Table public.tbl_firma_organisationseinheit
+	
+	CREATE TABLE public.tbl_firma_organisationseinheit
+	(
+		firma_organisationseinheit_id Serial NOT NULL,
+		firma_id Integer NOT NULL,
+		oe_kurzbz Character varying(32) NOT NULL,
+		bezeichnung Character varying(256),
+		kundennummer Character varying(128),
+		insertamum Timestamp,
+		insertvon Character varying(32),
+		updateamum Timestamp,
+		updatevon Character varying(32),
+		ext_id Bigint
+	);
+	
+	ALTER TABLE public.tbl_firma_organisationseinheit ADD CONSTRAINT pk_firma_oe PRIMARY KEY (firma_organisationseinheit_id);
+	ALTER TABLE public.tbl_firma_organisationseinheit ADD CONSTRAINT uk_firma_oe UNIQUE (firma_id, oe_kurzbz);	
+	ALTER TABLE public.tbl_firma_organisationseinheit ADD CONSTRAINT fk_firma_organisationseinheitfirma FOREIGN KEY (firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_firma_organisationseinheit ADD CONSTRAINT fk_organisationseinheit_organisationseinheitfirma FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	-- Lehreinheitmitarbeiter
+	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD COLUMN standort_id integer;
+	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD CONSTRAINT fk_standort_lehreinheitmitarbeiter FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	-- Finanzamt
+	ALTER TABLE public.tbl_firma ADD COLUMN finanzamt integer;
+	ALTER TABLE public.tbl_firma ADD CONSTRAINT fk_standort_firma FOREIGN KEY (finanzamt) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	-- Kontakt Standort
+	ALTER TABLE public.tbl_kontakt ADD COLUMN standort_id integer;
+	ALTER TABLE public.tbl_kontakt ADD CONSTRAINT fk_standort_kontakt FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE CASCADE ON UPDATE CASCADE;
+		
+	-- Berechtigungen
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_personfunktionstandort TO admin;
+	GRANT SELECT ON public.tbl_personfunktionstandort TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_standort TO admin;
+	GRANT SELECT ON public.tbl_standort TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_firma_organisationseinheit TO admin;
+	GRANT SELECT ON public.tbl_firma_organisationseinheit TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_tag TO admin;
+	GRANT SELECT ON public.tbl_tag TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_firmatag TO admin;
+	GRANT SELECT ON public.tbl_firmatag TO web;
+	GRANT SELECT, UPDATE ON public.tbl_standort_standort_id_seq TO admin;
+	GRANT SELECT, UPDATE ON public.tbl_standort_standort_id_seq TO web;
+	GRANT SELECT, UPDATE ON public.tbl_personfunktionstandort_personfunktionstandort_id_seq TO admin;
+	GRANT SELECT, UPDATE ON public.tbl_personfunktionstandort_personfunktionstandort_id_seq TO admin;
+	GRANT SELECT, UPDATE ON public.tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO admin;
+	GRANT SELECT, UPDATE ON public.tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO web;
+
+	-- View wieder anlegen
+	CREATE OR REPLACE VIEW campus.vw_mitarbeiter as
+	SELECT tbl_benutzer.uid, tbl_mitarbeiter.ausbildungcode, tbl_mitarbeiter.personalnummer, tbl_mitarbeiter.kurzbz, tbl_mitarbeiter.lektor, tbl_mitarbeiter.fixangestellt, tbl_mitarbeiter.telefonklappe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_mitarbeiter.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_mitarbeiter.ort_kurzbz, tbl_benutzer.aktiv, tbl_mitarbeiter.bismelden, tbl_mitarbeiter.standort_id, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon, tbl_mitarbeiter.ext_id
+   	FROM tbl_mitarbeiter
+   	JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
+   	JOIN tbl_person USING (person_id);
+   	
+   	GRANT SELECT ON campus.vw_mitarbeiter TO admin;
+   	GRANT SELECT ON campus.vw_mitarbeiter TO web;
+   	
+   	-- Syncronisieren der Daten
+   	
+   	-- Firmenkontakte in tbl_kontakt auslagern
+   	-- EMail
+	INSERT INTO public.tbl_kontakt(standort_id, kontakttyp, kontakt, insertamum, insertvon, updateamum, updatevon) 
+	SELECT standort_id, 'email', email, tbl_firma.insertamum, tbl_firma.insertvon, now(), 'checksystem' FROM 
+	public.tbl_firma JOIN public.tbl_standort USING(firma_id) WHERE email is not null AND email<>'';
+	
+	-- Telefon
+	INSERT INTO public.tbl_kontakt(standort_id, kontakttyp, kontakt, insertamum, insertvon, updateamum, updatevon) 
+	SELECT standort_id, 'telefon', telefon, tbl_firma.insertamum, tbl_firma.insertvon, now(), 'checksystem' FROM 
+	public.tbl_firma JOIN public.tbl_standort USING(firma_id) WHERE telefon is not null AND telefon<>'';
+	
+	-- Fax
+	INSERT INTO public.tbl_kontakt(standort_id, kontakttyp, kontakt, insertamum, insertvon, updateamum, updatevon) 
+	SELECT standort_id, 'fax', fax, tbl_firma.insertamum, tbl_firma.insertvon, now(), 'checksystem' FROM 
+	public.tbl_firma JOIN public.tbl_standort USING(firma_id) WHERE fax is not null AND fax<>'';
+
+	UPDATE public.tbl_kontakt SET standort_id=(SELECT standort_id FROM public.tbl_standort WHERE firma_id=tbl_kontakt.firma_id LIMIT 1) WHERE firma_id IS NOT NULL
+
+	-- Spalten entfernen
+	ALTER TABLE public.tbl_firma DROP COLUMN email;
+	ALTER TABLE public.tbl_firma DROP COLUMN telefon;
+	ALTER TABLE public.tbl_firma DROP COLUMN fax;
+	ALTER TABLE public.tbl_kontakt DROP COLUMN firma_id;
+	
+	INSERT INTO public.tbl_kontakttyp(kontakttyp, beschreibung) VALUES('homepage','Homepage');
+	INSERT INTO public.tbl_funktion (funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('Ansprechpartner','Ansprechpartner',true,false,false);
+	INSERT INTO public.tbl_firmentyp (firmentyp_kurzbz, beschreibung) VALUES('Finanzamt','Finanzamt');
+	
+	CREATE INDEX idx_tbl_standort_firma_id ON public.tbl_standort(firma_id);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>Firmenverwaltung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabellen fuer neue Firmenverwaltung hinzugefuegt!<br>';
+		
+	//Adressen der Firmen Syncronisieren
+	$qry = "
+	SELECT 
+		adresse, tbl_firma.insertamum, tbl_firma.insertvon, standort_id 
+	FROM 
+		public.tbl_firma JOIN public.tbl_standort USING(firma_id)
+	WHERE 
+		tbl_firma.adresse IS NOT NULL
+		AND tbl_firma.adresse<>'' 
+		AND tbl_standort.adresse_id IS NULL";
+	
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$qry = "INSERT INTO public.tbl_adresse(strasse, typ, heimatadresse, 
+						zustelladresse, updateamum, updatevon, insertamum, insertvon)
+					VALUES('".addslashes($row->adresse)."', 'f', false, true, now(), 'checksystem', 
+					".($row->insertamum!=''?"'".addslashes($row->insertamum)."'":'null').",'".addslashes($row->insertvon)."');
+					UPDATE public.tbl_standort SET adresse_id=currval('public.tbl_adresse_adresse_id_seq') WHERE standort_id='".$row->standort_id."';";
+			if(!$db->db_query($qry))
+			{
+				echo 'Fehler beim Syncronisieren der Adress-Daten:'.$qry;
+			}
+		}
+	}
+	//Adressfeld entfernen
+	$qry = "ALTER TABLE public.tbl_firma DROP COLUMN adresse;";
+	
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Loeschen der Spalte adresse';
+	}
+
+}
+
+if(!@$db->db_query("SELECT mailverteiler FROM public.tbl_organisationseinheit LIMIT 1;"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_organisationseinheit ADD COLUMN mailverteiler boolean DEFAULT true;
+	UPDATE public.tbl_organisationseinheit SET mailverteiler=false;
+	ALTER TABLE public.tbl_organisationseinheit ALTER COLUMN mailverteiler SET NOT NULL;
+	
+	-- Gruppe Kurzbz auf 32 Zeichen aendern
+	DROP VIEW campus.vw_persongruppe;
+	DROP VIEW lehre.vw_reservierung;
+	DROP VIEW campus.vw_reservierung;
+	DROP VIEW lehre.vw_lva_stundenplandev;
+	DROP VIEW lehre.vw_lva_stundenplan;
+	DROP VIEW campus.vw_student_lehrveranstaltung;
+	DROP VIEW campus.vw_lehreinheit;
+	DROP VIEW lehre.vw_stundenplan;
+	DROP VIEW lehre.vw_stundenplandev;
+	DROP VIEW campus.vw_stundenplan;
+	DROP VIEW lehre.vw_stundenplandev_student_unr;
+	
+	ALTER TABLE public.tbl_gruppe ALTER COLUMN gruppe_kurzbz TYPE varchar(32);
+	ALTER TABLE campus.tbl_reservierung ALTER COLUMN gruppe_kurzbz TYPE varchar(32);
+	ALTER TABLE lehre.tbl_lehreinheitgruppe ALTER COLUMN gruppe_kurzbz TYPE varchar(32);
+	ALTER TABLE lehre.tbl_stundenplan ALTER COLUMN gruppe_kurzbz TYPE varchar(32);
+	ALTER TABLE lehre.tbl_stundenplandev ALTER COLUMN gruppe_kurzbz TYPE varchar(32);
+	ALTER TABLE public.tbl_benutzergruppe ALTER COLUMN gruppe_kurzbz TYPE varchar(32);
+		
+	CREATE VIEW campus.vw_persongruppe AS
+	SELECT tbl_benutzer.uid, tbl_benutzergruppe.gruppe_kurzbz, tbl_gruppe.studiengang_kz, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.person_id, tbl_person.gebdatum, tbl_person.titelpost, tbl_person.titelpre, tbl_person.staatsbuergerschaft, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.familienstand, tbl_person.geschlecht, tbl_person.anzahlkinder, tbl_benutzer.alias, tbl_person.anmerkung, tbl_person.aktiv AS aktivperson, tbl_gruppe.mailgrp, tbl_gruppe.sichtbar, tbl_benutzer.aktiv AS aktivbenutzer, tbl_gruppe.semester, tbl_gruppe.bezeichnung, tbl_gruppe.beschreibung, tbl_gruppe.generiert, tbl_gruppe.aktiv AS aktivgruppe, tbl_gruppe.sort, tbl_benutzergruppe.updateamum, tbl_benutzergruppe.updatevon, tbl_benutzergruppe.insertamum, tbl_benutzergruppe.insertvon
+	FROM public.tbl_person
+	JOIN public.tbl_benutzer USING (person_id)
+	JOIN public.tbl_benutzergruppe USING (uid)
+	JOIN public.tbl_gruppe USING (gruppe_kurzbz);
+	
+	CREATE VIEW lehre.vw_reservierung AS
+	SELECT tbl_reservierung.reservierung_id, tbl_reservierung.ort_kurzbz, tbl_reservierung.studiengang_kz, tbl_reservierung.uid, tbl_reservierung.stunde, tbl_reservierung.datum, tbl_reservierung.titel, tbl_reservierung.beschreibung, tbl_reservierung.semester, tbl_reservierung.verband, tbl_reservierung.gruppe, tbl_reservierung.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz
+	FROM campus.tbl_reservierung
+	JOIN public.tbl_studiengang USING (studiengang_kz);
+	
+	CREATE VIEW campus.vw_reservierung AS
+	SELECT tbl_reservierung.reservierung_id, tbl_reservierung.ort_kurzbz, tbl_reservierung.studiengang_kz, tbl_reservierung.uid, tbl_reservierung.stunde, tbl_reservierung.datum, tbl_reservierung.titel, tbl_reservierung.beschreibung, tbl_reservierung.semester, tbl_reservierung.verband, tbl_reservierung.gruppe, tbl_reservierung.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_reservierung.insertamum, tbl_reservierung.insertvon
+   	FROM campus.tbl_reservierung
+   	JOIN public.tbl_studiengang USING (studiengang_kz);
+   	
+	CREATE VIEW lehre.vw_lva_stundenplandev AS
+	SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, 
+	( SELECT count(*) AS count FROM lehre.tbl_stundenplandev WHERE tbl_stundenplandev.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplandev.semester = lvb.semester AND (tbl_stundenplandev.verband = lvb.verband OR (tbl_stundenplandev.verband IS NULL OR tbl_stundenplandev.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplandev.gruppe = lvb.gruppe OR (tbl_stundenplandev.gruppe IS NULL OR tbl_stundenplandev.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplandev.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplandev.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+	FROM lehre.tbl_lehreinheit le
+	JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+	JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+	JOIN public.tbl_studiengang ON lvb.studiengang_kz = tbl_studiengang.studiengang_kz
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+   	
+	CREATE VIEW lehre.vw_lva_stundenplan AS
+	SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, 
+	( SELECT count(*) AS count FROM lehre.tbl_stundenplan WHERE tbl_stundenplan.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplan.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplan.semester = lvb.semester AND (tbl_stundenplan.verband = lvb.verband OR (tbl_stundenplan.verband IS NULL OR tbl_stundenplan.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplan.gruppe = lvb.gruppe OR (tbl_stundenplan.gruppe IS NULL OR tbl_stundenplan.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplan.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplan.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+	FROM lehre.tbl_lehreinheit le
+	JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+	JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+	JOIN public.tbl_studiengang USING (studiengang_kz)
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid);
+   
+	CREATE VIEW campus.vw_student_lehrveranstaltung AS
+	SELECT tbl_benutzergruppe.uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+	FROM lehre.tbl_lehreinheitgruppe, tbl_benutzergruppe, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+	WHERE tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
+	UNION 
+	SELECT tbl_studentlehrverband.student_uid AS uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+	FROM lehre.tbl_lehreinheitgruppe, tbl_studentlehrverband, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+	WHERE tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_studentlehrverband.studiensemester_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester AND (btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text) OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND (btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text) OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL);
+	
+	CREATE VIEW campus.vw_lehreinheit AS
+	SELECT tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre, tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon, tbl_lehreinheit.lehrfach_id, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehrveranstaltung.aktiv, tbl_lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor, tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+	FROM lehre.tbl_lehreinheit
+	JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+	JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+	JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
+	JOIN public.tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz;
+	
+	CREATE VIEW lehre.vw_stundenplan AS
+	SELECT tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon
+	FROM lehre.tbl_stundenplan
+	JOIN public.tbl_studiengang USING (studiengang_kz)
+	JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+
+	CREATE VIEW lehre.vw_stundenplandev AS
+	SELECT tbl_stundenplandev.stundenplandev_id, tbl_stundenplandev.unr, tbl_stundenplandev.mitarbeiter_uid AS uid, tbl_stundenplandev.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplandev.datum, tbl_stundenplandev.stunde, tbl_stundenplandev.ort_kurzbz, tbl_stundenplandev.studiengang_kz, tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.titel, tbl_stundenplandev.anmerkung, tbl_stundenplandev.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplandev.updateamum, tbl_stundenplandev.updatevon, tbl_stundenplandev.insertamum, tbl_stundenplandev.insertvon
+	FROM lehre.tbl_stundenplandev
+	JOIN public.tbl_studiengang USING (studiengang_kz)
+	JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+	
+	CREATE VIEW campus.vw_stundenplan AS
+	SELECT tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon
+	FROM lehre.tbl_stundenplan
+	JOIN public.tbl_studiengang USING (studiengang_kz)
+	JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+	
+	CREATE VIEW lehre.vw_stundenplandev_student_unr AS
+	SELECT sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid
+	FROM (SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid AS student_uid
+	           FROM lehre.tbl_stundenplandev stpl
+	      JOIN public.tbl_benutzergruppe USING (gruppe_kurzbz)
+	     WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
+	              FROM public.tbl_studiensemester
+	             WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
+	     GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid
+	UNION 
+	     SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid
+	           FROM lehre.tbl_stundenplandev stpl
+	      JOIN public.tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
+	     WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
+	              FROM public.tbl_studiensemester
+	             WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
+	     GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
+	GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid;
+
+	GRANT SELECT ON campus.vw_persongruppe TO admin;
+	GRANT SELECT ON campus.vw_persongruppe TO web;
+	GRANT SELECT ON lehre.vw_reservierung TO admin;
+	GRANT SELECT ON lehre.vw_reservierung TO web;
+	GRANT SELECT ON campus.vw_reservierung TO admin;
+	GRANT SELECT ON campus.vw_reservierung TO web;
+	GRANT SELECT ON lehre.vw_lva_stundenplan TO admin;
+	GRANT SELECT ON lehre.vw_lva_stundenplan TO web;
+	GRANT SELECT ON lehre.vw_lva_stundenplandev TO admin;
+	GRANT SELECT ON lehre.vw_lva_stundenplandev TO web;
+	GRANT SELECT ON campus.vw_student_lehrveranstaltung TO admin;
+	GRANT SELECT ON campus.vw_student_lehrveranstaltung TO web;
+	GRANT SELECT ON campus.vw_lehreinheit TO admin;
+	GRANT SELECT ON campus.vw_lehreinheit TO web;
+	GRANT SELECT ON lehre.vw_stundenplan TO admin;
+	GRANT SELECT ON lehre.vw_stundenplan TO web;
+	GRANT SELECT ON lehre.vw_stundenplandev TO admin;
+	GRANT SELECT ON lehre.vw_stundenplandev TO web;
+	GRANT SELECT ON campus.vw_stundenplan TO admin;
+	GRANT SELECT ON campus.vw_stundenplan TO web;
+	GRANT SELECT ON lehre.vw_stundenplandev_student_unr TO admin;
+	GRANT SELECT ON lehre.vw_stundenplandev_student_unr TO web;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'tbl_organisationseinheit: Spalte mailverteiler hinzugefuegt!<br>';
+}
+
+if(!@$db->db_query("SELECT sort FROM lehre.tbl_lehrfunktion LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrfunktion ADD COLUMN sort smallint;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_lehrfunktion: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'tbl_lehrfunktion: Spalte sort hinzugefuegt!<br>';
+}
+
+if(!@$db->db_query("SELECT * FROM system.tbl_cronjob LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE system.tbl_cronjob
+		(
+			cronjob_id Serial NOT NULL,
+			server_kurzbz Character varying(64),
+			titel Character varying(64),
+			beschreibung Text,
+			file Text,
+			last_execute Timestamp,
+			aktiv Boolean DEFAULT true NOT NULL,
+			running Boolean DEFAULT false NOT NULL,
+			jahr Character varying(6),
+			monat Character varying(4),
+			tag Character varying(4),
+			wochentag Smallint,
+			stunde Character varying(4),
+			minute Character varying(4),
+			standalone Boolean DEFAULT true NOT NULL,
+			reihenfolge Smallint,
+			updateamum Timestamp,
+			updatevon Character varying(32),
+			insertamum Timestamp,
+			insertvon Character varying(32),
+			variablen text
+		);
+
+		ALTER TABLE system.tbl_cronjob ADD CONSTRAINT pk_tbl_cronjob PRIMARY KEY (cronjob_id);
+
+		CREATE TABLE system.tbl_server
+		(
+ 			server_kurzbz Character varying(64) NOT NULL,
+ 			beschreibung Text
+		);
+		
+		GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_cronjob TO admin;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_server TO admin;
+		GRANT SELECT, UPDATE ON system.tbl_cronjob_cronjob_id_seq TO admin;
+		";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_cronjob: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'tbl_cronjob: hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -426,10 +894,10 @@ $tabellen=array(
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehreinheitgruppe"  => array("lehreinheitgruppe_id","lehreinheit_id","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"lehre.tbl_lehreinheitmitarbeiter"  => array("lehreinheit_id","mitarbeiter_uid","lehrfunktion_kurzbz","semesterstunden","planstunden","stundensatz","faktor","anmerkung","bismelden","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_lehreinheitmitarbeiter"  => array("lehreinheit_id","mitarbeiter_uid","lehrfunktion_kurzbz","semesterstunden","planstunden","stundensatz","faktor","anmerkung","bismelden","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
-	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor"),
+	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz"),
 	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
@@ -460,23 +928,25 @@ $tabellen=array(
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
-	"public.tbl_firma"  => array("firma_id","name","adresse","email","telefon","fax","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule"),
+	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv"),
+	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
+	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz"),
-	"public.tbl_kontakt"  => array("kontakt_id","person_id","firma_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_kontakt"  => array("kontakt_id","person_id","firma_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
-	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_kurzbz","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
-	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_kurzbz","telefonklappe"),
+	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv"),
+	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung"),
-	"public.tbl_personfunktionfirma"  => array("personfunktionfirma_id","funktion_kurzbz","person_id","firma_id","position","anrede"),
+	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id"),
@@ -486,11 +956,12 @@ $tabellen=array(
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge"),
-	"public.tbl_standort"  => array("standort_kurzbz","adresse_id"),
+	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
+	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
 	"public.tbl_vorlagestudiengang"  => array("vorlage_kurzbz","studiengang_kz","version","text"),
@@ -506,10 +977,12 @@ $tabellen=array(
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
+	"system.tbl_cronjob"  => array("cronjob_id","server_kurzbz","titel","beschreibung","file","last_execute","aktiv","running","jahr","monat","tag","wochentag","stunde","minute","standalone","reihenfolge","updateamum", "updatevon","insertamum","insertvon","variablen"),
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon"),
+	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
-	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
+	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
 	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","nummerintern","leasing_bis"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),

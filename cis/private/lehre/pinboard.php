@@ -337,15 +337,18 @@ function show(id)
 							if($row_course_leader->telefonklappe != "")
 							{
 								$hauptnummer='';
+								/*
 								$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
 										WHERE standort_kurzbz='".addslashes($row_course_leader->standort_kurzbz)."' AND
 										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 										tbl_adresse.firma_id=tbl_firma.firma_id";
+								*/
+								$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader->standort_id)."' AND kontakttyp='telefon'";
 								if($result_standort = $db->db_query($qry_standort))
 								{
 									if($row_standort = $db->db_fetch_object($result_standort))
 									{
-										$hauptnummer = $row_standort->nummer;
+										$hauptnummer = $row_standort->kontakt;
 									}
 								}
 								
@@ -428,15 +431,18 @@ function show(id)
 									if($row_course_leader_deputy->telefonklappe != "")
 									{
 										$hauptnummer='';
+										/*
 										$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
 												WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
 												tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 												tbl_adresse.firma_id=tbl_firma.firma_id";
+										*/
+										$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader_deputy->standort_id)."' AND kontakttyp='telefon'";
 										if($result_standort = $db->db_query($qry_standort))
 										{
 											if($row_standort = $db->db_fetch_object($result_standort))
 											{
-												$hauptnummer = $row_standort->nummer;
+												$hauptnummer = $row_standort->kontakt;
 											}
 										}
 				
@@ -514,15 +520,19 @@ function show(id)
 									if($row_course_leader_deputy->telefonklappe != "")
 									{
 										$hauptnummer='';
+										/*
 										$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
 												WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
 												tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 												tbl_adresse.firma_id=tbl_firma.firma_id";
+										*/
+										$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader_deputy->standort_id)."' AND kontakttyp='telefon'";
+										
 										if($result_standort = $db->db_query($qry_standort))
 										{
 											if($row_standort = $db->db_fetch_object($result_standort))
 											{
-												$hauptnummer = $row_standort->nummer;
+												$hauptnummer = $row_standort->kontakt;
 											}
 										}
 				
@@ -598,15 +608,19 @@ function show(id)
 							if($row_course_secretary->telefonklappe != "")
 							{
 								$hauptnummer='';
+								/*
 								$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
 										WHERE standort_kurzbz='".addslashes($row_course_secretary->standort_kurzbz)."' AND
 										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
 										tbl_adresse.firma_id=tbl_firma.firma_id";
+								*/
+								$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_secretary->standort_id)."' AND kontakttyp='telefon'";
+										
 								if($result_standort = $db->db_query($qry_standort))
 								{
 									if($row_standort = $db->db_fetch_object($result_standort))
 									{
-										$hauptnummer = $row_standort->nummer;
+										$hauptnummer = $row_standort->kontakt;
 									}
 								}
 

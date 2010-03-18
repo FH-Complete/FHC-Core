@@ -11,3 +11,13 @@ vbox.StyleBox
 {
     -moz-binding: url('bindings.xml.php#StyleBox');
 }
+
+box.Standort
+{
+    -moz-binding: url('bindings.xml.php#Standort');
+}
+
+box.Firma
+{
+    -moz-binding: url('bindings.xml.php#Firma');
+}

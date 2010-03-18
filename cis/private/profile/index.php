@@ -100,12 +100,12 @@
 		if($tel != "")
 		{
 			$vorwahl = '+43 1 333 40 77-';
-			if($row->standort_kurzbz!='')
+			if($row->standort_id!='')
 			{
-						$qry = "SELECT telefon FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma WHERE tbl_standort.standort_kurzbz='$row->standort_kurzbz' AND tbl_standort.adresse_id=tbl_adresse.adresse_id AND tbl_adresse.firma_id=tbl_firma.firma_id";
-						if($result_tel = $db->db_query($qry))
-						if($row_tel = $db->db_fetch_object($result_tel))
-						$vorwahl = $row_tel->telefon;
+				$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='$row->standort_id'";
+				if($result_tel = $db->db_query($qry))
+					if($row_tel = $db->db_fetch_object($result_tel))
+						$vorwahl = $row_tel->kontakt;
 			}
 		}	
 	}

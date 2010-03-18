@@ -22,31 +22,23 @@
  */
 
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
+	require_once('../../config/vilesci.config.inc.php');
+  	require_once('../../include/functions.inc.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/mitarbeiter.class.php');
+	require_once('../../include/ort.class.php');
+  	require_once('../../include/organisationseinheit.class.php');
+  	require_once('../../include/wawi.class.php');	
+  	require_once('../../include/person.class.php');	
+  	require_once('../../include/betriebsmittel.class.php');
+  	require_once('../../include/betriebsmittelperson.class.php');
+  	require_once('../../include/betriebsmitteltyp.class.php');
+  	require_once('../../include/betriebsmittelstatus.class.php');
+  	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
-  	require_once($path.'include/functions.inc.php');
 	if (!$uid = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-	require_once($path.'include/benutzer.class.php');
-	require_once($path.'include/benutzerberechtigung.class.php');
-	require_once($path.'include/mitarbeiter.class.php');
-	require_once($path.'include/ort.class.php');
-  	require_once($path.'include/organisationseinheit.class.php');
-  	require_once($path.'include/wawi.class.php');
-	
-  	require_once($path.'include/person.class.php');	
-  	require_once($path.'include/betriebsmittel.class.php');
-  	require_once($path.'include/betriebsmittelperson.class.php');
-  	require_once($path.'include/betriebsmitteltyp.class.php');
-  	require_once($path.'include/betriebsmittelstatus.class.php');
-  	require_once($path.'include/betriebsmittel_betriebsmittelstatus.class.php');
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 // ------------------------------------------------------------------------------------------
 // Initialisierung
@@ -327,14 +319,14 @@
 	<head>
 		<title>Inventar - Betriebsmittel - Suche</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="stylesheet" href="<?php echo $path;?>skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/tablesort/table.css" type="text/css">
-		<script src="<?php echo $path;?>include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
 	
 			
 		<script type="text/javascript" language="JavaScript1.2">
@@ -737,7 +729,7 @@
 		
 //Test	$order='order';$nummer='nummer';$ort_kurzbz='ort_kurzbz';$betriebsmittelstatus_kurzbz='betriebsmittelstatus_kurzbz';$betriebsmitteltyp='betriebsmitteltyp';$bestellung_id='bestellung_id';$bestelldetail_id='bestelldetail_id';$bestellnr='bestellnr';$hersteller='hersteller';$afa='afa';$jahr_monat='jahr_monat';$firma_id='firma_id';$inventur_jahr='inventur_jahr';$inventur_jahr='inventur_jahr';$beschreibung='beschreibung';$oe_kurzbz='oe_kurzbz';$seriennummer='seriennummer';
  	$check=$nummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$inventur_jahr.$beschreibung.$oe_kurzbz.$seriennummer.$person_id.$betriebsmittel_id;
-	$order='tbl_betriebsmittel.nummer'; // Sortierung
+	$order='tbl_betriebsmittel.nummer, tbl_betriebsmittel_betriebsmittelstatus.datum DESC, tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id DESC'; // Sortierung
 
 	$oBetriebsmittel->result=array();
 	$oBetriebsmittel->errormsg='';

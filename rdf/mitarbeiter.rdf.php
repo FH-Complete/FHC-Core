@@ -119,7 +119,7 @@ function draw_row($mitarbeiter)
 
 if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 {
-	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz,$fachbereich_id);
+	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz);
 	
 	$stg_obj = new studiengang();
 	$stg_obj->getAll('typ, kurzbz', false);

@@ -100,7 +100,7 @@ if(!$error)
 			$mitarbeiter->ausbildungcode = $_POST['ausbildung'];
 			$mitarbeiter->anmerkung = $_POST['anmerkung'];
 			$mitarbeiter->ort_kurzbz = $_POST['ort_kurzbz'];
-			$mitarbeiter->standort_kurzbz = $_POST['standort_kurzbz'];
+			$mitarbeiter->standort_id = $_POST['standort_id'];
 			$mitarbeiter->alias = $_POST['alias'];
 			$mitarbeiter->updateamum = date('Y-m-d H:i:s');
 			$mitarbeiter->updatevon = $user;

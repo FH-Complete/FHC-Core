@@ -383,13 +383,15 @@ class firma extends basis_db
 	 * Laedt alle Firmen Standorte, und Adressen nach Suchstring und/oder eines bestimmen Firmentyps
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function searchFirma($filter='',$firmentyp_kurzbz='')
+	public function searchFirma($filter='',$firmentyp_kurzbz='', $standorte=false)
 	{
 		$this->result = array();
 		$this->errormsg = '';
 	
-		$qry =" SElECT tbl_firma.firma_id,tbl_firma.*  ";
-		$qry.=" ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
+		$qry ="SELECT * FROM (SElECT ";
+		if(!$standorte)
+			$qry.=" distinct on(firma_id)";
+		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
 		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";		
 		$qry.=" FROM public.tbl_firma,  public.tbl_standort  ";
 		$qry.=" left outer join public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
@@ -411,9 +413,10 @@ class firma extends basis_db
 		
 		if($firmentyp_kurzbz!='')
 			$qry.=" and firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
-		$qry.=" ORDER BY name ";
+		
 		if($filter=='' && $firmentyp_kurzbz=='')
 			$qry.=" limit 500 ";
+		$qry.=") as a ORDER BY name ";
 		
 		if($this->db_query($qry))
 		{

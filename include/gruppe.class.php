@@ -281,9 +281,9 @@ class gruppe extends basis_db
 	 */
 	protected function validate()
 	{
-		if(mb_strlen($this->gruppe_kurzbz)>16)
+		if(mb_strlen($this->gruppe_kurzbz)>32)
 		{
-			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->gruppe_kurzbz=='')
