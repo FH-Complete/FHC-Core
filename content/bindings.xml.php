@@ -19,8 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-	header("Content-type: application/vnd.mozilla.xul+xml");
-	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+require_once('../config/vilesci.config.inc.php');
+header("Content-type: application/vnd.mozilla.xul+xml");
+
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 ?>
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -142,5 +144,448 @@
 			<children/>
 		</xul:box>
 	</content>
+  </binding>
+  
+  <!--
+  Binding fuer die Standortauswahl
+  Zeigt ein DropDown fuer die Firmen an,
+  wenn eine Firma ausgewaehlt wird, wird ein DropDown mit den zugehoerigen Standorten angezeigt
+  -->
+  <binding id="Standort">
+  	<content>
+		<xul:hbox flex="1">
+			<!--<xul:label value="Firma" />-->
+			<xul:menulist anonid="binding-standort-menulist-firma"
+					  editable="true"
+					  xbl:inherits="disabled"
+			          datasources="rdf:null" flex="1"
+			          ref="http://www.technikum-wien.at/firma/liste" 
+			          oninput="document.getBindingParent(this).getFirmen();"
+			          oncommand="document.getBindingParent(this).getStandorte();">
+				<xul:template>
+					<xul:menupopup>
+						<xul:menuitem value="rdf:http://www.technikum-wien.at/firma/rdf#firma_id"
+			        		      label="rdf:http://www.technikum-wien.at/firma/rdf#name"
+						  		  uri="rdf:*"/>
+					</xul:menupopup>
+				</xul:template>
+			</xul:menulist>	
+			<!--<xul:label value="Standort" />-->
+			<xul:menulist anonid="binding-standort-menulist-standort"
+					  xbl:inherits="disabled"
+			          datasources="rdf:null" flex="1"
+			          ref="http://www.technikum-wien.at/standort/liste">
+				<xul:template>
+					<xul:menupopup>
+						<xul:menuitem value="rdf:http://www.technikum-wien.at/standort/rdf#standort_id"
+			        		      label="rdf:http://www.technikum-wien.at/standort/rdf#bezeichnung"
+			        		      firma_id="rdf:http://www.technikum-wien.at/standort/rdf#firma_id"
+						  		  uri="rdf:*"/>
+					</xul:menupopup>
+				</xul:template>
+			</xul:menulist>	
+		</xul:hbox>
+	</content>
+	<implementation>
+		<field name="firmentyp" />
+		<field name="autoload" />
+		<property name="value" onget="return document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-standort').value" >
+			<setter>
+				<![CDATA[
+				//Standort DropDown mit standorten dieser Firma laden
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				menuliststandort = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-standort');
+				menulistfirma = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma');
+				if(val!='')
+				{
+					
+					var url = '<?php echo APP_ROOT; ?>rdf/standort.rdf.php?standort_id_all='+val+'&'+gettimestamp();
+					
+					var oldDatasources = menuliststandort.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menuliststandort.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menuliststandort.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					var datasource = rdfService.GetDataSourceBlocking(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menuliststandort.database.AddDataSource(datasource);
+					menuliststandort.builder.rebuild();
+					
+					//Standort markieren
+					menuliststandort.selectedIndex=0;
+					
+	
+					//Firmen Drop Down laden
+									
+					var children = menuliststandort.getElementsByAttribute('selected','true');
+					if(children.length>0)
+						v = children[0].getAttribute('firma_id');
+					else
+						return false;
+					
+					typ=this.getAttribute('firmentyp');
+					
+					var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?firma_id='+encodeURIComponent(v);
+					if(typ!='')
+						url = url+'&firmentyp_kurzbz='+encodeURIComponent(typ);
+					
+					url = url+'&optional=true&'+gettimestamp()
+					
+					var oldDatasources = menulistfirma.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulistfirma.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulistfirma.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					var datasource = rdfService.GetDataSourceBlocking(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menulistfirma.database.AddDataSource(datasource);
+					menulistfirma.builder.rebuild();
+					//Firma markieren
+					menulistfirma.selectedIndex=1;
+				}
+				else
+				{
+					menulistfirma.selectedIndex=-1;
+					menuliststandort.selectedIndex=-1;
+					menulistfirma.value='';
+				}
+				]]>
+			</setter>
+		</property>
+		<property name="disabled" onget="return document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma').disabled" >
+			<setter>
+			<![CDATA[
+				document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma').disabled = val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-standort').disabled = val;
+				
+				if(!val)
+				{
+					autoload = this.getAttribute('autoload');
+					if(autoload)
+					{
+						//alert('autoload');
+						this.getAllFirmen();
+					}
+				}				
+			]]>
+			</setter>
+		</property>
+		<method name="getFirmen">
+			<body>
+			<![CDATA[
+				// Setzt das Drop Down fuer die Firmen
+				
+				//Set Source RDF
+				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma');
+								
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+				v = menulist.value;
+				typ=this.getAttribute('firmentyp');
+				
+				if(v.length>2)
+				{		
+					var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?filter='+encodeURIComponent(v);
+					if(typ!='')
+						url = url+'&firmentyp_kurzbz='+encodeURIComponent(typ);
+					
+					url = url+'&optional=true&'+gettimestamp()
+					//alert(url);
+					var oldDatasources = menulist.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulist.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulist.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					var datasource = rdfService.GetDataSource(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menulist.database.AddDataSource(datasource);
+					menulist.builder.rebuild();
+				}
+				
+			]]>
+			</body>
+		</method>
+		<method name="getStandorte">
+			<body>
+			<![CDATA[
+				//Setzt das DropDown fuer die Standorte
+				
+				//Set Source RDF
+				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-standort');
+				menulistfirma = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma');
+								
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				
+				var children = menulistfirma.getElementsByAttribute('selected','true');
+				if(children.length>0)
+					v = children[0].value;
+				else
+					return false;
+				
+				if(v!='')
+				{
+					var url = '<?php echo APP_ROOT; ?>rdf/standort.rdf.php?firma_id='+v+'&'+gettimestamp();
+					
+					var oldDatasources = menulist.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulist.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulist.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					var datasource = rdfService.GetDataSourceBlocking(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menulist.database.AddDataSource(datasource);
+					menulist.builder.rebuild();
+					menulist.selectedIndex=0;
+					menulist.disabled=false;
+				}
+				else
+				{
+					var oldDatasources = menulist.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulist.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulist.builder.rebuild();
+					menulist.value='';
+					menulist.selectdIndex=-1;
+				}
+			]]>
+			</body>
+		</method>
+		<method name="getAllFirmen">
+			<body>
+			<![CDATA[
+				//alert('Load');
+				// Setzt das Drop Down fuer die Firmen
+				
+				//Set Source RDF
+				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma');
+								
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+				v = menulist.value;
+				typ=this.getAttribute('firmentyp');
+				
+				var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?firmentyp_kurzbz='+encodeURIComponent(typ);
+				
+				url = url+'&optional=true&'+gettimestamp()
+				//alert(url);
+				var oldDatasources = menulist.database.GetDataSources();
+				while(oldDatasources.hasMoreElements())
+				{
+					menulist.database.RemoveDataSource(oldDatasources.getNext());
+				}
+				//Refresh damit die entfernten DS auch wirklich entfernt werden
+				menulist.builder.rebuild();
+			
+				var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+				var datasource = rdfService.GetDataSourceBlocking(url);
+				datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+				datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+				menulist.database.AddDataSource(datasource);
+				menulist.builder.rebuild();
+				
+			]]>
+			</body>
+		</method>
+	</implementation>
+	<handlers>
+	</handlers>
+  </binding>
+  
+  <!--
+  Binding fuer die Firmenauswahl
+  Zeigt ein DropDown fuer die Firmen an
+  -->
+  <binding id="Firma">
+  	<content>
+		<xul:hbox flex="1">
+			<xul:menulist anonid="binding-firma-menulist-firma"
+					  editable="true"
+					  xbl:inherits="disabled"
+			          datasources="rdf:null" flex="1"
+			          ref="http://www.technikum-wien.at/firma/liste" 
+			          oninput="document.getBindingParent(this).getFirmen();">
+				<xul:template>
+					<xul:menupopup>
+						<xul:menuitem value="rdf:http://www.technikum-wien.at/firma/rdf#firma_id"
+			        		      label="rdf:http://www.technikum-wien.at/firma/rdf#name"
+						  		  uri="rdf:*"/>
+					</xul:menupopup>
+				</xul:template>
+			</xul:menulist>	
+		</xul:hbox>
+	</content>
+	<implementation>
+		<field name="firmentyp" />
+		<field name="autoload" />
+		<property name="value">
+			<getter>
+				<![CDATA[
+				menulistfirma = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-firma-menulist-firma');
+				
+				var children = menulistfirma.getElementsByAttribute('selected','true');
+				if(children.length>0)
+					return children[0].value;
+				else
+					return '';
+				]]>
+			</getter>
+			<setter>
+				<![CDATA[
+				v = val;
+				menulistfirma=document.getAnonymousElementByAttribute(this ,'anonid', 'binding-firma-menulist-firma');
+				
+				if(v!='')
+				{
+					typ=this.getAttribute('firmentyp');
+					
+					var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?firma_id='+encodeURIComponent(v);
+					if(typ!='')
+						url = url+'&firmentyp_kurzbz='+encodeURIComponent(typ);
+					
+					url = url+'&optional=true&'+gettimestamp()
+					
+					var oldDatasources = menulistfirma.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulistfirma.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulistfirma.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					var datasource = rdfService.GetDataSourceBlocking(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menulistfirma.database.AddDataSource(datasource);
+					menulistfirma.builder.rebuild();
+					//Firma markieren
+					menulistfirma.selectedIndex=1;
+				}
+				else
+				{
+					menulistfirma.selectedIndex=-1;
+					menulistfirma.value='';
+				}
+				]]>
+			</setter>
+		</property>
+		<property name="disabled" onget="return document.getAnonymousElementByAttribute(this ,'anonid', 'binding-standort-menulist-firma').disabled" >
+			<setter>
+			<![CDATA[
+				document.getAnonymousElementByAttribute(this ,'anonid', 'binding-firma-menulist-firma').disabled = val;
+				
+				if(!val)
+				{
+					autoload = this.getAttribute('autoload');
+					if(autoload)
+					{
+						this.getAllFirmen();
+					}
+				}				
+			]]>
+			</setter>
+		</property>
+		<method name="getFirmen">
+			<body>
+			<![CDATA[
+				// Setzt das Drop Down fuer die Firmen
+				
+				//Set Source RDF
+				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-firma-menulist-firma');
+								
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+				v = menulist.value;
+				typ=this.getAttribute('firmentyp');
+				
+				if(v.length>2)
+				{		
+					var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?filter='+encodeURIComponent(v);
+					if(typ!='')
+						url = url+'&firmentyp_kurzbz='+encodeURIComponent(typ);
+					
+					url = url+'&optional=true&'+gettimestamp()
+					//alert(url);
+					var oldDatasources = menulist.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulist.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulist.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					var datasource = rdfService.GetDataSource(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menulist.database.AddDataSource(datasource);
+					menulist.builder.rebuild();
+				}
+				
+			]]>
+			</body>
+		</method>
+		<method name="getAllFirmen">
+			<body>
+			<![CDATA[
+				//alert('Load');
+				// Setzt das Drop Down fuer die Firmen
+				
+				//Set Source RDF
+				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'binding-firma-menulist-firma');
+								
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+				v = menulist.value;
+				typ=this.getAttribute('firmentyp');
+				
+				var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?firmentyp_kurzbz='+encodeURIComponent(typ);
+				
+				url = url+'&optional=true&'+gettimestamp()
+				//alert(url);
+				var oldDatasources = menulist.database.GetDataSources();
+				while(oldDatasources.hasMoreElements())
+				{
+					menulist.database.RemoveDataSource(oldDatasources.getNext());
+				}
+				//Refresh damit die entfernten DS auch wirklich entfernt werden
+				menulist.builder.rebuild();
+			
+				var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+				var datasource = rdfService.GetDataSourceBlocking(url);
+				datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+				datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+				menulist.database.AddDataSource(datasource);
+				menulist.builder.rebuild();
+				
+			]]>
+			</body>
+		</method>
+	</implementation>
+	<handlers>
+	</handlers>
   </binding>
 </bindings>

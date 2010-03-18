@@ -153,7 +153,7 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:ort_kurzbz><![CDATA['.$mitarbeiter->ort_kurzbz.']]></MITARBEITER:ort_kurzbz>
     		<MITARBEITER:telefonklappe><![CDATA['.$mitarbeiter->telefonklappe.']]></MITARBEITER:telefonklappe>
     		<MITARBEITER:anmerkung><![CDATA['.$mitarbeiter->anmerkung.']]></MITARBEITER:anmerkung>
-    		<MITARBEITER:standort_kurzbz><![CDATA['.$mitarbeiter->standort_kurzbz.']]></MITARBEITER:standort_kurzbz>
+    		<MITARBEITER:standort_id><![CDATA['.$mitarbeiter->standort_id.']]></MITARBEITER:standort_id>
     		<MITARBEITER:alias><![CDATA['.$mitarbeiter->alias.']]></MITARBEITER:alias>
     		<MITARBEITER:insertamum><![CDATA['.date('d.m.Y H:i:s',$datum->mktime_fromtimestamp($mitarbeiter->insertamum)).']]></MITARBEITER:insertamum>
     		<MITARBEITER:insertamum_iso><![CDATA['.$mitarbeiter->insertamum.']]></MITARBEITER:insertamum_iso>

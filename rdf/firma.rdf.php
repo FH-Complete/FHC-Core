@@ -38,6 +38,16 @@ if(isset($_GET['firma_id']))
 else 
 	$firma_id = '';
 
+if(isset($_GET['filter']))
+	$filter = $_GET['filter'];
+else 
+	$filter = '';
+
+if(isset($_GET['firmentyp_kurzbz']))
+	$firmentyp_kurzbz = $_GET['firmentyp_kurzbz'];
+else 
+	$firmentyp_kurzbz='';
+
 $datum = new datum();
 
 $firma = new firma();
@@ -60,10 +70,6 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
          <RDF:Description  id=""  about="" >
             <FIRMA:firma_id><![CDATA[]]></FIRMA:firma_id>
             <FIRMA:name><![CDATA[-- keine Auswahl --]]></FIRMA:name>
-            <FIRMA:adresse><![CDATA[]]></FIRMA:adresse>
-            <FIRMA:email><![CDATA[]]></FIRMA:email>
-            <FIRMA:telefon><![CDATA[]]></FIRMA:telefon>
-            <FIRMA:fax><![CDATA[]]></FIRMA:fax>
             <FIRMA:anmerkung><![CDATA[]]></FIRMA:anmerkung>
             <FIRMA:firmentyp_kurzbz><![CDATA[]]></FIRMA:firmentyp_kurzbz>
          </RDF:Description>
@@ -76,11 +82,17 @@ if($firma_id!='')
 	$firma->load($firma_id);
 	draw_rdf($firma);
 }
-else
+elseif($firmentyp_kurzbz!='' || $filter!='')
 {
-	$firma->getAll($firma_id);
+	$firma->searchFirma($filter, $firmentyp_kurzbz);
 	foreach ($firma->result as $row)
 		draw_rdf($row);
+}
+else
+{
+	//$firma->getAll($firma_id);
+	//foreach ($firma->result as $row)
+	//	draw_rdf($row);
 }
 
 function draw_rdf($row)
@@ -92,10 +104,6 @@ function draw_rdf($row)
          <RDF:Description  id="'.$row->firma_id.'"  about="'.$rdf_url.'/'.$row->firma_id.'" >
             <FIRMA:firma_id><![CDATA['.$row->firma_id.']]></FIRMA:firma_id>
             <FIRMA:name><![CDATA['.$row->name.']]></FIRMA:name>
-            <FIRMA:adresse><![CDATA['.$row->adresse.']]></FIRMA:adresse>
-            <FIRMA:email><![CDATA['.$row->email.']]></FIRMA:email>
-            <FIRMA:telefon><![CDATA['.$row->telefon.']]></FIRMA:telefon>
-            <FIRMA:fax><![CDATA['.$row->fax.']]></FIRMA:fax>
             <FIRMA:anmerkung><![CDATA['.$row->anmerkung.']]></FIRMA:anmerkung>
             <FIRMA:firmentyp_kurzbz><![CDATA['.$row->firmentyp_kurzbz.']]></FIRMA:firmentyp_kurzbz>
          </RDF:Description>

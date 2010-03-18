@@ -34,6 +34,27 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	
 $rdf_url='http://www.technikum-wien.at/standort';
 
+if(isset($_GET['firma_id']) && is_numeric($_GET['firma_id']))
+	$firma_id = $_GET['firma_id'];
+else 
+	unset($firma_id);
+	
+if(isset($_GET['standort_id']) && is_numeric($_GET['standort_id']))
+	$standort_id = $_GET['standort_id'];
+else 
+	unset($standort_id);
+
+if(isset($_GET['standort_id_all']) && is_numeric($_GET['standort_id_all']))
+	$standort_id_all = $_GET['standort_id_all'];
+else 
+	unset($standort_id_all);
+	
+if(isset($_GET['firmentyp_kurzbz']))
+	$firmentyp_kurzbz = $_GET['firmentyp_kurzbz'];
+else 
+	unset($firmentyp_kurzbz);
+
+
 echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -47,14 +68,29 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 	echo '
 	  <RDF:li>
          <RDF:Description  id=""  about="" >
-            <STANDORT:standort_kurzbz><![CDATA[]]></STANDORT:standort_kurzbz>
+            <STANDORT:standort_id><![CDATA[]]></STANDORT:standort_id>
             <STANDORT:adresse_id><![CDATA[]]></STANDORT:adresse_id>
             <STANDORT:bezeichnung><![CDATA[-- keine Auswahl --]]></STANDORT:bezeichnung>
+            <STANDORT:kurzbz><![CDATA[-- keine Auswahl --]]></STANDORT:kurzbz>
+            <STANDORT:firma_id><![CDATA[]]></STANDORT:firma_id>
          </RDF:Description>
       </RDF:li>';
 }
 
-$qry = "SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz";
+$qry = "SELECT * FROM public.tbl_standort";
+
+if(isset($firma_id))
+	$qry.=" WHERE firma_id='".addslashes($firma_id)."'";
+elseif(isset($standort_id))
+	$qry.=" WHERE standort_id='".addslashes($standort_id)."'";
+elseif(isset($standort_id_all))
+	$qry.=" WHERE firma_id=(SELECT firma_id FROM public.tbl_standort WHERE standort_id='".addslashes($standort_id_all)."')";
+elseif(isset($firmentyp_kurzbz))
+	$qry.=" JOIN public.tbl_firma USING(firma_id) WHERE firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
+else 
+	die('Fehlerhafte Parameteruebergabe');
+$qry.=" ORDER BY kurzbz";
+
 $db = new basis_db();
 if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
@@ -66,10 +102,12 @@ function draw_content($row)
 	
 	echo '
 		  <RDF:li>
-	         <RDF:Description  id="'.$row->standort_kurzbz.'"  about="'.$rdf_url.'/'.$row->standort_kurzbz.'" >
-	            <STANDORT:standort_kurzbz><![CDATA['.$row->standort_kurzbz.']]></STANDORT:standort_kurzbz>
+	         <RDF:Description  id="'.$row->standort_id.'"  about="'.$rdf_url.'/'.$row->standort_id.'" >
+	            <STANDORT:standort_id><![CDATA['.$row->standort_id.']]></STANDORT:standort_id>
 	            <STANDORT:adresse_id><![CDATA['.$row->adresse_id.']]></STANDORT:adresse_id>
-	            <STANDORT:bezeichnung><![CDATA['.$row->standort_kurzbz.']]></STANDORT:bezeichnung>
+	            <STANDORT:bezeichnung><![CDATA['.$row->bezeichnung.']]></STANDORT:bezeichnung>
+	            <STANDORT:kurzbz><![CDATA['.$row->kurzbz.']]></STANDORT:kurzbz>
+	            <STANDORT:firma_id><![CDATA['.$row->firma_id.']]></STANDORT:firma_id>
 	         </RDF:Description>
 	      </RDF:li>';
 }

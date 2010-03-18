@@ -54,7 +54,7 @@ function KontaktInit(kontakt_id, person_id)
 		anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 		kontakt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kontakt" ));
 		zustellung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zustellung" ));
-		firma_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#firma_id" ));
+		standort_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#standort_id" ));
 		typ = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kontakttyp" ));
 		neu = false;
 	}
@@ -65,7 +65,7 @@ function KontaktInit(kontakt_id, person_id)
 		anmerkung='';
 		kontakt='';
 		zustellung='Ja';
-		firma_id='';
+		standort_id='';
 		typ='email';
 	}		
 	
@@ -75,7 +75,7 @@ function KontaktInit(kontakt_id, person_id)
 	document.getElementById('kontakt-textbox-anmerkung').value=anmerkung;
 	document.getElementById('kontakt-textbox-kontakt').value=kontakt;
 	document.getElementById('kontakt-menulist-typ').value=typ;
-	document.getElementById('kontakt-menulist-firma').value=firma_id;
+	document.getElementById('kontakt-menulist-firma').value=standort_id;
 	
 	if(zustellung=='Ja')
 		document.getElementById('kontakt-checkbox-zustellung').checked=true;

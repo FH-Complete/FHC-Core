@@ -234,16 +234,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menulist>
 						<spacer flex="1"/>
 					</vbox>
-					
 					<label align="end" control="mitarbeiter-detail-menulist-standort" value="Standort"/>
 					<vbox>
 					 	<menulist id="mitarbeiter-detail-menulist-standort" disabled="true"
-					              datasources="<?php echo APP_ROOT; ?>rdf/standort.rdf.php?optional=true"
+					              datasources="<?php echo APP_ROOT; ?>rdf/standort.rdf.php?optional=true&amp;firmentyp_kurzbz=Intern"
 						          ref="http://www.technikum-wien.at/standort/liste" oncommand="MitarbeiterDetailValueChange()">
 						    <template>
 						       <menupopup>
 							      <menuitem uri="rdf:*" label="rdf:http://www.technikum-wien.at/standort/rdf#bezeichnung"
-							                            value="rdf:http://www.technikum-wien.at/standort/rdf#standort_kurzbz"/>
+							                            value="rdf:http://www.technikum-wien.at/standort/rdf#standort_id"/>
 							      </menupopup>
 							</template>
 						</menulist>

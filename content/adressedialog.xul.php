@@ -157,6 +157,7 @@ else
 				</row>
 				<row>
 					<label value="Firma" control="adresse-menulist-firma"/>
+					<!--
 					<menulist id="adresse-menulist-firma" 
 					          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
 					          ref="http://www.technikum-wien.at/firma/liste" >
@@ -168,6 +169,8 @@ else
 								</menupopup>
 						</template>
 					</menulist>
+					-->
+					<box class="Firma" id="adresse-menulist-firma" />
 				</row>
 				<row>
 					<label value="Anmerkung" control="adresse-textbox-name"/>

@@ -467,7 +467,7 @@ function KontaktKontaktSpeichern(dialog)
 	kontakt = dialog.getElementById('kontakt-textbox-kontakt').value;
 	zustellung = dialog.getElementById('kontakt-checkbox-zustellung').checked;
 	typ = dialog.getElementById('kontakt-menulist-typ').value;
-	firma_id = dialog.getElementById('kontakt-menulist-firma').value;
+	standort_id = dialog.getElementById('kontakt-menulist-firma').value;
 		
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
@@ -488,7 +488,7 @@ function KontaktKontaktSpeichern(dialog)
 	req.add('kontakt', kontakt);
 	req.add('typ', typ);
 	req.add('zustellung', zustellung);
-	req.add('firma_id', firma_id);
+	req.add('standort_id', standort_id);
 	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();

@@ -20,47 +20,33 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
 	header( 'Expires:  -1' );
 	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 	header( 'Pragma: no-cache' );
 	header('Content-Type: text/html;charset=UTF-8');
 
+	require_once('../../config/vilesci.config.inc.php');
+  	require_once('../../include/functions.inc.php');
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/mitarbeiter.class.php');
+	require_once('../../include/ort.class.php');
+	require_once('../../include/studiengang.class.php');
+  	require_once('../../include/organisationseinheit.class.php');
+  	require_once('../../include/wawi.class.php');
+  	require_once('../../include/betriebsmittel.class.php');
+  	require_once('../../include/betriebsmittelperson.class.php');
+  	require_once('../../include/betriebsmitteltyp.class.php');
+  	require_once('../../include/betriebsmittelstatus.class.php');
+  	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 
-// ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
-	if (!$db = new basis_db())
-		die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-  	require_once($path.'include/functions.inc.php');
-	if (!$uid = get_uid())
+  	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	require_once($path.'include/benutzerberechtigung.class.php');
-	require_once($path.'include/benutzer.class.php');
-
-	require_once($path.'include/person.class.php');
-	require_once($path.'include/mitarbeiter.class.php');
-
-	require_once($path.'include/ort.class.php');
-	require_once($path.'include/studiengang.class.php');
-  	require_once($path.'include/organisationseinheit.class.php');
-
-  	require_once($path.'include/wawi.class.php');
-
-  	require_once($path.'include/betriebsmittel.class.php');
-  	require_once($path.'include/betriebsmittelperson.class.php');
-  	require_once($path.'include/betriebsmitteltyp.class.php');
-  	require_once($path.'include/betriebsmittelstatus.class.php');
-  	require_once($path.'include/betriebsmittel_betriebsmittelstatus.class.php');
+  	if (!$db = new basis_db())
+		die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 
 // ------------------------------------------------------------------------------------------
@@ -135,7 +121,7 @@ cellSeparator (default value: "|")
 			$pArt='select';
 			$pDistinct=true; 
 			$pFields='seriennummer,beschreibung';
-			$pTable=$oBetriebsmittel->schema_inventar.'.tbl_betriebsmittel';
+			$pTable='wawi.tbl_betriebsmittel';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($seriennummer)));
 			$pWhere=" upper(trim(seriennummer)) like upper(trim('".$matchcode."%'))";
 			$pOrder='seriennummer';
@@ -155,7 +141,7 @@ cellSeparator (default value: "|")
 			$pArt='select';
 			$pDistinct=true; 
 			$pFields='hersteller';
-			$pTable=$oBetriebsmittel->schema_inventar.'.tbl_betriebsmittel';
+			$pTable='wawi.tbl_betriebsmittel';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($hersteller)));
 			$pWhere=" upper(trim(hersteller)) like upper(trim('".$matchcode."%'))";
 			$pOrder='hersteller';
@@ -175,7 +161,7 @@ cellSeparator (default value: "|")
 			$pArt='select';
 			$pDistinct=true; 
 			$pFields='nummer,beschreibung';
-			$pTable=$oBetriebsmittel->schema_inventar.'.tbl_betriebsmittel';
+			$pTable='wawi.tbl_betriebsmittel';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($nummer)));
 			$pWhere=" upper(trim(bestellung_id)) like upper(trim('".$matchcode."%'))";
 			$pOrder='bestellung_id';
@@ -195,7 +181,7 @@ cellSeparator (default value: "|")
 			$pArt='select';
 			$pDistinct=true; 
 			$pFields='nummer,beschreibung';
-			$pTable=$oBetriebsmittel->schema_inventar.'.tbl_betriebsmittel';
+			$pTable='wawi.tbl_betriebsmittel';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($nummer)));
 			$pWhere=" upper(trim(nummer)) like upper(trim('".$matchcode."%'))";
 			$pOrder='nummer';
@@ -215,7 +201,7 @@ cellSeparator (default value: "|")
 			$pArt='select';
 			$pDistinct=true; 
 			$pFields='tbl_betriebsmittel.ort_kurzbz,tbl_ort.bezeichnung,tbl_ort.aktiv';
-			$pTable=$oBetriebsmittel->schema_inventar.'.tbl_betriebsmittel left outer join public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz) ';
+			$pTable='wawi.tbl_betriebsmittel left outer join public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz) ';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($ort_kurzbz)));
 			$pWhere=" upper(trim(tbl_betriebsmittel.ort_kurzbz)) like upper(trim('".$matchcode."%')) or upper(trim(tbl_ort.bezeichnung)) like upper(trim('%".$matchcode."%'))";
 			$pOrder='tbl_betriebsmittel.ort_kurzbz';
@@ -301,9 +287,7 @@ cellSeparator (default value: "|")
 				$matchcode='';
 				$pWhere='';
 				$pOrder='';
-				$pLimit='';
-##				echo $pSql;
-				
+				$pLimit='';				
 			}
 			else
 			{
@@ -330,7 +314,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Organisation -  suche
+		// Organisation -  suche
 		case 'organisationseinheit':
 		 	$oe_kurzbz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($oe_kurzbz) || $oe_kurzbz=='')
@@ -360,7 +344,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Suche
+		// Suche
 		case 'wawi_search':
 		 	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($search) || $search=='')
@@ -373,7 +357,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Bestellung
+		// Bestellung
 		case 'wawi_bestellnr':
 		 	$bestellnr=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($bestellnr) || $bestellnr=='')
@@ -395,7 +379,7 @@ cellSeparator (default value: "|")
 
 			break;
 
-// Bestellung ID
+		// Bestellung ID
 		case 'wawi_bestellung_id':
 		 	$bestellung_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($bestellung_id) || $bestellung_id=='')
@@ -416,15 +400,13 @@ cellSeparator (default value: "|")
 			break;
 
 
-// Bestelldetail ID
+		// Bestelldetail ID
 		case 'wawi_bestelldetail_id':
 		 	$bestelldetail_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($bestellung_id) || $bestellung_id=='' || is_null($bestelldetail_id) || $bestelldetail_id=='')
 				exit();
 			if ($oWawi->bestellpositionen($bestellung_id,null,"%$bestelldetail_id"))
 			{
-#			var_dump($oWawi->result);
-
 				for ($i=0;$i<count($oWawi->result);$i++)
 					echo html_entity_decode($oWawi->result[$i]->bestelldetail_id).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung).',  '.html_entity_decode($oWawi->result[$i]->artikelnr).' Preis VE '.html_entity_decode(number_format($oWawi->result[$i]->preisve,2)).', Menge '.html_entity_decode($oWawi->result[$i]->menge).', Pos.summe '.html_entity_decode(number_format($oWawi->result[$i]->summe,2))."\n";
 			}
@@ -433,13 +415,13 @@ cellSeparator (default value: "|")
 
 			if (!$oWawi->bestellpositionen($bestellung_id,null,null,null))
 				exit($oWawi->errormsg."\n");
-#			var_dump($oWawi->result);
+
 			echo "| *** alle Positionen *** \n";
 			for ($i=0;$i<count($oWawi->result);$i++)
 					echo html_entity_decode($oWawi->result[$i]->bestelldetail_id).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung).',  '.html_entity_decode($oWawi->result[$i]->artikelnr).' Preis VE '.html_entity_decode(number_format($oWawi->result[$i]->preisve,2)).', Menge '.html_entity_decode($oWawi->result[$i]->menge).', Pos.summe '.html_entity_decode(number_format($oWawi->result[$i]->summe,2))."\n";
 			break;
 			
-// Firmen ID
+		// Firmen ID
 		case 'wawi_firma_id':
 		 	$firma_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($firma_id) ||$firma_id=='')
@@ -453,7 +435,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oWawi->result[$i]->firma_id).'|'.', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->strasse).' '.html_entity_decode($oWawi->result[$i]->plz).' '.html_entity_decode($oWawi->result[$i]->ort)."\n";
 			break;
 
-// Firmen Search
+		// Firmen Search
 		case 'wawi_firma_search':
 		 	$firma_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($firma_search) ||$firma_search=='')
@@ -464,7 +446,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oWawi->result[$i]->firma_id).'|'.', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->strasse).' '.html_entity_decode($oWawi->result[$i]->plz).' '.html_entity_decode($oWawi->result[$i]->ort)."\n";
 			break;
 
-// Kostenstelle ID
+		// Kostenstelle ID
 		case 'wawi_kostenstelle_id':
 		 	$kostenstelle_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($kostenstelle_id) || $kostenstelle_id=='')
@@ -479,7 +461,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Kostenstelle Nr
+		// Kostenstelle Nr
 		case 'wawi_kostenstelle_nr':
 		 	$kostenstelle_nr=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($kostenstelle_nr) || $kostenstelle_nr=='')
@@ -494,7 +476,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Kostenstelle Serch
+		// Kostenstelle Serch
 		case 'wawi_kostenstelle_search':
 		 	$kostenstelle_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($kostenstelle_search) || $kostenstelle_search=='')
@@ -509,7 +491,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Konto ID
+		// Konto ID
 		case 'wawi_konto_id':
 		 	$konto_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($konto_id) || $konto_id=='')
@@ -520,12 +502,10 @@ cellSeparator (default value: "|")
 			{
 				echo html_entity_decode($oWawi->result[$i]->konto).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung)
 				."\n";
-#.', Stg.:'.html_entity_decode($oWawi->result[$i]->stg_kurzzeichen).' '.html_entity_decode($oWawi->result[$i]->stg_bez).' '
-#					.' '.($oWawi->result[$i]->stg_aktiv==true || $oWawi->result[$i]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
 			}
 			break;
 
-// Konto ID
+		// Konto ID
 		case 'wawi_konto_search':
 		 	$konto_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($konto_search) || $konto_search=='')
@@ -536,12 +516,10 @@ cellSeparator (default value: "|")
 			{
 				echo html_entity_decode($oWawi->result[$i]->konto).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung)
 				."\n";
-#.', Stg.:'.html_entity_decode($oWawi->result[$i]->stg_kurzzeichen).' '.html_entity_decode($oWawi->result[$i]->stg_bez).' '
-#					.' '.($oWawi->result[$i]->stg_aktiv==true || $oWawi->result[$i]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
 			}
 			break;
 
-// Studiengang ID
+		// Studiengang ID
 		case 'wawi_studiengang_id':
 		 	$studiengang_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($studiengang_id) || $studiengang_id=='')
@@ -558,7 +536,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-// Studiengang Suche
+		// Studiengang Suche
 		case 'wawi_studiengang_search':
 		 	$studiengang_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($studiengang_search) || $studiengang_search=='')

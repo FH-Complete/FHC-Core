@@ -235,7 +235,7 @@ if(!$error)
 			$kontakt->kontakt = $_POST['kontakt'];
 			$kontakt->kontakttyp = $_POST['typ'];
 			$kontakt->zustellung = ($_POST['zustellung']=='true'?true:false);
-			$kontakt->firma_id = $_POST['firma_id'];
+			$kontakt->standort_id = $_POST['standort_id'];
 			$kontakt->updateamum = date('Y-m-d H:i:s');
 			$kontakt->updatevon = $user;
 	

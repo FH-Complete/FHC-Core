@@ -39,31 +39,31 @@ if (!$db = new basis_db())
 echo '
 <html>
 <head>
-<title>Details</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script language="javascript">
-// ****
-// * Liefert einen Timestamp in Sekunden
-// * zum anhaengen an eine URL um Caching zu verhindern
-// ****
-function gettimestamp()
-{
-	var now = new Date();
-	var ret = now.getHours()*60*60*60;
-	ret = ret + now.getMinutes()*60*60;
-	ret = ret + now.getSeconds()*60;
-	ret = ret + now.getMilliseconds();
-	return ret;
-}
-
-function RefreshImage()
-{
-	path=document.getElementById("personimage").src;
-	document.getElementById("personimage").src="";
-	document.getElementById("personimage").src=path+"&"+gettimestamp();
-}
-</script>
+	<title>Details</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<script language="javascript">
+		// ****
+		// * Liefert einen Timestamp in Sekunden
+		// * zum anhaengen an eine URL um Caching zu verhindern
+		// ****
+		function gettimestamp()
+		{
+			var now = new Date();
+			var ret = now.getHours()*60*60*60;
+			ret = ret + now.getMinutes()*60*60;
+			ret = ret + now.getSeconds()*60;
+			ret = ret + now.getMilliseconds();
+			return ret;
+		}
+		
+		function RefreshImage()
+		{
+			path=document.getElementById("personimage").src;
+			document.getElementById("personimage").src="";
+			document.getElementById("personimage").src=path+"&"+gettimestamp();
+		}
+	</script>
 </head>
 
 <body class="background_main">
@@ -116,7 +116,7 @@ $fixangestellt = (isset($_POST['fixangestellt'])?$_POST['fixangestellt']:'');
 $stundensatz = (isset($_POST['stundensatz'])?$_POST['stundensatz']:'');
 $ausbildungcode = (isset($_POST['ausbildungcode'])?$_POST['ausbildungcode']:'');
 $ort_kurzbz = (isset($_POST['ort_kurzbz'])?$_POST['ort_kurzbz']:'');
-$standort_kurzbz = (isset($_POST['standort_kurzbz'])?$_POST['standort_kurzbz']:'');
+$standort_id = (isset($_POST['standort_id'])?$_POST['standort_id']:'');
 $anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 $bismelden = (isset($_POST['bismelden'])?$_POST['bismelden']:'');
 $kurzbeschreibung = (isset($_POST['kurzbeschreibung'])?$_POST['kurzbeschreibung']:'');
@@ -269,7 +269,7 @@ if(isset($_POST['savemitarbeiter']))
 	$mitarbeiter->stundensatz = $stundensatz;
 	$mitarbeiter->ausbildungcode = $ausbildungcode;
 	$mitarbeiter->ort_kurzbz = $ort_kurzbz;
-	$mitarbeiter->standort_kurzbz = $standort_kurzbz;
+	$mitarbeiter->standort_id = $standort_id;
 	$mitarbeiter->anmerkung = $anmerkung;
 	$mitarbeiter->bismelden = $bismelden;
 	$mitarbeiter->new = false;
@@ -552,7 +552,7 @@ if(isset($uid) && $uid!='')
 			$stundensatz = $mitarbeiter->stundensatz;
 			$ausbildungcode = $mitarbeiter->ausbildungcode;
 			$ort_kurzbz = $mitarbeiter->ort_kurzbz;
-			$standort_kurzbz = $mitarbeiter->standort_kurzbz;
+			$standort_id = $mitarbeiter->standort_id;
 			$anmerkung = $mitarbeiter->anmerkung;
 			$bismelden = $mitarbeiter->bismelden;
 		}
@@ -597,18 +597,18 @@ if(isset($uid) && $uid!='')
 		
 		echo "</SELECT></td>
 				<td>Standort</td>
-				<td><SELECT name='standort_kurzbz'><option value=''>-- keine Auswahl --</option>";
-		$qry = "SELECT * FROM public.tbl_standort ORDER BY standort_kurzbz";
+				<td><SELECT name='standort_id'><option value=''>-- keine Auswahl --</option>";
+		$qry = "SELECT * FROM public.tbl_standort JOIN public.tbl_firma USING(firma_id) WHERE tbl_firma.firmentyp_kurzbz='Intern' ORDER BY tbl_standort.kurzbz";
 		if($result_standort = $db->db_query($qry))
 		{
 			while($row_standort = $db->db_fetch_object($result_standort))
 			{
-				if($row_standort->standort_kurzbz == $standort_kurzbz)
+				if($row_standort->standort_id == $standort_id)
 					$selected = 'selected';
 				else 
 					$selected = '';
 					
-				echo "<option value='$row_standort->standort_kurzbz' $selected>$row_standort->standort_kurzbz</option>";
+				echo "<option value='$row_standort->standort_id' $selected>$row_standort->kurzbz</option>";
 			}
 		}
 

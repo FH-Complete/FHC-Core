@@ -20,37 +20,28 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+	require_once('../../config/vilesci.config.inc.php');
+  	require_once('../../include/functions.inc.php');
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/benutzer.class.php');
+	require_once('../../include/mitarbeiter.class.php');
+	require_once('../../include/ort.class.php');
+  	require_once('../../include/organisationseinheit.class.php');
+  	require_once('../../include/wawi.class.php');
+  	require_once('../../include/betriebsmittel.class.php');
+  	require_once('../../include/betriebsmittelperson.class.php');
+  	require_once('../../include/betriebsmitteltyp.class.php');
+  	require_once('../../include/betriebsmittelstatus.class.php');
+  	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 
-// ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
-  	require_once($path.'include/functions.inc.php');
 	if (!$uid = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	require_once($path.'include/benutzerberechtigung.class.php');
 	$oBenutzerberechtigung = new benutzerberechtigung();
 	$oBenutzerberechtigung->errormsg='';
 	$oBenutzerberechtigung->berechtigungen=array();
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-	require_once($path.'include/benutzer.class.php');
-	require_once($path.'include/mitarbeiter.class.php');
-	require_once($path.'include/ort.class.php');
-  	require_once($path.'include/organisationseinheit.class.php');
-  	require_once($path.'include/wawi.class.php');
-  	require_once($path.'include/betriebsmittel.class.php');
-  	require_once($path.'include/betriebsmittelperson.class.php');
-  	require_once($path.'include/betriebsmitteltyp.class.php');
-  	require_once($path.'include/betriebsmittelstatus.class.php');
-  	require_once($path.'include/betriebsmittel_betriebsmittelstatus.class.php');
 
 // ------------------------------------------------------------------------------------------
 // Initialisierung
@@ -64,7 +55,6 @@
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
-##var_dump($_REQUEST);
 
   	$nummer=trim((isset($_REQUEST['nummer']) ? $_REQUEST['nummer']:''));
   	$seriennummer=trim((isset($_REQUEST['seriennummer']) ? $_REQUEST['seriennummer']:''));
@@ -240,13 +230,13 @@
 	<head>
 		<title>Inventar - Inventur</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="stylesheet" href="<?php echo $path;?>skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/tablesort/table.css" type="text/css">
-		<script src="<?php echo $path;?>include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
 		<script type="text/javascript">
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
 			function set_status(output_id,betriebsmittelbetriebsmittelstatus_id,betriebsmittel_id,nummer,bestellung_id,bestelldetail_id,betriebsmittelstatus_kurzbz)
@@ -387,7 +377,6 @@
 							{
 								$tmpJahr=$tmpJahr + 1;
 								$jjjjmm=$tmpJahr.'-00';
-#										echo '<option '.($inventur_jahr_select==$jjjjmm?'  selected="selected" ':'').' value="'.$jjjjmm.'>'.$jjjjmm.'&nbsp;</option>';
 								echo '<option '.($inventur_jahr_select==($tmpJahr * -1)?'  selected="selected" ':'').' value="'.($tmpJahr * -1).'">&nbsp;--'.$tmpJahr.' fehlt --&nbsp;</option>';
 								echo '<option '.($inventur_jahr_select==$tmpJahr?'  selected="selected" ':'').' value="'.$tmpJahr.'">&nbsp;--'.$tmpJahr.' erfolgt --&nbsp;</option>';
 							}
@@ -563,10 +552,10 @@
 			</div>
 			<script type="text/javascript">
 				var isShow = <?php echo ($extend_search && $extend_search!='false'?'true':'false'); ?>;
-			   $(document).ready(function(){            // Prüft, ob das Dokument geladen ist
+			   $(document).ready(function(){            // Prï¿½ft, ob das Dokument geladen ist
 			   $("div#extend_search_on").click(function(event){  // Bei Klick auf div#
 			      if (isShow == false) {
-			         $("div#ext_search").show("slow");         // div# langsam öffnen
+			         $("div#ext_search").show("slow");         // div# langsam ï¿½ffnen
 			         isShow = true;
 			      } else {
 			         $("div#ext_search").hide("slow");         // div# langsam verbergen
@@ -585,7 +574,6 @@
 // ----------------------------------------
 	if ($nummer || $bestellung_id || $bestellnr || $seriennummer)
 	{
-#		$inventur_jahr='';
 		$ort_kurzbz=null;
 		$oe_kurzbz=null;
 		$betriebsmitteltyp=null;
@@ -597,7 +585,7 @@
 	// Eingabe - Plausib
  	$check=$nummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$inventur_jahr.$firma_id.$beschreibung.$oe_kurzbz;
 	// Datenabfrage
-	$order='tbl_betriebsmittel.nummer';
+	$order='tbl_betriebsmittel.nummer, tbl_betriebsmittel_betriebsmittelstatus.datum DESC, tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id DESC';
 	if ($check!='' && !$oBetriebsmittel->betriebsmittel_inventar($order,$nummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz))
 		$errormsg[]=$oBetriebsmittel->errormsg;
 	$resultBetriebsmittel=$oBetriebsmittel->result;
@@ -746,8 +734,6 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			$resBetriebsmittel=$resultBetriebsmittel[0];
 		else
 			$resBetriebsmittel=$resultBetriebsmittel;
-
-#var_dump($resBetriebsmittel);
 
 		$htmlstring='';
 		if (is_null($resBetriebsmittel) || ( !is_object($resBetriebsmittel) && !is_array($resBetriebsmittel) ) || count($resBetriebsmittel)<1)
@@ -967,9 +953,6 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 		$oBetriebsmittelperson->errormsg='';
 		if (!$oBetriebsmittelperson->load_betriebsmittelpersonen($resBetriebsmittel->betriebsmittel_id))
 			$htmlstring.='<br />'.$oBetriebsmittelperson->errormsg;
-
-#echo $resBetriebsmittel->betriebsmittel_id;
-#var_dump($oBetriebsmittelperson);
 
 		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
 		{
