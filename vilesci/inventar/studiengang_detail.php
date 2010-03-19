@@ -22,19 +22,17 @@
  */
 
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
- 	require_once($path.'include/functions.inc.php');
-	if (!$uid = get_uid())
-	  	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+	$path='../../';
+	
+	require_once($path.'config/vilesci.config.inc.php');
+	require_once($path.'include/functions.inc.php');
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
  	require_once($path.'include/wawi.class.php');
+ 	
+ 	if (!$uid = get_uid())
+	  	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
@@ -61,9 +59,7 @@
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 	$recht=false;
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 's')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -201,207 +197,206 @@
 // ------------------------------------------------------------------------------------------
 function output_Studiengang($resultStudiengang=null,$debug=false)
 {
-		$htmlstring='';
-		if (is_null($resultStudiengang) || !is_array($resultStudiengang) || count($resultStudiengang)<1)
-			return $htmlstring;
-			
-		$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>';
-				
-		if (is_array($resultStudiengang) && count($resultStudiengang)>1)
-			$htmlstring.='<tr><th colspan="10">Bitte eine Studiengang aus den '.count($resultStudiengang).' gefundenen ausw&auml;hlen</th></tr>';
-			
-		$htmlstring.='<tr class="liste">
-					<th class="table-sortable:default">Studiengang ID</th>
-					<th class="table-sortable:default">Kurzz.</th>
-					<th class="table-sortable:default">Bezeichnung</th>					
-					<th class="table-sortable:default">Studenten</th>
-					<th class="table-sortable:default">Aktiv</th>
-					<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
-				</tr>
-				</thead>
-				';
-		for ($pos=0;$pos<count($resultStudiengang);$pos++)
-		{				
-			if ($pos%2)
-				$classe='liste1';
-			else
-				$classe='liste0';
-			$htmlstring.='<!-- studiengang Auflisten -->
-		    	<tr class="'.$classe.'" style="font-size:smaller;">
-					<td><a title="Detail Studiengang '.$resultStudiengang[$pos]->studiengang_id.'" href="'.$_SERVER["PHP_SELF"].'?studiengang_id='.$resultStudiengang[$pos]->studiengang_id.'">'.$resultStudiengang[$pos]->studiengang_id.'</a></td>
-					<td>'.$resultStudiengang[$pos]->kurzzeichen.'</td>
-					<td>'.$resultStudiengang[$pos]->bezeichnung.'</td>
-					<td>'.$resultStudiengang[$pos]->studentenanzahl.'</td>
-					<td>'.($resultStudiengang[$pos]->aktiv==true || $resultStudiengang[$pos]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />').'</td>
-					<td align="right">&nbsp;<a title="Bestellungen zum Studiengang '.$resultStudiengang[$pos]->studiengang_id.'" href="bestellung.php?studiengang_id='.$resultStudiengang[$pos]->studiengang_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
-				</tr>
-				';
-		}				
-		$htmlstring.='</table>';					
+	$htmlstring='';
+	if (is_null($resultStudiengang) || !is_array($resultStudiengang) || count($resultStudiengang)<1)
 		return $htmlstring;
-}
-// ------------------------------------------------------------------------------------------
-function output_Studienganginformation($resultStudiengang=null,$debug=false)
-{
-		$htmlstring='';
-		if (is_null($resultStudiengang) || !is_array($resultStudiengang) || count($resultStudiengang)<1)
-			return $htmlstring;
-		if (!$oWAWI = new wawi())
-		   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:''));
-		$pos=0;
-
+		
+	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+			<thead>';
+			
+	if (is_array($resultStudiengang) && count($resultStudiengang)>1)
+		$htmlstring.='<tr><th colspan="10">Bitte eine Studiengang aus den '.count($resultStudiengang).' gefundenen ausw&auml;hlen</th></tr>';
+		
+	$htmlstring.='<tr class="liste">
+				<th class="table-sortable:default">Studiengang ID</th>
+				<th class="table-sortable:default">Kurzz.</th>
+				<th class="table-sortable:default">Bezeichnung</th>					
+				<th class="table-sortable:default">Studenten</th>
+				<th class="table-sortable:default">Aktiv</th>
+				<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
+			</tr>
+			</thead>
+			';
+	for ($pos=0;$pos<count($resultStudiengang);$pos++)
+	{				
 		if ($pos%2)
 			$classe='liste1';
 		else
 			$classe='liste0';
-				
-		$htmlstring.='<fieldset><legend>Studiengang&nbsp;'.$resultStudiengang[$pos]->studiengang_id.'&nbsp;'.$resultStudiengang[$pos]->bezeichnung.'</legend>';
-		$htmlstring.='<br /><!-- Studiengang Detail -->
-				<table  class="liste" style="border:0;width:100%;">
-					<tr class="'.$classe.'">
-						<th align="right">Studiengang</th>
-						<td width="80%">'.$resultStudiengang[$pos]->studiengang_id.'&nbsp;'.$resultStudiengang[$pos]->kurzzeichen.'&nbsp;'.$resultStudiengang[$pos]->bezeichnung.'</td>
+		$htmlstring.='<!-- studiengang Auflisten -->
+	    	<tr class="'.$classe.'" style="font-size:smaller;">
+				<td><a title="Detail Studiengang '.$resultStudiengang[$pos]->studiengang_id.'" href="'.$_SERVER["PHP_SELF"].'?studiengang_id='.$resultStudiengang[$pos]->studiengang_id.'">'.$resultStudiengang[$pos]->studiengang_id.'</a></td>
+				<td>'.$resultStudiengang[$pos]->kurzzeichen.'</td>
+				<td>'.$resultStudiengang[$pos]->bezeichnung.'</td>
+				<td>'.$resultStudiengang[$pos]->studentenanzahl.'</td>
+				<td>'.($resultStudiengang[$pos]->aktiv==true || $resultStudiengang[$pos]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />').'</td>
+				<td align="right">&nbsp;<a title="Bestellungen zum Studiengang '.$resultStudiengang[$pos]->studiengang_id.'" href="bestellung.php?studiengang_id='.$resultStudiengang[$pos]->studiengang_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
+			</tr>
+			';
+	}				
+	$htmlstring.='</table>';					
+	return $htmlstring;
+}
+// ------------------------------------------------------------------------------------------
+function output_Studienganginformation($resultStudiengang=null,$debug=false)
+{
+	$htmlstring='';
+	if (is_null($resultStudiengang) || !is_array($resultStudiengang) || count($resultStudiengang)<1)
+		return $htmlstring;
+	if (!$oWAWI = new wawi())
+	   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:''));
+	$pos=0;
+
+	if ($pos%2)
+		$classe='liste1';
+	else
+		$classe='liste0';
+			
+	$htmlstring.='<fieldset><legend>Studiengang&nbsp;'.$resultStudiengang[$pos]->studiengang_id.'&nbsp;'.$resultStudiengang[$pos]->bezeichnung.'</legend>';
+	$htmlstring.='<br /><!-- Studiengang Detail -->
+			<table  class="liste" style="border:0;width:100%;">
+				<tr class="'.$classe.'">
+					<th align="right">Studiengang</th>
+					<td width="80%">'.$resultStudiengang[$pos]->studiengang_id.'&nbsp;'.$resultStudiengang[$pos]->kurzzeichen.'&nbsp;'.$resultStudiengang[$pos]->bezeichnung.'</td>
+				</tr>
+				<tr class="'.$classe.'">
+					<th align="right">Studenten</th>
+					<td>'.$resultStudiengang[$pos]->studentenanzahl.'&nbsp;</td>
+				</tr>
+				<tr class="'.$classe.'">
+					<th align="right">Aktiv&nbsp;</th>
+					<td>'.$resultStudiengang[$pos]->aktiv_kz.'&nbsp;'.($resultStudiengang[$pos]->aktiv==true || $resultStudiengang[$pos]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />').'</td>
+				</tr>
+				<tr class="'.$classe.'">
+					<th align="right">Bestellung</th>
+					<td>&nbsp;<a title="Bestellungen zum Studiengang '.$resultStudiengang[$pos]->studiengang_id.'" href="bestellung.php?studiengang_id='.$resultStudiengang[$pos]->studiengang_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
+				</tr>
+
+		</table>';			
+
+	$oWAWI->errormsg='';
+	$oWAWI->result=array();
+	if (!$oWAWI->studiengang_benutzer($resultStudiengang[$pos]->studiengang_id))
+		$htmlstring.=$oWAWI->errormsg;
+	$resultStudiengangbenutzer=$oWAWI->result;	
+
+	if (is_array($resultStudiengangbenutzer) && count($resultStudiengangbenutzer)>0)
+	{
+		$htmlstring.='<br /><!-- studiengang Kurzdetail -->
+				<table class="liste">
+				<thead>
+					<tr>
+						<th>Benutzer&nbsp;</th>
+						<th style="display:none;">Tel&nbsp;</th>
+
+						<th style="display:none;">lesen&nbsp;</th>
+						<th style="display:none;">schreiben&nbsp;</th>
+						<th>freigeben&nbsp;</th>
+						<th>verwalten&nbsp;</th>								
+
+						<th colspan="2">letzte &Auml;nderung</th>
 					</tr>
+				<thead>';
+
+		for ($i=0;$i<count($resultStudiengangbenutzer);$i++)
+		{		
+			if ($i%2)
+				$classe='liste1';
+			else
+				$classe='liste0';
+			$htmlstring.='<!-- Studiengang Kurzdetail -->
 					<tr class="'.$classe.'">
-						<th align="right">Studenten</th>
-						<td>'.$resultStudiengang[$pos]->studentenanzahl.'&nbsp;</td>
+
+						<td>&nbsp;'
+						.($resultStudiengangbenutzer[$i]->email?'<a href="mailto:'.$resultStudiengangbenutzer[$i]->email.'?subject=Anlage studiengang '.$resultStudiengangbenutzer[$i]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
+						.($resultStudiengangbenutzer[$i]->titel?'&nbsp;'.$resultStudiengangbenutzer[$i]->titel.'&nbsp;':'&nbsp;').$resultStudiengangbenutzer[$i]->vname.'&nbsp;'.$resultStudiengangbenutzer[$i]->nname.'&nbsp;
+						</td>
+
+						<td style="display:none;">&nbsp;'
+						.$resultStudiengangbenutzer[$i]->tel
+						.'</td>
+
+						<td style="display:none;" align="center">'.($resultStudiengangbenutzer[$i]->lesen=='t' || $resultStudiengangbenutzer[$i]->lesen==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+						<td style="display:none;" align="center">'.($resultStudiengangbenutzer[$i]->schreiben=='t' || $resultStudiengangbenutzer[$i]->schreiben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+						<td align="center">'.($resultStudiengangbenutzer[$i]->freigeben=='t' || $resultStudiengangbenutzer[$i]->freigeben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+						<td align="center">'.($resultStudiengangbenutzer[$i]->verwalten=='t' || $resultStudiengangbenutzer[$i]->verwalten==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+						
+						
+						<td>&nbsp;'
+						.($resultStudiengangbenutzer[$i]->l_email?'<a href="mailto:'.$resultStudiengangbenutzer[$i]->l_email.'?subject=Anlage studiengang '.$resultStudiengangbenutzer[$i]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
+						.($resultStudiengangbenutzer[$i]->l_titel?'&nbsp;'.$resultStudiengangbenutzer[$i]->l_titel.'&nbsp;':'&nbsp;').$resultStudiengangbenutzer[$i]->l_vname.'&nbsp;'.$resultStudiengangbenutzer[$i]->l_nname
+						.'</td>
+						<td>&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'
+						.substr($resultStudiengangbenutzer[$i]->lupdate,0,19)
+						.'</td>
 					</tr>
-					<tr class="'.$classe.'">
-						<th align="right">Aktiv&nbsp;</th>
-						<td>'.$resultStudiengang[$pos]->aktiv_kz.'&nbsp;'.($resultStudiengang[$pos]->aktiv==true || $resultStudiengang[$pos]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />').'</td>
-					</tr>
-					<tr class="'.$classe.'">
-						<th align="right">Bestellung</th>
-						<td>&nbsp;<a title="Bestellungen zum Studiengang '.$resultStudiengang[$pos]->studiengang_id.'" href="bestellung.php?studiengang_id='.$resultStudiengang[$pos]->studiengang_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
-					</tr>
-
-			</table>';			
-
-			$oWAWI->errormsg='';
-			$oWAWI->result=array();
-			if (!$oWAWI->studiengang_benutzer($resultStudiengang[$pos]->studiengang_id))
-				$htmlstring.=$oWAWI->errormsg;
-			$resultStudiengangbenutzer=$oWAWI->result;	
-
-			if (is_array($resultStudiengangbenutzer) && count($resultStudiengangbenutzer)>0)
-			{				
-#		var_dump($resultStudiengangbenutzer);
-				$htmlstring.='<br /><!-- studiengang Kurzdetail -->
-						<table class="liste">
-						<thead>
-							<tr>
-								<th>Benutzer&nbsp;</th>
-								<th style="display:none;">Tel&nbsp;</th>
-	
-								<th style="display:none;">lesen&nbsp;</th>
-								<th style="display:none;">schreiben&nbsp;</th>
-								<th>freigeben&nbsp;</th>
-								<th>verwalten&nbsp;</th>								
-	
-								<th colspan="2">letzte &Auml;nderung</th>
-							</tr>
-						<thead>';
-
-				for ($i=0;$i<count($resultStudiengangbenutzer);$i++)
-				{		
-					if ($i%2)
-						$classe='liste1';
-					else
-						$classe='liste0';
-					$htmlstring.='<!-- Studiengang Kurzdetail -->
-							<tr class="'.$classe.'">
-
-								<td>&nbsp;'
-								.($resultStudiengangbenutzer[$i]->email?'<a href="mailto:'.$resultStudiengangbenutzer[$i]->email.'?subject=Anlage studiengang '.$resultStudiengangbenutzer[$i]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
-								.($resultStudiengangbenutzer[$i]->titel?'&nbsp;'.$resultStudiengangbenutzer[$i]->titel.'&nbsp;':'&nbsp;').$resultStudiengangbenutzer[$i]->vname.'&nbsp;'.$resultStudiengangbenutzer[$i]->nname.'&nbsp;
-								</td>
-
-								<td style="display:none;">&nbsp;'
-								.$resultStudiengangbenutzer[$i]->tel
-								.'</td>
-
-								<td style="display:none;" align="center">'.($resultStudiengangbenutzer[$i]->lesen=='t' || $resultStudiengangbenutzer[$i]->lesen==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								<td style="display:none;" align="center">'.($resultStudiengangbenutzer[$i]->schreiben=='t' || $resultStudiengangbenutzer[$i]->schreiben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								<td align="center">'.($resultStudiengangbenutzer[$i]->freigeben=='t' || $resultStudiengangbenutzer[$i]->freigeben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								<td align="center">'.($resultStudiengangbenutzer[$i]->verwalten=='t' || $resultStudiengangbenutzer[$i]->verwalten==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								
-								
-								<td>&nbsp;'
-								.($resultStudiengangbenutzer[$i]->l_email?'<a href="mailto:'.$resultStudiengangbenutzer[$i]->l_email.'?subject=Anlage studiengang '.$resultStudiengangbenutzer[$i]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
-								.($resultStudiengangbenutzer[$i]->l_titel?'&nbsp;'.$resultStudiengangbenutzer[$i]->l_titel.'&nbsp;':'&nbsp;').$resultStudiengangbenutzer[$i]->l_vname.'&nbsp;'.$resultStudiengangbenutzer[$i]->l_nname
-								.'</td>
-								<td>&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'
-								.substr($resultStudiengangbenutzer[$i]->lupdate,0,19)
-								.'</td>
-							</tr>
-						';
-									
-				}		
-				$htmlstring.='</table>';				
-			}	
+				';
+							
+		}		
+		$htmlstring.='</table>';				
+	}	
 	$htmlstring.='</fieldset>';
-
+	
 	$htmlstring.='<fieldset><legend>Kostenstelle(n)</legend>';
 	$htmlstring.='<br /><!-- Kostenstellen -->
 		<table class="liste"  style="border:0;">';
 	$htmlstring.='		
-						<thead>
-							<tr>
-								<th>ID&nbsp;</th>
-								<th>Nr.&nbsp;</th>
-								<th>Kurzz.</th>
-								<th>Bezeichnung</th>
-								<th style="display:none;">Anlage</th>																								
-								<th>letzte &Auml;nderung</th>
-								<th>aktiv</th>
-								<th>Bestellung</th>
-							</tr>
-						<thead>';		
-		for ($pos=0;$pos<count($resultStudiengang);$pos++)
+					<thead>
+						<tr>
+							<th>ID&nbsp;</th>
+							<th>Nr.&nbsp;</th>
+							<th>Kurzz.</th>
+							<th>Bezeichnung</th>
+							<th style="display:none;">Anlage</th>																								
+							<th>letzte &Auml;nderung</th>
+							<th>aktiv</th>
+							<th>Bestellung</th>
+						</tr>
+					<thead>';		
+	for ($pos=0;$pos<count($resultStudiengang);$pos++)
+	{		
+		if ($pos%2)
+			$classe='liste1';
+		else
+			$classe='liste0';		
+
+		$resultKostenstelle=$oWAWI->kostenstelle($resultStudiengang[$pos]->kostenstelle_kostenstelle_id,null,null,$resultStudiengang[0]->studiengang_id );
+
+		for ($ii=0;$ii<count($resultKostenstelle);$ii++)
 		{		
-			if ($pos%2)
-				$classe='liste1';
-			else
-				$classe='liste0';		
+			$htmlstring.='
+				<tr class="'.$classe.'">
+					<td><a title="Detail Kostenstelle '.$resultKostenstelle[$ii]->kostenstelle_id.'" href="kostenstelle_detail.php?kostenstelle_id='.$resultKostenstelle[$ii]->kostenstelle_id.'">'.$resultKostenstelle[$ii]->kostenstelle_id.'</a></td>
+					<td><a title="Detail Kostenstelle '.$resultKostenstelle[$ii]->kostenstelle_nr.'" href="kostenstelle_detail.php?kostenstelle_id='.$resultKostenstelle[$ii]->kostenstelle_id.'">'.$resultKostenstelle[$ii]->kostenstelle_nr.'</a></td>
+					<td>'.$resultKostenstelle[$ii]->kurzzeichen.'</td>
+					<td>'.$resultKostenstelle[$ii]->bezeichnung.'</td>
 
-			$resultKostenstelle=$oWAWI->kostenstelle($resultStudiengang[$pos]->kostenstelle_kostenstelle_id,null,null,$resultStudiengang[0]->studiengang_id );
+					<td style="display:none;">'
+					.($resultKostenstelle[$ii]->c_email?'<a href="mailto:'.$resultKostenstelle[$ii]->c_email.'?subject=Anlage studiengang '.$resultKostenstelle[$ii]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
+					.($resultKostenstelle[$ii]->c_titel?'&nbsp;'.$resultKostenstelle[$ii]->c_titel.'&nbsp;':'&nbsp;').$resultKostenstelle[$ii]->c_vname.'&nbsp;'.$resultKostenstelle[$ii]->c_nname.'&nbsp;
+					</td>						
+					
+					<td>'
+					.($resultKostenstelle[$ii]->l_email?'<a href="mailto:'.$resultKostenstelle[$ii]->l_email.'?subject=Anlage studiengang '.$resultKostenstelle[$ii]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
+					.($resultKostenstelle[$ii]->l_titel?'&nbsp;'.$resultKostenstelle[$ii]->l_titel.'&nbsp;':'&nbsp;').$resultKostenstelle[$ii]->l_vname.'&nbsp;'.$resultKostenstelle[$ii]->l_nname.'&nbsp;
+					</td>
+					
+					<td align="left">&nbsp;'.(empty($resultKostenstelle[$ii]->ddate)?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />&nbsp;':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />&nbsp;'.$resultKostenstelle[$ii]->d_nname.'&nbsp;'.substr($resultKostenstelle[$ii]->ddate,0,19)).'</td>
+					
+					<td style="display:none;">'
+					.($resultKostenstelle[$ii]->d_email?'<a href="mailto:'.$resultKostenstelle[$ii]->d_email.'?subject=Anlage studiengang '.$resultKostenstelle[$ii]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
+					.($resultKostenstelle[$ii]->d_titel?'&nbsp;'.$resultKostenstelle[$ii]->d_titel.'&nbsp;':'&nbsp;').$resultKostenstelle[$ii]->d_vname.'&nbsp;'.$resultKostenstelle[$ii]->d_nname.'&nbsp;
+					
+					</td>
 
-			for ($ii=0;$ii<count($resultKostenstelle);$ii++)
-			{		
-				$htmlstring.='
-					<tr class="'.$classe.'">
-						<td><a title="Detail Kostenstelle '.$resultKostenstelle[$ii]->kostenstelle_id.'" href="kostenstelle_detail.php?kostenstelle_id='.$resultKostenstelle[$ii]->kostenstelle_id.'">'.$resultKostenstelle[$ii]->kostenstelle_id.'</a></td>
-						<td><a title="Detail Kostenstelle '.$resultKostenstelle[$ii]->kostenstelle_nr.'" href="kostenstelle_detail.php?kostenstelle_id='.$resultKostenstelle[$ii]->kostenstelle_id.'">'.$resultKostenstelle[$ii]->kostenstelle_nr.'</a></td>
-						<td>'.$resultKostenstelle[$ii]->kurzzeichen.'</td>
-						<td>'.$resultKostenstelle[$ii]->bezeichnung.'</td>
+					<td>&nbsp;<a title="Bestellungen zur Kostenstelle '.$resultKostenstelle[$ii]->kostenstelle_id.'" href="bestellung.php?kostenstelle_id='.$resultKostenstelle[$ii]->kostenstelle_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
 
-						<td style="display:none;">'
-						.($resultKostenstelle[$ii]->c_email?'<a href="mailto:'.$resultKostenstelle[$ii]->c_email.'?subject=Anlage studiengang '.$resultKostenstelle[$ii]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
-						.($resultKostenstelle[$ii]->c_titel?'&nbsp;'.$resultKostenstelle[$ii]->c_titel.'&nbsp;':'&nbsp;').$resultKostenstelle[$ii]->c_vname.'&nbsp;'.$resultKostenstelle[$ii]->c_nname.'&nbsp;
-						</td>						
-						
-						<td>'
-						.($resultKostenstelle[$ii]->l_email?'<a href="mailto:'.$resultKostenstelle[$ii]->l_email.'?subject=Anlage studiengang '.$resultKostenstelle[$ii]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
-						.($resultKostenstelle[$ii]->l_titel?'&nbsp;'.$resultKostenstelle[$ii]->l_titel.'&nbsp;':'&nbsp;').$resultKostenstelle[$ii]->l_vname.'&nbsp;'.$resultKostenstelle[$ii]->l_nname.'&nbsp;
-						</td>
-						
-						<td align="left">&nbsp;'.(empty($resultKostenstelle[$ii]->ddate)?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />&nbsp;':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />&nbsp;'.$resultKostenstelle[$ii]->d_nname.'&nbsp;'.substr($resultKostenstelle[$ii]->ddate,0,19)).'</td>
-						
-						<td style="display:none;">'
-						.($resultKostenstelle[$ii]->d_email?'<a href="mailto:'.$resultKostenstelle[$ii]->d_email.'?subject=Anlage studiengang '.$resultKostenstelle[$ii]->studiengang_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'')
-						.($resultKostenstelle[$ii]->d_titel?'&nbsp;'.$resultKostenstelle[$ii]->d_titel.'&nbsp;':'&nbsp;').$resultKostenstelle[$ii]->d_vname.'&nbsp;'.$resultKostenstelle[$ii]->d_nname.'&nbsp;
-						
-						</td>
+				</tr>
 
-						<td>&nbsp;<a title="Bestellungen zur Kostenstelle '.$resultKostenstelle[$ii]->kostenstelle_id.'" href="bestellung.php?kostenstelle_id='.$resultKostenstelle[$ii]->kostenstelle_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
-
-					</tr>
-
-				';
-			}	
-		}		
-		$htmlstring.='</table>';				
+			';
+		}	
+	}		
+	$htmlstring.='</table>';				
 	$htmlstring.='</fieldset>';
 	$htmlstring.='<div style="width:100%;text-align:right;"><a href="javascript:history.back();"><img src="../../skin/images/cross.png" alt="schliessen" title="schliessen/close" />&nbsp;zur&uuml;ck</a></div />';
 	return $htmlstring;

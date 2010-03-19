@@ -23,19 +23,16 @@
  */
 
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
+	$path='../../';
+
+	require_once($path.'config/vilesci.config.inc.php');
   	require_once($path.'include/functions.inc.php');
-	if (!$uid = get_uid())
-		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
   	require_once($path.'include/wawi.class.php');
+  	
+	if (!$uid = get_uid())
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
@@ -56,17 +53,13 @@
 // Berechtigung
 // ------------------------------------------------------------------------------------------
 	$oBenutzerberechtigung = new benutzerberechtigung();
-	$oBenutzerberechtigung->errormsg='';
-	$oBenutzerberechtigung->berechtigungen=array();
+
 	// read Berechtigung
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-
 	$recht=false;
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 's')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -176,39 +169,39 @@
 <?php
 function output_konten($resultKonto=null,$debug=false)
 {
-		$htmlstring='';
-		if (is_null($resultKonto) || !is_array($resultKonto) || count($resultKonto)<1)
-			return $htmlstring;
-
-		$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>';
-		if (is_array($resultKonto) && count($resultKonto)>1)
-			$htmlstring.='<tr><th colspan="10">Bitte eine Bestellnummer aus den '.count($resultKonto).' gefundenen ausw&auml;hlen</th></tr>';
-		$htmlstring.='<tr class="liste">
-					<th class="table-sortable:default">Konto</th>
-					<th class="table-sortable:default">Kontonnr.</th>
-					<th class="table-sortable:default">Bezeichnung</th>
-					<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
-				</tr>
-				</thead>
-				';
-		for ($pos=0;$pos<count($resultKonto);$pos++)
-		{
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-				$htmlstring.='<!-- Konto Auflistung -->
-			    	<tr class="'.$classe.'">
-						<td><a title="Detail Konto '.$resultKonto[$pos]->konto.'" href="konto_detail.php?konto='.$resultKonto[$pos]->konto.'">'.$resultKonto[$pos]->konto.'</a></td>
-						<td><a title="Detail Kontonr '.$resultKonto[$pos]->konto.'" href="konto_detail.php?konto='.$resultKonto[$pos]->konto.'&amp;kontonr='.$resultKonto[$pos]->kontonr.'">'.$resultKonto[$pos]->kontonr.'</a></td>
-						<td>'.$resultKonto[$pos]->beschreibung.'</td>
-						<td><a title="Bestellungen zum Konto '.$resultKonto[$pos]->konto.' Kontonr '.$resultKonto[$pos]->kontonr.'" href="bestellung.php?konto='.$resultKonto[$pos]->konto.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
-					</tr>
-					';
-		}
-		$htmlstring.='</table>';
+	$htmlstring='';
+	if (is_null($resultKonto) || !is_array($resultKonto) || count($resultKonto)<1)
 		return $htmlstring;
+
+	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+			<thead>';
+	if (is_array($resultKonto) && count($resultKonto)>1)
+		$htmlstring.='<tr><th colspan="10">Bitte eine Bestellnummer aus den '.count($resultKonto).' gefundenen ausw&auml;hlen</th></tr>';
+	$htmlstring.='<tr class="liste">
+				<th class="table-sortable:default">Konto</th>
+				<th class="table-sortable:default">Kontonnr.</th>
+				<th class="table-sortable:default">Bezeichnung</th>
+				<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
+			</tr>
+			</thead>
+			';
+	for ($pos=0;$pos<count($resultKonto);$pos++)
+	{
+			if ($pos%2)
+				$classe='liste1';
+			else
+				$classe='liste0';
+			$htmlstring.='<!-- Konto Auflistung -->
+		    	<tr class="'.$classe.'">
+					<td><a title="Detail Konto '.$resultKonto[$pos]->konto.'" href="konto_detail.php?konto='.$resultKonto[$pos]->konto.'">'.$resultKonto[$pos]->konto.'</a></td>
+					<td><a title="Detail Kontonr '.$resultKonto[$pos]->konto.'" href="konto_detail.php?konto='.$resultKonto[$pos]->konto.'&amp;kontonr='.$resultKonto[$pos]->kontonr.'">'.$resultKonto[$pos]->kontonr.'</a></td>
+					<td>'.$resultKonto[$pos]->beschreibung.'</td>
+					<td><a title="Bestellungen zum Konto '.$resultKonto[$pos]->konto.' Kontonr '.$resultKonto[$pos]->kontonr.'" href="bestellung.php?konto='.$resultKonto[$pos]->konto.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
+				</tr>
+				';
+	}
+	$htmlstring.='</table>';
+	return $htmlstring;
 }
 
 function output_konteninformation($resultKonto=null,$debug=false)
@@ -216,8 +209,6 @@ function output_konteninformation($resultKonto=null,$debug=false)
 	$htmlstring='';
 	if (is_null($resultKonto) || !is_array($resultKonto) || count($resultKonto)<1)
   		return $htmlstring;
-
-#var_dump($resultKonto);
 
 	for ($pos=0;$pos<count($resultKonto);$pos++)
 	{

@@ -23,19 +23,16 @@
  */
 
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
+	$path='../../';
+
+	require_once($path.'config/vilesci.config.inc.php');
  	require_once($path.'include/functions.inc.php');
-	if (!$uid = get_uid())
-		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
  	require_once($path.'include/wawi.class.php');
+ 	
+ 	if (!$uid = get_uid())
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
@@ -54,17 +51,13 @@
 // Berechtigung
 // ------------------------------------------------------------------------------------------
 	$oBenutzerberechtigung = new benutzerberechtigung();
-	$oBenutzerberechtigung->errormsg='';
-	$oBenutzerberechtigung->berechtigungen=array();
+
 	// read Berechtigung
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
 	
 	$recht=false;
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 's')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -190,41 +183,41 @@
 <?php
 function output_firma($resultFirma=null,$debug=false)
 {
-		$htmlstring='';
-		if (is_null($resultFirma) || !is_array($resultFirma) || count($resultFirma)<1)
-			return $htmlstring;
-
-		$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>';
-		if (is_array($resultFirma) && count($resultFirma)>1)
-			$htmlstring.='<tr><th colspan="10">Bitte eine Firmennummer aus den '.count($resultFirma).' gefundenen ausw&auml;hlen</th></tr>';
-		$htmlstring.='<tr class="liste">
-					<th class="table-sortable:default">ID</th>
-					<th class="table-sortable:default">Firmenname</th>
-					<th class="table-sortable:default">Plz.Ort</th>
-					<th class="table-sortable:default">Strasse</th>
-					<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
-				</tr>
-				</thead>
-				';
-		for ($pos=0;$pos<count($resultFirma);$pos++)
-		{
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-				$htmlstring.='<!-- firma_id Auflistung -->
-			    	<tr class="'.$classe.'">
-						<td><a title="Detail firma_id '.$resultFirma[$pos]->firma_id.'" href="'.$_SERVER["PHP_SELF"].'?firma_id='.$resultFirma[$pos]->firma_id.'">'.$resultFirma[$pos]->firma_id.'</a></td>
-						<td>'.StringCut($resultFirma[$pos]->firmenname,30).'</td>
-						<td>'.$resultFirma[$pos]->plz.'&nbsp;'.StringCut($resultFirma[$pos]->ort,15).'</td>
-						<td>'.StringCut($resultFirma[$pos]->strasse,20).'</td>
-						<td><a title="Bestellungen zum firma_id '.$resultFirma[$pos]->firma_id.' '.$resultFirma[$pos]->firmenname.'" href="bestellung.php?firma_id='.$resultFirma[$pos]->firma_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
-					</tr>
-					';
-		}
-		$htmlstring.='</table>';
+	$htmlstring='';
+	if (is_null($resultFirma) || !is_array($resultFirma) || count($resultFirma)<1)
 		return $htmlstring;
+
+	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+			<thead>';
+	if (is_array($resultFirma) && count($resultFirma)>1)
+		$htmlstring.='<tr><th colspan="10">Bitte eine Firmennummer aus den '.count($resultFirma).' gefundenen ausw&auml;hlen</th></tr>';
+	$htmlstring.='<tr class="liste">
+				<th class="table-sortable:default">ID</th>
+				<th class="table-sortable:default">Firmenname</th>
+				<th class="table-sortable:default">Plz.Ort</th>
+				<th class="table-sortable:default">Strasse</th>
+				<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
+			</tr>
+			</thead>
+			';
+	for ($pos=0;$pos<count($resultFirma);$pos++)
+	{
+			if ($pos%2)
+				$classe='liste1';
+			else
+				$classe='liste0';
+			$htmlstring.='<!-- firma_id Auflistung -->
+		    	<tr class="'.$classe.'">
+					<td><a title="Detail firma_id '.$resultFirma[$pos]->firma_id.'" href="'.$_SERVER["PHP_SELF"].'?firma_id='.$resultFirma[$pos]->firma_id.'">'.$resultFirma[$pos]->firma_id.'</a></td>
+					<td>'.StringCut($resultFirma[$pos]->firmenname,30).'</td>
+					<td>'.$resultFirma[$pos]->plz.'&nbsp;'.StringCut($resultFirma[$pos]->ort,15).'</td>
+					<td>'.StringCut($resultFirma[$pos]->strasse,20).'</td>
+					<td><a title="Bestellungen zum firma_id '.$resultFirma[$pos]->firma_id.' '.$resultFirma[$pos]->firmenname.'" href="bestellung.php?firma_id='.$resultFirma[$pos]->firma_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Bestellungen anzeigen" /></a>&nbsp;</td>
+				</tr>
+				';
+	}
+	$htmlstring.='</table>';
+	return $htmlstring;
 }
 
 function output_firmainformation($resultFirma=null,$debug=false)
@@ -233,7 +226,6 @@ function output_firmainformation($resultFirma=null,$debug=false)
 	if (is_null($resultFirma) || !is_array($resultFirma) || count($resultFirma)<1)
 		return $htmlstring;
 
-#var_dump($resultFirma);
 	for ($pos=0;$pos<count($resultFirma);$pos++)
 	{
 		$htmlstring.='<fieldset><legend>Firma&nbsp;'.$resultFirma[$pos]->firma_id.'&nbsp;'.$resultFirma[$pos]->firmenname.'</legend>';

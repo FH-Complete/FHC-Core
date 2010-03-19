@@ -39,8 +39,6 @@
 			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 	$oBenutzerberechtigung = new benutzerberechtigung();
-	$oBenutzerberechtigung->errormsg='';
-	$oBenutzerberechtigung->berechtigungen=array();
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
@@ -78,9 +76,7 @@
 	$extend_search=($check?'true':$extend_search);
 	
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
-	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'suid')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'sui')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su')	)
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su'))
 		$schreib_recht=true;
 	if (!$schreib_recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -586,7 +582,6 @@
 		$betriebsmittelstatus_kurzbz='';
 	}
 
-//Test	$order='order';$nummer='nummer';$ort_kurzbz='ort_kurzbz';$betriebsmittelstatus_kurzbz='betriebsmittelstatus_kurzbz';$betriebsmitteltyp='betriebsmitteltyp';$bestellung_id='bestellung_id';$bestelldetail_id='bestelldetail_id';$bestellnr='bestellnr';$hersteller='hersteller';$afa='afa';$jahr_monat='jahr_monat';$firma_id='firma_id';$afa='afa';$afa='afa';$beschreibung='beschreibung';$oe_kurzbz='oe_kurzbz';$seriennummer='seriennummer';
  	$check=$nummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$afa.$beschreibung.$oe_kurzbz.$seriennummer;
 	$order='tbl_betriebsmittel.nummer, tbl_betriebsmittel_betriebsmittelstatus.datum DESC, tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id DESC'; // Sortierung
 
@@ -624,354 +619,351 @@
 // Ausgabe der Bestellungen in Listenform
 function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false)
 {
-		$htmlstring='';
-		if (is_null($resultBetriebsmittel) || !is_array($resultBetriebsmittel) || count($resultBetriebsmittel)<1)
-			return $htmlstring;
+	$htmlstring='';
+	if (is_null($resultBetriebsmittel) || !is_array($resultBetriebsmittel) || count($resultBetriebsmittel)<1)
+		return $htmlstring;
 
-		$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>';
-		if (is_array($resultBetriebsmittel) && count($resultBetriebsmittel)>1)
-			$htmlstring.='<tr><th colspan="12">Bitte ein Inventar aus den '.count($resultBetriebsmittel).' gefundenen ausw&auml;hlen</th></tr>';
-		$htmlstring.='<tr>
-					<th class="table-sortable:default">Inv.nr.</th>
-					<th class="table-sortable:default">Standort</th>
-					<th class="table-sortable:default">Datum</th>
-					<th class="table-sortable:default">AfA</th>
-					<th class="table-sortable:default">Org.</th>
-					<th class="table-sortable:default">Bezeichnung</th>
-					<th class="table-sortable:default">Ser.nr.</th>
-					<th class="table-sortable:default">Status</th>
-				</tr>
-				</thead>
-			';
-#			var_dump($resultBetriebsmittel);
-			for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
+	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+			<thead>';
+	if (is_array($resultBetriebsmittel) && count($resultBetriebsmittel)>1)
+		$htmlstring.='<tr><th colspan="12">Bitte ein Inventar aus den '.count($resultBetriebsmittel).' gefundenen ausw&auml;hlen</th></tr>';
+	$htmlstring.='<tr>
+				<th class="table-sortable:default">Inv.nr.</th>
+				<th class="table-sortable:default">Standort</th>
+				<th class="table-sortable:default">Datum</th>
+				<th class="table-sortable:default">AfA</th>
+				<th class="table-sortable:default">Org.</th>
+				<th class="table-sortable:default">Bezeichnung</th>
+				<th class="table-sortable:default">Ser.nr.</th>
+				<th class="table-sortable:default">Status</th>
+			</tr>
+			</thead>
+		';
+
+	for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
+	{
+
+		if ($pos%2)
+			$classe='liste1';
+		else
+			$classe='liste0';
+
+
+		// Organisation - Inventarverwalter
+		$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
+		$OrgBezeichnung=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:'*'.$resultBetriebsmittel[$pos]->oe_kurzbz);
+		$OrgTitel=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung.' '.$oOrganisationseinheit->organisationseinheittyp_kurzbz:$resultBetriebsmittel[$pos]->oe_kurzbz.' Kontrolle');
+
+		// Ort - Inventarstandort
+		$oOrt = new ort($resultBetriebsmittel[$pos]->ort_kurzbz);
+		$OrtBezeichnung=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz:'*'.$resultBetriebsmittel[$pos]->ort_kurzbz);
+		$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.$oOrt->bezeichnung:$resultBetriebsmittel[$pos]->ort_kurzbz.' Kontrolle');
+
+		$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;">
+
+		<td><a href="'.$_SERVER["PHP_SELF"].'?nummer='.$resultBetriebsmittel[$pos]->nummer.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->nummer.'</a>&nbsp;</td>
+
+		<td title="'.$OrtTitel.'">'.$OrtBezeichnung.'&nbsp;</td>
+
+		<td>'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'&nbsp;</td>
+		<td>'.$resultBetriebsmittel[$pos]->afa.'&nbsp;</td>
+
+		<td title="'.$OrgTitel.'">'.$OrgBezeichnung.'&nbsp;</td>
+
+		<td>'.StringCut($resultBetriebsmittel[$pos]->beschreibung,25).'&nbsp;</td>
+		<td>'.$resultBetriebsmittel[$pos]->seriennummer.'&nbsp;</td>
+
+		<td>';
+			// mit Berechtigung ist der Status zum bearbeiten
+
+	  	$betriebsmittelstatus_kurzbz_select=trim($resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
+		if (!$schreib_recht)
+			$htmlstring.=$betriebsmittelstatus_kurzbz_select;
+		else
+		{
+			$htmlstring.='<select style="font-size:xx-small;" onchange="set_status(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittelbetriebsmittelstatus_id.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->nummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',\''.$resultBetriebsmittel[$pos]->bestelldetail_id.'\',this.value);" name="betriebsmittelstatus_kurzbz">';
+			for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
 			{
-
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-
-
-				// Organisation - Inventarverwalter
-				$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
-				$OrgBezeichnung=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:'*'.$resultBetriebsmittel[$pos]->oe_kurzbz);
-				$OrgTitel=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung.' '.$oOrganisationseinheit->organisationseinheittyp_kurzbz:$resultBetriebsmittel[$pos]->oe_kurzbz.' Kontrolle');
-
-				// Ort - Inventarstandort
-				$oOrt = new ort($resultBetriebsmittel[$pos]->ort_kurzbz);
-				$OrtBezeichnung=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz:'*'.$resultBetriebsmittel[$pos]->ort_kurzbz);
-				$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.$oOrt->bezeichnung:$resultBetriebsmittel[$pos]->ort_kurzbz.' Kontrolle');
-
-				$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;">
-
-					<td><a href="'.$_SERVER["PHP_SELF"].'?nummer='.$resultBetriebsmittel[$pos]->nummer.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->nummer.'</a>&nbsp;</td>
-
-					<td title="'.$OrtTitel.'">'.$OrtBezeichnung.'&nbsp;</td>
-
-					<td>'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'&nbsp;</td>
-					<td>'.$resultBetriebsmittel[$pos]->afa.'&nbsp;</td>
-
-					<td title="'.$OrgTitel.'">'.$OrgBezeichnung.'&nbsp;</td>
-
-					<td>'.StringCut($resultBetriebsmittel[$pos]->beschreibung,25).'&nbsp;</td>
-					<td>'.$resultBetriebsmittel[$pos]->seriennummer.'&nbsp;</td>
-
-					<td>';
-						// mit Berechtigung ist der Status zum bearbeiten
-
-				  	$betriebsmittelstatus_kurzbz_select=trim($resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
-					if (!$schreib_recht)
-						$htmlstring.=$betriebsmittelstatus_kurzbz_select;
-					else
-					{
-						$htmlstring.='<select style="font-size:xx-small;" onchange="set_status(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittelbetriebsmittelstatus_id.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->nummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',\''.$resultBetriebsmittel[$pos]->bestelldetail_id.'\',this.value);" name="betriebsmittelstatus_kurzbz">';
-								for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
-								{
-									if ($resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz)
-										$htmlstring.='<option '.($betriebsmittelstatus_kurzbz_select==$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz?' selected="selected" ':'').' value="'.$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz.'">'.($resultBetriebsmittelstatus[$i]->beschreibung=='NULL' || empty($resultBetriebsmittelstatus[$i]->beschreibung)?$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz:$resultBetriebsmittelstatus[$i]->beschreibung).'&nbsp;</option>';
-								}
-						$htmlstring.='</select>';
-					}	
-					$htmlstring.='&nbsp;</td>
-					<td style="font-size:xx-small;" id="list'.$pos.'"></td>
-
-				</tr>
-				';
+				if ($resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz)
+					$htmlstring.='<option '.($betriebsmittelstatus_kurzbz_select==$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz?' selected="selected" ':'').' value="'.$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz.'">'.($resultBetriebsmittelstatus[$i]->beschreibung=='NULL' || empty($resultBetriebsmittelstatus[$i]->beschreibung)?$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz:$resultBetriebsmittelstatus[$i]->beschreibung).'&nbsp;</option>';
 			}
-			$htmlstring.='</table>';
-		return 	$htmlstring;
+			$htmlstring.='</select>';
+		}	
+		$htmlstring.='&nbsp;</td>
+		<td style="font-size:xx-small;" id="list'.$pos.'"></td>
+
+		</tr>
+		';
+	}
+	$htmlstring.='</table>';
+	return 	$htmlstring;
 }
 
 // Ausgabe der Bestellungen in Listenform
 function output_inventarposition($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false)
 {
-		// Verarbeitungs Array ermitteln aus der Uebergabe
-		if (isset($resultBetriebsmittel[0]))
-			$resBetriebsmittel=$resultBetriebsmittel[0];
-		else
-			$resBetriebsmittel=$resultBetriebsmittel;
+	// Verarbeitungs Array ermitteln aus der Uebergabe
+	if (isset($resultBetriebsmittel[0]))
+		$resBetriebsmittel=$resultBetriebsmittel[0];
+	else
+		$resBetriebsmittel=$resultBetriebsmittel;
 
+	$htmlstring='';
+	if (is_null($resBetriebsmittel) || ( !is_object($resBetriebsmittel) && !is_array($resBetriebsmittel) ) || count($resBetriebsmittel)<1)
+		return $htmlstring;
 
-#var_dump($resBetriebsmittel);
+	// Organisation - Inventarverwalter
+	$oOrganisationseinheit = new organisationseinheit($resBetriebsmittel->oe_kurzbz);
+	$OrgBezeichnung=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:'*'.$resultBetriebsmittel[0]->oe_kurzbz);
+	$OrgTitel=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung.' '.$oOrganisationseinheit->organisationseinheittyp_kurzbz:$resultBetriebsmittel[0]->oe_kurzbz.' Kontrolle');
 
-		$htmlstring='';
-		if (is_null($resBetriebsmittel) || ( !is_object($resBetriebsmittel) && !is_array($resBetriebsmittel) ) || count($resBetriebsmittel)<1)
-			return $htmlstring;
+	// Ort - Inventarstandort
+	$oOrt = new ort($resBetriebsmittel->ort_kurzbz);
+	$OrtBezeichnung=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz:'*'.$resBetriebsmittel->ort_kurzbz);
+	$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.($oOrt->bezeichnung?$oOrt->bezeichnung:'').' '.$OrtBezeichnung.' '.($oOrt->telefonklappe?'Kl.'.$oOrt->telefonklappe:''):$resBetriebsmittel->ort_kurzbz.' Kontrolle');
 
-		// Organisation - Inventarverwalter
-		$oOrganisationseinheit = new organisationseinheit($resBetriebsmittel->oe_kurzbz);
-		$OrgBezeichnung=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:'*'.$resultBetriebsmittel[0]->oe_kurzbz);
-		$OrgTitel=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung.' '.$oOrganisationseinheit->organisationseinheittyp_kurzbz:$resultBetriebsmittel[0]->oe_kurzbz.' Kontrolle');
+	$htmlstring.='<fieldset><legend title="Betriebsmittel ID '.$resBetriebsmittel->betriebsmittel_id.'">Inventar '.$resBetriebsmittel->nummer.'</legend>';
+	$htmlstring.='<fieldset><legend>Kopfdaten</legend>';
+	$htmlstring.='<table class="liste">';
+	$htmlstring.='<tr>
+				<th align="right">Betriebsmitteltyp&nbsp;:&nbsp;</th>
+				<td>'.$resBetriebsmittel->betriebsmitteltyp.'</td>
 
-		// Ort - Inventarstandort
-		$oOrt = new ort($resBetriebsmittel->ort_kurzbz);
-		$OrtBezeichnung=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz:'*'.$resBetriebsmittel->ort_kurzbz);
-		$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.($oOrt->bezeichnung?$oOrt->bezeichnung:'').' '.$OrtBezeichnung.' '.($oOrt->telefonklappe?'Kl.'.$oOrt->telefonklappe:''):$resBetriebsmittel->ort_kurzbz.' Kontrolle');
+				<th align="right">Ort&nbsp;:&nbsp;</th>
+				<td>'.$OrtBezeichnung.'</td>
 
-		$htmlstring.='<fieldset><legend title="Betriebsmittel ID '.$resBetriebsmittel->betriebsmittel_id.'">Inventar '.$resBetriebsmittel->nummer.'</legend>';
-			$htmlstring.='<fieldset><legend>Kopfdaten</legend>';
-				$htmlstring.='<table class="liste">';
-				$htmlstring.='<tr>
-							<th align="right">Betriebsmitteltyp&nbsp;:&nbsp;</th>
-							<td>'.$resBetriebsmittel->betriebsmitteltyp.'</td>
+				<th align="right">Organisation&nbsp;:&nbsp;</th>
+				<td>'.$OrgTitel.'</td>
+			</tr>';
 
-							<th align="right">Ort&nbsp;:&nbsp;</th>
-							<td>'.$OrtBezeichnung.'</td>
+	$htmlstring.='<tr>
+				<th align="right">Bestellnr.&nbsp;:&nbsp;</th>
+				<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>
 
-							<th align="right">Organisation&nbsp;:&nbsp;</th>
-							<td>'.$OrgTitel.'</td>
-						</tr>';
+				<th align="right" nowrap>Bestell ID.&nbsp;:&nbsp;</th>
+				<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>
 
-				$htmlstring.='<tr>
-							<th align="right">Bestellnr.&nbsp;:&nbsp;</th>
-							<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>
-
-							<th align="right" nowrap>Bestell ID.&nbsp;:&nbsp;</th>
-							<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>
-
-							<th align="right" nowrap>Bestellpos. ID.&nbsp;:&nbsp;</th>
-							';
-			if ($schreib_recht && $resBetriebsmittel->bestellung_id)
-			{
-				$htmlstring.='<form name="sendform1" action="'. $_SERVER["PHP_SELF"].'" method="post" enctype="application/x-www-form-urlencoded">
-					<td>
-						<input style="display:none" name="work" value="set_position" >
-						<input style="display:none" name="nummer" value="'.$resBetriebsmittel->nummer.'" >
-						<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
-						<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
-						<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_id"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
-							<script type="text/javascript">
-									function selectItem(li) {
-									   return false;
-									}
-									function formatItem(row) {
-									    return row[0] + " <i>" + row[1] + "</i> ";
-									}
-									$(document).ready(function() {
-										  $(\'#bestelldetail_id\').autocomplete(\'inventar_autocomplete.php\', {
-											minChars:1,
-											matchSubset:1,matchContains:1,
-											width:500,
-											cacheLength:0,
-											onItemSelect:selectItem,
-											formatItem:formatItem,
-											extraParams:{\'work\':\'wawi_bestelldetail_id\'
-														,\'bestellung_id\':\''.$resBetriebsmittel->bestellung_id.'\'
-												}
-										  });
-								  });
-							</script>
-					</td>
-				</form>
+				<th align="right" nowrap>Bestellpos. ID.&nbsp;:&nbsp;</th>
 				';
-			}	
-			else
-				$htmlstring.='<td>'.$resBetriebsmittel->bestelldetail_id.'</td>';
+	if ($schreib_recht && $resBetriebsmittel->bestellung_id)
+	{
+		$htmlstring.='<form name="sendform1" action="'. $_SERVER["PHP_SELF"].'" method="post" enctype="application/x-www-form-urlencoded">
+			<td>
+				<input style="display:none" name="work" value="set_position" >
+				<input style="display:none" name="nummer" value="'.$resBetriebsmittel->nummer.'" >
+				<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
+				<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
+				<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_id"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
+					<script type="text/javascript">
+							function selectItem(li) {
+							   return false;
+							}
+							function formatItem(row) {
+							    return row[0] + " <i>" + row[1] + "</i> ";
+							}
+							$(document).ready(function() {
+								  $(\'#bestelldetail_id\').autocomplete(\'inventar_autocomplete.php\', {
+									minChars:1,
+									matchSubset:1,matchContains:1,
+									width:500,
+									cacheLength:0,
+									onItemSelect:selectItem,
+									formatItem:formatItem,
+									extraParams:{\'work\':\'wawi_bestelldetail_id\'
+												,\'bestellung_id\':\''.$resBetriebsmittel->bestellung_id.'\'
+										}
+								  });
+						  });
+					</script>
+			</td>
+		</form>
+		';
+	}	
+	else
+		$htmlstring.='<td>'.$resBetriebsmittel->bestelldetail_id.'</td>';
 
-			$htmlstring.='</tr>';
+	$htmlstring.='</tr>';
 
-			$htmlstring.='<tr>
-							<th align="right">Artikel&nbsp;:&nbsp;</th>
-							<td colspan="3">'.$resBetriebsmittel->beschreibung.'</td>
-							<th align="right">Seriennummer&nbsp;:&nbsp;</th>
-							<td>'.$resBetriebsmittel->seriennummer.'</td>
-						</tr>';
+	$htmlstring.='<tr>
+					<th align="right">Artikel&nbsp;:&nbsp;</th>
+					<td colspan="3">'.$resBetriebsmittel->beschreibung.'</td>
+					<th align="right">Seriennummer&nbsp;:&nbsp;</th>
+					<td>'.$resBetriebsmittel->seriennummer.'</td>
+				</tr>';
 
-			$htmlstring.='<tr>
-							<th align="right">Lieferant&nbsp;:&nbsp;</th>
-							<td colspan="3">'.$resBetriebsmittel->firmenname.'</td>
-							<th align="right">Hersteller&nbsp;:&nbsp;</th>
-							<td>'.$resBetriebsmittel->hersteller.'</td>
-						</tr>';
+	$htmlstring.='<tr>
+					<th align="right">Lieferant&nbsp;:&nbsp;</th>
+					<td colspan="3">'.$resBetriebsmittel->firmenname.'</td>
+					<th align="right">Hersteller&nbsp;:&nbsp;</th>
+					<td>'.$resBetriebsmittel->hersteller.'</td>
+				</tr>';
 
-				if ($info=$resBetriebsmittel->verwendung.($resBetriebsmittel->verwendung?'<br>':'').$resBetriebsmittel->anmerkung)
+	if ($info=$resBetriebsmittel->verwendung.($resBetriebsmittel->verwendung?'<br>':'').$resBetriebsmittel->anmerkung)
+	{
+		$htmlstring.='<tr>
+				<th align="right" valign="top">Verwendung&nbsp;:&nbsp;</th>
+				<td colspan="5">'.$info.'</td>
+			</tr>';
+	}
+
+	$htmlstring.='<tr><td>&nbsp;</td></tr>';
+
+	$htmlstring.='<tr>';
+
+	$htmlstring.='
+		<th align="right">Status&nbsp;:&nbsp;</th>
+
+	    <form name="sendform2" action="'. $_SERVER["PHP_SELF"].'" method="post" enctype="application/x-www-form-urlencoded">
+		<td>
+			<input style="display:none" name="work" value="set_status" >
+			<input style="display:none" name="betriebsmittelbetriebsmittelstatus_id" value="'.$resBetriebsmittel->betriebsmittelbetriebsmittelstatus_id.'" >
+			<input style="display:none" name="nummer" value="'.$resBetriebsmittel->nummer.'" >
+
+			<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
+
+			<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
+			<input style="display:none" id="bestelldetail_id" name="bestelldetail_id" value="'.$resBetriebsmittel->bestelldetail_id.'" >
+		';
+
+	// mit Berechtigung ist der Status zum bearbeiten
+  	$betriebsmittelstatus_kurzbz_select=trim($resBetriebsmittel->betriebsmittelstatus_kurzbz);
+	if (!$schreib_recht)
+		$htmlstring.=$betriebsmittelstatus_kurzbz_select;
+	else
+	{
+		$htmlstring.='&nbsp;<select onchange="document.sendform2.submit();" name="betriebsmittelstatus_kurzbz">';
+				for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
 				{
-					$htmlstring.='<tr>
-							<th align="right" valign="top">Verwendung&nbsp;:&nbsp;</th>
-							<td colspan="5">'.$info.'</td>
-						</tr>';
+					if ($resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz)
+						$htmlstring.='<option '.($betriebsmittelstatus_kurzbz_select==$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz?' selected="selected" ':'').' value="'.$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz.'">'.($resultBetriebsmittelstatus[$i]->beschreibung=='NULL' || empty($resultBetriebsmittelstatus[$i]->beschreibung)?$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz:$resultBetriebsmittelstatus[$i]->beschreibung).'&nbsp;</option>';
 				}
+		$htmlstring.='</select>';
+	}	
+	$htmlstring.='</td>
+	</form>';
+	$htmlstring.='<th align="right">AfA Ende&nbsp;:&nbsp;</th>
+				<td>'.$resBetriebsmittel->betriebsmittelstatus_datum_afa.'</td>
 
-				$htmlstring.='<tr><td>&nbsp;</td></tr>';
+				<th align="right">Leasing bis&nbsp;:&nbsp;</th>
+				<td>'.$resBetriebsmittel->leasing_bis.'</td>
+			</tr>';
 
-				$htmlstring.='<tr>';
+	$htmlstring.='<tr><td colspan="6" id="list">&nbsp;</td></tr>';
 
-				$htmlstring.='
-					<th align="right">Status&nbsp;:&nbsp;</th>
+	// Inventardaten Benutzer - Anlage und Aenderung
+	$htmlstring.='<tr><td colspan="6"><table><tr><td>&nbsp;</td><tr>';
+	$oUpdateBenutzer = new benutzer($resBetriebsmittel->insertvon);
+	$htmlstring.='
+				<td align="right">Anlage&nbsp;:&nbsp;</td>
+				<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
+					(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
+					$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->insertvon).'&nbsp;'.substr($resBetriebsmittel->insertamum,0,19).'&nbsp;
+				</td>
+				';
+	$oUpdateBenutzer = new benutzer($resBetriebsmittel->updatevon);
+	$htmlstring.='
+				<td align="right">letzte &Auml;nderung&nbsp;:&nbsp;</td>
+				<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
+					(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
+					$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->updatevon).'&nbsp;'.substr($resBetriebsmittel->updateamum,0,19).'&nbsp;
+				</td>
+				';
+	$htmlstring.='</tr></table></td></tr>';
 
-				    <form name="sendform2" action="'. $_SERVER["PHP_SELF"].'" method="post" enctype="application/x-www-form-urlencoded">
-					<td>
-						<input style="display:none" name="work" value="set_status" >
-						<input style="display:none" name="betriebsmittelbetriebsmittelstatus_id" value="'.$resBetriebsmittel->betriebsmittelbetriebsmittelstatus_id.'" >
-						<input style="display:none" name="nummer" value="'.$resBetriebsmittel->nummer.'" >
+	$htmlstring.='<tr>';
+	$htmlstring.='</table>';
+	$htmlstring.='</fieldset>';
 
-						<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
+	$htmlstring.='<fieldset><legend>History</legend>';
 
-						<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
-						<input style="display:none" id="bestelldetail_id" name="bestelldetail_id" value="'.$resBetriebsmittel->bestelldetail_id.'" >
-					';
+	// Betriebsmittel STATUS - History
+	$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
+	$oBetriebsmittel_betriebsmittelstatus->result=array();
+	$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
+	$oBetriebsmittel_betriebsmittelstatus->errormsg='';
+	if (!$oBetriebsmittel_betriebsmittelstatus->load_betriebsmittel_id($resBetriebsmittel->betriebsmittel_id))
+		$htmlstring.='<br />'.$oBetriebsmittel_betriebsmittelstatus->errormsg;
 
-					// mit Berechtigung ist der Status zum bearbeiten
-				  	$betriebsmittelstatus_kurzbz_select=trim($resBetriebsmittel->betriebsmittelstatus_kurzbz);
-					if (!$schreib_recht)
-						$htmlstring.=$betriebsmittelstatus_kurzbz_select;
-					else
-					{
-						$htmlstring.='&nbsp;<select onchange="document.sendform2.submit();" name="betriebsmittelstatus_kurzbz">';
-								for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
-								{
-									if ($resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz)
-										$htmlstring.='<option '.($betriebsmittelstatus_kurzbz_select==$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz?' selected="selected" ':'').' value="'.$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz.'">'.($resultBetriebsmittelstatus[$i]->beschreibung=='NULL' || empty($resultBetriebsmittelstatus[$i]->beschreibung)?$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz:$resultBetriebsmittelstatus[$i]->beschreibung).'&nbsp;</option>';
-								}
-						$htmlstring.='</select>';
-					}	
-				$htmlstring.='</td>
-				</form>';
-				$htmlstring.='<th align="right">AfA Ende&nbsp;:&nbsp;</th>
-							<td>'.$resBetriebsmittel->betriebsmittelstatus_datum_afa.'</td>
-
-							<th align="right">Leasing bis&nbsp;:&nbsp;</th>
-							<td>'.$resBetriebsmittel->leasing_bis.'</td>
-						</tr>';
-
-				$htmlstring.='<tr><td colspan="6" id="list">&nbsp;</td></tr>';
-
-				// Inventardaten Benutzer - Anlage und Aenderung
-				$htmlstring.='<tr><td colspan="6"><table><tr><td>&nbsp;</td><tr>';
-						$oUpdateBenutzer = new benutzer($resBetriebsmittel->insertvon);
-						$htmlstring.='
-									<td align="right">Anlage&nbsp;:&nbsp;</td>
-									<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
-										(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
-										$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->insertvon).'&nbsp;'.substr($resBetriebsmittel->insertamum,0,19).'&nbsp;
-									</td>
-									';
-						$oUpdateBenutzer = new benutzer($resBetriebsmittel->updatevon);
-						$htmlstring.='
-									<td align="right">letzte &Auml;nderung&nbsp;:&nbsp;</td>
-									<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
-										(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
-										$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->updatevon).'&nbsp;'.substr($resBetriebsmittel->updateamum,0,19).'&nbsp;
-									</td>
-									';
-				$htmlstring.='</tr></table></td></tr>';
-
-			$htmlstring.='<tr>';
-			$htmlstring.='</table>';
-		$htmlstring.='</fieldset>';
-
-		$htmlstring.='<fieldset><legend>History</legend>';
-
-		// Betriebsmittel STATUS - History
-		$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
-		$oBetriebsmittel_betriebsmittelstatus->result=array();
-		$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
-		$oBetriebsmittel_betriebsmittelstatus->errormsg='';
-		if (!$oBetriebsmittel_betriebsmittelstatus->load_betriebsmittel_id($resBetriebsmittel->betriebsmittel_id))
-			$htmlstring.='<br />'.$oBetriebsmittel_betriebsmittelstatus->errormsg;
-
-		if (is_array($oBetriebsmittel_betriebsmittelstatus->result) && count($oBetriebsmittel_betriebsmittelstatus->result)>0)
+	if (is_array($oBetriebsmittel_betriebsmittelstatus->result) && count($oBetriebsmittel_betriebsmittelstatus->result)>0)
+	{
+		$htmlstring.='<table>';
+		$htmlstring.='<tr>
+						<thead>
+							<th>Status</th>
+							<th>ab Datum</th>
+							<th colspan="2">Anlage</th>
+							<th colspan="2">&Auml;nderung</th>
+						</thead>
+					</tr>';
+		for ($pos=0;$pos<count($oBetriebsmittel_betriebsmittelstatus->result);$pos++)
 		{
-			$htmlstring.='<table>';
-			$htmlstring.='<tr>
-							<thead>
-								<th>Status</th>
-								<th>ab Datum</th>
-								<th colspan="2">Anlage</th>
-								<th colspan="2">&Auml;nderung</th>
-							</thead>
+			$row=$oBetriebsmittel_betriebsmittelstatus->result[$pos];
+			$oInsertBenutzer = new benutzer($row->insertvon);
+			$oUpdateBenutzer = new benutzer($row->updatevon);
+			if ($pos%2)
+				$classe='liste1';
+			else
+				$classe='liste0';
+			$htmlstring.='<tr class="'.$classe.'">
+							<td>'.$row->betriebsmittelstatus_kurzbz.'</td>
+							<td>'.$row->datum.'</td>
+
+							<td><a href="mailto:'.$oInsertBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oInsertBenutzer->person_id)?(isset($oInsertBenutzer->anrede) && !empty($oInsertBenutzer->anrede)?$oInsertBenutzer->anrede.' ':'').
+								(isset($oInsertBenutzer->titelpre) && !empty($oInsertBenutzer->titelpre)?$oInsertBenutzer->titelpre.' ':'').
+								$oInsertBenutzer->vorname.' '.$oInsertBenutzer->nachname.'</a>':$row->insertvon).'</td>
+							<td>'.substr($row->insertamum,0,19).'</td>
+
+							<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
+								(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
+								$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$row->updatevon).'</td>
+							<td>'.substr($row->updateamum,0,19).'</td>
 						</tr>';
-			for ($pos=0;$pos<count($oBetriebsmittel_betriebsmittelstatus->result);$pos++)
-			{
-				$row=$oBetriebsmittel_betriebsmittelstatus->result[$pos];
-				$oInsertBenutzer = new benutzer($row->insertvon);
-				$oUpdateBenutzer = new benutzer($row->updatevon);
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-				$htmlstring.='<tr class="'.$classe.'">
-								<td>'.$row->betriebsmittelstatus_kurzbz.'</td>
-								<td>'.$row->datum.'</td>
+		}
+	}
+	$htmlstring.='</table>';
 
-								<td><a href="mailto:'.$oInsertBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oInsertBenutzer->person_id)?(isset($oInsertBenutzer->anrede) && !empty($oInsertBenutzer->anrede)?$oInsertBenutzer->anrede.' ':'').
-									(isset($oInsertBenutzer->titelpre) && !empty($oInsertBenutzer->titelpre)?$oInsertBenutzer->titelpre.' ':'').
-									$oInsertBenutzer->vorname.' '.$oInsertBenutzer->nachname.'</a>':$row->insertvon).'</td>
-								<td>'.substr($row->insertamum,0,19).'</td>
+	// Betriebsmittel Personen
+	$oBetriebsmittelperson = new betriebsmittelperson();
+	$oBetriebsmittelperson->result=array();
+	$oBetriebsmittelperson->debug=$debug;
+	$oBetriebsmittelperson->errormsg='';
+	if (!$oBetriebsmittelperson->load_betriebsmittelpersonen($resBetriebsmittel->betriebsmittel_id))
+		  $htmlstring.='<br />'.$oBetriebsmittelperson->errormsg;
 
-								<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
-									(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
-									$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$row->updatevon).'</td>
-								<td>'.substr($row->updateamum,0,19).'</td>
-							</tr>';
-			}
+	if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
+	{
+		$htmlstring.='<fieldset><legend title="Betriebsmittelperson(en)</legend>';
+		asort($oBetriebsmittelperson->result);
+		$htmlstring.='<table>';
+			$htmlstring.='<tr>
+						<thead>
+							<td>Status</td>
+							<td>ab Datum</td>
+							<td colspan="2">Anlage</td>
+							<td colspan="2">&Auml;nderung</td>
+						</thead>
+						</tr>';
+		for ($pos=0;$pos<count($oBetriebsmittelperson->result);$pos++)
+		{
+			$row=$oBetriebsmittelperson->result[$pos];
+			if ($pos%2)
+				$classe='liste1';
+			else
+				$classe='liste0';
+			$htmlstring.='<tr class="'.$classe.'">
+							<td>'.$row->betriebsmittelstatus_kurzbz.'</td>
+							<td>'.$row->datum.'</td>
+
+							<td>'.$row->insertvon.'</td>
+							<td>'.$row->insertamum.'</td>
+
+							<td>'.$row->updatevon.'</td>
+							<td>'.$row->updateamum.'</td>
+				';
 		}
 		$htmlstring.='</table>';
-
-		// Betriebsmittel Personen
-		$oBetriebsmittelperson = new betriebsmittelperson();
-		$oBetriebsmittelperson->result=array();
-		$oBetriebsmittelperson->debug=$debug;
-		$oBetriebsmittelperson->errormsg='';
-		if (!$oBetriebsmittelperson->load_betriebsmittelpersonen($resBetriebsmittel->betriebsmittel_id))
-			  $htmlstring.='<br />'.$oBetriebsmittelperson->errormsg;
-
-		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
-		{
-			$htmlstring.='<fieldset><legend title="Betriebsmittelperson(en)</legend>';
-			asort($oBetriebsmittelperson->result);
-			$htmlstring.='<table>';
-				$htmlstring.='<tr>
-							<thead>
-								<td>Status</td>
-								<td>ab Datum</td>
-								<td colspan="2">Anlage</td>
-								<td colspan="2">&Auml;nderung</td>
-							</thead>
-							</tr>';
-			for ($pos=0;$pos<count($oBetriebsmittelperson->result);$pos++)
-			{
-				$row=$oBetriebsmittelperson->result[$pos];
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-				$htmlstring.='<tr class="'.$classe.'">
-								<td>'.$row->betriebsmittelstatus_kurzbz.'</td>
-								<td>'.$row->datum.'</td>
-
-								<td>'.$row->insertvon.'</td>
-								<td>'.$row->insertamum.'</td>
-
-								<td>'.$row->updatevon.'</td>
-								<td>'.$row->updateamum.'</td>
-					';
-			}
-			$htmlstring.='</table>';
-			$htmlstring.='</fieldset>';
-		}
+		$htmlstring.='</fieldset>';
+	}
 	$htmlstring.='</fieldset>';
 	$htmlstring.='<div style="width:100%;text-align:right;"><a href="javascript:history.back();"><img src="../../skin/images/cross.png" alt="schliessen" title="schliessen/close" >&nbsp;zur&uuml;ck&nbsp;</a></div />';
 	return 	$htmlstring;
