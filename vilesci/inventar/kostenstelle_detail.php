@@ -23,20 +23,16 @@
  */
 
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
-	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
+	$path='../../';
+	
+	require_once($path.'config/vilesci.config.inc.php');
   	require_once($path.'include/functions.inc.php');
-	if (!$uid = get_uid())
-		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
   	require_once($path.'include/wawi.class.php');
-
+  	
+	if (!$uid = get_uid())
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
@@ -64,15 +60,11 @@
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-
 	$recht=false;
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 's')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
 	
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung - Classe
@@ -204,160 +196,159 @@
 <?php
 function output_konstenstelle($resultKonstenstelle=null,$debug=false)
 {
-		$htmlstring='';
-		if (is_null($resultKonstenstelle) || !is_array($resultKonstenstelle) || count($resultKonstenstelle)<1)
-			return $htmlstring;
-
-		$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>';
-		if (is_array($resultKonstenstelle) && count($resultKonstenstelle)>1)
-			$htmlstring.='<tr><th colspan="10">Bitte eine Kostenstelle aus den '.count($resultKonstenstelle).' gefundenen ausw&auml;hlen</th></tr>';
-		$htmlstring.='<tr class="liste">
-					<th class="table-sortable:default">ID</th>
-					<th class="table-sortable:default">Nr.</th>
-					<th class="table-sortable:default">Kurzz.</th>
-					<th class="table-sortable:default">Bezeichnung</th>
-					<th class="table-sortable:default">StgKz</th>
-					<th class="table-sortable:default">Kurzz.</th>
-					<th class="table-sortable:default">Studiengang</th>
-					<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
-				</tr>
-				</thead>
-				';
-		#var_dump($resultKonstenstelle);
-		for ($pos=0;$pos<count($resultKonstenstelle);$pos++)
-		{
-			if ($pos%2)
-				$classe='liste1';
-			else
-				$classe='liste0';
-			$htmlstring.='<!-- Kostenstelle Auflisten -->
-		    	<tr class="'.$classe.'" style="font-size:smaller;">
-					<td><a title="Detail Kostenstelle ID '.$resultKonstenstelle[$pos]->kostenstelle_id.'" href="'.$_SERVER["PHP_SELF"].'?kostenstelle_id='.$resultKonstenstelle[$pos]->kostenstelle_id.'">'.$resultKonstenstelle[$pos]->kostenstelle_id.'</a></td>
-					<td><a title="Detail Kostenstelle Nr '.$resultKonstenstelle[$pos]->kostenstelle_nr.'" href="'.$_SERVER["PHP_SELF"].'?kostenstelle_id='.$resultKonstenstelle[$pos]->kostenstelle_id.'">'.$resultKonstenstelle[$pos]->kostenstelle_nr.'</a></td>
-					<td>'.$resultKonstenstelle[$pos]->kurzzeichen.'</td>
-					<td>'.$resultKonstenstelle[$pos]->bezeichnung.'</td>
-					<td><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'">'.$resultKonstenstelle[$pos]->studiengang_id.'</a></td>
-					<td><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'">'.$resultKonstenstelle[$pos]->stg_kurzzeichen.'</a></td>
-					<td><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'">'.$resultKonstenstelle[$pos]->stg_bez.'</a></td>
-					<td align="right">&nbsp;<a title="Bestellungen zur Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_nr.'" href="bestellung.php?kostenstelle_id='.$resultKonstenstelle[$pos]->kostenstelle_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_nr.'" /></a>&nbsp;</td>
-				</tr>
-				';
-		}
-		$htmlstring.='</table>';
+	$htmlstring='';
+	if (is_null($resultKonstenstelle) || !is_array($resultKonstenstelle) || count($resultKonstenstelle)<1)
 		return $htmlstring;
+
+	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+			<thead>';
+	if (is_array($resultKonstenstelle) && count($resultKonstenstelle)>1)
+		$htmlstring.='<tr><th colspan="10">Bitte eine Kostenstelle aus den '.count($resultKonstenstelle).' gefundenen ausw&auml;hlen</th></tr>';
+	$htmlstring.='<tr class="liste">
+				<th class="table-sortable:default">ID</th>
+				<th class="table-sortable:default">Nr.</th>
+				<th class="table-sortable:default">Kurzz.</th>
+				<th class="table-sortable:default">Bezeichnung</th>
+				<th class="table-sortable:default">StgKz</th>
+				<th class="table-sortable:default">Kurzz.</th>
+				<th class="table-sortable:default">Studiengang</th>
+				<th class="table-sortable:default" style="font-size:x-small;">Bestellung</th>
+			</tr>
+			</thead>
+			';
+
+	for ($pos=0;$pos<count($resultKonstenstelle);$pos++)
+	{
+		if ($pos%2)
+			$classe='liste1';
+		else
+			$classe='liste0';
+		$htmlstring.='<!-- Kostenstelle Auflisten -->
+	    	<tr class="'.$classe.'" style="font-size:smaller;">
+				<td><a title="Detail Kostenstelle ID '.$resultKonstenstelle[$pos]->kostenstelle_id.'" href="'.$_SERVER["PHP_SELF"].'?kostenstelle_id='.$resultKonstenstelle[$pos]->kostenstelle_id.'">'.$resultKonstenstelle[$pos]->kostenstelle_id.'</a></td>
+				<td><a title="Detail Kostenstelle Nr '.$resultKonstenstelle[$pos]->kostenstelle_nr.'" href="'.$_SERVER["PHP_SELF"].'?kostenstelle_id='.$resultKonstenstelle[$pos]->kostenstelle_id.'">'.$resultKonstenstelle[$pos]->kostenstelle_nr.'</a></td>
+				<td>'.$resultKonstenstelle[$pos]->kurzzeichen.'</td>
+				<td>'.$resultKonstenstelle[$pos]->bezeichnung.'</td>
+				<td><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'">'.$resultKonstenstelle[$pos]->studiengang_id.'</a></td>
+				<td><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'">'.$resultKonstenstelle[$pos]->stg_kurzzeichen.'</a></td>
+				<td><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'">'.$resultKonstenstelle[$pos]->stg_bez.'</a></td>
+				<td align="right">&nbsp;<a title="Bestellungen zur Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_nr.'" href="bestellung.php?kostenstelle_id='.$resultKonstenstelle[$pos]->kostenstelle_id.'&amp;jahr_monat='.date("Y").'">anzeigen<img src="../../skin/images/application_go.png" alt="Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_nr.'" /></a>&nbsp;</td>
+			</tr>
+			';
+	}
+	$htmlstring.='</table>';
+	return $htmlstring;
 }
 
 function output_konstenstelleinformation($resultKonstenstelle=null,$debug=false)
 {
-		$htmlstring='';
-		if (is_null($resultKonstenstelle) || !is_array($resultKonstenstelle) || count($resultKonstenstelle)<1)
+	$htmlstring='';
+	if (is_null($resultKonstenstelle) || !is_array($resultKonstenstelle) || count($resultKonstenstelle)<1)
+		return $htmlstring;
+
+	if (!$oWAWI = new wawi())
+	   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:''));
+
+	for ($pos=0;$pos<count($resultKonstenstelle);$pos++)
+	{
+		if ($pos%2)
+			$classe='liste1';
+		else
+			$classe='liste0';
+
+		$htmlstring.='<fieldset><legend>Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.'&nbsp;'.$resultKonstenstelle[$pos]->bezeichnung.'</legend>';
+		$htmlstring.='<br /><!-- Kostenstelle Kurzdetail -->
+			<table class="liste"  style="border:0;width:100%;">
+
+				<tr class="'.$classe.'">
+					<th align="right">Kostenstelle ID / Nr &nbsp;</th>
+					<td width="70%" align="left" colspan="2">'.$resultKonstenstelle[$pos]->kostenstelle_id.'&nbsp;/&nbsp;'.$resultKonstenstelle[$pos]->kostenstelle_nr.'&nbsp;</td>
+				</tr>
+
+				<tr class="'.$classe.'">
+					<th align="right">Kurzz.&nbsp;/&nbsp;Bezeichnung&nbsp;</th>
+					<td align="left" colspan="2">&nbsp;'.$resultKonstenstelle[$pos]->kurzzeichen.'&nbsp;/&nbsp;'.$resultKonstenstelle[$pos]->bezeichnung.'&nbsp;</td>
+				</tr>
+
+				<tr class="'.$classe.'"><th align="right">aktiv&nbsp;</th><td colspan="2">'.(empty($resultKostenstelle[$pos]->ddate)?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />&nbsp;':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />&nbsp;').'</td></tr>
+
+				<tr class="'.$classe.'"><th align="right">Anlage&nbsp;<img src="../../skin/images/edit.png" alt="cuser" /></th><td align="left">'.($resultKonstenstelle[$pos]->c_email?'<a href="mailto:'.$resultKonstenstelle[$pos]->c_email.'?subject=Anlage Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.' '.$resultKonstenstelle[$pos]->bezeichnung.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'&nbsp;'.($resultKonstenstelle[$pos]->c_nname?$resultKonstenstelle[$pos]->c_anrede:'').'&nbsp;'.$resultKonstenstelle[$pos]->c_vname.'&nbsp;'.$resultKonstenstelle[$pos]->c_nname.'&nbsp;</td><td align="left">&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'.substr($resultKonstenstelle[$pos]->cdate,0,19).'&nbsp;</td></tr>
+
+				<tr class="'.$classe.'"><th align="right">&Auml;nderung&nbsp;<img src="../../skin/images/edit.png" alt="luser" /></th><td align="left">'.($resultKonstenstelle[$pos]->l_email?'<a href="mailto:'.$resultKonstenstelle[$pos]->l_email.'?subject=Aenderung Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.' '.$resultKonstenstelle[$pos]->bezeichnung.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'&nbsp;'.($resultKonstenstelle[$pos]->l_nname?$resultKonstenstelle[$pos]->l_anrede:'').'&nbsp;'.$resultKonstenstelle[$pos]->l_vname.'&nbsp;'.$resultKonstenstelle[$pos]->l_nname.'&nbsp;</td><td align="left">&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'.substr($resultKonstenstelle[$pos]->lupdate,0,19).'&nbsp;</td></tr>
+
+				<tr class="'.$classe.'"><th align="right">L&ouml;schung&nbsp;<img src="../../skin/images/edit.png" alt="duser" /></th><td align="left">'.($resultKonstenstelle[$pos]->ddate && $resultKonstenstelle[$pos]->d_email?'<a href="mailto:'.$resultKonstenstelle[$pos]->d_email.'?subject=Geloesccht Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.' '.$resultKonstenstelle[$pos]->bezeichnung.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'&nbsp;'.($resultKonstenstelle[$pos]->ddate && $resultKonstenstelle[$pos]->d_nname?$resultKonstenstelle[$pos]->d_anrede:'').'&nbsp;'.($resultKonstenstelle[$pos]->ddate?$resultKonstenstelle[$pos]->d_vname.'&nbsp;'.$resultKonstenstelle[$pos]->d_nname:'').'&nbsp;</td><td align="left">&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'.substr($resultKonstenstelle[$pos]->ddate,0,19).'&nbsp;</td></tr>
+
+				<tr class="'.$classe.'">
+					<td colspan="3"><hr></td>
+				</tr>
+
+				<tr class="'.$classe.'">
+					<th align="right">Studiengang ID&nbsp;</th>
+					<td align="left" colspan="2"><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'&amp;stg_kurzzeichen='.$resultKonstenstelle[$pos]->stg_kurzzeichen.'">'.$resultKonstenstelle[$pos]->studiengang_id.'</a></td>
+				</tr>
+
+				<tr class="'.$classe.'">
+					<th align="right">Studiengang&nbsp;</th>
+					<td align="left" colspan="2"><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'&amp;stg_kurzzeichen='.$resultKonstenstelle[$pos]->stg_kurzzeichen.'">'.$resultKonstenstelle[$pos]->stg_kurzzeichen.'</a></td>
+				</tr>
+
+				<tr class="'.$classe.'">
+					<th align="right">Studenten</th>
+					<td align="left" colspan="2">'.$resultKonstenstelle[$pos]->studentenanzahl.'&nbsp;</td>
+				</tr>
+				<tr class="'.$classe.'">
+					<th align="right">Stg.Aktiv&nbsp;</th>
+					<td align="left" colspan="2">'.$resultKonstenstelle[$pos]->stg_aktiv.'&nbsp;'.($resultKonstenstelle[$pos]->stg_aktiv==true || $resultKonstenstelle[$pos]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />').'</td>
+				</tr>
+
+			</table>
+			';
+		$htmlstring.='</fieldset>';
+
+		$oWAWI->errormsg='';
+		$oWAWI->result=array();
+		if (!$oWAWI->kostenstelle_benutzer($resultKonstenstelle[$pos]->kostenstelle_id))
+			$htmlstring.=$oWAWI->errormsg;
+		$resultKonstenstellebenutzer=$oWAWI->result;
+
+		if (is_null($resultKonstenstellebenutzer) || !is_array($resultKonstenstellebenutzer) || count($resultKonstenstellebenutzer)<1)
 			return $htmlstring;
 
-		if (!$oWAWI = new wawi())
-		   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:''));
-
-		for ($pos=0;$pos<count($resultKonstenstelle);$pos++)
-		{
-			if ($pos%2)
-				$classe='liste1';
-			else
-				$classe='liste0';
-
-			$htmlstring.='<fieldset><legend>Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.'&nbsp;'.$resultKonstenstelle[$pos]->bezeichnung.'</legend>';
+		$htmlstring.='<fieldset><legend>Benutzer - Rechte</legend>';
 			$htmlstring.='<br /><!-- Kostenstelle Kurzdetail -->
-				<table class="liste"  style="border:0;width:100%;">
+					<table class="liste">
+					<thead>
+						<tr>
+							<th>Benutzer&nbsp;</th>
+							<th>lesen&nbsp;</th>
+							<th>schreiben&nbsp;</th>
+							<th>freigeben&nbsp;</th>
+							<th>verwalten&nbsp;</th>
+						</tr>
+					<thead>';
+			for ($i=0;$i<count($resultKonstenstellebenutzer);$i++)
+			{
+				if ($i%2)
+					$classe='liste1';
+				else
+					$classe='liste0';
+				$htmlstring.='<!-- Kostenstelle Kurzdetail -->
+						<tr class="'.$classe.'">
+							<td>'
+							.($resultKonstenstellebenutzer[$i]->c_email?'<a href="mailto:'.$resultKonstenstellebenutzer[$i]->c_email.'?subject=Anlage Kostenstelle '.$resultKonstenstellebenutzer[$i]->kostenstelle_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'
+							&nbsp;'.$resultKonstenstellebenutzer[$i]->c_titel.'&nbsp;'.$resultKonstenstellebenutzer[$i]->c_vname.'&nbsp;'.$resultKonstenstellebenutzer[$i]->c_nname.'&nbsp;
+							</td>
+							<td align="center">'.($resultKonstenstellebenutzer[$i]->lesen=='t' || $resultKonstenstellebenutzer[$i]->lesen==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+							<td align="center">'.($resultKonstenstellebenutzer[$i]->schreiben=='t' || $resultKonstenstellebenutzer[$i]->schreiben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+							<td align="center">'.($resultKonstenstellebenutzer[$i]->freigeben=='t' || $resultKonstenstellebenutzer[$i]->freigeben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+							<td align="center">'.($resultKonstenstellebenutzer[$i]->verwalten=='t' || $resultKonstenstellebenutzer[$i]->verwalten==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
+						</tr>
+					';
 
-					<tr class="'.$classe.'">
-						<th align="right">Kostenstelle ID / Nr &nbsp;</th>
-						<td width="70%" align="left" colspan="2">'.$resultKonstenstelle[$pos]->kostenstelle_id.'&nbsp;/&nbsp;'.$resultKonstenstelle[$pos]->kostenstelle_nr.'&nbsp;</td>
-					</tr>
-
-					<tr class="'.$classe.'">
-						<th align="right">Kurzz.&nbsp;/&nbsp;Bezeichnung&nbsp;</th>
-						<td align="left" colspan="2">&nbsp;'.$resultKonstenstelle[$pos]->kurzzeichen.'&nbsp;/&nbsp;'.$resultKonstenstelle[$pos]->bezeichnung.'&nbsp;</td>
-					</tr>
-
-					<tr class="'.$classe.'"><th align="right">aktiv&nbsp;</th><td colspan="2">'.(empty($resultKostenstelle[$pos]->ddate)?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />&nbsp;':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />&nbsp;').'</td></tr>
-
-					<tr class="'.$classe.'"><th align="right">Anlage&nbsp;<img src="../../skin/images/edit.png" alt="cuser" /></th><td align="left">'.($resultKonstenstelle[$pos]->c_email?'<a href="mailto:'.$resultKonstenstelle[$pos]->c_email.'?subject=Anlage Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.' '.$resultKonstenstelle[$pos]->bezeichnung.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'&nbsp;'.($resultKonstenstelle[$pos]->c_nname?$resultKonstenstelle[$pos]->c_anrede:'').'&nbsp;'.$resultKonstenstelle[$pos]->c_vname.'&nbsp;'.$resultKonstenstelle[$pos]->c_nname.'&nbsp;</td><td align="left">&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'.substr($resultKonstenstelle[$pos]->cdate,0,19).'&nbsp;</td></tr>
-
-					<tr class="'.$classe.'"><th align="right">&Auml;nderung&nbsp;<img src="../../skin/images/edit.png" alt="luser" /></th><td align="left">'.($resultKonstenstelle[$pos]->l_email?'<a href="mailto:'.$resultKonstenstelle[$pos]->l_email.'?subject=Aenderung Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.' '.$resultKonstenstelle[$pos]->bezeichnung.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'&nbsp;'.($resultKonstenstelle[$pos]->l_nname?$resultKonstenstelle[$pos]->l_anrede:'').'&nbsp;'.$resultKonstenstelle[$pos]->l_vname.'&nbsp;'.$resultKonstenstelle[$pos]->l_nname.'&nbsp;</td><td align="left">&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'.substr($resultKonstenstelle[$pos]->lupdate,0,19).'&nbsp;</td></tr>
-
-					<tr class="'.$classe.'"><th align="right">L&ouml;schung&nbsp;<img src="../../skin/images/edit.png" alt="duser" /></th><td align="left">'.($resultKonstenstelle[$pos]->ddate && $resultKonstenstelle[$pos]->d_email?'<a href="mailto:'.$resultKonstenstelle[$pos]->d_email.'?subject=Geloesccht Kostenstelle '.$resultKonstenstelle[$pos]->kostenstelle_id.' '.$resultKonstenstelle[$pos]->bezeichnung.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'&nbsp;'.($resultKonstenstelle[$pos]->ddate && $resultKonstenstelle[$pos]->d_nname?$resultKonstenstelle[$pos]->d_anrede:'').'&nbsp;'.($resultKonstenstelle[$pos]->ddate?$resultKonstenstelle[$pos]->d_vname.'&nbsp;'.$resultKonstenstelle[$pos]->d_nname:'').'&nbsp;</td><td align="left">&nbsp;<img src="../../skin/images/date_edit.png" alt="cupdate" />&nbsp;'.substr($resultKonstenstelle[$pos]->ddate,0,19).'&nbsp;</td></tr>
-
-					<tr class="'.$classe.'">
-						<td colspan="3"><hr></td>
-					</tr>
-
-					<tr class="'.$classe.'">
-						<th align="right">Studiengang ID&nbsp;</th>
-						<td align="left" colspan="2"><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'&amp;stg_kurzzeichen='.$resultKonstenstelle[$pos]->stg_kurzzeichen.'">'.$resultKonstenstelle[$pos]->studiengang_id.'</a></td>
-					</tr>
-
-					<tr class="'.$classe.'">
-						<th align="right">Studiengang&nbsp;</th>
-						<td align="left" colspan="2"><a title="Detail Studiengang '.$resultKonstenstelle[$pos]->studiengang_id.'" href="studiengang_detail.php?studiengang_id='.$resultKonstenstelle[$pos]->studiengang_id.'&amp;stg_kurzzeichen='.$resultKonstenstelle[$pos]->stg_kurzzeichen.'">'.$resultKonstenstelle[$pos]->stg_kurzzeichen.'</a></td>
-					</tr>
-
-					<tr class="'.$classe.'">
-						<th align="right">Studenten</th>
-						<td align="left" colspan="2">'.$resultKonstenstelle[$pos]->studentenanzahl.'&nbsp;</td>
-					</tr>
-					<tr class="'.$classe.'">
-						<th align="right">Stg.Aktiv&nbsp;</th>
-						<td align="left" colspan="2">'.$resultKonstenstelle[$pos]->stg_aktiv.'&nbsp;'.($resultKonstenstelle[$pos]->stg_aktiv==true || $resultKonstenstelle[$pos]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />').'</td>
-					</tr>
-
-				</table>
-				';
-			$htmlstring.='</fieldset>';
-
-			$oWAWI->errormsg='';
-			$oWAWI->result=array();
-			if (!$oWAWI->kostenstelle_benutzer($resultKonstenstelle[$pos]->kostenstelle_id))
-				$htmlstring.=$oWAWI->errormsg;
-			$resultKonstenstellebenutzer=$oWAWI->result;
-
-			if (is_null($resultKonstenstellebenutzer) || !is_array($resultKonstenstellebenutzer) || count($resultKonstenstellebenutzer)<1)
-				return $htmlstring;
-
-		#	var_dump($resultKonstenstellebenutzer);
-			$htmlstring.='<fieldset><legend>Benutzer - Rechte</legend>';
-				$htmlstring.='<br /><!-- Kostenstelle Kurzdetail -->
-						<table class="liste">
-						<thead>
-							<tr>
-								<th>Benutzer&nbsp;</th>
-								<th>lesen&nbsp;</th>
-								<th>schreiben&nbsp;</th>
-								<th>freigeben&nbsp;</th>
-								<th>verwalten&nbsp;</th>
-							</tr>
-						<thead>';
-				for ($i=0;$i<count($resultKonstenstellebenutzer);$i++)
-				{
-					if ($i%2)
-						$classe='liste1';
-					else
-						$classe='liste0';
-					$htmlstring.='<!-- Kostenstelle Kurzdetail -->
-							<tr class="'.$classe.'">
-								<td>'
-								.($resultKonstenstellebenutzer[$i]->c_email?'<a href="mailto:'.$resultKonstenstellebenutzer[$i]->c_email.'?subject=Anlage Kostenstelle '.$resultKonstenstellebenutzer[$i]->kostenstelle_id.'">&nbsp;<img src="../../skin/images/email.png" alt="email" /></a>':'').'
-								&nbsp;'.$resultKonstenstellebenutzer[$i]->c_titel.'&nbsp;'.$resultKonstenstellebenutzer[$i]->c_vname.'&nbsp;'.$resultKonstenstellebenutzer[$i]->c_nname.'&nbsp;
-								</td>
-								<td align="center">'.($resultKonstenstellebenutzer[$i]->lesen=='t' || $resultKonstenstellebenutzer[$i]->lesen==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								<td align="center">'.($resultKonstenstellebenutzer[$i]->schreiben=='t' || $resultKonstenstellebenutzer[$i]->schreiben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								<td align="center">'.($resultKonstenstellebenutzer[$i]->freigeben=='t' || $resultKonstenstellebenutzer[$i]->freigeben==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-								<td align="center">'.($resultKonstenstellebenutzer[$i]->verwalten=='t' || $resultKonstenstellebenutzer[$i]->verwalten==true?'<img src="../../skin/images/green_point.gif" alt="ja" />':'<img src="../../skin/images/red_point.gif" alt="nein" />').'</td>
-							</tr>
-						';
-
-				}
-				$htmlstring.='</table>';
-			$htmlstring.='</fieldset>';
-		}	// Ende Kostenstellen-Array
+			}
+			$htmlstring.='</table>';
+		$htmlstring.='</fieldset>';
+	}	// Ende Kostenstellen-Array
 	$htmlstring.='<div style="width:100%;text-align:right;"><a href="javascript:history.back();"><img border="0" src="../../skin/images/cross.png" alt="schliessen" title="schliessen/close" />&nbsp;zur&uuml;ck</a></div />';
 	return $htmlstring;
 }

@@ -21,36 +21,26 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
+	$path='../../';
 
 	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
   	require_once($path.'include/functions.inc.php');
-	if (!$uid = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-		
 	require_once($path.'include/benutzerberechtigung.class.php');
-	$oBenutzerberechtigung = new benutzerberechtigung();
-	$oBenutzerberechtigung->getBerechtigungen($uid);
-
 	require_once($path.'include/person.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
-
   	require_once($path.'include/ort.class.php');
 	require_once($path.'include/studiengang.class.php');
   	require_once($path.'include/organisationseinheit.class.php');
-
   	require_once($path.'include/wawi.class.php');
   	require_once($path.'include/betriebsmittel.class.php');
   	require_once($path.'include/betriebsmitteltyp.class.php');
   	require_once($path.'include/betriebsmittelstatus.class.php');
   	require_once($path.'include/betriebsmittel_betriebsmittelstatus.class.php');
 	require_once($path.'include/betriebsmittelperson.class.php');
+	
+	if (!$uid = get_uid())
+		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
@@ -109,18 +99,9 @@
 	// read Berechtigung
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 'suid') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 'suid'))
-		$schreib_recht=true;
 		
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
-	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,$oe_kurzbz,'suid')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,$oe_kurzbz,'sui')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,$oe_kurzbz,'su')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'suid')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'sui')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su'))
 		$schreib_recht=true;
 
 
@@ -209,180 +190,178 @@
 	// Vorlagedaten lesen aus Betriebsmittel
 	if ($betriebsmittel_id!='' && empty($work) )
 	{
-			$oBetriebsmittel->result=array();
-			$oBetriebsmittel->errormsg='';
-			if ($oBetriebsmittel->load($betriebsmittel_id))
+		$oBetriebsmittel->result=array();
+		$oBetriebsmittel->errormsg='';
+		if ($oBetriebsmittel->load($betriebsmittel_id))
+		{
+		  	$anzahl=count($oBetriebsmittel->result);
+
+			foreach ($oBetriebsmittel->result as $key => $value)
+				$$key=$value;
+
+			$bestellung_id_old=$bestellung_id;
+			$bestelldetail_id_old=$bestelldetail_id;
+
+			$oBetriebsmittel_betriebsmittelstatus->result=array();
+			$oBetriebsmittel_betriebsmittelstatus->errormsg='';
+			if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id))
 			{
-			  	$anzahl=count($oBetriebsmittel->result);
-
-				foreach ($oBetriebsmittel->result as $key => $value)
-					$$key=$value;
-
-				$bestellung_id_old=$bestellung_id;
-				$bestelldetail_id_old=$bestelldetail_id;
-
-				$oBetriebsmittel_betriebsmittelstatus->result=array();
-				$oBetriebsmittel_betriebsmittelstatus->errormsg='';
-				if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id))
-				{
-					if (isset($oBetriebsmittel_betriebsmittelstatus->result->betriebsmittelstatus_kurzbz))
-						$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->result->betriebsmittelstatus_kurzbz;
-					else if (is_array($oBetriebsmittel_betriebsmittelstatus->result) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz))
-						$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz;
-					else
-						$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz;
-				}
+				if (isset($oBetriebsmittel_betriebsmittelstatus->result->betriebsmittelstatus_kurzbz))
+					$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->result->betriebsmittelstatus_kurzbz;
+				else if (is_array($oBetriebsmittel_betriebsmittelstatus->result) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz))
+					$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz;
 				else
-					$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
-				// suchen eine Person zum Betriebsmittel  - Entliehen an eine Person
-				$oBetriebsmittelperson->result=array();
-				$oBetriebsmittelperson->errormsg='';
-				if ($oBetriebsmittelperson->load_betriebsmittelpersonen($betriebsmittel_id))
-				{
-					if (isset($oBetriebsmittelperson->result->retouram) )
-						$person_id=($oBetriebsmittelperson->result->retouram?'':$oBetriebsmittelperson->result->person_id);
-					else if (is_array($oBetriebsmittelperson->result) && isset($oBetriebsmittelperson->result[0]) && isset($oBetriebsmittelperson->result[0]->retouram) )
-						$person_id=($oBetriebsmittelperson->result[0]->retouram?'':$oBetriebsmittelperson->result[0]->person_id);
-					else if (empty($oBetriebsmittelperson->retouram))
-						$person_id=$oBetriebsmittelperson->person_id;
-				}
-				else
-					$errormsg[]=$oBetriebsmittelperson->errormsg;
-
+					$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz;
 			}
 			else
-				$errormsg[]=$oBetriebsmittel->errormsg;
+				$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
+			// suchen eine Person zum Betriebsmittel  - Entliehen an eine Person
+			$oBetriebsmittelperson->result=array();
+			$oBetriebsmittelperson->errormsg='';
+			if ($oBetriebsmittelperson->load_betriebsmittelpersonen($betriebsmittel_id))
+			{
+				if (isset($oBetriebsmittelperson->result->retouram) )
+					$person_id=($oBetriebsmittelperson->result->retouram?'':$oBetriebsmittelperson->result->person_id);
+				else if (is_array($oBetriebsmittelperson->result) && isset($oBetriebsmittelperson->result[0]) && isset($oBetriebsmittelperson->result[0]->retouram) )
+					$person_id=($oBetriebsmittelperson->result[0]->retouram?'':$oBetriebsmittelperson->result[0]->person_id);
+				else if (empty($oBetriebsmittelperson->retouram))
+					$person_id=$oBetriebsmittelperson->person_id;
+			}
+			else
+				$errormsg[]=$oBetriebsmittelperson->errormsg;
+
+		}
+		else
+			$errormsg[]=$oBetriebsmittel->errormsg;
 	}
 
 	// Vorlagedaten lesen
 	if ($bestellung_id!='' && empty($work)
 	&& ($bestellung_id!=$bestellung_id_old || $bestelldetail_id!=$bestelldetail_id_old )  )
 	{
-#		echo time(). " BESTELLUNG <hr>";
-			$studiengang_kurzbzlang=array();
-			$studiengang_kuerzel=array();
-			$oStudiengang->result=array();
-			$oStudiengang->errormsg='';
-			if ($oStudiengang->getAll())
+		$studiengang_kurzbzlang=array();
+		$studiengang_kuerzel=array();
+		$oStudiengang->result=array();
+		$oStudiengang->errormsg='';
+		if ($oStudiengang->getAll())
+		{
+			reset($oStudiengang->result);
+			foreach($oStudiengang->result AS $key => $value)
 			{
-				reset($oStudiengang->result);
-				foreach($oStudiengang->result AS $key => $value)
-				{
-					$value->kurzbzlang=trim($value->kurzbzlang);
-					$studiengang_kurzbzlang[$value->kurzbzlang]=$value;
-				}
-
-				reset($oStudiengang->result);
-				foreach($oStudiengang->result AS $key => $value)
-				{
-					$value->kuerzel=trim($value->kuerzel);
-					$studiengang_kuerzel[$value->kuerzel]=$value;
-				}
+				$value->kurzbzlang=trim($value->kurzbzlang);
+				$studiengang_kurzbzlang[$value->kurzbzlang]=$value;
 			}
-			else if ($oStudiengang->errormsg)
-				$errormsg[]=$oStudiengang->errormsg;
 
-			// Bestellposition
-			if ($bestelldetail_id)
+			reset($oStudiengang->result);
+			foreach($oStudiengang->result AS $key => $value)
 			{
-				if (!$oWawi->bestellpositionen($bestellung_id,null,$bestelldetail_id))
-					$errormsg[]=$oWawi->errormsg;
-				if (!isset($oWawi->result[0]) && !$oWawi->bestellpositionen($bestellung_id,null,null,$bestelldetail_id))
-					$errormsg[]=$oWawi->errormsg;
-				if (isset($oWawi->result[0]->bestelldetail_id))
-					$bestelldetail_id=$oWawi->result[0]->bestelldetail_id;
+				$value->kuerzel=trim($value->kuerzel);
+				$studiengang_kuerzel[$value->kuerzel]=$value;
 			}
-			// Bestellung
+		}
+		else if ($oStudiengang->errormsg)
+			$errormsg[]=$oStudiengang->errormsg;
+
+		// Bestellposition
+		if ($bestelldetail_id)
+		{
+			if (!$oWawi->bestellpositionen($bestellung_id,null,$bestelldetail_id))
+				$errormsg[]=$oWawi->errormsg;
+			if (!isset($oWawi->result[0]) && !$oWawi->bestellpositionen($bestellung_id,null,null,$bestelldetail_id))
+				$errormsg[]=$oWawi->errormsg;
+			if (isset($oWawi->result[0]->bestelldetail_id))
+				$bestelldetail_id=$oWawi->result[0]->bestelldetail_id;
+		}
+		// Bestellung
+		else
+		{
+			if (!$oWawi->bestellung(null,null,$bestellung_id))
+				$errormsg[]=$oWawi->errormsg;
+		}
+		if (!isset($oWawi->result[0]))
+			$errormsg[]='Bestelldaten sind falsch!';
+
+		// Bestelldatenverarbeiten
+		for ($i=0;$i<count($oWawi->result);$i++)
+		{
+
+			$beschreibung=trim($oWawi->result[$i]->titel);
+			if (isset($oWawi->result[$i]->beschreibung))
+				$beschreibung.=($beschreibung?"\n":'').trim($oWawi->result[$i]->beschreibung).' '.trim($oWawi->result[$i]->artikelnr);
+
+		  	$verwendung=trim($oWawi->result[$i]->kostenstelle_bezeichnung);
+			if (isset($oWawi->result[$i]->konto_beschreibung))
+				$verwendung.=($verwendung?"\n":'').trim($oWawi->result[$i]->konto_beschreibung);
+
+
+		  	$anmerkung=trim($oWawi->result[$i]->bemerkungen);
+		  	$hersteller=trim($oWawi->result[$i]->firmenname);
+
+		  	$anzahl=trim(isset($oWawi->result[$i]->menge)?$oWawi->result[$i]->menge:$anzahl);
+
+			$wawi=$oWawi->result[$i];
+			// StgKz leer - pruefen ob in den Kostenstellen das StgKZ belegt ist
+			if ((!isset($wawi->studiengang_id) || !$wawi->studiengang_id)
+			&& isset($wawi->studiengang_kostenstelle_studiengang_id))
+			{
+					$wawi->studiengang_id=$wawi->studiengang_kostenstelle_studiengang_id;
+					$wawi->studiengang_bezeichnung=$wawi->studiengang_kostenstelle_bezeichnung;
+					$wawi->studiengang_kurzzeichen=$wawi->studiengang_kostenstelle_kurzzeichen;
+			}
+			$wawi->studiengang_kurzzeichen=trim($wawi->studiengang_kurzzeichen);
+			$wawi->studiengang_bezeichnung=trim($wawi->studiengang_bezeichnung);
+
+			if (isset($wawi->besteller) )
+			  	$besteller=$wawi->besteller;
+
+			// In Studiengangarray suchen mit Key = Kurzzeichen
+			if (isset($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]) && isset($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->oe_kurzbz) )
+			{
+				$wawi->oe_kurzbz=trim($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->oe_kurzbz);
+				if (empty($wawi->studiengang_bezeichnung))
+					$wawi->studiengang_bezeichnung=$studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->bezeichnung;
+				if (empty($wawi->studiengang_kurzzeichen))
+					$wawi->studiengang_kurzzeichen=$studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->kurzzeichen;
+				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
+			}
+			elseif (isset($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]) && isset($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->oe_kurzbz) )
+			{
+				$wawi->oe_kurzbz=trim($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->oe_kurzbz);
+				if (empty($wawi->studiengang_bezeichnung))
+					$wawi->studiengang_bezeichnung=$studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->bezeichnung;
+				if (empty($wawi->studiengang_kurzzeichen))
+					$wawi->studiengang_kurzzeichen=$studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->kurzzeichen;
+				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
+			}
+			elseif (isset($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]) && isset($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->oe_kurzbz) )
+			{
+				$wawi->oe_kurzbz=trim($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->oe_kurzbz);
+				if (empty($wawi->studiengang_bezeichnung))
+					$wawi->studiengang_bezeichnung=$studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->bezeichnung;
+				if (empty($wawi->studiengang_kurzzeichen))
+					$wawi->studiengang_kurzzeichen=$studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->kurzzeichen;
+				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
+			}
+			elseif (isset($studiengang_kuerzel[$wawi->studiengang_bezeichnung]) && isset($studiengang_kuerzel[$wawi->studiengang_bezeichnung]->oe_kurzbz) )
+			{
+				$wawi->oe_kurzbz=trim($studiengang_kuerzel[$wawi->studiengang_bezeichnung]->oe_kurzbz);
+				if (empty($wawi->studiengang_bezeichnung))
+					$wawi->studiengang_bezeichnung=$studiengang_kuerzel[$wawi->studiengang_bezeichnung]->bezeichnung;
+				if (empty($wawi->studiengang_kurzzeichen))
+					$wawi->studiengang_kurzzeichen=$studiengang_kuerzel[$wawi->studiengang_bezeichnung]->kurzzeichen;
+				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
+			}
+			elseif ($oOrganisationseinheit->load($wawi->studiengang_bezeichnung))
+			{
+				$wawi->oe_kurzbz=trim($wawi->studiengang_bezeichnung);
+				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung;
+			}
 			else
-			{
-				if (!$oWawi->bestellung(null,null,$bestellung_id))
-					$errormsg[]=$oWawi->errormsg;
-			}
-			if (!isset($oWawi->result[0]))
-				$errormsg[]='Bestelldaten sind falsch!';
+				$anmerkung.=($anmerkung?"\n":'').'WAWI Stg.: '.$wawi->studiengang_id.' '.$wawi->studiengang_kurzzeichen.', '.$wawi->studiengang_bezeichnung;
 
-			// Bestelldatenverarbeiten
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-
-				$beschreibung=trim($oWawi->result[$i]->titel);
-				if (isset($oWawi->result[$i]->beschreibung))
-					$beschreibung.=($beschreibung?"\n":'').trim($oWawi->result[$i]->beschreibung).' '.trim($oWawi->result[$i]->artikelnr);
-
-			  	$verwendung=trim($oWawi->result[$i]->kostenstelle_bezeichnung);
-				if (isset($oWawi->result[$i]->konto_beschreibung))
-					$verwendung.=($verwendung?"\n":'').trim($oWawi->result[$i]->konto_beschreibung);
-
-
-			  	$anmerkung=trim($oWawi->result[$i]->bemerkungen);
-			  	$hersteller=trim($oWawi->result[$i]->firmenname);
-
-			  	$anzahl=trim(isset($oWawi->result[$i]->menge)?$oWawi->result[$i]->menge:$anzahl);
-
-				$wawi=$oWawi->result[$i];
-				// StgKz leer - pruefen ob in den Kostenstellen das StgKZ belegt ist
-				if ((!isset($wawi->studiengang_id) || !$wawi->studiengang_id)
-				&& isset($wawi->studiengang_kostenstelle_studiengang_id))
-				{
-						$wawi->studiengang_id=$wawi->studiengang_kostenstelle_studiengang_id;
-						$wawi->studiengang_bezeichnung=$wawi->studiengang_kostenstelle_bezeichnung;
-						$wawi->studiengang_kurzzeichen=$wawi->studiengang_kostenstelle_kurzzeichen;
-				}
-				$wawi->studiengang_kurzzeichen=trim($wawi->studiengang_kurzzeichen);
-				$wawi->studiengang_bezeichnung=trim($wawi->studiengang_bezeichnung);
-
-				if (isset($wawi->besteller) )
-				  	$besteller=$wawi->besteller;
-
-				// In Studiengangarray suchen mit Key = Kurzzeichen
-				if (isset($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]) && isset($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->oe_kurzbz) )
-				{
-					$wawi->oe_kurzbz=trim($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->oe_kurzbz);
-					if (empty($wawi->studiengang_bezeichnung))
-						$wawi->studiengang_bezeichnung=$studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->bezeichnung;
-					if (empty($wawi->studiengang_kurzzeichen))
-						$wawi->studiengang_kurzzeichen=$studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->kurzzeichen;
-					$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-				}
-				elseif (isset($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]) && isset($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->oe_kurzbz) )
-				{
-					$wawi->oe_kurzbz=trim($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->oe_kurzbz);
-					if (empty($wawi->studiengang_bezeichnung))
-						$wawi->studiengang_bezeichnung=$studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->bezeichnung;
-					if (empty($wawi->studiengang_kurzzeichen))
-						$wawi->studiengang_kurzzeichen=$studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->kurzzeichen;
-					$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-				}
-				elseif (isset($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]) && isset($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->oe_kurzbz) )
-				{
-					$wawi->oe_kurzbz=trim($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->oe_kurzbz);
-					if (empty($wawi->studiengang_bezeichnung))
-						$wawi->studiengang_bezeichnung=$studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->bezeichnung;
-					if (empty($wawi->studiengang_kurzzeichen))
-						$wawi->studiengang_kurzzeichen=$studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->kurzzeichen;
-					$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-				}
-				elseif (isset($studiengang_kuerzel[$wawi->studiengang_bezeichnung]) && isset($studiengang_kuerzel[$wawi->studiengang_bezeichnung]->oe_kurzbz) )
-				{
-					$wawi->oe_kurzbz=trim($studiengang_kuerzel[$wawi->studiengang_bezeichnung]->oe_kurzbz);
-					if (empty($wawi->studiengang_bezeichnung))
-						$wawi->studiengang_bezeichnung=$studiengang_kuerzel[$wawi->studiengang_bezeichnung]->bezeichnung;
-					if (empty($wawi->studiengang_kurzzeichen))
-						$wawi->studiengang_kurzzeichen=$studiengang_kuerzel[$wawi->studiengang_bezeichnung]->kurzzeichen;
-					$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-				}
-				elseif ($oOrganisationseinheit->load($wawi->studiengang_bezeichnung))
-				{
-					$wawi->oe_kurzbz=trim($wawi->studiengang_bezeichnung);
-					$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung;
-				}
-				else
-					$anmerkung.=($anmerkung?"\n":'').'WAWI Stg.: '.$wawi->studiengang_id.' '.$wawi->studiengang_kurzzeichen.', '.$wawi->studiengang_bezeichnung;
-
-				if (!$oe_kurzbz)
-					$oe_kurzbz=(isset($wawi->oe_kurzbz) && $wawi->oe_kurzbz?$wawi->oe_kurzbz:'etw');
-			}
-	#	echo time(). " BESTELLUNG <hr>";
+			if (!$oe_kurzbz)
+				$oe_kurzbz=(isset($wawi->oe_kurzbz) && $wawi->oe_kurzbz?$wawi->oe_kurzbz:'etw');
+		}
 	}
 
 // ------------------------------------------------------------------------------------------
@@ -756,205 +735,206 @@
 
 	<!-- DATEN ANFANG -->
 	<?php
-		@flush();
+@flush();
 
-		$betriebsmittel_id_array=(isset($_REQUEST['betriebsmittel_id_array'])?$_REQUEST['betriebsmittel_id_array']:array());
+$betriebsmittel_id_array=(isset($_REQUEST['betriebsmittel_id_array'])?$_REQUEST['betriebsmittel_id_array']:array());
 
-		$nummer_array=(isset($_REQUEST['nummer_array'])?$_REQUEST['nummer_array']:array());
-		$seriennummer_array=(isset($_REQUEST['seriennummer_array'])?$_REQUEST['seriennummer_array']:array());
-		$betriebsmitteltyp_array=(isset($_REQUEST['betriebsmitteltyp_array'])?$_REQUEST['betriebsmitteltyp_array']:array());
-		$betriebsmittelstatus_kurzbz_array=(isset($_REQUEST['betriebsmittelstatus_kurzbz_array'])?$_REQUEST['betriebsmittelstatus_kurzbz_array']:array());
-		$ort_kurzbz_array=(isset($_REQUEST['ort_kurzbz_array'])?$_REQUEST['ort_kurzbz_array']:array());
-		$oe_kurzbz_array=(isset($_REQUEST['oe_kurzbz_array'])?$_REQUEST['oe_kurzbz_array']:array());
-		$person_id_array=(isset($_REQUEST['person_id_array'])?$_REQUEST['person_id_array']:array());
-		$person_id_old_array=(isset($_REQUEST['person_id_old_array'])?$_REQUEST['person_id_old_array']:array());
-		$bestellung_id_array=(isset($_REQUEST['bestellung_id_array'])?$_REQUEST['bestellung_id_array']:array());
-		$bestelldetail_id_array=(isset($_REQUEST['bestelldetail_id_array'])?$_REQUEST['bestelldetail_id_array']:array());
-		$hersteller_array=(isset($_REQUEST['hersteller_array'])?$_REQUEST['hersteller_array']:array());
-		$beschreibung_array=(isset($_REQUEST['beschreibung_array'])?$_REQUEST['beschreibung_array']:array());
-		$anmerkung_array=(isset($_REQUEST['anmerkung_array'])?$_REQUEST['anmerkung_array']:array());
-		$verwendung_array=(isset($_REQUEST['verwendung_array'])?$_REQUEST['verwendung_array']:array());
-		$leasing_bis_array=(isset($_REQUEST['leasing_bis_array'])?$_REQUEST['leasing_bis_array']:array());
-		$afa_array=(isset($_REQUEST['afa_array'])?$_REQUEST['afa_array']:array());
+$nummer_array=(isset($_REQUEST['nummer_array'])?$_REQUEST['nummer_array']:array());
+$seriennummer_array=(isset($_REQUEST['seriennummer_array'])?$_REQUEST['seriennummer_array']:array());
+$betriebsmitteltyp_array=(isset($_REQUEST['betriebsmitteltyp_array'])?$_REQUEST['betriebsmitteltyp_array']:array());
+$betriebsmittelstatus_kurzbz_array=(isset($_REQUEST['betriebsmittelstatus_kurzbz_array'])?$_REQUEST['betriebsmittelstatus_kurzbz_array']:array());
+$ort_kurzbz_array=(isset($_REQUEST['ort_kurzbz_array'])?$_REQUEST['ort_kurzbz_array']:array());
+$oe_kurzbz_array=(isset($_REQUEST['oe_kurzbz_array'])?$_REQUEST['oe_kurzbz_array']:array());
+$person_id_array=(isset($_REQUEST['person_id_array'])?$_REQUEST['person_id_array']:array());
+$person_id_old_array=(isset($_REQUEST['person_id_old_array'])?$_REQUEST['person_id_old_array']:array());
+$bestellung_id_array=(isset($_REQUEST['bestellung_id_array'])?$_REQUEST['bestellung_id_array']:array());
+$bestelldetail_id_array=(isset($_REQUEST['bestelldetail_id_array'])?$_REQUEST['bestelldetail_id_array']:array());
+$hersteller_array=(isset($_REQUEST['hersteller_array'])?$_REQUEST['hersteller_array']:array());
+$beschreibung_array=(isset($_REQUEST['beschreibung_array'])?$_REQUEST['beschreibung_array']:array());
+$anmerkung_array=(isset($_REQUEST['anmerkung_array'])?$_REQUEST['anmerkung_array']:array());
+$verwendung_array=(isset($_REQUEST['verwendung_array'])?$_REQUEST['verwendung_array']:array());
+$leasing_bis_array=(isset($_REQUEST['leasing_bis_array'])?$_REQUEST['leasing_bis_array']:array());
+$afa_array=(isset($_REQUEST['afa_array'])?$_REQUEST['afa_array']:array());
 
-		for ($pos=0;$pos<$anzahl;$pos++) {
-				$errormsg=array();
+for ($pos=0;$pos<$anzahl;$pos++) 
+{
+	$errormsg=array();
 
-			  	$vorlage=trim(isset($_REQUEST['vorlage'.$pos]) ?$_REQUEST['vorlage'.$pos]:'false');
+  	$vorlage=trim(isset($_REQUEST['vorlage'.$pos]) ?$_REQUEST['vorlage'.$pos]:'false');
 
-				$betriebsmittel_id_array[$pos]=trim(isset($betriebsmittel_id_array[$pos])?trim($betriebsmittel_id_array[$pos]):$betriebsmittel_id);
-				$nummer_array[$pos]=trim(isset($nummer_array[$pos])?trim($nummer_array[$pos]):$nummer);
-				$seriennummer_array[$pos]=trim(isset($seriennummer_array[$pos])?trim($seriennummer_array[$pos]):$seriennummer);
-				$betriebsmitteltyp_array[$pos]=trim(isset($betriebsmitteltyp_array[$pos]) && $work=='save' ?trim($betriebsmitteltyp_array[$pos]):$betriebsmitteltyp);
-				$betriebsmittelstatus_kurzbz_array[$pos]=trim(isset($betriebsmittelstatus_kurzbz_array[$pos]) && $work=='save' ?trim($betriebsmittelstatus_kurzbz_array[$pos]):$betriebsmittelstatus_kurzbz);
-				$ort_kurzbz_array[$pos]=trim(isset($ort_kurzbz_array[$pos]) && $work=='save' ?trim($ort_kurzbz_array[$pos]):$ort_kurzbz);
-				$oe_kurzbz_array[$pos]=trim(isset($oe_kurzbz_array[$pos]) && $work=='save' ?trim($oe_kurzbz_array[$pos]):$oe_kurzbz);
-				$person_id_array[$pos]=trim(isset($person_id_array[$pos]) && $work=='save' ?trim($person_id_array[$pos]):$person_id);
-				$person_id_old_array[$pos]=trim(isset($person_id_old_array[$pos]) && $work=='save' ?trim($person_id_old_array[$pos]):'');
-				$bestellung_id_array[$pos]=trim(isset($bestellung_id_array[$pos]) && $work=='save' ?trim($bestellung_id_array[$pos]):$bestellung_id);
-				$bestelldetail_id_array[$pos]=trim(isset($bestelldetail_id_array[$pos]) && $work=='save' ?trim($bestelldetail_id_array[$pos]):$bestelldetail_id);
-				$hersteller_array[$pos]=trim(isset($hersteller_array[$pos]) && $work=='save' ?trim($hersteller_array[$pos]):$hersteller);
-				$beschreibung_array[$pos]=trim(isset($beschreibung_array[$pos]) && $work=='save' ?trim($beschreibung_array[$pos]):$beschreibung);
-				$anmerkung_array[$pos]=trim(isset($anmerkung_array[$pos]) && $work=='save' ?trim($anmerkung_array[$pos]):$anmerkung);
-				$verwendung_array[$pos]=trim(isset($verwendung_array[$pos]) && $work=='save' ?trim($verwendung_array[$pos]):$verwendung);
-				$leasing_bis_array[$pos]=trim(isset($leasing_bis_array[$pos]) && $work=='save' ?trim($leasing_bis_array[$pos]):$leasing_bis);
-				$afa_array[$pos]=trim(isset($afa_array[$pos]) && $work=='save' ?trim($afa_array[$pos]):$afa);
+	$betriebsmittel_id_array[$pos]=trim(isset($betriebsmittel_id_array[$pos])?trim($betriebsmittel_id_array[$pos]):$betriebsmittel_id);
+	$nummer_array[$pos]=trim(isset($nummer_array[$pos])?trim($nummer_array[$pos]):$nummer);
+	$seriennummer_array[$pos]=trim(isset($seriennummer_array[$pos])?trim($seriennummer_array[$pos]):$seriennummer);
+	$betriebsmitteltyp_array[$pos]=trim(isset($betriebsmitteltyp_array[$pos]) && $work=='save' ?trim($betriebsmitteltyp_array[$pos]):$betriebsmitteltyp);
+	$betriebsmittelstatus_kurzbz_array[$pos]=trim(isset($betriebsmittelstatus_kurzbz_array[$pos]) && $work=='save' ?trim($betriebsmittelstatus_kurzbz_array[$pos]):$betriebsmittelstatus_kurzbz);
+	$ort_kurzbz_array[$pos]=trim(isset($ort_kurzbz_array[$pos]) && $work=='save' ?trim($ort_kurzbz_array[$pos]):$ort_kurzbz);
+	$oe_kurzbz_array[$pos]=trim(isset($oe_kurzbz_array[$pos]) && $work=='save' ?trim($oe_kurzbz_array[$pos]):$oe_kurzbz);
+	$person_id_array[$pos]=trim(isset($person_id_array[$pos]) && $work=='save' ?trim($person_id_array[$pos]):$person_id);
+	$person_id_old_array[$pos]=trim(isset($person_id_old_array[$pos]) && $work=='save' ?trim($person_id_old_array[$pos]):'');
+	$bestellung_id_array[$pos]=trim(isset($bestellung_id_array[$pos]) && $work=='save' ?trim($bestellung_id_array[$pos]):$bestellung_id);
+	$bestelldetail_id_array[$pos]=trim(isset($bestelldetail_id_array[$pos]) && $work=='save' ?trim($bestelldetail_id_array[$pos]):$bestelldetail_id);
+	$hersteller_array[$pos]=trim(isset($hersteller_array[$pos]) && $work=='save' ?trim($hersteller_array[$pos]):$hersteller);
+	$beschreibung_array[$pos]=trim(isset($beschreibung_array[$pos]) && $work=='save' ?trim($beschreibung_array[$pos]):$beschreibung);
+	$anmerkung_array[$pos]=trim(isset($anmerkung_array[$pos]) && $work=='save' ?trim($anmerkung_array[$pos]):$anmerkung);
+	$verwendung_array[$pos]=trim(isset($verwendung_array[$pos]) && $work=='save' ?trim($verwendung_array[$pos]):$verwendung);
+	$leasing_bis_array[$pos]=trim(isset($leasing_bis_array[$pos]) && $work=='save' ?trim($leasing_bis_array[$pos]):$leasing_bis);
+	$afa_array[$pos]=trim(isset($afa_array[$pos]) && $work=='save' ?trim($afa_array[$pos]):$afa);
 
-				if ($work=='save' && $nummer_array[$pos])
+	if ($work=='save' && $nummer_array[$pos])
+	{
+
+		$oBetriebsmittel = new betriebsmittel();
+		$oBetriebsmittel->result=array();
+		$oBetriebsmittel->debug=$debug;
+		$oBetriebsmittel->errormsg='';
+
+		$oBetriebsmittel->new=false;
+		if (!$oBetriebsmittel->load_nummer($nummer_array[$pos]))
+		{
+			$oBetriebsmittel->new=true;
+			$oBetriebsmittel->betriebsmittel_id=null;
+		}
+		$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
+
+		$oBetriebsmittel->beschreibung=$beschreibung_array[$pos];
+	    $oBetriebsmittel->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
+	    $oBetriebsmittel->nummer=$nummer_array[$pos];
+	    $oBetriebsmittel->nummerintern=0;
+	    $oBetriebsmittel->reservieren=false;
+	    $oBetriebsmittel->ort_kurzbz=$ort_kurzbz_array[$pos];
+	    $oBetriebsmittel->ext_id=0;
+	    $oBetriebsmittel->insertvon=$uid;
+	    $oBetriebsmittel->updatevon=$uid;
+
+	    $oBetriebsmittel->insertamum=null;
+	    $oBetriebsmittel->updateamum=null;
+
+		$oBetriebsmittel->oe_kurzbz=$oe_kurzbz_array[$pos];
+		$oBetriebsmittel->hersteller=$hersteller_array[$pos];
+		$oBetriebsmittel->seriennummer=$seriennummer_array[$pos];
+		$oBetriebsmittel->bestellung_id=$bestellung_id_array[$pos];
+		$oBetriebsmittel->bestelldetail_id=$bestelldetail_id_array[$pos];
+		$oBetriebsmittel->afa=$afa_array[$pos];
+		$oBetriebsmittel->verwendung=$verwendung_array[$pos];
+		$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
+		$oBetriebsmittel->leasing_bis=$leasing_bis_array[$pos];
+		
+		if ($oBetriebsmittel->save())
+		{
+			$errormsg[]='Inventar / Betriebsmittel '.($oBetriebsmittel->new?'gespeichert ':'ge&auml;ndert ');
+			$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
+
+			$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
+			$oBetriebsmittel_betriebsmittelstatus->result=array();
+			$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
+			$oBetriebsmittel_betriebsmittelstatus->errormsg='';
+
+			$oBetriebsmittel_betriebsmittelstatus->new=true;
+
+			$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=null;
+			if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id_array[$pos]))
+			{
+				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=trim($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz);
+				if (strtoupper($oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz)==strtoupper($betriebsmittelstatus_kurzbz_array[$pos]) )
 				{
-
-						$oBetriebsmittel = new betriebsmittel();
-						$oBetriebsmittel->result=array();
-						$oBetriebsmittel->debug=$debug;
-						$oBetriebsmittel->errormsg='';
-
-						$oBetriebsmittel->new=false;
-						if (!$oBetriebsmittel->load_nummer($nummer_array[$pos]))
-						{
-							$oBetriebsmittel->new=true;
-							$oBetriebsmittel->betriebsmittel_id=null;
-						}
-						$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
-
-						$oBetriebsmittel->beschreibung=$beschreibung_array[$pos];
-					    $oBetriebsmittel->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
-					    $oBetriebsmittel->nummer=$nummer_array[$pos];
-					    $oBetriebsmittel->nummerintern=0;
-					    $oBetriebsmittel->reservieren=false;
-					    $oBetriebsmittel->ort_kurzbz=$ort_kurzbz_array[$pos];
-					    $oBetriebsmittel->ext_id=0;
-					    $oBetriebsmittel->insertvon=$uid;
-					    $oBetriebsmittel->updatevon=$uid;
-
-					    $oBetriebsmittel->insertamum=null;
-					    $oBetriebsmittel->updateamum=null;
-
-						$oBetriebsmittel->oe_kurzbz=$oe_kurzbz_array[$pos];
-						$oBetriebsmittel->hersteller=$hersteller_array[$pos];
-						$oBetriebsmittel->seriennummer=$seriennummer_array[$pos];
-						$oBetriebsmittel->bestellung_id=$bestellung_id_array[$pos];
-						$oBetriebsmittel->bestelldetail_id=$bestelldetail_id_array[$pos];
-						$oBetriebsmittel->afa=$afa_array[$pos];
-						$oBetriebsmittel->verwendung=$verwendung_array[$pos];
-						$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
-						$oBetriebsmittel->leasing_bis=$leasing_bis_array[$pos];
-						
-						if ($oBetriebsmittel->save())
-						{
-							$errormsg[]='Inventar / Betriebsmittel '.($oBetriebsmittel->new?'gespeichert ':'ge&auml;ndert ');
-							$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
-
-							$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
-							$oBetriebsmittel_betriebsmittelstatus->result=array();
-							$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
-							$oBetriebsmittel_betriebsmittelstatus->errormsg='';
-
-							$oBetriebsmittel_betriebsmittelstatus->new=true;
-
-							$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=null;
-							if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id_array[$pos]))
-							{
-								$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=trim($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz);
-								if (strtoupper($oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz)==strtoupper($betriebsmittelstatus_kurzbz_array[$pos]) )
-								{
-									$oBetriebsmittel_betriebsmittelstatus->new=false;
-									$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=$oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelbetriebsmittelstatus_id;
-									$oBetriebsmittel_betriebsmittelstatus->datum=$oBetriebsmittel_betriebsmittelstatus->result[0]->datum;
-								}
-							}
-
-							$oBetriebsmittel_betriebsmittelstatus->datum=trim($oBetriebsmittel_betriebsmittelstatus->datum?$oBetriebsmittel_betriebsmittelstatus->datum:date('Y-m-d'));
-							$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$betriebsmittel_id_array[$pos];
-							$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=$betriebsmittelstatus_kurzbz_array[$pos];
-						    $oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
-						    $oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
-							if (!$oBetriebsmittel_betriebsmittelstatus->save())
-								$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
-
-
-							$oBetriebsmittelperson = new betriebsmittelperson();
-							$oBetriebsmittelperson->result=array();
-							$oBetriebsmittelperson->debug=$debug;
-							$oBetriebsmittelperson->errormsg='';
-							#$oBetriebsmittelperson->delete($betriebsmittel_id_array[$pos]);
-
-
-							// Entliehen an eine Person
-							if (!empty($person_id_array[$pos]) && !is_numeric($person_id_array[$pos]))
-							{
-								if ($oBenutzer = new benutzer($person_id_array[$pos]))
-									$person_id_array[$pos]=$oBenutzer->person_id;
-							}	
-							if (!empty($person_id_old_array[$pos]) && !is_numeric($person_id_old_array[$pos]))
-							{
-								if ($oBenutzer = new benutzer($person_id_old_array[$pos]))
-									$person_id_old_array[$pos]=$oBenutzer->person_id;
-							}	
-																						
-							if ($person_id_old_array[$pos] && $person_id_array[$pos]
-							&& $person_id_old_array[$pos]!=$person_id_array[$pos])
-							{
-								$oBetriebsmittelperson = new betriebsmittelperson();
-								$oBetriebsmittelperson->result=array();
-								$oBetriebsmittelperson->debug=$debug;
-								$oBetriebsmittelperson->errormsg='';
-								// Betriebsmittel lesen zur Person
-								if ($oBetriebsmittelperson->load($betriebsmittel_id_array[$pos],$person_id_old_array[$pos]))
-								{
-									if (is_array($oBetriebsmittelperson->result) && isset($oBetriebsmittelperson->result[0]))
-										$oBetriebsmittelperson->result=$oBetriebsmittelperson->result[0];
-									$oBetriebsmittelperson->errormsg='';
-								    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
-								    $oBetriebsmittelperson->person_id=$oBetriebsmittelperson->result->person_id;
-								    $oBetriebsmittelperson->anmerkung=$oBetriebsmittelperson->result->anmerkung;
-								    $oBetriebsmittelperson->kaution=($oBetriebsmittelperson->result->kaution?$oBetriebsmittelperson->result->kaution:0);
-								    $oBetriebsmittelperson->betriebsmitteltyp=$oBetriebsmittelperson->result->betriebsmitteltyp;
-								    $oBetriebsmittelperson->beschreibung=$oBetriebsmittelperson->result->beschreibung;
-								    $oBetriebsmittelperson->ausgegebenam=$oBetriebsmittelperson->result->ausgegebenam;
-								    $oBetriebsmittelperson->retouram=date('Y-m-d');
-								    $oBetriebsmittelperson->ext_id=$oBetriebsmittelperson->result->ext_id;
-								    $oBetriebsmittelperson->updatevon=$uid;
-
-									$oBetriebsmittelperson->new=false;
-					 				if (!$oBetriebsmittelperson->save())
-										$errormsg[]=$oBetriebsmittelperson->errormsg;
-								}
-							}
-
-							// Entliehen an eine Person
-							if ($person_id_array[$pos])
-							{
-								$oBetriebsmittelperson = new betriebsmittelperson();
-								$oBetriebsmittelperson->result=array();
-								$oBetriebsmittelperson->debug=$debug;
-								$oBetriebsmittelperson->errormsg='';
-								if (!$oBetriebsmittelperson->load($betriebsmittel_id_array[$pos],$person_id_array[$pos]))
-								{
-									$oBetriebsmittelperson->new=true;
-
-									$oBetriebsmittelperson->result=array();
-									$oBetriebsmittelperson->debug=$debug;
-									$oBetriebsmittelperson->errormsg='';
-
-								    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
-								    $oBetriebsmittelperson->person_id=$person_id_array[$pos];
-								    $oBetriebsmittelperson->anmerkung=($oBetriebsmittelperson->new?($anmerkung_array[$pos]?StringCut($anmerkung_array[$pos],43):$beschreibung_array[$pos]):$oBetriebsmittelperson->anmerkung);
-								    $oBetriebsmittelperson->kaution=0;
-								    $oBetriebsmittelperson->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
-								    $oBetriebsmittelperson->beschreibung=StringCut($beschreibung_array[$pos],89);
-								    $oBetriebsmittelperson->ausgegebenam=($oBetriebsmittelperson->new?date('Y-m-d'):$oBetriebsmittelperson->ausgegebenam);
-								    $oBetriebsmittelperson->retouram=($oBetriebsmittelperson->new?null:$oBetriebsmittelperson->retouram);
-								    $oBetriebsmittelperson->ext_id=($oBetriebsmittelperson->new?null:$oBetriebsmittelperson->ext_id);
-								    $oBetriebsmittelperson->insertvon=$uid;
-								    $oBetriebsmittelperson->updatevon=$uid;
-					 				if (!$oBetriebsmittelperson->save())
-										$errormsg[]=$oBetriebsmittelperson->errormsg;
-								}
-							}
-						}
-						else
-							$errormsg=$oBetriebsmittel->errormsg;
+					$oBetriebsmittel_betriebsmittelstatus->new=false;
+					$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=$oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelbetriebsmittelstatus_id;
+					$oBetriebsmittel_betriebsmittelstatus->datum=$oBetriebsmittel_betriebsmittelstatus->result[0]->datum;
 				}
+			}
+
+			$oBetriebsmittel_betriebsmittelstatus->datum=trim($oBetriebsmittel_betriebsmittelstatus->datum?$oBetriebsmittel_betriebsmittelstatus->datum:date('Y-m-d'));
+			$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$betriebsmittel_id_array[$pos];
+			$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=$betriebsmittelstatus_kurzbz_array[$pos];
+		    $oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
+		    $oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
+			if (!$oBetriebsmittel_betriebsmittelstatus->save())
+				$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
+
+
+			$oBetriebsmittelperson = new betriebsmittelperson();
+			$oBetriebsmittelperson->result=array();
+			$oBetriebsmittelperson->debug=$debug;
+			$oBetriebsmittelperson->errormsg='';
+			#$oBetriebsmittelperson->delete($betriebsmittel_id_array[$pos]);
+
+
+			// Entliehen an eine Person
+			if (!empty($person_id_array[$pos]) && !is_numeric($person_id_array[$pos]))
+			{
+				if ($oBenutzer = new benutzer($person_id_array[$pos]))
+					$person_id_array[$pos]=$oBenutzer->person_id;
+			}	
+			if (!empty($person_id_old_array[$pos]) && !is_numeric($person_id_old_array[$pos]))
+			{
+				if ($oBenutzer = new benutzer($person_id_old_array[$pos]))
+					$person_id_old_array[$pos]=$oBenutzer->person_id;
+			}	
+																		
+			if ($person_id_old_array[$pos] && $person_id_array[$pos]
+			&& $person_id_old_array[$pos]!=$person_id_array[$pos])
+			{
+				$oBetriebsmittelperson = new betriebsmittelperson();
+				$oBetriebsmittelperson->result=array();
+				$oBetriebsmittelperson->debug=$debug;
+				$oBetriebsmittelperson->errormsg='';
+				// Betriebsmittel lesen zur Person
+				if ($oBetriebsmittelperson->load($betriebsmittel_id_array[$pos],$person_id_old_array[$pos]))
+				{
+					if (is_array($oBetriebsmittelperson->result) && isset($oBetriebsmittelperson->result[0]))
+						$oBetriebsmittelperson->result=$oBetriebsmittelperson->result[0];
+					$oBetriebsmittelperson->errormsg='';
+				    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
+				    $oBetriebsmittelperson->person_id=$oBetriebsmittelperson->result->person_id;
+				    $oBetriebsmittelperson->anmerkung=$oBetriebsmittelperson->result->anmerkung;
+				    $oBetriebsmittelperson->kaution=($oBetriebsmittelperson->result->kaution?$oBetriebsmittelperson->result->kaution:0);
+				    $oBetriebsmittelperson->betriebsmitteltyp=$oBetriebsmittelperson->result->betriebsmitteltyp;
+				    $oBetriebsmittelperson->beschreibung=$oBetriebsmittelperson->result->beschreibung;
+				    $oBetriebsmittelperson->ausgegebenam=$oBetriebsmittelperson->result->ausgegebenam;
+				    $oBetriebsmittelperson->retouram=date('Y-m-d');
+				    $oBetriebsmittelperson->ext_id=$oBetriebsmittelperson->result->ext_id;
+				    $oBetriebsmittelperson->updatevon=$uid;
+
+					$oBetriebsmittelperson->new=false;
+	 				if (!$oBetriebsmittelperson->save())
+						$errormsg[]=$oBetriebsmittelperson->errormsg;
+				}
+			}
+
+			// Entliehen an eine Person
+			if ($person_id_array[$pos])
+			{
+				$oBetriebsmittelperson = new betriebsmittelperson();
+				$oBetriebsmittelperson->result=array();
+				$oBetriebsmittelperson->debug=$debug;
+				$oBetriebsmittelperson->errormsg='';
+				if (!$oBetriebsmittelperson->load($betriebsmittel_id_array[$pos],$person_id_array[$pos]))
+				{
+					$oBetriebsmittelperson->new=true;
+
+					$oBetriebsmittelperson->result=array();
+					$oBetriebsmittelperson->debug=$debug;
+					$oBetriebsmittelperson->errormsg='';
+
+				    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
+				    $oBetriebsmittelperson->person_id=$person_id_array[$pos];
+				    $oBetriebsmittelperson->anmerkung=($oBetriebsmittelperson->new?($anmerkung_array[$pos]?StringCut($anmerkung_array[$pos],43):$beschreibung_array[$pos]):$oBetriebsmittelperson->anmerkung);
+				    $oBetriebsmittelperson->kaution=0;
+				    $oBetriebsmittelperson->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
+				    $oBetriebsmittelperson->beschreibung=StringCut($beschreibung_array[$pos],89);
+				    $oBetriebsmittelperson->ausgegebenam=($oBetriebsmittelperson->new?date('Y-m-d'):$oBetriebsmittelperson->ausgegebenam);
+				    $oBetriebsmittelperson->retouram=($oBetriebsmittelperson->new?null:$oBetriebsmittelperson->retouram);
+				    $oBetriebsmittelperson->ext_id=($oBetriebsmittelperson->new?null:$oBetriebsmittelperson->ext_id);
+				    $oBetriebsmittelperson->insertvon=$uid;
+				    $oBetriebsmittelperson->updatevon=$uid;
+	 				if (!$oBetriebsmittelperson->save())
+						$errormsg[]=$oBetriebsmittelperson->errormsg;
+				}
+			}
+		}
+		else
+			$errormsg=$oBetriebsmittel->errormsg;
+	}
 		?>
 
 	<div id="container_array">
@@ -1327,10 +1307,10 @@
 			</fieldset>
 			<hr>
 			</div> <!-- ENDE Daten Container -->
-			<?php
-			@flush();
-			} // Ende Anzahl Schleife
-			?>
+<?php
+@flush();
+} // Ende Anzahl Schleife
+?>
 		</div>
 	&nbsp;
 	<input id="work" name="work" value="" style="display:none;">

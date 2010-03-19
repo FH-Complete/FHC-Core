@@ -22,22 +22,18 @@
  */
 
 // ---------------- Vilesci Include Dateien einbinden
-	$path='../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../';
-	if (!is_file($path.'config/vilesci.config.inc.php'))
-			$path='../../../';
+	$path='../../';
+
 	include_once($path.'config/vilesci.config.inc.php');
-	include_once($path.'include/basis_db.class.php');
  	require_once($path.'include/functions.inc.php');
-	if (!$uid=get_uid())
-		die('Keine Useranmeldedaten - UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/studiengang.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
  	require_once($path.'include/wawi.class.php');
   	require_once($path.'include/betriebsmittel.class.php');
-	
+  	
+	if (!$uid=get_uid())
+		die('Keine Useranmeldedaten - UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
@@ -80,26 +76,19 @@
 // Berechtigung
 // ------------------------------------------------------------------------------------------
 	$oBenutzerberechtigung = new benutzerberechtigung();
-	$oBenutzerberechtigung->errormsg='';
-	$oBenutzerberechtigung->berechtigungen=array();
 	// read Berechtigung
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
 		
 	$recht=false;
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 's')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'s'))
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
 	$schreib_recht=false;	
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 'suid') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 'suid')
-	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null), 'suid'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null, 'suid'))
 		$schreib_recht=true;
 
 // ------------------------------------------------------------------------------------------
@@ -306,12 +295,12 @@
 	</div>
 	<script type="text/javascript" language="JavaScript1.2">
 	   $(document).ready(function()
-	   {            // Prüft, ob das Dokument geladen ist
+	   {            // Prï¿½ft, ob das Dokument geladen ist
 	   	$("div#extend_search_on").click(function(event)
 		{  // Bei Klick auf div#
 	      if ( $("#extend_search").val() != 'true') 
 		  {
-	         $("div#ext_search").show("slow");         // div# langsam öffnen
+	         $("div#ext_search").show("slow");         // div# langsam ï¿½ffnen
 	         $("#extend_search").val('true')
 	      }
 		  else
@@ -383,323 +372,323 @@
 // Ausgabe der Bestellungen in Listenform
 function output_bestellung($resultBestellung=null,$schreib_recht=false,$debug=false)
 {
-		// Initialisierung
-		$htmlstring='';
-
-		// Plausib - Pruefung
-		if (is_null($resultBestellung) || !is_array($resultBestellung) || count($resultBestellung)<1)
-			return $htmlstring;
-
-		// Classen
-		if (!$oWAWI = new wawi())
-		   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
-		$oWAWI->debug=$debug;
-		$oWAWI->errormsg='';
-		$oWAWI->result=array();
-
-		if (!$oBetriebsmittel = new betriebsmittel())
-		   	die($oBetriebsmittel->errormsg.($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
-		$oBetriebsmittel->debug=$debug;
-		$oBetriebsmittel->errormsg='';
-		$oBetriebsmittel->result=array();
-
-		// HTML - Outputstring
-		$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>';
-		if (is_array($resultBestellung) && count($resultBestellung)>1)
-			$htmlstring.='<tr><th colspan="10">Bitte eine Bestellnummer aus den '.count($resultBestellung).' gefundenen ausw&auml;hlen</th></tr>';
-		$htmlstring.='<tr class="liste">
-					<th class="table-sortable:default">Bestellnr.</th>
-					<th class="table-sortable:default">ID</th>
-					<th class="table-sortable:default">Bezeichnung</th>
-					<th class="table-sortable:default">Lieferant</th>
-					<th class="table-sortable:default">Nr.</th>
-					<th class="table-sortable:default">Status</th>
-					<th class="table-sortable:default">Inventar</th>
-				</tr>
-				</thead>
-				';
-			// Listenausgabe der Bestellungen
-			for ($pos=0;$pos<count($resultBestellung);$pos++)
-			{
-
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-
-				$status='';
-				if (!empty($resultBestellung[$pos]->geliefert))
-					$status='<img src="../../skin/images/bullet_green.png" alt="" title="Lieferung am '.$resultBestellung[$pos]->geliefert.'" >&nbsp;Lieferung&nbsp;'.$resultBestellung[$pos]->geliefert;
-				else if (!empty($resultBestellung[$pos]->freigb_kst))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe KST am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigb_kst;
-				else if (!empty($resultBestellung[$pos]->freigb_stg))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe STG am '.$resultBestellung[$pos]->freigb_kst.'" &nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigb_stg;
-				else if (!empty($resultBestellung[$pos]->freigb_gst))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GST am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellung[$pos]->freigb_gst;
-				else if (!empty($resultBestellung[$pos]->freigb_rek))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe REK am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigb_rek;
-				else if (!empty($resultBestellung[$pos]->freigabe_gmb))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GMB am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigabe_gmb;
-				else if (!empty($resultBestellung[$pos]->bestellung))
-					$status='<img src="../../skin/images/bullet_red.png" alt="" title="Bestellung am '.$resultBestellung[$pos]->bestellung.'" >&nbsp;Bestellung&nbsp;'.$resultBestellung[$pos]->bestellung;
-				else
-					$status='<img src="../../skin/images/bullet_black.png" alt="" title="Anlage am '.$resultBestellung[$pos]->erstellung.'" >&nbsp;Anlage&nbsp;&nbsp;&nbsp;'.$resultBestellung[$pos]->erstellung;
-
-				$htmlstring.='<!-- Bestellungen Auflisten -->
-			    	<tr class="'.$classe.'"  style="font-size:smaller;">
-						<td><a title="Detail Bestellnummer '.$resultBestellung[$pos]->bestellnr.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id=&amp;bestellnr='.urlencode($resultBestellung[$pos]->bestellnr).'&amp;jahr_monat=">'.$resultBestellung[$pos]->bestellnr.'</a></td>
-						<td align="right"><a title="Detail Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestellnr=&amp;jahr_monat=">'.$resultBestellung[$pos]->bestellung_id.'</a></td>
-
-						<td>'.StringCut($resultBestellung[$pos]->titel,25) .'</td>
-
-						<!-- Firmen -->
-						<td>'.StringCut($resultBestellung[$pos]->firmenname,25).'</td>
-						<td align="right"><a href="firma_detail.php?firma_id='.$resultBestellung[$pos]->firma_id.'">'.$resultBestellung[$pos]->firma_id.'</a></td>
-
-						<td>&nbsp;'.$status.'&nbsp;</td>';
-
-					$oBetriebsmittel->result=array();
-					if (!isset($resultBestellung[$pos]->geliefert) || empty($resultBestellung[$pos]->geliefert))
-						$htmlstring.='<td align="right">&nbsp;<a title="Detail Bestell ID '.$resultBestellung[$pos]->bestellung_id.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">Status&nbsp;<img src="../../skin/images/information.png" alt="Status" ></a>&nbsp;</td>';
-					elseif ($oBetriebsmittel->load_bestellung_id($resultBestellung[$pos]->bestellung_id,null))
-						$htmlstring.='<td align="right">&nbsp;<a title="Inventar Anzeige Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="inventar.php?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">anzeigen&nbsp;<img src="../../skin/images/application_go.png" alt="Bestellung '.$resultBestellung[$pos]->bestellnr.'" ></a>&nbsp;</td>';
-					elseif ($schreib_recht)
-						$htmlstring.='<td align="right">&nbsp;<a title="Inventar Neuanlage Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="inventar_pflege.php?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">neuanlage&nbsp;<img src="../../skin/images/application_form_edit.png" alt="Bestellung '.$resultBestellung[$pos]->bestellnr.'" ></a>&nbsp;</td>';
-					else
-						$htmlstring.='<td align="right">&nbsp;<a title="Detail Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">Status&nbsp;<img src="../../skin/images/information.png" alt="Status" ></a>&nbsp;</td>';
-				$htmlstring.='</tr>';
-			}
-			$htmlstring.='</table>';
+	// Initialisierung
+	$htmlstring='';
+	
+	// Plausib - Pruefung
+	if (is_null($resultBestellung) || !is_array($resultBestellung) || count($resultBestellung)<1)
 		return $htmlstring;
+	
+	// Classen
+	if (!$oWAWI = new wawi())
+	   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
+	$oWAWI->debug=$debug;
+	$oWAWI->errormsg='';
+	$oWAWI->result=array();
+	
+	if (!$oBetriebsmittel = new betriebsmittel())
+	   	die($oBetriebsmittel->errormsg.($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
+	$oBetriebsmittel->debug=$debug;
+	$oBetriebsmittel->errormsg='';
+	$oBetriebsmittel->result=array();
+	
+	// HTML - Outputstring
+	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+			<thead>';
+	if (is_array($resultBestellung) && count($resultBestellung)>1)
+		$htmlstring.='<tr><th colspan="10">Bitte eine Bestellnummer aus den '.count($resultBestellung).' gefundenen ausw&auml;hlen</th></tr>';
+	$htmlstring.='<tr class="liste">
+				<th class="table-sortable:default">Bestellnr.</th>
+				<th class="table-sortable:default">ID</th>
+				<th class="table-sortable:default">Bezeichnung</th>
+				<th class="table-sortable:default">Lieferant</th>
+				<th class="table-sortable:default">Nr.</th>
+				<th class="table-sortable:default">Status</th>
+				<th class="table-sortable:default">Inventar</th>
+			</tr>
+			</thead>
+			';
+	// Listenausgabe der Bestellungen
+	for ($pos=0;$pos<count($resultBestellung);$pos++)
+	{
+
+		if ($pos%2)
+			$classe='liste1';
+		else
+			$classe='liste0';
+
+		$status='';
+		if (!empty($resultBestellung[$pos]->geliefert))
+			$status='<img src="../../skin/images/bullet_green.png" alt="" title="Lieferung am '.$resultBestellung[$pos]->geliefert.'" >&nbsp;Lieferung&nbsp;'.$resultBestellung[$pos]->geliefert;
+		else if (!empty($resultBestellung[$pos]->freigb_kst))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe KST am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigb_kst;
+		else if (!empty($resultBestellung[$pos]->freigb_stg))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe STG am '.$resultBestellung[$pos]->freigb_kst.'" &nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigb_stg;
+		else if (!empty($resultBestellung[$pos]->freigb_gst))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GST am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellung[$pos]->freigb_gst;
+		else if (!empty($resultBestellung[$pos]->freigb_rek))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe REK am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigb_rek;
+		else if (!empty($resultBestellung[$pos]->freigabe_gmb))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GMB am '.$resultBestellung[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;&nbsp;'.$resultBestellung[$pos]->freigabe_gmb;
+		else if (!empty($resultBestellung[$pos]->bestellung))
+			$status='<img src="../../skin/images/bullet_red.png" alt="" title="Bestellung am '.$resultBestellung[$pos]->bestellung.'" >&nbsp;Bestellung&nbsp;'.$resultBestellung[$pos]->bestellung;
+		else
+			$status='<img src="../../skin/images/bullet_black.png" alt="" title="Anlage am '.$resultBestellung[$pos]->erstellung.'" >&nbsp;Anlage&nbsp;&nbsp;&nbsp;'.$resultBestellung[$pos]->erstellung;
+
+		$htmlstring.='<!-- Bestellungen Auflisten -->
+	    	<tr class="'.$classe.'"  style="font-size:smaller;">
+				<td><a title="Detail Bestellnummer '.$resultBestellung[$pos]->bestellnr.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id=&amp;bestellnr='.urlencode($resultBestellung[$pos]->bestellnr).'&amp;jahr_monat=">'.$resultBestellung[$pos]->bestellnr.'</a></td>
+				<td align="right"><a title="Detail Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestellnr=&amp;jahr_monat=">'.$resultBestellung[$pos]->bestellung_id.'</a></td>
+
+				<td>'.StringCut($resultBestellung[$pos]->titel,25) .'</td>
+
+				<!-- Firmen -->
+				<td>'.StringCut($resultBestellung[$pos]->firmenname,25).'</td>
+				<td align="right"><a href="firma_detail.php?firma_id='.$resultBestellung[$pos]->firma_id.'">'.$resultBestellung[$pos]->firma_id.'</a></td>
+
+				<td>&nbsp;'.$status.'&nbsp;</td>';
+
+			$oBetriebsmittel->result=array();
+			if (!isset($resultBestellung[$pos]->geliefert) || empty($resultBestellung[$pos]->geliefert))
+				$htmlstring.='<td align="right">&nbsp;<a title="Detail Bestell ID '.$resultBestellung[$pos]->bestellung_id.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">Status&nbsp;<img src="../../skin/images/information.png" alt="Status" ></a>&nbsp;</td>';
+			elseif ($oBetriebsmittel->load_bestellung_id($resultBestellung[$pos]->bestellung_id,null))
+				$htmlstring.='<td align="right">&nbsp;<a title="Inventar Anzeige Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="inventar.php?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">anzeigen&nbsp;<img src="../../skin/images/application_go.png" alt="Bestellung '.$resultBestellung[$pos]->bestellnr.'" ></a>&nbsp;</td>';
+			elseif ($schreib_recht)
+				$htmlstring.='<td align="right">&nbsp;<a title="Inventar Neuanlage Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="inventar_pflege.php?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">neuanlage&nbsp;<img src="../../skin/images/application_form_edit.png" alt="Bestellung '.$resultBestellung[$pos]->bestellnr.'" ></a>&nbsp;</td>';
+			else
+				$htmlstring.='<td align="right">&nbsp;<a title="Detail Bestell-ID '.$resultBestellung[$pos]->bestellung_id.'" href="'.$_SERVER["PHP_SELF"].'?bestellung_id='.$resultBestellung[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">Status&nbsp;<img src="../../skin/images/information.png" alt="Status" ></a>&nbsp;</td>';
+		$htmlstring.='</tr>';
+	}
+	$htmlstring.='</table>';
+	return $htmlstring;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Ausgabe der Bestellpositionen in Listenform bei einer Bestellung
 function output_bestellposition($resultBestellungPos=null,$schreib_recht=false,$debug=false)
 {
-		// Initialisierung
-		$htmlstring='';
-		// Plausib - Pruefung
-		if (is_null($resultBestellungPos) || !is_array($resultBestellungPos) || count($resultBestellungPos)<1)
-			return $htmlstring;
+	// Initialisierung
+	$htmlstring='';
+	// Plausib - Pruefung
+	if (is_null($resultBestellungPos) || !is_array($resultBestellungPos) || count($resultBestellungPos)<1)
+		return $htmlstring;
 
-		// Classen
-		if (!$oWAWI = new wawi())
-		   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
-		$oWAWI->debug=$debug;
-		$oWAWI->errormsg='';
-		$oWAWI->result=array();
+	// Classen
+	if (!$oWAWI = new wawi())
+	   	die($oWAWI->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
+	$oWAWI->debug=$debug;
+	$oWAWI->errormsg='';
+	$oWAWI->result=array();
 
-		if (!$oBetriebsmittel = new betriebsmittel())
-		   	die($oBetriebsmittel->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
-		$oBetriebsmittel->debug=$debug;
-		$oBetriebsmittel->errormsg='';
-		$oBetriebsmittel->result=array();
+	if (!$oBetriebsmittel = new betriebsmittel())
+	   	die($oBetriebsmittel->errormsg . ($debug?' *** File:='.__FILE__.' Line:='.__LINE__:'') );
+	$oBetriebsmittel->debug=$debug;
+	$oBetriebsmittel->errormsg='';
+	$oBetriebsmittel->result=array();
 
-		// Wawi Besteller - Namen ermitteln
-		if ($oWAWI->benutzer(null,$resultBestellungPos[0]->besteller))
-			$besteller=$oWAWI->result[0]->anrede.' '.$oWAWI->result[0]->vname.' '.$oWAWI->result[0]->nname;
-		else
-		    $besteller=$resultBestellungPos[0]->besteller;
-		// Wawi Kontaktperson - Namen zusammen stellen
-		$kontaktperson=$resultBestellungPos[0]->kontaktperson_anrede.'&nbsp;'.$resultBestellungPos[0]->kontaktperson_vname.'&nbsp;'.$resultBestellungPos[0]->kontaktperson_nname;
-		// Bestellstatus ermitteln
-		if ($resultBestellungPos[0]->freigb_kst != '')
-			$freigabe='&nbsp;Kst '.$resultBestellungPos[0]->freigb_kst;
-		elseif ($resultBestellungPos[0]->freigb_stg != '')
-			$freigabe='&nbsp;Stg '.$resultBestellungPos[0]->freigb_stg;
-		elseif ($resultBestellungPos[0]->freigb_gst != '')
-			$freigabe='&nbsp;Gst '.$resultBestellungPos[0]->freigb_gst;
-		elseif ($resultBestellungPos[0]->freigb_rek != '')
-			$freigabe='&nbsp;Rek '.$resultBestellungPos[0]->freigb_rek;
-		elseif ($resultBestellungPos[0]->freigabe_gmb != '')
-			$freigabe='&nbsp;Gmb '.$resultBestellungPos[0]->freigabe_gmb;
-		else
-			$freigabe='';
-		// Lieferstatus ermitteln
-		$status='';
-		if (!empty($resultBestellungPos[0]->geliefert))
-			$status='<img src="../../skin/images/bullet_green.png" alt="" title="Geliefert am '.$resultBestellungPos[0]->geliefert.'" >&nbsp;Geliefert '.$resultBestellungPos[0]->geliefert;
-		else if (!empty($resultBestellungPos[0]->freigb_kst))
-			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe KST am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_kst;
-		else if (!empty($resultBestellungPos[0]->freigb_stg))
-			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe STG am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_stg;
-		else if (!empty($resultBestellungPos[0]->freigb_gst))
-			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GST am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_gst;
-		else if (!empty($resultBestellungPos[0]->freigb_rek))
-			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe REK am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_rek;
-		else if (!empty($resultBestellungPos[0]->freigabe_gmb))
-			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GMB am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigabe_gmb;
-		else if (!empty($resultBestellungPos[0]->bestellung))
-			$status='<img src="../../skin/images/bullet_red.png" alt="" title="Bestellt am '.$resultBestellungPos[0]->bestellung.'" >&nbsp;Bestellt '.$resultBestellungPos[0]->bestellung;
-		else
-			$status='<img src="../../skin/images/bullet_black.png" alt="" title="Erstellt am '.$resultBestellungPos[0]->erstellung.'" >&nbsp;Anlage '.$resultBestellungPos[0]->erstellung;
+	// Wawi Besteller - Namen ermitteln
+	if ($oWAWI->benutzer(null,$resultBestellungPos[0]->besteller))
+		$besteller=$oWAWI->result[0]->anrede.' '.$oWAWI->result[0]->vname.' '.$oWAWI->result[0]->nname;
+	else
+	    $besteller=$resultBestellungPos[0]->besteller;
+	// Wawi Kontaktperson - Namen zusammen stellen
+	$kontaktperson=$resultBestellungPos[0]->kontaktperson_anrede.'&nbsp;'.$resultBestellungPos[0]->kontaktperson_vname.'&nbsp;'.$resultBestellungPos[0]->kontaktperson_nname;
+	// Bestellstatus ermitteln
+	if ($resultBestellungPos[0]->freigb_kst != '')
+		$freigabe='&nbsp;Kst '.$resultBestellungPos[0]->freigb_kst;
+	elseif ($resultBestellungPos[0]->freigb_stg != '')
+		$freigabe='&nbsp;Stg '.$resultBestellungPos[0]->freigb_stg;
+	elseif ($resultBestellungPos[0]->freigb_gst != '')
+		$freigabe='&nbsp;Gst '.$resultBestellungPos[0]->freigb_gst;
+	elseif ($resultBestellungPos[0]->freigb_rek != '')
+		$freigabe='&nbsp;Rek '.$resultBestellungPos[0]->freigb_rek;
+	elseif ($resultBestellungPos[0]->freigabe_gmb != '')
+		$freigabe='&nbsp;Gmb '.$resultBestellungPos[0]->freigabe_gmb;
+	else
+		$freigabe='';
+	// Lieferstatus ermitteln
+	$status='';
+	if (!empty($resultBestellungPos[0]->geliefert))
+		$status='<img src="../../skin/images/bullet_green.png" alt="" title="Geliefert am '.$resultBestellungPos[0]->geliefert.'" >&nbsp;Geliefert '.$resultBestellungPos[0]->geliefert;
+	else if (!empty($resultBestellungPos[0]->freigb_kst))
+		$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe KST am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_kst;
+	else if (!empty($resultBestellungPos[0]->freigb_stg))
+		$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe STG am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_stg;
+	else if (!empty($resultBestellungPos[0]->freigb_gst))
+		$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GST am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_gst;
+	else if (!empty($resultBestellungPos[0]->freigb_rek))
+		$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe REK am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigb_rek;
+	else if (!empty($resultBestellungPos[0]->freigabe_gmb))
+		$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GMB am '.$resultBestellungPos[0]->freigb_kst.'" >&nbsp;Freigabe '.$resultBestellungPos[0]->freigabe_gmb;
+	else if (!empty($resultBestellungPos[0]->bestellung))
+		$status='<img src="../../skin/images/bullet_red.png" alt="" title="Bestellt am '.$resultBestellungPos[0]->bestellung.'" >&nbsp;Bestellt '.$resultBestellungPos[0]->bestellung;
+	else
+		$status='<img src="../../skin/images/bullet_black.png" alt="" title="Erstellt am '.$resultBestellungPos[0]->erstellung.'" >&nbsp;Anlage '.$resultBestellungPos[0]->erstellung;
 
-			
-		// Wawi - Bestelldetail - Ausgabe START
-		$htmlstring.='<fieldset><legend>Bestelldetail '.$resultBestellungPos[0]->bestellnr.'</legend>';
-			$htmlstring.='<fieldset><legend>Besteller </legend>';
-			$htmlstring.='<table class="liste">
-						<tr class="liste1">
-							<th align="right">Bestellnr.</th>
-							<td width="90%">'.$resultBestellungPos[0]->bestellnr.'</td>
-						</tr>
-						<tr class="liste1">
-							<th align="right">Bestell ID</th>
-							<td>'.$resultBestellungPos[0]->bestellung_id.'</a></td>
-						</tr>
-
-						<tr class="liste1">
-							<th align="right">Bestelltitel</th>
-							<td width="90%">'.$resultBestellungPos[0]->titel.'</td>
-						</tr>
-
-						<tr class="liste1">
-							<th align="right">Firmenname</th>
-							<td><a href="firma_detail.php?firma_id='.$resultBestellungPos[0]->firma_id.'">'.$resultBestellungPos[0]->firma_id.'&nbsp;'.$resultBestellungPos[0]->firmenname.'</a></td>
-						</tr>
-						<tr class="liste1">
-							<th align="right">Studiengangkz.</th>
-							<td><a href="studiengang_detail.php?studiengang_id='.(!empty($resultBestellungPos[0]->studiengang_id)?$resultBestellungPos[0]->studiengang_id:(isset($resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id)?$resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id:'')).'">'.(!empty($resultBestellungPos[0]->studiengang_id)?$resultBestellungPos[0]->studiengang_id:(isset($resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id)?$resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id:'')).' '.(isset($resultBestellungPos[0]->studiengang_bezeichnung) && !empty($resultBestellungPos[0]->studiengang_bezeichnung)?$resultBestellungPos[0]->studiengang_bezeichnung:(isset($resultBestellungPos[0]->studiengang_kostenstelle_bezeichnung)?$resultBestellungPos[0]->studiengang_kostenstelle_bezeichnung:'')).'</a></td>
-						</tr>
-						<tr class="liste1">
-							<th align="right">Kostenstelle</th>
-							<td><a href="kostenstelle_detail.php?kostenstelle_id='.$resultBestellungPos[0]->kostenstelle_id.'">'.$resultBestellungPos[0]->kostenstelle_id.' '.(isset($resultBestellungPos[0]->kostenstelle_bezeichnung)?$resultBestellungPos[0]->kostenstelle_bezeichnung:'').'</a></td>
-						</tr>
-						<tr class="liste1">
-							<th align="right">Konto</th>
-							<td><a href="konto_detail.php?konto_id='.$resultBestellungPos[0]->konto_id.'">'.$resultBestellungPos[0]->konto_id.' '.(isset($resultBestellungPos[0]->konto_beschreibung)?$resultBestellungPos[0]->konto_beschreibung:'').'</a></td>
-						</tr>
-						<tr class="liste1">
-							<th align="right">Kontaktperson</th>
-							<td title="user '.$resultBestellungPos[0]->kontaktperson_username.'">'.($resultBestellungPos[0]->kontaktperson_email?'<a title="'.$resultBestellungPos[0]->kontaktperson_email.'" href="mailto:'.$resultBestellungPos[0]->kontaktperson_email.'&amp;subject=Bestellung '.urlencode($resultBestellungPos[0]->bestellnr).' '.$resultBestellungPos[0]->titel.' '.$resultBestellungPos[0]->beschreibung.'"><img src="../../skin/images/email.png" alt="email" >&nbsp;':'').$kontaktperson.'&nbsp;'.($resultBestellungPos[0]->kontaktperson_email?'</a>':'').'&nbsp;</td>
-						</tr>
-						<tr class="liste1">
-							<th align="right">Besteller</th>
-							<td>'.($resultBestellungPos[0]->besteller?'<a title="'.$resultBestellungPos[0]->besteller.'" href="mailto:'.$resultBestellungPos[0]->besteller.'&amp;subject=Bestellung '.urlencode($resultBestellungPos[0]->bestellnr).' - '.$resultBestellungPos[0]->titel.',  '.$resultBestellungPos[0]->beschreibung.'"><img src="../../skin/images/email.png" alt="email" >&nbsp;':'').$besteller.'&nbsp;'.($resultBestellungPos[0]->besteller?'</a>':'').'&nbsp;</td>
-						</tr>
-				</table>';
-		$htmlstring.='</fieldset>';
-
-		$htmlstring.='<fieldset><legend>Infomation</legend>';
-				$htmlstring.='<table class="liste">
-						<tr>
-						<thead>
-							<th>Erstellt am</th>
-							<th>Gesendet am</th>
-							<th>Freigabe am</th>
-							<th>Liefertermin</th>
-							<th>Erledigt am</th>
-							<th>Status</th>
-						</thead>
-						</tr>
-						<tr class="liste1">
-							<td>'.$resultBestellungPos[0]->erstellung.'</td>
-							<td>'.$resultBestellungPos[0]->bestellung.'</td>
-							<td>&nbsp;'.$freigabe.'&nbsp;</td>
-							<td>'.$resultBestellungPos[0]->liefertermin.'</td>
-							<td>'.$resultBestellungPos[0]->geliefert.'</td>
-							<td>&nbsp;'.$status.'&nbsp;</td>
-						</tr>
-				</table>';
-		$htmlstring.='</fieldset>';
-
-		$htmlstring.='<fieldset><legend>Positionen zu '.$resultBestellungPos[0]->titel.'</legend>';
+		
+	// Wawi - Bestelldetail - Ausgabe START
+	$htmlstring.='<fieldset><legend>Bestelldetail '.$resultBestellungPos[0]->bestellnr.'</legend>';
+		$htmlstring.='<fieldset><legend>Besteller </legend>';
 		$htmlstring.='<table class="liste">
-					<thead>
-					<tr><th colspan="8">Positionen</th></tr>
-					<tr>
-						<th>Menge</th>
-						<th>VE</th>
-						<th>Beschreibung</th>
-						<th>Artikel</th>
-
-						<th>Preis/VE</th>
-						<th>Ust</th>
-						<th>Pos.wert</th>
-						<th>Inventar</th>
-
+					<tr class="liste1">
+						<th align="right">Bestellnr.</th>
+						<td width="90%">'.$resultBestellungPos[0]->bestellnr.'</td>
 					</tr>
+					<tr class="liste1">
+						<th align="right">Bestell ID</th>
+						<td>'.$resultBestellungPos[0]->bestellung_id.'</a></td>
+					</tr>
+
+					<tr class="liste1">
+						<th align="right">Bestelltitel</th>
+						<td width="90%">'.$resultBestellungPos[0]->titel.'</td>
+					</tr>
+
+					<tr class="liste1">
+						<th align="right">Firmenname</th>
+						<td><a href="firma_detail.php?firma_id='.$resultBestellungPos[0]->firma_id.'">'.$resultBestellungPos[0]->firma_id.'&nbsp;'.$resultBestellungPos[0]->firmenname.'</a></td>
+					</tr>
+					<tr class="liste1">
+						<th align="right">Studiengangkz.</th>
+						<td><a href="studiengang_detail.php?studiengang_id='.(!empty($resultBestellungPos[0]->studiengang_id)?$resultBestellungPos[0]->studiengang_id:(isset($resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id)?$resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id:'')).'">'.(!empty($resultBestellungPos[0]->studiengang_id)?$resultBestellungPos[0]->studiengang_id:(isset($resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id)?$resultBestellungPos[0]->studiengang_kostenstelle_studiengang_id:'')).' '.(isset($resultBestellungPos[0]->studiengang_bezeichnung) && !empty($resultBestellungPos[0]->studiengang_bezeichnung)?$resultBestellungPos[0]->studiengang_bezeichnung:(isset($resultBestellungPos[0]->studiengang_kostenstelle_bezeichnung)?$resultBestellungPos[0]->studiengang_kostenstelle_bezeichnung:'')).'</a></td>
+					</tr>
+					<tr class="liste1">
+						<th align="right">Kostenstelle</th>
+						<td><a href="kostenstelle_detail.php?kostenstelle_id='.$resultBestellungPos[0]->kostenstelle_id.'">'.$resultBestellungPos[0]->kostenstelle_id.' '.(isset($resultBestellungPos[0]->kostenstelle_bezeichnung)?$resultBestellungPos[0]->kostenstelle_bezeichnung:'').'</a></td>
+					</tr>
+					<tr class="liste1">
+						<th align="right">Konto</th>
+						<td><a href="konto_detail.php?konto_id='.$resultBestellungPos[0]->konto_id.'">'.$resultBestellungPos[0]->konto_id.' '.(isset($resultBestellungPos[0]->konto_beschreibung)?$resultBestellungPos[0]->konto_beschreibung:'').'</a></td>
+					</tr>
+					<tr class="liste1">
+						<th align="right">Kontaktperson</th>
+						<td title="user '.$resultBestellungPos[0]->kontaktperson_username.'">'.($resultBestellungPos[0]->kontaktperson_email?'<a title="'.$resultBestellungPos[0]->kontaktperson_email.'" href="mailto:'.$resultBestellungPos[0]->kontaktperson_email.'&amp;subject=Bestellung '.urlencode($resultBestellungPos[0]->bestellnr).' '.$resultBestellungPos[0]->titel.' '.$resultBestellungPos[0]->beschreibung.'"><img src="../../skin/images/email.png" alt="email" >&nbsp;':'').$kontaktperson.'&nbsp;'.($resultBestellungPos[0]->kontaktperson_email?'</a>':'').'&nbsp;</td>
+					</tr>
+					<tr class="liste1">
+						<th align="right">Besteller</th>
+						<td>'.($resultBestellungPos[0]->besteller?'<a title="'.$resultBestellungPos[0]->besteller.'" href="mailto:'.$resultBestellungPos[0]->besteller.'&amp;subject=Bestellung '.urlencode($resultBestellungPos[0]->bestellnr).' - '.$resultBestellungPos[0]->titel.',  '.$resultBestellungPos[0]->beschreibung.'"><img src="../../skin/images/email.png" alt="email" >&nbsp;':'').$besteller.'&nbsp;'.($resultBestellungPos[0]->besteller?'</a>':'').'&nbsp;</td>
+					</tr>
+			</table>';
+	$htmlstring.='</fieldset>';
+
+	$htmlstring.='<fieldset><legend>Infomation</legend>';
+			$htmlstring.='<table class="liste">
+					<tr>
+					<thead>
+						<th>Erstellt am</th>
+						<th>Gesendet am</th>
+						<th>Freigabe am</th>
+						<th>Liefertermin</th>
+						<th>Erledigt am</th>
+						<th>Status</th>
 					</thead>
-				';
-			$summe_netto=0;
-			$summe_brutto=0;
-			for ($pos=0;$pos<count($resultBestellungPos);$pos++)
-			{
-				$status='';
-				if (!empty($resultBestellungPos[$pos]->geliefert))
-					$status='<img src="../../skin/images/bullet_green.png" alt="" title="Geliefert am '.$resultBestellungPos[$pos]->geliefert.'" >&nbsp;Geliefert&nbsp;'.$resultBestellungPos[$pos]->geliefert;
-				else if (!empty($resultBestellungPos[$pos]->freigb_kst))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe KST am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_kst;
-				else if (!empty($resultBestellungPos[$pos]->freigb_stg))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe STG am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_stg;
-				else if (!empty($resultBestellungPos[$pos]->freigb_gst))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GST am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_gst;
-				else if (!empty($resultBestellungPos[$pos]->freigb_rek))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe REK am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_rek;
-				else if (!empty($resultBestellungPos[$pos]->freigabe_gmb))
-					$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GMB am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigabe_gmb;
-				else if (!empty($resultBestellungPos[$pos]->bestellung))
-					$status='<img src="../../skin/images/bullet_red.png" alt="" title="Bestellt am '.$resultBestellungPos[$pos]->bestellung.'" >&nbsp;Bestellt&nbsp;&nbsp;'.$resultBestellungPos[$pos]->bestellung;
-				else
-					$status='<img src="../../skin/images/bullet_black.png" alt="" title="Erstellt am '.$resultBestellungPos[$pos]->erstellung.'" >&nbsp;Anlage&nbsp;&nbsp;&nbsp;'.$resultBestellungPos[$pos]->erstellung;
-#pos
-				$summe_netto=$summe_netto+$resultBestellungPos[$pos]->summe;
-				$brutto=$resultBestellungPos[$pos]->summe + (($resultBestellungPos[$pos]->summe/100)*$resultBestellungPos[$pos]->mwst);
+					</tr>
+					<tr class="liste1">
+						<td>'.$resultBestellungPos[0]->erstellung.'</td>
+						<td>'.$resultBestellungPos[0]->bestellung.'</td>
+						<td>&nbsp;'.$freigabe.'&nbsp;</td>
+						<td>'.$resultBestellungPos[0]->liefertermin.'</td>
+						<td>'.$resultBestellungPos[0]->geliefert.'</td>
+						<td>&nbsp;'.$status.'&nbsp;</td>
+					</tr>
+			</table>';
+	$htmlstring.='</fieldset>';
 
-				if (empty($brutto))
-					$brutto=0;
-				$summe_brutto=$summe_brutto+$brutto;
+	$htmlstring.='<fieldset><legend>Positionen zu '.$resultBestellungPos[0]->titel.'</legend>';
+	$htmlstring.='<table class="liste">
+				<thead>
+				<tr><th colspan="8">Positionen</th></tr>
+				<tr>
+					<th>Menge</th>
+					<th>VE</th>
+					<th>Beschreibung</th>
+					<th>Artikel</th>
 
-				if ($pos%2)
-					$classe='liste1';
-				else
-					$classe='liste0';
-				$summe=0;
+					<th>Preis/VE</th>
+					<th>Ust</th>
+					<th>Pos.wert</th>
+					<th>Inventar</th>
 
-				// Wurde ein Position ausgewaehlt diese Markieren
-				$bestelldetail_id=trim(isset($_REQUEST['bestelldetail_id'])?$_REQUEST['bestelldetail_id']:'');
-				if ($resultBestellungPos[$pos]->bestelldetail_id==$bestelldetail_id)
-					$htmlstring.='<tr class="'.$classe.'" style="background-color: #FAFAD2;">';
-				else
-					$htmlstring.='<tr class="'.$classe.'">';
+				</tr>
+				</thead>
+			';
+	$summe_netto=0;
+	$summe_brutto=0;
+	for ($pos=0;$pos<count($resultBestellungPos);$pos++)
+	{
+		$status='';
+		if (!empty($resultBestellungPos[$pos]->geliefert))
+			$status='<img src="../../skin/images/bullet_green.png" alt="" title="Geliefert am '.$resultBestellungPos[$pos]->geliefert.'" >&nbsp;Geliefert&nbsp;'.$resultBestellungPos[$pos]->geliefert;
+		else if (!empty($resultBestellungPos[$pos]->freigb_kst))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe KST am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_kst;
+		else if (!empty($resultBestellungPos[$pos]->freigb_stg))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe STG am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_stg;
+		else if (!empty($resultBestellungPos[$pos]->freigb_gst))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GST am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_gst;
+		else if (!empty($resultBestellungPos[$pos]->freigb_rek))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe REK am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigb_rek;
+		else if (!empty($resultBestellungPos[$pos]->freigabe_gmb))
+			$status='<img src="../../skin/images/bullet_orange.png" alt="" title="Freigabe GMB am '.$resultBestellungPos[$pos]->freigb_kst.'" >&nbsp;Freigabe&nbsp;'.$resultBestellungPos[$pos]->freigabe_gmb;
+		else if (!empty($resultBestellungPos[$pos]->bestellung))
+			$status='<img src="../../skin/images/bullet_red.png" alt="" title="Bestellt am '.$resultBestellungPos[$pos]->bestellung.'" >&nbsp;Bestellt&nbsp;&nbsp;'.$resultBestellungPos[$pos]->bestellung;
+		else
+			$status='<img src="../../skin/images/bullet_black.png" alt="" title="Erstellt am '.$resultBestellungPos[$pos]->erstellung.'" >&nbsp;Anlage&nbsp;&nbsp;&nbsp;'.$resultBestellungPos[$pos]->erstellung;
 
-					$htmlstring.='<td align="right">'.number_format($resultBestellungPos[$pos]->menge, 2).'</td>
-								<td>'.$resultBestellungPos[$pos]->ve.'</td>
-								<td>'.$resultBestellungPos[$pos]->beschreibung.'</td>
-								<td>'.$resultBestellungPos[$pos]->artikelnr.'</td>
+		$summe_netto=$summe_netto+$resultBestellungPos[$pos]->summe;
+		$brutto=$resultBestellungPos[$pos]->summe + (($resultBestellungPos[$pos]->summe/100)*$resultBestellungPos[$pos]->mwst);
 
-								<td align="right">'.number_format($resultBestellungPos[$pos]->preisve,2).'</td>
+		if (empty($brutto))
+			$brutto=0;
+		$summe_brutto=$summe_brutto+$brutto;
 
-								<td align="right">'.number_format($resultBestellungPos[$pos]->mwst, 0).'%</td>
-								<td align="right">'.number_format($brutto,2).'</td>
-					';
-					$oBetriebsmittel->result=array();
-					if (!isset($resultBestellungPos[$pos]->geliefert) || empty($resultBestellungPos[$pos]->geliefert))
-						$htmlstring.='<td>&nbsp;-&nbsp;</td>';
-					elseif ($oBetriebsmittel->load_bestellung_id($resultBestellungPos[$pos]->bestellung_id,$resultBestellungPos[$pos]->bestelldetail_id))
-						$htmlstring.='<td>&nbsp;<a title="Inventar Anzeige Bestell-ID '.$resultBestellungPos[$pos]->bestelldetail_id.'" href="inventar.php?bestellung_id='.$resultBestellungPos[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBestellungPos[$pos]->bestelldetail_id.'&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">anzeigen<img src="../../skin/images/right.gif" alt="Bestellung '.$resultBestellungPos[$pos]->bestellnr.'-'.$resultBestellungPos[$pos]->bestelldetail_id.'" ></a>&nbsp;</td>';
-					elseif ($oBetriebsmittel->load_bestellung_id($resultBestellungPos[$pos]->bestellung_id,null))
-						$htmlstring.='<td>&nbsp;<a title="Inventar Anzeige Bestell-ID '.$resultBestellungPos[$pos]->bestelldetail_id.'" href="inventar.php?bestellung_id='.$resultBestellungPos[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">anzeigen<img src="../../skin/images/right.gif" alt="Bestellung '.$resultBestellungPos[$pos]->bestellnr.'" ></a>&nbsp;</td>';
-					elseif ($schreib_recht)
-						$htmlstring.='<td>&nbsp;<a title="Inventar Neuanlage Bestell-ID '.$resultBestellungPos[$pos]->bestelldetail_id.'" href="inventar_pflege.php?bestellung_id='.$resultBestellungPos[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBestellungPos[$pos]->bestelldetail_id.'&amp;betriebsmittelstatus_kurzbz=&amp;anzahl='.number_format($resultBestellungPos[$pos]->menge,0).'">neuanlage<img src="../../skin/images/right.gif" alt="Bestellung '.$resultBestellungPos[$pos]->bestellnr.'-'.$resultBestellungPos[$pos]->bestelldetail_id.'" ></a>&nbsp;</td>';
-					else
-						$htmlstring.='<td>&nbsp;-&nbsp;</td>';
-				$htmlstring.='</tr>';
-				}
-				$htmlstring.='<tr>
-								<td colspan="8"><hr /></td>
-							</tr>';
-				$htmlstring.='<tr>
-								<td colspan="6" align="right" nowrap>&nbsp;Summe Netto:&nbsp;</td>
-								<td align="right">'.number_format($summe_netto, 2).'</td>
-							</tr>';
-				$htmlstring.='<tr>
-								<td colspan="6" align="right" nowrap>&nbsp;Summe Brutto:&nbsp;</td>
-								<td align="right">'.number_format($summe_brutto, 2).'</td>
-							</tr>';
-				$htmlstring.='</table>';
-		$htmlstring.='</fieldset>';
+		if ($pos%2)
+			$classe='liste1';
+		else
+			$classe='liste0';
+		$summe=0;
+
+		// Wurde ein Position ausgewaehlt diese Markieren
+		$bestelldetail_id=trim(isset($_REQUEST['bestelldetail_id'])?$_REQUEST['bestelldetail_id']:'');
+		if ($resultBestellungPos[$pos]->bestelldetail_id==$bestelldetail_id)
+			$htmlstring.='<tr class="'.$classe.'" style="background-color: #FAFAD2;">';
+		else
+			$htmlstring.='<tr class="'.$classe.'">';
+
+			$htmlstring.='<td align="right">'.number_format($resultBestellungPos[$pos]->menge, 2).'</td>
+						<td>'.$resultBestellungPos[$pos]->ve.'</td>
+						<td>'.$resultBestellungPos[$pos]->beschreibung.'</td>
+						<td>'.$resultBestellungPos[$pos]->artikelnr.'</td>
+
+						<td align="right">'.number_format($resultBestellungPos[$pos]->preisve,2).'</td>
+
+						<td align="right">'.number_format($resultBestellungPos[$pos]->mwst, 0).'%</td>
+						<td align="right">'.number_format($brutto,2).'</td>
+			';
+			$oBetriebsmittel->result=array();
+			if (!isset($resultBestellungPos[$pos]->geliefert) || empty($resultBestellungPos[$pos]->geliefert))
+				$htmlstring.='<td>&nbsp;-&nbsp;</td>';
+			elseif ($oBetriebsmittel->load_bestellung_id($resultBestellungPos[$pos]->bestellung_id,$resultBestellungPos[$pos]->bestelldetail_id))
+				$htmlstring.='<td>&nbsp;<a title="Inventar Anzeige Bestell-ID '.$resultBestellungPos[$pos]->bestelldetail_id.'" href="inventar.php?bestellung_id='.$resultBestellungPos[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBestellungPos[$pos]->bestelldetail_id.'&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">anzeigen<img src="../../skin/images/right.gif" alt="Bestellung '.$resultBestellungPos[$pos]->bestellnr.'-'.$resultBestellungPos[$pos]->bestelldetail_id.'" ></a>&nbsp;</td>';
+			elseif ($oBetriebsmittel->load_bestellung_id($resultBestellungPos[$pos]->bestellung_id,null))
+				$htmlstring.='<td>&nbsp;<a title="Inventar Anzeige Bestell-ID '.$resultBestellungPos[$pos]->bestelldetail_id.'" href="inventar.php?bestellung_id='.$resultBestellungPos[$pos]->bestellung_id.'&amp;bestelldetail_id=&amp;bestellnr=&amp;betriebsmittelstatus_kurzbz=">anzeigen<img src="../../skin/images/right.gif" alt="Bestellung '.$resultBestellungPos[$pos]->bestellnr.'" ></a>&nbsp;</td>';
+			elseif ($schreib_recht)
+				$htmlstring.='<td>&nbsp;<a title="Inventar Neuanlage Bestell-ID '.$resultBestellungPos[$pos]->bestelldetail_id.'" href="inventar_pflege.php?bestellung_id='.$resultBestellungPos[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBestellungPos[$pos]->bestelldetail_id.'&amp;betriebsmittelstatus_kurzbz=&amp;anzahl='.number_format($resultBestellungPos[$pos]->menge,0).'">neuanlage<img src="../../skin/images/right.gif" alt="Bestellung '.$resultBestellungPos[$pos]->bestellnr.'-'.$resultBestellungPos[$pos]->bestelldetail_id.'" ></a>&nbsp;</td>';
+			else
+				$htmlstring.='<td>&nbsp;-&nbsp;</td>';
+		$htmlstring.='</tr>';
+	}
+	$htmlstring.='<tr>
+					<td colspan="8"><hr /></td>
+				</tr>';
+	$htmlstring.='<tr>
+					<td colspan="6" align="right" nowrap>&nbsp;Summe Netto:&nbsp;</td>
+					<td align="right">'.number_format($summe_netto, 2).'</td>
+				</tr>';
+	$htmlstring.='<tr>
+					<td colspan="6" align="right" nowrap>&nbsp;Summe Brutto:&nbsp;</td>
+					<td align="right">'.number_format($summe_brutto, 2).'</td>
+				</tr>';
+	$htmlstring.='</table>';
+	$htmlstring.='</fieldset>';
 	$htmlstring.='</fieldset>';
 	$htmlstring.='<div style="width:100%;text-align:right;"><a href="javascript:history.back();"><img src="../../skin/images/cross.png" alt="schliessen" title="schliessen/close" />&nbsp;zur&uuml;ck</a></div />';
 

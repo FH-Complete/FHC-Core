@@ -48,6 +48,12 @@
   	if (!$db = new basis_db())
 		die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
+	$rechte = new benutzerberechtigung();
+	if(!$rechte->getBerechtigungen($uid))
+		die('Sie haben keine Berechtigung fuer diese Seite');
+		
+	if(!$rechte->isBerechtigt('wawi/inventar', null, 's'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
 
 // ------------------------------------------------------------------------------------------
 // Initialisierung

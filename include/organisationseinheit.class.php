@@ -39,6 +39,7 @@ class organisationseinheit extends basis_db
 	public $bezeichnung;
 	public $organisationseinheittyp_kurzbz;
 	public $aktiv;
+	public $mailverteiler;
 	
 	public $oe_kurzbz_orig;
 	public $beschreibung;
@@ -72,6 +73,7 @@ class organisationseinheit extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
 				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->mailverteiler = ($row->mailverteiler=='t'?true:false);
 				
 				$this->result[] = $obj;
 			}
@@ -112,6 +114,7 @@ class organisationseinheit extends basis_db
 			$this->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 			$this->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
 			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->mailverteiler = ($row->mailverteiler=='t'?true:false);
 		}
 		else
 		{
@@ -142,6 +145,7 @@ class organisationseinheit extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
 				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->mailverteiler = ($row->mailverteiler=='t'?true:false);
 				
 				$this->result[] = $obj;
 			}
@@ -242,6 +246,7 @@ class organisationseinheit extends basis_db
 	 * Speichert eine Organisationseinheit
 	 *
 	 * @param $new
+	 * @return boolean
 	 */
 	public function save($new=null)
 	{
@@ -252,12 +257,13 @@ class organisationseinheit extends basis_db
 		{
 			//Neu anlegen
 			$qry = 'INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, 
-																organisationseinheittyp_kurzbz, aktiv) VALUES('.
+																organisationseinheittyp_kurzbz, aktiv, mailverteiler) VALUES('.
 					$this->addslashes($this->oe_kurzbz).','.
 					$this->addslashes($this->oe_parent_kurzbz).','.
 					$this->addslashes($this->bezeichnung).','.
 					$this->addslasheS($this->organisationseinheittyp_kurzbz).','.
-					($this->aktiv?'true':'false').');';
+					($this->aktiv?'true':'false').','.
+					($this->mailverteiler?'true':'false').');';
 		}
 		else 
 		{
@@ -277,7 +283,8 @@ class organisationseinheit extends basis_db
 					' oe_parent_kurzbz='.$this->addslashes($this->oe_parent_kurzbz).','.
 					' bezeichnung='.$this->addslashes($this->bezeichnung).','.
 					' organisationseinheittyp_kurzbz='.$this->addslashes($this->organisationseinheittyp_kurzbz).','.
-					' aktiv='.($this->aktiv?'true':'false').
+					' aktiv='.($this->aktiv?'true':'false').','.
+					' mailverteiler='.($this->mailverteiler?'true':'false').
 					" WHERE oe_kurzbz='".addslashes($this->oe_kurzbz_orig)."';";
 		}
 		
@@ -358,6 +365,7 @@ class organisationseinheit extends basis_db
 			$obj->bezeichnung = $row->bezeichnung;
 			$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
 			$obj->aktiv = ($row->aktiv=='t'?true:false);
+			$obj->mailverteiler = ($row->mailverteiler=='t'?true:false);
 			
 			$this->result[] = $obj;
 		}
@@ -367,7 +375,7 @@ class organisationseinheit extends basis_db
 	
 	/**
 	 * Laedt die Organisationseinheiten in ein Array
-	 *
+	 * das Array enthaelt danach Key alle Organisationseinheiten und als Value dessen Parent OE
 	 */
 	public function loadParentsArray()
 	{
@@ -382,7 +390,13 @@ class organisationseinheit extends basis_db
 		}
 	}
 	
-	
+	/**
+	 * Prueft ob $child eine Organisationseinheit unterhalb der OE $oe_kurzbz ist
+	 *
+	 * @param $oe_kurzbz parent organisationseinheit
+	 * @param $child child organisationseinheit
+	 * @return true wenn child, false wenn nicht
+	 */
 	public function isChild($oe_kurzbz, $child)
 	{
 		if(count(organisationseinheit::$oe_parents_array)<=0)
@@ -411,9 +425,7 @@ class organisationseinheit extends basis_db
 			}
 		}
 		
-		return false;
-			
-		
+		return false;		
 	}
 }
 ?>
