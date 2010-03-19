@@ -48,7 +48,7 @@
 // ------------------------------------------------------------------------------------------
 	$errormsg=array();
 	$default_status_vorhanden='Inventur';
-	$berechtigung_kurzbz='wawi/inventar';
+	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$recht=false;
 	$schreib_recht=false;
 	
@@ -77,8 +77,7 @@
 	$check=$firma_id.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$betriebsmitteltyp.$beschreibung.$oe_kurzbz;
 	$extend_search=($check?'true':$extend_search);
 
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 'suid') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 'suid'))
+	if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 'suid') )
 		$schreib_recht=true;
 
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)

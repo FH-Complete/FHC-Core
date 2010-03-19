@@ -40,7 +40,7 @@
 	$errormsg=array();
 
 	//------------ Berechtigungen
-	$berechtigung_kurzbz='wawi/inventar';
+	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$recht=false;
 	$schreib_recht=false;
 	$schreib_recht_administration=2; // Admin wert fuer set schreib_recht	

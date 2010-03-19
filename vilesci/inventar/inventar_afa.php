@@ -47,7 +47,7 @@
 // ------------------------------------------------------------------------------------------
 	$errormsg=array();
 	$default_status_vorhanden='vorhanden';
-	$berechtigung_kurzbz='wawi/inventar';
+	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$schreib_recht=false;
 	
 // ------------------------------------------------------------------------------------------
@@ -180,7 +180,7 @@
 //	Datenlesen
 // ------------------------------------------------------------------------------------------
 	// Organisation - Inventarverwalter
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') || $oBenutzerberechtigung->isBerechtigt('support', null, 's'))
+	if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 's'))
 	{
 		if (!$oOrganisationseinheit->getAll())
 			$errormsg[]=$oOrganisationseinheit->errormsg;
