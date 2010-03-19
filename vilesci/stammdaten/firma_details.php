@@ -20,73 +20,73 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
-		 
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/firma.class.php');
-	require_once('../../include/standort.class.php');
-	require_once('../../include/adresse.class.php');
-	require_once('../../include/nation.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	
+$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
+	 
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/firma.class.php');
+require_once('../../include/standort.class.php');
+require_once('../../include/adresse.class.php');
+require_once('../../include/nation.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-	if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	// ******* INIT ********
-	$user = get_uid();
-	//Zugriffsrechte pruefen
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('basis/firma'))
-		die('Sie haben keine Berechtigung für diese Seite');
-	
-	// Parameter einlesen
-	$adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
-	$standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
-	$oe_kurzbz = (isset($_REQUEST['oe_kurzbz'])?$_REQUEST['oe_kurzbz']:'');
-	$firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
-	
-	$save = (isset($_REQUEST['save'])?$_REQUEST['save']:null);	
-	$work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
-	$ajax = (isset($_REQUEST['ajax'])?$_REQUEST['ajax']:null);	
 
-	// Defaultwerte 
-	$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
-	$errorstr='';
-	$tabselect=0;
-	
-	//Loeschen einer Adresse
-	if(isset($_GET['deleteadresse']))
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+// ******* INIT ********
+$user = get_uid();
+//Zugriffsrechte pruefen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if(!$rechte->isBerechtigt('basis/firma:begrenzt'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+// Parameter einlesen
+$adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
+$standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
+$oe_kurzbz = (isset($_REQUEST['oe_kurzbz'])?$_REQUEST['oe_kurzbz']:'');
+$firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
+
+$save = (isset($_REQUEST['save'])?$_REQUEST['save']:null);	
+$work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
+$ajax = (isset($_REQUEST['ajax'])?$_REQUEST['ajax']:null);	
+
+// Defaultwerte 
+$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
+$errorstr='';
+$tabselect=0;
+
+//Loeschen einer Adresse
+if(isset($_GET['deleteadresse']))
+{
+	if( !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	if(is_numeric($standort_id))
 	{
-		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
-			die('Sie haben keine Berechtigung fuer diese Aktion');
-		if(is_numeric($standort_id))
+		$standort_obj = new standort();
+		if(!$standort_obj->delete($standort_id))
 		{
-			$standort_obj = new standort();
-			if(!$standort_obj->delete($standort_id))
-			{
-				$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Firma/Standort:'.$standort_obj->errormsg;
-			}
+			$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Firma/Standort:'.$standort_obj->errormsg;
 		}
-		if(is_numeric($adresse_id))
+	}
+	if(is_numeric($adresse_id))
+	{
+		$adresse_obj = new adresse();
+		if(!$adresse_obj->delete($adresse_id))
 		{
-			$adresse_obj = new adresse();
-			if(!$adresse_obj->delete($adresse_id))
-			{
-				$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen der Firma/Adresse:'.$adresse_obj->errormsg;
-			}
+			$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen der Firma/Adresse:'.$adresse_obj->errormsg;
 		}
+	}
 ?>
 	<script language="JavaScript1.2" type="text/javascript">
 		parent.frames[0].location.reload();
 	</script>
 <?php
-	}
-	//Loeschen einer Adresse
+}
+	//Loeschen einer Organisationseinheit
 	if(isset($_GET['deleteorganisationseinheit']))
 	{
-		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+		if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 		if(!empty($firma_organisationseinheit_id))
 		{
@@ -301,69 +301,79 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 	$htmlstr.="<form id='addFirma' name='addFirma' action='firma_details.php' method='POST'>\n";
 	$htmlstr.="<input type='hidden' name='work' value='saveFirma'>\n";	
 	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
-// Firma Detailanzeige
+	// Firma Detailanzeige
 	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr.="<tr><td><table width='100%'><tr>\n";
-		$htmlstr.="<td>Typ: </td>";		
-		$htmlstr.="<td><select name='typ'>\n";
+	$htmlstr.="<td>Typ: </td>";		
+	$htmlstr.="<td><select name='typ'>\n";
 
-		$qry = "SELECT firmentyp_kurzbz FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
-		if($result = $db->db_query($qry))
+	$qry = "SELECT firmentyp_kurzbz FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
 		{
-			while($row = $db->db_fetch_object($result))
-			{
-				$htmlstr.="<option value='".$row->firmentyp_kurzbz."' ".($firma->firmentyp_kurzbz == $row->firmentyp_kurzbz?' selected ':'').">".$row->firmentyp_kurzbz."</option>";
-			}
+			$htmlstr.="<option value='".$row->firmentyp_kurzbz."' ".($firma->firmentyp_kurzbz == $row->firmentyp_kurzbz?' selected ':'').">".$row->firmentyp_kurzbz."</option>";
 		}
-		$htmlstr.="</select></td>";
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Name: </td>";
-		$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
-		//$htmlstr.="<td>&nbsp;</td>";	
-		if($firma_id!='' && is_numeric($firma_id) )
-			$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 0);\" name='save' value='speichern'></td>\n";
-		else
-			$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
-		$htmlstr.="</tr></table></td>";
-		//$htmlstr.="<td rowspan='2'><table><tr>\n";	
-		//$htmlstr.="<td valign='top'>Anmerkung: </td>";
-		//$htmlstr.="<td><textarea cols='40' style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
-		// Unterscheiden der Wartung - Neuanlage = Submit, Aendern = Ajax
-		//if($firma_id!='' && is_numeric($firma_id) )
-		//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
-		//else
-		//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='submit' name='save' value='anlegen'></td>\n";
+	}
+	$htmlstr.="</select></td>";
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Name: </td>";
+	$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
+	//$htmlstr.="<td>&nbsp;</td>";	
+	if($firma_id!='' && is_numeric($firma_id) )
+		$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 0);\" name='save' value='speichern'></td>\n";
+	else
+		$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
+	$htmlstr.="</tr></table></td>";
+	//$htmlstr.="<td rowspan='2'><table><tr>\n";	
+	//$htmlstr.="<td valign='top'>Anmerkung: </td>";
+	//$htmlstr.="<td><textarea cols='40' style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
+	// Unterscheiden der Wartung - Neuanlage = Submit, Aendern = Ajax
+	//if($firma_id!='' && is_numeric($firma_id) )
+	//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+	//else
+	//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='submit' name='save' value='anlegen'></td>\n";
 
 	//$htmlstr.="</tr></table></td>";	
 	$htmlstr.="</tr>\n";
 	$htmlstr.="<tr><td><table><tr>\n";	
-		$htmlstr.="<td>Steuernummer: </td>";
-		$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value=".$firma->steuernummer."></td>\n";
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Finanzamt: </td>";
-		// Finanzamt anzeige und suche
-		$firma_finanzamt = new firma();
-		$firmentyp_finanzamt='Finanzamt';
-		$firma_finanzamt->searchFirma('',$firmentyp_finanzamt);	
-		#var_dump($firma_finanzamt);
-		$htmlstr.="<td><select name='finanzamt'>";
-			$htmlstr.="<option value=''> </option>";
-			foreach ($firma_finanzamt->result as $row_finazamt)
-				$htmlstr.="	<option value='".$row_finazamt->standort_id ."'>".$row_finazamt->bezeichnung." </option>";
-		$htmlstr.="</select></td>\n";
+	$htmlstr.="<td>Steuernummer: </td>";
+	$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value=".$firma->steuernummer."></td>\n";
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Finanzamt: </td>";
+	// Finanzamt anzeige und suche
+	$firma_finanzamt = new firma();
+	$firmentyp_finanzamt='Finanzamt';
+	$firma_finanzamt->searchFirma('',$firmentyp_finanzamt);	
+	#var_dump($firma_finanzamt);
+	$htmlstr.="<td><select name='finanzamt'>";
+		$htmlstr.="<option value=''> </option>";
+		foreach ($firma_finanzamt->result as $row_finazamt)
+			$htmlstr.="	<option value='".$row_finazamt->standort_id ."'>".$row_finazamt->bezeichnung." </option>";
+	$htmlstr.="</select></td>\n";
 
-		$htmlstr.="<td>Aktiv: </td>";
-		$htmlstr.="<td><input ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'')."></td>\n";
-		$htmlstr.="<td>&nbsp;</td>\n";
-	
-		$htmlstr.="<td>Gesperrt: </td>";
-		
+	$htmlstr.="<td>Aktiv: </td>";
+	$htmlstr.="<td><input ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'')."></td>\n";
+	$htmlstr.="<td>&nbsp;</td>\n";
+
+	$htmlstr.="<td>Gesperrt: </td>";
+	$user = get_uid();
+	//Zugriffsrechte pruefen
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if(!$rechte->isBerechtigt('basis/firma',null, 'suid'))
+	{
 		$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')."></td>\n";
-		$htmlstr.="<td>&nbsp;</td>\n";
-	
-		$htmlstr.="<td>Schule:</td>";
-		$htmlstr.="<td><input ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'')."> </td>";
-		$htmlstr.="<td>&nbsp;</td>";	
+	}
+	else 
+	{
+		$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')." disabled></td>\n";
+	}
+	$htmlstr.="<td>&nbsp;</td>\n";
+
+	$htmlstr.="<td>Schule:</td>";
+	$htmlstr.="<td><input ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'')."> </td>";
+	$htmlstr.="<td>&nbsp;</td>";	
 
 	$htmlstr.="</tr></table></td>";	
 	$htmlstr.="</tr>\n";
@@ -396,7 +406,7 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 function saveFirma($user,$rechte)
 {
 	// Speichern der Firmendaten
-	if(!$rechte->isBerechtigt('basis/firma',null, 'suid'))
+	if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 		return 'Sie haben keine Berechtigung fuer diese Aktion';
 	// Verarbeiten
 	$firma_id = (isset($_POST['firma_id'])?$_POST['firma_id']:'');
