@@ -37,7 +37,7 @@
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
 	$errormsg=array();
-	$berechtigung_kurzbz='wawi/inventar';
+	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$recht=false;
 
 // ------------------------------------------------------------------------------------------

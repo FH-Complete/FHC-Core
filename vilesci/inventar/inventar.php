@@ -47,7 +47,7 @@
 	$default_status_vorhanden='vorhanden'; // Defaultwert fuer Selectfeld - Status
 	
 	//------------ Berechtigungen
-	$berechtigung_kurzbz='wawi/inventar';
+	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$recht=false;
 	$delete_recht=false;	
 	$schreib_recht=false;
@@ -110,9 +110,7 @@
 	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'suid'))
 		$delete_recht=true;
 		
-	if($oBenutzerberechtigung->isBerechtigt('admin', 0, 'suid') 
-	|| $oBenutzerberechtigung->isBerechtigt('admin', null, 'suid') 
-	|| $oBenutzerberechtigung->isBerechtigt('support', null, 'suid'))
+	if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 'suid') )
 		$schreib_recht=$schreib_recht_administration;
 			
 // ------------------------------------------------------------------------------------------
@@ -472,7 +470,7 @@
 				<td><label for="oe_kurzbz">Organisation</label>&nbsp;
 					<select id="oe_kurzbz" name="oe_kurzbz" >
 						  <?php
-								if($oBenutzerberechtigung->isBerechtigt('admin', 0, 's') || $oBenutzerberechtigung->isBerechtigt('support', null, 's'))
+								if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 's'))
 									echo '<option '.(empty($oe_kurzbz)?' selected="selected" ':''); ?>  value="">bitte ausw&auml;hlen&nbsp;</option>
 							<?php
 								for ($i=0;$i<count($resultOrganisationseinheit) ;$i++)
