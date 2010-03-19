@@ -15,32 +15,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-    require_once('../../include/firma.class.php');
-    require_once('../../include/benutzerberechtigung.class.php');
-    
-	if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-    
-	$user = get_uid();
-	
-	//Berechtigung pruefen
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	$berechtigung_kurzbz = 'basis/firma';
-	if(!$rechte->isBerechtigt($berechtigung_kurzbz))
-		die('Sie haben keine Berechtigung fuer diese Seite ');
-	
-	// Parameter uebernehmen
-	$suchen = (isset($_GET['suchen'])?$_GET['suchen']:null);
-	$filter = (isset($_GET['filter'])?$_GET['filter']:'');
-	$firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/firma.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+$user = get_uid();
+
+//Berechtigung pruefen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+$berechtigung_kurzbz = 'basis/firma';
+if(!$rechte->isBerechtigt($berechtigung_kurzbz))
+	die('Sie haben keine Berechtigung fuer diese Seite ');
+
+// Parameter uebernehmen
+$suchen = (isset($_GET['suchen'])?$_GET['suchen']:null);
+$filter = (isset($_GET['filter'])?$_GET['filter']:'');
+$firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
 ?>
 <html>
 <head>
@@ -118,9 +118,10 @@ function creatList($suchen,$filter,$firmentypfilter)
 	    $htmlstr .= "       <th class='table-sortable:default'>Strasse</th>";		
 
 	    $htmlstr .= "       <th class='table-sortable:default'>Typ</th>";
+		$htmlstr .= "       <th class='table-sortable:default'>Aktiv</th>";
+	    $htmlstr .= "       <th class='table-sortable:default'>Gesperrt</th>";
 	    $htmlstr .= "       <th class='table-sortable:default'>Schule</th>";
-	    $htmlstr .= "       <th class='table-sortable:default'>Gesperrt</th>";		
-	    $htmlstr .= "       <th class='table-sortable:default'>Aktiv</th>";				
+				
 	    $htmlstr .= "       <th class='table-sortable:default'>Ext ID</th>";
 
 	    $htmlstr .= "   </tr></thead><tbody>\n";
@@ -141,9 +142,9 @@ function creatList($suchen,$filter,$firmentypfilter)
 	        $htmlstr .= "       <td>$row->ort</td>\n";
 	        $htmlstr .= "       <td>$row->strasse</td>\n";
 	        $htmlstr .= "       <td>$row->firmentyp_kurzbz</td>\n";
-			$htmlstr .= "       <td>".($row->gesperrt=='t'?'Ja':'Nein')."</td>\n";			
-			$htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
-			$htmlstr .= "       <td>".($row->aktiv=='t'?'Ja':'Nein')."</td>\n";			
+			$htmlstr .= "       <td>".($row->aktiv=='t'?'Ja':'Nein')."</td>\n";
+			$htmlstr .= "       <td>".($row->gesperrt=='t'?'Ja':'Nein')."</td>\n";
+	        $htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
 	        $htmlstr .= "       <td>$row->ext_id</td>\n";
 	        $htmlstr .= "   </tr>\n";
 	        $i++;
