@@ -54,6 +54,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('basis/firma'))
 
 // Parameter einlesen
 $errorstr='';
+$tabselect=0;
 
 $standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
 $adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
@@ -397,6 +398,7 @@ function setOrtData()
 						success: function(phpData)
 						{
 					   		$("div#"+wohin).html(phpData);
+					   		
 						}
 					}
 				);
@@ -514,25 +516,32 @@ div.css-panes div div{
 		{
 			case 'listKontakte':
 				$htmlcode=listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
+				$tabselect=2;
 				break;
 			case 'eingabeKontakt':
 				$htmlcode=eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
+				$tabselect=2;
 				break;
 			case 'saveKontakt':
 				$htmlcode=saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte,$rechte);
+				$tabselect=2;
 				break;
 
 			case 'listPersonenfunktionen':
 				$htmlcode=getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
+				$tabselect=1;
 				break;
 			case 'eingabePersonenfunktionen':
 				$htmlcode=eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
+				$tabselect=1;
 				break;
 			case 'savePersonenfunktionen':
 				$htmlcode=savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
+				$tabselect=1;
 				break;
 			case 'saveStandort':
 				$htmlcode=saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
+				$tabselect=0;
 				break;		
 				
 			case 'saveFirmaorganisationseinheit':
@@ -564,15 +573,15 @@ div.css-panes div div{
 		if ($showmenue)
 			echo '<!-- Tabs --> 
 			<ul class="css-tabsDetail">
-			     <li><a href="firma_detailwork.php?work=standort&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Standort</a></li>
-				 <li><a href="firma_detailwork.php?work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Personen/Funktion</a></li>
-				 <li><a href="firma_detailwork.php?work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Kontakte</a></li>
+			     <li '.($tabselect==0?"class=current":"").'><a href="firma_detailwork.php?work=standort&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Standort</a></li>
+				 <li '.($tabselect==1?"class=current":"").'><a href="firma_detailwork.php?work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Ansprechpartner</a></li>
+				 <li '.($tabselect==2?"class=current":"").'><a href="firma_detailwork.php?work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Kontakte</a></li>
 			</ul>
 			<div class="css-panes">
 				<div style="display:block" id="detail">'.$htmlcode.'</div>
 			</div>
 			<br />	
-			<div id="detailworinfodiv"></div>
+			<div id="detailworkinfodiv"></div>
 			';
 		else	
 			echo $htmlcode;	
@@ -807,12 +816,19 @@ function saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_a
 		return 'Fehler beim Speichern des Kontakt '.$kontakttyp .' '.$kontakt.' ID '. $kontakt_id.' :'.$kontakt_obj->errormsg;
 	if ($kontakt_obj->new)
 		$kontakt_id=$kontakt_obj->kontakt_id;
+		
+	//frame reloaden, um wieder zur liste zu kommen
+	echo '<script language="JavaScript1.2" type="text/javascript">
+	<!--
+		parent.frames[2].location.reload();
+	-->		
+	</script>';
 	return 'Kontakt: '.$kontakttyp .' '.$kontakt.' ID '. $kontakt_id.' gespeichert';
 }
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
 /*
-	Kontakte zu Firmen,Standorte in Listenform
+	Kontakte zu Firmen, Standorte in Listenform
 */
 function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte)	
 {	
@@ -957,7 +973,7 @@ function eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adressty
 	$htmlstr.="<tr><td><table><tr>\n";
 			$htmlstr.='<td><input onclick="callUrl(\'detail\',\'work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');" type="Button" value="zur&uuml;ck"></td>';
 			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
-			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworinfodiv\',\'addKontakt\');" type="Button" value="speichern"></td>';
+			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addKontakt\');" type="Button" value="speichern"></td>';
 		$htmlstr.="</tr></table></td>";				
 	$htmlstr.="</tr>\n";
 	
@@ -1032,6 +1048,11 @@ function savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_i
 		
 	if ($standort_obj->new)
 		$personfunktionstandort_id=$standort_obj->personfunktionstandort_id;
+	echo '<script language="JavaScript1.2" type="text/javascript">
+	<!--
+		parent.frames[2].location.reload();
+	-->		
+	</script>';
 	return 'Funktion der Person am Standort : '.$funktion_kurzbz .' '.$position.' ID '. $personfunktionstandort_id.' gespeichert';
 }
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
@@ -1081,7 +1102,7 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 					<th>Position</th>
 					<th>Anrede</th>
 					<th>Person</th>
-					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top" colspan="3"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 	$i=0;
 	foreach ($standort_obj->result as $row)
@@ -1097,12 +1118,11 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		$htmlstr.= '<td>'.$row->anrede.'</td>';
 
 		$person=($row->person_anrede?$row->person_anrede.' ':'').($row->titelpre?$row->titelpre.' ':'').($row->vorname?$row->vorname.' ':'').($row->nachname?$row->nachname.' ':'');
-		if (empty($person))
-			$person=$row->personen_id;
 		$htmlstr.= '<td>'.$person.'</td>';
 		
-		$htmlstr.= '<td align="center"><a href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="editieren"/></a></td>';
-		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletepersonfunktionstandort=true&standort_id=".$row->standort_id."&personfunktionstandort_id=".$row->personfunktionstandort_id."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+		$htmlstr.= '<td align="center"><a href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="Funktion editieren" title="Funktion editieren"/></a></td>';
+		$htmlstr.= "<td align='center'><a href='../personen/kontaktdaten_edit.php?person_id=".$row->person_id."' target=\"_blank\"><img src='../../skin/images/edit.png' alt='Kontaktdaten editieren' title='Kontaktdaten editieren'/></a></td>";
+		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletepersonfunktionstandort=true&standort_id=".$row->standort_id."&personfunktionstandort_id=".$row->personfunktionstandort_id."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='Funktion loeschen' title='Funktion loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
 	$htmlstr.= '</table>';
@@ -1176,19 +1196,16 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 						{
 						    return row[0] + ' <li>' + row[1] + '</li> ';
 						}
-						//$(document).ready(function() 
-						//{
-							  $('#position').autocomplete('stammdaten_autocomplete.php', 
-							  {
-								minChars:1,
-								matchSubset:1,matchContains:1,
-								width:400,
-								formatItem:formatItem,
-								extraParams:{'work':'position'
+						$('#position').autocomplete('stammdaten_autocomplete.php', 
+						{
+							minChars:1,
+							matchSubset:1,matchContains:1,
+							width:400,
+							formatItem:formatItem,
+							extraParams:{'work':'position'
 								,'funktion_kurzbz':$('#funktion_kurzbz').val()
-								}
-							});
-					  //});
+							}
+						});
 					</script>
 		";
 		
@@ -1203,17 +1220,15 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 							{
 							    return row[0] + ' <li>' + row[1] + '</li> ';
 							}
-							//$(document).ready(function() 
-							//{
-								$('#person_id').autocomplete('stammdaten_autocomplete.php', 
-								{
-									minChars:2,
-									matchSubset:1,matchContains:1,
-									width:400,
-									formatItem:formatItem,
-									extraParams:{'work':'person'}
-								});
-							//});
+							$('#person_id').autocomplete('stammdaten_autocomplete.php', 
+							{
+								minChars:2,
+								matchSubset:1,matchContains:1,
+								width:400,
+								formatItem:formatItem,
+								extraParams:{'work':'person'}
+							});
+
 					</script>
 		";
 
@@ -1223,10 +1238,13 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 	$htmlstr.="</tr>\n";
 				
 	// Submit-Knopf  Zeile
+	$tabselect=1;
 	$htmlstr.="<tr><td><table><tr>\n";
 			$htmlstr.='<td><input onclick="callUrl(\'detail\',\'work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');" type="Button" value="zur&uuml;ck"></td>';
 			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
-			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworinfodiv\',\'addPersonenfunktionen\');" type="Button" value="speichern"></td>';
+			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addPersonenfunktionen\');" type="Button" value="speichern"></td>';
+			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
+			$htmlstr.="<td><a href='../personen/personen_anlegen.php' target='_blank'><input type='button' value='Person anlegen'></a></td>";
 		$htmlstr.="</tr></table></td>";				
 	$htmlstr.="</tr>\n";
 	
@@ -1396,7 +1414,7 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	$htmlstr.="</tr>\n";
 
 	$htmlstr.="<tr><td><table><tr>\n";
-		$htmlstr.='<td><input onclick="workDetailRecord(\'detailworinfodiv\',\'addStandort\');" type="Button" value="speichern"></td>';
+		$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addStandort\');" type="Button" value="speichern"></td>';
 	$htmlstr.="</tr></table></td>";				
 	$htmlstr.="</tr>\n";
 	$htmlstr.="	</table>\n";

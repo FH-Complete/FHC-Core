@@ -357,6 +357,7 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 		$htmlstr.="<td>&nbsp;</td>\n";
 	
 		$htmlstr.="<td>Gesperrt: </td>";
+		
 		$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')."></td>\n";
 		$htmlstr.="<td>&nbsp;</td>\n";
 	
@@ -631,7 +632,7 @@ function getAnmerkungen($firma_id,$user)
 		$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 2);\" name='save' value='speichern'></td>\n";
 	else
 		$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
-	$htmlstr.= "</tr><tr><td colspan='2'><textarea cols='40' rows='8' style='width:100%' name='anmerkung'>".$firma->anmerkung."</textarea></td></tr>";
+	$htmlstr.= "</tr><tr><td colspan='2'><textarea cols='40' rows='6' style='width:100%' name='anmerkung'>".$firma->anmerkung."</textarea></td></tr>";
 	$htmlstr.="</form>\n";
 	return $htmlstr;
 }
