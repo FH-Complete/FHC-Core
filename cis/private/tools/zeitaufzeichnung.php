@@ -137,8 +137,8 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 	
 	$zeit->uid = $user;
 	$zeit->aktivitaet_kurzbz = $aktivitaet_kurzbz;
-	$zeit->start = $von;
-	$zeit->ende = $bis;
+	$zeit->start = $datum->formatDatum($von, $format='Y-m-d H:i:s');
+	$zeit->ende = $datum->formatDatum($bis, $format='Y-m-d H:i:s');
 	$zeit->beschreibung = $beschreibung;
 	$zeit->studiengang_kz = $studiengang_kz;
 	$zeit->fachbereich_kurzbz = $fachbereich_kurzbz;
@@ -148,7 +148,7 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 	
 	if(!$zeit->save())
 	{
-		echo '<b>Fehler beim Speichern der Daten:'.$zeit->errormsg.'</b><br>';
+		echo '<b>Fehler beim Speichern der Daten: '.$zeit->errormsg.'</b><br>';
 	}
 	else 
 	{
