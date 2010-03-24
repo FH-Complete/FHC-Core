@@ -361,7 +361,7 @@ function getFirmadetail($firma_id,$adresstyp_arr,$user)
 	//Zugriffsrechte pruefen
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	if(!$rechte->isBerechtigt('basis/firma',null, 'suid'))
+	if($rechte->isBerechtigt('basis/firma',null, 'suid'))
 	{
 		$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')."></td>\n";
 	}
@@ -581,8 +581,7 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 ##	var_dump($firma);
 	$htmlstr.= '<table class="liste">
 				<tr>
-					<th width="30%">Kurzbezeichnung</th>
-					<th width="15%">Typ</th>
+					<th width="30%">Organisationseinheit</th>
 					<th width="25%">Bezeichnung</th>
 					<th width="15%">Kundennummer</th>
 					<td width="15%" align="center" valign="top" colspan="2"><a target="detail_workfirma" 
@@ -595,10 +594,8 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 	{
 		$htmlstr .= "<tr id='standort".$i."' class='liste". ($i%2) ."'>\n";
 		$i++;
-			$htmlstr.= '<td><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id='.$row->firma_organisationseinheit_id.'&oe_kurzbz='.$row->oe_kurzbz.'&firma_id='.$firma_id.'">'.$row->oe_kurzbz.'</a></td>';
-			$htmlstr.= '<td>'.$row->organisationseinheittyp_kurzbz.'</td>';
-			$htmlstr.= '<td>'.$row->bezeichnung.'</td>';
-
+			$htmlstr.= '<td><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id='.$row->firma_organisationseinheit_id.'&oe_kurzbz='.$row->oe_kurzbz.'&firma_id='.$firma_id.'">'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</a></td>';
+			$htmlstr.= '<td>'.$row->fobezeichnung.'</td>';
 			$htmlstr.= '<td align="center">'.$row->kundennummer.'</td>';
 			$htmlstr.= '<td align="center"><a target="detail_workfirma" href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id='.$row->firma_organisationseinheit_id.'&oe_kurzbz='.$row->oe_kurzbz.'&firma_id='.$firma_id.'"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="edit"/></a></td>';
 			$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteorganisationseinheit=true&firma_organisationseinheit_id=".$row->firma_organisationseinheit_id."&oe_kurzbz=".$row->oe_kurzbz."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";

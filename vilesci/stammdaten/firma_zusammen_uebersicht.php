@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2010 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 	require_once('../../config/vilesci.config.inc.php');
@@ -73,7 +73,24 @@
 	<script src="../../include/js/jquery.js" type="text/javascript"></script>
 	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
 	<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
+	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+	<style type="text/css">
+	<!--
+	
+	/* define the table content to be scrollable                                              */
+	/* set TBODY element to have block level attributes. All other non-IE browsers            */
+	/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */
+	/* induced side effect is that child TDs no longer accept width: auto                     */
+	html>body tbody.scrollContent 
+	{
+		display: block;
+		height: 500px;
+		overflow: auto;
+		width: 100%
+	}
+	-->
+	</style>
+	
 	<script type="text/javascript" language="JavaScript1.2">
 	<!--
 		function set_firmen_search_rechts(wohin,filter,firmentypkurzbz)
@@ -131,8 +148,8 @@
 
 
 				var output = '';
-				output += '<table cellpadding="1" cellspacing="1">';
-				output += '<tr class="liste"><td>&nbsp;</td><td>Firma</td><td>Name</td></tr>\n';
+				output += '<table cellpadding="1" cellspacing="1" width="100%" class="scrollTable">';
+				output += '<tbody class="scrollContent"><tr class="liste"><td>&nbsp;</td><td width="10%">Firma</td><td width="84%">Name</td></tr>\n';
 
 				var classen='liste1';
 				for (p in json) 
@@ -145,9 +162,9 @@
 					if (json[p].oFirma_id=='')
 						output += '<tr class="'+classen+'"><td colspan="3">' + json[p].oName + '</td></tr>\n';
 					else
-						output += '<tr class="'+classen+'"><td><input name="firma_id_'+wohin+'" type="Radio" value="' + json[p].oFirma_id + '">&nbsp;</td><td>' + json[p].oFirma_id + '&nbsp;</td><td>' + json[p].oName + '&nbsp;</td></tr>\n';
+						output += '<tr class="'+classen+'"><td><input name="firma_id_'+wohin+'" type="Radio" value="' + json[p].oFirma_id + '">&nbsp;</td><td align="right">' + json[p].oFirma_id + '&nbsp;</td><td>' + json[p].oName + '&nbsp;</td></tr>\n';
 				}
-				output += '</table>';
+				output += '</tbody></table>';
 				return output; 
 		}
 
@@ -236,7 +253,7 @@
 		   
 			<div id="info" class="info">
 				<div id="infodaten" class="infodaten">
-					<div style="text-align:right;color:#000;cursor: hand;"><b id="info_close">schliessen  <img border="0" src="../../skin/images/cross.png" title="schliessen">&nbsp;</b></div>
+					<div style="text-align:right;color:#000; cursor: pointer; cursor: hand;"><b id="info_close">schliessen  <img border="0" src="../../skin/images/cross.png" title="schliessen">&nbsp;</b></div>
 						<script type="text/javascript">
 						   $(document).ready(function()
 						   {

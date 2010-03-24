@@ -232,12 +232,14 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
-		
+
+
 <script src="../../include/js/mailcheck.js"></script>
 <script src="../../include/js/datecheck.js"></script>
 
 <script src="../../include/js/jquery.js" type="text/javascript"></script>
 <script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
+
 
 <script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
 <script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
@@ -245,7 +247,8 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 <script src="../../include/js/jquery.tools.min.js" type="text/javascript"></script>
 
 
-	<script type="text/javascript" language="JavaScript1.2">
+
+<script type="text/javascript" language="JavaScript1.2">
 	
 
 
@@ -433,6 +436,7 @@ function setOrtData()
 </script>
 
 
+
 <style type="text/css">
 <!--
 /* root element for tabs  */
@@ -500,6 +504,7 @@ div.css-panes div div{
 }
 -->
 </style>
+
 
 </head>
 <body style="background-color:#eeeeee;">
@@ -641,7 +646,7 @@ function saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,
 			echo 'Organisation fehler '.$organisationseinheit_obj->errormsg;
 			return false;
 		}	
-		$bezeichnung=($bezeichnung?$bezeichnung:$organisationseinheit_obj->bezeichnung);
+		//$bezeichnung=($bezeichnung?$bezeichnung:$organisationseinheit_obj->bezeichnung);
 	}	
 	else
 	{
@@ -657,6 +662,11 @@ function saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,
 	$firma->kundennummer=$kundennummer; 
 	$firma->ext_id=$ext_id; 	
 
+	if($firma->get_firmaorganisationseinheit($firma->firma_id, $firma->oe_kurzbz))
+	{
+		echo "Organisationseinheit ".$firma->oe_kurzbz." ist bereits zugeteilt!";
+		return false;
+	}
 	if (!$firma->saveorganisationseinheit())
 		echo $firma->errormsg;
 	return $firma->firma_organisationseinheit_id;
@@ -684,8 +694,8 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 			<tr>
 				<th>Bezeichnung Organisationseinheit</th>';
 				//<th>Kurzbezeichnung</th>
-				//<th>Bezeichnung</th>
-	$htmlstr.= '<th>Kundennummer</th>
+	$htmlstr.= '<th>Bezeichnung</th>
+				<th>Kundennummer</th>
 				<th>&nbsp;</th>
 			</tr>
 			';
@@ -716,8 +726,8 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 
 					//$htmlstr.= '<td>'.$row->organisationseinheittyp_kurzbz.'</td>';
 					//$htmlstr.= '<td>'.$row->oe_kurzbz.'</td>';
-					//$htmlstr.= '<td>'.$row->bezeichnung.'</td>';
-					$htmlstr.= "<td><input type='text' name='kundennummer' value=".$row->kundennummer."></td>";
+					$htmlstr.= "<td><input type='text' name='bezeichnung' value='".$row->fobezeichnung."' size='50' maxlength='256'></td>";
+					$htmlstr.= "<td><input type='text' name='kundennummer' value='".$row->kundennummer."' size='20' maxlength='128'></td>";
 					$htmlstr.= '<td><input type="Submit" value="speichern" ></td>';			
 			$htmlstr.= '</tr>';
 		$htmlstr.="</form>\n";
@@ -734,15 +744,15 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 			$htmlstr.= "<OPTION value='".$organisationseinheit_obj->result[$ii]->oe_kurzbz."' ".($organisationseinheit_obj->result[$ii]->oe_kurzbz==''?' selected ':'')." >".$organisationseinheit_obj->result[$ii]->bezeichnung."</OPTION>";
 		}
 		$htmlstr.= "</SELECT>
-			<input type='Hidden' name='firma_organisationseinheit_id' value=''>
-			<input type='Hidden' name='kundennummer' value=''>
-			<input type='Hidden' name='firma_id' value='".$firma_id."'>
+			<input type='Hidden' name='firma_organisationseinheit_id' value=''>";
+			//<input type='Hidden' name='kundennummer' value=''>
+		$htmlstr.= "<input type='Hidden' name='firma_id' value='".$firma_id."'>
 			<input type='Hidden' name='work' value='saveFirmaorganisationseinheit'>
 		</td>
 		";
 		//$htmlstr.= '<td></td>';
-		//$htmlstr.= '<td></td>';
-		$htmlstr.= "<td><input type='text' name='kundennummer'></td>";
+		$htmlstr.= "<td><input type='text' name='bezeichnung' size='50' maxlength='256'></td>";
+		$htmlstr.= "<td><input type='text' name='kundennummer' size='20' maxlength='128'></td>";
 		$htmlstr.= '<td><input type="Submit" value="speichern" ></td>';			
 		$htmlstr.= '</tr>';
 		$htmlstr.="</form>\n";
@@ -1212,9 +1222,9 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Anrede: </td>";		
 		$htmlstr.="<td><input type='text' name='anrede' value='".$standort_obj->anrede."' size='50' maxlength='128' /></td>\n";
-		$htmlstr.="<td>&nbsp;</td></tr>";	
+		$htmlstr.="<td>&nbsp;</td></tr>";
 		$htmlstr.="<tr><td>Person: </td>";		
-		$htmlstr.="<td><input type='text' id='person_id' name='person_id' value='".$standort_obj->person_id."' size='20' maxlength='20' /></td>\n";
+		$htmlstr.="<td><input type='text' id='person_id' name='person_id' value='".$standort_obj->person_id."' size='20' maxlength='20' />\n";
 		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
 							function formatItem(row) 
 							{
@@ -1231,7 +1241,8 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 
 					</script>
 		";
-
+		//$htmlstr.'<div id="contentPad">';
+		//$htmlstr.='<span class="formInfo"><a href="ansprechpartner_person_tt.htm?width=475" class="jTip" id="one" name="Personensuche">?</a></div></span></td>';
 		$htmlstr.="<td>&nbsp;</td>";	
 		$person=($standort_obj->person_anrede?$standort_obj->person_anrede.' ':'').($standort_obj->titelpre?$standort_obj->titelpre.' ':'').($standort_obj->vorname?$standort_obj->vorname.' ':'').($standort_obj->nachname?$standort_obj->nachname.' ':'');
 		$htmlstr.=($person?'<td colspan="2"></td><td id="person" colspan="9" align="right">'.$person.'</td></tr>':'')."</table></td>";		
@@ -1244,7 +1255,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
 			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addPersonenfunktionen\');" type="Button" value="speichern"></td>';
 			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
-			$htmlstr.="<td><a href='../personen/personen_anlegen.php' target='_blank'><input type='button' value='Person anlegen'></a></td>";
+			$htmlstr.="<td><input type='button' value='Person anlegen' onClick=\"window.open('../personen/personen_anlegen.php')\"></td>";
 		$htmlstr.="</tr></table></td>";				
 	$htmlstr.="</tr>\n";
 	
