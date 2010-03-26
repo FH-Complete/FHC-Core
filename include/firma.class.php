@@ -470,13 +470,12 @@ class firma extends basis_db
 	}	
 
 	/**
-	 * Laedt alle Firmen -  Organisationseinheiten nach Firmen ID und/oder OE Kurzbz und/oder Zwischentabellen ID 
+	 * Laedt alle Firmen -  Organisationseinheiten nach Firmen ID und/oder OE Kurzbz 
 	 * @param $firma_id ID die gelesen werden soll
-	 * @param $oe_kurzbz Organisationskurzbezeichnung
-	 * @param $firma_organisationseinheit_id  Zwischentabellen ID 
+	 * @param $oe_kurzbz Organisationskurzbezeichnung 
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_firmaorganisationseinheit($firma_id='',$oe_kurzbz='',$firma_organisationseinheit_id='')
+	public function get_firmaorganisationseinheit($firma_id='',$oe_kurzbz='')
 	{
 		$this->result = array();
 		$this->errormsg = '';
@@ -487,14 +486,14 @@ class firma extends basis_db
 		}
 
 		$qry =" select tbl_firma.*  ";
-		$qry.=", tbl_firma_organisationseinheit.firma_organisationseinheit_id ,tbl_firma_organisationseinheit.kundennummer ,tbl_firma_organisationseinheit.oe_kurzbz ";
-		$qry.=" ,tbl_organisationseinheit.oe_parent_kurzbz,tbl_organisationseinheit.bezeichnung,tbl_organisationseinheit.bezeichnung ,tbl_organisationseinheit.organisationseinheittyp_kurzbz,tbl_organisationseinheit.aktiv as oe_aktiv,tbl_organisationseinheit.mailverteiler   ";		
-		$qry.=" FROM public.tbl_firma, public.tbl_firma_organisationseinheit ";
+		$qry.=" ,tbl_firma_organisationseinheit.firma_organisationseinheit_id ,tbl_firma_organisationseinheit.kundennummer ,tbl_firma_organisationseinheit.oe_kurzbz ";
+		$qry.=" ,tbl_organisationseinheit.oe_parent_kurzbz,tbl_organisationseinheit.bezeichnung, tbl_firma_organisationseinheit.bezeichnung as fobezeichnung, ";
+		$qry.=" tbl_organisationseinheit.organisationseinheittyp_kurzbz,tbl_organisationseinheit.aktiv as oe_aktiv,tbl_organisationseinheit.mailverteiler   ";		
+		$qry.=" FROM public.tbl_firma";
+		$qry.=" JOIN public.tbl_firma_organisationseinheit USING(firma_id)";
 		$qry.=" left outer join public.tbl_organisationseinheit  on ( tbl_organisationseinheit.oe_kurzbz=tbl_firma_organisationseinheit.oe_kurzbz ) ";
-		$qry.=" WHERE tbl_firma.firma_id=tbl_firma_organisationseinheit.firma_id ";
+		$qry.=" WHERE true ";
 
-		if($firma_organisationseinheit_id!='')
-			$qry.=" and tbl_firma_organisationseinheit.firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";
 		if($firma_id!='')
 			$qry.=" and tbl_firma_organisationseinheit.firma_id='".addslashes($firma_id)."'";
 		if($oe_kurzbz!='')
@@ -517,18 +516,19 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
-	// Neu in Rel. 2.0 
+				// Neu in Rel. 2.0 
 				$fa->steuernummer = $row->steuernummer;				
 				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
 				$fa->aktiv = ($row->aktiv=='t'?true:false);		
 				$fa->finanzamt = $row->finanzamt;		
-	// firma_organisationseinheit
+				// firma_organisationseinheit
 				$fa->oe_kurzbz = $row->oe_kurzbz;	
-	// organisationseinheit
+				// organisationseinheit
 				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;		
 				$fa->oe_parent_kurzbz = $row->oe_parent_kurzbz;		
-				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;		
-				$fa->bezeichnung = $row->bezeichnung;		
+				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;	
+				$fa->bezeichnung = $row->bezeichnung;	
+				$fa->fobezeichnung = $row->fobezeichnung;		
 				$fa->kundennummer = $row->kundennummer;						
 
 				$fa->oe_aktiv = ($row->oe_aktiv=='t'?true:false);	
@@ -544,6 +544,46 @@ class firma extends basis_db
 			return false;
 		}
 	}	
+	
+	/**
+	 * Laedt Firma -  Organisationseinheiten nach Zwischentabellen ID 
+	 * @param $firma_organisationseinheit_id  Zwischentabellen ID 
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_firmaorganisationseinheit($firma_organisationseinheit_id='')
+	{
+		$this->result = array();
+		$this->errormsg = '';
+		
+
+		$qry =" select *  ";
+		$qry.=" FROM public.tbl_firma_organisationseinheit ";
+		$qry.=" WHERE tbl_firma_organisationseinheit.firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";	
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{				
+				$this->firma_id = $row->firma_id;
+
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				$this->oe_kurzbz = $row->oe_kurzbz;	
+				$this->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;		
+				$this->bezeichnung = $row->bezeichnung;		
+				$this->kundennummer = $row->kundennummer;							
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}	
+	
 	
 	/**
 	 * Loescht den Firma/Organisations Datenensatz mit der ID die uebergeben wird
@@ -606,9 +646,10 @@ class firma extends basis_db
 				'firma_id='.$this->addslashes($this->firma_id).', '.
 				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
+				'kundennummer='.$this->addslashes($this->kundennummer).', '.
 				'updateamum= now(), '.
 		     	'updatevon='.$this->addslashes($this->updatevon).', '.
-		     	'ext_id)='.addslashes($this->ext_id).' '.
+		     	'ext_id='.$this->addslashes($this->ext_id).' '.
 				'WHERE firma_organisationseinheit_id='.$this->addslashes($this->firma_organisationseinheit_id).';';
 		}
 		if($this->db_query($qry))
