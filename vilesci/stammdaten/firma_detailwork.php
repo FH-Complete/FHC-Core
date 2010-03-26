@@ -662,7 +662,7 @@ function saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,
 	$firma->kundennummer=$kundennummer; 
 	$firma->ext_id=$ext_id; 	
 
-	if($firma->get_firmaorganisationseinheit($firma->firma_id, $firma->oe_kurzbz))
+	if($firma->get_firmaorganisationseinheit($firma->firma_id, $firma->oe_kurzbz) && $firma_organisationseinheit_id=='')
 	{
 		echo "Organisationseinheit ".$firma->oe_kurzbz." ist bereits zugeteilt!";
 		return false;
