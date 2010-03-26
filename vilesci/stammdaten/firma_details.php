@@ -51,6 +51,8 @@ $save = (isset($_REQUEST['save'])?$_REQUEST['save']:null);
 $work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
 $ajax = (isset($_REQUEST['ajax'])?$_REQUEST['ajax']:null);	
 
+$neu = (isset($_REQUEST['neu'])?$_REQUEST['neu']:null);
+
 // Defaultwerte 
 $adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
 $errorstr='';
@@ -227,8 +229,8 @@ div.css-panes div {
 </head>
 <body style="background-color:#eeeeee;">
 <?php
-	if (empty($firma_id))
-		exit('');
+	/*if (empty($firma_id))
+		exit('ka firma');*/
 
 ##echo "$work <br>";
 
@@ -252,22 +254,23 @@ div.css-panes div {
 				if (is_numeric($status))
 					$firma_id=$status;
 				if (!$ajax)
-					echo getFirmadetail($firma_id,$adresstyp_arr,$user);
+					echo getFirmadetail($firma_id,$adresstyp_arr,$user,$neu);
 				else if (is_numeric($status))
 					echo "Daten erfolgreich gespeichert";
 				if (!is_numeric($status))
 					echo $status;
 				break;
 		    default:
-				echo getFirmadetail($firma_id,$adresstyp_arr,$user);
+				echo getFirmadetail($firma_id,$adresstyp_arr,$user,$neu);
 				break;
 		}
 echo  ($errorstr?'<br>'.$errorstr:'');
-echo '<script language="JavaScript1.2" type="text/javascript">
+/*Führt zu "Rückkopplung" im Frame 0 - große Suchkriterien werden nicht angenommen
+	echo '<script language="JavaScript1.2" type="text/javascript">
 	<!--
 		parent.frames[0].location.reload();
 	-->		
-	</script>';
+	</script>';*/
 ?>	
 
 </body>
@@ -276,125 +279,130 @@ echo '<script language="JavaScript1.2" type="text/javascript">
 /*
 	Firmenliste - lt. Suchekriterien 
 */
-function getFirmadetail($firma_id,$adresstyp_arr,$user)	
+function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)	
 {	
-	if (!$db = new basis_db())
-		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	// Init
-	$htmlstr='';
-	// Datenlesen zur Firma	
-	$firma = new firma();
-	if($firma_id!='' && is_numeric($firma_id) )
+	if($firma_id!='' || $neu=='true')
 	{
-		if (!$firma->load($firma_id))
-			return '<br>Firma mit der ID <b>'.$firma_id.'</b> existiert nicht';
-	}
-	else 
-	{
-		//Bei neuen Firmen wird standardmaessig Partnerfirma ausgewaehlt
-		$firma->firmentyp_kurzbz='Partnerfirma';
-		$firma->aktiv=true;
-		$firma->gesperrt=false;
-		$firma->schule=false;
-	}
-	
-	$htmlstr.="<form id='addFirma' name='addFirma' action='firma_details.php' method='POST'>\n";
-	$htmlstr.="<input type='hidden' name='work' value='saveFirma'>\n";	
-	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
-	// Firma Detailanzeige
-	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
-	$htmlstr.="<tr><td><table width='100%'><tr>\n";
-	$htmlstr.="<td>Typ: </td>";		
-	$htmlstr.="<td><select name='typ'>\n";
-
-	$qry = "SELECT firmentyp_kurzbz FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
-	if($result = $db->db_query($qry))
-	{
-		while($row = $db->db_fetch_object($result))
+		if (!$db = new basis_db())
+			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+		// Init
+		$htmlstr='';
+		// Datenlesen zur Firma	
+		$firma = new firma();
+		if($firma_id!='' && is_numeric($firma_id))
 		{
-			$htmlstr.="<option value='".$row->firmentyp_kurzbz."' ".($firma->firmentyp_kurzbz == $row->firmentyp_kurzbz?' selected ':'').">".$row->firmentyp_kurzbz."</option>";
+			if (!$firma->load($firma_id))
+				return '<br>Firma mit der ID <b>'.$firma_id.'</b> existiert nicht';
 		}
+		else 
+		{
+			//Bei neuen Firmen wird standardmaessig Partnerfirma ausgewaehlt
+			$firma->firmentyp_kurzbz='Partnerfirma';
+			$firma->aktiv=true;
+			$firma->gesperrt=false;
+			$firma->schule=false;
+		}
+		
+		$htmlstr.="<form id='addFirma' name='addFirma' action='firma_details.php' method='POST'>\n";
+		$htmlstr.="<input type='hidden' name='work' value='saveFirma'>\n";	
+		$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
+		// Firma Detailanzeige
+		$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
+		$htmlstr.="<tr><td><table width='100%'><tr>\n";
+		$htmlstr.="<td>Typ: </td>";		
+		$htmlstr.="<td><select name='typ'>\n";
+	
+		$qry = "SELECT firmentyp_kurzbz FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				$htmlstr.="<option value='".$row->firmentyp_kurzbz."' ".($firma->firmentyp_kurzbz == $row->firmentyp_kurzbz?' selected ':'').">".$row->firmentyp_kurzbz."</option>";
+			}
+		}
+		$htmlstr.="</select></td>";
+		$htmlstr.="<td>&nbsp;</td>";	
+		$htmlstr.="<td>Name: </td>";
+		$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
+		//$htmlstr.="<td>&nbsp;</td>";	
+		if($firma_id!='' && is_numeric($firma_id) )
+			$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 0);\" name='save' value='speichern'></td>\n";
+		else
+			$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
+		$htmlstr.="</tr></table></td>";
+		//$htmlstr.="<td rowspan='2'><table><tr>\n";	
+		//$htmlstr.="<td valign='top'>Anmerkung: </td>";
+		//$htmlstr.="<td><textarea cols='40' style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
+		// Unterscheiden der Wartung - Neuanlage = Submit, Aendern = Ajax
+		//if($firma_id!='' && is_numeric($firma_id) )
+		//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
+		//else
+		//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='submit' name='save' value='anlegen'></td>\n";
+	
+		//$htmlstr.="</tr></table></td>";	
+		$htmlstr.="</tr>\n";
+		$htmlstr.="<tr><td><table><tr>\n";	
+		$htmlstr.="<td>Steuernummer: </td>";
+		$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value=".$firma->steuernummer."></td>\n";
+		$htmlstr.="<td>&nbsp;</td>";	
+		$htmlstr.="<td>Finanzamt: </td>";
+		// Finanzamt anzeige und suche
+		$firma_finanzamt = new firma();
+		$firmentyp_finanzamt='Finanzamt';
+		$firma_finanzamt->searchFirma('',$firmentyp_finanzamt);	
+		#var_dump($firma_finanzamt);
+		$htmlstr.="<td><select name='finanzamt'>";
+			$htmlstr.="<option value=''> </option>";
+			foreach ($firma_finanzamt->result as $row_finazamt)
+				$htmlstr.="	<option value='".$row_finazamt->standort_id ."'>".$row_finazamt->bezeichnung." </option>";
+		$htmlstr.="</select></td>\n";
+	
+		$htmlstr.="<td>Aktiv: </td>";
+		$htmlstr.="<td><input ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'')."></td>\n";
+		$htmlstr.="<td>&nbsp;</td>\n";
+	
+		$htmlstr.="<td>Gesperrt: </td>";
+		$user = get_uid();
+		//Zugriffsrechte pruefen
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
+		if($rechte->isBerechtigt('basis/firma',null, 'suid'))
+		{
+			$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')."></td>\n";
+		}
+		else 
+		{
+			$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')." disabled></td>\n";
+		}
+		$htmlstr.="<td>&nbsp;</td>\n";
+	
+		$htmlstr.="<td>Schule:</td>";
+		$htmlstr.="<td><input ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'')."> </td>";
+		$htmlstr.="<td>&nbsp;</td>";	
+	
+		$htmlstr.="</tr></table></td>";	
+		$htmlstr.="</tr>\n";
+		$htmlstr.="	</table>\n";
+		$htmlstr.="</form>\n";
+	
+		$htmlstr.='<div id="addFirmaInfo"></div>';
+	
+
+		$htmlstr.='
+			<!-- Tabs --> 
+			<ul class="css-tabs">
+			     <li><a href="firma_details.php?work=standortliste&firma_id='.$firma_id.'">Standorte</a></li>
+				 <li><a href="firma_details.php?work=organisationliste&firma_id='.$firma_id.'">Organisationseinheit</a></li>
+				 <li><a href="firma_details.php?work=anmerkungsfeld&firma_id='.$firma_id.'">Anmerkungen</a></li>
+			</ul>
+			<div class="css-panes">
+				<div style="display:block"></div>
+			</div>	
+			<div id="detailstandort">	</div>
+			';
+
+		return $htmlstr;
 	}
-	$htmlstr.="</select></td>";
-	$htmlstr.="<td>&nbsp;</td>";	
-	$htmlstr.="<td>Name: </td>";
-	$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
-	//$htmlstr.="<td>&nbsp;</td>";	
-	if($firma_id!='' && is_numeric($firma_id) )
-		$htmlstr.="<td align='center' width='20%'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo', 0);\" name='save' value='speichern'></td>\n";
-	else
-		$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='anlegen'></td>\n";
-	$htmlstr.="</tr></table></td>";
-	//$htmlstr.="<td rowspan='2'><table><tr>\n";	
-	//$htmlstr.="<td valign='top'>Anmerkung: </td>";
-	//$htmlstr.="<td><textarea cols='40' style='width:100%' name='anmerkung'/>".$firma->anmerkung."</textarea></td>\n";
-	// Unterscheiden der Wartung - Neuanlage = Submit, Aendern = Ajax
-	//if($firma_id!='' && is_numeric($firma_id) )
-	//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='Button' onclick=\"workFirmaDetail('addFirmaInfo');\" name='save' value='speichern'></td>\n";
-	//else
-	//	$htmlstr.="<td>&nbsp;</td><td valign='bottom'><input type='submit' name='save' value='anlegen'></td>\n";
-
-	//$htmlstr.="</tr></table></td>";	
-	$htmlstr.="</tr>\n";
-	$htmlstr.="<tr><td><table><tr>\n";	
-	$htmlstr.="<td>Steuernummer: </td>";
-	$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value=".$firma->steuernummer."></td>\n";
-	$htmlstr.="<td>&nbsp;</td>";	
-	$htmlstr.="<td>Finanzamt: </td>";
-	// Finanzamt anzeige und suche
-	$firma_finanzamt = new firma();
-	$firmentyp_finanzamt='Finanzamt';
-	$firma_finanzamt->searchFirma('',$firmentyp_finanzamt);	
-	#var_dump($firma_finanzamt);
-	$htmlstr.="<td><select name='finanzamt'>";
-		$htmlstr.="<option value=''> </option>";
-		foreach ($firma_finanzamt->result as $row_finazamt)
-			$htmlstr.="	<option value='".$row_finazamt->standort_id ."'>".$row_finazamt->bezeichnung." </option>";
-	$htmlstr.="</select></td>\n";
-
-	$htmlstr.="<td>Aktiv: </td>";
-	$htmlstr.="<td><input ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'')."></td>\n";
-	$htmlstr.="<td>&nbsp;</td>\n";
-
-	$htmlstr.="<td>Gesperrt: </td>";
-	$user = get_uid();
-	//Zugriffsrechte pruefen
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
-	if($rechte->isBerechtigt('basis/firma',null, 'suid'))
-	{
-		$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')."></td>\n";
-	}
-	else 
-	{
-		$htmlstr.="<td><input ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')." disabled></td>\n";
-	}
-	$htmlstr.="<td>&nbsp;</td>\n";
-
-	$htmlstr.="<td>Schule:</td>";
-	$htmlstr.="<td><input ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'')."> </td>";
-	$htmlstr.="<td>&nbsp;</td>";	
-
-	$htmlstr.="</tr></table></td>";	
-	$htmlstr.="</tr>\n";
-	$htmlstr.="	</table>\n";
-	$htmlstr.="</form>\n";
-
-	$htmlstr.='<div id="addFirmaInfo"></div>';
-
-	$htmlstr.='
-		<!-- Tabs --> 
-		<ul class="css-tabs">
-		     <li><a href="firma_details.php?work=standortliste&firma_id='.$firma_id.'">Standorte</a></li>
-			 <li><a href="firma_details.php?work=organisationliste&firma_id='.$firma_id.'">Organisationseinheit</a></li>
-			 <li><a href="firma_details.php?work=anmerkungsfeld&firma_id='.$firma_id.'">Anmerkungen</a></li>
-		</ul>
-		<div class="css-panes">
-			<div style="display:block"></div>
-		</div>	
-		<div id="detailstandort">	</div>
-		';
-	return $htmlstr;
 }
 // ----------------------------------------------------------------------------------------------------------------------------------
 /*
@@ -567,17 +575,15 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 */
 function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 {
+
 	// Init
 	$htmlstr='';
 	// Plausib
 	if (empty($firma_id) || !is_numeric($firma_id) )
 		return 'Firma fehlt.';
  
- 	// Datenlesen zur Firma	
-	$firma = new firma();
-	if (!$firma->get_firmaorganisationseinheit($firma_id))
-		return '<br>Firma ID <b>'.$firma_id.'</b> '.$firma->errormsg;;
-		
+ 	
+	
 ##	var_dump($firma);
 	$htmlstr.= '<table class="liste">
 				<tr>
@@ -589,6 +595,10 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 						<input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>
 			';
+	// Datenlesen zur Firma	
+	$firma = new firma();
+	if (!$firma->get_firmaorganisationseinheit($firma_id))
+		return $htmlstr;
 	$i=0;
 	foreach ($firma->result as $row)
 	{

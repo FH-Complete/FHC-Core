@@ -97,6 +97,7 @@ function creatList($suchen,$filter,$firmentypfilter)
 	$firmentyp_finanzamt='Finanzamt';
 	$firma_finanzamt->errormsg='';
 	$firma_finanzamt->result=array();	
+	//echo "Filter: ".$filter." Firmentypfilter: ".$firmentypfilter."<br>";
 	if (!is_null($suchen)) // Nur wenn Suchknopf gedrueckt wurde
 		$firma_finanzamt->searchFirma($filter,$firmentypfilter);	
 		

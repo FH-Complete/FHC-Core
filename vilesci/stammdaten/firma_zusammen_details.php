@@ -90,6 +90,7 @@ function show_firma_bleibt(work)
 	$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
 	var formdata = $('form#firmaform').serialize(); 
 
+
 	$.ajax
 	(
 		{
@@ -448,11 +449,8 @@ function show_firma_bleibt(work)
 				{
 					if (isset($firmaorganisationseinheit_obj->result[$i]))
 					{
-						if(!array_key_exists($firmaorganisationseinheit_obj->result[$i]->oe_kurzbz,$firmaorganisationseinheit_check))
-						{
 							$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
 							//echo $firmaorganisationseinheit_obj->result[$i]->oe_kurzbz."  ".$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]."<br>";
-						}
 					}
 				}	
 				else 
@@ -475,10 +473,10 @@ function show_firma_bleibt(work)
 
 		?>	
 		
-	  <fieldset>
-    	<legend>Informationen nach der Zusammenlegung </legend>
-		  <fieldset>
-	    	<legend>Firma <?php echo $firma->firma_id; ?> </legend>
+	  <fieldset style="background-color:#B6ffAf;">
+    	<legend style="background-color:#B6ffAf;">Informationen nach der Zusammenlegung </legend>
+		  <fieldset style="background-color:#c3ffb9;">
+	    	<legend style="background-color:#c3ffb9;">Firma <?php echo $firma->firma_id; ?> </legend>
 				<?php 
 				echo '<table>';
 				echo '<tr><td>'.$firma->firmentyp_kurzbz.' '.$firma->name
@@ -507,8 +505,8 @@ function show_firma_bleibt(work)
 					foreach ($kontakt as $key => $val)
 					{
 					?>  
-					  <fieldset>
-					    	<legend>Standort  <?php echo $key .' der Firma '. $firma->name; ?> </legend>
+					  <fieldset style="background-color:#e3ffe1;">
+					    	<legend style="background-color:#e3ffe1;">Standort  <?php echo $key .' der Firma '. $firma->name; ?> </legend>
 							<?php
 								$standort_obj = new standort();
 								$standort_obj->result=array();
@@ -570,9 +568,9 @@ function show_firma_bleibt(work)
 					 ?>
 			<?php } ?>
 
-					  <fieldset>
+					  <fieldset style="background-color:#e3ffe1;">
 					  
-					    	<legend>Organisationseinheit zur Firma  <?php  echo $firma->name; ?> </legend>
+					    	<legend style="background-color:#e3ffe1;">Organisationseinheit zur Firma  <?php  echo $firma->name; ?> </legend>
 						<?php
 						 
 							if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
@@ -625,7 +623,7 @@ function show_firma_bleibt(work)
 		$kontakt = (isset($firmendaten['kontakt'])?$firmendaten['kontakt']:array());
 		$personfunktionstandort = (isset($firmendaten['personfunktionstandort'])?$firmendaten['personfunktionstandort']:array());
 		$firmaorganisationseinheit = (isset($firmendaten['firmaorganisationseinheit'])?$firmendaten['firmaorganisationseinheit']:array());
-		
+
 		//Überprüfung auf doppelte Organisationseinheiten
 		$firmaorganisationseinheit_check=array();
 		for ($i=0;$i<count($firmaorganisationseinheit);$i++)
@@ -643,7 +641,6 @@ function show_firma_bleibt(work)
 				}
 			}
 		}
-		
 		
 		// Ermitteln der Standorte zu den Firmen - geloescht und bleibt. Wichtiger Teil zum ermitteln welche Standorte entfernt werden sollen
 		$standorte_vorhanden=array();
@@ -688,7 +685,6 @@ function show_firma_bleibt(work)
 			}
 		} // Ende Standort 		
 		
-
 		// Pruefen ob Kontakte noch einen alten Standort zugewiessen ist	
 		$kontakt_check=array();
 		$kontakt_ok=array();
@@ -755,7 +751,6 @@ function show_firma_bleibt(work)
 			$personfunktionstandort_ok=null;
 		}	
 					
-		
 	// Welche Kontakte werden entfernt
 		if (is_array($standorte_vorhanden) && count($standorte_vorhanden))
 		{
@@ -793,38 +788,71 @@ function show_firma_bleibt(work)
 						$oRresult=$db->SQL('','','','','','','',$qry);
 					}
 				}
-				
 			}
 		}	
-##return;		
-		
+##return;	
+/*
+							if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
+							{
+								$i=0;
+								foreach ($firmaorganisationseinheit as $key => $val)
+								{
+									$firmaorganisationseinheit_obj->result[$i] = new firma();
+									$bleibt->firmaorganisationseinheit=array();
+									if(!$firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($val))
+									{
+										echo $firmaorganisationseinheit_obj->errormsg.'<br>';
+									}	
+									else if ($firmaorganisationseinheit_obj->result[$i])
+									{
+										//var_dump($firmaorganisationseinheit_obj->result[$i]);
+										echo $firmaorganisationseinheit_obj->result[$i]->firma_organisationseinheit_id.' <b>'.$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz.'</b><br>'.$firmaorganisationseinheit_obj->result[$i]->bezeichnung.', KNr.: '.$firmaorganisationseinheit_obj->result[$i]->kundennummer.'<br>';
+									}
+									$i++;	
+								}	
+							}	 
+							else
+							{
+								echo '<font color="red">Keine Organisationseinheit zur Firma !</font><br>';
+							} 
+*/		
 		if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
 		{
-				foreach ($firmaorganisationseinheit as $key => $firma_organisationseinheit_id)
+			$i=0;
+			foreach ($firmaorganisationseinheit as $key => $firma_organisationseinheit_id)
+			{
+				$firmaorganisationseinheit_obj->result[$i] = new firma();
+				if(!$firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firma_organisationseinheit_id))
 				{
-					$firmaorganisationseinheit_obj = new firma();
-					if(!$firmaorganisationseinheit_obj->load_firmaorganisationseinheit($firma_organisationseinheit_id))
+					echo 'Firma - Organisationseinheit: '.$firmaorganisationseinheit_obj->errormsg.' ($firma_organisationseinheit_id)<br>';
+				}	
+				else if ($firmaorganisationseinheit_obj->result[$i])
+				{
+					var_dump($firmaorganisationseinheit_obj);
+					foreach ($firmaorganisationseinheit_obj->result[$i] as $keys => $vals)
 					{
-						echo 'Firma - Organisationseinheit: '.$firmaorganisationseinheit_obj->errormsg.'<br>';
-					}	
-					else if ($firmaorganisationseinheit_obj->result)
-					{
-						foreach ($firmaorganisationseinheit_obj->result as $keys => $vals)
+						// Organisation gehoert bereits zu dieser Firma
+						if ($vals->firma_id==$firma_id_bleibt)
+							continue;
+						$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
+							'firma_id='.addslashes($firma_id_bleibt).', '.
+							'updateamum= now(), '.
+					     	'updatevon=\''.addslashes($uid).'\' '.
+							" WHERE firma_organisationseinheit_id='".addslashes($vals->firma_organisationseinheit_id)."';";
+						$db->errormsg='';
+						if ($oRresult=$db->SQL('','','','','','','',$qry))
 						{
-							// Organisation gehoert bereits zu dieser Firma
-							if ($vals->firma_id==$firma_id_bleibt)
-								continue;
-							$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
-								'firma_id='.addslashes($firma_id_bleibt).', '.
-								'updateamum= now(), '.
-						     	'updatevon=\''.addslashes($uid).'\' '.
-								" WHERE firma_organisationseinheit_id='".addslashes($vals->firma_organisationseinheit_id)."';";
-							$db->errormsg='';
-							if ($oRresult=$db->SQL('','','','','','','',$qry))
-								echo 'Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.' zugeordnet '.'<br>';
-						}	
+							echo 'Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.' zugeordnet '.'<br>';
+						}
+						else 
+						{
+							echo 'Fehler bein Zuordnen von Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.'<br>';
+							echo $db->errormsg."<br>";
+						}
 					}	
 				}	
+				$i++;
+			}	
 		}	 
 
  
@@ -851,7 +879,7 @@ function show_firma_bleibt(work)
 						$qry = "DELETE FROM public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id='".$vals->firma_organisationseinheit_id."'";
 						$db->errormsg='';
 						if (!$oRresult=$db->SQL('','','','','','','',$qry))
-							echo  'Firma - Organisationseinheit: '.$db->errormsg.'<br>';
+							echo  'Firma - Organisationseinheit: '.$db->errormsg.' (... $firma_organisationseinheit_id)<br>';
 						else	
 							echo 'Firma '.$firma_id_bleibt.' Organisationseinheit wurde gel&ouml;scht '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.'<br>';
 					}	
