@@ -23,8 +23,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-// ---------------- CIS Include Dateien einbinden
-	require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/cis.config.inc.php');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -93,28 +92,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$cSoftGridApplicationsRoot=array('%CSIDL_PROGRAMS%\\SoftGrid Applications\\','%CSIDL_PROGRAMS%\\SoftGrid Applications');
 
 	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:false));
-#	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'AppList.xml'));	
-	if ($_SERVER["SERVER_NAME"]=="dav.technikum-wien.at" || $_SERVER["SERVER_NAME"]=="calva.technikum-wien.at")
-	{
-		$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']: dirname(__FILE__).'/AppList.xml'));	
-		if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
-		{
-			$cXMLFile="/var/www/htdocs/simane/test/appllist/AppList.xml";
-		}
-	}
-	else
-	{
-		$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'../../../documents/infrastruktur/AppList.xml'));	
-		if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
-		{
-			if (is_file("AppList.xml") )
-			{
-				$cXMLFile="AppList.xml";
-			}
-		}
-		
-	}	
 	
+	$cXMLFile=trim((isset($_REQUEST['xml']) ? $_REQUEST['xml']:'../../../documents/infrastruktur/AppList.xml'));	
+	if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
+	{
+		if (is_file("AppList.xml") )
+		{
+			$cXMLFile="AppList.xml";
+		}
+	}	
 									
 	if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
 	{
@@ -293,7 +279,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		if (empty($tmp_value['SecondLevel']))
 		{ 
 			$cHTML.='<tr class="'.$cClass.'">';
-				$cHTML.='<td class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'blank.png\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'&nbsp;</td>';
+				$cHTML.='<td class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'../../../skin/images/blank.gif\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'&nbsp;</td>';
 			$cHTML.='</tr>';
 		}
 		else if ($cLastSecondLevel!=strtolower($tmp_value['SecondLevel']))
@@ -323,7 +309,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$cHTML.='</table></td></tr>';
 	$cHTML.='</table>';		
 	echo $cHTML;
-exit;
 
 	function SecondLevel($arrAPPMENUE,$cSearchSecondLevel)
 	{
@@ -359,7 +344,7 @@ exit;
 			if (empty($tmp_value['ThirdLevel']))
 			{ 
 				$cHTML.='<tr class="'.$cClass.'">';
-					$cHTML.='<td class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'blank.png\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'</td>';
+					$cHTML.='<td class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'../../../skin/images/blank.gif\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'</td>';
 				$cHTML.='</tr>';
 			}
 			else if ($cLastThirdLevel!=strtolower($tmp_value['ThirdLevel']))
@@ -428,7 +413,7 @@ exit;
 			if (empty($tmp_value['FourthLevel']))
 			{ 
 				$cHTML.='<tr  class="'.$cClass.'">';
-					$cHTML.='<td  class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'blank.png\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'</td>';
+					$cHTML.='<td  class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'../../../skin/images/blank.gif\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'</td>';
 				$cHTML.='</tr>';
 			}
 			else if ($cLastFourthLevel!=strtolower($tmp_value['FourthLevel']))
@@ -495,7 +480,7 @@ exit;
 				$cClass='row2';
 			}	
 			$cHTML.='<tr class="'.$cClass.'">';
-				$cHTML.='<td class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'blank.png\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'</td>';
+				$cHTML.='<td class="'.$cClass.'">'.(!empty($tmp_value['Icon'])?'<img onError="this.onerror=null;this.src=\'../../../skin/images/blank.gif\';" height="16" src="'.$tmp_value['Icon'].'" alt="Icon"  />':'').'&nbsp;'.$tmp_value['APPHref'].'</td>';
 			$cHTML.='</tr>';
 		}		
 		$cHTML.='</table>';		
