@@ -884,7 +884,7 @@ if(!$error)
 		// - Rolle Bewerber muss existieren
 		// Wenn die Voraussetzungen erfuellt sind, dann wird die Matrikelnr
 		// und UID generiert und der Studentendatensatz angelegt.
-
+		$errormsg='';
 		if(!$error)
 		{
 			if(isset($_POST['prestudent_id']))
