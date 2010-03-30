@@ -49,6 +49,19 @@ $firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'')
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script language="javascript" type="text/javascript" src="../../include/js/arc90_multiselect.js"></script>
+<script language="javascript" type="text/javascript">
+$(function() {
+    $('#basicmultiselect').multiSelect({select_all_min: 3});
+    $('#lang').multiSelect({
+                        select_all_min: 3,
+                        no_selection: "Please select a few items!",
+                        selected_text: " clicked"
+                       });
+    $('#methods').multiSelect();
+});
+</script>
+
 <script language="JavaScript" type="text/javascript">
 <!--
 //var firmentypfilter='<?php echo $firmentypfilter; ?>';
