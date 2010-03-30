@@ -403,11 +403,11 @@ if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
 	
 	ALTER TABLE public.tbl_standort ALTER COLUMN kurzbz DROP NOT NULL;
 	
-	-- vorhandene Standorte als Firmen anlegen
+	-- verknuepfung Standort/Firma richtigstellen
 	INSERT INTO public.tbl_firmentyp(firmentyp_kurzbz, beschreibung) VALUES('Intern','Intern');
 	
-	INSERT INTO public.tbl_firma(firmentyp_kurzbz, name, schule, steuernummer, anmerkung, gesperrt, aktiv, ext_id)
-	SELECT 'Intern', kurzbz, false, null, null, false, true, standort_id FROM public.tbl_standort;
+	UPDATE public.tbl_firma set firmentyp_kurzbz='Intern', ext_id=(SELECT standort_id FROM public.tbl_adresse JOIN public.tbl_standort USING(adresse_id) WHERE tbl_adresse.firma_id=tbl_firma.firma_id)
+	WHERE firma_id in(SELECT tbl_adresse.firma_id FROM public.tbl_standort JOIN public.tbl_adresse USING(adresse_id));
 	
 	UPDATE public.tbl_standort SET bezeichnung=kurzbz WHERE bezeichnung is null;
 	
@@ -544,7 +544,7 @@ if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
    	GRANT SELECT ON campus.vw_mitarbeiter TO web;
    	
    	-- Syncronisieren der Daten
-   	
+   		
    	-- Firmenkontakte in tbl_kontakt auslagern
    	-- EMail
 	INSERT INTO public.tbl_kontakt(standort_id, kontakttyp, kontakt, insertamum, insertvon, updateamum, updatevon) 
@@ -561,6 +561,7 @@ if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
 	SELECT standort_id, 'fax', fax, tbl_firma.insertamum, tbl_firma.insertvon, now(), 'checksystem' FROM 
 	public.tbl_firma JOIN public.tbl_standort USING(firma_id) WHERE fax is not null AND fax<>'';
 
+	
 	UPDATE public.tbl_kontakt SET standort_id=(SELECT standort_id FROM public.tbl_standort WHERE firma_id=tbl_kontakt.firma_id LIMIT 1) WHERE firma_id IS NOT NULL;
 
 	-- Spalten entfernen
@@ -579,42 +580,43 @@ if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
 	if(!$db->db_query($qry))
 		echo '<strong>Firmenverwaltung: '.$db->db_last_error().'</strong><br>';
 	else 
+	{
 		echo 'Tabellen fuer neue Firmenverwaltung hinzugefuegt!<br>';
 		
-	//Adressen der Firmen Syncronisieren
-	$qry = "
-	SELECT 
-		adresse, tbl_firma.insertamum, tbl_firma.insertvon, standort_id 
-	FROM 
-		public.tbl_firma JOIN public.tbl_standort USING(firma_id)
-	WHERE 
-		tbl_firma.adresse IS NOT NULL
-		AND tbl_firma.adresse<>'' 
-		AND tbl_standort.adresse_id IS NULL";
-	
-	if($result = $db->db_query($qry))
-	{
-		while($row = $db->db_fetch_object($result))
+		//Adressen der Firmen Syncronisieren
+		$qry = "
+		SELECT 
+			adresse, tbl_firma.insertamum, tbl_firma.insertvon, standort_id 
+		FROM 
+			public.tbl_firma JOIN public.tbl_standort USING(firma_id)
+		WHERE 
+			tbl_firma.adresse IS NOT NULL
+			AND tbl_firma.adresse<>'' 
+			AND tbl_standort.adresse_id IS NULL";
+		
+		if($result = $db->db_query($qry))
 		{
-			$qry = "INSERT INTO public.tbl_adresse(strasse, typ, heimatadresse, 
-						zustelladresse, updateamum, updatevon, insertamum, insertvon)
-					VALUES('".addslashes($row->adresse)."', 'f', false, true, now(), 'checksystem', 
-					".($row->insertamum!=''?"'".addslashes($row->insertamum)."'":'null').",'".addslashes($row->insertvon)."');
-					UPDATE public.tbl_standort SET adresse_id=currval('public.tbl_adresse_adresse_id_seq') WHERE standort_id='".$row->standort_id."';";
-			if(!$db->db_query($qry))
+			while($row = $db->db_fetch_object($result))
 			{
-				echo 'Fehler beim Syncronisieren der Adress-Daten:'.$qry;
+				$qry = "INSERT INTO public.tbl_adresse(strasse, typ, heimatadresse, 
+							zustelladresse, updateamum, updatevon, insertamum, insertvon)
+						VALUES('".addslashes($row->adresse)."', 'f', false, true, now(), 'checksystem', 
+						".($row->insertamum!=''?"'".addslashes($row->insertamum)."'":'null').",'".addslashes($row->insertvon)."');
+						UPDATE public.tbl_standort SET adresse_id=currval('public.tbl_adresse_adresse_id_seq') WHERE standort_id='".$row->standort_id."';";
+				if(!$db->db_query($qry))
+				{
+					echo 'Fehler beim Syncronisieren der Adress-Daten:'.$qry;
+				}
 			}
 		}
+		//Adressfeld entfernen
+		$qry = "ALTER TABLE public.tbl_firma DROP COLUMN adresse;";
+		
+		if(!$db->db_query($qry))
+		{
+			echo 'Fehler beim Loeschen der Spalte adresse';
+		}
 	}
-	//Adressfeld entfernen
-	$qry = "ALTER TABLE public.tbl_firma DROP COLUMN adresse;";
-	
-	if(!$db->db_query($qry))
-	{
-		echo 'Fehler beim Loeschen der Spalte adresse';
-	}
-
 }
 
 if(!@$db->db_query("SELECT mailverteiler FROM public.tbl_organisationseinheit LIMIT 1;"))

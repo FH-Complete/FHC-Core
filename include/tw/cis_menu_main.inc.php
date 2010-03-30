@@ -376,10 +376,6 @@
 					<table class="tabcontent" id="Medienaustattung" style="display: none">
 					<tr>
 						<td class="tdwidth10" nowrap>&nbsp;</td>
-				    	<td class="tdwrap"><a class="Item" href="private/tools/inventar.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Inventar</a></td>
-					</tr>
-					<tr>
-						<td class="tdwidth10" nowrap>&nbsp;</td>
 						<td class="tdwrap"><a class="Item" href="public/info/medien/medienausstattung_fixer_pc.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fixer PC</a></td>
 					</tr>
 					<tr>

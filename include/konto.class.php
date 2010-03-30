@@ -393,7 +393,7 @@ class konto extends basis_db
 	 * Liefert alle Buchungstypen
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getBuchungstyp($aktiv)
+	public function getBuchungstyp($aktiv=null)
 	{
 		$qry = "SELECT * FROM public.tbl_buchungstyp";
 		

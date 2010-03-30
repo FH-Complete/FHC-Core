@@ -849,7 +849,7 @@ class mitarbeiter extends benutzer
 	public function getMitarbeiterOrganisationseinheit($oe_kurzbz)
 	{
 		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
-					homepage, updateamum, updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
+					homepage, vw_mitarbeiter.updateamum, vw_mitarbeiter.updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE funktion_kurzbz='oezuordnung' AND oe_kurzbz='".addslashes($oe_kurzbz)."'  AND
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND

@@ -393,9 +393,10 @@ class firma extends basis_db
 			$qry.=" distinct on(firma_id)";
 		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
 		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";		
-		$qry.=" FROM public.tbl_firma,  public.tbl_standort  ";
-		$qry.=" left outer join public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
-		$qry.=" WHERE tbl_standort.firma_id=tbl_firma.firma_id ";
+		$qry.=" FROM public.tbl_firma";
+		$qry.=" LEFT JOIN public.tbl_standort USING(firma_id) ";
+		$qry.=" LEFT JOIN public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
+		$qry.=" WHERE 1=1";
 
 		if($filter!='')
 			$qry.= " and ( lower(tbl_firma.name) like lower('%$filter%') 
