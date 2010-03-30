@@ -561,7 +561,7 @@ if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
 	SELECT standort_id, 'fax', fax, tbl_firma.insertamum, tbl_firma.insertvon, now(), 'checksystem' FROM 
 	public.tbl_firma JOIN public.tbl_standort USING(firma_id) WHERE fax is not null AND fax<>'';
 
-	UPDATE public.tbl_kontakt SET standort_id=(SELECT standort_id FROM public.tbl_standort WHERE firma_id=tbl_kontakt.firma_id LIMIT 1) WHERE firma_id IS NOT NULL
+	UPDATE public.tbl_kontakt SET standort_id=(SELECT standort_id FROM public.tbl_standort WHERE firma_id=tbl_kontakt.firma_id LIMIT 1) WHERE firma_id IS NOT NULL;
 
 	-- Spalten entfernen
 	ALTER TABLE public.tbl_firma DROP COLUMN email;
@@ -934,7 +934,7 @@ $tabellen=array(
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz"),
-	"public.tbl_kontakt"  => array("kontakt_id","person_id","firma_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
+	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id"),
