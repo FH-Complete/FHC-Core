@@ -19,127 +19,122 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// **
-// * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
+/**
+ * Exportiert die Zeitsperren von Mitarbeitern als CSV File
+ */
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/globals.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/zeitsperre.class.php');
+require_once('../../../include/datum.class.php');
 
-  require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/globals.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/mitarbeiter.class.php');
-	require_once('../../../include/studiensemester.class.php');
-	require_once('../../../include/zeitsperre.class.php');
-	require_once('../../../include/datum.class.php');
+$crlf=crlf();
+$trenn=";";
 
-	$crlf=crlf();
-	$trenn=";";
+$uid = get_uid();
 
-	$uid = get_uid();
-
-	if(isset($_GET['lektor']))
-		$lektor=$_GET['lektor'];
+if(isset($_GET['lektor']))
+{
+	$lektor=$_GET['lektor'];
+	if ($lektor=='true' || $lektor=='1') 
+		$lektor=true;
 	else
-		$lektor=null;
-	if ($lektor=='true' || $lektor=='1') $lektor=true;
-	if ($lektor=='false' || $lektor=='') $lektor=false;
+		$lektor=false;
+}
+else
+	$lektor=null;
 
-	if(isset($_GET['fix']))
-		$fix=$_GET['fix'];
+
+if(isset($_GET['fix']))
+{
+	$fix=$_GET['fix'];
+	if ($fix=='true' || $fix=='1') 
+		$fix=true;
 	else
-		$fix=null;
-	if ($fix=='true' || $fix=='1') $fix=true;
-	if ($fix=='false' || $fix=='') $fix=false;
+		$fix=false;
+}
+else
+	$fix=null;
 
-	if(isset($_GET['funktion']))
-		$funktion=$_GET['funktion'];
+if(isset($_GET['funktion']))
+{
+	$funktion=$_GET['funktion'];
+}
+else
+	$funktion=null;
+
+if(isset($_GET['organisationseinheit']))
+	$organisationseinheit = $_GET['organisationseinheit'];
+else
+	$organisationseinheit = null;
+
+$stge=array();
+if(isset($_GET['stg_kz']))
+{
+	$stg_kz=$_GET['stg_kz'];
+	$stge[]=$stg_kz;
+}
+
+//Datumsbereich ermitteln
+$datum_obj = new datum();
+$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
+
+$dTmpAktuellerMontag=date("Y-m-d",strtotime(date('Y')."W".date('W')."1")); // Montag der Aktuellen Woche
+$dTmpAktuellesDatum=explode("-",$dTmpAktuellerMontag);
+$dTmpMontagPlus=date("Y-m-d", mktime(0,0,0,date($dTmpAktuellesDatum[1]),date($dTmpAktuellesDatum[2])+$days,date($dTmpAktuellesDatum[0])));
+
+$datum_beginn=$dTmpAktuellerMontag; 
+$datum_ende=$dTmpMontagPlus;
+
+$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
+$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
+
+// Mitarbeiter laden
+$ma=new mitarbeiter();
+if(!is_null($organisationseinheit))
+{
+	$mitarbeiter = $ma->getMitarbeiterOrganisationseinheit($organisationseinheit);
+}
+else
+{
+	if (is_null($funktion))
+		$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
 	else
-		$funktion=null;
-	if ($funktion=='true' || $funktion=='1') $funktion=true;
-	if ($funktion=='false' || $funktion=='') $funktion=false;
-
-	if(isset($_GET['institut']))
-		$institut = $_GET['institut'];
-	else
-		$institut = null;
-
-	$stge=array();
-	if(isset($_GET['stg_kz']))
-	{
-		$stg_kz=$_GET['stg_kz'];
-		$stge[]=$stg_kz;
-	}
-
-	if(isset($_GET['studiensemester']))
-		$studiensemester=$_GET['studiensemester'];
-	else
-		$studiensemester=null;
-
-	$datum_obj = new datum();
-
-	// Studiensemester setzen
-	$ss=new studiensemester($studiensemester);
-	if ($studiensemester==null)
-	{
-		$studiensemester = $ss->getaktorNext();
-		$ss->load($studiensemester);
-		//$studiensemester=$ss->getAktTillNext();
-	}
-	$datum_beginn=$ss->start;
-	$datum_ende='2008-09-01';//$ss->ende;
-	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
-	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
-
-	// Lektoren holen
-	$ma=new mitarbeiter();
-	if(!is_null($institut))
-	{
-		$mitarbeiter = $ma->getMitarbeiterInstitut($institut);
-	}
-	else
-	{
-		//if (!is_null($funktion))
-		//	$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
-		//else
-			$mitarbeiter=$ma->getMitarbeiter(null,true);//($lektor,$fix);
-	}
+		$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+}
 
 //EXPORT
-	header("Content-type: application/vnd.ms-excel");
-    header('Content-Disposition: attachment; filename="Zeitsperren.csv"');
-    header("Expires: 0");
-    header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
-    header("Pragma: public");
+header("Content-type: application/vnd.ms-excel");
+header('Content-Disposition: attachment; filename="Zeitsperren.csv"');
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
+header("Pragma: public");
 
-	echo '"Datum"'.$trenn;
+echo '"Datum"'.$trenn;
+for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+{
+	$tag=date('d',$ts);
+	$wt=date('w',$ts);
+	$monat=date('M',$ts);
+	echo '"'.$tagbez[$wt].' '.$tag.'.'.$monat.'"'.$trenn;
+}
+$zs=new zeitsperre();
+foreach ($mitarbeiter as $ma)
+{
+	$zs->getzeitsperren($ma->uid, false);
+	echo iconv('UTF8','LATIN9',$crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn);
 	for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 	{
 		$tag=date('d',$ts);
-		$wt=date('w',$ts);
 		$monat=date('M',$ts);
-		if ($wt==0 || $wt==6)
-			$class='feiertag';
-		else
-			$class='';
-		echo '"'.$tagbez[$wt].' '.$tag.'.'.$monat.'"'.$trenn;
+		$wt=date('w',$ts);
+		$grund=$zs->getTyp($ts);
+		$erbk=$zs->getErreichbarkeit($ts);
+		echo '"'.$grund.' - '.$erbk.'"'.$trenn;
 	}
-	$zs=new zeitsperre();
-	foreach ($mitarbeiter as $ma)
-	{
-		$zs->getzeitsperren($ma->uid, false);
-		echo $crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn;
-		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
-		{
-			$tag=date('d',$ts);
-			$monat=date('M',$ts);
-			$wt=date('w',$ts);
-			if ($wt==0 || $wt==6)
-				$class='feiertag';
-			else
-				$class='';
-			$grund=$zs->getTyp($ts);
-			$erbk=$zs->getErreichbarkeit($ts);
-			echo '"'.$grund.' - '.$erbk.'"'.$trenn;
-		}
-	}
-	?>
+}
+?>

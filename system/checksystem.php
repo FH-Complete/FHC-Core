@@ -419,6 +419,11 @@ if(!@$db->db_query("SELECT steuernummer FROM public.tbl_firma LIMIT 1;"))
 	SELECT firma_id, adresse_id, substring(tbl_firma.name for 16), tbl_firma.name 
 	FROM public.tbl_firma LEFT JOIN public.tbl_adresse USING(firma_id) 
 	WHERE tbl_adresse.person_id is null AND firma_id not in (SELECT firma_id FROM public.tbl_standort);
+
+	INSERT INTO public.tbl_standort(firma_id, adresse_id, kurzbz, bezeichnung)
+	SELECT firma_id, null, substring(tbl_firma.name for 16), tbl_firma.name 
+	FROM public.tbl_firma
+	WHERE firma_id not in (SELECT firma_id FROM public.tbl_standort);
 	
 	-- fk zum standort in tbl_mitarbeiter aendern
 	ALTER TABLE public.tbl_mitarbeiter ADD COLUMN standort_id integer;
