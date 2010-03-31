@@ -433,7 +433,7 @@ class mitarbeiter extends benutzer
 		}
 	    $sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz';
 	    //echo $sql_query;
-
+	
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();

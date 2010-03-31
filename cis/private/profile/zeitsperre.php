@@ -19,9 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// **
-// * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
-
+/**
+ * Uebersicht der Zeitsperren der Mitarbeiter
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -40,7 +40,9 @@ require_once('../../../include/organisationseinheit.class.php');
 		$lektor=$_GET['lektor'];
 	else
 		$lektor=null;
-
+	if ($lektor=='false') $lektor=false;
+	if ($lektor=='true' || $lektor=='1') $lektor=true;
+	
 	if(isset($_GET['fix']))
 		$fix=$_GET['fix'];
 	else
@@ -65,32 +67,29 @@ require_once('../../../include/organisationseinheit.class.php');
 		$stge[]=$stg_kz;
 	}
 
-	if(isset($_GET['studiensemester']))
-		$studiensemester=$_GET['studiensemester'];
-	else
-		$studiensemester=null;
-
 	// Link fuer den Export
 	$export_link='zeitsperre_export.php?';
-
+	$export_param='';
+	
 	if(!is_null($organisationseinheit))
-		$export_link.="organisationseinheit=$organisationseinheit";
+		$export_param.=($export_param!=''?'&':'')."organisationseinheit=$organisationseinheit";
 	else
 	{
-		if ($fix==true)
-			$export_link.='fix=true';
-			//&lektor=$lektor&funktion=$funktion";
+		if ($fix)
+			$export_param.=($export_param!=''?'&':'').'fix=true';
+		if($lektor)
+			$export_param.=($export_param!=''?'&':'').'lektor=true';
+		
+		if(!is_null($funktion))
+			$export_param.=($export_param!=''?'&':'').'funktion='.$funktion;
+		if(isset($stg_kz))
+			$export_param.=($export_param!=''?'&':'').'stg_kz='.$stg_kz;
+		
 	}
-
+	$export_link.=$export_param;
+	
+	//Datumsbereich ermitteln
 	$datum_obj = new datum();
-
-	// Studiensemester setzen
-	$ss=new studiensemester($studiensemester);
-	if ($studiensemester==null)
-	{
-		$studiensemester = $ss->getaktorNext();
-		$ss->load($studiensemester);
-	}
 
 	$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
 
@@ -100,13 +99,11 @@ require_once('../../../include/organisationseinheit.class.php');
 
 	$datum_beginn=$dTmpAktuellerMontag; 
 	$datum_ende=$dTmpMontagPlus;
-	
-
 
 	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
 	$ts_ende=$datum_obj->mktime_fromdate($datum_ende);
 
-	// Lektoren holen
+	// Mitarbeiter laden
 	$ma=new mitarbeiter();
 
 	if(!is_null($organisationseinheit))
@@ -122,10 +119,9 @@ require_once('../../../include/organisationseinheit.class.php');
 	}
 
 ?>
-
 <html>
 <head>
-	<title>Zeitsperren <?php echo $studiensemester; ?></title>
+	<title>Zeitsperren</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
@@ -134,8 +130,7 @@ require_once('../../../include/organisationseinheit.class.php');
 	<H2>
 		<table class="tabcontent">
 			<tr>
-				<td>&nbsp;Zeitsperren <?php echo $studiensemester; ?></td>
-				
+				<td>&nbsp;Zeitsperren</td>
 			</tr>
 		</table>
 	</H2>
