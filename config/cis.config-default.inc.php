@@ -30,6 +30,9 @@ define('MOODLE_PATH','http://dav.technikum-wien.at/oesi/portal/trunk/moodle/');
 //Moodle verwenden Ja/Nein
 define('MOODLE',true);
 
+//Name des Servers (benoetigt fuer Cronjobs
+define('SERVER_NAME','cis.technikum-wien.at');
+	
 //Pfad zum Upload-Ordner
 define('BENOTUNGSTOOL_PATH','/websites/portal/trunk/documents/benotungstool/');
 
