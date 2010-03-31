@@ -19,24 +19,16 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
- */
-$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
-	 
+ */	 
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
-
 require_once('../../include/firma.class.php');
-
 require_once('../../include/funktion.class.php');
-
 require_once('../../include/standort.class.php');
 require_once('../../include/adresse.class.php');
-
 require_once('../../include/kontakt.class.php');
 require_once('../../include/person.class.php');
-
 require_once('../../include/organisationseinheit.class.php');
-
 require_once('../../include/nation.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
@@ -48,14 +40,14 @@ $user = get_uid();
 //Zugriffsrechte pruefen
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('basis/firma'))
+if(!$rechte->isBerechtigt('basis/firma:begrenzt'))
 	die('Sie haben keine Berechtigung für diese Seite');
-
 
 // Parameter einlesen
 $errorstr='';
 $tabselect=0;
 
+$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
 $standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
 $adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
 $kontakt_id = (isset($_REQUEST['kontakt_id'])?$_REQUEST['kontakt_id']:'');	
@@ -164,7 +156,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	if(isset($_GET['deleteadresse']))
 	{
 		$showmenue=1;	
-		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
 		if(is_numeric($standort_id))
@@ -194,7 +186,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	if(isset($_GET['deletekontakt']))
 	{
 		$showmenue=1;	
-		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+		if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
 		if(is_numeric($kontakt_id))
@@ -210,7 +202,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	if(isset($_GET['deletepersonfunktionstandort']))
 	{
 		$showmenue=1;
-		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+		if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
 		if(is_numeric($personfunktionstandort_id))
@@ -246,196 +238,184 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 
 <script src="../../include/js/jquery.tools.min.js" type="text/javascript"></script>
 
-
-
 <script type="text/javascript" language="JavaScript1.2">
+	// **************************************
+	// * XMLHttpRequest Objekt erzeugen
+	// **************************************
+	var anfrage = null;
 	
-
-
-// **************************************
-// * XMLHttpRequest Objekt erzeugen
-// **************************************
-var anfrage = null;
-
-function erzeugeAnfrage()
-{
-	try
-	{
-		anfrage = new XMLHttpRequest();
-	}
-	catch (versuchmicrosoft)
+	function erzeugeAnfrage()
 	{
 		try
 		{
-			anfrage = new ActiveXObject("Msxml12.XMLHTTP");
+			anfrage = new XMLHttpRequest();
 		}
-		catch (anderesmicrosoft)
+		catch (versuchmicrosoft)
 		{
 			try
 			{
-				anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+				anfrage = new ActiveXObject("Msxml12.XMLHTTP");
 			}
-			catch (fehlschlag)
+			catch (anderesmicrosoft)
 			{
-				anfrage = null;
-            }
-        }
-    }
-	if (anfrage == null)
-		alert("Fehler beim Erstellen des Anfrageobjekts!");
-}
-
-//Gemeinde DropDown holen wenn Nation Oesterreich
-function loadGemeindeData()
-{
-	if(document.getElementById('nation').value=='A')
-	{
-		anfrage=null;
-		erzeugeAnfrage(); 
-	    var jetzt = new Date();
-		var ts = jetzt.getTime();
-		var plz = document.getElementById('plz').value;
-	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getgemeindecontent"?>';
-	    url += '&plz='+plz+"&"+ts;
-	    anfrage.open("GET", url, true);
-	    anfrage.onreadystatechange = setGemeindeData;
-	    anfrage.send(null);
-	    document.getElementById('gemeinde').style.display='none';
-		document.getElementById('ort').style.display='none';
+				try
+				{
+					anfrage = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				catch (fehlschlag)
+				{
+					anfrage = null;
+	            }
+	        }
+	    }
+		if (anfrage == null)
+			alert("Fehler beim Erstellen des Anfrageobjekts!");
 	}
-	else
+	
+	//Gemeinde DropDown holen wenn Nation Oesterreich
+	function loadGemeindeData()
 	{
-		document.getElementById('gemeindediv').innerHTML='';
-		document.getElementById('ortdiv').innerHTML='';
-		document.getElementById('gemeinde').style.display='block';
-		document.getElementById('ort').style.display='block';
-
+		if(document.getElementById('nation').value=='A')
+		{
+			anfrage=null;
+			erzeugeAnfrage(); 
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+			var plz = document.getElementById('plz').value;
+		    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getgemeindecontent"?>';
+		    url += '&plz='+plz+"&"+ts;
+		    anfrage.open("GET", url, true);
+		    anfrage.onreadystatechange = setGemeindeData;
+		    anfrage.send(null);
+		    document.getElementById('gemeinde').style.display='none';
+			document.getElementById('ort').style.display='none';
+		}
+		else
+		{
+			document.getElementById('gemeindediv').innerHTML='';
+			document.getElementById('ortdiv').innerHTML='';
+			document.getElementById('gemeinde').style.display='block';
+			document.getElementById('ort').style.display='block';
+	
+		}
 	}
-}
-
-function setGemeindeData()
-{
-	if (anfrage.readyState == 4)
+	
+	function setGemeindeData()
 	{
-		if (anfrage.status == 200) 
+		if (anfrage.readyState == 4)
 		{
-			var resp = anfrage.responseText;
-            var gemeindediv = document.getElementById('gemeindediv');
-			gemeindediv.innerHTML = resp;
-			gemeindediv.style.display = 'block';
-			gemeindediv.style.border = 0;
-			gemeindediv.style.padding = 0;
-			gemeindediv.style.minHeight=0;
-			loadOrtData();
-        } 
-        else alert("Request status:" + anfrage.status);
-    }
-}
-
-function loadOrtData()
-{
-	if(document.getElementById('gemeinde'))
-	{
-		anfrage=null;
-		//Request erzeugen und die Note speichern
-		erzeugeAnfrage(); 
-	    var jetzt = new Date();
-		var ts = jetzt.getTime();
-		var plz = document.getElementById('plz').value;
-		var gemeinde = document.getElementById('gemeinde_combo').value;
-	    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getortcontent"?>';
-	    url += '&plz='+plz+"&gemeinde="+encodeURIComponent(gemeinde)+"&"+ts;
-	    anfrage.open("GET", url, true);
-	    anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	    anfrage.onreadystatechange = setOrtData;
-	    anfrage.send(null);
+			if (anfrage.status == 200) 
+			{
+				var resp = anfrage.responseText;
+	            var gemeindediv = document.getElementById('gemeindediv');
+				gemeindediv.innerHTML = resp;
+				gemeindediv.style.display = 'block';
+				gemeindediv.style.border = 0;
+				gemeindediv.style.padding = 0;
+				gemeindediv.style.minHeight=0;
+				loadOrtData();
+	        } 
+	        else alert("Request status:" + anfrage.status);
+	    }
 	}
-}
-
-function setOrtData()
-{
-	if (anfrage.readyState == 4)
+	
+	function loadOrtData()
 	{
-		if (anfrage.status == 200) 
+		if(document.getElementById('gemeinde'))
 		{
-			var resp = anfrage.responseText;
-            var ortdiv = document.getElementById('ortdiv');
-			ortdiv.innerHTML = resp;
-			ortdiv.style.display = 'block';
-			ortdiv.style.border = 0;
-			ortdiv.style.padding = 0;
-			ortdiv.style.minHeight=0;
-        } 
-        else alert("Request status:" + anfrage.status);
-    }
-}	
-	
-	
-	
-	
-	
-	
-	
-		function confdel()
-		{
-			if(confirm("Diesen Datensatz wirklich loeschen?"))
-				return true;
-			return false;
+			anfrage=null;
+			//Request erzeugen und die Note speichern
+			erzeugeAnfrage(); 
+		    var jetzt = new Date();
+			var ts = jetzt.getTime();
+			var plz = document.getElementById('plz').value;
+			var gemeinde = document.getElementById('gemeinde_combo').value;
+		    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getortcontent"?>';
+		    url += '&plz='+plz+"&gemeinde="+encodeURIComponent(gemeinde)+"&"+ts;
+		    anfrage.open("GET", url, true);
+		    anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		    anfrage.onreadystatechange = setOrtData;
+		    anfrage.send(null);
 		}
+	}
 	
-		function workDetailRecord(wohin,formname)
+	function setOrtData()
+	{
+		if (anfrage.readyState == 4)
 		{
-		    $("div#"+wohin).show("slow"); // div# langsam oeffnen
-			$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
-			var formdata = $('form#'+formname).serialize(); 
-			//alert(formdata);
-			$.ajax
-				(
-					{
-						type: "POST", timeout: 3500,dataType: 'html',url: 'firma_detailwork.php',data: formdata,
-						error: function()
-						{
-				   			$("div#"+wohin).html("error ");
-							return;								
-						},		
-						success: function(phpData)
-						{
-					   		$("div#"+wohin).html(phpData);
-					   		
-						}
-					}
-				);
-			return;
-		}
-		function callUrl(wohin,urldata)
-		{
-		    $("div#"+wohin).show("slow"); // div# langsam oeffnen
-			$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
-			$.ajax
-				(
-					{
-						type: "POST", timeout: 3500,dataType: 'html',url: 'firma_detailwork.php',data: urldata,
-						error: function()
-						{
-				   			$("div#"+wohin).html("error ");
-							return;								
-						},		
-						success: function(phpData)
-						{
-					   		$("div#"+wohin).html(phpData);
-						}
-					}
-				);
-			return;
-		}
+			if (anfrage.status == 200) 
+			{
+				var resp = anfrage.responseText;
+	            var ortdiv = document.getElementById('ortdiv');
+				ortdiv.innerHTML = resp;
+				ortdiv.style.display = 'block';
+				ortdiv.style.border = 0;
+				ortdiv.style.padding = 0;
+				ortdiv.style.minHeight=0;
+	        } 
+	        else alert("Request status:" + anfrage.status);
+	    }
+	}	
 		
+	function confdel()
+	{
+		if(confirm("Diesen Datensatz wirklich loeschen?"))
+			return true;
+		return false;
+	}
+
+	function workDetailRecord(wohin,formname)
+	{
+	    $("div#"+wohin).show("slow"); // div# langsam oeffnen
+		$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
+		var formdata = $('form#'+formname).serialize(); 
+		//alert(formdata);
+		$.ajax
+			(
+				{
+					type: "POST", timeout: 3500,dataType: 'html',url: 'firma_detailwork.php',data: formdata,
+					error: function()
+					{
+			   			$("div#"+wohin).html("error ");
+						return;								
+					},		
+					success: function(phpData)
+					{
+				   		$("div#"+wohin).html(phpData);
+				   		
+					}
+				}
+			);
+		return;
+	}
+	
+	function callUrl(wohin,urldata)
+	{
+	    $("div#"+wohin).show("slow"); // div# langsam oeffnen
+		$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
+		$.ajax
+			(
+				{
+					type: "POST", timeout: 3500,dataType: 'html',url: 'firma_detailwork.php',data: urldata,
+					error: function()
+					{
+			   			$("div#"+wohin).html("error ");
+						return;								
+					},		
+					success: function(phpData)
+					{
+				   		$("div#"+wohin).html(phpData);
+					}
+				}
+			);
+		return;
+	}
+	
 	$(function() 
 	{
 		$("ul.css-tabsDetail").tabs("div.css-panes > div", {effect: 'ajax'}).history();
 	});
 </script>
-
-
 
 <style type="text/css">
 <!--
@@ -512,84 +492,81 @@ div.css-panes div div{
 	if (empty($firma_id))
 		exit('');
 
-#var_dump($_REQUEST);
-##exit;
-##echo "$work <br>";
+	$htmlcode='';
+	switch ($work)
+	{
+		case 'listKontakte':
+			$htmlcode=listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
+			$tabselect=2;
+			break;
+		case 'eingabeKontakt':
+			$htmlcode=eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
+			$tabselect=2;
+			break;
+		case 'saveKontakt':
+			$htmlcode=saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte,$rechte);
+			$tabselect=2;
+			break;
 
-		$htmlcode='';
-		switch ($work)
-		{
-			case 'listKontakte':
-				$htmlcode=listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
-				$tabselect=2;
-				break;
-			case 'eingabeKontakt':
-				$htmlcode=eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
-				$tabselect=2;
-				break;
-			case 'saveKontakt':
-				$htmlcode=saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte,$rechte);
-				$tabselect=2;
-				break;
-
-			case 'listPersonenfunktionen':
-				$htmlcode=getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
-				$tabselect=1;
-				break;
-			case 'eingabePersonenfunktionen':
-				$htmlcode=eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
-				$tabselect=1;
-				break;
-			case 'savePersonenfunktionen':
-				$htmlcode=savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
-				$tabselect=1;
-				break;
-			case 'saveStandort':
-				$htmlcode=saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
-				$tabselect=0;
-				break;		
-				
-			case 'saveFirmaorganisationseinheit':
-				$firma_organisationseinheit_id=saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte);
-				if (!is_numeric($firma_organisationseinheit_id))
-				{
-					$htmlcode=$firma_organisationseinheit_id;
-					$firma_organisationseinheit_id='';
-				}
-				$htmlcode.=eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte);
-				$htmlcode.='<script language="JavaScript1.2" type="text/javascript">
-						parent.frames[1].location.reload();
-						</script>';
-				break;		
-			case 'eingabeOrganisationseinheit':
-				$htmlcode=eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte);
-				break;		
-			case 'saveOrganisationseinheit':
-				$htmlcode=saveOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte);
-				break;		
+		case 'listPersonenfunktionen':
+			$htmlcode=getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
+			$tabselect=1;
+			break;
+		case 'eingabePersonenfunktionen':
+			$htmlcode=eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
+			$tabselect=1;
+			break;
+		case 'savePersonenfunktionen':
+			$htmlcode=savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
+			$tabselect=1;
+			break;
+		case 'saveStandort':
+			$htmlcode=saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
+			$tabselect=0;
+			break;		
+			
+		case 'saveFirmaorganisationseinheit':
+			$firma_organisationseinheit_id=saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte);
+			if (!is_numeric($firma_organisationseinheit_id))
+			{
+				$htmlcode=$firma_organisationseinheit_id;
+				$firma_organisationseinheit_id='';
+			}
+			$htmlcode.=eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte);
+			$htmlcode.='<script language="JavaScript1.2" type="text/javascript">
+					parent.frames[1].location.reload();
+					</script>';
+			break;		
+		case 'eingabeOrganisationseinheit':
+			$htmlcode=eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte);
+			break;		
+		case 'saveOrganisationseinheit':
+			$htmlcode=saveOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte);
+			break;		
 
 
-		    default:
-				if (!$showmenue)
-					$htmlcode=getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
-				break;
-		}
-		
-		if ($showmenue)
-			echo '<!-- Tabs --> 
-			<ul class="css-tabsDetail">
-			     <li '.($tabselect==0?"class=current":"").'><a href="firma_detailwork.php?work=standort&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Standort</a></li>
-				 <li '.($tabselect==1?"class=current":"").'><a href="firma_detailwork.php?work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Ansprechpartner</a></li>
-				 <li '.($tabselect==2?"class=current":"").'><a href="firma_detailwork.php?work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Kontakte</a></li>
-			</ul>
-			<div class="css-panes">
-				<div style="display:block" id="detail">'.$htmlcode.'</div>
-			</div>
-			<br />	
-			<div id="detailworkinfodiv"></div>
-			';
-		else	
-			echo $htmlcode;	
+	    default:
+			if (!$showmenue)
+				$htmlcode=getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
+			break;
+	}
+	
+	if ($showmenue)
+		echo '<!-- Tabs --> 
+		<ul class="css-tabsDetail">
+		     <li '.($tabselect==0?"class=current":"").'><a href="firma_detailwork.php?work=standort&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Standort</a></li>
+			 <li '.($tabselect==1?"class=current":"").'><a href="firma_detailwork.php?work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Ansprechpartner</a></li>
+			 <li '.($tabselect==2?"class=current":"").'><a href="firma_detailwork.php?work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Kontakte</a></li>
+		</ul>
+		<div class="css-panes">
+			<div style="display:block" id="detail">'.$htmlcode.'</div>
+		</div>
+		<br />	
+		<div id="detailworkinfodiv"></div>
+		';
+	else	
+		echo $htmlcode;
+	
 	echo  ($errorstr?'<br>'.$errorstr:'');	
 ?>	
 </body>
@@ -768,7 +745,7 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 */
 function saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte)	
 {	
-	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 		return 'Sie haben keine Berechtigung fuer diese Aktion - Kontakte';
 		
 	// Plausib
@@ -873,7 +850,6 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 					<th>Kontakt</th>
 					<th>Anmerkung</th>
 					<th>Zustellung</th>
-					<th>Ext.Id</th>
 					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 
@@ -888,7 +864,7 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 			$htmlstr.= '<td>'.$row->anmerkung.'</td>';
 			$htmlstr.= '<td align="center">'.($row->zustellung?'Ja':'Nein').'</td>';
 			//$htmlstr.= '<td>'.$row->person_id.'</td>';
-			$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
+			//$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
 			
 			$htmlstr.= '<td align="center"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&kontakt_id='.$row->kontakt_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="editieren"/></a></td>';
 			$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletekontakt=true&firma_id=$firma_id&standort_id=$row->standort_id&kontakt_id=$row->kontakt_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
@@ -998,7 +974,7 @@ function eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adressty
 */
 function savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte)	
 {	
-	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 		return 'Sie haben keine Berechtigung fuer diese Aktion - Kontakte';
 		
 	// Datenlesen 
@@ -1201,6 +1177,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Position: </td>";		
 		$htmlstr.="<td><input type='text' id='position'  name='position'  value='".$standort_obj->position."' size='30' maxlength='256' /></td>\n";
+		/*
 		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
 						function formatItem(row) 
 						{
@@ -1218,7 +1195,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 						});
 					</script>
 		";
-		
+		*/
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Anrede: </td>";		
 		$htmlstr.="<td><input type='text' name='anrede' value='".$standort_obj->anrede."' size='50' maxlength='128' /></td>\n";
@@ -1329,18 +1306,18 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 		$htmlstr.="<td>&nbsp;</td>";	
 
 		$htmlstr.="<td>Kurzbz: </td>";		
-		$htmlstr.="<td><input type='text' name='kurzbz' value='".$standort_obj->kurzbz."' size='20' maxlength='40' /></td>\n";
+		$htmlstr.="<td><input type='text' name='kurzbz' value='".$standort_obj->kurzbz."' size='16' maxlength='16' /></td>\n";
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Bezeichnung: </td>";		
 		$htmlstr.="<td><input type='text' name='bezeichnung' value='".$standort_obj->bezeichnung."' size='20' maxlength='80' /></td>\n";
 
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>&nbsp;</td>";	
-		
+		/*
 		$htmlstr.="<td>Heimatadresse: </td>";
 		$htmlstr.="<td><input ".($adresse_obj->heimatadresse?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='heimatadresse' ".($adresse_obj->heimatadresse?'checked':'')."></td>\n";
 		$htmlstr.="<td>&nbsp;</td>\n";
-	
+		*/
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Zustelladresse:</td>";
 		$htmlstr.="<td><input ".($adresse_obj->zustelladresse?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='zustelladresse' ".($adresse_obj->zustelladresse?'checked':'')."> </td>";
@@ -1439,7 +1416,7 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte)
 {
 
-	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma',null, 'suid'))
+	if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 		return 'Sie haben keine Berechtigung fuer diese Aktion';
 
 	// Standort speichern
@@ -1453,7 +1430,7 @@ function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$r
 	$name = (isset($_POST['name'])?$_POST['name']:'');	
 	$gemeinde = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$nation = (isset($_POST['nation'])?$_POST['nation']:'');
-	$heimatadresse = (isset($_POST['heimatadresse'])?true:false);
+	//$heimatadresse = (isset($_POST['heimatadresse'])?true:false);
 	$zustelladresse = (isset($_POST['zustelladresse'])?true:false);
 
 	$ext_id = (isset($_POST['ext_id'])?$_POST['ext_id']:'');

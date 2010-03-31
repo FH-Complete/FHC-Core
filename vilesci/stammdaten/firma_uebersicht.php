@@ -33,7 +33,7 @@ $user = get_uid();
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-$berechtigung_kurzbz = 'basis/firma';
+$berechtigung_kurzbz = 'basis/firma:begrenzt';
 if(!$rechte->isBerechtigt($berechtigung_kurzbz))
 	die('Sie haben keine Berechtigung fuer diese Seite ');
 
@@ -124,7 +124,7 @@ function creatList($suchen,$filter,$firmentypfilter)
 	    $htmlstr .= "       <th class='table-sortable:numeric'>ID</th>";
 	    $htmlstr .= "       <th class='table-sortable:default'>Name</th>";
 	    $htmlstr .= "       <th class='table-sortable:default'>Anmerkung</th>";
-		$htmlstr .= "       <th class='table-sortable:default'>Kurzbz.</th>";
+		$htmlstr .= "       <th class='table-sortable:default'>Kurzbz</th>";
 		$htmlstr .= "       <th class='table-sortable:default'>Standort</th>";
 
 	    $htmlstr .= "       <th class='table-sortable:default'>Plz</th>";
@@ -136,7 +136,7 @@ function creatList($suchen,$filter,$firmentypfilter)
 	    $htmlstr .= "       <th class='table-sortable:default'>Gesperrt</th>";
 	    $htmlstr .= "       <th class='table-sortable:default'>Schule</th>";
 				
-	    $htmlstr .= "       <th class='table-sortable:default'>Ext ID</th>";
+	    //$htmlstr .= "       <th class='table-sortable:default'>Ext ID</th>";
 
 	    $htmlstr .= "   </tr></thead><tbody>\n";
 	    $i = 0;
@@ -159,7 +159,7 @@ function creatList($suchen,$filter,$firmentypfilter)
 			$htmlstr .= "       <td>".($row->aktiv=='t'?'Ja':'Nein')."</td>\n";
 			$htmlstr .= "       <td>".($row->gesperrt=='t'?'Ja':'Nein')."</td>\n";
 	        $htmlstr .= "       <td>".($row->schule=='t'?'Ja':'Nein')."</td>\n";
-	        $htmlstr .= "       <td>$row->ext_id</td>\n";
+	        //$htmlstr .= "       <td>$row->ext_id</td>\n";
 	        $htmlstr .= "   </tr>\n";
 	        $i++;
 	    }
