@@ -242,7 +242,7 @@ class standort extends basis_db
 
 		if(mb_strlen($this->kurzbz)>16)
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein';
+			$this->errormsg = 'Kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->bezeichnung)>255)

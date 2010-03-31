@@ -349,12 +349,18 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 		// Finanzamt anzeige und suche
 		$firma_finanzamt = new firma();
 		$firmentyp_finanzamt='Finanzamt';
-		$firma_finanzamt->searchFirma('',$firmentyp_finanzamt);	
+		$firma_finanzamt->searchFirma('',$firmentyp_finanzamt, true);	
 		#var_dump($firma_finanzamt);
 		$htmlstr.="<td><select name='finanzamt'>";
-			$htmlstr.="<option value=''> </option>";
-			foreach ($firma_finanzamt->result as $row_finazamt)
-				$htmlstr.="	<option value='".$row_finazamt->standort_id ."'>".$row_finazamt->bezeichnung." </option>";
+		$htmlstr.="<option value=''>-- keine Auswahl --</option>";
+		foreach ($firma_finanzamt->result as $row_finanzamt)
+		{
+			if($firma->finanzamt==$row_finanzamt->standort_id)
+				$selected='selected="true"';
+			else 
+				$selected='';
+			$htmlstr.="	<option value='".$row_finanzamt->standort_id ."' ".$selected.">".$row_finanzamt->name.' - '.$row_finanzamt->bezeichnung." </option>";
+		}
 		$htmlstr.="</select></td>\n";
 	
 		$htmlstr.="<td>Aktiv: </td>";
@@ -477,10 +483,13 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 	// Es gibt noch keinen Standort zur Firma - Neuanlage		
 	if ($firma_id && !$standort_obj->result)
 	{
+		$firma_obj = new firma();
+		$firma_obj->load($firma_id);
+		
 		$standort_obj->new=true;
 		$standort_obj->standort_id=null;
 		$standort_obj->adresse_id=null;
-		$standort_obj->kurzbz='';
+		$standort_obj->kurzbz=mb_substr($firma_obj->name, 0, 16);
 		$standort_obj->bezeichnung='';
 		$standort_obj->updatevon=$user;
 		$standort_obj->insertvon=$user;
@@ -495,16 +504,15 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 #var_dump($standort_obj);	
 	$htmlstr.= '<table class="liste">
 				<tr>
-					<th>Kurzbez</th>
+					<th>Kurzbz</th>
 					<th>Nation</th>
 					<th>Gemeinde</th>
 					<th>Plz</th>
 					<th>Ort</th>
 					<th>Strasse</th>
 					<th>Typ</th>
-					<th><font size="0">Heimatadr.</font></th>
 					<th><font size="0">Zustelladr.</font></th>
-					<th>Ext.Id</th>
+					
 					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 #var_dump($standort_obj);
@@ -525,8 +533,8 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 				$adresse_obj->gemeinde = '';
 				$adresse_obj->nation = '';
 				$adresse_obj->typ = '';
-				$adresse_obj->heimatadresse = '';
-				$adresse_obj->zustelladresse = '';
+				$adresse_obj->heimatadresse = false;
+				$adresse_obj->zustelladresse = false;
 				$adresse_obj->firma_id = null;
 				$adresse_obj->updateamum = date('Y-m-d H:i:s');
 				$adresse_obj->updatvon = $user;
@@ -555,9 +563,9 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 				$htmlstr.= '<td>'.$adresse_obj->ort.'</td>';
 				$htmlstr.= '<td>'.$adresse_obj->strasse.'</td>';
 				$htmlstr.= '<td>'.$adresstyp_arr[$adresse_obj->typ].'</td>';
-				$htmlstr.= '<td align="center">'.($adresse_obj->heimatadresse?'Ja':'Nein').'</td>';
+				//$htmlstr.= '<td align="center">'.($adresse_obj->heimatadresse?'Ja':'Nein').'</td>';
 				$htmlstr.= '<td align="center">'.($adresse_obj->zustelladresse?'Ja':'Nein').'</td>';
-				$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
+				//$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
 				$htmlstr.= '<td align="center"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&adresse_id='.$adresse_obj->adresse_id.'"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="edit"/></a></td>';
 				$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteadresse=true&standort_id=$row->standort_id&adresse_id=$adresse_obj->adresse_id&firma_id=$firma_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 			}
