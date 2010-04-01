@@ -23,11 +23,38 @@
 // **
 // * @brief Uebersicht der Resturlaubstage
 
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/resturlaub.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/resturlaub.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
-	$uid = get_uid();
+$uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if (!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('mitarbeiter'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
+$db = new basis_db();
+
+$jahr=date('Y');
+if (date('m')>8)
+{
+	$datum_beginn_iso=$jahr.'-09-01';
+	$datum_beginn='1.Sept.'.$jahr;
+	$datum_ende_iso=($jahr+1).'-08-31';
+	$datum_ende='31.Aug.'.($jahr+1);
+	$geschaeftsjahr=$jahr.'/'.($jahr+1);
+}
+else
+{
+	$datum_beginn_iso=($jahr-1).'-09-01';
+	$datum_beginn='1.Sept.'.($jahr-1);
+	$datum_ende_iso=$jahr.'-08-31';
+	$datum_ende='31.Aug.'.$jahr;
+	$geschaeftsjahr=($jahr-1).'/'.$jahr;
+}
 ?>
 
 <html>
@@ -50,9 +77,9 @@
     <TR class="liste">
     	<TH>Nachname</TH>
     	<TH>Vorname</TH>
-    	<TH>Resturlaubstage</TH>
-    	<TH>Mehrarbeitsstunden</TH>
-    	<TH>Letzte Aenderung</TH>
+    	<TH>Resturlaubstage per <?php echo $datum_beginn ?></TH>
+    	<TH>aktueller Stand</TH>
+    	<TH>Resturlaubstage per <?php echo $datum_ende ?></TH>
 	</TR>
 
 	<?php
@@ -65,8 +92,36 @@
 		echo '<TR class="liste'.($i%2).'">';
 		echo "<TD>$row->nachname</TD><TD>$row->vorname $row->vornamen</TD>";
 		echo "<TD>$row->resturlaubstage</TD>";
-		echo "<TD>$row->mehrarbeitsstunden</TD>";
-		echo "<TD>$row->updateamum</TD>";
+
+		//Urlaub berechnen (date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR (date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
+		$qry = "SELECT 
+				(SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
+				 WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$row->mitarbeiter_uid' AND
+				 (
+					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
+				 )) as anzahltage,
+				 (SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
+				 WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$row->mitarbeiter_uid' AND
+				 (
+					vondatum>='$datum_beginn_iso' AND bisdatum<=now()
+				 )) as anzahltageaktuell
+				 ";
+		$tttt="\n";
+		if($result_summe = $db->db_query($qry))
+		{
+			if($row_summe = $db->db_fetch_object($result_summe))
+			{
+				$gebuchterurlaub = $row_summe->anzahltage;
+				$gebuchterurlaubaktuell = $row_summe->anzahltageaktuell;
+			}
+		}
+		if($gebuchterurlaub=='')
+			$gebuchterurlaub=0;
+		if($gebuchterurlaubaktuell=='')
+			$gebuchterurlaubaktuell=0;
+			
+		echo '<td>'.($row->urlaubstageprojahr+$row->resturlaubstage-$gebuchterurlaubaktuell).'</td>';
+		echo '<td>'.($row->urlaubstageprojahr+$row->resturlaubstage-$gebuchterurlaub).'</td>';
 		echo '</TR>';
 		$i++;
 	}

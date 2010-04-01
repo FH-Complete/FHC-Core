@@ -491,6 +491,7 @@ $error_msg='';
 	// **************************************************************
 	// Organisationseinheiten-Verteiler
 	
+	/*
 	$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE aktiv AND mailverteiler";
 	if($result = $db->db_query($qry))
 	{
@@ -570,7 +571,7 @@ $error_msg='';
 			}
 		}
 	}
-	
+	*/
 	echo $error_msg;
 	?>
 	<BR>
