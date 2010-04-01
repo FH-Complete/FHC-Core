@@ -20,22 +20,25 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Simane-Sequens <	gerald.simane-sequens@technikum-wien.at>.
  */
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/globals.inc.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/fckeditor/fckeditor.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/safehtml/safehtml.class.php');
-
- 	require_once('../../../include/betriebsmittel.class.php');
- 	require_once('../../../include/betriebsmittelperson.class.php');
- 	require_once('../../../include/betriebsmitteltyp.class.php');  
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/globals.inc.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/fckeditor/fckeditor.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/safehtml/safehtml.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/betriebsmittel.class.php');
+require_once('../../../include/betriebsmittelperson.class.php');
+require_once('../../../include/betriebsmitteltyp.class.php');  
   
 	if (!$db = new basis_db())
 		die('Fehler beim Oeffnen der Datenbankverbindung');
       
 	$uid=get_uid();
+	
+	$datum_obj = new datum();
+	
 	$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
 	if(isset($_GET['uid']))
 	{
@@ -102,7 +105,7 @@
 			$vorwahl = '+43 1 333 40 77-';
 			if($row->standort_id!='')
 			{
-				$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='$row->standort_id'";
+				$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='$row->standort_id' AND kontakttyp='telefon'";
 				if($result_tel = $db->db_query($qry))
 					if($row_tel = $db->db_fetch_object($result_tel))
 						$vorwahl = $row_tel->kontakt;
@@ -197,7 +200,7 @@ function RefreshImage()
         		
 		if(!$ansicht)
 		{
-        	echo "	Geburtsdatum: $gebdatum<br>
+        	echo '	Geburtsdatum: '.$datum_obj->formatDatum($gebdatum,'d.m.Y')."<br>
         			Geburtsort: $gebort<br>";
         		
         }
@@ -305,24 +308,23 @@ function RefreshImage()
     		$oBetriebsmittelperson = new betriebsmittelperson();
     		$oBetriebsmittelperson->result=array();
     		$oBetriebsmittelperson->errormsg='';
-			if (!defined('WAWI'))
-				$oBetriebsmittelperson->schema_inventar='public';
+			
     		if ($oBetriebsmittelperson->getBetriebsmittelPerson($person_id))
-        {
-      		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
-    	  	{
-    				echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
-#      var_dump($oBetriebsmittelperson->result);   
-            for ($i=0;$i<count($oBetriebsmittelperson->result);$i++)
-            {
-                if (empty($oBetriebsmittelperson->result[$i]->retouram) )
-                {
-      						echo "<tr class='liste1'><td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp."</td><td>".$oBetriebsmittelperson->result[$i]->nummer."</td><td>".$oBetriebsmittelperson->result[$i]->ausgegebenam."</td></tr>";
-                }
-            }
-    				echo '</table>';
-          }
-        }
+	        {
+	      		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
+	    	  	{
+	    			echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
+	   
+		            for ($i=0;$i<count($oBetriebsmittelperson->result);$i++)
+		            {
+		                if (empty($oBetriebsmittelperson->result[$i]->retouram) )
+		                {
+		      				echo "<tr class='liste1'><td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp."</td><td>".$oBetriebsmittelperson->result[$i]->nummer."</td><td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td></tr>";
+		                }
+		            }
+		    		echo '</table>';
+				}
+	        }
 		}
     
 		if(!$ansicht)
