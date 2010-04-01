@@ -126,7 +126,7 @@ $zs=new zeitsperre();
 foreach ($mitarbeiter as $ma)
 {
 	$zs->getzeitsperren($ma->uid, false);
-	echo mb_convert_encoding($crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn,'LATIN9','UTF-8');
+	echo mb_convert_encoding($crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn,'ISO-8859-15','UTF-8');
 	for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 	{
 		$tag=date('d',$ts);
