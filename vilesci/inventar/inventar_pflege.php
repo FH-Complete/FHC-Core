@@ -20,23 +20,20 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-// ---------------- Vilesci Include Dateien einbinden
-	$path='../../';
-
-	include_once($path.'config/vilesci.config.inc.php');
-  	require_once($path.'include/functions.inc.php');
-	require_once($path.'include/benutzerberechtigung.class.php');
-	require_once($path.'include/person.class.php');
-	require_once($path.'include/mitarbeiter.class.php');
-  	require_once($path.'include/ort.class.php');
-	require_once($path.'include/studiengang.class.php');
-  	require_once($path.'include/organisationseinheit.class.php');
-  	require_once($path.'include/wawi.class.php');
-  	require_once($path.'include/betriebsmittel.class.php');
-  	require_once($path.'include/betriebsmitteltyp.class.php');
-  	require_once($path.'include/betriebsmittelstatus.class.php');
-  	require_once($path.'include/betriebsmittel_betriebsmittelstatus.class.php');
-	require_once($path.'include/betriebsmittelperson.class.php');
+	require_once('../../config/vilesci.config.inc.php');
+  	require_once('../../include/functions.inc.php');
+	require_once('../../include/benutzerberechtigung.class.php');
+	require_once('../../include/person.class.php');
+	require_once('../../include/mitarbeiter.class.php');
+  	require_once('../../include/ort.class.php');
+	require_once('../../include/studiengang.class.php');
+  	require_once('../../include/organisationseinheit.class.php');
+  	require_once('../../include/wawi.class.php');
+  	require_once('../../include/betriebsmittel.class.php');
+  	require_once('../../include/betriebsmitteltyp.class.php');
+  	require_once('../../include/betriebsmittelstatus.class.php');
+  	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
+	require_once('../../include/betriebsmittelperson.class.php');
 	
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -373,18 +370,17 @@
 	<head>
 		<title>Inventar - Neuanlage</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="stylesheet" href="<?php echo $path;?>skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/jquery.css" type="text/css">
 		
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript">		
-		<script src="<?php echo $path;?>include/js/jquery.barcode.0.3.js" type="text/javascript"></script>		
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
+		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript">
+		<script src="../../include/js/jquery.barcode.0.3.js" type="text/javascript"></script>		
 
 	</head>
 	<body>
-		<h1 title="Anwender:<?php echo $uid ?>">&nbsp;Inventar - Neuanlage&nbsp;</h1>
+		<h1>&nbsp;Inventar - Neuanlage&nbsp;</h1>
 	    <form name="sendform" action="<?php echo $_SERVER["PHP_SELF"];  ?>" method="post" enctype="application/x-www-form-urlencoded">
 
 		<fieldset>
@@ -953,7 +949,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 						<td id="bcTarget<?php echo $pos; ?>">
 							<table>
 								<tr>
-									<td>druck&nbsp;<img border="0" src="<?php echo $path;?>skin/images/printer.png" title="drucken" > </td>
+									<td>druck&nbsp;<img border="0" src="../../skin/images/printer.png" title="drucken" > </td>
 								</tr>
 							</table>
 						</td>	
