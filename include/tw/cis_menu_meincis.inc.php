@@ -39,14 +39,14 @@
 				<tr>
 				  	<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap">
-						<a class="Item" href="https://www.mobility-online.co.at/mobility/BewerbungServlet?identifier=wien20&kz_bew_art=OUT&kz_bew_pers=S&aust_prog=SMS&bew_matr_nr='.rawurlencode(trim($student->matrikelnr)).'&bew_nachname='.rawurlencode($student->nachname).'&bew_vorname='.rawurlencode($student->vorname).'&bew_titel='.rawurlencode($student->titelpre).'&bew_email='.rawurlencode($user.'@'.DOMAIN).'&bew_geb_datum='.rawurlencode($datum_obj->formatDatum($student->gebdatum,'d.m.Y')).'&bew_geschlecht='.rawurlencode(mb_strtoupper($student->geschlecht)).'" target="content">
+						<a class="Item" href="https://www.service4mobility.com/mobility/BewerbungServlet?identifier=wien20&kz_bew_art=OUT&kz_bew_pers=S&aust_prog=SMS&bew_matr_nr='.rawurlencode(trim($student->matrikelnr)).'&bew_nachname='.rawurlencode($student->nachname).'&bew_vorname='.rawurlencode($student->vorname).'&bew_titel='.rawurlencode($student->titelpre).'&bew_email='.rawurlencode($user.'@'.DOMAIN).'&bew_geb_datum='.rawurlencode($datum_obj->formatDatum($student->gebdatum,'d.m.Y')).'&bew_geschlecht='.rawurlencode(mb_strtoupper($student->geschlecht)).'" target="content">
 						<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mobility</a>
 					</td>
 				</tr>
 				<tr>
 				  	<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap">
-						<a class="Item" href="https://www.mobility-online.co.at/mobility/BewerbungServlet?sprache=en&identifier=wien20&kz_bew_art=OUT&kz_bew_pers=S&aust_prog=SMS&bew_matr_nr='.rawurlencode(trim($student->matrikelnr)).'&bew_nachname='.rawurlencode($student->nachname).'&bew_vorname='.rawurlencode($student->vorname).'&bew_titel='.rawurlencode($student->titelpre).'&bew_email='.rawurlencode($user.'@'.DOMAIN).'&bew_geb_datum='.rawurlencode($datum_obj->formatDatum($student->gebdatum,'d.m.Y')).'&bew_geschlecht='.rawurlencode(mb_strtoupper($student->geschlecht)).'" target="content">
+						<a class="Item" href="https://www.service4mobility.com/mobility/BewerbungServlet?sprache=en&identifier=wien20&kz_bew_art=OUT&kz_bew_pers=S&aust_prog=SMS&bew_matr_nr='.rawurlencode(trim($student->matrikelnr)).'&bew_nachname='.rawurlencode($student->nachname).'&bew_vorname='.rawurlencode($student->vorname).'&bew_titel='.rawurlencode($student->titelpre).'&bew_email='.rawurlencode($user.'@'.DOMAIN).'&bew_geb_datum='.rawurlencode($datum_obj->formatDatum($student->gebdatum,'d.m.Y')).'&bew_geschlecht='.rawurlencode(mb_strtoupper($student->geschlecht)).'" target="content">
 						<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Mobility Englisch</a>
 					</td>
 				</tr>
