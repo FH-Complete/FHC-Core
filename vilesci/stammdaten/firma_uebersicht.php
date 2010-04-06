@@ -44,14 +44,14 @@ $firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'')
 ?>
 <html>
 <head>
-<title>Firma Uebersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<title>Firma Uebersicht</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 </head>
 <body class="background_main">
-<h2>Firmen - &Uuml;bersicht</h2>
+	<h2>Firmen - &Uuml;bersicht</h2>
 <?php 
 echo '<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>'; 
 	//Suche
@@ -80,7 +80,6 @@ echo '<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>';
 ?>
 </body>
 </html>
-
 <?php
 
 function creatList($suchen,$filter,$firmentypfilter)
