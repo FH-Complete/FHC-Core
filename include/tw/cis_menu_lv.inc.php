@@ -497,7 +497,8 @@
 			    	<strong>Moodle</strong><br>';
 		}
 	    if($is_lector)
-	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>';			
+	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">Wartung</a>
+	    		 <br /><a href="'.APP_ROOT.'cis/cisdocs/Moodle-Handbuch.pdf" class="Item" target="_blank">Handbuch [PDF]</a>';
 	}
 	else 
 	{
