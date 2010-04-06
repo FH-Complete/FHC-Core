@@ -64,8 +64,6 @@
 	
   	$work=trim(isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['ajax'])?$_REQUEST['ajax']:false));
 	$work=strtolower($work);
-
-##	$work='plz';
 	
 // ------------------------------------------------------------------------------------------
 //	Datenlesen
@@ -176,8 +174,6 @@ cellSeparator (default value: "|")
 
 		case 'position':
 		 	$position=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-##			if (is_null($position) || $position=='')
-#				exit();
 				
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($position))));
 			$pWhere=" upper(position) like '%".addslashes($matchcode)."%' ".($funktion_kurzbz?" and funktion_kurzbz='".addslashes($funktion_kurzbz)."'":'');
@@ -194,7 +190,7 @@ cellSeparator (default value: "|")
 				$pWhere='';
 				$pOrder='';
 				$pLimit='';
-##echo '<br>'.$pSql;
+
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 			{
 				if (empty($funktion_kurzbz))
@@ -206,7 +202,7 @@ cellSeparator (default value: "|")
 						FROM public.tbl_personfunktionstandort
 						where ". $pWhere ."
 						ORDER BY funktion_kurzbz,position ";
-	##				echo $pSql;
+
 				if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 					exit(' |'.$db->errormsg."\n");
 			}
@@ -216,15 +212,12 @@ cellSeparator (default value: "|")
 
 		case 'work_firmen_search':
 			$json=array();	
-			$berechtigung_kurzbz = 'basis/firma';
+			$berechtigung_kurzbz = 'basis/firma:begrenzt';
 			if(!$rechte->isBerechtigt($berechtigung_kurzbz))
 				exit(json_encode(array_push($json, array ('oFirma_id' => '','oName' =>'keine Berechtigung'))));
 
 			$filter = (isset($_REQUEST['filter'])?$_REQUEST['filter']:'');
 			$firmentyp_kurzbz = (isset($_REQUEST['firmentyp_kurzbz'])?$_REQUEST['firmentyp_kurzbz']:'');
-				
-//			$qry.=" ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
-//			$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";		
 
 			$qry =" select distinct tbl_firma.firma_id,tbl_firma.name  ";
 			$qry.=" FROM public.tbl_firma,  public.tbl_standort  ";
@@ -247,8 +240,6 @@ cellSeparator (default value: "|")
 			// Datenbremse fallse keine Kriterien gesetzt sind
 			if($filter=='' && $firmentyp_kurzbz=='')
 				$qry.=" limit 350 ";
-//Debug
-//			array_push($json, array ('oFirma_id' => $filter,'oName' => $firmentyp_kurzbz ));
 
 			$pArt='';
 			$pDistinct=false; 
@@ -277,8 +268,30 @@ cellSeparator (default value: "|")
 			echo json_encode($json);
 			break;
 
+		case 'tags':
+			$tag=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			
-// Person - FH Technikum suche
+		 	$pWhere=" upper(tag) like upper('%".addslashes($tag)."%')";
+			
+			$pArt='select';
+			$pDistinct=false; 
+			$pFields='tag';
+			$pTable='public.tbl_tag';
+			$matchcode='';
+			$pOrder='tag';
+			$pLimit='';
+			$pSql='';
+			if (!$result=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
+				exit(' |'.$db->errormsg."\n");
+			
+			if(is_array($result))
+			{
+				for ($i=0;$i<count($result);$i++)
+					echo html_entity_decode($result[$i]->tag)."\n";			
+			}
+			break;
+			
+		// Person - FH Technikum suche
 		case 'person':
 		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($person_id) || $person_id=='')
@@ -323,8 +336,7 @@ cellSeparator (default value: "|")
 				$pWhere='';
 				$pOrder='';
 				$pLimit='';
-##				echo $pSql;
-				
+
 			}
 			else
 			{

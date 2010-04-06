@@ -45,9 +45,9 @@ if(!$rechte->isBerechtigt('basis/firma:begrenzt'))
 
 // Parameter einlesen
 $errorstr='';
-$tabselect=0;
 
-$firma_id = (isset($_REQUEST["firma_id"])?$_REQUEST['firma_id']:'');
+$tabselect = (isset($_GET['tabselect'])?$_GET['tabselect']:0);
+$firma_id = (isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
 $standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
 $adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
 $kontakt_id = (isset($_REQUEST['kontakt_id'])?$_REQUEST['kontakt_id']:'');	
@@ -57,7 +57,7 @@ $work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_
 $showmenue = (isset($_REQUEST['showmenue'])?$_REQUEST['showmenue']:false);		
 $personfunktionstandort_id = (isset($_REQUEST['personfunktionstandort_id'])?$_REQUEST['personfunktionstandort_id']:'');	
 $firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
-if(isset($_REQUEST['nation']) && $_REQUEST['nation']=="A" && isset($_REQUEST['gemeinde_combo']) && isset($_REQUEST['ort_combo']))
+if(isset($_REQUEST['nation']) && $_REQUEST['nation']=='A' && isset($_REQUEST['gemeinde_combo']) && isset($_REQUEST['ort_combo']))
 {
 	$_REQUEST['gemeinde']=$_REQUEST['gemeinde_combo'];
 	$_REQUEST['ort']=$_REQUEST['ort_combo'];
@@ -150,13 +150,12 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	// Defaultwerte 
 	$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
 
-##	var_dump($_REQUEST);	
-
 	//Loeschen einer Adresse
 	if(isset($_GET['deleteadresse']))
 	{
 		$showmenue=1;	
-		if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
+		$tabselect=1;
+		if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
 		if(is_numeric($standort_id))
@@ -171,8 +170,8 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 			{
 				$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Person Funktion Standort:'.$standort_obj->errormsg;
 			}
-
 		}
+		
 		if(is_numeric($adresse_id))
 		{
 			$adresse_obj = new adresse();
@@ -185,7 +184,8 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	
 	if(isset($_GET['deletekontakt']))
 	{
-		$showmenue=1;	
+		$showmenue=1;
+		$tabselect=2;
 		if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
@@ -202,6 +202,7 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	if(isset($_GET['deletepersonfunktionstandort']))
 	{
 		$showmenue=1;
+		$tabselect=1;
 		if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
@@ -223,20 +224,14 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">
+<link rel="stylesheet" href="../../skin/styles/jquery-ui.css" type="text/css">
 
-
-<script src="../../include/js/mailcheck.js"></script>
-<script src="../../include/js/datecheck.js"></script>
-
+<script src="../../include/js/mailcheck.js" type="text/javascript"></script>
+<script src="../../include/js/datecheck.js" type="text/javascript"></script>
 <script src="../../include/js/jquery.js" type="text/javascript"></script>
 <script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-
-
-<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
 <script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
-
-<script src="../../include/js/jquery.tools.min.js" type="text/javascript"></script>
 
 <script type="text/javascript" language="JavaScript1.2">
 	// **************************************
@@ -364,31 +359,6 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 		return false;
 	}
 
-	function workDetailRecord(wohin,formname)
-	{
-	    $("div#"+wohin).show("slow"); // div# langsam oeffnen
-		$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
-		var formdata = $('form#'+formname).serialize(); 
-		//alert(formdata);
-		$.ajax
-			(
-				{
-					type: "POST", timeout: 3500,dataType: 'html',url: 'firma_detailwork.php',data: formdata,
-					error: function()
-					{
-			   			$("div#"+wohin).html("error ");
-						return;								
-					},		
-					success: function(phpData)
-					{
-				   		$("div#"+wohin).html(phpData);
-				   		
-					}
-				}
-			);
-		return;
-	}
-	
 	function callUrl(wohin,urldata)
 	{
 	    $("div#"+wohin).show("slow"); // div# langsam oeffnen
@@ -410,82 +380,8 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 			);
 		return;
 	}
-	
-	$(function() 
-	{
-		$("ul.css-tabsDetail").tabs("div.css-panes > div", {effect: 'ajax'}).history();
-	});
+
 </script>
-
-<style type="text/css">
-<!--
-/* root element for tabs  */
-ul.css-tabsDetail {  
-	margin:0 !important; 
-	padding:0;
-	height:30px;
-	border-bottom:1px solid #666;	 	
-}
-
-/* single tab */
-ul.css-tabsDetail li {  
-	float:left;	 
-	padding:0; 
-	margin:0;  
-	list-style-type:none;	
-}
-
-/* link inside the tab. uses a background image */
-ul.css-tabsDetail a { 
-	float:left;
-	font-size:13px;
-	display:block;
-	padding:5px 30px;	
-	text-decoration:none;
-	border:1px solid #666;	
-	border-bottom:0px;
-	height:18px;
-	background-color:#efefef;
-	color:#777;
-	margin-right:2px;
-	-moz-border-radius-topleft: 4px;
-	-moz-border-radius-topright:4px;
-	position:relative;
-	top:1px;	
-}
-
-ul.css-tabsDetail a:hover {
-	background-color:#F7F7F7;
-	color:#333;
-}
-	
-/* selected tab */
-ul.css-tabsDetail a.current {
-	background-color:#ddd;
-	border-bottom:2px solid #ddd;	
-	color:#000;	
-	cursor:default;
-}
-/* tab pane */
-div.css-panes div {
-	display:none;
-	border:1px solid #666;
-	border-width:0 1px 1px 1px;
-	min-height:150px;
-	padding:15px 20px;
-	background-color:#ddd;	
-}
-div.css-panes div div{
-	display:block;
-	border:0px solid #666;
-	min-height:0px;
-	padding:0px 0px;
-	background-color:#ddd;
-}
--->
-</style>
-
-
 </head>
 <body style="background-color:#eeeeee;">
 <?php
@@ -506,6 +402,7 @@ div.css-panes div div{
 		case 'saveKontakt':
 			$htmlcode=saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte,$rechte);
 			$tabselect=2;
+			$showmenue=true;
 			break;
 
 		case 'listPersonenfunktionen':
@@ -519,6 +416,7 @@ div.css-panes div div{
 		case 'savePersonenfunktionen':
 			$htmlcode=savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte);
 			$tabselect=1;
+			$showmenue=true;
 			break;
 		case 'saveStandort':
 			$htmlcode=saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
@@ -529,12 +427,17 @@ div.css-panes div div{
 			$firma_organisationseinheit_id=saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte);
 			if (!is_numeric($firma_organisationseinheit_id))
 			{
+				//Fehler beim Speichern
 				$htmlcode=$firma_organisationseinheit_id;
 				$firma_organisationseinheit_id='';
+				$htmlcode.=eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte);
 			}
-			$htmlcode.=eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte);
+			else 
+			{
+				$htmlcode.='Daten gespeichert';
+			}
 			$htmlcode.='<script language="JavaScript1.2" type="text/javascript">
-					parent.frames[1].location.reload();
+					parent.frames[1].location.href=\'firma_details.php?firma_id='.$firma_id.'&tabselect=1\';
 					</script>';
 			break;		
 		case 'eingabeOrganisationseinheit':
@@ -544,7 +447,6 @@ div.css-panes div div{
 			$htmlcode=saveOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte);
 			break;		
 
-
 	    default:
 			if (!$showmenue)
 				$htmlcode=getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte);
@@ -553,13 +455,21 @@ div.css-panes div div{
 	
 	if ($showmenue)
 		echo '<!-- Tabs --> 
-		<ul class="css-tabsDetail">
-		     <li '.($tabselect==0?"class=current":"").'><a href="firma_detailwork.php?work=standort&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Standort</a></li>
-			 <li '.($tabselect==1?"class=current":"").'><a href="firma_detailwork.php?work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Ansprechpartner</a></li>
-			 <li '.($tabselect==2?"class=current":"").'><a href="firma_detailwork.php?work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&adresse_id='.$adresse_id.'">Kontakte</a></li>
-		</ul>
-		<div class="css-panes">
-			<div style="display:block" id="detail">'.$htmlcode.'</div>
+		<div id="tabs" style="font-size:80%;">
+			<ul>
+			     <li><a href="#standort">Standort</a></li>
+				 <li><a href="#listPersonenfunktionen">Ansprechpartner</a></li>
+				 <li><a href="#listKontakte">Kontakte</a></li>
+			</ul>
+			<div id="standort">
+			'.getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte).'
+			</div>
+			<div id="listPersonenfunktionen">
+			'.getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte).'
+			</div>
+			<div id="listKontakte">
+			'.listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte).'
+			</div>
 		</div>
 		<br />	
 		<div id="detailworkinfodiv"></div>
@@ -569,15 +479,20 @@ div.css-panes div div{
 	
 	echo  ($errorstr?'<br>'.$errorstr:'');	
 ?>	
+<script language="Javascript">
+	$(document).ready(function() 
+	{
+		$("#tabs").tabs();
+		$( "#tabs" ).tabs( "option", "selected", <?php echo $tabselect;?> );
+	});
+</script>
 </body>
 </html>
 <?php	
-
-
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Organisation zur Firma
-*/
+/**
+ * Organisation zur Firma
+ */
 function saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$oe_parent_kurzbz,$adresstyp_arr,$user,$rechte)
 {
 	// Init
@@ -620,8 +535,7 @@ function saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,
 	{
 		if (!$organisationseinheit_obj->load($oe_kurzbz))
 		{
-			echo 'Organisation fehler '.$organisationseinheit_obj->errormsg;
-			return false;
+			return 'Organisation fehler '.$organisationseinheit_obj->errormsg;
 		}	
 		//$bezeichnung=($bezeichnung?$bezeichnung:$organisationseinheit_obj->bezeichnung);
 	}	
@@ -639,23 +553,20 @@ function saveFirmaorganisationseinheit($firma_id,$firma_organisationseinheit_id,
 	$firma->kundennummer=$kundennummer; 
 	$firma->ext_id=$ext_id; 	
 
-	if($firma->get_firmaorganisationseinheit($firma->firma_id, $firma->oe_kurzbz) && $firma_organisationseinheit_id=='')
+	if($firma_organisationseinheit_id=='' && $firma->get_firmaorganisationseinheit($firma->firma_id, $firma->oe_kurzbz))
 	{
-		echo "Organisationseinheit ".$firma->oe_kurzbz." ist bereits zugeteilt!";
-		return false;
+		return "Organisationseinheit ".$firma->oe_kurzbz." ist bereits zugeteilt!";
 	}
 	if (!$firma->saveorganisationseinheit())
 		echo $firma->errormsg;
 	return $firma->firma_organisationseinheit_id;
 }
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Organisation zur Firma
-*/
+/**
+ * Organisation zur Firma
+ */
 function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$oe_kurzbz,$adresstyp_arr,$user,$rechte)
 {
-	##var_dump($_REQUEST);
-
 	// Init
 	$htmlstr='';
 	// Plausib
@@ -685,28 +596,26 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 	foreach ($firma->result as $row)
 	{
 		$htmlstr.="<form id='addFirmaorganisationseinheit".$i."' name='addFirmaorganisationseinheit".$i."' action='firma_detailwork.php' method='POST'>\n";
-			$htmlstr.="<tr class='liste". ($i%2) ."'>\n";
-				$i++;
-				$htmlstr.= "<td><SELECT name='oe_kurzbz'>";
-				for ($ii=0;$ii<count($organisationseinheit_obj->result);$ii++)
-				{
-					$htmlstr.= "<OPTION value='".$organisationseinheit_obj->result[$ii]->oe_kurzbz."' ".($organisationseinheit_obj->result[$ii]->oe_kurzbz==$row->oe_kurzbz?' selected ':'')." >".$organisationseinheit_obj->result[$ii]->bezeichnung."</OPTION>";
-				}
-				$htmlstr.= "</SELECT>
-					<input type='Hidden' name='firma_organisationseinheit_id' value='".$row->firma_organisationseinheit_id."'>
-					<input type='Hidden' name='oe_parent_kurzbz' value='".$row->oe_parent_kurzbz."'>";
-					//<input type='Hidden' name='kundennummer' value='".$row->kundennummer."'>
-				$htmlstr.= "<input type='Hidden' name='firma_id' value='".$firma_id."'>
-					<input type='Hidden' name='work' value='saveFirmaorganisationseinheit'>
-					</td>
-					";
+		$htmlstr.="<tr class='liste". ($i%2) ."'>\n";
+		$i++;
+		$htmlstr.= "<td><SELECT name='oe_kurzbz'>";
+		for ($ii=0;$ii<count($organisationseinheit_obj->result);$ii++)
+		{
+			$htmlstr.= "<OPTION value='".$organisationseinheit_obj->result[$ii]->oe_kurzbz."' ".($organisationseinheit_obj->result[$ii]->oe_kurzbz==$row->oe_kurzbz?' selected ':'')." >".$organisationseinheit_obj->result[$ii]->bezeichnung."</OPTION>";
+		}
+		$htmlstr.= "</SELECT>
+			<input type='Hidden' name='firma_organisationseinheit_id' value='".$row->firma_organisationseinheit_id."'>
+			<input type='Hidden' name='oe_parent_kurzbz' value='".$row->oe_parent_kurzbz."'>";
+			//<input type='Hidden' name='kundennummer' value='".$row->kundennummer."'>
+		$htmlstr.= "<input type='Hidden' name='firma_id' value='".$firma_id."'>
+			<input type='Hidden' name='work' value='saveFirmaorganisationseinheit'>
+			</td>
+			";
 
-					//$htmlstr.= '<td>'.$row->organisationseinheittyp_kurzbz.'</td>';
-					//$htmlstr.= '<td>'.$row->oe_kurzbz.'</td>';
-					$htmlstr.= "<td><input type='text' name='bezeichnung' value='".$row->fobezeichnung."' size='50' maxlength='256'></td>";
-					$htmlstr.= "<td><input type='text' name='kundennummer' value='".$row->kundennummer."' size='20' maxlength='128'></td>";
-					$htmlstr.= '<td><input type="Submit" value="speichern" ></td>';			
-			$htmlstr.= '</tr>';
+		$htmlstr.= "<td><input type='text' name='bezeichnung' value='".$row->fobezeichnung."' size='50' maxlength='256'></td>";
+		$htmlstr.= "<td><input type='text' name='kundennummer' value='".$row->kundennummer."' size='20' maxlength='128'></td>";
+		$htmlstr.= '<td><input type="Submit" value="speichern" ></td>';			
+		$htmlstr.= '</tr>';
 		$htmlstr.="</form>\n";
 	}
 	if (!$firma_organisationseinheit_id)	
@@ -740,9 +649,9 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 	
 }
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Kontakte zu Firmen,Standorte in Listenform
-*/
+/**
+ * Kontakte zu Firmen,Standorte in Listenform
+ */
 function saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte)	
 {	
 	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
@@ -764,9 +673,6 @@ function saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_a
 	$kontakt = (isset($_POST['kontakt'])?$_REQUEST['kontakt']:'');
 	$zustellung = (isset($_POST['zustellung'])?true:false);		
 	$ext_id = (isset($_POST['ext_id'])?$_POST['ext_id']:'');
-
-	if (strstr($kontakttyp,'mail') && (!strstr($kontakt,'@') || !strstr($kontakt,'.')) ) 
-		return 'Kontakt (Typ '.$kontakttyp .') bitte pr&uuml;fen';
 
 	//----------------------------------------		
 	//	ADRESSEN Neuanlage - Aenderung
@@ -803,20 +709,14 @@ function saveKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_a
 		return 'Fehler beim Speichern des Kontakt '.$kontakttyp .' '.$kontakt.' ID '. $kontakt_id.' :'.$kontakt_obj->errormsg;
 	if ($kontakt_obj->new)
 		$kontakt_id=$kontakt_obj->kontakt_id;
-		
-	//frame reloaden, um wieder zur liste zu kommen
-	echo '<script language="JavaScript1.2" type="text/javascript">
-	<!--
-		parent.frames[2].location.reload();
-	-->		
-	</script>';
+
 	return 'Kontakt: '.$kontakttyp .' '.$kontakt.' ID '. $kontakt_id.' gespeichert';
 }
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Kontakte zu Firmen, Standorte in Listenform
-*/
+/**
+ * Kontakte zu Firmen, Standorte in Listenform
+ */
 function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte)	
 {	
 	// Plausib
@@ -841,8 +741,6 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 				return eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte);
 		}		
 	}
-##var_dump($kontakt_obj);
-
 	$htmlstr.= '<table class="liste">
 				<tr>
 					<th>ID</th>
@@ -850,7 +748,7 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 					<th>Kontakt</th>
 					<th>Anmerkung</th>
 					<th>Zustellung</th>
-					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="javascript:callUrl(\'listKontakte\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 
 	$i=0;
@@ -858,16 +756,14 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 	{
 		$htmlstr .= "<tr id='kontakt".$i."' class='liste". ($i%2) ."'>\n";
 		$i++;
-			$htmlstr.= '<td><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&kontakt_id='.$row->kontakt_id.'\');">'.$row->kontakt_id.'</a></td>';
-			$htmlstr.= '<td>'.$row->kontakttyp.'</td>';
-			$htmlstr.= '<td>'.$row->kontakt.'</td>';
-			$htmlstr.= '<td>'.$row->anmerkung.'</td>';
-			$htmlstr.= '<td align="center">'.($row->zustellung?'Ja':'Nein').'</td>';
-			//$htmlstr.= '<td>'.$row->person_id.'</td>';
-			//$htmlstr.= '<td align="center">'.$row->ext_id.'</td>';
+		$htmlstr.= '<td><a target="detail_workfirma" href="javascript:callUrl(\'listKontakte\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&kontakt_id='.$row->kontakt_id.'\');">'.$row->kontakt_id.'</a></td>';
+		$htmlstr.= '<td>'.$row->kontakttyp.'</td>';
+		$htmlstr.= '<td>'.$row->kontakt.'</td>';
+		$htmlstr.= '<td>'.$row->anmerkung.'</td>';
+		$htmlstr.= '<td align="center">'.($row->zustellung?'Ja':'Nein').'</td>';
 			
-			$htmlstr.= '<td align="center"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&kontakt_id='.$row->kontakt_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="editieren"/></a></td>';
-			$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletekontakt=true&firma_id=$firma_id&standort_id=$row->standort_id&kontakt_id=$row->kontakt_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+		$htmlstr.= '<td align="center"><a target="detail_workfirma" href="javascript:callUrl(\'listKontakte\',\'work=eingabeKontakt&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&kontakt_id='.$row->kontakt_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="editieren" title="editieren"/></a></td>';
+		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletekontakt=true&firma_id=$firma_id&standort_id=$row->standort_id&kontakt_id=$row->kontakt_id' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
 	$htmlstr.= '</table>';
@@ -876,9 +772,9 @@ function listKontakte($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Kontakte zu Firmen,Standorte in Listenform
-*/
+/**
+ * Kontakte zu Firmen,Standorte in Listenform
+ */
 function eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adresstyp_arr,$user,$rechte)	
 {	
 	// Plausib
@@ -901,18 +797,17 @@ function eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adressty
 	}
 	else 
 	{
-##		$kontakt_obj->firma_id=$firma_id;
 		$kontakt_obj->standort_id=$standort_id;
 	}
 	$htmlstr.="<form id='addKontakt' name='addKontakt' action='firma_detailwork.php' method='POST'>\n";
-		$htmlstr.="<input type='hidden' name='work' value='saveKontakt'>\n";	
-		$htmlstr.="<input type='hidden' name='firma_id' value='".$firma_id."'>\n";
-		$htmlstr.="<input type='hidden' name='adresse_id' value='".$adresse_id."'>\n";
-		$htmlstr.="<input type='hidden' name='standort_id' value='".$standort_id."'>\n";
-		$htmlstr.="<input type='hidden' name='person_id' value='".$kontakt_obj->person_id."'>\n";		
-		$htmlstr.="<input type='hidden' name='kontakt_id' value='".$kontakt_obj->kontakt_id."'>\n";
-		$htmlstr.="<input type='hidden' name='ext_id' value='".$kontakt_obj->ext_id."'>\n";
-		
+	$htmlstr.="<input type='hidden' name='work' value='saveKontakt'>\n";	
+	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma_id."'>\n";
+	$htmlstr.="<input type='hidden' name='adresse_id' value='".$adresse_id."'>\n";
+	$htmlstr.="<input type='hidden' name='standort_id' value='".$standort_id."'>\n";
+	$htmlstr.="<input type='hidden' name='person_id' value='".$kontakt_obj->person_id."'>\n";		
+	$htmlstr.="<input type='hidden' name='kontakt_id' value='".$kontakt_obj->kontakt_id."'>\n";
+	$htmlstr.="<input type='hidden' name='ext_id' value='".$kontakt_obj->ext_id."'>\n";
+	
 	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr.="<tr><td><table><tr>\n";
 
@@ -926,41 +821,41 @@ function eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adressty
 		else
 			$kontakttyp_obj->result=array();
 	}	
-#	var_dump($kontakttyp_obj);
-		$htmlstr.="<td>Typ: </td>";		
-		$htmlstr.= "<td><SELECT name='kontakttyp'>";
-		for ($i=0;$i<count($kontakttyp_obj->result);$i++)
-		{
-			$htmlstr.= "<OPTION value='".$kontakttyp_obj->result[$i]->kontakttyp."' ".($kontakt_obj->kontakttyp==$kontakttyp_obj->result[$i]->kontakttyp?' selected ':'')." >".$kontakttyp_obj->result[$i]->beschreibung."</OPTION>";
-		}
-		$htmlstr.= "</SELECT></td>";
 
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Kontakt: </td>";		
-		$htmlstr.="<td><input type='text' name='kontakt' value='".$kontakt_obj->kontakt."' size='30' maxlength='128' /></td>\n";
-		
-		
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Anmerkung: </td>";		
-		$htmlstr.="<td><input type='text' name='anmerkung' value='".$kontakt_obj->anmerkung."' size='30' maxlength='64' /></td>\n";
+	$htmlstr.="<td>Typ: </td>";		
+	$htmlstr.= "<td><SELECT name='kontakttyp'>";
+	for ($i=0;$i<count($kontakttyp_obj->result);$i++)
+	{
+		$htmlstr.= "<OPTION value='".$kontakttyp_obj->result[$i]->kontakttyp."' ".($kontakt_obj->kontakttyp==$kontakttyp_obj->result[$i]->kontakttyp?' selected ':'')." >".$kontakttyp_obj->result[$i]->beschreibung."</OPTION>";
+	}
+	$htmlstr.= "</SELECT></td>";
 
-
-		$htmlstr.="<td>&nbsp;&nbsp;</td>";	
-		
-		$htmlstr.="<td>Zustellung: </td>";
-		$htmlstr.="<td><input ".($kontakt_obj->zustellung?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='zustellung' ".($kontakt_obj->zustellung?'checked':'')."></td>\n";
-		$htmlstr.="<td>&nbsp;</td>\n";
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Kontakt: </td>";		
+	$htmlstr.="<td><input type='text' name='kontakt' value='".$kontakt_obj->kontakt."' size='30' maxlength='128' /></td>\n";
 	
+	
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Anmerkung: </td>";		
+	$htmlstr.="<td><input type='text' name='anmerkung' value='".$kontakt_obj->anmerkung."' size='30' maxlength='64' /></td>\n";
 
-		$htmlstr.="</tr></table></td>";		
+
+	$htmlstr.="<td>&nbsp;&nbsp;</td>";	
+	
+	$htmlstr.="<td>Zustellung: </td>";
+	$htmlstr.="<td><input ".($kontakt_obj->zustellung?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='zustellung' ".($kontakt_obj->zustellung?'checked':'')."></td>\n";
+	$htmlstr.="<td>&nbsp;</td>\n";
+
+
+	$htmlstr.="</tr></table></td>";		
 	$htmlstr.="</tr>\n";
 				
 	// Submit-Knopf  Zeile
 	$htmlstr.="<tr><td><table><tr>\n";
-			$htmlstr.='<td><input onclick="callUrl(\'detail\',\'work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');" type="Button" value="zur&uuml;ck"></td>';
-			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
-			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addKontakt\');" type="Button" value="speichern"></td>';
-		$htmlstr.="</tr></table></td>";				
+	$htmlstr.='<td><input onclick="callUrl(\'listKontakte\',\'work=listKontakte&firma_id='.$firma_id.'&standort_id='.$standort_id.'&kontakt_id=\');" type="Button" value="zur&uuml;ck"></td>';
+	$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
+	$htmlstr.='<td><input type="submit" value="speichern"></td>';
+	$htmlstr.="</tr></table></td>";				
 	$htmlstr.="</tr>\n";
 	
 	$htmlstr.="	</table>\n";
@@ -969,9 +864,9 @@ function eingabeKontakt($firma_id,$standort_id,$adresse_id,$kontakt_id,$adressty
 }
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Kontakte zu Firmen,Standorte in Listenform
-*/
+/**
+ * Kontakte zu Firmen,Standorte in Listenform
+ */
 function savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte)	
 {	
 	if( !$rechte->isBerechtigt('admin',null,'suid') && !$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
@@ -1034,17 +929,13 @@ function savePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_i
 		
 	if ($standort_obj->new)
 		$personfunktionstandort_id=$standort_obj->personfunktionstandort_id;
-	echo '<script language="JavaScript1.2" type="text/javascript">
-	<!--
-		parent.frames[2].location.reload();
-	-->		
-	</script>';
+	
 	return 'Funktion der Person am Standort : '.$funktion_kurzbz .' '.$position.' ID '. $personfunktionstandort_id.' gespeichert';
 }
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Firmen,Standorte Funktionen/Personen
-*/
+/**
+ * Ansprechpartner
+ */
 function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte)	
 {	
 	// Plausib
@@ -1080,7 +971,7 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		for ($i=0;$i<count($funktion_obj->result);$i++)
 			$funktionen[$funktion_obj->result[$i]->funktion_kurzbz]=$funktion_obj->result[$i]->beschreibung;
 	}	
-#var_dump($standort_obj);	
+
 	$htmlstr.= '<table class="liste">
 				<tr>
 					<th>ID</th>
@@ -1088,7 +979,7 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 					<th>Position</th>
 					<th>Anrede</th>
 					<th>Person</th>
-					<td align="center" valign="top" colspan="3"><a target="detail_workfirma" href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
+					<td align="center" valign="top" colspan="3"><a target="detail_workfirma" href="javascript:callUrl(\'listPersonenfunktionen\',\'work=eingabePersonenfunktionen&firma_id&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 	$i=0;
 	foreach ($standort_obj->result as $row)
@@ -1097,7 +988,7 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		$htmlstr .= "<tr id='standort".$i."' class='liste". ($i%2) ."'>\n";
 		$i++;
 
-		$htmlstr.= '<td><a href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');" >'. $row->personfunktionstandort_id.'</a></td>';
+		$htmlstr.= '<td><a href="javascript:callUrl(\'listPersonenfunktionen\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');" >'. $row->personfunktionstandort_id.'</a></td>';
 		
 		$htmlstr.= '<td>'.(isset($funktionen[$row->funktion_kurzbz])?$funktionen[$row->funktion_kurzbz]:$row->funktion_kurzbz).'</td>';
 		$htmlstr.= '<td>'.$row->position.'</td>';
@@ -1106,7 +997,7 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		$person=($row->person_anrede?$row->person_anrede.' ':'').($row->titelpre?$row->titelpre.' ':'').($row->vorname?$row->vorname.' ':'').($row->nachname?$row->nachname.' ':'');
 		$htmlstr.= '<td>'.$person.'</td>';
 		
-		$htmlstr.= '<td align="center"><a href="javascript:callUrl(\'detail\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="Funktion editieren" title="Funktion editieren"/></a></td>';
+		$htmlstr.= '<td align="center"><a href="javascript:callUrl(\'listPersonenfunktionen\',\'work=eingabePersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&personfunktionstandort_id='.$row->personfunktionstandort_id.'\');"><img src="../../skin/images/application_form_edit.png" alt="Funktion editieren" title="Funktion editieren"/></a></td>';
 		$htmlstr.= "<td align='center'><a href='../personen/kontaktdaten_edit.php?person_id=".$row->person_id."' target=\"_blank\"><img src='../../skin/images/edit.png' alt='Kontaktdaten editieren' title='Kontaktdaten editieren'/></a></td>";
 		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletepersonfunktionstandort=true&standort_id=".$row->standort_id."&personfunktionstandort_id=".$row->personfunktionstandort_id."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='Funktion loeschen' title='Funktion loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
@@ -1116,9 +1007,9 @@ function getlistPersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 }
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Firmenliste - lt. Suchekriterien 
-*/
+/**
+ * Firmenliste - lt. Suchekriterien 
+ */
 function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandort_id,$adresstyp_arr,$user,$rechte)
 {
 	// Plausib
@@ -1129,7 +1020,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 	// Init
 	$htmlstr='';
 	$standort_obj = new standort();
-#echo $personfunktionstandort_id;	
+
 	if($personfunktionstandort_id!='' && is_numeric($personfunktionstandort_id) )
 	{
 		$standort_obj->result=array();
@@ -1142,13 +1033,12 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 	{
 		$standort_obj->standort_id=$standort_id;
 	}
-##	var_dump($standort_obj);
-#	exit;
+
 	$htmlstr.="<form id='addPersonenfunktionen' name='addPersonenfunktionen' action='firma_detailwork.php' method='POST'>\n";
-		$htmlstr.="<input type='hidden' name='work' value='savePersonenfunktionen'>\n";	
-		$htmlstr.="<input type='hidden' name='firma_id' value='".$firma_id."'>\n";
-		$htmlstr.="<input type='hidden' name='standort_id' value='".$standort_id."'>\n";
-		$htmlstr.="<input type='hidden' name='personfunktionstandort_id' value='".$personfunktionstandort_id."'>\n";
+	$htmlstr.="<input type='hidden' name='work' value='savePersonenfunktionen'>\n";	
+	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma_id."'>\n";
+	$htmlstr.="<input type='hidden' name='standort_id' value='".$standort_id."'>\n";
+	$htmlstr.="<input type='hidden' name='personfunktionstandort_id' value='".$personfunktionstandort_id."'>\n";
 		
 	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr.="<tr><td><table><tr>\n";
@@ -1163,90 +1053,70 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
 		else
 			$funktion_obj->result=array();
 	}	
-#	var_dump($kontakttyp_obj);
-		$htmlstr.="<td>Funktion: </td>";		
-		
-		$htmlstr.= "<td><SELECT id='funktion_kurzbz' name='funktion_kurzbz'>";
-		for ($i=0;$i<count($funktion_obj->result);$i++)
-		{
-			if ($funktion_obj->result[$i]->aktiv || $standort_obj->funktion_kurzbz==$funktion_obj->result[$i]->funktion_kurzbz)
-				$htmlstr.= "<OPTION value='".$funktion_obj->result[$i]->funktion_kurzbz."' ".($standort_obj->funktion_kurzbz==$funktion_obj->result[$i]->funktion_kurzbz?' selected ':'')." >".$funktion_obj->result[$i]->beschreibung."</OPTION>";
-		}
-		$htmlstr.= "</SELECT></td>";
 
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Position: </td>";		
-		$htmlstr.="<td><input type='text' id='position'  name='position'  value='".$standort_obj->position."' size='30' maxlength='256' /></td>\n";
-		/*
-		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
+	$htmlstr.="<td>Funktion: </td>";		
+	
+	$htmlstr.= "<td><SELECT id='funktion_kurzbz' name='funktion_kurzbz'>";
+	for ($i=0;$i<count($funktion_obj->result);$i++)
+	{
+		if ($funktion_obj->result[$i]->aktiv || $standort_obj->funktion_kurzbz==$funktion_obj->result[$i]->funktion_kurzbz)
+			$htmlstr.= "<OPTION value='".$funktion_obj->result[$i]->funktion_kurzbz."' ".($standort_obj->funktion_kurzbz==$funktion_obj->result[$i]->funktion_kurzbz?' selected ':'')." >".$funktion_obj->result[$i]->beschreibung."</OPTION>";
+	}
+	$htmlstr.= "</SELECT></td>";
+
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Position: </td>";		
+	$htmlstr.="<td><input type='text' id='position'  name='position'  value='".$standort_obj->position."' size='30' maxlength='256' /></td>\n";
+
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Anrede: </td>";		
+	$htmlstr.="<td><input type='text' name='anrede' value='".$standort_obj->anrede."' size='50' maxlength='128' /></td>\n";
+	$htmlstr.="<td>&nbsp;</td></tr>";
+	$htmlstr.="<tr><td>Person: </td>";		
+	$htmlstr.="<td><input type='text' id='person_id' name='person_id' value='".$standort_obj->person_id."' size='20' maxlength='20' />\n";
+	$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
 						function formatItem(row) 
 						{
 						    return row[0] + ' <li>' + row[1] + '</li> ';
 						}
-						$('#position').autocomplete('stammdaten_autocomplete.php', 
+						$('#person_id').autocomplete('stammdaten_autocomplete.php', 
 						{
-							minChars:1,
+							minChars:2,
 							matchSubset:1,matchContains:1,
 							width:400,
 							formatItem:formatItem,
-							extraParams:{'work':'position'
-								,'funktion_kurzbz':$('#funktion_kurzbz').val()
-							}
+							extraParams:{'work':'person'}
 						});
-					</script>
-		";
-		*/
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Anrede: </td>";		
-		$htmlstr.="<td><input type='text' name='anrede' value='".$standort_obj->anrede."' size='50' maxlength='128' /></td>\n";
-		$htmlstr.="<td>&nbsp;</td></tr>";
-		$htmlstr.="<tr><td>Person: </td>";		
-		$htmlstr.="<td><input type='text' id='person_id' name='person_id' value='".$standort_obj->person_id."' size='20' maxlength='20' />\n";
-		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-							function formatItem(row) 
-							{
-							    return row[0] + ' <li>' + row[1] + '</li> ';
-							}
-							$('#person_id').autocomplete('stammdaten_autocomplete.php', 
-							{
-								minChars:2,
-								matchSubset:1,matchContains:1,
-								width:400,
-								formatItem:formatItem,
-								extraParams:{'work':'person'}
-							});
 
-					</script>
-		";
-		//$htmlstr.'<div id="contentPad">';
-		//$htmlstr.='<span class="formInfo"><a href="ansprechpartner_person_tt.htm?width=475" class="jTip" id="one" name="Personensuche">?</a></div></span></td>';
-		$htmlstr.="<td>&nbsp;</td>";	
-		$person=($standort_obj->person_anrede?$standort_obj->person_anrede.' ':'').($standort_obj->titelpre?$standort_obj->titelpre.' ':'').($standort_obj->vorname?$standort_obj->vorname.' ':'').($standort_obj->nachname?$standort_obj->nachname.' ':'');
-		$htmlstr.=($person?'<td colspan="2"></td><td id="person" colspan="9" align="right">'.$person.'</td></tr>':'')."</table></td>";		
+				</script>
+	";
+	//$htmlstr.'<div id="contentPad">';
+	//$htmlstr.='<span class="formInfo"><a href="ansprechpartner_person_tt.htm?width=475" class="jTip" id="one" name="Personensuche">?</a></div></span></td>';
+	$htmlstr.="<td>&nbsp;</td>";	
+	$person=($standort_obj->person_anrede?$standort_obj->person_anrede.' ':'').($standort_obj->titelpre?$standort_obj->titelpre.' ':'').($standort_obj->vorname?$standort_obj->vorname.' ':'').($standort_obj->nachname?$standort_obj->nachname.' ':'');
+	$htmlstr.=($person?'<td colspan="2"></td><td id="person" colspan="9" align="right">'.$person.'</td></tr>':'')."</table></td>";		
 	$htmlstr.="</tr>\n";
-				
+	
 	// Submit-Knopf  Zeile
 	$tabselect=1;
 	$htmlstr.="<tr><td><table><tr>\n";
-			$htmlstr.='<td><input onclick="callUrl(\'detail\',\'work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');" type="Button" value="zur&uuml;ck"></td>';
-			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
-			$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addPersonenfunktionen\');" type="Button" value="speichern"></td>';
-			$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";	
-			$htmlstr.="<td><input type='button' value='Person anlegen' onClick=\"window.open('../personen/personen_anlegen.php')\"></td>";
-		$htmlstr.="</tr></table></td>";				
+	$htmlstr.='<td><input onclick="callUrl(\'listPersonenfunktionen\',\'work=listPersonenfunktionen&firma_id='.$firma_id.'&standort_id='.$standort_id.'&personfunktionstandort_id=\');" type="Button" value="zur&uuml;ck"></td>';
+	$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	$htmlstr.='<td><input type="submit" value="speichern"></td>';
+	$htmlstr.="<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	$htmlstr.="<td><input type='button' value='Person anlegen' onClick=\"window.open('../personen/personen_anlegen.php')\"></td>";
+	$htmlstr.="</tr></table></td>";
 	$htmlstr.="</tr>\n";
-	
+
 	$htmlstr.="	</table>\n";
 	$htmlstr.="</form>\n";
 	return $htmlstr;
 }
 
-
-
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------#
-/*
-	Firmenliste - lt. Suchekriterien 
-*/
+/**
+ * Firmenliste - lt. Suchekriterien 
+ */
 function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte)	
 {	
 	// Plausib
@@ -1271,65 +1141,39 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 		$standort_obj->standort_id=$standort_id;
 		$standort_obj->adresse_id=$adresse_id;
 	}
-#	var_dump($standort_obj);
-#echo $adresse_id;
 
 	$adresse_obj = new adresse();
 	if ($adresse_id!='' && !$adresse_obj->load($adresse_id))
 	{	
-			return $adresse_obj->errormsg;
+		return $adresse_obj->errormsg;
 	}
 	else 
 	{
 		$adresse_obj->adresse_id=$adresse_id;
 		$adresse_obj->typ='f';
-		//$adresse_obj->nation='A';
 	}
 	
 	$htmlstr.="<form id='addStandort' name='addStandort' action='firma_detailwork.php' method='POST'>\n";
-		$htmlstr.="<input type='hidden' name='work' value='saveStandort'>\n";	
-		$htmlstr.="<input type='hidden' name='firma_id' value='".$standort_obj->firma_id."'>\n";
-		$htmlstr.="<input type='hidden' name='adresse_id' value='".$standort_obj->adresse_id."'>\n";
-		$htmlstr.="<input type='hidden' name='standort_id' value='".$standort_obj->standort_id."'>\n";
-		$htmlstr.="<input type='hidden' name='ext_id' value='".$standort_obj->ext_id."'>\n";
-		$htmlstr.="<input type='hidden' name='ext_id_adr' value='".$adresse_obj->ext_id."'>\n";
-		
+	$htmlstr.="<input type='hidden' name='work' value='saveStandort'>\n";	
+	$htmlstr.="<input type='hidden' name='firma_id' value='".$standort_obj->firma_id."'>\n";
+	$htmlstr.="<input type='hidden' name='adresse_id' value='".$standort_obj->adresse_id."'>\n";
+	$htmlstr.="<input type='hidden' name='standort_id' value='".$standort_obj->standort_id."'>\n";
+	
 	$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
 	
 	$htmlstr.="<tr><td><table><tr>\n";
-		$htmlstr.="<td>Typ: </td>";				
-		$htmlstr.= "<td><SELECT name='adresstyp'>";
-			foreach($adresstyp_arr as $code=>$kurzbz)
-			{
-				$htmlstr.= "<OPTION value='".$code."' ".($adresse_obj->typ == $code?' selected ':'').">$kurzbz</OPTION>";
-			}
-		$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Kurzbz: </td>";		
+	$htmlstr.="<td><input type='text' name='kurzbz' value='".$standort_obj->kurzbz."' size='16' maxlength='16' /></td>\n";
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Bezeichnung: </td>";		
+	$htmlstr.="<td><input type='text' name='bezeichnung' value='".$standort_obj->bezeichnung."' size='40' maxlength='256' /></td>\n";
 
-		$htmlstr.="<td>Kurzbz: </td>";		
-		$htmlstr.="<td><input type='text' name='kurzbz' value='".$standort_obj->kurzbz."' size='16' maxlength='16' /></td>\n";
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Bezeichnung: </td>";		
-		$htmlstr.="<td><input type='text' name='bezeichnung' value='".$standort_obj->bezeichnung."' size='20' maxlength='80' /></td>\n";
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Zustelladresse:</td>";
+	$htmlstr.="<td><input type='checkbox' name='zustelladresse' ".($adresse_obj->zustelladresse?'checked':'')."> </td>";
+	$htmlstr.="<td>&nbsp;</td>";	
 
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>&nbsp;</td>";	
-		/*
-		$htmlstr.="<td>Heimatadresse: </td>";
-		$htmlstr.="<td><input ".($adresse_obj->heimatadresse?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='heimatadresse' ".($adresse_obj->heimatadresse?'checked':'')."></td>\n";
-		$htmlstr.="<td>&nbsp;</td>\n";
-		*/
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td>Zustelladresse:</td>";
-		$htmlstr.="<td><input ".($adresse_obj->zustelladresse?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='zustelladresse' ".($adresse_obj->zustelladresse?'checked':'')."> </td>";
-		$htmlstr.="<td>&nbsp;</td>";	
-
-		$htmlstr.="</tr></table></td>";		
-	$htmlstr.="</tr>\n";
-
-		$htmlstr.="<tr><td><table><tr>\n";
-		$htmlstr.="<td>Name: </td>";
-		$htmlstr.="<td><input type='text' name='name' value='".$adresse_obj->name."' size='80' maxlength='128' /></td>\n";
-		$htmlstr.="</tr></table></td>";
+	$htmlstr.="</tr></table></td>";		
 	$htmlstr.="</tr>\n";
 
 	//Nationen laden
@@ -1337,7 +1181,7 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	$nation = new nation();
 	$nation->getAll();
 	foreach($nation->nation as $row)
-			$nation_arr[$row->code]=$row->kurztext;
+		$nation_arr[$row->code]=$row->kurztext;
 
 	//Auswahl Nation
 	$htmlstr.="<tr><td><table><tr>\n";
@@ -1345,9 +1189,9 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	$htmlstr.= "<td><SELECT id='nation' name='nation' onchange='loadGemeindeData();'>";
 	$htmlstr.= "<option ".($nation==''?' selected ':'')." value=''> </option>";				
 	foreach ($nation_arr as $code=>$kurzbz)
-		{
+	{
 		$htmlstr.= "<OPTION value='$code' ".($adresse_obj->nation==$code?' selected ':'')." >$kurzbz</OPTION>";
-		}
+	}
 	$htmlstr.= "</SELECT></td>";
 	
 	//Posleitzahl
@@ -1369,7 +1213,6 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	}
 	$htmlstr.="</div>";
 	$htmlstr.="<input type='text' id='gemeinde' name='gemeinde' ".$style." value='".$adresse_obj->gemeinde."' size='20' maxlength='40' /></td>\n";
-
 	
 	//Ort		
 	$htmlstr.="<td>Ort: </td>";		
@@ -1386,23 +1229,20 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	$htmlstr.="</div>";
 	$htmlstr.="<input type='text' name='ort' id='ort' ".$style." value='".$adresse_obj->ort."' size='30' maxlength='45' /></td>\n";
 		
-	
-		$htmlstr.="</tr></table></td>";		
-##var_dump($adresse_obj);
+	$htmlstr.="</tr></table></td>";		
+
 	$htmlstr.="<tr><td><table><tr>\n";
-			$htmlstr.="<td>Strasse:</td>";
-			$htmlstr.="<td><input type='text' name='strasse' value='".$adresse_obj->strasse."' size='120' maxlength='150' /></td>\n";
-			$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="</tr></table></td>";	
+	$htmlstr.="<td>Strasse:</td>";
+	$htmlstr.="<td><input type='text' name='strasse' value='".$adresse_obj->strasse."' size='80' maxlength='256' /></td>\n";
+	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="</tr></table></td>";	
 	$htmlstr.="</tr>\n";
-		
-		
-				
-		$htmlstr.="</tr></table></td>";		
+
+	$htmlstr.="</tr></table></td>";		
 	$htmlstr.="</tr>\n";
 
 	$htmlstr.="<tr><td><table><tr>\n";
-		$htmlstr.='<td><input onclick="workDetailRecord(\'detailworkinfodiv\',\'addStandort\');" type="Button" value="speichern"></td>';
+	$htmlstr.='<td><input type="submit" value="speichern"></td>';
 	$htmlstr.="</tr></table></td>";				
 	$htmlstr.="</tr>\n";
 	$htmlstr.="	</table>\n";
@@ -1410,9 +1250,9 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	return $htmlstr;
 }
 // ----------------------------------------------------------------------------------------------------------------------------------
-/*
-	Standortwartung - Adressen,Personen,Kontakte 
-*/
+/**
+ * 	Standortwartung - Adressen,Personen,Kontakte 
+ */
 function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$rechte)
 {
 
@@ -1430,13 +1270,7 @@ function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$r
 	$name = (isset($_POST['name'])?$_POST['name']:'');	
 	$gemeinde = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 	$nation = (isset($_POST['nation'])?$_POST['nation']:'');
-	//$heimatadresse = (isset($_POST['heimatadresse'])?true:false);
 	$zustelladresse = (isset($_POST['zustelladresse'])?true:false);
-
-	$ext_id = (isset($_POST['ext_id'])?$_POST['ext_id']:'');
-	$ext_id_adr = (isset($_POST['ext_id_adr'])?$_POST['ext_id_adr']:'');
-
-	
 	
 	//----------------------------------------		
 	//	ADRESSEN Neuanlage - Aenderung
@@ -1460,26 +1294,22 @@ function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$r
 		$adresse_obj->insertvon = $user;
 	}
 
-	$adresse_obj->person_id=null;
 	$adresse_obj->name=$name;
 	$adresse_obj->strasse = $strasse;
 	$adresse_obj->nation = $nation;
 	$adresse_obj->plz = $plz;
 	$adresse_obj->ort = $ort;
 	$adresse_obj->gemeinde = $gemeinde;
-	$adresse_obj->typ = $adresstyp;
-	$adresse_obj->heimatadresse = $heimatadresse;
+	$adresse_obj->typ = 'f';
+	$adresse_obj->heimatadresse = false;
 	$adresse_obj->zustelladresse = $zustelladresse;
-	$adresse_obj->firma_id = null;
 	$adresse_obj->updateamum = date('Y-m-d H:i:s');
 	$adresse_obj->updatvon = $user;
-	$adresse_obj->ext_id=($ext_id_adr?$ext_id_adr:null);
 
 	if(!$adresse_obj->save())
 		return 'Fehler beim Speichern der Adresse:'.$adresse_obj->errormsg;
 	if ($adresse_obj->new)
 		$adresse_id=$adresse_obj->adresse_id;
-
 		
 	$standort_obj = new standort();
 	if(is_numeric($standort_id))
@@ -1505,37 +1335,33 @@ function saveStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$r
 	else
 		$standort_obj->adresse_id=null;
 
-		$standort_obj->kurzbz=$kurzbz;
-		$standort_obj->bezeichnung=$bezeichnung;
-		$standort_obj->ext_id=($ext_id?$ext_id:null);
+	$standort_obj->kurzbz=$kurzbz;
+	$standort_obj->bezeichnung=$bezeichnung;
 
-		$standort_obj->firma_id=$firma_id;
-		$standort_obj->updatevon=$user;
-		$standort_obj->updateamum = date('Y-m-d H:i:s');
-		//var_dump($standort_obj);
-		if(!$standort_obj->save())
-		{
-			if ($standort_obj->new)
-				$adresse_obj->delete($adresse_id);
-			return 'Fehler beim Speichern des Standort:'.$standort_obj->errormsg;
-		}
+	$standort_obj->firma_id=$firma_id;
+	$standort_obj->updatevon=$user;
+	$standort_obj->updateamum = date('Y-m-d H:i:s');
 
+	if(!$standort_obj->save())
+	{
 		if ($standort_obj->new)
-			$standort_id=$standort_obj->standort_id;
-		if (empty($standort_id))
-			return 'Abbruch nach Standort verarbeitung! ID Fehlt ';
-##var_dump($standort_obj);
-#exit;
-?>
+			$adresse_obj->delete($adresse_id);
+		return 'Fehler beim Speichern des Standort:'.$standort_obj->errormsg;
+	}
+
+	if ($standort_obj->new)
+		$standort_id=$standort_obj->standort_id;
+	if (empty($standort_id))
+		return 'Abbruch nach Standort Verarbeitung! ID Fehlt ';
+
+	echo '
 	<script language="JavaScript1.2" type="text/javascript">
 	<!--
-		parent.frames[0].location.reload();
-		parent.frames[1].location.reload();
+		parent.frames[1].location.href=\'firma_details.php?firma_id='.$firma_id.'\';
 	-->		
 	</script>
-<?php
+	';
 		
-		return 'Standort ID '.$standort_id.' '.$standort_obj->kurzbz.' wurden erfolgreich gespeichert ';
+	return 'Standort wurde erfolgreich gespeichert ';
 }
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------#
 ?>

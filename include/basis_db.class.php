@@ -98,6 +98,7 @@ abstract class db extends basis
 					$sql.=($limit?' limit '.trim($limit).' ':'');
 			}
 		}
+		
 		if (!$results=$this->db_query($sql))
 		{
 			$this->errormsg=$this->db_last_error();

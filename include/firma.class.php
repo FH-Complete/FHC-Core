@@ -42,7 +42,6 @@ class firma extends basis_db
 	public $updatevon;		// bigint
 	public $firmentyp_kurzbz;	
 	public $schule; 		// boolean
-	// Neu in Rel. 2.0 
 	public $steuernummer; 	// string	
 	public $gesperrt; 		// boolean
 	public $aktiv; 			// boolean	
@@ -58,6 +57,7 @@ class firma extends basis_db
 	public $kundennummer; 		// integer
 	public $oe_aktiv; 			// boolean	
 	public $mailverteiler; 		// string
+	public $tags = array();
 
 			
 	/**
@@ -101,12 +101,19 @@ class firma extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->schule = ($row->schule=='t'?true:false);
-	// Neu in Rel. 2.0 
 				$this->steuernummer = $row->steuernummer;				
 				$this->gesperrt = ($row->gesperrt=='t'?true:false);
 				$this->aktiv = ($row->aktiv=='t'?true:false);		
 				$this->finanzamt = $row->finanzamt;				
 				
+				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id='$firma_id'";
+				if($resulttag = $this->db_query($qry))
+				{
+					while($rowtag = $this->db_fetch_object($resulttag))
+					{
+						$this->tags[]=$rowtag->tag;
+					}
+				}
 				return true;
 			}
 			else 
@@ -238,6 +245,98 @@ class firma extends basis_db
 	}
 
 	/**
+	 * Speichert die Tags in $tags zur Firma
+	 * 
+	 */
+	public function savetags()
+	{
+		if(!is_numeric($this->firma_id) || $this->firma_id=='')
+		{
+			$this->errormsg = 'FirmaID ist ungueltig';
+			return false;
+		}
+		
+		foreach($this->tags as $tag)
+		{
+			if($tag!='')
+			{
+				$qry = "
+					SELECT 
+						(SELECT true FROM public.tbl_firmatag WHERE tag='".addslashes($tag)."' AND firma_id='$this->firma_id') as zugewiesen,
+						(SELECT true FROM public.tbl_tag WHERE tag='".addslashes($tag)."') as vorhanden";
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						if($row->vorhanden!='t')
+						{
+							//Tag neu anlegen
+							$qry = "INSERT INTO public.tbl_tag(tag) VALUES('".addslashes($tag)."');";
+							if(!$this->db_query($qry))
+							{
+								$this->errormsg='Fehler beim Anlegen des Tags';
+								return false;
+							}
+						}
+						
+						if($row->zugewiesen!='t')
+						{
+							//Tag zuweisen
+							$qry = "INSERT INTO public.tbl_firmatag(firma_id, tag, insertamum, insertvon) 
+									VALUES(".$this->addslashes($this->firma_id).",".
+										$this->addslashes($tag).",".
+										$this->addslashes($this->insertamum).",".
+										$this->addslashes($this->insertvon).");";
+							if(!$this->db_query($qry))
+							{
+								$this->errormsg='Fehler beim Anlegen des Tags';
+								return false;
+							}
+						}
+					}
+					else 
+					{
+						$this->errormsg='Fehler beim Laden der Tags';
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg='Fehler beim Laden der Tags';
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Loescht die Tag-Zuordnung zur Firma
+	 *
+	 * @param $firma_id
+	 * @param $tag
+	 * @return boolean
+	 */
+	public function deletetag($firma_id, $tag)
+	{
+		if(!is_numeric($firma_id) || $firma_id=='')
+		{
+			$this->errormsg = 'FirmaID ist ungueltig';
+			return false;
+		}
+		
+		$qry = "DELETE FROM public.tbl_firmatag WHERE firma_id='".addslashes($firma_id)."' AND tag='".addslashes($tag)."'";
+		
+		if($this->db_query($qry))
+			return true;
+		else 
+		{
+			$this->errormsg = 'Fehler beim Löschen des Tags';
+			return false;
+		}
+	}
+	
+	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $firma_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
@@ -290,7 +389,6 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
-	// Neu in Rel. 2.0 
 				$fa->steuernummer = $row->steuernummer;				
 				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
 				$fa->aktiv = ($row->aktiv=='t'?true:false);		
@@ -362,7 +460,6 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
-	// Neu in Rel. 2.0 
 				$fa->steuernummer = $row->steuernummer;				
 				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
 				$fa->aktiv = ($row->aktiv=='t'?true:false);		
@@ -410,6 +507,8 @@ class firma extends basis_db
 					OR lower(bezeichnung) like lower('%$filter%') 
 					OR lower(anmerkung) like lower('%$filter%')
 					".(is_numeric($filter)?" OR tbl_firma.firma_id='$filter'":'')."
+					OR tbl_firma.firma_id IN (SELECT firma_id FROM public.tbl_firmatag 
+											  WHERE firma_id=tbl_firma.firma_id AND lower(tag) like lower('%$filter%'))
 					 ) ";
 		
 		if($firmentyp_kurzbz!='')
@@ -435,18 +534,14 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
-	// Neu in Rel. 2.0 
 				$fa->steuernummer = $row->steuernummer;				
 				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
 				$fa->aktiv = ($row->aktiv=='t'?true:false);		
 				$fa->finanzamt = $row->finanzamt;		
-
-	// Standort
 				$fa->kurzbz = $row->kurzbz;		
 				$fa->adresse_id = $row->adresse_id;		
 				$fa->standort_id = $row->standort_id;		
 				$fa->bezeichnung = $row->bezeichnung;	
-	// Adresse
 				$fa->person_id = $row->person_id;		
 				$fa->adresse_id = $row->adresse_id;		
 				$fa->strasse = $row->strasse;		
@@ -517,14 +612,11 @@ class firma extends basis_db
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
 				$fa->schule = ($row->schule=='t'?true:false);
-				// Neu in Rel. 2.0 
 				$fa->steuernummer = $row->steuernummer;				
 				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
 				$fa->aktiv = ($row->aktiv=='t'?true:false);		
 				$fa->finanzamt = $row->finanzamt;		
-				// firma_organisationseinheit
 				$fa->oe_kurzbz = $row->oe_kurzbz;	
-				// organisationseinheit
 				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;		
 				$fa->oe_parent_kurzbz = $row->oe_parent_kurzbz;		
 				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;	
