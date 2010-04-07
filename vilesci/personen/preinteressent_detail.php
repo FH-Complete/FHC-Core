@@ -729,8 +729,8 @@ echo '<td>Schule ID:</td><td><input type="text" size="3" name="schule_id" id="sc
 
 //SCHULE
 echo "<td>Schule:</td><td colspan='5'> <SELECT id='firma' name='firma' onchange='document.getElementById(\"schule_id\").value=this.value'>";
-$qry = "SELECT plz, ort, strasse, tbl_firma.name, firma_id 
-		FROM public.tbl_firma LEFT JOIN public.tbl_adresse USING(firma_id) 
+$qry = "SELECT plz, ort, strasse, tbl_firma.name, tbl_firma.firma_id 
+		FROM public.tbl_firma JOIN public.tbl_standort USING(firma_id) LEFT JOIN public.tbl_adresse USING(adresse_id) 
 		WHERE schule ORDER BY plz, name";
 echo "<option value='' >-- keine Angabe --</option>";
 
