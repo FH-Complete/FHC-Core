@@ -1068,11 +1068,11 @@ echo '<table>';
 echo "
 <tr style='font-weight:bold;' align='center'>
 <td class='ContentHeader2' style='font-weight:bold;'>&Sigma;</td>
-<td class='ContentHeader2' style='font-weight:bold;'>$summe_stud</td>
+<td class='ContentHeader2' style='font-weight:bold;' title='Anzahl der Studenten'>$summe_stud</td>
 <td class='ContentHeader2' colspan='6'></td>
-<td class='ContentHeader2' style='color:red; font-weight:bold;'>$summe_ng</td>
-<td class='ContentHeader2' style='font-weight:bold;' colspan='2'>$summe_t2</td>
-<td class='ContentHeader2' style='font-weight:bold;' colspan='2'>$summe_komm</td>
+<td class='ContentHeader2' style='color:red; font-weight:bold;' title='Anzahl negativer Beurteilungen'>$summe_ng</td>
+<td class='ContentHeader2' style='font-weight:bold;' colspan='2' title='Anzahl Nachpruefungen'>$summe_t2</td>
+<td class='ContentHeader2' style='font-weight:bold;' colspan='2' title='Anzahl Kommissionelle Pruefungen'>$summe_komm</td>
 </tr>
 </table>
 </td></tr>
