@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 mb_internal_encoding("UTF-8");
 mb_regex_encoding("UTF-8");
 setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
+date_default_timezone_set('Europe/Vienna');
 
 // Connection Strings zur Datenbank
 define("DB_SYSTEM","pgsql");
