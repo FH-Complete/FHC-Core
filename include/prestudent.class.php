@@ -707,6 +707,8 @@ class prestudent extends person
 			       ' ausbildungssemester='.$this->addslashes($this->ausbildungssemester).",".
 			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).",".
 			       ' datum='.$this->addslashes($this->datum).",".
+			       ' updateamum='.$this->addslashes($this->updateamum).",".
+			       ' updatevon='.$this->addslashes($this->updatevon).",".
 			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND status_kurzbz='".addslashes($this->status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_old)."' AND ausbildungssemester='".addslashes($this->ausbildungssemester_old)."';";
 		}
