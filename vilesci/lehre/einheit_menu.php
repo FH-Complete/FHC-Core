@@ -74,30 +74,6 @@ function conf_del()
 <H2>Gruppen - Verwaltung</H2>
 <?php
 
-//Studiengang Drop Down anzeigen
-$stud = new studiengang();
-if(!$stud->getAll('typ, kurzbzlang'))
-	echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
-
-// Studiengang AuswahlFilter
-echo '<form accept-charset="UTF-8" name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
-
-foreach($stud->result as $row)
-{
-	if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || 
-	   $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
-	{
-		if($studiengang_kz=='')
-			$studiengang_kz=$row->studiengang_kz;
-		
-		echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
-	}
-}
-
-echo '</SELECT>';
-echo '</form>';
-
 if (isset($_POST['newFrm']) || isset($_GET['newFrm']))
 {
 	doEdit(null,true);
@@ -108,11 +84,13 @@ else if (isset($_GET['edit']))
 }
 else if (isset($_POST['type']) && $_POST['type']=='save')
 {
+	printDropDown();
 	doSave();
 	getUebersicht();
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
+	printDropDown();
 	$e=new gruppe();
 	if(!$e->delete($_GET['einheit_id']))
 		echo $e->errormsg;
@@ -120,10 +98,37 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 }
 else
 {
+	printDropDown();
 	getUebersicht();
 }
 
-
+function printDropDown()
+{
+	global $rechte, $studiengang_kz;		
+	//Studiengang Drop Down anzeigen
+	$stud = new studiengang();
+	if(!$stud->getAll('typ, kurzbzlang'))
+		echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
+	
+	// Studiengang AuswahlFilter
+	echo '<form accept-charset="UTF-8" name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
+	echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
+	
+	foreach($stud->result as $row)
+	{
+		if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || 
+		   $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+		{
+			if($studiengang_kz=='')
+				$studiengang_kz=$row->studiengang_kz;
+			
+			echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
+		}
+	}
+	
+	echo '</SELECT>';
+	echo '</form>';
+}
 function doSave()
 {
 
@@ -172,7 +177,7 @@ function doEdit($kurzbz,$new=false)
   			<tr>
   				<td><i>Kurzbezeichnung</i></td>
       			<td>
-      				<input type="text" name="kurzbz" size="10" maxlength="10" value="<?php echo $e->gruppe_kurzbz; ?>">
+      				<input type="text" name="kurzbz" size="16" maxlength="32" value="<?php echo $e->gruppe_kurzbz; ?>">
 				</td>
 			</tr>
   			<tr>
