@@ -453,7 +453,7 @@ function indexdatei($source_opus, $fd)
 	        $opus->data_seek($autor, 0);
 	        $mrow = $opus->fetch_row($autor);
 	        $creator_name = $mrow[0];
-		# A. Maile, 6.8.2007: Ersten Autor speichern für Google Scholar
+		# A. Maile, 6.8.2007: Ersten Autor speichern f&uuml;r Google Scholar
 		$first_creator = $creator_name;
 	        $person = htmlspecialchars(rawurlencode($creator_name));
 	        fwrite($fd,"<B>Autor(in): <A HREF=\"$link$person\">$creator_name</A></B>");
@@ -910,7 +910,7 @@ function indexdatei($source_opus, $fd)
 	    }
 	//***************************************************************************************************************************************
 	//Änderung TW
-	//Studiengang, Seitenanzahl, Datum, AC-Nummer und Begutachter eingefügt
+	//Studiengang, Seitenanzahl, Datum, AC-Nummer und Begutachter eingef&uuml;gt
 	    if ($studiengang != "" && $studiengang>0) 
 	    {
 	        fwrite($fd,"<TR> \n<TD class=\"frontdoor\" valign=\"top\">");
@@ -1210,7 +1210,7 @@ if($erg=pg_query($db_conn,$qry))
 		}
 		else 
 		{
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden (sel benutzer)!'."\n".$qry_std);
+			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden (sel benutzer)!'."\n".$qry_std);
 			$mail->send();
 			die($qry_std);
 		}
@@ -1245,7 +1245,7 @@ if($erg=pg_query($db_conn,$qry))
 		}
 		else 
 		{
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!'."\n".$qry_bet);
+			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden!'."\n".$qry_bet);
 			$mail->send($qry_bet);
 			die();
 		}
@@ -1281,7 +1281,7 @@ if($erg=pg_query($db_conn,$qry))
 			}
 			else 
 			{
-				$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht geöffnet werden!'."\n".$qry_bet);
+				$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden!'."\n".$qry_bet);
 				$mail->send();
 				die($qry_bet);
 			}
@@ -1317,7 +1317,7 @@ if($erg=pg_query($db_conn,$qry))
 			$fehler.=$row->stud_uid.": Projektarbeit (".$row->projekttyp_kurzbz.") ".$row->projektarbeit_id.$fehler;
 			if($row->kontrollschlagwoerter==NULL || $row->kontrollschlagwoerter=='')
 			{
-				$fehler.="\nKontrollierte Schlagwörter nicht eingegeben!";
+				$fehler.="\nKontrollierte Schlagw&ouml;rter nicht eingegeben!";
 				$error=true;
 			}
 			if($row->abstract==NULL || $row->abstract=='')
@@ -1350,7 +1350,7 @@ if($erg=pg_query($db_conn,$qry))
 		if(!$error)
 		{
 			//*******************************************************************************************
-			//Einfügen in OPUS
+			//Einf&uuml;gen in OPUS
 			//*******************************************************************************************
 					
 			//	Originaltitel der Arbeit				title
@@ -1397,7 +1397,7 @@ if($erg=pg_query($db_conn,$qry))
 				if(mysql_num_rows($result_chk)>0)
 				{
 					//Datensatz bereits eingetragen
-					echo "-->".$qry_chk."<br>";
+					echo "Bereits vorhanden: ".$row->projektarbeit_id."<br>";
 				}
 				else 
 				{
@@ -1435,7 +1435,7 @@ if($erg=pg_query($db_conn,$qry))
 								$fehler1.="\n\nTransaktion abgebrochen!! \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 								if(!$result=mysql_query('ROLLBACK',$conn_ext))
 								{
-									$fehler1.="\n\nRollback nicht durchgeführt. \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
+									$fehler1.="\n\nRollback nicht durchgef&uuml;hrt. \n".mysql_errno($conn_ext) . ": " . mysql_error($conn_ext);
 								}
 							}
 							else 
@@ -1479,10 +1479,10 @@ if($erg=pg_query($db_conn,$qry))
 													}
 													//echo "\nQuelle: ".$url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'." -> ".$opus_url."".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf';
 													copy($url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf',$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf');
-													//überprüfen, ob Datei wirklich kopiert wurde
+													//&uuml;berpr&uuml;fen, ob Datei wirklich kopiert wurde
 													if(is_file($opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'))
 													{
-														//COMMIT durchführen
+														//COMMIT durchf&uuml;hren
 														if(!$result=mysql_query('COMMIT',$conn_ext))
 														{
 															mysql_query('ROLLBACK',$conn_ext);
@@ -1532,7 +1532,7 @@ if($erg=pg_query($db_conn,$qry))
 										}
 										else 
 										{
-											//COMMIT durchführen
+											//COMMIT durchf&uuml;hren
 											if(!$result=mysql_query('COMMIT',$conn_ext))
 											{
 												mysql_query('ROLLBACK',$conn_ext);
@@ -1548,7 +1548,7 @@ if($erg=pg_query($db_conn,$qry))
 			}
 			else 
 			{
-				$fehler1.="\nÜberprüfung, ob bereits vorhanden, konnte nicht durchgeführt werden! \n".mysql_errno($conn_ext)."\n".$qry_chk."\n";
+				$fehler1.="\n&Uuml;berpr&uuml;fung, ob bereits vorhanden, konnte nicht durchgef&uuml;hrt werden! \n".mysql_errno($conn_ext)."\n".$qry_chk."\n";
 			}
 			if($fehler1!='')
 			{
@@ -1556,7 +1556,7 @@ if($erg=pg_query($db_conn,$qry))
 				$fehler.="\n-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 				$fehler.="\nBegutachter1: ".$begutachter1."\nBegutachter2: ".$begutachter2."\nTitel: ".$row->titel."\nTitel en: ".$row->titel_english."\n";
 				$fehler.="Verfasser: ".$verfasser."\nInstitut: ".$institut."\nStudiengang: ".($row->stg_kz<1000?'0'.$row->stg_kz:$row->stg_kz)."\nDatum: ".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."\n";
-				$fehler.="Kontr. Schlagwörter: ".$row->kontrollschlagwoerter."\nSchlagwörter dt: ".$row->schlagwoerter."\nSchlagwörter en: ".$row->schlagwoerter_en."\n";
+				$fehler.="Kontr. Schlagw&ouml;rter: ".$row->kontrollschlagwoerter."\nSchlagw&ouml;rter dt: ".$row->schlagwoerter."\nSchlagw&ouml;rter en: ".$row->schlagwoerter_en."\n";
 				$fehler.="Abstract: ".$row->abstract."\nAbstract_en: ".$row->abstract_en."\nSeitenanzahl: ".$row->seitenanzahl."\nStudiensemester: ".$row->studiensemester_kurzbz."\n";
 				$fehler.="Projektarbeit ID: ".$row->projektarbeit_id."\nTyp der Arbeit: ".$row->projekttyp_kurzbz."\n";
 				$fehler1='';
@@ -1567,7 +1567,7 @@ if($erg=pg_query($db_conn,$qry))
 			$fehler.="\n-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 			$fehler.="\nBegutachter1: ".$begutachter1."\nBegutachter2: ".$begutachter2."\nTitel: ".$row->titel."\nTitel en: ".$row->titel_english."\n";
 			$fehler.="Verfasser: ".$verfasser."\nInstitut: ".$institut."\nStudiengang: ".($row->stg_kz<1000?'0'.$row->stg_kz:$row->stg_kz)."\nDatum: ".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."\n";
-			$fehler.="Kontr. Schlagwörter: ".$row->kontrollschlagwoerter."\nSchlagwörter dt: ".$row->schlagwoerter."\nSchlagwörter en: ".$row->schlagwoerter_en."\n";
+			$fehler.="Kontr. Schlagw&ouml;rter: ".$row->kontrollschlagwoerter."\nSchlagw&ouml;rter dt: ".$row->schlagwoerter."\nSchlagw&ouml;rter en: ".$row->schlagwoerter_en."\n";
 			$fehler.="Abstract: ".$row->abstract."\nAbstract_en: ".$row->abstract_en."\nSeitenanzahl: ".$row->seitenanzahl."\nStudiensemester: ".$row->studiensemester_kurzbz."\n";
 			$fehler.="Projektarbeit ID: ".$row->projektarbeit_id."\nTyp der Arbeit: ".$row->projekttyp_kurzbz."\n";
 			$error=false;			
@@ -1582,7 +1582,7 @@ if($erg=pg_query($db_conn,$qry))
 }
 else 
 {
-	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht geöffnet werden!'."\n".$qry);
+	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht ge&ouml;ffnet werden!'."\n".$qry);
 	$mail->send();
 	die($qry);
 }
