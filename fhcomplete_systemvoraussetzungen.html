@@ -19,26 +19,37 @@
 	</a>
 	<div style="height:10px;width:100%">&nbsp;</div>
 	<div style="font-family : Tahoma;font-size:medium;">
-	<h1>Einstellungen</h1>
-	<div style="border:1px outset #F4F4FF;
-			-moz-border-radius:30px; 
-			-khtml-border-radius:30px; 
-			padding:10px;
-			background-color:#F4F4FF;">
+		<h1>Systemvoraussetzungen</h1>
+		<div style="border:1px outset #F4F4FF;
+				-moz-border-radius:30px; 
+				-khtml-border-radius:30px; 
+				padding:10px;
+				background-color:#F4F4FF;">
 			<div style="font-family : Tahoma;font-size:medium;text-align: justify;">
 				<br/>
-				Um die Applikationen Tempus und FAS nutzen zu können, müssen einige Einstellungen im Browser vorgenommen werden:
+				Für den Betrieb von FH-Complete müssen folgende Systemvoraussetzungen erfüllt werden:
 				<div style="height:10px">&nbsp;</div>
 				<ul style="text-align:left;">
-				<li>Öffnen Sie hierzu ein neues Browserfenster und geben Sie in die Adresszeile 'about:config' ein.</li>
-				<li>Bestätigen Sie die angezeigte Warnmeldung mit OK.</li>
-				<li>Suchen Sie den Eintrag 'signed.applets.codebase_pricipal_support'</li>
-				<li>Doppelklicken Sie auf den Eintrag, damit er auf true gesetzt wird</li>
-				<li>Wiederholen Sie den Vorgang mit dem Eintrag 'dom.allow_scripts_to_close_windows'</li>
+				<li>WebServer (empfohlen: Apache 2.2)</li>
+				<li>PHP 5.2 oder höher<br />
+				Module:<br>
+				- xmlrpc<br>
+				- dom<br>
+				- xsl<br>
+				- gd<br>
+				</li>
+				<li>PostgreSQL 8.4 (oder SQL:1999 kompatible Datenbank)</li>
 				</ul>
-				<br />
-				Falls Sie die Seamonkey Suite verwenden und die Mails mit einem Externen MailClient versenden wollen, müssen Sie zusätzlich
-				noch den Eintrag 'network.protocol-handler.external.mailto' auf true setzen.
+				
+				<b>Browseranforderungen</b>
+				<br>
+				Für die Applikationen Tempus und FAS wird ein Gecko-basierender Browser benötigt:
+				<ul>
+					<li>Seamonkey ab Version 1.6</li>
+					<li>Firefox ab Version 1.5</li>
+				</ul>
+				
+				Für die Applikationen CIS und Vilesci kann jeder standardkonforme Webbrowser verwendet werden
 				<br />
 				<br />
 			</div>
