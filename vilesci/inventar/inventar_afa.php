@@ -20,6 +20,9 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ * Liefert eine Liste aller abgeschriebenen Betriebsmittel im ausgewähltem Monat/Jahr
+ */
 	include_once('../../config/vilesci.config.inc.php');
 	include_once('../../include/basis_db.class.php');
  	require_once('../../include/functions.inc.php');
@@ -34,6 +37,7 @@
  	require_once('../../include/betriebsmitteltyp.class.php');
  	require_once('../../include/betriebsmittelstatus.class.php');
  	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
+ 	require_once('../../include/datum.class.php');
 
 	if (!$uid = get_uid())
 			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -49,11 +53,12 @@
 	$default_status_vorhanden='vorhanden';
 	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$schreib_recht=false;
+	$datum_obj = new datum();
 	
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
- 	$nummer=trim((isset($_REQUEST['nummer']) ? $_REQUEST['nummer']:''));
+ 	$inventarnummer=trim((isset($_REQUEST['inventarnummer']) ? $_REQUEST['inventarnummer']:''));
  	$seriennummer=trim((isset($_REQUEST['seriennummer']) ? $_REQUEST['seriennummer']:''));
  	$ort_kurzbz=trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:''));
  	$oe_kurzbz=trim((isset($_REQUEST['oe_kurzbz']) ? $_REQUEST['oe_kurzbz']:''));
@@ -86,7 +91,7 @@
 // ------------------------------------------------------------------------------------------
  	$ajax=trim(isset($_REQUEST['ajax']) ?$_REQUEST['ajax']:false);
   	$work=trim(isset($_REQUEST['work']) ?$_REQUEST['work']:false);
-
+	
 	if (($ajax && strtolower($ajax)=='set_status')
 	||  ($work && strtolower($work)=='set_status') )
 	{
@@ -109,7 +114,7 @@
 	
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=trim(isset($_REQUEST['betriebsmittelbetriebsmittelstatus_id']) ? $_REQUEST['betriebsmittelbetriebsmittelstatus_id']:'');
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$oBetriebsmittel->betriebsmittel_id;
-				$oBetriebsmittel_betriebsmittelstatus->datum=date('Ymd');
+				$oBetriebsmittel_betriebsmittelstatus->datum=date('Y-m-d');
 				$oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
 				$oBetriebsmittel_betriebsmittelstatus->updateamum='';
 				$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
@@ -124,7 +129,7 @@
 				$errormsg[]=$oBetriebsmittel->errormsg;
 		}
 		else
-			$errormsg[]='sie haben keine Rechte fuer Datenbearbeitung';				
+			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';				
 		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 	}
 
@@ -147,7 +152,7 @@
 			// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 		}	
 		else
-			$errormsg[]='sie haben keine Rechte fuer Datenbearbeitung';				
+			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';				
 	}
 	if (!empty($ajax))
 	{
@@ -218,12 +223,11 @@
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
 				
 		<script type="text/javascript">
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
-			function set_status(output_id,betriebsmittelbetriebsmittelstatus_id,betriebsmittel_id,nummer,bestellung_id,bestelldetail_id,betriebsmittelstatus_kurzbz)
+			function set_status(output_id,betriebsmittelbetriebsmittelstatus_id,betriebsmittel_id,inventarnummer,bestellung_id,bestelldetail_id,betriebsmittelstatus_kurzbz)
 			{
 				document.getElementById(output_id).innerHTML = '<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >';
 				$.ajax
@@ -231,7 +235,7 @@
 					{
 						type: "POST",
 						url: ajxFile,
-						data: "ajax=set_status" + "&debug=<?php echo $debug;?>" + "&betriebsmittelbetriebsmittelstatus_id=" + betriebsmittelbetriebsmittelstatus_id  + "&betriebsmittel_id=" + betriebsmittel_id + "&nummer=" + nummer + "&bestellung_id=" + bestellung_id + "&bestelldetail_id=" + bestelldetail_id + "&betriebsmittelstatus_kurzbz=" + betriebsmittelstatus_kurzbz,
+						data: "ajax=set_status" + "&debug=<?php echo $debug;?>" + "&betriebsmittelbetriebsmittelstatus_id=" + betriebsmittelbetriebsmittelstatus_id  + "&betriebsmittel_id=" + betriebsmittel_id + "&inventarnummer=" + inventarnummer + "&bestellung_id=" + bestellung_id + "&bestelldetail_id=" + bestelldetail_id + "&betriebsmittelstatus_kurzbz=" + betriebsmittelstatus_kurzbz,
 						success: function(phpData)
 						{
 							document.getElementById(output_id).innerHTML = phpData;
@@ -242,7 +246,7 @@
 				document.getElementById(output_id).innerHTML = '';
 			}
 
-			function set_position(output_id,betriebsmittel_id,nummer,bestellung_id,bestelldetail_id)
+			function set_position(output_id,betriebsmittel_id,inventarnummer,bestellung_id,bestelldetail_id)
 			{
 				document.getElementById(output_id).innerHTML = '<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >';
 				if(bestelldetail_id!='')
@@ -252,7 +256,7 @@
 						{
 							type: "POST",
 							url: ajxFile,
-							data: "ajax=set_position" + "&debug=<?php echo $debug;?>"  + "&betriebsmittel_id=" + betriebsmittel_id + "&nummer=" + nummer + "&bestellung_id=" + bestellung_id + "&bestelldetail_id=" + bestelldetail_id ,
+							data: "ajax=set_position" + "&debug=<?php echo $debug;?>"  + "&betriebsmittel_id=" + betriebsmittel_id + "&inventarnummer=" + inventarnummer + "&bestellung_id=" + bestellung_id + "&bestelldetail_id=" + bestelldetail_id ,
 							success: function(phpData)
 							{
 								document.getElementById(output_id).innerHTML = phpData;
@@ -280,8 +284,8 @@
 		<div>
 		<table class="navbar">
 			<tr>
-				<td><label for="nummer">Inv.nr.</label>&nbsp;
-					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="nummer" name="nummer" type="text" size="10" maxlength="30" value="<?php echo $nummer;?>" />&nbsp;
+				<td><label for="inventarnummer">Inv.nr.</label>&nbsp;
+					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>" />&nbsp;
 					<script type="text/javascript">
 						function selectItem(li) 
 						{
@@ -293,7 +297,7 @@
 						}
 						$(document).ready(function() 
 						{
-							  $('#nummer').autocomplete('inventar_autocomplete.php', 
+							  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
 							  {
 								minChars:2,
 								scroll: true, 
@@ -301,7 +305,7 @@
 								width:350,
 								onItemSelect:selectItem,
 								formatItem:formatItem,
-								extraParams:{'work':'nummer'
+								extraParams:{'work':'inventarnummer'
 											,'afa':$("#afa").val()
 											,'betriebsmitteltyp':$("#betriebsmitteltyp").val()
 											 }
@@ -571,7 +575,7 @@
 // Inventardaten - lesen
 // ----------------------------------------
 	// pruefen ob eine Eingabe erfolgte
-	if ($nummer || $bestellung_id || $bestellnr || $seriennummer)
+	if ($inventarnummer || $bestellung_id || $bestellnr || $seriennummer)
 	{
 		$afa='';
 		$afa='';
@@ -582,12 +586,12 @@
 		$betriebsmittelstatus_kurzbz='';
 	}
 
- 	$check=$nummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$afa.$beschreibung.$oe_kurzbz.$seriennummer;
-	$order='tbl_betriebsmittel.nummer, tbl_betriebsmittel_betriebsmittelstatus.datum DESC, tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id DESC'; // Sortierung
+ 	$check=$inventarnummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$afa.$beschreibung.$oe_kurzbz.$seriennummer;
+	$order=null; // Sortierung
 
 	$oBetriebsmittel->result=array();
 	$oBetriebsmittel->errormsg='';
-	if ($check!='' && !$oBetriebsmittel->betriebsmittel_inventar($order,$nummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$afa,$beschreibung,$oe_kurzbz,$seriennummer))
+	if ($check!='' && !$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$afa,$beschreibung,$oe_kurzbz,$seriennummer))
 		$errormsg[]=$oBetriebsmittel->errormsg;
 
 	// Ausgabe
@@ -661,7 +665,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 
 		$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;">
 
-		<td><a href="'.$_SERVER["PHP_SELF"].'?nummer='.$resultBetriebsmittel[$pos]->nummer.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->nummer.'</a>&nbsp;</td>
+		<td><a href="'.$_SERVER["PHP_SELF"].'?inventarnummer='.$resultBetriebsmittel[$pos]->inventarnummer.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->inventarnummer.'</a>&nbsp;</td>
 
 		<td title="'.$OrtTitel.'">'.$OrtBezeichnung.'&nbsp;</td>
 
@@ -681,7 +685,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			$htmlstring.=$betriebsmittelstatus_kurzbz_select;
 		else
 		{
-			$htmlstring.='<select style="font-size:xx-small;" onchange="set_status(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittelbetriebsmittelstatus_id.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->nummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',\''.$resultBetriebsmittel[$pos]->bestelldetail_id.'\',this.value);" name="betriebsmittelstatus_kurzbz">';
+			$htmlstring.='<select style="font-size:xx-small;" onchange="set_status(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittelbetriebsmittelstatus_id.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',\''.$resultBetriebsmittel[$pos]->bestelldetail_id.'\',this.value);" name="betriebsmittelstatus_kurzbz">';
 			for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
 			{
 				if ($resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz)
@@ -702,6 +706,8 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 // Ausgabe der Bestellungen in Listenform
 function output_inventarposition($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false)
 {
+	global $datum_obj;
+	
 	// Verarbeitungs Array ermitteln aus der Uebergabe
 	if (isset($resultBetriebsmittel[0]))
 		$resBetriebsmittel=$resultBetriebsmittel[0];
@@ -722,7 +728,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 	$OrtBezeichnung=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz:'*'.$resBetriebsmittel->ort_kurzbz);
 	$OrtTitel=(isset($oOrt->bezeichnung) && $oOrt->bezeichnung?$oOrt->ort_kurzbz.' '.($oOrt->bezeichnung?$oOrt->bezeichnung:'').' '.$OrtBezeichnung.' '.($oOrt->telefonklappe?'Kl.'.$oOrt->telefonklappe:''):$resBetriebsmittel->ort_kurzbz.' Kontrolle');
 
-	$htmlstring.='<fieldset><legend title="Betriebsmittel ID '.$resBetriebsmittel->betriebsmittel_id.'">Inventar '.$resBetriebsmittel->nummer.'</legend>';
+	$htmlstring.='<fieldset><legend title="Betriebsmittel ID '.$resBetriebsmittel->betriebsmittel_id.'">Inventar '.$resBetriebsmittel->inventarnummer.'</legend>';
 	$htmlstring.='<fieldset><legend>Kopfdaten</legend>';
 	$htmlstring.='<table class="liste">';
 	$htmlstring.='<tr>
@@ -750,7 +756,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 		$htmlstring.='<form name="sendform1" action="'. $_SERVER["PHP_SELF"].'" method="post" enctype="application/x-www-form-urlencoded">
 			<td>
 				<input style="display:none" name="work" value="set_position" >
-				<input style="display:none" name="nummer" value="'.$resBetriebsmittel->nummer.'" >
+				<input style="display:none" name="inventarnummer" value="'.$resBetriebsmittel->inventarnummer.'" >
 				<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
 				<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
 				<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_id"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
@@ -817,7 +823,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 		<td>
 			<input style="display:none" name="work" value="set_status" >
 			<input style="display:none" name="betriebsmittelbetriebsmittelstatus_id" value="'.$resBetriebsmittel->betriebsmittelbetriebsmittelstatus_id.'" >
-			<input style="display:none" name="nummer" value="'.$resBetriebsmittel->nummer.'" >
+			<input style="display:none" name="inventarnummer" value="'.$resBetriebsmittel->inventarnummer.'" >
 
 			<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
 
@@ -842,10 +848,10 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 	$htmlstring.='</td>
 	</form>';
 	$htmlstring.='<th align="right">AfA Ende&nbsp;:&nbsp;</th>
-				<td>'.$resBetriebsmittel->betriebsmittelstatus_datum_afa.'</td>
+				<td>'.$datum_obj->formatDatum($resBetriebsmittel->betriebsmittelstatus_datum_afa,'d.m.Y').'</td>
 
 				<th align="right">Leasing bis&nbsp;:&nbsp;</th>
-				<td>'.$resBetriebsmittel->leasing_bis.'</td>
+				<td>'.$datum_obj->formatDatum($resBetriebsmittel->leasing_bis,'d.m.Y').'</td>
 			</tr>';
 
 	$htmlstring.='<tr><td colspan="6" id="list">&nbsp;</td></tr>';
@@ -855,17 +861,17 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 	$oUpdateBenutzer = new benutzer($resBetriebsmittel->insertvon);
 	$htmlstring.='
 				<td align="right">Anlage&nbsp;:&nbsp;</td>
-				<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
+				<td><a href="mailto:'.$oUpdateBenutzer->uid.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->inventarnummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
 					(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
-					$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->insertvon).'&nbsp;'.substr($resBetriebsmittel->insertamum,0,19).'&nbsp;
+					$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->insertvon).'&nbsp;'.$datum_obj->formatDatum($resBetriebsmittel->insertamum,'d.m.Y H:i:s').'&nbsp;
 				</td>
 				';
 	$oUpdateBenutzer = new benutzer($resBetriebsmittel->updatevon);
 	$htmlstring.='
 				<td align="right">letzte &Auml;nderung&nbsp;:&nbsp;</td>
-				<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
+				<td><a href="mailto:'.$oUpdateBenutzer->uid.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->inventarnummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
 					(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
-					$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->updatevon).'&nbsp;'.substr($resBetriebsmittel->updateamum,0,19).'&nbsp;
+					$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$resBetriebsmittel->updatevon).'&nbsp;'.$datum_obj->formatDatum($resBetriebsmittel->updateamum,'d.m.Y H:i:s').'&nbsp;
 				</td>
 				';
 	$htmlstring.='</tr></table></td></tr>';
@@ -906,17 +912,17 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 				$classe='liste0';
 			$htmlstring.='<tr class="'.$classe.'">
 							<td>'.$row->betriebsmittelstatus_kurzbz.'</td>
-							<td>'.$row->datum.'</td>
+							<td>'.$datum_obj->formatDatum($row->datum,'d.m.Y').'</td>
 
-							<td><a href="mailto:'.$oInsertBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oInsertBenutzer->person_id)?(isset($oInsertBenutzer->anrede) && !empty($oInsertBenutzer->anrede)?$oInsertBenutzer->anrede.' ':'').
+							<td><a href="mailto:'.$oInsertBenutzer->uid.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->inventarnummer.'">'.(isset($oInsertBenutzer->person_id)?(isset($oInsertBenutzer->anrede) && !empty($oInsertBenutzer->anrede)?$oInsertBenutzer->anrede.' ':'').
 								(isset($oInsertBenutzer->titelpre) && !empty($oInsertBenutzer->titelpre)?$oInsertBenutzer->titelpre.' ':'').
 								$oInsertBenutzer->vorname.' '.$oInsertBenutzer->nachname.'</a>':$row->insertvon).'</td>
-							<td>'.substr($row->insertamum,0,19).'</td>
+							<td>'.$datum_obj->formatDatum($row->insertamum,'d.m.Y H:i:s').'</td>
 
-							<td><a href="mailto:'.$oUpdateBenutzer->alias.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->nummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
+							<td><a href="mailto:'.$oUpdateBenutzer->uid.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->inventarnummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
 								(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
 								$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$row->updatevon).'</td>
-							<td>'.substr($row->updateamum,0,19).'</td>
+							<td>'.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').'</td>
 						</tr>';
 		}
 	}
@@ -927,18 +933,19 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 	$oBetriebsmittelperson->result=array();
 	$oBetriebsmittelperson->debug=$debug;
 	$oBetriebsmittelperson->errormsg='';
-	if (!$oBetriebsmittelperson->load_betriebsmittelpersonen($resBetriebsmittel->betriebsmittel_id))
+	if (!$oBetriebsmittelperson->getbetriebsmittelpersonen($resBetriebsmittel->betriebsmittel_id))
 		  $htmlstring.='<br />'.$oBetriebsmittelperson->errormsg;
 
 	if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
 	{
-		$htmlstring.='<fieldset><legend title="Betriebsmittelperson(en)</legend>';
+		$htmlstring.='<fieldset><legend>Ausgabehistorie</legend>';
 		asort($oBetriebsmittelperson->result);
 		$htmlstring.='<table>';
 			$htmlstring.='<tr>
 						<thead>
-							<td>Status</td>
+							<td>Person</td>
 							<td>ab Datum</td>
+							<td>Retour am</td>
 							<td colspan="2">Anlage</td>
 							<td colspan="2">&Auml;nderung</td>
 						</thead>
@@ -951,15 +958,40 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			else
 				$classe='liste0';
 			$htmlstring.='<tr class="'.$classe.'">
-							<td>'.$row->betriebsmittelstatus_kurzbz.'</td>
-							<td>'.$row->datum.'</td>
-
-							<td>'.$row->insertvon.'</td>
-							<td>'.$row->insertamum.'</td>
-
-							<td>'.$row->updatevon.'</td>
-							<td>'.$row->updateamum.'</td>
-				';
+							<td>';
+										$oPerson = new person();
+										if (!$oPerson->load($row->person_id))
+											$htmlstring.=$oPerson->errormsg;
+										else if ($oPerson->nachname)
+											$htmlstring.=$oPerson->anrede.($oPerson->titelpre?'&nbsp;'.$oPerson->titelpre:'').'&nbsp;'.$oPerson->vorname.'&nbsp;'.$oPerson->nachname.'&nbsp;'.($oPerson->aktiv==true || $oPerson->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" >':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" >');
+										else
+											$htmlstring.=$row->person_id;
+			$htmlstring.='	</td>
+							<td>'.$datum_obj->formatDatum($row->ausgegebenam,'d.m.Y').'</td>
+							<td>'.$datum_obj->formatDatum($row->retouram,'d.m.Y').'</td>
+							
+							<td>';
+										$oBenutzer = new benutzer();
+										if (!$oBenutzer->load($row->insertvon))
+											$htmlstring.=$oBenutzer->errormsg;
+										else if ($oBenutzer->nachname)
+											$htmlstring.=$oBenutzer->anrede.($oBenutzer->titelpre?'&nbsp;'.$oBenutzer->titelpre:'').'&nbsp;'.$oBenutzer->vorname.'&nbsp;'.$oBenutzer->nachname.'&nbsp;'.($oBenutzer->aktiv==true || $oBenutzer->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" >':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" >');
+										else
+											$htmlstring.=$row->insertvon;
+			$htmlstring.='	</td>
+							<td>'.$datum_obj->formatDatum($row->insertamum,'d.m.Y H:i:s').'</td>
+							<td>';
+										$oBenutzer = new benutzer();
+										if (!$oBenutzer = new benutzer($row->updatevon))
+											$htmlstring.=$oBenutzer->errormsg;
+										else if ($oBenutzer->nachname)
+											$htmlstring.=$oBenutzer->anrede.($oBenutzer->titelpre?'&nbsp;'.$oBenutzer->titelpre:'').'&nbsp;'.$oBenutzer->vorname.'&nbsp;'.$oBenutzer->nachname.'&nbsp;'.($oBenutzer->aktiv==true || $oBenutzer->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" >':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" >');
+										else
+											$htmlstring.=$row->updatevon;
+			$htmlstring.='	</td>
+							<td>'.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').'</td>
+						</tr>';
+			
 		}
 		$htmlstring.='</table>';
 		$htmlstring.='</fieldset>';

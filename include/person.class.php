@@ -319,13 +319,13 @@ class person extends basis_db
 		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 		if($this->svnr!='' && $this->gebdatum!='')
 		{
-			if(ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$this->gebdatum, $regs))
+			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$this->gebdatum, $regs))
 			{
 				//$day = sprintf('%02s',$regs[1]);
 				//$month = sprintf('%02s',$regs[2]);
 				//$year = mb_substr($regs[3],2,2);
 			}
-			elseif(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->gebdatum, $regs))
+			elseif(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->gebdatum, $regs))
 			{
 				//$day = sprintf('%02s',$regs[3]);
 				//$month = sprintf('%02s',$regs[2]);

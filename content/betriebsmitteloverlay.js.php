@@ -28,9 +28,8 @@ loadVariables($user);
 ?>
 // *********** Globale Variablen *****************//
 var BetriebsmittelTreeDatasource; //Datasource des BetriebsmittelTrees
-var BetriebsmittelSelectBetriebsmittel_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
-var BetriebsmittelSelectPerson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
-var BetriebsmittePerson_id;
+var BetriebsmittelSelectBetriebsmittelperson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
+var Betriebsmittel_Person_id;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -81,7 +80,7 @@ var BetriebsmittelTreeListener =
 function loadBetriebsmittel(person_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	BetriebsmittelPerson_id = person_id;
+	Betriebsmittel_Person_id = person_id;
 	
 	// *** Betriebsmittel ***
 	betriebsmitteltree = document.getElementById('betriebsmittel-tree');
@@ -128,26 +127,21 @@ function BetriebsmittelTreeSelectZuordnung()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Buchung gespeichert
-	if(BetriebsmittelSelectBetriebsmittel_id!=null && BetriebsmittelSelectPerson_id!=null)
+	if(BetriebsmittelSelectBetriebsmittelperson_id!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
-	   		//ids der row holen
-			col = tree.columns ? tree.columns["betriebsmittel-tree-betriebsmittel_id"] : "betriebsmittel-tree-betriebsmittel_id";
-			betriebsmittel_id=tree.view.getCellText(i,col);
-			col = tree.columns ? tree.columns["betriebsmittel-tree-person_id"] : "betriebsmittel-tree-person_id";
-			person_id=tree.view.getCellText(i,col);
-
+	   		//id der row holen
+			betriebsmittelperson_id=getTreeCellText(tree, "betriebsmittel-tree-betriebsmittelperson_id", i);
+			
 			//wenn dies die zu selektierende Zeile ist
-			if(betriebsmittel_id == BetriebsmittelSelectBetriebsmittel_id &&
-			   person_id == BetriebsmittelSelectPerson_id)
+			if(betriebsmittelperson_id == BetriebsmittelSelectBetriebsmittelperson_id)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
 				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
 				tree.treeBoxObject.ensureRowIsVisible(i);
-				BetriebsmittelSelectBetriebsmittel_id=null;
-				BetriebsmittelSelectPerson_id=null;
+				BetriebsmittelSelectBetriebsmittelperson_id=null;
 				return true;
 			}
 	   	}
@@ -160,31 +154,31 @@ function BetriebsmittelTreeSelectZuordnung()
 // ****
 function BetriebsmittelAuswahl()
 {
-	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('betriebsmittel-tree');
 
-	if (tree.currentIndex==-1) return;
+	if (tree.currentIndex==-1) 
+		return;
 		
 	BetriebsmittelDetailDisableFields(false);
 
 	document.getElementById('betriebsmittel-checkbox-neu').checked=false;
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["betriebsmittel-tree-betriebsmittel_id"] : "betriebsmittel-tree-betriebsmittel_id";
-	var betriebsmittel_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["betriebsmittel-tree-person_id"] : "betriebsmittel-tree-person_id";
-	var person_id=tree.view.getCellText(tree.currentIndex,col);
+	betriebsmittelperson_id=getTreeCellText(tree, "betriebsmittel-tree-betriebsmittelperson_id", tree.currentIndex);
 
+	if(betriebsmittelperson_id=='')
+		return;
+	
 	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/betriebsmittelperson.rdf.php?betriebsmittel_id='+betriebsmittel_id+'&person_id='+person_id+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/betriebsmittelperson.rdf.php?betriebsmittelperson_id='+betriebsmittelperson_id+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
     var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/betriebsmittel/"+person_id+'/'+betriebsmittel_id);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/betriebsmittel/"+betriebsmittelperson_id);
 
 	var predicateNS = "http://www.technikum-wien.at/betriebsmittel/rdf";
 
@@ -197,11 +191,11 @@ function BetriebsmittelAuswahl()
 	retouram = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#retouram" ));
 	betriebsmitteltyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmitteltyp" ));
 	nummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
-	nummerintern = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummerintern" ));
 	beschreibung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
 
 	document.getElementById('betriebsmittel-textbox-person_id').value=person_id;
 	document.getElementById('betriebsmittel-textbox-betriebsmittel_id').value=betriebsmittel_id;
+	document.getElementById('betriebsmittel-textbox-betriebsmittelperson_id').value=betriebsmittelperson_id;
 	document.getElementById('betriebsmittel-textbox-anmerkung').value=anmerkung;
 	document.getElementById('betriebsmittel-textbox-kaution').value=kaution;
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value=ausgegebenam;
@@ -209,7 +203,6 @@ function BetriebsmittelAuswahl()
 	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value=betriebsmitteltyp;
 	document.getElementById('betriebsmittel-textbox-nummer').value=nummer;
 	document.getElementById('betriebsmittel-textbox-nummerold').value=nummer;
-	document.getElementById('betriebsmittel-textbox-nummerintern').value=nummerintern;
 	document.getElementById('betriebsmittel-textbox-beschreibung').value=beschreibung;
 }
 
@@ -254,7 +247,6 @@ function BetriebsmittelDetailResetFields()
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value='';
 	document.getElementById('betriebsmittel-textbox-retouram').value='';
 	document.getElementById('betriebsmittel-textbox-nummerold').value='';
-	document.getElementById('betriebsmittel-textbox-nummerintern').value='';
 }
 
 // ****
@@ -270,10 +262,7 @@ function BetriebsmittelDelete()
 	BetriebsmittelDetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["betriebsmittel-tree-betriebsmittel_id"] : "betriebsmittel-tree-betriebsmittel_id";
-	var betriebsmittel_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["betriebsmittel-tree-person_id"] : "betriebsmittel-tree-person_id";
-	var person_id=tree.view.getCellText(tree.currentIndex,col);
+	betriebsmittelperson_id=getTreeCellText(tree, "betriebsmittel-tree-betriebsmittelperson_id", tree.currentIndex);
 
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-studenten'))
 		studiengang_kz=window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
@@ -287,8 +276,7 @@ function BetriebsmittelDelete()
 
 		req.add('type', 'deletebetriebsmittel');
 
-		req.add('betriebsmittel_id', betriebsmittel_id);
-		req.add('person_id', person_id);
+		req.add('betriebsmittelperson_id', betriebsmittelperson_id);
 		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
@@ -319,6 +307,7 @@ function BetriebsmittelDetailSpeichern()
 
 	person_id = document.getElementById('betriebsmittel-textbox-person_id').value;
 	betriebsmittel_id = document.getElementById('betriebsmittel-textbox-betriebsmittel_id').value;
+	betriebsmittelperson_id = document.getElementById('betriebsmittel-textbox-betriebsmittelperson_id').value;
 	anmerkung = document.getElementById('betriebsmittel-textbox-anmerkung').value;
 	kaution = document.getElementById('betriebsmittel-textbox-kaution').value;
 	ausgegebenam = document.getElementById('betriebsmittel-textbox-ausgegebenam').value;
@@ -357,6 +346,7 @@ function BetriebsmittelDetailSpeichern()
 	req.add('neu', neu);
 	req.add('person_id', person_id);
 	req.add('betriebsmittel_id', betriebsmittel_id);
+	req.add('betriebsmittelperson_id', betriebsmittelperson_id);
 	req.add('anmerkung', anmerkung);
 	req.add('kaution', kaution);
 	req.add('ausgegebenam', ConvertDateToISO(ausgegebenam));
@@ -380,10 +370,8 @@ function BetriebsmittelDetailSpeichern()
 	}
 	else
 	{
-		BetriebsmittelSelectBetriebsmittel_id=val.dbdml_data;
-		BetriebsmittelSelectPerson_id=person_id;
-		//BetriebsmittelTreeDatasource.Refresh(false); //blocking
-		loadBetriebsmittel(BetriebsmittelPerson_id);
+		BetriebsmittelSelectBetriebsmittelperson_id=val.dbdml_data;
+		loadBetriebsmittel(Betriebsmittel_Person_id);
 	}
 }
 
@@ -406,9 +394,10 @@ function BetriebsmittelNeu()
 	document.getElementById('betriebsmittel-checkbox-neu').checked=true;
 	BetriebsmittelDetailDisableFields(false);
 	BetriebsmittelDetailResetFields();
-	document.getElementById('betriebsmittel-textbox-person_id').value = BetriebsmittelPerson_id;
+	document.getElementById('betriebsmittel-textbox-person_id').value = Betriebsmittel_Person_id;
+	document.getElementById('betriebsmittel-textbox-betriebsmittelperson_id').value = '';
+	document.getElementById('betriebsmittel-textbox-betriebsmittel_id').value = '';
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value=tag+'.'+monat+'.'+jahr;
 	document.getElementById('betriebsmittel-textbox-kaution').value = '0.0';
 	document.getElementById('betriebsmittel-textbox-nummerold').value='';
-	document.getElementById('betriebsmittel-textbox-nummerintern').value='';
 }

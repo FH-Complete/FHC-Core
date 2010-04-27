@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2010 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -22,40 +22,26 @@
  */
 
 /**
- * Klasse betriebsmittelstatus (FAS-Online)
- * @create 13-01-2007
+ * Klasse Betriebsmittelstatus
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class betriebsmittel_betriebsmittelstatus extends basis_db
 {
-	private $schema_inventar='wawi';
-
 	public $new;
 	public $debug=false;	
 	public $result = array();
 	
-	/*
-  betriebsmittelbetriebsmittelstatus_id integer NOT NULL DEFAULT nextval('wawi.tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq'::regclass),
-  betriebsmittel_id integer NOT NULL,
-  betriebsmittelstatus_kurzbz character varying(16) NOT NULL,
-  datum bigint,
-  updateamum timestamp without time zone,
-  updatevon character varying(32),
-  insertamum timestamp without time zone,
-  insertvon character varying(32),	
-	*/
-	
 	//Tabellenspalten
 	public $betriebsmittelbetriebsmittelstatus_id; // Integer
 	public $betriebsmittel_id; // Integer
-	public $betriebsmittelstatus_kurzbz;	//string
-	public $anmerkung;  //String	
-	public $datum;   	//Int
-	public $updateamum; // timestamp without time zone,
-	public $updatevon; //  character varying(32),
-	public $insertamum; //  timestamp without time zone,
-	public $insertvon; //  character varying(32),	
+	public $betriebsmittelstatus_kurzbz; // character varying(16)
+	public $anmerkung;  // text
+	public $datum;   	// date
+	public $updateamum; // timestamp without time zone
+	public $updatevon; 	// character varying(32)
+	public $insertamum; // timestamp without time zone
+	public $insertvon; 	// character varying(32)
 	
 	/**
 	 * Konstruktor
@@ -78,48 +64,30 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 	{	
 		$this->result=array();
 		$this->errormsg='';
-					
-		$qry='';
-		$where='';
-
-		$qry.=' select * from '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus';
-		// Bedingungen hinzufuegen
-		$where.=" where betriebsmittelbetriebsmittelstatus_id=".$this->addslashes(trim($betriebsmittelbetriebsmittelstatus_id)) ;
-		$qry.=$where;
-
-		// Sortierung
-		$qry.=' order by datum ';
+		
+		$qry='SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
+			WHERE betriebsmittelbetriebsmittelstatus_id='.$this->addslashes(trim($betriebsmittelbetriebsmittelstatus_id));
 
 		if($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			if($row = $this->db_fetch_object())
 			{
-
-				$bmt = new betriebsmittel_betriebsmittelstatus();
-				$bmt->betriebsmittelbetriebsmittelstatus_id = $row->betriebsmittelbetriebsmittelstatus_id;
-				$bmt->betriebsmittel_id = $row->betriebsmittel_id;
-				$bmt->betriebsmittelstatus_kurzbz = $row->betriebsmittelstatus_kurzbz;
-				$bmt->anmerkung = $row->anmerkung;
-				$bmt->datum = $row->datum;
-				$bmt->updateamum = $row->updateamum;
-				$bmt->updatevon = $row->updatevon;
-				$bmt->insertamum = $row->insertamum;
-				$bmt->insertvon = $row->insertvon;
-				$this->result[] = $bmt;
+				$this->betriebsmittelbetriebsmittelstatus_id = $row->betriebsmittelbetriebsmittelstatus_id;
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->betriebsmittelstatus_kurzbz = $row->betriebsmittelstatus_kurzbz;
+				$this->anmerkung = $row->anmerkung;
+				$this->datum = $row->datum;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				return true;
 			}
-			if (count($this->result)==1)
+			else 
 			{
-				$this->betriebsmittelbetriebsmittelstatus_id = $this->result[0]->betriebsmittelbetriebsmittelstatus_id;
-				$this->betriebsmittel_id = $this->result[0]->betriebsmittel_id;
-				$this->betriebsmittelstatus_kurzbz = $this->result[0]->betriebsmittelstatus_kurzbz;
-				$this->anmerkung = $this->result[0]->anmerkung;
-				$this->datum = $this->result[0]->datum;
-				$this->updateamum = $this->result[0]->updateamum;
-				$this->updatevon = $this->result[0]->updatevon;
-				$this->insertamum = $this->result[0]->insertamum;
-				$this->insertvon = $this->result[0]->insertvon;
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
 			}
-			return $this->result;
 		}
 		else 
 		{
@@ -143,17 +111,15 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
 			return false;
 		}
-					
-		$qry='';
-		$where='';
-		$qry.=' select * from '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus';
-		// Bedingungen hinzufuegen
-		$where.=" where betriebsmittel_id=".$this->addslashes(trim($betriebsmittel_id)) ;
+		
+		$qry='SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
+			WHERE betriebsmittel_id='.$this->addslashes(trim($betriebsmittel_id));
+		
 		if (!is_null($betriebsmittelstatus_kurzbz) && !empty($betriebsmittelstatus_kurzbz))
-			$where.=" and trim(betriebsmittelstatus_kurzbz)=".$this->addslashes(trim($betriebsmittelstatus_kurzbz)) ;
-		$qry.=$where;
+			$qry.=" and trim(betriebsmittelstatus_kurzbz)=".$this->addslashes(trim($betriebsmittelstatus_kurzbz)) ;
+		
 		// Sortierung
-		$qry.=' order by datum desc,updateamum desc,insertamum desc';
+		$qry.=' ORDER BY datum desc,updateamum desc,insertamum desc';
 
 		if($this->db_query($qry))
 		{
@@ -171,19 +137,8 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 				$bmt->insertvon = $row->insertvon;
 				$this->result[] = $bmt;
 			}
-			if (count($this->result)==1)
-			{
-				$this->betriebsmittelbetriebsmittelstatus_id = $this->result[0]->betriebsmittelbetriebsmittelstatus_id;
-				$this->betriebsmittel_id = $this->result[0]->betriebsmittel_id;
-				$this->betriebsmittelstatus_kurzbz = $this->result[0]->betriebsmittelstatus_kurzbz;
-				$this->anmerkung = $this->result[0]->anmerkung;
-				$this->datum = $this->result[0]->datum;
-				$this->updateamum = $this->result[0]->updateamum;
-				$this->updatevon = $this->result[0]->updatevon;
-				$this->insertamum = $this->result[0]->insertamum;
-				$this->insertvon = $this->result[0]->insertvon;
-			}
-			return $this->result;
+			
+			return true;
 		}
 		else 
 		{
@@ -193,9 +148,8 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 	}
 	
 	/**
-	 * Laedt die Funktion mit der ID $betriebsmittel und Optional einen Status
+	 * Laedt den letzten Stauts eines Betriebsmittels
 	 * @param  $betriebsmittel_id
-	 * @param  $betriebsmittelstatus_kurzbz	 
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load_last_betriebsmittel_id($betriebsmittel_id)
@@ -210,48 +164,31 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
 			return false;
 		}
-					
-		$qry='';
-		$where='';
-
-		$qry.=' select * from '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus';
-		// Bedingungen hinzufuegen
-		$where.=" where betriebsmittel_id=".$this->addslashes(trim($this->betriebsmittel_id)) ;
-
-		$qry.=$where;
-		// Sortierung
-		$qry.=' order by betriebsmittelbetriebsmittelstatus_id desc  limit 1';
+		
+		$qry=' SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
+			WHERE betriebsmittel_id='.$this->addslashes(trim($this->betriebsmittel_id)).'
+			ORDER BY betriebsmittelbetriebsmittelstatus_id DESC LIMIT 1';
 		
 		if($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			if($row = $this->db_fetch_object())
 			{
-				$bmt = new betriebsmittel_betriebsmittelstatus();
-				
-				$bmt->betriebsmittelbetriebsmittelstatus_id = $row->betriebsmittelbetriebsmittelstatus_id;
-				$bmt->betriebsmittel_id = $row->betriebsmittel_id;
-				$bmt->betriebsmittelstatus_kurzbz = $row->betriebsmittelstatus_kurzbz;
-				$bmt->anmerkung = $row->anmerkung;
-				$bmt->datum = $row->datum;
-				$bmt->updateamum = $row->updateamum;
-				$bmt->updatevon = $row->updatevon;
-				$bmt->insertamum = $row->insertamum;
-				$bmt->insertvon = $row->insertvon;
-				$this->result[] = $bmt;
+				$this->betriebsmittelbetriebsmittelstatus_id = $row->betriebsmittelbetriebsmittelstatus_id;
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->betriebsmittelstatus_kurzbz = $row->betriebsmittelstatus_kurzbz;
+				$this->anmerkung = $row->anmerkung;
+				$this->datum = $row->datum;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				return true;
 			}
-			if (count($this->result)==1)
+			else 
 			{
-				$this->betriebsmittelbetriebsmittelstatus_id = $this->result[0]->betriebsmittelbetriebsmittelstatus_id;
-				$this->betriebsmittel_id = $this->result[0]->betriebsmittel_id;
-				$this->betriebsmittelstatus_kurzbz = $this->result[0]->betriebsmittelstatus_kurzbz;
-				$this->anmerkung = $this->result[0]->anmerkung;
-				$this->datum = $this->result[0]->datum;
-				$this->updateamum = $this->result[0]->updateamum;
-				$this->updatevon = $this->result[0]->updatevon;
-				$this->insertamum = $this->result[0]->insertamum;
-				$this->insertvon = $this->result[0]->insertvon;
+				$this->errormsg='Es wurde kein Eintrag gefunden';
+				return false;
 			}
-			return $this->result;
 		}
 		else 
 		{
@@ -267,18 +204,9 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg='';
-			
-		$qry='';
-		$where='';
-
-		$qry.=' select * FROM '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus';
-		$qry.="	where betriebsmittelstatus_kurzbz >'' ";
-
-		// Bedingungen hinzufuegen
-		$qry.=$where;
-
-		// Sortierung
-		$qry.=' order by betriebsmittel_id,datum desc,insertamum desc ';
+		
+		$qry='SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
+			ORDER BY betriebsmittel_id,datum desc,insertamum desc ';
 		
 		if($this->db_query($qry))
 		{
@@ -296,19 +224,8 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 				$bmt->insertvon = $row->insertvon;
 				$this->result[] = $bmt;
 			}
-			if (count($this->result)==1)
-			{
-				$this->betriebsmittelbetriebsmittelstatus_id = $this->result[0]->betriebsmittelbetriebsmittelstatus_id;
-				$this->betriebsmittel_id = $this->result[0]->betriebsmittel_id;
-				$this->betriebsmittelstatus_kurzbz = $this->result[0]->betriebsmittelstatus_kurzbz;
-				$this->anmerkung = $this->result[0]->anmerkung;
-				$this->datum = $this->result[0]->datum;
-				$this->updateamum = $this->result[0]->updateamum;
-				$this->updatevon = $this->result[0]->updatevon;
-				$this->insertamum = $this->result[0]->insertamum;
-				$this->insertvon = $this->result[0]->insertvon;
-			}
-			return $this->result;
+			
+			return true;
 		}
 		else 
 		{
@@ -334,7 +251,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		if($this->new)
 		{
 			$this->betriebsmittelbetriebsmittelstatus_id='';
-			$qry='INSERT INTO '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus 
+			$qry='BEGIN;INSERT INTO wawi.tbl_betriebsmittel_betriebsmittelstatus 
 			(betriebsmittel_id,betriebsmittelstatus_kurzbz,anmerkung,datum,insertamum,insertvon,updateamum,updatevon ) VALUES('.
 						$this->addslashes($this->betriebsmittel_id).','.
 						$this->addslashes($this->betriebsmittelstatus_kurzbz).','.
@@ -347,7 +264,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else 
 		{
-			$qry='UPDATE '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus SET '.
+			$qry='UPDATE wawi.tbl_betriebsmittel_betriebsmittelstatus SET '.
 					"betriebsmittel_id =".$this->addslashes($this->betriebsmittel_id).', '.
 					"betriebsmittelstatus_kurzbz =".$this->addslashes($this->betriebsmittelstatus_kurzbz).', '.
 					"anmerkung =".$this->addslashes($this->anmerkung).', '.					
@@ -357,31 +274,35 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 					" WHERE betriebsmittelbetriebsmittelstatus_id=".$this->addslashes($this->betriebsmittelbetriebsmittelstatus_id);
 		}
 
-#		echo "<br> $qry <br>";
+		
 		if($this->db_query($qry))
 		{
 			if($this->new)
 			{
-				$qry = "SELECT currval('".$this->schema_inventar.".tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq') as id;";
+				$qry = "SELECT currval('wawi.tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq') as id;";
+				
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
 					{
+						$this->db_query('COMMIT;');
 						$this->betriebsmittelbetriebsmittelstatus_id= $row->id;
 					}
 					else 
 					{
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = 'Fehler beim Lesen der Sequence '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
 						return false;
 					}
 				}
 				else 
 				{
+					$this->db_query('ROLLBACK;');
 					$this->errormsg = 'Fehler beim Lesen der Sequence '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
 					return false;
 				}
 			}
-			return $this->betriebsmittelbetriebsmittelstatus_id;
+			return true;
 		}
 		else 
 		{
@@ -406,7 +327,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 			return false;
 		}
 
-		$qry='DELETE from '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus '.
+		$qry='DELETE from wawi.tbl_betriebsmittel_betriebsmittelstatus '.
 			' WHERE betriebsmittelbetriebsmittelstatus_id='.$this->addslashes($this->betriebsmittelbetriebsmittelstatus_id);
 		if($this->db_query($qry))
 		{
@@ -414,14 +335,14 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
 			return false;
 		}	
 	}	
 
 
 	/**
-	 * Entfernt die alle Daten zu einem Betriebsmittel in die Datenbank
+	 * Entfernt die alle Stati zu einem Betriebsmittel in der Datenbank
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function delete_betriebsmittel($betriebsmittel_id)
@@ -436,7 +357,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 			return false;
 		}
 
-		$qry='DELETE from '.$this->schema_inventar.'.tbl_betriebsmittel_betriebsmittelstatus '.
+		$qry='DELETE from wawi.tbl_betriebsmittel_betriebsmittelstatus '.
 			' WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
 		if($this->db_query($qry))
 		{
@@ -444,7 +365,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
 			return false;
 		}	
 	}	

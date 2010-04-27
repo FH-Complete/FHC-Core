@@ -39,7 +39,7 @@ class betriebsmittel extends basis_db
 	public $betriebsmittel_id;	// integer
 	public $betriebsmitteltyp;	// string
 	public $nummer;				// string
-	public $nummerintern;		// string
+	public $inventarnummer;		// string
 	public $reservieren;		// boolean
 	public $ort_kurzbz;			// string
 	public $ext_id;				// integer
@@ -99,7 +99,7 @@ class betriebsmittel extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
-				$this->nummerintern = $row->nummerintern;
+				$this->inventarnummer = $row->inventarnummer;
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->updateamum = $row->updateamum;
@@ -118,7 +118,6 @@ class betriebsmittel extends basis_db
 				$this->anmerkung = $row->anmerkung;
 				$this->leasing_bis = $row->leasing_bis;
 
-				//return $this->result=$row;
 				return true;
 			}
 			else
@@ -165,13 +164,13 @@ class betriebsmittel extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO wawi.tbl_betriebsmittel (beschreibung, betriebsmitteltyp, nummer
-				, nummerintern, reservieren, ort_kurzbz
+				, inventarnummer, reservieren, ort_kurzbz
 				,ext_id, insertamum, insertvon, updateamum, updatevon,oe_kurzbz,hersteller,seriennummer
 				,bestellung_id,bestelldetail_id,afa,verwendung,anmerkung,leasing_bis) VALUES('.
 				$this->addslashes($this->beschreibung).', '.
 				$this->addslashes($this->betriebsmitteltyp).', '.
 				$this->addslashes($this->nummer).', '.
-				$this->addslashes($this->nummerintern).', '.
+				$this->addslashes($this->inventarnummer).', '.
 				($this->reservieren?'true':'false').', '.
 				$this->addslashes($this->ort_kurzbz).', '.
 				$this->addslashes($this->ext_id).', '.
@@ -202,7 +201,7 @@ class betriebsmittel extends basis_db
 				'betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).', '.
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'nummer='.$this->addslashes($this->nummer).', '.
-				'nummerintern='.$this->addslashes($this->nummerintern).', '.
+				'inventarnummer='.$this->addslashes($this->inventarnummer).', '.
 				'reservieren='.($this->reservieren?'true':'false').', '.
 				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '.
 				'ext_id='.$this->addslashes($this->ext_id).', '.
@@ -302,7 +301,7 @@ class betriebsmittel extends basis_db
 				$bm->beschreibung = $row->beschreibung;
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
-				$bm->nummerintern = $row->nummerintern;
+				$bm->inventarnummer = $row->inventarnummer;
 				$bm->reservieren = $row->reservieren;
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->updateamum = $row->updateamum;
@@ -354,7 +353,7 @@ class betriebsmittel extends basis_db
 				$bm->beschreibung = $row->beschreibung;
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
-				$bm->nummerintern = $row->nummerintern;
+				$bm->inventarnummer = $row->inventarnummer;
 				$bm->reservieren = $row->reservieren;
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->updateamum = $row->updateamum;
@@ -382,7 +381,7 @@ class betriebsmittel extends basis_db
 	}
 
 	/**
-	 * Laedt das Betriebsmittel mit der Nummer des Betriebsmittels $nummer
+	 * Laedt die Betriebsmittel Anhand der Nummer
 	 * @param  $nummer Nummer des zu ladenden Betriebsmittel
 	 * @return true wenn ok, false im Fehlerfall
 	 */
@@ -396,13 +395,66 @@ class betriebsmittel extends basis_db
 
 		if($this->db_query($qry))
 		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new betriebsmittel();
+				
+				$obj->betriebsmittel_id = $row->betriebsmittel_id;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$obj->nummer = $row->nummer;
+				$obj->inventarnummer = $row->inventarnummer;
+				$obj->reservieren = ($row->reservieren=='t'?true:false);
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertvon = $row->insertvon;
+				$obj->insertamum = $row->insertamum;
+				$obj->ext_id = $row->ext_id;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->hersteller = $row->hersteller;
+				$obj->seriennummer = $row->seriennummer;
+				$obj->bestellung_id = $row->bestellung_id;
+				$obj->bestelldetail_id = $row->bestelldetail_id;
+				$obj->afa = $row->afa;
+				$obj->verwendung = $row->verwendung;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->leasing_bis = $row->leasing_bis;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br /> $qry <br />":'');
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Betriebsmittel Anhand der Invenatrnummer
+	 * @param  $inventarnummer Inventarnummer des zu ladenden Betriebsmittel
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_inventarnummer($inventarnummer)
+	{
+		// Initialisieren
+		$this->result=array();
+		$this->errormsg = '';
+
+		$qry=' SELECT * FROM wawi.tbl_betriebsmittel WHERE inventarnummer='.$this->addslashes($inventarnummer);
+
+		if($this->db_query($qry))
+		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->betriebsmittel_id = $row->betriebsmittel_id;
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
-				$this->nummerintern = $row->nummerintern;
+				$this->inventarnummer = $row->inventarnummer;
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->updateamum = $row->updateamum;
@@ -421,12 +473,14 @@ class betriebsmittel extends basis_db
 				$this->anmerkung = $row->anmerkung;
 				$this->leasing_bis = $row->leasing_bis;
 				
-				return $this->result=$row;
+				return true;
 			}
-			else
+			else 
 			{
+				$this->errormsg = 'Es wurde kein Betriebsmittel mit dieser Inventarnummer gefunden';
 				return false;
 			}
+			
 		}
 		else
 		{
@@ -434,6 +488,7 @@ class betriebsmittel extends basis_db
 			return false;
 		}
 	}
+	
 	/**
 	 * Laedt die Organisation des Betriebsmittels $bestellung_id
 	 * @param  $bestellung_id Bestellnummer des zu ladenden Betriebsmittel
@@ -461,7 +516,7 @@ class betriebsmittel extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
-				$this->nummerintern = $row->nummerintern;
+				$this->inventarnummer = $row->inventarnummer;
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->updateamum = $row->updateamum;
@@ -553,7 +608,7 @@ class betriebsmittel extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
-				$this->nummerintern = $row->nummerintern;
+				$this->inventarnummer = $row->inventarnummer;
 				$this->reservieren = ($row->reservieren=='t'?true:false);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->updateamum = $row->updateamum;
@@ -607,18 +662,17 @@ class betriebsmittel extends basis_db
 
 	 * @return Daten Objekt wenn ok, false im Fehlerfall
 	 */
-	function betriebsmittel_inventar($order=null,$nummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
+	function betriebsmittel_inventar($order=null,$inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
 	{
 		// Init
 		$this->errormsg='';
 		$this->result=array();
 
-		$nummer=trim($nummer);
+		$inventarnummer=trim($inventarnummer);
 		$ort_kurzbz=trim($ort_kurzbz);
 		$firma_id=trim($firma_id);
-
-		$qry='';
-		$qry.='select distinct on(tbl_betriebsmittel.nummer) tbl_betriebsmittel.nummer ';
+		
+		$qry='SELECT distinct on(tbl_betriebsmittel.betriebsmittel_id) tbl_betriebsmittel.inventarnummer ';
 		$qry.=',tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id ';
 		$qry.=',tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz ';
 		$qry.=',tbl_betriebsmittel_betriebsmittelstatus.datum as betriebsmittelstatus_datum ';
@@ -627,34 +681,35 @@ class betriebsmittel extends basis_db
 		$qry.=', tbl_betriebsmittel.*';
 		$qry.=', wawi_be.*';
 		$qry.=", trim(to_char(date_part('year', tbl_betriebsmittel_betriebsmittelstatus.datum) + tbl_betriebsmittel.afa , '9999') || '-' || to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'MM-DD')) as betriebsmittelstatus_datum_afa ";
-		$qry.=' from wawi.tbl_betriebsmittel';
+		$qry.=' FROM wawi.tbl_betriebsmittel';
 
-		$qry.=' left outer join wawi.tbl_betriebsmitteltyp on (tbl_betriebsmitteltyp.betriebsmitteltyp=tbl_betriebsmittel.betriebsmitteltyp ) ';
-		$qry.=' left outer join wawi.tbl_betriebsmittel_betriebsmittelstatus on (tbl_betriebsmittel_betriebsmittelstatus.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id ) ';
-		$qry.=' left outer join wawi.tbl_betriebsmittelstatus on (tbl_betriebsmittelstatus.betriebsmittelstatus_kurzbz=tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz ) ';
-		$qry.=' left outer join public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz ) ';
-		$qry.=' left outer join wawi.tbl_betriebsmittelperson on (tbl_betriebsmittelperson.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id ) ';
+		$qry.=' LEFT JOIN wawi.tbl_betriebsmitteltyp on (tbl_betriebsmitteltyp.betriebsmitteltyp=tbl_betriebsmittel.betriebsmitteltyp ) ';
+		$qry.=' LEFT JOIN wawi.tbl_betriebsmittel_betriebsmittelstatus on (tbl_betriebsmittel_betriebsmittelstatus.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id ) ';
+		$qry.=' LEFT JOIN wawi.tbl_betriebsmittelstatus on (tbl_betriebsmittelstatus.betriebsmittelstatus_kurzbz=tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz ) ';
+		$qry.=' LEFT JOIN public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz ) ';
+		$qry.=' LEFT JOIN wawi.tbl_betriebsmittelperson on (tbl_betriebsmittelperson.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id ) ';
 		
 		// Verbindung zum WAWI aufbauen
-		$qry.=' left outer join  dblink(\''.CONN_STRING_WAWI.'\',\'
-		select distinct bestellung.bestellung_id,bestellung.bestellnr,bestellung.titel,bestellung.firma_id,firma.firmenname from public.bestellung
-			left join public.firma on ( firma.firma_id=bestellung.firma_id ) \' )
+		$qry.=' LEFT JOIN  dblink(\''.CONN_STRING_WAWI.'\',\'
+		SELECT distinct bestellung.bestellung_id,bestellung.bestellnr,bestellung.titel,bestellung.firma_id,firma.firmenname from public.bestellung
+			LEFT JOIN public.firma on ( firma.firma_id=bestellung.firma_id ) \' )
 			 as wawi_be(bestellung_id int, bestellnr char(32), titel char(120), firma_id int, firmenname char(160) )
 			 	 on ( cast(wawi_be.bestellung_id as INTEGER)=cast(tbl_betriebsmittel.bestellung_id as INTEGER) and cast(tbl_betriebsmittel.bestellung_id as INTEGER)>0 ) ';
 
-		$qry.=" where not tbl_betriebsmittel.betriebsmittel_id is null ";
-		$where=$this->betriebsmittel_inventar_get_where($nummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id);
+		$qry.=" WHERE not tbl_betriebsmittel.betriebsmittel_id is null ";
+		$where=$this->betriebsmittel_inventar_get_where($inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id);
 		if ($where!='' && !$where)
 			return $this->result;
 			
 		if($order=='')
-			$order = 'tbl_betriebsmittel.nummer,tbl_betriebsmittel_betriebsmittelstatus.datum DESC, tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id DESC';
+			$order = 'tbl_betriebsmittel.betriebsmittel_id, betriebsmittelstatus_datum DESC, betriebsmittelbetriebsmittelstatus_id DESC';
+		$order = ' ORDER BY '.$order;
 		//	Select und Bedingung zusammen fuehren zu SQL Abfrage
-		$qry.=$where.(!is_null($order) && !empty($order)?' ORDER BY '. $order:''). (!$where?' limit 100 ':' limit 300 ');
+		$qry.=$where.$order.(!$where?' limit 100 ':' limit 300 ');
 		
 		if(!$result=$this->db_query($qry))
 		{
-			$this->errormsg ='Probleme beim lesen der Betriebsmittel '.($this->debug?$this->db_last_error() ."<br />$qry<br />":'') ;
+			$this->errormsg ='Probleme beim Lesen der Betriebsmittel '.($this->debug?$this->db_last_error() ."<br />$qry<br />":'') ;
 			return false;
 		}
 		while($row = $this->db_fetch_object($result))
@@ -665,7 +720,7 @@ class betriebsmittel extends basis_db
 
 	/**
 	 * Laedt INVENTARTABELLE BESTELLUNG_ID
-	 * @param nummer  ID eines Inventars
+	 * @param inventarnummer  ID eines Inventars
 	 * @param ort_kurzbz ort_kurzbz eines Inventars
 	 * @param betriebsmitteltyp ort_kurzbz eines Inventars
 	 * @param betriebsmittelstatus_kurzbz STATUS eines Inventars
@@ -682,7 +737,7 @@ class betriebsmittel extends basis_db
 
 	 * @return Daten Objekt wenn ok, false im Fehlerfall
 	 */
-	function betriebsmittel_inventar_bestellung_id($order=null,$nummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
+	function betriebsmittel_inventar_bestellung_id($order=null,$inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
 	{
 		// Init
 		$this->errormsg='';
@@ -709,7 +764,7 @@ class betriebsmittel extends basis_db
 
 		$qry.=" where not tbl_betriebsmittel.bestellung_id is null ";
 		$where='';
-		$where=$this->betriebsmittel_inventar_get_where($nummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer);
+		$where=$this->betriebsmittel_inventar_get_where($inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer);
 
 		//	Select und Bedingung zusammen fuehren zu SQL Abfrage
 		if (is_null($order) || empty($order) )
@@ -732,7 +787,7 @@ class betriebsmittel extends basis_db
 	/**
 	 * Laedt Inventartabelle 
 	 *
-	 * @param $nummer
+	 * @param $inventarnummer
 	 * @param $ort_kurzbz
 	 * @param $betriebsmittelstatus_kurzbz
 	 * @param $betriebsmitteltyp
@@ -751,14 +806,14 @@ class betriebsmittel extends basis_db
 	 * @param $betriebsmittel_id
 	 * @return unknown
 	 */
-	public function betriebsmittel_inventar_get_where($nummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
+	public function betriebsmittel_inventar_get_where($inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
 	{
 		$where='';
 		// Inventarnummer oder Betriebsmittelnummer
-		if (!is_null($nummer) && !empty($nummer) )
+		if (!is_null($inventarnummer) && !empty($inventarnummer) )
 		{
-			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($nummer))));
-			$where.=" AND UPPER(trim(tbl_betriebsmittel.nummer))  like '".$matchcode."' " ;
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($inventarnummer))));
+			$where.=" AND UPPER(trim(tbl_betriebsmittel.inventarnummer))  like '".$matchcode."' " ;
 		}
 		if (!is_null($betriebsmittel_id) && !empty($betriebsmittel_id) )
 			$where.=" AND tbl_betriebsmittel.betriebsmittel_id = ".$this->addslashes(trim($betriebsmittel_id));
@@ -883,7 +938,7 @@ class betriebsmittel extends basis_db
 				$where.=" and not afa is null and trim(to_char(date_part('year', tbl_betriebsmittel_betriebsmittelstatus.datum)  + tbl_betriebsmittel.afa ,'9999')) <= '".Date('Y')."'";
 			if (is_null($betriebsmittelstatus_kurzbz) || $betriebsmittelstatus_kurzbz==''  )
 				$betriebsmittelstatus_kurzbz=mb_strtoupper('vorhanden');
-			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus ".($betriebsmittelstatus_kurzbz?" where  not betriebsmittelbetriebsmittelstatus_id is null and upper(tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz) = ".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))):'')." group by  betriebsmittel_id ) ";
+			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus ".($betriebsmittelstatus_kurzbz?" where  not betriebsmittelbetriebsmittelstatus_id is null and upper(tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz) = ".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))):'')." ) ";
 
 		}
 		elseif (!is_null($inventur_jahr) && $inventur_jahr!='')
@@ -893,13 +948,13 @@ class betriebsmittel extends basis_db
 			{
 				$where.=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY') = '".($inventur_jahr)."'";
 				$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null
-						and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY')='".$inventur_jahr."' ".($betriebsmittelstatus_kurzbz?"  and upper(trim(betriebsmittelstatus_kurzbz))=".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))):'')." group by  betriebsmittel_id ) ";
+						and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY')='".$inventur_jahr."' ".($betriebsmittelstatus_kurzbz?"  and upper(trim(betriebsmittelstatus_kurzbz))=".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))):'')." ) ";
 			}
 			else
 			{
 				$inventur_jahr=($inventur_jahr * -1);
 				$where.=" and not tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null
-						and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY')='".$inventur_jahr."' ".($betriebsmittelstatus_kurzbz?"  and upper(trim(betriebsmittelstatus_kurzbz))=".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))):'')." group by  betriebsmittel_id ) ";
+						and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY')='".$inventur_jahr."' ".($betriebsmittelstatus_kurzbz?"  and upper(trim(betriebsmittelstatus_kurzbz))=".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))):'')." ) ";
 				$betriebsmittelstatus_kurzbz='vorhanden';
 			}
 		}
@@ -914,10 +969,10 @@ class betriebsmittel extends basis_db
 			elseif (!is_null($jahr_monat) && !empty($jahr_monat))
 				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY') = '".$jahr_monat."' ";
 			$where.=$jm;
-			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null ". $jm ." group by  betriebsmittel_id ) ";
+			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null ". $jm ."  ) ";
 		}
 		else if (!is_null($betriebsmittelstatus_kurzbz) && $betriebsmittelstatus_kurzbz!='')
-			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null  group by  betriebsmittel_id ) ";
+			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null  ) ";
 
 		// Bestellnummer
 		if (!is_null($bestellnr) && !empty($bestellnr) )

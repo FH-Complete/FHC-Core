@@ -24,7 +24,7 @@
  */
 
 //Zebra Etiketen 5cm*2.5cm
-$nummer=trim((isset($_REQUEST['nummer']) ? str_replace(array('`','�','*','~'),'+',$_REQUEST['nummer']):''));
+$inventarnummer=trim((isset($_REQUEST['inventarnummer']) ? str_replace(array('`','�','*','~'),'+',$_REQUEST['inventarnummer']):''));
 
 // Formel: Groesse in cm * 72 dpi / 2,54 = Masse in Pixel; Masse in Pixel * 2,54 / 72 dpi = Groesse in cm
 $dpiDefault=96;	
@@ -67,7 +67,7 @@ if (!strstr($browser,'msie'))
 	<title>Etiketten</title>
 	
 <?php
-	if (empty($nummer))
+	if (empty($inventarnummer))
 	{ 
 	//onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}"
 ?>	
@@ -75,8 +75,8 @@ if (!strstr($browser,'msie'))
 		<body>
 			<h1>Etiketten</h1>
 			<form target="_blank" name="sendform" action="<?php echo $_SERVER["PHP_SELF"];?>" method="post" enctype="application/x-www-form-urlencoded">
-				<label for="nummer">Inventarnummer :</label>&nbsp;
-					<input id="nummer" name="nummer" type="text" size="10" maxlength="30" value="">&nbsp;
+				<label for="inventarnummer">Inventarnummer :</label>&nbsp;
+					<input id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="">&nbsp;
 					<script type="text/javascript">
 						function selectItem(li) 
 						{
@@ -128,7 +128,7 @@ if (!strstr($browser,'msie'))
 						
 						// http://www.pengoworks.com/workshop/jquery/autocomplete_docs.txt
 						$(document).ready(function() {
-							  $('#nummer').autocomplete('inventar_autocomplete.php',{
+							  $('#inventarnummer').autocomplete('inventar_autocomplete.php',{
 								minChars:2,
 								scroll: true, 
 						        scrollHeight: 200, 
@@ -136,7 +136,7 @@ if (!strstr($browser,'msie'))
 								onItemSelect:selectItem,
 								formatItem:formatItem,
 								onFindValue: findValue, 
-								extraParams:{'work':'nummer'}
+								extraParams:{'work':'inventarnummer'}
 							  });
 					  });
 					</script>						
@@ -184,9 +184,9 @@ output text css output type : css, svg or bmp
 				<td>
 					<div id="bcTarget"></div>
 					<script type="text/javascript" language="JavaScript1.2">	
-						if ('<?php echo $nummer;?>' != '') 	
+						if ('<?php echo $inventarnummer;?>' != '') 	
 						{		
-							$("#bcTarget").barcode('<?php echo $nummer;?>', 'code128',{output: "<?php echo $output; ?>",barWidth:<?php echo $etikette_width;?>, barHeight:<?php echo $etikette_height;?>}); 
+							$("#bcTarget").barcode('<?php echo $inventarnummer;?>', 'code128',{output: "<?php echo $output; ?>",barWidth:<?php echo $etikette_width;?>, barHeight:<?php echo $etikette_height;?>}); 
 						}	
 					</script>
 				</td>

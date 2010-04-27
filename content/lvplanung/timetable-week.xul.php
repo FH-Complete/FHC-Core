@@ -22,14 +22,16 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 
-include('../../config/vilesci.config.inc.php');
-include('../../include/globals.inc.php');
-include('../../include/functions.inc.php');
-#include('../../include/berechtigung.class.php');
-include('../../include/lehreinheit.class.php');
-include('../../include/zeitwunsch.class.php');
-include('../../include/wochenplan.class.php');
-include('../../include/reservierung.class.php'); 
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/globals.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/lehreinheit.class.php');
+require_once('../../include/zeitwunsch.class.php');
+require_once('../../include/wochenplan.class.php');
+require_once('../../include/reservierung.class.php'); 
+require_once('../../include/log.class.php'); 
+
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
@@ -41,6 +43,13 @@ $db = new basis_db();
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 
 $uid = get_uid();
+
+//Berechtigung pruefen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('lehre/lvplan'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $error_msg='';
 
@@ -200,10 +209,16 @@ $db->db_query('BEGIN;');
 // *************** Stunden verschieben ****************************************
 if ($aktion=='stpl_move' || $aktion=='stpl_set')
 {
+	$undo='';
+	$sql='';
+	$moved=array();
+	
 	foreach ($stpl_id as $stundenplan_id)
 	{
+		$moved[]=$stundenplan_id;
 		$lehrstunde=new lehrstunde();
 		$lehrstunde->load($stundenplan_id,$db_stpl_table);
+		$undo.=$lehrstunde->getUndo($db_stpl_table);
 		$diffStunde=$new_stunde-$lehrstunde->stunde;
 		$lehrstunde->datum=$new_datum;
 		$lehrstunde->stunde=$new_stunde;
@@ -218,29 +233,51 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 		{
 			if(!$lehrstunde->save($uid,$db_stpl_table))
 				$error_msg.=$lehrstunde->errormsg;
+			$sql.=$lehrstunde->lastqry;
 		}
 	}
 	// Mehrfachauswahl
 	if (isset($stpl_idx))
+	{
 		foreach ($stpl_idx as $stundenplan_id)
 		{
-			$lehrstunde=new lehrstunde();
-			$lehrstunde->load($stundenplan_id,$db_stpl_table);
-			$lehrstunde->datum=$new_datum;
-			$lehrstunde->stunde+=$diffStunde;
-			if ($ort!=$old_ort)
-				$lehrstunde->ort_kurzbz=$ort;
-			if ($aktion=='stpl_set')
-				$lehrstunde->ort_kurzbz=$new_ort;
-			$kollision=$lehrstunde->kollision($db_stpl_table);
-			if ($kollision && !$ignore_kollision)
-				$error_msg.=$lehrstunde->errormsg;
-			if (!$kollision || $ignore_kollision)
+			if(!in_array($stundenplan_id, $moved))
 			{
-				if(!$lehrstunde->save($uid,$db_stpl_table))
+				$lehrstunde=new lehrstunde();
+				$lehrstunde->load($stundenplan_id,$db_stpl_table);
+				$undo.=$lehrstunde->getUndo($db_stpl_table);
+				$lehrstunde->datum=$new_datum;
+				$lehrstunde->stunde+=$diffStunde;
+				if ($ort!=$old_ort)
+					$lehrstunde->ort_kurzbz=$ort;
+				if ($aktion=='stpl_set')
+					$lehrstunde->ort_kurzbz=$new_ort;
+				$kollision=$lehrstunde->kollision($db_stpl_table);
+				if ($kollision && !$ignore_kollision)
 					$error_msg.=$lehrstunde->errormsg;
+				if (!$kollision || $ignore_kollision)
+				{
+					if(!$lehrstunde->save($uid,$db_stpl_table))
+						$error_msg.=$lehrstunde->errormsg;
+					$sql.=$lehrstunde->lastqry;
+				}
 			}
 		}
+	}
+	
+	//UNDO Befehl schreiben
+	if($undo!='')
+	{
+		$log = new log();
+		$log->executetime = date('Y-m-d H:i:s');
+		$log->sqlundo = $undo;
+		$log->sql = $sql;
+		$log->beschreibung = 'Stundenverschiebung '.$new_datum.'('.$new_stunde.') '.$ort;
+		$log->mitarbeiter_uid = $uid;
+		if(!$log->save(true))
+			$error_msg.='Fehler beim Schreiben des UNDO Befehls'.$log->errormsg;
+		
+	}
 }
 // ****************** STPL Delete *******************************
 elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')

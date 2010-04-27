@@ -836,6 +836,151 @@ if(!@$db->db_query("SELECT * FROM system.tbl_cronjob LIMIT 1;"))
 	else 
 		echo 'tbl_cronjob: hinzugefuegt!<br>';
 }
+
+//Nummerintern wird in Inventarnummer umbenannt
+if(!@$db->db_query("SELECT inventarnummer FROM wawi.tbl_betriebsmittel"))
+{
+	$qry = "ALTER TABLE wawi.tbl_betriebsmittel RENAME nummerintern TO inventarnummer;
+			COMMENT ON COLUMN wawi.tbl_betriebsmittel.inventarnummer IS 'Inventarnummer';
+			UPDATE wawi.tbl_betriebsmittel SET inventarnummer=null;
+			ALTER TABLE wawi.tbl_betriebsmittel ADD CONSTRAINT uk_betriebsmittel_inventarnummer UNIQUE (inventarnummer);
+			";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'tbl_betriebsmittel: nummerintern wurde in inventarnummer umbenannt!<br>';
+}
+
+//zusaetzliche Spalten fuer campus.vw_student
+if(!@$db->db_query('SELECT updateaktivam FROM campus.vw_student LIMIT 1'))
+{
+	$qry = "DROP VIEW campus.vw_student;
+			CREATE VIEW campus.vw_student AS
+				SELECT 
+					tbl_benutzer.uid, tbl_student.matrikelnr, tbl_student.prestudent_id, tbl_student.studiengang_kz, 
+					tbl_student.semester, tbl_student.verband, tbl_student.gruppe, tbl_benutzer.person_id, 
+					tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, 
+					tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, 
+					tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, 
+					tbl_person.foto, tbl_person.anmerkung, tbl_person.homepage, tbl_person.svnr, 
+					tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, 
+					tbl_person.anzahlkinder, tbl_benutzer.aktiv, tbl_student.updateamum, tbl_student.updatevon, 
+					tbl_student.insertamum, tbl_student.insertvon, tbl_student.ext_id, 
+					tbl_benutzer.updateaktivam, tbl_benutzer.updateaktivvon
+				FROM public.tbl_student
+				JOIN public.tbl_benutzer ON (tbl_student.student_uid=tbl_benutzer.uid)
+				JOIN public.tbl_person USING (person_id);
+			GRANT SELECT ON campus.vw_student TO admin;
+			GRANT SELECT ON campus.vw_student TO web;
+			";
+	if(!$db->db_query($qry))
+		echo '<strong>vw_student: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'vw_student: updateaktivam und updateaktivvon hinzugefuegt!<br>';
+}
+
+//eine eindeutige ID wird fuer alle Gruppen hinzugefuegt um diese leichter mit LDAP zu Syncronisieren
+if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe'))
+{
+	$qry = "
+	CREATE SEQUENCE public.seq_gruppe_gid
+	 INCREMENT BY 1
+	 START WITH 50000
+	 NO MAXVALUE
+	 NO MINVALUE
+	 CACHE 1
+	;
+	GRANT SELECT, UPDATE ON public.seq_gruppe_gid TO admin;
+	GRANT SELECT, UPDATE ON public.seq_gruppe_gid TO web;
+	
+	ALTER TABLE public.tbl_gruppe ADD COLUMN gid bigint DEFAULT nextval('public.seq_gruppe_gid');
+	ALTER TABLE public.tbl_lehrverband ADD COLUMN gid bigint DEFAULT nextval('public.seq_gruppe_gid');
+	
+	UPDATE public.tbl_gruppe SET gid=nextval('public.seq_gruppe_gid');
+	UPDATE public.tbl_lehrverband SET gid=nextval('public.seq_gruppe_gid');
+	
+	ALTER TABLE public.tbl_gruppe ALTER COLUMN gid SET NOT NULL;
+	ALTER TABLE public.tbl_lehrverband ALTER COLUMN gid SET NOT NULL;
+	
+	ALTER TABLE public.tbl_gruppe ADD CONSTRAINT uk_gruppe_gid UNIQUE (gid);
+	ALTER TABLE public.tbl_lehrverband ADD CONSTRAINT uk_lehrverbandsgruppe_gid UNIQUE (gid);
+	
+	--TRIGGER
+	CREATE FUNCTION check_unique_gid() RETURNS trigger AS '
+		DECLARE
+			id INTEGER;
+		BEGIN
+			
+			IF TG_RELNAME=''tbl_gruppe'' THEN
+				SELECT INTO id gid FROM public.tbl_lehrverband WHERE gid=NEW.gid;
+				
+				IF NOT FOUND THEN
+					RETURN NEW;
+				ELSE
+					 RAISE EXCEPTION ''GID Nummer wird bereits in tbl_lehrverband verwendet.'';
+					 RETURN NULL;
+				END IF;
+			ELSE
+				SELECT INTO id gid FROM public.tbl_gruppe WHERE gid=NEW.gid;
+
+				IF NOT FOUND THEN
+					RETURN NEW;
+				ELSE
+					 RAISE EXCEPTION ''GID Nummer wird bereits in tbl_gruppe verwendet.'';
+					 RETURN NULL;
+				END IF;
+			END IF;
+		END;
+	' LANGUAGE 'plpgsql';
+	
+	CREATE TRIGGER tr_gruppe_unique_gid BEFORE INSERT OR UPDATE ON public.tbl_gruppe FOR EACH ROW EXECUTE PROCEDURE check_unique_gid();
+	CREATE TRIGGER tr_lehrverband_unique_gid BEFORE INSERT OR UPDATE ON public.tbl_lehrverband FOR EACH ROW EXECUTE PROCEDURE check_unique_gid();
+	
+	CREATE VIEW public.vw_gruppen AS
+	SELECT 
+		gid, gruppe_kurzbz, uid, mailgrp, beschreibung,
+		tbl_gruppe.studiengang_kz, tbl_gruppe.semester, studiensemester_kurzbz
+	FROM
+		public.tbl_gruppe LEFT JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz)
+	UNION
+	SELECT
+		gid, 
+		trim(
+				(
+				SELECT typ || kurzbz FROM public.tbl_studiengang 
+			 	WHERE studiengang_kz=tbl_lehrverband.studiengang_kz
+			 	) 
+				|| tbl_lehrverband.semester 
+				|| tbl_lehrverband.verband 
+				|| tbl_lehrverband.gruppe
+			 ) as gruppe_kurzbz, 
+		student_uid, true, bezeichnung as beschreibung, 
+		tbl_lehrverband.studiengang_kz, tbl_lehrverband.semester, studiensemester_kurzbz
+	FROM
+		public.tbl_lehrverband LEFT JOIN public.tbl_studentlehrverband USING(studiengang_kz, semester)
+	WHERE
+		(
+			tbl_lehrverband.verband=tbl_studentlehrverband.verband 
+			OR tbl_lehrverband.verband is null 
+			OR trim(tbl_lehrverband.verband)='' 
+			OR tbl_studentlehrverband.verband is null
+		)
+		AND
+		(
+			tbl_lehrverband.gruppe=tbl_studentlehrverband.gruppe 
+			OR tbl_lehrverband.gruppe is null 
+			OR trim(tbl_lehrverband.gruppe)='' 
+			OR tbl_studentlehrverband.gruppe is null
+		);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_gruppe/tbl_lehrverband: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'tbl_gruppe/tbl_lehrverband: GID wurde hinzugefuegt! (inklusive Trigger und View)<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -940,12 +1085,12 @@ $tabellen=array(
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
-	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz"),
+	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz"),
+	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe"),
@@ -991,7 +1136,7 @@ $tabellen=array(
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
-	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","nummerintern","leasing_bis"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),

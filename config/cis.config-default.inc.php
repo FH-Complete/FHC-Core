@@ -78,37 +78,20 @@ define('VERSION','7.1 vom 9.9.2006');
 
 //Konstanten fuer die Reservierung
 define('RES_TAGE_STUDENT','1');
-define('RES_TAGE_LEKTOR_MIN','5'); // Tage ab wann ein Mitarbeiter reservieren kann.
-// define('RES_TAGE_LEKTOR_MAX','60');
-define('RES_TAGE_LEKTOR_BIS','2008-08-01'); // Datum bis wann im voraus ein Mitarbeiter reservieren kann.
+// Tage ab wann ein Mitarbeiter reservieren kann.
+define('RES_TAGE_LEKTOR_MIN','5'); 
+// Datum bis wann im voraus ein Mitarbeiter reservieren kann.
+define('RES_TAGE_LEKTOR_BIS','2008-08-01'); 
 
 // Stundenplan
 define('TAGE_PRO_WOCHE','7');
-
-/* oesi 31.03.2009 - sollte nicht mehr verwendet werden - liegt unter include/globals.inc.php
-// Hintergrundfarben fuer Tabellen beim Zeitwunsch
-$cfgStdBgcolor[0]="#FF0000";
-$cfgStdBgcolor[1]="#D44128";
-$cfgStdBgcolor[2]="#CA8780";
-$cfgStdBgcolor[3]="#C0C0C0";
-$cfgStdBgcolor[4]="#A2C294";
-$cfgStdBgcolor[5]="#4EA83C";
-$cfgStdBgcolor[6]="#006000";
-
-// Wochentage auf Deutsch (Zeitwunsch)
-$tagbez[1]="Montag";
-$tagbez[2]="Dienstag";
-$tagbez[3]="Mittwoch";
-$tagbez[4]="Donnerstag";
-$tagbez[5]="Freitag";
-$tagbez[6]="Samstag";
-$tagbez[7]="Sonntag";
-*/
 
 define('LVPLAN_KATEGORIE', 'StundenplanTW');
 
 //Default Stylesheet
 define('DEFAULT_STYLE','tw');
+//Layout Wechsel im CIS moeglich?
+define('CHOOSE_LAYOUT',false);
 
 // MAIL Adressen
 define('MAIL_DEBUG','oesi@technikum-wien.at');
@@ -118,10 +101,10 @@ define('MAIL_LVPLAN','pam@technikum-wien.at,lvplan@technikum-wien.at');
 define('MAIL_CIS','cis@technikum-wien.at');
 
 //OPUS
-define('OPUS_SERVER','sirene.technikum-wien.at');
-define('OPUS_USER','opus');
-define('OPUS_PASSWD','opus');
-define('OPUS_DB','opus');
+define('OPUS_SERVER','www.technikum-wien.at');
+define('OPUS_USER','bla');
+define('OPUS_PASSWD','bla');
+define('OPUS_DB','bla');
 // Projektabgabepfad
 define('PAABGABE_PATH','/var/www/htdocs/PaUpload/');
 //Pfad von PAAbgabe zum OPUS

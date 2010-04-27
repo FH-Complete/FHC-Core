@@ -28,7 +28,7 @@ header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
-header("Content-type: application/vnd.mozilla.xul+xml");
+header("Content-type: application/xhtml+xml");
 // xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
@@ -79,12 +79,42 @@ if (isset($_GET['filter']))
 else
 	$filter=null;
 
+//Sortierreihenfolge
+if(isset($_GET['order']))
+{
+	switch($_GET['order'])
+	{
+		case 'lektorDESC': 
+			$order='lektor DESC, offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+			break;
+		case 'lektorASC': 
+			$order='lektor ASC, offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+			break;
+		case 'lfDESC': 
+			$order='lehrfach DESC, offenestunden DESC, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+			break;
+		case 'lfASC': 
+			$order='lehrfach ASC, offenestunden DESC, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+			break;
+		case 'stundenDESC':
+			$order='offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+			break;
+		case 'stundenASC':
+			$order='offenestunden ASC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+			break;
+		default:
+			$order=null;
+			break;
+	}
+}
+else 
+	$order=null;
 
 // LVA holen
 $lva=array();
 $lehreinheit=new lehreinheit();
 if (!$error_msg)
-	if (!$lehreinheit->getLehreinheitLVPL($db_stpl_table,$studiensemester,$type,$stg_kz,$sem,$lektor,$ver,$grp,$gruppe_kurzbz))
+	if (!$lehreinheit->getLehreinheitLVPL($db_stpl_table,$studiensemester,$type,$stg_kz,$sem,$lektor,$ver,$grp,$gruppe_kurzbz, $order))
 		die ('Fehler bei Methode getLehreinheitLVPL(): '.$lehreinheit->errormsg);
 $lva=$lehreinheit->lehreinheiten;
 $rdf_url='http://www.technikum-wien.at/lehreinheit-lvplan/';

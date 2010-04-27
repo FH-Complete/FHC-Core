@@ -13,7 +13,8 @@
 	if (isset($_COOKIE['stylesheet']) && preg_match('/^[a-zA-Z]+$/', $_COOKIE['stylesheet']))
 	{
 		$stylesheet=$_COOKIE['stylesheet'];
-		$stylesheet=DEFAULT_STYLE;
+		if(!CHOOSE_LAYOUT)
+			$stylesheet=DEFAULT_STYLE;
 	}
 	else
 	{

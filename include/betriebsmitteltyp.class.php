@@ -58,23 +58,14 @@ class betriebsmitteltyp extends basis_db
 	 */
 	public function load($betriebsmitteltyp)
 	{		
-		// Initialisieren Variable	
-		$qry='';
-		$where='';
 		$this->result=array();
 		$this->errormsg = '';
-		// Select erzeugen		
-		$qry.=' select * FROM wawi.tbl_betriebsmitteltyp';
-		$qry.="	where betriebsmitteltyp >'' ";
-
-		// Bedingungen hinzufuegen
-		$where.=" AND trim(UPPER(betriebsmitteltyp)) like '%".mb_strtoupper(trim(addslashes(str_replace(array('*',';',' ',"'",'"'),'%',trim($betriebsmitteltyp)))))."%' " ;
-		$qry.=$where;
-
-		// Sortierung
-		$qry.=' order by betriebsmitteltyp ';
+		$search = mb_strtoupper(trim(addslashes(str_replace(array('*',';',' ',"'",'"'),'%',trim($betriebsmitteltyp)))));
+		$qry=" 
+			SELECT * FROM wawi.tbl_betriebsmitteltyp 
+			WHERE trim(UPPER(betriebsmitteltyp)) like '%".$search."%'
+			ORDER BY betriebsmitteltyp";
 		
-		// Datenbankabfrage - ausfuehren
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -128,82 +119,46 @@ class betriebsmitteltyp extends basis_db
 			return false;
 		}
 	}
-		
-	/**
-	 * Speichert die Daten in die Datenbank
-	 * @return true wenn erfolgreich, false im Fehlerfall
-	 */
-	public function save()
-	{		
-		$this->errormsg = '';	
-		$dbanzahl=0;
-		$qry='';
-		$qry1='SELECT * FROM wawi.tbl_betriebsmitteltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
-		if($this->db_query($qry1))
-		{
-			if($this->db_num_rows()>0) //eintrag gefunden
-			{
-				if($row1 = $this->db_fetch_object())
-				{
-					if($row1->anzahl==null)
-						$dbanzahl=0;
-					else 
-						$dbanzahl=$row1->anzahl;
-
-					$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
-					'anzahl ='.addslashes($dbanzahl)."+".addslashes($this->anzahl).' '.
-					'WHERE beschreibung='.$this->addslashes($this->beschreibung).'; ' ;
-				}
-			}
-			else 
-			{
-				$qry='INSERT INTO wawi.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution,typ_code) VALUES('.
-					$this->addslashes($this->betriebsmitteltyp).', '.
-					$this->addslashes($this->beschreibung).', '.
-					$this->addslashes($this->anzahl).', '.
-					$this->addslashes($this->kaution).', '.
-					$this->addslashes($this->typ_code).');';					
-			}
-			
-			if($this->db_query($qry))
-			{
-				return true;
-			}
-			else
-			{			
-				$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
-				return false;
-			}	
-		}
-		else
-		{			
-			$this->errormsg = 'Fehler beim Zugriff auf den Betriebsmitteltypen-Datensatz '.($this->debug?$this->db_last_error():'');
-			return false;
-		}
-	}
 	
 	/**
 	 * Speichert die Daten in die Datenbank
-	 * @return true wenn erfolgreich, false im Fehlerfall
+	 *
+	 * @param $new wenn true wird ein Insert durchgefuehrt sonst ein Update
+	 * @return boolean
 	 */
-	public function update()
-	{		
-		$this->errormsg = '';	
-		$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
+	public function save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+			
+		if($new)
+		{
+			$qry="INSERT INTO wawi.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution , typ_code)
+					VALUES(".$this->addslashes($this->betriebsmitteltyp).",".
+						$this->addslashes($this->beschreibung).",".
+						$this->addslashes($this->anzahl).",".
+						$this->addslashes($this->kaution).",".
+						$this->addslashes($this->typ_code).");";
+		}
+		else 
+		{
+			$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
 				'beschreibung ='.$this->addslashes($this->beschreibung).', '.
 				'anzahl ='.$this->addslashes($this->anzahl).', '.
 				'kaution ='.$this->addslashes($this->kaution).', '.
 				'typ_code ='.$this->addslashes($this->typ_code).' '.
-				'WHERE betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).'; ' ;		
-			if($this->db_query($qry))
-			{
-				return true;
-			}
-			else
-			{			
-				$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
-				return false;
-			}	
+				'WHERE betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).'; ' ;	
+		}
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{			
+			$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
+			return false;
+		}	
 	}
 	
 	/**

@@ -43,10 +43,10 @@ if(isset($_GET['betriebsmitteltyp']))
 else 
 	$betriebsmitteltyp = null;
 	
-if(isset($_GET['betriebsmittel_id']))
-	$betriebsmittel_id = $_GET['betriebsmittel_id'];
+if(isset($_GET['betriebsmittelperson_id']))
+	$betriebsmittelperson_id = $_GET['betriebsmittelperson_id'];
 else 
-	$betriebsmittel_id = null;
+	$betriebsmittelperson_id = null;
 
 $datum = new datum();
 
@@ -62,17 +62,21 @@ echo '
 
 
 $betriebsmittel = new betriebsmittelperson();
-if($betriebsmittel_id=='')
+if($betriebsmittelperson_id=='' && $person_id!='')
+{
 	if($betriebsmittel->getBetriebsmittelPerson($person_id, $betriebsmitteltyp))
 		foreach ($betriebsmittel->result as $row)
 			draw_content($row);
 	else 
 		die($betriebsmittel->errormsg);
+}
 else 
-	if($betriebsmittel->load($betriebsmittel_id, $person_id))
+{
+	if($betriebsmittel->load($betriebsmittelperson_id))
 		draw_content($betriebsmittel);
 	else 
 		die($betriebsmittel->errormsg);
+}
 
 function draw_content($row)
 {
@@ -80,12 +84,13 @@ function draw_content($row)
 	
 	echo '
       <RDF:li>
-         <RDF:Description  id="'.$row->person_id.'/'.$row->betriebsmittel_id.'"  about="'.$rdf_url.'/'.$row->person_id.'/'.$row->betriebsmittel_id.'" >
+         <RDF:Description  id="'.$row->betriebsmittelperson_id.'"  about="'.$rdf_url.'/'.$row->betriebsmittelperson_id.'" >
+         	<BTM:betriebsmittelperson_id><![CDATA['.$row->betriebsmittelperson_id.']]></BTM:betriebsmittelperson_id>
             <BTM:betriebsmittel_id><![CDATA['.$row->betriebsmittel_id.']]></BTM:betriebsmittel_id>
             <BTM:beschreibung><![CDATA['.$row->beschreibung.']]></BTM:beschreibung>
             <BTM:betriebsmitteltyp><![CDATA['.$row->betriebsmitteltyp.']]></BTM:betriebsmitteltyp>
             <BTM:nummer><![CDATA['.$row->nummer.']]></BTM:nummer>
-            <BTM:nummerintern><![CDATA['.$row->nummerintern.']]></BTM:nummerintern>
+            <BTM:inventarnummer><![CDATA['.$row->inventarnummer.']]></BTM:inventarnummer>
             <BTM:reservieren><![CDATA['.($row->reservieren?'Ja':'Nein').']]></BTM:reservieren>
             <BTM:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></BTM:ort_kurzbz>            
             <BTM:person_id><![CDATA['.$row->person_id.']]></BTM:person_id>

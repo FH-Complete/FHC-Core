@@ -179,24 +179,24 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->seriennummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
 			break;
 
-// Betriebsmittel nummer
-		case 'nummer':
-		 	$nummer=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($nummer) || $nummer=='')
+// Betriebsmittel Inventarnummer
+		case 'inventarnummer':
+		 	$inventarnummer=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			if (is_null($inventarnummer) || $inventarnummer=='')
 				exit();
 			$pArt='select';
 			$pDistinct=true; 
-			$pFields='nummer,beschreibung';
+			$pFields='inventarnummer,beschreibung';
 			$pTable='wawi.tbl_betriebsmittel';
-			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($nummer)));
-			$pWhere=" upper(trim(nummer)) like upper(trim('".$matchcode."%'))";
-			$pOrder='nummer';
+			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($inventarnummer)));
+			$pWhere=" upper(trim(inventarnummer)) like upper(trim('".$matchcode."%'))";
+			$pOrder='inventarnummer';
 			$pLimit='100';
 			$pSql='';
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->nummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
+				echo html_entity_decode($oRresult[$i]->inventarnummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
 			break;
 
 // Ort - Inventarorte suche
@@ -209,7 +209,7 @@ cellSeparator (default value: "|")
 			$pFields='tbl_betriebsmittel.ort_kurzbz,tbl_ort.bezeichnung,tbl_ort.aktiv';
 			$pTable='wawi.tbl_betriebsmittel left outer join public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz) ';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($ort_kurzbz)));
-			$pWhere=" upper(trim(tbl_betriebsmittel.ort_kurzbz)) like upper(trim('".$matchcode."%')) or upper(trim(tbl_ort.bezeichnung)) like upper(trim('%".$matchcode."%'))";
+			$pWhere=" upper(trim(tbl_betriebsmittel.ort_kurzbz)) like upper(trim('%".$matchcode."%')) or upper(trim(tbl_ort.bezeichnung)) like upper(trim('%".$matchcode."%'))";
 			$pOrder='tbl_betriebsmittel.ort_kurzbz';
 			$pLimit='100';
 			$pSql='';
@@ -234,7 +234,7 @@ cellSeparator (default value: "|")
 			$pFields='tbl_ort.ort_kurzbz,tbl_ort.bezeichnung,tbl_ort.aktiv';
 			$pTable=' public.tbl_ort ';
 			$matchcode=addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($ort_kurzbz)));
-			$pWhere=" tbl_ort.aktiv and ( upper(trim(tbl_ort.ort_kurzbz)) like upper(trim('".$matchcode."%')) or upper(trim(tbl_ort.bezeichnung)) like upper(trim('%".$matchcode."%')) )";
+			$pWhere=" tbl_ort.aktiv and ( upper(trim(tbl_ort.ort_kurzbz)) like upper(trim('%".$matchcode."%')) or upper(trim(tbl_ort.bezeichnung)) like upper(trim('%".$matchcode."%')) )";
 			$pOrder='tbl_ort.ort_kurzbz';
 			$pLimit='100';
 			$pSql='';

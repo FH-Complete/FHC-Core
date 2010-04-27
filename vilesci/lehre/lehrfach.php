@@ -20,6 +20,9 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ * Administrationsseite fuer Lehrfaecher
+ */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/studiengang.class.php');
@@ -65,6 +68,13 @@ else
 
 if (isset($_POST['neu']))
 {
+	$stg_obj = new studiengang();
+	if(!$stg_obj->load($_POST['stg_kz']))
+		die('Studiengang wurde nicht gefunden');
+	
+	if(!$rechte->isBerechtigt('lehre/lehrfach', $stg_obj->oe_kurzbz, 'sui'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
 	$lf = new lehrfach();
 	$lf->new=true;
 	$lf->studiengang_kz=$_POST['stg_kz'];
@@ -88,6 +98,13 @@ if (isset($_POST['neu']))
 
 if (isset($_POST['type']) && $_POST['type']=='editsave')
 {
+	$stg_obj = new studiengang();
+	if(!$stg_obj->load($_POST['stg_kz']))
+		die('Studiengang wurde nicht gefunden');
+	
+	if(!$rechte->isBerechtigt('lehre/lehrfach', $stg_obj->oe_kurzbz, 'sui'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
 	$lf = new lehrfach();
 	$lf->new=false;
 	$lf->lehrfach_id = $_POST['lehrfach_id'];
@@ -112,25 +129,24 @@ $outp='<form method="GET" action="'.$_SERVER['PHP_SELF'].'">';
 
 $s=array();
 $outp.= " Studiengang: <SELECT name='filter_stg_kz'>";
-
-if(count($rechte->getFbKz())>0)
+$count_fb = count($rechte->getFbKz());
+if($count_fb>0)
 	$outp.= '<option value="" >-- Alle --</option>';
 $s['']->max_sem=8;
 $s['']->kurzbz='';
 
 foreach ($studiengang as $stg)
 {
-	if($rechte->isBerechtigt('assistenz', $stg->studiengang_kz) || $rechte->isBerechtigt('admin', $stg->studiengang_kz) ||
-		$rechte->isBerechtigt('assistenz', 0) || $rechte->isBerechtigt('admin', 0))
+	if($rechte->isBerechtigt('lehre/lehrfach:begrenzt', $stg->oe_kurzbz))
 	{
-		if(count($rechte->getFbKz())==0 && $filter_stg_kz=='')
+		if($count_fb==0 && $filter_stg_kz=='')
 			$filter_stg_kz=$stg->studiengang_kz;
 		
 		if($stg->studiengang_kz==$filter_stg_kz)
 			$selected='selected';
 		else 	
 			$selected='';
-		//$outp.= '<A href="lehrfach.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kurzbzlang.'</A> - ';
+		
 		$outp.= '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
 	}
 	
@@ -146,7 +162,7 @@ for ($i=0;$i<=$s[$filter_stg_kz]->max_sem;$i++)
 		$selected='selected';
 	else 
 		$selected='';
-	//$outp.= '<A href="lehrfach.php?stg_kz='.$stg_kz.'&semester='.$i.'">'.$i.'</A> -- ';
+	
 	$outp.= '<option value="'.$i.'" '.$selected.'>'.$i.'</option>';
 }
 $outp.="</SELECT>";
@@ -157,24 +173,18 @@ $outp.= '<option value="">-- Alle --</option>';
 
 foreach ($fachbereiche as $fb)
 {
-	/*
-	if($rechte->isBerechtigt('assistenz', null, null, $fb->fachbereich_kurzbz) || $rechte->isBerechtigt('admin', null, null, $fb->fachbereich_kurzbz) ||
-		$rechte->isBerechtigt('assistenz', 0) || $rechte->isBerechtigt('admin', 0))
-	{*/
-		if($fb->fachbereich_kurzbz==$filter_fachbereich_kurzbz)
-			$selected='selected';
-		else 
-			$selected='';
-		if($fb->aktiv)
-		{
-			$outp.= '<option value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
-		}
-		else 
-		{
-			$outp.= '<option style="color: red;" value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
-		}
-	//}
-	
+	if($fb->fachbereich_kurzbz==$filter_fachbereich_kurzbz)
+		$selected='selected';
+	else 
+		$selected='';
+	if($fb->aktiv)
+	{
+		$outp.= '<option value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
+	}
+	else 
+	{
+		$outp.= '<option style="color: red;" value="'.$fb->fachbereich_kurzbz.'" '.$selected.'>'.$fb->bezeichnung.'</option>';
+	}	
 }
 $outp.="</SELECT>";
 
@@ -184,15 +194,15 @@ $outp.="
 
 echo '
 <html>
-<head>
-<title>Lehrfach Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-</head>
-<body>
-<H2>Lehrfach Verwaltung ('.$s[$filter_stg_kz]->kurzbz.' '.$filter_semester.' '.$filter_fachbereich_kurzbz.')</H2>
+	<head>
+		<title>Lehrfach Verwaltung</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<H2>Lehrfach Verwaltung ('.$s[$filter_stg_kz]->kurzbz.' '.$filter_semester.' '.$filter_fachbereich_kurzbz.')</H2>
 ';
 
 echo $outp;
@@ -200,113 +210,129 @@ echo $outp;
 if($filter_stg_kz=='' && $filter_fachbereich_kurzbz=='' && !isset($_GET['type']))
 	die('Bitte einen Studiengang oder Fachbereich auswaehlen');
 
-if($rechte->isBerechtigt('admin',0))
+if (isset($_GET['type']) && $_GET['type']=='aktiv')
 {
-	if (isset($_GET['type']) && $_GET['type']=='aktiv')
+	$lf = new lehrfach();
+	$lf->load($_GET['lehrfach_nr']);
+	
+	$stg_obj = new studiengang();
+	if(!$stg_obj->load($lf->studiengang_kz))
+		die('Studiengang konnte nicht ermittelt werden');
+	
+	if(!$rechte->isBerechtigt('lehre/lehrfach:begrenzt',$stg_obj->oe_kurzbz,'sui'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	
+	if ($lf->aktiv)
+		$lf->aktiv=false;
+	else 
+		$lf->aktiv=true;
+	$lf->updatevon = $user;
+
+	if(!$lf->save())
 	{
-		$lf = new lehrfach();
-		$lf->load($_GET['lehrfach_nr']);
-		if ($lf->aktiv)
-			$lf->aktiv=false;
+		echo "<br>$lf->errormsg<br>";
+	}
+	unset($_GET['type']);	
+}
+
+if (isset($_GET['type']) && $_GET['type']=='edit')
+{
+	$lf=new lehrfach();
+	$lf->load($_GET['lehrfach_nr']);
+	
+	$stg_obj = new studiengang();
+	if(!$stg_obj->load($lf->studiengang_kz))
+		die('Studiengang konnte nicht ermittelt werden');
+	
+	if(!$rechte->isBerechtigt('lehre/lehrfach',$stg_obj->oe_kurzbz,'sui'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+		
+	echo '<form name="lehrfach_edit" method="post" action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'">';
+	echo '<p><b>Edit Lehrfach: '.$_GET['lehrfach_nr'].'</b>';
+	echo '<table>';
+	echo '<tr><td>';
+	echo " Studiengang:</td><td>\n <SELECT name='stg_kz'>";
+	
+	foreach ($studiengang as $stg)
+	{
+		if($stg->studiengang_kz==$lf->studiengang_kz)
+			$selected='selected';
 		else 
-			$lf->aktiv=true;
-		$lf->updatevon = $user;
-	
-		if(!$lf->save())
-		{
-			echo "<br>$lf->errormsg<br>";
-		}
-		unset($_GET['type']);	
-	}
-	if (isset($_GET['type']) && $_GET['type']=='edit')
-	{
-		$lf=new lehrfach();
-		$lf->load($_GET['lehrfach_nr']);
-		echo '<form name="lehrfach_edit" method="post" action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'">';
-		echo '<p><b>Edit Lehrfach: '.$_GET['lehrfach_nr'].'</b>';
-		echo '<table>';
-		echo '<tr><td>';
-		echo " Studiengang:</td><td>\n <SELECT name='stg_kz'>";
-		
-		foreach ($studiengang as $stg)
-		{
-				if($stg->studiengang_kz==$lf->studiengang_kz)
-					$selected='selected';
-				else 
-					$selected='';
+			$selected='';
 
-				echo "\n".'<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
-		}
-		echo "</SELECT></td></tr>";
-		
-		echo "<tr><td>Semester:</td><td> <SELECT name='semester'>";
-		for ($i=0;$i<=$s[$lf->studiengang_kz]->max_sem;$i++)
-		{
-			if($i==$lf->semester)
-				$selected='selected';
-			else 
-				$selected='';
-			
-			echo '<option value="'.$i.'" '.$selected.'>'.$i.'</option>';
-		}
-		echo "</SELECT></td></tr>";
-		echo '
-		<tr><td><i>Institut</i></td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
-	      			<option value="-1">- ausw&auml;hlen -</option>';
-		foreach($fachbereiche as $fb)
-		{
-			if($fb->fachbereich_kurzbz==$lf->fachbereich_kurzbz)
-				$selected='selected';
-			else 
-				$selected='';
-			if($fb->aktiv)
-			{
-				echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
-
-			}
-			else 
-			{
-				echo "<option style=\"color: red;\" value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
-			}
-			echo " >$fb->fachbereich_kurzbz.$gg</option>\n";
-		}
-	
-		echo '</SELECT></td></tr>';
-	
-	    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="30" maxlength="250" value="'.$lf->bezeichnung.'"></td></tr>';
-		echo '<tr><td><i>Kurzbezeichnung</i></td><td>';
-		echo '<input type="text" name="kurzbz" size="30" maxlength="12" value="'.$lf->kurzbz.'"></td></tr>';
-		echo '<tr><td><i>Farbe</i></td><td>';
-	    echo '<input type="text" name="farbe" id="farbe" size="30" maxlength="7" value="'.$lf->farbe.'"></td></tr>';
-	
-		echo '<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lf->aktiv?'checked':'').' />';
-	    echo '<tr><td>Sprache</td><td><select name="sprache">';
-	
-		$qry1="SELECT * FROM public.tbl_sprache";
-		if(!$result1=$db->db_query($qry1))
-		{
-			die( "Fehler bei der DB-Connection");
-		}
-	
-		while($row1=$db->db_fetch_object($result1))
-		{
-		   if($row1->sprache==$lf->sprache)
-		      echo "<option value='$row1->sprache' selected>$row1->sprache</option>";
-		   else
-		      echo "<option value='$row1->sprache'>$row1->sprache</option>";
-		}
-	
-		echo '</select></td></tr>';
-		echo '</table>';
-		echo '<input type="hidden" name="type" value="editsave">';
-		echo '<input type="hidden" name="lehrfach_id" value="'.$lf->lehrfach_id.'">';
-		//echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
-		//echo '<input type="hidden" name="semester" value="'.$semester.'">';
-		echo '<input type="submit" name="save" value="Speichern">';
-		echo '</p><hr></form>';
+		echo "\n".'<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
 	}
-	else
+	echo "</SELECT></td></tr>";
+	
+	echo "<tr><td>Semester:</td><td> <SELECT name='semester'>";
+	for ($i=0;$i<=$s[$lf->studiengang_kz]->max_sem;$i++)
 	{
+		if($i==$lf->semester)
+			$selected='selected';
+		else 
+			$selected='';
+		
+		echo '<option value="'.$i.'" '.$selected.'>'.$i.'</option>';
+	}
+	echo "</SELECT></td></tr>";
+	echo '
+	<tr><td><i>Institut</i></td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
+      			<option value="-1">- ausw&auml;hlen -</option>';
+	foreach($fachbereiche as $fb)
+	{
+		if($fb->fachbereich_kurzbz==$lf->fachbereich_kurzbz)
+			$selected='selected';
+		else 
+			$selected='';
+		if($fb->aktiv)
+		{
+			echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
+
+		}
+		else 
+		{
+			echo "<option style=\"color: red;\" value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\" $selected";
+		}
+		echo " >$fb->fachbereich_kurzbz.$gg</option>\n";
+	}
+
+	echo '</SELECT></td></tr>';
+
+    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="30" maxlength="250" value="'.$lf->bezeichnung.'"></td></tr>';
+	echo '<tr><td><i>Kurzbezeichnung</i></td><td>';
+	echo '<input type="text" name="kurzbz" size="30" maxlength="12" value="'.$lf->kurzbz.'"></td></tr>';
+	echo '<tr><td><i>Farbe</i></td><td>';
+    echo '<input type="text" name="farbe" id="farbe" size="30" maxlength="7" value="'.$lf->farbe.'"></td></tr>';
+
+	echo '<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lf->aktiv?'checked':'').' />';
+    echo '<tr><td>Sprache</td><td><select name="sprache">';
+
+	$qry1="SELECT * FROM public.tbl_sprache";
+	if(!$result1=$db->db_query($qry1))
+	{
+		die( "Fehler bei der DB-Connection");
+	}
+
+	while($row1=$db->db_fetch_object($result1))
+	{
+	   if($row1->sprache==$lf->sprache)
+	      echo "<option value='$row1->sprache' selected>$row1->sprache</option>";
+	   else
+	      echo "<option value='$row1->sprache'>$row1->sprache</option>";
+	}
+
+	echo '</select></td></tr>';
+	echo '</table>';
+	echo '<input type="hidden" name="type" value="editsave">';
+	echo '<input type="hidden" name="lehrfach_id" value="'.$lf->lehrfach_id.'">';
+	echo '<input type="submit" name="save" value="Speichern">';
+	echo '</p><hr></form>';
+}
+else
+{
+	if($rechte->isBerechtigt('lehre/lehrfach',null,'sui'))
+	{
+		//Neuanlage
 		echo '
 				<form action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'" method="post" name="lehrfach_neu" id="lehrfach_neu">
 				  <p><b>Neues Lehrfach</b>: <br/>';
@@ -316,12 +342,12 @@ if($rechte->isBerechtigt('admin',0))
 		
 		foreach ($studiengang as $stg)
 		{
-				if($stg->studiengang_kz==$filter_stg_kz)
-					$selected='selected';
-				else 
-					$selected='';
+			if($stg->studiengang_kz==$filter_stg_kz)
+				$selected='selected';
+			else 
+				$selected='';
 
-				echo '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
+			echo '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
 		}
 		echo "</SELECT></td></tr>";
 		
@@ -340,19 +366,19 @@ if($rechte->isBerechtigt('admin',0))
 		<tr><td><i>Institut</i></td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
 	      			<option value="-1">- ausw&auml;hlen -</option>';
 	
-				foreach($fachbereiche as $fb)
-				{
-					if($fb->aktiv)
-					{
-						echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\"";
-		
-					}
-					else 
-					{
-						echo "<option style=\"color: red;\" value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\"";
-					}
-					echo " >$fb->fachbereich_kurzbz</option>\n";
-				}
+		foreach($fachbereiche as $fb)
+		{
+			if($fb->aktiv)
+			{
+				echo "<option value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\"";
+
+			}
+			else 
+			{
+				echo "<option style=\"color: red;\" value=\"$fb->fachbereich_kurzbz\" farbe=\"$fb->farbe\"";
+			}
+			echo " >$fb->fachbereich_kurzbz</option>\n";
+		}
 	
 		echo '</SELECT></td></tr>';
 	
@@ -371,10 +397,7 @@ if($rechte->isBerechtigt('admin',0))
 		   echo "<option value='$row1->sprache'>$row1->sprache</option>";
 	
 		echo '</select></td></tr>	</table>';
-		//echo '<input type="hidden" name="stg_kz" value="'.$stg_kz.'">';
-		//echo '<input type="hidden" name="semester" value="'.$semester.'">';
-	
-	
+			
 		echo '
 			    <input type="hidden" name="type" value="save">
 			    <input type="submit" name="neu" value="Speichern">
@@ -384,9 +407,10 @@ if($rechte->isBerechtigt('admin',0))
 	}
 }
 
+
 if(!isset($_GET['type']))
 {
-	if($rechte->isBerechtigt('admin'))
+	if($rechte->isBerechtigt('lehre/lehrfach'))
 		$where = '';
 	else
 		$where = ' AND aktiv=true'; 
@@ -449,7 +473,7 @@ if(!isset($_GET['type']))
 				"<td>$row->fachbereich</td>
 				<td>$row->sprache</td>
 				<td>";
-		   if($rechte->isBerechtigt('admin', 0))
+		   if($rechte->isBerechtigt('lehre/lehrfach', null, 'sui'))
 				echo "<a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\">Edit</a>";
 			echo "</td></tr>";
 		}
@@ -461,6 +485,6 @@ if(!isset($_GET['type']))
 }
 
 ?>
-<br>
-</body>
+	<br>
+	</body>
 </html>

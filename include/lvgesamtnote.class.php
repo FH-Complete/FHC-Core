@@ -140,12 +140,12 @@ class lvgesamtnote extends basis_db
 			$this->errormsg = 'Note ist ungueltig: '.$this->note;
 			return false;
 		}
-		if($this->freigabedatum!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->freigabedatum))
+		if($this->freigabedatum!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->freigabedatum))
 		{
 			$this->errormsg = 'Uebernahmedatum ist ungueltig';
 			return false;
 		}
-		if($this->benotungsdatum!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->benotungsdatum))
+		if($this->benotungsdatum!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->benotungsdatum))
 		{
 			$this->errormsg = 'Benotungsdatum ist ungueltig';
 			return false;

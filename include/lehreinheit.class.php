@@ -654,7 +654,7 @@ class lehreinheit extends basis_db
 	 * @param integer stg_kz    Kennzahl des Studiengangs
 	 * @return variabel Array mit LVA; <b>false</b> bei Fehler
 	 */
-	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null)
+	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null, $order=null)
 	{
 		$this->errormsg='';
 		$this->lehreinheiten=array();
@@ -684,7 +684,13 @@ class lehreinheit extends basis_db
 		}
 		$sql_query='SELECT *, planstunden-verplant::smallint AS offenestunden
 			FROM lehre.'.$lva_stpl_view.' JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
-			WHERE '.$where.' AND verplanen ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;';
+			WHERE '.$where.' AND verplanen';
+		
+
+		if($order=='')
+			$order='offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
+		
+		$sql_query.=" ORDER BY $order;";
 	    
 		if(!$this->db_query($sql_query))
 		{

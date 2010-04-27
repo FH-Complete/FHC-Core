@@ -19,14 +19,14 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/****************************************************************************
+/**
  * @class 			Lehrstunde
  * @author	 		Christian Paminger
  * @date	 		2004/8/21
  * @version			$Revision: 1.2 $
  * Update: 			21.10.2004 von Christian Paminger
  * @brief  			Beschreibung einer Unterrichts-Stunde der Tabelle tbl_stundenplan
-  *****************************************************************************/
+ */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
 
@@ -61,6 +61,7 @@ class lehrstunde extends basis_db
 	public $lehrstunden=array(); // @brief Objekt der eigenen Klasse
 	public $anzahl;			// @brief Gesamte Anzahl der Stunden im Array
 	public $ss=null;		// @brief Studiensemester
+	public $lastqry=null;
 
 
 	/** 
@@ -81,8 +82,6 @@ class lehrstunde extends basis_db
 	 */
 	public function load($stundenplan_id,$stpl_table='stundenplandev')
 	{
-		///////////////////////////////////////////////////////////////////////
-		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
 		$stpl_view='lehre.'.VIEW_BEGIN.$stpl_table;
@@ -152,12 +151,12 @@ class lehrstunde extends basis_db
 		{
 			// update
 			$sql_query='UPDATE '.$stpl_table;
-			$sql_query.=" SET datum='$this->datum', stunde=$this->stunde";
-			$sql_query.=", ort_kurzbz='$this->ort_kurzbz', mitarbeiter_uid='$this->lektor_uid'";
-			$sql_query.=", updateamum=now(), updatevon='$uid'";
-			$sql_query.=" WHERE $stpl_id=$this->stundenplan_id";
-			//echo $sql_query."<br>";
+			$sql_query.=" SET datum=".$this->addslashes($this->datum).", stunde=".$this->addslashes($this->stunde);
+			$sql_query.=", ort_kurzbz=".$this->addslashes($this->ort_kurzbz).", mitarbeiter_uid=".$this->addslashes($this->lektor_uid);
+			$sql_query.=", updateamum=now(), updatevon=".$this->addslashes($uid);
+			$sql_query.=" WHERE $stpl_id=$this->stundenplan_id;";
 
+			$this->lastqry = $sql_query;
 			//Datenbankabfrage
 			if (!$this->db_query($sql_query))
 			{
@@ -169,6 +168,26 @@ class lehrstunde extends basis_db
 		return true;
 	}
 
+	/**
+	 * Erstellt einen Undo Befehl fuer die Speichern funktion
+	 *
+	 * @param $stpl_table
+	 * @return string undo
+	 */
+	public function getUndo($stpl_table='stundenplandev')
+	{
+		$stpl_id=$stpl_table.TABLE_ID;
+		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
+		
+		$sql_query='UPDATE '.$stpl_table;
+		$sql_query.=" SET datum='".addslashes($this->datum)."', stunde='".addslashes($this->stunde)."'";
+		$sql_query.=", ort_kurzbz='".addslashes($this->ort_kurzbz)."', mitarbeiter_uid='".addslashes($this->lektor_uid)."'";
+		$sql_query.=", updateamum='".addslashes($this->updateamum)."', updatevon='".addslashes($this->updatevon)."'";
+		$sql_query.=" WHERE $stpl_id='".addslashes($this->stundenplan_id)."';";
+		
+		return $sql_query;
+	}
+	
 	/**
 	 *	Datensatz aus DB entfernen
 	 * @param id ID des Datensatzes in der Tabelle
@@ -213,21 +232,20 @@ class lehrstunde extends basis_db
 	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null)
 	{
 		$num_rows_einheit=0;
-		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_view.TABLE_ID;
 		$stpl_view='lehre.'.VIEW_BEGIN.$stpl_view;
 
 		// Datum im Format YYYY-MM-TT ?
-		if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_von) )
+		if (!mb_ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_von) )
 		{
 			$this->errormsg='Fehler: Startdatum hat falsches Format!';
 			return -1;
 		}
 		if ($datum_bis!=null)
 		{
-			if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_bis) )
+			if (!mb_ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_bis) )
 			{
 				$this->errormsg='Fehler: Enddatum hat falsches Format!';
 				return -1;
@@ -266,7 +284,6 @@ class lehrstunde extends basis_db
 			return -1;
 		}
 
-		///////////////////////////////////////////////////////////////////////
 		// Zusaetzliche Daten ermitteln
 		// Personendaten
 		if ($type=='student')
@@ -306,7 +323,6 @@ class lehrstunde extends basis_db
 				$num_rows_einheit=$this->db_num_rows($result_einheit);
 		}
 
-		///////////////////////////////////////////////////////////////////////
 		// Stundenplandaten ermitteln
 		// Abfrage generieren
 		$sql_query_stdplan='SELECT * FROM '.$stpl_view;
@@ -401,7 +417,6 @@ class lehrstunde extends basis_db
 			$this->lehrstunden[$i]=$stunde;
 		}
 
-		///////////////////////////////////////////////////////////////////////
 		// Reservierungsdaten ermitteln
 		if ($type!='idList')
 		{
@@ -458,13 +473,10 @@ class lehrstunde extends basis_db
 	 */
 	public function load_lehrstunden_le($lehreinheit_id, $uid=null, $stpl_table='stundenplandev')
 	{
-		///////////////////////////////////////////////////////////////////////
-		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
 		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
 
-		///////////////////////////////////////////////////////////////////////
 		// Stundenplandaten ermitteln
 		// Abfrage generieren
 		$sql="SELECT * FROM ".$stpl_table." WHERE lehreinheit_id='".addslashes($lehreinheit_id)."'";
