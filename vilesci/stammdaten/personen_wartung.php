@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 			
@@ -125,7 +125,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
   	$sql_query_upd1.="UPDATE wawi.tbl_betriebsmittelperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
 
 		$sql_query_upd1.="UPDATE public.tbl_preinteressent SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_personfunktionfirma SET person_id='$radio_2' WHERE person_id='$radio_1';";
+		$sql_query_upd1.="UPDATE public.tbl_personfunktionstandort SET person_id='$radio_2' WHERE person_id='$radio_1';";
 
 
 		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$radio_1';";
