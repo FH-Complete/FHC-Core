@@ -937,16 +937,16 @@ if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe'))
 	CREATE TRIGGER tr_gruppe_unique_gid BEFORE INSERT OR UPDATE ON public.tbl_gruppe FOR EACH ROW EXECUTE PROCEDURE check_unique_gid();
 	CREATE TRIGGER tr_lehrverband_unique_gid BEFORE INSERT OR UPDATE ON public.tbl_lehrverband FOR EACH ROW EXECUTE PROCEDURE check_unique_gid();
 	
-	CREATE VIEW public.vw_gruppen AS
+	CREATE OR REPLACE VIEW public.vw_gruppen AS
 	SELECT 
 		gid, gruppe_kurzbz, uid, mailgrp, beschreibung,
-		tbl_gruppe.studiengang_kz, tbl_gruppe.semester, studiensemester_kurzbz
+		tbl_gruppe.studiengang_kz, tbl_gruppe.semester, studiensemester_kurzbz, null as verband, null as gruppe
 	FROM
 		public.tbl_gruppe LEFT JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz)
 	UNION
 	SELECT
 		gid, 
-		trim(
+		UPPER(trim(
 				(
 				SELECT typ || kurzbz FROM public.tbl_studiengang 
 			 	WHERE studiengang_kz=tbl_lehrverband.studiengang_kz
@@ -954,9 +954,9 @@ if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe'))
 				|| tbl_lehrverband.semester 
 				|| tbl_lehrverband.verband 
 				|| tbl_lehrverband.gruppe
-			 ) as gruppe_kurzbz, 
+			 )) as gruppe_kurzbz, 
 		student_uid, true, bezeichnung as beschreibung, 
-		tbl_lehrverband.studiengang_kz, tbl_lehrverband.semester, studiensemester_kurzbz
+		tbl_lehrverband.studiengang_kz, tbl_lehrverband.semester, studiensemester_kurzbz, tbl_lehrverband.verband, tbl_lehrverband.gruppe
 	FROM
 		public.tbl_lehrverband LEFT JOIN public.tbl_studentlehrverband USING(studiengang_kz, semester)
 	WHERE
