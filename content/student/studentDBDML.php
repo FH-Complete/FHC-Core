@@ -1706,6 +1706,8 @@ if(!$error)
 		//Loescht ein Betriebsmittel
 		//Wenn studiengang_kz uebergeben wird, dann handelt es sich um die Betriebsmittel eines Studenten
 		//Wenn studiengang_kz='' dann werden Mitarbeiterrechte benoetigt
+		//ToDo: hier sollte nicht der Studiengang uebergeben werden sonder aus der DB ermittelt werden ob es
+		//ein Student oder Mitarbeiter ist
 		if(($_POST['studiengang_kz']!='' &&
 			!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
 			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid')
@@ -1721,12 +1723,11 @@ if(!$error)
 		}
 		else
 		{
-			if(isset($_POST['betriebsmittel_id']) && is_numeric($_POST['betriebsmittel_id']) &&
-			   isset($_POST['person_id']) && is_numeric($_POST['person_id']))
+			if(isset($_POST['betriebsmittelperson_id']) && is_numeric($_POST['betriebsmittelperson_id']))
 			{
 				$btm = new betriebsmittelperson();
 
-				if($btm->delete($_POST['betriebsmittel_id'], $_POST['person_id']))
+				if($btm->delete($_POST['betriebsmittelperson_id']))
 				{
 					$return = true;
 				}
@@ -1748,6 +1749,8 @@ if(!$error)
 		//Speichert eine Betriebsmittelzuordnung
 		//Wenn studiengang_kz uebergeben wird, dann handelt es sich um die Betriebsmittel eines Studenten
 		//Wenn studiengang_kz='' dann werden Mitarbeiterrechte benoetigt
+		//ToDo: hier sollte nicht der Studiengang uebergeben werden sonder aus der DB ermittelt werden ob es
+		//ein Student oder Mitarbeiter ist
 		if(($_POST['studiengang_kz']!='' &&
 			!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
 			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid')
@@ -1856,18 +1859,23 @@ if(!$error)
 						$bmp = new betriebsmittelperson();
 						if($_POST['neu']!='true')
 						{
-							if($bmp->load($_POST['betriebsmittel_id'], $_POST['person_id']))
+							if($bmp->load($_POST['betriebsmittelperson_id']))
 							{
 								$bmp->updateamum = date('Y-m-d H:i:s');
 								$bmp->updatevon = $user;
-								$bmp->betriebsmittel_id_old = $_POST['betriebsmittel_id'];
+								$bmp->betriebsmittelperson_id = $_POST['betriebsmittelperson_id'];
 								$bmp->new = false;
 							}
 							else
 							{
+								/*
 								$bmp->insertamum = date('Y-m-d H:i:s');
 								$bmp->insertvon = $user;
 								$bmp->new = true;
+								*/
+								$error = true;
+								$errormsg = "Zuordnung unbekannt:".$_POST['betriebsmittelperson_id'];
+								$return = false;
 							}
 						}
 						else
@@ -1889,7 +1897,7 @@ if(!$error)
 							if($bmp->save())
 							{
 								$return = true;
-								$data = $betriebsmittel_id;
+								$data = $bmp->betriebsmittelperson_id;
 							}
 							else
 							{

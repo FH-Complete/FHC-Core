@@ -168,7 +168,7 @@ class log extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Beispiels';
+			$this->errormsg = 'Fehler beim Speichern des Undo-Befehls';
 			return false;
 		}
 	}

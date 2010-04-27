@@ -141,13 +141,13 @@ class bisio extends basis_db
 			return false;
 		}
 		
-		if($this->von!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->von))
+		if($this->von!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->von))
 		{			
 			$this->errormsg = 'VON-Datum hat ein ungueltiges Format';
 			return false;
 		}
 		
-		if($this->bis!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->bis))
+		if($this->bis!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->bis))
 		{
 			$this->errormsg = 'BIS-Datum hat ein ungueltiges Format';
 			return false;

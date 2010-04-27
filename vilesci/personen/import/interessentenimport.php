@@ -1070,7 +1070,7 @@ Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
 //Vorschlaege laden
 if($geburtsdatum!='')
 {		
-	if(ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
+	if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 	{
 		$where = " gebdatum='".$geburtsdatum."'";
 	}

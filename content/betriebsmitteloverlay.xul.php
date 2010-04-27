@@ -109,6 +109,10 @@ else
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#person_id" />
 							<splitter class="tree-splitter"/>
+							<treecol id="betriebsmittel-tree-betriebsmittelperson_id" label="Betriebsmittlperson_id" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittelperson_id" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -123,6 +127,7 @@ else
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#retouram"/>
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittel_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#person_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittelperson_id"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
@@ -138,6 +143,8 @@ else
 							<textbox id="betriebsmittel-textbox-betriebsmittel_id" disabled="true"/>
 							<label value="person_id" control="betriebsmittel-textbox-person_id"/>
 							<textbox id="betriebsmittel-textbox-person_id" disabled="true"/>
+							<label value="betriebsmittelperson_id" control="betriebsmittel-textbox-betriebsmittelperson_id"/>
+							<textbox id="betriebsmittel-textbox-betriebsmittelperson_id" disabled="true"/>
 							<label value="Neu" control="betriebsmittel-checkbox-neu"/>
 							<checkbox id="betriebsmittel-checkbox-neu" disabled="true" checked="false"/>
 						</vbox>
@@ -168,7 +175,6 @@ else
 										<hbox>
 											<textbox id="betriebsmittel-textbox-nummerold" hidden="true"/>
 					      					<textbox id="betriebsmittel-textbox-nummer" disabled="true" maxlength="12"/>
-					      					<textbox id="betriebsmittel-textbox-nummerintern" disabled="true"/>
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
@@ -191,7 +197,6 @@ else
 										<label value="Ausgegeben am" control="betriebsmittel-textbox-ausgegebenam"/>
 										<hbox>
 											<box class="Datum" id="betriebsmittel-textbox-ausgegebenam" disabled="true"/>
-					      					<!--<textbox id="betriebsmittel-textbox-ausgegebenam" disabled="true" maxlength="10"/>-->
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
@@ -199,7 +204,6 @@ else
 										<label value="Retour am" control="betriebsmittel-textbox-retouram"/>
 										<hbox>
 											<box class="Datum" id="betriebsmittel-textbox-retouram" disabled="true"/>
-					      					<!--<textbox id="betriebsmittel-textbox-retouram" disabled="true" maxlength="10"/>-->
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
@@ -218,5 +222,4 @@ else
 </hbox>
 <spacer flex="1" />
 </vbox>
-<!--<iframe src="cardReader.html" />-->
 </window>

@@ -140,12 +140,12 @@ class zeugnisnote extends basis_db
 			$this->errormsg = 'Note ist ungueltig';
 			return false;
 		}
-		if($this->uebernahmedatum!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->uebernahmedatum))
+		if($this->uebernahmedatum!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->uebernahmedatum))
 		{
 			$this->errormsg = 'Uebernahmedatum ist ungueltig';
 			return false;
 		}
-		if($this->benotungsdatum!='' && !ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->benotungsdatum))
+		if($this->benotungsdatum!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->benotungsdatum))
 		{
 			$this->errormsg = 'Benotungsdatum ist ungueltig';
 			return false;

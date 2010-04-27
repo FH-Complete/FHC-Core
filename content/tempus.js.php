@@ -430,6 +430,7 @@ function UnDo(log_id, bezeichnung)
 		else
 		{
 			LvTreeRefresh();
+			onJumpDate(0);
 		}
 	}
 }

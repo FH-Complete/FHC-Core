@@ -35,11 +35,11 @@ function crlf()
 	// doing some DOS-CRLF magic...
 	$crlf="\n";
 	$client=getenv("HTTP_USER_AGENT");
-	if (ereg('[^(]*\((.*)\)[^)]*',$client,$regs))
+	if (mb_ereg('[^(]*\((.*)\)[^)]*',$client,$regs))
 	{
 		$os = $regs[1];
 		// this looks better under WinX
-		if (eregi("Win",$os))
+		if (mb_eregi("Win",$os))
 			$crlf="\r\n";
 	}
 	return $crlf;

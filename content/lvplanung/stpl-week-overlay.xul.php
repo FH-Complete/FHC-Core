@@ -103,13 +103,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 <vbox style="margin:0px;" flex="1">
 <toolbox>
 		<toolbar id="toolbarTimeTableLeftWeek" tbautostretch="always" persist="collapsed">
-		<toolbarbutton id="toolbarbuttonStplWeekRefresh"
-			image="../skin/images/refresh.png"
-			oncommand="onLVARefresh();"
-			tooltiptext="Neu laden"
-		/>
-		<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
+			<toolbarbutton id="toolbarbuttonStplWeekRefresh"
+				image="../skin/images/refresh.png"
+				oncommand="onLVARefresh();"
+				tooltiptext="Neu laden"
+			/>
+			<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
 		</toolbar>
+		
 </toolbox>
 
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
@@ -194,6 +195,42 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    </rule>
 	</template>
 </vbox>
+<toolbox>
+
+		<toolbar id="toolbarTimeTableSort" tbautostretch="always" persist="collapsed">
+			<toolbarbutton
+				image="../skin/images/down.png"
+				oncommand="onLVASort('lfDESC');"
+				tooltiptext="Lehrfach absteigend"
+			/>
+			<toolbarbutton
+				image="../skin/images/up.png"
+				oncommand="onLVASort('lfASC');"
+				tooltiptext="Lehrfach aufsteigend"
+			/>
+			<toolbarbutton
+				image="../skin/images/user_down.png"
+				oncommand="onLVASort('lektorDESC');"
+				tooltiptext="Lektor absteigend"
+			/>
+			<toolbarbutton
+				image="../skin/images/user_up.png"
+				oncommand="onLVASort('lektorASC');"
+				tooltiptext="Lektor aufsteigend"
+			/>
+			<toolbarbutton
+				image="../skin/images/clock_down.png"
+				oncommand="onLVASort('stundenDESC');"
+				tooltiptext="Offene Stunden absteigend"
+			/>
+			<toolbarbutton
+				image="../skin/images/clock_up.png"
+				oncommand="onLVASort('stundenASC');"
+				tooltiptext="Offenen Stunden aufsteigend"
+			/>
+			
+		</toolbar>
+</toolbox>
 </vbox>
 </hbox>
 </overlay>

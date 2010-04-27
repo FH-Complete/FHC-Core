@@ -59,7 +59,7 @@
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 	$recht=false;
-	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz?$oe_kurzbz:null),'s'))
+	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'s'))
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');

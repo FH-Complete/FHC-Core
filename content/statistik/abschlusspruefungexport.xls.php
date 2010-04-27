@@ -102,11 +102,10 @@ loadVariables($user);
 				tbl_benutzer.uid = tbl_abschlusspruefung.student_uid AND
 				tbl_person.person_id = tbl_benutzer.person_id AND
 				tbl_abschlusspruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz
-			ORDER BY nachname, vorname";
-
+			";
 	if($semester!='')
 		$qry.= " AND tbl_studentlehrverband.semester='".addslashes($semester)."'";
-	
+	$qry.=' ORDER BY nachname, vorname';
 	$zeile=1;
 	if($db->db_query($qry))
 	{

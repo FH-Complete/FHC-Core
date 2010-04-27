@@ -1,5 +1,6 @@
 @charset "utf-8";
-	table.navbar {width:100%;border:0;}
+
+	table.navbar {width:100%;border: 1px solid WindowFrame;}
 	table.navbar tr {text-align:left;}
 	table.navbar td {text-align:left;white-space: nowrap;}			
 	table.navbar .ac_submit {width:10%;background-color: #FFFFDD;}			
@@ -20,7 +21,7 @@
 		in relative units scroll will be broken in firefox	*/
 		line-height: 16px;	overflow: hidden;
 	}
-	.ac_loading {background: #ffffff url('../images/indicator.gif') right center no-repeat;	}
+	.ac_loading {background: #ffffff url('indicator.gif') right center no-repeat;	}
 	.ac_odd {background-color: #eee;}
 	.ac_over {background-color: navy;color: white;font-weight: bold;}
 	.ac_input {border: 1px solid WindowFrame;background-color: #FBFBFB;}
@@ -30,7 +31,7 @@
 		----------------------------------*/
 		.ui-widget { font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; font-size: 1.1em; }
 		.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; font-size: 1em; }
-		.ui-widget-content { border: 1px solid #dddddd; background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x; color: #333333; }
+		.ui-widget-content { border: 0px solid #dddddd; background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x; color: #333333; }
 		.ui-widget-content a { color: #333333; }
 
 		.ui-widget-header { border: 1px solid #e78f08; background: #f6a828; color: #ffffff; font-weight: bold; }

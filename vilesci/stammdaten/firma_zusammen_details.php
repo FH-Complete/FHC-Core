@@ -20,8 +20,6 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/firma.class.php');
@@ -41,7 +39,7 @@ $user=get_uid();
 // Zugriffsrechte pruefen
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('basis/firma:begrenzt',null,'suid'))
+if(!$rechte->isBerechtigt('basis/firma',null,'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 // Parameter
@@ -70,84 +68,58 @@ if (empty($work) )
 ?>	
 <html>
 <head>
-<title>Firmen zusammenlegen</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Firmen zusammenlegen</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script src="../../include/js/jquery.js" type="text/javascript"></script>
-<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<script src="../../include/js/jquery.js" type="text/javascript"></script>
+	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
 
-<script type="text/javascript" language="JavaScript1.2">
-function show_firma_bleibt(work)
-{
-
+	<script type="text/javascript" language="JavaScript1.2">
+	function show_firma_bleibt(work)
+	{
 	
-	var wohin='detailInfoAnzeigeZusammenlegen';
-    $("div#detailInfoZusammenlegen").show("slow"); // div# langsam oeffnen
-	
-	$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
-	var formdata = $('form#firmaform').serialize(); 
-
-
-	$.ajax
-	(
-		{
-			type: "POST", timeout: 3500,	
-			dataType: 'html',
-			url: 'firma_zusammen_details.php',
-			data: formdata+'&work='+work,
-			error: function()
-			{
-	   			$("div#"+wohin).html("error ");
-				return;								
-			},		
-			success: function(phpData)
-			{
-		   		$("div#"+wohin).html(phpData);
-			}
-		}
-	);
 		
-//	if (work=='save')
-//	{
-//		$('input[@type=checkbox]:checked').each(function()
-//		{ 
-//			$(this).parent().parent().css('background-color','#C0C0C0'); 
-//		});
-//	}	
-	return;
-}
+		var wohin='detailInfoAnzeigeZusammenlegen';
+	    $("div#detailInfoZusammenlegen").show("slow"); // div# langsam oeffnen
+		
+		$("div#"+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
+		var formdata = $('form#firmaform').serialize(); 
+	
+	
+		$.ajax
+		(
+			{
+				type: "POST", timeout: 3500,	
+				dataType: 'html',
+				url: 'firma_zusammen_details.php',
+				data: formdata+'&work='+work,
+				error: function()
+				{
+		   			$("div#"+wohin).html("error ");
+					return;								
+				},		
+				success: function(phpData)
+				{
+			   		$("div#"+wohin).html(phpData);
+				}
+			}
+		);
+			
+		return;
+	}
 
-//		$(function() 
-//		{
-//			$("#detailInfoZusammenlegen").resizable();
-//		});
-
-
-/*function my_array_unique($old)
-{
-    $new = array();
-    foreach( $old AS $key => $val ) 
-    {            
-        if(in_array($val, $new) === false)
-        {
-            $new[$key] = $val;
-        }
-    }
-    return $new;
-}*/ 
 	-->
-</script>	
-<style type="text/css">
-<!--
-	div.detailInfoZusammenlegen {width:90%;display:none;padding: 5px 5px 5px 5px;border: 1px solid Black;empty-cells : hide;text-align:center;vertical-align: top;z-index: 99;background-color: white; position:absolute;}
-	div.detailInfoCloseZusammenlegen {border: 7px outset #008381;padding: 0px 10px 0px 10px;}
-	div.detailInfoAnzeigeZusammenlegen {font-size:medium;text-align:left;background-color: #F5F5F5;padding: 15px 15px 15px 15px;}
--->
-</style>
-
+	</script>	
+	<style type="text/css">
+	<!--
+		div.detailInfoZusammenlegen {width:90%;display:none;padding: 5px 5px 5px 5px;border: 1px solid Black;empty-cells : hide;text-align:center;vertical-align: top;z-index: 99;background-color: white; position:absolute;}
+		div.detailInfoCloseZusammenlegen {border: 7px outset #008381;padding: 0px 10px 0px 10px;}
+		div.detailInfoAnzeigeZusammenlegen {font-size:medium;text-align:left;background-color: #F5F5F5;padding: 15px 15px 15px 15px;}
+	-->
+	</style>
 </head>
 <body>	
 <?php 
@@ -349,329 +321,326 @@ function show_firma_bleibt(work)
 </body>
 </html>
 <?php 
-//----------------------------------------------------------------------------------------
-// Voransicht
-//----------------------------------------------------------------------------------------
-	function voransicht($firmendaten)
+/**
+ * Voransicht der Zusammenlegung
+ *
+ * @param $firmendaten
+ */
+function voransicht($firmendaten)
+{
+	$firma_id_bleibt = (isset($firmendaten['firma_id_bleibt'])?$firmendaten['firma_id_bleibt']:'');
+	$standort = (isset($firmendaten['standort'])?$firmendaten['standort']:array());
+	$kontakt = (isset($firmendaten['kontakt'])?$firmendaten['kontakt']:array());
+	$personfunktionstandort = (isset($firmendaten['personfunktionstandort'])?$firmendaten['personfunktionstandort']:array());
+	$firmaorganisationseinheit = (isset($firmendaten['firmaorganisationseinheit'])?$firmendaten['firmaorganisationseinheit']:array());
+
+	//Überprüfung auf doppelte Organisationseinheiten
+	$firmaorganisationseinheit_check=array();
+	for ($i=0;$i<count($firmaorganisationseinheit);$i++)
 	{
-		$firma_id_bleibt = (isset($firmendaten['firma_id_bleibt'])?$firmendaten['firma_id_bleibt']:'');
-		$standort = (isset($firmendaten['standort'])?$firmendaten['standort']:array());
-		$kontakt = (isset($firmendaten['kontakt'])?$firmendaten['kontakt']:array());
-		$personfunktionstandort = (isset($firmendaten['personfunktionstandort'])?$firmendaten['personfunktionstandort']:array());
-		$firmaorganisationseinheit = (isset($firmendaten['firmaorganisationseinheit'])?$firmendaten['firmaorganisationseinheit']:array());
-
-		//Überprüfung auf doppelte Organisationseinheiten
-		$firmaorganisationseinheit_check=array();
-		for ($i=0;$i<count($firmaorganisationseinheit);$i++)
+		$firmaorganisationseinheit_obj->result[$i] = new firma();
+		if($firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firmaorganisationseinheit[$i]))
 		{
-			$firmaorganisationseinheit_obj->result[$i] = new firma();
-			if($firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firmaorganisationseinheit[$i]))
+			if (isset($firmaorganisationseinheit_obj->result[$i]))
 			{
-				if (isset($firmaorganisationseinheit_obj->result[$i]))
+				if(array_key_exists($firmaorganisationseinheit_obj->result[$i]->oe_kurzbz,$firmaorganisationseinheit_check))
 				{
-					if(array_key_exists($firmaorganisationseinheit_obj->result[$i]->oe_kurzbz,$firmaorganisationseinheit_check))
-					{
-						exit("<b style='color:red'>Es wurden Zuordnungen von Organisationseiheiten mehrfach ausgewählt!<br>Bitte Auswahl korrigieren.</b>");
-					}
-					$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
+					exit("<b style='color:red'>Es wurden Zuordnungen von Organisationseiheiten mehrfach ausgewählt!<br>Bitte Auswahl korrigieren.</b>");
 				}
+				$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
 			}
-		}		
-		
-		if (is_array($standort) && count($standort))
-		{
-			// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
-			$standort_check=array();
-			for ($i=0;$i<count($standort);$i++)
-				$standort_check[$standort[$i]]=$standort[$i];
-				
-			// Pruefen ob Kontakte noch einen alten Standort zugewiessen ist	
 		}
-		
+	}		
+	
+	if (is_array($standort) && count($standort))
+	{
+		// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
+		$standort_check=array();
+		for ($i=0;$i<count($standort);$i++)
+			$standort_check[$standort[$i]]=$standort[$i];
+			
 		// Pruefen ob Kontakte noch einen alten Standort zugewiessen ist	
-		$kontakt_ok=array();
-		if (is_array($kontakt) && count($kontakt))
+	}
+	
+	// Pruefen ob Kontakte noch einen alten Standort zugewiessen ist	
+	$kontakt_ok=array();
+	if (is_array($kontakt) && count($kontakt))
+	{
+		foreach ($kontakt as $key => $val)
 		{
-			foreach ($kontakt as $key => $val)
+			$standort_id=$key;
+			// Kontakt wird dem ersten Standort von Firma bleibt zugeordnet
+			if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
+				$standort_id=$standort[0];
+			elseif (!isset($standort_check[$standort_id]))
+				continue;	
+			for ($ii=0;$ii<count($val);$ii++)
 			{
-				$standort_id=$key;
-				// Kontakt wird dem ersten Standort von Firma bleibt zugeordnet
-				if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
-					$standort_id=$standort[0];
-				elseif (!isset($standort_check[$standort_id]))
-					continue;	
-				for ($ii=0;$ii<count($val);$ii++)
-				{
-					$kontakt_ok[$standort_id][]=$val[$ii];	
-					if ($standort_id==$key)
-						continue; // Keine Aenderung nechsten Datensatz pruefen
-				}
+				$kontakt_ok[$standort_id][]=$val[$ii];	
+				if ($standort_id==$key)
+					continue; // Keine Aenderung nechsten Datensatz pruefen
 			}
-			$kontakt=$kontakt_ok;
-			$kontakt_ok=null;
+		}
+		$kontakt=$kontakt_ok;
+		$kontakt_ok=null;
+	}				
+
+		
+	// Pruefen ob personfunktionstandorte noch einen alten Standort zugewiessen ist	
+	$personfunktionstandort_ok=array();
+	if (is_array($personfunktionstandort) && count($personfunktionstandort))
+	{
+		foreach ($personfunktionstandort as $key => $val)
+		{
+			$standort_id=$key;
+			if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
+				$standort_id=$standort[0];
+			elseif (!isset($standort_check[$standort_id]))
+				continue;	
+			for ($ii=0;$ii<count($val);$ii++)
+			{
+				$personfunktionstandort_ok[$standort_id][]=$val[$ii];	
+				if ($standort_id==$key)
+					continue; // Keine Aenderung nechsten Datensatz pruefen
+			}
 		}				
-
-			
-			// Pruefen ob personfunktionstandorte noch einen alten Standort zugewiessen ist	
-		$personfunktionstandort_ok=array();
-		if (is_array($personfunktionstandort) && count($personfunktionstandort))
-		{
-			foreach ($personfunktionstandort as $key => $val)
-			{
-				$standort_id=$key;
-				if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
-					$standort_id=$standort[0];
-				elseif (!isset($standort_check[$standort_id]))
-					continue;	
-				for ($ii=0;$ii<count($val);$ii++)
-				{
-					$personfunktionstandort_ok[$standort_id][]=$val[$ii];	
-					if ($standort_id==$key)
-						continue; // Keine Aenderung nechsten Datensatz pruefen
-				}
-			}				
-			$personfunktionstandort=$personfunktionstandort_ok;
-			$personfunktionstandort_ok=null;
-		}
-
-		if (is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit))
-		{
-			// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
-			$firmaorganisationseinheit_check=array();
-			$firmaorganisationseinheit_ok=array();
-			for ($i=0;$i<count($firmaorganisationseinheit);$i++)
-			{
-			
-				$firmaorganisationseinheit_obj->result[$i] = new firma();
-					
-					
-				if($firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firmaorganisationseinheit[$i]))
-				{
-					if (isset($firmaorganisationseinheit_obj->result[$i]))
-					{
-							$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
-							//echo $firmaorganisationseinheit_obj->result[$i]->oe_kurzbz."  ".$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]."<br>";
-					}
-				}	
-				else 
-					echo "<br>".$firmaorganisationseinheit_obj->errormsg;	
-			}	
-			//var_dump($firmaorganisationseinheit_check);
-			foreach ($firmaorganisationseinheit_check as $key => $val)
-			{
-				$firmaorganisationseinheit_ok[]=$val;
-			}
-
-			$firmaorganisationseinheit=$firmaorganisationseinheit_ok;				
-			$firmaorganisationseinheit_ok=null;
-			$firmaorganisationseinheit_check=null;
-		}
-		
-		$firma = new firma();
-		if(!$firma->load($firma_id_bleibt))
-			exit('Welche Firma bleibt Fehler :'.$firma->errormsg);
-
-		?>	
-		
-	  <fieldset style="background-color:#B6ffAf;">
-    	<legend style="background-color:#B6ffAf;">Informationen nach der Zusammenlegung </legend>
-		  <fieldset style="background-color:#c3ffb9;">
-	    	<legend style="background-color:#c3ffb9;">Firma <?php echo $firma->firma_id; ?> </legend>
-				<?php 
-				echo '<table>';
-				echo '<tr><td>'.$firma->firmentyp_kurzbz.' '.$firma->name
-				 .($firma->anmerkung?'<br>'.$firma->anmerkung:'')
-				 .'<br>Steuernummer:&nbsp;'.$firma->steuernummer .'&nbsp;Finanzamt:&nbsp;';
-				// Finanzamt anzeige und suche
-				if ($firma->finanzamt)
-				{
-					$firma_finanzamt = new firma();
-					if ($firma_finanzamt->load($firma->finanzamt))	
-						echo $firma_finanzamt->name;
-				}
-				echo '</td></tr>';
-				
-				echo "<tr><td>"
-					."Aktiv:<input disabled ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'').">"
-					."&nbsp;Gesperrt:<input disabled ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'').">"
-					."&nbsp;Schule:<input disabled ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'').">"
-					."</td></tr>";
-				echo '</table>';
-
-				if (!is_array($standort) || !count($standort))
-					echo '<font color="red">Achtung! Keinen Standort gefunden ! - Verarbeiten wird nicht m&ouml;glich sein</font><br>';
-				else
-				{
-					foreach ($kontakt as $key => $val)
-					{
-					?>  
-					  <fieldset style="background-color:#e3ffe1;">
-					    	<legend style="background-color:#e3ffe1;">Standort  <?php echo $key .' der Firma '. $firma->name; ?> </legend>
-							<?php
-								$standort_obj = new standort();
-								$standort_obj->result=array();
-								if ($standort_obj->load($key))
-									echo '<h3>'.$standort_obj->kurzbz.', '.$standort_obj->bezeichnung.'</h3>';
-								else
-									echo $standort_obj->errormsg.'<br>';
-									
-							// Kontakt zum Standort
-							if (!isset($kontakt[$key]) || !is_array($kontakt[$key]) || !count($kontakt[$key]))
-							{
-								echo '<font color="red">Keine Kontakte zum Standort !</font><br>';
-							}	
-							else
-							{
-								foreach ($kontakt[$key] as $keys => $vals)
-								{
-								// Kontakte zum Standort
-								$kontakt_obj = new kontakt();
-								if($kontakt_obj->load($vals))
-									echo '<b>Kontakt</b> '
-									."&nbsp;Zustellung:<input disabled ".($kontakt_obj->zustellung?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($kontakt_obj->zustellung?'checked':'').">&nbsp;"									
-									.  $vals.' '.$kontakt_obj->kontakttyp.' '.$kontakt_obj->kontakt 
-									.'&nbsp;'.$kontakt_obj->beschreibung
-									.'<br>';
-								else
-									echo $kontakt_obj->errormsg.'<br>';
-								 }
-							}	 
-
-							// Personfunktionstandort zum Standort
-							if (!isset($personfunktionstandort[$key]) || !is_array($personfunktionstandort[$key]) || !count($personfunktionstandort[$key]))
-							{
-								echo '<font color="red">Keine Personen mit Funktionen zum Standort !</font><br>';
-							}	
-							else
-							{
-								foreach ($personfunktionstandort[$key] as $keys => $vals)
-								{
-									// Personfunktion zum Standort
-									$personfunktion_obj = new person(); 
-									if($personfunktion_obj->load_personfunktion('','','','',$vals))
-									{
-										//var_dump($personfunktion_obj);
-										echo '<b>Personen und Funktion</b> '
-										.  $vals.' '.$personfunktion_obj->result[0]->funktion_kurzbz.' '.$personfunktion_obj->result[0]->position.' '.$personfunktion_obj->result[0]->anrede.'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.trim($personfunktion_obj->result[0]->titelpre.' '.$personfunktion_obj->result[0]->vorname.' '.$personfunktion_obj->result[0]->nachname.' '.$personfunktion_obj->result[0]->titelpost)
-										.'<br>';
-									}
-									else
-									{
-										echo $personfunktion_obj->errormsg.'<br>';
-									}
-								 }
-							}	 
-						?>	
-					  </fieldset>	
-					  <?php
-					}			 
-					 ?>
-			<?php } ?>
-
-					  <fieldset style="background-color:#e3ffe1;">
-					  
-					    	<legend style="background-color:#e3ffe1;">Organisationseinheit zur Firma  <?php  echo $firma->name; ?> </legend>
-						<?php
-						 
-							if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
-							{
-								$i=0;
-								foreach ($firmaorganisationseinheit as $key => $val)
-								{
-									$firmaorganisationseinheit_obj->result[$i] = new firma();
-									$bleibt->firmaorganisationseinheit=array();
-									if(!$firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($val))
-									{
-										echo $firmaorganisationseinheit_obj->errormsg.'<br>';
-									}	
-									else if ($firmaorganisationseinheit_obj->result[$i])
-									{
-										//var_dump($firmaorganisationseinheit_obj->result[$i]);
-										echo $firmaorganisationseinheit_obj->result[$i]->firma_organisationseinheit_id.' <b>'.$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz.'</b><br>'.$firmaorganisationseinheit_obj->result[$i]->bezeichnung.', KNr.: '.$firmaorganisationseinheit_obj->result[$i]->kundennummer.'<br>';
-									}
-									$i++;	
-								}	
-							}	 
-							else
-							{
-								echo '<font color="red">Keine Organisationseinheit zur Firma !</font><br>';
-							} 
-						?>					 						
-
-					 </fieldset>
-				
-		  </fieldset>
-	  </fieldset>
-	<?php
-		return true;
+		$personfunktionstandort=$personfunktionstandort_ok;
+		$personfunktionstandort_ok=null;
 	}
 
-//----------------------------------------------------------------------------------------
-// Zusammenlegen 
-//----------------------------------------------------------------------------------------
-
-	function zusammenlegen($firmendaten)
+	if (is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit))
 	{
-		if (!$db = new basis_db())
-			die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		if (!$uid = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
-		$firma_id_geloescht = (isset($firmendaten['firma_id_geloescht'])?$firmendaten['firma_id_geloescht']:'');
-		$firma_id_bleibt = (isset($firmendaten['firma_id_bleibt'])?$firmendaten['firma_id_bleibt']:'');
-		$standort = (isset($firmendaten['standort'])?$firmendaten['standort']:array());
-		$kontakt = (isset($firmendaten['kontakt'])?$firmendaten['kontakt']:array());
-		$personfunktionstandort = (isset($firmendaten['personfunktionstandort'])?$firmendaten['personfunktionstandort']:array());
-		$firmaorganisationseinheit = (isset($firmendaten['firmaorganisationseinheit'])?$firmendaten['firmaorganisationseinheit']:array());
-
-		//Überprüfung auf doppelte Organisationseinheiten
+		// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
 		$firmaorganisationseinheit_check=array();
+		$firmaorganisationseinheit_ok=array();
 		for ($i=0;$i<count($firmaorganisationseinheit);$i++)
 		{
+		
 			$firmaorganisationseinheit_obj->result[$i] = new firma();
+				
+				
 			if($firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firmaorganisationseinheit[$i]))
 			{
 				if (isset($firmaorganisationseinheit_obj->result[$i]))
 				{
-					if(array_key_exists($firmaorganisationseinheit_obj->result[$i]->oe_kurzbz,$firmaorganisationseinheit_check))
-					{
-						exit("<b style='color:red'>Es wurden Zuordnungen von Organisationseiheiten mehrfach ausgewählt!<br>Bitte Auswahl korrigieren.</b>");
-					}
-					$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
+						$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
+						//echo $firmaorganisationseinheit_obj->result[$i]->oe_kurzbz."  ".$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]."<br>";
 				}
+			}	
+			else 
+				echo "<br>".$firmaorganisationseinheit_obj->errormsg;	
+		}	
+		//var_dump($firmaorganisationseinheit_check);
+		foreach ($firmaorganisationseinheit_check as $key => $val)
+		{
+			$firmaorganisationseinheit_ok[]=$val;
+		}
+
+		$firmaorganisationseinheit=$firmaorganisationseinheit_ok;				
+		$firmaorganisationseinheit_ok=null;
+		$firmaorganisationseinheit_check=null;
+	}
+	
+	$firma = new firma();
+	if(!$firma->load($firma_id_bleibt))
+		exit('Welche Firma bleibt Fehler :'.$firma->errormsg);
+
+	echo '	
+	  <fieldset style="background-color:#B6ffAf;">
+		<legend style="background-color:#B6ffAf;">Informationen nach der Zusammenlegung </legend>
+		  <fieldset style="background-color:#c3ffb9;">
+	    	<legend style="background-color:#c3ffb9;">Firma '.$firma->firma_id.'</legend>';
+			
+	echo '<table>';
+	echo '<tr><td>'.$firma->firmentyp_kurzbz.' '.$firma->name
+	 .($firma->anmerkung?'<br>'.$firma->anmerkung:'')
+	 .'<br>Steuernummer:&nbsp;'.$firma->steuernummer .'&nbsp;Finanzamt:&nbsp;';
+	// Finanzamt anzeige und suche
+	if ($firma->finanzamt)
+	{
+		$firma_finanzamt = new firma();
+		if ($firma_finanzamt->load($firma->finanzamt))	
+			echo $firma_finanzamt->name;
+	}
+	echo '</td></tr>';
+	
+	echo "<tr><td>"
+		."Aktiv:<input disabled ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'').">"
+		."&nbsp;Gesperrt:<input disabled ".($firma->gesperrt?' style="background-color: #FFF4F4;" ':' style="background-color: #E3FDEE;" ')." type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'').">"
+		."&nbsp;Schule:<input disabled ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'').">"
+		."</td></tr>";
+	echo '</table>';
+
+	if (!is_array($standort) || !count($standort))
+		echo '<font color="red">Achtung! Keinen Standort gefunden ! - Verarbeiten wird nicht m&ouml;glich sein</font><br>';
+	else
+	{
+		foreach ($kontakt as $key => $val)
+		{
+			echo '<fieldset style="background-color:#e3ffe1;">';
+		    echo '<legend style="background-color:#e3ffe1;">Standort  '.$key.' der Firma '. $firma->name.'</legend>';
+				
+			$standort_obj = new standort();
+			$standort_obj->result=array();
+			if ($standort_obj->load($key))
+				echo '<h3>'.$standort_obj->kurzbz.', '.$standort_obj->bezeichnung.'</h3>';
+			else
+				echo $standort_obj->errormsg.'<br>';
+					
+			// Kontakt zum Standort
+			if (!isset($kontakt[$key]) || !is_array($kontakt[$key]) || !count($kontakt[$key]))
+			{
+				echo '<font color="red">Keine Kontakte zum Standort !</font><br>';
+			}	
+			else
+			{
+				foreach ($kontakt[$key] as $keys => $vals)
+				{
+				// Kontakte zum Standort
+				$kontakt_obj = new kontakt();
+				if($kontakt_obj->load($vals))
+					echo '<b>Kontakt</b> '
+					."&nbsp;Zustellung:<input disabled ".($kontakt_obj->zustellung?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($kontakt_obj->zustellung?'checked':'').">&nbsp;"									
+					.  $vals.' '.$kontakt_obj->kontakttyp.' '.$kontakt_obj->kontakt 
+					.'&nbsp;'.$kontakt_obj->beschreibung
+					.'<br>';
+				else
+					echo $kontakt_obj->errormsg.'<br>';
+				 }
+			}	 
+
+			// Personfunktionstandort zum Standort
+			if (!isset($personfunktionstandort[$key]) || !is_array($personfunktionstandort[$key]) || !count($personfunktionstandort[$key]))
+			{
+				echo '<font color="red">Keine Personen mit Funktionen zum Standort !</font><br>';
+			}	
+			else
+			{
+				foreach ($personfunktionstandort[$key] as $keys => $vals)
+				{
+					// Personfunktion zum Standort
+					$personfunktion_obj = new person(); 
+					if($personfunktion_obj->load_personfunktion('','','','',$vals))
+					{
+						//var_dump($personfunktion_obj);
+						echo '<b>Personen und Funktion</b> '
+						.  $vals.' '.$personfunktion_obj->result[0]->funktion_kurzbz.' '.$personfunktion_obj->result[0]->position.' '.$personfunktion_obj->result[0]->anrede.'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.trim($personfunktion_obj->result[0]->titelpre.' '.$personfunktion_obj->result[0]->vorname.' '.$personfunktion_obj->result[0]->nachname.' '.$personfunktion_obj->result[0]->titelpost)
+						.'<br>';
+					}
+					else
+					{
+						echo $personfunktion_obj->errormsg.'<br>';
+					}
+				 }
+			}	 
+			echo '</fieldset>';
+		}			 
+	} 
+
+	echo '<fieldset style="background-color:#e3ffe1;">
+			<legend style="background-color:#e3ffe1;">Organisationseinheit zur Firma  '.$firma->name.'</legend>';
+					
+					 
+	if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
+	{
+		$i=0;
+		foreach ($firmaorganisationseinheit as $key => $val)
+		{
+			$firmaorganisationseinheit_obj->result[$i] = new firma();
+			$bleibt->firmaorganisationseinheit=array();
+			if(!$firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($val))
+			{
+				echo $firmaorganisationseinheit_obj->errormsg.'<br>';
+			}	
+			else if ($firmaorganisationseinheit_obj->result[$i])
+			{
+				echo $firmaorganisationseinheit_obj->result[$i]->firma_organisationseinheit_id.' <b>'.$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz.'</b><br>'.$firmaorganisationseinheit_obj->result[$i]->bezeichnung.', KNr.: '.$firmaorganisationseinheit_obj->result[$i]->kundennummer.'<br>';
+			}
+			$i++;	
+		}	
+	}	 
+	else
+	{
+		echo '<font color="red">Keine Organisationseinheit zur Firma !</font><br>';
+	} 
+
+	echo '</fieldset>
+	  </fieldset>
+	</fieldset>';
+
+	return true;
+}
+
+/**
+ * Zusammenlegen der Firmen
+ *
+ * @param unknown_type $firmendaten
+ * @return unknown
+ */
+function zusammenlegen($firmendaten)
+{
+	global $db, $user;
+			
+	$error=false;
+	$firma_id_geloescht = (isset($firmendaten['firma_id_geloescht'])?$firmendaten['firma_id_geloescht']:'');
+	$firma_id_bleibt = (isset($firmendaten['firma_id_bleibt'])?$firmendaten['firma_id_bleibt']:'');
+	$standort = (isset($firmendaten['standort'])?$firmendaten['standort']:array());
+	$kontakt = (isset($firmendaten['kontakt'])?$firmendaten['kontakt']:array());
+	$personfunktionstandort = (isset($firmendaten['personfunktionstandort'])?$firmendaten['personfunktionstandort']:array());
+	$firmaorganisationseinheit = (isset($firmendaten['firmaorganisationseinheit'])?$firmendaten['firmaorganisationseinheit']:array());
+
+	//Überprüfung auf doppelte Organisationseinheiten
+	$firmaorganisationseinheit_check=array();
+	for ($i=0;$i<count($firmaorganisationseinheit);$i++)
+	{
+		$firmaorganisationseinheit_obj->result[$i] = new firma();
+		if($firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firmaorganisationseinheit[$i]))
+		{
+			if (isset($firmaorganisationseinheit_obj->result[$i]))
+			{
+				if(array_key_exists($firmaorganisationseinheit_obj->result[$i]->oe_kurzbz,$firmaorganisationseinheit_check))
+				{
+					exit("<b style='color:red'>Es wurden Zuordnungen von Organisationseiheiten mehrfach ausgewählt!<br>Bitte Auswahl korrigieren.</b>");
+				}
+				$firmaorganisationseinheit_check[$firmaorganisationseinheit_obj->result[$i]->oe_kurzbz]=$firmaorganisationseinheit[$i];
 			}
 		}
-		
-		// Ermitteln der Standorte zu den Firmen - geloescht und bleibt. Wichtiger Teil zum ermitteln welche Standorte entfernt werden sollen
-		$standorte_vorhanden=array();
-		$standort_obj = new standort();
-		$standort_obj->result=array();
-		if ($standort_obj->load_firma($firma_id_geloescht))
-		{
-			foreach ($standort_obj->result as $key => $val)
-				$standorte_vorhanden[$val->standort_id]=$val->standort_id;
-		}
-		$standort_obj = new standort();
-		$standort_obj->result=array();
-		if ($standort_obj->load_firma($firma_id_bleibt))
-		{
-			foreach ($standort_obj->result as $key => $val)
-				$standorte_vorhanden[$val->standort_id]=$val->standort_id;
-		}
-		
+	}
+	
+	if(!$db->db_query('BEGIN;'))
+		return 'Fehler beim Starten der Transaktion';
+	
+	// Ermitteln der Standorte zu den Firmen - geloescht und bleibt. Wichtiger Teil zum ermitteln welche Standorte entfernt werden sollen
+	$standorte_vorhanden=array();
+	$standort_obj = new standort();
+	$standort_obj->result=array();
+	if ($standort_obj->load_firma($firma_id_geloescht))
+	{
+		foreach ($standort_obj->result as $key => $val)
+			$standorte_vorhanden[$val->standort_id]=$val->standort_id;
+	}
+	$standort_obj = new standort();
+	$standort_obj->result=array();
+	if ($standort_obj->load_firma($firma_id_bleibt))
+	{
+		foreach ($standort_obj->result as $key => $val)
+			$standorte_vorhanden[$val->standort_id]=$val->standort_id;
+	}
+	
+	$standort_check=array();
+	if (is_array($standort) && count($standort))
+	{
+		// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
 		$standort_check=array();
-		if (is_array($standort) && count($standort))
+		for ($i=0;$i<count($standort);$i++)
 		{
-			// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
-			$standort_check=array();
-			for ($i=0;$i<count($standort);$i++)
+			$standort_check[$standort[$i]]=$standort[$i];
+			$standorte_vorhanden[$standort[$i]]='X';
+			
+			$standort_obj = new standort();
+			$standort_obj->result=array();
+			if($standort_obj->load($standort[$i]))
 			{
-				$standort_check[$standort[$i]]=$standort[$i];
-				$standorte_vorhanden[$standort[$i]]='X';
-				
-				$standort_obj = new standort();
-				$standort_obj->result=array();
-				$standort_obj->load($standort[$i]);
 				// Standortwechsel zu anderer Firma
 				if ($standort_obj->firma_id!=$firma_id_bleibt)
 				{
@@ -679,340 +648,434 @@ function show_firma_bleibt(work)
 					$standort_obj->new=false;
 					$standort_obj->firma_id=$firma_id_bleibt;
 					if (!$standort_obj->save())
-						echo 'Standort: '.$standort_obj->errormsg.'<br>';
-						
-				} 
-			}
-		} // Ende Standort 		
-		
-		// Pruefen ob Kontakte noch einen alten Standort zugewiessen ist	
-		$kontakt_check=array();
-		$kontakt_ok=array();
-		if (is_array($kontakt) && count($kontakt))
-		{
-			foreach ($kontakt as $key => $val)
-			{
-				$standort_id=$key;
-				// Kontakt wird dem ersten Standort von Firma bleibt zugeordnet
-				if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
-					$standort_id=$standort[0];
-				elseif (!isset($standort_check[$standort_id]))
-					continue;	
-					
-				for ($ii=0;$ii<count($val);$ii++)
-				{
-					$kontakt_check[$val[$ii]]=$val[$ii];
-					$kontakt_ok[$standort_id][]=$val[$ii];	
-					if ($standort_id!=$key)
-						echo '<h5>Wechsel Kontakt '.$val[$ii] .' von Standort ID '.$key.' auf => Standort ID '.$standort_id.'</h5>';
-					else
-						continue; // Keine Aenderung nechsten Datensatz pruefen
-
-					$qry = "UPDATE public.tbl_kontakt set updateamum= now(),updatevon='".addslashes($uid)."',standort_id='".$standort_id."' WHERE kontakt_id='".$val[$ii]."'";
-					$db->errormsg='';
-					$oRresult=$db->SQL('','','','','','','',$qry);
-				}
-			}
-			$kontakt=$kontakt_ok;
-			$kontakt_ok=null;
-		}				
-		
-		// Pruefen ob personfunktionstandorte noch einen alten Standort zugewiessen ist	
-		$personfunktionstandort_check=array();
-		$personfunktionstandort_ok=array();
-		if (is_array($personfunktionstandort) && count($personfunktionstandort))
-		{
-			foreach ($personfunktionstandort as $key => $val)
-			{
-				
-				$standort_id=$key;
-				if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
-					$standort_id=$standort[0];
-				elseif (!isset($standort_check[$standort_id]))
-					continue;	
-				
-				
-				for ($ii=0;$ii<count($val);$ii++)
-				{
-					$personfunktionstandort_check[$val[$ii]]=$val[$ii];
-					$personfunktionstandort_ok[$standort_id][]=$val[$ii];	
-	
-					if ($standort_id!=$key)
-						echo '<h5>Wechsel Personfunktionstandort '.$val[$ii] .' von Standort ID '.$key.' auf => Standort ID '.$standort_id.'</h5>';
-					else
-						continue; // Keine Aenderung nechsten Datensatz pruefen
-
-					$qry = "UPDATE public.tbl_personfunktionstandort set standort_id='".$standort_id."' WHERE personfunktionstandort_id='".$val[$ii]."'";
-					$db->errormsg='';
-					$oRresult=$db->SQL('','','','','','','',$qry);
-				}
-			}
-			$personfunktionstandort=$personfunktionstandort_ok;
-			$personfunktionstandort_ok=null;
-		}	
-					
-	// Welche Kontakte werden entfernt
-		if (is_array($standorte_vorhanden) && count($standorte_vorhanden))
-		{
-			reset($standorte_vorhanden);
-			// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
-			foreach ($standorte_vorhanden as $key => $val)
-			{
-				if (!is_numeric($val)) // Kennzeichen ob bereits verarbeitet
-					continue;
-					
-				$qry = "DELETE FROM public.tbl_kontakt WHERE standort_id='".$val."'";
-				$db->errormsg='';
-				$oRresult=$db->SQL('','','','','','','',$qry);
-
-				$qry = "DELETE FROM public.tbl_personfunktionstandort WHERE standort_id='".$val."'";
-				$db->errormsg='';
-				$oRresult=$db->SQL('','','','','','','',$qry);
-
-				$standort_obj = new standort();
-				$standort_obj->result=array();
-				if (!$standort_obj->load($val))
-					echo  'Fehler beim lesen Adresse zum Standort '.$val.' '.$standort_obj->errormsg.'<br>';
-
-
-				if ($standort_obj->result)
-				{	
-					foreach ($standort_obj->result as $keys => $vals)
 					{
-					$qry = "DELETE FROM public.tbl_standort WHERE standort_id='".$val."'";
-						$db->errormsg='';
-						$oRresult=$db->SQL('','','','','','','',$qry);
-
-					$qry = "DELETE FROM public.tbl_adresse WHERE adresse_id='".$vals->adresse_id."'";
-						$db->errormsg='';
-						$oRresult=$db->SQL('','','','','','','',$qry);
+						$error=true;
+						echo 'Standort: '.$standort_obj->errormsg.'<br>';
 					}
 				}
 			}
-		}	
-##return;	
-		
-		if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
-		{
-			$i=0;
-			foreach ($firmaorganisationseinheit as $key => $firma_organisationseinheit_id)
+			else 
 			{
-				$firmaorganisationseinheit_obj->result[$i] = new firma();
-				if(!$firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firma_organisationseinheit_id))
+				$error=true;
+				echo 'Standort: '.$standort_obj->errormsg;
+			}
+		}
+	} // Ende Standort 		
+	
+	if($error)
+	{
+		$db->db_query('ROLLBACK;');
+		return false;
+	}
+	
+	// Pruefen ob Kontakte noch einen alten Standort zugewiessen ist	
+	$kontakt_check=array();
+	$kontakt_ok=array();
+	if (is_array($kontakt) && count($kontakt))
+	{
+		foreach ($kontakt as $key => $val)
+		{
+			$standort_id=$key;
+			// Kontakt wird dem ersten Standort von Firma bleibt zugeordnet
+			if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
+				$standort_id=$standort[0];
+			elseif (!isset($standort_check[$standort_id]))
+				continue;	
+				
+			for ($ii=0;$ii<count($val);$ii++)
+			{
+				$kontakt_check[$val[$ii]]=$val[$ii];
+				$kontakt_ok[$standort_id][]=$val[$ii];	
+				if ($standort_id!=$key)
+					echo '<h5>Wechsel Kontakt '.$val[$ii] .' von Standort ID '.$key.' auf => Standort ID '.$standort_id.'</h5>';
+				else
+					continue; // Keine Aenderung nechsten Datensatz pruefen
+
+				$qry = "UPDATE public.tbl_kontakt set updateamum= now(),updatevon='".addslashes($user)."',standort_id='".$standort_id."' WHERE kontakt_id='".$val[$ii]."'";
+				$db->errormsg='';
+				if(!$db->db_query($qry))
 				{
-					echo 'Firma - Organisationseinheit: '.$firmaorganisationseinheit_obj->errormsg.' ('.$firma_organisationseinheit_id.')<br>';
-				}	
-				else if ($firmaorganisationseinheit_obj)
+					$error=true;
+					echo 'Fehler beim Aender der Kontaktdaten';
+				}
+			}
+		}
+		$kontakt=$kontakt_ok;
+		$kontakt_ok=null;
+	}				
+	
+	if($error)
+	{
+		$db->db_query('ROLLBACK;');
+		return false;
+	}
+	
+	// Pruefen ob personfunktionstandorte noch einen alten Standort zugewiessen ist	
+	$personfunktionstandort_check=array();
+	$personfunktionstandort_ok=array();
+	if (is_array($personfunktionstandort) && count($personfunktionstandort))
+	{
+		foreach ($personfunktionstandort as $key => $val)
+		{
+			
+			$standort_id=$key;
+			if (!isset($standort_check[$standort_id]) && isset($standort[0]) )
+				$standort_id=$standort[0];
+			elseif (!isset($standort_check[$standort_id]))
+				continue;	
+			
+			
+			for ($ii=0;$ii<count($val);$ii++)
+			{
+				$personfunktionstandort_check[$val[$ii]]=$val[$ii];
+				$personfunktionstandort_ok[$standort_id][]=$val[$ii];	
+
+				if ($standort_id!=$key)
+					echo '<h5>Wechsel Personfunktionstandort '.$val[$ii] .' von Standort ID '.$key.' auf => Standort ID '.$standort_id.'</h5>';
+				else
+					continue; // Keine Aenderung nechsten Datensatz pruefen
+
+				$qry = "UPDATE public.tbl_personfunktionstandort SET standort_id='".$standort_id."' WHERE personfunktionstandort_id='".$val[$ii]."'";
+				$db->errormsg='';
+				if(!$db->db_query($qry))
 				{
-					//var_dump($firmaorganisationseinheit_obj);
-					foreach ($firmaorganisationseinheit_obj->result as $keys => $vals)
+					echo 'Fehler beim Aendern der Personenzuordnung';
+					$error = true;
+				}
+			}
+		}
+		$personfunktionstandort=$personfunktionstandort_ok;
+		$personfunktionstandort_ok=null;
+	}
+	
+	if($error)
+	{
+		$db->db_query('ROLLBACK;');
+		return false;
+	}
+	
+	// Welche Kontakte werden entfernt
+	if (is_array($standorte_vorhanden) && count($standorte_vorhanden))
+	{
+		reset($standorte_vorhanden);
+		// Array mit Standort als Key fuer Kontrolle der Adressen ob der Standort noch gueltig ist oder neu zugeordnet wird
+		foreach ($standorte_vorhanden as $key => $val)
+		{
+			if (!is_numeric($val)) // Kennzeichen ob bereits verarbeitet
+				continue;
+				
+			$qry = "DELETE FROM public.tbl_kontakt WHERE standort_id='".$val."'";
+			$db->errormsg='';
+			if(!$db->db_query($qry))
+			{
+				$error=true;
+				echo 'Fehler beim Aendern der Kontakte';
+			}
+
+			$qry = "DELETE FROM public.tbl_personfunktionstandort WHERE standort_id='".$val."'";
+			$db->errormsg='';
+			if(!$db->db_query($qry))
+			{
+				$error=true;
+				echo 'Fehler beim Aendern der Personenzuordnung';
+			}
+
+			$standort_obj = new standort();
+			$standort_obj->result=array();
+			if (!$standort_obj->load($val))
+			{
+				$error=true;
+				echo  'Fehler beim lesen Adresse zum Standort '.$val.' '.$standort_obj->errormsg.'<br>';
+			}
+
+
+			if ($standort_obj->result)
+			{	
+				foreach ($standort_obj->result as $keys => $vals)
+				{
+					$qry = "DELETE FROM public.tbl_standort WHERE standort_id='".$val."'";
+					if(!$db->db_query($qry))
 					{
-						// Organisation gehoert bereits zu dieser Firma
-						if ($vals->firma_id==$firma_id_bleibt)
-							continue;
-						// gibt es die Zuornung der Oe-Einheit zur Firma schon?
-						$qry_check="SELECT * FROM public.tbl_firma_organisationseinheit WHERE firma_id='".$firma_id_bleibt."' AND oe_kurzbz='".$vals->oe_kurzbz."';";
-						if($db->db_num_rows($db->db_query($qry_check))==0)
-						{
-							//nein
-							$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
-								'firma_id='.addslashes($firma_id_bleibt).', '.
-								'updateamum= now(), '.
-						     	'updatevon=\''.addslashes($uid).'\' '.
-								" WHERE firma_organisationseinheit_id='".addslashes($vals->firma_organisationseinheit_id)."';";
-						}
-						else 
-						{
-							//ja
-							$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
-								'bezeichnung=\''.addslashes($vals->bezeichnung).'\', '.
-								'kundennummer=\''.addslashes($vals->kundennummer).'\', '.
-								'updateamum= now(), '.
-						     	'updatevon=\''.addslashes($uid).'\' '.
-								" WHERE firma_id='".addslashes($firma_id_bleibt)."' AND oe_kurzbz='".$vals->oe_kurzbz."';";
-						}
-						$db->errormsg='';
-						//if ($oRresult=$db->SQL('','','','','','','',$qry))
-						if($result=$db->db_query($qry))					
-						{
-							echo 'Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.' zugeordnet '.'<br>';
-						}
-						else 
-						{
-							echo "<br>OE: ".$qry."<br>";
-							echo 'Fehler bein Zuordnen von Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.'<br>';
-							echo $db->errormsg."<br>";
-						}
-					}	
-				}	
-				$i++;
-			}	
-		}	 
+						$error=true;
+						echo 'Fehler beim Aendern des Standorts';
+					}
 
- 		
-		// Alle Organisationseinheiten die noch gebunden sind an "wird geloescht Firma" nach dem Zuordnen zu "bleibt Firma" loeschen
-		$qry = "DELETE FROM public.tbl_firma_organisationseinheit WHERE firma_id='".$firma_id_geloescht."'";
-		$db->errormsg='';
-		$oRresult=$db->SQL('','','','','','','',$qry);
-
-		/*
-		// Alle Organisationseinheiten die nicht mehr bei der "bleibt Firma" vorhanden sind loeschen
-		$firmaorganisationseinheit_check=array();
-		foreach ($firmaorganisationseinheit as $keys => $vals)
-			$firmaorganisationseinheit_check[$vals]=$vals;
-
-		$firmaorganisationseinheit_obj = new firma();
-		if($firmaorganisationseinheit_obj->get_firmaorganisationseinheit($firma_id_bleibt))
+					if($vals->adresse_id!='')
+					{
+						$qry = "DELETE FROM public.tbl_adresse WHERE adresse_id='".$vals->adresse_id."'";
+						if(!$db->db_query($qry))
+						{
+							$error=true;
+							echo 'Fehler beim Aendern der Adresse';
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	if($error)
+	{
+		$db->db_query('ROLLBACK;');
+		return false;
+	}	
+	
+	if (isset($firmaorganisationseinheit) && is_array($firmaorganisationseinheit) && count($firmaorganisationseinheit) ) 
+	{
+		$i=0;
+		foreach ($firmaorganisationseinheit as $key => $firma_organisationseinheit_id)
 		{
-			if (is_array($firmaorganisationseinheit_obj->result) && count($firmaorganisationseinheit_obj->result) )
+			$firmaorganisationseinheit_obj->result[$i] = new firma();
+			if(!$firmaorganisationseinheit_obj->result[$i]->load_firmaorganisationseinheit($firma_organisationseinheit_id))
 			{
+				$error=true;
+				echo 'Firma - Organisationseinheit: '.$firmaorganisationseinheit_obj->errormsg.' ('.$firma_organisationseinheit_id.')<br>';
+			}	
+			else if ($firmaorganisationseinheit_obj)
+			{
+				//var_dump($firmaorganisationseinheit_obj);
 				foreach ($firmaorganisationseinheit_obj->result as $keys => $vals)
 				{
-					if (!isset($firmaorganisationseinheit_check[$vals->firma_organisationseinheit_id]))
+					// Organisation gehoert bereits zu dieser Firma
+					if ($vals->firma_id==$firma_id_bleibt)
+						continue;
+					// gibt es die Zuornung der Oe-Einheit zur Firma schon?
+					$qry_check="SELECT * FROM public.tbl_firma_organisationseinheit WHERE firma_id='".$firma_id_bleibt."' AND oe_kurzbz='".$vals->oe_kurzbz."';";
+					if($db->db_num_rows($db->db_query($qry_check))==0)
 					{
-						$qry = "DELETE FROM public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id='".$vals->firma_organisationseinheit_id."'";
-						$db->errormsg='';
-						if (!$oRresult=$db->SQL('','','','','','','',$qry))
-							echo  'Firma - Organisationseinheit: '.$db->errormsg.' (... '.$firma_organisationseinheit_id.')<br>';
-						else	
-							echo 'Firma '.$firma_id_bleibt.' Organisationseinheit wurde gel&ouml;scht '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.'<br>';
-					}	
+						//nein
+						$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
+							'firma_id='.addslashes($firma_id_bleibt).', '.
+							'updateamum= now(), '.
+					     	'updatevon=\''.addslashes($user).'\' '.
+							" WHERE firma_organisationseinheit_id='".addslashes($vals->firma_organisationseinheit_id)."';";
+					}
+					else 
+					{
+						//ja
+						$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
+							'bezeichnung=\''.addslashes($vals->bezeichnung).'\', '.
+							'kundennummer=\''.addslashes($vals->kundennummer).'\', '.
+							'updateamum= now(), '.
+					     	'updatevon=\''.addslashes($user).'\' '.
+							" WHERE firma_id='".addslashes($firma_id_bleibt)."' AND oe_kurzbz='".$vals->oe_kurzbz."';";
+					}
+					$db->errormsg='';
+					
+					if($result=$db->db_query($qry))					
+					{
+						echo 'Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.' zugeordnet '.'<br>';
+					}
+					else 
+					{
+						$error=true;
+						echo "<br>OE: ".$qry."<br>";
+						echo 'Fehler bein Zuordnen von Organisation '.$vals->firma_organisationseinheit_id.' '.$vals->name.', '. $vals->organisationseinheittyp_kurzbz.' '.$vals->bezeichnung.' zu Firma '.$firma_id_bleibt.'<br>';
+						echo $db->errormsg."<br>";
+					}
 				}	
-			}		
-		}*/		
+			}	
+			$i++;
+		}	
+	}	 
+
 		
-		// ---------------------------------------------------------------------------------
-		// Deaktivieren der Firma "das wird geloescht"
-		// ---------------------------------------------------------------------------------		
-		$firma = new firma();
-		if(!$firma->load($firma_id_geloescht))
-			exit('Firma wird gel&ouml;scht fehler :'.$firma->errormsg);
-		$firma->new=false;
-		$firma->aktiv=false;
-		$firma->gesperrt=true;		
-		$firma->updatevon=$uid;
-		if(!$firma->save())
-			exit('Fehler beim Deaktivieren der Firma '. $firma->firma_id.' '. $firma->name.'  wird gel&ouml;scht fehler :'.$firma->errormsg);
+	// Alle Organisationseinheiten die noch gebunden sind an "wird geloescht Firma" nach dem Zuordnen zu "bleibt Firma" loeschen
+	$qry = "DELETE FROM public.tbl_firma_organisationseinheit WHERE firma_id='".$firma_id_geloescht."'";
+	$db->errormsg='';
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Loeschen der Organisationseinheiten';
+		$error=true;
+	}
+
+	//Alle Tags uebernehemen die der neuen Firma noch nicht zugeordnet sind
+	$qry = "UPDATE public.tbl_firmatag SET firma_id='$firma_id_bleibt' WHERE firma_id='$firma_id_geloescht' AND tag NOT IN(SELECT tag FROM public.tbl_firmatag WHERE firma_id='$firma_id_bleibt');";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Uebernehmen der Tags';
+		$error=true;
+	}
+
+	//Die Restlichen Tags loeschen
+	$qry = "DELETE FROM public.tbl_firmatag WHERE firma_id='$firma_id_geloescht'";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Entfernen der Tags';
+		$error=true;
+	}
+	
+	//Projektarbeiten Zuordnungen umhaengen
+	$qry = "UPDATE lehre.tbl_projektarbeit SET firma_id='$firma_id_bleibt' WHERE firma_id='$firma_id_geloescht'";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Aendern der Projektarbeitszuordnung';
+		$error=true;
+	}
+	
+	//Projektarbeiten Zuordnungen umhaengen
+	$qry = "UPDATE public.tbl_adresse SET firma_id='$firma_id_bleibt' WHERE firma_id='$firma_id_geloescht'";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Aendern der Adresszuordnung';
+		$error=true;
+	}
+	
+	//Preinteressenten umhaengen
+	$qry = "UPDATE public.tbl_preinteressent SET firma_id='$firma_id_bleibt' WHERE firma_id='$firma_id_geloescht'";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Aendern der Preinteressentzuordnung';
+		$error=true;
+	}
+	
+	//Projektarbeiten Zuordnungen umhaengen
+	$qry = "UPDATE public.tbl_firma SET finanzamt='$firma_id_bleibt' WHERE finanzamt='$firma_id_geloescht'";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Aendern der Finanzamtzuordnung';
+		$error=true;
+	}
 			
+	// Firma loeschen
+	$firma = new firma();
+	if(!$firma->delete($firma_id_geloescht))
+	{
+		$error = true;
+		echo 'Firma loeschen:'.$firma->errormsg;
+	}
+	
+	if($error)
+	{
+		$db->db_query('ROLLBACK;');
+		return false;
+	}
+	else 
+	{
+		$db->db_query('COMMIT;');
 		return true;
 	}
-//----------------------------------------------------------------------------------------
-// Erimtteln der Firmen.- Standortdaten
-//----------------------------------------------------------------------------------------
+}
 
-	function getFirmaUndStandorte($firma_id_geloescht,$firma_id_bleibt)	
-	{
-		//----------------------------------------------------------------------------------------
-		//  zwei Teileanzeigen a) wird geloescht b) bleibt 
-		//----------------------------------------------------------------------------------------
-	
-		// -------------------------------------------------------------------------
-		// Firmenstammdaten holen
-		// -------------------------------------------------------------------------
-		$firma = new firma();
-		if(!$firma->load($firma_id_geloescht))
-			exit('Firma wird gel&ouml;scht Fehler :'.$firma->errormsg);
-		$geloescht=$firma;
-				
-		$firma = new firma();
-		if(!$firma->load($firma_id_bleibt))
-			exit('Welche Firma bleibt Fehler :'.$firma->errormsg);
-		$bleibt=$firma;
-	
-		// -------------------------------------------------------------------------
-		// Standorte je Firmenstammdaten holen
-		// -------------------------------------------------------------------------
-		// - wird geloescht
-		$standort_obj = new standort();
-		$standort_obj->result=array();
-		$standort_obj->load_firma($geloescht->firma_id);
-		$geloescht->standorte=array();
-		if ($standort_obj->result)
-		{
-			$geloescht->standorte=$standort_obj->result;
-			for ($i=0;$i<count($geloescht->standorte);$i++)
-			{
-				// Adresse zum Standort
-				$adresse_obj = new adresse();
-				$geloescht->standorte[$i]->adresse=array();
-				if($geloescht->standorte[$i]->adresse_id && $adresse_obj->load($geloescht->standorte[$i]->adresse_id))
-				{
-					$geloescht->standorte[$i]->adresse=$adresse_obj;
-				}
-				// Kontakte zum Standort
-				$kontakt_obj = new kontakt();
-				$geloescht->standorte[$i]->kontakt=array();
-				if($geloescht->standorte[$i]->standort_id && $kontakt_obj->load_standort($geloescht->standorte[$i]->standort_id))
-				{
-					$geloescht->standorte[$i]->kontakt=$kontakt_obj;
-				}
-	
-				// Personen zum Standort
-				$personfunktion_obj = new person();
-				$geloescht->personen[$i]->personfunktion=array();
-				if($geloescht->standorte[$i]->standort_id && $personfunktion_obj->load_personfunktion($geloescht->standorte[$i]->standort_id,'',$geloescht->firma_id))
-				{
-					$geloescht->standorte[$i]->personfunktion=$personfunktion_obj;
-				}
-			}		
-		}
-		
-		$firmaorganisationseinheit_obj = new firma();
-		$geloescht->firmaorganisationseinheit=array();
-		if(!$firmaorganisationseinheit_obj->get_firmaorganisationseinheit($geloescht->firma_id))
-		{
-			$geloescht->firmaorganisationseinheit=array();
-		}
-		if ($firmaorganisationseinheit_obj->result)
-		{
-			$geloescht->firmaorganisationseinheit=$firmaorganisationseinheit_obj->result;
-		}	
+/**
+ * Erimtteln der Firmen.- Standortdaten
+ *
+ * @param $firma_id_geloescht
+ * @param $firma_id_bleibt
+ */
+function getFirmaUndStandorte($firma_id_geloescht,$firma_id_bleibt)	
+{
+	//----------------------------------------------------------------------------------------
+	//  zwei Teileanzeigen a) wird geloescht b) bleibt 
+	//----------------------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------
+	// Firmenstammdaten holen
+	// -------------------------------------------------------------------------
+	$firma = new firma();
+	if(!$firma->load($firma_id_geloescht))
+		exit('Firma wird gel&ouml;scht Fehler :'.$firma->errormsg);
+	$geloescht=$firma;
 			
-		// - bleibt
-		$standort_obj = new standort();
-		$standort_obj->result=array();
-		$standort_obj->load_firma($bleibt->firma_id);
-		$bleibt->standorte=array();
-		if ($standort_obj->result)
+	$firma = new firma();
+	if(!$firma->load($firma_id_bleibt))
+		exit('Welche Firma bleibt Fehler :'.$firma->errormsg);
+	$bleibt=$firma;
+
+	// -------------------------------------------------------------------------
+	// Standorte je Firmenstammdaten holen
+	// -------------------------------------------------------------------------
+	// - wird geloescht
+	$standort_obj = new standort();
+	$standort_obj->result=array();
+	$standort_obj->load_firma($geloescht->firma_id);
+	$geloescht->standorte=array();
+	if ($standort_obj->result)
+	{
+		$geloescht->standorte=$standort_obj->result;
+		for ($i=0;$i<count($geloescht->standorte);$i++)
 		{
-			$bleibt->standorte=$standort_obj->result;
-			for ($i=0;$i<count($bleibt->standorte);$i++)
+			// Adresse zum Standort
+			$adresse_obj = new adresse();
+			$geloescht->standorte[$i]->adresse=array();
+			if($geloescht->standorte[$i]->adresse_id && $adresse_obj->load($geloescht->standorte[$i]->adresse_id))
 			{
-				// Adresse zum Standort
-				$adresse_obj = new adresse();
-				$bleibt->standorte[$i]->adresse=array();
-				if($bleibt->standorte[$i]->adresse_id && $adresse_obj->load($bleibt->standorte[$i]->adresse_id))
-				{
-					$bleibt->standorte[$i]->adresse=$adresse_obj;
-				}
-				// Kontakte zum Standort
-				$kontakt_obj = new kontakt();
-				$bleibt->standorte[$i]->kontakt=array();
-				if($bleibt->standorte[$i]->standort_id && $kontakt_obj->load_standort($bleibt->standorte[$i]->standort_id))
-				{
-					$bleibt->standorte[$i]->kontakt=$kontakt_obj;
-				}
-				
-				// Personen zum Standort
-				$personfunktion_obj = new person();
-				$bleibt->personen[$i]->personfunktion=array();
-				if($bleibt->standorte[$i]->standort_id && $personfunktion_obj->load_personfunktion($bleibt->standorte[$i]->standort_id,'',$bleibt->firma_id))
-				{
-					$bleibt->standorte[$i]->personfunktion=$personfunktion_obj;
-				}
-			}		
-		}
+				$geloescht->standorte[$i]->adresse=$adresse_obj;
+			}
+			// Kontakte zum Standort
+			$kontakt_obj = new kontakt();
+			$geloescht->standorte[$i]->kontakt=array();
+			if($geloescht->standorte[$i]->standort_id && $kontakt_obj->load_standort($geloescht->standorte[$i]->standort_id))
+			{
+				$geloescht->standorte[$i]->kontakt=$kontakt_obj;
+			}
+
+			// Personen zum Standort
+			$personfunktion_obj = new person();
+			$geloescht->personen[$i]->personfunktion=array();
+			if($geloescht->standorte[$i]->standort_id && $personfunktion_obj->load_personfunktion($geloescht->standorte[$i]->standort_id,'',$geloescht->firma_id))
+			{
+				$geloescht->standorte[$i]->personfunktion=$personfunktion_obj;
+			}
+		}		
+	}
+	
+	$firmaorganisationseinheit_obj = new firma();
+	$geloescht->firmaorganisationseinheit=array();
+	if(!$firmaorganisationseinheit_obj->get_firmaorganisationseinheit($geloescht->firma_id))
+	{
+		$geloescht->firmaorganisationseinheit=array();
+	}
+	if ($firmaorganisationseinheit_obj->result)
+	{
+		$geloescht->firmaorganisationseinheit=$firmaorganisationseinheit_obj->result;
+	}	
 		
-		$firmaorganisationseinheit_obj = new firma();
-		$bleibt->firmaorganisationseinheit=array();
-		if(!$firmaorganisationseinheit_obj->get_firmaorganisationseinheit($bleibt->firma_id))
-			$bleibt->firmaorganisationseinheit=array();
-		if ($firmaorganisationseinheit_obj->result)
+	// - bleibt
+	$standort_obj = new standort();
+	$standort_obj->result=array();
+	$standort_obj->load_firma($bleibt->firma_id);
+	$bleibt->standorte=array();
+	if ($standort_obj->result)
+	{
+		$bleibt->standorte=$standort_obj->result;
+		for ($i=0;$i<count($bleibt->standorte);$i++)
 		{
-			$bleibt->firmaorganisationseinheit=$firmaorganisationseinheit_obj->result;
-		}	
-		//var_dump($geloescht);
-		return $standort=array("geloescht"=>$geloescht,"bleibt"=>$bleibt);
-	}		
+			// Adresse zum Standort
+			$adresse_obj = new adresse();
+			$bleibt->standorte[$i]->adresse=array();
+			if($bleibt->standorte[$i]->adresse_id && $adresse_obj->load($bleibt->standorte[$i]->adresse_id))
+			{
+				$bleibt->standorte[$i]->adresse=$adresse_obj;
+			}
+			// Kontakte zum Standort
+			$kontakt_obj = new kontakt();
+			$bleibt->standorte[$i]->kontakt=array();
+			if($bleibt->standorte[$i]->standort_id && $kontakt_obj->load_standort($bleibt->standorte[$i]->standort_id))
+			{
+				$bleibt->standorte[$i]->kontakt=$kontakt_obj;
+			}
+			
+			// Personen zum Standort
+			$personfunktion_obj = new person();
+			$bleibt->personen[$i]->personfunktion=array();
+			if($bleibt->standorte[$i]->standort_id && $personfunktion_obj->load_personfunktion($bleibt->standorte[$i]->standort_id,'',$bleibt->firma_id))
+			{
+				$bleibt->standorte[$i]->personfunktion=$personfunktion_obj;
+			}
+		}		
+	}
+	
+	$firmaorganisationseinheit_obj = new firma();
+	$bleibt->firmaorganisationseinheit=array();
+	if(!$firmaorganisationseinheit_obj->get_firmaorganisationseinheit($bleibt->firma_id))
+		$bleibt->firmaorganisationseinheit=array();
+	if ($firmaorganisationseinheit_obj->result)
+	{
+		$bleibt->firmaorganisationseinheit=$firmaorganisationseinheit_obj->result;
+	}	
+
+	return $standort=array("geloescht"=>$geloescht,"bleibt"=>$bleibt);
+}		
 ?>		
 

@@ -343,19 +343,7 @@ class firma extends basis_db
 	 */
 	public function delete($firma_id)
 	{
-		if(!is_numeric($firma_id))
-		{
-			$this->errormsg = 'Firma_id ist ungueltig';
-			return false;
-		}
-		$qry = "update public.tbl_firma set aktiv=false,gesperrt=true WHERE firma_id='$firma_id'";
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = 'Fehler beim Loeschen der Daten';
-			return false;
-		}
-
-		$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
+		$qry = "DELETE FROM public.tbl_firma WHERE firma_id='$firma_id'";
 		if($this->db_query($qry))
 			return true;
 		else 

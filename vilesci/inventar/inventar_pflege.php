@@ -20,6 +20,13 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ * Diese Seite dient zur Inventarisierung der Betriebsmittel.
+ * Es kann eine Vorlage erstellt werden, damit mehrere Betriebsmittel mit den
+ * gleichen Daten angelegt werden können.
+ * 
+ * Es koennen neue Betriebsmittel angelegt, bearbeitet und geloescht werden.
+ */
 	require_once('../../config/vilesci.config.inc.php');
   	require_once('../../include/functions.inc.php');
 	require_once('../../include/benutzerberechtigung.class.php');
@@ -54,7 +61,7 @@
 
   	$beschreibung=trim((isset($_REQUEST['beschreibung']) ? $_REQUEST['beschreibung']:''));
   	$betriebsmitteltyp=trim((isset($_REQUEST['betriebsmitteltyp']) ? $_REQUEST['betriebsmitteltyp']:''));
-  	$nummer=trim((isset($_REQUEST['nummer']) ? $_REQUEST['nummer']:''));
+  	$inventarnummer=trim((isset($_REQUEST['inventarnummer']) ? $_REQUEST['inventarnummer']:''));
   	$reservieren=trim((isset($_REQUEST['reservieren']) ?$_REQUEST['reservieren']:false));
   	$ort_kurzbz=trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:''));
 	$oe_kurzbz=trim((isset($_REQUEST['oe_kurzbz']) ? $_REQUEST['oe_kurzbz']:''));
@@ -84,8 +91,8 @@
   	$work=trim(isset($_REQUEST['work']) ?$_REQUEST['work']:false);
   	$anzahl=trim(isset($_REQUEST['anzahl']) ?$_REQUEST['anzahl']:1);
 
-  	$vorlage=trim(isset($_REQUEST['vorlage']) ?$_REQUEST['vorlage']:'true');
-  	$vorlage=trim((isset($_REQUEST['betriebsmittel_id']) ?'false':$vorlage));
+  	$vorlage=(isset($_REQUEST['vorlage'])?$_REQUEST['vorlage']:'true');
+  	$vorlage=(isset($_REQUEST['betriebsmittel_id']) ?'false':$vorlage);
 
 // ------------------------------------------------------------------------------------------
 // Berechtigung
@@ -170,18 +177,16 @@
 	$resultBetriebsmittelstatus=$oBetriebsmittelstatus->result;
 
 	// Vorlagedaten lesen aus Betriebsmittel
-	if ($nummer!='' && empty($work) )
+	if ($inventarnummer!='' && empty($work) )
 	{
-			$oBetriebsmittel->result=array();
-			$oBetriebsmittel->errormsg='';
-			if ($oBetriebsmittel->load_nummer($nummer))
-			{
-				if (is_array($oBetriebsmittel->result) && isset($oBetriebsmittel->result[0]) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz))
-					$oBetriebsmittel->result=$oBetriebsmittel->result[0];
-				$betriebsmittel_id=$oBetriebsmittel->result->betriebsmittel_id;
-			}
-			else
-				$errormsg[]=$oBetriebsmittel->errormsg;
+		$oBetriebsmittel->result=array();
+		$oBetriebsmittel->errormsg='';
+		if ($oBetriebsmittel->load_inventarnummer($inventarnummer))
+		{
+			$betriebsmittel_id=$oBetriebsmittel->betriebsmittel_id;
+		}
+		else
+			$errormsg[]=$oBetriebsmittel->errormsg;
 	}
 
 	// Vorlagedaten lesen aus Betriebsmittel
@@ -191,10 +196,29 @@
 		$oBetriebsmittel->errormsg='';
 		if ($oBetriebsmittel->load($betriebsmittel_id))
 		{
-		  	$anzahl=count($oBetriebsmittel->result);
+		  	$anzahl=1;
 
-			foreach ($oBetriebsmittel->result as $key => $value)
-				$$key=$value;
+			$betriebsmittel_id = $oBetriebsmittel->betriebsmittel_id;
+			$beschreibung = $oBetriebsmittel->beschreibung;
+			$betriebsmitteltyp = $oBetriebsmittel->betriebsmitteltyp;
+			$inventarnummer = $oBetriebsmittel->inventarnummer;
+			$reservieren = $oBetriebsmittel->reservieren;
+			$ort_kurzbz = $oBetriebsmittel->ort_kurzbz;
+			$updateamum = $oBetriebsmittel->updateamum;
+			$updatevon = $oBetriebsmittel->updatevon;
+			$insertvon = $oBetriebsmittel->insertvon;
+			$insertamum = $oBetriebsmittel->insertamum;
+			$ext_id = $oBetriebsmittel->ext_id;
+			$beschreibung = $oBetriebsmittel->beschreibung;
+			$oe_kurzbz = $oBetriebsmittel->oe_kurzbz;
+			$hersteller = $oBetriebsmittel->hersteller;
+			$seriennummer = $oBetriebsmittel->seriennummer;
+			$bestellung_id = $oBetriebsmittel->bestellung_id;
+			$bestelldetail_id = $oBetriebsmittel->bestelldetail_id;
+			$afa = $oBetriebsmittel->afa;
+			$verwendung = $oBetriebsmittel->verwendung;
+			$anmerkung = $oBetriebsmittel->anmerkung;
+			$leasing_bis = $oBetriebsmittel->leasing_bis;
 
 			$bestellung_id_old=$bestellung_id;
 			$bestelldetail_id_old=$bestelldetail_id;
@@ -203,12 +227,7 @@
 			$oBetriebsmittel_betriebsmittelstatus->errormsg='';
 			if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id))
 			{
-				if (isset($oBetriebsmittel_betriebsmittelstatus->result->betriebsmittelstatus_kurzbz))
-					$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->result->betriebsmittelstatus_kurzbz;
-				else if (is_array($oBetriebsmittel_betriebsmittelstatus->result) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]) && isset($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz))
-					$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz;
-				else
-					$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz;
+				$betriebsmittelstatus_kurzbz=$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz;
 			}
 			else
 				$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
@@ -217,12 +236,7 @@
 			$oBetriebsmittelperson->errormsg='';
 			if ($oBetriebsmittelperson->load_betriebsmittelpersonen($betriebsmittel_id))
 			{
-				if (isset($oBetriebsmittelperson->result->retouram) )
-					$person_id=($oBetriebsmittelperson->result->retouram?'':$oBetriebsmittelperson->result->person_id);
-				else if (is_array($oBetriebsmittelperson->result) && isset($oBetriebsmittelperson->result[0]) && isset($oBetriebsmittelperson->result[0]->retouram) )
-					$person_id=($oBetriebsmittelperson->result[0]->retouram?'':$oBetriebsmittelperson->result[0]->person_id);
-				else if (empty($oBetriebsmittelperson->retouram))
-					$person_id=$oBetriebsmittelperson->person_id;
+				$person_id=($oBetriebsmittelperson->retouram?'':$oBetriebsmittelperson->person_id);
 			}
 			else
 				$errormsg[]=$oBetriebsmittelperson->errormsg;
@@ -368,27 +382,32 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 	<head>
-		<title>Inventar - Neuanlage</title>
+		<title>Inventar</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/jquery.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">		
 		
 		<script src="../../include/js/jquery.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript">
-		<script src="../../include/js/jquery.barcode.0.3.js" type="text/javascript"></script>		
-
+		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+		<script type="text/javascript" language="JavaScript1.2">
+			function formatItem(row) 
+			{
+				return row[0] + ' <li>' + row[1] + '</li> ';
+			}
+		</script>
 	</head>
 	<body>
-		<h1>&nbsp;Inventar - Neuanlage&nbsp;</h1>
-	    <form name="sendform" action="<?php echo $_SERVER["PHP_SELF"];  ?>" method="post" enctype="application/x-www-form-urlencoded">
+		<h1>&nbsp;Inventar&nbsp;</h1>
+		<form name="sendform" action="<?php echo $_SERVER["PHP_SELF"];  ?>" method="post" enctype="application/x-www-form-urlencoded">
 
 		<fieldset>
 			<legend>Vorlage&nbsp;&nbsp;&nbsp;Anzahl:
 			<select  id="anzahl" name="anzahl" onchange="document.sendform.submit();">
 				<?php
 					for ($i=1;$i<100 ;$i++)
-						echo '<option '.($anzahl==$i?' selected="selected" ':'').' value="'.$i.'">'.$i.'&nbsp;</option>';
+						echo '<option '.($anzahl==$i?' selected="selected" ':'').' value="'.$i.'">'.$i.'</option>';
 				?>
 			</select>
 		</legend>
@@ -403,10 +422,6 @@
 							<td>&nbsp;<label for="bestellung_id">Bestellung ID</label>&nbsp;
 								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestellung_id" name="bestellung_id" size="10" maxlength="41" value="<?php echo $bestellung_id;?>">
 								<script type="text/javascript" language="JavaScript1.2">				
-									function formatItem(row) 
-									{
-									    return row[0] + " <li>" + row[1] + "</li> ";
-									}
 									$(document).ready(function() 
 									{
 										  $('#bestellung_id').autocomplete('inventar_autocomplete.php', 
@@ -426,10 +441,6 @@
 							<td>&nbsp;<label for="bestelldetail_id">Bestelldetail ID</label>&nbsp;
 								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestelldetail_id" name="bestelldetail_id" size="6" maxlength="41" value="<?php echo $bestelldetail_id;?>">
 								<script type="text/javascript" language="JavaScript1.2">
-									function formatItem(row) 
-									{
-									    return row[0] + " <li>" + row[1] + "</li> ";
-									}
 									$(document).ready(function() 
 									{
 										  $('#bestelldetail_id').autocomplete('inventar_autocomplete.php', 
@@ -450,10 +461,6 @@
 							<td>&nbsp;<label for="hersteller">Hersteller</label>&nbsp;
 							<input id="hersteller" name="hersteller" type="text" size="35" maxlength="120" value="<?php echo $hersteller;?>">
 									<script type="text/javascript" language="JavaScript1.2">
-									function formatItem(row) 
-									{
-									    return row[0] + " <li>" + row[1] + "</li> ";
-									}
 									$(document).ready(function() 
 									{
 										  $('#hersteller').autocomplete('inventar_autocomplete.php', 
@@ -497,10 +504,6 @@
 							<td>&nbsp;<label for="ort_kurzbz">Ort</label>&nbsp;
 								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="ort_kurzbz" name="ort_kurzbz" size="10" maxlength="20" value="<?php echo $ort_kurzbz;?>">
 									<script type="text/javascript" language="JavaScript1.2">
-									function formatItem(row) 
-									{
-									    return row[0] + " <li>" + row[1] + "</li> ";
-									}
 									$(document).ready(function() 
 									{
 										  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', 
@@ -533,10 +536,6 @@
 							<td>&nbsp;<label for="oe_kurzbz">Organisation</label>&nbsp;
 								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="oe_kurzbz" name="oe_kurzbz" size="13" maxlength="14" value="<?php echo $oe_kurzbz;?>">
 								<script type="text/javascript" language="JavaScript1.2">
-									function formatItem(row) 
-									{
-									    return row[0] + " <li>" + row[1] + "</li> ";
-									}
 									$(document).ready(function() 
 									{
 										  $('#oe_kurzbz').autocomplete('inventar_autocomplete.php', 
@@ -593,9 +592,6 @@
 						<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
 								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="person_id" name="person_id" size="13" maxlength="14" value="<?php echo $person_id; ?>">
 									<script type="text/javascript" language="JavaScript1.2">
-									function formatItem(row) {
-									    return row[0] + " <li>" + row[1] + "</li> ";
-									}
 									$(document).ready(function() 
 									{
 										  $('#person_id').autocomplete('inventar_autocomplete.php', 
@@ -723,19 +719,15 @@
 	?>
 	</fieldset>
 	<hr>
-	<!-- VORLAGE EMDE -->
+	<!-- VORLAGE ENDE -->
 
-	<noscript>
-		<p class="error">Bitte JavaScript einschalten!</p>
-  	</noscript>
-
-	<!-- DATEN ANFANG -->
-	<?php
+<!-- DATEN ANFANG -->
+<?php
 @flush();
 
 $betriebsmittel_id_array=(isset($_REQUEST['betriebsmittel_id_array'])?$_REQUEST['betriebsmittel_id_array']:array());
 
-$nummer_array=(isset($_REQUEST['nummer_array'])?$_REQUEST['nummer_array']:array());
+$inventarnummer_array=(isset($_REQUEST['inventarnummer_array'])?$_REQUEST['inventarnummer_array']:array());
 $seriennummer_array=(isset($_REQUEST['seriennummer_array'])?$_REQUEST['seriennummer_array']:array());
 $betriebsmitteltyp_array=(isset($_REQUEST['betriebsmitteltyp_array'])?$_REQUEST['betriebsmitteltyp_array']:array());
 $betriebsmittelstatus_kurzbz_array=(isset($_REQUEST['betriebsmittelstatus_kurzbz_array'])?$_REQUEST['betriebsmittelstatus_kurzbz_array']:array());
@@ -756,10 +748,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 {
 	$errormsg=array();
 
-  	$vorlage=trim(isset($_REQUEST['vorlage'.$pos]) ?$_REQUEST['vorlage'.$pos]:'false');
+  	//$vorlage=trim(isset($_REQUEST['vorlage'.$pos]) ?$_REQUEST['vorlage'.$pos]:'false');
 
 	$betriebsmittel_id_array[$pos]=trim(isset($betriebsmittel_id_array[$pos])?trim($betriebsmittel_id_array[$pos]):$betriebsmittel_id);
-	$nummer_array[$pos]=trim(isset($nummer_array[$pos])?trim($nummer_array[$pos]):$nummer);
+	$inventarnummer_array[$pos]=trim(isset($inventarnummer_array[$pos])?trim($inventarnummer_array[$pos]):$inventarnummer);
 	$seriennummer_array[$pos]=trim(isset($seriennummer_array[$pos])?trim($seriennummer_array[$pos]):$seriennummer);
 	$betriebsmitteltyp_array[$pos]=trim(isset($betriebsmitteltyp_array[$pos]) && $work=='save' ?trim($betriebsmitteltyp_array[$pos]):$betriebsmitteltyp);
 	$betriebsmittelstatus_kurzbz_array[$pos]=trim(isset($betriebsmittelstatus_kurzbz_array[$pos]) && $work=='save' ?trim($betriebsmittelstatus_kurzbz_array[$pos]):$betriebsmittelstatus_kurzbz);
@@ -775,161 +767,173 @@ for ($pos=0;$pos<$anzahl;$pos++)
 	$verwendung_array[$pos]=trim(isset($verwendung_array[$pos]) && $work=='save' ?trim($verwendung_array[$pos]):$verwendung);
 	$leasing_bis_array[$pos]=trim(isset($leasing_bis_array[$pos]) && $work=='save' ?trim($leasing_bis_array[$pos]):$leasing_bis);
 	$afa_array[$pos]=trim(isset($afa_array[$pos]) && $work=='save' ?trim($afa_array[$pos]):$afa);
-
-	if ($work=='save' && $nummer_array[$pos])
+	
+	if ($work=='save')
 	{
-
-		$oBetriebsmittel = new betriebsmittel();
-		$oBetriebsmittel->result=array();
-		$oBetriebsmittel->debug=$debug;
-		$oBetriebsmittel->errormsg='';
-
-		$oBetriebsmittel->new=false;
-		if (!$oBetriebsmittel->load_nummer($nummer_array[$pos]))
+		if($inventarnummer_array[$pos]!='')
 		{
-			$oBetriebsmittel->new=true;
-			$oBetriebsmittel->betriebsmittel_id=null;
-		}
-		$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
-
-		$oBetriebsmittel->beschreibung=$beschreibung_array[$pos];
-	    $oBetriebsmittel->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
-	    $oBetriebsmittel->nummer=$nummer_array[$pos];
-	    $oBetriebsmittel->nummerintern=0;
-	    $oBetriebsmittel->reservieren=false;
-	    $oBetriebsmittel->ort_kurzbz=$ort_kurzbz_array[$pos];
-	    $oBetriebsmittel->ext_id=0;
-	    $oBetriebsmittel->insertvon=$uid;
-	    $oBetriebsmittel->updatevon=$uid;
-
-	    $oBetriebsmittel->insertamum=null;
-	    $oBetriebsmittel->updateamum=null;
-
-		$oBetriebsmittel->oe_kurzbz=$oe_kurzbz_array[$pos];
-		$oBetriebsmittel->hersteller=$hersteller_array[$pos];
-		$oBetriebsmittel->seriennummer=$seriennummer_array[$pos];
-		$oBetriebsmittel->bestellung_id=$bestellung_id_array[$pos];
-		$oBetriebsmittel->bestelldetail_id=$bestelldetail_id_array[$pos];
-		$oBetriebsmittel->afa=$afa_array[$pos];
-		$oBetriebsmittel->verwendung=$verwendung_array[$pos];
-		$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
-		$oBetriebsmittel->leasing_bis=$leasing_bis_array[$pos];
-		
-		if ($oBetriebsmittel->save())
-		{
-			$errormsg[]='Inventar / Betriebsmittel '.($oBetriebsmittel->new?'gespeichert ':'ge&auml;ndert ');
+			$oBetriebsmittel = new betriebsmittel();
+			$oBetriebsmittel->result=array();
+			$oBetriebsmittel->debug=$debug;
+			$oBetriebsmittel->errormsg='';
+	
+			$oBetriebsmittel->new=false;
+			if (!$oBetriebsmittel->load($betriebsmittel_id_array[$pos]))
+			{
+				$oBetriebsmittel->new=true;
+				$oBetriebsmittel->betriebsmittel_id=null;
+				 $oBetriebsmittel->insertamum = date('Y-m-d H:i:s');
+				 $oBetriebsmittel->insertvon=$uid;
+			}
 			$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
-
-			$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
-			$oBetriebsmittel_betriebsmittelstatus->result=array();
-			$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
-			$oBetriebsmittel_betriebsmittelstatus->errormsg='';
-
-			$oBetriebsmittel_betriebsmittelstatus->new=true;
-
-			$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=null;
-			if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id_array[$pos]))
+	
+			$oBetriebsmittel->beschreibung=$beschreibung_array[$pos];
+		    $oBetriebsmittel->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
+		    $oBetriebsmittel->inventarnummer=$inventarnummer_array[$pos];
+		    $oBetriebsmittel->reservieren=false;
+		    $oBetriebsmittel->ort_kurzbz=$ort_kurzbz_array[$pos];
+		    		    
+		    $oBetriebsmittel->updatevon=$uid;
+		    $oBetriebsmittel->updateamum=date('Y-m-d H:i:s');
+	
+			$oBetriebsmittel->oe_kurzbz=$oe_kurzbz_array[$pos];
+			$oBetriebsmittel->hersteller=$hersteller_array[$pos];
+			$oBetriebsmittel->seriennummer=$seriennummer_array[$pos];
+			$oBetriebsmittel->bestellung_id=$bestellung_id_array[$pos];
+			$oBetriebsmittel->bestelldetail_id=$bestelldetail_id_array[$pos];
+			$oBetriebsmittel->afa=$afa_array[$pos];
+			$oBetriebsmittel->verwendung=$verwendung_array[$pos];
+			$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
+			$oBetriebsmittel->leasing_bis=$leasing_bis_array[$pos];
+			
+			if ($oBetriebsmittel->save())
 			{
-				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=trim($oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelstatus_kurzbz);
-				if (strtoupper($oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz)==strtoupper($betriebsmittelstatus_kurzbz_array[$pos]) )
+				$errormsg[]='Inventar / Betriebsmittel '.($oBetriebsmittel->new?'gespeichert ':'ge&auml;ndert ');
+				$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
+	
+				$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
+				$oBetriebsmittel_betriebsmittelstatus->result=array();
+				$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
+				$oBetriebsmittel_betriebsmittelstatus->errormsg='';
+	
+				$oBetriebsmittel_betriebsmittelstatus->new=true;
+	
+				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=null;
+				if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id_array[$pos]))
 				{
-					$oBetriebsmittel_betriebsmittelstatus->new=false;
-					$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=$oBetriebsmittel_betriebsmittelstatus->result[0]->betriebsmittelbetriebsmittelstatus_id;
-					$oBetriebsmittel_betriebsmittelstatus->datum=$oBetriebsmittel_betriebsmittelstatus->result[0]->datum;
+					if (strtoupper($oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz)==strtoupper($betriebsmittelstatus_kurzbz_array[$pos]) )
+					{
+						$oBetriebsmittel_betriebsmittelstatus->new=false;
+					}
+					else 
+					{
+						$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
+						$oBetriebsmittel_betriebsmittelstatus->insertamum=date('Y-m-d H:i:s');
+					}
 				}
-			}
-
-			$oBetriebsmittel_betriebsmittelstatus->datum=trim($oBetriebsmittel_betriebsmittelstatus->datum?$oBetriebsmittel_betriebsmittelstatus->datum:date('Y-m-d'));
-			$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$betriebsmittel_id_array[$pos];
-			$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=$betriebsmittelstatus_kurzbz_array[$pos];
-		    $oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
-		    $oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
-			if (!$oBetriebsmittel_betriebsmittelstatus->save())
-				$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
-
-
-			$oBetriebsmittelperson = new betriebsmittelperson();
-			$oBetriebsmittelperson->result=array();
-			$oBetriebsmittelperson->debug=$debug;
-			$oBetriebsmittelperson->errormsg='';
-			#$oBetriebsmittelperson->delete($betriebsmittel_id_array[$pos]);
-
-
-			// Entliehen an eine Person
-			if (!empty($person_id_array[$pos]) && !is_numeric($person_id_array[$pos]))
-			{
-				if ($oBenutzer = new benutzer($person_id_array[$pos]))
-					$person_id_array[$pos]=$oBenutzer->person_id;
-			}	
-			if (!empty($person_id_old_array[$pos]) && !is_numeric($person_id_old_array[$pos]))
-			{
-				if ($oBenutzer = new benutzer($person_id_old_array[$pos]))
-					$person_id_old_array[$pos]=$oBenutzer->person_id;
-			}	
-																		
-			if ($person_id_old_array[$pos] && $person_id_array[$pos]
-			&& $person_id_old_array[$pos]!=$person_id_array[$pos])
-			{
+				else 
+				{
+					$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
+					$oBetriebsmittel_betriebsmittelstatus->insertamum=date('Y-m-d H:i:s');
+				}
+				$oBetriebsmittel_betriebsmittelstatus->datum=trim($oBetriebsmittel_betriebsmittelstatus->datum?$oBetriebsmittel_betriebsmittelstatus->datum:date('Y-m-d'));
+				$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$betriebsmittel_id_array[$pos];
+				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=$betriebsmittelstatus_kurzbz_array[$pos];
+			    
+			    $oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
+			    $oBetriebsmittel_betriebsmittelstatus->updateamum=date('Y-m-d H:i:s');
+			    
+				if (!$oBetriebsmittel_betriebsmittelstatus->save())
+					$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
+	
+	
 				$oBetriebsmittelperson = new betriebsmittelperson();
 				$oBetriebsmittelperson->result=array();
 				$oBetriebsmittelperson->debug=$debug;
 				$oBetriebsmittelperson->errormsg='';
-				// Betriebsmittel lesen zur Person
-				if ($oBetriebsmittelperson->load($betriebsmittel_id_array[$pos],$person_id_old_array[$pos]))
+				#$oBetriebsmittelperson->delete($betriebsmittel_id_array[$pos]);
+	
+	
+				// Entliehen an eine Person
+				if (!empty($person_id_array[$pos]) && !is_numeric($person_id_array[$pos]))
 				{
-					if (is_array($oBetriebsmittelperson->result) && isset($oBetriebsmittelperson->result[0]))
-						$oBetriebsmittelperson->result=$oBetriebsmittelperson->result[0];
-					$oBetriebsmittelperson->errormsg='';
-				    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
-				    $oBetriebsmittelperson->person_id=$oBetriebsmittelperson->result->person_id;
-				    $oBetriebsmittelperson->anmerkung=$oBetriebsmittelperson->result->anmerkung;
-				    $oBetriebsmittelperson->kaution=($oBetriebsmittelperson->result->kaution?$oBetriebsmittelperson->result->kaution:0);
-				    $oBetriebsmittelperson->betriebsmitteltyp=$oBetriebsmittelperson->result->betriebsmitteltyp;
-				    $oBetriebsmittelperson->beschreibung=$oBetriebsmittelperson->result->beschreibung;
-				    $oBetriebsmittelperson->ausgegebenam=$oBetriebsmittelperson->result->ausgegebenam;
-				    $oBetriebsmittelperson->retouram=date('Y-m-d');
-				    $oBetriebsmittelperson->ext_id=$oBetriebsmittelperson->result->ext_id;
-				    $oBetriebsmittelperson->updatevon=$uid;
-
-					$oBetriebsmittelperson->new=false;
-	 				if (!$oBetriebsmittelperson->save())
-						$errormsg[]=$oBetriebsmittelperson->errormsg;
-				}
-			}
-
-			// Entliehen an eine Person
-			if ($person_id_array[$pos])
-			{
-				$oBetriebsmittelperson = new betriebsmittelperson();
-				$oBetriebsmittelperson->result=array();
-				$oBetriebsmittelperson->debug=$debug;
-				$oBetriebsmittelperson->errormsg='';
-				if (!$oBetriebsmittelperson->load($betriebsmittel_id_array[$pos],$person_id_array[$pos]))
+					if ($oBenutzer = new benutzer($person_id_array[$pos]))
+						$person_id_array[$pos]=$oBenutzer->person_id;
+				}	
+				if (!empty($person_id_old_array[$pos]) && !is_numeric($person_id_old_array[$pos]))
 				{
-					$oBetriebsmittelperson->new=true;
+					if ($oBenutzer = new benutzer($person_id_old_array[$pos]))
+						$person_id_old_array[$pos]=$oBenutzer->person_id;
+				}	
 
+				//wenn sich die Personenzuordnung aendert, dann wird die alte Personenzuordnung beendet			
+				if ($person_id_old_array[$pos]
+				&& $person_id_old_array[$pos]!=$person_id_array[$pos])
+				{
+					$oBetriebsmittelperson = new betriebsmittelperson();
 					$oBetriebsmittelperson->result=array();
 					$oBetriebsmittelperson->debug=$debug;
 					$oBetriebsmittelperson->errormsg='';
-
-				    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
-				    $oBetriebsmittelperson->person_id=$person_id_array[$pos];
-				    $oBetriebsmittelperson->anmerkung=($oBetriebsmittelperson->new?($anmerkung_array[$pos]?StringCut($anmerkung_array[$pos],43):$beschreibung_array[$pos]):$oBetriebsmittelperson->anmerkung);
-				    $oBetriebsmittelperson->kaution=0;
-				    $oBetriebsmittelperson->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
-				    $oBetriebsmittelperson->beschreibung=StringCut($beschreibung_array[$pos],89);
-				    $oBetriebsmittelperson->ausgegebenam=($oBetriebsmittelperson->new?date('Y-m-d'):$oBetriebsmittelperson->ausgegebenam);
-				    $oBetriebsmittelperson->retouram=($oBetriebsmittelperson->new?null:$oBetriebsmittelperson->retouram);
-				    $oBetriebsmittelperson->ext_id=($oBetriebsmittelperson->new?null:$oBetriebsmittelperson->ext_id);
-				    $oBetriebsmittelperson->insertvon=$uid;
-				    $oBetriebsmittelperson->updatevon=$uid;
-	 				if (!$oBetriebsmittelperson->save())
-						$errormsg[]=$oBetriebsmittelperson->errormsg;
+					// Betriebsmittel lesen zur Person
+					if ($oBetriebsmittelperson->load_betriebsmittelpersonen($betriebsmittel_id_array[$pos],$person_id_old_array[$pos]))
+					{
+						$oBetriebsmittelperson->errormsg='';
+					    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
+					    $oBetriebsmittelperson->retouram=date('Y-m-d');
+					    $oBetriebsmittelperson->updatevon=$uid;
+					    $oBetriebsmittelperson->updateamum=date('Y-m-d H:i:s');
+	
+						$oBetriebsmittelperson->new=false;
+		 				if (!$oBetriebsmittelperson->save())
+							$errormsg[]=$oBetriebsmittelperson->errormsg;
+					}
+					else 
+					{
+						$errormsg[] = $oBetriebsmittelperson->errormsg;
+					}
+				}
+	
+				// Entliehen an eine Person
+				if ($person_id_array[$pos])
+				{
+					$oBetriebsmittelperson = new betriebsmittelperson();
+					$oBetriebsmittelperson->result=array();
+					$oBetriebsmittelperson->debug=$debug;
+					$oBetriebsmittelperson->errormsg='';
+					if (!$oBetriebsmittelperson->load_betriebsmittelpersonen($betriebsmittel_id_array[$pos],$person_id_array[$pos])
+					|| $oBetriebsmittelperson->retouram!='')
+					{
+						//wenn das Betriebsmittel dieser Person noch nicht zugeordnet ist, oder
+						//es in der Zwischenzeit schon retourniert hat, dann zuordnen
+						$oBetriebsmittelperson->new=true;
+	
+						$oBetriebsmittelperson->result=array();
+						$oBetriebsmittelperson->debug=$debug;
+						$oBetriebsmittelperson->errormsg='';
+	
+					    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
+					    $oBetriebsmittelperson->person_id=$person_id_array[$pos];
+					    $oBetriebsmittelperson->anmerkung=$anmerkung_array[$pos];
+					    $oBetriebsmittelperson->kaution=0;
+					    $oBetriebsmittelperson->retouram=null;
+					    $oBetriebsmittelperson->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
+					    $oBetriebsmittelperson->ausgegebenam=date('Y-m-d');
+					    $oBetriebsmittelperson->insertvon=$uid;
+					    $oBetriebsmittelperson->updatevon=$uid;
+		 				if (!$oBetriebsmittelperson->save())
+							$errormsg[]=$oBetriebsmittelperson->errormsg;
+					}
 				}
 			}
+			else
+			{
+				$errormsg[]=$oBetriebsmittel->errormsg;
+			}
 		}
-		else
-			$errormsg=$oBetriebsmittel->errormsg;
+		else 
+		{
+			$errormsg[]='Fehler: Es muss eine Inventarnummer eingetragen werden';
+		}
 	}
 		?>
 
@@ -941,8 +945,8 @@ for ($pos=0;$pos<$anzahl;$pos++)
 					<tr>
 						<th><?php echo (1 + $pos ); ?><input style="display:none;" id="betriebsmittel_id_array<?php echo $pos; ?>" name="betriebsmittel_id_array[]" value="<?php echo $betriebsmittel_id_array[$pos]; ?>"></th>
 
-						<td>&nbsp;<label for="nummer_array<?php echo $pos; ?>">Inventarnummer</label>&nbsp;</td>
-						<td><input id="nummer_array<?php echo $pos; ?>" name="nummer_array[]" size="32" maxlength="33" value="<?php echo $nummer_array[$pos]; ?>"></td>
+						<td>&nbsp;<label for="inventarnummer_array<?php echo $pos; ?>">Inventarnummer</label>&nbsp;</td>
+						<td><input id="inventarnummer_array<?php echo $pos; ?>" name="inventarnummer_array[]" size="32" maxlength="33" value="<?php echo $inventarnummer_array[$pos]; ?>"></td>
 
 						<td>&nbsp;<label for="seriennummer_array<?php echo $pos; ?>">Seriennummer</label>&nbsp;</td>
 						<td><input id="seriennummer_array<?php echo $pos; ?>" name="seriennummer_array[]" size="32" maxlength="33" value="<?php echo $seriennummer_array[$pos]; ?>"></td>
@@ -958,7 +962,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 							   {  
 							  	 $("td#bcTarget<?php echo $pos; ?>").click(function(event) 
 								 { 
-										var PrintWin=window.open('etiketten.php?nummer=<?php echo urlencode($nummer_array[$pos]); ?>','Etik','copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20'); 
+										var PrintWin=window.open('etiketten.php?inventarnummer=<?php echo urlencode($inventarnummer_array[$pos]); ?>','Etik','copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20'); 
 										if (PrintWin) 
 										{
 											PrintWin.focus();
@@ -970,8 +974,8 @@ for ($pos=0;$pos<$anzahl;$pos++)
 					</tr>
 				</table>
 
-			<div id="container<?php echo $pos; ?>"  style="display:<?php echo ($vorlage && $vorlage!='false'?'block':'none'); ?>;" >
-
+			<div id="container<?php echo $pos; ?>"  style="display:<?php echo ($vorlage && $vorlage=='false'?'block':'none'); ?>;" >
+			
 			<div id="container_shows<?php echo $pos; ?>">
 				<div style="background-color: #FFF4D5;cursor: pointer;font-size:normal;">
 					<img src="../../skin/images/right.png" alt="anzeigen - show">Inventardaten anzeigen / ausblenden
@@ -984,7 +988,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				   {
 				      if ($("#vorlage<?php echo $pos; ?>").val() == 'false') 
 					  {
-				         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam ?ffnen
+				         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam oeffnen
 				         $("#vorlage<?php echo $pos; ?>").val('true');
 			    	  }
 					  else
@@ -1004,10 +1008,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 											<td>&nbsp;<label for="bestellung_id_array<?php echo $pos; ?>">Bestellung ID</label>&nbsp;
 												<input id="bestellung_id_array<?php echo $pos; ?>" name="bestellung_id_array[]" size="10" maxlength="41" value="<?php echo $bestellung_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
-													function formatItem(row) 
-													{
-													    return row[0] + " <li>" + row[1] + "</li> ";
-													}
 													$(document).ready(function() 
 													{
 														  $('#bestellung_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
@@ -1026,10 +1026,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 											<td>&nbsp;<label for="bestelldetail_id_array<?php echo $pos; ?>">Bestelldetail ID</label>&nbsp;
 												<input id="bestelldetail_id_array<?php echo $pos; ?>" name="bestelldetail_id_array[]" size="6" maxlength="41" value="<?php echo $bestelldetail_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
-													function formatItem(row) 
-													{
-													    return row[0] + " <li>" + row[1] + "</li> ";
-													}
 													$(document).ready(function() 
 													{
 														  $('#bestelldetail_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
@@ -1051,10 +1047,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 											<td>&nbsp;<label for="hersteller_array<?php echo $pos; ?>">Hersteller</label>&nbsp;
 											<input id="hersteller_array<?php echo $pos; ?>" name="hersteller_array[]" type="text" size="35" maxlength="120" value="<?php echo $hersteller_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
-													function formatItem(row) 
-													{
-													    return row[0] + " <li>" + row[1] + "</li> ";
-													}
 													$(document).ready(function() 
 													{
 														  $('#hersteller_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
@@ -1101,10 +1093,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>&nbsp;<label for="ort_kurzbz_array<?php echo $pos; ?>">Ort</label>&nbsp;
 										<input id="ort_kurzbz_array<?php echo $pos; ?>" name="ort_kurzbz_array[]" size="10" maxlength="20" value="<?php echo $ort_kurzbz_array[$pos]; ?>">
 											<script type="text/javascript" language="JavaScript1.2">
-													function formatItem(row) 
-													{
-													    return row[0] + " <li>" + row[1] + "</li> ";
-													}
 													$(document).ready(function() 
 													{
 														  $('#ort_kurzbz_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
@@ -1137,10 +1125,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 								<td>&nbsp;<label for="oe_kurzbz_array<?php echo $pos; ?>">Organisation</label>&nbsp;
 									<input id="oe_kurzbz_array<?php echo $pos; ?>" name="oe_kurzbz_array[]" size="13" maxlength="14" value="<?php echo $oe_kurzbz_array[$pos]; ?>" >
 									<script type="text/javascript" language="JavaScript1.2">
-										function formatItem(row) 
-										{
-										    return row[0] + " <li>" + row[1] + "</li> ";
-										}
 										$(document).ready(function() 
 										{
 											  $('#oe_kurzbz_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
@@ -1170,10 +1154,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<input style="display:none;" id="person_id_old_array<?php echo $pos; ?>" name="person_id_old_array[]" value="<?php echo $person_id_array[$pos]; ?>" >
 									<input id="person_id_array<?php echo $pos; ?>" name="person_id_array[]" size="13" maxlength="14" value="<?php echo $person_id_array[$pos]; ?>" >
 									<script type="text/javascript" language="JavaScript1.2">
-											function formatItem(row) 
-											{
-											    return row[0] + " <li>" + row[1] + "</li> ";
-											}
 											$(document).ready(function() 
 											{
 												  $('#person_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
@@ -1307,7 +1287,6 @@ for ($pos=0;$pos<$anzahl;$pos++)
 @flush();
 } // Ende Anzahl Schleife
 ?>
-		</div>
 	&nbsp;
 	<input id="work" name="work" value="" style="display:none;">
 	</form>
