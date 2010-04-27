@@ -965,10 +965,15 @@ if(!$error)
 														$benutzer->person_id = $prestd->person_id;
 														$benutzer->aktiv = true;
 				
-														$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".clean_string($prestd->vorname).".".clean_string($prestd->nachname)."')";
+														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
+														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));
+														$nachname_clean = str_replace(' ','_', $nachname_clean);
+														$vorname_clean = str_replace(' ','_', $vorname_clean);
+														
+														$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
 														$result_alias = $db->db_query($qry_alias);
 														if($db->db_num_rows($result_alias)==0)
-															$benutzer->alias = strtolower(clean_string($prestd->vorname).'.'.clean_string($prestd->nachname));
+															$benutzer->alias = $vorname_clean.'.'.$nachname_clean;
 														else
 															$benutzer->alias = '';
 				

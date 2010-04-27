@@ -476,6 +476,9 @@ if(isset($_POST['save']))
 	{
 		$nachname_clean = mb_strtolower(convertProblemChars($nachname));
 		$vorname_clean = mb_strtolower(convertProblemChars($vorname));
+		$nachname_clean = str_replace(' ','_', $nachname_clean);
+		$vorname_clean = str_replace(' ','_', $vorname_clean);
+		
 		$bn = new benutzer();
 		
 		if(!$bn->alias_exists($vorname_clean.'.'.$nachname_clean))

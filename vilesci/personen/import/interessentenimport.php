@@ -814,11 +814,16 @@ if(isset($_POST['save']))
 		$benutzer->uid = $uid;
 		$benutzer->person_id = $person->person_id;
 		$benutzer->aktiv = true;
-							
-		$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".clean_string($person->vorname).".".clean_string($person->nachname)."')";
+		
+		$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
+		$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
+		$nachname_clean = str_replace(' ','_', $nachname_clean);
+		$vorname_clean = str_replace(' ','_', $vorname_clean);
+		
+		$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
 		$result_alias = $db->db_query($qry_alias);
 		if($db->db_num_rows($result_alias)==0)								
-			$benutzer->alias = mb_strtolower(clean_string($person->vorname).'.'.clean_string($person->nachname));
+			$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
 		else 
 			$benutzer->alias = '';
 									
