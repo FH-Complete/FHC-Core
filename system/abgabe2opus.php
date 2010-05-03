@@ -1161,7 +1161,7 @@ $qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.studen
 	LEFT JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id, studiensemester_kurzbz, student_uid)
 	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
 	AND to_char(tbl_projektarbeit.abgabedatum,'YYYYMMDD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 
-	AND tbl_projektarbeit.freigegeben ";
+	AND (tbl_projektarbeit.freigegeben OR(to_char(tbl_projektarbeit.gesperrtbis,'YYYYMMDD')<'".date('Ymd',mktime(0, 0, 0, date('m'), date('d'), date('Y')))."'))";
 
 //echo $qry."<br>";
 
@@ -1575,20 +1575,20 @@ if($erg=pg_query($db_conn,$qry))
 	}
 	if($fehler!='')
 	{
-		$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', "Aufgetretene Fehler: \n".$fehler);
+		$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'abgabe2opus', "Aufgetretene Fehler: \n".$fehler);
 		$mail->send();
 		$fehler='';
 	}
 }
 else 
 {
-	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht ge&ouml;ffnet werden!'."\n".$qry);
+	$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbank konnte nicht ge&ouml;ffnet werden!'."\n".$qry);
 	$mail->send();
 	die($qry);
 }
 if ($kopiert!='' && $kopiert!=NULL)
 {
-	$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', "Übertragene Projektarbeiten:\n".$kopiert);
+	$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'abgabe2opus', "Übertragene Projektarbeiten:\n".$kopiert);
 	$mail->send();
 }
 
