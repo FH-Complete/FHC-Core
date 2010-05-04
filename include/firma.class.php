@@ -502,8 +502,8 @@ class firma extends basis_db
 		if($firmentyp_kurzbz!='')
 			$qry.=" and firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
 		
-		if($filter=='' && $firmentyp_kurzbz=='')
-			$qry.=" limit 500 ";
+		//if($filter=='' && $firmentyp_kurzbz=='')
+		//	$qry.=" limit 500 ";
 		$qry.=") as a ORDER BY name ";
 		
 		if($this->db_query($qry))
