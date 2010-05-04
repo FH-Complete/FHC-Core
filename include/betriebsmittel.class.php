@@ -812,7 +812,7 @@ class betriebsmittel extends basis_db
 		// Inventarnummer oder Betriebsmittelnummer
 		if (!is_null($inventarnummer) && !empty($inventarnummer) )
 		{
-			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($inventarnummer))));
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' ','`'),'%',trim($inventarnummer))));
 			$where.=" AND UPPER(trim(tbl_betriebsmittel.inventarnummer))  like '".$matchcode."' " ;
 		}
 		if (!is_null($betriebsmittel_id) && !empty($betriebsmittel_id) )
