@@ -250,7 +250,7 @@
 			<?php							
 			}
 
-			if ($rechte->isFix())
+			if ($rechte->isFix() || $rechte->isBerechtigt('mitarbeiter/zeitsperre'))
 			{
 				?>
 				<tr>
