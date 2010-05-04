@@ -93,7 +93,7 @@ if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 	{
 		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>   <thead><tr class='liste'>\n";
     	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
-    						<th class='table-sortable:default'>NrIntern</th><th class='table-sortable:default'>Person (UID)</th>
+    						<th class='table-sortable:default'>Person (UID)</th>
     						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
     	$htmlstr .= "   </tr></thead><tbody>\n";
     	$i = 0;
@@ -103,9 +103,8 @@ if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 			$htmlstr .= "   <tr>\n";
 		    $htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
 			$htmlstr .= '       <td>
-									<a href="betriebsmittel_details.php?betriebsmittel_id='.$row->betriebsmittel_id.'&person_id='.$row->person_id.'" 
+									<a href="betriebsmittel_details.php?betriebsmittel_id='.$row->betriebsmittel_id.'&betriebsmittelperson_id='.$row->betriebsmittelperson_id.'" 
 										target="betriebsmittel_details">'.$row->nummer."</a></td>\n";
-			$htmlstr .= "       <td>".$row->nummerintern."</td>\n";
 			$htmlstr .= "       <td>$row->nachname $row->vorname &nbsp; ( $row->uid )</td>\n";
 	    	$htmlstr .= "       <td>".$row->ausgegebenam."</td>\n";
 			$htmlstr .= "       <td>$row->retouram</td>\n";
