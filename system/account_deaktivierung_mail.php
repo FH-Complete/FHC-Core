@@ -46,6 +46,9 @@ echo '
 
 
 //Information an Bibliothek wenn ein Account deaktiviert wurde
+/**
+ 03-05-2010 oesi Infomail wird nicht mehr benoetigt
+ 
 $qry = "SELECT uid, (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=uid) as mitarbeiter, titelpre, vorname, nachname, titelpost FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) WHERE tbl_benutzer.aktiv=false AND updateaktivam=CURRENT_DATE- interval '3 days'";
 if($result = $db->db_query($qry))
 {
@@ -73,7 +76,7 @@ if($result = $db->db_query($qry))
 		$text.= "Warnung für Bibliothek wurde an $to verschickt\n";
 	}
 }
-
+*/
 
 /*
 
