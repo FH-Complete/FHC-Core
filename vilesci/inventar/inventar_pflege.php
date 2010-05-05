@@ -586,7 +586,7 @@
 											}	
 									}
 									else if ($besteller)
-										$personen_namen='<a href="mailto:.'.$besteller.'">$besteller</a>';
+										$personen_namen='<a href="mailto:.'.$besteller.'">'.$besteller.'</a>';
 								?>
 
 						<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
@@ -600,9 +600,7 @@
 											matchSubset:1,matchContains:1,
 											width:400,
 											formatItem:formatItem,
-											extraParams:{'work':'person'
-												,'oe_kurzbz':$("#oe_kurzbz").val()
-												 }
+											extraParams:{'work':'person'}
 										  });
 								  });
 								</script>

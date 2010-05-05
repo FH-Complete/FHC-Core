@@ -439,7 +439,7 @@
 				<td><label for="jahr_monat">Datum</label>&nbsp;
 					<select id="jahr_monat" name="jahr_monat">
 							<?php
-							$jahr_monat_select=trim((!isset($_REQUEST['jahr_monat'])? date("Y-m"):$jahr_monat));
+							$jahr_monat_select=trim((!isset($_REQUEST['jahr_monat'])? '-':$jahr_monat));
 							$tmpJahr=(int)date("Y",mktime(0, 0, 0, 1, 1, date("Y")-12));
 							for ($i=0;$i<12;$i++)
 							{
@@ -623,7 +623,7 @@
 				<td><label for="betriebsmittelstatus_kurzbz">Status</label>&nbsp;
 						<select id="betriebsmittelstatus_kurzbz" name="betriebsmittelstatus_kurzbz" >
 							<option  <?php
-									  	$betriebsmittelstatus_kurzbz_select=trim((!isset($_REQUEST['betriebsmittelstatus_kurzbz'])?$default_status_vorhanden:$betriebsmittelstatus_kurzbz));
+									  	$betriebsmittelstatus_kurzbz_select=trim((!isset($_REQUEST['betriebsmittelstatus_kurzbz'])?'':$betriebsmittelstatus_kurzbz));
 										echo (empty($betriebsmittelstatus_kurzbz_select)?' selected="selected" ':''); ?>  value="">bitte ausw&auml;hlen&nbsp;</option>
 										<?php
 										for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
@@ -717,6 +717,28 @@
 	if ($check!='' && !$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id))
 		$errormsg[]=$oBetriebsmittel->errormsg;
 
+	echo '<form action="inventarliste.php" method="POST" target="_blank">
+		<input type="hidden" name="order" value="'.$order.'">
+		<input type="hidden" name="inventarnummer" value="'.$inventarnummer.'">
+		<input type="hidden" name="ort_kurzbz" value="'.$ort_kurzbz.'">
+		<input type="hidden" name="betriebsmittelstatus_kurzbz" value="'.$betriebsmittelstatus_kurzbz.'">
+		<input type="hidden" name="betriebsmitteltyp" value="'.$betriebsmitteltyp.'">
+		<input type="hidden" name="bestellung_id" value="'.$bestellung_id.'">
+		<input type="hidden" name="bestelldetail_id" value="'.$bestelldetail_id.'">
+		<input type="hidden" name="bestellnr" value="'.$bestellnr.'">
+		<input type="hidden" name="hersteller" value="'.$hersteller.'">
+		<input type="hidden" name="afa" value="'.$afa.'">
+		<input type="hidden" name="jahr_monat" value="'.$jahr_monat.'">
+		<input type="hidden" name="firma_id" value="'.$firma_id.'">
+		<input type="hidden" name="inventur_jahr" value="'.$inventur_jahr.'">
+		<input type="hidden" name="beschreibung" value="'.$beschreibung.'">
+		<input type="hidden" name="oe_kurzbz" value="'.$oe_kurzbz.'">
+		<input type="hidden" name="seriennummer" value="'.$seriennummer.'">
+		<input type="hidden" name="person_id" value="'.$person_id.'">
+		<input type="hidden" name="betriebsmittel_id" value="'.$betriebsmittel_id.'">
+		<input type="submit" value="Liste drucken" />
+		</form>
+		';
 	// Inventardatenliste
 	if ( is_array($oBetriebsmittel->result) && count($oBetriebsmittel->result)==1)
 		echo output_inventarposition($debug,$oBetriebsmittel->result,$resultBetriebsmittelstatus,$schreib_recht,$delete_recht,$schreib_recht_administration);
@@ -800,14 +822,14 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		$resultBetriebsmittel[$pos]->firmenname=trim($resultBetriebsmittel[$pos]->firmenname);
 						
 		$htmlstring.='<tr class="'.$classe.'">
-			<td><a href="'.$_SERVER["PHP_SELF"].'?inventarnummer='.$resultBetriebsmittel[$pos]->inventarnummer.'&amp;betriebsmittel_id='.$resultBetriebsmittel[$pos]->betriebsmittel_id.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.($resultBetriebsmittel[$pos]->inventarnummer?$resultBetriebsmittel[$pos]->inventarnummer:$resultBetriebsmittel[$pos]->betriebsmittel_id).'</a>&nbsp;</td>
+			<td><a href="'.$_SERVER["PHP_SELF"].'?inventarnummer='.$resultBetriebsmittel[$pos]->inventarnummer.'&amp;betriebsmittel_id='.$resultBetriebsmittel[$pos]->betriebsmittel_id.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'" target="_blank">'.($resultBetriebsmittel[$pos]->inventarnummer?$resultBetriebsmittel[$pos]->inventarnummer:$resultBetriebsmittel[$pos]->betriebsmittel_id).'</a>&nbsp;</td>
 			<td>'.StringCut((!empty($resultBetriebsmittel[$pos]->beschreibung)?$resultBetriebsmittel[$pos]->beschreibung:$resultBetriebsmittel[$pos]->betriebsmitteltyp),20).'&nbsp;</td>
 			<td>'.$resultBetriebsmittel[$pos]->seriennummer.'&nbsp;</td>
 			<td>'.$resultBetriebsmittel[$pos]->ort_kurzbz.'&nbsp;</td>
 			';
 
 			if (!$schreib_recht || !empty($resultBetriebsmittel[$pos]->bestellung_id) )
-				$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'">'.$resultBetriebsmittel[$pos]->bestellung_id.'</a>&nbsp;</td>';
+				$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank">'.$resultBetriebsmittel[$pos]->bestellung_id.'</a>&nbsp;</td>';
 			else
 				$htmlstring.='<td align="right">
 						<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',this.value,0);" id="bestellung_id'.$pos.'" name="bestellung_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestellung_id .'">
