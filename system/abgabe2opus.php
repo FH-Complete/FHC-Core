@@ -1150,6 +1150,10 @@ function indexdatei($source_opus, $fd)
 
 //****************************************************************************************************
 //Einlesen Projektarbeiten (nur Diplomarbeiten)
+//Bedingungen:
+//Entweder DA oder LV benotet
+//Abgabedatum nicht länger als 6 Monate zurück
+//Freigegeben oder Endedatum der Sperre vorbei
 //****************************************************************************************************
 $qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.student_uid as stud_uid, tbl_fachbereich.bezeichnung as fb_bez, 
 	tbl_lehrveranstaltung.studiengang_kz as stg_kz, tbl_projektarbeit.note as note1, tbl_zeugnisnote.note as note2  
