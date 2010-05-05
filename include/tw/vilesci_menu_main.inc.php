@@ -133,7 +133,7 @@ $menu=array
 	),
 	'Wartung'=>	array
 	(
-		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'edit-clear.png',
+		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/firma'), 'image'=>'edit-clear.png',
 		'link'=>'left.php?categorie=Wartung', 'target'=>'nav',
 		'Vorrueckung'=>	array
 		(
@@ -163,7 +163,7 @@ $menu=array
 	),
 	'Inventar'=>	array
 	(
-		'name'=>'Inventar', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','wawi','support'), 'image'=>'edit-paste.png',
+		'name'=>'Inventar', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','wawi','support','wawi/inventar'), 'image'=>'edit-paste.png',
 		'link'=>'left.php?categorie=Inventar', 'target'=>'nav',
 		'Inventar'=>	array
 		(
