@@ -137,7 +137,7 @@ class ort extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+			$this->errormsg = 'Ort wurde nicht gefunden';
 			return false;
 		}
 
