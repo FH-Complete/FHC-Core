@@ -4005,10 +4005,7 @@ function StudentSendMail()
   			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
   			if(tree.view.getCellText(v,col).length>1)
   			{
-  				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
-				else
-					mailempfaenger='mailto:'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+				mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}
   			else
   			{
@@ -4017,9 +4014,9 @@ function StudentSendMail()
   		}
 	}
 	if(anzfault!=0)
-		alert(anzfault+' Student konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+		alert(anzfault+' Student(en) konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
-		window.location.href=mailempfaenger;
+		splitmailto(mailempfaenger);
 }
 
 // ****
@@ -4062,14 +4059,44 @@ function StudentSendMailPrivat()
 		{
 			alert(val.dbdml_errormsg)
 			if(val.dbdml_data!='')
-				window.location.href='mailto:'+val.dbdml_data;
+				splitmailto(val.dbdml_data);
 		}
 	}
 	else
 	{
 		if(val.dbdml_data!='')
-			window.location.href='mailto:'+val.dbdml_data;
+			splitmailto(val.dbdml_data);
 	}	
+}
+
+// ****
+// * Teilt die Mailto Links auf kleinere Brocken auf, da der
+// * Link nicht funktioniert wenn er zu lange ist
+// ****
+function splitmailto(mails)
+{
+	var splititem = '<?php echo $variable->variable->emailadressentrennzeichen; ?>';
+	var splitposition=0;
+	var mailto='';
+	var loop=true;
+	if(mails.length>2048)
+		alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
+	
+	while(loop)
+	{
+		if(mails.length>2048)
+		{
+			splitposition=mails.indexOf(splititem,1900);
+			mailto = mails.substring(0,splitposition);
+			mails = mails.substring(splitposition);
+		}
+		else
+		{
+			loop=false;
+			mailto=mails;
+		}
+		window.location.href='mailto:?bcc='+mailto;
+	}
 }
 
 // ****
