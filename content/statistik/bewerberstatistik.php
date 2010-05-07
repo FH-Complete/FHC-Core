@@ -232,13 +232,13 @@ if(isset($_GET['excel']))
 				
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-	   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL)) AS interessentenzgv,
+	   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL)) AS interessentenzgv,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 	   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
-	   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL)) AS interessentenzgv_m,
+	   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL)) AS interessentenzgv_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 	   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
-	   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL)) AS interessentenzgv_w,
+	   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL)) AS interessentenzgv_w,
 	   				   			
 	   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -548,13 +548,13 @@ if(isset($_GET['excel']))
 						) AS interessenten_fst,	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -1714,13 +1714,13 @@ else
 					
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL)) AS interessentenzgv,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL)) AS interessentenzgv,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geschlecht='m'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL)) AS interessentenzgv_m,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL)) AS interessentenzgv_m,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem' AND geschlecht='w'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL)) AS interessentenzgv_w,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL)) AS interessentenzgv_w,
 		   				   			
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -1916,13 +1916,13 @@ else
 						) AS interessenten_fst,	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND (zgv_code IS NOT NULL OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'

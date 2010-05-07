@@ -310,7 +310,22 @@ class vorschlag extends basis_db
 	 */
 	public function delete($vorschlag_id)
 	{
-		$qry = "DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
+		$qry = "SELECT count(*) as anzahl FROM testtool.tbl_antwort WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if($row->anzahl>0)
+				{
+					$this->errormsg='Fehler: Sie muessen zuerst alle Antworten zu diesem Vorschlag entfernen!';
+					return false;
+				}
+			}
+		}
+		
+		$qry = "
+			DELETE FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id='".addslashes($vorschlag_id)."';
+			DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
 		if($this->db_query($qry))
 			return true;
 		else

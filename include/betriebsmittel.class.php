@@ -152,7 +152,7 @@ class betriebsmittel extends basis_db
 	{
 		$qry = "SELECT * FROM wawi.tbl_betriebsmittel WHERE inventarnummer='$this->inventarnummer'";
 		if($betriebsmittel_id!='')
-			$qry.=" AND tbl_betriebsmittel_id<>'$this->betriebsmittel_id'";
+			$qry.=" AND betriebsmittel_id<>'$this->betriebsmittel_id'";
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)
