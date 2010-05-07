@@ -552,7 +552,7 @@ class benutzerberechtigung extends basis_db
 	
 		foreach ($this->berechtigungen as $b)
 		{
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -606,9 +606,10 @@ class benutzerberechtigung extends basis_db
 		if($this->db_query($qry))
 			while($row = $this->db_fetch_object())
 				$studiengang_kz[]=$row->studiengang_kz;	
-					
+		
 		$studiengang_kz=array_unique($studiengang_kz);
 		sort($studiengang_kz);
+		
 		return $studiengang_kz;
 	}
 
@@ -629,7 +630,7 @@ class benutzerberechtigung extends basis_db
 		
 		foreach ($this->berechtigungen as $b)
 		{
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -697,12 +698,12 @@ class benutzerberechtigung extends basis_db
 	{
 		$oe_kurzbz=array();
 		$timestamp=time();
-		$not='';
+		$not=array();
 		$all=false;
 		$oe = new organisationseinheit();
 		foreach ($this->berechtigungen as $b)
 		{
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -712,7 +713,7 @@ class benutzerberechtigung extends basis_db
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
-							$not .="'".addslashes($row)."',";
+							$not[] = $row;
 					}
 					else 
 						return array();
@@ -739,6 +740,7 @@ class benutzerberechtigung extends basis_db
 			$oe->loadParentsArray();
 			$oe_kurzbz = array_keys(organisationseinheit::$oe_parents_array);
 		}
+		$oe_kurzbz = array_diff($oe_kurzbz, $not);
 		$oe_kurzbz=array_unique($oe_kurzbz);
 		sort($oe_kurzbz);
 		return $oe_kurzbz;

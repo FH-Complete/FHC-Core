@@ -501,7 +501,12 @@ class prestudent extends person
 				$qry.=" AND a.rolle='Interessent'";
 				break;
 			case "zgv":	
-				$qry.=" AND a.rolle='Interessent' AND (a.zgv_code is not null OR a.zgvmas_code is not null)";
+				$stg_obj = new studiengang();
+				$stg_obj->load($studiengang_kz);
+				if($stg_obj->typ=='m')
+					$qry.=" AND a.rolle='Interessent' AND a.zgvmas_code is not null";
+				else
+					$qry.=" AND a.rolle='Interessent' AND a.zgv_code is not null";
 				break;
 			case "reihungstestangemeldet":  
 				$qry.=" AND a.rolle='Interessent' AND a.anmeldungreihungstest is not null";
