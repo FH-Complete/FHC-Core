@@ -848,7 +848,7 @@ class wochenplan extends basis_db
 	 * @param datum Datum eines Tages in der angeforderten Woche
 	 * @return true oder false
 	 */
-	public function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false)
+	public function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false, $kollision_student=false)
 	{
 		//echo $wunsch;
 		global $cfgStdBgcolor;
@@ -924,7 +924,7 @@ class wochenplan extends basis_db
 		{
 			$isferien=$ferien->isferien($datum);
 			echo '<row><vbox>';
-			echo '<html:div><html:small>'.date("l",$datum).'<html:br /></html:small>'.date("j.m y",$datum).'</html:div>';
+			echo '<html:div><html:small>'.date("l",$datum).'<html:br /></html:small>'.date("j.m. y",$datum).'</html:div>';
 			echo '</vbox>';
 			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
@@ -993,19 +993,58 @@ class wochenplan extends basis_db
 						$a_unr[]=$lehrstunde->unr;
 						$a_lvb[$lehrstunde->unr][]=$lehrstunde->sem.$lehrstunde->ver.$lehrstunde->grp;
 					}
+					
 					// Unterrichtsnummer (Kollision?)
 					$a_unr=array_unique($a_unr);
 					$kollision+=count($a_unr);
-					// Ist es bei LVB-Ansicht wirklich eine Kollision?
-					if ($kollision>0 && $this->type=='verband')
+					//Kollisionspruefung Studentenebene
+					if($kollision_student=='true')
 					{
 						$kollision=0;
-						$a=0;
-						foreach ($a_unr as $unr)
+						$studiensemester = getStudiensemesterFromDatum(date('Y-m-d',$datum));
+						
+						$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
+								FROM (
+									SELECT sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid
+									FROM (  SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid AS student_uid
+									               FROM lehre.tbl_stundenplandev stpl
+									          JOIN public.tbl_benutzergruppe USING (gruppe_kurzbz)
+									         WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = '".$studiensemester."'
+									         GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid
+									UNION 
+									             SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid
+									               FROM lehre.tbl_stundenplandev stpl
+									          JOIN public.tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
+									         WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = '".$studiensemester."'
+									         GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
+									GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid
+
+								) as a
+								WHERE datum='".date('Y-m-d',$datum)."' AND stunde='$j'
+								GROUP BY datum, stunde, student_uid
+								HAVING count(student_uid)>1
+								ORDER BY datum, stunde, student_uid LIMIT 1; 
+							   ";
+
+						if($this->db_query($qry))
+							if($this->db_num_rows()>0)
+								$kollision++;
+					}
+					else 
+					{
+						
+						//Kollisionspruefung LVB Ebene
+						// Ist es bei LVB-Ansicht wirklich eine Kollision?
+						if ($kollision>0 && $this->type=='verband')
 						{
-							array_unique($a_lvb[$unr]);
-							$lvb[$a++]=$a_lvb[$unr];
-						}
+							$kollision=0;
+							$a=0;
+							foreach ($a_unr as $unr)
+							{
+								array_unique($a_lvb[$unr]);
+								$lvb[$a++]=$a_lvb[$unr];
+							}
+						
 						for ($a=0;$a<count($lvb)-1;$a++)
 							for ($b=0;$b<count($lvb[$a]);$b++)
 								for ($c=$a+1;$c<count($lvb);$c++)
@@ -1013,16 +1052,18 @@ class wochenplan extends basis_db
 									{
 										$s1=mb_substr($lvb[$a][$b],0,1);
 										$s2=mb_substr($lvb[$c][$d],0,1);
-										$v1=mb_substr($lvb[$a][$b],1,1);
-										$v2=mb_substr($lvb[$c][$d],1,1);
-										$g1=mb_substr($lvb[$a][$b],2,1);
-										$g2=mb_substr($lvb[$c][$d],2,1);
+										$v1=trim(mb_substr($lvb[$a][$b],1,1));
+										$v2=trim(mb_substr($lvb[$c][$d],1,1));
+										$g1=trim(mb_substr($lvb[$a][$b],2,1));
+										$g2=trim(mb_substr($lvb[$c][$d],2,1));
 										if ($s1==$s2 || !$s1 || $s1=='' || $s1=='0' || !$s2 || $s2=='' || $s2=='0')
 											if ($v1==$v2 || !$v1 || $v1=='' || $v1=='0' || !$v2 || $v2=='' || $v2=='0')
 												if ($g1==$g2 || !$g1 || $g1=='' || $g1=='0' || !$g2 || $g2=='' || $g2=='0')
 													$kollision++;
 									}
-					}
+						}
+					}					
+						
 					// Kollision anzeigen?
 					if ($ignore_kollision)
 						$kollision=0;
@@ -1141,14 +1182,17 @@ class wochenplan extends basis_db
 							$blink_aus='';
 						}
 
+						$stg_obj = new studiengang();
+						$stg_obj->load($stg_kz);
+						
 						// Ausgabe
 						echo '<button id="buttonSTPL'.$count++.'"
 							tooltiptext="('.$updatevonam.') '.$titel.' - '.$anmerkung.'"
 							style="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
-							styleOrig="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').'" ';
-						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'uid') || $berechtigung->isBerechtigt('lv-plan',0,'uid') || $berechtigung->isBerechtigt('admin',0,'uid') || $berechtigung->isBerechtigt('admin',$stg_kz,'uid'))
+							styleOrig="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';" ';
+						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'uid'))
 							echo ' context="stplPopupMenue" ';
-						if ($berechtigung->isBerechtigt('lv-plan',$stg_kz,'u') || $berechtigung->isBerechtigt('lv-plan',0,'u') || $berechtigung->isBerechtigt('admin',0,'u') || $berechtigung->isBerechtigt('admin',$stg_kz,'u'))
+						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'u'))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"

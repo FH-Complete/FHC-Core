@@ -57,7 +57,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	</toolbar>
 </toolbox>
 
-<iframe id="iframeTimeTableSemester" name="TimeTableSemester" flex="1"
-	src="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php?semesterplan=true" />
+<iframe id="iframeTimeTableSemester" name="TimeTableSemester" flex="1" />
+<!-- src="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php?semesterplan=true"-->
 </vbox>
 </overlay>

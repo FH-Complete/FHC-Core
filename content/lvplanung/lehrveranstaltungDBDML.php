@@ -807,14 +807,22 @@ if(!$error)
 
 				if(!$leg->checkVorhanden())
 				{
-					if($leg->save(true))
+					if($leg->errormsg=='')
 					{
-						$return = true;
+						if($leg->save(true))
+						{
+							$return = true;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = $leg->errormsg;
+						}
 					}
-					else
+					else 
 					{
 						$return = false;
-						$errormsg = $leg->errormsg;
+						$errormsg=$leg->errormsg;
 					}
 				}
 				else

@@ -109,6 +109,18 @@ class variable extends basis_db
 		if(is_null($new))
 			$new = $this->new;
 
+		if(!is_bool($new))
+		{
+			$qry ="SELECT * FROM public.tbl_variable WHERE uid='".addslashes($this->uid)."' AND name='".addslashes($this->name)."';";
+			if($this->db_query($qry))
+			{
+				if($this->db_num_rows()==0)
+					$new=true;
+				else 
+					$new=false;
+			}
+		}
+		
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
@@ -247,6 +259,8 @@ class variable extends basis_db
 		if (!isset($this->variable->ignore_reservierung))
 			$this->variable->ignore_reservierung='false';
 
+		if (!isset($this->variable->kollision_student))
+			$this->variable->kollision_student='false';
 		return true;
 	}
 		

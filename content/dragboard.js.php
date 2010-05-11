@@ -170,7 +170,10 @@ var LeLvbgrpDDObserver=
 	    var child = { }
 
 	    if(lehreinheit_id=='')
+	    {
+	    	alert('Eine Gruppe kann nur zu einer Lehreinheit hinzugefügt werden. Nicht aber zu einer Lehrveranstaltung');
 	    	return false;
+	    }
 
 	    quell_gruppe=dropdata.data;
 	    var arr = quell_gruppe.split("&");
@@ -499,6 +502,7 @@ var boardObserver=
   	{
     		if (dropdata.data!="")
     		{
+    			saveScrollPositionTimeTableWeek();
     			var stplData=document.getElementById('TimeTableWeekData');
     			var datum=stplData.getAttribute("datum");
     			var type=stplData.getAttribute("stpl_type");

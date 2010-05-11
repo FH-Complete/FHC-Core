@@ -26,19 +26,28 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
+require_once('../../include/lehrveranstaltung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
 
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
 
 $user = get_uid();
-
+$oe_studiengang='';
 if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
+{
 	$stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:$_POST['stg_kz']);
+	if($stg_kz!='')
+	{
+		$stg_obj = new studiengang();
+		if(!$stg_obj->load($stg_kz))
+			die('Studiengang kann nicht geladen werden');
+		$oe_studiengang = $stg_obj->oe_kurzbz;
+	}
+}
 else
 	$stg_kz='';
 	
@@ -57,112 +66,221 @@ if(!is_numeric($stg_kz) && $stg_kz!='')
 if(!is_numeric($semester))
 	$semester=0;
 
-$fachbereich_kurzbz = (isset($_REQUEST['fachbereich_kurzbz'])?$_REQUEST['fachbereich_kurzbz']:'');
+$oe_fachbereich='';
+if(isset($_REQUEST['fachbereich_kurzbz']))
+{
+	$fachbereich_kurzbz = $_REQUEST['fachbereich_kurzbz'];
+	if($fachbereich_kurzbz!='')
+	{
+		$fb_obj = new fachbereich();
+		if(!$fb_obj->load($fachbereich_kurzbz))
+			die('Institut konnte nicht geladen werden');
+		$oe_fachbereich = $fb_obj->oe_kurzbz;
+	}
+}
+else 
+	$fachbereich_kurzbz = '';
 
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+$write_admin=false;
+$write_low=false;
 
-if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') 
-&& !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') 
-&& !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz))
-	die('Sie haben keine Berechtigung für diesen Studiengang');
+if($rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 'suid')
+|| $rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_fachbereich, 'suid'))
+	$write_admin=true;
+
+if($rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_studiengang, 'suid') 
+|| $rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_fachbereich, 'suid'))
+	$write_low=true;
+
+if(!$rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 {
-	if($rechte->isBerechtigt('admin', $stg_kz, 'suid'))
+	if($write_admin)
 	{
 		//Lehrevz Speichern
 		if(isset($_POST['lehrevz']))
 		{
-			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehreverzeichnis='".addslashes($_POST['lehrevz'])."' WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!$db->db_query($qry))
-				echo "Fehler beim Speichern!";
-			else
-				echo "Erfolgreich gespeichert";
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->lehreverzeichnis=$_POST['lehrevz'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
 		}
 
 		//Aktiv Feld setzen
 		if(isset($_GET['aktiv']))
 		{
-			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET aktiv=".($_GET['aktiv']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!$db->db_query($qry))
-				echo "Fehler beim Speichen!";
-			else
-				echo "Erfolgreich gespeichert";
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->aktiv=($_GET['aktiv']=='t'?false:true);
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
 		}
 		//Organisationsform Speichern
 		if(isset($_POST['orgform']))
 		{
-			$qry = "UPDATE lehre.tbl_lehrveranstaltung SET orgform_kurzbz=".($_POST['orgform']==''?'null':"'".addslashes($_POST['orgform'])."'")." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-			if(!$db->db_query($qry))
-				echo "Fehler beim Speichern!";
-			else
-				echo "Erfolgreich gespeichert";
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->orgform_kurzbz=$_POST['orgform'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
 		}
 	}
 	
-	//LVInfo kopieren
-	if(isset($_POST['source_id']))
+	if($write_low || $write_admin)
 	{
-		$lvinfo = new lvinfo();
-		if(!$lvinfo->copy($_POST['source_id'], $_GET['lvid']))
-			echo 'Fehler beim Kopieren';
-		else 
-			echo 'Erfolgreich gespeichert';
-	}
+		//LVInfo kopieren
+		if(isset($_POST['source_id']))
+		{
+			$lvinfo = new lvinfo();
+			if(!$lvinfo->copy($_POST['source_id'], $_GET['lvid']))
+				echo 'Fehler beim Kopieren';
+			else 
+				echo 'Erfolgreich gespeichert';
+		}
+		
+		//Lehre Feld setzen
+		if(isset($_GET['lehre']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->lehre=($_GET['lehre']=='t'?false:true);
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
+		}
 	
-	//Lehre Feld setzen
-	if(isset($_GET['lehre']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET lehre=".($_GET['lehre']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!$db->db_query($qry))
-			echo "Fehler beim Speichen!";
-		else
-			echo "Erfolgreich gespeichert";
+		//Zeugnis Feld setzen
+		if(isset($_GET['zeugnis']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->zeugnis=($_GET['zeugnis']=='t'?false:true);
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
+		}
+	
+		//Sort Speichern
+		if(isset($_POST['sort']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->sort=$_POST['sort'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
+		}
+		
+		//Incoming Speichern
+		if(isset($_POST['incoming']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->incoming=$_POST['incoming'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
+		}
+	
+		//FBK Speichern
+		if(isset($_POST['fbk']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->koordinator=$_POST['fbk'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
+		}
+	
+		//Projektarbeit Feld setzen
+		if(isset($_GET['projektarbeit']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_GET['lvid']))
+			{
+				$lv_obj->projektarbeit=($_GET['projektarbeit']=='t'?false:true);
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					echo 'Erfolgreich gespeichert';
+				else 
+					echo 'Fehler beim Speichern:'.$lv_obj->errormsg;
+			}
+			else 
+				echo 'Fehler beim Laden der LV:'.$lv_obj->errormsg;
+		}
 	}
-
-	//Zeugnis Feld setzen
-	if(isset($_GET['zeugnis']))
+	else 
 	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET zeugnis=".($_GET['zeugnis']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!$db->db_query($qry))
-			echo "Fehler beim Speichen!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-
-	//Sort Speichern
-	if(isset($_POST['sort']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET sort=".($_POST['sort']!=''?"'".addslashes($_POST['sort'])."'":'null')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!$db->db_query($qry))
-			echo "Fehler beim Speichern!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-
-	//FBK Speichern
-	if(isset($_POST['fbk']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET koordinator=".($_POST['fbk']==''?'null':"'".addslashes($_POST['fbk'])."'")." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		if(!$db->db_query($qry))
-			echo "Fehler beim Speichern!";
-		else
-			echo "Erfolgreich gespeichert";
-	}
-
-	//Projektarbeit Feld setzen
-	if(isset($_GET['projektarbeit']))
-	{
-		$qry = "UPDATE lehre.tbl_lehrveranstaltung SET projektarbeit=".($_GET['projektarbeit']=='t'?'false':'true')." WHERE lehrveranstaltung_id='".$_GET['lvid']."'";
-		//echo $qry;
-		if(!$db->db_query($qry))
-			echo "Fehler beim Speichen!";
-		else
-			echo "Erfolgreich gespeichert";
+		echo 'Sie haben keine Schreibrechte fuer diese Seite';
 	}
 }
 
@@ -209,7 +327,7 @@ if($result = $db->db_query($qry))
 //Wenn nicht admin, dann nur die aktiven anzeigen
 $aktiv='';
 $isaktiv=trim($isaktiv);
-if(!$rechte->isBerechtigt('admin'))
+if(!$write_admin)
 	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
 else 
 {
@@ -249,9 +367,11 @@ $s=array();
 $outp.="<form action='".$_SERVER['PHP_SELF']."' method='GET' onsubmit='return checksubmit();'>";
 $outp.=" Studiengang <SELECT name='stg_kz' id='select_stg_kz'>";
 $outp.="<OPTION value='' ".($stg_kz==''?'selected':'').">-- Alle --</OPTION>";
+$stg_berechtigt = $rechte->getStgKz('lehre/lehrveranstaltung:begrenzt');
+
 foreach ($studiengang as $stg)
 {
-	if($rechte->isBerechtigt('admin', $stg->studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $stg->studiengang_kz, 'suid'))
+	if(in_array($stg->studiengang_kz, $stg_berechtigt))
 	{
 		$outp.="<OPTION value='$stg->studiengang_kz' ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->kurzbzlang</OPTION>";
 	}
@@ -273,6 +393,7 @@ $outp.= ' Institut <SELECT name="fachbereich_kurzbz" id="select_fachbereich_kurz
 $fachb = new fachbereich();
 $fachb->getAll();
 $outp.= "<OPTION value='' ".($fachbereich_kurzbz==''?'selected':'').">-- Alle --</OPTION>";
+$fachbereich_berechtigt = $rechte->getFbKz('lehre/lehrveranstaltung:begrenzt');
 foreach ($fachb->result as $fb)
 {
 	if($fachbereich_kurzbz==$fb->fachbereich_kurzbz)
@@ -280,15 +401,13 @@ foreach ($fachb->result as $fb)
 	else
 		$selected = '';
 
-	if($rechte->isBerechtigt('admin', 0, 'suid') ||
-	   $rechte->isBerechtigt('assistenz', null, 'suid', $fb->fachbereich_kurzbz) ||
-	   $rechte->isBerechtigt('admin', null, 'suid', $fb->fachbereich_kurzbz))
-	$outp.= "<OPTION value='$fb->fachbereich_kurzbz' $selected>$fb->fachbereich_kurzbz</OPTION>";
+	if(in_array($fb->fachbereich_kurzbz, $fachbereich_berechtigt))
+		$outp.= "<OPTION value='$fb->fachbereich_kurzbz' $selected>$fb->fachbereich_kurzbz</OPTION>";
 }
 
 $outp.= '</SELECT>';
 
-if($rechte->isBerechtigt('admin'))
+if($write_admin)
 {
 	//Aktiv DropDown
 	$outp.= ' Aktiv <SELECT name="isaktiv" id="isaktiv">';
@@ -309,28 +428,25 @@ $outp .="</form>";
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<html>
 	<head>
-	<title>Lehrveranstaltung Verwaltung</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-	<script language="Javascript">
-	var isaktiv="'.$isaktiv.'";
-	function checksubmit()
-	{
-		//alert(document.getElementById("select_stg_kz").value+" : "+document.getElementById("select_fachbereich_kurzbz").value);
-		//return false;
-
-		if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
-		{
-			alert("Studiengang und Fachbereich dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
-			return false;
-		}
-		else
-			return true;
-
-	}
-	</script>
+		<title>Lehrveranstaltung Verwaltung</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var isaktiv="'.$isaktiv.'";
+			function checksubmit()
+			{		
+				if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
+				{
+					alert("Studiengang und Fachbereich dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+					return false;
+				}
+				else
+					return true;
+		
+			}
+		</script>
 	</head>
 	<body class="Background_main">
 	';
@@ -341,7 +457,7 @@ echo $outp;
 
 echo '</td><td>';
 //Neu Button
-if($rechte->isBerechtigt('admin'))
+if($write_admin)
 	echo "<input type='button' onclick='parent.lv_detail.location=\"lehrveranstaltung_details.php?neu=true&stg_kz=$stg_kz&semester=$semester\"' value='Neu'/>";
 echo '</td></tr></table>';
 
@@ -357,17 +473,18 @@ if ($result_lv!=0)
 		  <th class='table-sortable:default'>Bezeichnung</th>
 		  <th class='table-sortable:default'>LF</th>
 		  <th class='table-sortable:default'>Stg</th>
-		  <th class='table-sortable:default'>Organisationsform</th>
-		  <th class='table-sortable:default'>SS</th>
+		  <th class='table-sortable:default'>Orgform</th>
+		  <th class='table-sortable:default' title='Semesterstunden'>SS</th>
 		  <th class='table-sortable:default'>ECTS</th>
 		  <th class='table-sortable:default'>Lehre</th>
-		  <th class='table-sortable:default'>LehreVz</th>
+		  <th class='table-sortable:default' title='Verzeichnisname im Filesystem'>LehreVz</th>
 		  <th class='table-sortable:default'>Aktiv</th>
-		  <th class='table-sortable:numeric'>Sort</th>
+		  <th class='table-sortable:numeric' title='Sortierreihenfolge der LV am Zeugnis'>Sort</th>
+		  <th class='table-sortable:numeric' title='Anzahl der Incoming die an dieser LV teilnehmen duerfen'>Incoming</th>
 		  <th class='table-sortable:default'>Zeugnis</th>
-		  <th class='table-sortable:default'>BA/DA</th>
+		  <th class='table-sortable:default' title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th class='table-sortable:default'>Koordinator</th>
-		  <th class='table-sortable:default'>LVInfo</th>\n";
+		  <th class='table-sortable:default'>LV-Info</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
@@ -377,7 +494,7 @@ if ($result_lv!=0)
 		//ID
 		echo "<td align='right'>";
 		
-		if($rechte->isBerechtigt('admin'))		
+		if($write_admin)		
 			echo "<a href='lehrveranstaltung_details.php?lv_id=$row->lehrveranstaltung_id' target='lv_detail'>$row->lehrveranstaltung_id</a>";
 		else		
 			echo "$row->lehrveranstaltung_id";
@@ -386,7 +503,7 @@ if ($result_lv!=0)
 		echo "<td>$row->kurzbz</td>";
 		//Bezeichnung
 		echo "<td>";
-		if($rechte->isBerechtigt('admin'))
+		if($write_admin)
 			echo "<a href='lehrveranstaltung_details.php?lv_id=$row->lehrveranstaltung_id' target='lv_detail'>$row->bezeichnung</a>";
 		else
 			echo $row->bezeichnung;
@@ -395,7 +512,7 @@ if ($result_lv!=0)
 		echo "<td>".$s[$row->studiengang_kz]->kurzbz."</td>";
 		//Organisationsform
 		echo "<td style='white-space:nowrap;'>";
-		if($rechte->isBerechtigt('admin'))
+		if($write_admin)
 		{
 			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&fachbereich_kurzbz=$fachbereich_kurzbz&isaktiv=$isaktiv' method='POST'>";
 			echo "<SELECT name='orgform'>";
@@ -430,14 +547,14 @@ if ($result_lv!=0)
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&lehre=$row->lehre&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->lehre=='t'?'true.png':'false.png')."' height='20'></a></td>";
 		//LehreVz
 		echo "<td  style='white-space:nowrap;'>";
-		if($rechte->isBerechtigt('admin'))
+		if($write_admin)
 			echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><input type='text' value='$row->lehreverzeichnis' size='4' name='lehrevz'><input type='submit' value='ok'></form>";
 		else
 			echo $row->lehreverzeichnis;
 		echo "</td>";
 		//Aktiv
 		echo "<td align='center'  style='white-space:nowrap;'>";
-		if($rechte->isBerechtigt('admin'))
+		if($write_admin)
 			echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&aktiv=$row->aktiv&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20'></a>";
 		else
 			echo ($row->aktiv?'Ja':'Nein');
@@ -446,6 +563,11 @@ if ($result_lv!=0)
 		echo "<td style='white-space:nowrap;'>";
 		echo "<div style='display: none'>$row->sort</div>";
 		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><input type='text' value='$row->sort' size='4' name='sort'><input type='submit' value='ok'></form>";
+		echo "</td>";
+		//Incoming
+		echo "<td style='white-space:nowrap;'>";
+		echo "<div style='display: none'>$row->incoming</div>";
+		echo "<form action='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz' method='POST'><input type='text' value='$row->incoming' size='4' name='incoming'><input type='submit' value='ok'></form>";
 		echo "</td>";
 		//Zeugnis
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?lvid=$row->lehrveranstaltung_id&stg_kz=$stg_kz&semester=$semester&zeugnis=$row->zeugnis&isaktiv=$isaktiv&fachbereich_kurzbz=$fachbereich_kurzbz'><img src='../../skin/images/".($row->zeugnis=='t'?'true.png':'false.png')."' height='20'></a></td>";
@@ -464,7 +586,7 @@ if ($result_lv!=0)
 			echo "<option value='$fb_uid' $selected>".$fb_k['nachname']." ".$fb_k['vorname']."</option>";
 		}
 		echo "</SELECT><input type='submit' value='ok' name='submitfbk'></form>";
-		echo "</td>";
+		echo '</td>';
 		echo '<td nowrap>';
 		//LVInfo
 		$lvinfo = new lvinfo();
@@ -484,11 +606,9 @@ if ($result_lv!=0)
 
 }
 else
-	echo "Kein Eintrag gefunden!";
+	echo 'Kein Eintrag gefunden!';
 ?>
-</tbody>
-</table>
-
-<br>
-</body>
+		</tbody>
+		</table>
+	</body>
 </html>

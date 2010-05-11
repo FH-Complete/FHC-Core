@@ -49,6 +49,10 @@
 			{
 				$lv->new=false;
 			}
+			else 
+			{
+				die('Fehler beim Laden der Lehrveranstaltung');
+			}
 		}
 		else
 		{
@@ -77,6 +81,7 @@
 		$lv->updateamum = date('Y-m-d H:i:s');
 		$lv->updatevon = $user;
 		$lv->sort = $_POST['sort'];
+		$lv->incoming = $_POST['incoming'];
 		$lv->zeugnis = isset($_POST['zeugnis']);
 		$lv->projektarbeit = isset($_POST['projektarbeit']);
 		$lv->orgform_kurzbz = $_POST['orgform_kurzbz'];
@@ -259,6 +264,14 @@
 		$htmlstr .= "</SELECT>";
 		$htmlstr .= "	</td>";
 		$htmlstr .= "	<td></td>";
+		$htmlstr .= "	<td>Incomingpl&auml;tze</td>";
+		$htmlstr .= "	<td><input type='text' name='incoming' value='$lv->incoming' maxlength='2'></td>";
+		$htmlstr .= "	</tr><tr>\n";
+		$htmlstr .= "	<td></td>";
+		$htmlstr .= "	<td></td>";
+		$htmlstr .= "	<td></td>";
+		$htmlstr .= "	<td></td>";
+		$htmlstr .= "	<td></td>";
 		$htmlstr .= "	<td><input type='submit' value='Speichern' name='schick'></td>";
 
 		$htmlstr .= "	</tr>\n";
@@ -272,14 +285,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Lehrveranstaltung - Details</title>
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<script src="../../include/js/mailcheck.js"></script>
-<script src="../../include/js/datecheck.js"></script>
-<script type="text/javascript">
-
-</script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Lehrveranstaltung - Details</title>
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<script src="../../include/js/mailcheck.js"></script>
+	<script src="../../include/js/datecheck.js"></script>
 </head>
 <body style="background-color:#eeeeee;">
 

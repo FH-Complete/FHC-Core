@@ -377,9 +377,9 @@ class lehreinheitgruppe extends basis_db
 					lehreinheit_id='".addslashes($this->lehreinheit_id)."' AND 
 					studiengang_kz='".addslashes($this->studiengang_kz)."'";
 		if($this->semester!='')
-			$qry.=" AND trim(semester)='".addslashes($this->semester)."'";
+			$qry.=" AND semester='".addslashes($this->semester)."'";
 		else 
-			$qry.=" AND (trim(semester)='' OR semester is null)";
+			$qry.=" AND (semester='' OR semester is null)";
 			
 		if($this->verband!='')
 			$qry.=" AND trim(verband)='".addslashes($this->verband)."'";

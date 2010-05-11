@@ -53,6 +53,7 @@ class lehrveranstaltung extends basis_db
 	public $updatevon;				// string
 	public $sprache='German';		// varchar(16)
 	public $sort;					// smallint
+	public $incoming;				// smallint
 	public $zeugnis=true;			// boolean
 	public $projektarbeit;			// boolean
 	public $koordinator;			// varchar(16)
@@ -116,6 +117,7 @@ class lehrveranstaltung extends basis_db
 			$this->updatevon=$row->updatevon;
 			$this->sprache=$row->sprache;
 			$this->sort=$row->sort;
+			$this->incoming=$row->incoming;
 			$this->zeugnis=($row->zeugnis=='t'?true:false);
 			$this->projektarbeit=($row->projektarbeit=='t'?true:false);
 			$this->koordinator=$row->koordinator;
@@ -167,6 +169,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
+			$lv_obj->incoming=$row->incoming;
 			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
 			$lv_obj->koordinator=$row->koordinator;
@@ -234,7 +237,7 @@ class lehrveranstaltung extends basis_db
 		
 		if ($sort == "bezeichnung")
 			$qry .= " ORDER BY bezeichnung";
-		else if (is_null($sort) || empty($sort))
+		elseif (is_null($sort) || empty($sort))
 			$qry .= " ORDER BY semester, bezeichnung";
 		else
 			$qry .= " ORDER BY $sort ";
@@ -273,6 +276,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
+			$lv_obj->incoming=$row->incoming;
 			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
 			$lv_obj->koordinator=$row->koordinator;
@@ -285,7 +289,7 @@ class lehrveranstaltung extends basis_db
 		return true;
 	}
 	
-/**
+	/**
 	 * Liefert alle Lehrveranstaltungen zu einem Studiengang/Semester
 	 * @param $studiengang_kz
 	 * @param $semester
@@ -344,11 +348,11 @@ class lehrveranstaltung extends basis_db
 		
 		if ($sort == "bezeichnung")
 			$qry .= " ORDER BY bezeichnung";
-		else if (is_null($sort) || empty($sort))
+		elseif (is_null($sort) || empty($sort))
 			$qry .= " ORDER BY semester, bezeichnung";
 		else
 			$qry .= " ORDER BY $sort ";
-#echo "<hr> $qry <hr>";
+
 		//Datensaetze laden
 		if(!$this->db_query($qry))
 		{
@@ -383,6 +387,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
+			$lv_obj->incoming=$row->incoming;
 			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
 			$lv_obj->koordinator=$row->koordinator;
@@ -442,6 +447,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->updatevon=$row->updatevon;
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
+			$lv_obj->incoming=$row->incoming;
 			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
 			$lv_obj->koordinator=$row->koordinator;
@@ -516,6 +522,16 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Semesterstunden muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
+		if($this->sort!='' && !isint($this->sort))
+		{
+			$this->errormsg = 'Sort muss ein eine gueltige ganze Zahl sein';
+			return false;
+		}
+		if($this->incoming!='' && !isint($this->incoming))
+		{
+			$this->errormsg = 'Sort muss ein eine gueltige ganze Zahl sein';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;
 	}
@@ -538,7 +554,7 @@ class lehrveranstaltung extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
-				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz) VALUES ('.
+				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz,incoming) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->bezeichnung).', '.
 				$this->addslashes($this->kurzbz).', ';
@@ -568,7 +584,8 @@ class lehrveranstaltung extends basis_db
 				$this->addslashes($this->sprache).','.
 				$this->addslashes($this->koordinator).','.
 				$this->addslashes($this->bezeichnung_english).','.
-				$this->addslashes($this->orgform_kurzbz).');';
+				$this->addslashes($this->orgform_kurzbz).','.
+				$this->addslashes($this->incoming).');';
 		}
 		else
 		{
@@ -608,6 +625,7 @@ class lehrveranstaltung extends basis_db
 				'updateamum='.$this->addslashes($this->updateamum) .','.
 				'updatevon='.$this->addslashes($this->updatevon) .','.
 				'sort='.$this->addslashes($this->sort) .','.
+				'incoming='.$this->addslashes($this->incoming).','.
 				'zeugnis='.($this->zeugnis?'true':'false').','.
 				'projektarbeit='.($this->projektarbeit?'true':'false').','.
 				'koordinator='.$this->addslashes($this->koordinator).','.
@@ -705,6 +723,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->updatevon=$row->updatevon;
 				$lv_obj->sprache=$row->sprache;
 				$lv_obj->sort=$row->sort;
+				$lv_obj->incoming=$row->incoming;
 				$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
 				$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
 				$lv_obj->zeugnis=$row->koordinator;
@@ -781,6 +800,7 @@ class lehrveranstaltung extends basis_db
 				$l->insertamum = $row->insertamum;
 				$l->insertvon = $row->insertvon;
 				$l->sort = $row->sort;
+				$l->incoming = $row->incoming;
 				$l->zeugnis = ($row->zeugnis=='t'?true:false);
 				$l->projektarbeit = ($row->projektarbeit=='t'?true:false);
 				$l->koordinator = $row->koordinator;
