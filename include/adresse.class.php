@@ -279,7 +279,7 @@ class adresse extends basis_db
 			      $this->addslashes($this->name).', '.
 			      $this->addslashes($this->strasse).', '.
 			      $this->addslashes($this->plz).', '.
-			      $this->addslashes($this->typ).', '.
+			      $this->addslashes(trim($this->typ)).', '.
 			      $this->addslashes($this->ort).', '.
 			      $this->addslashes($this->nation).', now(), '.
 			      $this->addslashes($this->insertvon).', '.
@@ -303,7 +303,7 @@ class adresse extends basis_db
 				' name='.$this->addslashes($this->name).', '.
 				' strasse='.$this->addslashes($this->strasse).', '.
 				' plz='.$this->addslashes($this->plz).', '.
-		      	' typ='.$this->addslashes($this->typ).', '.
+		      	' typ='.$this->addslashes(trim($this->typ)).', '.
 		      	' ort='.$this->addslashes($this->ort).', '.
 		      	' nation='.$this->addslashes($this->nation).', '.
 		      	' gemeinde='.$this->addslashes($this->gemeinde).', '.

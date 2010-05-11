@@ -288,7 +288,13 @@ function loadVariables($user)
 		global $ignore_kollision;
 		$ignore_kollision='false';
 	}
-
+	
+	if (!isset($kollision_student))
+	{
+		global $kollision_student;
+		$kollision_student='false';
+	}
+	
 	if (!isset($ignore_zeitsperre))
 	{
 		global $ignore_zeitsperre;

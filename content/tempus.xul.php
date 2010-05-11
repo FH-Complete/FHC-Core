@@ -49,6 +49,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-prefs-ignore_kollision:command" oncommand="variableChange('ignore_kollision','menu-prefs-ignore_kollision');"/>
   <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
+  <command id="menu-prefs-kollision_student:command" oncommand="variableChange('kollision_student','menu-prefs-kollision_student');"/>
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
   <command id="menu-extras-lvplanwartung:command" oncommand="LVPlanWartungShow();"/>
   <command id="menu-extras-rescheck:command" oncommand="ResCheckShow();"/>
@@ -120,7 +121,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
       		</menupopup>
         </menu>
         <?php
-        if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('lv-plan'))
+        if($rechte->isBerechtigt('lv-plan'))
         {
         ?>	
         <menu id="menu-prefs-stpltable" label="&menu-prefs-stpltable.label;" accesskey="&menu-prefs-stpltable.accesskey;">
@@ -172,6 +173,16 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
    			 accesskey 	="&menu-prefs-ignore_reservierung.accesskey;"
    			 checkbox   ="true"
    			 checked   ="<?php echo $ignore_reservierung;?>"
+   			 />
+   		 <menuitem
+			 id        	="menu-prefs-kollision_student"
+			 type		="checkbox"
+  			 key       	="menu-prefs-kollision_student:key"
+			 label     	="&menu-prefs-kollision_student.label;"
+			 command   	="menu-prefs-kollision_student:command"
+   			 accesskey 	="&menu-prefs-kollision_student.accesskey;"
+   			 checkbox   ="true"
+   			 checked    ="<?php echo $kollision_student;?>"
    			 />
    		<?php
         }
@@ -258,6 +269,10 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 				oncommand="studiensemesterChange('', 1)"
 			/>
 	</statusbarpanel>
+	<?php
+		if($rechte->isBerechtigt('system/developer'))
+			echo '<statusbarpanel label="'.DB_NAME.'"/>';
+	?>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo $db_stpl_table; ?>"/>
 	<statusbarpanel>
 		<toolbarbutton id="statusbarpanel-ignore_kollision" label="Kollisionscheck <?php echo ($ignore_kollision=='true'?'AUS':'AN'); ?>" <?php echo ($ignore_kollision=='true'?'style="background-color: RED;"':'');?> oncommand="updateignorekollision()"/>

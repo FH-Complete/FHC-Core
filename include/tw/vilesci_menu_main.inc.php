@@ -167,7 +167,7 @@ $menu=array
 		'link'=>'left.php?categorie=Inventar', 'target'=>'nav',
 		'Inventar'=>	array
 		(
-			'name'=>'Inventar', 'permissions'=>array('admin','wawi','support'),		
+			'name'=>'Inventar', 'permissions'=>array('admin','wawi','support','wawi/inventar'),		
 			'Neu'=>array('name'=>'Neu', 'link'=>'inventar/inventar_pflege.php', 'target'=>'main'),
 			'Suche'=>array('name'=>'Suche', 'link'=>'inventar/inventar.php', 'target'=>'main'),
 			'AfA'=>array('name'=>'AfA', 'link'=>'inventar/inventar_afa.php', 'target'=>'main'),
@@ -176,7 +176,7 @@ $menu=array
 		),			
 		'WAWI'=>	array
 		(
-			'name'=>'WAWI', 'permissions'=>array('admin','wawi','support'),
+			'name'=>'WAWI', 'permissions'=>array('admin','wawi','support','wawi/inventar'),
 					'Suche'=>array('name'=>'Suche', 'link'=>'inventar/bestellung.php', 'target'=>'main'),
 		),
 	),	

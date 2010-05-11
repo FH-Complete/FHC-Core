@@ -24,6 +24,10 @@ require_once('../config/vilesci.config.inc.php');
 var menuUndoDatasource=0;
 var STPLlastDetailUrl='leer';
 
+//Speichert die Position der Scrollbalken in der Wochenuebersicht
+TimeTableWeekPositionX=0;
+TimeTableWeekPositionY=0;
+
 // ----------------------------------------------------------
 // ------- CLASS Progressmeter ------------------------------
 function Progressmeter(progress_id)

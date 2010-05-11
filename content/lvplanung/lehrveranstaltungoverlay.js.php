@@ -519,6 +519,7 @@ function LeDetailReset()
 	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='Dummy';
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='UE';
+	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value='';
 
 	//mitarbeiterlehreinheit tree leeren
 	lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');

@@ -204,6 +204,22 @@ class lehreinheitmitarbeiter extends basis_db
 
 		if($new)
 		{
+			//Pruefen ob dieser Mitarbeiter schon zugeordnet ist
+			$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='".addslashes($this->lehreinheit_id)."' AND mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."'";
+			if($this->db_query($qry))
+			{
+				if($this->db_num_rows()>0)
+				{
+					$this->errormsg='Der Mitarbeiter ist bereits zugeteilt!';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->errormsg='Fehler beim Pruefen der Zuordnung';
+				return false;
+			}
+			
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden,
 			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon)

@@ -23,6 +23,7 @@
 require_once('../../config/vilesci.config.inc.php');
 ?>
 
+
 // LVA-Panel aktualisieren
 function onLVARefresh()
 {
@@ -210,6 +211,7 @@ function onStplSearchRoom(event)
 
 function StplSearchRoom(target)
 {
+	saveScrollPositionTimeTableWeek();
 	if(typeof(target)==='undefined')
 		target = document.popupNode;
 	
@@ -239,6 +241,7 @@ function StplSearchRoom(target)
 
 function onStplDelete(aktion)
 {
+	saveScrollPositionTimeTableWeek();
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var daten=document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
@@ -423,5 +426,37 @@ function STPLDetailDelete()
 			treeStplDetails.setAttribute('datasources', '');
 			treeStplDetails.setAttribute('datasources', STPLlastDetailUrl);
 		}
+	}
+}
+
+// ****
+// * Speichert die aktuelle Scrollposition der Wochenuebersicht.
+// * Nach dem neuladen der Uebersicht, kann die Scrollposition mit setScrollpositionTimeTableWeek wieder gesetzt werden
+// ****
+function saveScrollPositionTimeTableWeek()
+{
+	
+	var sbox = document.getElementById('timetable-week-scrollbox');
+	if(sbox)
+	{
+		var xpcomInterface = sbox.boxObject.QueryInterface(Components.interfaces.nsIScrollBoxObject);
+		var x={};
+		var y={};
+		xpcomInterface.getPosition(x, y);
+		window.parent.TimeTableWeekPositionX=x.value;
+		window.parent.TimeTableWeekPositionY=y.value;
+	}
+}
+
+// ****
+// * Setzt die Scrollposition wieder auf den Stand zurueck der zuvor mittels saveScrollPositionTimeTableWeek gespeichert wurde
+// ****
+function setScrollpositionTimeTableWeek()
+{
+	var sbox = document.getElementById('timetable-week-scrollbox');
+	if(sbox)
+	{
+		var xpcomInterface = sbox.boxObject.QueryInterface(Components.interfaces.nsIScrollBoxObject);
+		xpcomInterface.scrollTo(window.parent.TimeTableWeekPositionX, window.parent.TimeTableWeekPositionY);
 	}
 }

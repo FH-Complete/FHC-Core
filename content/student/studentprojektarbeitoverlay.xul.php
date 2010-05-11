@@ -185,7 +185,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 						<row>
 							<label value="Firma" control="student-projektarbeit-menulist-firma"/>
-							<box class="Firma" id="student-projektarbeit-menulist-firma" />
+							<box class="Firma" id="student-projektarbeit-menulist-firma" disabled="true"/>
 							<!--
 							<hbox>
 								<menulist id="student-projektarbeit-menulist-firma" disabled="true"

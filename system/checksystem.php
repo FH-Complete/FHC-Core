@@ -973,12 +973,27 @@ if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe'))
 			OR trim(tbl_lehrverband.gruppe)='' 
 			OR tbl_studentlehrverband.gruppe is null
 		);
+	GRANT SELECT ON public.vw_gruppen TO admin;
+	GRANT SELECT ON public.vw_gruppen TO web;
+	
+	CREATE INDEX idx_benutzer_aktiv ON public.tbl_benutzer (aktiv);
 	";
 	
 	if(!$db->db_query($qry))
 		echo '<strong>tbl_gruppe/tbl_lehrverband: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'tbl_gruppe/tbl_lehrverband: GID wurde hinzugefuegt! (inklusive Trigger und View)<br>';
+}
+
+//Spalte incoming zur Lehrveranstaltung hinzufuegen. Legt fest wie viele Incoming an der LV teilnehmen duerfen
+if(!@$db->db_query('SELECT incoming FROM lehre.tbl_lehrveranstaltung'))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN incoming smallint DEFAULT null;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'lehre.tbl_lehrveranstaltung: Spalte incoming hinzugefuegt<br>';
 }
 
 echo '<br>';
@@ -1050,7 +1065,7 @@ $tabellen=array(
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming"),
 	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),

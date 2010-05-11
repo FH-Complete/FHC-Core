@@ -29,6 +29,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
+require_once(dirname(__FILE__).'/variable.class.php');
 
 class lehrstunde extends basis_db
 {
@@ -525,107 +526,65 @@ class lehrstunde extends basis_db
 
 	/**
 	 * Prueft die geladene Lehrveranstaltung auf Kollisionen im Stundenplan.
-	 * Rueckgabewert 'false' und die Fehlermeldung steht in '$this->errormsg'.
-	 * @param string	datum	gewuenschtes Datum YYYY-MM-TT
-	 * @param integer	stunde	gewuenschte Stunde
-	 * @param string	ort		gewuenschter Ort
+	 * Bei einer Kollision steht der Grund der Kollision in '$this->errormsg'.
 	 * @param string	db_stpl_table	Tabllenname des Stundenplans im DBMS
-	 * @return boolean true=ok, false=fehler
+	 * @return boolean true=kollision, false=keine kollision
 	 */
 	public function kollision($stpl_table='stundenplandev')
 	{
-		$ignore_reservation=false;
+		$variablen_obj = new variable();
+		$variablen_obj->loadVariables(get_uid());
+		
+		$kollision_student = $variablen_obj->variable->kollision_student;
+		$ignore_reservierung = $variablen_obj->variable->ignore_reservierung;
+		$ignore_zeitsperre = $variablen_obj->variable->ignore_zeitsperre;
+		
+		//Kollisionspruefung auf Studentenebene
+		if($kollision_student=='true' && $this->kollision_student($stpl_table))
+			return true;
+		
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
 		$stpl_table='lehre.'.VIEW_BEGIN.$stpl_table;
-
+	
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id AS id, lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde FROM $stpl_table
-				WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' OR ";
+				WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' ";
 		if ($this->lektor_uid!='_DummyLektor')
-			$sql_query.="(uid='$this->lektor_uid' AND uid!='_DummyLektor') OR ";
-		$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
-		if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
-			$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
-		if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
-			$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
-		if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
-			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
-		$sql_query.=")) AND unr!=$this->unr";
+			$sql_query.=" OR (uid='$this->lektor_uid' AND uid!='_DummyLektor') ";
 		
-		if (!$this->db_query($sql_query))
+		//Wenn eine Kollisionspruefung auf Studentenebene durchgefuehrt wird, werden die LVB nicht gecheckt	
+		if(!$kollision_student)
+		{
+			$sql_query.=" OR (studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
+			if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
+				$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+			if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
+				$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+			if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
+				$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz' OR gruppe_kurzbz IS null)";
+			$sql_query.=")";
+		}
+		$sql_query.=") AND unr!=$this->unr";
+		
+		if (!$erg_stpl = $this->db_query($sql_query))
 		{
 			$this->errormsg=$sql_query.$this->db_last_error();
 			return true;
 		}
-		$erg_stpl = $this->db_result;
+
 		$anz=$this->db_num_rows($erg_stpl);
-		//Check
 		if ($anz==0)
 		{
 			// Zeitsperren pruefen
-			if ($this->lektor_uid!='_DummyLektor')
-			{
-				// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )
-				$sql_query="SELECT zeitsperre_id,zeitsperretyp_kurzbz,mitarbeiter_uid AS lektor,vondatum,vonstunde,bisdatum,bisstunde
-							FROM campus.tbl_zeitsperre
-							WHERE mitarbeiter_uid='$this->lektor_uid'
-								AND (vondatum<'$this->datum' OR (vondatum='$this->datum' AND (vonstunde<=$this->stunde OR vonstunde IS NULL)))
-								AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR bisstunde IS NULL)));";
-				//echo $sql_query.'<br>';
-				if (!$this->db_query($sql_query))
-				{
-					$this->errormsg=$sql_query.$this->db_last_error();
-					return true;
-				}
-				$erg_zs = $this->db_result;
-				$anz_zs=$this->db_num_rows($erg_zs);
-				//Check
-				if ($anz_zs!=0)
-				{
-					$row = $this->db_fetch_object($erg_zs);
-					$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
-					return true;
-				}
-			}
-			// Reservierungen pruefen?
-			if (!$ignore_reservation)
-			{
-				// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )
-				$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde
-							FROM lehre.vw_reservierung
-							WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' OR ";
-				if ($this->lektor_uid!='_DummyLektor')
-					$sql_query.="(uid='$this->lektor_uid' AND uid!='_DummyLektor') OR ";
-				$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
-				if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
-					$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
-				if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
-					$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
-				if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
-					$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
-				$sql_query.="))";
-				//echo $sql_query.'<br>';
-				if (!$this->db_query($sql_query))
-				{
-					$this->errormsg=$sql_query.$this->db_last_error();
-					return true;
-				}
-				$erg_res = $this->db_result;
-				$anz_res = $this->db_num_rows($erg_res);
-				//Check
-				if ($anz_res==0)
-				{
-					return false;
-				}
-				else
-				{
-					$row = $this->db_fetch_object($erg_res);
-					$this->errormsg="Kollision (Reservierung): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
-					return true;
-				}
-			}
+			if($ignore_zeitsperre=='false' && $this->lektor_uid!='_DummyLektor' && $this->kollision_zeitsperre())
+				return true;
+			
+			// Reservierungen pruefen
+			if ($ignore_reservierung=='false' && $this->kollision_reservierung())
+				return true;
+			
 			return false;
 		}
 		else
@@ -633,6 +592,145 @@ class lehrstunde extends basis_db
 			$row = $this->db_fetch_object($erg_stpl);
 			$this->errormsg="Kollision ($stpl_table): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde"; //\n".$sql_query
 			return true;
+		}
+	}
+
+	/**
+	 * Prueft ob eine Kollision mit den Zeitsperren vorhanden ist
+	 *
+	 * @return boolean true=kollision, false=keine kollision
+	 */
+	public function kollision_zeitsperre()
+	{
+		$sql_query="SELECT 
+						zeitsperre_id,zeitsperretyp_kurzbz,mitarbeiter_uid AS lektor,vondatum,vonstunde,bisdatum,bisstunde
+					FROM campus.tbl_zeitsperre
+					WHERE mitarbeiter_uid='$this->lektor_uid'
+						AND (vondatum<'$this->datum' OR (vondatum='$this->datum' AND (vonstunde<=$this->stunde OR vonstunde IS NULL)))
+						AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR bisstunde IS NULL)));";
+
+		if (!$erg_zs = $this->db_query($sql_query))
+		{
+			$this->errormsg=$sql_query.$this->db_last_error();
+			return true;
+		}
+		
+		$anz_zs=$this->db_num_rows($erg_zs);
+		if ($anz_zs!=0)
+		{
+			$row = $this->db_fetch_object($erg_zs);
+			$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Prueft ob eine LV-Plan Kollision mit den Reservierungen besteht
+	 *
+	 * @return boolean true=kollision, false=keine kollision
+	 */
+	public function kollision_reservierung()
+	{
+		$sql_query="SELECT 
+						reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, 
+						semester, verband, gruppe, gruppe_kurzbz, datum, stunde
+					FROM lehre.vw_reservierung
+					WHERE 
+						datum='$this->datum' AND 
+						stunde=$this->stunde AND 
+						(ort_kurzbz='$this->ort_kurzbz' OR ";
+		
+		if ($this->lektor_uid!='_DummyLektor')
+			$sql_query.="(uid='$this->lektor_uid' AND uid!='_DummyLektor') OR ";
+		
+		$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
+		if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
+			$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+		if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
+			$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+		if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
+			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
+		$sql_query.="))";
+		
+		if (!$erg_res = $this->db_query($sql_query))
+		{
+			$this->errormsg=$sql_query.$this->db_last_error();
+			return true;
+		}
+		$anz_res = $this->db_num_rows($erg_res);
+
+		if ($anz_res!=0)
+		{
+			$row = $this->db_fetch_object($erg_res);
+			$this->errormsg="Kollision (Reservierung): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Prueft eine Kollision auf Studentenebene
+	 * Es werden nur die Kollisionen der Studenten abgefragt
+	 * Raum, Lektor, Reservierung, Zeitsperren, etc werden hier nicht geprueft
+	 * 
+	 * @param $stpl_table
+	 * @return boolean true=kollision, false=keine kollision
+	 */
+	public function kollision_student($stpl_table='stundenplandev')
+	{
+		// Parameter Checken
+		// Bezeichnung der Stundenplan-Tabelle
+		$stpl_table='lehre.'.VIEW_BEGIN.$stpl_table;
+		
+		$sql_query = "SELECT *
+			FROM ".$stpl_table."_student_unr
+			WHERE datum='$this->datum' AND stunde='$this->stunde' AND student_uid IN(
+			SELECT uid FROM public.vw_gruppen WHERE 
+			
+		   ";
+		$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem 
+			AND studiensemester_kurzbz=(
+					SELECT tbl_studiensemester.studiensemester_kurzbz
+					FROM 
+						public.tbl_studiensemester
+                   	WHERE 
+                   		tbl_studiensemester.ende >= '$this->datum'
+                    	AND tbl_studiensemester.start <='$this->datum' LIMIT 1)";
+		if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
+			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
+		else 
+		{
+			if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
+				$sql_query.=" AND (verband='$this->ver')";
+			else 
+				$sql_query.=" AND (verband IS NULL OR verband='' OR verband=' ')";
+			if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
+				$sql_query.=" AND (gruppe='$this->grp')";
+			else 
+				$sql_query.=" AND (gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+		}
+		
+		
+		$sql_query.=")) AND unr!=$this->unr";
+		
+		if (!$erg_stpl=$this->db_query($sql_query))
+		{
+			$this->errormsg=$sql_query.$this->db_last_error();
+			return true;
+		}
+		
+		$anz=$this->db_num_rows($erg_stpl);
+		
+		if ($anz>0)
+		{
+			$row = $this->db_fetch_object($erg_stpl);
+			$this->errormsg="Kollision Student ($stpl_table): $row->student_uid $row->datum/$row->stunde ";
+			return true;
+		}
+		else 
+		{
+			return false;
 		}
 	}
 }

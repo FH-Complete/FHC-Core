@@ -32,7 +32,6 @@ require_once('../../include/wochenplan.class.php');
 require_once('../../include/reservierung.class.php'); 
 require_once('../../include/log.class.php'); 
 
-
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
 $PHP_SELF = $_SERVER['PHP_SELF'];
@@ -126,6 +125,7 @@ if (!isset($semester_aktuell) && $semesterplan)
 <window id="windowTimeTableWeek"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	<?php echo ((isset($semesterplan) && $semesterplan)?'':'onload="setScrollpositionTimeTableWeek()"'); ?>
 	>
 
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
@@ -138,7 +138,8 @@ if (isset($semesterplan) && $semesterplan)
 else
 	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.js.php"/>';
 ?>
-<vbox id="boxTimeTableWeek" flex="5" style="overflow:auto;">
+<scrollbox id="timetable-week-scrollbox" flex="1" style="overflow:auto;" orient="vertical">
+<vbox id="boxTimeTableWeek" flex="5">
 <?php
 $user=NULL;
 
@@ -266,7 +267,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 	}
 	
 	//UNDO Befehl schreiben
-	if($undo!='')
+	if($undo!='' && $error_msg=='')
 	{
 		$log = new log();
 		$log->executetime = date('Y-m-d H:i:s');
@@ -275,7 +276,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 		$log->beschreibung = 'Stundenverschiebung '.$new_datum.'('.$new_stunde.') '.$ort;
 		$log->mitarbeiter_uid = $uid;
 		if(!$log->save(true))
-			$error_msg.='Fehler beim Schreiben des UNDO Befehls'.$log->errormsg;
+			$error_msg.='Fehler: '.$log->errormsg;
 		
 	}
 }
@@ -515,8 +516,8 @@ if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$gruppe) &
 	$error_msg.=$stdplan->errormsg;
 
 // Stundenplan einer Woche laden
-if (! $stdplan->load_week($datum,$db_stpl_table))
-	$error_msg.=$stdplan->errormsg;
+//if (! $stdplan->load_week($datum,$db_stpl_table))
+//	$error_msg.=$stdplan->errormsg;
 while ($begin<=$ende)
 {
 	$stdplan->init_stdplan();
@@ -545,20 +546,22 @@ while ($begin<=$ende)
 	}
 
 	// Stundenplan der Woche drucken
-	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision);
+	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision, $kollision_student);
 	
 }
 
 ?>
 
 </vbox>
+</scrollbox>
 <label id="TimeTableWeekErrors"><?php echo htmlspecialchars($error_msg); ?></label>
 
 <script type="application/x-javascript">
 	<?php
 		if ($error_msg!='')
-			echo "alert('".str_replace("'",'"',$error_msg)."');";
+			echo "alert('".str_replace("'",'"',str_replace(chr(10),'',htmlspecialchars($error_msg)))."');";
 	?>
-	top.document.getElementById("statusbarpanel-text").setAttribute("label","<?php echo htmlspecialchars($PHP_SELF.$error_msg); ?>");
+	
+	top.document.getElementById("statusbarpanel-text").setAttribute("label","<?php echo str_replace(chr(10),' ',htmlspecialchars($PHP_SELF.$error_msg)); ?>");
 </script>
 </window>

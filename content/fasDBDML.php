@@ -471,7 +471,6 @@ if(!$error)
 		$variable = new variable();
 		
 		$variable->uid = $user;
-		$variable->new = false;
 		
 		// Aendert die Variable Studiensemester		
 		if(isset($_POST['stsem']))
