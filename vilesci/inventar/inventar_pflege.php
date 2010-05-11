@@ -484,7 +484,7 @@
 										for ($i=0;$i<count($resultBetriebsmitteltyp) ;$i++)
 										{
 											if ($resultBetriebsmitteltyp[$i]->betriebsmitteltyp)
-												echo '<option '.($betriebsmitteltyp==$resultBetriebsmitteltyp[$i]->betriebsmitteltyp?' selected="selected" ':'').' value="'.$resultBetriebsmitteltyp[$i]->betriebsmitteltyp.'">'.($resultBetriebsmitteltyp[$i]->beschreibung=='NULL' || empty($resultBetriebsmitteltyp[$i]->beschreibung)?$resultBetriebsmitteltyp[$i]->betriebsmitteltyp:$resultBetriebsmitteltyp[$i]->beschreibung).'&nbsp;</option>';
+												echo '<option '.($betriebsmitteltyp==$resultBetriebsmitteltyp[$i]->betriebsmitteltyp?' selected="selected" ':'').' value="'.$resultBetriebsmitteltyp[$i]->betriebsmitteltyp.'">'.($resultBetriebsmitteltyp[$i]->beschreibung=='NULL' || empty($resultBetriebsmitteltyp[$i]->beschreibung)?$resultBetriebsmitteltyp[$i]->betriebsmitteltyp:$resultBetriebsmitteltyp[$i]->beschreibung).'&nbsp;('.$resultBetriebsmitteltyp[$i]->typ_code.')</option>';
 										}
 										?>
 								</select>
@@ -1070,7 +1070,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 										for ($i=0;$i<count($resultBetriebsmitteltyp) ;$i++)
 										{
 											if ($resultBetriebsmitteltyp[$i]->betriebsmitteltyp)
-												echo '<option '.($betriebsmitteltyp_array[$pos]==$resultBetriebsmitteltyp[$i]->betriebsmitteltyp?' selected="selected" ':'').' value="'.$resultBetriebsmitteltyp[$i]->betriebsmitteltyp.'">'.($resultBetriebsmitteltyp[$i]->beschreibung=='NULL' || empty($resultBetriebsmitteltyp[$i]->beschreibung)?$resultBetriebsmitteltyp[$i]->betriebsmitteltyp:$resultBetriebsmitteltyp[$i]->beschreibung).'&nbsp;</option>';
+												echo '<option '.($betriebsmitteltyp_array[$pos]==$resultBetriebsmitteltyp[$i]->betriebsmitteltyp?' selected="selected" ':'').' value="'.$resultBetriebsmitteltyp[$i]->betriebsmitteltyp.'">'.($resultBetriebsmitteltyp[$i]->beschreibung=='NULL' || empty($resultBetriebsmitteltyp[$i]->beschreibung)?$resultBetriebsmitteltyp[$i]->betriebsmitteltyp:$resultBetriebsmitteltyp[$i]->beschreibung).'&nbsp;('.$resultBetriebsmitteltyp[$i]->typ_code.')</option>';
 										}
 										?>
 										</select>
