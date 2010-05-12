@@ -57,7 +57,7 @@ function clean_string($string)
  				   "ß" => "ss");
  				   
 	$string = strtr($string, $trans);
-    return ereg_replace("[^a-zA-Z0-9]", "", $string);
+    return mb_ereg_replace("[^a-zA-Z0-9]", "", $string);
     //[:space:]
  }
 

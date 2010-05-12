@@ -125,6 +125,7 @@ else
 	$titel=mb_convert_encoding(trim($titel),'ISO-8859-15','UTF-8');
 	$titelpre=mb_convert_encoding(trim($titelpre),'ISO-8859-15','UTF-8');
 	$titelpost=mb_convert_encoding(trim($titelpost),'ISO-8859-15','UTF-8');
+	$studiengang=mb_convert_encoding(trim($studiengang),'ISO-8859-15','UTF-8');
 	
 	
 	//Ausdruck generieren
@@ -479,7 +480,7 @@ else
 
 
 
-$sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
+$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id='$projektarbeit_id' ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
 	FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 	LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 	LEFT JOIN public.tbl_student on(tbl_benutzer.uid=tbl_student.student_uid) 
@@ -699,7 +700,7 @@ else
 		$htmlstr .= "<input type='hidden' name='titelpre' value='".$row->titelpre."'>\n";
 		$htmlstr .= "<input type='hidden' name='titelpost' value='".$row->titelpost."'>\n";
 		$htmlstr .= "<input type='hidden' name='autor' value='".$row->vorname." ".$row->nachname."'>\n";
-		$htmlstr .= "<input type='hidden' name='ende' value='".$row->ende."'>\n";
+		$htmlstr .= "<input type='hidden' name='ende' value='".$row->abgabedatum."'>\n";
 		if($row->stgtyp=='b')
 		{
 			$stgtyp='Bachelor';
