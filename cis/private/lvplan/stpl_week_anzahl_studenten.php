@@ -117,7 +117,6 @@
 									{
 						
 										var iframe=document.createElement('IFRAME');
-//										$(iframe).attr('style','position:absolute;width:0px;height:0px;left:-500px;top:-500px;');
 										document.body.appendChild(iframe);
 										doc=iframe.contentWindow.document;
 									}
@@ -183,20 +182,16 @@
 	$letzter_tag_monat_jahr=strftime('%a %d %b %Y',mktime(0,0,0,date('m',$letzterTagAnzeige),date('d',$letzterTagAnzeige),date('Y',$letzterTagAnzeige)));			
 	
 	// Beginn Ende setzen
-##	if (!isset($datum))
-#	{
-		$objSS=new studiensemester();
-		$ss=$objSS->getaktorNext();
-		$objSS->load($ss);
-		$ss_begin=datum::mktime_fromdate($objSS->start);
-		$ss_ende=datum::mktime_fromdate($objSS->ende);
-##var_dump($ss);
-#exit;		
-#	}
+	$objSS=new studiensemester();
+	$ss=$objSS->getaktorNext();
+	$objSS->load($ss);
+	$ss_begin=datum::mktime_fromdate($objSS->start);
+	$ss_ende=datum::mktime_fromdate($objSS->ende);
+
 	
 	$sql_query=' select tbl_adresse.plz,tbl_adresse.name, sum(tbl_ort.max_person) as summe  ';
 	$sql_query.=' from  public.tbl_ort,public.tbl_standort, public.tbl_adresse ';
-	$sql_query.=" where tbl_standort.standort_kurzbz=tbl_ort.standort_kurzbz ";	
+	$sql_query.=" where tbl_standort.standort_id=tbl_ort.standort_id ";	
 	$sql_query.=" and tbl_adresse.adresse_id=tbl_standort.adresse_id ";	
 	$sql_query.=" and tbl_adresse.adresse_id='".$adresse_id."'";	
 	$sql_query.=" and tbl_ort.aktiv and tbl_ort.lehre ";
@@ -269,7 +264,7 @@
 					$sql_query.=" where vw_stundenplan.datum='".date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag)))."' ";
 					$sql_query.=" and vw_stundenplan.stunde='".$row->stunde."' ";
 					$sql_query.=" and tbl_ort.ort_kurzbz=vw_stundenplan.ort_kurzbz ";
-					$sql_query.=" and tbl_standort.standort_kurzbz=tbl_ort.standort_kurzbz ";	
+					$sql_query.=" and tbl_standort.standort_id=tbl_ort.standort_id ";	
 					$sql_query.=" and tbl_adresse.adresse_id=tbl_standort.adresse_id ";	
 					$sql_query.=" and tbl_adresse.adresse_id='".$adresse_id."'";
 					$sql_query.=" order by tbl_adresse.plz,vw_stundenplan.ort_kurzbz ";
@@ -333,7 +328,7 @@
 								   $("img#img_'.$i.'_'.$k.'").click(function(event)
 								   {
 								   		$("div#infodetail").html("<table border=\"0\"><tr>'.$tooltip.'</tr></table>");
-						    	    	$("div#info").show("slow"); // div# langsam öffnen
+						    	    	$("div#info").show("slow"); // div# langsam ï¿½ffnen
 		   							});
 								});
 						</script>';
