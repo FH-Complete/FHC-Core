@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Hauptmenue fuer CIS
+ * Hauptmenue fuer CIS Main
  */
 ?>
 <table class="tabcontent">
