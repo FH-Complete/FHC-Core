@@ -38,27 +38,27 @@
 						</fo:block>
 					</fo:block-container>		
 					
-					<fo:block-container position="absolute" top="90mm" left="30mm">
+					<fo:block-container position="absolute" top="87mm" left="30mm">
 						<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="10pt">
 							<xsl:text>Personenkennzeichen: </xsl:text><xsl:value-of select="matrikelnr" />
 						</fo:block>
 					</fo:block-container>					
 					
-					<fo:block-container position="absolute" top="100mm" left="30mm">
-						<fo:block content-width="80mm" line-height="14pt" font-family="sans-serif" font-size="10pt" >
+					<fo:block-container position="absolute" top="97mm" left="30mm">
+						<fo:block content-width="75mm" line-height="14pt" font-family="sans-serif" font-size="10pt" >
 							<xsl:text>an der Lehrveranstaltung</xsl:text>
 						</fo:block>
 					</fo:block-container>
 
 					
-					<fo:block-container position="absolute" top="110mm" left="30mm">
+					<fo:block-container position="absolute" top="115mm" left="30mm">
 						<fo:block content-width="180mm" line-height="18pt" font-family="sans-serif" font-size="18pt">
 							<xsl:value-of select="bezeichnung" />
 						</fo:block>
 					</fo:block-container>
 					
 
-					<fo:block-container position="absolute" top="120mm" left="30mm">
+					<fo:block-container position="absolute" top="125mm" left="30mm">
 						<fo:block content-width="180mm" line-height="14pt" font-family="sans-serif" font-size="10pt">
 							<xsl:text>im Ausmaß von </xsl:text><xsl:value-of select="sws" />
 							<xsl:text> Semesterstunden; </xsl:text>
@@ -146,14 +146,7 @@
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
-								
-								<fo:table-row  line-height="10pt">
-									<fo:table-cell number-columns-spanned="3">
-										<fo:block font-size="10pt" content-width="165mm" text-align="center">
-											<xsl:text>Fachhochschule Technikum Wien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476426\nDVR-Nr.:0928381</xsl:text>
-										</fo:block></fo:table-cell>
-								</fo:table-row>
-								
+															
 								    
 							</fo:table-body>
 						</fo:table>
