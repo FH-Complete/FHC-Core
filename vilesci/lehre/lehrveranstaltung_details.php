@@ -263,7 +263,7 @@
 		}
 		$htmlstr .= "</SELECT>";
 		$htmlstr .= "	</td>";
-		$htmlstr .= "	<td></td>";
+		//$htmlstr .= "	<td></td>";
 		$htmlstr .= "	<td>Incomingpl&auml;tze</td>";
 		$htmlstr .= "	<td><input type='text' name='incoming' value='$lv->incoming' maxlength='2'></td>";
 		$htmlstr .= "	</tr><tr>\n";
