@@ -201,7 +201,7 @@
 								    	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 									    tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
 									    mitarbeiter_uid='$user' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem' AND
-									    tbl_lehrveranstaltung.aktiv AND tbl_lehrveranstaltung.lehre ORDER BY typ, tbl_studiengang.kurzbz, semester, bezeichnung";
+									    (tbl_lehrveranstaltung.aktiv OR tbl_lehrveranstaltung.studiengang_kz=0) AND tbl_lehrveranstaltung.lehre ORDER BY typ, tbl_studiengang.kurzbz, semester, bezeichnung";
 
 							if($result = $db->db_query($qry))
 							{

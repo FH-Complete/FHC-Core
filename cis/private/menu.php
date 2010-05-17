@@ -80,6 +80,7 @@ else
 		}
 	}
 
+$aktiv=false;
 $qry = "SELECT aktiv FROM campus.vw_benutzer WHERE uid='$user'";
 if($result = $db->db_query($qry))
 {
