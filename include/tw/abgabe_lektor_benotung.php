@@ -22,17 +22,14 @@
  */
 /*******************************************************************************************************
  *			abgabe_lektor_benotung
- *     abgabe_lektor_benotung ist die Benotungsoberfl�che des Abgabesystems 
- * 			f�r Diplom- und Bachelorarbeiten
+ *     abgabe_lektor_benotung ist die Benotungsoberflaeche des Abgabesystems 
+ * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
+require_once('../../config/cis.config.inc.php');
+require_once('../../include/basis_db.class.php');
 
- 	require_once('../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 			 
  
 // Pfad zu fpdf
@@ -480,7 +477,7 @@ else
 
 
 
-$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id='$projektarbeit_id' ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
+$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id='$projektarbeit_id' AND abgabedatum is NOT NULL ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
 	FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 	LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 	LEFT JOIN public.tbl_student on(tbl_benutzer.uid=tbl_student.student_uid) 
