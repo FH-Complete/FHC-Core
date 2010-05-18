@@ -47,7 +47,7 @@
 				  	<table class="tabcontent" id="jahresplan" style="display: none">
 						<tr>
 							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="content" class="Item" href="/documents/fotos/" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
+							<td class="tdwrap"><a class="Item" href="/documents/fotos/" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Sponsionsfotos</a></td>
 						</tr>
 					</table>
 					</td>
@@ -724,8 +724,8 @@
 				<td class="tdwrap"><a href="public/kollegium.html" class="Item" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Statuten</a></td>
 			</tr>
 			</table>
-		</td>-->
-  		</tr>
+		</td>
+  		</tr>-->
   		<!-- Hauptmenue Betriebsrat -->
  		<tr>
 			<td class="tdwrap">
