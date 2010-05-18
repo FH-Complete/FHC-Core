@@ -29,7 +29,7 @@ require_once('../config/cis.config.inc.php');
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="../skin/style.css.php" rel="stylesheet" type="text/css">
-
+<title>Menu</title>
 <script language="JavaScript" type="text/javascript">
 <!--
 	var __js_page_array = new Array();
