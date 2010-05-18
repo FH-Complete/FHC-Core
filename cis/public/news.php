@@ -27,6 +27,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+<title>NEWS</title>
 </head>
 
 <body>
@@ -40,6 +41,7 @@
       <tr>
         <td>&nbsp;</td>
       </tr>
+	  <tr>
 	  	<td>
 	  	<div id="news">
 		  <?php
