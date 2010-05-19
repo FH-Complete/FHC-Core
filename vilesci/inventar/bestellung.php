@@ -332,7 +332,7 @@
 		$check=$firma_id.$jahr_monat.$bestellung_id.$bestellnr.$besteller.$titel.$kostenstelle_id.$konto_id.$studiengang_id.$pos_wert;
 		if ($check!='' && !$oWAWI->bestellung($firma_id,$jahr_monat,$bestellung_id,$bestellnr,$besteller,$titel,$kostenstelle_id,$konto_id,$studiengang_id,$pos_wert))
 			$errormsg[]=$oWAWI->errormsg;
-	
+		
 		// Pruefen ob nur EINE Bestellung gefunden wurde : ja - keine Liste - die Positionen dazu anzeigen
 		if (is_array($oWAWI->result) && count($oWAWI->result)==1)
 		{
@@ -340,12 +340,20 @@
 				$bestellung_id=$oWAWI->result[0]->bestellung_id;
 			if (empty($bestellnr) && isset($oWAWI->result[0]->bestellnr) )
 				$bestellnr=$oWAWI->result[0]->bestellnr;
+			$result_old = $oWAWI->result;
 			$oWAWI->result=array();
 			$oWAWI->errormsg='';
+
 			if (!empty($check) && !$oWAWI->bestellpositionen($bestellung_id,$bestellnr))
 				$errormsg[]=$oWAWI->errormsg;
 			// Ausgabe Bestelldetailanzeige
-			echo output_bestellposition($oWAWI->result,$schreib_recht,$debug);
+			if(count($oWAWI->result)==0)
+			{
+				//wenn keine Bestellpositionen vorhanden sind, dann nur die Uebersichtsdaten anzeigen
+				echo output_bestellposition($result_old,$schreib_recht,$debug);
+			}
+			else
+				echo output_bestellposition($oWAWI->result,$schreib_recht,$debug);
 		}
 		else if (is_array($oWAWI->result) && count($oWAWI->result)>1)
 		{
@@ -615,6 +623,8 @@ function output_bestellposition($resultBestellungPos=null,$schreib_recht=false,$
 	$summe_brutto=0;
 	for ($pos=0;$pos<count($resultBestellungPos);$pos++)
 	{
+		if(!isset($resultBestellungPos[$pos]->summe))
+			continue;
 		$status='';
 		if (!empty($resultBestellungPos[$pos]->geliefert))
 			$status='<img src="../../skin/images/bullet_green.png" alt="" title="Geliefert am '.$resultBestellungPos[$pos]->geliefert.'" >&nbsp;Geliefert&nbsp;'.$resultBestellungPos[$pos]->geliefert;

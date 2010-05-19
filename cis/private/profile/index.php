@@ -120,21 +120,20 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 	
 	
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Profil</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<script language="Javascript">
-<!--
-function RefreshImage()
-{
-	window.location.reload();
-}
--->
-</script>
+	<title>Profil</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<script language="Javascript">
+	<!--
+		function RefreshImage()
+		{
+			window.location.reload();
+		}
+	-->
+	</script>
 </head>
 
 <body>
@@ -147,45 +146,43 @@ function RefreshImage()
 		<td class='ContentHeader'><font class='ContentHeader'>&nbsp;Userprofil</font></td>
 	  </tr>
 	</table>
-	<!--
+<?php
+	/*
 	Results: <?php echo $num_rows; ?><br>
 	Username: <?php echo $uid; ?><br><br>
-	-->
-<?php
-	
-	if(isset($_POST['savekurzbeschreibung']) && !$ansicht)
-	{
-		$person = new person();
-		$person->load($person_id);
-		
-		//Remove Script Tags and other stuff
-		$parser = new SafeHTML();
-		$result = $parser->parse($_POST['kurzbeschreibung']);
-		
-		$person->kurzbeschreibung = $result;
-		$person->updateamum = date('Y-m-d H:i:s');
-		$person->updatevon = $uid;
-		if($person->save())
-			echo '<b>Kurzbeschreibung wurde erfolgreich gespeichert</b>';
-		else 
-			echo '<span class="error">Fehler beim Speichern der Kurzbeschreibung</span>';
-	}
-	
-	if($aktiv=='f')
-	{
-		$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?<br><br>";
-		$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.<br>";
-		$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
-		$message .= "- Ihr Account wird gelöscht.<br>";
-		$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.<br>";
-		$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.<br><br>";
-		$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.<br>";
-
-		echo "<span style='color: red;'>Achtung!<br>$message</span>";
-	}
-	
+	*/
 	if ($num_rows==1)
 	{
+		if(isset($_POST['savekurzbeschreibung']) && !$ansicht)
+		{
+			$person = new person();
+			$person->load($person_id);
+			
+			//Remove Script Tags and other stuff
+			$parser = new SafeHTML();
+			$result = $parser->parse($_POST['kurzbeschreibung']);
+			
+			$person->kurzbeschreibung = $result;
+			$person->updateamum = date('Y-m-d H:i:s');
+			$person->updatevon = $uid;
+			if($person->save())
+				echo '<b>Kurzbeschreibung wurde erfolgreich gespeichert</b>';
+			else 
+				echo '<span class="error">Fehler beim Speichern der Kurzbeschreibung</span>';
+		}
+		
+		if($aktiv=='f')
+		{
+			$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?<br><br>";
+			$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.<br>";
+			$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
+			$message .= "- Ihr Account wird gelöscht.<br>";
+			$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.<br>";
+			$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.<br><br>";
+			$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.<br>";
+	
+			echo "<span style='color: red;'>Achtung!<br>$message</span>";
+		}
 		echo '
 		<table class="tabcontent">
   		<tr>
@@ -446,6 +443,6 @@ function RefreshImage()
 		Bitte wenden sie sich an die <a class="Item" href="mailto:'.MAIL_ADMIN.'?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User '.$uid.' gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">Administration</a>
 		';
 	}
-	?>
+?>
 </body>
 </html>
