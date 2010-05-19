@@ -82,11 +82,12 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 if($zipfile=='')
 {
 	?>
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
 	<title>Projektabgabe</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 	<script src="../../../include/js/jquery.js" type="text/javascript"></script>
@@ -175,7 +176,7 @@ if($aktion!='zip')
 										var output = '';
 										for (p in json) 
 										{
-											output += '<option value=\"' + json[p].oTermin + '\">' + json[p].oTerminAnzeige + '</option>\n';
+											output += '<option value=\"' + json[p].oTermin + '\">' + json[p].oTerminAnzeige + '<\/option>\n';
 										}
 										$('#termin').html(output);
 										$('#termin').result(function(event, data, formatted) {}).focus();
@@ -185,7 +186,7 @@ if($aktion!='zip')
 						}
 					</script>	
 <?php
-	echo "&nbsp;<INPUT type='submit' name='ok' value='OK'>&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM>";
+	echo "&nbsp;<INPUT type='submit' name='ok' value='OK'>&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.ok='OK';f.aktion.value='zip';f.submit();\"></FORM>";
 	}
 	
 ##if($stg_kz!='' || $abgabetyp!='' || $termin!='')
@@ -246,7 +247,7 @@ if(isset($_REQUEST['ok']))
 				$htmlstr .= "<tr>";
 				if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$row->uid.'.pdf'))
 				{
-					$htmlstr .= "		<td align=center><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$row->uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
+					$htmlstr .= "		<td align=center><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&amp;uid=$row->uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
 				}
 				else 
 				{
@@ -272,6 +273,7 @@ if(isset($_REQUEST['ok']))
 					}					
  				}
 			}
+			$htmlstr .= "</tbody></table>";
 		}
 	} 
 	else 
@@ -283,8 +285,7 @@ if(isset($_REQUEST['ok']))
 if($zipfile=='')
 {
 	echo $htmlstr;
-	echo "</body>
-	</html>";
+	//echo "</body></html>";
 }
 else
 {
@@ -292,8 +293,8 @@ else
 	chdir(PAABGABE_PATH);
 	$zipausgabe=tempnam("/tmp", "PAA").".zip";
 	exec("zip ".$zipausgabe." ".$zipfile);
-	//echo $zipausgabe;
-	//echo "<br>zip -r ".$zipausgabe." ".$zipfile;
+	echo $zipausgabe;
+	echo "<br>zip -r ".$zipausgabe." ".$zipfile;
 	if(file_exists($zipausgabe))
 	{
 		header('Content-Type: application/octet-stream');
