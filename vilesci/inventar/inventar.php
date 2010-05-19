@@ -827,72 +827,82 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			<td>'.$resultBetriebsmittel[$pos]->seriennummer.'&nbsp;</td>
 			<td>'.$resultBetriebsmittel[$pos]->ort_kurzbz.'&nbsp;</td>
 			';
-
-			if (!$schreib_recht || !empty($resultBetriebsmittel[$pos]->bestellung_id) )
-				$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank">'.$resultBetriebsmittel[$pos]->bestellung_id.'</a>&nbsp;</td>';
-			else
-				$htmlstring.='<td align="right">
-						<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',this.value,0);" id="bestellung_id'.$pos.'" name="bestellung_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestellung_id .'">
-						<script type="text/javascript">
-							function formatItem(row) 
+		$bestellung_ivalid_style='';
+		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
+			$bestellung_ivalid_style='style="color: red;"';
+		
+		if (!$schreib_recht || !empty($resultBetriebsmittel[$pos]->bestellung_id) )
+			$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellung_id.'</a>&nbsp;</td>';
+		else
+			$htmlstring.='<td align="right">
+					<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',this.value,0);" id="bestellung_id'.$pos.'" name="bestellung_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestellung_id .'">
+					<script type="text/javascript">
+						function formatItem(row) 
+						{
+						    return row[0] + " <li>" + row[1] + "</li> ";
+						}
+						$(document).ready(function() 
+						{
+							  $("#bestellung_id'.$pos.'").autocomplete("inventar_autocomplete.php", {
+								minChars:2,
+								matchSubset:1,matchContains:1,
+								width:600,
+						        scrollHeight: 200, 													
+								formatItem:formatItem,
+								extraParams:{"work":"wawi_search"}
+							  });
+						    $("#bestellung_id'.$pos.'").change(function () 
 							{
-							    return row[0] + " <li>" + row[1] + "</li> ";
-							}
-							$(document).ready(function() 
-							{
-								  $("#bestellung_id'.$pos.'").autocomplete("inventar_autocomplete.php", {
-									minChars:2,
-									matchSubset:1,matchContains:1,
-									width:600,
-							        scrollHeight: 200, 													
-									formatItem:formatItem,
-									extraParams:{"work":"wawi_search"}
-								  });
-							    $("#bestellung_id'.$pos.'").change(function () 
-								{
-									$("#bestellung_id'.$pos.'").blur();
-						        })
-								  
-						  });
-						</script>
-				&nbsp;</td>
-			';
+								$("#bestellung_id'.$pos.'").blur();
+					        })
+							  
+					  });
+					</script>
+			&nbsp;</td>
+		';
 
 		$htmlstring.='
 			<td align="right">';
-			if ($schreib_recht && $resultBetriebsmittel[$pos]->bestellung_id)
-				$htmlstring.='
-						<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',this.value);" id="bestelldetail_id'.$pos.'" name="bestelldetail_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestelldetail_id .'">
-						<script type="text/javascript">
-							function formatItem(row) 
-							{
-							    return row[0] + " <li>" + row[1] + "</li> ";
-							}
-						
-							$(document).ready(function() 
-							{
-								  $("#bestelldetail_id'.$pos.'").autocomplete("inventar_autocomplete.php", 
-								  {
-									minChars:1,
-									matchSubset:1,matchContains:1,
-									width:600,
-							        scrollHeight: 200, 											
-									formatItem:formatItem,
-									extraParams:{"work":"wawi_bestelldetail_id"
-												,"bestellung_id":"'.$resultBetriebsmittel[$pos]->bestellung_id.'"}
-								  });
-	
-							    $("#bestelldetail_id'.$pos.'").change(function () {
-									$("#bestelldetail_id'.$pos.'").blur();
-						        })
-								  
+		
+		
+		
+		if ($schreib_recht && $resultBetriebsmittel[$pos]->bestellung_id)
+		{
+			$htmlstring.='
+					<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',this.value);" id="bestelldetail_id'.$pos.'" name="bestelldetail_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestelldetail_id .'">
+					<script type="text/javascript">
+						function formatItem(row) 
+						{
+						    return row[0] + " <li>" + row[1] + "</li> ";
+						}
+					
+						$(document).ready(function() 
+						{
+							  $("#bestelldetail_id'.$pos.'").autocomplete("inventar_autocomplete.php", 
+							  {
+								minChars:1,
+								matchSubset:1,matchContains:1,
+								width:600,
+						        scrollHeight: 200, 											
+								formatItem:formatItem,
+								extraParams:{"work":"wawi_bestelldetail_id"
+											,"bestellung_id":"'.$resultBetriebsmittel[$pos]->bestellung_id.'"}
 							  });
 
+						    $("#bestelldetail_id'.$pos.'").change(function () {
+								$("#bestelldetail_id'.$pos.'").blur();
+					        })
 							  
-						</script>
-			';
+						  });
+
+						  
+					</script>
+		';
+		}
 		else
-			$htmlstring.='<a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'">'.$resultBetriebsmittel[$pos]->bestelldetail_id.'</a>';
+		{
+			$htmlstring.='<a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestelldetail_id.'</a>';
+		}
 
 		$htmlstring.='&nbsp;</td>';
 		$htmlstring.='<td>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
@@ -935,8 +945,6 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			<td style="font-size:xx-small;" id="list'.$pos.'"></td>
 		</tr>
 		';
-	if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
-		$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;"><td colspan="12" class="error">Achtung! Bestellung nicht mehr vorhanden!</td></tr>';
 	}
 	$htmlstring.='</table>';
 	return 	$htmlstring;
