@@ -142,6 +142,14 @@ if (isset($_POST['beschreibung']))
 if (isset($_POST['titel']))
 	$titel=$_POST['titel'];
 
+//Parameter pruefen
+if($sem!='' && !is_numeric($sem))
+	die('Semester ist ungueltig');
+if(strlen($ver)>2)
+	die('Verband ist ungueltig');
+if(strlen($grp)>2)
+	die('Gruppe ist ungueltig');
+
 $berechtigung=new benutzerberechtigung();
 $berechtigung->getBerechtigungen($uid);
 if ($berechtigung->isBerechtigt('lehre/reservierung:begrenzt', null, 'sui'))
@@ -236,7 +244,7 @@ if (isset($reserve) && $raumres)
 				}
 				else
 				{
-					echo "<br>$ort_kurzbz bereits reserviert von ".$db->db_result($suchen_std,0,'"uid"')." $datum_res - Stunde $stunde <br>";
+					echo "<br>$ort_kurzbz bereits reserviert: $datum_res - Stunde $stunde <br>";
 				}	
 			}
 		}

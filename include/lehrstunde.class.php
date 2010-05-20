@@ -331,25 +331,25 @@ class lehrstunde extends basis_db
 		{
 			$sql_query=" WHERE datum>='$datum_von' AND datum<'$datum_bis'";
 			if ($type=='lektor')
-				$sql_query.=" AND uid='$uid'";
+				$sql_query.=" AND uid='".addslashes($uid)."'";
 			elseif ($type=='ort')
-				$sql_query.=" AND ort_kurzbz='$ort_kurzbz'";
+				$sql_query.=" AND ort_kurzbz='".addslashes($ort_kurzbz)."'";
 			elseif ($type=='gruppe')
-				$sql_query.=" AND gruppe_kurzbz='$gruppe_kurzbz'";
+				$sql_query.=" AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 			else
 			{
-				$sql_query.=' AND ( (studiengang_kz='.$studiengang_kz;
+				$sql_query.=" AND ( (studiengang_kz='".addslashes($studiengang_kz)."'";
 				if ($sem!=null && $sem>=0  && $sem!='')
 				{
-					$sql_query.=" AND (semester=$sem OR semester IS NULL";
+					$sql_query.=" AND (semester='".addslashes($sem)."' OR semester IS NULL";
 					if ($type=='student' && $sem>0)
-						$sql_query.=' OR semester='.($sem+1);
+						$sql_query.=" OR semester='".addslashes(($sem+1))."'";
 					$sql_query.=')';
 				}
 				if ($ver!='0' && $ver!=null && $ver!='')
-					$sql_query.=" AND (verband='$ver' OR verband IS NULL OR verband='0' OR verband='')";
+					$sql_query.=" AND (verband='".addslashes($ver)."' OR verband IS NULL OR verband='0' OR verband='')";
 				if ($grp!='0' && $grp!=null && $grp!='')
-					$sql_query.=" AND (gruppe='$grp' OR gruppe IS NULL OR gruppe='0' OR gruppe='')";
+					$sql_query.=" AND (gruppe='".addslashes($grp)."' OR gruppe IS NULL OR gruppe='0' OR gruppe='')";
 				if ($type=='student')
 					$sql_query.=' AND gruppe_kurzbz IS NULL';
 				$sql_query.=' )';
@@ -357,7 +357,7 @@ class lehrstunde extends basis_db
 				for ($i=0;$i<$num_rows_einheit;$i++)
 				{
 					$row=$this->db_fetch_object($result_einheit,$i);
-					$sql_query.=" OR gruppe_kurzbz='$row->gruppe_kurzbz'";
+					$sql_query.=" OR gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."'";
 				}
 				$sql_query.=')';
 			}
@@ -368,7 +368,7 @@ class lehrstunde extends basis_db
 		{
 			$sql_query='';
 			foreach ($idList as $id)
-				$sql_query.=' OR '.$stpl_id.'='.$id;
+				$sql_query.=" OR ".$stpl_id."='".addslashes($id)."'";
 			$sql_query=mb_substr($sql_query,3);
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
@@ -550,23 +550,23 @@ class lehrstunde extends basis_db
 	
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id AS id, lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde FROM $stpl_table
-				WHERE datum='$this->datum' AND stunde=$this->stunde AND (ort_kurzbz='$this->ort_kurzbz' ";
+				WHERE datum='".addslashes($this->datum)."' AND stunde='".addslashes($this->stunde)."' AND (ort_kurzbz='".addslashes($this->ort_kurzbz)."' ";
 		if ($this->lektor_uid!='_DummyLektor')
-			$sql_query.=" OR (uid='$this->lektor_uid' AND uid!='_DummyLektor') ";
+			$sql_query.=" OR (uid='".addslashes($this->lektor_uid)."' AND uid!='_DummyLektor') ";
 		
 		//Wenn eine Kollisionspruefung auf Studentenebene durchgefuehrt wird, werden die LVB nicht gecheckt	
 		if(!$kollision_student)
 		{
-			$sql_query.=" OR (studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
+			$sql_query.=" OR (studiengang_kz='".addslashes($this->studiengang_kz)."' AND semester='".addslashes($this->sem)."'";
 			if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
-				$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+				$sql_query.=" AND (verband='".addslashes($this->ver)."' OR verband IS NULL OR verband='' OR verband=' ')";
 			if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
-				$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+				$sql_query.=" AND (gruppe='".addslashes($this->grp)."' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 			if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
-				$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz' OR gruppe_kurzbz IS null)";
+				$sql_query.=" AND (gruppe_kurzbz='".addslashes($this->gruppe_kurzbz)."' OR gruppe_kurzbz IS null)";
 			$sql_query.=")";
 		}
-		$sql_query.=") AND unr!=$this->unr";
+		$sql_query.=") AND unr!='".addslashes($this->unr)."'";
 		
 		if (!$erg_stpl = $this->db_query($sql_query))
 		{
@@ -605,9 +605,9 @@ class lehrstunde extends basis_db
 		$sql_query="SELECT 
 						zeitsperre_id,zeitsperretyp_kurzbz,mitarbeiter_uid AS lektor,vondatum,vonstunde,bisdatum,bisstunde
 					FROM campus.tbl_zeitsperre
-					WHERE mitarbeiter_uid='$this->lektor_uid'
-						AND (vondatum<'$this->datum' OR (vondatum='$this->datum' AND (vonstunde<=$this->stunde OR vonstunde IS NULL)))
-						AND (bisdatum>'$this->datum' OR (bisdatum='$this->datum' AND (bisstunde>=$this->stunde OR bisstunde IS NULL)));";
+					WHERE mitarbeiter_uid='".addslashes($this->lektor_uid)."'
+						AND (vondatum<'".addslashes($this->datum)."' OR (vondatum='".addslashes($this->datum)."' AND (vonstunde<='".addslashes($this->stunde)."' OR vonstunde IS NULL)))
+						AND (bisdatum>'".addslashes($this->datum)."' OR (bisdatum='".addslashes($this->datum)."' AND (bisstunde>='".addslashes($this->stunde)."' OR bisstunde IS NULL)));";
 
 		if (!$erg_zs = $this->db_query($sql_query))
 		{
@@ -637,20 +637,20 @@ class lehrstunde extends basis_db
 						semester, verband, gruppe, gruppe_kurzbz, datum, stunde
 					FROM lehre.vw_reservierung
 					WHERE 
-						datum='$this->datum' AND 
-						stunde=$this->stunde AND 
-						(ort_kurzbz='$this->ort_kurzbz' OR ";
+						datum='".addslashes($this->datum)."' AND 
+						stunde='".addslashes($this->stunde)."' AND 
+						(ort_kurzbz='".addslashes($this->ort_kurzbz)."' OR ";
 		
 		if ($this->lektor_uid!='_DummyLektor')
-			$sql_query.="(uid='$this->lektor_uid' AND uid!='_DummyLektor') OR ";
+			$sql_query.="(uid='".addslashes($this->lektor_uid)."' AND uid!='_DummyLektor') OR ";
 		
-		$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem";
+		$sql_query.="(studiengang_kz='".addslashes($this->studiengang_kz)."' AND semester='".addslashes($this->sem)."'";
 		if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
-			$sql_query.=" AND (verband='$this->ver' OR verband IS NULL OR verband='' OR verband=' ')";
+			$sql_query.=" AND (verband='".addslashes($this->ver)."' OR verband IS NULL OR verband='' OR verband=' ')";
 		if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
-			$sql_query.=" AND (gruppe='$this->grp' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+			$sql_query.=" AND (gruppe='".addslashes($this->grp)."' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 		if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
-			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
+			$sql_query.=" AND (gruppe_kurzbz='".addslashes($this->gruppe_kurzbz)."')";
 		$sql_query.="))";
 		
 		if (!$erg_res = $this->db_query($sql_query))
@@ -685,34 +685,34 @@ class lehrstunde extends basis_db
 		
 		$sql_query = "SELECT *
 			FROM ".$stpl_table."_student_unr
-			WHERE datum='$this->datum' AND stunde='$this->stunde' AND student_uid IN(
+			WHERE datum='".addslashes($this->datum)."' AND stunde='".addslashes($this->stunde)."' AND student_uid IN(
 			SELECT uid FROM public.vw_gruppen WHERE 
 			
 		   ";
-		$sql_query.="(studiengang_kz=$this->studiengang_kz AND semester=$this->sem 
+		$sql_query.="(studiengang_kz='".addslashes($this->studiengang_kz)."' AND semester='".addslashes($this->sem)."'
 			AND studiensemester_kurzbz=(
 					SELECT tbl_studiensemester.studiensemester_kurzbz
 					FROM 
 						public.tbl_studiensemester
                    	WHERE 
-                   		tbl_studiensemester.ende >= '$this->datum'
-                    	AND tbl_studiensemester.start <='$this->datum' LIMIT 1)";
+                   		tbl_studiensemester.ende >= '".addslashes($this->datum)."'
+                    	AND tbl_studiensemester.start <='".addslashes($this->datum)."' LIMIT 1)";
 		if ($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
-			$sql_query.=" AND (gruppe_kurzbz='$this->gruppe_kurzbz')";
+			$sql_query.=" AND (gruppe_kurzbz='".addslashes($this->gruppe_kurzbz)."')";
 		else 
 		{
 			if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
-				$sql_query.=" AND (verband='$this->ver')";
+				$sql_query.=" AND (verband='".addslashes($this->ver)."')";
 			else 
 				$sql_query.=" AND (verband IS NULL OR verband='' OR verband=' ')";
 			if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
-				$sql_query.=" AND (gruppe='$this->grp')";
+				$sql_query.=" AND (gruppe='".addslashes($this->grp)."')";
 			else 
 				$sql_query.=" AND (gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 		}
 		
 		
-		$sql_query.=")) AND unr!=$this->unr";
+		$sql_query.=")) AND unr!='".addslashes($this->unr)."'";
 		
 		if (!$erg_stpl=$this->db_query($sql_query))
 		{
