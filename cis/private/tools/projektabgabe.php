@@ -79,29 +79,36 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 	exit();
 }
 
-if($zipfile=='')
+
+if($aktion!='zip')
 {
 	?>
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
-	<title>Projektabgabe</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-	<script src="../../../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../../../include/js/jquery-ui.js" type="text/javascript"></script>
-	<script src="../../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
-	<script src="../../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
-
+		<title>Projektabgabe</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script src="../../../include/js/jquery.js" type="text/javascript"></script>
+		<script src="../../../include/js/jquery-ui.js" type="text/javascript"></script>
+		<script src="../../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
+		<script src="../../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
 	</head>
 	<body class="background_main">
+	<table class="tabcontent">
+	  <tr>
+	    <td class="tdwidth10">&nbsp;</td>
+	    <td>
+	    	<table class="tabcontent">
+		      <tr>
+		        <td class="ContentHeader"><font class="ContentHeader">Projektabgabe - &Uuml;bersicht</font></td>
+		      </tr>
+		    </table>
+		    <br>
 	<?php 
-}
-
-if($aktion!='zip')
-{
+	
 	$s = new studiengang();
 	$s->loadArray($rechte->getStgKz($berechtigung_kurzbz),'typ,kurzbz');
 		
@@ -186,12 +193,14 @@ if($aktion!='zip')
 						}
 					</script>	
 <?php
-	echo "&nbsp;<INPUT type='submit' name='ok' value='OK'>&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.ok='OK';f.aktion.value='zip';f.submit();\"></FORM>";
+	echo "&nbsp;<INPUT type='submit' name='ok' value='OK' onclick=\"f=document.abgabeFrm;f.aktion.value='';\">&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM><br>";
 	}
 	
 ##if($stg_kz!='' || $abgabetyp!='' || $termin!='')
-if(isset($_REQUEST['ok']))
+
+if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=='zip'))
 {
+
 	$s=new studiengang();
 	if($stg_kz!='' && !$s->load($stg_kz))
 	{
@@ -285,7 +294,7 @@ if(isset($_REQUEST['ok']))
 if($zipfile=='')
 {
 	echo $htmlstr;
-	//echo "</body></html>";
+	echo "</td></tr></table></body></html>";
 }
 else
 {
@@ -293,8 +302,8 @@ else
 	chdir(PAABGABE_PATH);
 	$zipausgabe=tempnam("/tmp", "PAA").".zip";
 	exec("zip ".$zipausgabe." ".$zipfile);
-	echo $zipausgabe;
-	echo "<br>zip -r ".$zipausgabe." ".$zipfile;
+	//echo $zipausgabe;
+	//echo "<br>zip -r ".$zipausgabe." ".$zipfile;
 	if(file_exists($zipausgabe))
 	{
 		header('Content-Type: application/octet-stream');
