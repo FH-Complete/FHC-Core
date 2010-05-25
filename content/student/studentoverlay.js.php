@@ -4016,7 +4016,7 @@ function StudentSendMail()
 	if(anzfault!=0)
 		alert(anzfault+' Student(en) konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
-		splitmailto(mailempfaenger);
+		splitmailto(mailempfaenger,'to');
 }
 
 // ****
@@ -4059,21 +4059,22 @@ function StudentSendMailPrivat()
 		{
 			alert(val.dbdml_errormsg)
 			if(val.dbdml_data!='')
-				splitmailto(val.dbdml_data);
+				splitmailto(val.dbdml_data,'bcc');
 		}
 	}
 	else
 	{
 		if(val.dbdml_data!='')
-			splitmailto(val.dbdml_data);
+			splitmailto(val.dbdml_data,'bcc');
 	}	
 }
 
 // ****
 // * Teilt die Mailto Links auf kleinere Brocken auf, da der
 // * Link nicht funktioniert wenn er zu lange ist
+// * art = to | cc | bcc
 // ****
-function splitmailto(mails)
+function splitmailto(mails, art)
 {
 	var splititem = '<?php echo $variable->variable->emailadressentrennzeichen; ?>';
 	var splitposition=0;
@@ -4095,7 +4096,7 @@ function splitmailto(mails)
 			loop=false;
 			mailto=mails;
 		}
-		window.location.href='mailto:?bcc='+mailto;
+		window.location.href='mailto:?'+art+'='+mailto;
 	}
 }
 
