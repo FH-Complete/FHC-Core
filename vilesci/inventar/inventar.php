@@ -781,9 +781,10 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 	$htmlstring.='<tr>
 				<th class="table-sortable:default">Inv.nr.</th>
 				<th class="table-sortable:default">Bezeichnung</th>
+				<th class="table-sortable:default">Verwendung</th>
 				<th class="table-sortable:default">Ser.nr.</th>
 				<th class="table-sortable:default">Ort</th>
-				<th colspan="2" class="table-sortable:default">Bestell ID</th>
+				<th class="table-sortable:default">Bestellnummer</th>
 				<th class="table-sortable:default">Datum</th>
 				<th class="table-sortable:default">Org.</th>
 				<th colspan="3" class="table-sortable:default">Status</th>
@@ -824,6 +825,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		$htmlstring.='<tr class="'.$classe.'">
 			<td><a href="'.$_SERVER["PHP_SELF"].'?inventarnummer='.$resultBetriebsmittel[$pos]->inventarnummer.'&amp;betriebsmittel_id='.$resultBetriebsmittel[$pos]->betriebsmittel_id.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'" target="_blank">'.($resultBetriebsmittel[$pos]->inventarnummer?$resultBetriebsmittel[$pos]->inventarnummer:$resultBetriebsmittel[$pos]->betriebsmittel_id).'</a>&nbsp;</td>
 			<td>'.StringCut((!empty($resultBetriebsmittel[$pos]->beschreibung)?$resultBetriebsmittel[$pos]->beschreibung:$resultBetriebsmittel[$pos]->betriebsmitteltyp),20).'&nbsp;</td>
+			<td>'.$resultBetriebsmittel[$pos]->verwendung.'&nbsp;</td>
 			<td>'.$resultBetriebsmittel[$pos]->seriennummer.'&nbsp;</td>
 			<td>'.$resultBetriebsmittel[$pos]->ort_kurzbz.'&nbsp;</td>
 			';
@@ -831,9 +833,11 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
 			$bestellung_ivalid_style='style="color: red;"';
 		
-		if (!$schreib_recht || !empty($resultBetriebsmittel[$pos]->bestellung_id) )
-			$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellung_id.'</a>&nbsp;</td>';
-		else
+
+		
+
+			$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
+		/*
 			$htmlstring.='<td align="right">
 					<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',this.value,0);" id="bestellung_id'.$pos.'" name="bestellung_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestellung_id .'">
 					<script type="text/javascript">
@@ -905,7 +909,8 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		}
 
 		$htmlstring.='&nbsp;</td>';
-		$htmlstring.='<td>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
+		*/
+		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
 
 		$htmlstring.='<td>';

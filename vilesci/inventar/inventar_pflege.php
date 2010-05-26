@@ -79,7 +79,7 @@
 	$firma_id=trim(isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
 	$bestellnr=trim(isset($_REQUEST['bestellnr'])?$_REQUEST['bestellnr']:'');
 
-  	$afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:5);
+  	$afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:3);
   	$leasing_bis=trim(isset($_REQUEST['leasing_bis']) ? $_REQUEST['leasing_bis']:'');
 
 	$jahr_monat=trim(isset($_REQUEST['jahr_monat']) ? $_REQUEST['jahr_monat']:'');
@@ -665,7 +665,7 @@
 							<td>
 								<select id="afa" name="afa" >
 								<?php
-									for ($i=1;$i<20;$i++)
+									for ($i=0;$i<20;$i++)
 										echo '<option  '.($afa==$i?' selected="selected" ':'').'  value="'.$i.'">'.$i.' Jahre</option>';
 								?>
 								</select>
