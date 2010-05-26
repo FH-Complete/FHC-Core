@@ -4005,7 +4005,10 @@ function StudentSendMail()
   			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
   			if(tree.view.getCellText(v,col).length>1)
   			{
-				mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+  				if(mailempfaenger=='')
+  					mailempfaenger=tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
+  				else
+					mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+tree.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}
   			else
   			{
@@ -4096,7 +4099,13 @@ function splitmailto(mails, art)
 			loop=false;
 			mailto=mails;
 		}
-		window.location.href='mailto:?'+art+'='+mailto;
+		
+		if(art=='to')
+			window.location.href='mailto:'+mailto;
+		else
+			window.location.href='mailto:?'+art+'='+mailto;
+		
+		
 	}
 }
 
