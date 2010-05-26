@@ -1165,7 +1165,7 @@ $qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.studen
 	LEFT JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id, studiensemester_kurzbz, student_uid)
 	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
 	AND to_char(tbl_projektarbeit.abgabedatum,'YYYYMMDD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 
-	AND (tbl_projektarbeit.freigegeben OR(to_char(tbl_projektarbeit.gesperrtbis,'YYYYMMDD')<'".date('Ymd',mktime(0, 0, 0, date('m'), date('d'), date('Y')))."'))";
+	AND (tbl_projektarbeit.freigegeben OR (to_char(tbl_projektarbeit.gesperrtbis,'YYYYMMDD')<'".date('Ymd',mktime(0, 0, 0, date('m'), date('d'), date('Y')))."'))";
 
 //echo $qry."<br>";
 
