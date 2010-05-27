@@ -85,6 +85,8 @@ abstract class db extends basis
 				$sql.=($where?' where '.trim($where).' ':'');
 			if ($art=='select')		
 			{
+			    // FIXME: If $where is e.g. 'orderstatus' because there's a column named orderstatus, this would
+			    // fail horribly? Same for the 'where'-stuff above. -MP
 				if (strstr('order',strtolower($where)))
 					$sql.=($order?trim($order).' ':'');
 				else

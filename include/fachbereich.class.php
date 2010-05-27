@@ -67,6 +67,10 @@ class fachbereich extends basis_db
 			return false;
 		}
 
+		// Don't turn to garbage when getAll is called twice.
+		// TODO: Should most likely also be done in 'loadArray' [and every other file], but I don't know what it's used for.
+		$this->result = array();
+		
 		while($row = $this->db_fetch_object())
 		{
 			$fachb_obj = new fachbereich();
