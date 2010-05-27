@@ -29,6 +29,14 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/fachbereich.class.php');
 
+if (isset($_GET['studiengang_kz']))
+{ 
+    if (isset($_GET['institut']))
+        die('Only one parameter please.');
+}
+elseif (!isset($_GET['institut']))
+    die('No Parameters!');
+    
 if(isset($_GET['studiengang_kz']))
 {
 	$stg = $_GET['studiengang_kz'];
@@ -36,8 +44,6 @@ if(isset($_GET['studiengang_kz']))
 	if (!$obj->load($stg))
 		die($obj->errormsg);
 }
-else
-	$stg = '';
 
 if(isset($_GET['institut']))
 {
@@ -46,17 +52,12 @@ if(isset($_GET['institut']))
 	if (!$obj->load($institut))
 		die($obj->errormsg);
 }
-else
-	$institut = '';
 
-if (!isset($obj))
-	die('No Parameters!');
-	
 // content type setzen
 header("Content-type: application/xhtml+xml");
-	// xml
+// xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-	
+
 $db = new basis_db();
 
 $rdf_url='http://www.technikum-wien.at/lektoren';
@@ -70,17 +71,16 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-//Alle Lehrfaecher mit Entsprechendem Studiengang und Semester holen bei 
-//denen sowohl das Lehrfach als auch der Fachbereich aktiv ist und
-//zusaetzlich das Lehrfach das uebergeben wurde
 $qry = "SELECT
 			uid,fixangestellt,person_id,alias,anrede,titelpost,titelpre,nachname,vorname
 		FROM
-			campus.vw_mitarbeiter join public.tbl_benutzerfunktion USING (uid)
+			campus.vw_mitarbeiter
+		JOIN
+			public.tbl_benutzerfunktion USING (uid)
 		WHERE
 			funktion_kurzbz='oezuordnung' AND aktiv AND oe_kurzbz='$obj->oe_kurzbz'
 		ORDER BY
-			nachname,vorname,vornamen;";
+			nachname,vorname,vornamen,person_id;";
 
 if($db->db_query($qry))
 {
@@ -96,9 +96,9 @@ if($db->db_query($qry))
             <LEKTOREN:vorname><![CDATA['.$lektoren->vorname.']]></LEKTOREN:vorname>
             <LEKTOREN:nachname><![CDATA['.$lektoren->nachname.']]></LEKTOREN:nachname>
             <LEKTOREN:titelpost><![CDATA['.$lektoren->titelpost.']]></LEKTOREN:titelpost>
-            <LEKTOREN:email>'
+            <LEKTOREN:email><![CDATA['
             .($lektoren->alias=='' ? $lektoren->uid : $lektoren->alias).'@'.DOMAIN.
-            '</LEKTOREN:email> 
+            ']]></LEKTOREN:email> 
             <LEKTOREN:fixangestellt>'
             .(strtolower($lektoren->fixangestellt)=='t' ? 'TRUE' : 'FALSE').
             '</LEKTOREN:fixangestellt> 
