@@ -223,7 +223,10 @@
   		</tr>
 		<!-- Weiterbildung -->
 		<tr>
-			<td class="tdwrap"><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Weiterbildung</a>
+			<td class="tdwrap"><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Weiterbildung</a></td>
+		</tr>
+		<tr>
+			<td class="tdwrap">
 		  	<table class="tabcontent" id="Weiterbildung" style="display: none">
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -569,7 +572,7 @@
   		<!--QM-->
 
   		<tr> 
-			<td class="tdwrap"><a href="private/info/qm/info.html" target="content" class="MenuItem" onClick="js_toggle_container('QM');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Qualit&auml;tsmanagement</a>
+			<td class="tdwrap"><a href="private/info/qm/info.html" target="content" class="MenuItem" onClick="js_toggle_container('QM');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Qualit&auml;tsmanagement</a></td>
 				<!--QM Language Deutsch -->				
 				<tr>
         		<td class="tdwrap">
@@ -728,9 +731,11 @@
   		</tr>-->
   		<!-- Hauptmenue Betriebsrat -->
  		<tr>
+			<td class="tdwrap"><a href="?Betriebsrat" class="MenuItem" onClick="return(js_toggle_container('BTR'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Betriebsrat</a></td>
+		</tr>
+		<tr>
 			<td class="tdwrap">
-				<a href="?Betriebsrat" class="MenuItem" onClick="return(js_toggle_container('BTR'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Betriebsrat</a>
-				<table class="tabcontent" id="BTR" style="display: none">
+			<table class="tabcontent" id="BTR" style="display: none">
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/news.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;News</a></td>
@@ -752,8 +757,10 @@
 		</tr>
  		<!-- Hauptmenue FAQ -->
  		<tr>
+			<td class="tdwrap"><a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;FAQ</a></td>
+		</tr>
+		<tr>
 			<td class="tdwrap">
-				<a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;FAQ</a>
 				<table class="tabcontent" id="FAQ" style="display: none">
 				<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -801,11 +808,7 @@
   		<tr>
 			<td class="tdwrap"><a class="MenuItem" href="private/menu.php" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Mein CIS</a></td>
 		</tr>
-			</table>
-			</td>
-  		</tr>
 	  </table>
 	</td>
-
   </tr>
 </table>
