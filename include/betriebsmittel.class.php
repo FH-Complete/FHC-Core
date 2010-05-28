@@ -711,7 +711,25 @@ class betriebsmittel extends basis_db
 		$qry.=',tbl_betriebsmitteltyp.beschreibung as betriebsmitteltyp_beschreibung ';
 		$qry.=', tbl_betriebsmittel.*';
 		$qry.=', wawi_be.*';
-		$qry.=", trim(to_char(date_part('year', tbl_betriebsmittel_betriebsmittelstatus.datum) + tbl_betriebsmittel.afa , '9999') || '-' || to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'MM-DD')) as betriebsmittelstatus_datum_afa ";
+
+		//AfA Datum ermitteln
+		$qry.=", trim(to_char(date_part('year', 
+					(
+					SELECT datum 
+					FROM wawi.tbl_betriebsmittel_betriebsmittelstatus 
+					WHERE tbl_betriebsmittel_betriebsmittelstatus.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id 
+					ORDER BY datum ASC, betriebsmittelbetriebsmittelstatus_id ASC 
+					LIMIT 1
+					))  + tbl_betriebsmittel.afa , '9999') 
+					|| '-' || 
+					to_char(
+					(
+					SELECT datum 
+					FROM wawi.tbl_betriebsmittel_betriebsmittelstatus 
+					WHERE tbl_betriebsmittel_betriebsmittelstatus.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id 
+					ORDER BY datum ASC, betriebsmittelbetriebsmittelstatus_id ASC 
+					LIMIT 1
+					) , 'MM-DD')) as betriebsmittelstatus_datum_afa ";
 		$qry.=' FROM wawi.tbl_betriebsmittel';
 
 		$qry.=' LEFT JOIN wawi.tbl_betriebsmitteltyp on (tbl_betriebsmitteltyp.betriebsmitteltyp=tbl_betriebsmittel.betriebsmitteltyp ) ';
@@ -736,7 +754,7 @@ class betriebsmittel extends basis_db
 			$order = 'tbl_betriebsmittel.betriebsmittel_id, betriebsmittelstatus_datum DESC, betriebsmittelbetriebsmittelstatus_id DESC';
 		$order = ' ORDER BY '.$order;
 		//	Select und Bedingung zusammen fuehren zu SQL Abfrage
-		$qry.=$where.$order.(!$where?' limit 100 ':' limit 300 ');
+		$qry.=$where.$order; //.(!$where?' limit 100 ':' limit 300 ');
 		//echo $qry;
 		if(!$result=$this->db_query($qry))
 		{

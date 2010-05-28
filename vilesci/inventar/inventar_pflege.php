@@ -478,7 +478,7 @@
 					</table>
 					<table class="navbar">
 						<tr>
-							<td>&nbsp;<label for="betriebsmitteltyp">Inventartyp</label>&nbsp;
+							<td>&nbsp;<label for="betriebsmitteltyp">Betriebsmitteltyp</label>&nbsp;
 								<select id="betriebsmitteltyp" name="betriebsmitteltyp">
 										<?php
 										for ($i=0;$i<count($resultBetriebsmitteltyp) ;$i++)
@@ -1064,7 +1064,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 
 							<table class="navbar">
 								<tr>
-									<td>&nbsp;<label for="betriebsmitteltyp_array<?php echo $pos; ?>">Inventartyp</label>&nbsp;
+									<td>&nbsp;<label for="betriebsmitteltyp_array<?php echo $pos; ?>">Betriebsmitteltyp</label>&nbsp;
 										<select id="betriebsmitteltyp_array<?php echo $pos; ?>" name="betriebsmitteltyp_array[]">
 										<?php
 										for ($i=0;$i<count($resultBetriebsmitteltyp) ;$i++)

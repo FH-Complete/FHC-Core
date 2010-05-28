@@ -635,7 +635,7 @@
 						</select>
 				</td>
 
-				<td>&nbsp;<label for="betriebsmitteltyp">Inventartyp</label>&nbsp;
+				<td>&nbsp;<label for="betriebsmitteltyp">Betriebsmitteltyp</label>&nbsp;
 					<select id="betriebsmitteltyp" name="betriebsmitteltyp">
 						<option  <?php echo (empty($betriebsmitteltyp)?' selected="selected" ':''); ?>  value="">bitte ausw&auml;hlen&nbsp;</option>
 									<?php
