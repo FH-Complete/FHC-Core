@@ -519,7 +519,7 @@
 									?>
 					</select>&nbsp;
 				</td>
-				<td>Inventartyp&nbsp;
+				<td>Betriebsmitteltyp&nbsp;
 					<select name="betriebsmitteltyp"  onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}">
 						<option  <?php echo (empty($betriebsmitteltyp)?' selected="selected" ':''); ?>  value="">bitte ausw&auml;hlen&nbsp;</option>
 									<?php
