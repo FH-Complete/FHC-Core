@@ -42,6 +42,10 @@ require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/mail.class.php');
+require_once('../../../../include/benutzerfunktion.class.php');
+require_once('../../../../include/benutzer.class.php');
+require_once('../../../../include/student.class.php');
 
 $user = get_uid();
 
@@ -65,8 +69,11 @@ if(isset($_GET['lehreinheit_id_pr']) && is_numeric($_GET['lehreinheit_id_pr'])) 
 	$lehreinheit_id = $_GET['lehreinheit_id_pr'];
 	
 if(isset($_GET['datum']))
+{
 	$datum = $_GET['datum'];
-	
+	$datum_obj = new datum();
+	$datum = $datum_obj->checkformatDatum($datum, 'Y-m-d', true) OR die('Invalid date format');
+}
 else
 	die('Fehlerhafte Parameteruebergabe');
 
@@ -82,9 +89,8 @@ if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
-
+	
 //Vars
-$datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
@@ -109,6 +115,7 @@ if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==8) )
 else
 	$note = 9;
 
+$old_note = $note;
 
 // lvgesamtnote für studenten speichern
 if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
@@ -178,6 +185,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			$pr_2->new = null;
 			$pr_2->updateamum = $jetzt;
 			$pr_2->updatevon = $user;
+			$old_note = $pr_2->note;
 			$pr_2->note = $note;
 			$pr_2->datum = $datum;
 			$pr_2->anmerkung = "";
@@ -196,7 +204,8 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			$pr_2->updateamum = Null;
 			$pr_2->updatevon = Null;
 			$pr_2->ext_id = Null;
-			$pr_2->new = 1;		
+			$pr_2->new = 1;
+			$old_note = -1;		
 		}
 		$pr_2->save();
 	}
@@ -251,7 +260,56 @@ else
 	echo "Fehler beim Eintragen der Pr&uuml;fungen";
 
 
+if ($old_note != $note)
+{
+	    $qry = "SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, oe_kurzbz 
+	    		FROM lehre.tbl_lehreinheit
+	    		JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+	    		JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
+	    		JOIN public.tbl_person USING (person_id)
+	    		JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+	    		JOIN public.tbl_studiengang USING (studiengang_kz)
+	    		WHERE 
+	    			lehrveranstaltung_id='$lvid' AND 
+	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
+	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
+	    			studiensemester_kurzbz='$stsem'";
 
+    $mailto = '';
+    if(($result = $db->db_query($qry)) != FALSE)
+    {
+        if ($db->db_num_rows($result) > 0)
+        {
+            $row_lector = $db->db_fetch_object($result);
+            $oe_kurzbz = $row_lector->oe_kurzbz;
+            $mailto = $row_lector->uid.'@'.DOMAIN;
+            while (($row_lector = $db->db_fetch_object($result)) != FALSE)
+                $mailto .= ','.$row_lector->uid.'@'.DOMAIN;
+        }        
+    }
+    
+    $ass = new benutzerfunktion();
+    if ($ass->getBenutzerFunktionen("ass",$oe_kurzbz))
+        foreach ($ass->result as $res) $mailto .= (empty($mailto) ? "" : ",").$res->uid.'@'.DOMAIN;
+        
+    if($mailto != '')
+    {
+        $culprit = new benutzer($user);
+        $victim = new student($student_uid);
 
-
+        $mail = new mail(	$mailto,
+        					'CIS-System@do.not.reply',
+        					'[CIS-System] Note der Nachprüfung wurde '.($old_note < 0 ? 'eingetragen' : 'geändert'),
+        					"Automatische Benachrichtigung:\n\nDie Nachprüfungsnote von\n\n$victim->vorname $victim->nachname ($student_uid)\n\nwurde im Studiensemester $stsem von $culprit->vorname $culprit->nachname ($user)\n\n".
+                            ($old_note < 0
+                            ? "mit '$note' eingetragen."
+                            : "von '$old_note' auf '$note' geändert.").
+                            "\n");
+        if (!$mail->send())
+        {
+            sleep(3);
+            $mail->send();    // Desperate second attempt. 
+        }
+    }
+}
 ?>
