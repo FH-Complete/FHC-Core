@@ -174,7 +174,9 @@ class benutzerfunktion extends basis_db
 	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz='', $semester='')
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE funktion_kurzbz='".addslashes($funktion_kurzbz)."'";
+				WHERE funktion_kurzbz='".addslashes($funktion_kurzbz)."'
+				AND (datum_bis >= now() OR datum_bis IS NULL)
+				AND (datum_von <= now() OR datum_von IS NULL)";
 
 		if($oe_kurzbz!='')
 			$qry.=" AND oe_kurzbz='".addslashes($oe_kurzbz)."'";

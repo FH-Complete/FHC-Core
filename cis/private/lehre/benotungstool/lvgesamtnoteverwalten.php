@@ -264,7 +264,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	
 		str += "<tr><td colspan='2'><b>Pr&uuml;fung f&uuml;r "+uid+" anlegen:</b></td></tr>";
 		str += "<tr><td>Datum:</td>";
-		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [YYYY-MM-DD]</td>";
+		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [DD.MM.YYYY]</td>";
 		str += "</tr><tr><td>Note:</td>";
 		str += "<td><input type='text' name='note' value='"+note+"'></td>";
 		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='speichern' onclick='pruefungSpeichern();'></td></tr>";
@@ -284,10 +284,10 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 			alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt), 8 (teilgenommen), 9 (noch nicht eingetragen) ein oder lassen Sie das Feld leer!");
 			document.getElementById(uid).note.value="";
 		}		
-		var datum = 	document.nachpruefung_form.datum.value;		
-		var datum_test = datum.split("-");
-		if (datum_test[0].length != 4 || datum_test[1].length!=2 || datum_test[2].length!=2 || isNaN(datum_test[0]) || datum_test[1]>12 || datum_test[2]>31)
-			alert("Invalid Date. Format: YYYY-MM-DD");
+		var datum = document.nachpruefung_form.datum.value;		
+		var datum_test = datum.split(".");
+		if (datum_test[0].length != 2 || datum_test[1].length != 2 || datum_test[2].length!=4 || isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
+			alert("Invalid Date. Format: DD.MM.YYYY");
 		else
 		{
 			var anlegendiv = document.getElementById("nachpruefung_div");			
@@ -353,7 +353,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 					anlegendiv.style.visibility = "hidden";
 					//if (note == 9)
 					//	note = " ";
-					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='Ã¤ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>"
+					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='&Auml;ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
                 }
                 else
          		{
@@ -443,7 +443,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	// *******************************************************************************
 	function readNotenAusZwischenablage()
 	{
-		var data = getDataFromClipboard()
+		var data = getDataFromClipboard();
 		
 		//Reihen ermitteln
 		var rows = data.split("\n");
@@ -502,7 +502,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	        else alert("Request status:" + anfrage.status);
 	    }
 	}
--->
+//-->
 </script>
 <style type="text/css">
 .transparent {
@@ -1013,7 +1013,7 @@ echo '<table>';
 						
 						echo "<tr><td class='td_datum'>";
 						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
-						echo "<input type='button' name='anlegen' value='Ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
+						echo "<input type='button' name='anlegen' value='&Auml;ndern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
 						echo "</td></tr>";
 					}
 					echo "</table>";			

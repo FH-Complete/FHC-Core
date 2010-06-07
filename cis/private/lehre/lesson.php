@@ -109,15 +109,15 @@ function hideSemPlanHelp(){
 <table width="100%">
 <tr><td valign="top"><h2>&nbsp;Erstellung des Semesterplanes</h2></td><td align="right" valign="top"><a href="#" onclick="hideSemPlanHelp();">X</a>&nbsp;</td></tr>
 <tr>
-<td coslspan="2">
+<td colspan="2">
 <ol style="font-size:8pt;">
 	<li>Speichern Sie die Vorlage (html oder doc - Version) auf Ihrem Computer.</li>
 	<li>&Ouml;ffnen Sie die gespeicherte Datei mit ihrem Textverarbeitungsprogramm (MS Word, OpenOffice ...) bzw die html-Vorlage auch mit einem geeigneten Editor.</li>
 	<li>Erstellen Sie Ihren Semesterplan.</li>
-	<li>Speichern Sie das Dokument als 'Webseite' mit dem Namen 'index.html'<br>(In MS Word: 'Datei' -> 'Speichern unter' -> Dateiname: index.html, Dateityp: Webseite )</li>
+	<li>Speichern Sie das Dokument als 'Webseite' mit dem Namen 'index.html'<br>(In MS Word: 'Datei' -&gt; 'Speichern unter' -&gt; Dateiname: index.html, Dateityp: Webseite )</li>
 	<li>Laden Sie diese Datei nun &uuml;ber den 'Upload'-Knopf hoch.</li>
 	<li>Fertig!</li>
-<ol>
+</ol>
 </td>
 </tr>
 <tr><td colspan="2" align="center"><a href="#" onClick="hideSemPlanHelp();">schlie&szlig;en</a></td></tr>
@@ -189,8 +189,8 @@ function hideSemPlanHelp(){
 				}
 			}
 		}
-			
-		//Berechtigungen auf Fachbereichsebene
+
+				//Berechtigungen auf Fachbereichsebene
 	  $qry = "SELECT distinct fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz 
 	  		FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
 	  		WHERE lehrveranstaltung_id='$lvid'";
