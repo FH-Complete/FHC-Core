@@ -85,7 +85,7 @@
 				
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" target="_blank" href="https://twist.technikum-wien.at/"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Studentenvertretung</a></td>
+					<td class="tdwrap"><a class="Item" target="_blank" href="http://twist.technikum-wien.at/"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Studierendenvertretung</a></td>
 		  		</tr>
 
 		  		<tr>
