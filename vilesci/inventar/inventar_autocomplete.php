@@ -256,7 +256,8 @@ cellSeparator (default value: "|")
 				exit();
 			
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
-			$pWhere=" aktiv ";
+			//$pWhere=" aktiv ";
+			$pWhere=' 1=1 ';
 			if ($person_id)
 			{
 				$pWhere.="	and (UPPER(trim(uid)) like '%".$matchcode."%'  ";
@@ -265,7 +266,7 @@ cellSeparator (default value: "|")
 				$pWhere.="	or	UPPER(trim(vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(nachname || ' ' || vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(vorname || ' ' || nachname)) like '%".addslashes($matchcode)."%' ) ";
-			}		
+			}
 			if (!empty($oe_kurzbz))
 			{	
 				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz 
@@ -315,7 +316,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->person_id).'|'
 									.trim($oRresult[$i]->anrede).'&nbsp;'.($oRresult[$i]->titelpre?html_entity_decode($oRresult[$i]->titelpre).'&nbsp;':'')
 									.html_entity_decode($oRresult[$i]->vorname).' '.html_entity_decode($oRresult[$i]->nachname).($oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).'&nbsp;':'') 
-									.($oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
+									.($oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
 					."\n";
 			}
 			break;
