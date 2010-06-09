@@ -791,7 +791,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 	$htmlstring.='</tr>';
 
 	$htmlstring.='<tr>
-					<th align="right">Artikel&nbsp;:&nbsp;</th>
+					<th align="right">Beschreibung&nbsp;:&nbsp;</th>
 					<td colspan="3">'.$resBetriebsmittel->beschreibung.'</td>
 					<th align="right">Seriennummer&nbsp;:&nbsp;</th>
 					<td>'.$resBetriebsmittel->seriennummer.'</td>

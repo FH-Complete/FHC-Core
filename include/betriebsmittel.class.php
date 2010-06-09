@@ -709,6 +709,7 @@ class betriebsmittel extends basis_db
 		$qry.=',tbl_betriebsmittel_betriebsmittelstatus.datum as betriebsmittelstatus_datum ';
 		$qry.=',tbl_betriebsmittelstatus.beschreibung as betriebsmittelstatus_beschreibung ';
 		$qry.=',tbl_betriebsmitteltyp.beschreibung as betriebsmitteltyp_beschreibung ';
+		$qry.=', CASE WHEN betriebsmittelperson_id is not null AND retouram is null THEN \'t\' ELSE \'f\' END ausgegeben';
 		$qry.=', tbl_betriebsmittel.*';
 		$qry.=', wawi_be.*';
 
