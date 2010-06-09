@@ -295,6 +295,12 @@ function loadVariables($user)
 		$kollision_student='false';
 	}
 	
+	if (!isset($max_kollision))
+	{
+		global $max_kollision;
+		$max_kollision='0';
+	}
+	
 	if (!isset($ignore_zeitsperre))
 	{
 		global $ignore_zeitsperre;
@@ -322,6 +328,13 @@ function writeCISlog($stat, $rm = '')
 	$handle = fopen(LOG_PATH.'cis.log','a');
 	fwrite($handle, date('Y-m-d H:i:s').' '. $stat .' '. getmypid() .' '. $_SERVER['REMOTE_USER'] .' '. $_SERVER['REQUEST_URI'] .' '.$rm.'
 ');
+}
+
+function Debuglog($entry)
+{
+	$handle = fopen(LOG_PATH.'debug.log','a');
+	fwrite($handle, $entry);
+	fclose($handle);
 }
 
 // ***************************************************************

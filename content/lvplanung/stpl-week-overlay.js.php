@@ -22,7 +22,8 @@
  */
 require_once('../../config/vilesci.config.inc.php');
 ?>
-
+// Stunde die zuletzt markiert wurde
+var TimeTableWeekLastMarkedItem='';
 
 // LVA-Panel aktualisieren
 function onLVARefresh()
@@ -168,6 +169,7 @@ function onJumpDateRel(evt)
 
 function onLVAdoStpl(evt)
 {
+	saveScrollPositionTimeTableWeek();
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
@@ -239,33 +241,149 @@ function StplSearchRoom(target)
 		location.href=url;
 }
 
-function onStplDelete(aktion)
+// ****
+// * Markiert einen LV-Plan Eintrag
+// * item ... Element das markiert werden soll
+// * Wenn kein Item uebergeben wird, dann werden alle markierungen geloescht
+// ****
+function TimeTableWeekMarkiere(item)
 {
-	saveScrollPositionTimeTableWeek();
-	var contentFrame=document.getElementById('iframeTimeTableWeek');
-	var daten=document.getElementById('TimeTableWeekData');
-	var datum=parseInt(daten.getAttribute("datum"));
-	var type=daten.getAttribute("stpl_type");
-	var	stg_kz=daten.getAttribute("stg_kz");
-	var sem=daten.getAttribute("sem");
-	var ver=daten.getAttribute("ver");
-	var grp=daten.getAttribute("grp");
-	var gruppe=daten.getAttribute("gruppe");
-	var ort=daten.getAttribute("ort");
-	var pers_uid=daten.getAttribute("pers_uid");
-	var idList=document.popupNode.getAttribute("idList");
-	var doIt=true;
-	doIt=confirm('Es werden die gewaehlten Eintraege aus dem Stundenplan geloescht!\nSind Sie sicher?')
-
-	var attributes="\n?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
-	attributes+=idList+"&aktion="+aktion;
-	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
-	url+=attributes;
-	//alert(url);
-	if (url && doIt)
-		location.href=url;
+	if(!item)
+	{
+		items = document.getElementsByTagName('button');
+		
+		for each(var button in items)
+		{
+			if(button.id && button.id.startsWith('buttonSTPL'))
+			{
+				button.setAttribute('marked','false');
+				button.style.color='black';
+				//button.style.fontStyle='normal';
+				//button.style.fontWeight='normal';
+				button.style.border = "1px solid transparent";
+					
+				button.style.MozBorderTopColors='transparent';
+				button.style.MozBorderLeftColors='transparent';
+				button.style.MozBorderBottomColors='transparent';
+				button.style.MozBorderRightColors='transparent';
+			}
+		}
+		TimeTableWeekLastMarkedItem='';
+	}
+	else
+	{
+		item.setAttribute('marked','true');
+		
+		item.style.color='darkred';
+		//item.style.fontStyle='italic';
+		//item.style.fontWeight='bold';
+		
+		item.style.border = "1px solid darkred";
+			
+		item.style.MozBorderTopColors='darkred';
+		item.style.MozBorderLeftColors='darkred';
+		item.style.MozBorderBottomColors='darkred';
+		item.style.MozBorderRightColors='darkred';
+		
+		TimeTableWeekLastMarkedItem=item;		
+	}
 }
 
+// ****
+// * Liefert die IdList der Markierten Stunden
+// ****
+function TimeTableWeekGetMarkedIdList()
+{
+	var items = document.getElementsByTagName('button');
+	var myidlist = '';
+	var i=0;
+	for each(var button in items)
+	{
+		if(button.id && button.id.startsWith('buttonSTPL'))
+		{
+			marked = button.getAttribute('marked');
+			if(marked=='true')
+			{
+				myidlist = myidlist+button.getAttribute('idList').replace(/&/g,"&x"+i);
+				i++;
+			}
+		}
+	}
+	return myidlist;
+}
+
+// ****
+// * Klick auf eine Stunde im LV-Plan
+// ****
+function TimeTableWeekClick(event)
+{
+
+	if(event.ctrlKey)
+	{
+		//Wenn mit Strg auf die Stunde geklickt wird, dann wird diese Stunde zur Markierung hinzugefuegt
+		TimeTableWeekMarkiere(event.target);
+	}
+	else if(event.shiftKey)
+	{
+		//Wenn mit Shift auf eine Stunde geklickt wird, dann werden alle Stunden markiert, 
+		//die zwischen der zuletzt markierten und dieser Stunde liegen
+		start = parseInt(TimeTableWeekLastMarkedItem.id.substring('buttonSTPL'.length));
+		ende = parseInt(event.target.id.substring('buttonSTPL'.length));
+		if(start>ende)
+		{
+			hlp = ende;
+			ende = start;
+			start = hlp;
+		}
+		
+		for(var i=start;i<=ende;i++)
+		{
+			item = document.getElementById('buttonSTPL'+i);
+			TimeTableWeekMarkiere(item);
+		}
+	}
+	else
+	{
+	
+		//alle markierungen entfernen
+		TimeTableWeekMarkiere();
+		
+		//aktuellen Eintrag markieren
+		TimeTableWeekMarkiere(event.target);
+	
+		//Details anzeigen
+		onStplDetail(event);
+	}
+}
+
+// ****
+// * Doppelklick auf eine Stunde im LV-Plan
+// * Markiert alle Stunden mit der selben UNR an diesem Tag
+// ****
+function TimeTableWeekDblClick(event)
+{
+	var items = document.getElementsByTagName('button');
+	var unr = event.target.getAttribute('unr');
+	var wochentag = event.target.getAttribute('wochentag');
+
+	for each(var button in items)
+	{
+		if(button.id && button.id.startsWith('buttonSTPL'))
+		{
+			buttonunr=button.getAttribute('unr');
+			buttonwochentag=button.getAttribute('wochentag');
+			
+			if(buttonunr==unr && buttonwochentag==wochentag)
+			{
+				TimeTableWeekMarkiere(button);
+			}
+		}
+	}
+}
+
+// ****
+// * Laedt die Details zu einer Stunde
+// ****
 function onStplDetail(event)
 {
 	var idList=event.target.getAttribute("idList");
@@ -435,14 +553,18 @@ function STPLDetailDelete()
 // ****
 function saveScrollPositionTimeTableWeek()
 {
-	
-	var sbox = document.getElementById('timetable-week-scrollbox');
+	if(window.TimeTableWeek)
+		var sbox = window.TimeTableWeek.document.getElementById('timetable-week-scrollbox');
+	else
+		var sbox = document.getElementById('timetable-week-scrollbox');
 	if(sbox)
 	{
 		var xpcomInterface = sbox.boxObject.QueryInterface(Components.interfaces.nsIScrollBoxObject);
 		var x={};
 		var y={};
 		xpcomInterface.getPosition(x, y);
+		TimeTableWeekPositionX=x.value;
+		TimeTableWeekPositionY=y.value;
 		window.parent.TimeTableWeekPositionX=x.value;
 		window.parent.TimeTableWeekPositionY=y.value;
 	}
@@ -459,4 +581,42 @@ function setScrollpositionTimeTableWeek()
 		var xpcomInterface = sbox.boxObject.QueryInterface(Components.interfaces.nsIScrollBoxObject);
 		xpcomInterface.scrollTo(window.parent.TimeTableWeekPositionX, window.parent.TimeTableWeekPositionY);
 	}
+}
+
+// ****
+// * Loescht alle markierten Stunden
+// ****
+function TimetableDeleteEntries()
+{
+	saveScrollPositionTimeTableWeek();
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+	if(window.TimeTableWeek)
+		var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
+	else
+		var daten=document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+	var type=daten.getAttribute("stpl_type");
+	var	stg_kz=daten.getAttribute("stg_kz");
+	var sem=daten.getAttribute("sem");
+	var ver=daten.getAttribute("ver");
+	var grp=daten.getAttribute("grp");
+	var gruppe=daten.getAttribute("gruppe");
+	var ort=daten.getAttribute("ort");
+	var pers_uid=daten.getAttribute("pers_uid");
+	var doIt=true;
+	var aktion='stpl_delete_single';
+	
+	doIt=confirm('Es werden die gewaehlten Eintraege aus dem Stundenplan geloescht!\nSind Sie sicher?')
+
+	var attributes="\n?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
+	attributes+="&aktion="+aktion;
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
+	url+=attributes;
+	
+	//IDs der Stunden dazuhaengen
+    idList = TimeTableWeekGetMarkedIdList();
+    url+=idList
+    
+	if (url && doIt)
+		location.href=url;
 }

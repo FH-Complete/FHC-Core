@@ -38,7 +38,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/lvplanung/stpl-week-overlay.js.php"/>
-
 <hbox id="hboxTimeTableWeek">
 <vbox id="vboxTimeTableWeek" flex="30">
 <toolbox>
@@ -86,6 +85,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 		/>
 	</toolbar>
 </toolbox>
+
 <iframe id="iframeTimeTableWeek" name="TimeTableWeek" flex="5"
 	src="<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php" />
 <splitter collapse="after" persist="state">

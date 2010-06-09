@@ -261,6 +261,9 @@ class variable extends basis_db
 
 		if (!isset($this->variable->kollision_student))
 			$this->variable->kollision_student='false';
+			
+		if (!isset($this->variable->max_kollision))
+			$this->variable->max_kollision='0';
 		return true;
 	}
 		

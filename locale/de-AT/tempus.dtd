@@ -54,6 +54,10 @@
 <!ENTITY menu-prefs-kollision_student.label    	"kollision_student">
 <!ENTITY menu-prefs-kollision_student.accesskey	"s">
 
+<!ENTITY menu-prefs-max_kollision.key      	"m">
+<!ENTITY menu-prefs-max_kollision.label    	"max_kollision">
+<!ENTITY menu-prefs-max_kollision.accesskey	"m">
+
 <!ENTITY menu-help-about.key          	"U">
 <!ENTITY menu-help-about.label        	"Über FHComplete">
 <!ENTITY menu-help-about.accesskey    	"U">

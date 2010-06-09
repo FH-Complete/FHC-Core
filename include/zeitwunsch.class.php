@@ -169,7 +169,7 @@ class zeitwunsch extends basis_db
 			// Zeitsperren abfragen
 			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
 				FROM campus.tbl_zeitsperre
-				WHERE mitarbeiter_uid='".addslashes($uid)."' AND vondatum<='$ende' AND bisdatum>'$start'";
+				WHERE mitarbeiter_uid='".addslashes($uid)."' AND vondatum<='$ende' AND bisdatum>='$start'";
 			if(!$this->db_query($sql))
 			{
 				$this->errormsg=$this->db_last_error();
@@ -260,7 +260,7 @@ class zeitwunsch extends basis_db
 			// Zeitsperren abfragen
 			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
 				FROM campus.tbl_zeitsperre
-				WHERE mitarbeiter_uid IN ($sql_query_le) AND vondatum<='$ende' AND bisdatum>'$start'";
+				WHERE mitarbeiter_uid IN ($sql_query_le) AND vondatum<='$ende' AND bisdatum>='$start'";
 			if(!$this->db_query($sql))
 			{
 				$this->errormsg = $this->db_last_error();

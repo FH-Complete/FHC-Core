@@ -590,7 +590,7 @@ class lehreinheit extends basis_db
 		else
 		{
 			$row=$this->db_fetch_row($erg_stpl);
-			$this->errormsg="Kollision mit StundenplanID($stpl_table.$stpl_id): $row[0]";
+			$this->errormsg="Kollision mit StundenplanID($stpl_id): $row[0] | $datum | $ort";
 			return false;
 		}
 	}
