@@ -137,7 +137,6 @@ class wochenplan extends basis_db
 	 */
 	public function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL)
 	{
-		///////////////////////////////////////////////////////////////////////
 		// Parameter Checken
 		// Typ des Stundenplans
 		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='gruppe' || $type=='ort')
@@ -191,7 +190,6 @@ class wochenplan extends basis_db
 			$this->gruppe_kurzbz=$gruppe;
 
 
-		///////////////////////////////////////////////////////////////////////
 		// Zusaetzliche Daten ermitteln
 		//personendaten
 		if ($this->type=='student' || $this->type=='lektor')
@@ -848,7 +846,7 @@ class wochenplan extends basis_db
 	 * @param datum Datum eines Tages in der angeforderten Woche
 	 * @return true oder false
 	 */
-	public function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false, $kollision_student=false)
+	public function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false, $kollision_student=false, $max_kollision=0)
 	{
 		//echo $wunsch;
 		global $cfgStdBgcolor;
@@ -866,7 +864,7 @@ class wochenplan extends basis_db
 		echo '<popupset>
   				<popup id="stplPopupMenue">
 					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(document.popupNode);" />
-    				<menuitem label="Entfernen" oncommand="onStplDelete(\'stpl_delete_single\');" />
+    				<menuitem label="Entfernen" oncommand="TimeTableWeekMarkiere(document.popupNode);TimetableDeleteEntries()" />
   				</popup>
 			</popupset>';
 
@@ -1087,6 +1085,7 @@ class wochenplan extends basis_db
 						$z=0;
 						$reservierung=false;
 						foreach ($this->std_plan[$i][$j] as $lehrstunde)
+						{
 							if ($lehrstunde->unr==$unr)
 							{
 								// Lektoren
@@ -1123,7 +1122,7 @@ class wochenplan extends basis_db
 								$titel=htmlspecialchars($lehrstunde->titel);
 								$anmerkung=htmlspecialchars($lehrstunde->anmerkung);
 							}
-
+						}
 						// Lektoren
 						//if ($this->type!='lektor')
 						$lektor=array_unique($lektor);
@@ -1186,28 +1185,31 @@ class wochenplan extends basis_db
 						$stg_obj->load($stg_kz);
 						
 						// Ausgabe
-						echo '<button id="buttonSTPL'.$count++.'"
+						echo '<button id="buttonSTPL'.$count.'"
 							tooltiptext="('.$updatevonam.') '.$titel.' - '.$anmerkung.'"
-							style="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
-							styleOrig="border-width:1px;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';" ';
+							style="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
+							styleOrig="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';" ';
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'uid'))
 							echo ' context="stplPopupMenue" ';
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'u'))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
+						//onclick="return onStplSearchRoom(event, event.target);"
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
-							onclick="return onStplSearchRoom(event, event.target);"
-							oncommand="onStplDetail(event);"
+							oncommand="TimeTableWeekClick(event)"
+							ondblclick="TimeTableWeekDblClick(event)"
 							aktion="stpl"
+							unr="'.$unr.'"
+							markiert="false"
 							elem="stundenplan'.$i.$j.'"
 							idList="'.$paramList.'" stpltype="'.$this->type.'"
 							stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
 							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
-							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
+							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'" wochentag="'.$i.'"
 							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.$this->ort_kurzbz.'">';
 						
 						echo '<label align="center">'.$blink_ein;
-						
+						$count++;
 						//echo $lf;
 						echo mb_substr($lf, 0,-strlen('<html:br />'));
 						if($titel!='' && !$reservierung)
@@ -1227,19 +1229,35 @@ class wochenplan extends basis_db
 					}
 				}
 				if (isset($this->std_plan[$i][$j][0]->frei_orte))
-					foreach ($this->std_plan[$i][$j][0]->frei_orte as $f_ort)
+				{
+					//orte sortieren => AnzahlKollisionen ASC, Ort_kurzbz ASC
+					$keys=array();
+					$values=array();			
+					foreach ($this->std_plan[$i][$j][0]->frei_orte as $key=>$value)
 					{
-						echo '<label value="'.$f_ort.'"
-							styleOrig=""
-							ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
-							ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"
-		  					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
-							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
-							stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
-							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
-							stpltype="'.$this->type.'"
-							/>';
+						$keys[]=$key;
+						$values[]=$value;
 					}
+					array_multisort($values, SORT_ASC, $keys, SORT_ASC, $this->std_plan[$i][$j][0]->frei_orte);
+					
+					foreach ($this->std_plan[$i][$j][0]->frei_orte as $f_ort=>$anzahl)
+					{
+						if($anzahl<=$max_kollision)
+						{
+							echo '<label value="'.$f_ort.($anzahl>0?'('.$anzahl.')':'').'"
+								styleOrig=""
+								ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
+								ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"
+			  					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
+								datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
+								stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
+								grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
+								stpltype="'.$this->type.'" ort_kurzbz="'.$f_ort.'" kollision="'.$anzahl.'"
+								'.($anzahl>0?'tooltiptext="'.$anzahl.' Kollision(en)"':'').'
+								/>';
+						}
+					}
+				}
 				echo '</vbox>'.$this->crlf;
 			}
 			echo "</row>";
@@ -1440,16 +1458,62 @@ class wochenplan extends basis_db
 				
 		// freie Plaetze in den Stundenplan eintragen.
 		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
+		{
 			for ($s=1;$s<=$max_stunde;$s++)
-				if (!$raster[$t][$s]->kollision && ($s+$block)<=($max_stunde+1))
+			{
+				if (($s+$block)<=($max_stunde+1))
 				{
-					if (count($raster[$t][$s]->ort)>0)
-						$this->std_plan[$t][$s][0]->frei_orte=array_diff($orte,$raster[$t][$s]->ort);
-					else
-						$this->std_plan[$t][$s][0]->frei_orte=$orte;
+					// Alle infrage kommenden Orte zuweisen
+					foreach($orte as $ort)
+					{
+						$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]:0);
+					}
+					
+					// Besetzte Raueme eintragen
+					foreach($raster[$t][$s]->ort as $ort)
+					{
+						if(in_array($ort, $orte))
+							$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+					}
+					
+					// Gruppenkollision eintragen
+					if($raster[$t][$s]->kollision)
+					{
+						foreach($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+						{
+							$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);					
+						}
+					}
+					
+					// Blockung beruecksichtigen
 					for ($b=1;$b<$block && ($s+$block)<=($max_stunde+1);$b++)
-						$this->std_plan[$t][$s][0]->frei_orte=array_diff($this->std_plan[$t][$s][0]->frei_orte,$raster[$t][$s+$b]->ort);
+					{
+						if(!$raster[$t][$s+$b]->kollision)
+						{
+							//Wenn keine Gruppenkollision vorhanden ist, nur die Raumkollision eintragen
+							foreach($raster[$t][$s+$b]->ort as $ort)
+							{
+								if(in_array($ort, $orte))
+									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+							}
+						}
+						else 
+						{
+							// Bei Gruppenkollision kollidieren alle Raeume
+							foreach($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+							{
+								$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+							}
+						}
+					}
 				}
+				else 
+				{
+					// Wenn sich die Stunden mit der Blockung nicht ausgehen, dann keine Raeume anzeigen
+					$this->std_plan[$t][$s][0]->frei_orte = array();
+				}
+			}
+		}
 		return true;
 	}
 
@@ -1629,7 +1693,7 @@ class wochenplan extends basis_db
 		// Raeume die in Frage kommen aufgrund der Raumtypen
 		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
 			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; //
-		//echo $sql_query;
+		//die($sql_query);
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
@@ -1664,6 +1728,7 @@ class wochenplan extends basis_db
 		{
 			// Raster vorbereiten
 			for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
+			{
 				for ($s=$min_stunde;$s<=$max_stunde;$s++)
 				{
 					if (isset($raster[$t][$s]))
@@ -1671,7 +1736,8 @@ class wochenplan extends basis_db
 					$raster[$t][$s]->ort=array();
 					$raster[$t][$s]->kollision=false;
 				}
-
+			}
+			
 			// Stundenplanabfrage bauen (Wo ist Kollision?)
 			$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_table
 				WHERE datum>='".addslashes($datum_begin)."' AND datum<'".addslashes($datum_end)."' AND
@@ -1720,32 +1786,73 @@ class wochenplan extends basis_db
 				$jahr=mb_substr($row->datum, 0,4);
 				$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 				$raster[$tag][$row->stunde]->ort[]=$row->ort_kurzbz;
-				//if ($row->ort_kurzbz=='EDV6.10' && $tag==2 && $row->stunde==8)
-				//	$this->errormsg.=htmlspecialchars($row->ort_kurzbz).'/'.$mtag.'/'.$month;
 			}
 
-			// freie Plaetze in den Stundenplan eintragen.
+			// Moegliche Orte fuer den Vorschlag in den Stundenplan eintragen.
+			// $this->std_plan[$t][$s][0]->frei_orte ist ein Array mit den in Frage kommenden Orten
+			// der Wert von $this->std_plan[$t][$s][0]->frei_orte[$ort_kurzbz] gibt an, wie viele
+			// kollisionen bei der Zuteilung entstehen
 			for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
+			{
 				for ($s=1;$s<=$max_stunde;$s++)
-					if (!$raster[$t][$s]->kollision && ($s+$block)<=($max_stunde+1))
+				{
+					//Blockung passt in die Maximalstundenanzahl
+					if (($s+$blck)<=($max_stunde+1))
 					{
-						// Besetzte Orte von den freien abziehen
-						if (count($raster[$t][$s]->ort)>0 && $count==0)
-							$this->std_plan[$t][$s][0]->frei_orte=array_diff($orte,$raster[$t][$s]->ort);
-						elseif ($count==0)
-							$this->std_plan[$t][$s][0]->frei_orte=$orte;
-						elseif (count($raster[$t][$s]->ort)>0)
-							$this->std_plan[$t][$s][0]->frei_orte=array_diff($this->std_plan[$t][$s][0]->frei_orte,$raster[$t][$s]->ort);
+						if($count==0)
+						{
+							// Freie Orte beim 1. Durchlauf zuteilen
+							foreach($orte as $ort)
+								$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]:0);
+						}
+						
+						// Besetzte Orte eintragen
+						foreach ($raster[$t][$s]->ort as $ort)
+						{
+							if(in_array($ort, $orte))
+								$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+						}
+						
+						//Kollision mit Gruppe
+						if($raster[$t][$s]->kollision)
+						{
+							foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+							{
+								if(in_array($ort, $orte))
+									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+							}
+						}
+					
 						// Blockung beruecksichtigen
 						for ($b=1;$b<$block && ($s+$block)<=($max_stunde+1);$b++)
+						{
 							if (!$raster[$t][$s+$b]->kollision)
-								$this->std_plan[$t][$s][0]->frei_orte=array_diff($this->std_plan[$t][$s][0]->frei_orte,$raster[$t][$s+$b]->ort);
+							{
+								// Wenn keine Gruppenkollision vorhanden ist, dann die kollidierenden Raeume eintragen
+								foreach ($raster[$t][$s+$b]->ort as $ort)
+								{
+									if(in_array($ort, $orte))
+										$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+								}
+							}
 							else
-								$this->std_plan[$t][$s][0]->frei_orte=array();
+							{
+								// Bei Gruppenkollision den Wert bei allen Raumen erhoehen
+								foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+								{
+									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+								}
+							}
+						}
 					}
-					elseif($raster[$t][$s]->kollision)
+					else
+					{
+						// Wenn sich die Verplanung mit der Blockung nicht mehr ausgeht, dann keine Raeume vorschlagen
 						$this->std_plan[$t][$s][0]->frei_orte=array();
-
+					}
+				}
+			}
+			
 			// Variablen abgleichen
 			$rest-=$block;
 			if ($block>$rest)

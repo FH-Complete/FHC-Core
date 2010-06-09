@@ -50,6 +50,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
   <command id="menu-prefs-kollision_student:command" oncommand="variableChange('kollision_student','menu-prefs-kollision_student');"/>
+  <command id="menu-prefs-max_kollision:command" oncommand="variableChangeValue('max_kollision');"/>
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
   <command id="menu-extras-lvplanwartung:command" oncommand="LVPlanWartungShow();"/>
   <command id="menu-extras-rescheck:command" oncommand="ResCheckShow();"/>
@@ -183,6 +184,14 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
    			 accesskey 	="&menu-prefs-kollision_student.accesskey;"
    			 checkbox   ="true"
    			 checked    ="<?php echo $kollision_student;?>"
+   			 />
+   		<menuitem
+			 id        	="menu-prefs-max_kollision"
+  			 key       	="menu-prefs-max_kollision:key"
+			 label     	="&menu-prefs-max_kollision.label;"
+			 command   	="menu-prefs-max_kollision:command"
+   			 accesskey 	="&menu-prefs-max_kollision.accesskey;"
+   			 value    	="<?php echo $max_kollision;?>"
    			 />
    		<?php
         }

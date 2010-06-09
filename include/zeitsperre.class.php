@@ -355,9 +355,9 @@ class zeitsperre extends basis_db
 				FROM 
 					campus.tbl_zeitsperre 
 				WHERE 
-					vondatum<='$datum' AND bisdatum>='$datum' AND 
-					(vonstunde<='$stunde' OR vonstunde is null) AND 
-					(bisstunde>='$stunde' OR bisstunde is null) AND 
+					vondatum<='$datum' AND bisdatum>='$datum' AND
+					((vondatum='$datum' AND vonstunde<='$stunde') OR vonstunde is null OR vondatum<>'$datum') AND 
+					((bisdatum='$datum' AND bisstunde>='$stunde') OR bisstunde is null OR bisdatum<>'$datum') AND 
 					mitarbeiter_uid='$user'";
 
 		if($result = $this->db_query($qry))

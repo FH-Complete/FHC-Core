@@ -51,6 +51,7 @@ if(!$rechte->isBerechtigt('lehre/lvplan'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $error_msg='';
+$kollision_msg='';
 
 // Benutzerdefinierte Variablen laden
 loadVariables($uid);
@@ -83,6 +84,10 @@ if (isset($_GET['old_ort']))
 	$old_ort=$_GET['old_ort'];
 if (isset($_GET['new_ort']))
 	$new_ort=$_GET['new_ort'];
+if (isset($_GET['kollisionsanzahl']))
+	$kollisionsanzahl=$_GET['kollisionsanzahl'];
+else 
+	$kollisionsanzahl=0;
 if (isset($_GET['ort']))
 	$ort=$_GET['ort'];
 else
@@ -140,6 +145,10 @@ else
 ?>
 <scrollbox id="timetable-week-scrollbox" flex="1" style="overflow:auto;" orient="vertical">
 <vbox id="boxTimeTableWeek" flex="5">
+<keyset>
+  <key id="timetable-week-key-delete" keycode="VK_DELETE" oncommand="TimetableDeleteEntries();"/>
+</keyset>
+
 <?php
 $user=NULL;
 
@@ -229,8 +238,8 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 			$lehrstunde->ort_kurzbz=$new_ort;
 		$kollision=$lehrstunde->kollision($db_stpl_table);
 		if ($kollision && !$ignore_kollision)
-			$error_msg.=$lehrstunde->errormsg;
-		if (!$kollision || $ignore_kollision)
+			$kollision_msg.=$lehrstunde->errormsg;
+		if (!$kollision || $ignore_kollision || $kollisionsanzahl>0)
 		{
 			if(!$lehrstunde->save($uid,$db_stpl_table))
 				$error_msg.=$lehrstunde->errormsg;
@@ -255,8 +264,8 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 					$lehrstunde->ort_kurzbz=$new_ort;
 				$kollision=$lehrstunde->kollision($db_stpl_table);
 				if ($kollision && !$ignore_kollision)
-					$error_msg.=$lehrstunde->errormsg;
-				if (!$kollision || $ignore_kollision)
+					$kollision_msg.=$lehrstunde->errormsg;
+				if (!$kollision || $ignore_kollision || $kollisionsanzahl>0)
 				{
 					if(!$lehrstunde->save($uid,$db_stpl_table))
 						$error_msg.=$lehrstunde->errormsg;
@@ -267,7 +276,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 	}
 	
 	//UNDO Befehl schreiben
-	if($undo!='' && $error_msg=='')
+	if($undo!='' && $error_msg=='' && $sql!='')
 	{
 		$log = new log();
 		$log->executetime = date('Y-m-d H:i:s');
@@ -285,9 +294,20 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 {
 	$lehrstunde=new lehrstunde();
 	
+	//Einzelne Stunden entfernen
 	if(isset($stpl_id))
 	{
 		foreach ($stpl_id as $stundenplan_id)
+		{
+			$lehrstunde->delete($stundenplan_id,$db_stpl_table);
+			$error_msg.=$lehrstunde->errormsg;
+		}
+	}
+	
+	//Loeschen von mehreren Stunden
+	if(isset($stpl_idx))
+	{
+		foreach ($stpl_idx as $stundenplan_id)
 		{
 			$lehrstunde->delete($stundenplan_id,$db_stpl_table);
 			$error_msg.=$lehrstunde->errormsg;
@@ -315,7 +335,7 @@ elseif ($aktion=='lva_single_set')
 		//$error_msg.='test'.$le_id.($lva[$i]->errormsg).($lva[$i]->stundenblockung);
 		for ($j=0;$j<$lva[$z]->stundenblockung && $error_msg=='';$j++)
 			if (!$lva[$z]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
-				$error_msg.=$lva[$z]->errormsg;
+				$kollision_msg.=$lva[$z]->errormsg."\n";
 		$z++;
 	}
 	for ($i=0;$i<$z && $error_msg=='';$i++)
@@ -419,7 +439,7 @@ elseif ($aktion=='lva_multi_set')
 				$lva[$i]->loadLE($lva_id[$i]);
 				for ($j=0;$j<$block;$j++)
 					if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
-						$error_msg.=$lva[$i]->errormsg;
+						$kollision_msg.=$lva[$i]->errormsg;
 			}
 			// LVAs setzen
 			for ($i=0;$i<$anz_lvas && $error_msg=='';$i++)
@@ -465,10 +485,16 @@ elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 		$error_msg.='Studiensemester '.$semester_aktuell.' konnte nicht gefunden werden!';
 }
 
-if ($error_msg=='')
+if ($error_msg=='' && ($kollision_msg=='' || $kollisionsanzahl>0))
+{
 	$db->db_query('COMMIT;');
+	if($kollisionsanzahl>0)
+		$error_msg.="\nStunden wurden verplant\n";
+}
 else
 	$db->db_query('ROLLBACK;');
+	
+$error_msg.=$kollision_msg;
 
 // Stundenplan erstellen
 $stdplan=new wochenplan($type);
@@ -494,23 +520,6 @@ $stdplan->user=$user;
 // aktueller Benutzer
 $stdplan->user_uid=$uid;
 
-// Zeitwuensche laden falls benoetigt
-$zeitwunsch=null;
-if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_search')
-{
-	$wunsch=new zeitwunsch();
-	if ($type=='lektor')
-		if ($wunsch->loadPerson($pers_uid,$datum))
-			$zeitwunsch=$wunsch->zeitwunsch;
-		else
-			$error_msg.=$wunsch->errormsg;
-	if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
-		if ($wunsch->loadZwLE($lva_id,$datum))
-			$zeitwunsch=$wunsch->zeitwunsch;
-		else
-			$error_msg.=$wunsch->errormsg;
-}
-
 // Zusaetzliche Daten laden
 if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$gruppe) && $error_msg!='')
 	$error_msg.=$stdplan->errormsg;
@@ -524,6 +533,23 @@ while ($begin<=$ende)
 	$datum=$begin;
 	$begin+=604800;	// eine Woche
 
+	// Zeitwuensche laden falls benoetigt
+	$zeitwunsch=null;
+	if ($type=='lektor' || $aktion=='lva_single_search'	|| $aktion=='lva_multi_search')
+	{
+		$wunsch=new zeitwunsch();
+		if ($type=='lektor')
+			if ($wunsch->loadPerson($pers_uid,$datum))
+				$zeitwunsch=$wunsch->zeitwunsch;
+			else
+				$error_msg.=$wunsch->errormsg;
+		if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
+			if ($wunsch->loadZwLE($lva_id,$datum))
+				$zeitwunsch=$wunsch->zeitwunsch;
+			else
+				$error_msg.=$wunsch->errormsg;
+	}
+	
 	// Stundenplan einer Woche laden
 	if (! $stdplan->load_week($datum,$db_stpl_table))
 		$error_msg.=$stdplan->errormsg;
@@ -546,7 +572,7 @@ while ($begin<=$ende)
 	}
 
 	// Stundenplan der Woche drucken
-	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision, $kollision_student);
+	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision, $kollision_student, $max_kollision);
 	
 }
 
@@ -559,7 +585,7 @@ while ($begin<=$ende)
 <script type="application/x-javascript">
 	<?php
 		if ($error_msg!='')
-			echo "alert('".str_replace("'",'"',str_replace(chr(10),'',htmlspecialchars($error_msg)))."');";
+			echo "alert('".str_replace("'",'"',str_replace(chr(10),'\n',htmlspecialchars($error_msg)))."');";
 	?>
 	
 	top.document.getElementById("statusbarpanel-text").setAttribute("label","<?php echo str_replace(chr(10),' ',htmlspecialchars($PHP_SELF.$error_msg)); ?>");

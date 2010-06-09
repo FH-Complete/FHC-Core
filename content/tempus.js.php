@@ -105,36 +105,13 @@ function loadURL(event)
 
         if (url) contentFrame.setAttribute('src', url);
 }
+
+// ****
+// * Aendert die Stundenplantabelle
+// ****
 function stpltableChange(db_stpl_table)
 {
-	// Request absetzen
-	
-	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
-
-	var req = new phpRequest(url,'','');
-
-	req.add('type', 'variablechange');
-	req.add('name', 'db_stpl_table');
-	req.add('wert', db_stpl_table);
-		
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		if(val.dbdml_errormsg=='')
-			alert(response)
-		else
-			alert(val.dbdml_errormsg)
-	}
-	else
-	{
-		//Statusbar setzen
-   		document.getElementById("statusbarpanel-text").label = "Tabelle erfolgreich geaendert";
-   		document.getElementById("statusbarpanel-db_table").label = db_stpl_table;
-	}
-	updatedbstpltable();
+	variableChange('db_stpl_table', null, db_stpl_table);	
 	return true;
 }
 
@@ -219,6 +196,22 @@ function studiensemesterChange(stsem, wert)
 	return true;
 }
 
+// ****
+// * Oeffnet ein Fenster zum Aendern eines Variablenwertes
+// ****
+function variableChangeValue(variable)
+{
+	var variablevalue = getvariable(variable);
+	
+	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
+	{	
+		variableChange(variable, '', variablevalue);
+	}
+}
+
+// ****
+// * Aendert den Wert der Variable IgnoreKollision
+// ****
 function toggleIgnoreKollision()
 {
 	if(getvariable('ignore_kollision')=='true')
@@ -227,6 +220,9 @@ function toggleIgnoreKollision()
 		variableChange('ignore_kollision','menu-prefs-ignore_kollision', 'true');
 }
 
+// ****
+// * Sendet einen Request zum Aendern einer Variable
+// ****
 function variableChange(variable, id, wert)
 {
 	item = document.getElementById(id);
@@ -269,14 +265,19 @@ function variableChange(variable, id, wert)
 		if(variable=='ignore_kollision')
 			updateignorekollision();
 		if(variable=='db_stpl_table')
-			updateidbstpltable();
+		{
+			document.getElementById("statusbarpanel-db_table").label = wert;
+			updatedbstpltable();
+		}
 		//Statusbar setzen
    		document.getElementById("statusbarpanel-text").label = "Variable erfolgreich geaendert";
 	}
 }
 
-// Aktualisiert die IngnoreKollision Anzeige
-// sowohl in der Toolbar als auch im Menue
+// ****
+// * Aktualisiert die IngnoreKollision Anzeige
+// * sowohl in der Toolbar als auch im Menue
+// ****
 function updateignorekollision()
 {
 	var panel = document.getElementById('statusbarpanel-ignore_kollision');
@@ -294,21 +295,27 @@ function updateignorekollision()
 	}		
 }
 
-// markiert den eintrag in der statusleiste rot wenn auf die
-// echte stpl tabelle zugegriffen wird
+// ****
+// * Markiert den Eintrag in der Statusleiste rot wenn auf die
+// * echte stpl tabelle zugegriffen wird
+// ****
 function updatedbstpltable()
 {
 	var panel = document.getElementById('statusbarpanel-db_table');
+
 	if(panel.label=='stundenplan')
 	{
 		panel.style.backgroundColor='red';
 	}
 	else
 	{
-		panel.style.backgroundColor='';
+		panel.style.backgroundColor='transparent';
 	}		
 }
 
+// ****
+// * Laedt den Wert einer Variable aus der DB
+// ****
 function getvariable(variable)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -340,6 +347,9 @@ function getvariable(variable)
 	}
 }
 
+// ****
+// * Liefert das eingestellte Studiensemester
+// ****
 function getStudiensemesterVariable()
 {
 	if(stsem = getvariable('semester_aktuell'))
