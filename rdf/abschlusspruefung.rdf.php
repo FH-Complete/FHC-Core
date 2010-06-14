@@ -134,8 +134,8 @@ if($db->db_query($qry))
 		
 		switch($student->anrede)
 		{
-			case 'Herr': $anrede_engl = 'Mr.'; break;
-			case 'Frau': $anrede_engl = 'Mrs.'; break;
+			case 'Herr': $anrede_engl = 'Mr'; break;
+			case 'Frau': $anrede_engl = 'Ms'; break;
 			default: $anrede_engl = ''; break;
 		}
 		
