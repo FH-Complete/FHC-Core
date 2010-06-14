@@ -1773,150 +1773,159 @@ if(!$error)
 		{
 			$bm = new betriebsmittel();
 
-			//Das speichern von Zutrittskarten ohne Nummern verhindern
-			if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
+			if($_POST['betriebsmitteltyp']=='Zutrittskarte' || $_POST['betriebsmitteltyp']=='Schluessel')
 			{
-				$error = true;
-				$return = false;
-				$errormsg = 'Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu loeschen entfernen Sie bitte den ganzen Datensatz';
-			}
-			else 
-			{
-				//Nachschauen ob dieses Betriebsmittel schon existiert
-				if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
+				//Das speichern von Zutrittskarten ohne Nummern verhindern
+				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
 				{
-					if(count($bm->result)>0)
+					$error = true;
+					$return = false;
+					$errormsg = 'Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu loeschen entfernen Sie bitte den ganzen Datensatz';
+				}
+				else 
+				{
+					//Nachschauen ob dieses Betriebsmittel schon existiert
+					if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
 					{
-						//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
-						//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
-						if($_POST['nummer']==$_POST['nummerold'])
+						if(count($bm->result)>0)
 						{
-							$betriebsmittel_id = $_POST['betriebsmittel_id'];
-						}
-						else 
-							$betriebsmittel_id = $bm->result[0]->betriebsmittel_id;
-						//Wenn ein Eintrag gefunden wurde, dann wird die Beschreibung aktualisiert
-						if($bm->load($betriebsmittel_id))
-						{
-							$bm->beschreibung = $_POST['beschreibung'];
-							$bm->nummer = $_POST['nummer'];
-							if(!$bm->save(false))
+							//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
+							//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
+							if($_POST['nummer']==$_POST['nummerold'])
+							{
+								$betriebsmittel_id = $_POST['betriebsmittel_id'];
+							}
+							else 
+								$betriebsmittel_id = $bm->result[0]->betriebsmittel_id;
+							//Wenn ein Eintrag gefunden wurde, dann wird die Beschreibung aktualisiert
+							if($bm->load($betriebsmittel_id))
+							{
+								$bm->beschreibung = $_POST['beschreibung'];
+								$bm->nummer = $_POST['nummer'];
+								if(!$bm->save(false))
+								{
+									$return = false;
+									$error = true;
+									$errormsg = 'Fehler beim Speichern des Betriebsmittels';
+								}
+							}
+							else
 							{
 								$return = false;
 								$error = true;
-								$errormsg = 'Fehler beim Speichern des Betriebsmittels';
+								$errormsg = 'Gefundener Eintrag konnte nicht geladen werden!?!?';
 							}
 						}
 						else
 						{
-							$return = false;
-							$error = true;
-							$errormsg = 'Gefundener Eintrag konnte nicht geladen werden!?!?';
+							//Wenn kein Eintrag gefunden wurde, dann wird ein neuer Eintrag angelegt
+							$bm->betriebsmitteltyp = $_POST['betriebsmitteltyp'];
+							$bm->nummer = $_POST['nummer'];
+							$bm->beschreibung = $_POST['beschreibung'];
+							$bm->reservieren = false;
+							$bm->ort_kurzbz = null;
+							$bm->insertamum = date('Y-m-d H:i:s');
+							$bm->insertvon = $user;
+		
+							if($bm->save(true))
+							{
+								$betriebsmittel_id = $bm->betriebsmittel_id;
+							}
+							else
+							{
+								$error = true;
+								$return = false;
+								$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
+							}
+						}
+						
+						if($_POST['betriebsmitteltyp']=='Zutrittskarte')
+						{
+							//Bei Zutrittskarten schauen ob diese schon vergeben sind
+							$qry = "SELECT vorname, nachname, uid 
+									FROM public.vw_betriebsmittelperson 
+									WHERE betriebsmitteltyp='Zutrittskarte' AND 
+										nummer::bigint='".$_POST['nummer']."'::bigint AND 
+										person_id<>'".$_POST['person_id']."' AND
+										retouram is null";
+							if($result_bmp = $db->db_query($qry))
+							{
+								if($db->db_num_rows($result_bmp)>0)
+								{
+									$row_bmp = $db->db_fetch_object($result_bmp);
+									$error = true;
+									$return = false;
+									$errormsg = "Diese Zutrittskarte ist bereits ausgegeben an: $row_bmp->vorname $row_bmp->nachname ($row_bmp->uid)";
+								}
+							}
+						}
+						
+						if(!$error)
+						{
+							//Zuordnung Betriebsmittel-Person anlegen
+							$bmp = new betriebsmittelperson();
+							if($_POST['neu']!='true')
+							{
+								if($bmp->load($_POST['betriebsmittelperson_id']))
+								{
+									$bmp->updateamum = date('Y-m-d H:i:s');
+									$bmp->updatevon = $user;
+									$bmp->betriebsmittelperson_id = $_POST['betriebsmittelperson_id'];
+									$bmp->new = false;
+								}
+								else
+								{
+									/*
+									$bmp->insertamum = date('Y-m-d H:i:s');
+									$bmp->insertvon = $user;
+									$bmp->new = true;
+									*/
+									$error = true;
+									$errormsg = "Zuordnung unbekannt:".$_POST['betriebsmittelperson_id'];
+									$return = false;
+								}
+							}
+							else
+							{
+								$bmp->insertamum = date('Y-m-d H:i:s');
+								$bmp->insertvon = $user;
+								$bmp->new = true;
+							}
+			
+							if(!$error)
+							{
+								$bmp->person_id = $_POST['person_id'];
+								$bmp->betriebsmittel_id=$betriebsmittel_id;
+								$bmp->anmerkung = $_POST['anmerkung'];
+								$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
+								$bmp->ausgegebenam = $_POST['ausgegebenam'];
+								$bmp->retouram = $_POST['retouram'];
+			
+								if($bmp->save())
+								{
+									$return = true;
+									$data = $bmp->betriebsmittelperson_id;
+								}
+								else
+								{
+									$return = false;
+									$errormsg = $bmp->errormsg;
+								}
+							}
 						}
 					}
 					else
 					{
-						//Wenn kein Eintrag gefunden wurde, dann wird ein neuer Eintrag angelegt
-						$bm->betriebsmitteltyp = $_POST['betriebsmitteltyp'];
-						$bm->nummer = $_POST['nummer'];
-						$bm->beschreibung = $_POST['beschreibung'];
-						$bm->reservieren = false;
-						$bm->ort_kurzbz = null;
-						$bm->insertamum = date('Y-m-d H:i:s');
-						$bm->insertvon = $user;
-	
-						if($bm->save(true))
-						{
-							$betriebsmittel_id = $bm->betriebsmittel_id;
-						}
-						else
-						{
-							$error = true;
-							$return = false;
-							$errormsg = 'Fehler beim Anlegen des Betriebsmittels';
-						}
-					}
-					
-					if($_POST['betriebsmitteltyp']=='Zutrittskarte')
-					{
-						//Bei Zutrittskarten schauen ob diese schon vergeben sind
-						$qry = "SELECT vorname, nachname, uid 
-								FROM public.vw_betriebsmittelperson 
-								WHERE betriebsmitteltyp='Zutrittskarte' AND 
-									nummer::bigint='".$_POST['nummer']."'::bigint AND 
-									person_id<>'".$_POST['person_id']."' AND
-									retouram is null";
-						if($result_bmp = $db->db_query($qry))
-						{
-							if($db->db_num_rows($result_bmp)>0)
-							{
-								$row_bmp = $db->db_fetch_object($result_bmp);
-								$error = true;
-								$return = false;
-								$errormsg = "Diese Zutrittskarte ist bereits ausgegeben an: $row_bmp->vorname $row_bmp->nachname ($row_bmp->uid)";
-							}
-						}
-					}
-					
-					if(!$error)
-					{
-						//Zuordnung Betriebsmittel-Person anlegen
-						$bmp = new betriebsmittelperson();
-						if($_POST['neu']!='true')
-						{
-							if($bmp->load($_POST['betriebsmittelperson_id']))
-							{
-								$bmp->updateamum = date('Y-m-d H:i:s');
-								$bmp->updatevon = $user;
-								$bmp->betriebsmittelperson_id = $_POST['betriebsmittelperson_id'];
-								$bmp->new = false;
-							}
-							else
-							{
-								/*
-								$bmp->insertamum = date('Y-m-d H:i:s');
-								$bmp->insertvon = $user;
-								$bmp->new = true;
-								*/
-								$error = true;
-								$errormsg = "Zuordnung unbekannt:".$_POST['betriebsmittelperson_id'];
-								$return = false;
-							}
-						}
-						else
-						{
-							$bmp->insertamum = date('Y-m-d H:i:s');
-							$bmp->insertvon = $user;
-							$bmp->new = true;
-						}
-		
-						if(!$error)
-						{
-							$bmp->person_id = $_POST['person_id'];
-							$bmp->betriebsmittel_id=$betriebsmittel_id;
-							$bmp->anmerkung = $_POST['anmerkung'];
-							$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
-							$bmp->ausgegebenam = $_POST['ausgegebenam'];
-							$bmp->retouram = $_POST['retouram'];
-		
-							if($bmp->save())
-							{
-								$return = true;
-								$data = $bmp->betriebsmittelperson_id;
-							}
-							else
-							{
-								$return = false;
-								$errormsg = $bmp->errormsg;
-							}
-						}
+						$errormsg = 'Fehler:'.$bm->errormsg;
+						$return = false;
 					}
 				}
-				else
-				{
-					$errormsg = 'Fehler:'.$bm->errormsg;
-					$return = false;
-				}
+			}
+			else 
+			{
+				$error = true;
+				$return = false;
+				$errormsg = 'Derzeit koennen nur Zutrittskarten und Schluessel geaendert werden!';
 			}
 		}
 	}
