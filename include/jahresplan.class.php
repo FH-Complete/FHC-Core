@@ -1,5 +1,4 @@
 <?php
-//-------------------------------------------------------------------------------------------------
 /* Copyright (C) 2008 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,85 +20,80 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
  *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
  */
-
-#--------------------------------------------------------------------------------------------------
-/*
-*
-* @classe Jahresplan 
-*
-* @param connectSQL Datenbankverbindung
-* @param veranstaltungskategorie_kurzbz Veranstaltungskategorie Key	
-* @param veranstaltung_id Veranstaltung Key 
-* @param reservierung_id Reservierung Key
-*
-* @return - Retourn Konstruktor
-*
-*/
-
+/**
+ *
+ * @classe Jahresplan 
+ *
+ * @param connectSQL Datenbankverbindung
+ * @param veranstaltungskategorie_kurzbz Veranstaltungskategorie Key	
+ * @param veranstaltung_id Veranstaltung Key 
+ * @param reservierung_id Reservierung Key
+ *
+ */
 require_once(dirname(__FILE__).'/basis_db.class.php'); 
+
 class jahresplan extends basis_db 
 {
-		public $new;     		// @boolean
-		public $result = array(); 	// jahresplan Objekt 
+	public $new;     			// @boolean
+	public $result = array(); 	// jahresplan Objekt 
 
-    	// Veranstaltungskategorie	
-		public $veranstaltungskategorie_kurzbz; // @string (16) KEY 
-		public $bezeichnung; // @string (64)
-		public $farbe; // @string (6)
-		public $bild; // @string (255)
+	// Veranstaltungskategorie	
+	public $veranstaltungskategorie_kurzbz; // @string (16) KEY 
+	public $bezeichnung; 		// @string (64)
+	public $farbe; 				// @string (6)
+	public $bild; 				// @string (255)
 		
 	// Veranstaltungen		
-       	public $veranstaltung_id; // @int serial (Key)
-       	
-		public $titel; // @string (64)
-		public $beschreibung; // @string (255)
-		public $inhalt; // @string (255)
-		
-		public $start; // @timestamp oder @date
-       	public $ende; // @timestamp oder @date
+   	public $veranstaltung_id; 	// @int serial (Key)
+   	
+	public $titel; 				// @string (64)
+	public $beschreibung; 		// @string (255)
+	public $inhalt; 			// @string (255)
+	
+	public $start; 				// @timestamp oder @date
+   	public $ende; 				// @timestamp oder @date
 
-		public $insertamum; // @timestamp oder @date
-		public $insertvon; // @string (16)
-		public $updateamum; // @timestamp oder @date
-		public $updatevon; // c@string (16)
-		public $freigabeamum; // @timestamp oder @date
-		public $freigabevon; // @string (16)
+	public $insertamum; 		// @timestamp
+	public $insertvon; 			// @string (16)
+	public $updateamum; 		// @timestamp
+	public $updatevon; 			// @string (16)
+	public $freigabeamum; 		// @timestamp oder @date
+	public $freigabevon; 		// @string (16)
 		
 	// Reservierung
-       	public $reservierung_id;	// @int serial (key)  
-		public $startDatum;	// @int
-		public $endeDatum;	// @int
-		public $startZeit;	// @int
-		public $endeZeit;	// @int			
-		
-       	// Suchbedingungen
-		public $show_only_public_kategorie=true;	// @boolean  - Public Kategorien sollen gelesen werden = false
-
-       	public $start_jahr;	// @int
-       	public $ende_jahr;	// @int
-		
-       	public $start_jahr_monat; // @int
-       	public $ende_jahr_monat; // @int	
-		
-       	public $start_jahr_woche; // @int
-       	public $ende_jahr_woche; // @int	
-		
-       	public $suchtext; // @int
-	    	public $freigabe; // @boolean
+   	public $reservierung_id;	// @int serial (key)  
+	public $startDatum;			// @int
+	public $endeDatum;			// @int
+	public $startZeit;			// @int
+	public $endeZeit;			// @int			
 	
-		
-		public $schemaSQL="campus"; // string Datenbankschema
+   	// Suchbedingungen
+	public $show_only_public_kategorie=true;	// @boolean  - Public Kategorien sollen gelesen werden = false
+
+   	public $start_jahr;			// @int
+   	public $ende_jahr;			// @int
+	
+   	public $start_jahr_monat; 	// @int
+   	public $ende_jahr_monat; 	// @int	
+	
+   	public $start_jahr_woche; 	// @int
+   	public $ende_jahr_woche; 	// @int	
+	
+   	public $suchtext; 			// @int
+	public $freigabe; 			// @boolean
+	
+	public $schemaSQL="campus"; // string Datenbankschema
 		
 	/**
-	* Konstruktor
-	* @param $db Connection zur DB
-	*        $veranstaltungskategorie_kurzbz  zum ladenden der Kategorie Funktion
-	*        $veranstaltung_id  zum ladenden der Veranstaltung Funktion
-	*        $reservierung_id  zum ladenden der Reservierung Funktion
-	*        $show_only_public_kategorie  Boolean welche Kategorien Public oder Alle fuer Lektoren und Mitarbeiter
-	*/
+	 * Konstruktor
+	 * @param $db Connection zur DB
+	 *        $veranstaltungskategorie_kurzbz  zum ladenden der Kategorie Funktion
+	 *        $veranstaltung_id  zum ladenden der Veranstaltung Funktion
+	 *        $reservierung_id  zum ladenden der Reservierung Funktion
+	 *        $show_only_public_kategorie  Boolean welche Kategorien Public oder Alle fuer Lektoren und Mitarbeiter
+	 */
 	public function __construct($veranstaltungskategorie_kurzbz="",$veranstaltung_id="",$reservierung_id="",$show_only_public_kategorie=true) 
-       {
+	{
 		parent::__construct();
 
 		// Init alle Funktionen und Variablen
@@ -108,12 +102,12 @@ class jahresplan extends basis_db
 		// Berechtigungen beim Lesen
 		$this->show_only_public_kategorie=$show_only_public_kategorie;
 			
-		// Veranstaltungskategorie ------------------------------------------------------------------------------
+		// Veranstaltungskategorie
 		$this->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
 		if (!empty($this->veranstaltungskategorie_kurzbz))
 			$this->loadVeranstaltungskategorie($this->veranstaltungskategorie_kurzbz);
 	
-		// Veranstaltungen --------------------------------------------------------------------------------------				
+		// Veranstaltungen
 		$this->veranstaltung_id=$veranstaltung_id;
 		if (!empty($this->veranstaltung_id))
 			$this->loadVeranstaltung($this->veranstaltung_id,$this->veranstaltungskategorie_kurzbz);
@@ -122,9 +116,12 @@ class jahresplan extends basis_db
 		if (!empty($this->reservierung_id))
 			$this->loadReservierung($this->reservierung_id,$this->veranstaltung_id);
 
-       }
-	   
-//-----Initialisierung--------------------------------------------------------------------------------------------
+	}
+
+	/**
+	 * Initialisierung
+	 *
+	 */
 	public function InitJahresplan() 
 	{
 		$this->errormsg='';
@@ -135,9 +132,10 @@ class jahresplan extends basis_db
 		$this->InitReservierung();	
 	}
 	   
-//-------------------------------------------------------------------------------------------------
-//	------------------------ VERANSTALTUNGSKATEGORIE
-//-------------------------------------------------------------------------------------------------
+	/**
+	 * Initialisierung der Kategorien
+	 *
+	 */
 	public function InitVeranstaltungskategorie()
    	{
 		// Veranstaltungskategorie	
@@ -148,20 +146,18 @@ class jahresplan extends basis_db
 			$this->result=array();
 	}
 
-//-------------------------------------------------------------------------------------------------
 	/**
 	 * Speichert bzw. Aendert eine Veranstaltungskategorie
 	 * @return true wenn ok, false im Fehlerfall
 	 */	
 	public function saveVeranstaltungskategorie()
-    	{
+   	{
 		// Initialisieren
 		$this->errormsg='';
-		$qry="";
+		$qry='';
 			
 		$fildsList='';
 		$fildsValue='';
-		
 		
 		if (empty($this->veranstaltungskategorie_kurzbz) || $this->veranstaltungskategorie_kurzbz==null )
 		{
@@ -209,59 +205,52 @@ class jahresplan extends basis_db
 				$this->errormsg = 'Fehler beim speichern des Datensatzes';
 			return false;
 		}	
-		
-		// Beim Lesen ist ein Fehler aufgetreten
-		if (!$this->loadVeranstaltungskategorie()) 
-			return false;
-		return $this->result;
 	}
 
-//-------------------------------------------------------------------------------------------------
 	/**
 	 * Loescht eine Veranstaltungskategorie
 	 * @return true wenn ok, false im Fehlerfall
 	 */	      
-	   public function deleteVeranstaltungskategorie($veranstaltungskategorie_kurzbz="")
-       {
-
-			// Initialisieren
-			$qry="";
-			$this->errormsg='';
+	public function deleteVeranstaltungskategorie($veranstaltungskategorie_kurzbz="")
+	{
+		// Initialisieren
+		$qry="";
+		$this->errormsg='';
 	
-			// Parameter
-			if (!empty($veranstaltungskategorie_kurzbz))
-				$this->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
+		// Parameter
+		if (!empty($veranstaltungskategorie_kurzbz))
+			$this->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
 	
-			// Plausib
-			if (empty($this->veranstaltungskategorie_kurzbz) || $this->veranstaltungskategorie_kurzbz==null )
-			{
-				$this->errormsg='Veranstaltungskategorie - Kurzbz. fehlt!';
-				return false;
-			}
-			
-			// Abfrage
-			$qry.=" delete from ".$this->schemaSQL.".tbl_veranstaltungskategorie ";
-			if (is_array($this->veranstaltungskategorie_kurzbz))
-				$qry.=" where veranstaltungskategorie_kurzbz in ('".implode("','",$this->veranstaltungskategorie_kurzbz)."') ";
-			else	
-				$qry.=" where veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."' ";
-
-			if($this->db_query($qry))
-				return true;
-			else
-			{
-				if (empty($this->errormsg))
-					$this->errormsg = 'Fehler beim Veranstaltungskategorie löschen';
-				return false;
-			}	
+		// Plausib
+		if (empty($this->veranstaltungskategorie_kurzbz) || $this->veranstaltungskategorie_kurzbz==null )
+		{
+			$this->errormsg='Veranstaltungskategorie - Kurzbz. fehlt!';
+			return false;
 		}
-//-------------------------------------------------------------------------------------------------
+		
+		// Abfrage
+		$qry.=" delete from ".$this->schemaSQL.".tbl_veranstaltungskategorie ";
+		if (is_array($this->veranstaltungskategorie_kurzbz))
+			$qry.=" where veranstaltungskategorie_kurzbz in ('".implode("','",$this->veranstaltungskategorie_kurzbz)."') ";
+		else	
+			$qry.=" where veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."' ";
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			if (empty($this->errormsg))
+				$this->errormsg = 'Fehler beim Veranstaltungskategorie löschen';
+			return false;
+		}
+	}
+
 	/**
 	 * Lesen der Veranstaltungskategorien 
 	 * @return Array mit Veranstaltungs-Objekt wenn ok, false im Fehlerfall
 	 */	    
-	   public function loadVeranstaltungskategorie($veranstaltungskategorie_kurzbz="")
-       {
+	public function loadVeranstaltungskategorie($veranstaltungskategorie_kurzbz="")
+	{
 		// Initialisieren
 		$qry="";
 		$this->errormsg='';
@@ -305,14 +294,15 @@ class jahresplan extends basis_db
 				$this->errormsg = 'Fehler Veranstaltungskategorien lesen!';
 			return false;
 		}	
-     }
+	}
 
-//-------------------------------------------------------------------------------------------------
-//	------------------------ VERANSTALTUNG
-//-----Initialisierung Veranstaltung--------------------------------------------------------------------------------------------
 
-       public function InitVeranstaltung() 
-       {
+	/**
+	 *	Initialisierung Veranstaltung
+	 *
+	 */
+	public function InitVeranstaltung() 
+	{
 		$this->InitVeranstaltungskategorie();
 	
 		$this->veranstaltung_id=0;
@@ -347,15 +337,15 @@ class jahresplan extends basis_db
     	$this->freigabe=false; 
 			
 		$this->result=array();
-       }
+	}
 
-//-------------------------------------------------------------------------------------------------
 	/**
 	 * Speichert bzw. Aendert eine Veranstaltung
 	 * @return true wenn ok, false im Fehlerfall
+	 * ToDo: angleichen an die anderen Save Funktionen
 	 */	
-	   public function saveVeranstaltung()
-       {
+	public function saveVeranstaltung()
+	{
 		// Initialisieren
 		$this->errormsg='';
 		$qry='';
@@ -382,7 +372,6 @@ class jahresplan extends basis_db
 		
 		if($this->new)
 		{
-#			$fildsList.='veranstaltung_id,'; // Key - Automatisch erzeugt - Serial
 			$fildsList.='veranstaltungskategorie_kurzbz,';
 			$fildsList.='beschreibung,';
 			$fildsList.='inhalt,';			
@@ -395,7 +384,6 @@ class jahresplan extends basis_db
 			$fildsList.='freigabeamum,';
 			$fildsList.='freigabevon';
 
-#			$fildsValue.="'".addslashes($this->veranstaltung_id)."',";  // Key - Automatisch erzeugt - Serial
 			$fildsValue.="'".addslashes($this->veranstaltungskategorie_kurzbz)."',"; 
 			$fildsValue.="'".addslashes($this->beschreibung)."',";
 			$fildsValue.="'".addslashes($this->inhalt)."',";
@@ -427,11 +415,11 @@ class jahresplan extends basis_db
 			$qry.=$fildsValue;
 			$qry.=" where veranstaltung_id='".addslashes($this->veranstaltung_id)."' ";
 		}	
-#echo "<p> $qry </p>";
+
 		if(!$this->db_query($qry))
 		{
 			if (empty($this->errormsg))
-				$this->errormsg = 'Fehler beim speichern des Datensatzes';
+				$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}	
 		
@@ -444,7 +432,7 @@ class jahresplan extends basis_db
 					$this->errormsg = 'Fehler beim lesen des neuen Datensatzes';
 				return false;
 			}	
-#echo "<p> $qry </p>";
+
 			if (!$row = $this->db_fetch_object())
 			{
 				if (empty($this->errormsg))
@@ -463,7 +451,7 @@ class jahresplan extends basis_db
 			return false;
 		return $this->result;
 	}
-//-------------------------------------------------------------------------------------------------
+
 	/**
 	 * Loescht eine Veranstaltung
 	 * @return true wenn ok, false im Fehlerfall
@@ -471,14 +459,12 @@ class jahresplan extends basis_db
 	public function deleteVeranstaltung($veranstaltung_id="")
 	{
 		// Initialisieren
-		$qry="";
+		$qry='';
 		$this->errormsg='';
 	
-		// Parameter
 		if (!empty($veranstaltung_id))
 			$this->veranstaltung_id=$veranstaltung_id;
 	
-		// Plausib
 		if (empty($this->veranstaltung_id) || $this->veranstaltung_id==null )
 		{
 			$this->errormsg='Veranstaltung - ID fehlt!';
@@ -489,7 +475,7 @@ class jahresplan extends basis_db
 		$qry.="BEGIN;  ";
 		
 		// Reservierung 
-     		$qry.="update  ".$this->schemaSQL.".tbl_reservierung set veranstaltung_id=null ";
+		$qry.="update  ".$this->schemaSQL.".tbl_reservierung set veranstaltung_id=null ";
 		if (is_array($this->veranstaltung_id))
 			$qry.=" WHERE veranstaltung_id in (".implode(",",$this->veranstaltung_id)."); ";
 		else 
@@ -512,108 +498,112 @@ class jahresplan extends basis_db
 				$this->errormsg = 'Fehler beim Veranstaltung löschen ';
 			return false;
 		}	
-}
+	}
 	   
-//-------------------------------------------------------------------------------------------------
 	/**
 	 * Lesen der Veranstaltung 
 	 * @return Array mit Veranstaltungs-Objekt wenn ok, false im Fehlerfall
 	 */	    
-public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstaltung_id="",$freigabe="",$show_only_public_kategorie="")
-{
-			//Init
-			$qry="";
-		
-			$this->errormsg='';
-			$this->result=array();
+	public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstaltung_id="",$freigabe="",$show_only_public_kategorie="")
+	{
+		//Init
+		$qry='';
 	
-	       	if ($veranstaltung_id!='')
-				$this->veranstaltung_id=$veranstaltung_id;
-	
-			if (!empty($veranstaltungskategorie_kurzbz))
-				$this->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
-				
-	       	if ($freigabe!='')
-				$this->freigabe=$freigabe;
-	
-	       	if ($show_only_public_kategorie!='')
-				$this->show_only_public_kategorie=$show_only_public_kategorie;
+		$this->errormsg='';
+		$this->result=array();
+
+       	if ($veranstaltung_id!='')
+			$this->veranstaltung_id=$veranstaltung_id;
+
+		if (!empty($veranstaltungskategorie_kurzbz))
+			$this->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
 			
-     		$qry.="SELECT tbl_veranstaltung.* ";
+       	if ($freigabe!='')
+			$this->freigabe=$freigabe;
 
-			$qry.=", to_char(tbl_veranstaltung.start, 'YYYYMMDD') as \"start_jjjjmmtt\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'YYYYMMDD') as \"ende_jjjjmmtt\" ";
-			$qry.=", to_char(tbl_veranstaltung.start, 'YYYYMM') as \"start_jahr_monat\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'YYYYMM') as \"ende_jahr_monat\" ";
-			$qry.=", to_char(tbl_veranstaltung.start, 'YYYY') as \"start_jahr\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'YYYY') as \"ende_jahr\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.start, 'MM') as \"start_monat\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'MM') as \"ende_monat\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.start, 'DD') as \"start_tag\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'DD') as \"ende_tag\" ";
-			
-			$qry.=", to_char(tbl_veranstaltung.start, 'Day') as \"start_tagname\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'Day') as \"ende_tagname\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.start, 'IW') as \"start_woche\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'IW') as \"ende_woche\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.start, 'Q') as \"start_quartal\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'Q') as \"ende_quartal\" ";
-			
-			$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start) as \"start_timestamp\" ";
-			$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende) as \"ende_timestamp\" ";
-
-
-			$qry.=", to_char(tbl_veranstaltung.start, 'DD.MM.YYYY') as \"start_datum\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'DD.MM.YYYY') as \"ende_datum\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.start, 'HH24:MI') as \"start_zeit\" ";
-			$qry.=", to_char(tbl_veranstaltung.ende, 'HH24:MI') as \"ende_zeit\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.insertamum, 'DD.MM.YYYY') as \"insertamum_datum\" ";
-			$qry.=", to_char(tbl_veranstaltung.insertamum, 'HH24:MI') as \"insertamum_zeit\" ";
-			$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.insertamum) as \"insertamum_timestamp\" ";
-
-			$qry.=", to_char(tbl_veranstaltung.updateamum, 'DD.MM.YYYY') as \"updateamum_datum\" ";
-			$qry.=", to_char(tbl_veranstaltung.updateamum, 'HH24:MI') as \"updateamum_zeit\" ";
-			$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.updateamum) as \"updateamum_timestamp\" ";
+       	if ($show_only_public_kategorie!='')
+			$this->show_only_public_kategorie=$show_only_public_kategorie;
 		
-			$qry.=", to_char(tbl_veranstaltung.freigabeamum, 'DD.MM.YYYY') as \"freigabeamum_datum\" ";
-			$qry.=", to_char(tbl_veranstaltung.freigabeamum, 'HH24:MI') as \"freigabeamum_zeit\" ";
-			$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.freigabeamum) as \"freigabeamum_timestamp\" ";
+ 		$qry.="SELECT tbl_veranstaltung.* ";
 
-     		$qry.=",tbl_veranstaltungskategorie.*,tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz as kategorie_kurzbz  ";
+		$qry.=", to_char(tbl_veranstaltung.start, 'YYYYMMDD') as \"start_jjjjmmtt\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'YYYYMMDD') as \"ende_jjjjmmtt\" ";
+		$qry.=", to_char(tbl_veranstaltung.start, 'YYYYMM') as \"start_jahr_monat\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'YYYYMM') as \"ende_jahr_monat\" ";
+		$qry.=", to_char(tbl_veranstaltung.start, 'YYYY') as \"start_jahr\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'YYYY') as \"ende_jahr\" ";
 
-   			$qry.=" FROM ".$this->schemaSQL.".tbl_veranstaltungskategorie  ";
-	   		$qry.=" LEFT JOIN ".$this->schemaSQL.".tbl_veranstaltung ON ".$this->schemaSQL.".tbl_veranstaltung.veranstaltungskategorie_kurzbz=".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz ";
-			$qry.=" WHERE ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz>'' ";
+		$qry.=", to_char(tbl_veranstaltung.start, 'MM') as \"start_monat\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'MM') as \"ende_monat\" ";
+
+		$qry.=", to_char(tbl_veranstaltung.start, 'DD') as \"start_tag\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'DD') as \"ende_tag\" ";
 		
-			if ($this->freigabe)
+		$qry.=", to_char(tbl_veranstaltung.start, 'Day') as \"start_tagname\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'Day') as \"ende_tagname\" ";
+
+		$qry.=", to_char(tbl_veranstaltung.start, 'IW') as \"start_woche\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'IW') as \"ende_woche\" ";
+
+		$qry.=", to_char(tbl_veranstaltung.start, 'Q') as \"start_quartal\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'Q') as \"ende_quartal\" ";
+		
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start) as \"start_timestamp\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende) as \"ende_timestamp\" ";
+
+
+		$qry.=", to_char(tbl_veranstaltung.start, 'DD.MM.YYYY') as \"start_datum\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'DD.MM.YYYY') as \"ende_datum\" ";
+
+		$qry.=", to_char(tbl_veranstaltung.start, 'HH24:MI') as \"start_zeit\" ";
+		$qry.=", to_char(tbl_veranstaltung.ende, 'HH24:MI') as \"ende_zeit\" ";
+
+		$qry.=", to_char(tbl_veranstaltung.insertamum, 'DD.MM.YYYY') as \"insertamum_datum\" ";
+		$qry.=", to_char(tbl_veranstaltung.insertamum, 'HH24:MI') as \"insertamum_zeit\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.insertamum) as \"insertamum_timestamp\" ";
+
+		$qry.=", to_char(tbl_veranstaltung.updateamum, 'DD.MM.YYYY') as \"updateamum_datum\" ";
+		$qry.=", to_char(tbl_veranstaltung.updateamum, 'HH24:MI') as \"updateamum_zeit\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.updateamum) as \"updateamum_timestamp\" ";
+	
+		$qry.=", to_char(tbl_veranstaltung.freigabeamum, 'DD.MM.YYYY') as \"freigabeamum_datum\" ";
+		$qry.=", to_char(tbl_veranstaltung.freigabeamum, 'HH24:MI') as \"freigabeamum_zeit\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.freigabeamum) as \"freigabeamum_timestamp\" ";
+
+ 		$qry.=",tbl_veranstaltungskategorie.*,tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz as kategorie_kurzbz  ";
+
+			$qry.=" FROM ".$this->schemaSQL.".tbl_veranstaltungskategorie  ";
+   		$qry.=" LEFT JOIN ".$this->schemaSQL.".tbl_veranstaltung ON ".$this->schemaSQL.".tbl_veranstaltung.veranstaltungskategorie_kurzbz=".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz ";
+		$qry.=" WHERE ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz>'' ";
+	
+		if ($this->freigabe)
+		{
+			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.freigabevon>'' ";
+		}
+       	// Suche nach einer einzigen Veranstaltung_id
+	    if (!is_array($this->veranstaltung_id) && !empty($this->veranstaltung_id) )
+		{
+			if(!is_numeric($this->veranstaltung_id))
 			{
-				$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.freigabevon>'' ";
+				$this->errormsg = 'Veranstaltung_id ist ungueltig';
+				return false;
 			}
-	       	// Suche nach einer einzigen Veranstaltung_id
-		    if (!is_array($this->veranstaltung_id) && !empty($this->veranstaltung_id) )
-    		{
-       			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id=".addslashes($this->veranstaltung_id)." ";	
-	       	}
-   		   	elseif (is_array($this->veranstaltung_id) && count($this->veranstaltung_id)>0 )
-       		{
-	   	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id in (".addslashes(implode(",",$this->veranstaltung_id)).") ";	
-       		}
-		
-       	// Suche nach einer einzigen Veranstaltungskategorie_kurzbz
-	       	if (!is_array($this->veranstaltungskategorie_kurzbz) && $this->veranstaltungskategorie_kurzbz!='' )
-    	   	{
-       			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."' ";	
-		    }
-    	   	elseif (is_array($this->veranstaltungskategorie_kurzbz) && count($this->veranstaltungskategorie_kurzbz)>0 )
-	       	{
-    	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz in ('".implode("','",$this->veranstaltungskategorie_kurzbz)."') ";	
-			}
+   			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id='".addslashes($this->veranstaltung_id)."' ";	
+       	}
+		elseif (is_array($this->veranstaltung_id) && count($this->veranstaltung_id)>0 )
+   		{
+   	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id in (".addslashes(implode(",",$this->veranstaltung_id)).") ";	
+   		}
+	
+   		// Suche nach einer einzigen Veranstaltungskategorie_kurzbz
+       	if (!is_array($this->veranstaltungskategorie_kurzbz) && $this->veranstaltungskategorie_kurzbz!='' )
+	   	{
+   			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."' ";	
+	    }
+	   	elseif (is_array($this->veranstaltungskategorie_kurzbz) && count($this->veranstaltungskategorie_kurzbz)>0 )
+       	{
+	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz in ('".implode("','",$this->veranstaltungskategorie_kurzbz)."') ";	
+		}
 
 
 		if (!empty($this->start) && empty($this->ende) )
@@ -680,14 +670,12 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 
 		// Entscheiden welche Daten angezeigt werden Public oder fuer Mitarbeiter alles		
 		if ($this->show_only_public_kategorie)
-    	   	$qry.=" AND NOT ".$this->schemaSQL.".tbl_veranstaltung.veranstaltungskategorie_kurzbz like '*%' ";	
+			$qry.=" AND NOT ".$this->schemaSQL.".tbl_veranstaltung.veranstaltungskategorie_kurzbz like '*%' ";	
 	
 		if (!empty($this->start) || !empty($this->ende) || !empty($this->start_jahr) || !empty($this->ende_jahr) || !empty($this->start_jahr_monat) || !empty($this->ende_jahr_monat)  || !empty($this->start_jahr_monat_tag) || !empty($this->ende_jahr_monat_tag) )
-    	   		$qry.=" ORDER BY ".$this->schemaSQL.".tbl_veranstaltung.start, ".$this->schemaSQL.".tbl_veranstaltungskategorie.bezeichnung  ";	
+			$qry.=" ORDER BY ".$this->schemaSQL.".tbl_veranstaltung.start, ".$this->schemaSQL.".tbl_veranstaltungskategorie.bezeichnung  ";	
 		else
-	     		$qry.=" ORDER BY ".$this->schemaSQL.".tbl_veranstaltungskategorie.bezeichnung, ".$this->schemaSQL.".tbl_veranstaltung.start  ";	
-
-#echo "<p> $qry </p>";			
+			$qry.=" ORDER BY ".$this->schemaSQL.".tbl_veranstaltungskategorie.bezeichnung, ".$this->schemaSQL.".tbl_veranstaltung.start  ";	
 			
 		if($this->db_query($qry))
 		{
@@ -697,8 +685,6 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 				$veranstaltungkategorie[]=$row;
 			}
 			
-#var_dump($veranstaltungkategorie);
-
 			return $this->result=$veranstaltungkategorie;
 		}
 		else
@@ -710,10 +696,13 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
     }
 
 
-//-----Initialisierung Veranstaltungskategorie--------------------------------------------------------------------------------------------
-       public function InitReservierung() 
-       {
-	      	$this->reservierung_id=0; 
+	/**
+	 * Reservierung Initialisieren
+	 *
+	 */
+	public function InitReservierung() 
+	{
+		$this->reservierung_id=0; 
 		$this->veranstaltung_id=null;
 
 		$this->startDatum='';
@@ -721,13 +710,18 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 		$this->startZeit='';
 		$this->endeZeit='';			
 
-	      	$this->result=array();
-	}	
-//-------------------------------------------------------------------------------------------------
-//
-//-------------------------------------------------------------------------------------------------
-       public function saveReservierung()
-       {
+		$this->result=array();
+	}
+	
+	/**
+	 * Reservierung Speichern
+	 *
+	 * @return unknown
+	 * 
+	 * TODO: eventuelle auslagerung in reservierung.class.php ???
+	 */
+	public function saveReservierung()
+	{
 		// Initialisieren
 		$this->errormsg='';
 		$qry="";
@@ -744,49 +738,58 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 		else
 		{
 			if (empty($this->errormsg))
-				$this->errormsg = 'Fehler beim speichern des Datensatzes';
+				$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}	
+		}
+	}
 
-	}	
-
-//-------------------------------------------------------------------------------------------------
-//	
-//-------------------------------------------------------------------------------------------------
+	/**
+	 * Laedt Reservierungen
+	 *
+	 * @param unknown_type $reservierung_id
+	 * @param unknown_type $veranstaltung_id
+	 * @param unknown_type $startDatum
+	 * @param unknown_type $endeDatum
+	 * @param unknown_type $startZeit
+	 * @param unknown_type $endeZeit
+	 * @return unknown
+	 * 
+	 * TODO: eventuelle auslagerung in reservierung.class.php ???
+	 */
      public function loadReservierung($reservierung_id="",$veranstaltung_id="",$startDatum="",$endeDatum="",$startZeit="",$endeZeit="")
      {
-	//Init
-	$this->errormsg='';
-	$qry="";
+		//Init
+		$this->errormsg='';
 	
      	if ($reservierung_id!='')
-		$this->reservierung_id=$reservierung_id;
+			$this->reservierung_id=$reservierung_id;
      	if ($veranstaltung_id!='')
-		$this->veranstaltung_id=$veranstaltung_id;
+			$this->veranstaltung_id=$veranstaltung_id;
 	
      	if ($startDatum!='')
-		$this->startDatum=$startDatum;
-	if (!empty($this->startDatum) && is_numeric($this->startDatum))
-		$this->startDatum=strftime('%Y%m%d',$this->startDatum);
+			$this->startDatum=$startDatum;
 		
-	     	if ($endeDatum!='')
-		$this->endeDatum=$endeDatum;
-	if (!empty($this->endeDatum) && is_numeric($this->endeDatum))
-		$this->endeDatum=strftime('%Y%m%d',$this->endeDatum);
-	
-	     	if ($startZeit!='')
-		$this->startZeit=$startZeit;
-	if (!empty($this->startZeit) && is_numeric($this->startZeit))
-		$this->startZeit=date('Hi',$this->startZeit);
+		if (!empty($this->startDatum) && is_numeric($this->startDatum))
+			$this->startDatum=strftime('%Y%m%d',$this->startDatum);
 		
-	     	if ($endeZeit!='')
-		$this->endeZeit=$endeZeit;
-	if (!empty($this->endeZeit) && is_numeric($this->endeZeit))
-		$this->endeZeit=date('Hi',$this->endeZeit);			
+		if ($endeDatum!='')
+			$this->endeDatum=$endeDatum;
+		
+		if (!empty($this->endeDatum) && is_numeric($this->endeDatum))
+			$this->endeDatum=strftime('%Y%m%d',$this->endeDatum);
 	
-	// Selektion
-	
-		$qry="";
+		if ($startZeit!='')
+			$this->startZeit=$startZeit;
+		
+		if (!empty($this->startZeit) && is_numeric($this->startZeit))
+			$this->startZeit=date('Hi',$this->startZeit);
+		
+		if ($endeZeit!='')
+			$this->endeZeit=$endeZeit;
+		if (!empty($this->endeZeit) && is_numeric($this->endeZeit))
+			$this->endeZeit=date('Hi',$this->endeZeit);			
+		
+		$qry='';
    		$qry.="SELECT tbl_reservierung.* ";
 	   		
 		$qry.=", to_char(tbl_reservierung.datum, 'YYYYMMDD') as \"datum_jjjjmmtt\" ";
@@ -806,8 +809,9 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 		$qry.=", EXTRACT(EPOCH FROM tbl_reservierung.datum) as \"datum_timestamp\" ";
 	
 		
-	   			$qry.=" FROM ".$this->schemaSQL.".tbl_reservierung  ";
-	 			$qry.=" RIGHT JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde=".$this->schemaSQL.".tbl_reservierung.stunde ";
+		$qry.=" FROM ".$this->schemaSQL.".tbl_reservierung  ";
+		$qry.=" RIGHT JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde=".$this->schemaSQL.".tbl_reservierung.stunde ";
+		
 		// Wird nur fuer Lesen alle - benoetigt
 		if (empty($this->reservierung_id) && empty($this->veranstaltung_id))
 		{
@@ -818,34 +822,34 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 			else if (!empty($this->startZeit) && !empty($this->endeZeit) )
 			{
 		   		$qry.=" AND to_char(lehre.tbl_stunde.beginn, 'HH24MI') >='".$this->startZeit."' ";	
-	  				$qry.=" AND to_char(lehre.tbl_stunde.ende, 'HH24MI') <= '".$this->endeZeit.",' ";	
+  				$qry.=" AND to_char(lehre.tbl_stunde.ende, 'HH24MI') <= '".$this->endeZeit.",' ";	
 			}	
 		}		
-	 		    	$qry.=" WHERE ".$this->schemaSQL.".tbl_reservierung.titel>'' ";
+		
+    	$qry.=" WHERE ".$this->schemaSQL.".tbl_reservierung.titel>'' ";
 	
-	      	// Suche nach einer einzigen reservierung_id
+	    // Suche nach einer einzigen reservierung_id
 		if (!is_array($this->reservierung_id) && !empty($this->reservierung_id) )
-	      		$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.reservierung_id=".$this->reservierung_id." ";	
-	 		   	elseif (is_array($this->reservierung_id) && count($this->reservierung_id)>0 )
-	   	   		$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.reservierung_id in (".implode(",",$this->reservierung_id).") ";	
+      		$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.reservierung_id=".$this->reservierung_id." ";	
+		elseif (is_array($this->reservierung_id) && count($this->reservierung_id)>0 )
+   	   		$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.reservierung_id in (".implode(",",$this->reservierung_id).") ";	
 	
-	     	// Suche nach einer einzigen Veranstaltung_id
+     	// Suche nach einer einzigen Veranstaltung_id
 		if (!is_array($this->veranstaltung_id) && !empty($this->veranstaltung_id) )
-	     			$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.veranstaltung_id=".$this->veranstaltung_id." ";	
-	  	   	elseif (is_array($this->veranstaltung_id) && count($this->veranstaltung_id)>0 )
-	   	   		$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.veranstaltung_id in (".implode(",",$this->veranstaltung_id).") ";	
+   			$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.veranstaltung_id=".$this->veranstaltung_id." ";	
+  	   	elseif (is_array($this->veranstaltung_id) && count($this->veranstaltung_id)>0 )
+   	   		$qry.=" AND ".$this->schemaSQL.".tbl_reservierung.veranstaltung_id in (".implode(",",$this->veranstaltung_id).") ";	
 	
 		if (!empty($this->startDatum) && empty($this->endeDatum) )
 	   		$qry.=" AND to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD')='".$this->start."' ";	
 		else if (empty($this->startDatum) && !empty($this->endeDatum) )
-	  			$qry.=" AND to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD')='".$this->ende."' ";	
+  			$qry.=" AND to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD')='".$this->ende."' ";	
 		else if (!empty($this->startDatum) && !empty($this->endeDatum) )
 		{
 	   		$qry.=" AND '".$this->startDatum."' between to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD') AND to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD') ";	
   			$qry.=" AND '".$this->endeDatum."' between to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD') AND to_char(".$this->schemaSQL.".tbl_reservierung.datum, 'YYYYMMDD') ";	
 		}	
 		$qry.=" ORDER BY ".$this->schemaSQL.".tbl_reservierung.datum,tbl_reservierung.stunde  ";	
-#echo "<p> $qry </p>";
 			
 		if($this->db_query($qry))
 		{
@@ -862,8 +866,6 @@ public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstalt
 				$this->errormsg = 'Fehler Reservierung lesen';
 			return false;
 		}	
-       }
-	
-} // Class jahresplan Ende 
-
+	}	
+}
 ?>

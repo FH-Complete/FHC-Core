@@ -20,26 +20,15 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/jahresplan.class.php');
+require_once('jahresplan_funktionen.inc.php');
 
-
-
-// ---------------- CIS Include Dateien einbinden
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-
-// ---------------- Datenbank-Verbindung
-	include_once('../../../include/person.class.php');
-	include_once('../../../include/benutzer.class.php');
-	include_once('../../../include/benutzerberechtigung.class.php');
-
-	setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
-
-// ------------------------------------------------------------------------------------------
-//	Jahresplan Classe
-// ------------------------------------------------------------------------------------------
-	include_once('../../../include/jahresplan.class.php');
-// ---------------- Check User und Jahresplan-Classe Init
-	include_once('jahresplan_funktionen.inc.php');
+setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
 
 // ------------------------------------------------------------------------------------------
 //	Init
@@ -50,21 +39,27 @@
 //	Request Parameter einlesen
 // ------------------------------------------------------------------------------------------
 
-	// Parameter Veranstaltungskategorie
-  	$veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_kurzbz']) ? $_REQUEST['veranstaltungskategorie_kurzbz']:''));
-	// Parameter Veranstaltung
-   	$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
-   	$Jahr=trim((isset($_REQUEST['Jahr']) ? $_REQUEST['Jahr']:date("Y", mktime(0,0,0,date("m"),date("d"),date("y")))));
-   	$Monat=trim((isset($_REQUEST['Monat']) ? $_REQUEST['Monat']:date("m", mktime(0,0,0,date("m"),date("d"),date("y")))));
-	$suchtext=trim((isset($_REQUEST['suchtext']) ? $_REQUEST['suchtext']:''));
+// Parameter Veranstaltungskategorie
+$veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_kurzbz']) ? $_REQUEST['veranstaltungskategorie_kurzbz']:''));
+// Parameter Veranstaltung
+$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
+$Jahr=trim((isset($_REQUEST['Jahr']) ? $_REQUEST['Jahr']:date("Y", mktime(0,0,0,date("m"),date("d"),date("y")))));
+$Monat=trim((isset($_REQUEST['Monat']) ? $_REQUEST['Monat']:date("m", mktime(0,0,0,date("m"),date("d"),date("y")))));
+$suchtext=trim((isset($_REQUEST['suchtext']) ? $_REQUEST['suchtext']:''));
 
-
+if(!is_numeric($Jahr))
+	die('Jahr ist ungueltig');
+if(!is_numeric($Monat))
+	die('Monat ist ungueltig');
+if($veranstaltung_id!='' && !is_numeric($veranstaltung_id))
+	die('VeranstaltungID ist ungueltig');
+	
 // ------------------------------------------------------------------------------------------
 // 	Alle Kategoriedaten lesen fuer Selektfeld (open in jahresplan_funktionen)
 // ------------------------------------------------------------------------------------------
-	$Jahresplan->InitVeranstaltungskategorie();
-	if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
-		die('Fehler beim lesen der Veranstaltungskategorie ! '.$Jahresplan->errormsg);
+$Jahresplan->InitVeranstaltungskategorie();
+if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
+	die('Fehler beim lesen der Veranstaltungskategorie ! '.$Jahresplan->errormsg);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

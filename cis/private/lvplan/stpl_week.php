@@ -149,6 +149,8 @@ if(strlen($ver)>2)
 	die('Verband ist ungueltig');
 if(strlen($grp)>2)
 	die('Gruppe ist ungueltig');
+if(isset($datum) && !is_numeric($datum))
+	die('Datum ist ungueltig');
 
 $berechtigung=new benutzerberechtigung();
 $berechtigung->getBerechtigungen($uid);
