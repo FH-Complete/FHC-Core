@@ -86,12 +86,22 @@
 					</fo:table>
 				</fo:block-container>
 
-				<fo:block-container position="absolute" top="250mm" left="23mm">
+				<fo:block-container position="absolute" top="244mm" left="23mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="73mm" />
 						<fo:table-column column-width="17mm" />
 						<fo:table-column column-width="73mm" />
 						<fo:table-body>
+							<fo:table-row>
+								<fo:table-cell>
+									<fo:block line-height="12pt" font-size="9pt">
+										Wien, am <xsl:value-of select="ort_datum" />
+									</fo:block>
+									<fo:block line-height="3pt" font-size="3pt" />
+								</fo:table-cell>
+								<fo:table-cell></fo:table-cell>
+								<fo:table-cell></fo:table-cell>
+							</fo:table-row>
 							<fo:table-row>
 								<fo:table-cell border-top-style="dotted">
 								<fo:block line-height="13pt" font-family="arial" font-size="9pt"><xsl:text>Ort, Ausstellungsdatum</xsl:text></fo:block>

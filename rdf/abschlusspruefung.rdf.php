@@ -219,7 +219,8 @@ if($db->db_query($qry))
 		<betreuer_2><![CDATA['.$betreuer_2.']]></betreuer_2>
 		<note><![CDATA['.$note.']]></note>
 		<notekommpruef><![CDATA['.$row->note.']]></notekommpruef>
-		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>';
+		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>
+		<ort_datum><![CDATA['.date('d.m.Y').']]></ort_datum>';
 		
 	 	echo "\n\t</pruefung>";
 	}
