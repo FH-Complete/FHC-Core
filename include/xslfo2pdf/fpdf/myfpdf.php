@@ -251,8 +251,9 @@ class MyPdf extends FPDF {
 			$nb++;
 			//oesi - wenn er die zeileumbricht dann soll in der naechsten zeile um
 			//1 eingerueckt werden sonst schaut des in einer tablle nicht gut aus
+			//$this->GetStringWidth(" ") statt '1' is bessa - MP
 			if($width!=0)
-				$x = $xNewLine+1;
+				$x = $xNewLine+$this->GetStringWidth(" ");
 			else
 				$x = $xNewLine;
 		} while ($width > 0);
