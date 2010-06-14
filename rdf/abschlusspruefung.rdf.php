@@ -84,13 +84,13 @@ if($db->db_query($qry))
 		$akadgrad = new akadgrad($row->akadgrad_id);
 		
 		if($mitarbeiter->load($row->vorsitz))
-			$vorsitz = $mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost;
+			$vorsitz = trim($mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost);
 		if($person->load($row->pruefer1))
-			$pruefer1 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
+			$pruefer1 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
 		if($person->load($row->pruefer2))
-			$pruefer2 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
+			$pruefer2 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
 		if($person->load($row->pruefer3))
-			$pruefer3 = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
+			$pruefer3 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
 			
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='rek'";
 		$rektor = '';
