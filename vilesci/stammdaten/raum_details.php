@@ -147,7 +147,7 @@
 	$htmlstr .= "			<table>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Kurzbezeichnung</td>\n";
-	$htmlstr .= "					<td><input class='detail' type='text' name='ort_kurzbz' size='12' maxlength='8' value='".$ort_kurzbz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "					<td><input class='detail' type='text' name='ort_kurzbz' size='12' maxlength='16' value='".$ort_kurzbz."' onchange='submitable()'></td>\n";
 	$htmlstr .= "					<td>Bezeichnung</td>\n";
 	$htmlstr .= "					<td><input class='detail' type='text' name='bezeichnung' size='32' maxlength='30' value='".$bezeichnung."' onchange='submitable()'></td>\n";
 	$htmlstr .= "					<td>Planbezeichnung</td>\n";
