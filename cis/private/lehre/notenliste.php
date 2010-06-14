@@ -25,18 +25,16 @@
  * das betreffende Studiensemester kann ausgewaehlt werden
  */
 require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
+
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
-	<head>
+<html>
+<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<title>Leistungsbeurteilung</title>
@@ -52,25 +50,25 @@ require_once('../../../include/datum.class.php');
 	  }
 	}
 	</script>
-	</head>
+</head>
 
-	<body>
+<body>
 	<table class="tabcontent" id="inhalt">
 		<tr>
 	    <td class="tdwidth10">&nbsp;</td>
 	    <td><table class="tabcontent">
 	    	<tr>
-	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;Leistungsbeurteilung</font></td>
+	      		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Leistungsbeurteilung</font></td>
 	    	</tr>
 	    	<tr>
-	      	<td>&nbsp;</td>
+	      		<td>&nbsp;</td>
 	    	</tr>
 	    	<tr>
-	    	<td>
+	    		<td>
 <?php
 
-if(isset($_GET["stsem"]))
-	$stsem = $_GET["stsem"];
+if(isset($_GET['stsem']))
+	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
 	
@@ -87,7 +85,9 @@ if(!check_student($user))
 }
 else
 {
-	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.bezeichnung FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) WHERE campus.vw_student.uid = '$user'";
+	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.bezeichnung 
+		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) 
+		WHERE campus.vw_student.uid = '".addslashes($user)."'";
 	
 	if (!$result=$db->db_query($qry))
 		die("Kein Studentendatensatz!");
@@ -134,9 +134,9 @@ else
 				campus.tbl_lvgesamtnote
 			USING (lehrveranstaltung_id, student_uid)
 			WHERE
-				tbl_zeugnisnote.student_uid = '$user'
+				tbl_zeugnisnote.student_uid = '".addslashes($user)."'
 			AND
-				tbl_zeugnisnote.studiensemester_kurzbz = '$stsem'
+				tbl_zeugnisnote.studiensemester_kurzbz = '".addslashes($stsem)."'
 			AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
 			ORDER BY bezeichnung";

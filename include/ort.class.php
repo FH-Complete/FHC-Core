@@ -250,6 +250,11 @@ class ort extends basis_db
 	{
 		$stundevon = 1;
 		$stundebis = 1;
+		if(!is_numeric($anzpersonen))
+		{
+			$this->errormsg='Anzahl der Personen muss eine gueltige Zahl sein';
+			return false;
+		}
 		
 		//stundevon ermitteln
 		$qry = "SELECT stunde FROM (

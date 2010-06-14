@@ -145,25 +145,30 @@ if($sent)
 	if(!$error)
 	{
 		$ort = new ort();
-		$ort->search($datum_obj->formatDatum($datum), $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true);
-		
-		echo '<br><table>';
-		echo '<tr class="liste"><th>Raum</th><th>Bezeichnung</th><td>Nummer</th><th>Personen</th><th>Aktion</th></tr>';
-		$i=0;
-		$datum_sec = $datum_obj->mktime_datum($datum)-1;
-		foreach ($ort->result as $row)
+		if(!$ort->search($datum_obj->formatDatum($datum), $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true))
 		{
-			$i++;
-			echo '<tr class="liste'.($i%2).'">';
-			echo "<td>$row->ort_kurzbz</td>";
-			echo "<td>$row->bezeichnung</td>";
-			echo "<td>$row->planbezeichnung</td>";
-			echo "<td>$row->max_person</td>";
-			echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>zur Reservierung</a></td>";
-			echo '</tr>';
-			flush();
+			echo $ort->errormsg;	
 		}
-		echo '</table>';
+		else 
+		{
+			echo '<br><table>';
+			echo '<tr class="liste"><th>Raum</th><th>Bezeichnung</th><td>Nummer</th><th>Personen</th><th>Aktion</th></tr>';
+			$i=0;
+			$datum_sec = $datum_obj->mktime_datum($datum)-1;
+			foreach ($ort->result as $row)
+			{
+				$i++;
+				echo '<tr class="liste'.($i%2).'">';
+				echo "<td>$row->ort_kurzbz</td>";
+				echo "<td>$row->bezeichnung</td>";
+				echo "<td>$row->planbezeichnung</td>";
+				echo "<td>$row->max_person</td>";
+				echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>zur Reservierung</a></td>";
+				echo '</tr>';
+				flush();
+			}
+			echo '</table>';
+		}
 	}
 }
 ?>
