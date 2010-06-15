@@ -20,14 +20,17 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
  */
-
+/**
+ * Auswertung fuer den Reihungstest
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/datum.class.php');
 
 if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-      
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+
 function sortByField($multArray,$sortField,$desc=true)
 {
 	$tmpKey='';
@@ -45,12 +48,14 @@ function sortByField($multArray,$sortField,$desc=true)
     	$tempMin=$multArray[$maIndex[$i]]->$sortField;
     	$tmpKey=$maIndex[$i];
     	for($j=$i+1; $j <= $maSize; $j++)
+    	{
     		if($multArray[$maIndex[$j]]->$sortField < $tempMin )
     		{
    				$minElement=$j;
     		    $tmpKey=$maIndex[$j];
     		    $tempMin=$multArray[$maIndex[$j]]->$sortField;
     		}
+    	}
     	$maIndex[$minElement]=$maIndex[$i];
     	$maIndex[$i]=$tmpKey;
     }
@@ -69,11 +74,26 @@ $ergebnis='';
 $gebiet=array();
 $kategorie=array();
 $erg_kat=array();
+$datum_obj = new datum();
+
+$datum_von = isset($_POST['datum_von'])?$_POST['datum_von']:'';
+$datum_bis = isset($_POST['datum_bis'])?$_POST['datum_bis']:'';
+$reihungstest = isset($_POST['reihungstest'])?$_POST['reihungstest']:'';
+$studiengang = isset($_POST['studiengang'])?$_POST['studiengang']:'';
+
+if($reihungstest!='' && !is_numeric($reihungstest))
+	die('ReihungstestID ist ungueltig');
+if($studiengang!='' && !is_numeric($studiengang))
+	die('Studiengang ist ungueltig');
+
+if($datum_von!='')
+	$datum_von = $datum_obj->formatDatum($datum_von, 'Y-m-d');
+if($datum_bis!='')
+	$datum_bis = $datum_obj->formatDatum($datum_bis, 'Y-m-d');
 
 // Reihungstests laden
-$sql_query=";
-		SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
-//echo $sql_query;
+$sql_query="SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
+
 if(!($result=$db->db_query($sql_query)))
     die($db->db_last_error());
 
@@ -90,11 +110,23 @@ while ($row=$db->db_fetch_object($result))
 if (isset($_POST['reihungstest']))
 {
 	// Vorkommende Gebiete laden
-	$sql_query="SELECT DISTINCT gebiet_id, gebiet FROM testtool.vw_auswertung WHERE reihungstest_id='".addslashes($_POST['reihungstest'])."'";
-	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($_POST['studiengang'])."'";
+	$sql_query="
+		SELECT DISTINCT gebiet_id, gebiet 
+		FROM 
+			testtool.vw_auswertung 
+			JOIN public.tbl_prestudent USING(prestudent_id) 
+			JOIN public.tbl_reihungstest ON(vw_auswertung.reihungstest_id=tbl_reihungstest.reihungstest_id)
+		WHERE 1=1";
+	if($reihungstest!='')
+		$sql_query.=" AND vw_auswertung.reihungstest_id='".addslashes($reihungstest)."'";
+	if($datum_von!='')
+		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+	if($datum_bis!='')
+		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+	if($studiengang!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
 	
-	//echo $sql_query;
+	
 	if(!($result=$db->db_query($sql_query)))
 	     die($db->db_last_error());
 	while ($row=$db->db_fetch_object($result))
@@ -107,11 +139,18 @@ if (isset($_POST['reihungstest']))
 	$sql_query="SELECT 
 					*
 				FROM
-					testtool.vw_auswertung
-				WHERE
-					reihungstest_id='".addslashes($_POST['reihungstest'])."'";
-	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($_POST['studiengang'])."'";
+					testtool.vw_auswertung 
+					JOIN public.tbl_prestudent USING(prestudent_id)
+					JOIN public.tbl_reihungstest ON(vw_auswertung.reihungstest_id=tbl_reihungstest.reihungstest_id)
+				WHERE 1=1";
+	if($reihungstest!='')
+		$sql_query.=" AND vw_auswertung.reihungstest_id='".addslashes($reihungstest)."'";
+	if($datum_von!='')
+		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+	if($datum_bis!='')
+		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+	if($studiengang!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
 	
 	//echo $sql_query;
 	if(!($result=$db->db_query($sql_query)))
@@ -119,6 +158,7 @@ if (isset($_POST['reihungstest']))
 	
 	while ($row=$db->db_fetch_object($result))
 	{
+		$ergebnis[$row->pruefling_id]->prestudent_id=$row->prestudent_id;
 		$ergebnis[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
 		$ergebnis[$row->pruefling_id]->nachname=$row->nachname;
 		$ergebnis[$row->pruefling_id]->vorname=$row->vorname;
@@ -152,11 +192,20 @@ if (isset($_POST['reihungstest']))
 					DISTINCT kategorie_kurzbz, 
 					(SELECT sum(punkte) FROM testtool.tbl_vorschlag JOIN testtool.tbl_frage USING(frage_id) 
 					 WHERE tbl_frage.kategorie_kurzbz=vw_auswertung_kategorie.kategorie_kurzbz) as gesamtpunkte 
-				 FROM testtool.vw_auswertung_kategorie
-				 WHERE reihungstest_id='".addslashes($_POST['reihungstest'])."'";
+				 FROM 
+				 	testtool.vw_auswertung_kategorie 
+				 	JOIN public.tbl_prestudent USING(prestudent_id)
+					JOIN public.tbl_reihungstest ON(vw_auswertung_kategorie.reihungstest_id=tbl_reihungstest.reihungstest_id)
+				WHERE 1=1";
+	if($reihungstest!='')
+		$sql_query.=" AND vw_auswertung_kategorie.reihungstest_id='".addslashes($reihungstest)."'";
+	if($datum_von!='')
+		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+	if($datum_bis!='')
+		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+	if($studiengang!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
 
-	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".$_POST['studiengang']."'";
 	
 	//echo $sql_query;
 	if(!($result=$db->db_query($sql_query)))
@@ -176,13 +225,21 @@ if (isset($_POST['reihungstest']))
 			(SELECT typ FROM testtool.tbl_kriterien 
 			 WHERE gebiet_id=vw_auswertung_kategorie.gebiet_id AND punkte=vw_auswertung_kategorie.punkte 
 			 AND kategorie_kurzbz=vw_auswertung_kategorie.kategorie_kurzbz) as typ
-		FROM testtool.vw_auswertung_kategorie
-		WHERE reihungstest_id='".addslashes($_POST['reihungstest'])."'";
-	if(isset($_POST['studiengang']) && $_POST['studiengang']!='')
-		$sql_query.=" AND studiengang_kz='".$_POST['studiengang']."'";
+		FROM 
+			testtool.vw_auswertung_kategorie 
+			JOIN public.tbl_prestudent USING(prestudent_id)
+			JOIN public.tbl_reihungstest ON(vw_auswertung_kategorie.reihungstest_id=tbl_reihungstest.reihungstest_id)
+		WHERE 1=1";
+	if($reihungstest!='')
+		$sql_query.=" AND vw_auswertung_kategorie.reihungstest_id='".addslashes($reihungstest)."'";
+	if($datum_von!='')
+		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+	if($datum_bis!='')
+		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+	if($studiengang!='')
+		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
 	
 	$sql_query.=" ORDER BY nachname, vorname";
-	//echo $sql_query;
 	
 	if(!($result=$db->db_query($sql_query)))
 	     die($db->db_last_error());
@@ -190,6 +247,7 @@ if (isset($_POST['reihungstest']))
 	while ($row=$db->db_fetch_object($result))
 	{
 		$erg_kat[$row->pruefling_id]->pruefling_id=$row->pruefling_id;
+		$erg_kat[$row->pruefling_id]->prestudent_id=$row->prestudent_id;
 		$erg_kat[$row->pruefling_id]->nachname=$row->nachname;
 		$erg_kat[$row->pruefling_id]->vorname=$row->vorname;
 		$erg_kat[$row->pruefling_id]->gebdatum=$row->gebdatum;
@@ -206,7 +264,7 @@ if (isset($_POST['reihungstest']))
 
 //Studiengaenge laden
 $stg_obj = new studiengang();
-$stg_obj->getAll(null, false);
+$stg_obj->getAll('typ, kurzbz', false);
 $stg_arr = array();
 
 foreach($stg_obj->result as $row)
@@ -219,7 +277,7 @@ foreach($stg_obj->result as $row)
 <head>
 	<title>Testtool - Auswertung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../../../skin/style.css.php">
+	<link type="text/css" rel="stylesheet" href="../../../skin/style.css.php">
 </head>
 
 <body>
@@ -230,11 +288,12 @@ foreach($stg_obj->result as $row)
 		<td>
 			<form method="POST">
 			Reihungstest w&auml;hlen:&nbsp;
-				<SELECT name="reihungstest">';
+				<SELECT name="reihungstest">
+				<OPTION value="">-- keine Auswahl --</OPTION>
 					<?php
 					foreach($rtest as $rt)
 					{
-						if(isset($_POST['reihungstest']) && $rt->reihungstest_id==$_POST['reihungstest'])
+						if(isset($reihungstest) && $rt->reihungstest_id==$reihungstest)
 							$selected = 'selected';
 						else 
 							$selected = '';
@@ -243,6 +302,8 @@ foreach($stg_obj->result as $row)
 					}
 					?>
 				</SELECT>
+				<INPUT type="submit" value="Auswerten" />
+				<br />
 			Studiengang:
 				<SELECT name="studiengang">
 					<OPTION value=''>Alle</OPTION>
@@ -258,7 +319,11 @@ foreach($stg_obj->result as $row)
 					}
 					?>
 				</SELECT>
-				<INPUT type="submit" value="Auswerten" />
+				
+				<?php
+					echo 'von Datum: <INPUT type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_von.'" />&nbsp;';
+					echo 'bis Datum: <INPUT type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" />';
+				?>
 			</form>
 		</td>
 		<td align="right">
@@ -274,7 +339,7 @@ if (isset($_POST['reihungstest']))
 
 <table id="zeitsperren">
   <tr>
-		<th rowspan="2">ID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
+		<th rowspan="2">PrestudentID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
 		<th rowspan="2">GebDatum</th><th rowspan="2">G</th>
 		<!--<th rowspan="2">IdNachweis</th>-->
 		<th rowspan="2">Registriert</th><th rowspan="2">STG</th><th rowspan="2">Studiengang</th>
@@ -296,7 +361,7 @@ if (isset($_POST['reihungstest']))
   {
   	foreach ($ergb AS $erg)
   	{
-  		echo "<tr><td>$erg->pruefling_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
+  		echo "<tr><td>$erg->prestudent_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
   					<td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td>";
   		//<td>$erg->idnachweis</td>
   		foreach ($gebiet AS $gbt)
