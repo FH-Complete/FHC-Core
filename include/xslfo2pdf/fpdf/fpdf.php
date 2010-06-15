@@ -177,7 +177,9 @@ if(!class_exists('FPDF'))
 	//Enable compression
 	$this->SetCompression(true);
 	//Set default PDF version number
-	$this->PDFVersion='1.3';
+	//$this->PDFVersion='1.3';
+	//Changed to 1.6 since the added '/PrintScaling /None' is a 1.6 (Acrobat 7) feature - MP
+	$this->PDFVersion='1.6';
       }
 
       function SetMargins($left,$top,$right=-1)
@@ -1382,6 +1384,8 @@ if(!class_exists('FPDF'))
 	  $this->_out('/PageLayout /OneColumn');
 	elseif($this->LayoutMode=='two')
 	  $this->_out('/PageLayout /TwoColumnLeft');
+	// Don't use page scaling when printing by default - MP
+	$this->_out('/ViewerPreferences<< /PrintScaling /None >>');
       }
 
       function _putheader()
