@@ -220,12 +220,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($row->lehrveranstaltung_id)."'";
 				
 				$firma = '';
+				$firma_eng = '';
 				if($result_firma = $db->db_query($qry))
 				{
 					if($row_firma = $db->db_fetch_object($result_firma))
 					{
 						if($row_firma->name!='')
+						{
 							$firma = " bei Firma: $row_firma->name";
+							$firma_eng = " written at: $row_firma->name";
+						}
 					}
 				}
 				
@@ -233,7 +237,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				if(array_key_exists($row->lehrveranstaltung_id, $projektarbeit))
 				{
 					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma.' '.$fussnotenzeichen[$anzahl_fussnoten];
-					$bezeichnung_englisch = $row->lehrveranstaltung_bezeichnung_english.$firma.' '.$fussnotenzeichen[$anzahl_fussnoten];
+					$bezeichnung_englisch = $row->lehrveranstaltung_bezeichnung_english.$firma_eng.' '.$fussnotenzeichen[$anzahl_fussnoten];
 					$xml_fussnote .="\n <fussnote>";
 					$xml_fussnote .=" 		<fussnotenzeichen>".$fussnotenzeichen[$anzahl_fussnoten]."</fussnotenzeichen>";
 					
@@ -275,7 +279,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				else 
 				{
 					$bezeichnung = $row->lehrveranstaltung_bezeichnung.$firma;
-					$bezeichnung_englisch = $row->lehrveranstaltung_bezeichnung_english.$firma;
+					$bezeichnung_englisch = $row->lehrveranstaltung_bezeichnung_english.$firma_eng;
 				}
 				
 					
