@@ -35,17 +35,21 @@
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="132mm" left="23mm">
-				<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Vorname/Familienname:\n\nGeburtsdatum:</xsl:text></fo:block>
+				<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Vorname/Familienname:\n</xsl:text></fo:block>
+				<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Geburtsdatum:</xsl:text></fo:block>
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="132mm" left="68mm">
-				<fo:block line-height="11pt" font-family="arial" font-size="10pt">
+				<fo:block line-height="11pt" font-family="arial" font-size="10pt" font-weight="bold">
 				<xsl:if test="string-length(titelpre)!=0"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text></xsl:if>
 				<xsl:value-of select="vorname" /><xsl:text> </xsl:text>
 				<xsl:value-of select="vornamen" /><xsl:text> </xsl:text>
 				<xsl:value-of select="nachname" />
 				<xsl:if test="string-length(titelpost)!=0"><xsl:text>, </xsl:text><xsl:value-of select="titelpost" /></xsl:if>
-				<xsl:text>\n\n</xsl:text><xsl:value-of select="gebdatum" />
+				<xsl:text>\n</xsl:text>
+				</fo:block>
+				<fo:block line-height="11pt" font-family="arial" font-size="10pt">
+				<xsl:value-of select="gebdatum" />
 				</fo:block>
 				</fo:block-container>
  
