@@ -165,6 +165,8 @@ loadVariables($user);
 	$maxlength[$i]=7;
 	$worksheet->write($zeile,++$i,"VORNAMEN", $format_bold);
 	$maxlength[$i]=8;
+	$worksheet->write($zeile,++$i,"PRESTUDENTID", $format_bold);
+	$maxlength[$i]=12;
 	
 	$zeile++;
 	
@@ -501,6 +503,12 @@ loadVariables($user);
 		if(mb_strlen($row->vornamen)>$maxlength[$i])
 			$maxlength[$i] = mb_strlen($row->vornamen);
 		$worksheet->write($zeile,$i, $row->vornamen);
+		$i++;
+		
+		//PrestudentID
+		if(mb_strlen($row->prestudent_id)>$maxlength[$i])
+			$maxlength[$i] = mb_strlen($row->prestudent_id);
+		$worksheet->write($zeile,$i, $row->prestudent_id);
 		$i++;
 	}
 		
