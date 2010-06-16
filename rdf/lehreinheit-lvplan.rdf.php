@@ -235,9 +235,11 @@ if ($anz>0)
 	
 		if($filter!='')
 		{
-			if(!mb_strstr(mb_strtolower($lektor), mb_strtolower($filter)) && 
-			   !mb_strstr(mb_strtolower($lehrfach), mb_strtolower($filter)) &&
-			   !mb_strstr(mb_strtolower($l->lehrfach_bez[0]), mb_strtolower($filter)))
+			$filter = mb_strtolower($filter);
+			if(!mb_strstr(mb_strtolower($lektor), $filter) && 
+			   !mb_strstr(mb_strtolower($lehrfach), $filter) &&
+			   !mb_strstr(mb_strtolower($l->lehrfach_bez[0]), $filter) && 
+			   !mb_strstr(mb_strtolower(implode('',$l->stg)), $filter))
 			{
 				continue;
 			}

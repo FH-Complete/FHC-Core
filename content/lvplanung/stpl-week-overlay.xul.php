@@ -200,32 +200,45 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 		<toolbar id="toolbarTimeTableSort" tbautostretch="always" persist="collapsed">
 			<toolbarbutton
 				image="../skin/images/down.png"
-				oncommand="onLVASort('lfDESC');"
+				oncommand="onLVASort(this);"
+				value="lfDESC"
+				id="toolbarTimeTableSort-lfDESC"
 				tooltiptext="Lehrfach absteigend"
 			/>
 			<toolbarbutton
 				image="../skin/images/up.png"
-				oncommand="onLVASort('lfASC');"
+				oncommand="onLVASort(this);"
+				value="lfASC"
+				id="toolbarTimeTableSort-lfASC"
 				tooltiptext="Lehrfach aufsteigend"
 			/>
 			<toolbarbutton
 				image="../skin/images/user_down.png"
-				oncommand="onLVASort('lektorDESC');"
+				oncommand="onLVASort(this);"
+				value="lektorDESC"
+				id="toolbarTimeTableSort-lektorDESC"
 				tooltiptext="Lektor absteigend"
 			/>
 			<toolbarbutton
 				image="../skin/images/user_up.png"
-				oncommand="onLVASort('lektorASC');"
+				oncommand="onLVASort(this);"
+				value="lektorASC"
+				id="toolbarTimeTableSort-lektorASC"
 				tooltiptext="Lektor aufsteigend"
 			/>
 			<toolbarbutton
 				image="../skin/images/clock_down.png"
-				oncommand="onLVASort('stundenDESC');"
+				oncommand="onLVASort(this);"
+				value="stundenDESC"
+				checked="true"
+				id="toolbarTimeTableSort-stundenDESC"
 				tooltiptext="Offene Stunden absteigend"
 			/>
 			<toolbarbutton
 				image="../skin/images/clock_up.png"
-				oncommand="onLVASort('stundenASC');"
+				oncommand="onLVASort(this);"
+				value="stundenASC"
+				id="toolbarTimeTableSort-stundenASC"
 				tooltiptext="Offenen Stunden aufsteigend"
 			/>
 			
