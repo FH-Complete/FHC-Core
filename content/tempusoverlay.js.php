@@ -98,122 +98,56 @@ function onVerbandSelect()
 			contentFrame.setAttribute('src', url);
 	}
 
-
+	var order = LehrstundeGetSortOrder();
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&order="+order;
+
 	vboxLehrveranstalungPlanung.setAttribute('datasources',attribute);
 
-	// Studenten
-	//var treeStudenten=document.getElementById('treeStudenten');
-	//attribute="<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
-	//treeStudenten.setAttribute('datasources',attribute);
-
-	// Studenten
-	if(typ=='')
+	// -------------- Studenten --------------------------
+	try
 	{
+		stsem = getStudiensemester();
+		url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&"+gettimestamp();
+		var treeStudent=document.getElementById('student-tree');
 
-		try
+		//Alte DS entfernen
+		var oldDatasources = treeStudent.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
 		{
-			//Bei Ansicht von Ab-/Unterbrecher den Button "->Student" anzeigen
-			if(sem=='0')
-				document.getElementById('student-toolbar-student').hidden=false;
-			else
-				document.getElementById('student-toolbar-student').hidden=true;
+			treeStudent.database.RemoveDataSource(oldDatasources.getNext());
 		}
-		catch(e){}
 
-		// -------------- Studenten --------------------------
 		try
 		{
-			stsem = getStudiensemester();
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&"+gettimestamp();
-			var treeStudent=document.getElementById('student-tree');
-
-			//Alte DS entfernen
-			var oldDatasources = treeStudent.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-				treeStudent.database.RemoveDataSource(oldDatasources.getNext());
-			}
-
-			try
-			{
-				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
-				treeStudent.builder.removeListener(StudentTreeListener);
-			}
-			catch(e)
-			{}
-			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-			StudentTreeDatasource = rdfService.GetDataSource(url);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeStudent.database.AddDataSource(StudentTreeDatasource);
-			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
-			treeStudent.builder.addListener(StudentTreeListener);
-
-			//Detailfelder Deaktivieren
-			StudentDetailReset();
-			StudentDetailDisableFields(true);
-			StudentPrestudentDisableFields(true);
-			StudentKontoDisableFields(true);
-			StudentAkteDisableFields(true);
-			StudentIODisableFields(true);
-			StudentNoteDisableFields(true);
-			document.getElementById('student-kontakt').setAttribute('src','');
-			document.getElementById('student-betriebsmittel').setAttribute('src','');
-			StudentAbschlusspruefungDisableFields(true);
-		}
-		catch(e){}
-	}
-	else
-	{
-		// -------------- Interessenten / Bewerber --------------------------
-		try
-		{
-			if(stsem=='' && typ=='')
-				stsem='aktuelles';
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?"+"studiengang_kz="+stg_kz+"&semester="+sem+"&typ="+typ+"&studiensemester_kurzbz="+stsem+"&"+gettimestamp();
-			var treeInt=document.getElementById('student-tree');
-
-			//Alte DS entfernen
-			var oldDatasources = treeInt.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-				treeInt.database.RemoveDataSource(oldDatasources.getNext());
-			}
-
-			try
-			{
-				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
-				treeInt.builder.removeListener(StudentTreeListener);
-			}
-			catch(e)
-			{}
-
-			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-			StudentTreeDatasource = rdfService.GetDataSource(url);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeInt.database.AddDataSource(StudentTreeDatasource);
-			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
-			treeInt.builder.addListener(StudentTreeListener);
-
-			//Detailfelder Deaktivieren
-			StudentDetailReset();
-			StudentDetailDisableFields(true);
-			StudentPrestudentDisableFields(true);
-			StudentKontoDisableFields(true);
-			StudentAkteDisableFields(true);
-			StudentIODisableFields(true);
-			StudentNoteDisableFields(true);
-			document.getElementById('student-kontakt').setAttribute('src','');
-			document.getElementById('student-betriebsmittel').setAttribute('src','');
-			StudentAbschlusspruefungDisableFields(true);
+			StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+			treeStudent.builder.removeListener(StudentTreeListener);
 		}
 		catch(e)
 		{}
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentTreeDatasource = rdfService.GetDataSource(url);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeStudent.database.AddDataSource(StudentTreeDatasource);
+		StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+		treeStudent.builder.addListener(StudentTreeListener);
+
+		//Detailfelder Deaktivieren
+		StudentDetailReset();
+		StudentDetailDisableFields(true);
+		StudentPrestudentDisableFields(true);
+		StudentKontoDisableFields(true);
+		StudentAkteDisableFields(true);
+		StudentIODisableFields(true);
+		StudentNoteDisableFields(true);
+		document.getElementById('student-kontakt').setAttribute('src','');
+		document.getElementById('student-betriebsmittel').setAttribute('src','');
+		StudentAbschlusspruefungDisableFields(true);
 	}
+	catch(e){}
+
 
 	// Lehrveranstaltung
 	try
@@ -316,9 +250,10 @@ function onLektorSelect(event)
 			contentFrame.setAttribute('src', url);
 	}
 	
+	var order = LehrstundeGetSortOrder();
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid+"&"+gettimestamp());
+	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid+"&order="+order+"&"+gettimestamp());
 
 	var tree=document.getElementById('tree-lektor');
 	//Wenn nichts markiert wurde -> beenden

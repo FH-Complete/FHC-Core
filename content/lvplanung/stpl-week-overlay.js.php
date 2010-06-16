@@ -63,11 +63,40 @@ function onLVAFilter()
 	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources);
 }
 
+// Liefert die Sortierreihenfolge der Lehrstunden
+function LehrstundeGetSortOrder()
+{
+	var toolbar = document.getElementById('toolbarTimeTableSort');
+	var tbbuttons = toolbar.getElementsByTagName('toolbarbutton');
+	
+	for each(var button in tbbuttons)
+	{
+		if(button.getAttribute('checked')=='true')
+		{
+			return button.getAttribute('value');
+		}
+	}
+	return 'stundenDESC';
+}
+
 // LVA-Panel filtern
-function onLVASort(order)
+function onLVASort(item)
 {
 	var vorher='';
 	var nachher='';
+	var order=item.getAttribute('value');
+	
+	//Sortiermarkierung von allen entfernen
+	var toolbar = document.getElementById('toolbarTimeTableSort');
+	var tbbuttons = toolbar.getElementsByTagName('toolbarbutton');
+	
+	for each(var button in tbbuttons)
+	{
+		if(button.id)
+			button.setAttribute('checked','false');
+	}
+	//Element als gedrueckt markieren
+	item.setAttribute('checked','true');
 	
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');

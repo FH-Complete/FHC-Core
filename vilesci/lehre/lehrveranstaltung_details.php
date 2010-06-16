@@ -139,7 +139,7 @@
 		}
 
 		$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung</div>\n";
-		$htmlstr .= "<form accept-charset='UTF-8' action='lehrveranstaltung_details.php' method='POST'>\n";
+		$htmlstr .= "<form action='lehrveranstaltung_details.php' method='POST'>\n";
 		$htmlstr .= "<input type='hidden' name='lv_id' value='".$lv->lehrveranstaltung_id."'>\n";
 
 		$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
@@ -149,7 +149,7 @@
 		$htmlstr .= "		<td>Kurzbz</td>";
 		$htmlstr .= "		<td><input type='text' name='kurzbz' value='$lv->kurzbz'\n</td>";
 		$htmlstr .= "		<td>Bezeichnung</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($lv->bezeichnung, ENT_QUOTES)."' size='60' maxlength='128'></td>\n";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($lv->bezeichnung, ENT_QUOTES, 'UTF-8')."' size='60' maxlength='128'></td>\n";
 
 		$htmlstr .= "</tr>";
 		$htmlstr .= "<tr>";
@@ -166,7 +166,7 @@
 		}
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td>Bezeichnung English</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung_english' value='".htmlentities($lv->bezeichnung_english,ENT_QUOTES)."' size='60' maxlength='256'></td>\n";
+		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung_english' value='".htmlentities($lv->bezeichnung_english, ENT_QUOTES, 'UTF-8')."' size='60' maxlength='256'></td>\n";
 
 		$htmlstr .= "</tr>";
 		$htmlstr .= "<tr>";
@@ -285,11 +285,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Lehrveranstaltung - Details</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<script src="../../include/js/mailcheck.js"></script>
-	<script src="../../include/js/datecheck.js"></script>
+	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
+	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
 </head>
 <body style="background-color:#eeeeee;">
 

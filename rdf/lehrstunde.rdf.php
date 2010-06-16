@@ -37,6 +37,8 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/datum.class.php');
 require_once('../include/lehrstunde.class.php');
+require_once('../include/lehrverband.class.php');
+require_once('../include/gruppe.class.php');
 
 $datumObj=new datum();
 
@@ -175,6 +177,24 @@ if (is_array($lehrstunden->lehrstunden))
 			//Anzahl der Studenten in der Gruppe ermitteln
 			$stsem = getStudiensemesterFromDatum($ls->datum);
 			$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
+			$gruppenbezeichnung = '';
+			
+			if($ls->gruppe_kurzbz!='')
+			{
+				$obj = new gruppe();
+				if(!$obj->load($ls->gruppe_kurzbz))
+					die($obj->errormsg);
+				$gruppenbezeichnung = $obj->bezeichnung;
+				$gruppenbeschreibung = $obj->beschreibung;
+			}
+			else 
+			{
+				$obj = new lehrverband();
+				if(!$obj->load($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp))
+					die($obj->errormsg);
+				$gruppenbezeichnung = $obj->bezeichnung;
+				$gruppenbeschreibung = '';
+			}
 			?>
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
@@ -198,6 +218,8 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
 				<LEHRSTUNDE:titel><![CDATA[<?php echo $ls->titel;  ?>]]></LEHRSTUNDE:titel>
 				<LEHRSTUNDE:anzahlstudenten><![CDATA[<?php echo $anzahl;  ?>]]></LEHRSTUNDE:anzahlstudenten>
+				<LEHRSTUNDE:gruppe_bezeichnung><![CDATA[<?php echo $gruppenbezeichnung;  ?>]]></LEHRSTUNDE:gruppe_bezeichnung>
+				<LEHRSTUNDE:gruppe_beschreibung><![CDATA[<?php echo $gruppenbeschreibung;  ?>]]></LEHRSTUNDE:gruppe_beschreibung>
   	    	</RDF:Description>
   			</RDF:li>
 			<?php
