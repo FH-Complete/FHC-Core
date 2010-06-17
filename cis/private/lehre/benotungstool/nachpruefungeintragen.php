@@ -259,6 +259,10 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 else
 	echo "Fehler beim Eintragen der Pr&uuml;fungen";
 
+/*
+Beim Eintragen von Nachpruefungen wird ein Mail an die Assistenz geschickt.
+
+17.06.2010 auf Wunsch der Assistenz werden keine Mails mehr versendet
 
 if ($old_note != $note)
 {
@@ -312,4 +316,5 @@ if ($old_note != $note)
         }
     }
 }
+*/
 ?>
