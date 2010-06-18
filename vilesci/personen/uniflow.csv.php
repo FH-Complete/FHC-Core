@@ -26,6 +26,7 @@
 
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/basis_db.class.php');
+require_once('../../include/functions.inc.php');
 
 header("Content-Type: text/csv");
 header("Content-Disposition: attachment; filename=uniflow.csv");
@@ -62,7 +63,7 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		echo "$row->uid;$row->oe_kurzbz;$row->organisationseinheittyp_kurzbz $row->bezeichnung;1\n";
+		echo mb_str_replace('&','und',"$row->uid;$row->oe_kurzbz;$row->organisationseinheittyp_kurzbz $row->bezeichnung;1\n");
 	}
 }
 

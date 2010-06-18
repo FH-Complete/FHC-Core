@@ -739,4 +739,25 @@ function isint( $mixed )
     return ( preg_match( '/^\d*$/'  , $mixed) == 1 );
 }
 
+/**
+ * Multibyte String Replace
+ *
+ * @param $needle
+ * @param $replacement
+ * @param $haystack
+ * @return string
+ */
+function mb_str_replace( $needle, $replacement, $haystack ) 
+{
+	$needle_len = mb_strlen($needle);
+	$pos = mb_strpos( $haystack, $needle);
+	while (!($pos ===false)) 
+	{
+		$front = mb_substr( $haystack, 0, $pos );
+		$back  = mb_substr( $haystack, $pos + $needle_len);
+		$haystack = $front.$replacement.$back;
+		$pos = mb_strpos( $haystack, $needle);
+	}
+	return $haystack;
+}
 ?>
