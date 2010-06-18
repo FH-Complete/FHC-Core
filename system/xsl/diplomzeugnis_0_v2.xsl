@@ -19,15 +19,15 @@
 			<fo:flow flow-name="xsl-region-body" >
 
 				<fo:block-container position="absolute" top="43mm" left="21.5mm">
-				<fo:block line-height="19pt" font-family="arial" font-size="16pt" font-weight="bold"><xsl:text> MASTER-\n PRÜFUNGSZEUGNIS</xsl:text></fo:block>
+				<fo:block line-height="19pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="90mm"><xsl:text> MASTER-\n PRÜFUNGSZEUGNIS</xsl:text></fo:block>
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="65mm" left="21.5mm">
-				<fo:block line-height="16pt" font-family="arial" font-size="16pt"><xsl:text> Studiengang</xsl:text></fo:block>
+				<fo:block line-height="16pt" font-family="arial" font-size="16pt" content-width="90mm"><xsl:text> Studiengang</xsl:text></fo:block>
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="72mm" left="21.5mm">
-				<fo:block line-height="18pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="72mm"><xsl:text> </xsl:text><xsl:value-of select="stg_bezeichnung"/></fo:block>
+				<fo:block line-height="18pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="90mm"><xsl:text> </xsl:text><xsl:value-of select="stg_bezeichnung"/></fo:block>
 				</fo:block-container>
  
 				<fo:block-container position="absolute" top="94.5mm" left="117.5mm">

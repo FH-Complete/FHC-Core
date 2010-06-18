@@ -466,7 +466,7 @@ class prestudent extends person
 	 * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
 	 *                                geladen werden sollen
 	 */
-	public function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=nulll, $typ=null, $orgform=null)
+	public function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
 	{
 		$stsemqry='';
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
