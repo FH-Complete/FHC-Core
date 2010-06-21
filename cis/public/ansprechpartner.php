@@ -1,12 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<title>Ansprechpartner Infrastruktur</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
-
 <body>
-
 <table id="inhalt" class="tabcontent">
   <tr>
     <td class="tdwidth10">&nbsp;</td>
@@ -32,21 +31,13 @@
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
-<!--
 		  	<tr>
-		  	  <td width="260" class='tdwrap'>Mag. Nestlang Dietmar</td>
-		  	  <td width="50" class='tdwrap'>215</td>
-		  	  <td class='tdwrap'></td>
-		  	  <td class='tdwrap'>&nbsp;</td>
-		  	  <td class='tdwrap'>Termin nach Vereinbarung </td>
-		  	</tr>
--->
-			  <td width="260" class='tdwrap'>Ing. Dipl. Ing. (FH) Paminger Christian (Interremistisch)</td>
+			  <td width="260" class='tdwrap'>Ing. Dipl. Ing. (FH) Paminger Christian</td>
 			  <td width="50" class='tdwrap'>245</td>
 			  <td  class='tdwrap'></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
-
+			</tr>
 		  	<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -86,7 +77,7 @@
 			  <td class='tdwrap'>&nbsp;</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Vogt Eva (karenziert)</td>
+			  <td width="260" class='tdwrap'>Vogt Eva</td>
 			  <td width="50" class='tdwrap'>249</td>
 			  <td class='tdwrap'></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -152,26 +143,7 @@
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
-			<tr>
-		   	  <td width="260" class='tdwrap'><strong>Softgrid-Virtualisierung</strong></td>
-			  <td width="50" class='tdwrap'>&nbsp;</td>
-			  <td  class='tdwrap'>&nbsp;</td>
-			  <td width="56" class='tdwrap'>&nbsp;</td>
-			  <td class='tdwrap'>&nbsp;</td>
-			</tr>
-			<tr>
-			  <td width="260" class='tdwrap'>Ing. Esberger Franz</td>
-			  <td width="50" class='tdwrap'>243</td>
-			  <td class='tdwrap'></td>
-			  <td width="56" class='tdwrap'>&nbsp;</td>
-			  <td class='tdwrap'>Termin nach Vereinbarung</td>
-			</tr>
-			<tr>
-		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
-		  	  <td class='tdwrap'>&nbsp;</td>
-		  	  <td class='tdwrap'>&nbsp;</td>
-		  	  <td class='tdwrap'>&nbsp;</td>
-		  	</tr>
+			
 		  	<tr>
 			  <td width="280" colspan="2" nowrap class="ContentHeader2">&nbsp;Haustechnik</td>
 			  <td  class="ContentHeader2"  nowrap></td>
@@ -192,13 +164,6 @@
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Nagl Richard</td>
-			  <td width="50" class='tdwrap'>252</td>
-			  <td  class='tdwrap'></td>
-			  <td width="56" class='tdwrap'>&nbsp;</td>
-			  <td class='tdwrap'>Termin nach Vereinbarung</td>
-			</tr>
-			<tr>
 		      <td width="260" class='tdwrap'>Weigl Harald</td>
 		      <td width="50" class='tdwrap'>253</td>
 			  <td  class='tdwrap'></td>
@@ -207,7 +172,7 @@
 			</tr>
 			<tr>
 		      <td width="260" class='tdwrap'>Jozsa Franz</td>
-		      <td width="50" class='tdwrap'>&nbsp;</td>
+		      <td width="50" class='tdwrap'>255</td>
 			  <td  class='tdwrap'></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
@@ -279,7 +244,7 @@
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Simane-Sequens Gerald</td>
+			  <td width="260" class='tdwrap'>Markus Pospischil</td>
 			  <td width="50" class='tdwrap'>258</td>
 			  <td  class='tdwrap'></td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
@@ -361,13 +326,28 @@
               <td class='tdwrap'>Termin nach Vereinbarung</td>
           	</tr>
           	<tr>
+			  <td width="260" class='tdwrap'>Ing. Esberger Franz</td>
+			  <td width="50" class='tdwrap'>243</td>
+			  <td class='tdwrap'></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+			</tr>
+			<tr>
+			  <td width="260" class='tdwrap'>Nagl Richard</td>
+			  <td width="50" class='tdwrap'>252</td>
+			  <td  class='tdwrap'></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+			</tr>
+          	<tr>
               <td width="260" class='tdwrap'>Dipl. Ing. Nimmervoll Alexander</td>
               <td width="50" class='tdwrap'>242</td>
               <td class='tdwrap'></td>
               <td width="56" class='tdwrap'>&nbsp;</td>
               <td class='tdwrap'>Termin nach Vereinbarung</td>
           	</tr>
-          				
+          	
+			
 			<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>

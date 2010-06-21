@@ -56,7 +56,7 @@ if(isset($do_search) || $do_excel)
 		if($txtSearchQuery == "" || $txtSearchQuery == "*" || $txtSearchQuery == "*.*")
 		{
 			if($cmbChoice == "all")
-				$sql_query.= "SELECT person_id, uid, titelpre, titelpost, nachname, vorname, vornamen, standort_id, telefonklappe as teltw,(uid || '@".DOMAIN."') AS emailtw, foto,-1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias, CASE WHEN (fixangestellt) THEN 'Fix' ELSE 'Extern' END as personenart  FROM campus.vw_mitarbeiter WHERE 1=1 ";
+				$sql_query.= "SELECT person_id, uid, titelpre, titelpost, nachname, vorname, vornamen, standort_id, telefonklappe as teltw,(uid || '@".DOMAIN."') AS emailtw, foto,-1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias, CASE WHEN (fixangestellt) THEN 'Fix' ELSE 'Extern' END as personenart  FROM campus.vw_mitarbeiter WHERE 1=1 AND aktiv ";
 			else
 				$sql_query.= "SELECT DISTINCT person_id, uid, titelpre, titelpost, nachname, vorname, vornamen, standort_id, telefonklappe AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, -1 AS studiengang_kz, -1 AS semester, ort_kurzbz as ort, alias, CASE WHEN (fixangestellt) THEN 'Fix' ELSE 'Extern' END as personenart FROM campus.vw_mitarbeiter JOIN public.tbl_benutzerfunktion using(uid) WHERE funktion_kurzbz='$cmbChoice' AND aktiv ".$sql_extend_query;
 		}
@@ -83,7 +83,7 @@ if(isset($do_search) || $do_excel)
 		if($txtSearchQuery == "" || $txtSearchQuery == "*" || $txtSearchQuery == "*.*")
 		{
 			if($cmbChoice == "all")
-				$sql_query.= " SELECT DISTINCT person_id,uid, titelpre, titelpost, nachname, vorname, vornamen,null::integer AS standort_id, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, vw_student.semester, ''::varchar as ort, alias,CASE WHEN (TRUE) THEN 'StudentIn' ELSE 'StudentIn' END as personenart FROM campus.vw_student WHERE vw_student.semester<10 ";
+				$sql_query.= " SELECT DISTINCT person_id,uid, titelpre, titelpost, nachname, vorname, vornamen,null::integer AS standort_id, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, vw_student.semester, ''::varchar as ort, alias,CASE WHEN (TRUE) THEN 'StudentIn' ELSE 'StudentIn' END as personenart FROM campus.vw_student WHERE vw_student.semester<10 AND aktiv";
 			else
 				$sql_query.= " SELECT DISTINCT person_id,uid, titelpre,titelpost, nachname, vorname, vornamen,null::integer AS standort_id, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, vw_student.semester, ''::varchar as ort, alias,CASE WHEN (TRUE) THEN 'StudentIn' ELSE 'StudentIn' END as personenart FROM campus.vw_student JOIN public.tbl_benutzerfunktion using(uid) WHERE vw_student.semester<10 AND funktion_kurzbz='$cmbChoice' AND aktiv ".$sql_extend_query;
 		}
@@ -91,7 +91,7 @@ if(isset($do_search) || $do_excel)
 		{
 			$txtSearchQuery = addslashes($txtSearchQuery);
 			if($cmbChoice == "all")
-				$sql_query.= " SELECT DISTINCT person_id,uid, titelpre, titelpost, nachname, vorname, vornamen,null::integer AS standort_id, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, semester, ''::varchar as ort, alias,CASE WHEN (TRUE) THEN 'StudentIn' ELSE 'StudentIn' END as personenart FROM campus.vw_student WHERE semester<10 AND (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) ";
+				$sql_query.= " SELECT DISTINCT person_id,uid, titelpre, titelpost, nachname, vorname, vornamen,null::integer AS standort_id, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, studiengang_kz, semester, ''::varchar as ort, alias,CASE WHEN (TRUE) THEN 'StudentIn' ELSE 'StudentIn' END as personenart FROM campus.vw_student WHERE semester<10 AND aktiv AND (LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) ";
 			else
 				$sql_query.= " SELECT DISTINCT person_id,uid, titelpre, titelpost, nachname, vorname, vornamen,null::integer AS standort_id, (''::varchar) AS teltw, (uid || '@".DOMAIN."') AS emailtw, foto, vw_student.studiengang_kz, vw_student.semester, ''::varchar as ort, alias,CASE WHEN (TRUE) THEN 'StudentIn' ELSE 'StudentIn' END as personenart FROM campus.vw_student JOIN public.tbl_benutzerfunktion USING(uid) WHERE vw_student.semester <10 AND ((LOWER(nachname) LIKE LOWER('%$txtSearchQuery%') OR uid LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(nachname || ' ' || vorname) LIKE LOWER('%$txtSearchQuery%') OR LOWER(vorname || ' ' || nachname) LIKE LOWER('%$txtSearchQuery%')) AND funktion_kurzbz='$cmbChoice') AND aktiv=TRUE ".$sql_extend_query;
 		}
@@ -822,15 +822,15 @@ if(isset($do_search) || $do_excel)
 <table class="tabcontent" id="inhalt">
   <tr>
     <td class="tdwidth10">&nbsp;</td>
-    <td><table class="tabcontent">
+    <td>
+    <form target="_self" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" name="SearchFormular" id="SearchFormular" >
+    <table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Personensuche <?php echo CAMPUS_NAME;?></font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
       </tr>
-	  
-  	<form target="_self" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" name="SearchFormular" id="SearchFormular" >
 	  <tr>
 	  	<td nowrap>
 	  	  Suche nach:
@@ -885,7 +885,7 @@ if(isset($do_search) || $do_excel)
 			</table>
 		</td>
 	  </tr>
-		</form>
+		
 
 	  <tr>
 	  	<td nowrap>
@@ -1072,7 +1072,8 @@ if(isset($do_search) || $do_excel)
 ?>
 		</td>
 	  </tr>
-    </table></td>
+    </table>
+    </form></td>
 	<td class="tdwidth30">&nbsp;</td>
   </tr>
 </table>
