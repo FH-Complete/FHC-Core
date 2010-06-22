@@ -530,7 +530,7 @@ if ($sendmail)
 {
 	foreach ($message as $msg)
 	{
-		$mail = new mail($msg->mailadress,'no-reply@technikum-wien.at','Stundenplan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
+		$mail = new mail($msg->mailadress,MAIL_LVPLAN,'Stundenplan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 		$mail->setHTMLContent($msg->message_begin.$msg->message);
 		if ($mail->send())
 		{
