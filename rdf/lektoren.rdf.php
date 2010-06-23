@@ -72,15 +72,20 @@ echo '
 ';
 
 $qry = "SELECT
-			uid,fixangestellt,person_id,alias,anrede,titelpost,titelpre,nachname,vorname
+			uid, fixangestellt, person_id, alias, anrede, titelpost, titelpre, nachname, vorname, kompetenzen
 		FROM
-			campus.vw_mitarbeiter
-		JOIN
-			public.tbl_benutzerfunktion USING (uid)
+			public.tbl_mitarbeiter
+			JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+			JOIN public.tbl_person USING(person_id)
+			JOIN public.tbl_benutzerfunktion USING (uid)
 		WHERE
-			funktion_kurzbz='oezuordnung' AND aktiv AND oe_kurzbz='$obj->oe_kurzbz'
+			funktion_kurzbz='oezuordnung' 
+			AND tbl_benutzer.aktiv 
+			AND oe_kurzbz='$obj->oe_kurzbz'
+			AND (datum_bis >= now() OR datum_bis IS NULL)
+			AND (datum_von <= now() OR datum_von IS NULL)
 		ORDER BY
-			nachname,vorname,vornamen,person_id;";
+			nachname, vorname, vornamen, person_id;";
 
 if($db->db_query($qry))
 {
@@ -101,7 +106,8 @@ if($db->db_query($qry))
             ']]></LEKTOREN:email> 
             <LEKTOREN:fixangestellt>'
             .(strtolower($lektoren->fixangestellt)=='t' ? 'TRUE' : 'FALSE').
-            '</LEKTOREN:fixangestellt> 
+            '</LEKTOREN:fixangestellt>
+            <LEKTOREN:kompetenzen><![CDATA['.$lektoren->kompetenzen.']]></LEKTOREN:kompetenzen>
          </RDF:Description>
       </RDF:li>';
 	}
