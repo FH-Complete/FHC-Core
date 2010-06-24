@@ -42,7 +42,7 @@ class ferien extends basis_db
 	 * Konstruktor
 	 * @param $bezeichnung und studiengang_kz ID der zu ladenden Ferien
 	 */
-	public function _construct($bezeichnung=null, $studiengang_kz=null)
+	public function __construct($bezeichnung=null, $studiengang_kz=null)
 	{
 		parent::__construct();
 		
