@@ -143,10 +143,10 @@ $db = new basis_db();
       			</row>
       			<?php
       				$hidden='true';
-      				$qry = "SELECT orgform_kurzbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE prestudent_id='$prestudent_id'";
+      				$qry = "SELECT mischform FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE prestudent_id='$prestudent_id'";
       				if($result = $db->db_query($qry))
       					if($row = $db->db_fetch_object($result))
-      						if($row->orgform_kurzbz=='VBB')
+      						if($row->mischform=='t')
       							$hidden='false';
       			?>
       			<row hidden="<?php echo $hidden; ?>">		
