@@ -38,6 +38,14 @@
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
+
+		  	<tr>
+			  <td width="260" class='tdwrap'>Moser Petra (Projektassistenz)</td>
+			  <td width="50" class='tdwrap'>340</td>
+			  <td  class='tdwrap'></td>
+			  <td width="56" class='tdwrap'>&nbsp;</td>
+			  <td class='tdwrap'>Termin nach Vereinbarung</td>
+			</tr>
 		  	<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -244,13 +252,6 @@
 			  <td class='tdwrap'>Termin nach Vereinbarung</td>
 			</tr>
 			<tr>
-			  <td width="260" class='tdwrap'>Markus Pospischil</td>
-			  <td width="50" class='tdwrap'>258</td>
-			  <td  class='tdwrap'></td>
-			  <td width="56" class='tdwrap'>&nbsp;</td>
-			  <td class='tdwrap'>Termin nach Vereinbarung</td>
-			</tr>
-			<tr>
 		  	  <td colspan="2" class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	  <td class='tdwrap'>&nbsp;</td>
@@ -355,7 +356,7 @@
 		  	  <td class='tdwrap'>&nbsp;</td>
 		  	</tr>
 			<tr>
-			  <td width="280" colspan="2" nowrap class="ContentHeader2">&nbsp;Einkauf</td>
+			  <td width="280" colspan="2" nowrap class="ContentHeader2">&nbsp;Einkauf / Inventar</td>
 			  <td class="ContentHeader2" nowrap>&nbsp;</td>
 			  <td width="56" class='tdwrap'>&nbsp;</td>
 			  <td class="ContentHeader2" nowrap>&nbsp;Sprechzeiten</td>
@@ -373,7 +374,13 @@
               <td width="56" class='tdwrap'>&nbsp;</td>
               <td class='tdwrap'>Termin nach Vereinbarung</td>
           	</tr>
-
+          	<tr> 
+              <td width="260" class='tdwrap'>Ribisch Michaela</td>
+              <td width="50" class='tdwrap'>227</td>
+              <td class='tdwrap'></td>
+              <td width="56" class='tdwrap'>&nbsp;</td>
+              <td class='tdwrap'>Termin nach Vereinbarung</td>
+          	</tr>
 		  </table>
 		</td>
 	  </tr>
