@@ -102,7 +102,7 @@ function draw_orgformpart($stg_kz)
 	$stg_obj = new studiengang($stg_kz);
 	
 	//Zusatzfilterung nur bei Mischformen anzeigen
-	if($stg_obj->orgform_kurzbz!='VBB')
+	if(!$stg_obj->mischform)
 		return true;
 	
 	$orgform_sequence[$stg_kz]='';

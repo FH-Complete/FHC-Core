@@ -881,7 +881,7 @@ if(!@$db->db_query('SELECT updateaktivam FROM campus.vw_student LIMIT 1'))
 }
 
 //eine eindeutige ID wird fuer alle Gruppen hinzugefuegt um diese leichter mit LDAP zu Syncronisieren
-if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe'))
+if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe LIMIT 1'))
 {
 	$qry = "
 	CREATE SEQUENCE public.seq_gruppe_gid
@@ -986,7 +986,7 @@ if(!@$db->db_query('SELECT gid FROM public.tbl_gruppe'))
 }
 
 //Spalte incoming zur Lehrveranstaltung hinzufuegen. Legt fest wie viele Incoming an der LV teilnehmen duerfen
-if(!@$db->db_query('SELECT incoming FROM lehre.tbl_lehrveranstaltung'))
+if(!@$db->db_query('SELECT incoming FROM lehre.tbl_lehrveranstaltung LIMIT 1'))
 {
 	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN incoming smallint DEFAULT null;";
 	
@@ -996,6 +996,32 @@ if(!@$db->db_query('SELECT incoming FROM lehre.tbl_lehrveranstaltung'))
 		echo 'lehre.tbl_lehrveranstaltung: Spalte incoming hinzugefuegt<br>';
 }
 
+// Spalte mischform zum Studiengang hinzufuegen.
+if(!@$db->db_query('SELECT mischform FROM public.tbl_studiengang LIMIT 1'))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN mischform boolean DEFAULT false;
+			UPDATE public.tbl_studiengang SET mischform=true WHERE orgform_kurzbz='VBB';
+			ALTER TABLE public.tbl_studiengang ALTER COLUMN mischform SET NOT NULL;
+			ALTER TABLE bis.tbl_orgform DROP CONSTRAINT tbl_orgform_code_key;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_studiengang: Spalte mischform hinzugefuegt<br>';
+}
+
+// Spalten fuer Inventur zu Betriebsmitteln hinzufuegen
+if(!@$db->db_query('SELECT inventuramum FROM wawi.tbl_betriebsmittel LIMIT 1'))
+{
+	$qry = "ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN inventuramum timestamp;
+			ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN inventurvon varchar(32);
+			";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'wawi.tbl_betriebsmittel: Spalten inventuramum und inventurvon hinzugefuegt<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -1126,7 +1152,7 @@ $tabellen=array(
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
@@ -1151,7 +1177,7 @@ $tabellen=array(
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
-	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),

@@ -58,6 +58,7 @@ class studiengang extends basis_db
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
 	public $moodle;		// boolean
 	public $lgartcode;	//integer
+	public $mischform;	// boolean
 	
 	/**
 	 * Konstruktor
@@ -126,7 +127,7 @@ class studiengang extends basis_db
             	$this->titelbescheidvom=$row->titelbescheidvom;
             	$this->aktiv=($row->aktiv=='t'?true:false);
             	$this->moodle=($row->moodle=='t'?true:false);
-				
+				$this->mischform=($row->mischform=='t'?true:false);
 			}
 		}
 		else
@@ -193,6 +194,7 @@ class studiengang extends basis_db
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
             $stg_obj->aktiv=($row->aktiv=='t'?true:false);
 			$stg_obj->moodle=($row->moodle=='t'?true:false);
+			$stg_obj->mischform=($row->mischform=='t'?true:false);
 			
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
@@ -262,6 +264,7 @@ class studiengang extends basis_db
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
             $stg_obj->aktiv=($row->aktiv=='t'?true:false);
 			$stg_obj->moodle=($row->moodle=='t'?true:false);
+			$stg_obj->mischform=($row->mischform=='t'?true:false);
 			
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
@@ -328,7 +331,7 @@ class studiengang extends basis_db
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, 
-				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode) VALUES ('.
+				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->kurzbz).', '.
 				$this->addslashes($this->kurzbzlang).', '.
@@ -357,7 +360,8 @@ class studiengang extends basis_db
 				$this->addslashes($this->sprache).', '.
 				($this->testtool_sprachwahl?'true':'false').', '.
 				$this->addslashes($this->studienplaetze).', '.
-				$this->addslashes($this->lgartcode).');';
+				$this->addslashes($this->lgartcode).', '.
+				($this->mischform?'true':'false').');';
 		}
 		else
 		{
@@ -392,7 +396,8 @@ class studiengang extends basis_db
 				'sprache='.$this->addslashes($this->sprache).', '.
 				'testtool_sprachwahl='.($this->testtool_sprachwahl?'true':'false').', '.
 				'studienplaetze='.$this->addslashes($this->studienplaetze).', '.
-				'lgartcode='.$this->addslashes($this->lgartcode).' '.
+				'lgartcode='.$this->addslashes($this->lgartcode).', '.
+				'mischform='.($this->mischform?'true':'false').', '.
 				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
 		}
 
