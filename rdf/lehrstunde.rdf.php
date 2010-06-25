@@ -141,6 +141,9 @@ $db = new basis_db();
 function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
 {
 	global $db;
+	
+	if($semester=='')
+		return 0;
 	if($gruppe_kurzbz=='')
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband 
@@ -159,6 +162,7 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 	}
+	
 	if($res_anz = $db->db_query($qry))
 	{
 		if($row_anz = $db->db_fetch_object($res_anz))
@@ -178,6 +182,7 @@ if (is_array($lehrstunden->lehrstunden))
 			$stsem = getStudiensemesterFromDatum($ls->datum);
 			$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
 			$gruppenbezeichnung = '';
+			$gruppenbeschreibung = '';
 			
 			if($ls->gruppe_kurzbz!='')
 			{
@@ -190,15 +195,17 @@ if (is_array($lehrstunden->lehrstunden))
 			else 
 			{
 				$obj = new lehrverband();
-				if(!$obj->load($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp))
-					die($obj->errormsg);
-				$gruppenbezeichnung = $obj->bezeichnung;
-				$gruppenbeschreibung = '';
+				if($obj->load($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp))
+				{
+					$gruppenbezeichnung = $obj->bezeichnung;
+					$gruppenbeschreibung = '';
+				}
 			}
 			?>
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
   		      	<LEHRSTUNDE:id><?php echo $ls->stundenplan_id  ?></LEHRSTUNDE:id>
+  		      	<LEHRSTUNDE:reservierung><?php echo ($ls->reservierung?'true':'false'); ?></LEHRSTUNDE:reservierung>
 				<LEHRSTUNDE:lehreinheit_id><?php echo $ls->lehreinheit_id  ?></LEHRSTUNDE:lehreinheit_id>
 				<LEHRSTUNDE:datum><?php echo $ls->datum  ?></LEHRSTUNDE:datum>
 				<LEHRSTUNDE:stunde><?php echo $ls->stunde  ?></LEHRSTUNDE:stunde>

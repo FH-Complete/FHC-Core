@@ -31,6 +31,7 @@ require_once('../include/log.class.php');
 require_once('../include/benutzerfunktion.class.php');
 require_once('../include/stundenplan.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/reservierung.class.php');
 
 $user = get_uid();
 
@@ -180,6 +181,29 @@ if(!$error)
 			else 
 			{
 				$errormsg='Fehler beim Loeschen: '.$stundenplan->errormsg;
+				$return = false;
+				$data = '';
+			}
+		}
+		else 
+		{
+			$return = false;
+			$errormsg = 'ID ist ungueltig';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletereservierung')
+	{
+		//Loescht eine Reservierung
+		if(isset($_POST['reservierung_id']) && is_numeric($_POST['reservierung_id']))
+		{
+			$reservierung = new reservierung();
+			if($reservierung->delete($_POST['reservierung_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg='Fehler beim Loeschen: '.$reservierung->errormsg;
 				$return = false;
 				$data = '';
 			}

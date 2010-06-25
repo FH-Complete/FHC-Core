@@ -211,6 +211,21 @@ if ($aktion=='stpl_move' || $aktion=='stpl_single_search' || $aktion=='stpl_set'
 		$res_id[]=$_GET[$name_res_id];
 		$name_res_id='reservierung_id'.++$i;
 	}
+	
+	// Mehrfachauswahl uebernehmen
+	$j=0;
+	$name_res_idx='x'.$j.'reservierung_id0';
+	while ($j<100 && isset($_GET[$name_res_idx]))
+	{
+		$i=0;
+		$name_res_id='x'.$j.'reservierung_id'.$i;
+		while ($i<100 && isset($_GET[$name_res_id]))
+		{
+			$res_idx[]=$_GET[$name_res_id];
+			$name_res_id='x'.$j.'reservierung_id'.++$i;
+		}
+		$name_res_idx='x'.++$j.'reservierung_id0';
+	}
 }
 
 // ****************************************************************************
@@ -318,6 +333,17 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 	{
 		$reservierung=new reservierung();
 		foreach ($res_id as $reservierung_id)
+		{
+			$reservierung->delete($reservierung_id);
+			$error_msg.=$reservierung->errormsg;
+		}
+	}
+	
+	//Loeschen von mehreren Reservierungen
+	if(isset($res_idx))
+	{
+		$reservierung=new reservierung();
+		foreach ($res_idx as $reservierung_id)
 		{
 			$reservierung->delete($reservierung_id);
 			$error_msg.=$reservierung->errormsg;

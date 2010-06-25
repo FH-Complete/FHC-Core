@@ -140,6 +140,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_beschreibung"  />
 			<splitter class="tree-splitter"/>
+			<treecol id="stpl-details-overlay-lehrstunde-reservierung" label="Reservierung" flex="2" hidden="true"
+				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#reservierung"  />
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -167,6 +171,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#titel" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_bezeichnung" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_beschreibung" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#reservierung" />
    						</treerow>
 					</treeitem>
 				</treechildren>
