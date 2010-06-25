@@ -95,10 +95,10 @@ class lehrverband extends basis_db
 	public function load($studiengang_kz, $semester, $verband, $gruppe)
 	{
 		$qry = "SELECT * FROM public.tbl_lehrverband
-				WHERE studiengang_kz='".addslashes($studiengang_kz)."'
-				AND semester='".addslashes($semester)."'
-				AND verband='".addslashes($verband)."'
-				AND gruppe='".addslashes($gruppe)."'";
+				WHERE studiengang_kz=".$this->addslashes($studiengang_kz)."
+				AND semester=".$this->addslashes($semester)."
+				AND verband=".$this->addslashes($verband)."
+				AND gruppe=".$this->addslashes($gruppe);
 		
 		if($this->db_query($qry))
 		{

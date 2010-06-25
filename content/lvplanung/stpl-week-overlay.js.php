@@ -447,18 +447,19 @@ function onStplDetail(event)
 function STPLDetailEdit()
 {
 	tree = document.getElementById('treeStplDetails');
-	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
-	if(tree.currentIndex!=-1)
-	{
-		var id = tree.view.getCellText(tree.currentIndex,col);
-	}
-	else
+	if(tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren!');
 		return false;
 	}
-	
-	window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=400,width=350,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
+	var id = tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["stpl-details-overlay-lehrstunde-reservierung"] : "stpl-details-overlay-lehrstunde-reservierung";
+	var reservierung = tree.view.getCellText(tree.currentIndex,col);
+	if(reservierung=='true')
+		alert('Reservierungen koennen hier nicht editiert werden');
+	else
+		window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=400,width=350,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -532,26 +533,33 @@ function STPLDetailDelete()
 	//return false;
 	
 	tree = document.getElementById('treeStplDetails');
-	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
-	
-	if(tree.currentIndex!=-1)
-	{
-		var stundenplanid = tree.view.getCellText(tree.currentIndex,col);
-	}
-	else
+	if(tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren!');
 		return false;
 	}
+
+	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
+	var stundenplanid = tree.view.getCellText(tree.currentIndex,col);
+	
+	var col = tree.columns ? tree.columns["stpl-details-overlay-lehrstunde-reservierung"] : "stpl-details-overlay-lehrstunde-reservierung";
+	var reservierung = tree.view.getCellText(tree.currentIndex,col);
 	
 	if(confirm('Wollen Sie diesen Datensatz wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
 		var req = new phpRequest(url,'','');
-		
-		req.add('type', 'deletestundenplaneintrag');
-	
-		req.add('stundenplan_id', stundenplanid);
+			
+		if(reservierung=='true')
+		{
+			req.add('type', 'deletereservierung');
+			req.add('reservierung_id', stundenplanid);
+		}
+		else
+		{
+			req.add('type', 'deletestundenplaneintrag');
+			req.add('stundenplan_id', stundenplanid);
+		}
 		
 		var response = req.executePOST();
 	
