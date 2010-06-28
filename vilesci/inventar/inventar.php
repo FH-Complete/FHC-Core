@@ -779,15 +779,15 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 	if (is_array($resultBetriebsmittel) && count($resultBetriebsmittel)>1)
 		$htmlstring.='<tr><th colspan="12">Bitte ein Inventar aus den '.count($resultBetriebsmittel).' gefundenen ausw&auml;hlen</th></tr>';
 	$htmlstring.='<tr>
-				<th class="table-sortable:default">Inv.nr.</th>
+				<th class="table-sortable:default" title="Inventarnummer">Inv.nr.</th>
 				<th class="table-sortable:default">Bezeichnung</th>
 				<th class="table-sortable:default">Verwendung</th>
-				<th class="table-sortable:default">Ser.nr.</th>
+				<th class="table-sortable:default" title="Seriennummer">Ser.nr.</th>
 				<th class="table-sortable:default">Ort</th>
-				<th class="table-sortable:default">Bestellnummer</th>
+				<th class="table-sortable:default" title="Bestellnummer">Bestellnr</th>
 				<th class="table-sortable:default">Datum</th>
-				<th class="table-sortable:default">Org.</th>
-				<th class="table-sortable:default">Entlehnt</th>
+				<th class="table-sortable:default" title="Organisationseinheit">Org.</th>
+				<th class="table-sortable:default" title="Entlehnt">Entl.</th>
 				<th colspan="3" class="table-sortable:default">Status</th>
 			</tr>
 			</thead>
@@ -956,7 +956,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 	return 	$htmlstring;
 }
 // ===========================================================================================
-// Ausgabe der Bestellungen in Listenform
+// Ausgabe der Bestellung Detail
 function output_inventarposition($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false,$delete_recht=false,$schreib_recht_administration=2)
 {
 	global $datum_obj;
@@ -1150,6 +1150,11 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 
 						<th align="right">Leasing bis&nbsp;:&nbsp;</th>
 						<td>'.$datum_obj->formatDatum($resBetriebsmittel->leasing_bis,'d.m.Y').'</td>
+					</tr>';
+			$htmlstring.='
+					<tr>
+						<th align="right">Letzte Inventur&nbsp;:&nbsp;</th>
+						<td>'.$datum_obj->formatDatum($resBetriebsmittel->inventuramum,'d.m.Y').' '.$resBetriebsmittel->inventurvon.'</td>
 					</tr>';
 		$htmlstring.='<tr><td colspan="6">&nbsp;</td></tr>';
 

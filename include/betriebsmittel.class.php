@@ -58,6 +58,9 @@ class betriebsmittel extends basis_db
 	public $verwendung;			// string
 	public $anmerkung;			// string
 	public $leasing_bis;		// date
+	
+	public $inventuramum;		// timestamp
+	public $inventurvon;		// string
 
 
 	/**
@@ -117,7 +120,9 @@ class betriebsmittel extends basis_db
 				$this->verwendung = $row->verwendung;
 				$this->anmerkung = $row->anmerkung;
 				$this->leasing_bis = $row->leasing_bis;
-
+				$this->inventuramum = $row->inventuramum;
+				$this->inventurvon = $row->inventurvon;
+				
 				return true;
 			}
 			else
@@ -197,7 +202,7 @@ class betriebsmittel extends basis_db
 			$qry='INSERT INTO wawi.tbl_betriebsmittel (beschreibung, betriebsmitteltyp, nummer
 				, inventarnummer, reservieren, ort_kurzbz
 				,ext_id, insertamum, insertvon, updateamum, updatevon,oe_kurzbz,hersteller,seriennummer
-				,bestellung_id,bestelldetail_id,afa,verwendung,anmerkung,leasing_bis) VALUES('.
+				,bestellung_id,bestelldetail_id,afa,verwendung,anmerkung,leasing_bis, inventuramum, inventurvon) VALUES('.
 				$this->addslashes($this->beschreibung).', '.
 				$this->addslashes($this->betriebsmitteltyp).', '.
 				$this->addslashes($this->nummer).', '.
@@ -217,7 +222,9 @@ class betriebsmittel extends basis_db
 				$this->addslashes($this->afa).', '.
 				$this->addslashes($this->verwendung).', '.
 				$this->addslashes($this->anmerkung) .', '.
-				($this->leasing_bis?$this->addslashes($this->leasing_bis):'null') .');' ;
+				($this->leasing_bis?$this->addslashes($this->leasing_bis):'null') .', '.
+				$this->addslashes($this->inventuramum) .', '.
+				$this->addslashes($this->inventurvon) .');' ;
 				
 		}
 		else
@@ -246,7 +253,9 @@ class betriebsmittel extends basis_db
 				'afa='.($this->afa && is_numeric($this->afa)?$this->afa:$this->default_afa_jahre).', '.
 				'verwendung='.$this->addslashes($this->verwendung).', '.
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
-				'leasing_bis='.($this->leasing_bis?$this->addslashes($this->leasing_bis):'null').' '.
+				'leasing_bis='.($this->leasing_bis?$this->addslashes($this->leasing_bis):'null').', '.
+				'inventuramum='.$this->addslashes($this->inventuramum).', '.
+				'inventurvon='.$this->addslashes($this->inventurvon).' '.
 				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
 		}
 
@@ -349,6 +358,8 @@ class betriebsmittel extends basis_db
 				$bm->verwendung = $row->verwendung;
 				$bm->anmerkung = $row->anmerkung;
 				$bm->leasing_bis = $row->leasing_bis;
+				$bm->inventuramum = $row->inventuramum;
+				$bm->inventurvon = $row->inventurvon;
 
 				$this->result[] = $bm;
 			}
@@ -400,6 +411,9 @@ class betriebsmittel extends basis_db
 				$bm->verwendung = $row->verwendung;
 				$bm->anmerkung = $row->anmerkung;
 				$bm->leasing_bis = $row->leasing_bis;
+				$bm->inventuramum = $row->inventuramum;
+				$bm->inventurvon = $row->inventurvon;
+				
 				$this->result[] = $bm;
 			}
 			return true;
@@ -452,6 +466,8 @@ class betriebsmittel extends basis_db
 				$obj->verwendung = $row->verwendung;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->leasing_bis = $row->leasing_bis;
+				$obj->inventuramum = $row->inventuramum;
+				$obj->inventurvon = $row->inventurvon;
 				
 				$this->result[] = $obj;
 			}
@@ -474,7 +490,7 @@ class betriebsmittel extends basis_db
 		// Initialisieren
 		$this->result=array();
 		$this->errormsg = '';
-
+		$inventarnummer = mb_str_replace('`','+',$inventarnummer);
 		$qry=' SELECT * FROM wawi.tbl_betriebsmittel WHERE inventarnummer='.$this->addslashes($inventarnummer);
 
 		if($this->db_query($qry))
@@ -503,6 +519,8 @@ class betriebsmittel extends basis_db
 				$this->verwendung = $row->verwendung;
 				$this->anmerkung = $row->anmerkung;
 				$this->leasing_bis = $row->leasing_bis;
+				$this->inventuramum = $row->inventuramum;
+				$this->inventurvon = $row->inventurvon;
 				
 				return true;
 			}
@@ -522,6 +540,8 @@ class betriebsmittel extends basis_db
 	
 	/**
 	 * Laedt die Organisation des Betriebsmittels $bestellung_id
+	 * Wenn keine Organisationseinheit zugeteilt ist, dann wird die Organisationseinheit der zugeteilten Person
+	 * geladen
 	 * @param  $bestellung_id Bestellnummer des zu ladenden Betriebsmittel
 	 * @return true wenn ok, false im Fehlerfall
 	 */
@@ -565,6 +585,8 @@ class betriebsmittel extends basis_db
 				$this->anmerkung = $row->anmerkung;
 				$this->leasing_bis = $row->leasing_bis;
 				$this->oe_kurzbz = trim($row->oe_kurzbz);
+				$this->inventuramum = $row->inventuramum;
+				$this->inventurvon = $row->inventurvon;
 
 				if (empty($this->oe_kurzbz))
 				{
@@ -657,6 +679,8 @@ class betriebsmittel extends basis_db
 				$this->verwendung = $row->verwendung;
 				$this->anmerkung = $row->anmerkung;
 				$this->leasing_bis = $row->leasing_bis;
+				$this->inventuramum = $row->inventuramum;
+				$this->inventurvon = $row->inventurvon;
 				
 				return $this->result=$row;
 			}
@@ -709,7 +733,7 @@ class betriebsmittel extends basis_db
 		$qry.=',tbl_betriebsmittel_betriebsmittelstatus.datum as betriebsmittelstatus_datum ';
 		$qry.=',tbl_betriebsmittelstatus.beschreibung as betriebsmittelstatus_beschreibung ';
 		$qry.=',tbl_betriebsmitteltyp.beschreibung as betriebsmitteltyp_beschreibung ';
-		$qry.=', CASE WHEN betriebsmittelperson_id is not null AND retouram is null THEN \'t\' ELSE \'f\' END ausgegeben';
+		$qry.=', CASE WHEN EXISTS(SELECT retouram FROM wawi.tbl_betriebsmittelperson WHERE betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id AND retouram is NULL) THEN \'t\' ELSE \'f\' END ausgegeben';
 		$qry.=', tbl_betriebsmittel.*';
 		$qry.=', wawi_be.*';
 
@@ -917,6 +941,7 @@ class betriebsmittel extends basis_db
 				$pWhere.="	or	UPPER(trim(nachname || ' ' || vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(vorname || ' ' || nachname)) like '%".addslashes($matchcode)."%' ) )";				
 			}
+			$pWhere.=" AND retouram is null";
 			$where.=$pWhere;
 			
 			if (!is_null($oe_kurzbz) && $oe_kurzbz!='')
