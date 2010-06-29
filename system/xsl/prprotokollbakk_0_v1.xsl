@@ -73,7 +73,7 @@
 						    <fo:table-column column-width="80mm"/>
 							<fo:table-column column-width="181.2mm"/>
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
+						            <fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												<xsl:text> BA-Betreuer</xsl:text>
@@ -85,7 +85,7 @@
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
-									<fo:table-row line-height="14pt">
+									<fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="betreuer" />\n <xsl:value-of select="betreuer_2" />
@@ -106,7 +106,7 @@
 							<fo:table-column column-width="26mm"/>
 							<fo:table-column column-width="28mm"/>
 								<fo:table-body>
-						            <fo:table-row line-height="14pt">
+						            <fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												<xsl:text> Prüfer</xsl:text>
@@ -133,7 +133,7 @@
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
-									<fo:table-row line-height="14pt">
+									<fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer1_nachname" />\n
@@ -160,7 +160,7 @@
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
-									<fo:table-row line-height="14pt">
+									<fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer2_nachname" />\n
@@ -187,7 +187,7 @@
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
-									<fo:table-row line-height="14pt">
+									<fo:table-row line-height="12pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="80mm" text-align="left">
 												<xsl:text> </xsl:text><xsl:value-of select="pruefer3_nachname" />\n
@@ -214,7 +214,7 @@
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
-									<fo:table-row line-height="14pt">
+									<fo:table-row line-height="12pt">
 									<fo:table-cell>
 											<fo:block font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="left">
 												\n
