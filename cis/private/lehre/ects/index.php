@@ -499,7 +499,7 @@
 	   //FB Koordinator auslesen
 		//$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
 	   $qry = "SELECT 
-				distinct on(tbl_benutzerfunktion.uid) titelpre, titelpost, vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
+				distinct titelpre, titelpost, vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
 			WHERE
