@@ -67,20 +67,7 @@
 				  	<table class="tabcontent" id="oeh" style="display: visible">
 						<tr>
 				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/index.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate 2009</a></td>
-				  		</tr>
-				
-				  		<tr>
-				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/wahl2010.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Wahlen 2010</a></td>
-				  		</tr>
-				  		<tr>
-				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/bewerber.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Kandidaturen </a></td>
-				  		</tr>
-						<tr>
-				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/Wahlergebnisse.doc" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate 2010</a></td>
+							<td><a href="private/info/oeh/index2010.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate 2010</a></td>
 				  		</tr>
 				  	</table>
 				 </tr>
