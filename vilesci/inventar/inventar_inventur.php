@@ -368,10 +368,8 @@ if($work=='inventarisieren')
 		echo '
 		<span style="font-size:small">Inventur f&uuml;r '.$ort_kurzbz.' '.$personen_namen.'</span>
 		<hr />
-		<form action="">
 		<label for="inventarnummer">Inventarnummer: </label>&nbsp;
 		<input id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30">&nbsp;
-		</form>
 		<hr />
 		<div id="inventarliste">
 		</div>';
