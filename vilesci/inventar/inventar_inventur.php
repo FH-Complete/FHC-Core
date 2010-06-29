@@ -409,7 +409,8 @@ elseif($work=='uebersicht')
         FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
         WHERE betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
         ORDER BY datum desc,insertamum desc, betriebsmittelbetriebsmittelstatus_id desc
-        LIMIT 1) IN ('Aenderung','Inventar Extern','Inventur','Reparatur','vorhanden','keineZuordnung')";
+        LIMIT 1) IN ('Aenderung','Inventar Extern','Inventur','Reparatur','vorhanden','keineZuordnung')
+        AND betriebsmitteltyp NOT IN('Zutrittskarte','Schluessel')";
 	
 	$db = new basis_db();
 	if($result = $db->db_query($qry))
@@ -422,6 +423,7 @@ elseif($work=='uebersicht')
 				<th>Inv.Nr</th>
 				<th>Beschreibung</th>
 				<th>Verwendung</th>
+				<th>Typ</th>
 				<th colspan="2">Inventur</th>
 			 </tr>';
 		$i=0;
@@ -433,6 +435,7 @@ elseif($work=='uebersicht')
 			echo '<td><a href="inventar.php?betriebsmittel_id='.$row->betriebsmittel_id.'" target="_blank">'.$row->inventarnummer.'</a></td>';
 			echo '<td>',$row->beschreibung,'</td>';
 			echo '<td>',$row->verwendung,'</td>';
+			echo '<td>',$row->betriebsmitteltyp,'</td>';
 			echo '<td>',$row->inventuramum,'</td>';
 			echo '<td>',$row->inventurvon,'</td>';
 			echo '</tr>';
