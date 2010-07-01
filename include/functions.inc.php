@@ -498,7 +498,8 @@ function convertProblemChars($str)
    'Y' => '/&Yacute;/',
    'y' => '/&yacute;|&yuml;/',
    'a.' => '/&ordf;/',
-   'o.' => '/&ordm;/'
+   'o.' => '/&ordm;/',
+   'ss' => '/&szlig;/'
 	);
 
 	return preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));     
