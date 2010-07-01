@@ -1775,6 +1775,9 @@ if(!$error)
 
 			if($_POST['betriebsmitteltyp']=='Zutrittskarte' || $_POST['betriebsmitteltyp']=='Schluessel')
 			{
+				if($_POST['betriebsmitteltyp']=='Zutrittskarte')
+					$_POST['nummer']=$bm->transform_kartennummer($_POST['nummer']);
+				
 				//Das speichern von Zutrittskarten ohne Nummern verhindern
 				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
 				{

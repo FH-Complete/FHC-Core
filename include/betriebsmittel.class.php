@@ -195,6 +195,11 @@ class betriebsmittel extends basis_db
 			return false;
 		}
 		
+		//bei Zutrittskarten sicherstellen, dass die Nummer richtig kodiert ist
+		if($this->betriebsmitteltyp=='Zutrittskarte')
+		{
+			$this->nummer = $this->transform_kartennummer($this->nummer);
+		}
 		$this->afa=(!isset($this->afa) || empty($this->afa)?$this->default_afa_jahre:$this->afa);
 		if($new)
 		{
@@ -1070,6 +1075,30 @@ class betriebsmittel extends basis_db
 			$where.=" and upper(trim(tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz)) = ".$this->addslashes(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))) ;
 			
 		return $where;
+	}
+	
+	/**
+	 * Es sind mehrere Kartenlesegeraete im Umlauf
+	 * Manche Geraete liefern die Kartennummer hexcodiert zurueck.
+	 * Diese muessen erst in das richtige Format transformiert werden
+	 * zusaetzlich werden die fuehrenden nullen entfernt
+	 *
+	 * @param $kartennummer
+	 * @return $kartennummer
+	 */
+	function transform_kartennummer($kartennummer)
+	{
+		$kartennummer = trim($kartennummer);
+		//Kartennummern die im Hex-Format sind werden umgewandelt
+		if (!is_numeric($kartennummer))
+		{
+			$kartennummer=substr($kartennummer,strlen($kartennummer)-2,2).substr($kartennummer,strlen($kartennummer)-4,2). substr($kartennummer,strlen($kartennummer)-6,2).substr($kartennummer,0,2);
+			$kartennummer=hexdec( $kartennummer);
+		}
+		
+		//Fuehrende nullen entfernen
+		$kartennummer = preg_replace("/^0*/", "", $kartennummer);
+		return $kartennummer;
 	}
 }
 ?>
