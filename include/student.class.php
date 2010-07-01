@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/benutzer.class.php');
 
 class student extends benutzer
 {
@@ -511,6 +512,52 @@ class student extends benutzer
 		else 
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Daten eines Studenten anhand der Person_id und des Studienganges
+	 * Wenn mehrere Eintraege fuer diesen Studiengang vorhanden sind, dann wird der zuletzt eingetragene verwendet
+	 * 
+	 * @param person_id
+	 * @param studiengang_kz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_person($person_id, $studiengang_kz)
+	{
+		$qry = "SELECT tbl_student.* FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid)
+				WHERE person_id='".addslashes($person_id)."' AND studiengang_kz='".addslashes($studiengang_kz)."'
+				ORDER BY prestudent_id DESC LIMIT 1";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->uid = $row->student_uid;
+				$this->matrikelnr = $row->matrikelnr;
+				$this->prestudent_id = $row->prestudent_id;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Kein Benutzer mit dieser UID vorhanden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Auslesen des Studenten '.$qry;
 			return false;
 		}
 	}
