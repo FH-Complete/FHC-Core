@@ -25,6 +25,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/betriebsmittel.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -64,22 +65,24 @@ $htmlstr.='
 	
 if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 {
+	$bm_obj = new betriebsmittel();
 	if (isset($_POST['bmsuche']))
 	{
 		$bmsuche=strtoupper($_POST['bmsuche']);
-		$bmsuche = ereg_replace("^0*", "", $bmsuche);
-		
+		$kartennummer = $bm_obj->transform_kartennummer($bmsuche);
+
 		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
-					WHERE upper(uid) LIKE '%".addslashes($bmsuche)."%' OR upper(nachname) LIKE '%".addslashes($bmsuche)."%' OR upper(vorname) LIKE '%".addslashes($bmsuche)."%' 
-						OR upper(nummer) LIKE '%".addslashes($bmsuche)."%' OR upper(nummerintern) LIKE '%".addslashes($bmsuche)."%'
-					LIMIT 30";
+					WHERE upper(nummer) LIKE '%".addslashes($kartennummer)."%' LIMIT 30";
 		//echo $sql_query;
 	}
 	else
 	{
 		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
 		if(!empty($searchstr))
-			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummerintern  ~* '".addslashes($searchstr)."'  OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
+		{
+			$kartennummer = $bm_obj->transform_kartennummer($searchstr);
+			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummer  ~* '".addslashes($kartennummer)."' OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  ";
+		}
 		$sql_query.="	ORDER BY nummer ";
 		if(empty($searchstr))
 			$sql_query.=" LIMIT 100 ";

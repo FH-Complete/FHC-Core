@@ -416,7 +416,28 @@ var listObserver=
 		var aktion=evt.target.getAttribute("aktion");
 		aktion+="_set";
 		var paramList="?dragtype="+type+"&dragdatum="+dragdatum+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit+"&old_ort="+old_ort+idList+"&aktion="+aktion;
-
+		idList = TimeTableWeekGetMarkedIdList();
+		paramList = paramList+idList;
+		
+		//die Buttons die verschoben werden grau einfaerben
+		var styleNow=evt.target.getAttribute("style");
+		evt.target.setAttribute("style",styleNow+"color:gray;");
+					
+		var items = document.getElementsByTagName('button');
+		for each(var button in items)
+		{
+			if(button.id && button.id.startsWith('buttonSTPL'))
+			{
+				marked = button.getAttribute('marked');
+				if(marked=='true')
+				{
+					var styleNow=button.getAttribute("style");
+					button.setAttribute("style",styleNow+"color:gray;");
+				}
+			}
+		}
+		
+		
 		transferData.data=new TransferData();
 		transferData.data.addDataForFlavour("application/tempus-lehrstunde",paramList);
   	}
@@ -496,8 +517,8 @@ var boardObserver=
 			url+="&mime="+dropdata.flavour.contentType;
 			
 			//IDs der Stunden die verschoben werden dazuhaengen
-			idList = TimeTableWeekGetMarkedIdList();
-			url+=idList;
+			//idList = TimeTableWeekGetMarkedIdList();
+			//url+=idList;
 			if(new_ort=='' && ort=='')
 			{
 				alert('Es muss ein Ort gewaehlt werden');
