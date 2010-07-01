@@ -23,22 +23,23 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class zeitwunsch extends basis_db
 {
-	public $conn;     // resource DB-Handle
-	public $errormsg; // string
 	public $new;      // boolean
-	public $zeitwuensche = array(); // zeitwunsch Objekt
 	public $zeitwunsch;
 
 	//Tabellenspalten
-	public $stunde;			// smalint
+	public $stunde;				// smalint
 	public $mitarbeiter_uid;	// varchar(32)
 	public $tag;				// smalint
 	public $gewicht;			// smalint
 	public $min_stunde;
 	public $max_stunde;
+	public $insertamum;
+	public $insertvon;
+	public $updateamum;
+	public $updatevon;
 
 	/**
-	 * Konstruktor - Uebergibt die Connection und laedt optional eine Lehrform
+	 * Konstruktor
 	 */
 	public function __construct()
 	{
@@ -108,7 +109,7 @@ class zeitwunsch extends basis_db
 	/**
 	 * Speichert einen Zeitwunsch in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	 * angelegt, ansonsten der Datensatz mit $lehrfach_nr upgedated
+	 * angelegt, ansonsten der Datensatz upgedated
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function save()
@@ -119,16 +120,25 @@ class zeitwunsch extends basis_db
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht)
-			        VALUES('".addslashes($this->mitarbeiter_uid)."',".
-					$this->tag.','.$this->stunde.','.$this->gewicht.');';
+			$qry = 'INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht, 
+					insertamum, insertvon, updateamum, updatevon) VALUES('.
+					$this->addslashes($this->mitarbeiter_uid).','.
+					$this->addslashes($this->tag).','.
+					$this->addslashes($this->stunde).','.
+					$this->addslashes($this->gewicht).','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslasheS($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_zeitwunsch SET'.
-			       ' gewicht='.$this->gewicht.
+			       ' gewicht='.$this->addslashes($this->gewicht).', '.
+			       ' updateamum='.$this->addslashes($this->updateamum).', '.
+			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND
-			         tag=".$this->tag.' AND stunde='.$this->stunde;
+			         tag='".addslashes($this->tag)."' AND stunde='".addslashes($this->stunde)."'";
 		}
 
 		if($this->db_query($qry))
@@ -137,7 +147,7 @@ class zeitwunsch extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Zeitwunsches:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Zeitwunsches';
 			return false;
 		}
 	}
@@ -157,9 +167,17 @@ class zeitwunsch extends basis_db
 			return false;
 		}
 		else
+		{
 			while ($row = $this->db_fetch_object())
+			{
 				$this->zeitwunsch[$row->tag][$row->stunde]=$row->gewicht;
-
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+			}
+		}
+		
 		if (!is_null($datum))
 		{
 			$beginn=montag($datum);
@@ -221,6 +239,8 @@ class zeitwunsch extends basis_db
 
 	/**
 	 * Zeitwunsch der Personen in Lehreinheiten laden
+	 * @param $le_id LehreinheitID Array
+	 * @param $datum 
 	 * @return true oder false
 	 */
 	public function loadZwLE($le_id,$datum=null)
@@ -230,7 +250,7 @@ class zeitwunsch extends basis_db
 		$sql_query_leid='';
 		$sql_query_le='SELECT DISTINCT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE ';
 		for ($i=0;$i<count($le_id);$i++)
-			$sql_query_leid.=' OR lehreinheit_id='.$le_id[$i];
+			$sql_query_leid.=" OR lehreinheit_id='".$le_id[$i]."'";
 		$sql_query_leid=mb_substr($sql_query_leid,3);
 		$sql_query_le.=$sql_query_leid;
 
@@ -304,6 +324,35 @@ class zeitwunsch extends basis_db
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Prueft ob bereits ein Zeitwunsch eingetragen ist
+	 *
+	 * @param $uid
+	 * @param $stunde
+	 * @param $tag
+	 * @return true wenn vorhanden sonst false
+	 */
+	function exists($uid, $stunde, $tag)
+	{
+		$qry = "SELECT 1 FROM campus.tbl_zeitwunsch 
+				WHERE 
+					mitarbeiter_uid='".addslashes($uid)."' 
+					AND stunde='".addslashes($stunde)."' 
+					AND tag='".addslashes($tag)."';";
+		if($this->db_query($qry))
+		{
+			if($this->db_num_rows()>0)
+				return true;
+			else 
+				return false;
+		}
+		else 
+		{
+			$this->errormsg='Fehler beim Abfragen des Zeitwunsches';
+			return false;
+		}
 	}
 }
 ?>
