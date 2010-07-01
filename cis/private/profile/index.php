@@ -175,7 +175,12 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 		{
 			$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?<br><br>";
 			$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.<br>";
-			$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
+			if ($stud_num_rows==1)
+				$message .= "Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:<br>";
+			elseif($lekt_num_rows==1)
+				$message .= "Wenn innerhalb einer Frist von 12 Monaten nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:<br>";
+			else 
+				$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
 			$message .= "- Ihr Account wird gelöscht.<br>";
 			$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.<br>";
 			$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.<br><br>";
