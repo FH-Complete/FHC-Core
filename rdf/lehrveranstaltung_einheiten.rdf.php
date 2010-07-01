@@ -83,7 +83,7 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 }
 else
 {
-	$qry = "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz, semester, sprache,
+	$qry = "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz, semester, sprache,
 				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
 				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz
@@ -96,7 +96,7 @@ else
 	if($orgform!='')
 		$qry.=" AND (orgform_kurzbz='".addslashes($orgform)."' OR orgform_kurzbz is null)";
 
-	$qry.=" UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, studiengang_kz,
+	$qry.=" UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
 				semester, tbl_lehrveranstaltung.sprache, ects as lv_ects, semesterstunden, tbl_lehrveranstaltung.anmerkung,
 				tbl_lehrveranstaltung.lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv, planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
@@ -167,6 +167,7 @@ if(!$result = $db->db_query($qry))
 			<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
 			<LVA:kurzbz><![CDATA[".$row_lva->lv_kurzbz."]]></LVA:kurzbz>
 			<LVA:bezeichnung><![CDATA[".$row_lva->lv_bezeichnung."]]></LVA:bezeichnung>
+			<LVA:bezeichnung_english><![CDATA[".$row_lva->lv_bezeichnung_english."]]></LVA:bezeichnung_english>
 			<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
 			<LVA:studiengang>".$stg_arr[$row_lva->studiengang_kz]."</LVA:studiengang>
 			<LVA:semester>".$row_lva->semester."</LVA:semester>
@@ -246,6 +247,7 @@ if(!$result = $db->db_query($qry))
 				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
 				<LVA:kurzbz><![CDATA[".$row_lf->kurzbz."]]></LVA:kurzbz>
 				<LVA:bezeichnung><![CDATA[".$row_lf->bezeichnung."]]></LVA:bezeichnung>
+				<LVA:bezeichnung_englisch><![CDATA[]]></LVA:bezeichnung_englisch>
 				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
 				<LVA:studiengang>".$stg_arr[$row_lva->studiengang_kz]."</LVA:studiengang>
 				<LVA:semester>".$row_lva->semester."</LVA:semester>
