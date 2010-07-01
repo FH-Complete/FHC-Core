@@ -33,6 +33,7 @@ require_once('../include/person.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
+require_once('../include/student.class.php');
 
 $hier='';
 if(isset($_GET['xmlformat']))
@@ -230,6 +231,8 @@ elseif ($xmlformat=='xml')
 		$pers->load($row->person_id);
 		
 		$stg = new studiengang($row->studiengang_kz);
+		$student_obj = new student();
+		$student_obj->load_person($row->person_id, $row->studiengang_kz);
 		
 		echo "
   		<person>
@@ -244,6 +247,7 @@ elseif ($xmlformat=='xml')
 			<geburtsdatum><![CDATA[".$datum->convertISODate($pers->gebdatum)."]]></geburtsdatum>
 			<sozialversicherungsnummer><![CDATA[".$pers->svnr."]]></sozialversicherungsnummer>
 			<ersatzkennzeichen><![CDATA[".$pers->ersatzkennzeichen."]]></ersatzkennzeichen>
+			<matrikelnr><![CDATA[".trim($student_obj->matrikelnr)."]]></matrikelnr>
 			<tagesdatum><![CDATA[".date('d.m.Y')."]]></tagesdatum>
 			<logopath>".DOC_ROOT."skin/images/</logopath>
 			<studiengang><![CDATA[".$stg->bezeichnung."]]></studiengang>
@@ -262,7 +266,7 @@ elseif ($xmlformat=='xml')
 			drawrow_xml($buchung);
 	elseif($buchungsnummern!='')
 	{
-		$buchungsnr = split(';',$buchungsnummern);
+		$buchungsnr = explode(';',$buchungsnummern);
 		$drawperson=true;
 		foreach($buchungsnr as $bnr)
 		{
