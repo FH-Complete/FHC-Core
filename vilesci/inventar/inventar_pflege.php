@@ -780,8 +780,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			{
 				$oBetriebsmittel->new=true;
 				$oBetriebsmittel->betriebsmittel_id=null;
-				 $oBetriebsmittel->insertamum = date('Y-m-d H:i:s');
-				 $oBetriebsmittel->insertvon=$uid;
+				$oBetriebsmittel->insertamum = date('Y-m-d H:i:s');
+				$oBetriebsmittel->insertvon=$uid;
+				$oBetriebsmittel->inventuramum = date('Y-m-d H:i:s');
+				$oBetriebsmittel->inventurvon = $uid;
 			}
 			$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
 	
