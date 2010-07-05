@@ -470,6 +470,7 @@
 				echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
 						<thead>
 						<tr class='liste'>
+							<th class='table-sortable:default' title='PrestudentID'>ID</th>
 							<th class='table-sortable:default'>Vorname</th>
 							<th class='table-sortable:default'>Nachname</th>
 							<th class='table-sortable:default'>Studiengang</th>
@@ -501,6 +502,7 @@
 					}
 					echo "
 						<tr>
+							<td>$row->prestudent_id</td>
 							<td>$row->vorname</td>
 							<td>$row->nachname</td>
 							<td>".$stg_arr[$row->studiengang_kz]."</td>
