@@ -132,7 +132,7 @@
 			$oBetriebsmittel->debug=$debug;
 			$oBetriebsmittel->errormsg='';
 			$oBetriebsmittel->updatevon=$uid;
-			$oBetriebsmittel->updateamum=null;
+			$oBetriebsmittel->updateamum=date('Y-m-d H:i:s');
 			if ($oBetriebsmittel->save())
 			{
 				$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
@@ -146,9 +146,9 @@
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$oBetriebsmittel->betriebsmittel_id;
 				$oBetriebsmittel_betriebsmittelstatus->datum=date('Ymd');
 				$oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
-				$oBetriebsmittel_betriebsmittelstatus->updateamum='';
+				$oBetriebsmittel_betriebsmittelstatus->updateamum=date('Y-m-d H:i:s');
 				$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
-				$oBetriebsmittel_betriebsmittelstatus->insertamum='';
+				$oBetriebsmittel_betriebsmittelstatus->insertamum=date('Y-m-d H:i:s');
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=trim((isset($_REQUEST['betriebsmittelstatus_kurzbz']) ? $_REQUEST['betriebsmittelstatus_kurzbz']:''));
 				if ($oBetriebsmittel_betriebsmittelstatus->save())
 					$errormsg[]='<span title="die Neue Status ID ist '.$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id.'"><img src="../../skin/images/tick.png" alt="ok" /></span>';
@@ -178,8 +178,8 @@
 				$oBetriebsmittel->bestellung_id=$bestellung_id;
 				$oBetriebsmittel->bestelldetail_id=$bestelldetail_id;
 				$oBetriebsmittel->updatevon=$uid;
-				$oBetriebsmittel->updateamum=null;
-				if (!$oBetriebsmittel->save())
+				$oBetriebsmittel->updateamum=date('Y-m-d H:i:s');
+				if (!$oBetriebsmittel->save(false))
 					$errormsg[]=$oBetriebsmittel->errormsg;
 			}
 			else
@@ -190,7 +190,32 @@
 		
 		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 	}
-
+	
+	// Inventur setzen
+	if (($ajax && strtolower($ajax)=='set_inventur')
+	||  ($work && strtolower($work)=='set_inventur') )
+	{
+		if($schreib_recht)
+		{
+			$oBetriebsmittel = new betriebsmittel();
+			if($oBetriebsmittel->load($betriebsmittel_id))
+			{
+				$oBetriebsmittel->updatevon = $uid;
+				$oBetriebsmittel->updateamum = date('Y-m-d H:i:s');
+				$oBetriebsmittel->inventuramum = date('Y-m-d H:i:s');
+				$oBetriebsmittel->inventurvon = $uid;
+				if (!$oBetriebsmittel->save())
+					$errormsg[]=$oBetriebsmittel->errormsg;
+			}
+			else
+				$errormsg[]='BetriebsmittelID ist falsch';
+		}
+		else
+			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';
+		
+		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
+	}
+	
 	// Betriebsmittel Baum entfernen - Personen,Status,Inventar
 	if (($ajax && strtolower($ajax)=='set_delete')
 	||  ($work && strtolower($work)=='set_delete') )
@@ -1155,6 +1180,13 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<tr>
 						<th align="right">Letzte Inventur&nbsp;:&nbsp;</th>
 						<td>'.$datum_obj->formatDatum($resBetriebsmittel->inventuramum,'d.m.Y').' '.$resBetriebsmittel->inventurvon.'</td>
+						<td>
+						<form action="'.$_SERVER['PHP_SELF'].'" mehtod="post">
+						<input type="hidden" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
+						<input type="hidden" name="work" value="set_inventur" />
+						<input type="submit" value="Inventur" />
+						</form>
+						</td>
 					</tr>';
 		$htmlstring.='<tr><td colspan="6">&nbsp;</td></tr>';
 
@@ -1309,7 +1341,6 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 							<th>Person</th>
 							<th>Ausgabe</th>
 							<th>Retour</th>
-							<th>Ort</th>
 							<th colspan="2">Anlage</th>
 							<th colspan="2">&Auml;nderung</th>
 						</thead>
@@ -1333,7 +1364,6 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			$htmlstring.='	</td>
 							<td>'.$datum_obj->formatDatum($row->ausgegebenam,'d.m.Y').'</td>
 							<td>'.$datum_obj->formatDatum($row->retouram,'d.m.Y').'</td>
-							<td>'.$row->ort_kurzbz.'</td>
 							<td>';
 										$oBenutzer = new benutzer();
 										if (!$oBenutzer->load($row->insertvon))
