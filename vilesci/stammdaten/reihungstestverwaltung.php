@@ -20,6 +20,16 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ * Reihungstestverwaltung
+ * 
+ * - Anlegen und Bearbeiten von Reihungstestterminen
+ * - Export von Anwesenheitslisten als Excel
+ * - Uebertragung der Reihungstestpunkte ins FAS
+ * 
+ * Parameter:
+ * excel ... wenn gesetzt, dann wird die Anwesenheitsliste als Excel exportiert
+ */
 	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/studiengang.class.php');
@@ -55,9 +65,7 @@
 	$studiengang->getAll('typ, kurzbz', false);
 		
 	if(isset($_GET['excel']))
-	{
-		
-		
+	{	
 		$reihungstest = new reihungstest();
 		if($reihungstest->load($_GET['reihungstest_id']))
 		{
@@ -344,8 +352,8 @@
 		echo "<SELECT name='reihungstest' id='reihungstest' onchange='window.location.href=this.value'>";
 		foreach ($reihungstest->result as $row) 
 		{
-			if($reihungstest_id=='')
-				$reihungstest_id=$row->reihungstest_id;
+			//if($reihungstest_id=='')
+			//	$reihungstest_id=$row->reihungstest_id;
 			if($row->reihungstest_id==$reihungstest_id)
 				$selected='selected';
 			else
@@ -356,10 +364,15 @@
 		echo "</SELECT>";
 		echo "<INPUT type='button' value='Anzeigen' onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>";
 		echo "</td>";
-		echo "<td align='right'><INPUT type='button' value='Neuen Reihungstesttermin anlegen' onclick='window.location.href=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&neu=true\"' >";
-		
+		echo "<td align='right'>";
+		if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		{
+			echo '<a href="reihungstest_administration.php">Administration</a>';
+		}
 		echo "</td></tr></table><br>";
 		
+		if($reihungstest_id=='')
+			$neu=true;
 		$reihungstest = new reihungstest();
 		
 		if(!$neu)
@@ -376,11 +389,8 @@
 			$reihungstest->uhrzeit = date('H:i:s');
 		}
 	
-		if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
-		{
-			echo '<a href="reihungstest_administration.php">Administration</a>';
-		}
 		
+		echo "<INPUT type='button' value='Neuen Reihungstesttermin anlegen' onclick='window.location.href=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&neu=true\"' >";
 		//Formular zum Bearbeiten des Reihungstests
 		echo '<HR>';
 		echo "<FORM method='POST' action='".$_SERVER['PHP_SELF']."'>";
