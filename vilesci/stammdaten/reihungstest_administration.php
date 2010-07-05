@@ -58,9 +58,10 @@ echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeig
 
 if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 {
-	$qry = "SELECT kurzbzlang, datum,ort_kurzbz,anmerkung, uhrzeit, insertvon,reihungstest_id
+	$qry = "SELECT kurzbzlang, datum,ort_kurzbz,anmerkung, uhrzeit, insertvon,reihungstest_id, 
+			(SELECT count(*) FROM public.tbl_prestudent WHERE reihungstest_id=tbl_reihungstest.reihungstest_id) as anzahl_teilnehmer
 			FROM public.tbl_reihungstest JOIN public.tbl_studiengang USING (studiengang_kz)
-			WHERE datum>=now() ORDER BY datum";
+			WHERE datum>=CURRENT_DATE ORDER BY datum";
 	
 	if($result = $db->db_query($qry))
 	{
@@ -71,6 +72,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 						<th>Datum</th>
 						<th>Ort</th>
 						<th>Uhrzeit</th>
+						<th>Teilnehmer</th>
 						<th>Anmerkung</th>
 						<th>InsertVon</th>
 						<th>ReihungstestID</th>
@@ -84,6 +86,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 			echo "<td>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>";
 			echo "<td>$row->ort_kurzbz</td>";
 			echo "<td>$row->uhrzeit</td>";
+			echo "<td>$row->anzahl_teilnehmer</td>";
 			echo "<td>$row->anmerkung</td>";
 			echo "<td>$row->insertvon</td>";
 			echo "<td>$row->reihungstest_id</td>";
@@ -137,7 +140,7 @@ if($result = $db->db_query($qry))
 		else
 			$selected='';
 			
-		echo "<OPTION  value='$row->gebiet_id' $selected>$row->bezeichnung</OPTION>";
+		echo "<OPTION  value='$row->gebiet_id' $selected>$row->bezeichnung ($row->kurzbz)</OPTION>";
 	}
 	echo '</SELECT>';
 }
