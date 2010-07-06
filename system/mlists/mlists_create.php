@@ -102,9 +102,20 @@
 
 	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
 	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN public.tbl_student on(uid=student_uid)
-	        WHERE alias<>'' AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null) 
-	        AND tbl_benutzer.aktiv ORDER BY nachname, vorname";
-
+	        WHERE 
+	        	alias<>'' 
+	        	AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null) 
+	        	AND (tbl_benutzer.aktiv OR 
+	        		(tbl_benutzer.aktiv=false 
+	        		AND updateaktivam >= now()-(SELECT CASE public.get_rolle_prestudent (prestudent_id,null) 
+	        										WHEN 'Abbrecher' THEN '".DEL_ABBRECHER_WEEKS." weeks'::interval
+	        										WHEN 'Absolvent' THEN '".DEL_STUDENT_WEEKS." weeks'::interval
+	        										ELSE '".DEL_MITARBEITER_WEEKS." weeks'::interval
+	        										END
+	        									  )
+	        		))
+	        ORDER BY nachname, vorname";
+	
 	if($result = $db->db_query($qry))
 	{
 		$fp=fopen('../../../mlists/tw_alias.txt',"w");
