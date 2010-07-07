@@ -116,9 +116,10 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				<th class="table-sortable:default">Verwendung</th>
 				<th class="table-sortable:default">Ser.nr.</th>
 				<th class="table-sortable:default">Ort</th>
-				<th class="table-sortable:default">Bestellnummer</th>
+				<th class="table-sortable:default">Bestellnr</th>
 				<th class="table-sortable:default">Datum</th>
 				<th class="table-sortable:default">Org.</th>
+				<th class="table-sortable:default">Inventur</th>
 				<th class="table-sortable:default">Entlehnt</th>
 				<th colspan="3" class="table-sortable:default">Status</th>
 			</tr>
@@ -172,6 +173,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		*/
 		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
+		$htmlstring.='<td align="right">'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum, 'Y-m-d').'&nbsp;</td>';
 		$htmlstring.='<td align="right">'.($resultBetriebsmittel[$pos]->ausgegeben=='t'?'Ja':'Nein').'&nbsp;</td>';
 		$htmlstring.='<td>';
 		// mit Berechtigung ist der Status zum bearbeiten

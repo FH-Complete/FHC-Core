@@ -812,6 +812,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				<th class="table-sortable:default" title="Bestellnummer">Bestellnr</th>
 				<th class="table-sortable:default">Datum</th>
 				<th class="table-sortable:default" title="Organisationseinheit">Org.</th>
+				<th class="table-sortable:default" title="Inventur">Inv.</th>
 				<th class="table-sortable:default" title="Entlehnt">Entl.</th>
 				<th colspan="3" class="table-sortable:default">Status</th>
 			</tr>
@@ -938,7 +939,9 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		*/
 		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
+		$htmlstring.='<td align="right">'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td align="right">'.($resultBetriebsmittel[$pos]->ausgegeben=='t'?'Ja':'Nein').'&nbsp;</td>';
+		
 		$htmlstring.='<td>';
 			// mit Berechtigung ist der Status zum bearbeiten
 		  	$betriebsmittelstatus_kurzbz_select=trim($resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
