@@ -740,18 +740,20 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
 	var paramList= '';
 	var anzahl=0;
 	var uids='';
+	var stg_kz='';
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
 			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
+			stg_kz = getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 			uids = uids + uid;
 			anzahl++;
 		}
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
