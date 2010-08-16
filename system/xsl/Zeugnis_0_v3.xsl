@@ -70,7 +70,7 @@
 				<fo:block-container position="absolute" top="137mm" left="23mm">
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
 						<fo:table-column column-width="0mm"/>
-						<fo:table-column column-width="102mm"/>
+						<fo:table-column column-width="103mm"/>
 						<fo:table-column column-width="20mm"/>
 						<fo:table-column column-width="20mm"/>
 						<fo:table-column column-width="20mm"/>
@@ -182,7 +182,7 @@
 				<!-- Dummy Zelle -->
 			</fo:table-cell>
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="102mm" vertical-align="center" font-family="arial">
+				<fo:block font-size="9pt" content-width="104mm" vertical-align="center" font-family="arial">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">

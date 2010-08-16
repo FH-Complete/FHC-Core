@@ -397,7 +397,7 @@ class studiengang extends basis_db
 				'testtool_sprachwahl='.($this->testtool_sprachwahl?'true':'false').', '.
 				'studienplaetze='.$this->addslashes($this->studienplaetze).', '.
 				'lgartcode='.$this->addslashes($this->lgartcode).', '.
-				'mischform='.($this->mischform?'true':'false').', '.
+				'mischform='.($this->mischform?'true':'false').' '.
 				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
 		}
 
