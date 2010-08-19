@@ -1067,6 +1067,21 @@ if(!@$db->db_query('SELECT lv_bezeichnung_english FROM campus.vw_lehreinheit LIM
 		echo 'campus.vw_lehreinheit: Spalte lv_bezeichunng_english hinzugefuegt<br>';
 }
 
+//Ort bezeichnung von 30 auf 64 Zeichen verlaengern
+if($result = $db->db_query("SELECT character_maximum_length FROM information_schema.columns WHERE column_name='bezeichnung' AND table_name='tbl_ort' AND table_schema='public';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->character_maximum_length==30)
+		{
+			$qry = "ALTER TABLE public.tbl_ort ALTER COLUMN bezeichnung TYPE varchar(64);";
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_ort: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo 'public.tbl_ort: Spalte bezeichnung auf 64 Zeichen verlaengert<br>';
+		}
+	}
+}
 echo '<br>';
 
 $tabellen=array(
