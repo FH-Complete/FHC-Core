@@ -576,7 +576,7 @@
 
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Qualitaetsmanagementhandbuch.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm_2010/Deutsch/1_Handbuch/QM-Handbuch_FHTW_2010.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
 			  			</tr>
 
 				  		<tr>
@@ -585,7 +585,7 @@
 			  			</tr>
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Organigramm</a></td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm_2010/organigramm.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Organigramm</a></td>
 			  			</tr>
 						<tr>
 			  				<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -593,11 +593,11 @@
 				  		</tr>
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/dokumente.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dokumente</a></td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm_2010/dokumente.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dokumente</a></td>
 			  			</tr>
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/vorlagen/Ground_Rules.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm_2010/Deutsch/6_Ground_Rules/Ground_Rules_2010.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
 			  			</tr>
 			  			<tr style="display:none;">
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -615,7 +615,7 @@
 						<!-- EN QM Handbuch CRM@FHTW ist nun in Documents/Support Documents CRM@FHTW-->						
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm/Quality management Handbook.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm_2010/English/1_QM-Handbook/QM_Handbook_UASTW_2010.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
 			  			</tr>
 						<!--<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -623,7 +623,7 @@
 			  			</tr>-->
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/qm/organigramm_en.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Organigram</a></td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm_2010/organigramm_en.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Organigram</a></td>
 			  			</tr>
 						<tr>
 			  				<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -631,11 +631,11 @@
 				  		</tr>
 						<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="private/info/qm/dokumente/dokumente.php?lang=en" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Documents</a></td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm_2010/dokumente.php?lang=en" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Documents</a></td>
 			  			</tr>
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm/vorlagen_en/Ground Rules.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm_2010/English/5_Ground Rules/Ground Rules_2010.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
 			  			</tr>
 			  			<tr style="display:none;">
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
