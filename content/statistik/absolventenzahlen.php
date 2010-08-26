@@ -49,7 +49,7 @@ $sumsum_w=0;
 $trennung=false;
 
 $stsem_obj = new studiensemester();
-$stsem = $stsem_obj->getakt();
+$stsem = $stsem_obj->getaktorNext();
 $stgall = new studiengang();
 $stgall->getAll("typ, kurzbz asc",true);
 

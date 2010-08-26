@@ -62,7 +62,9 @@ $stg->getAll();
 	';
 
 	$qry = "SELECT 
-				*,
+				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, 
+				tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, 
+				tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming,
 				(
 				SELECT
 					count(*)
@@ -76,14 +78,17 @@ $stg->getAll();
 						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 						AND tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
 					AND tbl_prestudentstatus.status_kurzbz='Incoming'
+					AND tbl_prestudentstatus.status_kurzbz='$stsem->studiensemester_kurzbz'
 				GROUP BY uid
 				) as anzahlincoming
 			FROM 
-				lehre.tbl_lehrveranstaltung
+				lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE 
 				tbl_lehrveranstaltung.incoming>0 AND 
 				tbl_lehrveranstaltung.aktiv AND 
 				tbl_lehrveranstaltung.lehre
+				AND tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000
+				AND tbl_studiengang.aktiv
 				";
 
 	echo '<table width="100%" class="table-autosort:3 table-stripeclass:alternate table-autostripe">
@@ -110,7 +115,7 @@ $stg->getAll();
 				$freieplaetze=0;
 			
 			$i++;
-			echo '<tr class="liste'.($i%2).'">';
+			echo '<tr>';
 			echo '<td>',$row->lehrveranstaltung_id,'</td>';
 			echo '<td>',$stg->kuerzel_arr[$row->studiengang_kz],'</td>';
 			echo '<td>',$row->semester,'</td>';
