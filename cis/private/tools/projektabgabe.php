@@ -308,7 +308,16 @@ else
 	{
 		header('Content-Type: application/octet-stream');
 		header('Content-disposition: attachment; filename="Abgabe_'.$s->kuerzel.'.zip"');
-		echo file_get_contents($zipausgabe);
+		$handle = fopen($zipausgabe, "rb");
+		
+		while (!feof($handle)) 
+		{
+			echo fread($handle, 1024);
+		}
+		
+		fclose($handle);
+
+		//echo file_get_contents($zipausgabe);
 		unlink($zipausgabe);	
 	}
 	else 
