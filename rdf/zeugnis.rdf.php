@@ -104,7 +104,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, 
 					tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, 
 					tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, 
-					tbl_person.titelpost, tbl_studiensemester.bezeichnung as sembezeichnung, 
+					tbl_person.titelpost, tbl_person.anrede, tbl_studiensemester.bezeichnung as sembezeichnung, 
 					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id 
 				FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester 
 				WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
@@ -172,6 +172,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
 		$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
+		$xml .= "\n		<anrede>".$row->anrede."</anrede>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
 		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
