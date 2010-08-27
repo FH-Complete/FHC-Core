@@ -92,7 +92,7 @@ if($stsem!='')
 						<th>Studiengänge</th>
 						<th>Absolut / %</th>
 						<th>In / Out</th>
-						<th>BB / VZ / FST</th>
+						<th>BB / VZ / DL</th>
 						<th>m / w</th>
 						<th>&Ouml;sterreich</th>
 						<th>EU</th>
@@ -121,7 +121,7 @@ if($stsem!='')
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='VZ'
 					) a) AS vz,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='FST'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='DL'
 					) a) AS fs,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='w'
@@ -184,9 +184,9 @@ if($stsem!='')
 				$gesamt_vz += $row->gesamt_stg;
 				$gesamt_fs += $row->fs;
 			}
-			else if($row->orgform_kurzbz=='FST')
+			else if($row->orgform_kurzbz=='DL')
 			{
-				//fernlehre: gesamtzahl in spalte fst
+				//fernlehre: gesamtzahl in spalte DL
 				echo "<td align='center'>$row->bb / $row->vz / $row->gesamt_stg</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->vz;
@@ -248,7 +248,7 @@ if($stsem!='')
 		<th>Studiengänge</th>
 		<th>Absolut / %</th>
 		<th>In / Out</th>
-		<th>BB / VZ / FST</th>
+		<th>BB / VZ / DL</th>
 		<th>m / w</th>
 		<th>&Ouml;sterreich</th>
 		<th>EU</th>
@@ -275,7 +275,7 @@ if($stsem!='')
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='VZ'
 					) a) AS vz,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
-	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='FST'
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='DL'
 					) a) AS fs,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='w'
@@ -338,9 +338,9 @@ if($stsem!='')
 				$gesamt_vz += $row->gesamt_stg;
 				$gesamt_fs += $row->fs;
 			}
-			else if($row->orgform_kurzbz=='FST')
+			else if($row->orgform_kurzbz=='DL')
 			{
-				//fernlehre: gesamtzahl in spalte fst
+				//fernlehre: gesamtzahl in spalte DL
 				echo "<td align='center'>$row->bb / $row->vz / $row->gesamt_stg</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->vz;
