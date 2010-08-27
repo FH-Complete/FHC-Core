@@ -1082,6 +1082,25 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 		}
 	}
 }
+
+
+//Raumtyp_kurzbz von 8 auf 16 Zeichen verlaengern
+if($result = $db->db_query("SELECT character_maximum_length FROM information_schema.columns WHERE column_name='raumtyp_kurzbz' AND table_name='tbl_raumtyp' AND table_schema='public';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->character_maximum_length==8)
+		{
+			$qry = "
+			ALTER TABLE public.tbl_raumtyp ALTER COLUMN raumtyp_kurzbz TYPE varchar(16);
+			ALTER TABLE public.tbl_ortraumtyp ALTER COLUMN raumtyp_kurzbz TYPE varchar(16);";
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_ort: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo 'public.tbl_raumtyp: Spalte raumtyp_kurzbz auf 16 Zeichen verlaengert<br>';
+		}
+	}
+}
 echo '<br>';
 
 $tabellen=array(
