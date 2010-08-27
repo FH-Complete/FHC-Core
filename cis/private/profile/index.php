@@ -173,20 +173,24 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 		
 		if($aktiv=='f')
 		{
-			$message = "Ihr Benutzerdatensatz wurde von einem unserer Mitarbeiter deaktiviert. Was bedeutet das nun für Sie?<br><br>";
-			$message .= "Vorerst werden Sie aus allen Mail-Verteilern gelöscht.<br>";
-			if ($stud_num_rows==1)
-				$message .= "Wenn innerhalb einer Frist von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:<br>";
-			elseif($lekt_num_rows==1)
-				$message .= "Wenn innerhalb einer Frist von 12 Monaten nach Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgt, dann werden zudem folgende Aktionen automatisch durchgeführt werden:<br>";
+			if(!$ansicht)
+			{
+				$message = "Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz deaktiviert wurde. Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>";
+				if ($stud_num_rows==1)
+					$message .= "Sollte innerhalb von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach der Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>";
+				elseif($lekt_num_rows==1)
+					$message .= "Sollte innerhalb von 12 Monaten nach der Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>";
+				else 
+					$message .= "Sollte innerhalb der nächsten Tagen keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>";
+				$message .= "- Ihr Account, <br>";
+				$message .= "- Ihre Mailbox (inkl. aller E-Mails) und<br>";
+				$message .= "- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>";
+				$message .= "Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>";
+		
+				echo "<span style='color: red;'>Achtung!<br>$message</span>";
+			}
 			else 
-				$message .= "Wenn der Datensatz in den nächsten Tagen nicht mehr aktiviert wird, führt das System automatisch folgende Aktionen durch:<br>";
-			$message .= "- Ihr Account wird gelöscht.<br>";
-			$message .= "- Ihre Mailbox mit sämtlichen Mails wird gelöscht.<br>";
-			$message .= "- Ihr Home-Verzeichnis mit allen enthaltenen Dateien wird gelöscht.<br><br>";
-			$message .= "Sollte es sich hierbei um einen Irrtum handeln, wenden sie sich bitte an ihre Studiengangsassistenz.<br>";
-	
-			echo "<span style='color: red;'>Achtung!<br>$message</span>";
+				echo "<span style='color: red;'>Achtung: Dieser Account ist nicht mehr aktiv</span>";
 		}
 		echo '
 		<table class="tabcontent">
