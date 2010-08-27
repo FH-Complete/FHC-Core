@@ -123,9 +123,9 @@ class ortraumtyp extends basis_db
 			$this->errormsg = 'Ort_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->raumtyp_kurzbz)>8)
+		if(mb_strlen($this->raumtyp_kurzbz)>16)
 		{
-			$this->errormsg = 'Raumtyp_kurzbz darf nicht laenger als 8 Zeichen sein';
+			$this->errormsg = 'Raumtyp_kurzbz darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		$this->errormsg = '';
