@@ -572,6 +572,106 @@ $error_msg='';
 		}
 	}
 	*/
+	
+	// **************************************************************
+	// Studentenverteiler fuer die einzelnen Organisationseinheiten bei Mischformen
+	echo '<br>Abgleich der Mischformverteiler';
+	$stsem = $stsem_obj->getNearest();
+	
+	$sql_query = "
+		SELECT 
+			tbl_prestudentstatus.orgform_kurzbz, 
+			tbl_studiengang.studiengang_kz, 
+			tbl_studiengang.typ, 
+			tbl_studiengang.kurzbz 
+		FROM 
+			public.tbl_student
+			JOIN public.tbl_benutzer ON(student_uid=uid)
+			JOIN public.tbl_prestudentstatus USING(prestudent_id)
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+		WHERE
+			tbl_studiengang.mischform
+			AND tbl_benutzer.aktiv
+			AND tbl_prestudentstatus.orgform_kurzbz is not null
+		GROUP BY
+			tbl_studiengang.studiengang_kz, tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.typ, tbl_studiengang.kurzbz
+		";
+	
+	if($result = $db->db_query($sql_query))
+	{
+		echo '<BR>';
+		
+		while($row = $db->db_fetch_object($result))
+		{
+	     	$mlist_name=strtoupper($row->typ.$row->kurzbz.'_'.$row->orgform_kurzbz);
+	     	echo $mlist_name.'<br>';
+	     	
+	     	//Gruppe anlegen falls noch nicht vorhanden
+			$grp = new gruppe();
+			if(!$grp->exists($mlist_name))
+			{
+				$grp->gruppe_kurzbz = $mlist_name;
+				$grp->studiengang_kz = $row->studiengang_kz;
+				$grp->bezeichnung = 'Alle '.$row->orgform_kurzbz.' Studenten von '.strtoupper($row->typ.$row->kurzbz);
+				$grp->beschreibung = 'Alle '.$row->orgform_kurzbz.' Studenten von '.strtoupper($row->typ.$row->kurzbz);
+				$grp->semester = '0';
+				$grp->mailgrp = true;
+				$grp->sichtbar = true;
+				$grp->generiert = true;
+				$grp->aktiv = true;
+				$grp->lehre = false;
+				$grp->insertamum = date('Y-m-d H:i:s');
+				$grp->insertvon = 'mlists_generate';
+				
+				if(!$grp->save(true, false))
+					die('Fehler: '.$grp->errormsg);
+			}
+			else 
+			{
+				setGeneriert($mlist_name);
+			}
+			
+			$sql_query="
+				SELECT 
+					distinct student_uid
+				FROM 
+					public.tbl_student JOIN 
+					public.tbl_benutzer ON(uid=student_uid)
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+				WHERE
+					tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($stsem)."'
+					AND tbl_benutzer.aktiv
+					AND tbl_prestudentstatus.orgform_kurzbz='".addslashes($row->orgform_kurzbz)."'
+					AND tbl_student.studiengang_kz='".addslashes($row->studiengang_kz)."'";
+			
+			//Personen entfernen die nicht mehr in den Verteiler gehoeren
+			$qry = "DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".$mlist_name."' AND uid NOT IN(".$sql_query.");";
+			if(!$db->db_query($qry))
+			{
+				$error_msg.="Fehler bei Qry:".$qry;
+			}
+			
+			//Fehlende Personen hinzufuegen
+			$sql_query.=" AND student_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+			if(!($result_oe = $db->db_query($sql_query)))
+				$error_msg.=$db->db_last_error().' '.$sql_query;
+			
+			
+			while($row_oe = $db->db_fetch_object($result_oe))
+			{
+		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->student_uid','".$mlist_name."', now(), 'mlists_generate')";
+				if(!$db->db_query($sql_query))
+				{
+					$error_msg.=$db->db_last_error().$sql_query;
+					exit($error_msg);
+				}
+				echo '-';
+				flush();
+			}
+		}	
+	}
+	else 
+		$error_msg.=$db->db_last_error().' '.$sql_query;
 	echo $error_msg;
 	?>
 	<BR>

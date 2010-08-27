@@ -38,6 +38,7 @@
  *                    per CLI (Cronjob) wird das Script mit "php bewerberstatistik.php mail" aufgerufen
  * showdetails    ... wenn true, dann wird die Detailansicht fuer einen Studiengang geliefert
  * studiengang_kz ... gibt den Studiengang an der angezeigt werden soll, wenn showdetails=true
+ * excel          ... statt HTML wird die Statistik als Excel exportiert
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -70,7 +71,7 @@ if(isset($_GET['mail']) || (isset($_SERVER['argv']) && in_array('mail',$_SERVER[
 else 
 	$mail=false;
 
-//wenn die Statistik per Mail versandt wird (Chronjob), 
+//wenn die Statistik per Mail versandt wird (Cronjob), 
 //keine Ruecksicht auf Berechtigungen nehmen
 //das Mail enthaelt alle Studiengaenge
 if(!$mail)
@@ -544,8 +545,8 @@ if(isset($_GET['excel']))
 						) AS interessenten_bb,	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND orgform_kurzbz='FST'
-						) AS interessenten_fst,	
+		   			 	AND orgform_kurzbz='DL'
+						) AS interessenten_dl,	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
@@ -554,7 +555,7 @@ if(isset($_GET['excel']))
 		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='DL') AS interessentenzgv_dl,
 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -564,7 +565,7 @@ if(isset($_GET['excel']))
 		   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='BB') AS interessentenrtanmeldung_bb,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='FST') AS interessentenrtanmeldung_fst,
+		   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='DL') AS interessentenrtanmeldung_dl,
 	
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -574,7 +575,7 @@ if(isset($_GET['excel']))
 		   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='VZ') AS interessentenrttermin_vz,
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='FST') AS interessentenrttermin_fst,
+		   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='DL') AS interessentenrttermin_dl,
 		   			 	
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -584,7 +585,7 @@ if(isset($_GET['excel']))
 		   			 	AND reihungstestangetreten AND orgform_kurzbz='BB') AS interessentenrtabsolviert_bb,
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND reihungstestangetreten AND orgform_kurzbz='FST') AS interessentenrtabsolviert_fst,
+		   			 	AND reihungstestangetreten AND orgform_kurzbz='DL') AS interessentenrtabsolviert_dl,
 		   			 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
@@ -594,7 +595,7 @@ if(isset($_GET['excel']))
 						AND orgform_kurzbz='VZ') AS bewerber_vz,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
-						AND orgform_kurzbz='FST') AS bewerber_fst,
+						AND orgform_kurzbz='DL') AS bewerber_dl,
 						
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
@@ -604,7 +605,7 @@ if(isset($_GET['excel']))
 						AND orgform_kurzbz='BB') AS aufgenommener_bb,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
-						AND orgform_kurzbz='FST') AS aufgenommener_fst,
+						AND orgform_kurzbz='DL') AS aufgenommener_dl,
 						
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' ";
@@ -626,7 +627,7 @@ if(isset($_GET['excel']))
 					{
 							$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
 					}
-						$qry.="AND orgform_kurzbz='FST') AS aufgenommenerber_fst,
+						$qry.="AND orgform_kurzbz='DL') AS aufgenommenerber_dl,
 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
@@ -636,7 +637,7 @@ if(isset($_GET['excel']))
 						AND orgform_kurzbz='VZ') AS student1sem_vz,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
-						AND orgform_kurzbz='FST') AS student1sem_fst,
+						AND orgform_kurzbz='DL') AS student1sem_dl,
 						
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
@@ -646,11 +647,11 @@ if(isset($_GET['excel']))
 						AND orgform_kurzbz='VZ') AS student3sem_vz,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
-						AND orgform_kurzbz='FST') AS student3sem_fst
+						AND orgform_kurzbz='DL') AS student3sem_dl
 				FROM
 					public.tbl_studiengang stg
 				WHERE
-					studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere AND orgform_kurzbz='VBB'
+					studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere AND stg.mischform=true
 				ORDER BY kurzbzlang; ";
 	
 		if($result = $db->db_query($qry))
@@ -698,75 +699,75 @@ if(isset($_GET['excel']))
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				$worksheet->write($zeile,++$i,"VZ", $format_bold);
 				$maxlength[$i] = 6;
 				$worksheet->write($zeile,++$i,"BB", $format_bold);
 				$maxlength[$i] = 3;
-				$worksheet->write($zeile,++$i,"FST", $format_bold);
+				$worksheet->write($zeile,++$i,"DL", $format_bold);
 				$maxlength[$i] = 3;
 				
 				$interessenten_vz_sum = 0;
 				$interessenten_bb_sum = 0;
-				$interessenten_fst_sum = 0;
+				$interessenten_dl_sum = 0;
 				$interessentenzgv_vz_sum = 0;
 				$interessentenzgv_bb_sum = 0;
-				$interessentenzgv_fst_sum = 0;
+				$interessentenzgv_dl_sum = 0;
 				$interessentenrtanmeldung_vz_sum = 0;
 				$interessentenrtanmeldung_bb_sum = 0;
-				$interessentenrtanmeldung_fst_sum = 0;
+				$interessentenrtanmeldung_dl_sum = 0;
 				$bewerber_vz_sum = 0;
 				$bewerber_bb_sum = 0;
-				$bewerber_fst_sum = 0;
+				$bewerber_dl_sum = 0;
 				$aufgenommener_vz_sum = 0;
 				$aufgenommener_bb_sum = 0;
-				$aufgenommener_fst_sum = 0;
+				$aufgenommener_dl_sum = 0;
 				$aufgenommenerber_vz_sum = 0;
 				$aufgenommenerber_bb_sum = 0;
-				$aufgenommenerber_fst_sum = 0;
+				$aufgenommenerber_dl_sum = 0;
 				$student1sem_vz_sum = 0;
 				$student1sem_bb_sum = 0;
-				$student1sem_fst_sum = 0;
+				$student1sem_dl_sum = 0;
 				$student3sem_vz_sum = 0;
 				$student3sem_bb_sum = 0;
-				$student3sem_fst_sum = 0;
+				$student3sem_dl_sum = 0;
 				
 				
 				while($row = $db->db_fetch_object($result))
@@ -783,98 +784,98 @@ if(isset($_GET['excel']))
 					$worksheet->write($zeile,++$i,$row->interessenten_bb, $$format);
 					if(strlen($row->interessenten_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->interessenten_bb);		
-					$worksheet->write($zeile,++$i,$row->interessenten_fst, $$format);
-					if(strlen($row->interessenten_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->interessenten_fst);			
+					$worksheet->write($zeile,++$i,$row->interessenten_dl, $$format);
+					if(strlen($row->interessenten_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->interessenten_dl);			
 					$worksheet->write($zeile,++$i,$row->interessentenzgv_vz, $$format);
 					if(strlen($row->interessentenzgv_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->interessentenzgv_vz);
 					$worksheet->write($zeile,++$i,$row->interessentenzgv_bb, $$format);
 					if(strlen($row->interessentenzgv_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->interessentenzgv_bb);
-					$worksheet->write($zeile,++$i,$row->interessentenzgv_fst, $$format);
-					if(strlen($row->interessentenzgv_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->interessentenzgv_fst);
+					$worksheet->write($zeile,++$i,$row->interessentenzgv_dl, $$format);
+					if(strlen($row->interessentenzgv_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->interessentenzgv_dl);
 					$worksheet->write($zeile,++$i,$row->interessentenrtanmeldung_vz, $$format);
 					if(strlen($row->interessentenrtanmeldung_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->interessentenrtanmeldung_vz);		
 					$worksheet->write($zeile,++$i,$row->interessentenrtanmeldung_bb, $$format);
 					if(strlen($row->interessentenrtanmeldung_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->interessentenrtanmeldung_bb);		
-					$worksheet->write($zeile,++$i,$row->interessentenrtanmeldung_fst, $$format);
-					if(strlen($row->interessentenrtanmeldung_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->interessentenrtanmeldung_fst);		
+					$worksheet->write($zeile,++$i,$row->interessentenrtanmeldung_dl, $$format);
+					if(strlen($row->interessentenrtanmeldung_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->interessentenrtanmeldung_dl);		
 					$worksheet->write($zeile,++$i,$row->bewerber_vz, $$format);
 					if(strlen($row->bewerber_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->bewerber_vz);		
 					$worksheet->write($zeile,++$i,$row->bewerber_bb, $$format);
 					if(strlen($row->bewerber_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->bewerber_bb);
-					$worksheet->write($zeile,++$i,$row->bewerber_fst, $$format);
-					if(strlen($row->bewerber_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->bewerber_fst);		
+					$worksheet->write($zeile,++$i,$row->bewerber_dl, $$format);
+					if(strlen($row->bewerber_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->bewerber_dl);		
 					$worksheet->write($zeile,++$i,$row->aufgenommener_vz, $$format);
 					if(strlen($row->aufgenommener_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->aufgenommener_vz);		
 					$worksheet->write($zeile,++$i,$row->aufgenommener_bb, $$format);
 					if(strlen($row->aufgenommener_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->aufgenommener_bb);
-					$worksheet->write($zeile,++$i,$row->aufgenommener_fst, $$format);
-					if(strlen($row->aufgenommener_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->aufgenommener_fst);
+					$worksheet->write($zeile,++$i,$row->aufgenommener_dl, $$format);
+					if(strlen($row->aufgenommener_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->aufgenommener_dl);
 					$worksheet->write($zeile,++$i,$row->aufgenommenerber_vz, $$format);
 					if(strlen($row->aufgenommenerber_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->aufgenommenerber_vz);
 					$worksheet->write($zeile,++$i,$row->aufgenommenerber_bb, $$format);
 					if(strlen($row->aufgenommenerber_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->aufgenommenerber_bb);
-					$worksheet->write($zeile,++$i,$row->aufgenommenerber_fst, $$format);
-					if(strlen($row->aufgenommenerber_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->aufgenommenerber_fst);		
+					$worksheet->write($zeile,++$i,$row->aufgenommenerber_dl, $$format);
+					if(strlen($row->aufgenommenerber_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->aufgenommenerber_dl);		
 					$worksheet->write($zeile,++$i,$row->student1sem_vz, $$format);
 					if(strlen($row->student1sem_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->student1sem_vz);
 					$worksheet->write($zeile,++$i,$row->student1sem_bb, $$format);
 					if(strlen($row->student1sem_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->student1sem_bb);		
-					$worksheet->write($zeile,++$i,$row->student1sem_fst, $$format);
-					if(strlen($row->student1sem_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->student1sem_fst);
+					$worksheet->write($zeile,++$i,$row->student1sem_dl, $$format);
+					if(strlen($row->student1sem_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->student1sem_dl);
 					$worksheet->write($zeile,++$i,$row->student3sem_vz, $$format);
 					if(strlen($row->student3sem_vz)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->student3sem_vz);
 					$worksheet->write($zeile,++$i,$row->student3sem_bb, $$format);
 					if(strlen($row->student3sem_bb)>$maxlength[$i])
 							$maxlength[$i] = mb_strlen($row->student3sem_bb);		
-					$worksheet->write($zeile,++$i,$row->student3sem_fst, $$format);
-					if(strlen($row->student3sem_fst)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row->student3sem_fst);		
+					$worksheet->write($zeile,++$i,$row->student3sem_dl, $$format);
+					if(strlen($row->student3sem_dl)>$maxlength[$i])
+							$maxlength[$i] = mb_strlen($row->student3sem_dl);		
 					
 					//Summe berechnen
 					$interessenten_vz_sum += $row->interessenten_vz;
 					$interessenten_bb_sum += $row->interessenten_bb;
-					$interessenten_fst_sum += $row->interessenten_fst;
+					$interessenten_dl_sum += $row->interessenten_dl;
 					$interessentenzgv_vz_sum += $row->interessentenzgv_vz;
 					$interessentenzgv_bb_sum += $row->interessentenzgv_bb;
-					$interessentenzgv_fst_sum += $row->interessentenzgv_fst;
+					$interessentenzgv_dl_sum += $row->interessentenzgv_dl;
 					$interessentenrtanmeldung_vz_sum += $row->interessentenrtanmeldung_vz;
 					$interessentenrtanmeldung_bb_sum += $row->interessentenrtanmeldung_bb;
-					$interessentenrtanmeldung_fst_sum += $row->interessentenrtanmeldung_fst;
+					$interessentenrtanmeldung_dl_sum += $row->interessentenrtanmeldung_dl;
 					$bewerber_vz_sum += $row->bewerber_vz;
 					$bewerber_bb_sum += $row->bewerber_bb;
-					$bewerber_fst_sum += $row->bewerber_fst;
+					$bewerber_dl_sum += $row->bewerber_dl;
 					$aufgenommener_vz_sum += $row->aufgenommener_vz;
 					$aufgenommener_bb_sum += $row->aufgenommener_bb;
-					$aufgenommener_fst_sum += $row->aufgenommener_fst;
+					$aufgenommener_dl_sum += $row->aufgenommener_dl;
 					$aufgenommenerber_vz_sum += $row->aufgenommenerber_vz;
 					$aufgenommenerber_bb_sum += $row->aufgenommenerber_bb;
-					$aufgenommenerber_fst_sum += $row->aufgenommenerber_fst;
+					$aufgenommenerber_dl_sum += $row->aufgenommenerber_dl;
 					$student1sem_vz_sum += $row->student1sem_vz;
 					$student1sem_bb_sum += $row->student1sem_bb;
-					$student1sem_fst_sum += $row->student1sem_fst;
+					$student1sem_dl_sum += $row->student1sem_dl;
 					$student3sem_vz_sum += $row->student3sem_vz;
 					$student3sem_bb_sum += $row->student3sem_bb;
-					$student3sem_fst_sum += $row->student3sem_fst;
+					$student3sem_dl_sum += $row->student3sem_dl;
 				}
 				$i=0;
 				$worksheet->write(++$zeile,$i,"Summe", $format_bold);
@@ -886,72 +887,72 @@ if(isset($_GET['excel']))
 				$worksheet->write($zeile,++$i,$interessenten_bb_sum, $format_bold);
 				if(strlen($interessenten_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($interessenten_bb_sum);
-				$worksheet->write($zeile,++$i,$interessenten_fst_sum, $format_bold);
-				if(strlen($interessenten_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($interessenten_fst_sum);
+				$worksheet->write($zeile,++$i,$interessenten_dl_sum, $format_bold);
+				if(strlen($interessenten_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($interessenten_dl_sum);
 				$worksheet->write($zeile,++$i,$interessentenzgv_vz_sum, $format_bold);
 				if(strlen($interessentenzgv_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($interessentenzgv_vz_sum);		
 				$worksheet->write($zeile,++$i,$interessentenzgv_bb_sum, $format_bold);
 				if(strlen($interessentenzgv_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($interessentenzgv_bb_sum);
-				$worksheet->write($zeile,++$i,$interessentenzgv_fst_sum, $format_bold);
-				if(strlen($interessentenzgv_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($interessentenzgv_fst_sum);		
+				$worksheet->write($zeile,++$i,$interessentenzgv_dl_sum, $format_bold);
+				if(strlen($interessentenzgv_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($interessentenzgv_dl_sum);		
 				$worksheet->write($zeile,++$i,$interessentenrtanmeldung_vz_sum, $format_bold);
 				if(strlen($interessentenrtanmeldung_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($interessentenrtanmeldung_vz_sum);
 				$worksheet->write($zeile,++$i,$interessentenrtanmeldung_bb_sum, $format_bold);
 				if(strlen($interessentenrtanmeldung_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($interessentenrtanmeldung_bb_sum);		
-				$worksheet->write($zeile,++$i,$interessentenrtanmeldung_fst_sum, $format_bold);
-				if(strlen($interessentenrtanmeldung_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($interessentenrtanmeldung_fst_sum);		
+				$worksheet->write($zeile,++$i,$interessentenrtanmeldung_dl_sum, $format_bold);
+				if(strlen($interessentenrtanmeldung_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($interessentenrtanmeldung_dl_sum);		
 				$worksheet->write($zeile,++$i,$bewerber_vz_sum, $format_bold);
 				if(strlen($bewerber_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($bewerber_vz_sum);		
 				$worksheet->write($zeile,++$i,$bewerber_bb_sum, $format_bold);
 				if(strlen($bewerber_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($bewerber_bb_sum);		
-				$worksheet->write($zeile,++$i,$bewerber_fst_sum, $format_bold);
-				if(strlen($bewerber_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($bewerber_fst_sum);				
+				$worksheet->write($zeile,++$i,$bewerber_dl_sum, $format_bold);
+				if(strlen($bewerber_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($bewerber_dl_sum);				
 				$worksheet->write($zeile,++$i,$aufgenommener_vz_sum, $format_bold);
 				if(strlen($aufgenommener_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($aufgenommener_vz_sum);		
 				$worksheet->write($zeile,++$i,$aufgenommener_bb_sum, $format_bold);
 				if(strlen($aufgenommener_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($aufgenommener_bb_sum);
-				$worksheet->write($zeile,++$i,$aufgenommener_fst_sum, $format_bold);
-				if(strlen($aufgenommener_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($aufgenommener_fst_sum);		
+				$worksheet->write($zeile,++$i,$aufgenommener_dl_sum, $format_bold);
+				if(strlen($aufgenommener_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($aufgenommener_dl_sum);		
 				$worksheet->write($zeile,++$i,$aufgenommenerber_vz_sum, $format_bold);
 				if(strlen($aufgenommenerber_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($aufgenommenerber_vz_sum);		
 				$worksheet->write($zeile,++$i,$aufgenommenerber_bb_sum, $format_bold);
 				if(strlen($aufgenommenerber_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($aufgenommenerber_bb_sum);		
-				$worksheet->write($zeile,++$i,$aufgenommenerber_fst_sum, $format_bold);
-				if(strlen($aufgenommenerber_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($aufgenommenerber_fst_sum);		
+				$worksheet->write($zeile,++$i,$aufgenommenerber_dl_sum, $format_bold);
+				if(strlen($aufgenommenerber_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($aufgenommenerber_dl_sum);		
 				$worksheet->write($zeile,++$i,$student1sem_vz_sum, $format_bold);
 				if(strlen($student1sem_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($student1sem_vz_sum);
 				$worksheet->write($zeile,++$i,$student1sem_bb_sum, $format_bold);
 				if(strlen($student1sem_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($student1sem_bb_sum);
-				$worksheet->write($zeile,++$i,$student1sem_fst_sum, $format_bold);
-				if(strlen($student1sem_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($student1sem_fst_sum);
+				$worksheet->write($zeile,++$i,$student1sem_dl_sum, $format_bold);
+				if(strlen($student1sem_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($student1sem_dl_sum);
 				$worksheet->write($zeile,++$i,$student3sem_vz_sum, $format_bold);
 				if(strlen($student3sem_vz_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($student3sem_vz_sum);
 				$worksheet->write($zeile,++$i,$student3sem_bb_sum, $format_bold);
 				if(strlen($student3sem_bb_sum)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($student3sem_bb_sum);
-				$worksheet->write($zeile,++$i,$student3sem_fst_sum, $format_bold);
-				if(strlen($student3sem_fst_sum)>$maxlength[$i])
-						$maxlength[$i] = mb_strlen($student3sem_fst_sum);
+				$worksheet->write($zeile,++$i,$student3sem_dl_sum, $format_bold);
+				if(strlen($student3sem_dl_sum)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($student3sem_dl_sum);
 			}
 		}
 		
@@ -977,7 +978,8 @@ if(isset($_GET['excel']))
 					HAVING 
 						status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 				) AS prestd
-				GROUP BY anzahl; ";
+				GROUP BY anzahl
+				ORDER BY anzahl; ";
 		
 		$i=0;
 		$worksheet->write(++$zeile,$i,"Personen", $format_bold);
@@ -1480,7 +1482,8 @@ if(isset($_GET['excel']))
 					HAVING 
 						status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 				) AS prestd
-				GROUP BY anzahl; ";
+				GROUP BY anzahl
+				ORDER BY anzahl; ";
 		$i=0;
 		$worksheet2->write(++$zeile,$i,"Personen", $format_bold);
 		$maxlength[$i] = 10;
@@ -1912,8 +1915,8 @@ else
 						) AS interessenten_bb,	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND orgform_kurzbz='FST'
-						) AS interessenten_fst,	
+		   			 	AND orgform_kurzbz='DL'
+						) AS interessenten_dl,	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='BB') AS interessentenzgv_bb,
@@ -1922,7 +1925,7 @@ else
 		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='VZ') AS interessentenzgv_vz,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='FST') AS interessentenzgv_FST,
+		   				AND ((stg.typ<>'m' AND zgv_code IS NOT NULL) OR zgvmas_code IS NOT NULL) AND orgform_kurzbz='DL') AS interessentenzgv_dl,
 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -1932,7 +1935,7 @@ else
 		   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='BB') AS interessentenrtanmeldung_bb,
 		   			(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='FST') AS interessentenrtanmeldung_fst,
+		   			 	AND anmeldungreihungstest IS NOT NULL AND orgform_kurzbz='DL') AS interessentenrtanmeldung_dl,
 	
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -1942,7 +1945,7 @@ else
 		   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='VZ') AS interessentenrttermin_vz,
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='FST') AS interessentenrttermin_fst,
+		   			 	AND reihungstest_id IS NOT NULL  AND orgform_kurzbz='DL') AS interessentenrttermin_dl,
 		   			 	
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
@@ -1952,7 +1955,7 @@ else
 		   			 	AND reihungstestangetreten AND orgform_kurzbz='BB') AS interessentenrtabsolviert_bb,
 		   			 (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
-		   			 	AND reihungstestangetreten AND orgform_kurzbz='FST') AS interessentenrtabsolviert_fst,
+		   			 	AND reihungstestangetreten AND orgform_kurzbz='DL') AS interessentenrtabsolviert_dl,
 		   			 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
@@ -1962,7 +1965,7 @@ else
 						AND orgform_kurzbz='VZ') AS bewerber_vz,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 		   				WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Bewerber' AND studiensemester_kurzbz='$stsem'
-						AND orgform_kurzbz='FST') AS bewerber_fst,
+						AND orgform_kurzbz='DL') AS bewerber_dl,
 						
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
@@ -1972,7 +1975,7 @@ else
 						AND orgform_kurzbz='BB') AS aufgenommener_bb,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem'
-						AND orgform_kurzbz='FST') AS aufgenommener_fst,
+						AND orgform_kurzbz='DL') AS aufgenommener_dl,
 						
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Aufgenommener' AND studiensemester_kurzbz='$stsem' ";
@@ -1994,7 +1997,7 @@ else
 					{
 							$qry.="AND (prestudent_id) NOT IN ('".implode("','",$ausgeschieden)."')  ";
 					}
-						$qry.="AND orgform_kurzbz='FST') AS aufgenommenerber_fst,
+						$qry.="AND orgform_kurzbz='DL') AS aufgenommenerber_dl,
 	
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
@@ -2004,7 +2007,7 @@ else
 						AND orgform_kurzbz='VZ') AS student1sem_vz,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
-						AND orgform_kurzbz='FST') AS student1sem_fst,
+						AND orgform_kurzbz='DL') AS student1sem_dl,
 						
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
@@ -2014,11 +2017,11 @@ else
 						AND orgform_kurzbz='VZ') AS student3sem_vz,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
-						AND orgform_kurzbz='FST') AS student3sem_fst
+						AND orgform_kurzbz='DL') AS student3sem_dl
 				FROM
 					public.tbl_studiengang stg
 				WHERE
-					studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere AND orgform_kurzbz='VBB'
+					studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere AND stg.mischform=true
 				ORDER BY kurzbzlang; ";
 	
 		if($result = $db->db_query($qry))
@@ -2030,14 +2033,14 @@ else
 						<thead>
 							<tr>
 								<th class='table-sortable:default'>Studiengang</th>
-								<th class='table-sortable:numeric'>Interessenten VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Bewerber 1S VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Aufgenommener VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Aufgenommener bereinigt VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Student 1S VZ / BB / FST</th>
-								<th class='table-sortable:numeric'>Student 3S VZ / BB / FST</th>
+								<th class='table-sortable:numeric'>Interessenten VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Bewerber 1S VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Aufgenommener VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Aufgenommener bereinigt VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Student 1S VZ / BB / DL</th>
+								<th class='table-sortable:numeric'>Student 3S VZ / BB / DL</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -2045,81 +2048,81 @@ else
 				
 				$interessenten_vz_sum = 0;
 				$interessenten_bb_sum = 0;
-				$interessenten_fst_sum = 0;
+				$interessenten_dl_sum = 0;
 				$interessentenzgv_vz_sum = 0;
 				$interessentenzgv_bb_sum = 0;
-				$interessentenzgv_fst_sum = 0;
+				$interessentenzgv_dl_sum = 0;
 				$interessentenrtanmeldung_vz_sum = 0;
 				$interessentenrtanmeldung_bb_sum = 0;
-				$interessentenrtanmeldung_fst_sum = 0;
+				$interessentenrtanmeldung_dl_sum = 0;
 				$bewerber_vz_sum = 0;
 				$bewerber_bb_sum = 0;
-				$bewerber_fst_sum = 0;
+				$bewerber_dl_sum = 0;
 				$aufgenommener_vz_sum = 0;
 				$aufgenommener_bb_sum = 0;
-				$aufgenommener_fst_sum = 0;
+				$aufgenommener_dl_sum = 0;
 				$aufgenommenerber_vz_sum = 0;
 				$aufgenommenerber_bb_sum = 0;
-				$aufgenommenerber_fst_sum = 0;
+				$aufgenommenerber_dl_sum = 0;
 				$student1sem_vz_sum = 0;
 				$student1sem_bb_sum = 0;
-				$student1sem_fst_sum = 0;
+				$student1sem_dl_sum = 0;
 				$student3sem_vz_sum = 0;
 				$student3sem_bb_sum = 0;
-				$student3sem_fst_sum = 0;
+				$student3sem_dl_sum = 0;
 				
 				while($row = $db->db_fetch_object($result))
 				{
 					$content.= "\n";
 					$content.= '<tr>';
 					$content.= "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
-					$content.= "<td align='center'>$row->interessenten_vz / $row->interessenten_bb / $row->interessenten_fst</td>";
-					$content.= "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb / $row->interessentenzgv_fst</td>";
-					$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb / $row->interessentenrtanmeldung_fst</td>";
-					$content.= "<td align='center'>$row->bewerber_vz / $row->bewerber_bb / $row->bewerber_fst</td>";
-					$content.= "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb / $row->aufgenommener_fst</td>";
-					$content.= "<td align='center'>$row->aufgenommenerber_vz / $row->aufgenommenerber_bb / $row->aufgenommenerber_fst</td>";
-					$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb / $row->student1sem_fst</td>";
-					$content.= "<td align='center'>$row->student3sem_vz / $row->student3sem_bb / $row->student3sem_fst</td>";
+					$content.= "<td align='center'>$row->interessenten_vz / $row->interessenten_bb / $row->interessenten_dl</td>";
+					$content.= "<td align='center'>$row->interessentenzgv_vz / $row->interessentenzgv_bb / $row->interessentenzgv_dl</td>";
+					$content.= "<td align='center'>$row->interessentenrtanmeldung_vz / $row->interessentenrtanmeldung_bb / $row->interessentenrtanmeldung_dl</td>";
+					$content.= "<td align='center'>$row->bewerber_vz / $row->bewerber_bb / $row->bewerber_dl</td>";
+					$content.= "<td align='center'>$row->aufgenommener_vz / $row->aufgenommener_bb / $row->aufgenommener_dl</td>";
+					$content.= "<td align='center'>$row->aufgenommenerber_vz / $row->aufgenommenerber_bb / $row->aufgenommenerber_dl</td>";
+					$content.= "<td align='center'>$row->student1sem_vz / $row->student1sem_bb / $row->student1sem_dl</td>";
+					$content.= "<td align='center'>$row->student3sem_vz / $row->student3sem_bb / $row->student3sem_dl</td>";
 					$content.= "</tr>";
 					
 					//Summe berechnen
 					$interessenten_vz_sum += $row->interessenten_vz;
 					$interessenten_bb_sum += $row->interessenten_bb;
-					$interessenten_fst_sum += $row->interessenten_fst;
+					$interessenten_dl_sum += $row->interessenten_dl;
 					$interessentenzgv_vz_sum += $row->interessentenzgv_vz;
 					$interessentenzgv_bb_sum += $row->interessentenzgv_bb;
-					$interessentenzgv_fst_sum += $row->interessentenzgv_fst;
+					$interessentenzgv_dl_sum += $row->interessentenzgv_dl;
 					$interessentenrtanmeldung_vz_sum += $row->interessentenrtanmeldung_vz;
 					$interessentenrtanmeldung_bb_sum += $row->interessentenrtanmeldung_bb;
-					$interessentenrtanmeldung_fst_sum += $row->interessentenrtanmeldung_fst;
+					$interessentenrtanmeldung_dl_sum += $row->interessentenrtanmeldung_dl;
 					$bewerber_vz_sum += $row->bewerber_vz;
 					$bewerber_bb_sum += $row->bewerber_bb;
-					$bewerber_fst_sum += $row->bewerber_fst;
+					$bewerber_dl_sum += $row->bewerber_dl;
 					$aufgenommener_vz_sum += $row->aufgenommener_vz;
 					$aufgenommener_bb_sum += $row->aufgenommener_bb;
-					$aufgenommener_fst_sum += $row->aufgenommener_fst;
+					$aufgenommener_dl_sum += $row->aufgenommener_dl;
 					$aufgenommenerber_vz_sum += $row->aufgenommenerber_vz;
 					$aufgenommenerber_bb_sum += $row->aufgenommenerber_bb;
-					$aufgenommenerber_fst_sum += $row->aufgenommenerber_fst;
+					$aufgenommenerber_dl_sum += $row->aufgenommenerber_dl;
 					$student1sem_vz_sum += $row->student1sem_vz;
 					$student1sem_bb_sum += $row->student1sem_bb;
-					$student1sem_fst_sum += $row->student1sem_fst;
+					$student1sem_dl_sum += $row->student1sem_dl;
 					$student3sem_vz_sum += $row->student3sem_vz;
 					$student3sem_bb_sum += $row->student3sem_bb;
-					$student3sem_fst_sum += $row->student3sem_fst;
+					$student3sem_dl_sum += $row->student3sem_dl;
 				}
 				$content.= "\n";
 				$content.= '</tbody><tfoot style="font-weight: bold;"><tr>';
 				$content.= "<td>Summe</td>";
-				$content.= "<td align='center'>$interessenten_vz_sum / $interessenten_bb_sum / $interessenten_fst_sum</td>";
-				$content.= "<td align='center'>$interessentenzgv_vz_sum / $interessentenzgv_bb_sum / $interessentenzgv_fst_sum</td>";
-				$content.= "<td align='center'>$interessentenrtanmeldung_vz_sum / $interessentenrtanmeldung_bb_sum / $interessentenrtanmeldung_fst_sum</td>";
-				$content.= "<td align='center'>$bewerber_vz_sum / $bewerber_bb_sum / $bewerber_fst_sum</td>";
-				$content.= "<td align='center'>$aufgenommener_vz_sum / $aufgenommener_bb_sum / $aufgenommener_fst_sum</td>";
-				$content.= "<td align='center'>$aufgenommenerber_vz_sum / $aufgenommenerber_bb_sum / $aufgenommenerber_fst_sum</td>";
-				$content.= "<td align='center'>$student1sem_vz_sum / $student1sem_bb_sum / $student1sem_fst_sum</td>";
-				$content.= "<td align='center'>$student3sem_vz_sum / $student3sem_bb_sum / $student3sem_fst_sum</td>";
+				$content.= "<td align='center'>$interessenten_vz_sum / $interessenten_bb_sum / $interessenten_dl_sum</td>";
+				$content.= "<td align='center'>$interessentenzgv_vz_sum / $interessentenzgv_bb_sum / $interessentenzgv_dl_sum</td>";
+				$content.= "<td align='center'>$interessentenrtanmeldung_vz_sum / $interessentenrtanmeldung_bb_sum / $interessentenrtanmeldung_dl_sum</td>";
+				$content.= "<td align='center'>$bewerber_vz_sum / $bewerber_bb_sum / $bewerber_dl_sum</td>";
+				$content.= "<td align='center'>$aufgenommener_vz_sum / $aufgenommener_bb_sum / $aufgenommener_dl_sum</td>";
+				$content.= "<td align='center'>$aufgenommenerber_vz_sum / $aufgenommenerber_bb_sum / $aufgenommenerber_dl_sum</td>";
+				$content.= "<td align='center'>$student1sem_vz_sum / $student1sem_bb_sum / $student1sem_dl_sum</td>";
+				$content.= "<td align='center'>$student3sem_vz_sum / $student3sem_bb_sum / $student3sem_dl_sum</td>";
 				$content.= "</tfoot></tr>";
 				$content.= '</table>';
 			}
@@ -2143,7 +2146,8 @@ else
 					HAVING 
 						status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 				) AS prestd
-				GROUP BY anzahl; ";
+				GROUP BY anzahl
+				ORDER BY anzahl; ";
 	
 		$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
 					<thead>
@@ -2429,7 +2433,8 @@ else
 						HAVING 
 							status_kurzbz='Interessent' AND studiensemester_kurzbz='$stsem'
 					) AS prestd
-					GROUP BY anzahl; ";
+					GROUP BY anzahl
+					ORDER BY anzahl; ";
 		
 			$content.= "\n<table class='liste table-stripeclass:alternate table-autostripe' style='width:auto'>
 						<thead>

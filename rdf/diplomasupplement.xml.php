@@ -127,7 +127,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						break;
 			case 'VZ':	echo '		<studienart>Vollzeitstudium/Full-time degree programm</studienart>';
 						break;
-			case 'FST':	echo '		<studienart>Fernstudium/Distance study</studienart>';
+			case 'DL':	echo '		<studienart>Fernstudium/Distance study</studienart>';
 						break;
 			default:	echo '		<studienart></studienart>';
 						break;
