@@ -53,7 +53,7 @@ class lehrveranstaltung extends basis_db
 	public $updatevon;				// string
 	public $sprache='German';		// varchar(16)
 	public $sort;					// smallint
-	public $incoming;				// smallint
+	public $incoming=5;				// smallint
 	public $zeugnis=true;			// boolean
 	public $projektarbeit;			// boolean
 	public $koordinator;			// varchar(16)
