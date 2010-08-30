@@ -1101,6 +1101,18 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 		}
 	}
 }
+
+//bezeichnung_english fuer tbl_abschlussbeurteilung hinzugefuegt
+if(!@$db->db_query("SELECT bezeichnung_english FROM lehre.tbl_abschlussbeurteilung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_abschlussbeurteilung ADD COLUMN bezeichnung_english varchar(64);";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlussbeurteilung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'lehre.tbl_abschlussbeurteilung: Spalte bezeichnung_english hinzugefuegt<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -1159,7 +1171,7 @@ $tabellen=array(
 	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","teamgroesse","wbtyp_kurzbz","uid","icon"),
 	"kommune.tbl_wettbewerbteam"  => array("team_kurzbz","wettbewerb_kurzbz","rang","punkte"),
 	"kommune.tbl_wettbewerbtyp"  => array("wbtyp_kurzbz","bezeichnung","farbe"),
-	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung"),
+	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
