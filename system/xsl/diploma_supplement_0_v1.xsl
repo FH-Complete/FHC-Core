@@ -258,7 +258,7 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 4.5 \n </fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Gesamtbeurteilung der Qualifikation \n Overall classification of the qualification</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="beurteilung" /> \n</fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="beurteilung" /> \n<xsl:value-of select="beurteilung_english" /></fo:block></fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
