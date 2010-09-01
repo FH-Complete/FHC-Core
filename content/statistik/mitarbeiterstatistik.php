@@ -54,6 +54,8 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
 			WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' 
 			AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv 
+			AND (datum_bis >= now() OR datum_bis IS NULL)
+			AND (datum_von <= now() OR datum_von IS NULL)
 			ORDER BY nachname, vorname";
 	
 	if($result = $db->db_query($qry))
@@ -86,6 +88,8 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
 			WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' 
 			AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv
+			AND (datum_bis >= now() OR datum_bis IS NULL)
+			AND (datum_von <= now() OR datum_von IS NULL)
 			ORDER BY nachname, vorname";
 	
 	if($result = $db->db_query($qry))
@@ -140,8 +144,8 @@ else
 	
 	$qry = "SELECT 
 				bezeichnung, fachbereich_kurzbz,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as fix,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv) a) as extern
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) a) as fix,
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) a) as extern
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	
 	if($result = $db->db_query($qry))
@@ -165,8 +169,8 @@ else
 		}
 		
 		$qry = "SELECT 
-					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung') AND aktiv AND fixangestellt) as fix,
-					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung') AND aktiv AND NOT fixangestellt) as extern
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND fixangestellt) as fix,
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND NOT fixangestellt) as extern
 				";
 		if($result = $db->db_query($qry))
 		{
