@@ -142,49 +142,104 @@
 					</table>
 					</td>
 	  			</tr>
-
-				<tr>
+		  		<tr> 
 					<td class="tdwrap"></td>
-					<td><a href="public/bibliothek_allgemein.html" target="content" class="MenuItem" onClick="js_toggle_container('Bibliothek');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bibliothek</a>
-				  	<table class="tabcontent" id="Bibliothek" style="display: none">
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_allgemein.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Allgemeines</a></td>
-						</tr>
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Online-Katalog / Recherche</a></td>
-						</tr>
-
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_ebooks.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;eBooks</a></td>
-						</tr>
-
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_e_journals.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;E-Journals</a></td>
-						</tr>
-
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_datenbanken.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Datenbanken</a></td>
-						</tr>
+					<td><a href="#" class="MenuItem" onClick="js_toggle_container('Bibliothek');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bibliothek / Library</a>
 
 
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
-						</tr>
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_Publikationsdatenbank.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Publikationsdatenbank</a></td>
-						</tr>
-						<tr>
-							<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a class="Item" href="public/bibliothek_aktuelles.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Aktuelles</a></td>
-						</tr>
-					</table>
+				  		<table class="tabcontent" id="Bibliothek" style="display: none">
+							<tr>
+		  						<td class="tdwidth10" nowrap>&nbsp;</td>
+							    <td class="tdwrap"><a href="public/bibliothek/Deutsch/bibliothek_allgemein.html" target="content" class="MenuItem" onClick="js_toggle_container('BIBLIOTHEK_DE');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Deutsch</a>
+								<table class="tabcontent" id="BIBLIOTHEK_DE" style="display: none">
+
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_allgemein.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Allgemeines</a></td>
+										</tr>
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Online-Katalog / Recherche</a></td>
+										</tr>
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_ebooks.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;eBooks</a></td>
+										</tr>
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_e_journals.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;E-Journals</a></td>
+										</tr>
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_datenbanken.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Datenbanken</a></td>
+										</tr>
+				
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bestellung von Medien</a></td>
+										</tr>
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_Publikationsdatenbank.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Publikationsdatenbank</a></td>
+										</tr>
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Deutsch/bibliothek_aktuelles.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Aktuelles</a></td>
+										</tr>
+								</table>
+								</td>
+							</tr>
+
+							<tr>
+		  						<td class="tdwidth10" nowrap>&nbsp;</td>
+							    <td class="tdwrap"><a href="public/bibliothek/Englisch/bibliothek_allgemein.html" target="content" class="MenuItem" onClick="js_toggle_container('BIBLIOTHEK_EN');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;English</a>
+								<table class="tabcontent" id="BIBLIOTHEK_EN" style="display: none">
+
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_allgemein.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;General information</a></td>
+										</tr>
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_onlinekatalog.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Online Catalog / Research</a></td>
+										</tr>
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_ebooks.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;eBooks</a></td>
+										</tr>
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_e_journals.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;E-Journals</a></td>
+										</tr>
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_datenbanken.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Databases</a></td>
+										</tr>
+				
+				
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_bestellung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ordering</a></td>
+										</tr>
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_Publikationsdatenbank.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Publication Database</a></td>
+										</tr>
+										<tr>
+											<td class="tdwidth10" nowrap>&nbsp;</td>
+											<td class="tdwrap"><a class="Item" href="public/bibliothek/Englisch/bibliothek_aktuelles.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;News</a></td>
+										</tr>
+								</table>
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 				<tr>
@@ -499,7 +554,7 @@
 							</tr>
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
-								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Benutzungsordnung Bibliothek_E.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Terms &amp; Conditions of Use for the library</a></td>
+								<td class="tdwrap"><a class="Item" href="public/info/verordnungen/Library_regulations.pdf" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Library Regulations</a></td>
 							</tr>
 							<tr>
 							  	<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -687,6 +742,8 @@
 
 			</table>
 		</td>
+  		
+  		
   		</tr>
   			<tr>
 				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
