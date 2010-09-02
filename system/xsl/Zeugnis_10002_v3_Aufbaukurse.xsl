@@ -82,7 +82,7 @@
 						<fo:table-body>
 							<fo:table-row>
 								<fo:table-cell>
-									<fo:block font-size="6pt" font-family="arial">Beurteilung: bestanden, nicht bestanden</fo:block>
+									<fo:block font-size="6pt" font-family="arial">Beurteilung: bestanden, nicht bestanden, nicht teilgenommen</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
@@ -151,6 +151,9 @@
 						</xsl:when>
 						<xsl:when test="note='b'">
 							<xsl:text>bestanden</xsl:text>
+						</xsl:when>
+						<xsl:when test="note='nt'">
+							<xsl:text>nicht teilgenommen</xsl:text>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="note"/>
