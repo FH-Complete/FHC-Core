@@ -322,7 +322,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
 				$xml .= "				<note>".$note2."</note>";
 				$xml .= "				<sws>".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."</sws>";
-				$xml .= "				<ects>".($row->ects==0 || $row->ects==''?'':number_format($row->ects,1))."</ects>";
+				$ectspunkte='';
+				
+				if($row->ects==0 || $row->ects=='')
+					$ectspunkte='';
+				else
+				{
+					//Bei 2 Nachkommastellen beide anzeigen, sonst nur 1
+					if(number_format($row->ects,1)==number_format($row->ects,2))
+						$ectspunkte=number_format($row->ects,1);
+					else 	
+						$ectspunkte=number_format($row->ects,2);
+				}
+				$xml .= "				<ects>".$ectspunkte."</ects>";
 				$xml .= "				<lv_lehrform_kurzbz>".$row->lv_lehrform_kurzbz."</lv_lehrform_kurzbz>";
 				if($auslandssemester)
 				{
