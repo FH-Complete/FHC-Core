@@ -131,9 +131,12 @@ if(isset($_POST['neu']))
 		$studiengang = new studiengang();
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
 		
-		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
-		$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
+		$orgform = ($lehrveranstaltung->orgform_kurzbz!=''?$lehrveranstaltung->orgform_kurzbz:$studiengang->orgform_kurzbz);
 		
+		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
+		//$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
+		$shortname = $studiengang->kuerzel.'-'.$orgform.'-'.$lehrveranstaltung->semester.'-'.$stsem.'-'.$lehrveranstaltung->kurzbz;
+
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{
@@ -247,6 +250,8 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 		$studiengang = new studiengang();
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
 		
+		//$orgform = ($lehrveranstaltung->orgform_kurzbz!=''?$lehrveranstaltung->orgform_kurzbz:$studiengang->orgform_kurzbz);
+		
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
 		$shortname = 'TK-'.$stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
 		
@@ -351,8 +356,10 @@ else
 	
 	$studiengang = new studiengang();
 	$studiengang->load($lv->studiengang_kz);
-		
-	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$studiengang->kuerzel.' '.$lv->semester.' '.$stsem.' - '.$lv->bezeichnung.'">';
+	$orgform = ($lv->orgform_kurzbz!=''?$lv->orgform_kurzbz:$studiengang->orgform_kurzbz);
+	$longbezeichnung = $studiengang->kuerzel.'-'.$orgform.'-'.$lv->semester.'-'.$stsem.' - '.$lv->bezeichnung;
+	
+	echo '<br>Kursbezeichnung: <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$longbezeichnung.'">';
 	echo '<br>Gruppen übernehmen: <input type="checkbox" name="gruppen" checked>';
 	echo '<br><br><input type="submit" name="neu" value="Kurs anlegen">
 			</form>';
