@@ -73,11 +73,11 @@
 				 </tr>
 
 				
-		  		<tr>
+	<!--    		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://twist.technikum-wien.at/"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Studierendenvertretung</a></td>
 		  		</tr>
-
+	-->	
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" target="_blank" href="http://www.groll-gars.at/mensa.htm"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Mensa</a></td>
