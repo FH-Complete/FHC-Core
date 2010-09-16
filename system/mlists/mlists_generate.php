@@ -635,13 +635,17 @@ $error_msg='';
 				SELECT 
 					distinct student_uid
 				FROM 
-					public.tbl_student JOIN 
-					public.tbl_benutzer ON(uid=student_uid)
-					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+					public.tbl_student 
+					JOIN public.tbl_benutzer ON(uid=student_uid)
 				WHERE
-					tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($stsem)."'
-					AND tbl_benutzer.aktiv
-					AND tbl_prestudentstatus.orgform_kurzbz='".addslashes($row->orgform_kurzbz)."'
+					tbl_benutzer.aktiv AND
+					'".addslashes($row->orgform_kurzbz)."'=
+						(SELECT orgform_kurzbz 
+						 FROM public.tbl_prestudentstatus 
+						 WHERE 
+						 	prestudent_id=tbl_student.prestudent_id 
+						 	AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($stsem)."' 
+						 ORDER BY datum desc, insertamum desc, ext_id desc LIMIT 1)					
 					AND tbl_student.studiengang_kz='".addslashes($row->studiengang_kz)."'";
 			
 			//Personen entfernen die nicht mehr in den Verteiler gehoeren
