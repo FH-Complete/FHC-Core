@@ -769,9 +769,41 @@
 
 			</table>
 		</td>
-  		
-  		
+		<!-- 
+		<tr>
+          <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Rektorat</a></td>
   		</tr>
+		<tr>
+        	<td class="tdwrap">
+		  	<table class="tabcontent" id="Infos" style="display: none;">
+		  	<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a class="Item" href="http://www.technikum-wien.at/fh/leitbild/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Leitbild der FHTW</a></td>
+			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="public/frauenbeauftragte.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Frauen an der FHTW</a></td>
+			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="public/stipendien.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Stipendien &amp; Awards</a></td>
+			</tr>			
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="public/auszeichnungen.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Auszeichnungen &amp; Preistr&auml;gerInnen</a></td>
+			</tr>			
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="public/hochschulprojekte.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Hochschulprojekte</a></td>
+			</tr>			
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="public/factsnfigures.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Facts &amp; Figures</a></td>
+			</tr>
+			</table>
+		</td>
+		</tr>-->
+  		
   			<tr>
 				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
 			</tr>
@@ -781,6 +813,10 @@
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/kollegiumswahl.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Kollegiumswahl 2008</a></td>
+				</tr>
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="private/info/kollegiumswahl2010.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Kollegiumswahl 2010</a></td>
 				</tr>
 				</table>
 				</td>
