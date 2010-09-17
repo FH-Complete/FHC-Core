@@ -51,7 +51,23 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 function generateMitarbeiterUID($vorname, $nachname, $lektor)
 {
 	$bn = new benutzer();
-
+	$reserviert = array();
+	
+	// Das File aliases enthaelt die Mailverteiler haendisch gewarteten Mailverteiler die nicht
+	// in der FHC Datenbank vorhanden sind.
+	// Diese duerfen nicht als UID verwendet werden, da es sonst zu Konflikten kommt
+	$aliases = file_get_contents(DOC_ROOT.'../system/aliases');
+	$aliases = explode("\n",$aliases);
+	foreach($aliases as $alias)
+	{
+		if(!strstr($alias,'#'))
+		{
+		 $entry = preg_split("/[\s:]+/", $alias);
+		 if($entry[0]!='')
+		 	$reserviert[]=$entry[0];
+		}
+	}
+	
 	for($nn=8,$vn=0;$nn!=0;$nn--,$vn++)
 	{
 		$uid = mb_substr($nachname,0,$nn);
@@ -59,7 +75,7 @@ function generateMitarbeiterUID($vorname, $nachname, $lektor)
 		
 		$uid = mb_str_replace(' ','',$uid);
 
-		if(!$bn->uid_exists($uid))
+		if(!$bn->uid_exists($uid) && !in_array($uid, $reserviert))
 			if($bn->errormsg=='')
 				return $uid;
 	}
