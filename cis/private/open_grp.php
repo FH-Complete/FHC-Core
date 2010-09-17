@@ -76,12 +76,14 @@ require_once('../../include/functions.inc.php');
 			<td><a href='mailto:".$_REQUEST['grp'].$mail_id."@technikum-wien.at'>".$_REQUEST['desc']."</a></td>
 			<td>Ge&ouml;ffnet (Code: ".$mail_id.")</td>
 		</tr>
-<table>
+		<tr>
+		<td colspan='2'>
+		<p>Um ein Mail an den Verteiler zu senden klicken Sie bitte auf den obigen Link. Ihr Mailprogramm &ouml;ffnet automatisch eine Vorlage f&uuml;r ein neues Mail, welche bereits die korrekte Adresse enth&auml;lt.</p>
 
-		<p>Um ein Mail an den Verteiler zu senden klicken Sie bitte auf den obigen Link. Ihr Mailprogramm &ouml;ffnet automatisch eine Vorlage f&uuml;r ein neues Mail, welche bereits die korrekte Adresse enth&auml;lt.
-
-		<p>Das Senden ist f&uuml;r den Zeitraum von <b>2 Stunden</b> bzw. f&uuml;r die <b>einmalige</b> Benutzung unter der Adresse <a href='mailto:".$_REQUEST['grp'].$mail_id."@technikum-wien.at'>".$_REQUEST['grp'].$mail_id."@technikum-wien.at</a> m&ouml;glich.
-
+		<p>Das Senden ist f&uuml;r den Zeitraum von <b>2 Stunden</b> bzw. f&uuml;r die <b>einmalige</b> Benutzung unter der Adresse <a href='mailto:".$_REQUEST['grp'].$mail_id."@technikum-wien.at'>".$_REQUEST['grp'].$mail_id."@technikum-wien.at</a> m&ouml;glich.</p>
+		</td>
+		</tr>
+		</table>
 		";
  }
  else
