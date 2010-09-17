@@ -279,7 +279,7 @@
 				</tr>
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Programm 2009/10</a></td>
+					<td class="tdwrap"><a class="Item" href="private/info/weiterbildung/aktuelles/aktuelles.html" target="content" style="font-weight: bold;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Programm 2010/11</a></td>
 				</tr>
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -387,8 +387,35 @@
 				<td class="tdwrap"><a class="Item" href="private/info/twbook/" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;twbook</a></td>
 			</tr>
 			<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="public/ansprechpartner.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ansprechpartner</a></td>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="MenuItem" href="public/team_leitung.html" target="content" onClick="js_toggle_container('Team');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Team</a>
+					<table class="tabcontent" id="Team" style="display: none">
+					<tr>
+					 	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/team_servicedesk.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Service Desk</a></td>
+					</tr>
+					<tr>
+					 	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/team_lvplanung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;LV-Planung</a></td>
+					</tr>
+					<tr>
+					 	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/team_zentraleinkauf.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Zentraleinkauf</a></td>
+					</tr>
+					<tr>
+					 	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/team_haustechnik.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Haustechnik</a></td>
+					</tr>
+					<tr>
+					 	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/team_systementwicklung.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Systementwicklung</a></td>
+					</tr>
+					<tr>
+					 	<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="public/team_serveradministration.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Serveradministration (Zentrale Services)</a></td>
+					</tr>
+					</table>
+				</td>
 			</tr>
 			<tr>
 		  		<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -398,33 +425,33 @@
 				<td class="tdwidth10" nowrap>&nbsp;</td>
  				<td class="tdwrap"><a class="Item" href="https://bug.technikum-wien.at/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Bug Tracking</a></td>
 			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/tools/notebook_registration.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Notebook-Registration</a></td>
-			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/tools/wlan_registration.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;WLAN-Zugang</a></td>
-			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/vpn/index.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;VPN-Zugang</a></td>
-			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/security.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Security</a></td>
-			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/zertifikat.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Zertifikat</a></td>
-			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/softgrid2.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;App-V&nbsp;(SoftGrid)</a></td>
-			</tr>
-			<tr>
-  					<td class="tdwidth10" nowrap>&nbsp;</td>
-				    <td class="tdwrap"><a href="?Medienaustattung" class="MenuItem" onClick="return(js_toggle_container('Medienaustattung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Medienaustattung</a>
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="private/tools/notebook_registration.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Notebook-Registration</a></td>
+					</tr>
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="private/tools/wlan_registration.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;WLAN-Zugang</a></td>
+					</tr>
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="private/info/vpn/index.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;VPN-Zugang</a></td>
+					</tr>
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="private/info/security.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Security</a></td>
+					</tr>
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="private/info/zertifikat.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Zertifikat</a></td>
+					</tr>
+					<tr>
+						<td class="tdwidth10" nowrap>&nbsp;</td>
+						<td class="tdwrap"><a class="Item" href="private/info/softgrid2.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;App-V&nbsp;(SoftGrid)</a></td>
+					</tr>
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a href="?Medienaustattung" class="MenuItem" onClick="return(js_toggle_container('Medienaustattung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Medienaustattung</a>
 					<table class="tabcontent" id="Medienaustattung" style="display: none">
 					<tr>
 						<td class="tdwidth10" nowrap>&nbsp;</td>
