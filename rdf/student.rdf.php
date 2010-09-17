@@ -376,10 +376,10 @@ if($xmlformat=='rdf')
 			//die Orgform keine ruecksicht genommen
 			if($verband=='' && $gruppe=='' && $orgform!='')
 			{
-				$where.=" AND EXISTS(SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND orgform_kurzbz='$orgform'";
+				$where.=" AND '$orgform' = (SELECT orgform_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id";
 				if($studiensemester_kurzbz!=null)
 					$where.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
-				$where.=")";
+				$where.=" ORDER BY datum desc, insertamum desc, ext_id desc LIMIT 1)";
 			}
 		}
 
