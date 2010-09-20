@@ -155,18 +155,17 @@
 	function checkvz(id)
 	{
 		vz = document.getElementById(id).value;
-		if(vz.indexOf('.')>0)
-		{
-			alert('Der Verzeichnisname darf keinen Punkt beinhalten');
-			return false;
-		}
-		if(vz.indexOf('&')>0)
-		{
-			alert('Der Verzeichnisname darf kein "&" beinhalten');
-			return false;
-		}
+		re = new RegExp(/^(\d|\w|\s)*$/);
 		
-		return true;
+		if (vz.match(re))
+		{
+			return true;
+		}
+		else
+		{
+			alert('Der Verzeichnisname darf nur Buchstaben und Zahlen beinhalten');
+			return false;
+		}
 	}
 </script>
 
@@ -195,7 +194,7 @@ A:hover {
 		<td width="97%"><table class="tabcontent"><tr><td>
 			<table cellSpacing="2" cellPadding="2" width="100%" border="0">
 			  <tr>
-				<td align="middle" class="ContentHeader" colSpan="5" height="20"><b><font class="ContentHeader">Datei Upload</font></b></td>
+				<td align="center" class="ContentHeader" colSpan="5" height="20"><b><font class="ContentHeader">Datei Upload</font></b></td>
 			  </tr>
 			  <?php
 				if($islector)
@@ -584,7 +583,7 @@ A:hover {
 				}
 			  ?>
 			  <tr>
-              <td align="middle" colSpan="5" height="36">
+              <td align="center" colSpan="5" height="36">
                 <table class="tabcontent">
                   <tr>
                     <td><div align="center"><b><font face="Arial" size="2">
@@ -821,39 +820,46 @@ A:hover {
 					{
 						if(isset($new_dir_name_text) && $new_dir_name_text != "")
 						{
-							$new_dir_name_text = trim($new_dir_name_text);
-							if(isset($subdir) && $subdir != "")
+							if(!preg_match('/^(\d|\w|\s)*$/',$new_dir_name_text))
 							{
-								if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
-								{
-									unset($subdir);
-
-									$dest_create_dir = @dir($upload_root.'/'.$uploaddir);
-								}
-								else
-								{
-									$dest_create_dir = @dir($upload_root.'/'.$uploaddir.'/'.$subdir);
-								}
+								echo '<center><b>Verzeichnisname ist ungueltig!</b></center>';
 							}
 							else
 							{
-								$dest_create_dir = @dir($upload_root.'/'.$uploaddir);
-							}
-
-							if($dest_create_dir)
-							{
-								if(!@is_dir($dest_create_dir->path.'/'.$new_dir_name_text) && !@file_exists($dest_create_dir->path.'/'.$new_dir_name_text) && $new_dir_name_text != "")
+								$new_dir_name_text = trim($new_dir_name_text);
+								if(isset($subdir) && $subdir != "")
 								{
-									@mkdir($dest_create_dir->path.'/'.$new_dir_name_text);
-									exec('chmod 775 "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
-
-									if($islector)
+									if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
 									{
-										exec('sudo chown :teacher "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										unset($subdir);
+	
+										$dest_create_dir = @dir($upload_root.'/'.$uploaddir);
 									}
 									else
 									{
-										exec('sudo chown :student "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										$dest_create_dir = @dir($upload_root.'/'.$uploaddir.'/'.$subdir);
+									}
+								}
+								else
+								{
+									$dest_create_dir = @dir($upload_root.'/'.$uploaddir);
+								}
+	
+								if($dest_create_dir)
+								{
+									if(!@is_dir($dest_create_dir->path.'/'.$new_dir_name_text) && !@file_exists($dest_create_dir->path.'/'.$new_dir_name_text) && $new_dir_name_text != "")
+									{
+										@mkdir($dest_create_dir->path.'/'.$new_dir_name_text);
+										exec('chmod 775 "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+	
+										if($islector)
+										{
+											exec('sudo chown :teacher "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										}
+										else
+										{
+											exec('sudo chown :student "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										}
 									}
 								}
 							}
