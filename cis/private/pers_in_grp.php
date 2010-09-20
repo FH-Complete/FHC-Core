@@ -24,10 +24,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<title>Personen im Mailverteiler</title>
 </head>
-<title>Personen im Mailverteiler</title>
 <body id="inhalt">
 <?php
   require_once('../../config/cis.config.inc.php');
@@ -49,13 +49,12 @@
        $is_lector=false;       
        
 ?>
-<table class="tabcontent">
-	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">Nachname</font></td>
-	        <td class="ContentHeader"><font class="ContentHeader">Vorname</font></td>
-	        <td class="ContentHeader"><font class="ContentHeader">E-Mail</font></td>
-	      </tr>
-
+	<table class="tabcontent">
+		<tr>
+			<td class="ContentHeader"><font class="ContentHeader">Nachname</font></td>
+			<td class="ContentHeader"><font class="ContentHeader">Vorname</font></td>
+			<td class="ContentHeader"><font class="ContentHeader">E-Mail</font></td>
+		</tr>
 
 <?php
  		  //$sql_query = "SELECT vornamen AS vn,nachname AS nn,a.uid as uid FROM public.tbl_personmailgrp AS a, public.tbl_person AS b WHERE a.uid=b.uid AND a.mailgrp_kurzbz='$grp' ORDER BY nachname";
@@ -72,4 +71,6 @@
 		}
 	  }
 ?>
-</body></html>
+	</table>
+</body>
+</html>
