@@ -13,20 +13,81 @@
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;Druckinsel - FAQ</font></td>
       </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-	  <tr>
+	  
+<tr><td>&nbsp;</td></tr>	
+<tr>
 	  	<td>
 			<a href="../cisdocs/anleitung_multifunktionsgeraet.doc" class="Item">Anleitung Multifunktionsgerät</a><br><br>
 			<a href="../cisdocs/druckinsel_schulungsunterlagen.doc" class="Item">Schulungsunterlage zur Verwendung der Drucker an der FH Technikum Wien</a><br><br>
 			<a href="../cisdocs/preisprofile.doc" class="Item">Preisprofile</a><br><br>
 			<a href="../cisdocs/MoneyLoader.doc" class="Item">MoneyLoader</a><br><br>
-			<a href="../cisdocs/MACOS_Druckinsel.pdf" class="Item">Drucken mit MacOS</a><br><br>
+<!--			
+<a href="../cisdocs/MACOS_Druckinsel.pdf" class="Item">Drucken mit MacOS</a><br><br>
 			<a href="../cisdocs/GNU_Linux_Druckinsel.pdf" class="Item">Drucken mit GNU/Linux</a><br><br>
 			<a href="../cisdocs/Vista_Druckinsel.pdf" class="Item">Drucken mit Windows Vista</a> (Download: Druckertreiber <a href="https://cis.technikum-wien.at/documents/infrastruktur/Canon_Treiber_o841dex.exe">32-Bit</a> / <a href="https://cis.technikum-wien.at/documents/infrastruktur/Canon_Treiber_x64_o888gex.exe">64-Bit</a>)<br><br>
-		</td>
+-->		
+
+</td>
 	  </tr>
+	
+      <tr>
+        <td>
+	<b>Verbinden des Druckers am Notebook:</b><br>
+<hr>
+<i>MS Windows:</i><br>
+Netzwerkdrucker \\print1\Druckinsel1 verbinden, authentifizieren mit TW-Username und Passwort.<br> 
+(Unter Windows Vista/7: Start->Ausführen->\\print1)
+<br>
+<hr>
+<i>Mac OSX</i><br>
+Systemeinstellungen/Drucken&Faxen<br>
+"+" clicken<br>
+Auf Symbolleiste oben sollte es das Symbol "Erweitert" geben - wenn
+nicht: Mauscursor auf "Standard" und rechte Maustaste -
+"Symbolleiste anpassen..."<br>
+Symbol "Erweitert" in die Leiste oben ziehen und "Fertig" clicken<br>
+<br>
+"Erweitert" clicken<br>
+<br>
+Typ: "Windows"<br>
+URL: "smb://tw-uid:tw-Passwort@print1.technikum-wien.at/Druckinsel1"<br>
+Drucken mit: "Allgemeiner PostScript-Drucker"<br>
+"Hinzufügen" clicken<br>
+<hr>
+
+<i>GNU/Linux</i><br>
+
+Neuen Windows Printer via SAMBA anlegen<br>
+smb://"print1.technikum-wien.at/Druckinsel1"<br>
+"Setze Authentifizierung-Detail jetzt" clicken<br>
+<br>
+Benutzername: "tw-uid"<br>
+Passwort: "tw-Passwort"<br>
+<br>
+Optional: "Verifizieren..." für Anmeldetest clicken<br>
+<br>
+"Vor" clicken<br>
+<br>
+"Drucker aus Datenbank auswählen" clicken<br>
+<br>
+Druckerhersteller "Canon" auswählen<br>
+<br>
+"Vor" clicken<br>
+<br>
+"imageRunner C5870U" auswählen<br>
+<br>
+"Vor" clicken<br>
+<br>
+"Anwenden" clicken<br>
+
+<hr>
+
+
+</td>
+      </tr>
+
+
+
     </table></td>
 	<td class="tdwidth30">&nbsp;</td>
   </tr>
