@@ -314,7 +314,15 @@
 						</xsl:choose>
 						<xsl:text> </xsl:text>
 					</fo:inline>
-					<xsl:value-of select="titel"/>
+					<xsl:choose>
+						<xsl:when test="string-length(titel_en)!=0">
+							<xsl:value-of select="titel_en"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="titel"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid">
