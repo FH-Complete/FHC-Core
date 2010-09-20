@@ -740,11 +740,15 @@
 		  	<table class="tabcontent" id="unternehmenskommunikation" style="display: none;">
 		  	<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a class="Item" href="private/info/unternehmenskommunikation/logo.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Logo</a></td>
+				<td class="tdwrap"><a class="Item" href="private/info/unternehmenskommunikation/logo.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Logo</a></td>
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="private/info/unternehmenskommunikation/CorporateWordingManual.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Corporate Wording Manual</a></td>
+				<td class="tdwrap"><a href="private/info/unternehmenskommunikation/CorporateWordingManual.php" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Corporate Wording Manual</a></td>
+			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="private/info/unternehmenskommunikation/veranstaltungsleitfaden.php" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Veranstaltungsleitfaden</a></td>
 			</tr>
 			</table>
 		</td>
@@ -752,6 +756,7 @@
 		
 		
 		<!-- Hauptmenue Rektor -->
+		 
 		<tr>
           <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Rektorat</a></td>
   		</tr>
@@ -769,7 +774,7 @@
 
 			</table>
 		</td>
-		<!-- 
+		<!--
 		<tr>
           <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Rektorat</a></td>
   		</tr>
@@ -802,7 +807,7 @@
 			</tr>
 			</table>
 		</td>
-		</tr>-->
+		</tr>
   		
   			<tr>
 				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
@@ -820,7 +825,7 @@
 				</tr>
 				</table>
 				</td>
-			</tr>
+			</tr>-->
 		<!-- Hauptmenue Studentenvertretung -->
 	<!--	<tr>
           <td class="tdwrap"><a href="?Studentenvertretung" class="MenuItem" onClick="return(js_toggle_container('Studentenvertretung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Studentenvertretung</a></td>

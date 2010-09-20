@@ -262,6 +262,15 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 				<input type="Submit" value="anzeigen">
 			</td>
 			<td>&nbsp;</td>
+			<?php 
+			if($is_mitarbeiter)
+			{
+				echo '
+				<td style="width:100%; text-align:right">
+					<a href="../info/unternehmenskommunikation/veranstaltungsleitfaden.php">Veranstaltungsleitfaden</a>
+				</td>';
+			}
+			?>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
 		</table>
