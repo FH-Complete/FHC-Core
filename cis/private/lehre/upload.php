@@ -155,7 +155,7 @@
 	function checkvz(id)
 	{
 		vz = document.getElementById(id).value;
-		re = new RegExp(/^(\d|\w|\s)*$/);
+		re = new RegExp(/^(\d|\w|\s|[-_])*$/);
 		
 		if (vz.match(re))
 		{
@@ -820,7 +820,7 @@ A:hover {
 					{
 						if(isset($new_dir_name_text) && $new_dir_name_text != "")
 						{
-							if(!preg_match('/^(\d|\w|\s)*$/',$new_dir_name_text))
+							if(!preg_match('/^(\d|\w|\s|[-_])*$/',$new_dir_name_text))
 							{
 								echo '<center><b>Verzeichnisname ist ungueltig!</b></center>';
 							}
