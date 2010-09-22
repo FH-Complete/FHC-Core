@@ -761,4 +761,20 @@ function mb_str_replace( $needle, $replacement, $haystack )
 	}
 	return $haystack;
 }
+
+/**
+ * 
+ * Prueft ob es sich um einen gueltigen Filenamen handelt
+ * Filenamen mit HTML-Tags oder sonstigem Schadcode sind nicht gueltig
+ * 
+ * @param string $filename
+ * @return boolean true wenn gueltig, sonst false
+ */
+function check_filename($filename)
+{
+	if(!preg_match('/^(\d|\w|\s|[-_.,ÄÜÖäüö!?])*$/',$filename))
+		return false;
+	else
+		return true;
+}
 ?>

@@ -155,7 +155,7 @@
 	function checkvz(id)
 	{
 		vz = document.getElementById(id).value;
-		re = new RegExp(/^(\d|\w|\s|[-_])*$/);
+		re = new RegExp(/^(\d|\w|\s|[-_ÄÜÖäüö])*$/);
 		
 		if (vz.match(re))
 		{
@@ -607,102 +607,52 @@ A:hover {
 								  {
 								  	  $file_name = $_FILES[$file]['name'];
 
-								  	  if($file_name != "")
-									  {
-										  if(isset($subdir) && $subdir != "")
+								  	  if(!check_filename($file_name))
+								  	  {
+										echo "<center><b><font color='red'>Dateiname von Datei ".($i+1)." ist ung&uuml;ltig! Der Dateiname darf nur Buchstaben und Zahlen enthalten.</b></font></center>";
+								  	  }
+								  	  else
+								  	  {
+									  	  if($file_name != "")
 										  {
-										  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$subdir.'/'.$file_name;
-										  }
-										  else
-										  {
-										  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$file_name;
-										  }
-										
-										  if(!file_exists($uploadfile))
-										  {
-										  	
 											  if(isset($subdir) && $subdir != "")
 											  {
-											  	  if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
-												  {
-												  	  unset($subdir);
-												  }
-												  else
-												  {
-												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
-													  {
-													  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
-													  	 {
-													  	 	 exec('chmod 664 "'.$uploadfile.'"');
-															 if($islector)
-															 {
-																exec('sudo chown :teacher "'.$uploadfile.'"');
-															 }
-															 else
-															 {
-																exec('sudo chown :student "'.$uploadfile.'"');
-															 }
-													  	 }
-													  }
-													  else
-													  {
-													  	 $unallowed_upload = true;
-													  }
-												  }
+											  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$subdir.'/'.$file_name;
 											  }
 											  else
 											  {
-											  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
-												  {
-													  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
-													  {
-													  	  exec('chmod 664 "'.$uploadfile.'"');
-														  if($islector)
-														  {
-															exec('sudo chown :teacher "'.$uploadfile.'"');
-														  }
-														  else
-														  {
-															exec('sudo chown :student "'.$uploadfile.'"');
-														  }
-													  }
-												  }
-												  else
-												  {
-													 $unallowed_upload = true;
-												  }
+											  	  $uploadfile = $upload_root.'/'.$uploaddir.'/'.$file_name;
 											  }
-										  }
-										  else
-										  {
-											  if(isset($overwrite))
+											
+											  if(!file_exists($uploadfile))
 											  {
-											  	  if(isset($subdir) && $subdir != "")
-											  	  {
-													  if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
+											  	
+												  if(isset($subdir) && $subdir != "")
+												  {
+												  	  if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
 													  {
-														  unset($subdir);
+													  	  unset($subdir);
 													  }
 													  else
 													  {
-														  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
 														  {
-														  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
-														  	   {
-														  	   	   exec('chmod 664 "'.$uploadfile.'"');
-																   if($islector)
-																   {
-																		exec('sudo chown :teacher "'.$uploadfile.'"');
-																   }
-																   else
-																   {
-																		exec('sudo chown :student "'.$uploadfile.'"');
-																   }
-														  	   }
+														  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
+														  	 {
+														  	 	 exec('chmod 664 "'.$uploadfile.'"');
+																 if($islector)
+																 {
+																	exec('sudo chown :teacher "'.$uploadfile.'"');
+																 }
+																 else
+																 {
+																	exec('sudo chown :student "'.$uploadfile.'"');
+																 }
+														  	 }
 														  }
 														  else
 														  {
-															   $unallowed_upload = true;
+														  	 $unallowed_upload = true;
 														  }
 													  }
 												  }
@@ -725,15 +675,72 @@ A:hover {
 													  }
 													  else
 													  {
-													  	  $unallowed_upload = true;
+														 $unallowed_upload = true;
 													  }
 												  }
-												  $no_overwrite_error=false;
 											  }
 											  else
-											  	$no_overwrite_error=true;
+											  {
+												  if(isset($overwrite))
+												  {
+												  	  if(isset($subdir) && $subdir != "")
+												  	  {
+														  if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
+														  {
+															  unset($subdir);
+														  }
+														  else
+														  {
+															  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+															  {
+															  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
+															  	   {
+															  	   	   exec('chmod 664 "'.$uploadfile.'"');
+																	   if($islector)
+																	   {
+																			exec('sudo chown :teacher "'.$uploadfile.'"');
+																	   }
+																	   else
+																	   {
+																			exec('sudo chown :student "'.$uploadfile.'"');
+																	   }
+															  	   }
+															  }
+															  else
+															  {
+																   $unallowed_upload = true;
+															  }
+														  }
+													  }
+													  else
+													  {
+													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+														  {
+															  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
+															  {
+															  	  exec('chmod 664 "'.$uploadfile.'"');
+																  if($islector)
+																  {
+																	exec('sudo chown :teacher "'.$uploadfile.'"');
+																  }
+																  else
+																  {
+																	exec('sudo chown :student "'.$uploadfile.'"');
+																  }
+															  }
+														  }
+														  else
+														  {
+														  	  $unallowed_upload = true;
+														  }
+													  }
+													  $no_overwrite_error=false;
+												  }
+												  else
+												  	$no_overwrite_error=true;
+											  }
 										  }
-									  }
+								  	  }
 								  }
 							  }
 						  }
@@ -820,7 +827,7 @@ A:hover {
 					{
 						if(isset($new_dir_name_text) && $new_dir_name_text != "")
 						{
-							if(!preg_match('/^(\d|\w|\s|[-_])*$/',$new_dir_name_text))
+							if(!check_filename($new_dir_name_text))
 							{
 								echo '<center><b>Verzeichnisname ist ungueltig!</b></center>';
 							}
