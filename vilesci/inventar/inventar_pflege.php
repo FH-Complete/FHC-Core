@@ -913,7 +913,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 	
 					    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
 					    $oBetriebsmittelperson->person_id=$person_id_array[$pos];
-					    $oBetriebsmittelperson->anmerkung=$anmerkung_array[$pos];
+					    //$oBetriebsmittelperson->anmerkung=$anmerkung_array[$pos];
 					    $oBetriebsmittelperson->kaution=0;
 					    $oBetriebsmittelperson->retouram=null;
 					    $oBetriebsmittelperson->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
