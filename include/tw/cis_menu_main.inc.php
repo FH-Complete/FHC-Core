@@ -67,7 +67,11 @@
 				  	<table class="tabcontent" id="oeh" style="display: visible">
 						<tr>
 				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/index2010.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate 2010</a></td>
+							<td><a href="private/info/oeh/index2010.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate Fr&uuml;hjahr 2010</a></td>
+				  		</tr>
+				  		<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/index2010herbst.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Herbstwahlen 2010</a></td>
 				  		</tr>
 				  	</table>
 				 </tr>
@@ -807,7 +811,7 @@
 			</tr>
 			</table>
 		</td>
-		</tr>
+		</tr>-->
   		
   			<tr>
 				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
@@ -825,7 +829,7 @@
 				</tr>
 				</table>
 				</td>
-			</tr>-->
+			</tr>
 		<!-- Hauptmenue Studentenvertretung -->
 	<!--	<tr>
           <td class="tdwrap"><a href="?Studentenvertretung" class="MenuItem" onClick="return(js_toggle_container('Studentenvertretung'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Studentenvertretung</a></td>
