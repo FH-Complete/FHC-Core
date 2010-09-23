@@ -961,7 +961,7 @@ A:hover {
 					}
 					else
 					{
-						echo '/'.$subdir;
+						echo '/'.htmlentities($subdir,ENT_QUOTES,'UTF-8');
 					}
 				 }
 				 else
@@ -1056,33 +1056,33 @@ A:hover {
 									{
 										if(isset($subdir) && $subdir != "")
 										{
-											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir/$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$subdir/$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;".htmlentities($entry,ENT_QUOTES,'UTF-8')."&nbsp;</a></font>";
 										}
 										else
 										{
-											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$row_lesson->kuerzel&subdir=$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;".htmlentities($entry,ENT_QUOTES,'UTF-8')."&nbsp;</a></font>";
 										}
 									}
 									else if(isset($short))
 									{
 										if(isset($subdir) && $subdir != "")
 										{
-											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir/$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$subdir/$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;".htmlentities($entry,ENT_QUOTES,'UTF-8')."&nbsp;</a></font>";
 										}
 										else
 										{
-											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&short=$short&subdir=$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;".htmlentities($entry,ENT_QUOTES,'UTF-8')."&nbsp;</a></font>";
 										}
 									}
 									else
 									{
 										if(isset($subdir) && $subdir != "")
 										{
-											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir/$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$subdir/$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;".htmlentities($entry,ENT_QUOTES,'UTF-8')."&nbsp;</a></font>";
 										}
 										else
 										{
-											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+											echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"upload.php?course_id=$course_id&term_id=$term_id&subdir=$entry\"><img src=\"../../../skin/images/folder.gif\" border=\"0\">&nbsp;".htmlentities($entry,ENT_QUOTES,'UTF-8')."&nbsp;</a></font>";
 										}
 									}
 
@@ -1244,7 +1244,7 @@ A:hover {
 						 }
 						 else
 						 {
-						 	 echo '/'.$subdir;
+						 	 echo '/'.htmlentities($subdir,ENT_QUOTES,'UTF-8');
 						 }
 					}
 					else
@@ -1325,7 +1325,7 @@ A:hover {
 									$link_path = '../../../documents'.mb_substr($dest_dir->path, mb_strlen($link_cut)).'/'.urlencode($entry);
 									//+ durch %20 ersetzten damit Files mit leerzeichen geoeffnet werden koennen
 									$link_path = str_replace("+","%20",$link_path);
-									echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"$link_path\" target=\"_blank\">&nbsp;<img src=\"../../../skin/images/file.gif\" border=\"0\">&nbsp;$entry&nbsp;</a></font>";
+									echo "</b></td><td align=\"left\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><a href=\"$link_path\" target=\"_blank\">&nbsp;<img src=\"../../../skin/images/file.gif\" border=\"0\">&nbsp;".htmlentities($entry, ENT_QUOTES, 'UTF-8')."&nbsp;</a></font>";
 
 									if(isset($_POST['new_file_name'.$file_count]))
 										$new_file_name_ = $_POST['new_file_name'.$file_count];
