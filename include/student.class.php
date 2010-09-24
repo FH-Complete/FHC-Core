@@ -32,6 +32,7 @@ class student extends benutzer
 	public $verband;
 	public $gruppe;
 	public $ext_id_student;
+	public $result;
 	
 	public $studiensemester_kurzbz;
 
@@ -560,6 +561,83 @@ class student extends benutzer
 			$this->errormsg = 'Fehler beim Auslesen des Studenten '.$qry;
 			return false;
 		}
+	}
+	
+	/**
+	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
+	 * Ueberschreibt die Methode aus der Klasse Person
+	 * @param $filter String mit Vorname oder Nachname
+	 * @param $order Sortierkriterium
+	 * @return array mit Personen oder false wenn ein Fehler auftritt
+	 */
+	public function getTab($filter, $order='person_id')
+	{
+		$sql_query = "SELECT 
+						person_id, staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre, 
+						nachname, vorname, vornamen, gebdatum, gebort, gebzeit, anmerkung, homepage, svnr, 
+						ersatzkennzeichen, familienstand, geschlecht, anzahlkinder, tbl_person.aktiv, kurzbeschreibung,
+						tbl_benutzer.aktiv as bnaktiv, tbl_student.studiengang_kz, tbl_student.semester, tbl_student.verband,
+						tbl_student.gruppe, tbl_student.prestudent_id 
+					  FROM 
+					  	public.tbl_person 
+						JOIN public.tbl_benutzer USING(person_id)
+						JOIN public.tbl_student ON(student_uid=uid) 
+					WHERE true ";
+		
+		if($filter!='')
+		{
+			$sql_query.=" AND 	nachname ~* '".addslashes($filter)."' OR 
+								vorname ~* '".addslashes($filter)."' OR
+								(nachname || ' ' || vorname) ~* '".addslashes($filter)."' OR
+								(vorname || ' ' || nachname) ~* '".addslashes($filter)."'";
+		}
+
+		$sql_query .= " ORDER BY $order";
+		if($filter=='')
+		   $sql_query .= " LIMIT 30";
+		
+		if($this->db_query($sql_query))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$l = new student();
+				$l->person_id = $row->person_id;
+				$l->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$l->geburtsnation = $row->geburtsnation;
+				$l->sprache = $row->sprache;
+				$l->anrede = $row->anrede;
+				$l->titelpost = $row->titelpost;
+				$l->titelpre = $row->titelpre;
+				$l->nachname = $row->nachname;
+				$l->vorname = $row->vorname;
+				$l->vornamen = $row->vornamen;
+				$l->gebdatum = $row->gebdatum;
+				$l->gebort = $row->gebort;
+				$l->gebzeit = $row->gebzeit;
+				$l->anmerkungen = $row->anmerkung;
+				$l->homepage = $row->homepage;
+				$l->svnr = $row->svnr;
+				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$l->familienstand = $row->familienstand;
+				$l->geschlecht = $row->geschlecht;
+				$l->anzahlkinder = $row->anzahlkinder;
+				$l->aktiv = ($row->aktiv=='t'?true:false);
+				$l->kurzbeschreibung = $row->kurzbeschreibung;
+				$l->bnaktiv = ($row->bnaktiv=='t'?true:false);
+				$l->studiengang_kz = $row->studiengang_kz;
+				$l->semester = $row->semester;
+				$l->verband = $row->verband;
+				$l->gruppe = $row->gruppe;
+				$l->prestudent_id = $row->prestudent_id;
+				$this->result[]=$l;
+			}
+		}
+		else
+		{
+			$this->errormsg = $this->db_last_error();
+			return false;
+		}
+		return true;
 	}
 }
 ?>
