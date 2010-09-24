@@ -74,6 +74,7 @@ $menu=array
 		'link'=>'left.php?categorie=Personen', 'target'=>'nav',
 		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
 		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
+		'Wiederholer'=>array('name'=>'Stg-Wiederholer', 'link'=>'personen/wiederholer.php', 'target'=>'main', 'permissions'=>array('basis/person')),
 		'Gruppen'=>array
 		(
 			'name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support'),
