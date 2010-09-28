@@ -22,40 +22,54 @@
  */
  
 /**
- *	Statistik der Zeitwuensche
- *
+ * Statistik der Zeitwuensche
+ * Wenn der GET Parameter fix uebergeben wird, dann werden nur die 
+ * Fixangestellten Mitarbeiter beruecksichtigt
  */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-		require('../../include/globals.inc.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+require_once('../../include/globals.inc.php');
 
-	//Stundentabelleholen
-	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
-		die($db->db_last_error());
-	$num_rows_stunde=$db->db_num_rows($result_stunde);
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+$fix = isset($_GET['fix'])?true:false;
 
-	if(!($erg=$db->db_query("SELECT DISTINCT mitarbeiter_uid AS uid FROM campus.tbl_zeitwunsch")))
-		die($db->db_last_error());
-	$anz_lektoren=$db->db_num_rows($erg);
+//Stundentabelleholen
+if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
+	die($db->db_last_error());
+$num_rows_stunde=$db->db_num_rows($result_stunde);
 
-	if(!($erg=$db->db_query("SELECT tag,stunde,gewicht+3 AS gewicht, count(*) AS anz FROM campus.tbl_zeitwunsch GROUP BY tag,stunde,gewicht;")))
-		die($db->db_last_error());
-	$num_rows=$db->db_num_rows($erg);
-	for ($i=0;$i<$num_rows;$i++)
-	{
-		$row=$db->db_fetch_object($erg,$i);
-		$wunsch[$row->tag][$row->stunde][$row->gewicht]=$row->anz;
-	}
+$qry = "SELECT DISTINCT mitarbeiter_uid AS uid FROM campus.tbl_zeitwunsch";
+
+if($fix)
+{	
+	$fixwhere= " JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE fixangestellt";
+	$qry.=$fixwhere;
+}
+else
+	$fixwhere='';
+ 
+if(!($erg=$db->db_query($qry)))
+	die($db->db_last_error());
+$anz_lektoren=$db->db_num_rows($erg);
+
+$qry = "SELECT tag,stunde,gewicht+3 AS gewicht, count(*) AS anz FROM campus.tbl_zeitwunsch $fixwhere GROUP BY tag,stunde,gewicht;";
+if(!($erg=$db->db_query($qry)))
+	die($db->db_last_error());
+
+$num_rows=$db->db_num_rows($erg);
+for ($i=0;$i<$num_rows;$i++)
+{
+	$row=$db->db_fetch_object($erg,$i);
+	$wunsch[$row->tag][$row->stunde][$row->gewicht]=$row->anz;
+}
 
 ?>
 
 <html>
 <head>
-<title>Profil</title>
+<title>Zeitwuensche</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
@@ -89,7 +103,7 @@ Anzahl der Lektoren: <?PHP echo $anz_lektoren; ?>
 			     (isset($wunsch[$j][$i+1][2])?$wunsch[$j][$i+1][2]:0)+
 			     (isset($wunsch[$j][$i+1][1])?$wunsch[$j][$i+1][1]:0)+
 			     (isset($wunsch[$j][$i+1][0])?$wunsch[$j][$i+1][0]:0);
-			$bgcolor=$cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4];
+			$bgcolor=isset($cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4])?$cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4]:'';
 			echo '<TD bgcolor="'.$bgcolor.'">';
 			echo '+:'.round(100/$anz_lektoren*$pos).'%<BR>';
 			echo '-:'.round(100/$anz_lektoren*$neg).'%';
