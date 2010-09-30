@@ -54,8 +54,15 @@ echo '
 		<h2>Liste der MitarbeiterInnen der Institute an der Fachhochschule Technikum Wien</h2>';
 
 $stsem = new studiensemester();
-$ws = $stsem->getNearest(1);
-$ss = $stsem->getNearest(2);
+if(isset($_GET['ws']) && check_stsem($_GET['ws']))
+	$ws = $_GET['ws'];
+else
+	$ws = $stsem->getNearest(1);
+	
+if(isset($_GET['ss']) && check_stsem($_GET['ss']))
+	$ss = $_GET['ss'];
+else
+	$ss = $stsem->getNearest(2);
 
 if($rechte->isBerechtigt('admin', 0) || $rechte->isBerechtigt('mitarbeiter', 0))
 	$where = '';
