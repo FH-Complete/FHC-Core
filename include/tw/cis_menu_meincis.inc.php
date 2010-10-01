@@ -306,7 +306,7 @@
 				
 				if($untergebene!='')
 				{
-					$qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene) ORDER BY nachname, vorname";
+					$qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene) and tbl_benutzer.aktiv ORDER BY nachname, vorname";
 
 					if($result = $db->db_query($qry))
 					{
