@@ -650,7 +650,13 @@ function show(id)
 				}
 				$stg_oe_obj = new studiengang($studiengang_kz);
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
-				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stdv' AND  tbl_person.aktiv and tbl_person.person_id=public.tbl_benutzer.person_id AND public.tbl_benutzer.aktiv AND tbl_benutzerfunktion.uid=tbl_benutzer.uid";
+				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid 
+								FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion 
+								WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stdv' 
+								AND  tbl_person.aktiv and tbl_person.person_id=public.tbl_benutzer.person_id 
+								AND public.tbl_benutzer.aktiv AND tbl_benutzerfunktion.uid=tbl_benutzer.uid
+								AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+								AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
 				if($result_course_stdv = $db->db_query($sql_query))
 				{
 					$num_rows_course_stdv = $db->db_num_rows($result_course_stdv);
