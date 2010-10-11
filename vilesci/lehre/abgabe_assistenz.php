@@ -268,6 +268,8 @@ else
 	$htmlstr .= "<td rowspan=2><input type='button' name='stmail' value='E-Mail Studierende' title='E-Mail an mehrere Studierende schicken' onclick='stserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td>";
 	$htmlstr .= "<td rowspan=2><input type='button' name='btmail' value='E-Mail Begutachter(innen)' title='E-Mail an mehrere Begutachter(innen) schicken' onclick='btserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
 	$htmlstr .= "</form>";
+	
+
 }
 
 ?>
@@ -388,6 +390,22 @@ echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' 
 
 
     echo $htmlstr;
+    
+    echo showFarbcodes(); 
+    
+ function showFarbcodes()
+ {
+ 	$farbcodes = '';
+
+	$farbcodes.= "<table>";
+	$farbcodes.="<tr><td style=\"background-color:#FFFFFF; width:35px;\"></td><td style=\"padding-left:5px;\">Termin noch mehr als 12 Tage entfernt</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#FFFF00;\"></td><td style=\"padding-left:5px;\">Termin innerhalb der nächsten 12 Tage</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#FF0000;\"></td><td style=\"padding-left:5px;\">Termin überschritten / keine Abgabe</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#00FF00;\"></td><td style=\"padding-left:5px;\">abgegeben</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#EA7B7B;\"></td><td style=\"padding-left:5px;\">Abgabe nach Termin</tr>";
+	$farbcodes.="</table>";
+	return $farbcodes; 
+ }
 ?>
 
 </body>
