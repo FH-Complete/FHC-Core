@@ -958,11 +958,11 @@ else
 			Qualit&auml;t der L&ouml;sung</td>";
 			$weight1='0.6';
 		}
-		$htmlstr .= "<td width='30%'><textarea name='qualitaet' value='".$qualitaet."' cols='50'  rows='10' 
+		$htmlstr .= "<td width='30%'><textarea  name='qualitaet' value='".$qualitaet."' cols='50'  rows='10' 
 		onKeyDown='txtcount(this.form.qualitaet,this.form.remLen,500);' onKeyUp='txtcount(this.form.qualitaet,this.form.remLen,500);'></textarea>
-		<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen size=3 maxlength=3 value='500' style='text-align:right'> </td>\n
+		<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen size=3 maxlength=3 value='500' style='text-align:right'> </td>\n
 		<td width='10%' align='center'><input type='hidden' name='weight' id='weight1' value='".$weight1."'>
-		<input  type='text' name='punkte1' value='".$punkte1."' size='5' maxlength='5' id='punkte1' onkeyup='berechne()' style='text-align:right'></td>\n";
+		<input type='text' name='punkte1' value='".$punkte1."' size='5' maxlength='5' id='punkte1' onkeyup='berechne()' style='text-align:right'></td>\n";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr.="<td width='10%' align='center'>0.55</td>";
@@ -981,7 +981,7 @@ else
 			Sprache: ben&ouml;tigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
 			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
 			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
 			$weight2='0.2';
 		}
 		else 
@@ -993,7 +993,7 @@ else
 			Sprache</td>
 			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
 			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
 			$weight2='0.4';
 		}
 		$htmlstr .= "<td width='10%' align='center'><input type='hidden' name='weight' id='weight2' value='".$weight2."'>
@@ -1015,7 +1015,7 @@ else
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
 			<td width='30%'><textarea name='hintergrund' value='".$hintergrund."' cols='50'  rows='10' 
 			onKeyDown='txtcount(this.form.hintergrund,this.form.remLen3,500);' onKeyUp='txtcount(this.form.hintergrund,this.form.remLen3,500);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly type=text name=remLen3 size=3 maxlength=3 value='500' style='text-align:right'></td>\n
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen3 size=3 maxlength=3 value='500' style='text-align:right'></td>\n
 			<td width='10%' align='center'><input type='hidden' name='weight' id='weight3' value='0.25'>
 			<input  type='text' name='punkte3' value='".$punkte3."' size='5' maxlength='5' id='punkte3' style='text-align:right' onkeyup='berechne()'></td>\n
 			<td width='10%' align='center'>0.25</td>
@@ -1032,8 +1032,8 @@ else
 		//$htmlstr .="<td align='center'><input  type='text' name='summe1' value='".$summe1."' id='summe1' style='text-align:right' size='5' maxlength='5' readonly ></td>
 		$htmlstr .="<td align='center'>&nbsp;</td>
 			<td align='center'>&nbsp;</td>";
-		$htmlstr .= "<td align='center'><input  type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
-		$htmlstr .= "<td colspan='4'>Note</td><td align='center'><input  type='text' name='note' value='".$note."' id='note' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
+		$htmlstr .= "<td align='center'><input type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
+		$htmlstr .= "<td colspan='4'>Note</td><td align='center'><input type='text' name='note' value='".$note."' id='note' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
 		$htmlstr .="</table>";
 		$htmlstr .= "<br><table border='1' align='center' width='70%'>";
 		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <90 : Note 2</td><td>90<= Ergebnis : Note 1</td></tr>";
