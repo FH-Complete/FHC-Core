@@ -45,6 +45,14 @@ require_once('../../include/mitarbeiter.class.php');
 
 require_once('../../include/pdf.inc.php');
 
+
+
+
+
+
+
+
+
 $getuid=get_uid();
 $datum_obj = new datum();
 $htmlstr = "";
@@ -125,131 +133,140 @@ else
 	$studiengang=mb_convert_encoding(trim($studiengang),'ISO-8859-15','UTF-8');
 	
 	
-	//Ausdruck generieren
-	//PDF erzeugen
-	$pdf = new PDF('P','pt');
-	$pdf->Open();
-	$pdf->AddPage();
-	$pdf->AliasNbPages();
 	
-	$pdf->SetFillColor(111,111,111);
-	$pdf->SetXY(30,30);
-
-	//Logo
-	$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
-	
-	$pdf->SetFont('Arial','',12);
-	$pdf->SetFillColor(190,190,190);
-	$pdf->SetXY(40,80);
-	$pdf->SetFont('Arial','',10);
-	$pdf->MultiCell(0,15,'Studiengang: ');
-	$pdf->SetXY(40,95);
-	$pdf->SetFont('Arial','',12);
-	$pdf->MultiCell(0,15,$stgtyp.'studiengang '.$studiengang);
-	$pdf->SetFont('Arial','',14);
-	$pdf->SetXY(40,115);
-	if($stgtyp=='Bachelor')
-	{
-		$pdf->MultiCell(0,15,'Beurteilung Bachelorarbeit');
-	}
-	else
-	{
-		$pdf->MultiCell(0,15,'Beurteilung Diplomarbeit');
-	}
-	$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
-	if(!$erg_beu=@$db->db_query($qry_beu))
-	{
-		die('Fehler beim Laden des Betreuernamens');
-	}
-	else
-	{
-		if($row_beu=$db->db_fetch_object($erg_beu))
-		{
-			// UTF-8 encoden
-			while (list($key, $value) = each($row_beu)) 
-			{
-				if (!empty($value))
-			    	$row_beu->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
-			}
-			$beurteiler=trim($row_beu->titelpre.' '.$row_beu->vorname.' '.$row_beu->nachname.' '.$row_beu->titelpost);
-		}
-		else 
-		{
-			die('Betreuer nicht gefunden!');
-		}
-	}
-	//Zeile Titel
-	$pdf->SetFont('Arial','',12);
-	$maxY=$pdf->GetY()+5;
-	$maxX=30;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,42,'Titel',1,'L',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(450,14,$titel,0,'L',0);
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(450,42,'',1,'L',0);
-	//Autor
-	$maxY=$pdf->GetY();
-	$maxX=30;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,14,'Autor',1,'L',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(291,14,trim($titelpre." ".$autor." ".$titelpost),1,'L',0);
-	$maxX +=291;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(159,14,trim('Personenkz.: '),1,'L',0);
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(159,14,trim($perskz),0,'R',0);
-	//Zeile Beurteilt von
-	$maxY=$pdf->GetY();
-	$maxX=30;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,14,'Beurteilt von',1,'L',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(291,14,$beurteiler,1,'L',0);
-	$maxX +=291;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(159,14,'Datum.: ',1,'L',0);
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(159,14,date('d.m.Y',mktime(0, 0, 0, date("m")  , date("d"), date("Y"))),1,'R',0);
-	
-	//Feld Beurteilung
-	//Zeile Überschrift
-	$pdf->SetFont('Arial','',9);
-	$maxY=$pdf->GetY()+2;
-	$maxX=30;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(159,36,'',1,'L',0);
-	$maxX +=159;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(212,36,'Kurze verbale Beurteilung',1,'C',0);
-	$maxX +=212;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,'Punkte (0-100)',0,'C',0);
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,36,'',1,'L',0);
-	$maxX +=53;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,'Gewicht',0,'C',0);
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,36,'',1,'L',0);
-	$maxX +=53;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,'    Punkte             *          Gewicht',0,'C',0);
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,36,'',1,'L',0);
-	//Zeile Qualität
-	$pdf->SetFont('Arial','',9);
 	if($projekttyp_kurzbz=='Bachelor')
-	//if($stgtyp=='Bachelor')
 	{
+		//Bachelorausdruck generieren
+		//PDF erzeugen
+		$pdf = new PDF('P','pt');
+		$pdf->Open();
+		$pdf->AddPage();
+		$pdf->AliasNbPages();
+		
+		$pdf->SetFillColor(111,111,111);
+		$pdf->SetXY(30,30);
+	
+		//Logo
+		$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
+
+		$pdf->SetFont('Arial','',12);
+		$pdf->SetFillColor(190,190,190);
+		$pdf->SetXY(30,110);
+		$pdf->SetFont('Arial','',10);
+		$pdf->MultiCell(0,15,'Studiengang: ');
+		$pdf->SetXY(30,125);
+		$pdf->SetFont('Arial','',12);
+		$pdf->MultiCell(0,15,$stgtyp.'studiengang '.$studiengang);
+		$pdf->SetFont('Arial','',14);
+		$pdf->SetXY(30,170);
+		
+		$pdf->MultiCell(0,15,'Beurteilung Bachelorarbeit');
+
+	
+		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
+		if(!$erg_beu=@$db->db_query($qry_beu))
+		{
+			die('Fehler beim Laden des Betreuernamens');
+		}
+		else
+		{
+			if($row_beu=$db->db_fetch_object($erg_beu))
+			{
+				// UTF-8 encoden
+				while (list($key, $value) = each($row_beu)) 
+				{
+					if (!empty($value))
+				    	$row_beu->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
+				}
+				$beurteiler=trim($row_beu->titelpre.' '.$row_beu->vorname.' '.$row_beu->nachname.' '.$row_beu->titelpost);
+			}
+			else 
+			{
+				die('Betreuer nicht gefunden!');
+			}
+		}
+		
+		//Zeile Titel		 
+		$pdf->SetFont('Arial','',10);
+		$maxY=$pdf->GetY()+18;
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,18,'Titel',1,'L',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(450,18,$titel,0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(450,18,'',1,'L',0);
+		
+		//Autor
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,mb_convert_encoding("Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - wissenschaftlich fundierte,\n     systematische, ingenieurmäßige\n     Vorgangsweise\n   - Ist der eigene Beitrag\n     deutlich sichtbar?\n   - Qualität der Lösung",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->MultiCell(80,18,'Autor',1,'L',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(291,18,trim($titelpre." ".$autor." ".$titelpost),1,'L',0);
+		$maxX +=291;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->SetFont('Arial','',9);
+		$pdf->MultiCell(159,18,trim('Personenkennzeichen: '),1,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,18,trim($perskz),0,'R',0);
+		
+		//Zeile Beurteilt von
+		$maxY=$pdf->GetY();
+		$pdf->SetFont('Arial','',10);
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,18,'Beurteilt von',1,'L',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(291,18,$beurteiler,1,'L',0);
+		$maxX +=291;
+		$pdf->SetFont('Arial','',9);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,18,'Datum (dd.MM.yyyy): ',1,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,18,date('d.m.Y',mktime(0, 0, 0, date("m")  , date("d"), date("Y"))),1,'R',0);
+		
+		//Feld Beurteilung
+		//Zeile Überschrift
+		$maxY=$pdf->GetY()+14;
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,36,'',1,'L',0);
+		$maxX +=159;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(212,36,'Kurze schriftliche Beurteilung',1,'C',0);
+		$maxX +=212;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'Punkte (0-100)',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,36,'',1,'L',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'Gewicht',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,36,'',1,'L',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'    Punkte             x          Gewicht',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,36,'',1,'L',0);
+		
+		//Zeile Qualität
+		$pdf->SetFont('Arial','B',9);
+		$maxY=$pdf->GetY();
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		//nur fettgedruckter Text
+		$pdf->MultiCell(159,12,mb_convert_encoding("1.) Qualität des eigenen Beitrags\n\n  Angewandte Methodik, z.B.\n\n\n\n\n\n",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->SetFont('Arial','',9);
+		$maxY=$pdf->GetY();
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,13,mb_convert_encoding("\n\n\n   - Wissenschaftlich fundierte,\n     systematische, ingenieurmäßige\n     Vorgangsweise\n   - Ist der eigene Beitrag deutlich\n     sichtbar?\n   - Qualität der Lösung",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,144,'',1,'L',0);
 		$maxX +=159;
@@ -272,207 +289,406 @@ else
 		$pdf->MultiCell(53,12,$punkteges1,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,144,'',1,'L',0);
-	}
-	else 
-	{
+		
+		//Zeile Form
+		$pdf->SetFont('Arial','B',9);
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,mb_convert_encoding("Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n   - Projektmäßige Vorgehensweise\n   - Wissenschaftlich - systematische\n     Methoden in der Analyse\n     bzw. Lösungsfindung",'ISO-8859-15','UTF-8'),0,'L',0);
+		//nur fettgedruckter Text
+		$pdf->MultiCell(159,12,mb_convert_encoding("2.) Form / Stil\n\n\n\n\n\n\n",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,144,'',1,'L',0);
-		$maxX +=159;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,12,$qualitaet,0,'L',0);
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,144,'',1,'L',0);
-		$maxX +=212;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,12,$punkte1,0,'C',0);
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
-		$maxX +=53;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,12,'0.55',0,'C',0);
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
-		$maxX +=53;
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,12,$punkteges1,0,'C',0);
-		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
-	}
-	//Zeile Form
-	$pdf->SetFont('Arial','',9);
-	if($projekttyp_kurzbz=='Bachelor')
-	//if($stgtyp=='Bachelor')
-	{
+		$pdf->SetFont('Arial','',9);
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,mb_convert_encoding("Form / Stil\n  - Hat die Bachelorarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->MultiCell(159,13,mb_convert_encoding("\n\n   - Hat die Bachelorarbeit eine klare\n     Struktur, entspricht der Vorgabe?\n   - Wird einwandfrei zitiert?\n   - Abbildungen?\n   - Sprache",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,144,'',1,'L',0);
+		$pdf->MultiCell(159,116,'',1,'L',0);
 		$maxX +=159;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(212,12,$form,0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,144,'',1,'L',0);
+		$pdf->MultiCell(212,116,'',1,'L',0);
 		$maxX +=212;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,$punkte2,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
+		$pdf->MultiCell(53,116,'',1,'L',0);
 		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,'0.40',0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
+		$pdf->MultiCell(53,116,'',1,'L',0);
 		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,$punkteges2,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
-	}
-	else 
-	{
+		$pdf->MultiCell(53,116,'',1,'L',0);
+
+		//Zeile Hintergrundinfo
+		$pdf->SetFont('Arial','B',9);
+		//Zeile Gesamtpunkte
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,mb_convert_encoding("Form / Stil\n   - Hat die Diplomarbeit eine\n     klare Struktur, entspricht der\n     Vorgabe\n   - Wird einwandfrei zitiert\n   - Abbildungen\n   - Sprache: benötigte Überarbeitung\n     seitens der Betreuerin / \n     des Betreuers",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->MultiCell(371,17,'Gesamtpunkte',1,'R',0);
+		$pdf->SetFont('Arial','',9);
+		$maxX +=371;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,144,'',1,'L',0);
-		$maxX +=159;
+		$pdf->MultiCell(53,17," ",1,'C',0);
+		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,12,$form,0,'L',0);
+		$pdf->MultiCell(53,17,' ',1,'C',0);
+		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,144,'',1,'L',0);
-		$maxX +=212;
+		$pdf->MultiCell(53,17,$summe2,1,'C',0);
+		
+		//Feld Umrechnung Punkte=>Note
+		$maxY=620;
+		$maxX=40;
+		$pdf->SetFont('Arial','',10);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'Kriterien:');
+		$pdf->SetFont('Arial','',7);
+		$maxX +=120;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'0 - 50 Pkte = 5',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'51 - 64 Pkte = 4',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'65 - 77 Pkte = 3',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'78 - 90 Pkte = 2',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'91 - 100 Pkte = 1',1,'C',0);
+		$maxY=$pdf->GetY();
+		$maxX=160;
+		$pdf->SetXY($maxX,$maxY);	
+		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Bachelorarbeit gesamt negativ','LB','L',0);
+		$maxX +=240;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'','TB','C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'','RB','C',0);
+		
+		//Zeile Note und Unterschrift
+		$pdf->SetFont('Arial','',11);
+		$maxY+=25;
+		$maxX=+40;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'Note: '.$note,0,'L',0);
+		$maxX=+40;
+		$maxY=$pdf->GetY();
+		$pdf->SetXY($maxX,$maxY);
+		$maxX +=300;
+		$maxY +=80;
+		$pdf->SetFont('Arial','',10);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(240,12,"_________________________________",0,'C',0);
+		$maxY += 12;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(240,12,"Unterschrift",0,'C',0);
+		$maxY=$pdf->GetY();
+		$pdf->footerset[1]=1;
+		$pdf->Output('Beurteilung.pdf','I');
+		
+	}
+	else //diplomarbeit
+	{	
+		$pdf = new PDF('P','pt');
+		$pdf->Open();
+		$pdf->AddPage();
+		$pdf->AliasNbPages();
+		
+		$pdf->SetFillColor(111,111,111);
+		$pdf->SetXY(30,30);
+	
+		//Logo
+		$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
+		$pdf->SetFont('Arial','',12);
+		$pdf->SetFillColor(190,190,190);
+		$pdf->SetXY(30,110);
+		$pdf->SetFont('Arial','',10);
+		$pdf->MultiCell(0,15,'Studiengang: ');
+		$pdf->SetXY(30,125);
+		$pdf->SetFont('Arial','',12);
+		$pdf->MultiCell(0,15,$stgtyp.'studiengang '.$studiengang);
+		$pdf->SetFont('Arial','',14);
+		$pdf->SetXY(30,150);
+		$pdf->MultiCell(0,15,'Beurteilung Master Thesis - 1. BegutachterIn');
+
+		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
+		if(!$erg_beu=@$db->db_query($qry_beu))
+		{
+			die('Fehler beim Laden des Betreuernamens');
+		}
+		else
+		{
+			if($row_beu=$db->db_fetch_object($erg_beu))
+			{
+				// UTF-8 encoden
+				while (list($key, $value) = each($row_beu)) 
+				{
+					if (!empty($value))
+				    	$row_beu->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
+				}
+				$beurteiler=trim($row_beu->titelpre.' '.$row_beu->vorname.' '.$row_beu->nachname.' '.$row_beu->titelpost);
+			}
+			else 
+			{
+				die('Betreuer nicht gefunden!');
+			}
+		}
+		//Zeile Titel
+		 
+		$pdf->SetFont('Arial','',10);
+		$maxY=$pdf->GetY()+4;
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,18,'Titel',1,'L',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(450,18,$titel,0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(450,18,'',1,'L',0);
+		
+		//Autor
+		$maxY=$pdf->GetY();
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,18,'Autor',1,'L',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(291,18,trim($titelpre." ".$autor." ".$titelpost),1,'L',0);
+		$maxX +=291;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->SetFont('Arial','',9);
+		$pdf->MultiCell(159,18,trim('Personenkennzeichen: '),1,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,18,trim($perskz),0,'R',0);
+		
+		//Zeile Beurteilt von
+		$maxY=$pdf->GetY();
+		$pdf->SetFont('Arial','',10);
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,18,'Beurteilt von',1,'L',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(291,18,$beurteiler,1,'L',0);
+		$maxX +=291;
+		$pdf->SetFont('Arial','',9);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,18,'Datum (dd.MM.yyyy): ',1,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(159,18,date('d.m.Y',mktime(0, 0, 0, date("m")  , date("d"), date("Y"))),1,'R',0);
+		
+		//Feld Beurteilung
+		//Zeile Überschrift
+		$maxY=$pdf->GetY()+3;
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(170,36,'',1,'L',0);
+		$maxX +=170;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(201,36,'Kurze schriftliche Beurteilung',1,'C',0);
+		$maxX +=201;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'Punkte (0-100)',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,36,'',1,'L',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'Gewicht',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,36,'',1,'L',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'    Punkte             x          Gewicht',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,36,'',1,'L',0);
+		
+		//Zeile Qualität
+		$pdf->SetFont('Arial','B',9);
+		$maxY=$pdf->GetY();
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		//nur fettgedruckter Text
+		$pdf->MultiCell(170,12,mb_convert_encoding("Qualität des eigenen Beitrags\nAngewandte Methodik, z.B.\n\n\n\n\n\n Art der Problemlösung \n\n\n\n\n",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->SetFont('Arial','',9);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(170,12,mb_convert_encoding("\n\n - Projektmäßige Vorgangsweise\n - Wissenschaftlich - systematische\n   Methoden in der Analyse bzw.\n   Lösungsfindung\n\n\n - Wurde das Problem tatsächlich gelöst?\n - Eigenständigkeit & Kreativität der\n   Lösung \n - Ist der eigene Beitrag deutlich sichtbar\n - Technische Qualität der Lösung",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(170,160,'',1,'L',0);
+		$maxX +=170;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(201,12,$qualitaet,0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(201,160,'',1,'L',0);
+		$maxX +=201;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,$punkte1,0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,160,'',1,'L',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,'0.55',0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,160,'',1,'L',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,12,$punkteges1,0,'C',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,160,'',1,'L',0);	
+		
+		//Zeile Form
+		$pdf->SetFont('Arial','B',9);
+		$maxY=$pdf->GetY();
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		//nur fettgedruckter Text
+		$pdf->MultiCell(170,12,mb_convert_encoding("Form / Stil\n\n\n\n\n\n\n",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->SetFont('Arial','',9);
+		$pdf->MultiCell(170,12,mb_convert_encoding("\n - Hat die Master Thesis eine klare\n   Struktur, entspricht der Vorgabe\n - Wird einwandfrei zitiert?\n - Abbildungen?\n - Sprache: benötigte Überarbeitung\n   seitens seitens des Betreuers/ der\n   Betreuerin",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(170,100,'',1,'L',0);
+		$maxX +=170;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(201,12,$form,0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(201,100,'',1,'L',0);
+		$maxX +=201;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,$punkte2,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
+		$pdf->MultiCell(53,100,'',1,'L',0);
 		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,'0.20',0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
+		$pdf->MultiCell(53,100,'',1,'L',0);
 		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,$punkteges2,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,144,'',1,'L',0);
-	}
-	//Zeile Hintergrundinfo
-	$pdf->SetFont('Arial','',9);
-	if($projekttyp_kurzbz=='Bachelor')
-	//if($stgtyp=='Bachelor')
-	{
-	}
-	else 
-	{
+		$pdf->MultiCell(53,100,'',1,'L',0);
+
+		//Zeile Hintergrundinfo
+		$pdf->SetFont('Arial','B',9	);	
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,12,mb_convert_encoding("Qualität der Hintergrundinformation\n   - werden Gesamtzusammenhänge\n     erkannt, wird Bedeutung\n     und Gewicht der Einflussfaktoren\n     /Daten/Informationen richtig\n     bewertet\n   - Intelligente Darstellung des\n     relevanten Stands der Technik\n     und des Firmenumfelds\n   - Aufdecken und Darstellen von\n     größeren (z.B. wirtschaftlichen\n     oder sozialen) Zusammenhängen\n     und entsprechende Diskussion",'ISO-8859-15','UTF-8'),0,'L',0);
+		//nur fettgedruckter Text
+		$pdf->MultiCell(170,12,mb_convert_encoding("Qualität der Hintergrundinformation\n\n\n\n\n\n\n\n\n\n\n",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->SetFont('Arial','',9	);	
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,156,'',1,'L',0);
-		$maxX +=159;
+		$pdf->MultiCell(170,12,mb_convert_encoding("\n - werden Gesamtzusammenhänge\n   erkannt, wird Bedeutung und Gewicht\n   der Einflussfaktoren /Daten/\n   Informationen richtig bewertet?\n - Intelligente Darstellung des relevanten\n   Stands der Technik und des\n   Firmenumfelds\n - Aufdecken und Darstellen von\n   größeren (z.B. wirtschaftlichen oder\n   sozialen) Zusammenhängen und\n   entsprechende Diskussion",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,12,$hintergrund,0,'L',0);
+		$pdf->MultiCell(170,150,'',1,'L',0);
+		$maxX +=170;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(212,156,'',1,'L',0);
-		$maxX +=212;
+		$pdf->MultiCell(201,12,$hintergrund,0,'L',0);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(201,150,'',1,'L',0);
+		$maxX +=201;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,$punkte3,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,156,'',1,'L',0);
+		$pdf->MultiCell(53,150,'',1,'L',0);
 		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,'0.25',0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,156,'',1,'L',0);
+		$pdf->MultiCell(53,150,'',1,'L',0);
 		$maxX +=53;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(53,12,$punkteges3,0,'C',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(53,156,'',1,'L',0);
+		$pdf->MultiCell(53,150,'',1,'L',0);
+
+		//Zeile Gesamtpunkte
+		$maxY=$pdf->GetY();
+		$maxX=30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->SetFont('Arial','B',9	);
+		$pdf->MultiCell(371,17,'Gesamtpunkte',1,'R',0);
+		$pdf->SetFont('Arial','',9	);
+		$maxX +=371;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,17," ",1,'C',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,17,' ',1,'C',0);
+		$maxX +=53;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(53,17,$summe2,1,'C',0);
+		
+		//Feld Umrechnung Punkte=>Note
+		$maxY=697;
+		$maxX=30;
+		$pdf->SetFont('Arial','',10);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'Kriterien:');
+		$pdf->SetFont('Arial','',8);
+		$maxX +=130;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'0 - 50 Pkte = 5',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'51 - 64 Pkte = 4',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'65 - 77 Pkte = 3',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'78 - 90 Pkte = 2',1,'C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'91 - 100 Pkte = 1',1,'C',0);
+		$maxY=$pdf->GetY();
+		$maxX=160;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Master Thesis gesamt negativ','LB','L',0);	
+		$maxX +=240;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'','TB','C',0);
+		$maxX +=80;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'','RB','C',0);
+		
+		//Zeile Note und Unterschrift
+		$pdf->SetFont('Arial','',10);
+		$maxY+=20;
+		$maxX = 30;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(450,12,'Das Gutachten des/der 2. Gutachters/Gutachterin liegt vor und ist in die Benotung miteinbezogen.','0','L',0);
+		$maxY+=17;
+		$maxX=+30;
+		$pdf->SetFont('Arial','',11);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(80,12,'Note: '.$note,0,'L',0);
+		$maxX=+40;
+		$maxY=$pdf->GetY();
+		$pdf->SetXY($maxX,$maxY);
+		$maxX +=300;
+		$maxY +=4;
+		$pdf->SetFont('Arial','',10);
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(240,12,"_________________________________",0,'C',0);
+		$maxY += 11;
+		$pdf->SetXY($maxX,$maxY);
+		$pdf->MultiCell(240,12,"Unterschrift",0,'C',0);
+		$maxY=$pdf->GetY();
+		$pdf->footerset[1]=1;
+		$pdf->Output('Beurteilung.pdf','I');
 	}
-	//Zeile Gesamtpunkte
-	$maxY=$pdf->GetY();
-	$maxX=30;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(371,12,'Gesamtpunkte',1,'L',0);
-	$maxX +=371;
-	$pdf->SetXY($maxX,$maxY);
-	//$pdf->MultiCell(53,12,$summe1,1,'C',0);
-	$pdf->MultiCell(53,12," ",1,'C',0);
-	$maxX +=53;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,' ',1,'C',0);
-	$maxX +=53;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(53,12,$summe2,1,'C',0);
-	//Feld Umrechnung Punkte=>Note
-	$pdf->SetFont('Arial','',7);
-	if($projekttyp_kurzbz=='Bachelor')
-	//if($stgtyp=='Bachelor')
-	{
-		$maxY=680;
-	}
-	else 
-	{
-		$maxY=705;
-	}
-	$maxX=160;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'Ergebnis <=50: 5',1,'C',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'50< Ergebnis <65: 4',1,'C',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'65<= Ergebnis <78: 3',1,'C',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'78<= Ergebnis <90: 2',1,'C',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'90<= Ergebnis: 1',1,'C',0);
-	$maxY=$pdf->GetY();
-	$maxX=160;
-	$pdf->SetXY($maxX,$maxY);
-	if($projekttyp_kurzbz=='Bachelor')
-	//if($stgtyp=='Bachelor')
-	{
-		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Bachelorarbeit gesamt negativ',1,'L',0);
-	}
-	else 
-	{
-		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Diplomarbeit gesamt negativ',1,'L',0);
-	}
-	$maxX +=240;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'',1,'C',0);
-	$maxX +=80;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'',1,'C',0);
-	//Zeile Note und Unterschrift
-	$pdf->SetFont('Arial','',10);
-	$maxY=760;
-	$maxX=+40;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(80,12,'Note: '.$note,0,'L',0);
-	$maxX=+40;
-	$maxY=$pdf->GetY();
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(160,12,'Letzter Abgabetermin: '.$datum_obj->formatDatum($ende,'d.m.Y'),0,'L',0);
-	$maxX +=300;
-	$pdf->SetXY($maxX,$maxY);
-	$pdf->MultiCell(240,12,"Unterschrift:__________________________",0,'C',0);
-	$maxY=$pdf->GetY();
-	$pdf->footerset[1]=1;
-	$pdf->Output('Beurteilung.pdf','I');
 }
 
 
@@ -500,7 +716,8 @@ if(!$erg=$db->db_query($sql_query))
 }
 else
 {
-	if($row=@$db->db_fetch_object($erg))
+	
+	if($row=$db->db_fetch_object($erg))
 	{
 			// UTF-8 encoden
 		/*while (list($key, $value) = each($row)) 
@@ -717,7 +934,7 @@ else
 		$htmlstr .= "<input type='hidden' name='stgtyp' value='".$stgtyp."'>\n";
 		$htmlstr .= "<input type='hidden' name='projekttyp_kurzbz' value='".$row->projekttyp_kurzbz."'>\n";
 		$htmlstr .= "</td></tr>";
-		$htmlstr .= "<td>&nbsp;</td><td align='center'>Kurze verbale Beurteilung</td><td align='center'>Punkte (0-100)</td><td align='center'>Gewicht</td><td align='center'>Punkte * Gewicht</td>\n";
+		$htmlstr .= "<td>&nbsp;</td><td align='center'>Kurze schriftliche Beurteilung</td><td align='center'>Punkte (0-100)</td><td align='center'>Gewicht</td><td align='center'>Punkte x Gewicht</td>\n";
 		$htmlstr .= "<tr>\n";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
