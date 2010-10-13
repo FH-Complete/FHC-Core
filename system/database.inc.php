@@ -3774,264 +3774,6 @@ $tabellen=array
 		),
    	),
     	
-	'{9875E5BA-5331-4409-AFA8-84A1F9209472}'  => array
-	(
-	    	"id" => "{9875E5BA-5331-4409-AFA8-84A1F9209472}" ,
-	    	"name" => "tbl_bmreservierung" ,
-	    	"caption" => "tbl_bmreservierung" ,
-	    	"comments" => "" ,
-	    	"storage" => "" ,
-	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
-	    	"attribute"  => array
-	    	(
-			
-			'{4AF05AC0-AF41-48C9-9A27-55DD8E5A2FE6}' => array
-			(
-				"id" => "{4AF05AC0-AF41-48C9-9A27-55DD8E5A2FE6}" ,
-				"name" => "bmreservierung_id" ,
-				"caption" => "bmreservierung_id" ,
-				"ordinal" => "1" ,
-				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "nextval('campus.seq_bmreservierung_bmreservierung_id'::regclass)",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{8137ADE1-FA96-47EA-B8C0-029E53D09F96}' => array
-			(
-				"id" => "{8137ADE1-FA96-47EA-B8C0-029E53D09F96}" ,
-				"name" => "uid" ,
-				"caption" => "uid" ,
-				"ordinal" => "2" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "16" ,
-				"datatypeparam2" => "" ,
-				"length" => "16",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{628A9C68-9884-4AB7-87B2-F74672A0778B}' => array
-			(
-				"id" => "{628A9C68-9884-4AB7-87B2-F74672A0778B}" ,
-				"name" => "datum" ,
-				"caption" => "datum" ,
-				"ordinal" => "3" ,
-				"pk" => "" ,
-				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{A45A2EB3-8F0E-43BD-A3FC-12E669E0CE20}' => array
-			(
-				"id" => "{A45A2EB3-8F0E-43BD-A3FC-12E669E0CE20}" ,
-				"name" => "stunde" ,
-				"caption" => "stunde" ,
-				"ordinal" => "4" ,
-				"pk" => "" ,
-				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{D7489558-C7A0-47E5-9992-7CDE2E78F127}' => array
-			(
-				"id" => "{D7489558-C7A0-47E5-9992-7CDE2E78F127}" ,
-				"name" => "titel" ,
-				"caption" => "titel" ,
-				"ordinal" => "5" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "10" ,
-				"datatypeparam2" => "" ,
-				"length" => "10",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{549737F9-1C0C-478C-8D46-7C67EF5FB667}' => array
-			(
-				"id" => "{549737F9-1C0C-478C-8D46-7C67EF5FB667}" ,
-				"name" => "beschreibung" ,
-				"caption" => "beschreibung" ,
-				"ordinal" => "6" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "32" ,
-				"datatypeparam2" => "" ,
-				"length" => "32",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{0634FF51-0C6C-4630-9A12-C0914AAA4B32}' => array
-			(
-				"id" => "{0634FF51-0C6C-4630-9A12-C0914AAA4B32}" ,
-				"name" => "updateamum" ,
-				"caption" => "updateamum" ,
-				"ordinal" => "7" ,
-				"pk" => "" ,
-				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{536F1BD7-D77D-4713-9755-4C6C9342837E}' => array
-			(
-				"id" => "{536F1BD7-D77D-4713-9755-4C6C9342837E}" ,
-				"name" => "updatevon" ,
-				"caption" => "updatevon" ,
-				"ordinal" => "8" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "32" ,
-				"datatypeparam2" => "" ,
-				"length" => "32",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{055B4A49-074E-4C09-BB5C-F4A361EC3624}' => array
-			(
-				"id" => "{055B4A49-074E-4C09-BB5C-F4A361EC3624}" ,
-				"name" => "insertamum" ,
-				"caption" => "insertamum" ,
-				"ordinal" => "9" ,
-				"pk" => "" ,
-				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "now()",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{F2103B96-82CB-4E8C-9D1B-3BC74B285CAA}' => array
-			(
-				"id" => "{F2103B96-82CB-4E8C-9D1B-3BC74B285CAA}" ,
-				"name" => "insertvon" ,
-				"caption" => "insertvon" ,
-				"ordinal" => "10" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "32" ,
-				"datatypeparam2" => "" ,
-				"length" => "32",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{DC712CE7-8440-43F1-A38E-B1FE3B2FD9F6}' => array
-			(
-				"id" => "{DC712CE7-8440-43F1-A38E-B1FE3B2FD9F6}" ,
-				"name" => "betriebsmittelperson_id" ,
-				"caption" => "betriebsmittelperson_id" ,
-				"ordinal" => "0" ,
-				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-	   	),
-		"keyconstraint"  => array
-	    	(
-			
-			'{C6AE07B1-ECC0-4F7D-9548-8A19444C7BB4}' => array
-			(
-				"id" => "{C6AE07B1-ECC0-4F7D-9548-8A19444C7BB4}" ,
-				"name" => "pk_bmreservierung" ,
-				"caption" => "pk_tbl_bmreservierung" ,
-				"ordinal" => "0" ,
-				"comments" => "" ,
-				"keyconstraintitem"  => array
-			    	(
-					
-			   		'{F0E1DA73-6B93-42B8-AF42-090BC01251F4}' => array
-			   		(
-		   				"id" => "{F0E1DA73-6B93-42B8-AF42-090BC01251F4}" ,
-		   				"name" => "bmreservierung_id" ,
-		   				"caption" => "" ,
-		   				"ordinal" => "0" ,
-		   				"comments" => "" ,
-		   				"description" => "",
-						"attribute"  => array
-					    	(
-							"id" => "{4AF05AC0-AF41-48C9-9A27-55DD8E5A2FE6}",
-				   		),
-						"foreignkeys"  => array
-					    	(
-							
-				   		)
-		   			),
-		   			
-		   		),
-			),
-			
-		),
-   	),
-    	
 	'{A7BEE74A-E2DF-402F-B209-C25B5635D4D7}'  => array
 	(
 	    	"id" => "{A7BEE74A-E2DF-402F-B209-C25B5635D4D7}" ,
@@ -6354,6 +6096,44 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{062FE967-1B4C-49AE-8B1F-D622926B172E}' => array
+			(
+				"id" => "{062FE967-1B4C-49AE-8B1F-D622926B172E}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{77BD873A-E512-457F-8AE4-FF08703E1765}' => array
+			(
+				"id" => "{77BD873A-E512-457F-8AE4-FF08703E1765}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -9235,7 +9015,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{6D474BB4-B542-468F-8E66-A2DAAD9C0080}","id" => "{C34CC8D9-1155-462F-8FFB-16CD6684B08B}",
+							"id" => "{6D474BB4-B542-468F-8E66-A2DAAD9C0080}","id" => "{C34CC8D9-1155-462F-8FFB-16CD6684B08B}","id" => "{CC262E27-5F23-4F56-9A64-E7F0120C3509}",
 				   		)
 		   			),
 		   			
@@ -10395,6 +10175,25 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"description" => ""
 			),
 			
+			'{C29790A7-017F-4D69-936C-49800196A9D5}' => array
+			(
+				"id" => "{C29790A7-017F-4D69-936C-49800196A9D5}" ,
+				"name" => "bezeichnung_english" ,
+				"caption" => "bezeichnung_english" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -11365,13 +11164,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 			(
 				"id" => "{0B7F4ADA-904D-4FD6-8A34-F14C9A303990}" ,
 				"name" => "raumtyp" ,
-				"caption" => "raumtyp" ,
+				"caption" => "raumtyp_kurzbz" ,
 				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "8" ,
+				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
-				"length" => "8",
+				"length" => "16",
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "",
@@ -11384,13 +11183,13 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 			(
 				"id" => "{E4E43A30-DB00-4EE1-8EC7-FF13B5DBF31E}" ,
 				"name" => "raumtypalternativ" ,
-				"caption" => "raumtypalternativ" ,
+				"caption" => "raumtyp_kurzbz" ,
 				"ordinal" => "10" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "8" ,
+				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
-				"length" => "8",
+				"length" => "16",
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "",
@@ -12181,6 +11980,25 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"description" => ""
 			),
 			
+			'{7C321800-A8DE-4C4C-898D-D65BEC3A000F}' => array
+			(
+				"id" => "{7C321800-A8DE-4C4C-898D-D65BEC3A000F}" ,
+				"name" => "standort_id" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -12718,6 +12536,25 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"datatypeparam1" => "3" ,
 				"datatypeparam2" => "2" ,
 				"length" => "3",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C6C70CA2-8140-4AF4-97CB-DD0D4C7A201A}' => array
+			(
+				"id" => "{C6C70CA2-8140-4AF4-97CB-DD0D4C7A201A}" ,
+				"name" => "sort" ,
+				"caption" => "sort" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -13915,7 +13752,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "0",
-				"defaultvalue" => "",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -17018,12 +16855,31 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"description" => ""
 			),
 			
+			'{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}' => array
+			(
+				"id" => "{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}" ,
+				"name" => "firma_id" ,
+				"caption" => "firma_id" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{5EEE291E-11E4-4821-9456-FB24867FEAE3}' => array
 			(
 				"id" => "{5EEE291E-11E4-4821-9456-FB24867FEAE3}" ,
 				"name" => "name" ,
 				"caption" => "name" ,
-				"ordinal" => "3" ,
+				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -17042,7 +16898,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{8D2EFD4F-94E5-445B-9076-9EAD33B6A2BF}" ,
 				"name" => "strasse" ,
 				"caption" => "strasse" ,
-				"ordinal" => "4" ,
+				"ordinal" => "5" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -17061,7 +16917,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{511A03C2-B004-4CB3-AC23-8A8D3A018D72}" ,
 				"name" => "plz" ,
 				"caption" => "plz" ,
-				"ordinal" => "5" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -17080,7 +16936,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{9715FD0C-581C-41D2-9350-7B54CB3D74DD}" ,
 				"name" => "ort" ,
 				"caption" => "ort" ,
-				"ordinal" => "6" ,
+				"ordinal" => "7" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -17099,7 +16955,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{64520C27-7FB4-48F1-99BB-90C0E73F995B}" ,
 				"name" => "gemeinde" ,
 				"caption" => "gemeinde" ,
-				"ordinal" => "7" ,
+				"ordinal" => "8" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -17118,7 +16974,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{1D2D430A-ED4B-4522-9A2E-0AB33F07191F}" ,
 				"name" => "nation" ,
 				"caption" => "nation" ,
-				"ordinal" => "8" ,
+				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "3" ,
@@ -17137,7 +16993,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{883C7760-6119-4B62-A398-CBA0A70102D7}" ,
 				"name" => "typ" ,
 				"caption" => "typ" ,
-				"ordinal" => "9" ,
+				"ordinal" => "10" ,
 				"pk" => "" ,
 				"datatypeid" => "{E12D6C2A-E13A-4877-B9C4-AA7BA668C316}" ,
 				"datatypeparam1" => "1" ,
@@ -17156,7 +17012,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{C6144DDF-44C5-4125-BFD6-F038CA0B3604}" ,
 				"name" => "heimatadresse" ,
 				"caption" => "heimatadresse" ,
-				"ordinal" => "10" ,
+				"ordinal" => "11" ,
 				"pk" => "" ,
 				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
 				"datatypeparam1" => "" ,
@@ -17175,7 +17031,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{014394F7-0D8A-459D-8F5A-20AF4423F694}" ,
 				"name" => "zustelladresse" ,
 				"caption" => "zustelladresse" ,
-				"ordinal" => "11" ,
+				"ordinal" => "12" ,
 				"pk" => "" ,
 				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
 				"datatypeparam1" => "" ,
@@ -17184,25 +17040,6 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "false",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}' => array
-			(
-				"id" => "{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}" ,
-				"name" => "firma_id" ,
-				"caption" => "firma_id" ,
-				"ordinal" => "12" ,
-				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -18431,7 +18268,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}","id" => "{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}","id" => "{B5CDBA7C-C418-4369-880D-F395732719F6}","id" => "{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}","id" => "{4B442C0C-6000-4003-97C8-40640D73C52B}","id" => "{A9109C87-859C-4D7C-8933-511A7231B1E8}","id" => "{71F8271B-B5B2-4002-8EC5-74639660E463}","id" => "{BF6217E2-57AB-4D99-B40D-7CBEF0466622}","id" => "{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}","id" => "{30BEDA69-44AE-49C6-9687-18D9FB5A720B}","id" => "{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}","id" => "{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}","id" => "{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}","id" => "{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}","id" => "{97064858-CA15-40E8-AE55-98B6BD1BE753}","id" => "{087640DB-A402-4657-A79B-79B6C539C027}","id" => "{3A452E95-98F0-4764-A775-011B729C69A9}","id" => "{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}",
+							"id" => "{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}","id" => "{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}","id" => "{B5CDBA7C-C418-4369-880D-F395732719F6}","id" => "{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}","id" => "{4B442C0C-6000-4003-97C8-40640D73C52B}","id" => "{A9109C87-859C-4D7C-8933-511A7231B1E8}","id" => "{71F8271B-B5B2-4002-8EC5-74639660E463}","id" => "{BF6217E2-57AB-4D99-B40D-7CBEF0466622}","id" => "{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}","id" => "{30BEDA69-44AE-49C6-9687-18D9FB5A720B}","id" => "{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}","id" => "{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}","id" => "{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}","id" => "{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}","id" => "{97064858-CA15-40E8-AE55-98B6BD1BE753}","id" => "{087640DB-A402-4657-A79B-79B6C539C027}","id" => "{3A452E95-98F0-4764-A775-011B729C69A9}","id" => "{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}","id" => "{CF08AC9E-4FD5-4F1D-B38C-708027F34218}","id" => "{B7455DCB-FB2A-4A2E-A9D8-B2912F496834}",
 				   		)
 		   			),
 		   			
@@ -18601,12 +18438,31 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
+			'{43CE20C6-06AD-46F2-A0F0-E7A06D43E436}' => array
+			(
+				"id" => "{43CE20C6-06AD-46F2-A0F0-E7A06D43E436}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{45192F27-72E1-4E23-9C82-D8BDD60BA590}' => array
 			(
 				"id" => "{45192F27-72E1-4E23-9C82-D8BDD60BA590}" ,
 				"name" => "art" ,
 				"caption" => "art" ,
-				"ordinal" => "7" ,
+				"ordinal" => "8" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "5" ,
@@ -18625,7 +18481,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{02005B36-1FDE-402C-854E-F19451B1FEEC}" ,
 				"name" => "studiensemester_kurzbz" ,
 				"caption" => "studiensemester_kurzbz" ,
-				"ordinal" => "8" ,
+				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -18644,7 +18500,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{1024D2BB-BA2D-4FD8-A71F-A5D8CC7911EE}" ,
 				"name" => "start" ,
 				"caption" => "start" ,
-				"ordinal" => "9" ,
+				"ordinal" => "10" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -18663,7 +18519,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{ED07B35F-BC01-4369-9064-86CECC61C1BD}" ,
 				"name" => "ende" ,
 				"caption" => "ende" ,
-				"ordinal" => "10" ,
+				"ordinal" => "11" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -18682,7 +18538,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{B4598576-AE64-4340-9A1D-B70AA07FB4F4}" ,
 				"name" => "negativ" ,
 				"caption" => "negativ" ,
-				"ordinal" => "11" ,
+				"ordinal" => "12" ,
 				"pk" => "" ,
 				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
 				"datatypeparam1" => "" ,
@@ -18701,7 +18557,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{1EF4FE03-81F2-4704-BD32-8C8D655421E3}" ,
 				"name" => "updateamum" ,
 				"caption" => "updateamum" ,
-				"ordinal" => "12" ,
+				"ordinal" => "13" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -18720,7 +18576,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{A68F600B-C739-43C6-AE46-460F80767B0A}" ,
 				"name" => "updatevon" ,
 				"caption" => "updatevon" ,
-				"ordinal" => "13" ,
+				"ordinal" => "14" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -18739,7 +18595,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{CC129A53-47ED-44E0-A324-0371673611A1}" ,
 				"name" => "insertamum" ,
 				"caption" => "insertamum" ,
-				"ordinal" => "14" ,
+				"ordinal" => "15" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -18758,7 +18614,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{5637EF22-7102-4FE1-A542-A7E4C0642048}" ,
 				"name" => "insertvon" ,
 				"caption" => "insertvon" ,
-				"ordinal" => "15" ,
+				"ordinal" => "16" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -19449,7 +19305,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"caption" => "betriebsmittel_id" ,
 				"ordinal" => "1" ,
 				"pk" => "{F77283EA-37F6-4B41-AB09-417E372C432F}" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
@@ -19518,12 +19374,31 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
+			'{A87B3703-22BE-4C7A-A5BE-772FB9E423C6}' => array
+			(
+				"id" => "{A87B3703-22BE-4C7A-A5BE-772FB9E423C6}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{8F1B6C33-45A8-424D-88A6-F3D0D865A408}' => array
 			(
 				"id" => "{8F1B6C33-45A8-424D-88A6-F3D0D865A408}" ,
 				"name" => "beschreibung" ,
 				"caption" => "beschreibung" ,
-				"ordinal" => "5" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -19542,13 +19417,13 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{80746FDF-BBF9-442B-B7A1-057E4B55E222}" ,
 				"name" => "nummer" ,
 				"caption" => "nummer" ,
-				"ordinal" => "6" ,
+				"ordinal" => "7" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
 				"datatypeparam2" => "" ,
 				"length" => "32",
-				"unique" => "1",
+				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
@@ -19561,7 +19436,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{BD321BBE-AE94-4A13-9979-7D2C386F4431}" ,
 				"name" => "hersteller" ,
 				"caption" => "hersteller" ,
-				"ordinal" => "7" ,
+				"ordinal" => "8" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "128" ,
@@ -19580,7 +19455,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{83415CD4-0958-410B-9546-22E3B7D30040}" ,
 				"name" => "seriennummer" ,
 				"caption" => "seriennummer" ,
-				"ordinal" => "8" ,
+				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -19594,31 +19469,12 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
-			'{0D6E497B-3D89-40E9-9796-6D9A5E20848D}' => array
-			(
-				"id" => "{0D6E497B-3D89-40E9-9796-6D9A5E20848D}" ,
-				"name" => "bestellung_id" ,
-				"caption" => "bestellung_id" ,
-				"ordinal" => "9" ,
-				"pk" => "" ,
-				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
 			'{7FCA279C-4779-4560-9A0B-062D70C8019F}' => array
 			(
 				"id" => "{7FCA279C-4779-4560-9A0B-062D70C8019F}" ,
 				"name" => "bestelldetail_id" ,
 				"caption" => "bestelldetail_id" ,
-				"ordinal" => "10" ,
+				"ordinal" => "11" ,
 				"pk" => "" ,
 				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
 				"datatypeparam1" => "" ,
@@ -19637,7 +19493,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{984C20ED-9094-4A4B-9C36-B4130EAF9979}" ,
 				"name" => "afa" ,
 				"caption" => "afa" ,
-				"ordinal" => "11" ,
+				"ordinal" => "12" ,
 				"pk" => "" ,
 				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
 				"datatypeparam1" => "" ,
@@ -19701,7 +19557,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "false",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -19806,9 +19662,66 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 			'{3D6E5E3B-D186-48F9-910F-9F0EEE6836F4}' => array
 			(
 				"id" => "{3D6E5E3B-D186-48F9-910F-9F0EEE6836F4}" ,
-				"name" => "nummerintern" ,
-				"caption" => "nummerintern" ,
+				"name" => "inventarnummer" ,
+				"caption" => "inventarnummer" ,
 				"ordinal" => "21" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{12360AEA-A5E5-4767-9ABB-285AA17EC9E5}' => array
+			(
+				"id" => "{12360AEA-A5E5-4767-9ABB-285AA17EC9E5}" ,
+				"name" => "leasing_bis" ,
+				"caption" => "leasing_bis" ,
+				"ordinal" => "22" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EE62ACE9-A446-4695-8156-E247F986D0CF}' => array
+			(
+				"id" => "{EE62ACE9-A446-4695-8156-E247F986D0CF}" ,
+				"name" => "inventuramum" ,
+				"caption" => "inventuramum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{45C1226E-4BBF-4371-B675-4C163D4FAD4E}' => array
+			(
+				"id" => "{45C1226E-4BBF-4371-B675-4C163D4FAD4E}" ,
+				"name" => "inventurvon" ,
+				"caption" => "inventurvon" ,
+				"ordinal" => "0" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -19857,37 +19770,6 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 		   		),
 			),
 			
-			'{3150B2C8-ADD3-4563-9A50-9A9BB700D6F7}' => array
-			(
-				"id" => "{3150B2C8-ADD3-4563-9A50-9A9BB700D6F7}" ,
-				"name" => "nummer" ,
-				"caption" => "nummer" ,
-				"ordinal" => "0" ,
-				"comments" => "" ,
-				"keyconstraintitem"  => array
-			    	(
-					
-			   		'{17DBBC21-8178-48FB-BAFE-C94C8A3E4BD6}' => array
-			   		(
-		   				"id" => "{17DBBC21-8178-48FB-BAFE-C94C8A3E4BD6}" ,
-		   				"name" => "nummer" ,
-		   				"caption" => "" ,
-		   				"ordinal" => "0" ,
-		   				"comments" => "" ,
-		   				"description" => "",
-						"attribute"  => array
-					    	(
-							"id" => "{80746FDF-BBF9-442B-B7A1-057E4B55E222}",
-				   		),
-						"foreignkeys"  => array
-					    	(
-							
-				   		)
-		   			),
-		   			
-		   		),
-			),
-			
 		),
    	),
     	
@@ -19908,7 +19790,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"name" => "betriebsmittelperson_id" ,
 				"caption" => "betriebsmittelperson_id" ,
 				"ordinal" => "0" ,
-				"pk" => "{11332208-C79F-4E68-9B35-B77E6FEF85BD}" ,
+				"pk" => "" ,
 				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
@@ -19934,7 +19816,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "",
+				"defaultvalue" => "nextval('seq_betriebsmittel_betriebsmittel_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -20158,7 +20040,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{11332208-C79F-4E68-9B35-B77E6FEF85BD}",
+							
 				   		)
 		   			),
 		   			
@@ -20394,6 +20276,25 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{820531B5-B838-42A9-A924-3193C444EECC}' => array
+			(
+				"id" => "{820531B5-B838-42A9-A924-3193C444EECC}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -21268,7 +21169,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"caption" => "firma_id" ,
 				"ordinal" => "1" ,
 				"pk" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
@@ -21280,49 +21181,49 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
+			'{42464AA3-DC7D-478A-948A-B903E74B3E59}' => array
+			(
+				"id" => "{42464AA3-DC7D-478A-948A-B903E74B3E59}" ,
+				"name" => "finanzamt" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8F214C8E-0D95-468F-8D6B-AF62E6D6A032}' => array
+			(
+				"id" => "{8F214C8E-0D95-468F-8D6B-AF62E6D6A032}" ,
+				"name" => "firmentyp_kurzbz" ,
+				"caption" => "firmentyp_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{7F60DBBD-3646-4439-AA48-11B804B6A754}' => array
 			(
 				"id" => "{7F60DBBD-3646-4439-AA48-11B804B6A754}" ,
 				"name" => "name" ,
 				"caption" => "name" ,
-				"ordinal" => "2" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "128" ,
-				"datatypeparam2" => "" ,
-				"length" => "128",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{0D338D61-8486-4AD3-B23A-E0818E6C7A53}' => array
-			(
-				"id" => "{0D338D61-8486-4AD3-B23A-E0818E6C7A53}" ,
-				"name" => "adresse" ,
-				"caption" => "adresse" ,
-				"ordinal" => "3" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "256" ,
-				"datatypeparam2" => "" ,
-				"length" => "256",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{4AE829B0-9E81-4FDC-8D69-54A9D8E62DD5}' => array
-			(
-				"id" => "{4AE829B0-9E81-4FDC-8D69-54A9D8E62DD5}" ,
-				"name" => "email" ,
-				"caption" => "email" ,
 				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -21337,30 +21238,30 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
-			'{9FCD8E1C-0990-4FC7-9DC6-40DF620EE4FC}' => array
+			'{9E36E6CA-A059-4C5B-A8F6-73F27361E3D1}' => array
 			(
-				"id" => "{9FCD8E1C-0990-4FC7-9DC6-40DF620EE4FC}" ,
-				"name" => "telefon" ,
-				"caption" => "telefon" ,
+				"id" => "{9E36E6CA-A059-4C5B-A8F6-73F27361E3D1}" ,
+				"name" => "schule" ,
+				"caption" => "schule" ,
 				"ordinal" => "5" ,
 				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "32" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
-				"length" => "32",
+				"length" => "",
 				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
+				"notnull" => "1",
+				"defaultvalue" => "false",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
 			),
 			
-			'{8BEB3727-4B74-4E7F-9406-3D67C7C047F1}' => array
+			'{26C21D41-57DC-4B20-A42F-3539518D0143}' => array
 			(
-				"id" => "{8BEB3727-4B74-4E7F-9406-3D67C7C047F1}" ,
-				"name" => "fax" ,
-				"caption" => "fax" ,
+				"id" => "{26C21D41-57DC-4B20-A42F-3539518D0143}" ,
+				"name" => "steuernummer" ,
+				"caption" => "steuernummer" ,
 				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
@@ -21394,20 +21295,39 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
-			'{8F214C8E-0D95-468F-8D6B-AF62E6D6A032}' => array
+			'{90E17405-6FB7-49A5-B9F9-5DF3D79FEF5E}' => array
 			(
-				"id" => "{8F214C8E-0D95-468F-8D6B-AF62E6D6A032}" ,
-				"name" => "firmentyp_kurzbz" ,
-				"caption" => "firmentyp_kurzbz" ,
+				"id" => "{90E17405-6FB7-49A5-B9F9-5DF3D79FEF5E}" ,
+				"name" => "gesperrt" ,
+				"caption" => "gesperrt" ,
 				"ordinal" => "8" ,
 				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "32" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
-				"length" => "32",
+				"length" => "",
 				"unique" => "0",
 				"notnull" => "1",
-				"defaultvalue" => "",
+				"defaultvalue" => "FALSE",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8794E59F-6365-454D-9966-EE4C5F0D4402}' => array
+			(
+				"id" => "{8794E59F-6365-454D-9966-EE4C5F0D4402}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "TRUE",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -21418,7 +21338,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{92B8329B-239E-4FD8-88F6-04D502C0ADFA}" ,
 				"name" => "updateamum" ,
 				"caption" => "updateamum" ,
-				"ordinal" => "9" ,
+				"ordinal" => "10" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -21437,7 +21357,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{5D457AE4-3EFF-4555-B82A-99A03E64A1AC}" ,
 				"name" => "updatevon" ,
 				"caption" => "updatevon" ,
-				"ordinal" => "10" ,
+				"ordinal" => "11" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -21456,7 +21376,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{72C54CA8-8872-45C9-8F38-8F0AFD3EA9E7}" ,
 				"name" => "insertamum" ,
 				"caption" => "insertamum" ,
-				"ordinal" => "11" ,
+				"ordinal" => "12" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -21475,7 +21395,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{9B71F709-DCBC-4D7F-B3A1-A8EA7816D433}" ,
 				"name" => "insertvon" ,
 				"caption" => "insertvon" ,
-				"ordinal" => "12" ,
+				"ordinal" => "13" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -21494,7 +21414,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"id" => "{8F20C372-1110-4F31-BB40-87CFAF31C481}" ,
 				"name" => "ext_id" ,
 				"caption" => "ext_id" ,
-				"ordinal" => "13" ,
+				"ordinal" => "14" ,
 				"pk" => "" ,
 				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
 				"datatypeparam1" => "" ,
@@ -21503,25 +21423,6 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{9E36E6CA-A059-4C5B-A8F6-73F27361E3D1}' => array
-			(
-				"id" => "{9E36E6CA-A059-4C5B-A8F6-73F27361E3D1}" ,
-				"name" => "schule" ,
-				"caption" => "schule" ,
-				"ordinal" => "14" ,
-				"pk" => "" ,
-				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "false",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -21555,7 +21456,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}","id" => "{20C6EDC1-2A13-4BD1-89EF-1C6E89ECB97B}","id" => "{EDB6FA36-36CF-43F8-A165-743B70304BED}","id" => "{5E64D00F-BF30-45AA-8171-0C3FCC183903}","id" => "{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}",
+							"id" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}","id" => "{5E64D00F-BF30-45AA-8171-0C3FCC183903}","id" => "{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}","id" => "{1B3EE35E-A221-4E54-A428-20EE997CC89A}","id" => "{5F937967-995D-456B-A9D2-DA746E123869}","id" => "{472B3BFA-5F62-40AD-B30E-4D707D2B837F}","id" => "{301871B2-5357-4E08-9F1A-D557A2C9D16B}",
 				   		)
 		   			),
 		   			
@@ -22130,6 +22031,25 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
+			'{6FA4FE25-82C3-450D-AFF6-D0576D71A053}' => array
+			(
+				"id" => "{6FA4FE25-82C3-450D-AFF6-D0576D71A053}" ,
+				"name" => "gid" ,
+				"caption" => "gid" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "nextval('public.seq_gruppe_gid')",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -22159,6 +22079,37 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 						"foreignkeys"  => array
 					    	(
 							"id" => "{3229E124-B6D4-461E-B4A4-D56D63A627E9}","id" => "{C0D45455-D62E-4976-8A81-8F779C91F41B}","id" => "{4A6EFE0B-68CC-4573-AC43-C168310F9A0E}","id" => "{2F376168-E84F-4287-8A24-7C30108CD3EB}","id" => "{2E07FD73-BB4C-4AEE-9B45-C3A961B2E8D2}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{F1A77C70-AD1B-4FD9-A1B3-40D7C1036C0E}' => array
+			(
+				"id" => "{F1A77C70-AD1B-4FD9-A1B3-40D7C1036C0E}" ,
+				"name" => "gid" ,
+				"caption" => "gid" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{4138918F-D0DC-4F08-A1A1-7C6D06B67C70}' => array
+			   		(
+		   				"id" => "{4138918F-D0DC-4F08-A1A1-7C6D06B67C70}" ,
+		   				"name" => "gid" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6FA4FE25-82C3-450D-AFF6-D0576D71A053}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
 				   		)
 		   			),
 		   			
@@ -22217,31 +22168,12 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
-			'{7D9B8942-0811-484F-8903-FCAB8F51A0B3}' => array
-			(
-				"id" => "{7D9B8942-0811-484F-8903-FCAB8F51A0B3}" ,
-				"name" => "firma_id" ,
-				"caption" => "firma_id" ,
-				"ordinal" => "3" ,
-				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
 			'{B533D5E3-6A93-4D14-81EA-1EB82F5CAA48}' => array
 			(
 				"id" => "{B533D5E3-6A93-4D14-81EA-1EB82F5CAA48}" ,
 				"name" => "kontakttyp" ,
 				"caption" => "kontakttyp" ,
-				"ordinal" => "4" ,
+				"ordinal" => "3" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -22249,6 +22181,25 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"length" => "32",
 				"unique" => "0",
 				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{046AE7F9-17FD-490B-926C-18F883EB3A0C}' => array
+			(
+				"id" => "{046AE7F9-17FD-490B-926C-18F883EB3A0C}" ,
+				"name" => "standort_id" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -23116,6 +23067,25 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
+			'{5995A925-4204-4A2F-B74A-EC993313E555}' => array
+			(
+				"id" => "{5995A925-4204-4A2F-B74A-EC993313E555}" ,
+				"name" => "gid" ,
+				"caption" => "gid" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "nextval('public.seq_gruppe_gid')",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -23199,6 +23169,37 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 						"foreignkeys"  => array
 					    	(
 							"id" => "{D7D183AA-F885-4557-A5F4-908E00C1A851}","id" => "{7FE4B36E-E9BB-4217-8392-F8EF847AF590}","id" => "{6670C52E-4B7D-4887-9E90-D07964E2881A}","id" => "{C7C33A82-6A84-4AC1-B98A-A38EBD584E62}","id" => "{F0535E2C-D8E7-4596-A124-9F88247A02CD}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{62FEFB7C-B227-432B-91E2-9DEE7A22E970}' => array
+			(
+				"id" => "{62FEFB7C-B227-432B-91E2-9DEE7A22E970}" ,
+				"name" => "gid" ,
+				"caption" => "gid" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{181466EE-9F64-456F-8B9D-CD7D49F48A3D}' => array
+			   		(
+		   				"id" => "{181466EE-9F64-456F-8B9D-CD7D49F48A3D}" ,
+		   				"name" => "gid" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{5995A925-4204-4A2F-B74A-EC993313E555}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
 				   		)
 		   			),
 		   			
@@ -23649,25 +23650,6 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
-			'{F6A79886-6356-45A8-A0A8-2AD965D0E6C8}' => array
-			(
-				"id" => "{F6A79886-6356-45A8-A0A8-2AD965D0E6C8}" ,
-				"name" => "standort_kurzbz" ,
-				"caption" => "standort_kurzbz" ,
-				"ordinal" => "15" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "16" ,
-				"datatypeparam2" => "" ,
-				"length" => "16",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
 			'{5214641A-11C4-4AF1-9F15-E52ABF2D83D4}' => array
 			(
 				"id" => "{5214641A-11C4-4AF1-9F15-E52ABF2D83D4}" ,
@@ -23701,6 +23683,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1194717F-9CE0-4B93-A98E-5D11BF784E20}' => array
+			(
+				"id" => "{1194717F-9CE0-4B93-A98E-5D11BF784E20}" ,
+				"name" => "standort_id" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -23844,9 +23845,9 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"ordinal" => "2" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "30" ,
+				"datatypeparam1" => "64" ,
 				"datatypeparam2" => "" ,
-				"length" => "30",
+				"length" => "64",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -24140,25 +24141,6 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
-			'{D42D051E-0F08-4C06-9935-A3763B8D8C29}' => array
-			(
-				"id" => "{D42D051E-0F08-4C06-9935-A3763B8D8C29}" ,
-				"name" => "standort_kurzbz" ,
-				"caption" => "standort_kurzbz" ,
-				"ordinal" => "18" ,
-				"pk" => "" ,
-				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "16" ,
-				"datatypeparam2" => "" ,
-				"length" => "16",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
 			'{F52BEC0D-FECF-4891-94F7-5041022F5251}' => array
 			(
 				"id" => "{F52BEC0D-FECF-4891-94F7-5041022F5251}" ,
@@ -24170,6 +24152,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam1" => "8" ,
 				"datatypeparam2" => "" ,
 				"length" => "8",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B3FCDAC7-D3F3-4FEE-B8B4-97CA9247F75E}' => array
+			(
+				"id" => "{B3FCDAC7-D3F3-4FEE-B8B4-97CA9247F75E}" ,
+				"name" => "standort_id" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -24273,9 +24274,9 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"ordinal" => "3" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "8" ,
+				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
-				"length" => "8",
+				"length" => "16",
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "",
@@ -25024,8 +25025,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	'{370D251A-1CF0-4A53-9B67-2AB455F02731}'  => array
 	(
 	    	"id" => "{370D251A-1CF0-4A53-9B67-2AB455F02731}" ,
-	    	"name" => "tbl_personfunktionfirma" ,
-	    	"caption" => "tbl_personfunktionfirma" ,
+	    	"name" => "tbl_personfunktionstandort" ,
+	    	"caption" => "tbl_personfunktionstandort" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
 	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
@@ -25035,11 +25036,11 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{72F011E9-F56E-4CF4-92DA-3682E8FE1DC6}' => array
 			(
 				"id" => "{72F011E9-F56E-4CF4-92DA-3682E8FE1DC6}" ,
-				"name" => "personfunktionfirma_id" ,
-				"caption" => "personfunktionfirma_id" ,
+				"name" => "personfunktionstandort_id" ,
+				"caption" => "personfunktionstandort_id" ,
 				"ordinal" => "1" ,
 				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
@@ -25076,25 +25077,6 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"name" => "person_id" ,
 				"caption" => "person_id" ,
 				"ordinal" => "3" ,
-				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
-				"datatypeparam1" => "" ,
-				"datatypeparam2" => "" ,
-				"length" => "",
-				"unique" => "0",
-				"notnull" => "1",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
-			'{DB466955-FC5A-443C-A656-42E8077CC824}' => array
-			(
-				"id" => "{DB466955-FC5A-443C-A656-42E8077CC824}" ,
-				"name" => "firma_id" ,
-				"caption" => "firma_id" ,
-				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
 				"datatypeparam1" => "" ,
@@ -25146,6 +25128,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{09C174E5-523C-470A-AB7F-835F889A6578}' => array
+			(
+				"id" => "{09C174E5-523C-470A-AB7F-835F889A6578}" ,
+				"name" => "standort_id" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -25163,7 +25164,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			   		'{77EABBEE-F435-4EBE-9F5D-9FCAD3CB705E}' => array
 			   		(
 		   				"id" => "{77EABBEE-F435-4EBE-9F5D-9FCAD3CB705E}" ,
-		   				"name" => "personfunktionfirma_id" ,
+		   				"name" => "personfunktionstandort_id" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
@@ -25284,7 +25285,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"length" => "",
 				"unique" => "0",
 				"notnull" => "0",
-				"defaultvalue" => "",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -26687,9 +26688,9 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"ordinal" => "1" ,
 				"pk" => "{68DD7D49-58B0-4824-A759-479C35966529}" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
-				"datatypeparam1" => "8" ,
+				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
-				"length" => "8",
+				"length" => "16",
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "",
@@ -27410,13 +27411,70 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	    	"attribute"  => array
 	    	(
 			
+			'{7A6B6680-600D-4C41-B03F-52A0EDC201CF}' => array
+			(
+				"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}" ,
+				"name" => "standort_id" ,
+				"caption" => "standort_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{5BA7D9E1-F9CA-4283-8E17-1AEB7F592494}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{76053D89-ADCF-43E1-B763-C15BF2641661}' => array
+			(
+				"id" => "{76053D89-ADCF-43E1-B763-C15BF2641661}" ,
+				"name" => "firma_id" ,
+				"caption" => "firma_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{667D3112-625B-48D1-907B-1F10FC3727ED}' => array
+			(
+				"id" => "{667D3112-625B-48D1-907B-1F10FC3727ED}" ,
+				"name" => "adresse_id" ,
+				"caption" => "adresse_id" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{45143BA7-5943-49EE-A4DD-4780F358DAED}' => array
 			(
 				"id" => "{45143BA7-5943-49EE-A4DD-4780F358DAED}" ,
-				"name" => "standort_kurzbz" ,
-				"caption" => "standort_kurzbz" ,
-				"ordinal" => "1" ,
-				"pk" => "{83853692-8BBC-4526-9BFD-C5540BAF2D39}" ,
+				"name" => "kurzbz" ,
+				"caption" => "kurzbz" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
@@ -27429,19 +27487,114 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
-			'{667D3112-625B-48D1-907B-1F10FC3727ED}' => array
+			'{AF5397C5-D7B7-4215-988B-6856BC269BA1}' => array
 			(
-				"id" => "{667D3112-625B-48D1-907B-1F10FC3727ED}" ,
-				"name" => "adresse_id" ,
-				"caption" => "adresse_id" ,
-				"ordinal" => "2" ,
+				"id" => "{AF5397C5-D7B7-4215-988B-6856BC269BA1}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "5" ,
 				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3B3EA88F-65CB-4972-B561-CAB66B9F637D}' => array
+			(
+				"id" => "{3B3EA88F-65CB-4972-B561-CAB66B9F637D}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DF16FF04-F38D-4620-8BF2-8B5D7CE2BF22}' => array
+			(
+				"id" => "{DF16FF04-F38D-4620-8BF2-8B5D7CE2BF22}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "1",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{43E71982-4324-4300-A032-50A31BBF9020}' => array
+			(
+				"id" => "{43E71982-4324-4300-A032-50A31BBF9020}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6029D625-1381-48F8-8CE2-4F09743982E8}' => array
+			(
+				"id" => "{6029D625-1381-48F8-8CE2-4F09743982E8}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0CCB2663-84E6-44AC-9002-AE3171EC5009}' => array
+			(
+				"id" => "{0CCB2663-84E6-44AC-9002-AE3171EC5009}" ,
+				"name" => "ext_id" ,
+				"caption" => "ext_id" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -27462,21 +27615,21 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"keyconstraintitem"  => array
 			    	(
 					
-			   		'{B4E27FAF-82E5-4996-BAAB-89281700F085}' => array
+			   		'{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}' => array
 			   		(
-		   				"id" => "{B4E27FAF-82E5-4996-BAAB-89281700F085}" ,
-		   				"name" => "standort_kurzbz" ,
+		   				"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}" ,
+		   				"name" => "standort_id" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
 		   				"description" => "",
 						"attribute"  => array
 					    	(
-							"id" => "{45143BA7-5943-49EE-A4DD-4780F358DAED}",
+							"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{83853692-8BBC-4526-9BFD-C5540BAF2D39}","id" => "{0CF1AA47-4C16-4AE6-A5B6-15D14FB82EB7}",
+							"id" => "{5BA7D9E1-F9CA-4283-8E17-1AEB7F592494}","id" => "{F695498E-4872-4C9B-A945-E75EBB96F433}","id" => "{8A8F1C7B-6875-46A9-9676-35937A609B26}","id" => "{4E63AC47-CBFB-4ABD-AD3F-03A21B6E0F5B}","id" => "{C02D0361-9C8B-4B6A-A652-266B51D499D8}","id" => "{16F797DE-85BC-49E1-B45B-2A3D36367A1B}","id" => "{E7E4FA8C-C5A7-4F35-A28D-CC40F9E55D86}","id" => "{0C811FF6-679F-4395-A93F-0BD7DD75E5A7}",
 				   		)
 		   			),
 		   			
@@ -28442,25 +28595,6 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
-			'{3E484EFE-3C40-4442-AA12-51AA56E1FE5F}' => array
-			(
-				"id" => "{3E484EFE-3C40-4442-AA12-51AA56E1FE5F}" ,
-				"name" => "organisationsform" ,
-				"caption" => "organisationsform" ,
-				"ordinal" => "20" ,
-				"pk" => "" ,
-				"datatypeid" => "{E12D6C2A-E13A-4877-B9C4-AA7BA668C316}" ,
-				"datatypeparam1" => "1" ,
-				"datatypeparam2" => "" ,
-				"length" => "1",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
 			'{3FDA30B7-95F7-4362-BAAF-4744878EC11F}' => array
 			(
 				"id" => "{3FDA30B7-95F7-4362-BAAF-4744878EC11F}" ,
@@ -28492,7 +28626,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "true",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -28606,7 +28740,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -28646,6 +28780,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6035C515-E2C2-497E-B641-C028CE184627}' => array
+			(
+				"id" => "{6035C515-E2C2-497E-B641-C028CE184627}" ,
+				"name" => "mischform" ,
+				"caption" => "mischform" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "false",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -32357,7 +32510,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "16",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -32378,6 +32531,44 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"unique" => "0",
 				"notnull" => "1",
 				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{45CE8FD5-25F4-4B25-874A-026D24FD7CC7}' => array
+			(
+				"id" => "{45CE8FD5-25F4-4B25-874A-026D24FD7CC7}" ,
+				"name" => "mailverteiler" ,
+				"caption" => "mailverteiler" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "TRUE",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E4D6101C-A6CE-4D6A-AA67-1CDBE965C4C0}' => array
+			(
+				"id" => "{E4D6101C-A6CE-4D6A-AA67-1CDBE965C4C0}" ,
+				"name" => "freigabegrenze" ,
+				"caption" => "freigabegrenze" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
 				"description" => ""
@@ -32411,7 +32602,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{8C907027-ADCA-4E9E-B7F6-9172E40276CE}","id" => "{A34D7372-82C3-4FB5-BCE6-178F395E2480}","id" => "{35E3574A-1362-4C1F-8A71-AE4BD850D2BB}","id" => "{4FC9C131-177B-403F-A140-080E12A95245}","id" => "{1B7E1CE7-F867-458F-9EBC-0FD4B2DB2DC9}","id" => "{DB2DF6F4-5CE8-477C-820A-2D96DFA6FDB6}",
+							"id" => "{8C907027-ADCA-4E9E-B7F6-9172E40276CE}","id" => "{A34D7372-82C3-4FB5-BCE6-178F395E2480}","id" => "{35E3574A-1362-4C1F-8A71-AE4BD850D2BB}","id" => "{4FC9C131-177B-403F-A140-080E12A95245}","id" => "{1B7E1CE7-F867-458F-9EBC-0FD4B2DB2DC9}","id" => "{DB2DF6F4-5CE8-477C-820A-2D96DFA6FDB6}","id" => "{A4881723-4E50-4A5A-A26A-47EC283155E1}","id" => "{C46B6E52-7C48-409C-A7C4-63D5442BA823}","id" => "{BA4D2F69-C753-426C-B6A5-525F7D706D13}","id" => "{61C6BE6F-9AB8-4231-A5E4-7E35ED8773ED}","id" => "{7B34F5FA-FD6A-4334-8F25-AACBF59B32E2}",
 				   		)
 		   			),
 		   			
@@ -33639,8 +33830,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{585D0A4C-9E5F-4793-B6C9-7808AD7C2295}' => array
 			(
 				"id" => "{585D0A4C-9E5F-4793-B6C9-7808AD7C2295}" ,
-				"name" => "Key10" ,
-				"caption" => "Key10" ,
+				"name" => "pk_betriebsmittelstatus" ,
+				"caption" => "pk_betriebsmittelstatus" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
@@ -33708,7 +33899,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	    	"caption" => "tbl_betriebsmittel_betriebsmittelstatus" ,
 	    	"comments" => "" ,
 	    	"storage" => "" ,
-	    	"schemaid" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
 	    	"attribute"  => array
 	    	(
 			
@@ -33776,7 +33967,26 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"caption" => "datum" ,
 				"ordinal" => "4" ,
 				"pk" => "" ,
-				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{99302A48-6374-4A74-9BD5-129DB78A3E64}' => array
+			(
+				"id" => "{99302A48-6374-4A74-9BD5-129DB78A3E64}" ,
+				"name" => "anmerkung" ,
+				"caption" => "anmerkung" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
@@ -33793,7 +34003,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{7655D60E-8032-42A0-8D02-DAA9D966F804}" ,
 				"name" => "updateamum" ,
 				"caption" => "updateamum" ,
-				"ordinal" => "5" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -33812,7 +34022,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{A8CB7AD5-74EF-4EAA-982F-58DDD34699D6}" ,
 				"name" => "updatevon" ,
 				"caption" => "updatevon" ,
-				"ordinal" => "6" ,
+				"ordinal" => "7" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -33829,9 +34039,9 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{A3AA7D2B-BF80-4137-A0ED-F738B70251F6}' => array
 			(
 				"id" => "{A3AA7D2B-BF80-4137-A0ED-F738B70251F6}" ,
-				"name" => "inserstamum" ,
-				"caption" => "inserstamum" ,
-				"ordinal" => "7" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "8" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -33850,7 +34060,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{89BB67D1-40D0-4585-8B32-481EFE80BE85}" ,
 				"name" => "insertvon" ,
 				"caption" => "insertvon" ,
-				"ordinal" => "8" ,
+				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -33889,6 +34099,4167 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 						"attribute"  => array
 					    	(
 							"id" => "{C5164B16-FDB8-4680-9569-BD3CCB3A5B31}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{B5483FFA-E139-4914-A5F7-5CED2B0B056B}'  => array
+	(
+	    	"id" => "{B5483FFA-E139-4914-A5F7-5CED2B0B056B}" ,
+	    	"name" => "tbl_cronjob" ,
+	    	"caption" => "tbl_cronjob" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{8A2E315B-9F56-4776-AC0D-FCA3208ADAE1}' => array
+			(
+				"id" => "{8A2E315B-9F56-4776-AC0D-FCA3208ADAE1}" ,
+				"name" => "cronjob_id" ,
+				"caption" => "cronjob_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CB37A3BE-364A-4179-852E-56EA0CD32D51}' => array
+			(
+				"id" => "{CB37A3BE-364A-4179-852E-56EA0CD32D51}" ,
+				"name" => "server_kurzbz" ,
+				"caption" => "server_kurzbz" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CF4BB530-9368-4801-8262-9FDA9994DC40}' => array
+			(
+				"id" => "{CF4BB530-9368-4801-8262-9FDA9994DC40}" ,
+				"name" => "titel" ,
+				"caption" => "titel" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C0B69454-880F-43DE-B608-DAD02D012DF5}' => array
+			(
+				"id" => "{C0B69454-880F-43DE-B608-DAD02D012DF5}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E888001A-1804-47FE-8A81-0B2569DBEBD4}' => array
+			(
+				"id" => "{E888001A-1804-47FE-8A81-0B2569DBEBD4}" ,
+				"name" => "file" ,
+				"caption" => "file" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B1F2952F-AF25-4BA0-B2A2-A35F5799758F}' => array
+			(
+				"id" => "{B1F2952F-AF25-4BA0-B2A2-A35F5799758F}" ,
+				"name" => "last_execute" ,
+				"caption" => "last_execute" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5647B788-CCFD-40B3-A51F-AA2F00444D93}' => array
+			(
+				"id" => "{5647B788-CCFD-40B3-A51F-AA2F00444D93}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6F52C49F-D1B1-40AD-AF59-A7B6ED75077C}' => array
+			(
+				"id" => "{6F52C49F-D1B1-40AD-AF59-A7B6ED75077C}" ,
+				"name" => "running" ,
+				"caption" => "running" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "false",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{47517167-77D5-44CC-942E-7AEABB3623A9}' => array
+			(
+				"id" => "{47517167-77D5-44CC-942E-7AEABB3623A9}" ,
+				"name" => "jahr" ,
+				"caption" => "jahr" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "6" ,
+				"datatypeparam2" => "" ,
+				"length" => "6",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8E35948F-CD46-4013-AFD3-5B5E1F3CF7E0}' => array
+			(
+				"id" => "{8E35948F-CD46-4013-AFD3-5B5E1F3CF7E0}" ,
+				"name" => "monat" ,
+				"caption" => "monat" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{343F1DE4-52D8-405D-A866-09A2998D88AD}' => array
+			(
+				"id" => "{343F1DE4-52D8-405D-A866-09A2998D88AD}" ,
+				"name" => "tag" ,
+				"caption" => "tag" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{ED65B9BE-F718-471B-99B3-999A3298BCD8}' => array
+			(
+				"id" => "{ED65B9BE-F718-471B-99B3-999A3298BCD8}" ,
+				"name" => "wochentag" ,
+				"caption" => "wochentag" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{AC374038-D995-42A2-9B8E-7F422CD3573A}' => array
+			(
+				"id" => "{AC374038-D995-42A2-9B8E-7F422CD3573A}" ,
+				"name" => "stunde" ,
+				"caption" => "stunde" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4AED7962-7E36-475F-A585-EAEE040D6920}' => array
+			(
+				"id" => "{4AED7962-7E36-475F-A585-EAEE040D6920}" ,
+				"name" => "minute" ,
+				"caption" => "minute" ,
+				"ordinal" => "14" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EA9E6685-4EB0-4865-A3A0-546E04208117}' => array
+			(
+				"id" => "{EA9E6685-4EB0-4865-A3A0-546E04208117}" ,
+				"name" => "standalone" ,
+				"caption" => "standalone" ,
+				"ordinal" => "15" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{38EED46B-2690-4A24-97D1-268D63E8AA6B}' => array
+			(
+				"id" => "{38EED46B-2690-4A24-97D1-268D63E8AA6B}" ,
+				"name" => "reihenfolge" ,
+				"caption" => "reihenfolge" ,
+				"ordinal" => "16" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{73BA34DE-257C-4280-B3E7-4ED21FDCA7A9}' => array
+			(
+				"id" => "{73BA34DE-257C-4280-B3E7-4ED21FDCA7A9}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "17" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8BCE419D-1A09-45B7-AC6E-866A74656186}' => array
+			(
+				"id" => "{8BCE419D-1A09-45B7-AC6E-866A74656186}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "18" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E97DFD59-208C-49C8-937D-8C28F430AD13}' => array
+			(
+				"id" => "{E97DFD59-208C-49C8-937D-8C28F430AD13}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "19" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{423A8E0E-34E0-43C5-BC21-90EF617CFFF2}' => array
+			(
+				"id" => "{423A8E0E-34E0-43C5-BC21-90EF617CFFF2}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "20" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0825C699-D40B-4F46-AFCC-8B9A7332ACBB}' => array
+			(
+				"id" => "{0825C699-D40B-4F46-AFCC-8B9A7332ACBB}" ,
+				"name" => "variablen" ,
+				"caption" => "variablen" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{8387E69A-DF89-4CBC-A769-1877C470201C}' => array
+			(
+				"id" => "{8387E69A-DF89-4CBC-A769-1877C470201C}" ,
+				"name" => "pk_tbl_cronjob" ,
+				"caption" => "pk_tbl_cronjob" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{D81117EC-B34B-4C52-8680-02601668FC9C}' => array
+			   		(
+		   				"id" => "{D81117EC-B34B-4C52-8680-02601668FC9C}" ,
+		   				"name" => "cronjob_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{8A2E315B-9F56-4776-AC0D-FCA3208ADAE1}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{0D5570FD-7E47-4847-AF4C-DADF5B41BDB8}' => array
+			(
+				"id" => "{0D5570FD-7E47-4847-AF4C-DADF5B41BDB8}" ,
+				"name" => "cronjob_id" ,
+				"caption" => "cronjob_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{D96A51ED-D79D-4985-B529-00CDAA24DB0F}' => array
+			   		(
+		   				"id" => "{D96A51ED-D79D-4985-B529-00CDAA24DB0F}" ,
+		   				"name" => "cronjob_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{8A2E315B-9F56-4776-AC0D-FCA3208ADAE1}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{EFEEB62C-BA75-4206-973A-2F8AA360A906}'  => array
+	(
+	    	"id" => "{EFEEB62C-BA75-4206-973A-2F8AA360A906}" ,
+	    	"name" => "tbl_server" ,
+	    	"caption" => "tbl_server" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{D4257CDC-CDA8-4A73-B519-9ABC3CE00B9E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{E48D1B48-EFDF-4F43-9A1D-96B5CE8DA84B}' => array
+			(
+				"id" => "{E48D1B48-EFDF-4F43-9A1D-96B5CE8DA84B}" ,
+				"name" => "server_kurzbz" ,
+				"caption" => "server_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{ED98424F-3573-4715-8E0D-574EABF4AF59}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{215E41C9-A6FB-47AA-A03B-885CCD77E8BD}' => array
+			(
+				"id" => "{215E41C9-A6FB-47AA-A03B-885CCD77E8BD}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{A7A5D69D-42CF-46E3-A18F-3655BA8ECEF6}' => array
+			(
+				"id" => "{A7A5D69D-42CF-46E3-A18F-3655BA8ECEF6}" ,
+				"name" => "pk_tbl_server" ,
+				"caption" => "pk_tbl_server" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{FBA85BDE-4712-4CF8-B384-47FC52C375F1}' => array
+			   		(
+		   				"id" => "{FBA85BDE-4712-4CF8-B384-47FC52C375F1}" ,
+		   				"name" => "server_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{E48D1B48-EFDF-4F43-9A1D-96B5CE8DA84B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{ED98424F-3573-4715-8E0D-574EABF4AF59}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{D787180A-ADBC-4FE8-BDF4-80CB55A1DC1D}' => array
+			(
+				"id" => "{D787180A-ADBC-4FE8-BDF4-80CB55A1DC1D}" ,
+				"name" => "server_kurzbz" ,
+				"caption" => "server_kurzbz" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{3FE13D29-C11B-426B-B1BB-8B165CFC7F4E}' => array
+			   		(
+		   				"id" => "{3FE13D29-C11B-426B-B1BB-8B165CFC7F4E}" ,
+		   				"name" => "server_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{E48D1B48-EFDF-4F43-9A1D-96B5CE8DA84B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{58842BF3-8FC2-4938-94AA-5FEF76E9AB39}'  => array
+	(
+	    	"id" => "{58842BF3-8FC2-4938-94AA-5FEF76E9AB39}" ,
+	    	"name" => "tbl_tag" ,
+	    	"caption" => "tbl_tag" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}' => array
+			(
+				"id" => "{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}" ,
+				"name" => "tag" ,
+				"caption" => "tag" ,
+				"ordinal" => "0" ,
+				"pk" => "{E19F93B9-61F2-4F5D-A3AA-6FEA218F3661}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "128" ,
+				"datatypeparam2" => "" ,
+				"length" => "128",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{84438D88-1A21-40C4-B489-4D193A05DD09}' => array
+			(
+				"id" => "{84438D88-1A21-40C4-B489-4D193A05DD09}" ,
+				"name" => "Key10" ,
+				"caption" => "Key10" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{F7A4185D-1B9B-421B-8663-1EA00ACA5E05}' => array
+			   		(
+		   				"id" => "{F7A4185D-1B9B-421B-8663-1EA00ACA5E05}" ,
+		   				"name" => "tag" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{E19F93B9-61F2-4F5D-A3AA-6FEA218F3661}","id" => "{CA5F4772-27F8-4B33-BCBE-3EF21FD7DEB6}","id" => "{AB167F52-9E75-4B18-B66B-A893F19536A1}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{0E69CB8C-E7BF-405D-AB5A-9228B2CF0786}' => array
+			(
+				"id" => "{0E69CB8C-E7BF-405D-AB5A-9228B2CF0786}" ,
+				"name" => "tag" ,
+				"caption" => "tag" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{BB6CD766-46CE-441A-88E5-AAC1033A0460}' => array
+			   		(
+		   				"id" => "{BB6CD766-46CE-441A-88E5-AAC1033A0460}" ,
+		   				"name" => "tag" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{D32D445A-EA32-47E7-B47F-33536C384C8F}'  => array
+	(
+	    	"id" => "{D32D445A-EA32-47E7-B47F-33536C384C8F}" ,
+	    	"name" => "tbl_firmatag" ,
+	    	"caption" => "tbl_firmatag" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{EC8E2CEA-3EFC-4766-A138-9F6D5827861C}' => array
+			(
+				"id" => "{EC8E2CEA-3EFC-4766-A138-9F6D5827861C}" ,
+				"name" => "firma_id" ,
+				"caption" => "firma_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7C13571E-3285-42F6-8E2C-FA30F5208316}' => array
+			(
+				"id" => "{7C13571E-3285-42F6-8E2C-FA30F5208316}" ,
+				"name" => "tag" ,
+				"caption" => "tag" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "128" ,
+				"datatypeparam2" => "" ,
+				"length" => "128",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2E1DA005-DD3F-4582-8CA2-B57F222CACF6}' => array
+			(
+				"id" => "{2E1DA005-DD3F-4582-8CA2-B57F222CACF6}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5B0510A9-E68E-4DD2-9CEA-CE0EB3F96160}' => array
+			(
+				"id" => "{5B0510A9-E68E-4DD2-9CEA-CE0EB3F96160}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{502A6D35-AB03-44E8-9A2A-081099679631}' => array
+			(
+				"id" => "{502A6D35-AB03-44E8-9A2A-081099679631}" ,
+				"name" => "pk_tag" ,
+				"caption" => "pk_tag" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{DC160649-FA4E-4B5B-B16C-50BAE49EC4FD}' => array
+			   		(
+		   				"id" => "{DC160649-FA4E-4B5B-B16C-50BAE49EC4FD}" ,
+		   				"name" => "firma_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{EC8E2CEA-3EFC-4766-A138-9F6D5827861C}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{3B2A1631-7FF4-47F9-8CEF-A7E82CEE6BE2}' => array
+			   		(
+		   				"id" => "{3B2A1631-7FF4-47F9-8CEF-A7E82CEE6BE2}" ,
+		   				"name" => "tag" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{7C13571E-3285-42F6-8E2C-FA30F5208316}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{0AC8DEEB-9C93-46C9-B58E-CCE73F960FB1}'  => array
+	(
+	    	"id" => "{0AC8DEEB-9C93-46C9-B58E-CCE73F960FB1}" ,
+	    	"name" => "tbl_bestellung" ,
+	    	"caption" => "tbl_bestellung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}' => array
+			(
+				"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{E6A172F9-75F2-4B11-B92C-B60EFD6E3D2C}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FF3B19D3-1BFC-4ADA-A6D3-C3EA0BF4CDE7}' => array
+			(
+				"id" => "{FF3B19D3-1BFC-4ADA-A6D3-C3EA0BF4CDE7}" ,
+				"name" => "besteller_uid" ,
+				"caption" => "besteller_uid" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F062DC13-5123-401D-BD87-366C9A4C0570}' => array
+			(
+				"id" => "{F062DC13-5123-401D-BD87-366C9A4C0570}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E48DB80F-9ABA-4709-9777-F3D198586ACA}' => array
+			(
+				"id" => "{E48DB80F-9ABA-4709-9777-F3D198586ACA}" ,
+				"name" => "konto_id" ,
+				"caption" => "konto_id" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4CF7921B-CF6C-463C-908B-7795F992162F}' => array
+			(
+				"id" => "{4CF7921B-CF6C-463C-908B-7795F992162F}" ,
+				"name" => "firma_id" ,
+				"caption" => "firma_id" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C179A146-E45A-48AB-BC83-15DC3B2C30D0}' => array
+			(
+				"id" => "{C179A146-E45A-48AB-BC83-15DC3B2C30D0}" ,
+				"name" => "lieferadresse" ,
+				"caption" => "lieferadresse" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B65FD846-11CB-4E18-B41B-F8E2B71D2FA8}' => array
+			(
+				"id" => "{B65FD846-11CB-4E18-B41B-F8E2B71D2FA8}" ,
+				"name" => "rechnungsadresse" ,
+				"caption" => "rechnungsadresse" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{815F8EB2-6120-4F68-BCD4-97C18D7202F9}' => array
+			(
+				"id" => "{815F8EB2-6120-4F68-BCD4-97C18D7202F9}" ,
+				"name" => "freigegeben" ,
+				"caption" => "freigegeben" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "false",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6E00E540-71A3-4A5B-BA50-996B2FE95E41}' => array
+			(
+				"id" => "{6E00E540-71A3-4A5B-BA50-996B2FE95E41}" ,
+				"name" => "bestell_nr" ,
+				"caption" => "bestell_nr" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CCC50399-21E0-444F-870D-C79825EE2A71}' => array
+			(
+				"id" => "{CCC50399-21E0-444F-870D-C79825EE2A71}" ,
+				"name" => "titel" ,
+				"caption" => "titel" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{061276BF-5A24-48CB-8C98-64297529102E}' => array
+			(
+				"id" => "{061276BF-5A24-48CB-8C98-64297529102E}" ,
+				"name" => "bemerkung" ,
+				"caption" => "bemerkung" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{516FBC44-0CF7-464D-9D7E-3C027FBCB33C}' => array
+			(
+				"id" => "{516FBC44-0CF7-464D-9D7E-3C027FBCB33C}" ,
+				"name" => "liefertermin" ,
+				"caption" => "liefertermin" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DAE353B9-6105-4B52-ADFD-2378A59C333C}' => array
+			(
+				"id" => "{DAE353B9-6105-4B52-ADFD-2378A59C333C}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C5776FC5-54A7-4A80-AAFC-5525355710CB}' => array
+			(
+				"id" => "{C5776FC5-54A7-4A80-AAFC-5525355710CB}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "14" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1CEDE6A7-AAAB-4254-921F-6F80C05DFD87}' => array
+			(
+				"id" => "{1CEDE6A7-AAAB-4254-921F-6F80C05DFD87}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "15" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B44E31EA-A9B5-4C74-BBBA-05595C840E0A}' => array
+			(
+				"id" => "{B44E31EA-A9B5-4C74-BBBA-05595C840E0A}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "16" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9C8CE4F0-34D3-4F9C-A37A-44535BD0EDC1}' => array
+			(
+				"id" => "{9C8CE4F0-34D3-4F9C-A37A-44535BD0EDC1}" ,
+				"name" => "ext_id" ,
+				"caption" => "ext_id" ,
+				"ordinal" => "17" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{03759997-0FFB-488B-951E-B109A571A007}' => array
+			(
+				"id" => "{03759997-0FFB-488B-951E-B109A571A007}" ,
+				"name" => "Key12" ,
+				"caption" => "Key12" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{93F3BC78-2E81-4736-92E1-2F03D677ABBA}' => array
+			   		(
+		   				"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}" ,
+		   				"name" => "bestellung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{E6A172F9-75F2-4B11-B92C-B60EFD6E3D2C}","id" => "{D5A5F4FD-5A4B-48AA-A6B7-F0BFDEF6FA60}","id" => "{09B3B452-F304-42EA-9742-10BE0A7ACEB0}","id" => "{0B756FCF-E3B3-498D-AD8F-4FE589D0E1AB}","id" => "{8D1D27AB-2AC6-4EE2-A0A6-4FC08BD7B35D}","id" => "{3A821542-9842-4D98-A597-3AC1CEB7169A}","id" => "{CB62308D-30C4-434F-BD51-66B4505D9BAE}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{AC4CCB7A-CA75-4F45-8FA1-E43C2F1A393E}' => array
+			(
+				"id" => "{AC4CCB7A-CA75-4F45-8FA1-E43C2F1A393E}" ,
+				"name" => "bestell_nr" ,
+				"caption" => "bestell_nr" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{63A5FEB0-FADF-4953-A797-E324922ED986}' => array
+			   		(
+		   				"id" => "{63A5FEB0-FADF-4953-A797-E324922ED986}" ,
+		   				"name" => "bestell_nr" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6E00E540-71A3-4A5B-BA50-996B2FE95E41}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{160F5B5C-748A-4C37-9556-9EF3603D6484}'  => array
+	(
+	    	"id" => "{160F5B5C-748A-4C37-9556-9EF3603D6484}" ,
+	    	"name" => "tbl_firma_organisationseinheit" ,
+	    	"caption" => "tbl_firma_organisationseinheit" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{52ACE52A-18D6-42EE-A9C4-D8365561884E}' => array
+			(
+				"id" => "{52ACE52A-18D6-42EE-A9C4-D8365561884E}" ,
+				"name" => "firma_organisationseinheit_id" ,
+				"caption" => "firma_organisationseinheit_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6D33133A-8421-4745-95FA-245088F81749}' => array
+			(
+				"id" => "{6D33133A-8421-4745-95FA-245088F81749}" ,
+				"name" => "firma_id" ,
+				"caption" => "firma_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{47DAC216-5DF8-4DAF-A662-22720B6A9AEB}' => array
+			(
+				"id" => "{47DAC216-5DF8-4DAF-A662-22720B6A9AEB}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A962CD05-A8EC-498D-8806-C57604D110BB}' => array
+			(
+				"id" => "{A962CD05-A8EC-498D-8806-C57604D110BB}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A92C810C-54ED-4511-A999-58A0A3DA15D6}' => array
+			(
+				"id" => "{A92C810C-54ED-4511-A999-58A0A3DA15D6}" ,
+				"name" => "kundennummer" ,
+				"caption" => "kundennummer" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "128" ,
+				"datatypeparam2" => "" ,
+				"length" => "128",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{335832BB-E4BE-4A68-8E14-8D2C81625F5E}' => array
+			(
+				"id" => "{335832BB-E4BE-4A68-8E14-8D2C81625F5E}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F6CA7A93-936C-4326-B21D-A693873928A1}' => array
+			(
+				"id" => "{F6CA7A93-936C-4326-B21D-A693873928A1}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8A1EA915-CC90-4B23-9C4E-91F7D53C133D}' => array
+			(
+				"id" => "{8A1EA915-CC90-4B23-9C4E-91F7D53C133D}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{95AAE705-1D8A-40BD-882C-4BE92BD1F17B}' => array
+			(
+				"id" => "{95AAE705-1D8A-40BD-882C-4BE92BD1F17B}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{50AF153A-B587-47D3-9C22-C8E1C03C9513}' => array
+			(
+				"id" => "{50AF153A-B587-47D3-9C22-C8E1C03C9513}" ,
+				"name" => "ext_id" ,
+				"caption" => "ext_id" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{A72CF64D-FACE-4C2A-9E74-FCD98A78BFD2}' => array
+			(
+				"id" => "{A72CF64D-FACE-4C2A-9E74-FCD98A78BFD2}" ,
+				"name" => "pk_firma_oe" ,
+				"caption" => "pk_firma_oe" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{B78BA730-3CBD-42C3-A249-7F470DEC4EB4}' => array
+			   		(
+		   				"id" => "{B78BA730-3CBD-42C3-A249-7F470DEC4EB4}" ,
+		   				"name" => "firma_organisationseinheit_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{52ACE52A-18D6-42EE-A9C4-D8365561884E}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{32FE4B24-0DFA-4E35-A66A-397B1DFE9E58}' => array
+			(
+				"id" => "{32FE4B24-0DFA-4E35-A66A-397B1DFE9E58}" ,
+				"name" => "uk_firma_oe" ,
+				"caption" => "uk_firma_oe" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{7D6EB277-F1E8-424A-9827-8017F3A63AAA}' => array
+			   		(
+		   				"id" => "{7D6EB277-F1E8-424A-9827-8017F3A63AAA}" ,
+		   				"name" => "firma_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6D33133A-8421-4745-95FA-245088F81749}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{A4F218D7-7418-4239-BA47-0910D7341EA3}' => array
+			   		(
+		   				"id" => "{A4F218D7-7418-4239-BA47-0910D7341EA3}" ,
+		   				"name" => "oe_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "1" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{47DAC216-5DF8-4DAF-A662-22720B6A9AEB}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{D274B4CF-54C6-4337-B8B3-211C3D8A2B9C}'  => array
+	(
+	    	"id" => "{D274B4CF-54C6-4337-B8B3-211C3D8A2B9C}" ,
+	    	"name" => "tbl_kostenstelle" ,
+	    	"caption" => "tbl_kostenstelle" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}' => array
+			(
+				"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{2A31D553-50F4-4E7A-A04D-9D918732F217}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BF35915F-DBD2-459B-B1F5-28D5C305D640}' => array
+			(
+				"id" => "{BF35915F-DBD2-459B-B1F5-28D5C305D640}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6BF9E7B9-F1D1-4F7B-A692-1E75BF85F6D2}' => array
+			(
+				"id" => "{6BF9E7B9-F1D1-4F7B-A692-1E75BF85F6D2}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E8CB4DD5-B260-4741-B3FD-1B749C2CD382}' => array
+			(
+				"id" => "{E8CB4DD5-B260-4741-B3FD-1B749C2CD382}" ,
+				"name" => "kurzbz" ,
+				"caption" => "kurzbz" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{504C0FE6-DFED-48F5-9D9D-A04D38597146}' => array
+			(
+				"id" => "{504C0FE6-DFED-48F5-9D9D-A04D38597146}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CC6FBFCB-B32D-404A-9B00-E3D0196DB37A}' => array
+			(
+				"id" => "{CC6FBFCB-B32D-404A-9B00-E3D0196DB37A}" ,
+				"name" => "budget" ,
+				"caption" => "budget" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1FEF6D39-35EB-437B-B149-102FC0A61F92}' => array
+			(
+				"id" => "{1FEF6D39-35EB-437B-B149-102FC0A61F92}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0292880D-A08E-4FE5-A83E-CD23BDCE1AF6}' => array
+			(
+				"id" => "{0292880D-A08E-4FE5-A83E-CD23BDCE1AF6}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2E2C55A4-5F73-444A-8BBE-7812A674F40F}' => array
+			(
+				"id" => "{2E2C55A4-5F73-444A-8BBE-7812A674F40F}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5A205493-DC20-4D1B-AE8A-D49486F1FC84}' => array
+			(
+				"id" => "{5A205493-DC20-4D1B-AE8A-D49486F1FC84}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}' => array
+			(
+				"id" => "{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}" ,
+				"name" => "Key13" ,
+				"caption" => "Key13" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{43788A23-1BE0-4F92-837F-0606D31FF78F}' => array
+			   		(
+		   				"id" => "{43788A23-1BE0-4F92-837F-0606D31FF78F}" ,
+		   				"name" => "kostenstelle_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{2A31D553-50F4-4E7A-A04D-9D918732F217}","id" => "{934AE6B8-19E0-4856-869D-C695B30909A7}","id" => "{A0B74FF7-8046-4A98-936F-1083DBE8F467}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{06AA2D86-706B-49C9-835E-36DC8A4B4B5A}' => array
+			(
+				"id" => "{06AA2D86-706B-49C9-835E-36DC8A4B4B5A}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{87616E31-BF7B-4CC3-B509-7D0DAC4FF6E8}' => array
+			   		(
+		   				"id" => "{87616E31-BF7B-4CC3-B509-7D0DAC4FF6E8}" ,
+		   				"name" => "kostenstelle_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{EA9058EA-40FE-4F15-ADB9-F67A77DADFF8}'  => array
+	(
+	    	"id" => "{EA9058EA-40FE-4F15-ADB9-F67A77DADFF8}" ,
+	    	"name" => "tbl_bestellungtag" ,
+	    	"caption" => "tbl_bestellungtag" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{0486E070-08CC-42DA-AB15-F6FC3588FB95}' => array
+			(
+				"id" => "{0486E070-08CC-42DA-AB15-F6FC3588FB95}" ,
+				"name" => "tag" ,
+				"caption" => "tag" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "128" ,
+				"datatypeparam2" => "" ,
+				"length" => "128",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{09F76B2B-AB13-4876-B2D4-0A4D22A323FD}' => array
+			(
+				"id" => "{09F76B2B-AB13-4876-B2D4-0A4D22A323FD}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{AD22A091-4B5F-4266-9789-FB47638E0ABE}' => array
+			(
+				"id" => "{AD22A091-4B5F-4266-9789-FB47638E0ABE}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FE0E885C-C5A5-44F1-915B-9CC93D4BFE30}' => array
+			(
+				"id" => "{FE0E885C-C5A5-44F1-915B-9CC93D4BFE30}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{435D67D6-4499-4656-A68E-AC1819AA93BA}' => array
+			(
+				"id" => "{435D67D6-4499-4656-A68E-AC1819AA93BA}" ,
+				"name" => "Key14" ,
+				"caption" => "Key14" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{B4040E47-D5C3-4221-9001-1E72E7EEFCAE}' => array
+			   		(
+		   				"id" => "{B4040E47-D5C3-4221-9001-1E72E7EEFCAE}" ,
+		   				"name" => "tag" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{0486E070-08CC-42DA-AB15-F6FC3588FB95}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{D00D0B49-215D-4C4C-9F51-429385948B98}' => array
+			   		(
+		   				"id" => "{D00D0B49-215D-4C4C-9F51-429385948B98}" ,
+		   				"name" => "bestellung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{09F76B2B-AB13-4876-B2D4-0A4D22A323FD}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{334FB78F-5D07-4B00-B2E0-0F3E804E16DF}'  => array
+	(
+	    	"id" => "{334FB78F-5D07-4B00-B2E0-0F3E804E16DF}" ,
+	    	"name" => "tbl_projekt_bestellung" ,
+	    	"caption" => "tbl_projekt_bestellung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{3F7ACD98-6116-4C6E-A2AF-A1D512CF6506}' => array
+			(
+				"id" => "{3F7ACD98-6116-4C6E-A2AF-A1D512CF6506}" ,
+				"name" => "projekt_kurzbz" ,
+				"caption" => "projekt_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9EACDA4F-808E-48F6-B7B9-1C39B5FEAFC1}' => array
+			(
+				"id" => "{9EACDA4F-808E-48F6-B7B9-1C39B5FEAFC1}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{46BA919B-5C59-48B4-B000-270ADA5151D0}' => array
+			(
+				"id" => "{46BA919B-5C59-48B4-B000-270ADA5151D0}" ,
+				"name" => "anteil" ,
+				"caption" => "anteil" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "5" ,
+				"datatypeparam2" => "2" ,
+				"length" => "5",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{970EBDE4-EFC0-46F2-98F9-D63CF3CABDCC}' => array
+			(
+				"id" => "{970EBDE4-EFC0-46F2-98F9-D63CF3CABDCC}" ,
+				"name" => "Key15" ,
+				"caption" => "Key15" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{916D8913-FE02-4ECC-9D4F-D535D4A08F1E}' => array
+			   		(
+		   				"id" => "{916D8913-FE02-4ECC-9D4F-D535D4A08F1E}" ,
+		   				"name" => "projekt_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{3F7ACD98-6116-4C6E-A2AF-A1D512CF6506}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{B3CB96E9-43AE-4B70-852C-314F7D65524A}' => array
+			   		(
+		   				"id" => "{B3CB96E9-43AE-4B70-852C-314F7D65524A}" ,
+		   				"name" => "bestellung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{9EACDA4F-808E-48F6-B7B9-1C39B5FEAFC1}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{B08A906F-654A-468F-AD59-98EFACDB36C1}'  => array
+	(
+	    	"id" => "{B08A906F-654A-468F-AD59-98EFACDB36C1}" ,
+	    	"name" => "tbl_konto" ,
+	    	"caption" => "tbl_konto" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{6FA927BB-1FE8-4C8C-BD7C-6B053C17557E}' => array
+			(
+				"id" => "{6FA927BB-1FE8-4C8C-BD7C-6B053C17557E}" ,
+				"name" => "konto_id" ,
+				"caption" => "konto_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{986A1692-77B6-4100-ACD7-1F16A1B19D28}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C1C8112A-043A-4129-AB52-F6310F0B21DC}' => array
+			(
+				"id" => "{C1C8112A-043A-4129-AB52-F6310F0B21DC}" ,
+				"name" => "kontonr" ,
+				"caption" => "kontonr" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6E5E956D-3B16-4942-9CBD-34C789B2FFCA}' => array
+			(
+				"id" => "{6E5E956D-3B16-4942-9CBD-34C789B2FFCA}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{11D517DE-99F5-4167-902F-D80DADAD041F}' => array
+			(
+				"id" => "{11D517DE-99F5-4167-902F-D80DADAD041F}" ,
+				"name" => "kurzbz" ,
+				"caption" => "kurzbz" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E07B1DE2-8B2F-438C-ADE4-7851EF6837F8}' => array
+			(
+				"id" => "{E07B1DE2-8B2F-438C-ADE4-7851EF6837F8}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D3FBE7B2-314A-4C62-81F1-741E41EE672B}' => array
+			(
+				"id" => "{D3FBE7B2-314A-4C62-81F1-741E41EE672B}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3B544297-CD19-4980-889A-615BFA210A57}' => array
+			(
+				"id" => "{3B544297-CD19-4980-889A-615BFA210A57}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B64CD192-FF68-4E75-856E-AFDD29AC1CD4}' => array
+			(
+				"id" => "{B64CD192-FF68-4E75-856E-AFDD29AC1CD4}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{59EAB253-F265-4B12-A7CB-0D09D9DC134B}' => array
+			(
+				"id" => "{59EAB253-F265-4B12-A7CB-0D09D9DC134B}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{9AB9F3EA-D74E-48B9-BFA2-F7AF4D9884F7}' => array
+			(
+				"id" => "{9AB9F3EA-D74E-48B9-BFA2-F7AF4D9884F7}" ,
+				"name" => "Key16" ,
+				"caption" => "Key16" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{D0AD52C3-969D-4386-AD51-F4D022161102}' => array
+			   		(
+		   				"id" => "{D0AD52C3-969D-4386-AD51-F4D022161102}" ,
+		   				"name" => "konto_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6FA927BB-1FE8-4C8C-BD7C-6B053C17557E}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{986A1692-77B6-4100-ACD7-1F16A1B19D28}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{4764714D-F734-4E20-B60C-034BB8B83743}' => array
+			(
+				"id" => "{4764714D-F734-4E20-B60C-034BB8B83743}" ,
+				"name" => "konto_id" ,
+				"caption" => "konto_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{94CEC893-757A-41B5-B17A-75E190E764A4}' => array
+			   		(
+		   				"id" => "{94CEC893-757A-41B5-B17A-75E190E764A4}" ,
+		   				"name" => "konto_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6FA927BB-1FE8-4C8C-BD7C-6B053C17557E}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{2286D964-E405-4558-ADA0-8FFC92B3AEA6}'  => array
+	(
+	    	"id" => "{2286D964-E405-4558-ADA0-8FFC92B3AEA6}" ,
+	    	"name" => "tbl_bestelldetail" ,
+	    	"caption" => "tbl_bestelldetail" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{703BBAD4-2801-494F-A3E1-D837812164EF}' => array
+			(
+				"id" => "{703BBAD4-2801-494F-A3E1-D837812164EF}" ,
+				"name" => "bestelldetail_id" ,
+				"caption" => "bestelldetail_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{B0F8AA52-BE6F-4761-AC2A-FCB3481FBBD4}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{39060F95-6A18-4815-B5F7-E23BBD35B14B}' => array
+			(
+				"id" => "{39060F95-6A18-4815-B5F7-E23BBD35B14B}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4E8B48B4-5D00-4E97-A199-BD2827ED4D0D}' => array
+			(
+				"id" => "{4E8B48B4-5D00-4E97-A199-BD2827ED4D0D}" ,
+				"name" => "position" ,
+				"caption" => "position" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D52498F0-9B8C-4E7A-AD18-EA82F2B8CCDD}' => array
+			(
+				"id" => "{D52498F0-9B8C-4E7A-AD18-EA82F2B8CCDD}" ,
+				"name" => "menge" ,
+				"caption" => "menge" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{38A81F2A-7B4B-44E1-93D1-08F3B11C7048}' => array
+			(
+				"id" => "{38A81F2A-7B4B-44E1-93D1-08F3B11C7048}" ,
+				"name" => "verpackungseinheit" ,
+				"caption" => "verpackungseinheit" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6828D6FE-B170-4E0A-AF5B-2F5AB1D1FBD0}' => array
+			(
+				"id" => "{6828D6FE-B170-4E0A-AF5B-2F5AB1D1FBD0}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7DBD4C2D-19B8-4ECF-A382-7B2F77965AE8}' => array
+			(
+				"id" => "{7DBD4C2D-19B8-4ECF-A382-7B2F77965AE8}" ,
+				"name" => "artikelnummer" ,
+				"caption" => "artikelnummer" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0D743FEA-A12D-49EB-BEC5-C9447010C594}' => array
+			(
+				"id" => "{0D743FEA-A12D-49EB-BEC5-C9447010C594}" ,
+				"name" => "preisprove" ,
+				"caption" => "preisprove" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FC56875B-803E-41DB-8B48-CC73EB029CC7}' => array
+			(
+				"id" => "{FC56875B-803E-41DB-8B48-CC73EB029CC7}" ,
+				"name" => "mwst" ,
+				"caption" => "mwst" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "2" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FC6EA236-96D5-408B-89FD-426CA4A8AAEE}' => array
+			(
+				"id" => "{FC6EA236-96D5-408B-89FD-426CA4A8AAEE}" ,
+				"name" => "erhalten" ,
+				"caption" => "erhalten" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F2C8DFFE-A389-4A16-A538-4E39091ABD09}' => array
+			(
+				"id" => "{F2C8DFFE-A389-4A16-A538-4E39091ABD09}" ,
+				"name" => "sort" ,
+				"caption" => "sort" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{01F181AC-EB93-4E04-9A2D-536AC0D7C109}' => array
+			(
+				"id" => "{01F181AC-EB93-4E04-9A2D-536AC0D7C109}" ,
+				"name" => "text" ,
+				"caption" => "text" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "false",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{694A8B74-7AB4-4EBF-941F-00B04AC361CC}' => array
+			(
+				"id" => "{694A8B74-7AB4-4EBF-941F-00B04AC361CC}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8E84AE6D-2C07-48AC-8DA5-05053D3C7E45}' => array
+			(
+				"id" => "{8E84AE6D-2C07-48AC-8DA5-05053D3C7E45}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "14" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3A5626FA-7B2C-476F-939F-65E9B5099C52}' => array
+			(
+				"id" => "{3A5626FA-7B2C-476F-939F-65E9B5099C52}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "15" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0B716E54-B933-4264-AC58-27DFC8ADC311}' => array
+			(
+				"id" => "{0B716E54-B933-4264-AC58-27DFC8ADC311}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "16" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{D65923B8-D08C-4EA7-80A0-30393C9A352A}' => array
+			(
+				"id" => "{D65923B8-D08C-4EA7-80A0-30393C9A352A}" ,
+				"name" => "Key17" ,
+				"caption" => "Key17" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{DE32C997-9A9A-4F6D-B2BA-7C97D51F021F}' => array
+			   		(
+		   				"id" => "{DE32C997-9A9A-4F6D-B2BA-7C97D51F021F}" ,
+		   				"name" => "bestelldetail_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{703BBAD4-2801-494F-A3E1-D837812164EF}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{B0F8AA52-BE6F-4761-AC2A-FCB3481FBBD4}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{68A7CE0E-67C6-4E94-A56F-2827DAC8F8B0}' => array
+			(
+				"id" => "{68A7CE0E-67C6-4E94-A56F-2827DAC8F8B0}" ,
+				"name" => "bestelldetail_id" ,
+				"caption" => "bestelldetail_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{5B7638D1-2C64-418F-B8D9-764CE964FBF2}' => array
+			   		(
+		   				"id" => "{5B7638D1-2C64-418F-B8D9-764CE964FBF2}" ,
+		   				"name" => "bestelldetail_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{703BBAD4-2801-494F-A3E1-D837812164EF}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{BF9AAB8E-7B0F-4BEE-96E0-FD9D96D4B666}'  => array
+	(
+	    	"id" => "{BF9AAB8E-7B0F-4BEE-96E0-FD9D96D4B666}" ,
+	    	"name" => "tbl_rechnung" ,
+	    	"caption" => "tbl_rechnung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{5CF834D7-4E2D-46EB-9D4A-F5F2055A3463}' => array
+			(
+				"id" => "{5CF834D7-4E2D-46EB-9D4A-F5F2055A3463}" ,
+				"name" => "rechung_id" ,
+				"caption" => "rechung_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{9B829E1D-AF7A-4085-A1FC-5417BCD66BDA}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5E44A366-2737-4674-8302-5F8A794AD729}' => array
+			(
+				"id" => "{5E44A366-2737-4674-8302-5F8A794AD729}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DDE4D490-8AFB-419A-9316-7D44507A6981}' => array
+			(
+				"id" => "{DDE4D490-8AFB-419A-9316-7D44507A6981}" ,
+				"name" => "buchungsdatum" ,
+				"caption" => "buchungsdatum" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7B7FC66B-DB9B-4073-AE02-600AA6056665}' => array
+			(
+				"id" => "{7B7FC66B-DB9B-4073-AE02-600AA6056665}" ,
+				"name" => "rechnungsnr" ,
+				"caption" => "rechnungsnr" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EE741099-FE07-47FF-A905-4B17ABA222A7}' => array
+			(
+				"id" => "{EE741099-FE07-47FF-A905-4B17ABA222A7}" ,
+				"name" => "rechnungsdatum" ,
+				"caption" => "rechnungsdatum" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{83FFCC49-3CFE-44F9-A737-66F64B0926E3}' => array
+			(
+				"id" => "{83FFCC49-3CFE-44F9-A737-66F64B0926E3}" ,
+				"name" => "transfer_datum" ,
+				"caption" => "transfer_datum" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D54A2B0F-D431-428E-9033-37D9C068E8B4}' => array
+			(
+				"id" => "{D54A2B0F-D431-428E-9033-37D9C068E8B4}" ,
+				"name" => "buchungstext" ,
+				"caption" => "buchungstext" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5F373495-234A-4EDA-9996-9C057A1BA798}' => array
+			(
+				"id" => "{5F373495-234A-4EDA-9996-9C057A1BA798}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FDE72ABE-ACB5-4931-BB19-7D312A4CC18F}' => array
+			(
+				"id" => "{FDE72ABE-ACB5-4931-BB19-7D312A4CC18F}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F293C977-9EB5-4CAD-A8F1-85A8D0D048FA}' => array
+			(
+				"id" => "{F293C977-9EB5-4CAD-A8F1-85A8D0D048FA}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E233248A-8152-4606-8671-2B2B22D9020A}' => array
+			(
+				"id" => "{E233248A-8152-4606-8671-2B2B22D9020A}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{DD9F6AF0-89BF-4661-A8D3-25CE08CAF4C6}' => array
+			(
+				"id" => "{DD9F6AF0-89BF-4661-A8D3-25CE08CAF4C6}" ,
+				"name" => "Key18" ,
+				"caption" => "Key18" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{308A373E-5E71-47E8-950E-DA05E25D4D95}' => array
+			   		(
+		   				"id" => "{308A373E-5E71-47E8-950E-DA05E25D4D95}" ,
+		   				"name" => "rechung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{5CF834D7-4E2D-46EB-9D4A-F5F2055A3463}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{9B829E1D-AF7A-4085-A1FC-5417BCD66BDA}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{17925046-73DA-4BCD-A1B7-E1E1A2AB952A}' => array
+			(
+				"id" => "{17925046-73DA-4BCD-A1B7-E1E1A2AB952A}" ,
+				"name" => "rechung_id" ,
+				"caption" => "rechung_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{B8E0CB10-991C-40B2-B7A0-91925A4CB442}' => array
+			   		(
+		   				"id" => "{B8E0CB10-991C-40B2-B7A0-91925A4CB442}" ,
+		   				"name" => "rechung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{5CF834D7-4E2D-46EB-9D4A-F5F2055A3463}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{3A3F739D-CAAD-412C-8274-52D41BEB7D19}'  => array
+	(
+	    	"id" => "{3A3F739D-CAAD-412C-8274-52D41BEB7D19}" ,
+	    	"name" => "tbl_rechnungsbetrag" ,
+	    	"caption" => "tbl_rechnungsbetrag" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{7016B9B8-4666-490C-9DA4-11F9540E4A0A}' => array
+			(
+				"id" => "{7016B9B8-4666-490C-9DA4-11F9540E4A0A}" ,
+				"name" => "rechnungsbetrag_id" ,
+				"caption" => "rechnungsbetrag_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{146C883E-4FAF-4E82-BC7B-A60B7023AD1A}' => array
+			(
+				"id" => "{146C883E-4FAF-4E82-BC7B-A60B7023AD1A}" ,
+				"name" => "rechung_id" ,
+				"caption" => "rechung_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BE9FB33A-D08B-4B7D-8BBB-2411E6613D36}' => array
+			(
+				"id" => "{BE9FB33A-D08B-4B7D-8BBB-2411E6613D36}" ,
+				"name" => "mwst" ,
+				"caption" => "mwst" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "2" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{216B8D2D-43FC-407F-8898-9DC628E174B5}' => array
+			(
+				"id" => "{216B8D2D-43FC-407F-8898-9DC628E174B5}" ,
+				"name" => "betrag" ,
+				"caption" => "betrag" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{87C49044-79BF-46E1-8D88-21F83380490F}' => array
+			(
+				"id" => "{87C49044-79BF-46E1-8D88-21F83380490F}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{CD5E4018-85B1-4061-BADD-67493B8CE8E4}' => array
+			(
+				"id" => "{CD5E4018-85B1-4061-BADD-67493B8CE8E4}" ,
+				"name" => "Key19" ,
+				"caption" => "Key19" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{D5ABFA4C-C175-4529-B940-15A4DBB30B82}' => array
+			   		(
+		   				"id" => "{D5ABFA4C-C175-4529-B940-15A4DBB30B82}" ,
+		   				"name" => "rechnungsbetrag_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{7016B9B8-4666-490C-9DA4-11F9540E4A0A}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{1EDEDD14-F490-4066-9FFE-CAF26859EE26}' => array
+			(
+				"id" => "{1EDEDD14-F490-4066-9FFE-CAF26859EE26}" ,
+				"name" => "rechnungbetrag_id" ,
+				"caption" => "rechnungbetrag_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{13EC8604-3CA4-4B3B-945E-3809B9E5DE21}' => array
+			   		(
+		   				"id" => "{13EC8604-3CA4-4B3B-945E-3809B9E5DE21}" ,
+		   				"name" => "rechnungsbetrag_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{7016B9B8-4666-490C-9DA4-11F9540E4A0A}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{7D7185F0-FDD6-4FA6-BE01-278D02C5B6FC}'  => array
+	(
+	    	"id" => "{7D7185F0-FDD6-4FA6-BE01-278D02C5B6FC}" ,
+	    	"name" => "tbl_aufteilung_default" ,
+	    	"caption" => "tbl_aufteilung_default" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{7B584C7A-2479-446D-A3C2-3DA41BCE3BE1}' => array
+			(
+				"id" => "{7B584C7A-2479-446D-A3C2-3DA41BCE3BE1}" ,
+				"name" => "aufteilung_id" ,
+				"caption" => "aufteilung_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7309108D-2DD6-495C-9E47-8BC8D2292549}' => array
+			(
+				"id" => "{7309108D-2DD6-495C-9E47-8BC8D2292549}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7BBE7218-3066-4ADD-A9C2-D18DA73E60FA}' => array
+			(
+				"id" => "{7BBE7218-3066-4ADD-A9C2-D18DA73E60FA}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{56438DFD-3AA3-440B-A99F-174F05BFFB65}' => array
+			(
+				"id" => "{56438DFD-3AA3-440B-A99F-174F05BFFB65}" ,
+				"name" => "anteil" ,
+				"caption" => "anteil" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "5" ,
+				"datatypeparam2" => "2" ,
+				"length" => "5",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DD817F62-BB87-434D-B891-BD02099FAF24}' => array
+			(
+				"id" => "{DD817F62-BB87-434D-B891-BD02099FAF24}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{12A46F6C-3F8B-48BC-960C-ADE291560E8B}' => array
+			(
+				"id" => "{12A46F6C-3F8B-48BC-960C-ADE291560E8B}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{80851161-488B-4A61-B34B-5D8825DB40A5}' => array
+			(
+				"id" => "{80851161-488B-4A61-B34B-5D8825DB40A5}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{66A84959-D159-42E5-98DA-8BC465675A68}' => array
+			(
+				"id" => "{66A84959-D159-42E5-98DA-8BC465675A68}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{244468FE-B4AD-481F-B4FA-3A4CF21A1C2F}' => array
+			(
+				"id" => "{244468FE-B4AD-481F-B4FA-3A4CF21A1C2F}" ,
+				"name" => "Key20" ,
+				"caption" => "Key20" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{AFE04BDB-BA30-463A-9937-0D2066E6A21C}' => array
+			   		(
+		   				"id" => "{AFE04BDB-BA30-463A-9937-0D2066E6A21C}" ,
+		   				"name" => "aufteilung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{7B584C7A-2479-446D-A3C2-3DA41BCE3BE1}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{2619C811-12C5-4838-A9FD-B21763C61DC6}' => array
+			(
+				"id" => "{2619C811-12C5-4838-A9FD-B21763C61DC6}" ,
+				"name" => "aufteilung_id" ,
+				"caption" => "aufteilung_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{E390C736-77B6-4888-AD4B-C37F9FD47E68}' => array
+			   		(
+		   				"id" => "{E390C736-77B6-4888-AD4B-C37F9FD47E68}" ,
+		   				"name" => "aufteilung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{7B584C7A-2479-446D-A3C2-3DA41BCE3BE1}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{D82CA5C2-7A8A-42C0-956B-A651502FE6D5}'  => array
+	(
+	    	"id" => "{D82CA5C2-7A8A-42C0-956B-A651502FE6D5}" ,
+	    	"name" => "tbl_aufteilung" ,
+	    	"caption" => "tbl_aufteilung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{AEE27FDB-C7AA-4F64-BFF9-FFFC736FC20B}' => array
+			(
+				"id" => "{AEE27FDB-C7AA-4F64-BFF9-FFFC736FC20B}" ,
+				"name" => "aufteilung_id" ,
+				"caption" => "aufteilung_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CEA0DBEA-7F1C-4512-878D-12D183FD78C7}' => array
+			(
+				"id" => "{CEA0DBEA-7F1C-4512-878D-12D183FD78C7}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B0341E26-E6A5-4025-B068-5498713E3A9C}' => array
+			(
+				"id" => "{B0341E26-E6A5-4025-B068-5498713E3A9C}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{923235BD-4EA3-4A73-803C-71A350BEFA39}' => array
+			(
+				"id" => "{923235BD-4EA3-4A73-803C-71A350BEFA39}" ,
+				"name" => "anteil" ,
+				"caption" => "anteil" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "5" ,
+				"datatypeparam2" => "2" ,
+				"length" => "5",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5C229F09-8730-420A-9049-BBCE7B2E11D7}' => array
+			(
+				"id" => "{5C229F09-8730-420A-9049-BBCE7B2E11D7}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{26A16EEA-B1C6-4C1E-AD0C-2F5451558BFD}' => array
+			(
+				"id" => "{26A16EEA-B1C6-4C1E-AD0C-2F5451558BFD}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BE20DC0E-D6EF-4E39-A379-BDE613F1ECFC}' => array
+			(
+				"id" => "{BE20DC0E-D6EF-4E39-A379-BDE613F1ECFC}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CA768988-D7E3-4015-801D-7922FEC22500}' => array
+			(
+				"id" => "{CA768988-D7E3-4015-801D-7922FEC22500}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{4739E579-AB3A-4CBC-B280-7D975698878A}' => array
+			(
+				"id" => "{4739E579-AB3A-4CBC-B280-7D975698878A}" ,
+				"name" => "Key21" ,
+				"caption" => "Key21" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{A7CC0D96-FD49-49F4-8590-54A3E1B4092C}' => array
+			   		(
+		   				"id" => "{A7CC0D96-FD49-49F4-8590-54A3E1B4092C}" ,
+		   				"name" => "aufteilung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{AEE27FDB-C7AA-4F64-BFF9-FFFC736FC20B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{D7E48447-BC41-472E-9B4D-E59670C23EEE}' => array
+			(
+				"id" => "{D7E48447-BC41-472E-9B4D-E59670C23EEE}" ,
+				"name" => "aufteilung_id" ,
+				"caption" => "aufteilung_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{6143AD7D-E0A0-4ACA-9394-1C4057EF5DD6}' => array
+			   		(
+		   				"id" => "{6143AD7D-E0A0-4ACA-9394-1C4057EF5DD6}" ,
+		   				"name" => "aufteilung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{AEE27FDB-C7AA-4F64-BFF9-FFFC736FC20B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{2FBC09AC-043C-4AEA-A36E-A60CF0B6A0ED}'  => array
+	(
+	    	"id" => "{2FBC09AC-043C-4AEA-A36E-A60CF0B6A0ED}" ,
+	    	"name" => "tbl_bestellstatus" ,
+	    	"caption" => "tbl_bestellstatus" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{63E0BEC8-061C-41E3-981B-00A7148F9AF7}' => array
+			(
+				"id" => "{63E0BEC8-061C-41E3-981B-00A7148F9AF7}" ,
+				"name" => "bestellstatus_kurzbz" ,
+				"caption" => "bestellstatus_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{65D6B7CE-1702-495D-96D4-957B5F4D2A5B}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{48496993-5DD9-4C79-B242-D635DD850C4B}' => array
+			(
+				"id" => "{48496993-5DD9-4C79-B242-D635DD850C4B}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{825CC4B2-CBE6-4806-9529-608C3AADE8DF}' => array
+			(
+				"id" => "{825CC4B2-CBE6-4806-9529-608C3AADE8DF}" ,
+				"name" => "Key22" ,
+				"caption" => "Key22" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{DC4A2071-CFB4-47B2-B22D-160C6C5C4027}' => array
+			   		(
+		   				"id" => "{DC4A2071-CFB4-47B2-B22D-160C6C5C4027}" ,
+		   				"name" => "bestellstatus_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{63E0BEC8-061C-41E3-981B-00A7148F9AF7}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{65D6B7CE-1702-495D-96D4-957B5F4D2A5B}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{61332BBA-B078-48C2-BD71-73B7319CFB6E}' => array
+			(
+				"id" => "{61332BBA-B078-48C2-BD71-73B7319CFB6E}" ,
+				"name" => "kurzbz" ,
+				"caption" => "kurzbz" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{892A068D-D5F1-4E3F-BFA5-C860D85748AC}' => array
+			   		(
+		   				"id" => "{892A068D-D5F1-4E3F-BFA5-C860D85748AC}" ,
+		   				"name" => "bestellstatus_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{63E0BEC8-061C-41E3-981B-00A7148F9AF7}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{463A3EDC-C120-49BF-88EE-53AE03DFF39B}'  => array
+	(
+	    	"id" => "{463A3EDC-C120-49BF-88EE-53AE03DFF39B}" ,
+	    	"name" => "tbl_bestellung_bestellstatus" ,
+	    	"caption" => "tbl_bestellung_bestellstatus" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{CCEBDF9D-EDE3-4F94-82AB-28A6CE739CCA}' => array
+			(
+				"id" => "{CCEBDF9D-EDE3-4F94-82AB-28A6CE739CCA}" ,
+				"name" => "bestellung_bestellstatus_id" ,
+				"caption" => "bestellung_bestellstatus_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E23734E4-2CFD-48F7-9031-C62103022DF8}' => array
+			(
+				"id" => "{E23734E4-2CFD-48F7-9031-C62103022DF8}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2AC7EAE0-15D7-4B49-9996-04FD47F02341}' => array
+			(
+				"id" => "{2AC7EAE0-15D7-4B49-9996-04FD47F02341}" ,
+				"name" => "bestellstatus_kurzbz" ,
+				"caption" => "bestellstatus_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F334CE10-C428-4E30-AFAB-ECEB97DAE001}' => array
+			(
+				"id" => "{F334CE10-C428-4E30-AFAB-ECEB97DAE001}" ,
+				"name" => "uid" ,
+				"caption" => "uid" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A5668E78-4BC4-4C90-9582-FF8159E43824}' => array
+			(
+				"id" => "{A5668E78-4BC4-4C90-9582-FF8159E43824}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BFA2B766-C8F7-4723-BEB8-EFE18BE49DB4}' => array
+			(
+				"id" => "{BFA2B766-C8F7-4723-BEB8-EFE18BE49DB4}" ,
+				"name" => "datum" ,
+				"caption" => "datum" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4EF49CFE-784D-46C7-AA9A-4499D1E9E1DC}' => array
+			(
+				"id" => "{4EF49CFE-784D-46C7-AA9A-4499D1E9E1DC}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B6A34641-661D-4F08-AB6F-37EC3FC04194}' => array
+			(
+				"id" => "{B6A34641-661D-4F08-AB6F-37EC3FC04194}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D445C28B-E9AE-4ED4-8BB6-88C0835015D7}' => array
+			(
+				"id" => "{D445C28B-E9AE-4ED4-8BB6-88C0835015D7}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2F056F43-ED0C-464E-A3C9-961F36FF4035}' => array
+			(
+				"id" => "{2F056F43-ED0C-464E-A3C9-961F36FF4035}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{D01B7DC4-282E-4510-9E9E-531CA4209D11}' => array
+			(
+				"id" => "{D01B7DC4-282E-4510-9E9E-531CA4209D11}" ,
+				"name" => "Key24" ,
+				"caption" => "Key24" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{52258146-4D02-4563-A193-5F65E3431F7A}' => array
+			   		(
+		   				"id" => "{52258146-4D02-4563-A193-5F65E3431F7A}" ,
+		   				"name" => "bestellung_bestellstatus_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{CCEBDF9D-EDE3-4F94-82AB-28A6CE739CCA}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{313BAEB5-FF00-414C-AFEA-557625F743D5}' => array
+			(
+				"id" => "{313BAEB5-FF00-414C-AFEA-557625F743D5}" ,
+				"name" => "bestelltung_bestelltstatus_id" ,
+				"caption" => "bestelltung_bestelltstatus_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{E17A2200-A516-4A1F-8402-7BD6C541B6B8}' => array
+			   		(
+		   				"id" => "{E17A2200-A516-4A1F-8402-7BD6C541B6B8}" ,
+		   				"name" => "bestellung_bestellstatus_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{CCEBDF9D-EDE3-4F94-82AB-28A6CE739CCA}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{2E8C4E29-D449-4519-9E95-004B2428DCC9}'  => array
+	(
+	    	"id" => "{2E8C4E29-D449-4519-9E95-004B2428DCC9}" ,
+	    	"name" => "tbl_bestelldetailtag" ,
+	    	"caption" => "tbl_bestelldetailtag" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{E63FCF58-C3AC-48E2-BE2B-60A348DBD3B7}' => array
+			(
+				"id" => "{E63FCF58-C3AC-48E2-BE2B-60A348DBD3B7}" ,
+				"name" => "tag" ,
+				"caption" => "tag" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "128" ,
+				"datatypeparam2" => "" ,
+				"length" => "128",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2E569589-4860-4ADA-8A02-1148038D8C2E}' => array
+			(
+				"id" => "{2E569589-4860-4ADA-8A02-1148038D8C2E}" ,
+				"name" => "bestelldetail_id" ,
+				"caption" => "bestelldetail_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{087976D4-8628-4A3A-96F6-B315AF25C686}' => array
+			(
+				"id" => "{087976D4-8628-4A3A-96F6-B315AF25C686}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{92508DB9-320B-425C-BF1F-1C966734A21E}' => array
+			(
+				"id" => "{92508DB9-320B-425C-BF1F-1C966734A21E}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{3DD16815-8345-427D-93D8-8E8EAF4E1424}' => array
+			(
+				"id" => "{3DD16815-8345-427D-93D8-8E8EAF4E1424}" ,
+				"name" => "Key25" ,
+				"caption" => "Key25" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{26F9FF57-956B-41C0-A2B7-AD1D119622F9}' => array
+			   		(
+		   				"id" => "{26F9FF57-956B-41C0-A2B7-AD1D119622F9}" ,
+		   				"name" => "tag" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{E63FCF58-C3AC-48E2-BE2B-60A348DBD3B7}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{9B3F05C2-069A-4C6D-AF8D-627D307E56FB}' => array
+			   		(
+		   				"id" => "{9B3F05C2-069A-4C6D-AF8D-627D307E56FB}" ,
+		   				"name" => "bestelldetail_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{2E569589-4860-4ADA-8A02-1148038D8C2E}",
 				   		),
 						"foreignkeys"  => array
 					    	(
@@ -35769,55 +40140,6 @@ $relations=array
 	   	)
    	),
     	
-	'{7B7E0B90-3A1F-4FFC-A03B-05A681C6C6D1}'  => array
-	(
-	    	"id" => "{7B7E0B90-3A1F-4FFC-A03B-05A681C6C6D1}" ,
-	    	"name" => "fk_betriebsmittel_bmreservierung" ,
-	    	"caption" => "betriebsmittel_bmreservierung" ,
-	    	"comments" => "" ,
-	    	"notes" => "",
-	    	"identifying" => "0",
-	    	"mandatoryparent" => "1",
-	    	"mandatorychild" => "0",
-	    	"cardinalitychild" => "-1",
-	    	"refintegrityparentupdate" => "0" ,
-	    	"refintegrityparentdelete" => "0" ,
-	    	"refintegritychildupdate" => "0" ,
-	    	"refintegritychildinsert" => "0" ,
-		"key"  => array
-	    	(
-			"id" => "{4A21C209-8B96-46B1-AFC9-0F6008429C95}",
-   		),
-	    	"foreignkeys"  => array
-	    	(
-			
-			'{11332208-C79F-4E68-9B35-B77E6FEF85BD}' => array
-			(
-				"id" => "{11332208-C79F-4E68-9B35-B77E6FEF85BD}",
-				"name" => "FK betriebsmittelperson_id - betriebsmittelperson_id",
-				"comments" => "",
-				"notes" => "",
-				"deferred" => "",
-				"deferrable" => "",
-				"matchtype" => "",
-				"createindextofk" => "",
-				"attrparent"  => array
-			    	(
-					"id" => "{F9D52F17-9A9F-4B05-8E98-72512E4669CE}",
-		   		),
-				"attrchild"  => array
-			    	(
-					"id" => "{DC712CE7-8440-43F1-A38E-B1FE3B2FD9F6}",
-		   		),
-				"KeyConstraintItem"  => array
-			    	(
-					"id" => "{E796F95B-394A-448A-BE92-C8F77ED77B3D}",
-		   		)
-			),
-			
-	   	)
-   	),
-    	
 	'{DF30585D-F6C1-4DD3-A492-3486C14B5510}'  => array
 	(
 	    	"id" => "{DF30585D-F6C1-4DD3-A492-3486C14B5510}" ,
@@ -36445,104 +40767,6 @@ $relations=array
 				"attrchild"  => array
 			    	(
 					"id" => "{8073E15A-5A57-4198-BB3A-3D94B5C3CE6D}",
-		   		),
-				"KeyConstraintItem"  => array
-			    	(
-					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
-		   		)
-			),
-			
-	   	)
-   	),
-    	
-	'{715A0D28-973F-4C3B-8330-1DC54C3D7A97}'  => array
-	(
-	    	"id" => "{715A0D28-973F-4C3B-8330-1DC54C3D7A97}" ,
-	    	"name" => "fk_firma_kontakt" ,
-	    	"caption" => "firma_kontakt" ,
-	    	"comments" => "" ,
-	    	"notes" => "",
-	    	"identifying" => "0",
-	    	"mandatoryparent" => "1",
-	    	"mandatorychild" => "0",
-	    	"cardinalitychild" => "-1",
-	    	"refintegrityparentupdate" => "0" ,
-	    	"refintegrityparentdelete" => "0" ,
-	    	"refintegritychildupdate" => "0" ,
-	    	"refintegritychildinsert" => "0" ,
-		"key"  => array
-	    	(
-			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
-   		),
-	    	"foreignkeys"  => array
-	    	(
-			
-			'{20C6EDC1-2A13-4BD1-89EF-1C6E89ECB97B}' => array
-			(
-				"id" => "{20C6EDC1-2A13-4BD1-89EF-1C6E89ECB97B}",
-				"name" => "FK firma_id - firma_id",
-				"comments" => "",
-				"notes" => "",
-				"deferred" => "",
-				"deferrable" => "",
-				"matchtype" => "",
-				"createindextofk" => "",
-				"attrparent"  => array
-			    	(
-					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
-		   		),
-				"attrchild"  => array
-			    	(
-					"id" => "{7D9B8942-0811-484F-8903-FCAB8F51A0B3}",
-		   		),
-				"KeyConstraintItem"  => array
-			    	(
-					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
-		   		)
-			),
-			
-	   	)
-   	),
-    	
-	'{C0B4C2C2-86D6-43F4-9B2F-DBBD3355B99C}'  => array
-	(
-	    	"id" => "{C0B4C2C2-86D6-43F4-9B2F-DBBD3355B99C}" ,
-	    	"name" => "fk_firma_personfunktionfirma" ,
-	    	"caption" => "firma_personfunktionfirma" ,
-	    	"comments" => "" ,
-	    	"notes" => "",
-	    	"identifying" => "0",
-	    	"mandatoryparent" => "1",
-	    	"mandatorychild" => "0",
-	    	"cardinalitychild" => "-1",
-	    	"refintegrityparentupdate" => "0" ,
-	    	"refintegrityparentdelete" => "0" ,
-	    	"refintegritychildupdate" => "0" ,
-	    	"refintegritychildinsert" => "0" ,
-		"key"  => array
-	    	(
-			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
-   		),
-	    	"foreignkeys"  => array
-	    	(
-			
-			'{EDB6FA36-36CF-43F8-A165-743B70304BED}' => array
-			(
-				"id" => "{EDB6FA36-36CF-43F8-A165-743B70304BED}",
-				"name" => "FK firma_id - firma_id",
-				"comments" => "",
-				"notes" => "",
-				"deferred" => "",
-				"deferrable" => "",
-				"matchtype" => "",
-				"createindextofk" => "",
-				"attrparent"  => array
-			    	(
-					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
-		   		),
-				"attrchild"  => array
-			    	(
-					"id" => "{DB466955-FC5A-443C-A656-42E8077CC824}",
 		   		),
 				"KeyConstraintItem"  => array
 			    	(
@@ -37348,8 +41572,8 @@ $relations=array
 	    	"mandatoryparent" => "1",
 	    	"mandatorychild" => "0",
 	    	"cardinalitychild" => "-1",
-	    	"refintegrityparentupdate" => "0" ,
-	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
 	    	"refintegritychildupdate" => "0" ,
 	    	"refintegritychildinsert" => "0" ,
 		"key"  => array
@@ -42208,16 +46432,16 @@ $relations=array
 	'{EE4C6976-0A6B-44F7-8A28-BE3B7F1A21C8}'  => array
 	(
 	    	"id" => "{EE4C6976-0A6B-44F7-8A28-BE3B7F1A21C8}" ,
-	    	"name" => "fk_person_personfunktionfirma" ,
-	    	"caption" => "person_personfunktionfirma" ,
+	    	"name" => "fk_person_personfunktionstandort" ,
+	    	"caption" => "person_personfunktionstandort" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
 	    	"mandatoryparent" => "1",
 	    	"mandatorychild" => "0",
 	    	"cardinalitychild" => "-1",
-	    	"refintegrityparentupdate" => "0" ,
-	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
 	    	"refintegritychildupdate" => "0" ,
 	    	"refintegritychildinsert" => "0" ,
 		"key"  => array
@@ -43599,10 +47823,10 @@ $relations=array
 	    	"foreignkeys"  => array
 	    	(
 			
-			'{83853692-8BBC-4526-9BFD-C5540BAF2D39}' => array
+			'{5BA7D9E1-F9CA-4283-8E17-1AEB7F592494}' => array
 			(
-				"id" => "{83853692-8BBC-4526-9BFD-C5540BAF2D39}",
-				"name" => "FK standort_kurzbz - standort_kurzbz",
+				"id" => "{5BA7D9E1-F9CA-4283-8E17-1AEB7F592494}",
+				"name" => "FK standort_id - standort_id",
 				"comments" => "",
 				"notes" => "",
 				"deferred" => "",
@@ -43611,15 +47835,15 @@ $relations=array
 				"createindextofk" => "",
 				"attrparent"  => array
 			    	(
-					"id" => "{45143BA7-5943-49EE-A4DD-4780F358DAED}",
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
 		   		),
 				"attrchild"  => array
 			    	(
-					"id" => "{F6A79886-6356-45A8-A0A8-2AD965D0E6C8}",
+					"id" => "{1194717F-9CE0-4B93-A98E-5D11BF784E20}",
 		   		),
 				"KeyConstraintItem"  => array
 			    	(
-					"id" => "{B4E27FAF-82E5-4996-BAAB-89281700F085}",
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
 		   		)
 			),
 			
@@ -43648,10 +47872,10 @@ $relations=array
 	    	"foreignkeys"  => array
 	    	(
 			
-			'{0CF1AA47-4C16-4AE6-A5B6-15D14FB82EB7}' => array
+			'{F695498E-4872-4C9B-A945-E75EBB96F433}' => array
 			(
-				"id" => "{0CF1AA47-4C16-4AE6-A5B6-15D14FB82EB7}",
-				"name" => "FK standort_kurzbz - standort_kurzbz",
+				"id" => "{F695498E-4872-4C9B-A945-E75EBB96F433}",
+				"name" => "FK standort_id - standort_id",
 				"comments" => "",
 				"notes" => "",
 				"deferred" => "",
@@ -43660,15 +47884,15 @@ $relations=array
 				"createindextofk" => "",
 				"attrparent"  => array
 			    	(
-					"id" => "{45143BA7-5943-49EE-A4DD-4780F358DAED}",
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
 		   		),
 				"attrchild"  => array
 			    	(
-					"id" => "{D42D051E-0F08-4C06-9935-A3763B8D8C29}",
+					"id" => "{B3FCDAC7-D3F3-4FEE-B8B4-97CA9247F75E}",
 		   		),
 				"KeyConstraintItem"  => array
 			    	(
-					"id" => "{B4E27FAF-82E5-4996-BAAB-89281700F085}",
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
 		   		)
 			),
 			
@@ -47647,8 +51871,8 @@ $relations=array
 	'{D5D57359-C7F3-4A2A-85CE-85B7ECD69690}'  => array
 	(
 	    	"id" => "{D5D57359-C7F3-4A2A-85CE-85B7ECD69690}" ,
-	    	"name" => "organisationseinheittyp_organisationseinheit" ,
-	    	"caption" => "organisationseinheittyp_organisationseinheit" ,
+	    	"name" => "fk_organisationseinheittyp_organisationseinheit" ,
+	    	"caption" => "fk_organisationseinheittyp_organisationseinheit" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -47696,8 +51920,8 @@ $relations=array
 	'{C7A46D43-E58A-492A-89C9-4356929C738B}'  => array
 	(
 	    	"id" => "{C7A46D43-E58A-492A-89C9-4356929C738B}" ,
-	    	"name" => "organisationseinheit_benutzerfunktion" ,
-	    	"caption" => "organisationseinheit_benutzerfunktion" ,
+	    	"name" => "fk_organisationseinheit_benutzerfunktion" ,
+	    	"caption" => "fk_organisationseinheit_benutzerfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -47745,8 +51969,8 @@ $relations=array
 	'{7F3BD42C-E203-465F-A4CE-34B045BB3059}'  => array
 	(
 	    	"id" => "{7F3BD42C-E203-465F-A4CE-34B045BB3059}" ,
-	    	"name" => "organisationseinheit_studiengang" ,
-	    	"caption" => "organisationseinheit_studiengang" ,
+	    	"name" => "fk_organisationseinheit_studiengang" ,
+	    	"caption" => "fk_organisationseinheit_studiengang" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -47794,8 +52018,8 @@ $relations=array
 	'{C89340BD-BFB5-45E7-93F6-634762DF048D}'  => array
 	(
 	    	"id" => "{C89340BD-BFB5-45E7-93F6-634762DF048D}" ,
-	    	"name" => "organisationseinheit_fachbereich" ,
-	    	"caption" => "organisationseinheit_fachbereich" ,
+	    	"name" => "fk_organisationseinheit_fachbereich" ,
+	    	"caption" => "fk_organisationseinheit_fachbereich" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -47843,8 +52067,8 @@ $relations=array
 	'{40813C07-7B87-4870-8BD1-8F33B25D007E}'  => array
 	(
 	    	"id" => "{40813C07-7B87-4870-8BD1-8F33B25D007E}" ,
-	    	"name" => "fachbereich_benutzerfunktion" ,
-	    	"caption" => "fachbereich_benutzerfunktion" ,
+	    	"name" => "fk_fachbereich_benutzerfunktion" ,
+	    	"caption" => "fk_fachbereich_benutzerfunktion" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -47941,8 +52165,8 @@ $relations=array
 	'{58230F11-7DDA-4425-A390-511F53477F68}'  => array
 	(
 	    	"id" => "{58230F11-7DDA-4425-A390-511F53477F68}" ,
-	    	"name" => "Relationship1" ,
-	    	"caption" => "Relationship1" ,
+	    	"name" => "fk_gebiet_kriterien" ,
+	    	"caption" => "fk_gebiet_kriterien" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -47990,8 +52214,8 @@ $relations=array
 	'{5333659D-34DF-4D12-8FB9-B5D58DB074FE}'  => array
 	(
 	    	"id" => "{5333659D-34DF-4D12-8FB9-B5D58DB074FE}" ,
-	    	"name" => "Relationship2" ,
-	    	"caption" => "Relationship2" ,
+	    	"name" => "fk_gebiet_kategorie" ,
+	    	"caption" => "fk_gebiet_kategorie" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "0",
@@ -48275,6 +52499,1770 @@ $relations=array
 				"KeyConstraintItem"  => array
 			    	(
 					"id" => "{08218334-B8AE-4828-A4C6-98A30DB42E71}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{95CF52CF-7B94-4B68-BAFC-FA6574115B7F}'  => array
+	(
+	    	"id" => "{95CF52CF-7B94-4B68-BAFC-FA6574115B7F}" ,
+	    	"name" => "fk_server_cronjob" ,
+	    	"caption" => "fk_server_cronjob" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A7A5D69D-42CF-46E3-A18F-3655BA8ECEF6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{ED98424F-3573-4715-8E0D-574EABF4AF59}' => array
+			(
+				"id" => "{ED98424F-3573-4715-8E0D-574EABF4AF59}",
+				"name" => "FK server_kurzbz - server_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{E48D1B48-EFDF-4F43-9A1D-96B5CE8DA84B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{CB37A3BE-364A-4179-852E-56EA0CD32D51}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{FBA85BDE-4712-4CF8-B384-47FC52C375F1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{56659E6D-ACF8-47AB-A601-07F82514F1A0}'  => array
+	(
+	    	"id" => "{56659E6D-ACF8-47AB-A601-07F82514F1A0}" ,
+	    	"name" => "fk_firma_firmatag" ,
+	    	"caption" => "fk_firma_firmatag" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{1B3EE35E-A221-4E54-A428-20EE997CC89A}' => array
+			(
+				"id" => "{1B3EE35E-A221-4E54-A428-20EE997CC89A}",
+				"name" => "FK firma_id - firma_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{EC8E2CEA-3EFC-4766-A138-9F6D5827861C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{6AA8B5B4-B3A8-478F-8D75-0A801450907A}'  => array
+	(
+	    	"id" => "{6AA8B5B4-B3A8-478F-8D75-0A801450907A}" ,
+	    	"name" => "fk_tag_firmatag" ,
+	    	"caption" => "fk_tag_firmatag" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "1" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{84438D88-1A21-40C4-B489-4D193A05DD09}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{E19F93B9-61F2-4F5D-A3AA-6FEA218F3661}' => array
+			(
+				"id" => "{E19F93B9-61F2-4F5D-A3AA-6FEA218F3661}",
+				"name" => "FK tag - tag",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{7C13571E-3285-42F6-8E2C-FA30F5208316}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F7A4185D-1B9B-421B-8663-1EA00ACA5E05}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{D997D7CB-3DDE-4526-9BF4-F80ABA88E28A}'  => array
+	(
+	    	"id" => "{D997D7CB-3DDE-4526-9BF4-F80ABA88E28A}" ,
+	    	"name" => "fk_standort_personfunktionstandort" ,
+	    	"caption" => "fk_standort_personfunktionstandort" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{8A8F1C7B-6875-46A9-9676-35937A609B26}' => array
+			(
+				"id" => "{8A8F1C7B-6875-46A9-9676-35937A609B26}",
+				"name" => "FK standort_id - standort_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{09C174E5-523C-470A-AB7F-835F889A6578}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{C49CC42E-5ACE-4EA8-9AC4-189171EE9D38}'  => array
+	(
+	    	"id" => "{C49CC42E-5ACE-4EA8-9AC4-189171EE9D38}" ,
+	    	"name" => "fk_standort_kontakt" ,
+	    	"caption" => "fk_standort_kontakt" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{4E63AC47-CBFB-4ABD-AD3F-03A21B6E0F5B}' => array
+			(
+				"id" => "{4E63AC47-CBFB-4ABD-AD3F-03A21B6E0F5B}",
+				"name" => "FK standort_id - standort_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{046AE7F9-17FD-490B-926C-18F883EB3A0C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{C2C310BB-F2DD-46E5-8A26-31E57E7E714A}'  => array
+	(
+	    	"id" => "{C2C310BB-F2DD-46E5-8A26-31E57E7E714A}" ,
+	    	"name" => "fk_bestellung_betriebsmittel" ,
+	    	"caption" => "fk_bestellung_betriebsmittel" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{E6A172F9-75F2-4B11-B92C-B60EFD6E3D2C}' => array
+			(
+				"id" => "{E6A172F9-75F2-4B11-B92C-B60EFD6E3D2C}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{A87B3703-22BE-4C7A-A5BE-772FB9E423C6}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{B01B69B6-8CCA-4A47-BDFB-A91AD089A697}'  => array
+	(
+	    	"id" => "{B01B69B6-8CCA-4A47-BDFB-A91AD089A697}" ,
+	    	"name" => "fk_standort_firma" ,
+	    	"caption" => "fk_standort_firma" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{C02D0361-9C8B-4B6A-A652-266B51D499D8}' => array
+			(
+				"id" => "{C02D0361-9C8B-4B6A-A652-266B51D499D8}",
+				"name" => "FK standort_id - finanzamt",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{42464AA3-DC7D-478A-948A-B903E74B3E59}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{8C2F68C6-E195-4378-99CD-FCA3F55D52E7}'  => array
+	(
+	    	"id" => "{8C2F68C6-E195-4378-99CD-FCA3F55D52E7}" ,
+	    	"name" => "fk_firma_organisationseinheitfirma" ,
+	    	"caption" => "fk_firma_organisationseinheitfirma" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{5F937967-995D-456B-A9D2-DA746E123869}' => array
+			(
+				"id" => "{5F937967-995D-456B-A9D2-DA746E123869}",
+				"name" => "FK firma_id - firma_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{6D33133A-8421-4745-95FA-245088F81749}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{6FF5F37D-3613-4086-B35C-809DF87EF4C3}'  => array
+	(
+	    	"id" => "{6FF5F37D-3613-4086-B35C-809DF87EF4C3}" ,
+	    	"name" => "fk_organisationseinheit_organisationseinheitfirma" ,
+	    	"caption" => "fk_organisationseinheit_organisationseinheitfirma" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{A4881723-4E50-4A5A-A26A-47EC283155E1}' => array
+			(
+				"id" => "{A4881723-4E50-4A5A-A26A-47EC283155E1}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{47DAC216-5DF8-4DAF-A662-22720B6A9AEB}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{C99EAFFA-B06A-45C0-B0A1-3F656F42E63B}'  => array
+	(
+	    	"id" => "{C99EAFFA-B06A-45C0-B0A1-3F656F42E63B}" ,
+	    	"name" => "fk_standort _lehreinheitmitarbeiter" ,
+	    	"caption" => "fk_standort _lehreinheitmitarbeiter" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{16F797DE-85BC-49E1-B45B-2A3D36367A1B}' => array
+			(
+				"id" => "{16F797DE-85BC-49E1-B45B-2A3D36367A1B}",
+				"name" => "FK standort_id - standort_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{7C321800-A8DE-4C4C-898D-D65BEC3A000F}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{DDBBFB10-CAE1-4812-BF87-EB198CC841C3}'  => array
+	(
+	    	"id" => "{DDBBFB10-CAE1-4812-BF87-EB198CC841C3}" ,
+	    	"name" => "fk_firma_standort" ,
+	    	"caption" => "fk_firma_standort" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{472B3BFA-5F62-40AD-B30E-4D707D2B837F}' => array
+			(
+				"id" => "{472B3BFA-5F62-40AD-B30E-4D707D2B837F}",
+				"name" => "FK firma_id - firma_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{76053D89-ADCF-43E1-B763-C15BF2641661}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{7AE9398A-3978-4F11-A4AB-CD0022FAF6DB}'  => array
+	(
+	    	"id" => "{7AE9398A-3978-4F11-A4AB-CD0022FAF6DB}" ,
+	    	"name" => "fk_organisationseinheit_kostenstelle" ,
+	    	"caption" => "fk_organisationseinheit_kostenstelle" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{C46B6E52-7C48-409C-A7C4-63D5442BA823}' => array
+			(
+				"id" => "{C46B6E52-7C48-409C-A7C4-63D5442BA823}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{BF35915F-DBD2-459B-B1F5-28D5C305D640}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{89D45B12-77BF-48F8-8A6B-6C3A369314D7}'  => array
+	(
+	    	"id" => "{89D45B12-77BF-48F8-8A6B-6C3A369314D7}" ,
+	    	"name" => "fk_tag_bestellungtag" ,
+	    	"caption" => "fk_tag_bestellungtag" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{84438D88-1A21-40C4-B489-4D193A05DD09}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{CA5F4772-27F8-4B33-BCBE-3EF21FD7DEB6}' => array
+			(
+				"id" => "{CA5F4772-27F8-4B33-BCBE-3EF21FD7DEB6}",
+				"name" => "FK tag - tag",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{0486E070-08CC-42DA-AB15-F6FC3588FB95}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F7A4185D-1B9B-421B-8663-1EA00ACA5E05}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{DFACDBBF-1859-41CD-BAFE-A62A3ED5185A}'  => array
+	(
+	    	"id" => "{DFACDBBF-1859-41CD-BAFE-A62A3ED5185A}" ,
+	    	"name" => "fk_bestellungtag_bestellung" ,
+	    	"caption" => "fk_bestellungtag_bestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{D5A5F4FD-5A4B-48AA-A6B7-F0BFDEF6FA60}' => array
+			(
+				"id" => "{D5A5F4FD-5A4B-48AA-A6B7-F0BFDEF6FA60}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{09F76B2B-AB13-4876-B2D4-0A4D22A323FD}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{2BA97F49-1492-440A-A11A-5C38CC0615EE}'  => array
+	(
+	    	"id" => "{2BA97F49-1492-440A-A11A-5C38CC0615EE}" ,
+	    	"name" => "fk_benutzer_bestellung_besteller" ,
+	    	"caption" => "fk_benutzer_bestellung_besteller" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{CF08AC9E-4FD5-4F1D-B38C-708027F34218}' => array
+			(
+				"id" => "{CF08AC9E-4FD5-4F1D-B38C-708027F34218}",
+				"name" => "FK uid - besteller_uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{FF3B19D3-1BFC-4ADA-A6D3-C3EA0BF4CDE7}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{0CA16ED1-3F44-4E93-8931-F60D5799C47A}'  => array
+	(
+	    	"id" => "{0CA16ED1-3F44-4E93-8931-F60D5799C47A}" ,
+	    	"name" => "fk_projekt_projektbestellung" ,
+	    	"caption" => "fk_projekt_projektbestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2EA6597E-160F-4A49-A381-2EAB32B42057}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{CC262E27-5F23-4F56-9A64-E7F0120C3509}' => array
+			(
+				"id" => "{CC262E27-5F23-4F56-9A64-E7F0120C3509}",
+				"name" => "FK projekt_kurzbz - projekt_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{A7574311-DA3D-40C1-9E68-5E5EB743DC26}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3F7ACD98-6116-4C6E-A2AF-A1D512CF6506}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{C8B7DE7E-CE3C-4455-BF78-CC9D44E57C5F}'  => array
+	(
+	    	"id" => "{C8B7DE7E-CE3C-4455-BF78-CC9D44E57C5F}" ,
+	    	"name" => "fk_bestellung_projektbestellung" ,
+	    	"caption" => "fk_bestellung_projektbestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{09B3B452-F304-42EA-9742-10BE0A7ACEB0}' => array
+			(
+				"id" => "{09B3B452-F304-42EA-9742-10BE0A7ACEB0}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{9EACDA4F-808E-48F6-B7B9-1C39B5FEAFC1}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{B9CF264F-1CDD-4EA1-84B9-421B6CCF4D2F}'  => array
+	(
+	    	"id" => "{B9CF264F-1CDD-4EA1-84B9-421B6CCF4D2F}" ,
+	    	"name" => "fk_standort_bestellung_lieferadresse" ,
+	    	"caption" => "fk_standort_bestellung_lieferadresse" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{E7E4FA8C-C5A7-4F35-A28D-CC40F9E55D86}' => array
+			(
+				"id" => "{E7E4FA8C-C5A7-4F35-A28D-CC40F9E55D86}",
+				"name" => "FK standort_id - lieferadresse",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{C179A146-E45A-48AB-BC83-15DC3B2C30D0}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{38F76BC4-5EAD-4162-8255-E5D843FAC4F6}'  => array
+	(
+	    	"id" => "{38F76BC4-5EAD-4162-8255-E5D843FAC4F6}" ,
+	    	"name" => "fk_kostenstelle_bestellung" ,
+	    	"caption" => "fk_kostenstelle_bestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{2A31D553-50F4-4E7A-A04D-9D918732F217}' => array
+			(
+				"id" => "{2A31D553-50F4-4E7A-A04D-9D918732F217}",
+				"name" => "FK kostenstelle_id - kostenstelle_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{F062DC13-5123-401D-BD87-366C9A4C0570}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{43788A23-1BE0-4F92-837F-0606D31FF78F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{BE00A4DC-FF19-48ED-BB31-2D65301F3B27}'  => array
+	(
+	    	"id" => "{BE00A4DC-FF19-48ED-BB31-2D65301F3B27}" ,
+	    	"name" => "fk_konto_bestellung" ,
+	    	"caption" => "fk_konto_bestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{9AB9F3EA-D74E-48B9-BFA2-F7AF4D9884F7}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{986A1692-77B6-4100-ACD7-1F16A1B19D28}' => array
+			(
+				"id" => "{986A1692-77B6-4100-ACD7-1F16A1B19D28}",
+				"name" => "FK konto_id - konto_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{6FA927BB-1FE8-4C8C-BD7C-6B053C17557E}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{E48DB80F-9ABA-4709-9777-F3D198586ACA}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{D0AD52C3-969D-4386-AD51-F4D022161102}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{1DD93608-2D1B-45AC-8B23-D33414DF486E}'  => array
+	(
+	    	"id" => "{1DD93608-2D1B-45AC-8B23-D33414DF486E}" ,
+	    	"name" => "fk_standort_bestellung_rechnungsadresse" ,
+	    	"caption" => "fk_standort_bestellung_rechnungsadresse" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{190E3BB4-7A56-4B9A-983B-F88D9FAEF839}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{0C811FF6-679F-4395-A93F-0BD7DD75E5A7}' => array
+			(
+				"id" => "{0C811FF6-679F-4395-A93F-0BD7DD75E5A7}",
+				"name" => "FK standort_id - rechnungsadresse",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7A6B6680-600D-4C41-B03F-52A0EDC201CF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{B65FD846-11CB-4E18-B41B-F8E2B71D2FA8}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AD747DF4-66EE-41A2-AACC-C765DB9B71D1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{897A739C-26EF-48AD-9234-845D0D3F25BA}'  => array
+	(
+	    	"id" => "{897A739C-26EF-48AD-9234-845D0D3F25BA}" ,
+	    	"name" => "fk_bestellung_bestelldetail" ,
+	    	"caption" => "fk_bestellung_bestelldetail" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{0B756FCF-E3B3-498D-AD8F-4FE589D0E1AB}' => array
+			(
+				"id" => "{0B756FCF-E3B3-498D-AD8F-4FE589D0E1AB}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{39060F95-6A18-4815-B5F7-E23BBD35B14B}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{44531DA2-912E-4C9D-8D22-7769E6B491A1}'  => array
+	(
+	    	"id" => "{44531DA2-912E-4C9D-8D22-7769E6B491A1}" ,
+	    	"name" => "fk_firma_bestellung" ,
+	    	"caption" => "fk_firma_bestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{301871B2-5357-4E08-9F1A-D557A2C9D16B}' => array
+			(
+				"id" => "{301871B2-5357-4E08-9F1A-D557A2C9D16B}",
+				"name" => "FK firma_id - firma_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{4CF7921B-CF6C-463C-908B-7795F992162F}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{C73F2091-4316-4160-88D1-588372EC57E8}'  => array
+	(
+	    	"id" => "{C73F2091-4316-4160-88D1-588372EC57E8}" ,
+	    	"name" => "fk_kostenstelle_benutzerrolle" ,
+	    	"caption" => "fk_kostenstelle_benutzerrolle" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{934AE6B8-19E0-4856-869D-C695B30909A7}' => array
+			(
+				"id" => "{934AE6B8-19E0-4856-869D-C695B30909A7}",
+				"name" => "FK kostenstelle_id - kostenstelle_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{43CE20C6-06AD-46F2-A0F0-E7A06D43E436}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{43788A23-1BE0-4F92-837F-0606D31FF78F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{284F58B7-A817-494B-915E-4552DD36833E}'  => array
+	(
+	    	"id" => "{284F58B7-A817-494B-915E-4552DD36833E}" ,
+	    	"name" => "fk_bestellung_rechnung" ,
+	    	"caption" => "fk_bestellung_rechnung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{8D1D27AB-2AC6-4EE2-A0A6-4FC08BD7B35D}' => array
+			(
+				"id" => "{8D1D27AB-2AC6-4EE2-A0A6-4FC08BD7B35D}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{5E44A366-2737-4674-8302-5F8A794AD729}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{17234F05-04F7-434D-9D21-025C42ACE594}'  => array
+	(
+	    	"id" => "{17234F05-04F7-434D-9D21-025C42ACE594}" ,
+	    	"name" => "fk_rechnung_rechnungbetrag" ,
+	    	"caption" => "fk_rechnung_rechnungbetrag" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{DD9F6AF0-89BF-4661-A8D3-25CE08CAF4C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{9B829E1D-AF7A-4085-A1FC-5417BCD66BDA}' => array
+			(
+				"id" => "{9B829E1D-AF7A-4085-A1FC-5417BCD66BDA}",
+				"name" => "FK rechung_id - rechung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{5CF834D7-4E2D-46EB-9D4A-F5F2055A3463}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{146C883E-4FAF-4E82-BC7B-A60B7023AD1A}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{308A373E-5E71-47E8-950E-DA05E25D4D95}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{11F67A68-C53E-4BB8-A2B0-F36C33C681DC}'  => array
+	(
+	    	"id" => "{11F67A68-C53E-4BB8-A2B0-F36C33C681DC}" ,
+	    	"name" => "fk_kostenstelle_aufteilungdefault" ,
+	    	"caption" => "fk_kostenstelle_aufteilungdefault" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{A0B74FF7-8046-4A98-936F-1083DBE8F467}' => array
+			(
+				"id" => "{A0B74FF7-8046-4A98-936F-1083DBE8F467}",
+				"name" => "FK kostenstelle_id - kostenstelle_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{7309108D-2DD6-495C-9E47-8BC8D2292549}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{43788A23-1BE0-4F92-837F-0606D31FF78F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{940385E8-5495-4556-9CE5-4D87B13FD674}'  => array
+	(
+	    	"id" => "{940385E8-5495-4556-9CE5-4D87B13FD674}" ,
+	    	"name" => "fk_organisationseinheit_aufteilung_default" ,
+	    	"caption" => "fk_organisationseinheit_aufteilung_default" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{BA4D2F69-C753-426C-B6A5-525F7D706D13}' => array
+			(
+				"id" => "{BA4D2F69-C753-426C-B6A5-525F7D706D13}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{7BBE7218-3066-4ADD-A9C2-D18DA73E60FA}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{2A4634D5-5889-4AA4-B0F0-FBB86E23BBC1}'  => array
+	(
+	    	"id" => "{2A4634D5-5889-4AA4-B0F0-FBB86E23BBC1}" ,
+	    	"name" => "fk_bestellung_aufteilung" ,
+	    	"caption" => "fk_bestellung_aufteilung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{3A821542-9842-4D98-A597-3AC1CEB7169A}' => array
+			(
+				"id" => "{3A821542-9842-4D98-A597-3AC1CEB7169A}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{CEA0DBEA-7F1C-4512-878D-12D183FD78C7}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{643CB481-5461-4F68-8762-E0B8FA96D9ED}'  => array
+	(
+	    	"id" => "{643CB481-5461-4F68-8762-E0B8FA96D9ED}" ,
+	    	"name" => "fk_organisationseinheit_aufteilung" ,
+	    	"caption" => "fk_organisationseinheit_aufteilung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{61C6BE6F-9AB8-4231-A5E4-7E35ED8773ED}' => array
+			(
+				"id" => "{61C6BE6F-9AB8-4231-A5E4-7E35ED8773ED}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{B0341E26-E6A5-4025-B068-5498713E3A9C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{B403D8A0-142A-4ECC-8323-549807E419BD}'  => array
+	(
+	    	"id" => "{B403D8A0-142A-4ECC-8323-549807E419BD}" ,
+	    	"name" => "fk_bestellung_bestellung_bestellstatus" ,
+	    	"caption" => "fk_bestellung_bestellung_bestellstatus" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{CB62308D-30C4-434F-BD51-66B4505D9BAE}' => array
+			(
+				"id" => "{CB62308D-30C4-434F-BD51-66B4505D9BAE}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{E23734E4-2CFD-48F7-9031-C62103022DF8}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{CB1F2DC4-C639-42DB-B586-5D1376DCB3AD}'  => array
+	(
+	    	"id" => "{CB1F2DC4-C639-42DB-B586-5D1376DCB3AD}" ,
+	    	"name" => "fk_bestellstatus_bestellung_bestellstatus" ,
+	    	"caption" => "fk_bestellstatus_bestellung_bestellstatus" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{825CC4B2-CBE6-4806-9529-608C3AADE8DF}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{65D6B7CE-1702-495D-96D4-957B5F4D2A5B}' => array
+			(
+				"id" => "{65D6B7CE-1702-495D-96D4-957B5F4D2A5B}",
+				"name" => "FK bestellstatus_kurzbz - bestellstatus_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{63E0BEC8-061C-41E3-981B-00A7148F9AF7}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{2AC7EAE0-15D7-4B49-9996-04FD47F02341}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DC4A2071-CFB4-47B2-B22D-160C6C5C4027}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{127B5AF9-EF16-4F96-940A-73A33BA8EE09}'  => array
+	(
+	    	"id" => "{127B5AF9-EF16-4F96-940A-73A33BA8EE09}" ,
+	    	"name" => "fk_benutzer_bestellung_bestellstatus" ,
+	    	"caption" => "fk_benutzer_bestellung_bestellstatus" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{B7455DCB-FB2A-4A2E-A9D8-B2912F496834}' => array
+			(
+				"id" => "{B7455DCB-FB2A-4A2E-A9D8-B2912F496834}",
+				"name" => "FK uid - uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{F334CE10-C428-4E30-AFAB-ECEB97DAE001}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{D8350E98-09C1-4C7C-A5EB-1BE6F20EDC90}'  => array
+	(
+	    	"id" => "{D8350E98-09C1-4C7C-A5EB-1BE6F20EDC90}" ,
+	    	"name" => "fk_organisationseinheit_bestellung_bestellstatus" ,
+	    	"caption" => "fk_organisationseinheit_bestellung_bestellstatus" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{7B34F5FA-FD6A-4334-8F25-AACBF59B32E2}' => array
+			(
+				"id" => "{7B34F5FA-FD6A-4334-8F25-AACBF59B32E2}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{A5668E78-4BC4-4C90-9582-FF8159E43824}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{00D8F1D4-D9D2-4E1F-A3D0-CC1C78AC43B6}'  => array
+	(
+	    	"id" => "{00D8F1D4-D9D2-4E1F-A3D0-CC1C78AC43B6}" ,
+	    	"name" => "Relationship1" ,
+	    	"caption" => "Relationship1" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{84438D88-1A21-40C4-B489-4D193A05DD09}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{AB167F52-9E75-4B18-B66B-A893F19536A1}' => array
+			(
+				"id" => "{AB167F52-9E75-4B18-B66B-A893F19536A1}",
+				"name" => "FK tag - tag",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{78C8823B-E2CC-454D-8C62-E0FE6347A3B2}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{E63FCF58-C3AC-48E2-BE2B-60A348DBD3B7}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F7A4185D-1B9B-421B-8663-1EA00ACA5E05}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{E71C8D04-54C0-45AD-84BF-A947DB5B9D04}'  => array
+	(
+	    	"id" => "{E71C8D04-54C0-45AD-84BF-A947DB5B9D04}" ,
+	    	"name" => "Relationship2" ,
+	    	"caption" => "Relationship2" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{D65923B8-D08C-4EA7-80A0-30393C9A352A}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{B0F8AA52-BE6F-4761-AC2A-FCB3481FBBD4}' => array
+			(
+				"id" => "{B0F8AA52-BE6F-4761-AC2A-FCB3481FBBD4}",
+				"name" => "FK bestelldetail_id - bestelldetail_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{703BBAD4-2801-494F-A3E1-D837812164EF}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{2E569589-4860-4ADA-8A02-1148038D8C2E}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DE32C997-9A9A-4F6D-B2BA-7C97D51F021F}",
 		   		)
 			),
 			
