@@ -398,7 +398,7 @@ class preinteressent extends basis_db
 	 *        $studiensemester_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null, $einverstaendnis)
+	public function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null, $einverstaendnis=null)
 	{
 		$qry = "SELECT distinct tbl_preinteressent.* 
 				FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) 
