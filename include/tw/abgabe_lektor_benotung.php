@@ -45,14 +45,6 @@ require_once('../../include/mitarbeiter.class.php');
 
 require_once('../../include/pdf.inc.php');
 
-
-
-
-
-
-
-
-
 $getuid=get_uid();
 $datum_obj = new datum();
 $htmlstr = "";
@@ -225,7 +217,7 @@ else
 		$maxX +=291;
 		$pdf->SetFont('Arial','',9);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,18,'Datum (dd.MM.yyyy): ',1,'L',0);
+		$pdf->MultiCell(159,18,'Datum: ',1,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,18,date('d.m.Y',mktime(0, 0, 0, date("m")  , date("d"), date("Y"))),1,'R',0);
 		
