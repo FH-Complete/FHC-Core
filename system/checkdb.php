@@ -38,80 +38,82 @@ $uid=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('admin'))
-	die('Sie haben keine Berechtigung f�r diese Seite');
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 echo '
 <html>
 <head>
-<title>Datenbank Check</title>
-<meta http-equiv="Content-Type" content="text/html; charset="UTF-8">
-<link rel="stylesheet" href="../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../include/js/tablesort/table.css" type="text/css">
-<script src="../include/js/tablesort/table.js" type="text/javascript"></script>
-<script  type="text/javascript">
-String.prototype.startsWith = function(str)
-{return (this.match("^"+str)==str)}
-
-function display(id)
-{
-	if(id.startsWith("table."))
-		disableTables();
-	if(id.startsWith("schema."))
-		disableSchemas();
-	
-	document.getElementById(id).style.display="block";
-	return false;
-}
-
-function disableSchemas()
-{
-	elem = document.getElementsByTagName("div");
-	
-	for(i=0;i<elem.length;i++)
-	{
-		div = elem[i];
-		if(div.id && (div.id.startsWith("schema.") || div.id.startsWith("table.") || div.id.startsWith("attrib.")))
+	<title>Datenbank Check</title>
+	<meta http-equiv="Content-Type" content="text/html; charset="UTF-8">
+	<link rel="stylesheet" href="../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../include/js/tablesort/table.css" type="text/css">
+	<script src="../include/js/tablesort/table.js" type="text/javascript"></script>
+	<script  type="text/javascript">
+		String.prototype.startsWith = function(str)
 		{
-			document.getElementById(div.id).style.display="none";
+			return (this.match("^"+str)==str)
 		}
-	}
-}
 
-function disableTables()
-{
-	elem = document.getElementsByTagName("div");
-	
-	for(i=0;i<elem.length;i++)
-	{
-		div=elem[i];
-		if(div.id && (div.id.startsWith("table.") || div.id.startsWith("attrib.")))
+		function display(id)
 		{
-			document.getElementById(div.id).style.display="none";
+			if(id.startsWith("table."))
+				disableTables();
+			if(id.startsWith("schema."))
+				disableSchemas();
+			
+			document.getElementById(id).style.display="block";
+			return false;
 		}
+		
+		function disableSchemas()
+		{
+			elem = document.getElementsByTagName("div");
+			
+			for(i=0;i<elem.length;i++)
+			{
+				div = elem[i];
+				if(div.id && (div.id.startsWith("schema.") || div.id.startsWith("table.") || div.id.startsWith("attrib.")))
+				{
+					document.getElementById(div.id).style.display="none";
+				}
+			}
+		}
+		
+		function disableTables()
+		{
+			elem = document.getElementsByTagName("div");
+			
+			for(i=0;i<elem.length;i++)
+			{
+				div=elem[i];
+				if(div.id && (div.id.startsWith("table.") || div.id.startsWith("attrib.")))
+				{
+					document.getElementById(div.id).style.display="none";
+				}
+			}
+		}
+
+	</script>
+	<style>
+	.box
+	{
+		border: 1px solid black;
+		border: 2px solid #E6E6CC;
+		float: left;
+		margin: 10px;
+		padding: 3px;
 	}
-}
-
-</script>
-<style>
-.box
-{
-	border: 1px solid black;
-	border: 2px solid #E6E6CC;
-	float: left;
-	margin: 10px;
-	padding: 3px;
-}
-
-.boxhead
-{
-	background-color: #F3F3E9; 
-	border:0; 
-	text-align: center;
-	border-bottom: 1px solid #E6E6CC; 
-	font-weight: bold; 
-}
-
-</style>
+	
+	.boxhead
+	{
+		background-color: #F3F3E9; 
+		border:0; 
+		text-align: center;
+		border-bottom: 1px solid #E6E6CC; 
+		font-weight: bold; 
+	}
+	
+	</style>
 </head>
 <body>';
 
