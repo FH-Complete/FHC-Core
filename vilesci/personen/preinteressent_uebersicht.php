@@ -64,7 +64,12 @@ if(isset($_GET['bool_uebernommen']))
 	$bool_uebernommen = true;
 else 
 	$bool_uebernommen = null;
-
+	
+if(isset($_GET['bool_einverstaendnis']))
+	$bool_einverstaendnis = true;
+else 
+	$bool_einverstaendnis = null;
+	
 if(isset($_GET['bool_absage']))
 	$bool_absage = true;
 else 
@@ -167,7 +172,8 @@ foreach ($stg->result as $row)
 }
 echo '</SELECT></td><td>';
 echo '<input type="checkbox" name="bool_nichtfreigegeben" '.($bool_nichtfreigegeben?'checked':'').'> nicht freigegeben';
-echo '<input type="checkbox" name="bool_absage" '.($bool_absage?'checked':'').'> Absage<br>';
+echo '<input type="checkbox" name="bool_absage" '.($bool_absage?'checked':'').'> Absage';
+echo '<input type="checkbox" name="bool_einverstaendnis" '.($bool_einverstaendnis?'checked':'').'> Einverständnis<br>';
 echo '<input type="checkbox" name="bool_uebernommen" '.($bool_uebernommen?'checked':'').'> freigegeben aber nicht &uuml;bernommen</td><td>';
 echo '&nbsp;&nbsp;&nbsp;<input type="submit" name="anzeigen" value="Anzeigen"></td></tr>';
 echo '<tr><td>Kontaktmedium: <SELECT name="kontaktmedium">';
@@ -319,7 +325,7 @@ $preinteressent = new preinteressent();
 //if($filter=='')
 if($datum_obj->formatDatum($filter, 'Y-m-d', true))
 	$filter = $datum_obj->formatDatum($filter, 'Y-m-d', true);
-$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), $filter, $bool_nichtfreigegeben, $bool_uebernommen, $kontaktmedium, $bool_absage, $erfassungsdatum_von, $erfassungsdatum_bis);
+$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), $filter, $bool_nichtfreigegeben, $bool_uebernommen, $kontaktmedium, $bool_absage, $erfassungsdatum_von, $erfassungsdatum_bis, $bool_einverstaendnis);
 /*else 
 {
 	//Falls im Filter-Feld ein Datum steht dann wird dieses umformatiert
