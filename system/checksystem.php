@@ -1210,7 +1210,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			ALTER TABLE wawi.tbl_konto_kostenstelle ADD CONSTRAINT fk_konto_kostenstelle_konto FOREIGN KEY (konto_id) REFERENCES wawi.tbl_konto (konto_id) ON DELETE CASCADE ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_konto_kostenstelle ADD CONSTRAINT fk_konto_kostenstelle_kostenstelle FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE CASCADE ON UPDATE CASCADE;
 			
-			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_konto TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_konto_kostenstelle TO admin;
 			
 			-- Bestellung
 			CREATE TABLE wawi.tbl_bestellung
