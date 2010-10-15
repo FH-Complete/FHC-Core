@@ -75,7 +75,9 @@ for ($i=0;$i<$num_rows;$i++)
 </head>
 
 <body>
-<h2> Statistik der Zeitw&uuml;nsche</h2>
+<h2> Statistik der Zeitw&uuml;nsche - <?php echo ($fix?'Fixangestellte':'Alle').' Lektoren' ?></h2>
+<a href="zeitwuensche.php?fix">Nur fixangestellte Lektoren anzeigen</a>
+<br /><br />
 Anzahl der Lektoren: <?PHP echo $anz_lektoren; ?>
 <TABLE width="100%" border="1" cellspacing="0" cellpadding="0">
 	<TR>
