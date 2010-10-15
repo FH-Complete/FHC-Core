@@ -555,7 +555,7 @@ class lehrstunde extends basis_db
 			$sql_query.=" OR (uid='".addslashes($this->lektor_uid)."' AND uid!='_DummyLektor') ";
 		
 		//Wenn eine Kollisionspruefung auf Studentenebene durchgefuehrt wird, werden die LVB nicht gecheckt	
-		if(!$kollision_student)
+		if($kollision_student=='false')
 		{
 			$sql_query.=" OR (studiengang_kz='".addslashes($this->studiengang_kz)."' AND semester='".addslashes($this->sem)."'";
 			if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
@@ -567,7 +567,7 @@ class lehrstunde extends basis_db
 			$sql_query.=")";
 		}
 		$sql_query.=") AND unr!='".addslashes($this->unr)."'";
-		
+
 		if (!$erg_stpl = $this->db_query($sql_query))
 		{
 			$this->errormsg=$sql_query.$this->db_last_error();
