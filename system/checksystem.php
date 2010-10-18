@@ -1180,7 +1180,8 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				updatevon varchar(32),
 				insertamum timestamp,
 				insertvon varchar(32),
-				ext_id bigint
+				ext_id bigint,
+				kostenstelle_nr	varchar(4)
 			);
 			
 			CREATE SEQUENCE wawi.seq_kostenstelle_kostenstelle_id
@@ -1663,7 +1664,7 @@ $tabellen=array(
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
-	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","budget","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","budget","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
