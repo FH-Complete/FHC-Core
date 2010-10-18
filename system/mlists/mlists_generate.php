@@ -386,7 +386,16 @@ $error_msg='';
 	
 	echo 'Studentenvertreterverteiler werden abgeglichen!<BR>';
 	flush();
-	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE gruppe_kurzbz LIKE '%_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND (SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)=tbl_gruppe.studiengang_kz) AND tbl_gruppe.studiengang_kz!='0'";
+	$sql_query="SELECT gruppe_kurzbz, uid 
+				FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+				WHERE gruppe_kurzbz LIKE '%_STDV' 
+				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+								WHERE funktion_kurzbz='stdv' AND tbl_benutzer.aktiv AND
+								(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now()) 
+								AND (SELECT studiengang_kz FROM public.tbl_studiengang 
+									WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)=tbl_gruppe.studiengang_kz) 
+								AND tbl_gruppe.studiengang_kz!='0'";
 	if(!($result=$db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
@@ -400,7 +409,19 @@ $error_msg='';
 
 	// Studenten holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND gruppe_kurzbz Like '%_STDV')";
+	$sql_query="SELECT uid, 
+					(SELECT gruppe_kurzbz FROM public.tbl_gruppe 
+					WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
+											WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
+					AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz 
+				FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+				WHERE funktion_kurzbz='stdv' AND tbl_benutzer.aktiv AND 
+				(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+				AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+								WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
+														WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
+								AND gruppe_kurzbz Like '%_STDV')";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
@@ -419,7 +440,13 @@ $error_msg='';
 	//tw_stdv abgleichen
     flush();
     setGeneriert('TW_STDV');
-	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='TW_STDV' AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv')";
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
+				WHERE gruppe_kurzbz='TW_STDV' 
+				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+								WHERE funktion_kurzbz='stdv' AND tbl_benutzer.aktiv AND 
+								(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+								)";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
@@ -433,7 +460,12 @@ $error_msg='';
 	
 	// Studenten holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='stdv' AND uid NOT in(Select uid from public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)= UPPER('TW_STDV'))";
+	$sql_query="SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+				WHERE funktion_kurzbz='stdv' AND tbl_benutzer.aktiv AND
+				(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+				AND uid NOT in(Select uid from public.tbl_benutzergruppe 
+								WHERE UPPER(gruppe_kurzbz)= UPPER('TW_STDV'))";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
