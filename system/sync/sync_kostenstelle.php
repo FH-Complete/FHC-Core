@@ -20,7 +20,7 @@
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
 
-require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/wawi.config.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/mail.class.php');
 require_once('../../include/datum.class.php');
@@ -193,7 +193,11 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					{
 						$update .= $bedingung." WHERE kostenstelle_id =".$row_neu->kostenstelle_id.";";
 						//echo "$update <br>";
-						$db->db_query($update);
+						if($db->db_query($update) != true)
+						{
+							$errormsg.= "Fehler bei Update aufgetreten. ID:$row_neu->kostenstelle_id";
+							$error_count++;
+						}
 					}
 				}
 				else
@@ -210,6 +214,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					//echo "$insert_qry <br>";
 					$insert_count++;
 					if($db->db_query($insert_qry) != true)
+					$errormsg.= "Fehler bei Insert aufgetreten. ID: $row->kostenstelle_id";
 						$error_count++;
 				}
 			}
