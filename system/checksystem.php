@@ -1181,7 +1181,9 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				insertamum timestamp,
 				insertvon varchar(32),
 				ext_id bigint,
-				kostenstelle_nr	varchar(4)
+				kostenstelle_nr	varchar(4),
+				deaktiviertvon varchar(32),
+				deaktiviertamum timestamp
 			);
 			
 			CREATE SEQUENCE wawi.seq_kostenstelle_kostenstelle_id
@@ -1412,6 +1414,8 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			ALTER TABLE wawi.tbl_bestellung_bestellstatus ADD CONSTRAINT fk_bestellung_bestellstatus_benutzer FOREIGN KEY (uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_bestellung_bestellstatus ADD CONSTRAINT fk_bestellung_bestellstatus_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			
+			ALTER TABLE wawi.tbl_bestellung_bestellstatus ALTER COLUMN bestellung_bestellstatus_id SET DEFAULT nextval('wawi.seq_bestellung_bestellstatus_bestellung_bestellstatus_id');
+			
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestellung_bestellstatus TO admin;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO admin;
 			
@@ -1459,14 +1463,22 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				updatevon varchar(32)
 			);
 			
+			CREATE SEQUENCE wawi.seq_aufteilung_default_aufteilung_id
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+			
 			ALTER TABLE wawi.tbl_aufteilung_default ADD CONSTRAINT pk_wawi_aufteilung_default PRIMARY KEY (aufteilung_id);
 			ALTER TABLE wawi.tbl_aufteilung_default ADD CONSTRAINT fk_aufteilung_default_kostenstelle FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE CASCADE ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_aufteilung_default ADD CONSTRAINT fk_aufteilung_default_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE wawi.tbl_aufteilung_default ALTER COLUMN aufteilung_id SET DEFAULT nextval('wawi.seq_aufteilung_default_aufteilung_id');
 			
 			ALTER TABLE wawi.tbl_aufteilung_default ALTER COLUMN kostenstelle_id SET NOT NULL;
 			ALTER TABLE wawi.tbl_aufteilung_default ALTER COLUMN oe_kurzbz SET NOT NULL;
 			
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_aufteilung_default TO admin;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_default_aufteilung_id TO admin;
 			
 			CREATE TABLE wawi.tbl_aufteilung
 			(
@@ -1480,6 +1492,12 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				updatevon varchar(32)
 			);
 			
+			CREATE SEQUENCE wawi.seq_aufteilung_aufteilung_id
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+			
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT pk_wawi_aufteilung PRIMARY KEY (aufteilung_id);
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT fk_aufteilung_bestellung FOREIGN KEY (bestellung_id) REFERENCES wawi.tbl_bestellung (bestellung_id) ON DELETE CASCADE ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT fk_aufteilung_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -1487,7 +1505,10 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			ALTER TABLE wawi.tbl_aufteilung ALTER COLUMN bestellung_id SET NOT NULL;
 			ALTER TABLE wawi.tbl_aufteilung ALTER COLUMN oe_kurzbz SET NOT NULL;
 			
+			ALTER TABLE wawi.tbl_aufteilung ALTER COLUMN aufteilung_id SET DEFAULT nextval('wawi.seq_aufteilung_aufteilung_id');
+			
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_aufteilung TO admin;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO admin;
 			
 			-- Freigabegrenze
 			ALTER TABLE public.tbl_organisationseinheit ADD COLUMN freigabegrenze numeric(12,2);
@@ -1495,6 +1516,44 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			-- Berechtigung
 			ALTER TABLE system.tbl_benutzerrolle ADD COLUMN kostenstelle_id bigint;
 			ALTER TABLE system.tbl_benutzerrolle ADD CONSTRAINT fk_bentuzerrolle_kostenstelle FOREIGN KEY(kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE CASCADE ON UPDATE CASCADE;
+			
+			-- Berechtigung fuer User wawi
+			
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_aufteilung_default TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_aufteilung TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_kostenstelle TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_konto TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestellung TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestelldetail TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestellung_bestellstatus TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestellstatus TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_konto_kostenstelle TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestelldetailtag TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestellungtag TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_tag TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_projekt_bestellung TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnungstyp TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnung TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnungsbetrag TO wawi;
+			GRANT SELECT ON public.tbl_organisationseinheit TO wawi;
+			GRANT SELECT ON public.tbl_benutzer TO wawi;
+			GRANT SELECT ON public.tbl_person TO wawi;
+			GRANT SELECT ON public.tbl_standort TO wawi;
+			GRANT SELECT ON public.tbl_adresse TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_firma TO wawi;
+			GRANT SELECT ON system.tbl_benutzerrolle TO wawi;
+			
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_rechnungsbetrag_rechnungsbetrag_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_rechnung_rechnung_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_kostenstelle_kostenstelle_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_konto_konto_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestellung_bestellung_id TO admin;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestelldetail_bestelldetail_id TO admin;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
+			
+			
 	";
 	
 	if(!$db->db_query($qry))
@@ -1664,7 +1723,7 @@ $tabellen=array(
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
-	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","budget","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr"),
+	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","budget","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
