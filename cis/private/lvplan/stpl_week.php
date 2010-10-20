@@ -151,6 +151,8 @@ if(strlen($grp)>2)
 	die('Gruppe ist ungueltig');
 if(isset($datum) && !is_numeric($datum))
 	die('Datum ist ungueltig');
+if(!check_ort($ort_kurzbz))
+	die('Ort ist ungueltig');
 
 $berechtigung=new benutzerberechtigung();
 $berechtigung->getBerechtigungen($uid);
