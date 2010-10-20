@@ -48,14 +48,18 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 				*,
 				cbenutzer.username as cusername,
 				lbenutzer.username as lusername,
+				dbenutzer.username as dusername,
 				kostenstelle.lupdate as lkostenupdate,
 				kostenstelle.cdate as ckostendate,
 				kostenstelle.bezeichnung as kostenbezeichnung,
-				kostenstelle.kurzzeichen as kostenkurzzeichen
+				kostenstelle.kurzzeichen as kostenkurzzeichen,
+				kostenstelle.duser as deleteuser,
+				kostenstelle.ddate as deletedate
 			FROM
 				public.kostenstelle 
 				LEFT JOIN public.benutzer cbenutzer ON (cuser=user_id)
 				LEFT JOIN public.benutzer lbenutzer ON (kostenstelle.luser=lbenutzer.user_id)
+				LEFT JOIN public.benutzer dbenutzer ON (kostenstelle.duser=dbenutzer.user_id)
 				LEFT JOIN public.studiengang stud ON (kostenstelle.studiengang_id=stud.studiengang_id)
 			;';
 	
@@ -184,6 +188,40 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							$update_count++;
 						}
 						
+						if($date->formatDatum($row_neu->deaktiviertamum, 'Y-m-d H:i:s') != $date->formatDatum($row->deletedate, 'Y-m-d H:i:s'))
+						{
+							if($bedingung!='')
+								$bedingung.=',';
+							$bedingung .= " deaktiviertamum=".$db->addslashes($row->deletedate);
+							$updated_lines .= "deaktiviertamum von: \"".$row_neu->deaktiviertamum."\" auf: \"".$row->deletedate."\"\n";
+							
+							$update_count++;
+						}
+						
+						if($row_neu->deaktiviertvon != $row->dusername)
+						{
+							if($bedingung!='')
+								$bedingung.=',';
+							$bedingung .= " deaktiviertvon=".$db->addslashes($row->dusername);
+							$updated_lines .= "deaktiviertvon von: \"".$row_neu->deaktiviertvon."\" auf: \"".$row->dusername."\"\n";
+							
+							if(($row->dusername) != '')
+							{
+								// wenn dusername  gesetzt ist, aktiv auf false setzen
+								$bedingung.= ", aktiv = false";
+								$updated_lines .= "aktiv = false \n";
+								$update_count++;
+							}
+							else 
+							{
+								$bedingung.=", aktiv = true";
+								$updated_lines .= "aktiv = true \n";
+								$update_count++;
+							}
+
+							$update_count++;
+						}
+												
 						if($updated_lines != '')
 							$ausgabe .= "ID ".$row_neu->kostenstelle_id.": ".$updated_lines."\n \n";
 							$updated_lines ='';
@@ -192,7 +230,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					if ($bedingung !='')
 					{
 						$update .= $bedingung." WHERE kostenstelle_id =".$row_neu->kostenstelle_id.";";
-						//echo "$update <br>";
+						echo "$update <br>";
 						if($db->db_query($update) != true)
 						{
 							$errormsg.= "Fehler bei Update aufgetreten. ID:$row_neu->kostenstelle_id";
@@ -202,20 +240,29 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 				}
 				else
 				{
+					$aktiv = 'true';
+					if(isset($row->dusername))
+						$aktiv = 'false';
+						
 					// Insert neuen Eintrag	
 					$insert_qry = 	"INSERT INTO 
 									wawi.tbl_kostenstelle
-									(kostenstelle_id, oe_kurzbz, bezeichnung, kurzbz, aktiv, budget, updateamum, updatevon, insertamum, insertvon, ext_id, kostenstelle_nr) 
+									(kostenstelle_id, oe_kurzbz, bezeichnung, kurzbz, aktiv, budget, updateamum, updatevon, insertamum, insertvon, ext_id, kostenstelle_nr, deaktiviertvon, deaktiviertamum) 
 									VALUES (
 									".$db->addslashes($row->kostenstelle_id).",".$db->addslashes($row->oe_kurzbz).",".$db->addslashes($row->kostenbezeichnung).",
-									".$db->addslashes($row->kostenkurzzeichen).", true, ".$db->addslashes($row->budget).",".$db->addslashes($row->lkostenupdate).",
+									".$db->addslashes($row->kostenkurzzeichen).", $aktiv, ".$db->addslashes($row->budget).",".$db->addslashes($row->lkostenupdate).",
 									".$db->addslashes($row->lusername).",".$db->addslashes($row->ckostendate).",".$db->addslashes($row->cusername).",
-									".$db->addslashes($row->kostenstelle_id).",".$db->addslashes($row->kostenstelle_nr).");";
+									".$db->addslashes($row->kostenstelle_id).",".$db->addslashes($row->kostenstelle_nr).",
+									".$db->addslashes($row->dusername).",".$db->addslashes($row->deletedate).");";
 					//echo "$insert_qry <br>";
 					$insert_count++;
 					if($db->db_query($insert_qry) != true)
-					$errormsg.= "Fehler bei Insert aufgetreten. ID: $row->kostenstelle_id";
+					{
+						$errormsg.= "Fehler bei Insert aufgetreten. ID: $row->kostenstelle_id";
 						$error_count++;
+						$insert_count--;
+					}
+						
 				}
 			}
 		}
@@ -239,10 +286,17 @@ if ($insert_count >0)
 			$db->db_query($set_qry);
 		}
 		else 
-		$error_count++;
+		{
+			$error_count++;
+			$errormsg.= "Fehler bei Select setval aufgetreten ";
+		}
 	}
 	else 
-	$error_count++;
+	{
+		$error_count++;
+		$errormsg.= "Fehler bei Select MAX aufgetreten";
+	}
+
 }
 
 $msg = "
