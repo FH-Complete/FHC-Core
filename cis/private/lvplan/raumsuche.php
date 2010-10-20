@@ -29,7 +29,7 @@ $datum = (isset($_POST['datum'])?$_POST['datum']:date('d.m.Y'));
 $vonzeit = (isset($_POST['vonzeit'])?$_POST['vonzeit']:date('H:i'));
 $biszeit = (isset($_POST['biszeit'])?$_POST['biszeit']:date('H:i', mktime(date('H')+1,date('i'))));
 $raumtyp = (isset($_POST['raumtyp'])?$_POST['raumtyp']:'');
-$anzahlpersonen = (isset($_POST['anzahlpersonen'])?$_POST['anzahlpersonen']:'');
+$anzahlpersonen = (isset($_POST['anzahlpersonen'])?$_POST['anzahlpersonen']:'0');
 $sent = true; //isset($_POST['sent']);
 $datum_obj = new datum();
 
@@ -152,14 +152,14 @@ if($sent)
 		else 
 		{
 			echo '<br><table>';
-			echo '<tr class="liste"><th>Raum</th><th>Bezeichnung</th><td>Nummer</th><th>Personen</th><th>Aktion</th></tr>';
+			echo '<tr class="liste"><th>Raum</th><th>Bezeichnung</th><th>Nummer</th><th>Personen</th><th>Aktion</th></tr>';
 			$i=0;
 			$datum_sec = $datum_obj->mktime_datum($datum)-1;
 			foreach ($ort->result as $row)
 			{
 				$i++;
 				echo '<tr class="liste'.($i%2).'">';
-				echo "<td>$row->ort_kurzbz</td>";
+				echo '<td><a href="'.RAUMINFO_PATH.$row->ort_kurzbz.'.html" class="Item" title="Rauminfo anzeigen">'.$row->ort_kurzbz.'</td>';
 				echo "<td>$row->bezeichnung</td>";
 				echo "<td>$row->planbezeichnung</td>";
 				echo "<td>$row->max_person</td>";
