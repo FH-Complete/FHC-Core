@@ -1315,7 +1315,10 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				insertamum timestamp,
 				insertvon varchar(32),
 				updateamum timestamp,
-				updatevon varchar(32)
+				updatevon varchar(32),
+				freigegeben boolean NOT NULL,
+				freigegebenamum timestamp,
+				freigegebenvon varchar(32)
 			);
 			
 			CREATE SEQUENCE wawi.seq_rechnung_rechnung_id
@@ -1553,7 +1556,11 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
 			
+			-- INDEX
 			
+			CREATE INDEX idx_bestelldetail_bestellung_id ON wawi.tbl_bestelldetail (bestellung_id);
+			CREATE INDEX idx_bestellung_kostenstelle_id ON wawi.tbl_bestellung (kostenstelle_id);
+			CREATE INDEX idx_bestellung_freigegeben ON wawi.tbl_bestellung (freigegeben);
 	";
 	
 	if(!$db->db_query($qry))
@@ -1732,7 +1739,7 @@ $tabellen=array(
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),
 	"wawi.tbl_rechnungstyp"  => array("rechnungstyp_kurzbz","beschreibung"),
-	"wawi.tbl_rechnung"  => array("rechnung_id","bestellung_id","buchungsdatum","rechnungsnr","rechnungsdatum","transfer_datum","buchungstext","insertamum","insertvon","updateamum","updatevon","rechnungstyp_kurzbz"),
+	"wawi.tbl_rechnung"  => array("rechnung_id","bestellung_id","buchungsdatum","rechnungsnr","rechnungsdatum","transfer_datum","buchungstext","insertamum","insertvon","updateamum","updatevon","rechnungstyp_kurzbz","freigegeben","freigegebenvon","freigegebenamum"),
 	"wawi.tbl_rechnungsbetrag"  => array("rechnungsbetrag_id","rechnung_id","mwst","betrag","bezeichnung"),
 	"wawi.tbl_aufteilung"  => array("aufteilung_id","bestellung_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_aufteilung_default"  => array("aufteilung_id","kostenstelle_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
