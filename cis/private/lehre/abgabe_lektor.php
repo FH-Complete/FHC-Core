@@ -42,6 +42,7 @@
 	$getuid=get_uid();
 	$htmlstr = "";
 
+	$showall=isset($_GET['showall']);
 	
 	$sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
@@ -54,8 +55,7 @@
 			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
 				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
 				AND public.tbl_benutzer.uid='$getuid')
-			AND public.tbl_benutzer.aktiv 
-			AND lehre.tbl_projektarbeit.note IS NULL 
+			AND public.tbl_benutzer.aktiv ".($showall?'':' AND lehre.tbl_projektarbeit.note IS NULL ')."
 			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' 
 				OR betreuerart_kurzbz='Zweitbegutachter' OR betreuerart_kurzbz='Erstbetreuer') 
 			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
@@ -69,7 +69,7 @@ else
 {
 	//$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>";
 	$htmlstr .= "<form name='multitermin' action='abgabe_lektor_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
-	$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+	$htmlstr .= "<table id='t1' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
 	$htmlstr .= "<th></th><th class='table-sortable:default'>UID / Personenkennz.</th>
 				<th>Email</th>
@@ -84,7 +84,7 @@ else
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
 	{
-		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
+		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
 		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a> / ".$row->matrikelnr."</td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
@@ -123,11 +123,14 @@ function confdel()
 
 <body class="background_main">
 <?php 
-echo "<h2><a href='../../cisdocs/Projektarbeitsabgabe_FHTW_Anleitung_L.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen ($getuid)</h2>";
+echo "<h2>Bachelor-/Diplomarbeitsbetreuungen ($getuid) <div style='float:right'><a href='../../private/info/handbuecher/Projektarbeitsabgabe_FHTW_Anleitung_L.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
 
 
-    echo $htmlstr;
+echo $htmlstr;
+
+echo '<a href="'.$_SERVER['PHP_SELF'].'?showall">alle betreuten Arbeiten anzeigen</a>';
 ?>
+
 
 </body>
 </html>

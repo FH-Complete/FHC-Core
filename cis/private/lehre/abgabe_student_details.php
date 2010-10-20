@@ -25,20 +25,17 @@
  * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
  * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/student.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/mail.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
-	require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/mail.class.php');
-	require_once('../../../include/benutzerberechtigung.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-				
-	//require_once('../../../include/Excel/excel.php');
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
+
 if(!isset($_POST['uid']))
 {
 	$uid = (isset($_GET['uid'])?$_GET['uid']:'-1');
@@ -87,11 +84,65 @@ else
 //$user='if06b172';
 //$user='ti06m114';
 $user = get_uid();
-if($uid=='-1' || $uid!=$user)
+if($uid=='-1')
 {
 	exit;		
-}	
+}
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+	<html>
+	<head>
+		<title>PA-Abgabe</title>
+		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+	</head>
+	<body class="Background_main"  style="background-color:#eeeeee;">';
+if($uid!=$user)
+{
+	$student = new student();
+	if(!$student->load($uid))
+		die('Student ist ungueltig');
 	
+	$stg_obj = new studiengang();
+	if(!$stg_obj->load($student->studiengang_kz))
+		die('Studiengang des Studenten ist ungueltig');
+	
+	//Studentenansicht
+	//Rechte Pruefen
+	$allowed=false;
+	
+	//Berechtigung ueber das Berechtigungssystem
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+
+	if($rechte->isBerechtigt('lehre/abgabetool',$stg_obj->oe_kurzbz, 's'))
+		$allowed=true;
+
+	//oder Lektor mit Betreuung dieses Studenten
+	$qry = "SELECT 1
+			FROM 
+				lehre.tbl_projektarbeit 
+				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
+				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
+			WHERE
+				tbl_projektarbeit.student_uid='".addslashes($uid)."' AND
+				vw_benutzer.uid='".addslashes($user)."';";
+	
+	if($result = $db->db_query($qry))
+	{
+		if($db->db_num_rows($result)>0)
+		{
+			$allowed=true;
+		}
+	}
+	
+	if(!$allowed)
+	{
+		die('Sie haben keine Berechtigung zum Anzeigen der Studentenansicht');
+	}
+}	
 $datum_obj = new datum();
 $error='';
 $neu = (isset($_GET['neu'])?true:false);
@@ -124,7 +175,7 @@ if($command=='add')
 	if(!$error)
 	{	
 		$qry_upd="UPDATE lehre.tbl_projektarbeit SET 
-				seitenanzahl = '".$seitenanzahl."', 
+				seitenanzahl = '".addslashes($seitenanzahl)."', 
 				abgabedatum = now(),
 				sprache = '".addslashes($sprache)."',  
 				kontrollschlagwoerter = '".addslashes($kontrollschlagwoerter)."', 
@@ -132,14 +183,14 @@ if($command=='add')
 				schlagwoerter = '".addslashes($schlagwoerter)."',  
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
-				WHERE projektarbeit_id = '".$projektarbeit_id."'";
+				WHERE projektarbeit_id = '".addslashes($projektarbeit_id)."'";
 		if($result=$db->db_query($qry_upd))
 		{
 			$qry="UPDATE campus.tbl_paabgabe SET
 							abgabedatum = now(),
-							updatevon = '".$user."', 
+							updatevon = '".addslashes($user)."', 
 							updateamum = now() 
-							WHERE paabgabe_id='".$paabgabe_id."'";
+							WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 						$result=$db->db_query($qry);
 			$command="update";
 		}
@@ -165,17 +216,18 @@ if($command=="update" && $error!=true)
 			if($paabgabetyp_kurzbz!='end')
 			{
 				//"normaler" Upload
-				move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
-				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
+				move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
+				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 				{
-					exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'.'"');
+					exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'.'"');
 
 					$qry="UPDATE campus.tbl_paabgabe SET
 						abgabedatum = now(),
-						updatevon = '".$user."', 
+						updatevon = '".addslashes($user)."', 
 						updateamum = now() 
-						WHERE paabgabe_id='".$paabgabe_id."'";
+						WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 					$result=$db->db_query($qry);
+					echo 'Die Datei wurde erfolgreich hochgeladen';
 				} 
 				else 
 				{
@@ -188,9 +240,9 @@ if($command=="update" && $error!=true)
 				$command='add';
 				if(!$error)
 				{
-					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf');
+					move_uploaded_file($_FILES['datei']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf');
 				}
-				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$user.'.pdf'))
+				if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$uid.'.pdf'))
 				{
 					/*$qry="UPDATE campus.tbl_paabgabe SET
 						abgabedatum = now(),
@@ -199,18 +251,7 @@ if($command=="update" && $error!=true)
 						WHERE paabgabe_id='".$paabgabe_id."'";
 					$result=$db->db_query($qry);*/
 
-					echo '
-					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-					<html>
-					<head>
-					<title>PA-Abgabe</title>
-					<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-					<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-					<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-					<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-					</head>
-					<body class="Background_main"  style="background-color:#eeeeee;">
-					<h3>Abgabe Studentenbereich - Zus&auml;tzliche Daten f&uuml;r die Abgabe</h3>';
+					echo '<h3>Abgabe Studentenbereich - Zus&auml;tzliche Daten f&uuml;r die Abgabe</h3>';
 					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
 					$result_zd=@$db->db_query($qry_zd);
 					$row_zd=@$db->db_fetch_object($result_zd);
@@ -334,18 +375,7 @@ if($uid==-1||$projektarbeit_id==-1||$titel==-1)
 
 if($command!="add")
 {
-	echo '
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-	<html>
-	<head>
-	<title>PA-Abgabe</title>
-	<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-	</head>
-	<body class="Background_main"  style="background-color:#eeeeee;">
-	<h3>Abgabe Studentenbereich</h3>';
+	echo '<h3>Abgabe Studentenbereich</h3>';
 
 	//Einlesen der Termine
 	$qry="";	
