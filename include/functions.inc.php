@@ -58,6 +58,18 @@ function check_stsem($stsem)
 	return preg_match('/^[WS][S][0-9]{4}$/', $stsem);	
 }
 
+/**
+ * Prueft ob die ort_kurzbz ein gueltiges Format hat
+ * @param $ort_kurzbz Kurzbezeichnung eines Ortes
+ */
+function check_ort($ort_kurzbz)
+{
+	if(preg_match('/^[A-Za-z0-9_.\-]{0,16}$/', $ort_kurzbz)) 
+		return true;
+	else
+		return false;
+}
+
 function check_lektor($uid)
 {
 	$db = new basis_db();
