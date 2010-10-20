@@ -336,7 +336,7 @@ else
 {
 	$htmlstr .= "<td>&nbsp;</td></tr>";
 }
-$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br>";
+$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>Studentenansicht</a></td>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "<br><b>Abgabetermine:</b>\n";

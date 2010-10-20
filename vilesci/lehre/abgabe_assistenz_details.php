@@ -26,8 +26,14 @@
  * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
-//echo Test($_REQUEST);
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/mail.class.php');
+
 if(isset($_GET['id']) && isset($_GET['uid']) && isset($_GET['pdfread']))
 {
 	//PDF-Ausgabe vom Aufruf Zeile 689
@@ -36,29 +42,15 @@ if(isset($_GET['id']) && isset($_GET['uid']) && isset($_GET['pdfread']))
 	
 	$file = $_GET['id'].'_'.$_GET['uid'].'.pdf';
 	$filename = PAABGABE_PATH.$file;
-	//if ($pdf=@readfile($filename))
-	//{
-		header('Content-Type: application/octet-stream');
-		header('Content-disposition: attachment; filename="'.$file.'"');
-		echo readfile($filename);
-		exit(); //Keine weitere Verarbeitung
-	//}
-	//else
-	//{
-	//	exit("Datei $filename konnte nicht gelesen werden!");
-	//} 
+
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$file.'"');
+	echo readfile($filename);
+	exit(); 
 }
 
-	require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
-require_once('../../include/functions.inc.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/datum.class.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/datum.class.php');
-require_once('../../include/mail.class.php');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 $fachbereich_kurzbz='';
 $fixtermin=false;
 
@@ -148,17 +140,17 @@ echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<title>Abgabe Assistenz Details</title>
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="Javascript">
-	function confdel()
-	{
-		return confirm("Wollen Sie diesen Eintrag wirklich loeschen");
-	}
-</script>
+	<title>Abgabe Assistenz Details</title>
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<script language="Javascript">
+		function confdel()
+		{
+			return confirm("Wollen Sie diesen Eintrag wirklich loeschen");
+		}
+	</script>
 </head>
 <body class="Background_main"  style="background-color:#eeeeee;">
 <h3>Abgabe Assistenzbereich</h3>';
@@ -611,7 +603,7 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
-$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td></tr>";
+$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td><td align='right'><a href='".CIS_ROOT."cis/private/lehre/abgabe_student_frameset.php?uid=$uid' target='_blank'>Studentenansicht</a></td></tr>";
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br></td>";
 //$htmlstr .= "<td align='right'><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;&nbsp;</td>";
 $htmlstr .= "</tr>\n";
@@ -775,72 +767,5 @@ $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
 
-	echo $htmlstr;
-	
-function Test($arr=constLeer,$lfd=0,$displayShow=true,$onlyRoot=false )
-
-{
-
-    $tmpArrayString='';
-
-    if (!is_array($arr) && !is_object($arr)) return $arr;
-
-    if (is_array($arr) && count($arr)<1 && $displayShow) return '';
-
-    if (is_array($arr) && count($arr)<1 && $displayShow) return "<br><b>function Test (???)</b><br>";
-
-  
-
-    $lfdnr=$lfd + 1;
-
-    $tmpAnzeigeStufe='';
-
-    for ($i=1;$i<$lfdnr;$i++) $tmpAnzeigeStufe.="=";
-
-    $tmpAnzeigeStufe.="=>";
-
-        while (list( $tmp_key, $tmp_value ) = each($arr) )
-        {
-
-        if (!$onlyRoot && (is_array($tmp_value) || is_object($tmp_value)) && count($tmp_value) >0)
-
-        {
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key</b>".Test($tmp_value,$lfdnr);
-
-        } else if ( (is_array($tmp_value) || is_object($tmp_value)) )
-
-        {
-                  $tmpArrayString.="<br>$tmpAnzeigeStufe <b>$tmp_key -- 0 Records</b>";
-
-                } else if ($tmp_value!='')
-
-                {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe $tmp_key :== ".$tmp_value;
-
-                } else {
-
-                   $tmpArrayString.="<br>$tmpAnzeigeStufe $tmp_key :-- (is Empty :: $tmp_value)";
-
-                } 
-
-    }
-
-     if ($lfd!='') { return $tmpArrayString; }
-
-     if (!$displayShow) { return $tmpArrayString; }
-
-      
-
-    $tmpArrayString.="<br>";
-
-    $tmpArrayString="<br><hr><br>******* START *******<br>".$tmpArrayString."<br>******* ENDE *******<br><hr><br>";
-
-    $tmpArrayString.="<br>Server:: ".$_SERVER['PHP_SELF']."<br>";
-
-    return "$tmpArrayString";
-
-}
-
-//===========================================================================================  
+echo $htmlstr;  
 ?>

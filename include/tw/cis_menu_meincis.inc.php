@@ -134,7 +134,7 @@
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 				    <td class="tdwrap">
-				    	<a href="lehre/abgabe_student_frameset.html" class="Item" target="content">
+				    	<a href="lehre/abgabe_student_frameset.php" class="Item" target="content">
 				    		<img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Bachelor- und Diplomarbeitsabgabe
 				    	</a>
 				    </td>

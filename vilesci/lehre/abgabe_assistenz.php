@@ -26,40 +26,53 @@
  * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
  * 			            für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/variable.class.php');
 
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/datum.class.php');
-	require_once('../../include/person.class.php');
-	require_once('../../include/benutzer.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/mitarbeiter.class.php');
-	require_once('../../include/variable.class.php');
-
-	if (!$getuid = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+			
+if (!$getuid = get_uid())
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 				
-	$htmlstr = "";
-	$erstbegutachter='';
-	$zweitbegutachter='';
-	$fachbereich_kurzbz='';
-	//$p2id='';
+$htmlstr = "";
+$erstbegutachter='';
+$zweitbegutachter='';
+$fachbereich_kurzbz='';
+//$p2id='';
 
-	$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
-	if(!is_numeric($stg_kz) && $stg_kz!='')
-		die('Bitte vor dem Aufruf Studiengang ausw&auml;hlen!');
-	$stgbez='';
-	
-	$trenner='';
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($getuid);
+$stg_kz=(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
+if(!is_numeric($stg_kz) && $stg_kz!='')
+	die('Bitte vor dem Aufruf Studiengang ausw&auml;hlen!');
+$stgbez='';
+
+$trenner='';
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
 	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
+function showFarbcodes()
+{
+ 	$farbcodes = '';
+
+	$farbcodes.= "<table>";
+	$farbcodes.="<tr><td style=\"background-color:#FFFFFF; width:35px;\"></td><td style=\"padding-left:5px;\">Termin noch mehr als 12 Tage entfernt</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#FFFF00;\"></td><td style=\"padding-left:5px;\">Termin innerhalb der nächsten 12 Tage</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#FF0000;\"></td><td style=\"padding-left:5px;\">Termin überschritten / keine Abgabe</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#00FF00;\"></td><td style=\"padding-left:5px;\">abgegeben</tr>";
+	$farbcodes.="<tr><td style=\"background-color:#EA7B7B;\"></td><td style=\"padding-left:5px;\">Abgabe nach Termin</tr>";
+	$farbcodes.="</table>";
+	return $farbcodes; 
+}
+ 
 $trenner = new variable();
 $trenner->loadVariables($getuid);
 	
@@ -85,7 +98,7 @@ else
 {
 	//$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>";
 	$htmlstr .= "<form name='multitermin' action='abgabe_assistenz_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
-	$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
+	$htmlstr .= "<table id='t1' class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
 	$htmlstr .= "<th></th><th class='table-sortable:default'>UID</th>
 				<th>Email</th>
@@ -169,7 +182,7 @@ else
 									
 			}
 		}
-		$htmlstr .= "   <tr class='liste".($i%2)."'>\n";
+		$htmlstr .= "   <tr >\n";//class='liste".($i%2)."'
 		$htmlstr .= "		<td><input type='checkbox' id='mc_".$row->projektarbeit_id."' name='mc_".$row->projektarbeit_id."' ></td>";
 		//Anzeige 
 		$qry_end="SELECT * FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz='end' AND projektarbeit_id='$row->projektarbeit_id' ORDER BY datum DESC";
@@ -263,10 +276,12 @@ else
 	$htmlstr .= "</tbody></table>\n";
 	$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
 	$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
+	$htmlstr .= "<table width='100%'><tr><td>";
 	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren  </td></tr><tr><td>&nbsp;</td></tr><tr>\n";
 	$htmlstr .= "<td rowspan=2><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td>";
 	$htmlstr .= "<td rowspan=2><input type='button' name='stmail' value='E-Mail Studierende' title='E-Mail an mehrere Studierende schicken' onclick='stserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td>";
 	$htmlstr .= "<td rowspan=2><input type='button' name='btmail' value='E-Mail Begutachter(innen)' title='E-Mail an mehrere Begutachter(innen) schicken' onclick='btserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
+	$htmlstr .="</td><td align='right'>".showFarbcodes().'</td></tr></table>';
 	$htmlstr .= "</form>";
 	
 
@@ -386,26 +401,9 @@ function btserienmail(trenner, stgbez)
 
 <body class="background_main">
 <?php 
-echo "<h2><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</h2>";
+echo "<h2><div style='float:left'>Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cis/private/info/handbuecher/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
 
-
-    echo $htmlstr;
-    
-    echo showFarbcodes(); 
-    
- function showFarbcodes()
- {
- 	$farbcodes = '';
-
-	$farbcodes.= "<table>";
-	$farbcodes.="<tr><td style=\"background-color:#FFFFFF; width:35px;\"></td><td style=\"padding-left:5px;\">Termin noch mehr als 12 Tage entfernt</tr>";
-	$farbcodes.="<tr><td style=\"background-color:#FFFF00;\"></td><td style=\"padding-left:5px;\">Termin innerhalb der nächsten 12 Tage</tr>";
-	$farbcodes.="<tr><td style=\"background-color:#FF0000;\"></td><td style=\"padding-left:5px;\">Termin überschritten / keine Abgabe</tr>";
-	$farbcodes.="<tr><td style=\"background-color:#00FF00;\"></td><td style=\"padding-left:5px;\">abgegeben</tr>";
-	$farbcodes.="<tr><td style=\"background-color:#EA7B7B;\"></td><td style=\"padding-left:5px;\">Abgabe nach Termin</tr>";
-	$farbcodes.="</table>";
-	return $farbcodes; 
- }
+echo $htmlstr;
 ?>
 
 </body>
