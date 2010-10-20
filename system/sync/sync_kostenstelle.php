@@ -262,7 +262,6 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						$error_count++;
 						$insert_count--;
 					}
-						
 				}
 			}
 		}
@@ -296,7 +295,6 @@ if ($insert_count >0)
 		$error_count++;
 		$errormsg.= "Fehler bei Select MAX aufgetreten";
 	}
-
 }
 
 $msg = "
