@@ -764,7 +764,7 @@
 		
 		
 		<!-- Hauptmenue Rektor -->
-		 
+		 <!--
 		<tr>
           <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Rektorat</a></td>
   		</tr>
@@ -781,8 +781,8 @@
 			</tr>
 
 			</table>
-		</td>
-		<!--
+		</td>-->
+		
 		<tr>
           <td class="tdwrap"><a href="public/rektorat.html" class="MenuItem" target="content" onClick="js_toggle_container('Infos');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Rektorat</a></td>
   		</tr>
@@ -813,9 +813,13 @@
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a href="public/factsnfigures.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Facts &amp; Figures</a></td>
 			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="cisdocs/Institutionelle_Evaluierung.PPT" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Institutionelle Evaluierung</a></td>
+			</tr>
 			</table>
 		</td>
-		</tr>-->
+		</tr>
   		
   			<tr>
 				<td class="tdwrap"><a href="public/kollegium.html" class="MenuItem" onClick="js_toggle_container('Kollegium');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Fachhochschulkollegium</a></td>
