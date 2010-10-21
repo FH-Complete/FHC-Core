@@ -117,6 +117,10 @@ if(isset($_GET['all']))
 	$params.='&all='.$_GET['all'];
 if(isset($_GET["lvid"]))
 	$params.='&lvid='.$_GET["lvid"];
+if(isset($_GET['version']) && is_numeric($_GET['version']))
+	$version = $_GET['version'];
+else 
+	$version ='';
 
 if($xsl=='AccountInfo')
 {
@@ -183,7 +187,10 @@ if(!$xml_doc->load($xml_url))
 $qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0";
 if($xsl_stg_kz!='')
 $qry.=" OR studiengang_kz='".addslashes($xsl_stg_kz)."'";
-$qry.=") AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
+$qry.=") AND vorlage_kurzbz='$xsl'";
+if(isset($version) && $version!='')
+	$qry.=" AND version='$version'"; 
+$qry.=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
 //echo $qry;
 if(!$result = $db->db_query($qry))
 	die('Fehler beim Laden der Vorlage'.$db->db_last_error());
