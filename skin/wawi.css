@@ -3,6 +3,7 @@ A:link {text-decoration: none;
 	color: blue;
 
 	}
+		
 A:visited {text-decoration: none;
 	   color: blue;
 	   }
@@ -20,6 +21,10 @@ A.neutral:visited {text-decoration: underline;
 A.neutral:active {text-decoration: underline;
 	  color: black;
 	 }
+	 A img{text-decoration: none;
+	border:none;
+	
+	}
 
 B       {
 	font-family: Verdana,Lucida,Helvetica,Arial;
@@ -199,3 +204,22 @@ ul {list-style-type:none}
 ul.disc {list-style-type:disc}
 
 .frmField {background: #dedede;}
+
+table.tablesorter tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #EEEEEE;
+	vertical-align: top;
+}
+table.tablesorter tbody tr.odd td {
+	background-color:lightgray;
+}
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background:#E1DD00;
+    background:#DCE4EF;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 4px;
+
+
