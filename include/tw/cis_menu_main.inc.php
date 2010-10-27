@@ -73,6 +73,10 @@
 				  			<td class="tdwrap"></td>
 							<td><a href="private/info/oeh/index2010herbst.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Herbstwahlen 2010</a></td>
 				  		</tr>
+				  		<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/bewerber.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Kandidatur</a></td>
+				  		</tr>
 				  	</table>
 				 </tr>
 
