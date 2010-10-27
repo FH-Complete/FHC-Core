@@ -369,7 +369,7 @@ else
 		{
 			//Zeilen der Tabelle ausgeben
 			echo '<tr>';
-			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&id=$row->konto_id\"> <img src=\"edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&id=$row->konto_id\" onclick='return conf_del()'> <img src=\"close.gif\"></a>";
+			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&id=$row->konto_id\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&id=$row->konto_id\" onclick='return conf_del()'> <img src=\"../skin/images/delete.gif\"></a>";
 			echo '<td>'.$row->kontonr.'</td>';
 			echo '<td>'.$row->kurzbz.'</td>';
 			echo '<td>'.$row->beschreibung[1].'</td>';
