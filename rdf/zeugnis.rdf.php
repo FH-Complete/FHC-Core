@@ -258,7 +258,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					if($studiengang_typ=='b')
 						$typ = 'Bachelorarbeit:';
 					else 
-						$typ = 'Diplomarbeit:';
+						$typ = 'Master Thesis:';
 						
 					$nl='';
 					$nl2='';
