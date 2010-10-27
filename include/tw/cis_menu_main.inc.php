@@ -795,11 +795,19 @@
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="public/factsnfigures.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Facts &amp; Figures</a></td>
+			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap"><a href="cisdocs/Institutionelle_Evaluierung.PPT" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Institutionelle Evaluierung</a></td>
+			</tr>
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
 				<td class="tdwrap"><a href="public/frauenbeauftragte.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Frauen an der FHTW</a></td>
 			</tr>
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="public/stipendien.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Stipendien &amp; Awards</a></td>
+				<td class="tdwrap"><a href="public/hochschulprojekte.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Hochschulprojekte</a></td>
 			</tr>			
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -807,16 +815,8 @@
 			</tr>			
 			<tr>
 			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="public/hochschulprojekte.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Hochschulprojekte</a></td>
+				<td class="tdwrap"><a href="public/stipendien.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Stipendien &amp; Awards</a></td>
 			</tr>			
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="public/factsnfigures.html" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Facts &amp; Figures</a></td>
-			</tr>
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap"><a href="cisdocs/Institutionelle_Evaluierung.PPT" class="Item" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Institutionelle Evaluierung</a></td>
-			</tr>
 			</table>
 		</td>
 		</tr>
