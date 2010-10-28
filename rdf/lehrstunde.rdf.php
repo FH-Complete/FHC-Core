@@ -223,6 +223,7 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:studiengang><?php echo $ls->studiengang  ?></LEHRSTUNDE:studiengang>
 				<LEHRSTUNDE:farbe><?php echo $ls->farbe  ?></LEHRSTUNDE:farbe>
 				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
+				<LEHRSTUNDE:anmerkung_lehreinheit><![CDATA[<?php echo $ls->anmerkung_lehreinheit;  ?>]]></LEHRSTUNDE:anmerkung_lehreinheit>
 				<LEHRSTUNDE:titel><![CDATA[<?php echo $ls->titel;  ?>]]></LEHRSTUNDE:titel>
 				<LEHRSTUNDE:anzahlstudenten><![CDATA[<?php echo $anzahl;  ?>]]></LEHRSTUNDE:anzahlstudenten>
 				<LEHRSTUNDE:gruppe_bezeichnung><![CDATA[<?php echo $gruppenbezeichnung;  ?>]]></LEHRSTUNDE:gruppe_bezeichnung>
