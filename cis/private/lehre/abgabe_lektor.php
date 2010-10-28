@@ -125,10 +125,10 @@ function confdel()
 <?php 
 echo "<h2>Bachelor-/Diplomarbeitsbetreuungen ($getuid) <div style='float:right'><a href='../../private/info/handbuecher/Projektarbeitsabgabe_FHTW_Anleitung_L.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
 
-
 echo $htmlstr;
 
-echo '<a href="'.$_SERVER['PHP_SELF'].'?showall">alle betreuten Arbeiten anzeigen</a>';
+echo '<a href="'.$_SERVER['PHP_SELF'].'?showall">- alle betreuten Arbeiten anzeigen</a><br />';
+echo '<a href="abgabe_lektor_terminuebersicht.php" target="_blank">- Terminübersicht anzeigen</a>';
 ?>
 
 
