@@ -1598,6 +1598,66 @@ if(!@$db->db_query("SELECT index FROM public.tbl_sprache LIMIT 1;"))
 		echo 'public.tbl_sprache: Spalte index hinzugefuegt<br>';
 }
 
+//Spalte anmerkung_lehreinheit fuer lehre.vw_stundenplan und vw_stundenplandev hinzugefuegt
+if(!@$db->db_query("SELECT anmerkung_lehreinheit FROM lehre.vw_stundenplan LIMIT 1;"))
+{
+	$qry = "
+	CREATE OR REPLACE VIEW lehre.vw_stundenplan AS
+		SELECT 
+			tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, 
+			tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, 
+			tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, 
+			tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, 
+			tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, 
+			tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, 
+			tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, 
+			tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, 
+			tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, 
+			tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, 
+			tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, 
+			tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, 
+			tbl_stundenplan.insertvon, tbl_lehreinheit.anmerkung as anmerkung_lehreinheit
+   		FROM lehre.tbl_stundenplan
+   		JOIN public.tbl_studiengang USING (studiengang_kz)
+   		JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+   		JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+   		JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+
+   	CREATE OR REPLACE VIEW lehre.vw_stundenplandev AS
+		SELECT 
+			tbl_stundenplandev.stundenplandev_id, tbl_stundenplandev.unr, 
+			tbl_stundenplandev.mitarbeiter_uid AS uid, tbl_stundenplandev.lehreinheit_id, 
+			tbl_lehreinheit.lehrfach_id, tbl_stundenplandev.datum, tbl_stundenplandev.stunde, 
+			tbl_stundenplandev.ort_kurzbz, tbl_stundenplandev.studiengang_kz, 
+			tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, 
+			tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.titel, tbl_stundenplandev.anmerkung, 
+			tbl_stundenplandev.fix, tbl_lehreinheit.lehrveranstaltung_id, 
+			tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, 
+			tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, 
+			tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, 
+			tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, 
+			tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, 
+			tbl_stundenplandev.updateamum, tbl_stundenplandev.updatevon, tbl_stundenplandev.insertamum, 
+			tbl_stundenplandev.insertvon, tbl_lehreinheit.anmerkung as anmerkung_lehreinheit
+		FROM lehre.tbl_stundenplandev
+		JOIN public.tbl_studiengang USING (studiengang_kz)
+		JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+		JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+		JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+		
+	GRANT SELECT ON lehre.vw_stundenplan TO web;
+	GRANT SELECT ON lehre.vw_stundenplan TO admin;
+	GRANT SELECT ON lehre.vw_stundenplandev TO web;
+	GRANT SELECT ON lehre.vw_stundenplandev TO admin;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.vw_stundenplan (dev): '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'lehre.vw_stundenplan(dev): Spalte anmerkung_lehreinheit hinzugefuegt<br>';
+}
+
+
 echo '<br>';
 
 $tabellen=array(

@@ -412,6 +412,7 @@ class lehrstunde extends basis_db
 			$stunde->gruppe_kurzbz=$row->gruppe_kurzbz;
 			$stunde->titel=$row->titel;
 			$stunde->anmerkung=$row->anmerkung;
+			$stunde->anmerkung_lehreinheit=$row->anmerkung_lehreinheit;
 			$stunde->updateamum=$row->updateamum;
 			$stunde->updatevon=$row->updatevon;
 			$stunde->reservierung=false;
@@ -460,6 +461,7 @@ class lehrstunde extends basis_db
 				$stunde->gruppe_kurzbz=$row->gruppe_kurzbz;
 				$stunde->titel=$row->titel;
 				$stunde->anmerkung=$row->beschreibung;
+				$stunde->anmerkung_lehreinheit=$row->beschreibung;
 				$stunde->farbe='';
 				$this->lehrstunden[]=$stunde;
 			}

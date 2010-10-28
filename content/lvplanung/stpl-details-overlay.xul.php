@@ -128,6 +128,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung"  />
 			<splitter class="tree-splitter"/>
+			<treecol id="stpl-details-overlay-lehrstunde-anmerkung_lehreinheit" label="AnmerkungLE" flex="2" hidden="false"
+				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung_lehreinheit"  />
+			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-titel" label="Titel" flex="2" hidden="false"
 				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#titel"  />
@@ -168,6 +172,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anzahlstudenten" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung" />
+							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung_lehreinheit" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#titel" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_bezeichnung" />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_beschreibung" />
