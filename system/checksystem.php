@@ -1556,6 +1556,20 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
 			
+			GRANT USAGE ON SCHEMA wawi TO wawi;
+			GRANT USAGE ON SCHEMA system TO wawi;
+			
+			GRANT SELECT ON system.tbl_berechtigung TO wawi;
+			GRANT SELECT ON system.tbl_rolle TO wawi;
+			GRANT SELECT ON system.tbl_benutzerrolle TO wawi;
+			GRANT SELECT ON system.tbl_rolleberechtigung TO wawi;
+			GRANT SELECT ON public.tbl_benutzerfunktion TO wawi;
+			GRANT SELECT ON public.tbl_student TO wawi;
+			GRANT SELECT ON public.tbl_person TO wawi;
+			GRANT SELECT ON public.tbl_benutzer TO wawi;
+			GRANT SELECT ON public.tbl_mitarbeiter TO wawi;
+			GRANT SELECT ON public.tbl_sprache TO wawi;
+			
 			-- INDEX
 			
 			CREATE INDEX idx_bestelldetail_bestellung_id ON wawi.tbl_bestelldetail (bestellung_id);
@@ -1567,6 +1581,21 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 		echo '<strong>WaWi: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'WaWi: Tabellen fuer Warenwirtschaft hinzugefuegt<br>';
+}
+
+//Spalte index fuer tbl_sprache hinzugefuegt
+if(!@$db->db_query("SELECT index FROM public.tbl_sprache LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_sprache ADD COLUMN index smallint;
+	UPDATE public.tbl_sprache SET index=1 WHERE sprache='German';
+	UPDATE public.tbl_sprache SET index=2 WHERE sprache='English';
+	UPDATE public.tbl_sprache SET index=3 WHERE sprache='Espanol';
+	UPDATE public.tbl_sprache SET index=4 WHERE sprache='Ungarisch';";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_sprache: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_sprache: Spalte index hinzugefuegt<br>';
 }
 
 echo '<br>';
@@ -1695,7 +1724,7 @@ $tabellen=array(
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_sprache"  => array("sprache","locale","flagge"),
+	"public.tbl_sprache"  => array("sprache","locale","flagge","index"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
