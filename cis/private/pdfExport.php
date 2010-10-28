@@ -25,20 +25,19 @@
  * Hilfe der XSL-FO Vorlage aus der DB und generiert
  * daraus ein PDF (xslfo2pdf)
  */
-	require_once('../../config/cis.config.inc.php');
-  require_once('../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
+require_once('../../include/benutzer.class.php');
 
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+      
 $user = get_uid();
 loadVariables($user);
-
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -84,10 +83,27 @@ if(isset($_GET['typ']))
 $konto = new konto();
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 {
-		
 	if($xsl=='Inskription' && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
 		die('Der Studienbeitrag wurde noch nicht bezahlt');		
 	
+	if(isset($_GET['buchungsnummern']))
+	{
+		//Beim Drucken von Buchungsbestaetigungen pruefen ob diese Buchungen auch zu diesem Benutzer gehoeren
+		$buchungsnr = explode(';',$_GET['buchungsnummern']);
+		$user_obj = new benutzer();
+		$user_obj->load($user);
+		foreach($buchungsnr as $bnr)
+		{
+			if($bnr!='')
+			{
+				$konto->load($bnr);
+				if($konto->person_id!=$user_obj->person_id)
+					die('Sie haben keine Berechtigung fuer diese Buchung');
+				if($konto->getDifferenz($bnr)!=0)
+					die('Diese Zahlung wurde noch nicht beglichen');
+			}
+		}
+	}
 	$xml_url=XML_ROOT.$xml.$params;
 	//echo $xml_url;
 	// Load the XML source
@@ -107,7 +123,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	
 	// Load the XSL source
 	$xsl_doc = new DOMDocument;
-	//if(!$xsl_doc->load('../../../../xsl/collection.xsl'))
+	
 	if(!$xsl_doc->loadXML($row->text))
 		die('unable to load xsl');
 	
@@ -118,8 +134,6 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	$buffer = $proc->transformToXml($xml_doc);
 	//in $buffer steht nun das xsl-fo file mit den daten
 	$buffer = '<?xml version="1.0" encoding="utf-8" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
-	//$buffer = html_entity_decode($buffer);
-	//echo "buffer: $buffer";
 	
 	//Pdf erstellen
 	$fo2pdf = new XslFo2Pdf();
@@ -143,72 +157,9 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	}
 	$filename=$xsl.$nachname;
 	
-	if (!isset($_REQUEST["archive"]))
+	if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
 	{
-		if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
-		{
-		 echo('Failed to generate PDF');
-		}
-	}
-	else
-	{
-	
-		$filename = $user;
-		if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
-		{
-			echo('Failed to generate PDF');
-		}
-		$file = "/tmp/".$filename.".pdf";
-		$handle = fopen($file, "rb");
-		$string = fread($handle, filesize($file));
-		fclose($handle);
-		unlink($file);
-	
-		$hex="";
-		for ($i=0;$i<strlen($string);$i++)
-			$hex.=(strlen(dechex(ord($string[$i])))<2)? "0".dechex(ord($string[$i])): dechex(ord($string[$i]));
-	
-	
-		$uid = $_REQUEST["uid"];
-		$ss = $_REQUEST["ss"];
-		$heute = date('Y-m-d');
-		$query = "SELECT tbl_studentlehrverband.semester, tbl_studiengang.typ, tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, tbl_studentlehrverband, tbl_studiengang where tbl_studentlehrverband.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_studentlehrverband.student_uid = '".$uid."' and tbl_studentlehrverband.studiensemester_kurzbz = '".$ss."'";
-	
-		if($result = $db->db_query($query))
-		{
-			if($row = $db->db_fetch_object($result))
-			{
-				$person_id = $row->person_id;
-				$titel = "Zeugnis_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$row->semester;
-				$bezeichnung = "Zeugnis ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$row->semester.". Semester";
-			}
-			else
-			{
-				$echo = 'Datensatz wurde nicht gefunden';
-	
-			}
-		}
-	
-		$akte = new akte();
-		$akte->person_id = $person_id;
-	  	$akte->dokument_kurzbz = "Zeugnis";
-	  	$akte->inhalt = $hex;
-	  	$akte->mimetype = "application/octet-stream";
-	  	$akte->erstelltam = $heute;
-	  	$akte->gedruckt = true;
-	  	$akte->titel = $titel.".pdf";
-	  	$akte->bezeichnung = $bezeichnung;
-	  	$akte->updateamum = "";
-	  	$akte->updatevon = "";
-		$akte->insertamum = date('Y-m-d h:m:s');
-		$akte->insertvon = $user;
-	  	$akte->ext_id = "";
-	  	$akte->uid = $_REQUEST["uid"];
-		$akte->new = true;
-		if (!$akte->save('new'))
-			return true;
-		else
-			return false;
+		echo('Failed to generate PDF');
 	}
 }
 else
