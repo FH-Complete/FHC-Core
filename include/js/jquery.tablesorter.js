@@ -237,6 +237,12 @@
 						t = $(node).text();
 					}	
 				}
+				t=t.replace('ö','o');
+				t=t.replace('Ö','O');
+				t=t.replace('ü','u');
+				t=t.replace('Ü','U');
+				t=t.replace('ä','a');
+				t=t.replace('Ä','A');
 				return t;
 			}
 			
