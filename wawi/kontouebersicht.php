@@ -31,7 +31,7 @@ require_once('../include/benutzerberechtigung.class.php');
 <html>
 <head>
 	<title>WaWi Konten</title>	
-	<link rel="stylesheet" href="../skin/style.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
@@ -45,7 +45,6 @@ require_once('../include/benutzerberechtigung.class.php');
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[1,0]],
-					widthFixed: true, 
 					widgets: ['zebra']
 				}); 
 			} 
@@ -53,7 +52,7 @@ require_once('../include/benutzerberechtigung.class.php');
 
 		function conf_del()
 		{
-			return confirm('Diese Gruppe wirklich löschen?');
+			return confirm('Dieses Konto wirklich löschen?');
 		}
 			
 		</script>
