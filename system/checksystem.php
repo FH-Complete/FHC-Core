@@ -1657,6 +1657,37 @@ if(!@$db->db_query("SELECT anmerkung_lehreinheit FROM lehre.vw_stundenplan LIMIT
 		echo 'lehre.vw_stundenplan(dev): Spalte anmerkung_lehreinheit hinzugefuegt<br>';
 }
 
+// Index hinzufuegen
+if($result = $db->db_query("Select count(*) as anzahl FROM pg_class WHERE relname ='idx_student_studiengang_kz'"))
+{
+	if(!$row = $db->db_fetch_object($result))
+	{
+		if($row->anzahl==0)
+		{
+			$qry = "CREATE INDEX idx_student_studiengang_kz ON public.tbl_student (studiengang_kz);";
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_student: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo ' public.tbl_student: Index auf studiengang_kz angelegt!<br>';
+		}
+	}
+}
+
+// Index hinzufuegen
+if($result = $db->db_query("Select count(*) as anzahl FROM pg_class WHERE relname ='idx_gruppe_studiengang_kz'"))
+{
+	if(!$row = $db->db_fetch_object($result))
+	{
+		if($row->anzahl==0)
+		{
+			$qry = "CREATE INDEX idx_gruppe_studiengang_kz ON public.tbl_gruppe (studiengang_kz);";
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo ' public.tbl_gruppe: Index auf studiengang_kz angelegt!<br>';
+		}
+	}
+}
 
 echo '<br>';
 
