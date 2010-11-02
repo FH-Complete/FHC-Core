@@ -352,9 +352,11 @@ else
 {
 	// Anzeige aller Konten
 	if($konto->getAll(null, 'kontonr' ))
-	{
+	{	
+		echo '<a href="kontouebersicht.php?method=update">neues Konto anlegen </a><br>';
+		echo '<a href="kontouebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
+		
 		echo '<table id="myTable" class="tablesorter"> <thead>';
-	
 		echo '<tr>
 				<th></th>
 				<th>Kontonummer</th>
@@ -368,7 +370,7 @@ else
 		{
 			//Zeilen der Tabelle ausgeben
 			echo '<tr>';
-			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&id=$row->konto_id\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&id=$row->konto_id\" onclick='return conf_del()'> <img src=\"../skin/images/delete.gif\"></a>";
+			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&id=$row->konto_id\" title='Bearbeiten'> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&id=$row->konto_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
 			echo '<td>'.$row->kontonr.'</td>';
 			echo '<td>'.$row->kurzbz.'</td>';
 			echo '<td>'.$row->beschreibung[1].'</td>';
@@ -379,8 +381,6 @@ else
 			
 		}
 		echo '</tbody></table>';
-		echo '<a href="kontouebersicht.php?method=update">neues Konto anlegen </a><br>';
-		echo '<a href="kontouebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
 		echo '<a href="logout.php">abmelden</a><br>';
 
 	}
