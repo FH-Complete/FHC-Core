@@ -137,19 +137,19 @@ if(isset($_GET['method']))
 				echo '<table border=0>';
 				echo '<tr>';
 				echo '<td>Kontonummer</td>';
-		 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kontonummer\" value=\"\"></td>";
+		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kontonummer\" value=\"\"></td>";
 		 	 	echo '</tr>';
 		 	 	echo '<tr>';
 		 	 	echo "<td>Beschreibung Deutsch</td>";
-		 	 	echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung_d\" value=\"\"></td>";
+		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"256\" name=\"beschreibung_d\" value=\"\"></td>";
 		 	 	echo "</tr>";
 		 	 	echo '<tr>';
 		 	 	echo "<td>Beschreibung Englisch</td>";
-		 	 	echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung_e\" value=\"\"></td>";
+		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"256\" name=\"beschreibung_e\" value=\"\"></td>";
 		 	 	echo "</tr>";
 		 	 	echo '<tr>';
 		 	 	echo "<td>Kurzbezeichnung</td>";
-		 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kurzbezeichnung\" value=\"\"></td>";
+		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>";
 		 	 	echo "</tr>";
 		 	 	echo "<tr><td>&nbsp;</td><tr>"; 	 	
 		  		echo '<tr>';
@@ -207,7 +207,7 @@ if(isset($_GET['method']))
 		//Konto löschen
 		if(!$rechte->isBerechtigt('wawi/konto',null,'suid'))
 			die('Keine Berechtigung für Löschen');
-		$id = $_GET['id'];
+		$id = (isset($_GET['id'])?$_GET['id']:null);
 		if($konto->delete($id)==true)
 		{
 			echo "Datensatz erfolgreich gelöscht!";
@@ -373,6 +373,7 @@ else
 			echo '<td>'.$row->kurzbz.'</td>';
 			echo '<td>'.$row->beschreibung[1].'</td>';
 			echo '<td>'.$row->beschreibung[2].'</td>';
+			
 			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
 			echo '</tr>';
 			
