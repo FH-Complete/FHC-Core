@@ -557,7 +557,7 @@ while ($begin<=$ende)
 {
 	$stdplan->init_stdplan();
 	$datum=$begin;
-	$begin+=604800;	// eine Woche
+	$begin=strtotime("+1 week",$begin);
 
 	// Zeitwuensche laden falls benoetigt
 	$zeitwunsch=null;
