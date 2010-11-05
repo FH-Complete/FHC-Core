@@ -23,6 +23,7 @@
  * Klasse WaWi Konto
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class wawi_konto extends basis_db
 {
@@ -41,14 +42,20 @@ class wawi_konto extends basis_db
 	public $updateamum;         	//  timestamp
 	public $updatevon;				//  string
 	
+	public $sprache; 
+	public $spracheAnzahl; 
+	
+	
 	/**
 	 * Konstruktor
 	 * @param $konto_id ID des Kontos das geladen werden soll (Default=null)
 	 */
 	public function __construct($konto_id=null)
 	{
+		$this->sprache = new sprache(); 
+		$this->spracheAnzahl = $this->sprache->getAnzahl(); 
 		parent::__construct();
-		
+
 		if(!is_null($konto_id))
 			$this->load($konto_id);
 	}
@@ -66,10 +73,21 @@ class wawi_konto extends basis_db
 			$this->errormsg = 'Konto_id muss eine Zahl sein';
 			return false;
 		}
-
+		
+		$qry_beschreibung = '';
+		
+		for($i=1; $i<=$this->spracheAnzahl; $i++)
+		{
+			$qry_beschreibung .= " beschreibung[".$i."] as beschreibung".$i." ";
+			if($i != $this->spracheAnzahl)
+			{
+				$qry_beschreibung .= ",";
+			} 
+		}
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT *, beschreibung[1] as beschreibung_ger, beschreibung[2] as beschreibung_eng FROM wawi.tbl_konto WHERE konto_id='".addslashes($konto_id)."'";
+		$qry = "SELECT *, $qry_beschreibung FROM wawi.tbl_konto WHERE konto_id='".addslashes($konto_id)."'";
 
+		
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -80,8 +98,12 @@ class wawi_konto extends basis_db
 		{
 			$this->konto_id	= $row->konto_id;
 			$this->kontonr = $row->kontonr;
-			$this->beschreibung[1] = $row->beschreibung_ger;
-			$this->beschreibung[2] = $row->beschreibung_eng;
+			
+			for ($i=1; $i<=$this->spracheAnzahl; $i++)
+			{
+				$this->beschreibung[$i] = $row->{'beschreibung'.$i}; 		
+			}
+
 			$this->kurzbz = $row->kurzbz;
 			$this->aktiv = ($row->aktiv=='t'?true:false);
 			$this->insertamum = $row->insertamum;
@@ -107,7 +129,19 @@ class wawi_konto extends basis_db
 	public function getAll($aktiv=null, $order='beschreibung DESC')
 	{
 		//Daten aus der Datenbank lesen
-		$qry = 'SELECT *, beschreibung[1] as beschreibung_ger, beschreibung[2] as beschreibung_eng  FROM wawi.tbl_konto';
+		
+		$qry_beschreibung = '';
+		
+		for($i=1; $i<=$this->spracheAnzahl; $i++)
+		{
+			$qry_beschreibung .= " beschreibung[".$i."] as beschreibung".$i." ";
+			if($i != $this->spracheAnzahl)
+			{
+				$qry_beschreibung .= ",";
+			} 
+		}
+
+		$qry = "SELECT *, $qry_beschreibung FROM wawi.tbl_konto";
 		if(!is_null($aktiv))
 		{
 			$qry.=' WHERE aktiv='.($aktiv?'true':'false');
@@ -128,8 +162,10 @@ class wawi_konto extends basis_db
 			
 			$obj->konto_id = $row->konto_id;
 			$obj->kontonr = $row->kontonr;
-			$obj->beschreibung[1] = $row->beschreibung_ger;
-			$obj->beschreibung[2] = $row->beschreibung_eng;
+			for ($i=1; $i<=$this->spracheAnzahl; $i++)
+			{
+				$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 	
+			}
 			$obj->kurzbz = $row->kurzbz;
 			$obj->aktiv = ($row->aktiv=='t'?true:false);
 			$obj->insertamum = $row->insertamum;
@@ -154,16 +190,14 @@ class wawi_konto extends basis_db
 			$this->errormsg = 'Kontonummer darf nicht laenger als 32 Zeichen sein.';
 		}
 		
-		if(mb_strlen($this->beschreibung[1])>256)
-		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 256 Zeichen sein.';
-			return false;
-		}
 		
-		if(mb_strlen($this->beschreibung[2])>256)
+		for($i=1; $i<=$this->spracheAnzahl; $i++)
 		{
-			$this->errormsg = 'Bezeichnung darf nicht laenger als 256 Zeichen sein.';
-			return false;
+			if(mb_strlen($this->beschreibung[$i])>256)
+			{
+				$this->errormsg = 'Bezeichnung darf nicht laenger als 256 Zeichen sein.';
+				return false;
+			}
 		}
 		
 		if(mb_strlen($this->kurzbz)>32)
@@ -201,11 +235,23 @@ class wawi_konto extends basis_db
 
 		if($this->new)
 		{
+			$qry_beschreibung ='';
+			
+			for($i=1; $i<=$this->spracheAnzahl; $i++)
+			{
+				$qry_beschreibung .=$this->addslashes($this->beschreibung[$i]);
+				if($i != $this->spracheAnzahl)
+				{
+					$qry_beschreibung .= ',';
+				}
+			}
+		
+			
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO wawi.tbl_konto (kontonr, beschreibung, kurzbz, aktiv, insertamum, 
 			insertvon, updateamum, updatevon) VALUES('.
 			      $this->addslashes($this->kontonr).', '.
-			      "ARRAY[".$this->addslashes($this->beschreibung[1]).", ".$this->addslashes($this->beschreibung[2])."] ,".
+			      "ARRAY[$qry_beschreibung],".
 			      $this->addslashes($this->kurzbz).', '.
 			      ($this->aktiv?'true':'false').', '.
 			      $this->addslashes($this->insertamum).', '.
@@ -221,10 +267,18 @@ class wawi_konto extends basis_db
 				$this->errormsg = 'konto_id muss eine gültige Zahl sein: '.$this->konto_id."\n";
 				return false;
 			}
+			
+			$qry_beschreibung = '';
+			
+			for($i=1; $i<=$this->spracheAnzahl; $i++)
+			{
+				$qry_beschreibung .= " beschreibung[$i]=".$this->addslashes($this->beschreibung[$i]).','; 
+			}
+			
+			
 			$qry='UPDATE wawi.tbl_konto SET'.
 				' kontonr='.$this->addslashes($this->kontonr).', '.
-				' beschreibung[1]='.$this->addslashes($this->beschreibung[1]).', '.
-				' beschreibung[2]='.$this->addslashes($this->beschreibung[2]).', '.
+				$qry_beschreibung.
 				' kurzbz='.$this->addslashes($this->kurzbz).', '.
 		      	' aktiv='.($this->aktiv?'true':'false').', '.
 				' insertamum='.$this->addslashes($this->insertamum).', '.
@@ -307,8 +361,17 @@ class wawi_konto extends basis_db
 	 */
 	public function getKonto($filter, $order='konto_id')
 	{
+		$qry_beschreibung = '';	
+		for($i=1; $i<=$this->spracheAnzahl; $i++)
+		{	
+			$qry_beschreibung .= " beschreibung[".$i."] as beschreibung".$i." ";
+			if($i != $this->spracheAnzahl)
+			{
+				$qry_beschreibung .= ",";
+			} 
+		}		
 		$sql_query = "SELECT 
-						*, beschreibung[1] as beschreibung_ger, beschreibung[2] as beschreibung_eng
+						*, $qry_beschreibung
 					  FROM 
 					  	wawi.tbl_konto"; 
 		
@@ -333,8 +396,10 @@ class wawi_konto extends basis_db
 				
 				$obj->konto_id = $row->konto_id; 
 				$obj->kontonr = $row->kontonr;
-				$obj->beschreibung[1] = $row->beschreibung_ger;
-				$obj->beschreibung[2] = $row->beschreibung_eng;
+				for ($i=1; $i<=$this->spracheAnzahl; $i++)
+				{
+					$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 	
+				}
 				$obj->kurzbz = $row->kurzbz;
 				$obj->aktiv = ($row->aktiv=='t'?true:false);
 				$obj->insertamum = $row->insertamum;
@@ -362,28 +427,27 @@ class wawi_konto extends basis_db
 	 */
 	public function zusammenlegen($id1, $id2)
 	{
-	
-				$msg='';
-				$sql_query_upd1="BEGIN;";
-				$sql_query_upd1.="UPDATE wawi.tbl_bestellung SET konto_id='$id2' WHERE konto_id='$id1'; ";
-				$sql_query_upd1.="UPDATE wawi.tbl_konto_kostenstelle SET konto_id='$id2' WHERE konto_id='$id1'; ";
+		$msg='';
+		$sql_query_upd1="BEGIN;";
+		$sql_query_upd1.="UPDATE wawi.tbl_bestellung SET konto_id='$id2' WHERE konto_id='$id1'; ";
+		$sql_query_upd1.="UPDATE wawi.tbl_konto_kostenstelle SET konto_id='$id2' WHERE konto_id='$id1'; ";
+
+		$sql_query_upd1.="DELETE FROM wawi.tbl_konto WHERE konto_id='$id1';";
 		
-				$sql_query_upd1.="DELETE FROM wawi.tbl_konto WHERE konto_id='$id1';";
-				
-				if($this->db_query($sql_query_upd1))
-				{
-					$this->db_query("COMMIT;");
-					return true;
-				}
-				else
-				{
-					$this->db_query("ROLLBACK;");
-					$this->errormsg = "fehler beim Update aufgetreten";
-					return false;
-				}
-				$id1=0;
-				$id2=0;
-			}		
+		if($this->db_query($sql_query_upd1))
+		{
+			$this->db_query("COMMIT;");
+			return true;
+		}
+		else
+		{
+			$this->db_query("ROLLBACK;");
+			$this->errormsg = "fehler beim Update aufgetreten";
+			return false;
+		}
+		$id1=0;
+		$id2=0;
+	}		
 	
 }
 ?>
