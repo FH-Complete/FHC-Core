@@ -33,7 +33,7 @@ require_once('../include/benutzerberechtigung.class.php');
 <html>
 <head>
 	<title>WaWi Kostenstellen</title>	
-	<link rel="stylesheet" href="../skin/style.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
@@ -297,8 +297,10 @@ if(isset($_GET['method']))
 
 		if(isset($_POST['submit']))
 		{
+			//alle übergebenen POST Formular Daten
 			$keys = array_keys($_POST);
 			$active = array(); 
+			$message = 'erfolgreich aktualisiert.<br><br>';
 			foreach($keys as $key)
 			{
 				if(strstr($key,'checkbox_'))
@@ -308,13 +310,14 @@ if(isset($_GET['method']))
 					$active[] = $konto_id; 
 					if(!$kostenstelle->check_konto_kostenstelle($kostenstelle_id, $konto_id))
 					{
-						$kostenstelle->save_konto_kostenstelle($kostenstelle_id, $konto_id);
-						
-					}
+						if(!$kostenstelle->save_konto_kostenstelle($kostenstelle_id, $konto_id))
+							$message = 'Es ist ein Fehler beim Speichern aufgetreten.<br><br>';					}
 				}
 			}
-			$kostenstelle->delete_konto_kostenstelle($kostenstelle_id, $active);
-			echo "erfolgreich aktualisiert!"; 
+			if(!$kostenstelle->delete_konto_kostenstelle($kostenstelle_id, $active))
+				$message = 'Es ist ein Fehler beim Speichern aufgetreten <br><br>';
+			
+			echo $message; 
 		}
 		
 		//sucht nach allen Kontos der Kostenstelle und markiert diese
@@ -466,6 +469,9 @@ else
 			
 	if($kostenstelle->getAll())
 	{
+		echo '<a href="kostenstellenuebersicht.php?method=update">neue Kostenstelle anlegen </a><br>';
+		echo '<a href="kostenstellenuebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
+		
 		echo '<table id="myTable" class="tablesorter"> <thead>';
 		
 		echo '<tr>
@@ -483,7 +489,7 @@ else
 		{
 			//Zeilen der Tabelle ausgeben
 			echo '<tr>';
-			echo "<td nowrap> <a href=\"kostenstellenuebersicht.php?method=allocate&id=$row->kostenstelle_id\"><img src=\"../skin/images/addKonto.png\"></a> <a href= \"kostenstellenuebersicht.php?method=update&id=$row->kostenstelle_id\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kostenstellenuebersicht.php?method=delete&id=$row->kostenstelle_id\" onclick='return conf_del()'> <img src=\"../skin/images/delete.gif\"></a>";
+			echo "<td nowrap> <a href=\"kostenstellenuebersicht.php?method=allocate&id=$row->kostenstelle_id\" title=\"Konten zuordnen\"><img src=\"../skin/images/addKonto.png\"></a> <a href= \"kostenstellenuebersicht.php?method=update&id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kostenstellenuebersicht.php?method=delete&id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
 			echo '<td>'.$row->kostenstelle_id.'</td>';
 			echo '<td>'.$row->kostenstelle_nr.'</td>';
 			echo '<td>'.$row->bezeichnung.'</td>';
@@ -495,9 +501,7 @@ else
 			
 		}
 		echo '</tbody></table>';
-		echo '<a href="kostenstellenuebersicht.php?method=update">neue Kostenstelle anlegen </a><br>';
-		echo '<a href="kostenstellenuebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
-		//echo '<a href="logout.php">abmelden</a><br>';
+		echo '<a href="logout.php">abmelden</a><br>';
 	
 	}
 }
