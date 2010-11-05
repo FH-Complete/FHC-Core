@@ -49,8 +49,9 @@ class sprache extends basis_db
 
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $sprache
+	 * Lädt die Sprache der 
+	 * @param $sprache die geladen werden soll
+	 * @return true bei Erfolg, false wenn ein Fehler aufgetreten ist
 	 */
 	public function load($sprache)
 	{
@@ -73,7 +74,8 @@ class sprache extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Lädt alle verfügbaren Sprachen
+	 * @return true bei Erfolg, false wenn ein Fehler aufgetreten ist. 
 	 */
 	public function getAll()
 	{
@@ -100,8 +102,8 @@ class sprache extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $sprache
+	 * Löscht die übergebene Sprache
+	 * @param $sprache die gelöscht werden soll
 	 */
 	public function delete($sprache)
 	{
@@ -118,12 +120,13 @@ class sprache extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Liefert die Anzahl aller aktiven Sprachen zurück
+	 * @return $anzahl der Sprachen, false im Fehlerfall
 	 */
 	public function getAnzahl()
 	{
 		$anzahl = 0; 
-		$qry = 'SELECT count(sprache) as anzahl FROM public.tbl_sprache and content = true;';
+		$qry = 'SELECT count(sprache) as anzahl FROM public.tbl_sprache WHERE content = true;';
 		
 		if(!$this->db_query($qry))
 		{
@@ -136,13 +139,14 @@ class sprache extends basis_db
 			$anzahl = $row->anzahl; 
 		}
 		
-		return anzahl; 
+		return $anzahl; 
 	}
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $index
+	 * Liefert die Sprache eines Index zurück
+	 * @param $index der Sprache die gesucht wird
+	 * @return $sprache, false im Fehlerfall
 	 */
 	public function getSpracheFromIndex($index)
 	{
@@ -159,6 +163,6 @@ class sprache extends basis_db
 		{
 			$sprache = $row->sprache; 
 		}
-		return sprache; 
+		return $sprache; 
 	}
 }
