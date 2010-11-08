@@ -162,7 +162,7 @@ if(isset($_GET['method']))
 			$oe = new organisationseinheit(); 
 			$oe->getAll(); 
 			$oeinheiten= $oe->result; 
-			
+
 			echo "<form action=\"kostenstellenuebersicht.php?method=save\" method=\"post\">";
 			echo '<table border=0>';
 			echo '<tr>';
@@ -171,6 +171,7 @@ if(isset($_GET['method']))
 
 			foreach ($oeinheiten as $oei)
 			{
+				
 				$selected='';
 		
 				if($oei->aktiv)
