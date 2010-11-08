@@ -70,7 +70,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $sprache = new sprache(); 
-$spracheAnzahl = $sprache->getAnzahl(); 
+$sprache->getAll(); 
 
 if(!$rechte->isBerechtigt('wawi/konto'))
 	die('Keine Berechtigung');
@@ -86,10 +86,8 @@ if(isset($_GET['method']))
 		{
 			//Update Konto
 			$id = $_GET['id'];
-			
 			if($konto->load($id))
 			{
-				
 				$checked ='';
 				if($konto->aktiv)	
 				{
@@ -102,13 +100,18 @@ if(isset($_GET['method']))
 				echo '<td>Kontonummer</td>';
 		 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kontonummer\" value=\"$konto->kontonr\"></td>";
 		 	 	echo '</tr>';
-				for($i = 1; $i<=$spracheAnzahl; $i++)
-				{	
-					$headline = $sprache->getSpracheFromIndex($i);
-		 	 		echo '<tr>';
-		 	 		echo "<td>$headline</td>";
-		 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"".$konto->beschreibung[$i]."\"></td>";
-		 	 		echo "</tr>";
+		 	 	$i = 1; 
+				foreach($sprache->result as $s)	// Mehrsprachigkeit
+				{  
+					if($s->content == true)
+					{
+						$headline = $sprache->getSpracheFromIndex($i);
+			 	 		echo '<tr>';
+			 	 		echo "<td>$headline</td>";
+			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"".$konto->beschreibung[$i]."\"></td>";
+			 	 		echo "</tr>";
+					}
+					$i++;			
 				}
 		 	 	echo '<tr>';
 		 	 	echo "<td>Kurzbezeichnung</td>";
@@ -136,6 +139,7 @@ if(isset($_GET['method']))
 		{
 				if(!$rechte->isBerechtigt('wawi/konto',null,'sui'))
 				die('Keine Berechtigung für Insert');
+				
 				// neues Konto anlegen
 				echo "<form action=\"kontouebersicht.php?method=save\" method=\"post\">";
 				echo '<table border=0>';
@@ -143,13 +147,18 @@ if(isset($_GET['method']))
 				echo '<td>Kontonummer</td>';
 		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kontonummer\" value=\"\"></td>";
 		 	 	echo '</tr>';
-				for($i = 1; $i<=$spracheAnzahl; $i++)
-				{	
-					$headline = $sprache->getSpracheFromIndex($i);
-		 	 		echo '<tr>';
-		 	 		echo "<td>$headline</td>";
-		 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"\"></td>";
-		 	 		echo "</tr>";
+				$i = 1; 
+				foreach($sprache->result as $s)
+				{  
+					if($s->content == true)
+					{
+						$headline = $sprache->getSpracheFromIndex($i);
+			 	 		echo '<tr>';
+			 	 		echo "<td>$headline</td>";
+			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"\"></td>";
+			 	 		echo "</tr>";
+					}
+					$i++;			
 				}
 		 	 	echo "<td>Kurzbezeichnung</td>";
 		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>";
@@ -167,7 +176,7 @@ if(isset($_GET['method']))
 	{
 		if(!$rechte->isBerechtigt('wawi/konto',null,'sui'))
 		die('Keine Berechtigung für Insert');
-		//Daten in der DB speichern
+		
 		$konto = new wawi_konto();	
 		$aktiv = '';
 		$ausgabe ="Konto wurde erfolgreich upgedated!";
@@ -190,10 +199,15 @@ if(isset($_GET['method']))
 			$ausgabe = "Konto wurde erfolgreich erstellt!";
 		}	
 
-		$konto->kontonr = $_POST['kontonummer'];		
-		for ($i=1; $i<=$spracheAnzahl; $i++)
-		{
-			$konto->beschreibung[$i] = $_POST['beschreibung'.$i]; 		
+		$konto->kontonr = $_POST['kontonummer'];	
+		$i = 1; 
+		foreach($sprache->result as $s)
+		{  
+			if($s->content == true)
+			{
+				$konto->beschreibung[$i] = $_POST['beschreibung'.$i]; 	
+			}
+			$i++;			
 		}
 		$konto->kurzbz = $_POST['kurzbezeichnung'];
 		$konto->updateamum = date('Y-m-d H:i:s');
@@ -204,8 +218,7 @@ if(isset($_GET['method']))
 			die('Fehler beim Speichern:'.$konto->errormsg);
 		}
 		echo $ausgabe;
-		echo "<a href=\"kontouebersicht.php\"> <br>zurück </a>";
-		
+		echo "<a href=\"kontouebersicht.php\"> <br>zurück </a>";		
 	}
 	else if ($_GET['method']=="delete")
 	{
@@ -229,6 +242,7 @@ if(isset($_GET['method']))
 		//Kontos zusammenlegen
 		if(!$rechte->isBerechtigt('wawi/konto',null,'su'))
 			die('Keine Berechtigung für Update');
+			
 		$konto = new wawi_konto();
 		
 		if(isset($_POST['radio_1']) && isset($_POST['radio_2']))
@@ -269,11 +283,12 @@ if(isset($_GET['method']))
 		echo "<td width='45%%'><input name='filter2' type='text' value=\"$filter2\" size=\"64\" maxlength=\"64\" id ='suchen' onfocus=\"this.value='';\"></td>";
 		echo "</tr>";
 		echo "<tr><td>&nbsp;</td></tr>";
-		
 		echo "</form>";
+		
 		echo '<br><a href=kontouebersicht.php>zurueck</a><br>';
-		echo "</table>";
+		echo "</table>";	
 		//Tabellen anzeigen
+	
 		echo "<form name='form_table' action='kontouebersicht.php?method=merge' method='POST'>";
 		echo "<table width='100%' border='0' cellspacing='0' cellpadding='0' id='myTable' class='tablesorter'>";
 		echo "<tr>";	
@@ -284,35 +299,41 @@ if(isset($_GET['method']))
 		echo "<th>Konto ID</th>";
 		echo "<th>Kontonummer</th>";
 		echo "<th>Kurzbezeichnung</th>";
-		for($i = 1; $i<=$spracheAnzahl; $i++)
-			{	
+		$i = 1; 
+		foreach($sprache->result as $s)
+		{  
+			if($s->content == true)
+			{
 				$headline = $sprache->getSpracheFromIndex($i);
-				echo "<th>$headline</th>";
+				echo "<th>$headline</th>";	
 			}
+			$i++;			
+		}			
 		echo "<th>Aktiv</th>";
 		echo "<th>&nbsp;</th></tr></thead><tbody>";	
 	
 		$konto  = new wawi_konto();
 		$konto->getKonto($filter1);
-		$i=0;
-	
 		
 		foreach($konto->result as $row)
 		{
 			//Zeilen der Tabelle ausgeben
 			echo '<tr>';
-			echo "<td>$row->konto_id</td>";
+			echo '<td>'.$row->konto_id.'</td>';
 			echo '<td>'.$row->kontonr.'</td>';
 			echo '<td>'.$row->kurzbz.'</td>';
-			for($i = 1; $i<=$spracheAnzahl; $i++)
-			{	
-				echo '<td>'.$row->beschreibung[$i].'</td>';
+			$i = 1; 
+			foreach($sprache->result as $s)
+			{  
+				if($s->content == true)
+				{
+					echo '<td>'.$row->beschreibung[$i].'</td>';
+				}
+				$i++;			
 			}
 			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
 			echo "<td><input type='radio' name='radio_1' value='$row->konto_id' ";
 			echo '</tr>';
-
-			$i++;
 		}
 		echo "</tbody>";
 		echo "</table>"; 
@@ -321,24 +342,26 @@ if(isset($_GET['method']))
 		echo "<td valign='top'>Der bleibt:";
 		
 		//Tabelle 2
-		//echo "<table ><tr class='liste'>";
 		echo "<table id='myTable' class='tablesorter'><thead> <tr>";
 		echo "<th>&nbsp;</th>";
 		echo "<th>Konto ID</th>";
 		echo "<th>Kontonummer</th>";
 		echo "<th>Kurzbezeichnung</th>";
-		for($i = 1; $i<=$spracheAnzahl; $i++)
-		{	
-			$headline = $sprache->getSpracheFromIndex($i);
-			echo "<th>$headline</th>";
-		}
+		$i = 1; 
+		foreach($sprache->result as $s)
+		{  
+			if($s->content == true)
+			{
+				$headline = $sprache->getSpracheFromIndex($i);
+				echo "<th>$headline</th>";	
+			}
+			$i++;			
+		}	
 		echo "<th>Aktiv</th>";
 		echo "</tr></thead><tbody>";	
 	
-	
 		$konto  = new wawi_konto();
 		$konto->getKonto($filter2);
-		$i=0;
 		foreach($konto->result as $row)
 		{
 			echo '<tr>';
@@ -346,14 +369,17 @@ if(isset($_GET['method']))
 			echo "<td>$row->konto_id</td>";
 			echo '<td>'.$row->kontonr.'</td>';
 			echo '<td>'.$row->kurzbz.'</td>';
-			for($i = 1; $i<=$spracheAnzahl; $i++)
-			{	
-				echo '<td>'.$row->beschreibung[$i].'</td>';
+			$i = 1; 
+			foreach($sprache->result as $s)
+			{  
+				if($s->content == true)
+				{
+					echo '<td>'.$row->beschreibung[$i].'</td>';
+				}
+				$i++;			
 			}
 			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
 			echo '</tr>';
-
-			$i++;
 		}
 		echo "</table>";
 		echo "</td>";
@@ -361,7 +387,6 @@ if(isset($_GET['method']))
 		echo "</table>";
 		echo "</form>";		
 	}
-	
 }
 else 
 {
@@ -376,26 +401,37 @@ else
 				<th></th>
 				<th>Kontonummer</th>
 				<th>Kurzbzeichnung</th>';
-		for($i = 1; $i<=$spracheAnzahl; $i++)
-		{	
-			$headline = $sprache->getSpracheFromIndex($i);
-			echo "<th>$headline</th>";
+		$i = 1; 
+		foreach($sprache->result as $s)
+		{
+			if($s->content == true)
+			{
+				$headline = $sprache->getSpracheFromIndex($i);
+				echo "<th>$headline</th>";
+			}
+			$i++;
 		}
+
 		echo '<th>aktiv</th>
 			  </tr> </thead><tbody>';
 	
 		foreach($konto->result as $row)
 		{
-			//echo $row->beschreibung[1];
 			//Zeilen der Tabelle ausgeben
 			echo '<tr>';
 			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&id=$row->konto_id\" title='Bearbeiten'> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&id=$row->konto_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
 			echo '<td>'.$row->kontonr.'</td>';
 			echo '<td>'.$row->kurzbz.'</td>';
-			for($i = 1; $i<=$spracheAnzahl; $i++)
-			{	
-				echo '<td>'.$row->beschreibung[$i].'</td>';
+			$i = 1; 
+			foreach($sprache->result as $s)
+			{
+				if($s->content == true)
+				{
+					echo '<td>'.$row->beschreibung[$i].'</td>'; 
+				}
+				$i++;
 			}
+				
 			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
 			echo '</tr>';
 			
