@@ -67,7 +67,7 @@ class sprache extends basis_db
 			$this->sprache = $row->sprache; 
 			$this->locale = $row->locale; 
 			$this->index = $row->index; 
-			//$this->content = $row->content; 
+			$this->content = ($row->content=='t'?true:false); 
 		}
 		return true; 		
 	}
@@ -87,17 +87,17 @@ class sprache extends basis_db
 			return false;
 		}
 		
-		if($row = $this->db_fetch_object())
+		while($row = $this->db_fetch_object())
 		{
 			$sprache = new sprache();
 			$sprache->sprache = $row->sprache;
 			$sprache->locale = $row->locale;
 			$sprache->index = $row->index;
-			//$sprache->content = $row->content; 
+			$sprache->content = ($row->content=='t'?true:false); 
 			
 			$this->result[] = $sprache; 
 		}
-		return true; 
+ 			return true; 
 	}
 	
 	/**
