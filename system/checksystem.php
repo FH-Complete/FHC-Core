@@ -1689,6 +1689,20 @@ if($result = $db->db_query("Select count(*) as anzahl FROM pg_class WHERE relnam
 	}
 }
 
+// tbl_sprache spalte content
+if(!@$db->db_query("SELECT content FROM public.tbl_sprache LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_sprache ADD COLUMN content boolean;
+			UPDATE public.tbl_sprache SET content=true WHERE sprache IN('English','German');
+			UPDATE public.tbl_sprache SET content=false WHERE content IS NULL;
+			ALTER TABLE public.tbl_sprache ALTER COLUMN content SET NOT NULL;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_sprache: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_sprache: Spalte content hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -1815,7 +1829,7 @@ $tabellen=array(
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_sprache"  => array("sprache","locale","flagge","index"),
+	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
