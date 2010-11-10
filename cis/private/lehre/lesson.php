@@ -207,7 +207,7 @@ function hideSemPlanHelp(){
 	  {
 	  	while($row = $db->db_fetch_object($result))
 	  	{
-	  		if($rechte->isBerechtigt('lehre',$row->oe_kurzbz) || $rechte->isBerechtigt('assistenz',$stgobj->oe_kurzbz))
+	  		if($rechte->isBerechtigt('lehre',$row->oe_kurzbz) || $rechte->isBerechtigt('assistenz',$stg_obj->oe_kurzbz))
 	  			$user_is_allowed_to_upload=true;
 	  	}
 	  }
