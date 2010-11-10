@@ -213,7 +213,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
-							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung (rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Sem)"
+							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#orgform_kurzbz (rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Sem)"
 										  		  uri="rdf:*"/>
 									</menupopup>
 								</template>
