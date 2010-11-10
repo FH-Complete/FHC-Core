@@ -48,12 +48,15 @@ require_once('../opus/lib/opus.class.php');
 	if(!$db_conn = pg_connect($conn_str))
 		die('Fehler beim Oeffnen der Datenbankverbindung');
 
+mysql_set_charset('utf8',$conn_ext);
+/*
 $qry = "SET CLIENT_ENCODING TO 'WIN1252';";
 			
 if(!pg_query($db_conn,$qry))
 {
 	die('Encoding konnte nicht gesetzt werden');
 }
+*/
 
 $datum_obj = new datum();
 //$jahr='';
@@ -1214,7 +1217,7 @@ if($erg=pg_query($db_conn,$qry))
 		}
 		else 
 		{
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden (sel benutzer)!'."\n".$qry_std);
+			$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden (sel benutzer)!'."\n".$qry_std);
 			$mail->send();
 			die($qry_std);
 		}
@@ -1249,7 +1252,7 @@ if($erg=pg_query($db_conn,$qry))
 		}
 		else 
 		{
-			$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden!'."\n".$qry_bet);
+			$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden!'."\n".$qry_bet);
 			$mail->send($qry_bet);
 			die();
 		}
@@ -1285,7 +1288,7 @@ if($erg=pg_query($db_conn,$qry))
 			}
 			else 
 			{
-				$mail = new mail('ruhan@technikum-wien.at', 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden!'."\n".$qry_bet);
+				$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'abgabe2opus', 'Quelldatenbanken konnten nicht ge&ouml;ffnet werden!'."\n".$qry_bet);
 				$mail->send();
 				die($qry_bet);
 			}
