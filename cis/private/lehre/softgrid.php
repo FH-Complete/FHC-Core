@@ -123,6 +123,7 @@ require_once('../../../config/cis.config.inc.php');
 		// Applikation und Link lesen					
 		$cAPPName=trim((isset($xml['APP'][$i]['NAME'])?$xml['APP'][$i]['NAME']:''));
 		$cAPPLink=trim((isset($xml['APP'][$i]['OSD'])?$xml['APP'][$i]['OSD']:'')); 
+		//echo '<hr>'.$cAPPName.' - '.$cAPPLink.'<br>';
 		
 		if (empty($cAPPName) || empty($cAPPLink))
 		{
@@ -137,17 +138,22 @@ require_once('../../../config/cis.config.inc.php');
 		// SHORTCUTLIST / SHORTCUT lesen
 		$cAPPLocation='';
 		$arrAPPShortcutlist=(array)$xml['APP'][$i];
+
 		if (isset($arrAPPShortcutlist['SHORTCUTLIST']) && is_array($arrAPPShortcutlist) )
 		{
 			// SHORTCUT lesen
 			$arrAPPShortcut=(array)$arrAPPShortcutlist['SHORTCUTLIST'];
+			if(isset($arrAPPShortcut['SHORTCUT']) && !isset($arrAPPShortcut['SHORTCUT']['LOCATION']))
+				$arrAPPShortcut['SHORTCUT']=$arrAPPShortcut['SHORTCUT'][0];
+			//var_dump($arrAPPShortcut);
+			
 			if (isset($arrAPPShortcut['SHORTCUT']) && isset($arrAPPShortcut['SHORTCUT']['LOCATION']) )
 			{
 				// Location - Path zur Anwendung aufsplitten fuer Menue
 				$cAPPLocation=(string)$arrAPPShortcut['SHORTCUT']['LOCATION'];
 				// den APP-Path entfernen aus der Location - wird benoetigt fuer die Softwareunterteilung
 				$cAPPLocation=trim(str_ireplace($cSoftGridApplicationsRoot,'',$cAPPLocation));
-
+				
 				$arrAPPRow['Error']=0; 
 
 				// Softwarunterteilung
@@ -166,9 +172,10 @@ require_once('../../../config/cis.config.inc.php');
 					}
 					$arrAPPRow['SecondLevel']=trim((isset($arrLevel[0])?$arrLevel[0]:'')); 
 					$arrAPPRow['ThirdLevel']=trim((isset($arrLevel[1])?$arrLevel[1]:'')); 
-					$arrAPPRow['FourthLevel']=trim((isset($arrLevel[2])?$arrLevel[2]:'')); 
-				}	
-			}	
+					$arrAPPRow['FourthLevel']=trim((isset($arrLevel[2])?$arrLevel[2]:''));
+					 
+				}
+			}
 		}
 		// Sortkey umwandeln auf Kleinbuchstaben
 		$cSort=strtolower($arrAPPRow['SecondLevel'].$arrAPPRow['ThirdLevel'].$arrAPPRow['FourthLevel'].' '.$i);
