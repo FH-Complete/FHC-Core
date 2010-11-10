@@ -191,18 +191,23 @@ function hideSemPlanHelp(){
 		}
 
 				//Berechtigungen auf Fachbereichsebene
-	  $qry = "SELECT distinct fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz 
-	  		FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
-	  		WHERE lehrveranstaltung_id='$lvid'";
+	  $qry = "SELECT 
+	  			distinct fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz, tbl_fachbereich.oe_kurzbz 
+	  		FROM 
+	  			lehre.tbl_lehrveranstaltung 
+	  			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
+	  			JOIN lehre.tbl_lehrfach USING(lehrfach_id)
+	  			JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
+	  		WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
 
 	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
-	  	$qry .= " AND studiensemester_kurzbz='$angezeigtes_stsem'";
+	  	$qry .= " AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."'";
 
 	  if($result = $db->db_query($qry))
 	  {
 	  	while($row = $db->db_fetch_object($result))
 	  	{
-	  		if($rechte->isBerechtigt('lehre',null,null,$row->fachbereich_kurzbz) || $rechte->isBerechtigt('assistenz',$row->studiengang_kz))
+	  		if($rechte->isBerechtigt('lehre',$row->oe_kurzbz) || $rechte->isBerechtigt('assistenz',$stgobj->oe_kurzbz))
 	  			$user_is_allowed_to_upload=true;
 	  	}
 	  }
