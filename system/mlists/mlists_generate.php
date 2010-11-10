@@ -604,7 +604,170 @@ $error_msg='';
 		}
 	}
 	*/
+	// **************************************************************
+	// Instituts-Verteiler
+	echo '<br>Abgleich der Institutsverteiler<br>';
+	//Externe Mitarbeiter
+	$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE aktiv AND mailverteiler AND organisationseinheittyp_kurzbz='Institut'";
 	
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$mlist_name=strtoupper($row->oe_kurzbz).'_EXT';
+
+			$grp = new gruppe();
+			if(!$grp->exists($mlist_name))
+			{
+				$grp->gruppe_kurzbz = $mlist_name;
+				$grp->studiengang_kz = '0';
+				$grp->bezeichnung = $row->oe_kurzbz;
+				$grp->beschreibung = 'Externe Mitarbeiter des Instituts '.$row->bezeichnung;
+				$grp->semester = '0';
+				$grp->mailgrp = true;
+				$grp->sichtbar = true;
+				$grp->generiert = true;
+				$grp->aktiv = true;
+				$grp->lehre = true;
+				$grp->insertamum = date('Y-m-d H:i:s');
+				$grp->insertvon = 'mlists_generate';
+				
+				if(!$grp->save(true, false))
+					die('Fehler: '.$grp->errormsg);
+			}
+			else 
+			{
+				setGeneriert($mlist_name);
+			}
+			
+			$oe = new organisationseinheit();
+			$childs = $oe->getChilds($row->oe_kurzbz);
+			
+			// Lektoren holen die nicht mehr in den Verteiler gehoeren
+			echo '<br>'.$mlist_name.' wird abgeglichen!';
+			flush();
+			
+			$oes='';
+			foreach ($childs as $oe_kurzbz)
+			{
+				if($oes!='')
+					$oes.=',';
+				
+				$oes .= "'".addslashes($oe_kurzbz)."'";
+			}
+			
+			$sql_query = "SELECT distinct uid 
+						FROM 
+							public.tbl_benutzer 
+							JOIN public.tbl_benutzerfunktion USING(uid)
+							JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
+						WHERE oe_kurzbz in($oes) 
+						AND tbl_benutzer.aktiv AND NOT fixangestellt
+						AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+						AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+			
+			$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name' AND uid NOT IN ($sql_query)";
+			if(!$db->db_query($sql_querys))
+			{
+				$error_msg.=$db->db_last_error().' '.$sql_querys;
+			}
+			
+			$sql_query.=" AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+			if(!($result_oe = $db->db_query($sql_query)))
+				$error_msg.=$db->db_last_error().' '.$sql_query;
+			// Lektoren holen die nicht im Verteiler sind
+
+			while($row_oe = $db->db_fetch_object($result_oe))
+			{
+		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+				if(!$db->db_query($sql_query))
+				{
+					$error_msg.=$db->db_last_error().$sql_query;
+				}
+			}
+		}
+	}
+	
+	//Fixe Mitarbeiter
+	$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE aktiv AND mailverteiler AND organisationseinheittyp_kurzbz='Institut'";
+	
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$mlist_name=strtoupper($row->oe_kurzbz).'_FIX';
+
+			$grp = new gruppe();
+			if(!$grp->exists($mlist_name))
+			{
+				$grp->gruppe_kurzbz = $mlist_name;
+				$grp->studiengang_kz = '0';
+				$grp->bezeichnung = $row->oe_kurzbz;
+				$grp->beschreibung = 'Fixangestellte Mitarbeiter des Instituts '.$row->bezeichnung;
+				$grp->semester = '0';
+				$grp->mailgrp = true;
+				$grp->sichtbar = true;
+				$grp->generiert = true;
+				$grp->aktiv = true;
+				$grp->lehre = true;
+				$grp->insertamum = date('Y-m-d H:i:s');
+				$grp->insertvon = 'mlists_generate';
+				
+				if(!$grp->save(true, false))
+					die('Fehler: '.$grp->errormsg);
+			}
+			else 
+			{
+				setGeneriert($mlist_name);
+			}
+			
+			$oe = new organisationseinheit();
+			$childs = $oe->getChilds($row->oe_kurzbz);
+			
+			// Lektoren holen die nicht mehr in den Verteiler gehoeren
+			echo '<br>'.$mlist_name.' wird abgeglichen!';
+			flush();
+			
+			$oes='';
+			foreach ($childs as $oe_kurzbz)
+			{
+				if($oes!='')
+					$oes.=',';
+				
+				$oes .= "'".addslashes($oe_kurzbz)."'";
+			}
+			
+			$sql_query = "SELECT distinct uid 
+						FROM 
+							public.tbl_benutzer 
+							JOIN public.tbl_benutzerfunktion USING(uid)
+							JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
+						WHERE oe_kurzbz in($oes) 
+						AND tbl_benutzer.aktiv AND fixangestellt
+						AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+						AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+			
+			$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name' AND uid NOT IN ($sql_query)";
+			if(!$db->db_query($sql_querys))
+			{
+				$error_msg.=$db->db_last_error().' '.$sql_querys;
+			}
+			
+			$sql_query.=" AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+			if(!($result_oe = $db->db_query($sql_query)))
+				$error_msg.=$db->db_last_error().' '.$sql_query;
+			// Lektoren holen die nicht im Verteiler sind
+			while($row_oe = $db->db_fetch_object($result_oe))
+			{
+		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+				if(!$db->db_query($sql_query))
+				{
+					$error_msg.=$db->db_last_error().$sql_query;
+				}
+			}
+		}
+	}
+	echo '<br>';
 	// **************************************************************
 	// Studentenverteiler fuer die einzelnen Organisationseinheiten bei Mischformen
 	echo '<br>Abgleich der Mischformverteiler';
