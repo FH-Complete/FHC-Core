@@ -53,9 +53,8 @@ class basis
 	 * wenn $var !='' ist werden Datenbankkritische
 	 * Zeichen mit Backslash versehen und das Ergbnis
 	 * unter Hochkomma gesetzt.
-	 * XXX: Es wird nicht NULL sondern 'null' zurückgegeben, und der funktionsnamen ist sehr irreführend wenn auch single-quotes dazu kommen. -mp
 	 */
-	protected function addslashes($var)
+	public function addslashes($var)
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
