@@ -113,6 +113,12 @@ else
 				<th class='table-sortable:alphanumeric'>2.Begutachter(in)</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
+	$erstbegutachter='';
+	$zweitbegutachter='';
+	$muid='';
+	$muid2='';
+	$mituid='';
+	$p2id='';
 	while($row=$db->db_fetch_object($erg))
 	{
 		$erstbegutachter='';

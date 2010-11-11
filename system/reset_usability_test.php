@@ -16,6 +16,21 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 <input type="submit" name="reset" value="Reset starten">
 </form>
+<br />
+<br />
+<h2>Abgabetool</h2>
+<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+<input type="hidden" value="student1" name="uid">
+<input type="submit" name="reset_abgabe" value="Projektabgaben von Student1 resetten">
+</form>
+<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+<input type="hidden" value="student2" name="uid">
+<input type="submit" name="reset_abgabe" value="Projektabgaben von Student2 resetten">
+</form>
+<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+<input type="hidden" value="student3" name="uid">
+<input type="submit" name="reset_abgabe" value="Projektabgaben von Student3 resetten">
+</form>
 ';
 
 if(isset($_POST['reset']))
@@ -36,6 +51,28 @@ if(isset($_POST['reset']))
 	delete from public.tbl_adresse where person_id=(select person_id from public.tbl_person where nachname='Midler');
 	delete from public.tbl_person where nachname='Midler';
 	";	
+	
+	if($db->db_query($qry))
+		echo '<font color="green">done</font>';
+	else
+		echo '<font color="red">error</font>'.$db->db_last_error();
+}
+if(isset($_POST['reset_abgabe']))
+{
+	$uid=$_POST['uid'];
+	echo '<br />Resetting Abgabetool '.$uid.'...';
+	$db = new basis_db();
+	
+	$qry = "
+	DELETE FROM campus.tbl_paabgabe 
+	WHERE paabgabe_id IN(SELECT paabgabe_id 
+						FROM 
+							campus.tbl_paabgabe 
+							JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+						WHERE student_uid='".addslashes($uid)."');
+	DELETE FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id IN(SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($uid)."');
+	DELETE FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($uid)."';
+	";
 	
 	if($db->db_query($qry))
 		echo '<font color="green">done</font>';
