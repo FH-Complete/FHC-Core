@@ -1267,7 +1267,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				verpackungseinheit varchar(16),
 				beschreibung text,
 				artikelnummer varchar(32),
-				preisprove numeric(12,2),
+				preisprove numeric(12,4),
 				mwst numeric(4,2),
 				erhalten boolean NOT NULL,
 				sort integer,
@@ -1296,10 +1296,12 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			CREATE TABLE wawi.tbl_rechnungstyp
 			(
 				rechnungstyp_kurzbz varchar(32),
-				beschreibung varchar(256)
+				beschreibung varchar(256),
+				berechtigung_kurzbz varchar(32)
 			);
 			
 			ALTER TABLE wawi.tbl_rechnungstyp ADD CONSTRAINT pk_wawi_rechnungstyp PRIMARY KEY (rechnungstyp_kurzbz);
+			ALTER TABLE wawi.tbl_rechnungstyp ADD CONSTRAINT fk_berechtigung_rechnungstyp FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnungstyp TO admin;
 			
 			CREATE TABLE wawi.tbl_rechnung
@@ -1565,10 +1567,25 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT ON system.tbl_rolleberechtigung TO wawi;
 			GRANT SELECT ON public.tbl_benutzerfunktion TO wawi;
 			GRANT SELECT ON public.tbl_student TO wawi;
-			GRANT SELECT ON public.tbl_person TO wawi;
+			GRANT SELECT, UPDATE, INSERT ON public.tbl_person TO wawi;
 			GRANT SELECT ON public.tbl_benutzer TO wawi;
 			GRANT SELECT ON public.tbl_mitarbeiter TO wawi;
 			GRANT SELECT ON public.tbl_sprache TO wawi;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_firma TO wawi;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_firma_organisationseinheit TO wawi;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_adresse TO wawi;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_kontakt TO wawi;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_standort TO wawi;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_personfunktionstandort TO wawi;
+			
+			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_firma_firma_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_person_person_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_adresse_adresse_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kontakt_kontakt_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_standort_standort_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_personfunktionstandort_personfunktionstandort_id_seq TO wawi;
+			
 			
 			-- INDEX
 			
