@@ -578,7 +578,7 @@ function output_bestellposition($resultBestellungPos=null,$schreib_recht=false,$
 			</table>';
 	$htmlstring.='</fieldset>';
 
-	$htmlstring.='<fieldset><legend>Infomation</legend>';
+	$htmlstring.='<fieldset><legend>Information</legend>';
 			$htmlstring.='<table class="liste">
 					<tr>
 					<thead>
