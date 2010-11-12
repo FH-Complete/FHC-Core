@@ -19,34 +19,23 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
+require_once('../config/wawi.config.inc.php');
+require_once('auth.php');
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Logout</title>
+	<title>WaWi Home</title>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css">
-	<script type="text/javascript">
-		function login() 
-		{
-			document.location="login.php";
-		}
-		window.setTimeout("login()", 2500);
-	</script>
 </head>
 <body>
-<?php
-	session_start();
-	session_destroy();
-?>
-<center>
-<strong>
+<br /><br /><br />
+<br /><br /><br />
+<br /><br /><br />
+<br /><br /><br />
 <br />
-<br />
-Sie wurden erfolgreich ausgeloggt!!<br /> Sie werden sofort weitergeleitet!<br />
-</strong>
-<br />
-Sollten Sie nicht weitergeleitet werden klicken Sie bitte <a href="login.php">hier</a>
-</center>
+
+<center><img width="700px" src="../skin/images/wawi_logo_sz.png" ></center>
 </body>
 </html>

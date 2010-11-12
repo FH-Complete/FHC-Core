@@ -36,6 +36,23 @@ function get_uid()
 	//return 'pam';
 }
 
+function get_original_uid()
+{
+	if(isset($_SERVER['REMOTE_USER']))
+		return (isset($_SERVER['REMOTE_USER'])?mb_strtolower(trim($_SERVER['REMOTE_USER'])):'');
+	else
+	{
+		if(isset($_SESSION['user_original']))
+			return $_SESSION['user_original'];
+	}
+}
+
+function login_as_user($uid)
+{
+	$_SESSION['user']=$uid;
+	return true;
+}
+
 function crlf()
 {
 	// doing some DOS-CRLF magic...

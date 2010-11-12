@@ -65,7 +65,7 @@ require_once('../include/sprache.class.php');
 $id = '';
 $konto = new wawi_konto();
 $user=get_uid();
-echo 'USER: '.$user. '<br><br>';
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -81,9 +81,10 @@ if(isset($_GET['method']))
 	{
 		if(!$rechte->isBerechtigt('wawi/konto',null,'su'))
 			die('Keine Berechtigung für Update');
-		
+					
 		if(isset($_GET['id']))
 		{
+			echo '<h1>Konto - Bearbeiten</h1>';
 			//Update Konto
 			$id = $_GET['id'];
 			if($konto->load($id))
@@ -140,6 +141,7 @@ if(isset($_GET['method']))
 				if(!$rechte->isBerechtigt('wawi/konto',null,'sui'))
 				die('Keine Berechtigung für Insert');
 				
+				echo '<h1>Konto - Neu</h1>';
 				// neues Konto anlegen
 				echo "<form action=\"kontouebersicht.php?method=save\" method=\"post\">";
 				echo '<table border=0>';
@@ -243,6 +245,7 @@ if(isset($_GET['method']))
 		if(!$rechte->isBerechtigt('wawi/konto',null,'su'))
 			die('Keine Berechtigung für Update');
 			
+		echo '<h1>Konto - Zusammenlegen</h1>';
 		$konto = new wawi_konto();
 		
 		if(isset($_POST['radio_1']) && isset($_POST['radio_2']))
@@ -393,8 +396,9 @@ else
 	// Anzeige aller Konten
 	if($konto->getAll(null, 'kontonr' ))
 	{	
-		echo '<a href="kontouebersicht.php?method=update">neues Konto anlegen </a><br>';
-		echo '<a href="kontouebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
+		echo '<h1>Konto - &Uuml;bersicht</h1>';
+		//echo '<a href="kontouebersicht.php?method=update">neues Konto anlegen </a><br>';
+		//echo '<a href="kontouebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
 		
 		echo '<table id="myTable" class="tablesorter"> <thead>';
 		echo '<tr>
@@ -437,11 +441,7 @@ else
 			
 		}
 		echo '</tbody></table>';
-		echo '<a href="logout.php">abmelden</a><br>';
-
 	}
 }
-
-
 
 ?>

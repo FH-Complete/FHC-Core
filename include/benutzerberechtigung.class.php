@@ -25,6 +25,7 @@ require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 require_once(dirname(__FILE__).'/studiengang.class.php');
 require_once(dirname(__FILE__).'/fachbereich.class.php');
 require_once(dirname(__FILE__).'/functions.inc.php');
+require_once(dirname(__FILE__).'/wawi_kostenstelle.class.php');
 
 class benutzerberechtigung extends basis_db
 {
@@ -47,7 +48,8 @@ class benutzerberechtigung extends basis_db
 	public $updatevon;
 	public $insertamum;
 	public $insertvon;
-
+	public $kostenstelle_id;
+	
 	public $starttimestamp;
 	public $endetimestamp;
 	
@@ -100,6 +102,7 @@ class benutzerberechtigung extends basis_db
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
+				$this->kostenstelle_id = $row->kostenstelle_id;
 				
 				return true;
 			}
@@ -175,6 +178,19 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'Art darf nicht leer sein';
 			return false;
 		}
+		
+		if($this->kostenstelle_id!='' && !is_numeric($this->kostenstelle_id))
+		{
+			$this->errormsg = 'Kostenstelle_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		if($this->kostenstelle_id!='' && $this->oe_kurzbz!='')
+		{
+			$this->errormsg = 'Wenn eine Kostenstelle angegeben wird, darf keine Organisationseinheit eingetragen sein';
+			return false;
+		}
+		
 		return true;
 	}
 	
@@ -193,7 +209,8 @@ class benutzerberechtigung extends basis_db
 		if($this->new)
 		{
 			$qry = 'INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz, 
-						oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, insertamum, insertvon)
+						oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, 
+						insertamum, insertvon, kostenstelle_id)
 			        VALUES('.$this->addslashes($this->rolle_kurzbz).','.
 					$this->addslashes($this->berechtigung_kurzbz).','.
 					$this->addslashes($this->uid).','.
@@ -207,7 +224,8 @@ class benutzerberechtigung extends basis_db
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
 					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+					$this->addslashes($this->insertvon).','.
+					$this->addslashes($this->kostenstelle_id).');';
 		}
 		else
 		{
@@ -222,6 +240,7 @@ class benutzerberechtigung extends basis_db
 			       ' start='.$this->addslashes($this->start).','.
 			       ' ende='.$this->addslashes($this->ende).','.
 			       ' negativ='.($this->negativ?'true':'false').','.
+				   ' kostenstelle_id='.$this->addslashes($this->kostenstelle_id).','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).
 			       " WHERE benutzerberechtigung_id='".addslashes($this->benutzerberechtigung_id)."'";
@@ -303,6 +322,7 @@ class benutzerberechtigung extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->kostenstelle_id = $row->kostenstelle_id;
 				
 				$this->berechtigungen[] = $obj;
 			}
@@ -335,7 +355,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
 				FROM 
 					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) 
 				WHERE uid='".addslashes($uid)."'
@@ -347,7 +367,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
 				FROM 
 					system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz) 
 					JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz) 
@@ -359,9 +379,9 @@ class benutzerberechtigung extends basis_db
 				SELECT 
 					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
-					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
 				FROM 
 					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
 				WHERE tbl_benutzerfunktion.uid='".addslashes($uid)."'
@@ -373,7 +393,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
 				FROM 
 					system.tbl_benutzerrolle
 				WHERE 
@@ -387,7 +407,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
 				FROM 
 					system.tbl_benutzerrolle
 				WHERE 
@@ -428,6 +448,7 @@ class benutzerberechtigung extends basis_db
 			$b->updatevon = $row->updatevon;
 			$b->insertamum = $row->insertamum;
 			$b->insertvon = $row->insertvon;
+			$b->kostenstelle_id = $row->kostenstelle_id;
 			
 			$this->berechtigungen[]=$b;
 		}
@@ -464,10 +485,10 @@ class benutzerberechtigung extends basis_db
 	 * 		derzeit kann hier noch die Studiengangskennzahl uebergeben werden, 
 	 * 		dies wird in Zukunft aber nicht mehr moeglich sein
 	 * @param $art			suid (select|update|insert|delete)
-	 * @param $fachbereich_kurzbz DEPRECATED
+	 * @param $kostenstelle_id	ID der Kostenstelle
 	 * @return true wenn eine Berechtigung entspricht.
 	 */
-	public function isBerechtigt($berechtigung_kurzbz,$oe_kurzbz=null,$art=null, $fachbereich_kurzbz=null)
+	public function isBerechtigt($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null)
 	{
 		$timestamp=time();
 		
@@ -479,12 +500,12 @@ class benutzerberechtigung extends basis_db
 			$oe_kurzbz = $stg->oe_kurzbz;
 		}
 		
-		//Fachbereich
-		if(!is_null($fachbereich_kurzbz))
+		if($kostenstelle_id!='' && !is_numeric($kostenstelle_id))
 		{
-			$fb = new fachbereich($fachbereich_kurzbz);
-			$oe_kurzbz = $fb->oe_kurzbz;
+			$this->errormsg = 'Kostenstelle_id ist ungueltig';
+			return false;
 		}
+		
 		$oe = new organisationseinheit();
 		
 		foreach ($this->berechtigungen as $b)
@@ -492,7 +513,8 @@ class benutzerberechtigung extends basis_db
 			//Pruefen ob eine negativ-Berechtigung vorhanden ist
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz 
 				&& $b->negativ 
-				&& (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz)))
+				&& (is_null($oe_kurzbz) || ($b->kostenstelle_id=='' && ($b->oe_kurzbz=='' || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz))))
+				&& (is_null($kostenstelle_id) || $kostenstelle_id==$b->kostenstelle_id))
 			{
 				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
@@ -503,15 +525,34 @@ class benutzerberechtigung extends basis_db
 		
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
 			   && (is_null($art) || mb_strstr($b->art, $art))
-			   && (is_null($oe_kurzbz) || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz)))
+			   && (is_null($oe_kurzbz) || ($b->kostenstelle_id=='' && ($b->oe_kurzbz=='' || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz))))
+			   && (is_null($kostenstelle_id) || $kostenstelle_id==$b->kostenstelle_id))
 			{
 				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
 				{
 						return true;
 				}
-			}
+			}			
 		}
+		
+		//Kostenstellenrecht ueber Organisationseinheit
+		if($kostenstelle_id!='')
+		{
+			//Kostenstelle laden und schauen, ob auf die Organisationseinheit der Kostenstelle 
+			//die Berechtigung vorhanden ist
+			$kostenstelle = new wawi_kostenstelle();
+			if($kostenstelle->load($kostenstelle_id))
+			{
+				return $this->isBerechtigt($berechtigung_kurzbz, $kostenstelle->oe_kurzbz, $art);
+			}		
+			else
+			{
+				$this->errormsg='Kostenstelle existiert nicht';
+				return false;
+			}		
+		}
+	
 
 		//wenn ein Doppelpunkt vorkommt, pruefen ob das Uebergeordnete vorhanden ist
 		if($pos=mb_strpos($berechtigung_kurzbz,':')===false)
@@ -520,7 +561,7 @@ class benutzerberechtigung extends basis_db
 		}
 		else 
 		{
-			return $this->isBerechtigt(substr($berechtigung_kurzbz,0,$pos-1), $oe_kurzbz, $art, $fachbereich_kurzbz);
+			return $this->isBerechtigt(substr($berechtigung_kurzbz,0,$pos-1), $oe_kurzbz, $art, $kostenstelle_id);
 		}
 	}
 
