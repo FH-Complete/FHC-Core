@@ -62,7 +62,7 @@ if (isset($_POST['username']))
 	<title>Login - Bestellwesen Technikum Wien V 2.0.0</title>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css">
 </head>
-<body>
+<body onload="document.getElementById('username').focus();">
 	<br />
 	<br />
 	<form name="login" action="login.php" method=post>
@@ -70,7 +70,7 @@ if (isset($_POST['username']))
 	<th colspan=2 bgcolor="#666666"><font color="white">Login</font></th>
 	<tr valign=top align=left>
 		<td>Username:</td>
-		<td><input type="text" name="username" size=32 maxlength=32></td>
+		<td><input type="text" name="username" id="username" size=32 maxlength=32></td>
 	</tr>
 	<tr valign=top align=left>
 		<td>Passwort:</td>
