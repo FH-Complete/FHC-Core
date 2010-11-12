@@ -21,13 +21,12 @@
  */
 
 require_once('../config/wawi.config.inc.php');
-require_once ('../include/organisationseinheit.class.php');
+require_once('../include/organisationseinheit.class.php');
 require_once('auth.php');
 require_once('../include/wawi_kostenstelle.class.php');
 require_once('../include/wawi_konto.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -63,7 +62,12 @@ require_once('../include/benutzerberechtigung.class.php');
 
 $kostenstelle = new wawi_kostenstelle(); 
 $user=get_uid();
-echo 'USER: '.$user. '<br><br>';
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('wawi/kostenstelle'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 if(isset($_GET['method']))
 {
@@ -72,7 +76,10 @@ if(isset($_GET['method']))
 		//wenn id gesetzt ist --> update ansonsten neue anlegen 
 		if(isset($_GET['id']))
 		{
+			echo '<h1>Kostenstelle - Bearbeiten</h1>';
 			$id = $_GET['id'];
+			if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'su',$id))
+				die('Sie haben keine Berechtigung für diese Kostenstelle');
 			
 			//gültige ID
 			if(is_numeric($id))
@@ -158,6 +165,11 @@ if(isset($_GET['method']))
 		}
 		else
 		{
+			echo '<h1>Kostenstelle - Neu</h1>';
+			
+			if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'sui'))
+				die('Sie haben keine Berechtigung zum Anlegen von Kostenstellen');
+			
 			//neue Anlegen
 			$oe = new organisationseinheit(); 
 			$oe->getAll(); 
@@ -214,6 +226,9 @@ if(isset($_GET['method']))
 	{
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		
+		if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'suid'))
+			die('Sie haben keine Berechtigung zum Löschen von Kostenstellen');
+			
 		if($kostenstelle->delete($id))
 		{
 			echo 'Kostenstelle erfolgreich gelöscht. <br>';
@@ -231,9 +246,12 @@ if(isset($_GET['method']))
 		$kostenstelle = new wawi_kostenstelle();	
 		$aktiv = '';
 		$ausgabe ="Kostenstelle wurde erfolgreich upgedated!";
-		
+					
 		if(isset($_GET['id']))
 		{
+			if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'su',$_GET['id']))
+				die('Sie haben keine Berechtigung zum Ändern der Kostenstelle');
+			
 			//Update
 			$kostenstelle->load($_GET['id']);
 			$kostenstelle->kostenstelle_id = $_GET['id'];
@@ -257,6 +275,9 @@ if(isset($_GET['method']))
 		}
 		else 
 		{
+			if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'suid'))
+				die('Sie haben keine Berechtigung zum Anlegen von Kostenstellen');
+			
 			// neue Kostenstelle
 			$kostenstelle->new = true;
 			$kostenstelle->aktiv = true;
@@ -283,6 +304,10 @@ if(isset($_GET['method']))
 	}
 	else if ($_GET['method']=="allocate")
 	{
+		if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'su',$_GET['id']))
+				die('Sie haben keine Berechtigung zum Ändern der Kostenstelle');
+		
+		echo '<h1>Kostenstelle - Konten zuordnen</h1>';
 		$kostenstelle = new wawi_kostenstelle();
 		$konto = new wawi_konto(); 
 		
@@ -338,8 +363,12 @@ if(isset($_GET['method']))
 		
 		echo '<tr><td>&nbsp;</td></tr></table> <input name ="submit" type="submit" value="Speichern"></form>';
 	}
-	else if ($_GET['method']=="merge")
+	else if ($_GET['method']=="merge") 
 	{			
+		if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'suid'))
+				die('Sie haben keine Berechtigung zum Zusammenlegen von Kostenstellen');
+		
+		echo '<h1>Kostenstelle - Zusammenlegen</h1>';
 		//Kostenstellen zusammenlegen
 		$kostenstelle = new wawi_kostenstelle();
 		
@@ -467,11 +496,14 @@ if(isset($_GET['method']))
 }
 else
 { 
+	echo '<h1>Kostenstelle - &Uuml;bersicht</h1>';
+	if(!$rechte->isberechtigt('wawi/kostenstelle',null, 's'))
+		die('Sie haben keine Berechtigung zum Anzeigen der Kostenstellen');
 			
 	if($kostenstelle->getAll())
 	{
-		echo '<a href="kostenstellenuebersicht.php?method=update">neue Kostenstelle anlegen </a><br>';
-		echo '<a href="kostenstellenuebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
+		//echo '<a href="kostenstellenuebersicht.php?method=update">neue Kostenstelle anlegen </a><br>';
+		//echo '<a href="kostenstellenuebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
 		
 		echo '<table id="myTable" class="tablesorter"> <thead>';
 		
@@ -501,9 +533,7 @@ else
 			echo '</tr>';
 			
 		}
-		echo '</tbody></table>';
-		echo '<a href="logout.php">abmelden</a><br>';
-	
+		echo '</tbody></table>';	
 	}
 }
 

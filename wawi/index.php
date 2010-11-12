@@ -19,34 +19,28 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+require_once('../config/wawi.config.inc.php');
+require_once('auth.php');
+
+$menu = isset($_GET['menu'])?$_GET['menu']:'menu.php';
+$content = isset($_GET['content'])?$_GET['content']:'home.php';
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Logout</title>
-	<link rel="stylesheet" href="../skin/wawi.css" type="text/css">
-	<script type="text/javascript">
-		function login() 
-		{
-			document.location="login.php";
-		}
-		window.setTimeout("login()", 2500);
-	</script>
+	<title>WaWi - Warenwirtschaft</title>
 </head>
-<body>
-<?php
-	session_start();
-	session_destroy();
-?>
-<center>
-<strong>
-<br />
-<br />
-Sie wurden erfolgreich ausgeloggt!!<br /> Sie werden sofort weitergeleitet!<br />
-</strong>
-<br />
-Sollten Sie nicht weitergeleitet werden klicken Sie bitte <a href="login.php">hier</a>
-</center>
-</body>
+	<frameset cols="200,*">
+	  <frame src="'.$menu.'" name="menu" />
+	  <frame src="'.$content.'" name="content" />
+	  <noframes>
+	    <body>
+	      <h1>Error</h1>
+	      <p>Ihr Browser unterstuetzt leider keine Frames</p>
+	    </body>
+	  </noframes>
+	</frameset>
 </html>
+';
+?>
