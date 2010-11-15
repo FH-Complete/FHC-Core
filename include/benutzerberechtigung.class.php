@@ -786,6 +786,95 @@ class benutzerberechtigung extends basis_db
 		sort($oe_kurzbz);
 		return $oe_kurzbz;
 	}
+	
+	/**
+	 * Gibt Array mit den Kostenstellen zurueck fuer welche die
+	 * Person eine Berechtigung besitzt.
+	 * Optional wird auf Berechtigung eingeschraenkt.
+	 */
+	public function getKostenstelle($berechtigung_kurzbz=null)
+	{
+		$oe_kurzbz=array();
+		$not = array();
+		$not_id = array();
+		$kst_id = array();
+		$kostenstellen = array();
+		$timestamp=time();
+		$all=false;
+		$oe = new organisationseinheit();
+		foreach ($this->berechtigungen as $b)
+		{
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
+				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
+			{
+				if($b->negativ)
+				{
+					//Negativ-Recht
+					if(!is_null($b->oe_kurzbz))
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$not[] = $row;
+					}
+					elseif($b->kostenstelle_id!='')
+					{
+						$not_id[] = $b->kostenstelle_id;
+					}
+					else 
+						return array();
+				}
+				else 
+				{
+					if(!is_null($b->oe_kurzbz))
+					{
+						$childoes = $oe->getChilds($b->oe_kurzbz);
+						foreach($childoes as $row)
+							$oe_kurzbz[] = $row;
+					}
+					elseif($b->kostenstelle_id!='')
+					{
+						$kst_id[]=$b->kostenstelle_id;
+					}
+					else
+					{
+						$all=true;
+						break;
+					}
+				}
+			}
+		}
+		
+		$qry = "SELECT distinct kostenstelle_id FROM wawi.tbl_kostenstelle";
+
+		if(!$all)
+		{
+			$qry.="
+				WHERE 
+					(";
+			if(count($kst_id)>0)
+				$qry.=" kostenstelle_id IN(".$this->implode4SQL($kst_id).")";
+			if(count($oe_kurzbz)>0)
+			{
+				if(count($kst_id)>0)
+					$qry.= ' OR ';
+				$qry.=" oe_kurzbz IN(".$this->implode4SQL($oe_kurzbz).")";
+			}
+			$qry.=")";
+			if(count($not_id)>0)
+				$qry.=" AND kostenstelle_id NOT IN(".$this->implode4SQL($not_id).")";
+			if(count($not)>0)
+				$qry.=" AND oe_kurzbz NOT IN(".$this->implode4SQL($not).")";
+		}
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$kostenstellen[] = $row->kostenstelle_id;
+			}
+		}
+		return $kostenstellen;
+	}
 
 }
 ?>

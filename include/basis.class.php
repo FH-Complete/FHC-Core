@@ -58,5 +58,22 @@ class basis
 	{
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
+	
+	/**
+	 * Splittet ein Array auf um es zB in der IN Klausel eines SQL Befehles zu verwenden
+	 * Die einzelnen Elemente werden unter Hochkomma gesetzt und mit Beistrich getrennt.
+	 * @param $array
+	 */
+	public function implode4SQL($array)
+	{
+		$string = '';
+		foreach($array as $row)
+		{
+			if($string!='')
+				$string.=',';
+			$string.="'".addslashes($row)."'";
+		}
+		return $string;
+	}
 }
 ?>
