@@ -119,7 +119,7 @@ if($result = $db->db_query($qry))
 		if(!$person_error)
 		{
 			//SWS berechnen
-			$swsneu = number_format(round($row->semstd/$wochen, 2),'.');
+			$swsneu = number_format(round($row->semstd/$wochen, 2),2,'.','');
 
 			//Funktion fuer diesen Studiengang suchen
 			$bisfunktion = new bisfunktion();
