@@ -19,6 +19,9 @@
 	
 	define("CONN_STRING_WAWI","host=localhost port=5432 dbname=wawi user=user password=password");
 
+	// Externe Funktionen - Unterordner im Include-Verzeichnis
+	define('EXT_FKT_PATH','tw');
+	
 	// Fuer Mails etc
 	define('DOMAIN','technikum-wien.at');
 
