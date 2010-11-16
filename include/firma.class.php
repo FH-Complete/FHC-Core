@@ -357,10 +357,18 @@ class firma extends basis_db
 	 * Laedt alle Firmen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll()
+	public function getAll($firma_search = null)
 	{
-		$qry = "SElECT * FROM public.tbl_firma ORDER BY name";
+		$qry = "SElECT * FROM public.tbl_firma";
+		if (!empty($firma_search))
+		{
+			$qry.= " WHERE ";
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search)));		
+			$qry.="  UPPER(trim(public.tbl_firma.name)) like '%".$matchcode."%'";
 		
+		}
+		
+		$qry.= " ORDER BY NAME"; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
