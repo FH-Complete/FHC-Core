@@ -46,7 +46,7 @@ $menu=array
 		'name'=>'Benutzerbereich', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung'),
 		'Bestellung'=>array
 		(
-			'name'=>'Bestellung', 'permissions'=>array('wawi/bestellung'),'link'=>'bestellung.php', 'target'=>'content',
+			'name'=>'Bestellung', 'permissions'=>array('wawi/bestellung'),'link'=>'bestellung.php?method=suche', 'target'=>'content',
 			'BestellungNeu'=>array('name'=>'Neu', 'link'=>'bestellung.php?mehtod=update', 'target'=>'content'),
 		),
 	)	
