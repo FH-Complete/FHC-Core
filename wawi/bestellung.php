@@ -21,10 +21,13 @@
  */
 
 require_once '../config/wawi.config.inc.php';
+require_once('auth.php');
 require_once '../include/firma.class.php';
 require_once '../include/organisationseinheit.class.php';
 require_once '../include/wawi_konto.class.php';
+require_once '../include/wawi_bestellung.class.php';
 require_once '../include/mitarbeiter.class.php';
+require_once('../include/datum.class.php');
 $aktion ='';
 ?>
 
@@ -34,6 +37,7 @@ $aktion ='';
 <head>
 	<title>WaWi Bestellung</title>	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../include/js/jquery.autocomplete.css" type="text/css"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
@@ -50,7 +54,7 @@ $aktion ='';
 
 		$(document).ready(function() 
 		{
-			  $('#firma_id').autocomplete('wawi_autocomplete.php', 
+			  $('#firmenname').autocomplete('wawi_autocomplete.php', 
 			  {
 				minChars:2,
 				matchSubset:1,matchContains:1,
@@ -58,7 +62,7 @@ $aktion ='';
 				formatItem:formatItem,
 				extraParams:{'work':'wawi_firma_search'	}
 		  }).result(function(event, item) {
-			  $('#firmenname').val(item[1]);
+			  $('#firma_id').val(item[1]);
 		  });		  		  
 	 	});
 
@@ -76,109 +80,195 @@ $aktion ='';
 		  });
 		  		  		  
 	 	});
-
+	 	
+		function conf_del()
+		{
+			return confirm('Diese Gruppe wirklich löschen?');
+		}
 	</script>
 </head>
 <body>
 
 <?php 
+$date = new datum(); 
 
 if (isset($_GET['method']))
 	$aktion = $_GET['method'];
-
+	
 
 if($aktion == 'suche')
-{
-	$firma = new firma(); 
-	$firma->getAll(); 
-	$firma_all = $firma->result; 
-	$oe = new organisationseinheit(); 
-	$oe->getAll(); 
-	$oeinheiten= $oe->result; 
-	$konto = new wawi_konto();
-	$konto->getAll();
-	$konto_all = $konto->result;
-	$mitarbeiter = new mitarbeiter();
-	$mitarbeiter_all = array(); 
-	$mitarbeiter_all = $mitarbeiter->getMitarbeiter();
-
-		
-
-	echo "Bestellung suchen "; 
-	echo "<form action ='bestellung.php?method=suche method='post' name='sucheForm'>";
-	echo "<table border =0>";
-	echo "<tr>";
-	echo "<td>Bestellnummer</td>";
-	echo "<td><input type = 'text' size ='32' maxlength = '16' name = 'bestellnr'></td>";
-	echo "</tr>";
-	echo "<tr>";
-	echo "<td>Titel</td>";
-	echo "<td><input type = 'text' size ='32' maxlength = '256' name = 'titel'></td>";
-	echo "<tr>";
-	echo "<tr>"; 
-	echo "<td>Erstelldatum</td>";
-	echo "<td>von <input type ='text' size ='8' name ='evon'> bis <input type ='text' size ='8' name = 'ebis'></td>";
-	echo "</tr>";
-	echo "<tr>";
-	echo "<td>Bestelldatum</td>";
-	echo "<td>von <input type ='text' size ='8' name ='bvon'> bis <input type ='text' size ='8' name = 'bbis'></td>";
-	echo "</tr>";
-	echo "<tr>";
-	echo "<td> Firma: </td>";
-	echo "<td> <input id='firma_id' name='firma_id' size='32' maxlength='30' value=''  >";
-	echo "</td>";
-	echo "<td> <input id='firmenname' name='firmenname' size='10' maxlength='30' value=''  >";
-	echo "</td>";
-	echo "</tr>";
-	echo "<tr>";
-	echo "<td> Organisationseinheit: </td>";
-	echo "<td><SELECT name='filter_oe_kurzbz'>"; 
-	echo '<option value="">-- auswählen --</option>';
-	foreach ($oeinheiten as $oei)
+{	 
+	if(!isset($_POST['submit']))
 	{
-		if($oei->aktiv)
+		// Suchmaske anzeigen
+		$oe = new organisationseinheit(); 
+		$oe->getAll(); 
+		$oeinheiten= $oe->result; 
+		$konto = new wawi_konto();
+		$konto->getAll();
+		$konto_all = $konto->result;
+
+		echo "Bestellung suchen "; 
+		echo "<form action ='bestellung.php?method=suche' method='post' name='sucheForm'>";
+		echo "<table border =0>";
+		echo "<tr>";
+		echo "<td>Bestellnummer</td>";
+		echo "<td><input type = 'text' size ='32' maxlength = '16' name = 'bestellnr'></td>";
+		echo "</tr>";
+		echo "<tr>";
+		echo "<td>Titel</td>";
+		echo "<td><input type = 'text' size ='32' maxlength = '256' name = 'titel'></td>";
+		echo "<tr>";
+		echo "<tr>"; 
+		echo "<td>Erstelldatum</td>";
+		echo "<td>von <input type ='text' size ='8' name ='evon'> bis <input type ='text' size ='8' name = 'ebis'></td>";
+		echo "</tr>";
+		echo "<tr>";
+		echo "<td>Bestelldatum</td>";
+		echo "<td>von <input type ='text' size ='8' name ='bvon'> bis <input type ='text' size ='8' name = 'bbis'></td>";
+		echo "</tr>";
+		echo "<tr>";
+		echo "<td> Firma: </td>";
+		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  >";
+		echo "</td>";
+		echo "<td> <input id='firma_id' name='firma_id' size='10' maxlength='30' value=''  >";
+		echo "</td>";
+		echo "</tr>";
+		echo "<tr>";
+		echo "<td> Organisationseinheit: </td>";
+		echo "<td><SELECT name='filter_oe_kurzbz'>"; 
+		echo '<option value="">-- auswählen --</option>';
+		foreach ($oeinheiten as $oei)
 		{
-			echo '<option value="'.$oei->oe_kurzbz.'" >'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung.'</option>';
+			if($oei->aktiv)
+			{
+				echo '<option value="'.$oei->oe_kurzbz.'" >'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung.'</option>';
+			}
+			else 
+			{
+				echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'">'.$oei->bezeichnung.'</option>';
+			}	
 		}
-		else 
+		echo "</td>";
+		echo "</SELECT>";
+		echo "</tr>";
+		echo "<tr>";
+		echo "<td> Konto: </td>";
+		echo "<td><SELECT name='filter_konto'>"; 
+		echo '<option value="">-- auswählen --</option>';
+		
+		foreach($konto_all as $ko)
 		{
-			echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'">'.$oei->bezeichnung.'</option>';
-		}	
-	}
-	echo "</td>";
-	echo "</SELECT>";
-	echo "</tr>";
-	echo "<tr>";
-	echo "<td> Konto: </td>";
-	echo "<td><SELECT name='filter_konto'>"; 
-	echo '<option value="">-- auswählen --</option>';
+			echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz.'</option>';
 	
-	foreach($konto_all as $ko)
+		}
+		echo "</td>";
+		echo "</SELECT>";
+		echo "</tr>";	
+		echo "<tr>";
+		echo "<td> Änderung durch: </td>";
+		echo "<td> <input id='mitarbeiter_name' name='mitarbeiter_name' size='32' maxlength='30' value=''  >";
+		echo "</td>";
+		echo "<td> <input id='mitarbeiter_uid' name='mitarbeiter_uid' size='10' maxlength='30' value=''  >";
+		echo "</td>";		
+	
+		echo "</tr>";
+		echo "<tr>";
+		echo "<td>Nur ohne Rechnung</td>";
+		echo "<td><input type ='checkbox' name ='rechnung'></td>";
+		echo "</tr>";
+		echo "<tr><td>&nbsp;</td></tr>";
+		echo '<tr><td><input type="submit" name ="submit" value="Suche"></td></tr>';
+		
+		echo "</table>";
+		echo "</form>";
+	}
+	else
 	{
-		echo '<option value='.$ko->beschreibung.' >'.$ko->kurzbz.'</option>';
-
+		//var_dump($_POST);
+		
+		$bestellnummer = $_POST['bestellnr'];
+		$titel = $_POST['titel'];
+		$evon = $_POST['evon'];
+		$ebis = $_POST['ebis'];
+		$bvon = $_POST['bvon'];
+		$bbis = $_POST['bbis'];
+		$firma_id = $_POST['firma_id'];
+		$oe_kurzbz = $_POST['filter_oe_kurzbz'];
+		$filter_konto = $_POST['filter_konto'];
+		$mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+		if (isset ($_POST['rechnung']))
+			$rechnung = true; 
+		else
+			$rechnung = false; 
+		
+		$bestellung = new wawi_bestellung();
+		
+		if($evon != '') 
+			$evon = $date->formatDatum($evon);
+		if($ebis != '') 
+			$ebis = $date->formatDatum($ebis);
+		if($bvon != '') 
+			$bvon = $date->formatDatum($bvon);
+		if($bbis != '') 
+			$bbis = $date->formatDatum($bbis);
+			
+		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
+		{
+			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung))
+			{
+				$firma = new firma();
+				$date = new datum(); 
+		
+		
+				echo '<table id="myTable" class="tablesorter" width ="100%"> <thead>';
+				
+				echo '<tr>
+						<th></th>
+						<th>Bestellnr.</th>
+						<th>Bestell_ID</th>
+						<th>Firma</th>
+						<th>Erstellung</th>
+						<th>Freigegeben</th>
+						<th>Brutto</th>
+						<th>Titel</th>
+						<th>Letzte Änderung</th>
+					  </tr></thead><tbody>';
+			
+				foreach($bestellung->result as $row)
+				{	
+					$brutto = $bestellung->getBrutto($row->bestellung_id);
+					$firma->load($row->firma_id);
+					$freigegeben = 'false';
+					if($row->freigegeben == 't');
+					{
+						$freigegeben = 'true'; 
+					}
+					//Zeilen der Tabelle ausgeben
+					echo '<tr>';
+					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
+					echo '<td>'.$row->bestell_nr.'</td>';
+					echo '<td>'.$row->bestellung_id.'</td>';
+					echo '<td>'.$firma->name.'</td>';
+					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y').'</td>';
+					echo '<td>'.$freigegeben.'</td>'; 
+					echo '<td>'.number_format($brutto,2).'</td>'; 
+					echo '<td>'.$row->titel.'</td>';
+					echo '<td>'.$row->updateamum.' '.$row->updatevon .'</td>'; 
+		
+					echo '</tr>';
+					
+				}
+				echo '</tbody></table>';	
+				
+				
+				// Suchergebniss anzeigen
+			}
+			else 
+			echo "Fehler bei der Abfrage!";
+		}
+		else
+		echo "ungültiges Datumsformat";
 	}
-	echo "</td>";
-	echo "</SELECT>";
-	echo "</tr>";	
-	echo "<tr>";
-	echo "<td> Änderung durch: </td>";
 
-	echo "<td> <input id='mitarbeiter_name' name='mitarbeiter_name' size='32' maxlength='30' value=''  >";
-	echo "</td>";
-	echo "<td> <input id='mitarbeiter_uid' name='mitarbeiter_uid' size='10' maxlength='30' value=''  >";
-	echo "</td>";
-	
-	echo "</SELECT>";
-	echo "</tr>";
-	echo "<tr>";
-	echo "<td>Nur ohne Rechnung</td>";
-	echo "<td><input type ='checkbox' name ='rechnung'></td>";
-	echo "</tr>";
-	echo "<tr><td>&nbsp;</td></tr>";
-	echo '<tr><td><input type="submit" value="Suche"></td></tr>';
-	
-	echo "</table>";
-	echo "</form>";
-	
 }
