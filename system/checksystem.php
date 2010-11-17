@@ -1585,6 +1585,8 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kontakt_kontakt_id_seq TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_standort_standort_id_seq TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_personfunktionstandort_personfunktionstandort_id_seq TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_default_aufteilung_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
 			
 			
 			-- INDEX
