@@ -50,8 +50,8 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestellung_id
+	 * Konstruktor 
+	 * @param bestellung_id der Bestellung die geladen werden soll (Default=null)
 	 */
 	public function __construct($bestellung_id = null) 
 	{
@@ -64,8 +64,8 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestellung_id
+	 * Lädt die Bestellung mit der Übergebenen ID 
+	 * @param $bestellung_id der zu ladenden Bestellung
 	 */
 	public function load($bestellung_id)
 	{
@@ -113,7 +113,7 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Gibt alle Bestellungen zurück
 	 */
 	public function getAll()
 	{
@@ -154,8 +154,188 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestellung_id
+	 * Übernimmt die Parameter (Formular --> Bestellung suchen) und gibt die gefundenen Bestellungen zurück
+	 * @param $bestellnr
+	 * @param $titel
+	 * @param $evon
+	 * @param $ebis
+	 * @param $bvon
+	 * @param $bbis
+	 * @param $firma_id
+	 * @param $oe_kurzbz
+	 * @param $konto_id
+	 * @param $mitarbeiter_uid
+	 * @param $rechnung
+	 */
+	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung )
+	{
+		$first = true; 
+		$qry = "SELECT distinct on (bestellung.bestellung_id) *, status.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
+		FROM 
+		wawi.tbl_bestellung bestellung
+		
+		LEFT JOIN wawi.tbl_bestellung_bestellstatus status USING (bestellung_id) 
+		LEFT JOIN wawi.tbl_kostenstelle kostenstelle USING (kostenstelle_id) 
+		LEFT JOIN public.tbl_organisationseinheit orgaeinheit ON (orgaeinheit.oe_kurzbz = kostenstelle.oe_kurzbz)  "; 
+		
+		if ($bestellnr != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= "  UPPER(bestellung.bestell_nr) LIKE UPPER('%$bestellnr%')"; 
+		}
+		if ($titel != '')	
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= " UPPER(bestellung.titel)  LIKE UPPER('%$titel%')"; 
+		}	
+		if ($evon != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';	
+			$qry.= ' bestellung.insertamum > date('.$this->addslashes($evon).')';
+		}		
+		if ($ebis != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= ' bestellung.insertamum < '.$this->addslashes($ebis);
+		}
+		if ($bvon != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= " status.bestellstatus_kurzbz = 'Bestellung' and status.insertamum > ".$this->addslashes($bvon);
+		}
+		if ($bbis != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= " status.bestellstatus_kurzbz = 'Bestellung' and status.insertamum < ".$this->addslashes($bbis);
+		}
+		if ($firma_id != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= ' bestellung.firma_id = '.$this->addslashes($firma_id);
+		}
+		if ($oe_kurzbz != '')
+		{
+		if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= ' orgaeinheit.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
+		}
+		if ($konto_id != '')	
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= ' bestellung.konto_id = '.$this->addslashes($konto_id);
+		}
+		if ($mitarbeiter_uid != '')	
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= ' bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid);
+		}
+		if($rechnung)
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' and ';
+			$qry.= ' not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
+		}
+		echo $qry; 
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = "Fehler bei der Datenbankabfrage.";
+			return false; 
+		}
+		
+		while($row = $this->db_fetch_object())
+		{
+			$bestellung = new wawi_bestellung(); 
+			
+			$bestellung->bestellung_id = $row->bestellung_id;
+			$bestellung->kostenstelle_id = $row->kostenstelle_id;
+			$bestellung->konto_id = $row->konto_id; 
+			$bestellung->firma_id = $row->firma_id; 
+			$bestellung->lieferadresse = $row->lieferadresse; 
+			$bestellung->rechnungsadresse = $row->rechnungsadresse; 
+			$bestellung->freigegeben = $row->freigegeben; 
+			$bestellung->bestell_nr = $row->bestell_nr;
+			$bestellung->titel = $row->titel;
+			$bestellung->bemerkung = $row->bemerkung; 
+			$bestellung->liefertermin = $row->liefertermin; 
+			$bestellung->updateamum = $row->update; 
+			$bestellung->updatevon = $row->update_von;
+			$bestellung->insertamum = $row->insert; 
+			$bestellung->insertvon = $row->insert_von; 
+			$bestellung->ext_id = $row->ext_id; 
+			
+			$this->result[] = $bestellung; 
+		}
+		return true; 
+	}
+	
+	/**
+	 * 
+	 * Löscht die Bestellung mit der Übergebenen ID
+	 * @param $bestellung_id Bestellung die gelöscht werden soll
 	 */
 	public function delete($bestellung_id)
 	{
@@ -177,7 +357,7 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Prüft ob Richtige Daten eingegeben/vorhanden sind
 	 */
 	public function validate()
 	{
@@ -237,7 +417,7 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Speichert eine neue Besetellung in die Datenbank oder Updated eine bestehende
 	 */
 	public function save()
 	{
@@ -284,7 +464,7 @@ class wawi_bestellung extends basis_db
 			updateamum = '.$this->addslashes($this->updateamum).',
 			insertamum = '.$this->addslashes($this->insertamum).',
 			insertvon = '.$this->addslashes($this->insertvon).',
-			ext_id = '.$this->addslashes($this->ext_id); 
+			ext_id = '.$this->addslashes($this->ext_id).' WHERE bestellung_id = '.$this->bestellung_id.';'; 
 		}
 		if($this->db_query($qry))
 		{
@@ -320,4 +500,35 @@ class wawi_bestellung extends basis_db
 		}
 		return $this->bestellung_id;
 	}
+	/**
+	 * 
+	 * Rechnet den Bruttopreis einer Rechnung aus
+	 * @param $bestellung_id dessen Bruttopreis ausgerechnet werden soll
+	 */
+	public function getBrutto($bestellung_id)
+	{
+		$brutto = 0;
+		$qry_brutto= "select sum(brutto) as brutto 
+					from 
+					(select detail.menge, detail.preisprove, detail.mwst, sum(detail.menge * detail.preisprove) * ((100+detail.mwst)/100) as brutto 
+					from 
+					wawi.tbl_bestellung as bestellung, wawi.tbl_bestelldetail as detail 
+					where 
+					bestellung.bestellung_id = detail.bestellung_id and bestellung.bestellung_id =".$bestellung_id." group by detail.menge, detail.preisprove, detail.mwst) as b;";
+		
+		if($this->db_query($qry_brutto))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$brutto = $row->brutto;						
+			}
+			else
+			{
+				return false; 
+				$this->errormsg =" Fehler bei der Berechnung des Bruttobetrages.";
+			}
+			return $brutto; 			
+		}
+	}
+	
 }
