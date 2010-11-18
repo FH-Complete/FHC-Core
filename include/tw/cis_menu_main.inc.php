@@ -115,7 +115,21 @@
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/lvplan/index.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;LV-Plan</a></td>
 				</tr>
-
+				<tr>
+	          		<td class="tdwrap"></td>
+					<td><a href="#" class="MenuItem" onClick="js_toggle_container('LehreDokumente');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dokumente</a>
+				  	<table class="tabcontent" id="LehreDokumente" style="display: none">
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm_2010/dokumente.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Deutsch</a></td>
+						</tr>
+						<tr>
+							<td class="tdwidth10" nowrap>&nbsp;</td>
+							<td class="tdwrap"><a class="Item" href="private/info/qm_2010/dokumente.php?lang=en" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Englisch</a></td>
+						</tr>
+					</table>
+					</td>
+	  			</tr>
 			  	<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="http://valar3.technikum-wien.at:8080/dptmanager/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dynamic Power Trainer</a></td>

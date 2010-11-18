@@ -70,7 +70,7 @@ if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))
 	{
-		$erhalter = sprintf("%04s",trim($row->erhalter_kz));
+		$erhalter = sprintf("%03s",trim($row->erhalter_kz));
 	}
 }
 
