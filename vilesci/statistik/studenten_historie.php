@@ -81,7 +81,7 @@ else
 		$where.="''))";
 	}
 	else 
-		die('Sie haben keine Berechtigung fuer diese Seite');
+		echo 'Sie haben keine Berechtigung fuer diese Seite'; //die
 }
 
 $statistik = new statistik();
@@ -117,7 +117,7 @@ if($result)
 	//while($row = $db->db_fetch_object($result))
 	//{
 		echo '<tr>';
-		echo '<td>'.$statistik->.'</td>';
+		echo '<td>'.$statistik->statistik_obj[0].'</td>';
 		echo "<td>$row->vorname</td>";
 		echo "<td>".($row->fixangestellt=='t'?'fix':'frei')."</td>";
 		echo "<td>$row->kompetenzen</td>";
