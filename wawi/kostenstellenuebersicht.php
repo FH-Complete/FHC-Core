@@ -76,7 +76,7 @@ if(isset($_GET['method']))
 		//wenn id gesetzt ist --> update ansonsten neue anlegen 
 		if(isset($_GET['id']))
 		{
-			echo '<h1>Kostenstelle - Bearbeiten</h1>';
+			echo "<h1>Kostenstelle - Bearbeiten</h1>\n";
 			$id = $_GET['id'];
 			if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'su',$id))
 				die('Sie haben keine Berechtigung für diese Kostenstelle');
@@ -98,11 +98,11 @@ if(isset($_GET['method']))
 						$checked = 'checked';
 					}
 					
-					echo "<form action=\"kostenstellenuebersicht.php?method=save&id=$kostenstelle->kostenstelle_id\" method=\"post\">";
+					echo "<form action=\"kostenstellenuebersicht.php?method=save&id=$kostenstelle->kostenstelle_id\" method=\"post\">\n";
 					echo '<table border=0>';
 					echo '<tr>';					
-					echo " Organisationseinheit: <SELECT name='filter_oe_kurzbz'>";
-					echo '<option value="">-- Keine Auswahl --</option>';
+					echo " Organisationseinheit: <SELECT name='filter_oe_kurzbz'>\n";
+					echo "<option value=''>-- Keine Auswahl --</option>\n";
 					
 					foreach ($oeinheiten as $oei)
 					{
@@ -113,48 +113,48 @@ if(isset($_GET['method']))
 				
 						if($oei->aktiv)
 						{
-							echo '<option value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung.'</option>';
+							echo '<option value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung."</option>\n";
 						}
 						else 
 						{
-							echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->bezeichnung.'</option>';
+							echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->bezeichnung."</option>\n";
 						}	
 					}
 					
-					echo "</SELECT>";	
-			 	 	echo '<tr>';
-			 	 	echo "<td>Bezeichnung</td>";
-			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"bezeichnung\" value=\"$kostenstelle->bezeichnung\"></td>";
-			 	 	echo "</tr>";
-			 	 	echo '<tr>';
-			 	 	echo "<td>Kurzbezeichnung</td>";
-			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kurzbezeichnung\" value=\"$kostenstelle->kurzbz\"></td>";
-			 	 	echo "</tr>";
-			 	 	echo '<tr>';
-			 	 	echo "<td>Budget</td>";
-			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"budget\" value=\"$kostenstelle->budget\"></td>";
-			 	 	echo "</tr>";	
-			 	 	echo '<tr>';
-			 	 	echo "<td>Kostenstellen Nr.</td>";
-			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kostenstelle_nr\" value=\"$kostenstelle->kostenstelle_nr\"></td>";
-			 	 	echo "</tr>";	 	 	
-			 	 	echo '<tr>';
-			 	 	echo "<td>Aktiv?</td>";
-			 	 	echo "<td><input type=\"checkbox\" name=\"aktiv\" value=\"aktiv\" $checked>";
-			 	 	echo "</tr>";
-			 	 	echo "<tr><td>&nbsp;</td><tr>"; 	 	
-			  		echo '<tr>';
-			  		echo '<td><a href=kostenstellenuebersicht.php> zurueck </a></td>';
-			  		echo '<td><input type="submit" value="update"></td>';
-			  		echo '</tr>';
-			  		echo '</form>';
-			  		echo '</table>';
+					echo "</SELECT>\n";	
+			 	 	echo "<tr>\n";
+			 	 	echo "<td>Bezeichnung</td>\n";
+			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"bezeichnung\" value=\"$kostenstelle->bezeichnung\"></td>\n";
+			 	 	echo "</tr>\n";
+			 	 	echo "<tr>\n";
+			 	 	echo "<td>Kurzbezeichnung</td>\n";
+			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kurzbezeichnung\" value=\"$kostenstelle->kurzbz\"></td>\n";
+			 	 	echo "</tr>\n";
+			 	 	echo "<tr>\n";
+			 	 	echo "<td>Budget</td>\n";
+			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"budget\" value=\"$kostenstelle->budget\"></td>\n";
+			 	 	echo "</tr>\n";	
+			 	 	echo "<tr>\n";
+			 	 	echo "<td>Kostenstellen Nr.</td>\n";
+			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kostenstelle_nr\" value=\"$kostenstelle->kostenstelle_nr\"></td>\n";
+			 	 	echo "</tr>\n";	 	 	
+			 	 	echo "<tr>\n";
+			 	 	echo "<td>Aktiv?</td>\n";
+			 	 	echo "<td><input type=\"checkbox\" name=\"aktiv\" value=\"aktiv\" $checked>\n";
+			 	 	echo "</tr>\n";
+			 	 	echo "<tr><td>&nbsp;</td><tr>\n"; 	 	
+			  		echo "<tr>\n";
+			  		echo "<td><a href=kostenstellenuebersicht.php> zurueck </a></td>\n";
+			  		echo "<td><input type='submit' value='update'></td>";
+			  		echo "</tr>\n";
+			  		echo "</form>\n";
+			  		echo "</table>\n";
 			
 				}
 				else 
 				{
-					echo 'Kostenstelle wurde nicht gefunden!';
-					echo "<a href=\"kostenstellenuebersicht.php\"> <br>zurück </a>";					
+					echo "Kostenstelle wurde nicht gefunden!";
+					echo "<a href=\"kostenstellenuebersicht.php\"> <br>zurück </a>\n";					
 				}				
 			}		
 			else
@@ -175,11 +175,11 @@ if(isset($_GET['method']))
 			$oe->getAll(); 
 			$oeinheiten= $oe->result; 
 
-			echo "<form action=\"kostenstellenuebersicht.php?method=save\" method=\"post\">";
-			echo '<table border=0>';
-			echo '<tr>';
-			echo " Organisationseinheit: <SELECT name='filter_oe_kurzbz'>";
-			echo '<option value="">-- Keine Auswahl --</option>';
+			echo "<form action=\"kostenstellenuebersicht.php?method=save\" method=\"post\">\n";
+			echo "<table border=0>\n";
+			echo "<tr>\n";
+			echo " Organisationseinheit: <SELECT name='filter_oe_kurzbz'>\n";
+			echo "<option value=''>-- Keine Auswahl --</option>\n";
 
 			foreach ($oeinheiten as $oei)
 			{
@@ -188,38 +188,38 @@ if(isset($_GET['method']))
 		
 				if($oei->aktiv)
 				{
-					echo '<option value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung.'</option>';
+					echo '<option value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung."</option>\n";
 				}
 				else 
 				{
-					echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->bezeichnung.'</option>';
+					echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'" '.$selected.'>'.$oei->bezeichnung."</option>\n";
 				}	
 			}
-			echo "</SELECT>";
-	 	 	echo '</tr>';
-	 	 	echo '<tr>';
-	 	 	echo "<td>Bezeichnung</td>";
-	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"256\" name=\"bezeichnung\" value=\"\"></td>";
-	 	 	echo "</tr>";
-	 	 	echo '<tr>';
-	 	 	echo "<td>Kurzbezeichnung</td>";
-	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>";
-	 	 	echo "</tr>";
-	 	 	echo '<tr>';
-	 	 	echo "<td>Budget</td>";
-	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"budget\" value=\"\"></td>";
-	 	 	echo '</tr>';
-	 	 	echo '<tr>';
-	 	 	echo "<td>Kostenstellen Nr.</td>";
-	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"4\" name=\"kostenstelle_nr\" value=\"\"></td>";
-	 	 	echo '</tr>';
-	 	 	echo "<tr><td>&nbsp;</td><tr>"; 	 	
-	  		echo '<tr>';
-	  		echo '<td><a href=kostenstellenuebersicht.php> zurueck </a></td>';
-	  		echo '<td><input type="submit" value="Anlegen"></td>';
-	  		echo '</tr>';
-	  		echo '</form>';
-	  		echo '</table>';
+			echo "</SELECT>\n";
+	 	 	echo "</tr>\n";
+	 	 	echo "<tr>\n";
+	 	 	echo "<td>Bezeichnung</td>\n";
+	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"256\" name=\"bezeichnung\" value=\"\"></td>\n";
+	 	 	echo "</tr>\n";
+	 	 	echo "<tr>\n";
+	 	 	echo "<td>Kurzbezeichnung</td>\n";
+	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>\n";
+	 	 	echo "</tr>\n";
+	 	 	echo "<tr>\n";
+	 	 	echo "<td>Budget</td>\n";
+	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"budget\" value=\"\"></td>\n";
+	 	 	echo "</tr>\n";
+	 	 	echo "<tr>\n";
+	 	 	echo "<td>Kostenstellen Nr.</td>\n";
+	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"4\" name=\"kostenstelle_nr\" value=\"\"></td>\n";
+	 	 	echo "</tr>\n";
+	 	 	echo "<tr><td>&nbsp;</td><tr>\n"; 	 	
+	  		echo "<tr>\n";
+	  		echo "<td><a href=kostenstellenuebersicht.php> zurueck </a></td>\n";
+	  		echo "<td><input type='submit' value='Anlegen'></td>\n";
+	  		echo "</tr>\n";
+	  		echo "</form>\n";
+	  		echo "</table>\n";
 		}
 	}
 	else if($_GET['method']=='delete')
@@ -300,26 +300,27 @@ if(isset($_GET['method']))
 			die('Fehler beim Speichern:<br>'.$kostenstelle->errormsg."<a href=\"kostenstellenuebersicht.php\"> <br>zurück </a>");
 		}
 		echo $ausgabe;
-		echo "<a href=\"kostenstellenuebersicht.php\"> <br>zurück </a>";		
+		echo "<a href=\"kostenstellenuebersicht.php\"> <br>zurück </a>\n";		
 	}
 	else if ($_GET['method']=="allocate")
 	{
 		if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'su',$_GET['id']))
 				die('Sie haben keine Berechtigung zum Ändern der Kostenstelle');
 		
-		echo '<h1>Kostenstelle - Konten zuordnen</h1>';
+		echo '<h1>Kostenstelle - Konten zuordnen</h1><br>';
+		$i = 0;
 		$kostenstelle = new wawi_kostenstelle();
 		$konto = new wawi_konto(); 
 		
 		$kontos = array();	// Array der Konten die einer Kostenstelle zugewiesen sind
 		
-		$konto->getAll(); 	
+		$konto->getAll(null, 'beschreibung'); 	
 		$kontouebersicht = $konto->result; 
 		$kostenstelle_id = isset($_GET['id'])?$_GET['id']:'';
 		
-		echo '<a href="kostenstellenuebersicht.php">zurück</a>';
-		echo "<form name=\"save\" action=\"kostenstellenuebersicht.php?method=allocate&id=$kostenstelle_id\", method=\"POST\">";
-		echo "<table border ='0' width='100%'>";
+	//	echo "<a href='kostenstellenuebersicht.php'>zurück</a>\n";
+		echo "<form name=\"save\" action=\"kostenstellenuebersicht.php?method=allocate&id=$kostenstelle_id\", method=\"POST\">\n";
+		echo "<table border =0 width ='80%' ><tr><td><table border ='0' width=33% align=left >\n";
 
 		if(isset($_POST['submit']))
 		{
@@ -349,19 +350,28 @@ if(isset($_GET['method']))
 		//sucht nach allen Kontos der Kostenstelle und markiert diese
 		foreach($kontouebersicht as $ko)
 		{
+
 			$checked = '';
 			$kontos = $kostenstelle->get_konto_from_kostenstelle($kostenstelle_id);
 			if(in_array($ko->konto_id,$kontos))
 			{
 				$checked='checked';
 			}
-
-			echo '<tr> <td>';
+			
+			if($i % 31 == 0)
+			{
+				//echo $i; 
+				echo "</table><table border = '0' width=33% align=left>";
+			}
+			$i ++;
+			echo "<tr> <td>\n";
  			echo '<input type="checkbox" name="checkbox_'.$ko->konto_id.'" value='.$ko->konto_id." $checked>".$ko->beschreibung[1].'<br>';
  			echo '</td> </tr>';		
 		}
 		
-		echo '<tr><td>&nbsp;</td></tr></table> <input name ="submit" type="submit" value="Speichern"></form>';
+		echo "</table>\n";
+		echo "</td></tr><tr><td>&nbsp;</td></tr></table>";
+		echo "<table border =0 width =100><tr><td><input name ='submit' type='submit' value='Speichern'></form></td></tr></table>\n";
 	}
 	else if ($_GET['method']=="merge") 
 	{			
@@ -402,34 +412,34 @@ if(isset($_GET['method']))
 		$filter1 = isset($_POST['filter1'])?$_POST['filter1']:'';
 		$filter2 = isset($_POST['filter2'])?$_POST['filter2']:'';
 		
-		echo "<form name=\"suche\" action=\"kostenstellenuebersicht.php?method=merge\", method=\"POST\">";
-		echo "<table border ='0' width='100%'>";
-		echo "<tr>";
-		echo "<td width='45%%'><input name='filter1' type='text' value=\"$filter1\" size=\"64\" maxlength=\"64\" id ='suchen' onfocus=\"this.value='';\"></td>";
-		echo "<td width='10%'><input type='submit' value=' suchen ' ></td>";
-		echo "<td width='45%%'><input name='filter2' type='text' value=\"$filter2\" size=\"64\" maxlength=\"64\" id ='suchen' onfocus=\"this.value='';\"></td>";
-		echo "</tr>";
-		echo "<tr><td>&nbsp;</td></tr>";
+		echo "<form name=\"suche\" action=\"kostenstellenuebersicht.php?method=merge\", method=\"POST\">\n";
+		echo "<table border ='0' width='100%'>\n";
+		echo "<tr>\n";
+		echo "<td width='45%%'><input name='filter1' type='text' value=\"$filter1\" size=\"64\" maxlength=\"64\" id ='suchen' onfocus=\"this.value='';\"></td>\n";
+		echo "<td width='10%'><input type='submit' value=' suchen ' ></td>\n";
+		echo "<td width='45%%'><input name='filter2' type='text' value=\"$filter2\" size=\"64\" maxlength=\"64\" id ='suchen' onfocus=\"this.value='';\"></td>\n";
+		echo "</tr>\n";
+		echo "<tr><td>&nbsp;</td></tr>\n";
 		
-		echo "</form>";
-		echo '<br><a href=kostenstellenuebersicht.php>zurueck</a><br>';
-		echo "</table>";
+		echo "</form>\n";
+		echo "<br><a href=kostenstellenuebersicht.php>zurueck</a><br>\n";
+		echo "</table>\n";
 		//Tabellen anzeigen
-		echo "<form name='form_table' action='kostenstellenuebersicht.php?method=merge' method='POST'>";
-		echo "<table width='100%' border='0' cellspacing='0' cellpadding='0' id='myTable' class='tablesorter'>";
-		echo "<tr>";	
-		echo "<td valign='top'>Der wird gelöscht:";
+		echo "<form name='form_table' action='kostenstellenuebersicht.php?method=merge' method='POST'>\n";
+		echo "<table width='100%' border='0' cellspacing='0' cellpadding='0' id='myTable' class='tablesorter'>\n";
+		echo "<tr>\n";	
+		echo "<td valign='top'>Der wird gelöscht:\n";
 	
 		 //Tabelle 1
-		echo "<table id='myTable' class='tablesorter'><thead> <tr>";
+		echo "<table id='myTable' class='tablesorter'><thead> <tr>\n";
 		
-		echo "<th>Kostenstellen ID</th>";
-		echo "<th>Organisationseinheit</th>";
-		echo "<th>Bezeichnung</th>";
-		echo "<th>Kurzbezeichnung</th>";
-		echo "<th>Kostenstellennummer</th>";
-		echo "<th>Aktiv</th>";
-		echo "<th>&nbsp;</th></tr></thead><tbody>";	
+		echo "<th>Kostenstellen ID</th>\n";
+		echo "<th>Organisationseinheit</th>\n";
+		echo "<th>Bezeichnung</th>\n";
+		echo "<th>Kurzbezeichnung</th>\n";
+		echo "<th>Kostenstellennummer</th>\n";
+		echo "<th>Aktiv</th>\n";
+		echo "<th>&nbsp;</th></tr></thead><tbody>\n";	
 	
 		$kostenstelle  = new wawi_kostenstelle();
 		$kostenstelle->getAll($filter1);
@@ -439,35 +449,35 @@ if(isset($_GET['method']))
 		foreach($kostenstelle->result as $row)
 		{
 			//Zeilen der Tabelle ausgeben
-			echo '<tr>';
-			echo "<td>$row->kostenstelle_id</td>";
-			echo '<td>'.$row->oe_kurzbz.'</td>';
-			echo '<td>'.$row->bezeichnung.'</td>';
-			echo '<td>'.$row->kurzbz.'</td>';
-			echo '<td>'.$row->kostenstelle_nr.'</td>';
-			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
-			echo "<td><input type='radio' name='radio_1' value='$row->kostenstelle_id' ";
-			echo '</tr>';
+			echo "<tr>";
+			echo "<td>$row->kostenstelle_id</td>\n";
+			echo '<td>'.$row->oe_kurzbz."</td>\n";
+			echo '<td>'.$row->bezeichnung."</td>\n";
+			echo '<td>'.$row->kurzbz."</td>\n";
+			echo '<td>'.$row->kostenstelle_nr."</td>\n";
+			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
+			echo "<td><input type='radio' name='radio_1' value='$row->kostenstelle_id' </td>\n";
+			echo "</tr>\n";
 
 			$i++;
 		}
-		echo "</tbody>";
-		echo "</table>"; 
-		echo "</td>";
-		echo "<td valign='top'><input type='submit' value='  ->  '></td>";
-		echo "<td valign='top'>Der bleibt:";
+		echo "</tbody>\n";
+		echo "</table>\n"; 
+		echo "</td>\n";
+		echo "<td valign='top'><input type='submit' value='  ->  '></td>\n";
+		echo "<td valign='top'>Der bleibt:\n";
 		
 		//Tabelle 2
 		//echo "<table ><tr class='liste'>";
-		echo "<table id='myTable' class='tablesorter'><thead> <tr>";
-		echo "<th>&nbsp;</th>";
-		echo "<th>Kostenstellen ID</th>";
-		echo "<th>Organisationseinheit</th>";
-		echo "<th>Bezeichnung</th>";
-		echo "<th>Kurzbezeichnung</th>";
-		echo "<th>Kostenstellennummer</th>";
-		echo "<th>Aktiv</th>";
-		echo "<th>&nbsp;</th></tr></thead><tbody>";	
+		echo "<table id='myTable' class='tablesorter'><thead> <tr>\n";
+		echo "<th>&nbsp;</th>\n";
+		echo "<th>Kostenstellen ID</th>\n";
+		echo "<th>Organisationseinheit</th>\n";
+		echo "<th>Bezeichnung</th>\n";
+		echo "<th>Kurzbezeichnung</th>\n";
+		echo "<th>Kostenstellennummer</th>\n";
+		echo "<th>Aktiv</th>\n";
+		echo "<th>&nbsp;</th></tr></thead><tbody>\n";	
 	
 	
 		$kostenstelle  = new wawi_kostenstelle();
@@ -475,28 +485,28 @@ if(isset($_GET['method']))
 		$i=0;
 		foreach($kostenstelle->result as $row)
 		{
-			echo '<tr>';
-			echo "<td><input type='radio' name='radio_2' value='$row->kostenstelle_id' ";
-			echo '<td>'.$row->kostenstelle_id.'</td>';
-			echo '<td>'.$row->oe_kurzbz.'</td>';
-			echo '<td>'.$row->bezeichnung.'</td>';
-			echo '<td>'.$row->kurzbz.'</td>';
-			echo '<td>'.$row->kostenstelle_nr.'</td>';
-			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
-			echo '</tr>';
+			echo "<tr>\n";
+			echo "<td><input type='radio' name='radio_2' value='$row->kostenstelle_id' </td>\n";
+			echo '<td>'.$row->kostenstelle_id."</td>\n";
+			echo '<td>'.$row->oe_kurzbz."</td>\n";
+			echo '<td>'.$row->bezeichnung."</td>\n";
+			echo '<td>'.$row->kurzbz."</td>\n";
+			echo '<td>'.$row->kostenstelle_nr."</td>\n";
+			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
+			echo "</tr>\n";
 
 			$i++;
 		}
-		echo "</table>";
-		echo "</td>";
-		echo "</tr>";
-		echo "</table>";
-		echo "</form>";		
+		echo "</table>\n";
+		echo "</td>\n";
+		echo "</tr>\n";
+		echo "</table>\n";
+		echo "</form>\n";		
 	}
 }
 else
 { 
-	echo '<h1>Kostenstelle - &Uuml;bersicht</h1>';
+	echo "<h1>Kostenstelle - &Uuml;bersicht</h1>\n";
 	if(!$rechte->isberechtigt('wawi/kostenstelle',null, 's'))
 		die('Sie haben keine Berechtigung zum Anzeigen der Kostenstellen');
 			
@@ -505,7 +515,7 @@ else
 		//echo '<a href="kostenstellenuebersicht.php?method=update">neue Kostenstelle anlegen </a><br>';
 		//echo '<a href="kostenstellenuebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
 		
-		echo '<table id="myTable" class="tablesorter"> <thead>';
+		echo "<table id='myTable' class='tablesorter'> <thead>\n";
 		
 		echo '<tr>
 				<th></th>
@@ -521,19 +531,19 @@ else
 		foreach($kostenstelle->result as $row)
 		{
 			//Zeilen der Tabelle ausgeben
-			echo '<tr>';
-			echo "<td nowrap> <a href=\"kostenstellenuebersicht.php?method=allocate&id=$row->kostenstelle_id\" title=\"Konten zuordnen\"><img src=\"../skin/images/addKonto.png\"></a> <a href= \"kostenstellenuebersicht.php?method=update&id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kostenstellenuebersicht.php?method=delete&id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
-			echo '<td>'.$row->kostenstelle_id.'</td>';
-			echo '<td>'.$row->kostenstelle_nr.'</td>';
-			echo '<td>'.$row->bezeichnung.'</td>';
-			echo '<td>'.$row->kurzbz.'</td>';
-			echo '<td>'.$row->budget.'</td>';
-			echo '<td>'.$row->oe_kurzbz.'</td>';
-			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'.'</td>';
-			echo '</tr>';
+			echo "<tr>\n";
+			echo "<td nowrap> <a href=\"kostenstellenuebersicht.php?method=allocate&id=$row->kostenstelle_id\" title=\"Konten zuordnen\"><img src=\"../skin/images/addKonto.png\"></a> <a href= \"kostenstellenuebersicht.php?method=update&id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kostenstellenuebersicht.php?method=delete&id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>\n";
+			echo '<td>'.$row->kostenstelle_id."</td>\n";
+			echo '<td>'.$row->kostenstelle_nr."</td>\n";
+			echo '<td>'.$row->bezeichnung."</td>\n";
+			echo '<td>'.$row->kurzbz."</td>\n";
+			echo '<td>'.$row->budget."</td>\n";
+			echo '<td>'.$row->oe_kurzbz."</td>\n";
+			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
+			echo "</tr>\n";
 			
 		}
-		echo '</tbody></table>';	
+		echo "</tbody></table>\n";	
 	}
 }
 
