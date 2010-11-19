@@ -40,18 +40,15 @@ $fb_obj->getAll();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen(get_uid());
 
-echo '
-		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-		<html>
-		<head>
-		<title>Institutsliste</title>
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		</head>
-		<body class="Background_main">
-		<h2>Liste der MitarbeiterInnen der Institute an der Fachhochschule Technikum Wien</h2>';
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<title>Studenten Historie</title>
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+</head>
+<body class="Background_main">
+<h2>Studenten Historie</h2>';
 
 $stsem = new studiensemester();
 if(isset($_GET['ws']) && check_stsem($_GET['ws']))
@@ -64,74 +61,83 @@ if(isset($_GET['ss']) && check_stsem($_GET['ss']))
 else
 	$ss = $stsem->getNearest(2);
 
-if($rechte->isBerechtigt('admin', 0) || $rechte->isBerechtigt('mitarbeiter', 0))
-	$where = '';
+if(isset($_POST['show']))
+{
+	$studiengang_kz=$_POST['studiengang_kz'];
+	$ausbildungssemester = $_POST['ausbildungssemester'];
+}
 else 
 {
-	$fb = $rechte->getFbKz();
-	if(count($fb)>0)
-	{
-		$where = " AND EXISTS (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE 
-								tbl_lehreinheit.studiensemester_kurzbz in('$ws','$ss') AND mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
-								fachbereich_kurzbz IN(";
-		foreach ($fb as $fachbereich_kurzbz)
-		{
-			$where.="'$fachbereich_kurzbz',";
-		}
-		$where.="''))";
-	}
-	else 
-		echo 'Sie haben keine Berechtigung fuer diese Seite'; //die
+	$studiengang_kz=335;
+	$ausbildungssemester=1;
 }
-
-$statistik = new statistik();
-$result=$statistik->get_prestudenten(335,'WS2008',1);
-
-if($result)
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+$stg_obj = new studiengang();
+$stg_obj->getAll();
+echo "\n",'Studiengang <SELECT name="studiengang_kz">';
+foreach($stg_obj->result as $row)
 {
-	echo "<br><br><table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
-				<thead>
-					<tr>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th colspan='2'>ALVS</th>
-						<th></th>
-						<th colspan='2'>Institute</th>
-					</tr>
-					<tr class='liste'>
-						<th class='table-sortable:default'>Nachname</th>
-						<th class='table-sortable:default'>Vorname</th>
-						<th class='table-sortable:default'>Fix / Frei</th>
-						<th class='table-sortable:default'>Kompetenzen</th>
-						<th class='table-sortable:numeric'>$ws</th>
-						<th class='table-sortable:numeric'>$ss</th>
-						<th class='table-sortable:default'>Studiengang</th>
-						<th class='table-sortable:default'>Hauptzuteilung</th>
-						<th class='table-sortable:default'>Sonstige</th>
-					</tr>
-				</thead>
-				<tbody>";
-
-	//while($row = $db->db_fetch_object($result))
-	//{
-		echo '<tr>';
-		echo '<td>'.$statistik->statistik_obj[0].'</td>';
-		echo "<td>$row->vorname</td>";
-		echo "<td>".($row->fixangestellt=='t'?'fix':'frei')."</td>";
-		echo "<td>$row->kompetenzen</td>";
-		echo "<td>$row->lvs_wintersemester</td>";
-		echo "<td>$row->lvs_sommersemester</td>";
-		echo '<td>';
-		
-		echo '</td>';
-		echo "<td>";
-		echo "</td>";
-		echo '</tr>';
-	//}
-	echo '</tbody></table>';
+	if($row->studiengang_kz==$studiengang_kz)
+		$selected='selected';
+	else
+		$selected='';
+	echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.'</OPTION>';
 }
+echo '</SELECT>';
+/*
+$stsem_obj = new studiensemester();
+$stsem_obj->getAll();
+echo "\n",'Studiensemester <SELECT name="studiensemester_kurzbz">';
+foreach($stsem_obj->studiensemester as $row)
+{
+	if($row->studiensemester_kurzbz==$studiensemester_kurzbz)
+		$selected='selected';
+	else
+		$selected='';
+	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$row->studiensemester_kurzbz.'</OPTION>';
+}
+echo '</SELECT>';
+*/
+echo "\n",'Ausbildungssemester <SELECT name="ausbildungssemester">';
+echo '<OPTION value="">-- Alle --</OPTION>';
+for($i=1;$i<10;$i++)
+{
+	if($i==$ausbildungssemester)
+		$selected='selected';
+	else
+		$selected='';
+	echo '<OPTION value="'.$i.'" '.$selected.'>'.$i.'</OPTION>';
+}
+echo '</SELECT>';
+
+echo '&nbsp;&nbsp;<input type="submit" name="show" value="OK"></form>';
+
+echo "<table>
+		<tr class='liste'>
+			<th>Gesamt</th>
+			<th>Anfänger</th>
+			<th>Dropout</th>
+		</tr>
+";
+
+$stsem_obj = new studiensemester();
+$stsem_obj->getAll();
+foreach($stsem_obj->studiensemester as $row_stsem)
+{
+	$statistik = new statistik();
+		
+	echo '<tr>';
+	echo '<td>'.$row_stsem->studiensemester_kurzbz.'</td>';
+	
+	$statistik->get_prestudenten($studiengang_kz, $row_stsem->studiensemester_kurzbz, $ausbildungssemester);
+	echo '<td>'.count($statistik->statistik_obj).'</td>';
+	
+	$statistik->get_DropOut($studiengang_kz, $row_stsem->studiensemester_kurzbz, $ausbildungssemester);
+	echo '<td>'.count($statistik->statistik_obj).'</td>';
+	echo '</tr>';
+}
+echo '</tbody></table>';
+
 
 echo '</body></html>';
 ?>
