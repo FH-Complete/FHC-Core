@@ -84,7 +84,7 @@ class statistik extends basis_db
 	 * @param datum_stichtag Stichtag im ISO-Format, Ergebniss filtert auf <= (kleiner,gleich)
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function get_prestudenten($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester=null,$datum_stichtag=null)
+	public function get_prestudenten($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester=null, $datum_stichtag=null)
 	{
 		if(!is_numeric($studiengang_kz))
 		{
@@ -108,8 +108,8 @@ class statistik extends basis_db
 			AND ((studiensemester_kurzbz='".$studiensemester_kurzbz."'";
 		if (!is_null($datum_stichtag))
 			$qry.="	AND datum <='".$datum_stichtag."'";
-		$qry.=")";
-		$qry.=OR (studiensemester_kurzbz='".$studiensemester_kurzbz."'";
+		$qry.=') ';
+		$qry.="OR (studiensemester_kurzbz='".$studiensemester_kurzbz."'";
 		if (!is_null($datum_stichtag))
 			$qry.="	AND datum <='".$datum_stichtag."'";
 		$qry.="))";
@@ -119,12 +119,13 @@ class statistik extends basis_db
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$stg_obj = new studiengang();
+				$stat_obj = new statistik();
 				$this->studiengang_kz=$row->studiengang_kz;
 				$this->ausbildungssemester=$row->ausbildungssemester;
 				$this->prestudent_id=$row->prestudent_id;
 				$this->geschlecht=$row->geschlecht;
 				$this->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+				$this->statistik_obj=$stat_obj;
 			}
 		}
 		else
@@ -132,7 +133,7 @@ class statistik extends basis_db
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		var_dump(
+		var_dump($this);
 		return true;
 	}
 
