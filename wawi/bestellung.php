@@ -20,15 +20,40 @@
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
 
-require_once '../config/wawi.config.inc.php';
 require_once('auth.php');
+require_once '../config/wawi.config.inc.php';
 require_once '../include/firma.class.php';
 require_once '../include/organisationseinheit.class.php';
+require_once '../include/mitarbeiter.class.php';
+require_once '../include/datum.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
-require_once '../include/mitarbeiter.class.php';
-require_once('../include/datum.class.php');
+require_once '../include/wawi_kostenstelle.class.php';
+require_once '../include/benutzerberechtigung.class.php';
 $aktion ='';
+
+if(isset($_POST['getKonto']))
+{
+	$id = $_POST['id']; 
+	if(is_numeric($id))
+	{
+		$konto = new wawi_konto(); 
+		$konto->getKontoFromKostenstelle($id);
+		if(count($konto->result)>0)
+		{
+			foreach($konto->result as $ko)
+			{
+				echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
+			}
+		}
+		else 
+			echo "<option value =''>Keine Konten zu dieser Kst</option>";
+	}
+	else
+		echo "<option value =''>Keine Konten zu dieser Kst</option>";
+	exit; 
+}
+	
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -38,59 +63,92 @@ $aktion ='';
 	<title>WaWi Bestellung</title>	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
-		<link rel="stylesheet" href="../skin/style/jquery-ui.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/style/jquery-ui.css" type="text/css"/>
+	<link rel="stylesheet" href="../include/js/jquery.css" type="text/css"/>	
 	<link rel="stylesheet" href="../include/js/jquery.autocomplete.css" type="text/css"/>
+	<link rel="stylesheet" href="../include/js/redmond.datepick.css" type="text/css"/>
+	
+	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.autocomplete.min.js" ></script>
 	<script type="text/javascript" src="../include/js/jquery-ui.js" ></script>
+	<script type="text/javascript" src="../include/js/jquery.datepick.js" ></script>
+	
+	
 
 	<script type="text/javascript">
-		function formatItem(row) 
-		{
-		    return row[0] + " <li>" + row[1] + "</li> ";
-		}
-
-		$(document).ready(function() 
-		{
-			  $('#firmenname').autocomplete('wawi_autocomplete.php', 
-			  {
-				minChars:2,
-				matchSubset:1,matchContains:1,
-				width:500,
-				formatItem:formatItem,
-				extraParams:{'work':'wawi_firma_search'	}
-		  }).result(function(event, item) {
-			  $('#firma_id').val(item[1]);
-		  });		  		  
-	 	});
-
-		$(document).ready(function() 
-		{
-			  $('#mitarbeiter_name').autocomplete('wawi_autocomplete.php', 
-			  {
-				minChars:2,
-				matchSubset:1,matchContains:1,
-				width:500,
-				formatItem:formatItem,
-				extraParams:{'work':'wawi_mitarbeiter_search'	}
-		  }).result(function(event, item) {
-			  $('#mitarbeiter_uid').val(item[1]);
-		  });
-		  		  		  
-	 	});
-	 	
-		function conf_del()
-		{
-			return confirm('Diese Gruppe wirklich löschen?');
-		}
-
-		$(function() {
-			$( "#datepicker" ).datepicker();
+	function conf_del()
+	{
+		return confirm('Diese Bestellung wirklich löschen?');
+	}
+	
+	function loadKonto(id)
+	{
+		$.post("bestellung.php", {id: id, getKonto: 'true'},
+		function(data){
+			$('#konto').html(data);
 		});
 
+	}
+
+	function formatItem(row) 
+	{
+	    return row[0] + " <li>" + row[1] + "</li> ";
+	}
+
+	$(document).ready(function() 
+	{
+		  $('#firmenname').autocomplete('wawi_autocomplete.php', 
+		  {
+			minChars:2,
+			matchSubset:1,matchContains:1,
+			width:500,
+			formatItem:formatItem,
+			extraParams:{'work':'wawi_firma_search'	}
+	  }).result(function(event, item) {
+		  $('#firma_id').val(item[1]);
+	  });		  		  
+ 	});
+
+	$(document).ready(function() 
+	{
+		  $('#mitarbeiter_name').autocomplete('wawi_autocomplete.php', 
+		  {
+			minChars:2,
+			matchSubset:1,matchContains:1,
+			width:500,
+			formatItem:formatItem,
+			extraParams:{'work':'wawi_mitarbeiter_search'	}
+	  }).result(function(event, item) {
+		  $('#mitarbeiter_uid').val(item[1]);
+	  });
+	  		  		  
+ 	});
+ 	
+	function conf_del()
+	{
+		return confirm('Diese Bestellung wirklich löschen?');
+	}
+
+	$(function() {
+	//	$( "#datepicker" ).datepicker();
+		$('#datepicker').datepicker({ 
+		    pickerClass: 'myPicker', showTrigger: '#calImg'});
+		
+	});
+
+	$(document).ready(function() 
+			{ 
+			    $("#myTable").tablesorter(
+				{
+					sortList: [[1,0]],
+					widgets: ['zebra']
+				}); 
+			} 
+		); 
 			
 	</script>
 </head>
@@ -98,11 +156,19 @@ $aktion ='';
 
 <?php 
 $date = new datum(); 
+$user=get_uid();
+
+$berechtigung_kurzbz='wawi/bestellung'; 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+$kst=new wawi_kostenstelle(); 
+$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
+
 
 if (isset($_GET['method']))
 	$aktion = $_GET['method'];
 	
-
 if($aktion == 'suche')
 {	 
 	if(!isset($_POST['submit']))
@@ -172,8 +238,7 @@ if($aktion == 'suche')
 		echo "<tr>\n";
 		echo "<td> Konto: </td>\n";
 		echo "<td><SELECT name='filter_konto'>\n"; 
-		echo "<option value=''>-- auswählen --</option>\n";
-		
+		echo "<option value=''>-- auswählen --</option>\n";	
 		foreach($konto_all as $ko)
 		{
 			echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
@@ -188,7 +253,6 @@ if($aktion == 'suche')
 		echo "</td>\n";
 		echo "<td> <input type ='hidden' id='mitarbeiter_uid' name='mitarbeiter_uid' size='10' maxlength='30' value=''  >\n";
 		echo "</td>\n";		
-	
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td>Nur ohne Rechnung</td>\n";
@@ -251,20 +315,21 @@ if($aktion == 'suche')
 				foreach($bestellung->result as $row)
 				{	
 					$brutto = $bestellung->getBrutto($row->bestellung_id);
-					$firma->load($row->firma_id);
-					$freigegeben = 'false';
-					if($row->freigegeben == 't');
+					$firmenname = '';
+					if(is_numeric($row->firma_id))
 					{
-						$freigegeben = 'true'; 
+						$firma->load($row->firma_id);	
+						$firmenname = $firma->name; 
 					}
+
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
 					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
 					echo '<td>'.$row->bestell_nr."</td>\n";
 					echo '<td>'.$row->bestellung_id."</td>\n";
-					echo '<td>'.$firma->name."</td>\n";
+					echo '<td>'.$firmenname."</td>\n";
 					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
-					echo '<td>'.$freigegeben."</td>\n"; 
+					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
 					echo '<td>'.number_format($brutto,2)."</td>\n"; 
 					echo '<td>'.$row->titel."</td>\n";
 					echo '<td>'.$row->updateamum.' '.$row->updatevon ."</td>\n"; 
@@ -280,5 +345,78 @@ if($aktion == 'suche')
 		else
 		echo "ungültiges Datumsformat";
 	}
-
-}
+} else if($aktion == 'new')
+	{
+		echo "<h2>Neue Bestellung</h2>";
+		echo "<form action ='bestellung.php?method=save' method='post' name='newForm'>\n";
+		echo "<table border = 0>\n";
+		echo "<tr>\n";
+		echo "<td>Titel:</td>\n";
+		echo "<td><input type='text' size ='32' maxlength='256' id ='titel' name ='titel'>";
+		echo "</tr>\n";
+		echo "<tr>\n";
+		echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)'>\n";
+		echo "<option value=''>-- Kostenstelle auswählen --</option>\n";
+		foreach ($kst->result as $ks)
+		{
+			echo "<option value=".$ks->kostenstelle_id.">".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
+		}				
+		echo "</SELECT></td>\n";
+		echo "</tr>\n";
+		echo "<tr>\n";
+		echo "<td>Firma:</td>\n";
+		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  ></td>\n";
+		echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  ></td>\n";
+		echo "</tr>\n";
+		echo "<tr>\n"; 
+		echo "<td>Konto: </td>\n"; 
+		echo "<td>\n";
+		echo "<select name='konto' id='konto' style='width: 230px;'>\n";
+		echo "<option value='' >Kostenstelle auswaehlen</option>\n";
+		echo "</select>\n";
+		echo "</td>\n"; 
+		echo "<tr>\n";
+		echo "<td>&nbsp;</td>\n";
+		echo "<tr><td><input type='submit' name='submit' value='Anlegen'></td></tr>\n";
+		echo "</table>\n";
+	}
+	else if($aktion == 'save')
+	{
+		if(isset($_POST))
+		{
+			$newBestellung = new wawi_bestellung(); 
+			$newBestellung->titel = $_POST['titel'];
+			$newBestellung->kostenstelle_id = $_POST['filter_kst'];
+			$newBestellung->firma_id = $_POST['firma_id'];
+			$newBestellung->konto_id = $_POST['konto'];
+			
+			$newBestellung->insertamum = date('Y-m-d H:i:s');
+			$newBestellung->insertvon = $user; 
+			$newBestellung->updateamum = date('Y-m-d H:i:s');
+			$newBestellung->updatevon = $user; 
+			
+			$newBestellung->new = true; 
+			$newBestellung->freigegeben = false; 
+			
+			if (!$bestell_id = $newBestellung->save())
+			echo $newBestellung->errormsg; 
+			echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
+			echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken";  
+		}
+	
+	} 
+	else if($_GET['method']=='delete')
+	{
+		$id = (isset($_GET['id'])?$_GET['id']:null);
+		
+		$bestellung = new wawi_bestellung(); 
+		
+		if($bestellung->delete($id))
+		{
+			echo 'Bestellung erfolgreich gelöscht. <br>';
+		}
+		else
+		{
+			echo $bestellung->errormsg; 
+		}
+	}
