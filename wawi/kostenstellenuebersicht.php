@@ -122,6 +122,7 @@ if(isset($_GET['method']))
 					}
 					
 					echo "</SELECT>\n";	
+					
 			 	 	echo "<tr>\n";
 			 	 	echo "<td>Bezeichnung</td>\n";
 			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"bezeichnung\" value=\"$kostenstelle->bezeichnung\"></td>\n";
