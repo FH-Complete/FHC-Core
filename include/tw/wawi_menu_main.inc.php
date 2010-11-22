@@ -47,7 +47,7 @@ $menu=array
 		'Bestellung'=>array
 		(
 			'name'=>'Bestellung', 'permissions'=>array('wawi/bestellung'),'link'=>'bestellung.php?method=suche', 'target'=>'content',
-			'BestellungNeu'=>array('name'=>'Neu', 'link'=>'bestellung.php?mehtod=update', 'target'=>'content'),
+			'BestellungNeu'=>array('name'=>'Neu', 'link'=>'bestellung.php?method=new', 'target'=>'content'),
 		),
 	)	
 );
