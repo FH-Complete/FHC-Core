@@ -299,7 +299,7 @@ class wawi_bestellung extends basis_db
 				$qry.= ' and ';
 			$qry.= ' not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
 		}
-		echo $qry; 
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";

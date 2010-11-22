@@ -496,7 +496,7 @@ class wawi_kostenstelle extends basis_db
 	 */
 	public function loadArray($array)
 	{
-		$qry = 'SELECT * FROM wawi.tbl_kostenstelle WHERE kostenstelle_id IN('.$this->implode4SQL($array).');';
+		$qry = 'SELECT * FROM wawi.tbl_kostenstelle WHERE kostenstelle_id IN('.$this->implode4SQL($array).') ORDER BY bezeichnung;';
 				
 		if(!$this->db_query($qry))
 		{
