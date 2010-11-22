@@ -329,7 +329,7 @@ class wawi_konto extends basis_db
 	}
 	
 	/**
-	 * Liefert alle Konten die den Kriterien entsprechen
+	 * Liefert alle Konten die den Suchstring $filter entsprechen
 	 * @param $filter String nach dem gefiltert wird
 	 * @param $order Sortierkriterium
 	 * @return array mit Konten oder false wenn ein Fehler auftritt
@@ -418,6 +418,61 @@ class wawi_konto extends basis_db
 		$id1=0;
 		$id2=0;
 	}		
+	
+	/**
+	 * 
+	 * gibt alle Konten die der übergebenen Kostenstelle zugeordnet sind zurück
+	 * @param $kostenstelle_id 
+	 */
+	public function getKontoFromKostenstelle($kostenstelle_id)
+	{
+		if(is_numeric($kostenstelle_id))
+		{
+			$qry_beschreibung = $this->getBezeichnungString('select');
+		
+		
+			$qry = 'select *, konto.insertamum as inserta, konto.insertvon as insertv, '.$qry_beschreibung.' 
+			from wawi.tbl_konto konto, wawi.tbl_konto_kostenstelle kst 
+			where kst.konto_id = konto.konto_id and kst.kostenstelle_id ='.$kostenstelle_id.';';
+			
+			//echo $qry; 
+			if(!$this->db_query($qry))
+			{
+				$this->errormsg = "Fehler bei der Abfrage aufgetreten.";
+				return false; 
+				
+			}
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new wawi_konto(); 
+				
+				$obj->konto_id = $row->konto_id; 
+				$obj->kontonr = $row->kontonr;
+			
+				$i = 1; 
+				foreach($this->sprache->result as $s)
+				{
+					if($s->content == true)
+					{
+						$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 
+					}
+					$i++;
+				}
+				
+				$obj->kurzbz = $row->kurzbz; 
+				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->insertamum = $row->inserta;
+				$obj->insertvon = $row->insertv;
+				$obj->updateamum = $row->updateamum; 
+				$obj->updatevon = $row->updatevon; 
+				
+				$this->result[] = $obj; 
+			}
+			return true; 
+		}
+		else 
+		return false; 
+	}
 	
 	/**
 	 * 

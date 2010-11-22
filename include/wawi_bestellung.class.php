@@ -136,7 +136,7 @@ class wawi_bestellung extends basis_db
 			$bestellung->firma_id = $row->firma_id; 
 			$bestellung->lieferadresse = $row->lieferadresse; 
 			$bestellung->rechnungsadresse = $row->rechnungsadresse; 
-			$bestellung->freigegeben = $row->freigegeben; 
+			$bestellung->freigegeben = ($row->freigegeben=='t'?true:false);
 			$bestellung->bestell_nr = $row->bestell_nr;
 			$bestellung->titel = $row->titel;
 			$bestellung->bemerkung = $row->bemerkung; 
@@ -421,11 +421,16 @@ class wawi_bestellung extends basis_db
 	 */
 	public function save()
 	{
-		if(!$this->validate())
-			return false; 
+	/*	if(!$this->validate())
+			return false; */
 		
 		if($this->new)
 		{
+			if($this->freigegeben === false)
+				$freigegeben_new = 'false';
+			else 
+				$freigegeben_new = 'true';
+				
 			$qry = 'BEGIN; INSERT INTO wawi.tbl_bestellung (besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, 
 			freigegeben, bestell_nr, titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES ('.
 			$this->addslashes($this->besteller_uid).', '.
@@ -433,9 +438,9 @@ class wawi_bestellung extends basis_db
 			$this->addslashes($this->konto_id).', '.
 			$this->addslashes($this->firma_id).', '.
 			$this->addslashes($this->lieferadresse).', '.
-			$this->addslashes($this->rechnungsadresse).', '.
-			$this->addslashes($this->freigegeben).', '.
-			$this->addslashes($this->bestell_nr).', '.
+			$this->addslashes($this->rechnungsadresse).", ".
+			$freigegeben_new.",
+			currval('wawi.seq_bestellung_bestellung_id'), ".
 			$this->addslashes($this->titel).', '.
 			$this->addslashes($this->bemerkung).', '.
 			$this->addslashes($this->liefertermin).', '.
@@ -471,7 +476,7 @@ class wawi_bestellung extends basis_db
 			if($this->new)
 			{
 				//aktuelle Sequence holen
-				$qry="SELECT currval('seq_bestellung_bestellung_id') as id;";
+				$qry="SELECT currval('wawi.seq_bestellung_bestellung_id') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
