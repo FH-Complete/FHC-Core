@@ -78,7 +78,7 @@ if (count($berechtigt_studiengang)>0)
 	$sql_query="SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 				FROM (public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
 					LEFT OUTER JOIN public.tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
-				WHERE tbl_lehrverband.aktiv AND tbl_studiengang.aktiv $stg_kz_query
+				WHERE tbl_lehrverband.aktiv $stg_kz_query
 				ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 }
 else 
@@ -419,7 +419,7 @@ while ($row=$dbo->db_fetch_object())
 	if ($stg_kz!=$row->studiengang_kz)
 	{
 		draw_orgformpart($stg_kz);
-		
+		$sem=null;
 		$stg_kz=$row->studiengang_kz;
 		$stg_kurzbz=strtoupper($row->typ.$row->kurzbz);
 		?>
@@ -525,6 +525,7 @@ while ($row=$dbo->db_fetch_object())
 			}
 		}
    	}
+   	
    	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
    	{
    		$sem=$row->semester;
