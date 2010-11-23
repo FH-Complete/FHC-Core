@@ -431,7 +431,7 @@ class wawi_konto extends basis_db
 			$qry_beschreibung = $this->getBezeichnungString('select');
 		
 		
-			$qry = 'select *, konto.insertamum as inserta, konto.insertvon as insertv, '.$qry_beschreibung.' 
+			$qry = 'select konto.*, '.$qry_beschreibung.' 
 			from wawi.tbl_konto konto, wawi.tbl_konto_kostenstelle kst 
 			where kst.konto_id = konto.konto_id and kst.kostenstelle_id ='.$kostenstelle_id.';';
 			
@@ -461,8 +461,8 @@ class wawi_konto extends basis_db
 				
 				$obj->kurzbz = $row->kurzbz; 
 				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->insertamum = $row->inserta;
-				$obj->insertvon = $row->insertv;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum; 
 				$obj->updatevon = $row->updatevon; 
 				
@@ -472,6 +472,62 @@ class wawi_konto extends basis_db
 		}
 		else 
 		return false; 
+	}
+	
+	/**
+	 * 
+	 * gibt alle Konten die der übergebenen Organisationseinheit zugeordnet sind zurück
+	 * @param $kostenstelle_id 
+	 */
+	public function getKontoFromOE($oe_kurzbz)
+	{
+
+		$qry_beschreibung = $this->getBezeichnungString('select');
+	
+	
+		$qry = 'select konto.*, '.$qry_beschreibung.' 
+		from 
+		public.tbl_organisationseinheit as orga, wawi.tbl_kostenstelle as kst, wawi.tbl_konto_kostenstelle as kontokst, wawi.tbl_konto as konto where
+		orga.oe_kurzbz = kst.oe_kurzbz and 
+		kst.kostenstelle_id = kontokst.kostenstelle_id and 
+		kontokst.konto_id = konto.konto_id and 
+		orga.oe_kurzbz = '.$this->addslashes($oe_kurzbz).';';
+
+		
+		//echo $qry; 
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten.";
+			return false; 
+			
+		}
+		while($row = $this->db_fetch_object())
+		{
+			$obj = new wawi_konto(); 
+			
+			$obj->konto_id = $row->konto_id; 
+			$obj->kontonr = $row->kontonr;
+		
+			$i = 1; 
+			foreach($this->sprache->result as $s)
+			{
+				if($s->content == true)
+				{
+					$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 
+				}
+				$i++;
+			}
+			
+			$obj->kurzbz = $row->kurzbz; 
+			$obj->aktiv = ($row->aktiv=='t'?true:false);
+			$obj->insertamum = $row->insertamum;
+			$obj->insertvon = $row->insertvon;
+			$obj->updateamum = $row->updateamum; 
+			$obj->updatevon = $row->updatevon; 
+			
+			$this->result[] = $obj; 
+		}
+		return true; 
 	}
 	
 	/**
