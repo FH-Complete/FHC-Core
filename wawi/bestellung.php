@@ -53,6 +53,50 @@ if(isset($_POST['getKonto']))
 		echo "<option value =''>Keine Konten zu dieser Kst</option>";
 	exit; 
 }
+
+if(isset($_POST['getFirma']))
+{
+	$id = $_POST['id']; 
+	if(isset($_POST['id']))
+	{
+		$firma = new firma(); 
+		$firma->get_firmaorganisationseinheit(null,$id);
+		if(count($firma->result)>0)
+		{
+			foreach($firma->result as $fi)
+			{
+				echo '<option value='.$fi->firma_id.' >'.$fi->name."</option>\n";
+			}
+		}
+		else 
+			echo "<option value =''>Keine Firmen zu dieser OE</option>";
+	}
+	else
+		echo "<option value =''>Keine Firmen zu dieser OE</option>";
+	exit; 
+}
+
+if(isset($_POST['getSearchKonto']))
+{
+	$id = $_POST['id']; 
+	if(isset($_POST['id']))
+	{
+		$konto = new wawi_konto();
+		$konto->getKontoFromOE($id);
+		if(count($konto->result)>0)
+		{
+			foreach($konto->result as $ko)
+			{
+				echo '<option value='.$ko->konto_id.' >'.$ko->beschreibung[1]."</option>\n";
+			}
+		}
+		else 
+			echo "<option value =''>Kein Konto zu dieser OE</option>";
+	}
+	else
+		echo "<option value =''>Kein Konto zu dieser OE</option>";
+	exit; 
+}
 	
 ?>
 
@@ -63,11 +107,9 @@ if(isset($_POST['getKonto']))
 	<title>WaWi Bestellung</title>	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
-	<link rel="stylesheet" href="../skin/style/jquery-ui.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/jquery-ui.css" type="text/css"/>
 	<link rel="stylesheet" href="../include/js/jquery.css" type="text/css"/>	
 	<link rel="stylesheet" href="../include/js/jquery.autocomplete.css" type="text/css"/>
-	<link rel="stylesheet" href="../include/js/redmond.datepick.css" type="text/css"/>
-	
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
@@ -75,10 +117,9 @@ if(isset($_POST['getKonto']))
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.autocomplete.min.js" ></script>
 	<script type="text/javascript" src="../include/js/jquery-ui.js" ></script>
-	<script type="text/javascript" src="../include/js/jquery.datepick.js" ></script>
+	<script type="text/javascript" src="..//include/js/jquery.ui.datepicker-de.js"></script> 
 	
 	
-
 	<script type="text/javascript">
 	function conf_del()
 	{
@@ -91,7 +132,19 @@ if(isset($_POST['getKonto']))
 		function(data){
 			$('#konto').html(data);
 		});
+	}
 
+	function loadFirma(id)
+	{
+		$.post("bestellung.php", {id: id, getFirma: 'true'},
+		function(data){
+			$('#firma').html(data);
+		});
+		
+		$.post("bestellung.php", {id: id, getSearchKonto: 'true'},
+				function(data){
+					$('#searchKonto').html(data);
+		});
 	}
 
 	function formatItem(row) 
@@ -134,10 +187,16 @@ if(isset($_POST['getKonto']))
 	}
 
 	$(function() {
-	//	$( "#datepicker" ).datepicker();
-		$('#datepicker').datepicker({ 
-		    pickerClass: 'myPicker', showTrigger: '#calImg'});
-		
+		$( "#datepicker" ).datepicker($.datepicker.regional['de']);
+	});
+	$(function() {
+		$( "#datepicker1" ).datepicker($.datepicker.regional['de']);
+	});
+	$(function() {
+		$( "#datepicker2" ).datepicker($.datepicker.regional['de']);
+	});
+	$(function() {
+		$( "#datepicker3" ).datepicker($.datepicker.regional['de']);
 	});
 
 	$(document).ready(function() 
@@ -182,6 +241,8 @@ if($aktion == 'suche')
 		$konto_all = $konto->result;
 		$datum = new datum(); 
 		$datum=getdate(); 
+		$firmaAll = new firma(); 
+		$firmaAll->getAll(); 
 		if ($datum['mon']<=9)
 		{
 			$suchdatum="01.09.".($datum['year']-1);
@@ -191,7 +252,7 @@ if($aktion == 'suche')
 			$suchdatum="01.09.".$datum['year'];
 		}
 
-		echo "Bestellung suchen "; 
+		echo "<h2>Bestellung suchen</h2>\n"; 
 		echo "<form action ='bestellung.php?method=suche' method='post' name='sucheForm'>\n";
 		echo "<table border =0>\n";
 		echo "<tr>\n";
@@ -204,22 +265,15 @@ if($aktion == 'suche')
 		echo "<tr>\n";
 		echo "<tr>\n"; 
 		echo "<td>Erstelldatum</td>\n";
-		echo "<td>von <input type ='text' id='datepicker' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' size ='12' name = 'ebis'></td>\n";
+		echo "<td>von <input type ='text' id='datepicker' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' id='datepicker1' size ='12' name = 'ebis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td>Bestelldatum</td>\n";
-		echo "<td>von <input type ='text' size ='12' name ='bvon'> bis <input type ='text' size ='12' name = 'bbis'></td>\n";
-		echo "</tr>\n";
-		echo "<tr>\n";
-		echo "<td> Firma: </td>\n";
-		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  >\n";
-		echo "</td>\n";
-		echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  >\n";
-		echo "</td>\n";
+		echo "<td>von <input type ='text' id='datepicker2' size ='12' name ='bvon'> bis <input type ='text' id='datepicker3' size ='12' name = 'bbis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td> Organisationseinheit: </td>\n";
-		echo "<td><SELECT name='filter_oe_kurzbz'>\n"; 
+		echo "<td><SELECT name='filter_oe_kurzbz' onchange='loadFirma(this.value)'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";
 		foreach ($oeinheiten as $oei)
 		{
@@ -234,10 +288,26 @@ if($aktion == 'suche')
 		}
 		echo "</td>\n";
 		echo "</SELECT>\n";
-		echo "</tr>\n";
+		echo "</tr>\n";		
+		echo "<tr>\n";
+		echo "<td> Firma: </td>\n";
+		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  >\n";
+		
+		echo "<SELECT name='filter_firma' id='firma' style='width: 256px;'>\n"; 
+		echo "<option value=''>-- auswählen --</option>\n";
+		foreach ($firmaAll->result as $fi)
+		{
+			echo "<option value=".$fi->firma_id." >".$fi->name."</option>\n";
+		}
+		echo "</td>\n";
+		echo "</SELECT>\n";
+		echo "</td>\n";
+		echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  >\n";
+		echo "</td>\n";
+		echo "</tr>\n";	
 		echo "<tr>\n";
 		echo "<td> Konto: </td>\n";
-		echo "<td><SELECT name='filter_konto'>\n"; 
+		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";	
 		foreach($konto_all as $ko)
 		{
@@ -260,12 +330,12 @@ if($aktion == 'suche')
 		echo "</tr>\n";
 		echo "<tr><td>&nbsp;</td></tr>\n";
 		echo "<tr><td><input type='submit' name ='submit' value='Suche'></td></tr>\n";
-		
 		echo "</table>\n";
 		echo "</form>\n";
 	}
 	else
 	{		
+		// Suchergebnisse anzeigen
 		$bestellnummer = $_POST['bestellnr'];
 		$titel = $_POST['titel'];
 		$evon = $_POST['evon'];
@@ -345,8 +415,9 @@ if($aktion == 'suche')
 		else
 		echo "ungültiges Datumsformat";
 	}
-} else if($aktion == 'new')
+} 	else if($aktion == 'new')
 	{
+		// Maske für neue Bestellung anzeigen
 		echo "<h2>Neue Bestellung</h2>";
 		echo "<form action ='bestellung.php?method=save' method='post' name='newForm'>\n";
 		echo "<table border = 0>\n";
