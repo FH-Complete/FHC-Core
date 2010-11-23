@@ -321,7 +321,7 @@ if(isset($_GET['method']))
 		
 	//	echo "<a href='kostenstellenuebersicht.php'>zurück</a>\n";
 		echo "<form name=\"save\" action=\"kostenstellenuebersicht.php?method=allocate&id=$kostenstelle_id\", method=\"POST\">\n";
-		echo "<table border =0 width ='80%' ><tr><td><table border ='0' width=33% align=left >\n";
+		echo "<table border =0 width ='80%' ><tr><td><table border ='0' width=25% align=left >\n";
 
 		if(isset($_POST['submit']))
 		{
@@ -362,7 +362,7 @@ if(isset($_GET['method']))
 			if($i % 31 == 0)
 			{
 				//echo $i; 
-				echo "</table><table border = '0' width=33% align=left>";
+				echo "</table><table border = '0' width=25% align=left>";
 			}
 			$i ++;
 			echo "<tr> <td>\n";
