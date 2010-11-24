@@ -146,7 +146,6 @@ if($aktion!='zip')
 							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
 							AND public.tbl_benutzer.aktiv 
-							AND lehre.tbl_projektarbeit.note IS NULL 
 						";
 			if ($stg_kz!='')
 				$qry_termin.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";

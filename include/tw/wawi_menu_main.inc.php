@@ -43,11 +43,16 @@ $menu=array
 	),
 	'Benutzerbereich'=> 	array
 	(
-		'name'=>'Benutzerbereich', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung'),
+		'name'=>'Benutzerbereich', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
 		'Bestellung'=>array
 		(
 			'name'=>'Bestellung', 'permissions'=>array('wawi/bestellung'),'link'=>'bestellung.php?method=suche', 'target'=>'content',
 			'BestellungNeu'=>array('name'=>'Neu', 'link'=>'bestellung.php?method=new', 'target'=>'content'),
+		),
+		'Rechnung'=>array
+		(
+			'name'=>'Rechnung', 'permissions'=>array('wawi/rechnung'),'link'=>'rechnung.php?method=suche', 'target'=>'content',
+			'RechnungNeu'=>array('name'=>'Neu', 'link'=>'rechnung.php?method=new', 'target'=>'content'),
 		),
 	)	
 );
