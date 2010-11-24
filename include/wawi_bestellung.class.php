@@ -86,7 +86,7 @@ class wawi_bestellung extends basis_db
 		if($row = $this->db_fetch_object())
 		{
 			$this->bestellung_id = $row->bestellung_id; 
-			$this->besteller_uid = $row->besteller_id; 
+			$this->besteller_uid = $row->besteller_uid; 
 			$this->kostenstelle_id = $row->kostenstelle_id; 
 			$this->konto_id = $row->konto_id; 
 			$this->firma_id = $row->firma_id; 
@@ -167,7 +167,7 @@ class wawi_bestellung extends basis_db
 	 * @param $mitarbeiter_uid
 	 * @param $rechnung
 	 */
-	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung )
+	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma)
 	{
 		$first = true; 
 		$qry = "SELECT distinct on (bestellung.bestellung_id) *, status.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
@@ -254,6 +254,17 @@ class wawi_bestellung extends basis_db
 			else 
 				$qry.= ' and ';
 			$qry.= ' bestellung.firma_id = '.$this->addslashes($firma_id);
+		}
+		if ($filter_firma != '')
+		{
+			if($first == true)
+			{
+				$qry.= 'where ';
+				$first = false; 
+			}
+			else 
+				$qry.= ' or ';
+			$qry.= ' bestellung.firma_id = '.$this->addslashes($filter_firma);
 		}
 		if ($oe_kurzbz != '')
 		{

@@ -288,8 +288,51 @@ class wawi_bestelldetail extends basis_db
 			return false;
 		}
 		return $this->bestelldetail_id;
+	}
+	
+	public function getAllDetailsFromBestellung($bestell_id)
+	{
+		if(!is_numeric($bestell_id))
+		{
+			$this->errormsg ='Keine gültige Bestell ID.';
+			return false; 
+		}
+		$qry = "SELECT * from wawi.tbl_bestelldetail as detail
+				where
+				detail.bestellung_id = ".$bestell_id.";";
 		
-		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$detail = new wawi_bestelldetail(); 
+				
+				$detail->bestelldetail_id = $row->bestelldetail_id;
+				$detail->bestellung_id = $row->bestellung_id; 
+				$detail->positoin = $row->position; 
+				$detail->menge = $row->menge; 
+				$detail->verpackungseinheit = $row->verpackungseinheit; 
+				$detail->beschreibung = $row->beschreibung; 
+				$detail->artikelnummer = $row->artikelnummer; 
+				$detail->preisprove = $row->preisprove; 
+				$detail->mwst = $row->mwst; 
+				$detail->erhalten = $row->erhalten; 
+				$detail->sort = $row->sort; 
+				$detail->text = $row->text; 
+				$detail->insertamum = $row->insertamum; 
+				$detail->insertvon = $row->insertvon; 
+				$detail->updateamum = $row->updateamum; 
+				$detail->updatevon = $row->updatevon; 	
+				
+				$this->result[] = $detail; 
+			}
+			return true; 
+		}
+		else 
+		{
+			$this->errormsg = "Fehler bei der Abfrage.";
+			return false;
+		}
 	}
 	
 }
