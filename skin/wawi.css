@@ -105,3 +105,8 @@ ul
 {
 	padding-left: 10px;
 }
+
+table.dark td
+{
+	background:lightgray;
+}
