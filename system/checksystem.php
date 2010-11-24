@@ -1251,7 +1251,6 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			ALTER TABLE wawi.tbl_bestellung ADD CONSTRAINT fk_bestellung_kostenstelle FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_bestellung ADD CONSTRAINT fk_bestellung_konto FOREIGN KEY (konto_id) REFERENCES wawi.tbl_konto (konto_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_bestellung ADD CONSTRAINT fk_bestellung_firma FOREIGN KEY (firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-			ALTER TABLE wawi.tbl_bestellung ADD CONSTRAINT uk_bestellung_bestell_nr UNIQUE (bestell_nr);
 			
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_bestellung TO admin;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestellung_bestellung_id TO admin;
@@ -1594,6 +1593,9 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			CREATE INDEX idx_bestelldetail_bestellung_id ON wawi.tbl_bestelldetail (bestellung_id);
 			CREATE INDEX idx_bestellung_kostenstelle_id ON wawi.tbl_bestellung (kostenstelle_id);
 			CREATE INDEX idx_bestellung_freigegeben ON wawi.tbl_bestellung (freigegeben);
+			
+			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Zahlung','Zahlung');
+			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Gutschrift','Gutschrift');
 	";
 	
 	if(!$db->db_query($qry))
