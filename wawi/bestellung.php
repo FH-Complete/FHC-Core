@@ -26,10 +26,12 @@ require_once '../include/firma.class.php';
 require_once '../include/organisationseinheit.class.php';
 require_once '../include/mitarbeiter.class.php';
 require_once '../include/datum.class.php';
+require_once '../include/benutzerberechtigung.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
-require_once '../include/benutzerberechtigung.class.php';
+require_once '../include/wawi_bestelldetails.class.php';
+
 $aktion ='';
 
 if(isset($_POST['getKonto']))
@@ -59,17 +61,35 @@ if(isset($_POST['getFirma']))
 	$id = $_POST['id']; 
 	if(isset($_POST['id']))
 	{
-		$firma = new firma(); 
-		$firma->get_firmaorganisationseinheit(null,$id);
-		if(count($firma->result)>0)
+		if($_POST['id'] == 'opt_auswahl')
 		{
-			foreach($firma->result as $fi)
+			// anzeige aller Firmen
+			$firmaAll = new firma(); 
+			$firmaAll->getAll(); 
+			
+			echo "<option value=''>-- auswählen --</option>\n";
+			foreach ($firmaAll->result as $fi)
 			{
-				echo '<option value='.$fi->firma_id.' >'.$fi->name."</option>\n";
+				echo "<option value=".$fi->firma_id." >".$fi->name."</option>\n";
 			}
+			
 		}
-		else 
-			echo "<option value =''>Keine Firmen zu dieser OE</option>";
+		else
+		{
+			// anzeige der Firmen die oe zugeordnet sind
+			$firma = new firma(); 
+			$firma->get_firmaorganisationseinheit(null,$id);
+			if(count($firma->result)>0)
+			{
+				echo "<option value=''>-- auswählen --</option>\n";
+				foreach($firma->result as $fi)
+				{
+					echo '<option value='.$fi->firma_id.' >'.$fi->name."</option>\n";
+				}
+			}
+			else 
+				echo "<option value =''>Keine Firmen zu dieser OE</option>";
+		}
 	}
 	else
 		echo "<option value =''>Keine Firmen zu dieser OE</option>";
@@ -81,17 +101,34 @@ if(isset($_POST['getSearchKonto']))
 	$id = $_POST['id']; 
 	if(isset($_POST['id']))
 	{
-		$konto = new wawi_konto();
-		$konto->getKontoFromOE($id);
-		if(count($konto->result)>0)
+		if($_POST['id'] == 'opt_auswahl')
 		{
+			$konto = new wawi_konto();
+			$konto->getAll();
+			// anzeige aller Konten
+			echo "<option value=''>-- auswählen --</option>\n";
 			foreach($konto->result as $ko)
 			{
-				echo '<option value='.$ko->konto_id.' >'.$ko->beschreibung[1]."</option>\n";
+				echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
+		
 			}
 		}
 		else 
-			echo "<option value =''>Kein Konto zu dieser OE</option>";
+		{
+			// anzeige aller Konten die der Kostenstelle zugeordnet sind
+			$konto = new wawi_konto();
+			$konto->getKontoFromOE($id);
+			if(count($konto->result)>0)
+			{
+				echo "<option value=''>-- auswählen --</option>\n";
+				foreach($konto->result as $ko)
+				{
+					echo '<option value='.$ko->konto_id.' >'.$ko->beschreibung[1]."</option>\n";
+				}
+			}
+			else 
+				echo "<option value =''>Kein Konto zu dieser OE</option>";
+		}
 	}
 	else
 		echo "<option value =''>Kein Konto zu dieser OE</option>";
@@ -150,36 +187,7 @@ if(isset($_POST['getSearchKonto']))
 	function formatItem(row) 
 	{
 	    return row[0] + " <li>" + row[1] + "</li> ";
-	}
-
-	$(document).ready(function() 
-	{
-		  $('#firmenname').autocomplete('wawi_autocomplete.php', 
-		  {
-			minChars:2,
-			matchSubset:1,matchContains:1,
-			width:500,
-			formatItem:formatItem,
-			extraParams:{'work':'wawi_firma_search'	}
-	  }).result(function(event, item) {
-		  $('#firma_id').val(item[1]);
-	  });		  		  
- 	});
-
-	$(document).ready(function() 
-	{
-		  $('#mitarbeiter_name').autocomplete('wawi_autocomplete.php', 
-		  {
-			minChars:2,
-			matchSubset:1,matchContains:1,
-			width:500,
-			formatItem:formatItem,
-			extraParams:{'work':'wawi_mitarbeiter_search'	}
-	  }).result(function(event, item) {
-		  $('#mitarbeiter_uid').val(item[1]);
-	  });
-	  		  		  
- 	});
+	}	  		  
  	
 	function conf_del()
 	{
@@ -187,27 +195,69 @@ if(isset($_POST['getSearchKonto']))
 	}
 
 	$(function() {
-		$( "#datepicker" ).datepicker($.datepicker.regional['de']);
+		$( "#datepicker_evon" ).datepicker($.datepicker.regional['de']);
 	});
 	$(function() {
-		$( "#datepicker1" ).datepicker($.datepicker.regional['de']);
+		$( "#datepicker_ebis" ).datepicker($.datepicker.regional['de']);
 	});
 	$(function() {
-		$( "#datepicker2" ).datepicker($.datepicker.regional['de']);
+		$( "#datepicker_bvon" ).datepicker($.datepicker.regional['de']);
 	});
 	$(function() {
-		$( "#datepicker3" ).datepicker($.datepicker.regional['de']);
+		$( "#datepicker_bbis" ).datepicker($.datepicker.regional['de']);
+	});
+	$(function() {
+		$( "#datepicker_liefertermin" ).datepicker($.datepicker.regional['de']);
 	});
 
 	$(document).ready(function() 
-			{ 
-			    $("#myTable").tablesorter(
-				{
-					sortList: [[1,0]],
-					widgets: ['zebra']
-				}); 
-			} 
-		); 
+	{ 
+	    $("#myTable").tablesorter(
+		{
+			sortList: [[1,0]],
+			widgets: ['zebra']
+		}); 
+		
+	    $('#aufteilung_link').click(function() {
+	          $('#aufteilung').toggle();
+	          return false;
+	        });
+        
+	    $('#mitarbeiter_name').autocomplete('wawi_autocomplete.php', 
+	  		  {
+	  			minChars:2,
+	  			matchSubset:1,matchContains:1,
+	  			width:500,
+	  			formatItem:formatItem,
+	  			extraParams:{'work':'wawi_mitarbeiter_search'	}
+	  	  }).result(function(event, item) {
+	  		  $('#mitarbeiter_uid').val(item[1]);
+	  	  });
+	  	  
+	    $('#firmenname').autocomplete('wawi_autocomplete.php', 
+	  		  {
+	  			minChars:2,
+	  			matchSubset:1,matchContains:1,
+	  			width:500,
+	  			formatItem:formatItem,
+	  			extraParams:{'work':'wawi_firma_search'	}
+	  	  }).result(function(event, item) {
+	  		  $('#firma_id').val(item[1]);
+	  	  });
+	  	  		  		  
+	}); 
+	function calcLine(id)
+   	{
+     var zahl = 
+     (eval(document.getElementById("preisprove_"+id).value)  + ((document.getElementById("preisprove_"+id).value) * (document.getElementById("mwst_"+id).value) / 100)) 
+     * eval(document.getElementById("menge_"+id).value);
+     document.getElementById("brutto_"+id).value = zahl.toFixed(2); 
+   	}
+
+	function getMwst()
+	{
+
+	}
 			
 	</script>
 </head>
@@ -265,16 +315,16 @@ if($aktion == 'suche')
 		echo "<tr>\n";
 		echo "<tr>\n"; 
 		echo "<td>Erstelldatum</td>\n";
-		echo "<td>von <input type ='text' id='datepicker' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' id='datepicker1' size ='12' name = 'ebis'></td>\n";
+		echo "<td>von <input type ='text' id='datepicker_evon' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' id='datepicker_ebis' size ='12' name = 'ebis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td>Bestelldatum</td>\n";
-		echo "<td>von <input type ='text' id='datepicker2' size ='12' name ='bvon'> bis <input type ='text' id='datepicker3' size ='12' name = 'bbis'></td>\n";
+		echo "<td>von <input type ='text' id='datepicker_bvon' size ='12' name ='bvon'> bis <input type ='text' id='datepicker_bbis' size ='12' name = 'bbis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td> Organisationseinheit: </td>\n";
 		echo "<td><SELECT name='filter_oe_kurzbz' onchange='loadFirma(this.value)'>\n"; 
-		echo "<option value=''>-- auswählen --</option>\n";
+		echo "<option value='opt_auswahl'>-- auswählen --</option>\n";
 		foreach ($oeinheiten as $oei)
 		{
 			if($oei->aktiv)
@@ -307,7 +357,7 @@ if($aktion == 'suche')
 		echo "</tr>\n";	
 		echo "<tr>\n";
 		echo "<td> Konto: </td>\n";
-		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;>\n"; 
+		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";	
 		foreach($konto_all as $ko)
 		{
@@ -336,6 +386,7 @@ if($aktion == 'suche')
 	else
 	{		
 		// Suchergebnisse anzeigen
+		//var_dump($_POST);
 		$bestellnummer = $_POST['bestellnr'];
 		$titel = $_POST['titel'];
 		$evon = $_POST['evon'];
@@ -345,7 +396,8 @@ if($aktion == 'suche')
 		$firma_id = $_POST['firma_id'];
 		$oe_kurzbz = $_POST['filter_oe_kurzbz'];
 		$filter_konto = $_POST['filter_konto'];
-		$mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+		$mitarbeiter_uid =  $_POST['mitarbeiter_uid'];
+		$filter_firma = $_POST['filter_firma'];
 		if (isset ($_POST['rechnung']))
 			$rechnung = true; 
 		else
@@ -364,7 +416,8 @@ if($aktion == 'suche')
 			
 		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
 		{
-			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung))
+			// Filter firma oder firma id werden angezeigt
+			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma))
 			{
 				$firma = new firma();
 				$date = new datum(); 
@@ -455,6 +508,7 @@ if($aktion == 'suche')
 	{
 		if(isset($_POST))
 		{
+			// Die Bestellung wird gespeichert und die neue id zurückgegeben
 			$newBestellung = new wawi_bestellung(); 
 			$newBestellung->titel = $_POST['titel'];
 			$newBestellung->kostenstelle_id = $_POST['filter_kst'];
@@ -490,4 +544,111 @@ if($aktion == 'suche')
 		{
 			echo $bestellung->errormsg; 
 		}
+	}
+	else if($_GET['method']=='update')
+	{
+		$id = (isset($_GET['id'])?$_GET['id']:null);
+		
+		$bestellung = new wawi_bestellung(); 
+		$bestellung->load($id); 
+		$detail = new wawi_bestelldetail(); 
+		$detail->getAllDetailsFromBestellung($id);
+		$anz_detail =  count($detail->result); 
+		$konto = new wawi_konto(); 
+		$konto->getKontoFromKostenstelle($bestellung->kostenstelle_id);
+		$kostenstelle = new wawi_kostenstelle(); 
+		$kostenstelle->load($bestellung->kostenstelle_id);
+		
+		
+		$i= 0; 
+		$summe= 0; 
+		
+		echo "<h2>Bearbeiten</h2>";
+		echo "<form action ='bestellung.php?method=update' method='post' name='editForm'>\n";
+		echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
+		
+		//tabelle Bestelldetails
+		echo "<table border = 0 width= '100%' class='dark'>\n";
+		echo "<tr>\n"; 	
+		echo "<td>Titel: </td>\n";
+		echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
+		echo "<td>Erstellt am:</td>\n"; 
+		echo "<td>".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</td>\n";
+		echo "</tr>\n"; 
+		echo "<tr>\n"; 	
+		echo "<td>Firma: </td>\n";
+		echo "<td><input type='text' name='firma' size='60' maxlength='256' value ='".$bestellung->firma_id."'></input></td>\n";
+		echo "<td>Liefertermin:</td>\n"; 
+		echo "<td><input type='text' name ='liefertermin'  size='60' maxlength='10' id ='datepicker_liefertermin'></input></td>\n";
+		echo "</tr>\n"; 
+		echo "<tr>\n"; 	
+		echo "<td>Kostenstelle: </td>\n";
+		echo "<td>$kostenstelle->bezeichnung</td>\n";
+		echo "<td>Lieferadresse:</td>\n"; 
+		echo "<td><input type='text' name='lieferadresse' size='60' maxlength='256' ></input></td>\n";
+		echo "</tr>\n"; 
+		echo "<tr>\n"; 	
+		echo "<td>Konto: </td>\n";
+		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
+		echo "<option value=''>-- auswählen --</option>\n";	
+		foreach($konto->result as $ko)
+		{ 
+			$selected ='';
+			if($ko->konto_id == $bestellung->konto_id)
+				$selected = 'selected';	
+					
+			echo '<option value='.$ko->konto_id.' '.$selected.'>'.$ko->kurzbz."</option>\n";
+	
+		}
+		echo "<td>Rechnungsadresse:</td>\n"; 
+		echo "<td><input type='text' name='rechnungsadresse' size='60' maxlength='256' ></input></td>\n";
+		echo "</tr>\n"; 
+		echo "<tr>\n"; 	
+		echo "<td>Bemerkungen: </td>\n";
+		echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
+		echo "<td></td>\n"; 
+		echo "<td></td>\n";
+		echo "</tr>\n"; 
+		echo "</table>\n";
+		
+		echo "<br>";
+		
+		//tabelle Positonen
+		echo "<table border =1 width='70%'>\n";
+		echo "<tr>\n";
+		echo "<th>Löschen</th>\n";
+		echo "<th>Pos</th>\n";
+		echo "<th>Menge</th>\n";
+		echo "<th>VE</th>\n";
+		echo "<th>Bezeichnung</th>\n";
+		echo "<th>Artikelnr.</th>\n";
+		echo "<th>Preis/VE</th>\n";
+		echo "<th>USt</th>\n";
+		echo "<th>Brutto</th>\n";
+		echo "</tr>\n";
+		foreach($detail->result as $det)
+		{
+			$i++; 
+			$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
+			echo "<tr>\n";
+			echo "<td><a>delete</a></td>\n";
+			echo "<td><input type='text' size='2' name='pos' id='pos' maxlength='2' value='$det->position' ></input></td>\n";
+			echo "<td><input type='text' size='5' name='menge' id='menge_$i' maxlength='7' value='$det->menge' onChange='calcLine($i);'></input></td>\n";
+			echo "<td><input type='text' size='5' name='ve' id='ve' maxlength='7' value='$det->verpackungseinheit'></input></td>\n";
+			echo "<td><input type='text' size='100' name='beschreibung' id='beschreibung' value='$det->beschreibung'</input></td>\n";
+			echo "<td><input type='text' size='25' name='artikelnr' id='artikelnr' maxlength='32' value='$det->artikelnummer'></input></td>\n";
+			echo "<td><input type='text' size='25' name='preisprove' id='preisprove_$i' maxlength='15' value='$det->preisprove' onChange='calcLine($i);'></input></td>\n";
+			echo "<td><input type='text' size='5' name='mwst' id='mwst_$i' maxlength='5' value='$det->mwst' onChange='calcLine($i);'></input></td>\n";
+			echo "<td><input type='text' size='10' id='brutto_$i' value='".number_format($brutto,2)."' disabled></input></td>\n";
+			echo "</tr>\n";
+			$summe+=$brutto; 
+		}
+		echo "</table>\n";
+		echo "Gesamtpreis/Brutto: ".$summe; 
+		echo "<br><br>\n"; 
+		// div Aufteilung --> kann ein und ausgeblendet werden
+		echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
+		echo "<div id='aufteilung'>\n";
+		echo "test"; 
+		echo "</div>"; 
 	}
