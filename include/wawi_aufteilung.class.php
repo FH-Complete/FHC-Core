@@ -48,8 +48,8 @@ class wawi_aufteilung extends basis_db
 	{
 		parent::__construct();
 		
-		if(!is_null($konto_id))
-			$this->load($konto_id);
+		if(!is_null($aufteilung_id))
+			$this->load($aufteilung_id);
 	}
 	
 	/**
@@ -125,9 +125,46 @@ class wawi_aufteilung extends basis_db
 		
 	}
 	
+	/**
+	 * 
+	 * Gibt alle Aufteilungen zurück die einer Kostenstelle zugeordnet sind
+	 * @param $kostenstelle_id
+	 */
 	public function getAufteilungFromKostenstelle($kostenstelle_id)
 	{
+		if(!is_numeric($kostenstelle_id))
+		{
+			$this->errormsg = "Keine gültige Kostenstellen ID."; 
+			return false; 
+		}
 		
+		$qry = "SELECT aufteilung.* from wawi.tbl_aufteilung_default as aufteilung, wawi.tbl_kostenstelle as kostenstelle 
+		where
+		kostenstelle.kostenstelle_id = aufteilung.kostenstelle_id and kostenstelle.kostenstelle_id = ".$kostenstelle_id.";";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$aufteilung = new wawi_aufteilung(); 
+				
+				$aufteilung->aufteilung_id = $row->aufteilung_id; 
+				$aufteilung->kostenstelle_id = $row->kostenstelle_id; 
+				$aufteilung->oe_kurzbz = $row->oe_kurzbz; 
+				$aufteilung->anteil = $row->anteil; 
+				$aufteilung->insertamum = $row->insertamum; 
+				$aufteilung->insertvon = $row->insertvon; 
+				$aufteilung->updateamum = $row->updateamum; 
+				$aufteilung->updatevon = $row->updatevon; 
+				
+				$this->result[] = $aufteilung; 
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage."; 
+			return false; 
+		}
 	}
 	
 	
