@@ -1344,7 +1344,8 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				rechnung_id bigint,
 				mwst numeric(4,2),
 				betrag numeric(12,2),
-				bezeichnung text
+				bezeichnung text,
+				ext_id integer
 			);
 			
 			CREATE SEQUENCE wawi.seq_rechnungsbetrag_rechnungsbetrag_id

@@ -376,7 +376,7 @@ class wawi_rechnung extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM wawi.tbl_rechnungsbetrag WHERe rechnung_id='".addslashes($rechnung_id)."'";
+		$qry = "SELECT * FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id='".addslashes($rechnung_id)."' ORDER BY rechnungsbetrag_id";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -397,6 +397,89 @@ class wawi_rechnung extends basis_db
 		else
 		{
 			$this->errorlog='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * Speichert einen Rechnungsbetrag
+	 */
+	public function save_betrag()
+	{
+		if($this->new)
+		{
+			$qry = 'BEGIN;INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, bezeichnung) VALUES('.
+					$this->addslashes($this->rechnung_id).','.
+					$this->addslashes($this->mwst).','.
+					$this->addslashes($this->betrag).','.
+					$this->addslashes($this->bezeichnung).');';
+		}
+		else
+		{
+			$qry = 'UPDATE wawi.tbl_rechnungsbetrag SET'.
+					' rechnung_id='.$this->addslashes($this->rechnung_id).','.
+				 	' mwst='.$this->addslashes($this->mwst).','.
+					' betrag='.$this->addslashes($this->betrag).','.
+					' bezeichnung='.$this->addslashes($this->bezeichnung).
+					" WHERE rechnungsbetrag_id='".addslashes($this->rechnungsbetrag_id)."'";
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($this->new)
+			{
+				$qry = "SELECT currval('wawi.seq_rechnungsbetrag_rechnungsbetrag_id') as id;";
+				
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						$this->rechnugnsbetrag_id=$row->id;+
+						$this->db_query('COMMIT;');
+					}
+					else
+					{
+						$this->db_query('ROLLBACK');
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						return false;
+					}
+				}
+				else
+				{
+					 $this->errormsg = 'Fehler beim Auslesen der Sequence';
+					 return false;
+				}
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht einen Eintrag aus der Tabelle rechnungsbetrag
+	 *
+	 * @param $rechnungsbetrag_id
+	 */
+	public function delete_betrag($rechnungsbetrag_id)
+	{
+		if(!is_numeric($rechnungsbetrag_id) || $rechnungsbetrag_id=='')
+		{
+			$this->errormsg = 'ungueltige ID';
+			return false;
+		}
+		
+		$qry = "DELETE FROM wawi.tbl_rechnungsbetrag where rechnungsbetrag_id='".addslashes($rechnungsbetrag_id)."'";
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
 			return false;
 		}
 	}

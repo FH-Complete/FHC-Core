@@ -79,6 +79,11 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 		});
 	}
 
+	function conf_del()
+	{
+		return confirm('Wollen Sie diese Rechnung wirklich löschen?');
+	}
+	
 	function formatItem(row) 
 	{
 	    return row[0] + " <br/>" + row[1];
@@ -139,6 +144,9 @@ $kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz));
 	
 if($aktion == 'suche')
 {	 
+	if(!$rechte->isBerechtigt('wawi/rechnung',null,'s'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
+	
 	if(!isset($_POST['submit']))
 	{
 		// Suchmaske anzeigen
@@ -302,7 +310,9 @@ if($aktion == 'suche')
 				{	
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
-					echo "<td nowrap> <a href= \"rechnung.php?method=update&id=$row->rechnung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"rechnung.php?method=delete&id=$row->rechnung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
+					echo "<td nowrap> 
+							<a href= \"rechnung.php?method=update&id=$row->rechnung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a>
+							<a href=\"rechnung.php?method=delete&id=$row->rechnung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
 					echo '<td>'.$row->rechnungsnr."</td>\n";
 					echo '<td>'.$row->bestellung_id."</td>\n";
 					echo '<td>'.$row->rechnungstyp_kurzbz."</td>\n";
@@ -323,18 +333,124 @@ if($aktion == 'suche')
 } 	
 elseif($aktion == 'new')
 {
+	if(!$rechte->isBerechtigt('wawi/rechnung',null,'sui'))
+		die('Sie haben keine Berechtigung zum Anlegen von Rechnungen');
+	
 	echo '<h1>Noch nicht implementiert</h1>';
 }
 elseif($aktion == 'save')
 {
-	echo '<h1>Noch nicht implementiert</h1>';
+	if(!$rechte->isBerechtigt('wawi/rechnung',null,'su'))
+		die('Sie haben keine Berechtigung zum Speichern der Rechnungen');
+	
+	if(isset($_POST['rechnung_id']) 
+	&& isset($_POST['rechnungsnummer'])
+	&& isset($_POST['buchungstext'])
+	&& isset($_POST['rechnungsdatum'])
+	&& isset($_POST['bestellung_id'])
+	&& isset($_POST['buchungsdatum']))
+	{
+		$rechnung_id = $_POST['rechnung_id'];
+		$rechnungsnummer = $_POST['rechnungsnummer'];
+		$buchungstext = $_POST['buchungstext'];
+		$rechnungsdatum = $_POST['rechnungsdatum'];
+		$bestellung_id = $_POST['bestellung_id'];
+		$buchungsdatum = $_POST['buchungsdatum'];
+		
+		foreach($_POST as $key=>$value)
+		{
+			if(mb_strstr($key, 'rechnungsbetrag_id_'))
+			{
+				$id = mb_substr($key, mb_strlen('rechnungsbetrag_id_'));
+				$betraege[$id]['id']=$_POST['rechnungsbetrag_id_'.$id];
+				$betraege[$id]['bezeichnung']=$_POST['bezeichnung_'.$id];
+				$betraege[$id]['betrag']=$_POST['betrag_'.$id];
+				$betraege[$id]['mwst']=$_POST['mwst_'.$id];
+			}
+		}
+		
+		$rechnung = new wawi_rechnung();
+		if(!$rechnung->load($rechnung_id))
+			die('Rechnung wurde nicht gefunden');
+		
+		$rechnung->rechnungsnr = $rechnungsnummer;
+		$rechnung->buchungstext = $buchungstext;
+		$rechnung->rechnungsdatum = $date->formatDatum($rechnungsdatum);
+		$rechnung->buchungsdatum = $date->formatDatum($buchungsdatum);
+		$rechnung->bestellung_id = $bestellung_id;
+		$rechnung->updateamum = date('Y-m-d H:i:s');
+		$rechnung->updatevon = $user;
+		
+		if($rechnung->save())
+		{
+			foreach($betraege as $row)
+			{
+				if($row['id']=='' && $row['betrag']=='' && $row['mwst']=='' && $row['bezeichnung']=='')
+					continue;
+									
+				$rb = new wawi_rechnung();
+				
+				//Leere Zeilen werden geloescht
+				if($row['betrag']=='' && $row['mwst']=='' && $row['bezeichnung']=='')
+				{
+					$rb->delete_betrag($row['id']);
+				}
+				else
+				{
+					//Speichern der Zeile
+					$rb->rechnungsbetrag_id=$row['id'];
+					$rb->rechnung_id = $rechnung_id;
+					$rb->betrag = $row['betrag'];
+					$rb->bezeichnung = $row['bezeichnung'];
+					$rb->mwst = $row['mwst'];
+					if($row['id']=='')
+						$rb->new=true;
+					else
+						$rb->new=false;
+					
+					$rb->save_betrag();
+				}
+			}
+			
+			echo 'Daten wurden gespeichert!';
+			$_GET['id']=$rechnung_id;
+			$aktion = 'update';
+		}
+		else
+		{
+			echo 'Fehler: '.$rechnung->errormsg;
+		}
+	}
+	else
+		die('Falsche Parameter uebergeben');
 } 
 elseif($aktion=='delete')
 {
-	echo '<h1>Noch nicht implementiert</h1>';
+	if(!$rechte->isBerechtigt('wawi/rechnung',null,'suid'))
+		die('Sie haben keine Berechtigung zum Loeschen von Rechnungen');
+	
+	if(isset($_GET['id']))
+	{
+		echo '<h1>Rechnung Löschen</h1>';
+		
+		$rechnung = new wawi_rechnung();
+		if($rechnung->delete($_GET['id']))
+		{
+			echo 'Rechnung wurde erfolgreich geloescht';
+		}
+		else
+		{
+			echo '<span class="error">Fehler: '.$rechnung->errormsg.'</span>';
+		}
+		echo '<br /><br /><a href="javascript:history.back()">Zurück</a>';
+	}
 }
-elseif($aktion=='update')
+
+if($aktion=='update')
 {
+	if(!$rechte->isBerechtigt('wawi/rechnung',null,'su'))
+		die('Sie haben keine Berechtigung zum Bearbeiten der Rechnungen');
+	
 	echo '<h1>Rechnung Bearbeiten</h1>';
 	if(isset($_GET['id']))
 	{
@@ -378,11 +494,13 @@ elseif($aktion=='update')
 			</table>';
 		
 		echo '
+		<br />
 		<form action="'.$_SERVER['PHP_SELF'].'?method=save" method="POST">
+		<input type="hidden" name="rechnung_id" value="'.$rechnung->rechnung_id.'">
 		<table>
 		<tr>
 			<td>Rechnungsnummer</td>
-			<td>Rechnugnsdatum&nbsp;&nbsp;&nbsp;</td>
+			<td>Rechnungsdatum&nbsp;&nbsp;&nbsp;</td>
 			<td>Bestellung</td>
 		</tr>
 		<tr>
@@ -396,6 +514,11 @@ elseif($aktion=='update')
 			<td>
 				<input type="text" name="bestellung_id" size="8" value="'.$rechnung->bestellung_id.'">
 			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td></td>
+			<td></td>
 		</tr>
 		<tr>
 			<td valign="top">
