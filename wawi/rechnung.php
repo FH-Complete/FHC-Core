@@ -27,6 +27,7 @@ require_once('../include/datum.class.php');
 require_once('../include/wawi_konto.class.php');
 require_once('../include/wawi_rechnung.class.php');
 require_once('../include/wawi_kostenstelle.class.php');
+require_once('../include/wawi_bestellung.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 
 $aktion ='';
@@ -35,6 +36,19 @@ if (isset($_GET['method']))
 else 
 	$aktion = 'suche';
 
+if(isset($_POST['getBetragRow']) && isset($_POST['id']))
+{
+	if(is_numeric($_POST['id']))
+	{
+		echo getBetragRow($_POST['id']);
+		exit;
+	}
+	else
+	{
+		die('ID ungueltig');
+	}
+}
+	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -321,7 +335,219 @@ elseif($aktion=='delete')
 }
 elseif($aktion=='update')
 {
-	echo '<h1>Noch nicht implementiert</h1>';
+	echo '<h1>Rechnung Bearbeiten</h1>';
+	if(isset($_GET['id']))
+	{
+		$rechnung_id = $_GET['id'];
+		if(!is_numeric($rechnung_id))
+			die('RechnungID ist ungueltig');
+			
+		$rechnung = new wawi_rechnung();
+		if(!$rechnung->load($rechnung_id))
+			die('Rechnung wurde nicht gefunden');
+			
+		$bestellung = new wawi_bestellung();
+		if(!$bestellung->load($rechnung->bestellung_id))
+			die('Diese Rechnung ist keiner gueltigen Bestellung zugeordnet');
+		
+		$kostenstelle = new wawi_kostenstelle();
+		if(!$kostenstelle->load($bestellung->kostenstelle_id))
+			die('Die Rechnung bzw Bestellung ist keiner gueltigen Kostenstelle zugeordnet');
+			
+		$konto = new wawi_konto();
+		if(!$konto->load($bestellung->konto_id))
+			die('Die Rechnung bzw Bestellung ist keim gueltigen Konto zugeordnet');
+			
+		$firma = new firma();
+		if(!$firma->load($bestellung->firma_id))
+			die('Die Rechnung bzw Bestellung ist keiner gueltigen Firma zugeordnet');
+		
+		echo '<table>
+			<tr>
+				<td><b>Kostenstelle:</b></td>
+				<td>'.$kostenstelle->bezeichnung.'</td>
+			</tr>
+			<tr>
+				<td><b>Konto:</b></td>
+				<td>'.$konto->beschreibung[1].'</td>
+			</tr>
+			<tr>
+				<td><b>Firma:</b></td>
+				<td>'.$firma->name.'</td>
+			</tr>
+			</table>';
+		
+		echo '
+		<form action="'.$_SERVER['PHP_SELF'].'?method=save" method="POST">
+		<table>
+		<tr>
+			<td>Rechnungsnummer</td>
+			<td>Rechnugnsdatum&nbsp;&nbsp;&nbsp;</td>
+			<td>Bestellung</td>
+		</tr>
+		<tr>
+			<td><input type="text" name="rechnungsnummer" value="'.$rechnung->rechnungsnr.'"></td>
+			<td>
+				<input type="text" name="rechnungsdatum" size="10" id="rechnungsdatum" value="'.$date->formatDatum($rechnung->rechnungsdatum,'d.m.Y').'">
+				<script type="text/javascript">
+					$("#rechnungsdatum" ).datepicker($.datepicker.regional["de"]);
+				</script>	
+			</td>
+			<td>
+				<input type="text" name="bestellung_id" size="8" value="'.$rechnung->bestellung_id.'">
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				Buchungstext<br />
+				<textarea name="buchungstext" rows="4" cols="35">'.$rechnung->buchungstext.'</textarea>
+			</td>
+			<td valign="top">
+				Buchungsdatum<br />
+				<input type="text" name="buchungsdatum" size="10" id="buchungsdatum" value="'.$date->formatDatum($rechnung->buchungsdatum,'d.m.Y').'">
+				<script type="text/javascript">
+					$("#buchungsdatum" ).datepicker($.datepicker.regional["de"]);
+				</script>
+			</td>
+			<td valign="top">
+				<table>
+				<thead>
+					<tr>
+						<td>Bezeichnung</td>
+						<td>Betrag Netto</td>
+						<td>MwSt</td>
+					</tr>
+				</thead>
+				<tbody id="betrag_table">';
+		
+		
+		//Vorhandenen Betraege anzeigen
+		$betraege = new wawi_rechnung();
+		$betraege->loadBetraege($rechnung->rechnung_id);
+		
+		$i=0;
+		foreach($betraege->result as $row)
+		{
+			echo getBetragRow($i, $row->rechnungsbetrag_id, $row->bezeichnung, $row->betrag, $row->mwst);
+			$i++;
+		}
+		
+		//Unten eine Leere Zeile hinzufuegen
+		echo getBetragRow($i);
+		
+		echo '
+				</tbody>
+				<tfoot>
+				<tr>
+					<td>Summe Netto:</td>
+					<td class="number" ><span id="netto"></span> &euro;</td>
+				</tr>
+				<tr>
+					<td>Summe Brutto:</td>
+					<td class="number" ><span id="brutto"></span> &euro;</td>
+				</tr>
+				</tfoot>
+				</table>
+				<script type="text/javascript">
+				var anzahlRows='.$i.';
+				
+				/**
+				 * Fuegt eine neue Zeile fuer den Betrag hinzu wenn die 
+				 * uebergebene id, die der letzte Zeile ist
+				 * und der Betrag eingetragen wurde
+				 */
+				function checkNewRow(id)
+				{
+					var betrag="";
+					betrag = $("#betrag_"+id).val();
+					
+					// Wenn der betrag nicht leer ist,
+					// und die letzte reihe ist, 
+					// dann eine neue Zeile hinzufuegen
+					if(betrag.length>0 && anzahlRows==id)
+					{
+						$.post("rechnung.php", {id: id+1, getBetragRow: "true"},
+								function(data){
+									$("#betrag_table").append(data);
+									anzahlRows=anzahlRows+1;
+								});
+					}
+				}
+				
+				/**
+				 * Brutto und Netto Summen berechnen
+				 */
+				function summe()
+				{
+					var i=0;
+					var netto=0;
+					var brutto=0;
+					while(i<=anzahlRows)
+					{
+						var betrag = $("#betrag_"+i).val();
+						var mwst = $("#mwst_"+i).val();
+						
+						if(betrag!="" && mwst!="")
+						{
+							betrag = parseFloat(betrag);
+							mwst = parseFloat(mwst);
+							
+							netto = netto + betrag;
+							
+							brutto = brutto + (betrag+(betrag*mwst/100));
+						}
+						i=i+1;
+					}
+					netto = Math.round(netto*100)/100;
+					brutto = Math.round(brutto*100)/100;
+					$("#netto").html(netto);
+					$("#brutto").html(brutto);
+				}
+				
+				$(document).ready(function() 
+				{
+					summe();
+				});
+				
+				</script>
+			</td>
+		</tr>
+		<tr>
+			<td><input type="submit" value="Speichern"/></td>
+		</tr>
+		</table>	
+		';
+	}
+	else
+	{
+		echo 'Sie haben keine ID uebergeben';
+	}
+}
+
+/**
+ * 
+ * Liefert eine Zeile zum Eintragen des Betrages
+ *
+ * @param $i Nummer der Zeile
+ * @param $rechnungsbetrag_id ID des rechnungsbetrages (optional)
+ * @param $bezeichnung Bezeichnung des rechnungsbetrages (optional)
+ * @param $betrag Betrag des rechnungsbetrages (optional)
+ * @param $mwst MwSt des rechnungsbetrages (optional)
+ */
+function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $mwst='')
+{
+	return '<tr id="row_'.$i.'">
+				<td>
+					<input type="hidden" name="rechnungsbetrag_id_'.$i.'" value="'.$rechnungsbetrag_id.'">
+					<input type="text" name="bezeichnung_'.$i.'" value="'.$bezeichnung.'">
+				</td>
+				<td>
+					<input class="number" type="text" size="12" maxlength="12" id="betrag_'.$i.'" name="betrag_'.$i.'" value="'.$betrag.'"  onblur="checkNewRow('.$i.')" onchange="summe()"> &euro; 
+				</td>
+				<td>
+					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="summe()"> %
+				</td>
+			</tr>';
 }
 ?>
 </body>

@@ -1539,6 +1539,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnungstyp TO wawi;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnung TO wawi;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnungsbetrag TO wawi;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_firmatag TO wawi;
 			GRANT SELECT ON public.tbl_organisationseinheit TO wawi;
 			GRANT SELECT ON public.tbl_benutzer TO wawi;
 			GRANT SELECT ON public.tbl_person TO wawi;
