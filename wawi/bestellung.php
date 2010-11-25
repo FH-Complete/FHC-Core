@@ -27,10 +27,13 @@ require_once '../include/organisationseinheit.class.php';
 require_once '../include/mitarbeiter.class.php';
 require_once '../include/datum.class.php';
 require_once '../include/benutzerberechtigung.class.php';
+require_once '../include/standort.class.php';
+require_once '../include/adresse.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
 require_once '../include/wawi_bestelldetails.class.php';
+require_once '../include/wawi_aufteilung.class.php'; 
 
 $aktion ='';
 
@@ -39,17 +42,18 @@ if(isset($_POST['getKonto']))
 	$id = $_POST['id']; 
 	if(is_numeric($id))
 	{
-		$konto = new wawi_konto(); 
-		$konto->getKontoFromKostenstelle($id);
-		if(count($konto->result)>0)
-		{
-			foreach($konto->result as $ko)
+			$konto = new wawi_konto(); 
+			$konto->getKontoFromKostenstelle($id);
+			if(count($konto->result)>0)
 			{
-				echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
+				foreach($konto->result as $ko)
+				{
+					echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
+				}
 			}
-		}
-		else 
-			echo "<option value =''>Keine Konten zu dieser Kst</option>";
+			else 
+				echo "<option value =''>Keine Konten zu dieser Kst</option>";
+		
 	}
 	else
 		echo "<option value =''>Keine Konten zu dieser Kst</option>";
@@ -186,7 +190,7 @@ if(isset($_POST['getSearchKonto']))
 
 	function formatItem(row) 
 	{
-	    return row[0] + " <li>" + row[1] + "</li> ";
+	    return row[0] + " <br>" + row[1] + "<br> ";
 	}	  		  
  	
 	function conf_del()
@@ -209,7 +213,7 @@ if(isset($_POST['getSearchKonto']))
 	$(function() {
 		$( "#datepicker_liefertermin" ).datepicker($.datepicker.regional['de']);
 	});
-
+	
 	$(document).ready(function() 
 	{ 
 	    $("#myTable").tablesorter(
@@ -246,19 +250,7 @@ if(isset($_POST['getSearchKonto']))
 	  	  });
 	  	  		  		  
 	}); 
-	function calcLine(id)
-   	{
-     var zahl = 
-     (eval(document.getElementById("preisprove_"+id).value)  + ((document.getElementById("preisprove_"+id).value) * (document.getElementById("mwst_"+id).value) / 100)) 
-     * eval(document.getElementById("menge_"+id).value);
-     document.getElementById("brutto_"+id).value = zahl.toFixed(2); 
-   	}
-
-	function getMwst()
-	{
-
-	}
-			
+	
 	</script>
 </head>
 <body>
@@ -342,7 +334,6 @@ if($aktion == 'suche')
 		echo "<tr>\n";
 		echo "<td> Firma: </td>\n";
 		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  >\n";
-		
 		echo "<SELECT name='filter_firma' id='firma' style='width: 256px;'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";
 		foreach ($firmaAll->result as $fi)
@@ -480,7 +471,7 @@ if($aktion == 'suche')
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)'>\n";
-		echo "<option value=''>-- Kostenstelle auswählen --</option>\n";
+		echo "<option value ='opt_kostenstelle'>-- Kostenstelle auswählen --</option>\n";
 		foreach ($kst->result as $ks)
 		{
 			echo "<option value=".$ks->kostenstelle_id.">".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
@@ -526,7 +517,7 @@ if($aktion == 'suche')
 			if (!$bestell_id = $newBestellung->save())
 			echo $newBestellung->errormsg; 
 			echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
-			echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken";  
+			echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken </a>";  
 		}
 	
 	} 
@@ -556,12 +547,23 @@ if($aktion == 'suche')
 		$anz_detail =  count($detail->result); 
 		$konto = new wawi_konto(); 
 		$konto->getKontoFromKostenstelle($bestellung->kostenstelle_id);
+		$konto_bestellung = new wawi_konto(); 
+		$konto_bestellung->load($bestellung->konto_id);
 		$kostenstelle = new wawi_kostenstelle(); 
 		$kostenstelle->load($bestellung->kostenstelle_id);
+		$aufteilung = new wawi_aufteilung(); 
+		$aufteilung->getAufteilungFromKostenstelle($bestellung->kostenstelle_id);
+		$firma = new firma(); 
+		$firma->load($bestellung->firma_id);  
+		$liefertermin = $date->formatDatum($bestellung->liefertermin, 'd.m.Y'); 
+		$allStandorte = new standort(); 
+		$allStandorte->getStandorteWithTyp('Intern');
+		
 		
 		
 		$i= 0; 
 		$summe= 0; 
+		$konto_vorhanden = false; 
 		
 		echo "<h2>Bearbeiten</h2>";
 		echo "<form action ='bestellung.php?method=update' method='post' name='editForm'>\n";
@@ -577,32 +579,62 @@ if($aktion == 'suche')
 		echo "</tr>\n"; 
 		echo "<tr>\n"; 	
 		echo "<td>Firma: </td>\n";
-		echo "<td><input type='text' name='firma' size='60' maxlength='256' value ='".$bestellung->firma_id."'></input></td>\n";
+		echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
+		echo "<input type='text' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
 		echo "<td>Liefertermin:</td>\n"; 
-		echo "<td><input type='text' name ='liefertermin'  size='60' maxlength='10' id ='datepicker_liefertermin'></input></td>\n";
+		echo "<td><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
 		echo "</tr>\n"; 
 		echo "<tr>\n"; 	
 		echo "<td>Kostenstelle: </td>\n";
 		echo "<td>$kostenstelle->bezeichnung</td>\n";
 		echo "<td>Lieferadresse:</td>\n"; 
-		echo "<td><input type='text' name='lieferadresse' size='60' maxlength='256' ></input></td>\n";
-		echo "</tr>\n"; 
+		echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
+		foreach($allStandorte->result as $standorte)
+		{
+			$selected ='';
+			$standort_lieferadresse = new adresse(); 
+			$standort_lieferadresse->load($standorte->adresse_id); 
+			
+			if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
+				$selected ='selected';
+				
+			echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
+		}		
+		echo "</td></tr>\n"; 
 		echo "<tr>\n"; 	
 		echo "<td>Konto: </td>\n";
 		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
-		echo "<option value=''>-- auswählen --</option>\n";	
 		foreach($konto->result as $ko)
 		{ 
 			$selected ='';
 			if($ko->konto_id == $bestellung->konto_id)
+			{
 				$selected = 'selected';	
-					
+				$konto_vorhanden = true; 
+			}		
 			echo '<option value='.$ko->konto_id.' '.$selected.'>'.$ko->kurzbz."</option>\n";
 	
 		}
-		echo "<td>Rechnungsadresse:</td>\n"; 
-		echo "<td><input type='text' name='rechnungsadresse' size='60' maxlength='256' ></input></td>\n";
-		echo "</tr>\n"; 
+		//wenn die konto_id von der bestellung nicht dabei ist --> selbst hinschreiben
+		if(!$konto_vorhanden)
+		{
+			echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
+		}
+		echo "</td><td>Rechnungsadresse:</td>\n"; 
+		
+		echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
+		foreach($allStandorte->result as $standorte)
+		{
+			$selected ='';
+			$standort_rechnungsadresse = new adresse(); 
+			$standort_rechnungsadresse->load($standorte->adresse_id); 
+			
+			if($standort_rechnungsadresse->adresse_id == $bestellung->lieferadresse)
+				$selected ='selected';
+				
+			echo "<option value='".$standort_rechnungsadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_rechnungsadresse->strasse.', '.$standort_rechnungsadresse->plz.' '.$standort_rechnungsadresse->ort."</option>\n";
+		}		
+		echo "</td></tr>\n"; 
 		echo "<tr>\n"; 	
 		echo "<td>Bemerkungen: </td>\n";
 		echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
@@ -635,20 +667,110 @@ if($aktion == 'suche')
 			echo "<td><input type='text' size='2' name='pos' id='pos' maxlength='2' value='$det->position' ></input></td>\n";
 			echo "<td><input type='text' size='5' name='menge' id='menge_$i' maxlength='7' value='$det->menge' onChange='calcLine($i);'></input></td>\n";
 			echo "<td><input type='text' size='5' name='ve' id='ve' maxlength='7' value='$det->verpackungseinheit'></input></td>\n";
-			echo "<td><input type='text' size='100' name='beschreibung' id='beschreibung' value='$det->beschreibung'</input></td>\n";
-			echo "<td><input type='text' size='25' name='artikelnr' id='artikelnr' maxlength='32' value='$det->artikelnummer'></input></td>\n";
-			echo "<td><input type='text' size='25' name='preisprove' id='preisprove_$i' maxlength='15' value='$det->preisprove' onChange='calcLine($i);'></input></td>\n";
+			echo "<td><input type='text' size='80' name='beschreibung' id='beschreibung' value='$det->beschreibung'</input></td>\n";
+			echo "<td><input type='text' size='15' name='artikelnr' id='artikelnr' maxlength='32' value='$det->artikelnummer'></input></td>\n";
+			echo "<td><input type='text' size='15' name='preisprove' id='preisprove_$i' maxlength='15' value='$det->preisprove' onChange='calcLine($i);'></input></td>\n";
 			echo "<td><input type='text' size='5' name='mwst' id='mwst_$i' maxlength='5' value='$det->mwst' onChange='calcLine($i);'></input></td>\n";
 			echo "<td><input type='text' size='10' id='brutto_$i' value='".number_format($brutto,2)."' disabled></input></td>\n";
 			echo "</tr>\n";
 			$summe+=$brutto; 
 		}
+		echo "<tfoot><tr>"; 
+		echo "<td></td>"; 
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td colspan ='2'>Gesamtpreis/Brutto: </td>";
+		echo "<td id = 'brutto'></td>";
+		echo "</tr></tfoot>";
+		
 		echo "</table>\n";
-		echo "Gesamtpreis/Brutto: ".$summe; 
 		echo "<br><br>\n"; 
+		
+		
+		echo '
+		<script type="text/javascript">
+		
+		var anzahlRows='.$i.';
+		
+		/*
+		Berechnet die Brutto Summe für eine Zeile
+		*/
+		function calcLine(id)
+	   	{
+	    	var brutto=0;
+
+	    	var menge = $("#menge_"+id).val();
+	    	var betrag = $("#preisprove_"+id).val();
+	    	var mwst = $("#mwst_"+id).val();
+	    	
+	    	if(betrag!="" && mwst!="" && menge!="")
+	    	{
+	    		menge = parseFloat(menge);
+				betrag = parseFloat(betrag);
+				mwst = parseFloat(mwst);
+				
+				brutto = menge * (brutto + (betrag+(betrag*mwst/100)));
+	    	}
+	    	brutto = Math.round(brutto*100)/100;
+	    	
+		   	document.getElementById("brutto_"+id).value = brutto.toFixed(2);
+		
+		    summe();
+	   	}
+
+		/*
+		Berechnet die gesamte Brutto Summe für eine Bestellung
+		*/
+		function summe()
+		{
+			var i=1;
+			var netto=0;
+			var brutto=0;
+			while(i<=anzahlRows)
+			{
+			
+				var menge =$("#menge_"+i).val();
+				var betrag = $("#preisprove_"+i).val();
+				var mwst = $("#mwst_"+i).val();
+					
+				if(betrag!="" && mwst!="" && menge!="")
+				{
+					menge = parseFloat(menge);
+					betrag = parseFloat(betrag);
+					mwst = parseFloat(mwst);
+					
+					netto = netto + betrag;
+					
+					brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
+				}
+				i=i+1;
+			}
+			netto = Math.round(netto*100)/100;
+			brutto = Math.round(brutto*100)/100;
+			brutto = brutto.toFixed(2);
+			$("#netto").html(netto);
+			$("#brutto").html(brutto);
+		}
+		
+		$(document).ready(function() 
+		{
+			summe();
+		});
+		</script>';
+		
+		
+		
 		// div Aufteilung --> kann ein und ausgeblendet werden
 		echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
 		echo "<div id='aufteilung'>\n";
+		foreach($aufteilung->result as $auf)
+		{
+			echo $auf->oe_kurzbz.$auf->anteil; 
+		}
 		echo "test"; 
+		
 		echo "</div>"; 
 	}
