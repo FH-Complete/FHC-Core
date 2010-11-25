@@ -142,16 +142,17 @@ if($result=pg_query($conn_wawi, $qry))
 						if($row->$mwst!='')
 						{
 							$qry = "SELECT * FROM wawi.tbl_rechnungsbetrag 
-									WHERE rechnung_id=".$db->addslashes($row->r_id)." AND mwst=".$db->addslashes($row->$mwst);
+									WHERE rechnung_id=".$db->addslashes($row->r_id)." AND ext_id='$i'";
 							if($result_rbetrag = $db->db_query($qry))
 							{
 								if($row_rbetrag = $db->db_fetch_object($result_rbetrag))
 								{
 									//Update
-									if($row_rbetrag->betrag!=$row->$betrag)
+									if($row_rbetrag->betrag!=round($row->$betrag,2))
 									{
-										$qry = "UPDATE wawi.tbl_rechnungsbetrag 
-												SET betrag=".$db->addslashes($row->$betrag)." 
+										$qry = "UPDATE wawi.tbl_rechnungsbetrag SET 
+												betrag=".$db->addslashes($row->$betrag)."
+												mwst=".$db->addslashes($row->$betrag)."
 												WHERE rechnungsbetrag_id=".$db->addslashes($row_rbetrag->rechnungsbetrag_id);
 										if($db->db_query($qry))
 										{
@@ -163,14 +164,14 @@ if($result=pg_query($conn_wawi, $qry))
 								else
 								{
 									//Insert
-									$qry = "INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag) VALUES(".
+									$qry = "INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, ext_id) VALUES(".
 											$db->addslashes($row->r_id).",".
 											$db->addslashes($row->$mwst).",".
-											$db->addslashes($row->$betrag).");";
+											$db->addslashes($row->$betrag).",'".$i."');";
 									if($db->db_query($qry))
 									{
 										$anzahl_insert++;
-										$update_log.="\nRechnungsbetrag hinzugefügt Mwst $row->$mwst Betrag $row->$betrag";
+										$update_log.="\nRechnungsbetrag hinzugefügt Mwst ".$row->$mwst." Betrag ".$row->$betrag;
 									}
 								}
 							}
@@ -225,11 +226,11 @@ if($result=pg_query($conn_wawi, $qry))
 						.$db->addslashes($datum_obj->formatDatum($row->lupdate)).","
 						.$db->addslashes($row->updatevon).");";
 				if($row->mwst1!='')
-					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst1).",".$db->addslashes($row->betrag1).");";
+					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, ext_id) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst1).",".$db->addslashes($row->betrag1).",1);";
 				if($row->mwst2!='')
-					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst2).",".$db->addslashes($row->betrag2).");";
+					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, ext_id) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst2).",".$db->addslashes($row->betrag2).",2);";
 				if($row->mwst3!='')
-					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst3).",".$db->addslashes($row->betrag3).");";
+					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, ext_id) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst3).",".$db->addslashes($row->betrag3).",3);";
 				
 				if($db->db_query($qry))
 				{
