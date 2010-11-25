@@ -598,6 +598,47 @@ class standort extends basis_db
 		}
 	}
 	
+	/**
+	 * 
+	 * gibt alle Standorte eines bestimmten Typs zurück
+	 * @param $typ
+	 */
+	public function getStandorteWithTyp($typ)
+	{
+		$qry ="select standort.* from public.tbl_firma as firma, public.tbl_adresse as adresse, public.tbl_standort as standort where 
+		firma.firma_id = standort.firma_id  and 
+		standort.adresse_id = adresse.adresse_id and 
+		firma.firmentyp_kurzbz = '".addslashes($typ)."';";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$standort = new standort(); 
+
+				$standort->standort_id = $row->standort_id; 
+				$standort->firma_id = $row->firma_id; 
+				$standort->adresse_id = $row->adresse_id; 
+				$standort->kurzbz = $row->kurzbz; 
+				$standort->bezeichnung = $row->bezeichnung; 
+				$standort->insertvon = $row->insertvon; 
+				$standort->insertamum = $row->insertamum; 
+				$standort->updatevon = $row->updatevon; 
+				$standort->updateamum = $row->updateamum;
+
+				$this->result[] = $standort; 
+			}
+			return true; 
+		}
+		else
+		{
+			$this->errormsg="Fehler bei der Abfrage aufgetreten.";
+			return false; 
+		}
+		
+		
+	}
+	
 	
 }
 ?>
