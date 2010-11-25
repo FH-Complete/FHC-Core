@@ -110,3 +110,8 @@ table.dark td
 {
 	background:lightgray;
 }
+
+.number
+{
+	text-align: right;
+}

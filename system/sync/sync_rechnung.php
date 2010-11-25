@@ -25,6 +25,7 @@
 require_once('../../config/wawi.config.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/mail.class.php');
+require_once('../../include/datum.class.php');
 	
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -39,7 +40,7 @@ $anzahl_insert=0;
 $anzahl_update=0;
 $anzahl_delete=0;
 $anzahl_fehler=0;
-
+$datum_obj = new datum();
 ?>
 <html>
 <head>
@@ -104,7 +105,7 @@ if($result=pg_query($conn_wawi, $qry))
 						$update=true;
 						$update_log.="\nUpdatevon von $row_check->updatevon auf $row->updatevon geändert";
 					}
-					if($row_check->updateamum!=$row->lupdate)
+					if($row_check->updateamum!=$datum_obj->formatDatum($row->lupdate))
 					{
 						$update=true;
 						$update_log.="\nUpdateamum von $row_check->updateamum auf $row->lupdate geändert";
@@ -119,7 +120,7 @@ if($result=pg_query($conn_wawi, $qry))
 								transfer_datum=".$db->addslashes($row->transfer_datum).",
 								buchungstext=".$db->addslashes($row->buchungstext).",
 								updatevon=".$db->addslashes($row->updatevon).",
-								updateamum=".$db->addslashes($row->lupdate)."
+								updateamum=".$db->addslashes($datum_obj->formatDatum($row->lupdate))."
 								WHERE rechnung_id='".addslashes($row->r_id)."'";
 						if($db->db_query($qry))
 						{
@@ -217,11 +218,11 @@ if($result=pg_query($conn_wawi, $qry))
 						.$db->addslashes($row->transfer_datum).","
 						.$db->addslashes($row->buchungstext).","
 						."true,"
-						.$db->addslashes($row->lupdate).","
+						.$db->addslashes($datum_obj->formatDatum($row->lupdate)).","
 						.$db->addslashes($row->updatevon).","
-						.$db->addslashes($row->lupdate).","
+						.$db->addslashes($datum_obj->formatDatum($row->lupdate)).","
 						.$db->addslashes($row->updatevon).","
-						.$db->addslashes($row->lupdate).","
+						.$db->addslashes($datum_obj->formatDatum($row->lupdate)).","
 						.$db->addslashes($row->updatevon).");";
 				if($row->mwst1!='')
 					$qry.="INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag) VALUES(".$db->addslashes($row->r_id).",".$db->addslashes($row->mwst1).",".$db->addslashes($row->betrag1).");";

@@ -362,4 +362,43 @@ class wawi_rechnung extends basis_db
 		}
 		return $this->rechnung_id;
 	}
+	
+	/**
+	 * Laedt die Betraege zu einer Rechnung
+	 * 
+	 * @param $rechnung_id ID der Rechnung
+	 */
+	public function loadBetraege($rechnung_id)
+	{
+		if(!is_numeric($rechnung_id))
+		{
+			$this->errormsg='Ungueltige ID';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM wawi.tbl_rechnungsbetrag WHERe rechnung_id='".addslashes($rechnung_id)."'";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new wawi_rechnung();
+				
+				$obj->rechnungsbetrag_id=$row->rechnungsbetrag_id;
+				$obj->rechnung_id = $row->rechnung_id;
+				$obj->betrag = $row->betrag;
+				$obj->mwst = $row->mwst;
+				$obj->bezeichnung = $row->bezeichnung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errorlog='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 }
