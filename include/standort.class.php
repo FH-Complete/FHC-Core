@@ -141,7 +141,7 @@ class standort extends basis_db
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_standort WHERE adress_id='".addslashes($adress_id)."'";
+		$qry = "SELECT * FROM public.tbl_standort WHERE adresse_id='".addslashes($adress_id)."'";
 
 		if(!$this->db_query($qry))
 		{
