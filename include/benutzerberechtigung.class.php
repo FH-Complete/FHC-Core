@@ -848,7 +848,7 @@ class benutzerberechtigung extends basis_db
 
 		if(!$all)
 		{
-			if(count($kst_id)==0)
+			if(count($kst_id)==0 && count($oe_kurzbz)==0)
 				return array();
 			$qry.="
 				WHERE 

@@ -28,7 +28,7 @@ class wawi_rechnung extends basis_db
 {
 	public $rechnung_id; 		// serial
 	public $bestellung_id;		// int
-	public $rechnungstyp_kurzbz;// varchar
+	public $rechnungstyp_kurzbz='Zahlung';// varchar
 	public $buchungsdatum;		// date
 	public $rechnungsnr;		// varchar
 	public $rechnungsdatum;		// date
@@ -291,12 +291,12 @@ class wawi_rechnung extends basis_db
 		if($this->new)
 		{
 			$qry = 'BEGIN; INSERT INTO wawi.tbl_rechnung (bestellung_id,rechnungstyp_kurzbz, buchungsdatum, 
-			rechnungsnr, rechnugsdatum, transfer_datum, buchungstext, freigegeben, freigegebenvon, freigegebenamum,
+			rechnungsnr, rechnungsdatum, transfer_datum, buchungstext, freigegeben, freigegebenvon, freigegebenamum,
 			updateamum, updatevon, insertamum, insertvon) VALUES ('.
 			$this->addslashes($this->bestellung_id).', '.
 			$this->addslashes($this->rechnungstyp_kurzbz).', '.
 			$this->addslashes($this->buchungsdatum).', '.
-			"currval('wawi.seq_rechnung_rechnung_id'), ".
+			($this->rechnungsnr==''?"currval('wawi.seq_rechnung_rechnung_id')":$this->addslashes($this->rechnungsnr)).", ".
 			$this->addslashes($this->rechnungsdatum).', '.
 			$this->addslashes($this->transfer_datum).", ".
 			$this->addslashes($this->buchungstext).', '.
@@ -338,7 +338,8 @@ class wawi_rechnung extends basis_db
 					if($row = $this->db_fetch_object())
 					{
 						$this->rechnung_id = $row->id;
-						$this->rechnungsnr = $row->rechnungsnr;						
+						if($this->rechnungsnr=='')
+							$this->rechnungsnr = $row->id;						
 						$this->db_query('COMMIT');
 					}
 					else
@@ -484,4 +485,27 @@ class wawi_rechnung extends basis_db
 		}
 	}
 	
+	/**
+	 * Laedt alle Rechnungstypen
+	 */
+	public function getRechnungstyp()
+	{
+		$qry = 'SELECT * FROM wawi.tbl_rechnungstyp ORDER BY beschreibung';
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new wawi_rechnung();
+				$obj->rechnungstyp_kurzbz = $row->rechnungstyp_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}	
+	}
 }
