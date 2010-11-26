@@ -41,7 +41,6 @@ class wawi_bestellstatus extends basis_db
 	public $updatevon; 
 	public $updateamum; 
 	
-	public $bestellstatus_kurzbz; 
 	
 	/**
 	 * 
@@ -153,14 +152,17 @@ class wawi_bestellstatus extends basis_db
 		
 		$qry = "select bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus
 		where 
-		bestellung = ".$this->addslashes($bestellung_id)." and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz).";";
+		bestellung_id = ".$this->addslashes($bestellung_id)." and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-					return true;
-				else 
-					return false;
+			{
+				$this->datum = $row->datum; 
+				return true;
+			}
+			else 
+				return false;
 		} 
 		else
 		{

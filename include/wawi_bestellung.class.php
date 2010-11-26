@@ -478,8 +478,7 @@ class wawi_bestellung extends basis_db
 			bemerkung = '.$this->addslashes($this->bemerkung).',
 			liefertermin = '.$this->addslashes($this->liefertermin).',
 			updateamum = '.$this->addslashes($this->updateamum).',
-			insertamum = '.$this->addslashes($this->insertamum).',
-			insertvon = '.$this->addslashes($this->insertvon).',
+			updatevon ='.$this->addslashes($this->udpatevon).',
 			ext_id = '.$this->addslashes($this->ext_id).' WHERE bestellung_id = '.$this->bestellung_id.';'; 
 		}
 		if($this->db_query($qry))
