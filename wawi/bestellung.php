@@ -34,6 +34,7 @@ require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
 require_once '../include/wawi_bestelldetails.class.php';
 require_once '../include/wawi_aufteilung.class.php'; 
+require_once '../include/wawi_bestellstatus.class.php';
 
 $aktion ='';
 
@@ -137,6 +138,19 @@ if(isset($_POST['getSearchKonto']))
 	else
 		echo "<option value =''>Kein Konto zu dieser OE</option>";
 	exit; 
+}
+
+if(isset($_POST['getDetailRow']) && isset($_POST['id']))
+{
+	if(is_numeric($_POST['id']))
+	{
+		echo getDetailRow($_POST['id']);
+		exit;
+	}
+	else
+	{
+		die('ID ungueltig');
+	}
 }
 	
 ?>
@@ -558,10 +572,8 @@ if($aktion == 'suche')
 		$liefertermin = $date->formatDatum($bestellung->liefertermin, 'd.m.Y'); 
 		$allStandorte = new standort(); 
 		$allStandorte->getStandorteWithTyp('Intern');
+		$status= new wawi_bestellstatus();
 		
-		
-		
-		$i= 0; 
 		$summe= 0; 
 		$konto_vorhanden = false; 
 		
@@ -615,7 +627,7 @@ if($aktion == 'suche')
 			echo '<option value='.$ko->konto_id.' '.$selected.'>'.$ko->kurzbz."</option>\n";
 	
 		}
-		//wenn die konto_id von der bestellung nicht dabei ist --> selbst hinschreiben
+		//wenn die konto_id von der bestellung nicht in den Konten die der Kostenstelle zugeordnet sind befidet --> selbst hinschreiben
 		if(!$konto_vorhanden)
 		{
 			echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
@@ -638,9 +650,41 @@ if($aktion == 'suche')
 		echo "<tr>\n"; 	
 		echo "<td>Bemerkungen: </td>\n";
 		echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
-		echo "<td></td>\n"; 
-		echo "<td></td>\n";
+		echo "<td>Bestellt:</td>\n"; 
+		echo "<td>\n";
+
+		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
+		{
+			echo "<span id='btn_bestellt'>";	
+			echo "<input type='button' value ='Bestellt' $disabled onclick='deleteBtnBestellt($bestellung->bestellung_id)'></input>";
+			echo "</span>";
+		}
+		else
+		{
+			echo "Bestellt am: ".$date->formatDatum($status->datum,'d.m.Y'); 
+		}
+		
+		
+		
+		
+		
+		
+		echo "</td>\n";
 		echo "</tr>\n"; 
+		echo "<tr>\n";
+		echo"<td></td><td></td><td>Storniert:</td>\n";
+		echo "<td>";
+		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno'))
+		{
+			echo "<span id='btn_storniert'>";
+			echo "<input type='button' value='Storniert' ></input>";
+			echo "</span>";
+		}
+		else 
+		{
+			echo "Storniert am: ".$date->formatDatum($status->datum, 'd.m.Y');
+		}
+		echo "</td></tr>";
 		echo "</table>\n";
 		
 		echo "<br>";
@@ -658,23 +702,18 @@ if($aktion == 'suche')
 		echo "<th>USt</th>\n";
 		echo "<th>Brutto</th>\n";
 		echo "</tr>\n";
+		echo "<tbody id='detailTable'>";
+		$i= 1; 
 		foreach($detail->result as $det)
 		{
-			$i++; 
 			$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
-			echo "<tr>\n";
-			echo "<td><a>delete</a></td>\n";
-			echo "<td><input type='text' size='2' name='pos' id='pos' maxlength='2' value='$det->position' ></input></td>\n";
-			echo "<td><input type='text' size='5' name='menge' id='menge_$i' maxlength='7' value='$det->menge' onChange='calcLine($i);'></input></td>\n";
-			echo "<td><input type='text' size='5' name='ve' id='ve' maxlength='7' value='$det->verpackungseinheit'></input></td>\n";
-			echo "<td><input type='text' size='80' name='beschreibung' id='beschreibung' value='$det->beschreibung'</input></td>\n";
-			echo "<td><input type='text' size='15' name='artikelnr' id='artikelnr' maxlength='32' value='$det->artikelnummer'></input></td>\n";
-			echo "<td><input type='text' size='15' name='preisprove' id='preisprove_$i' maxlength='15' value='$det->preisprove' onChange='calcLine($i);'></input></td>\n";
-			echo "<td><input type='text' size='5' name='mwst' id='mwst_$i' maxlength='5' value='$det->mwst' onChange='calcLine($i);'></input></td>\n";
-			echo "<td><input type='text' size='10' id='brutto_$i' value='".number_format($brutto,2)."' disabled></input></td>\n";
-			echo "</tr>\n";
+			getDetailRow($i, $det->position, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
+			
 			$summe+=$brutto; 
+			$i++; 
 		}
+		getDetailRow($i);
+		echo "</tbody>";
 		echo "<tfoot><tr>"; 
 		echo "<td></td>"; 
 		echo "<td></td>";
@@ -694,6 +733,18 @@ if($aktion == 'suche')
 		<script type="text/javascript">
 		
 		var anzahlRows='.$i.';
+		
+		function deleteBtnBestellt($bestellung)
+		{
+			$("#btn_bestellt").html(); 
+			
+			$.post("bestellung.php", {id: $bestellung, saveBestelltStatus: "true"},
+						function(data){
+							$("#detailTable").append(data);
+							anzahlRows=anzahlRows+1;
+						});
+			
+		}
 		
 		/*
 		Berechnet die Brutto Summe für eine Zeile
@@ -759,6 +810,30 @@ if($aktion == 'suche')
 		{
 			summe();
 		});
+		
+		/**
+		 * Fuegt eine neue Zeile fuer den Betrag hinzu wenn die 
+		 * uebergebene id, die der letzte Zeile ist
+		 * und der Betrag eingetragen wurde
+		 */
+		function checkNewRow(id)
+		{
+			var betrag="";
+			betrag = $("#preisprove_"+id).val();
+			
+			// Wenn der betrag nicht leer ist,
+			// und die letzte reihe ist, 
+			// dann eine neue Zeile hinzufuegen
+			if(betrag.length>0 && anzahlRows==id)
+			{
+				$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
+						function(data){
+							$("#detailTable").append(data);
+							anzahlRows=anzahlRows+1;
+						});
+			}
+		}
+		
 		</script>';
 		
 		
@@ -770,7 +845,20 @@ if($aktion == 'suche')
 		{
 			echo $auf->oe_kurzbz.$auf->anteil; 
 		}
-		echo "test"; 
-		
 		echo "</div>"; 
+	}
+	
+	function getDetailRow($i, $pos='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
+	{
+		echo "<tr id ='row_$i'>\n";
+		echo "<td><a>delete</a></td>\n";
+		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' ></input></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
+		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
+		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'</input></td>\n";
+		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
+		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
+		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
+		echo "</tr>\n";
 	}
