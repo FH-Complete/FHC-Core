@@ -336,7 +336,28 @@ elseif($aktion == 'new')
 	if(!$rechte->isBerechtigt('wawi/rechnung',null,'sui'))
 		die('Sie haben keine Berechtigung zum Anlegen von Rechnungen');
 	
-	echo '<h1>Noch nicht implementiert</h1>';
+	if(isset($_GET['oe_kurzbz']))
+	{
+		$aktion='update';
+	}
+	else
+	{
+		echo '<h1>Rechnung Neu</h1>';
+		echo '<form action="rechnung.php" method="GET">';
+		echo '<input type="hidden" name="method" value="new"/>';
+		echo '<SELECT name="oe_kurzbz">';
+		$oe = new organisationseinheit();
+		$oe->loadArray($rechte->getOEkurzbz('wawi/rechnung'));
+		
+		foreach($oe->result as $row)
+		{
+			echo '<option value="'.$row->oe_kurzbz.'">'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
+		}
+		echo '</SELECT>';
+		echo '<input type="submit" name="submit" value="Weiter"/>';
+		echo '</form>';
+	}
+	
 }
 elseif($aktion == 'save')
 {
@@ -348,6 +369,7 @@ elseif($aktion == 'save')
 	&& isset($_POST['buchungstext'])
 	&& isset($_POST['rechnungsdatum'])
 	&& isset($_POST['bestellung_id'])
+	&& isset($_POST['rechnungstyp_kurzbz'])
 	&& isset($_POST['buchungsdatum']))
 	{
 		$rechnung_id = $_POST['rechnung_id'];
@@ -356,6 +378,7 @@ elseif($aktion == 'save')
 		$rechnungsdatum = $_POST['rechnungsdatum'];
 		$bestellung_id = $_POST['bestellung_id'];
 		$buchungsdatum = $_POST['buchungsdatum'];
+		$rechnungstyp_kurzbz = $_POST['rechnungstyp_kurzbz'];
 		
 		foreach($_POST as $key=>$value)
 		{
@@ -370,9 +393,20 @@ elseif($aktion == 'save')
 		}
 		
 		$rechnung = new wawi_rechnung();
-		if(!$rechnung->load($rechnung_id))
-			die('Rechnung wurde nicht gefunden');
-		
+		if($rechnung_id!='')
+		{
+			//Update
+			if(!$rechnung->load($rechnung_id))
+				die('Rechnung wurde nicht gefunden');
+		}
+		else
+		{
+			//Neue Rechnung
+			$rechnung->new = true;
+			$rechnung->insertamum = date('Y-m-d');
+			$rechnung->insertvon = $user;
+			$rechnung->freigegeben = false;
+		}	
 		$rechnung->rechnungsnr = $rechnungsnummer;
 		$rechnung->buchungstext = $buchungstext;
 		$rechnung->rechnungsdatum = $date->formatDatum($rechnungsdatum);
@@ -380,6 +414,7 @@ elseif($aktion == 'save')
 		$rechnung->bestellung_id = $bestellung_id;
 		$rechnung->updateamum = date('Y-m-d H:i:s');
 		$rechnung->updatevon = $user;
+		$rechnung->rechnungstyp_kurzbz = $rechnungstyp_kurzbz;
 		
 		if($rechnung->save())
 		{
@@ -399,7 +434,7 @@ elseif($aktion == 'save')
 				{
 					//Speichern der Zeile
 					$rb->rechnungsbetrag_id=$row['id'];
-					$rb->rechnung_id = $rechnung_id;
+					$rb->rechnung_id = $rechnung->rechnung_id;
 					$rb->betrag = $row['betrag'];
 					$rb->bezeichnung = $row['bezeichnung'];
 					$rb->mwst = $row['mwst'];
@@ -413,7 +448,7 @@ elseif($aktion == 'save')
 			}
 			
 			echo 'Daten wurden gespeichert!';
-			$_GET['id']=$rechnung_id;
+			$_GET['id']=$rechnung->rechnung_id;
 			$aktion = 'update';
 		}
 		else
@@ -451,32 +486,35 @@ if($aktion=='update')
 	if(!$rechte->isBerechtigt('wawi/rechnung',null,'su'))
 		die('Sie haben keine Berechtigung zum Bearbeiten der Rechnungen');
 	
-	echo '<h1>Rechnung Bearbeiten</h1>';
+	$rechnung = new wawi_rechnung();
+	$bestellung = new wawi_bestellung();
+	$kostenstelle = new wawi_kostenstelle();
+	$konto = new wawi_konto();
+	$firma = new firma();
+	$oe_kurzbz='';
+	
 	if(isset($_GET['id']))
 	{
+		echo '<h1>Rechnung Bearbeiten</h1>';
 		$rechnung_id = $_GET['id'];
 		if(!is_numeric($rechnung_id))
 			die('RechnungID ist ungueltig');
-			
-		$rechnung = new wawi_rechnung();
+				
 		if(!$rechnung->load($rechnung_id))
 			die('Rechnung wurde nicht gefunden');
 			
-		$bestellung = new wawi_bestellung();
 		if(!$bestellung->load($rechnung->bestellung_id))
 			die('Diese Rechnung ist keiner gueltigen Bestellung zugeordnet');
 		
-		$kostenstelle = new wawi_kostenstelle();
 		if(!$kostenstelle->load($bestellung->kostenstelle_id))
 			die('Die Rechnung bzw Bestellung ist keiner gueltigen Kostenstelle zugeordnet');
 			
-		$konto = new wawi_konto();
 		if(!$konto->load($bestellung->konto_id))
 			die('Die Rechnung bzw Bestellung ist keim gueltigen Konto zugeordnet');
 			
-		$firma = new firma();
 		if(!$firma->load($bestellung->firma_id))
 			die('Die Rechnung bzw Bestellung ist keiner gueltigen Firma zugeordnet');
+		$oe_kurzbz=$kostenstelle->oe_kurzbz;
 		
 		echo '<table>
 			<tr>
@@ -492,7 +530,17 @@ if($aktion=='update')
 				<td>'.$firma->name.'</td>
 			</tr>
 			</table>';
-		
+	}
+	elseif(isset($_GET['oe_kurzbz']))
+	{
+		echo '<h1>Rechnung Neu</h1>';
+		$rechnung_id='';	
+		$oe_kurzbz = $_GET['oe_kurzbz'];
+	}
+	else
+	{
+		die('ungueltige parameter');
+	}
 		echo '
 		<br />
 		<form action="'.$_SERVER['PHP_SELF'].'?method=save" method="POST">
@@ -502,6 +550,7 @@ if($aktion=='update')
 			<td>Rechnungsnummer</td>
 			<td>Rechnungsdatum&nbsp;&nbsp;&nbsp;</td>
 			<td>Bestellung</td>
+			<td>Typ</td>
 		</tr>
 		<tr>
 			<td><input type="text" name="rechnungsnummer" value="'.$rechnung->rechnungsnr.'"></td>
@@ -512,7 +561,38 @@ if($aktion=='update')
 				</script>	
 			</td>
 			<td>
-				<input type="text" name="bestellung_id" size="8" value="'.$rechnung->bestellung_id.'">
+				<SELECT name="bestellung_id">
+				';
+		$bestellung = new wawi_bestellung();
+		$bestellung->getAllSearch(null, null, null, null, null, null, null, $oe_kurzbz, null, null, TRUE, null);
+		
+		foreach($bestellung->result as $row)
+		{
+			if($rechnung->bestellung_id==$row->bestellung_id)
+				$selected='selected';
+			else
+				$selected='';
+			
+			echo '<option value="'.$row->bestellung_id.'" '.$selected.'>'.$row->bestell_nr.'</option>';
+		}
+		
+		echo '</SELECT>
+			</td>
+			<td>
+				<SELECT name="rechnungstyp_kurzbz">';
+		$rtyp = new wawi_rechnung();
+		$rtyp->getRechnungstyp();
+		
+		foreach($rtyp->result as $row)
+		{
+			if($row->rechnungstyp_kurzbz==$rechnung->rechnungstyp_kurzbz)
+				$selected='selected';
+			else
+				$selected='';
+			
+			echo '<option value="'.$row->rechnungstyp_kurzbz.'" '.$selected.'>'.$row->beschreibung.'</option>';
+		}	
+		echo '</SELECT>
 			</td>
 		</tr>
 		<tr>
@@ -532,7 +612,7 @@ if($aktion=='update')
 					$("#buchungsdatum" ).datepicker($.datepicker.regional["de"]);
 				</script>
 			</td>
-			<td valign="top">
+			<td valign="top" colspan="2">
 				<table>
 				<thead>
 					<tr>
@@ -640,11 +720,7 @@ if($aktion=='update')
 		</tr>
 		</table>	
 		';
-	}
-	else
-	{
-		echo 'Sie haben keine ID uebergeben';
-	}
+
 }
 
 /**
