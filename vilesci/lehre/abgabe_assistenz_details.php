@@ -295,7 +295,7 @@ if(isset($_POST["schick"]))
 			{
 				//Terminänderung
 				//Ermittlung der alten Daten
-				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."'";
 				if(!$result_old=$db->db_query($qry_old))
 				{
 					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
@@ -323,7 +323,7 @@ if(isset($_POST["schick"]))
 						kurzbz = '".$kurzbz."', 
 						updatevon = '".$user."', 
 						updateamum = now() 
-						WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+						WHERE paabgabe_id='".$paabgabe_id."'";
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
@@ -441,7 +441,7 @@ if(isset($_POST["del"]))
 	if($datum)
 	{
 		//Ermittlung der alten Daten
-		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."'";
 		if(!$result_old=$db->db_query($qry_old))
 		{
 			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
@@ -457,7 +457,7 @@ if(isset($_POST["del"]))
 			else
 			{
 				$row_std=$db->db_fetch_object($result_std);
-				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
+				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."'";	
 				if(!$result=$db->db_query($qry))
 				{
 					echo "<font color=\"#FF0000\">Fehler beim L&ouml;schen des Termins!</font><br>&nbsp;";
@@ -684,23 +684,18 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
-		if($user==$row->insertvon)
-		{		
-			$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
-		
-			if(!$row->abgabedatum)
-			{
-				$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()' title='Termin l&ouml;schen'></td>";
-			}
-			else 
-			{
-				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-			}
+			
+		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
+	
+		if(!$row->abgabedatum)
+		{
+			$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()' title='Termin l&ouml;schen'></td>";
 		}
 		else 
 		{
-			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
+	
 		if($row->paabgabetyp_kurzbz=='enda' && $row->abgabedatum==NULL)
 		{
 			$htmlstr .= "		<td width=50px><input type='submit' name='enda' value='best&auml;tigen' title='Endabgabe best&auml;tigen'></td>";
