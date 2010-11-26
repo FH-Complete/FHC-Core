@@ -49,8 +49,8 @@ class wawi_bestelldetail extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestelldetail_id
+	 * Konstruktor
+	 * @param $bestelldetail_id
 	 */
 	public function __construct($bestelldetail_id = null)
 	{
@@ -62,8 +62,8 @@ class wawi_bestelldetail extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestelldetail_id
+	 * Gibt das Beselldetail der übergebenen ID zurück
+	 * @param $bestelldetail_id
 	 */
 	public function load($bestelldetail_id)
 	{
@@ -105,7 +105,7 @@ class wawi_bestelldetail extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Gibt alle Bestelldetails zurück
 	 */
 	public function getAll()
 	{
@@ -144,8 +144,8 @@ class wawi_bestelldetail extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestelldetail_id
+	 * Löscht das Bestelldetail mit der übergebenen ID
+	 * @param $bestelldetail_id
 	 */
 	public function delete($bestelldetail_id)
 	{
@@ -167,7 +167,7 @@ class wawi_bestelldetail extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Überprüft die Richtigkeit der Daten
 	 */
 	public function validate()
 	{
@@ -206,7 +206,11 @@ class wawi_bestelldetail extends basis_db
 		return true; 		
 	}
 	
-	
+	/**
+	 * 
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Updatet einen bereits vorhandenen
+	 */
 	public function save()
 	{
 		if(!$this->validate())
@@ -290,6 +294,11 @@ class wawi_bestelldetail extends basis_db
 		return $this->bestelldetail_id;
 	}
 	
+	/**
+	 * 
+	 * Gibt alle Details einer Bestellung zurück
+	 * @param $bestell_id
+	 */
 	public function getAllDetailsFromBestellung($bestell_id)
 	{
 		if(!is_numeric($bestell_id))
