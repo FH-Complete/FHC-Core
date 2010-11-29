@@ -152,6 +152,46 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 		die('ID ungueltig');
 	}
 }
+
+if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
+{
+	$date = new datum(); 
+	
+	$bestellstatus = new wawi_bestellstatus(); 
+	$bestellstatus->bestellung_id = $_POST['id'];
+	$bestellstatus->bestellstatus_kurzbz = 'Bestellung';
+	//$bestellstatus->uid = $_POST['user'];
+	//$bestellstatus->oe_kurzbz = ?
+	$bestellstatus->datum = date('Y-m-d H:i:s');
+	//$bestellstatus->insertvon = $user;
+	$bestellstatus->insertamum = date('Y-m-d H:i:s');
+	//$bestellstatus->updatevon = $user;
+	$bestellstatus->updateamum = date('Y-m-d H:i:s');
+	
+	if($bestellstatus->setBestellung())
+	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
+		exit; 
+}
+
+if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
+{
+	$date = new datum(); 
+	
+	$bestellstatus = new wawi_bestellstatus(); 
+	$bestellstatus->bestellung_id = $_POST['id'];
+	$bestellstatus->bestellstatus_kurzbz = 'Bestellung';
+	//$bestellstatus->uid = $_POST['user'];
+	//$bestellstatus->oe_kurzbz = ?
+	$bestellstatus->datum = date('Y-m-d H:i:s');
+	//$bestellstatus->insertvon = $user;
+	$bestellstatus->insertamum = date('Y-m-d H:i:s');
+	//$bestellstatus->updatevon = $user;
+	$bestellstatus->updateamum = date('Y-m-d H:i:s');
+	
+	if($bestellstatus->setStorno())
+	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
+		exit; 
+}
 	
 ?>
 
@@ -391,7 +431,7 @@ if($aktion == 'suche')
 	else
 	{		
 		// Suchergebnisse anzeigen
-		//var_dump($_POST);
+		var_dump($_POST);
 		$bestellnummer = $_POST['bestellnr'];
 		$titel = $_POST['titel'];
 		$evon = $_POST['evon'];
@@ -399,7 +439,10 @@ if($aktion == 'suche')
 		$bvon = $_POST['bvon'];
 		$bbis = $_POST['bbis'];
 		$firma_id = $_POST['firma_id'];
-		$oe_kurzbz = $_POST['filter_oe_kurzbz'];
+		if($_POST['filter_oe_kurzbz'] == 'opt_auswahl')
+			$oe_kurzbz = '';
+		else 
+			$oe_kurzbz = $_POST['filter_oe_kurzbz'];
 		$filter_konto = $_POST['filter_konto'];
 		$mitarbeiter_uid =  $_POST['mitarbeiter_uid'];
 		$filter_firma = $_POST['filter_firma'];
@@ -529,7 +572,7 @@ if($aktion == 'suche')
 			$newBestellung->freigegeben = false; 
 			
 			if (!$bestell_id = $newBestellung->save())
-			echo $newBestellung->errormsg; 
+				echo $newBestellung->errormsg; 
 			echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
 			echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken </a>";  
 		}
@@ -553,7 +596,7 @@ if($aktion == 'suche')
 	else if($_GET['method']=='update')
 	{
 		$id = (isset($_GET['id'])?$_GET['id']:null);
-		
+
 		$bestellung = new wawi_bestellung(); 
 		$bestellung->load($id); 
 		$detail = new wawi_bestelldetail(); 
@@ -574,15 +617,16 @@ if($aktion == 'suche')
 		$allStandorte->getStandorteWithTyp('Intern');
 		$status= new wawi_bestellstatus();
 		
+		
 		$summe= 0; 
 		$konto_vorhanden = false; 
 		
 		echo "<h2>Bearbeiten</h2>";
-		echo "<form action ='bestellung.php?method=update' method='post' name='editForm'>\n";
+		echo "<form action ='bestellung.php?method=update' method='post' name='editForm' id='editForm'>\n";
 		echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
 		
 		//tabelle Bestelldetails
-		echo "<table border = 0 width= '100%' class='dark'>\n";
+		echo "<table border = 1 width= '100%' class='dark'>\n";
 		echo "<tr>\n"; 	
 		echo "<td>Titel: </td>\n";
 		echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
@@ -656,7 +700,7 @@ if($aktion == 'suche')
 		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
 		{
 			echo "<span id='btn_bestellt'>";	
-			echo "<input type='button' value ='Bestellt' $disabled onclick='deleteBtnBestellt($bestellung->bestellung_id)'></input>";
+			echo "<input type='button' value ='Bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)'></input>";
 			echo "</span>";
 		}
 		else
@@ -664,20 +708,19 @@ if($aktion == 'suche')
 			echo "Bestellt am: ".$date->formatDatum($status->datum,'d.m.Y'); 
 		}
 		
-		
-		
-		
-		
-		
 		echo "</td>\n";
 		echo "</tr>\n"; 
 		echo "<tr>\n";
 		echo"<td></td><td></td><td>Storniert:</td>\n";
 		echo "<td>";
-		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno'))
+		$disabled='';
+		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
 		{
+			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
+			$disabled = 'disabled';
 			echo "<span id='btn_storniert'>";
-			echo "<input type='button' value='Storniert' ></input>";
+			echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
+			
 			echo "</span>";
 		}
 		else 
@@ -733,17 +776,33 @@ if($aktion == 'suche')
 		<script type="text/javascript">
 		
 		var anzahlRows='.$i.';
+		var uid = "'.$user.'";
 		
-		function deleteBtnBestellt($bestellung)
+		function deleteBtnBestellt(bestellung_id, user_uid)
 		{
 			$("#btn_bestellt").html(); 
 			
-			$.post("bestellung.php", {id: $bestellung, saveBestelltStatus: "true"},
+			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnBestellt: "true"},
 						function(data){
-							$("#detailTable").append(data);
-							anzahlRows=anzahlRows+1;
-						});
+					
+
+							$("#btn_bestellt").html("Bestellt am: " +data); 
+							document.editForm.storniert.disabled=false; 
+						
+						});	
+			 
+		}
+		
+		function deleteBtnStorno(bestellung_id, user_uid)
+		{
+			$("#btn_storniert").html(); 
 			
+			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnStorno: "true"},
+						function(data){
+						$("#btn_storniert").html("Storniert am: " +data); 
+						document.editForm.btn_submit.disabled=true; 
+						});	
+				
 		}
 		
 		/*
@@ -840,12 +899,19 @@ if($aktion == 'suche')
 		
 		// div Aufteilung --> kann ein und ausgeblendet werden
 		echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
+
 		echo "<div id='aufteilung'>\n";
+		echo "<table border=1>"; 
+		echo "<tr>\n"; 
 		foreach($aufteilung->result as $auf)
 		{
-			echo $auf->oe_kurzbz.$auf->anteil; 
+			echo "<td>".$auf->oe_kurzbz.$auf->anteil."</td>"; 
 		}
+		echo "</tr>"; 
+		echo "</table>";
 		echo "</div>"; 
+		echo "<br><br>";
+		echo "<input type='submit' value='Speichern' id='btn_submit' ></input>\n"; 
 	}
 	
 	function getDetailRow($i, $pos='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
