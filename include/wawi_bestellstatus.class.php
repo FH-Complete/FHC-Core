@@ -170,4 +170,44 @@ class wawi_bestellstatus extends basis_db
 			return false; 
 		}
 	}
+	
+	/**
+	 * 
+	 * Setzt den Status einer Bestellung auf Bestellt
+	 */
+	public function setBestellung()
+	{	
+		$qry = "INSERT INTO wawi.tbl_bestellung_bestellstatus (bestellung_id, bestellstatus_kurzbz, uid, oe_kurzbz, datum, insertvon, insertamum, updatevon, updateamum)
+		VALUES
+		(".($this->bestellung_id).", 'Bestellung',".$this->addslashes($this->uid).", ".$this->addslashes($this->oe_kurzbz).", '".($this->datum)."',
+		 ".$this->addslashes($this->insertvon).", ".$this->addslashes($this->insertamum).", ".$this->addslashes($this->updatevon).", ".$this->addslashes($this->updateamum).");";
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg ="Fehler bei der Abfrage aufgetreten."; 
+			return false; 
+		}
+
+		return true; 
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 */
+	public function setStorno()
+	{
+		$qry = "INSERT INTO wawi.tbl_bestellung_bestellstatus (bestellung_id, bestellstatus_kurzbz, uid, oe_kurzbz, datum, insertvon, insertamum, updatevon, updateamum)
+		VALUES
+		(".($this->bestellung_id).", 'Storno',".$this->addslashes($this->uid).", ".$this->addslashes($this->oe_kurzbz).", '".($this->datum)."',
+		 ".$this->addslashes($this->insertvon).", ".$this->addslashes($this->insertamum).", ".$this->addslashes($this->updatevon).", ".$this->addslashes($this->updateamum).");";
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg ="Fehler bei der Abfrage aufgetreten."; 
+			return false; 
+		}
+
+		return true; 
+	}
 }
