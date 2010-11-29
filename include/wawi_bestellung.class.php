@@ -481,6 +481,7 @@ class wawi_bestellung extends basis_db
 			updatevon ='.$this->addslashes($this->udpatevon).',
 			ext_id = '.$this->addslashes($this->ext_id).' WHERE bestellung_id = '.$this->bestellung_id.';'; 
 		}
+		echo $qry; 
 		if($this->db_query($qry))
 		{
 			if($this->new)
