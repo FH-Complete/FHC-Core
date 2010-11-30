@@ -200,13 +200,13 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 <html>
 <head>
 	<title>WaWi Bestellung</title>	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/jquery-ui.css" type="text/css"/>
 	<link rel="stylesheet" href="../include/js/jquery.css" type="text/css"/>	
 	<link rel="stylesheet" href="../include/js/jquery.autocomplete.css" type="text/css"/>
-	
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
@@ -324,10 +324,14 @@ $kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz));
 if (isset($_GET['method']))
 	$aktion = $_GET['method'];
 	
+	
 if($aktion == 'suche')
 {	 
 	if(!isset($_POST['submit']))
 	{
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 's'))
+			die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
+		
 		// Suchmaske anzeigen
 		$oe = new organisationseinheit(); 
 		$oe->getAll(); 
@@ -431,7 +435,10 @@ if($aktion == 'suche')
 	else
 	{		
 		// Suchergebnisse anzeigen
-		var_dump($_POST);
+		//var_dump($_POST);
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 's'))
+			die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
+			
 		$bestellnummer = $_POST['bestellnr'];
 		$titel = $_POST['titel'];
 		$evon = $_POST['evon'];
@@ -511,7 +518,7 @@ if($aktion == 'suche')
 				echo "</tbody></table>\n";	
 			}
 			else 
-			echo "Fehler bei der Abfrage!";
+			echo $bestellung->errormsg;
 		}
 		else
 		echo "ungültiges Datumsformat";
@@ -519,6 +526,10 @@ if($aktion == 'suche')
 } 	else if($aktion == 'new')
 	{
 		// Maske für neue Bestellung anzeigen
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
+			die('Sie haben keine Berechtigung zum Anlegen von Bestellungen');
+		
+		
 		echo "<h2>Neue Bestellung</h2>";
 		echo "<form action ='bestellung.php?method=save' method='post' name='newForm'>\n";
 		echo "<table border = 0>\n";
@@ -544,7 +555,7 @@ if($aktion == 'suche')
 		echo "<td>Konto: </td>\n"; 
 		echo "<td>\n";
 		echo "<select name='konto' id='konto' style='width: 230px;'>\n";
-		echo "<option value='' >Kostenstelle auswaehlen</option>\n";
+		echo "<option value='' >Konto auswaehlen</option>\n";
 		echo "</select>\n";
 		echo "</td>\n"; 
 		echo "<tr>\n";
@@ -557,11 +568,24 @@ if($aktion == 'suche')
 		if(isset($_POST))
 		{
 			// Die Bestellung wird gespeichert und die neue id zurückgegeben
+			var_dump($_POST);
+			if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
+				die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
+			
 			$newBestellung = new wawi_bestellung(); 
 			$newBestellung->titel = $_POST['titel'];
-			$newBestellung->kostenstelle_id = $_POST['filter_kst'];
+			
+			if($_POST['filter_kst']=='opt_kostenstelle')
+				$newBestellung->kostenstelle_id = null; 
+			else 
+				$newBestellung->kostenstelle_id = $_POST['filter_kst'];
+			
 			$newBestellung->firma_id = $_POST['firma_id'];
-			$newBestellung->konto_id = $_POST['konto'];
+			
+			if($_POST['konto']=='')		
+				$newBestellung->konto_id = null; 
+			else
+				$newBestellung->konto_id = $_POST['konto'];
 			
 			$newBestellung->insertamum = date('Y-m-d H:i:s');
 			$newBestellung->insertvon = $user; 
@@ -572,16 +596,22 @@ if($aktion == 'suche')
 			$newBestellung->freigegeben = false; 
 			
 			if (!$bestell_id = $newBestellung->save())
+			{
 				echo $newBestellung->errormsg; 
-			echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
-			echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken </a>";  
+			}
+			else 
+			{
+				echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
+				echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken </a>zum editieren der Bestellung";  
+			}
 		}
-	
 	} 
 	else if($_GET['method']=='delete')
 	{
-		$id = (isset($_GET['id'])?$_GET['id']:null);
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
+			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
 		
+		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$bestellung = new wawi_bestellung(); 
 		
 		if($bestellung->delete($id))
@@ -595,6 +625,10 @@ if($aktion == 'suche')
 	}
 	else if($_GET['method']=='update')
 	{
+		// Bestellung Editieren	
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'su'))
+			die('Sie haben keine Berechtigung zum Bearbeiten von Bestellungen');
+		
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 
 		$bestellung = new wawi_bestellung(); 
@@ -617,7 +651,6 @@ if($aktion == 'suche')
 		$allStandorte->getStandorteWithTyp('Intern');
 		$status= new wawi_bestellstatus();
 		
-		
 		$summe= 0; 
 		$konto_vorhanden = false; 
 		
@@ -626,7 +659,7 @@ if($aktion == 'suche')
 		echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
 		
 		//tabelle Bestelldetails
-		echo "<table border = 1 width= '100%' class='dark'>\n";
+		echo "<table border = 0 width= '100%' class='dark'>\n";
 		echo "<tr>\n"; 	
 		echo "<td>Titel: </td>\n";
 		echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
@@ -653,7 +686,7 @@ if($aktion == 'suche')
 			
 			if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
 				$selected ='selected';
-				
+
 			echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 		}		
 		echo "</td></tr>\n"; 
@@ -744,6 +777,7 @@ if($aktion == 'suche')
 		echo "<th>Preis/VE</th>\n";
 		echo "<th>USt</th>\n";
 		echo "<th>Brutto</th>\n";
+		echo "<th>Position</th>";
 		echo "</tr>\n";
 		echo "<tbody id='detailTable'>";
 		$i= 1; 
@@ -926,5 +960,6 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
+		echo "<td>".$i."</td>"; 
 		echo "</tr>\n";
 	}
