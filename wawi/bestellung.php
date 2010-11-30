@@ -678,6 +678,8 @@ if($aktion == 'suche')
 		echo "<td>$kostenstelle->bezeichnung</td>\n";
 		echo "<td>Lieferadresse:</td>\n"; 
 		echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
+		
+		$select_help = false; 
 		foreach($allStandorte->result as $standorte)
 		{
 			$selected ='';
@@ -685,10 +687,14 @@ if($aktion == 'suche')
 			$standort_lieferadresse->load($standorte->adresse_id); 
 			
 			if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
-				$selected ='selected';
-
+			{	
+				$selected ='selected';	
+				$select_help = true; 
+			}
+			
 			echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 		}		
+		
 		echo "</td></tr>\n"; 
 		echo "<tr>\n"; 	
 		echo "<td>Konto: </td>\n";
