@@ -35,6 +35,7 @@ require_once '../include/wawi_kostenstelle.class.php';
 require_once '../include/wawi_bestelldetails.class.php';
 require_once '../include/wawi_aufteilung.class.php'; 
 require_once '../include/wawi_bestellstatus.class.php';
+require_once '../include/wawi_tags.class.php';
 
 $aktion ='';
 
@@ -301,8 +302,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	  			extraParams:{'work':'wawi_firma_search'	}
 	  	  }).result(function(event, item) {
 	  		  $('#firma_id').val(item[1]);
-	  	  });
-	  	  		  		  
+	  	  });	  		  
 	}); 
 	
 	</script>
@@ -650,6 +650,8 @@ if($aktion == 'suche')
 		$allStandorte = new standort(); 
 		$allStandorte->getStandorteWithTyp('Intern');
 		$status= new wawi_bestellstatus();
+		$bestell_tag = new wawi_tags(); 
+		$bestell_tag->GetTagsByBestellung($bestellung->bestellung_id);
 		
 		$summe= 0; 
 		$konto_vorhanden = false; 
@@ -750,7 +752,25 @@ if($aktion == 'suche')
 		echo "</td>\n";
 		echo "</tr>\n"; 
 		echo "<tr>\n";
-		echo"<td></td><td></td><td>Storniert:</td>\n";
+		echo"<td>Tags:</td>\n"; 
+		$tag_help = $bestell_tag->GetStringTags();
+		echo "<td><input type='text' id='tags' name='tags' size='32' value='".$tag_help."'>\n";		
+	
+		
+		echo '	<script type="text/javascript">
+					$("#tags").autocomplete("wawi_autocomplete.php", 
+					{
+						minChars:1,
+						matchSubset:1,matchContains:1,
+						width:500,
+						multiple: true,
+						multipleSeparator: "; ",
+						extraParams:{"work":"tags", "bestell_id":"'.$bestellung->bestellung_id.'"}
+					});
+				</script>';
+	
+		echo "</td>\n"; 
+		echo "<td>Storniert:</td>\n";
 		echo "<td>";
 		$disabled='';
 		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
@@ -768,7 +788,6 @@ if($aktion == 'suche')
 		}
 		echo "</td></tr>";
 		echo "</table>\n";
-		
 		echo "<br>";
 		
 		//tabelle Positonen
@@ -817,6 +836,7 @@ if($aktion == 'suche')
 		
 		var anzahlRows='.$i.';
 		var uid = "'.$user.'";
+
 		
 		function deleteBtnBestellt(bestellung_id, user_uid)
 		{
