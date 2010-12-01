@@ -42,10 +42,11 @@ class wawi_bestelldetail extends basis_db
 	public $insertvon; 			// char
 	public $updateamum; 		// timestamp
 	public $updatevon; 			// char
-	
-	public $result = array(); 
 	public $user; 
 	public $new; 
+	
+	public $result = array(); 
+
 	
 	/**
 	 * 
@@ -172,11 +173,6 @@ class wawi_bestelldetail extends basis_db
 	public function validate()
 	{
 		
-		if(!is_numeric($this->bestelldetail_id))
-		{
-			$this->errormsg = "Bestelldetail_id fehlerhaft.";
-			return false;
-		}
 		if(!is_numeric($this->bestellung_id))
 		{
 			$this->errormsg = "Bestellung_id fehlerhaft.";
@@ -228,10 +224,10 @@ class wawi_bestelldetail extends basis_db
 			$this->addslashes($this->beschreibung).', '.
 			$this->addslashes($this->artikelnummer).', '.
 			$this->addslashes($this->preisprove).', '.
-			$this->addslashes($this->mwst).', '.
-			$this->addslashes($this->erhalten).', '.
-			$this->addslashes($this->sort).', '.
-			$this->addslashes($this->text).', '.
+			$this->addslashes($this->mwst).', 
+			false, '.
+			$this->addslashes($this->sort).',  
+			false , '.
 			$this->addslashes($this->insertamum).', '.
 			$this->addslashes($this->insertvon).', '.
 			$this->addslashes($this->updateamum).', '.
@@ -241,22 +237,20 @@ class wawi_bestelldetail extends basis_db
 		else
 		{
 			// Update
-			$qry = 'UPDATE wawi.tbl_bestellung SET 
-			bestellung_id = '.$this->bestellung_id.',
-			position = '.$this->position.',
-			menge = '.$this->menge.',
-			verpackungseinheit = '.$this->verpackungseinheit.',
-			beschreibung = '.$this->beschreibung.',
-			artikelnummer = '.$this->artikelnummer.',
-			preisprove = '.$this->preisprove.',
-			mwst = '.$this->mwst.',
-			erhalten = '.$this->erhalten.',
-			sort = '.$this->sort.',
-			text = '.$this->text.',
-			insertamum = '.$this->insertamum.',
-			insertvon = '.$this->insertvon.',
-			updateamum = '.$this->updateamum.',
-			updatevon = '.$this->updatevon.' WHERE bestelldetail_id = '.$this->bestelldetail_id.';'; 
+			$qry = 'UPDATE wawi.tbl_bestelldetail SET 
+			bestellung_id = '.$this->addslashes($this->bestellung_id).',
+			position = '.$this->addslashes($this->position).',
+			menge = '.$this->addslashes($this->menge).',
+			verpackungseinheit = '.$this->addslashes($this->verpackungseinheit).',
+			beschreibung = '.$this->addslashes($this->beschreibung).',
+			artikelnummer = '.$this->addslashes($this->artikelnummer).',
+			preisprove = '.$this->addslashes($this->preisprove).',
+			mwst = '.$this->addslashes($this->mwst).',
+			erhalten = '.$this->addslashes($this->erhalten).',
+			sort = '.$this->addslashes($this->sort).',
+			text = '.$this->addslashes($this->text).',
+			updateamum = '.$this->addslashes($this->updateamum).',
+			updatevon = '.$this->addslashes($this->updatevon).' WHERE bestelldetail_id = '.$this->bestelldetail_id.';'; 
 		}
 		
 		if($this->db_query($qry))
@@ -264,7 +258,7 @@ class wawi_bestelldetail extends basis_db
 			if($this->new)
 			{
 				//aktuelle Sequence holen
-				$qry="SELECT currval('seq_bestelldetail_bestelldetail_id') as id;";
+				$qry="SELECT currval('wawi.seq_bestelldetail_bestelldetail_id') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())

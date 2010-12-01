@@ -31,10 +31,12 @@ class wawi_tags extends basis_db
 	public $result = array();		//  Konto Objekt
 
 	//Tabellenspalten
-	public $tag;				//  integer
-	public $bestellung_id;				//  string
+	public $tag;					//  integer
+	public $bestellung_id;			//  string
 	public $insertamum;        		//  timestamp
 	public $insertvon;				//  string
+	
+	public $bestelldetail_id; 
 
 	 
 	
@@ -51,6 +53,11 @@ class wawi_tags extends basis_db
 			$this->load($tag);
 	}
 
+	/**
+	 * 
+	 * Gibt die Tags einer Bestellung zurück
+	 * @param unknown_type $bestellung_id
+	 */
 	public function GetTagsByBestellung($bestellung_id)
 	{
 		if(!is_numeric($bestellung_id))
@@ -83,6 +90,10 @@ class wawi_tags extends basis_db
 		return true; 
 	}
 
+	/**
+	 * 
+	 * gibt die Tags per strichpunkt getrennt zurück
+	 */
 	public function GetStringTags()
 	{
 			$string = '';
@@ -94,8 +105,40 @@ class wawi_tags extends basis_db
 			}
 			return $string;
 	}
+
+
+	public function GetTagsByBesteldetail($bestelldetail_id)
+	{
+		/*if(!is_numeric($bestelldetail_id))
+		{
+			$this->errormsg = "Ungültige Bestelldetail ID"; 
+			return false; 
+		}*/
+		
+		$qry = "Select * from wawi.tbl_bestelldetailtag where bestelldetail_id = ".$bestelldetail_id.";";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$bestelltag = new wawi_tags();
+				
+				$bestelltag->tag = $row->tag; 
+				$bestelltag->bestelldetail_id = $row->bestelldetail_id; 
+				$bestelltag->insertamum = $row->insertamum; 
+				$bestelltag->insertvon = $row->insertvon; 
+				
+				$this->result[] = $bestelltag; 
+			}	
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei Abfrage aufgetreten."; 
+			return false; 
+		}
+		return true; 
+	}
+
+
 }
-
-
-
 
