@@ -43,6 +43,7 @@
   	require_once('../include/betriebsmittelstatus.class.php');
   	require_once('../include/betriebsmittel_betriebsmittelstatus.class.php');
   	require_once ('../include/firma.class.php');
+  	require_once ('../include/wawi_tags.class.php');
 
   	if (!$uid = get_uid())
 		die('Keine UID gefunden:'.$uid.' !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -334,6 +335,40 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($sFirma->result[$i]->name).'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
 			break;
 			
+		case 'tags':
+			$bestell_id = $_REQUEST['bestell_id'];
+			
+			$tag_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			
+			if (is_null($bestell_id) || $tag_search=='')
+				exit();	
+				
+			$tags = new wawi_tags(); 
+			
+			if (!$tags->GetTagsByBestellung($bestell_id))
+				exit($tags->errormsg."\n");
+				
+			for ($i=0;$i<count($tags->result);$i++)
+				echo html_entity_decode($tags->result[$i]->tag)."\n";
+			break;
+			
+		case 'detail_tags':
+			$detail = $_REQUEST['detail_id'];
+			
+			$tag_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			
+			if (is_null($detail) || $tag_search=='')
+				exit();	
+				
+			$tags = new wawi_tags(); 
+			
+			if (!$tags->GetTagsByBesteldetail($detail))
+				exit($tags->errormsg."\n");
+				
+			for ($i=0;$i<count($tags->result);$i++)
+				echo html_entity_decode($tags->result[$i]->tag)."\n";
+			break;
+			
 			// Mitarbeiter Search
 		case 'wawi_mitarbeiter_search':
 		 	$mitarbeiter_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
@@ -439,6 +474,8 @@ cellSeparator (default value: "|")
 			}
 			break;
 
+
+			
 		// Studiengang Suche
 		case 'wawi_studiengang_search':
 		 	$studiengang_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));

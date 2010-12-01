@@ -38,6 +38,7 @@ require_once '../include/wawi_bestellstatus.class.php';
 require_once '../include/wawi_tags.class.php';
 
 $aktion ='';
+$test = 0;
 
 if(isset($_POST['getKonto']))
 {
@@ -146,6 +147,7 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 	if(is_numeric($_POST['id']))
 	{
 		echo getDetailRow($_POST['id']);
+		$test++; 
 		exit;
 	}
 	else
@@ -624,361 +626,460 @@ if($aktion == 'suche')
 		}
 	}
 	else if($_GET['method']=='update')
-	{
+	{ 
 		// Bestellung Editieren	
-		if(!$rechte->isberechtigt('wawi/bestellung',null, 'su'))
-			die('Sie haben keine Berechtigung zum Bearbeiten von Bestellungen');
-		
-		$id = (isset($_GET['id'])?$_GET['id']:null);
-
-		$bestellung = new wawi_bestellung(); 
-		$bestellung->load($id); 
-		$detail = new wawi_bestelldetail(); 
-		$detail->getAllDetailsFromBestellung($id);
-		$anz_detail =  count($detail->result); 
-		$konto = new wawi_konto(); 
-		$konto->getKontoFromKostenstelle($bestellung->kostenstelle_id);
-		$konto_bestellung = new wawi_konto(); 
-		$konto_bestellung->load($bestellung->konto_id);
-		$kostenstelle = new wawi_kostenstelle(); 
-		$kostenstelle->load($bestellung->kostenstelle_id);
-		$aufteilung = new wawi_aufteilung(); 
-		$aufteilung->getAufteilungFromKostenstelle($bestellung->kostenstelle_id);
-		$firma = new firma(); 
-		$firma->load($bestellung->firma_id);  
-		$liefertermin = $date->formatDatum($bestellung->liefertermin, 'd.m.Y'); 
-		$allStandorte = new standort(); 
-		$allStandorte->getStandorteWithTyp('Intern');
-		$status= new wawi_bestellstatus();
-		$bestell_tag = new wawi_tags(); 
-		$bestell_tag->GetTagsByBestellung($bestellung->bestellung_id);
-		
-		$summe= 0; 
-		$konto_vorhanden = false; 
-		
-		echo "<h2>Bearbeiten</h2>";
-		echo "<form action ='bestellung.php?method=update' method='post' name='editForm' id='editForm'>\n";
-		echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
-		
-		//tabelle Bestelldetails
-		echo "<table border = 0 width= '100%' class='dark'>\n";
-		echo "<tr>\n"; 	
-		echo "<td>Titel: </td>\n";
-		echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
-		echo "<td>Erstellt am:</td>\n"; 
-		echo "<td>".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</td>\n";
-		echo "</tr>\n"; 
-		echo "<tr>\n"; 	
-		echo "<td>Firma: </td>\n";
-		echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
-		echo "<input type='text' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
-		echo "<td>Liefertermin:</td>\n"; 
-		echo "<td><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
-		echo "</tr>\n"; 
-		echo "<tr>\n"; 	
-		echo "<td>Kostenstelle: </td>\n";
-		echo "<td>$kostenstelle->bezeichnung</td>\n";
-		echo "<td>Lieferadresse:</td>\n"; 
-		echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
-		
-		$select_help = false; 
-		foreach($allStandorte->result as $standorte)
+		if(!isset($_GET['bestellung']))
 		{
-			$selected ='';
-			$standort_lieferadresse = new adresse(); 
-			$standort_lieferadresse->load($standorte->adresse_id); 
+			if(!$rechte->isberechtigt('wawi/bestellung',null, 'su'))
+				die('Sie haben keine Berechtigung zum Bearbeiten von Bestellungen');
 			
-			if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
-			{	
-				$selected ='selected';	
-				$select_help = true; 
+			$id = (isset($_GET['id'])?$_GET['id']:null);
+	
+			$bestellung = new wawi_bestellung(); 
+			$bestellung->load($id); 
+			$detail = new wawi_bestelldetail(); 
+			$detail->getAllDetailsFromBestellung($id);
+			$anz_detail =  count($detail->result); 
+			$konto = new wawi_konto(); 
+			$konto->getKontoFromKostenstelle($bestellung->kostenstelle_id);
+			$konto_bestellung = new wawi_konto(); 
+			$konto_bestellung->load($bestellung->konto_id);
+			$kostenstelle = new wawi_kostenstelle(); 
+			$kostenstelle->load($bestellung->kostenstelle_id);
+			$aufteilung = new wawi_aufteilung(); 
+			$aufteilung->getAufteilungFromKostenstelle($bestellung->kostenstelle_id);
+			$firma = new firma(); 
+			$firma->load($bestellung->firma_id);  
+			$liefertermin = $date->formatDatum($bestellung->liefertermin, 'd.m.Y'); 
+			$allStandorte = new standort(); 
+			$allStandorte->getStandorteWithTyp('Intern');
+			$status= new wawi_bestellstatus();
+			$bestell_tag = new wawi_tags(); 
+
+			
+			
+			$summe= 0; 
+			$konto_vorhanden = false; 
+			
+			echo "<h2>Bearbeiten</h2>";
+			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
+			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
+			
+			//tabelle Bestelldetails
+			echo "<table border = 0 width= '100%' class='dark'>\n";
+			echo "<tr>\n"; 	
+			echo "<td>Titel: </td>\n";
+			echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
+			echo "<td>Erstellt am:</td>\n"; 
+			echo "<td><p name='erstellt'>".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</p></td>\n";
+			echo "</tr>\n"; 
+			echo "<tr>\n"; 	
+			echo "<td>Firma: </td>\n";
+			echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
+			echo "<input type='text' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
+			echo "<td>Liefertermin:</td>\n"; 
+			echo "<td><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
+			echo "</tr>\n"; 
+			echo "<tr>\n"; 	
+			echo "<td>Kostenstelle: </td>\n";
+			echo "<td><input type='text' name='kostenstelle_id' id='kostenstelle_id' value='$kostenstelle->bezeichnung' disabled size ='60'></input></td>\n";
+			echo "<td>Lieferadresse:</td>\n"; 
+			echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
+			
+			$select_help = false; 
+			foreach($allStandorte->result as $standorte)
+			{
+				$selected ='';
+				$standort_lieferadresse = new adresse(); 
+				$standort_lieferadresse->load($standorte->adresse_id); 
+				
+				if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
+				{	
+					$selected ='selected';	
+					$select_help = true; 
+				}
+				
+				echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
+			}		
+			
+			echo "</td></tr>\n"; 
+			echo "<tr>\n"; 	
+			echo "<td>Konto: </td>\n";
+			echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
+			foreach($konto->result as $ko)
+			{ 
+				$selected ='';
+				if($ko->konto_id == $bestellung->konto_id)
+				{
+					$selected = 'selected';	
+					$konto_vorhanden = true; 
+				}		
+				echo '<option value='.$ko->konto_id.' '.$selected.'>'.$ko->kurzbz."</option>\n";
+		
+			}
+			//wenn die konto_id von der bestellung nicht in den Konten die der Kostenstelle zugeordnet sind befidet --> selbst hinschreiben
+			if(!$konto_vorhanden)
+			{
+				echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
+			}
+			echo "</td><td>Rechnungsadresse:</td>\n"; 
+			
+			echo "<td><Select name='filter_rechnungsadresse' id='filter_rechnungsadresse' style='width: 400px;'>\n";
+			foreach($allStandorte->result as $standorte)
+			{
+				$selected ='';
+				$standort_rechnungsadresse = new adresse(); 
+				$standort_rechnungsadresse->load($standorte->adresse_id); 
+				
+				if($standort_rechnungsadresse->adresse_id == $bestellung->rechnungsadresse)
+					$selected ='selected';
+					
+				echo "<option value='".$standort_rechnungsadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_rechnungsadresse->strasse.', '.$standort_rechnungsadresse->plz.' '.$standort_rechnungsadresse->ort."</option>\n";
+			}		
+			echo "</td></tr>\n"; 
+			echo "<tr>\n"; 	
+			echo "<td>Bemerkungen: </td>\n";
+			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
+			echo "<td>Bestellt:</td>\n"; 
+			echo "<td>\n";
+	
+			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
+			{
+				echo "<span id='btn_bestellt'>";	
+				echo "<input type='button' value ='Bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)'></input>";
+				echo "</span>";
+			}
+			else
+			{
+				echo "Bestellt am: ".$date->formatDatum($status->datum,'d.m.Y'); 
 			}
 			
-			echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
-		}		
+			echo "</td>\n";
+			echo "</tr>\n"; 
+			echo "<tr>\n";
+			echo"<td>Tags:</td>\n"; 
+			$bestell_tag->GetTagsByBestellung($bestellung->bestellung_id);
+			$tag_help = $bestell_tag->GetStringTags();
+			echo "<td><input type='text' id='tags' name='tags' size='32' value='".$tag_help."'>\n";		
 		
-		echo "</td></tr>\n"; 
-		echo "<tr>\n"; 	
-		echo "<td>Konto: </td>\n";
-		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
-		foreach($konto->result as $ko)
-		{ 
-			$selected ='';
-			if($ko->konto_id == $bestellung->konto_id)
+			
+			echo '	<script type="text/javascript">
+						$("#tags").autocomplete("wawi_autocomplete.php", 
+						{
+							minChars:1,
+							matchSubset:1,matchContains:1,
+							width:500,
+							multiple: true,
+							multipleSeparator: "; ",
+							extraParams:{"work":"tags", "bestell_id":"'.$bestellung->bestellung_id.'"}
+						});
+					</script>';
+		
+			echo "</td>\n"; 
+			echo "<td>Storniert:</td>\n";
+			echo "<td>";
+			$disabled='';
+			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
 			{
-				$selected = 'selected';	
-				$konto_vorhanden = true; 
-			}		
-			echo '<option value='.$ko->konto_id.' '.$selected.'>'.$ko->kurzbz."</option>\n";
-	
-		}
-		//wenn die konto_id von der bestellung nicht in den Konten die der Kostenstelle zugeordnet sind befidet --> selbst hinschreiben
-		if(!$konto_vorhanden)
-		{
-			echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
-		}
-		echo "</td><td>Rechnungsadresse:</td>\n"; 
-		
-		echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
-		foreach($allStandorte->result as $standorte)
-		{
-			$selected ='';
-			$standort_rechnungsadresse = new adresse(); 
-			$standort_rechnungsadresse->load($standorte->adresse_id); 
-			
-			if($standort_rechnungsadresse->adresse_id == $bestellung->lieferadresse)
-				$selected ='selected';
+				if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
+				$disabled = 'disabled';
+				echo "<span id='btn_storniert'>";
+				echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
 				
-			echo "<option value='".$standort_rechnungsadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_rechnungsadresse->strasse.', '.$standort_rechnungsadresse->plz.' '.$standort_rechnungsadresse->ort."</option>\n";
-		}		
-		echo "</td></tr>\n"; 
-		echo "<tr>\n"; 	
-		echo "<td>Bemerkungen: </td>\n";
-		echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
-		echo "<td>Bestellt:</td>\n"; 
-		echo "<td>\n";
-
-		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
-		{
-			echo "<span id='btn_bestellt'>";	
-			echo "<input type='button' value ='Bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)'></input>";
-			echo "</span>";
-		}
-		else
-		{
-			echo "Bestellt am: ".$date->formatDatum($status->datum,'d.m.Y'); 
-		}
-		
-		echo "</td>\n";
-		echo "</tr>\n"; 
-		echo "<tr>\n";
-		echo"<td>Tags:</td>\n"; 
-		$tag_help = $bestell_tag->GetStringTags();
-		echo "<td><input type='text' id='tags' name='tags' size='32' value='".$tag_help."'>\n";		
+				echo "</span>";
+			}
+			else 
+			{
+				echo "Storniert am: ".$date->formatDatum($status->datum, 'd.m.Y');
+			}
+			echo "</td></tr>";
+			echo "</table>\n";
+			echo "<br>";
+			
+			//tabelle Positonen
+			echo "<table border =1 width='70%'>\n";
+			echo "<tr>\n";
+			echo "<th>Löschen</th>\n";
+			echo "<th>Pos</th>\n";
+			echo "<th>Menge</th>\n";
+			echo "<th>VE</th>\n";
+			echo "<th>Bezeichnung</th>\n";
+			echo "<th>Artikelnr.</th>\n";
+			echo "<th>Preis/VE</th>\n";
+			echo "<th>USt</th>\n";
+			echo "<th>Brutto</th>\n";
+			echo "<th>Tags</th>";
+			echo "</tr>\n";
+			echo "<tbody id='detailTable'>";
+			$i= 1; 
+			foreach($detail->result as $det)
+			{
+				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
+				getDetailRow($i, $det->bestelldetail_id, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
+				
+				$summe+=$brutto; 
+				$i++; 
+			}
+			getDetailRow($i);
+			$test = $i; 
+			echo "</tbody>";
+			echo "<tfoot><tr>"; 
+			echo "<td></td>"; 
+			echo "<td></td>";
+			echo "<td></td>";
+			echo "<td></td>";
+			echo "<td></td>";
+			echo "<td></td>";
+			echo "<td colspan ='2'>Gesamtpreis/Brutto: </td>";
+			echo "<td id = 'brutto'></td>";
+			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' value='$test'></input></td>"; 
+			echo "</tr>";
+			echo "</tfoot>";
+			
+			echo "</table>\n";
+			echo "<br><br>\n"; 
+			
+			
+			echo '
+			<script type="text/javascript">
+			
+			var anzahlRows='.$i.';
+			var uid = "'.$user.'";
 	
-		
-		echo '	<script type="text/javascript">
-					$("#tags").autocomplete("wawi_autocomplete.php", 
-					{
-						minChars:1,
-						matchSubset:1,matchContains:1,
-						width:500,
-						multiple: true,
-						multipleSeparator: "; ",
-						extraParams:{"work":"tags", "bestell_id":"'.$bestellung->bestellung_id.'"}
-					});
-				</script>';
-	
-		echo "</td>\n"; 
-		echo "<td>Storniert:</td>\n";
-		echo "<td>";
-		$disabled='';
-		if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
-		{
-			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
-			$disabled = 'disabled';
-			echo "<span id='btn_storniert'>";
-			echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
 			
-			echo "</span>";
-		}
-		else 
-		{
-			echo "Storniert am: ".$date->formatDatum($status->datum, 'd.m.Y');
-		}
-		echo "</td></tr>";
-		echo "</table>\n";
-		echo "<br>";
-		
-		//tabelle Positonen
-		echo "<table border =1 width='70%'>\n";
-		echo "<tr>\n";
-		echo "<th>Löschen</th>\n";
-		echo "<th>Pos</th>\n";
-		echo "<th>Menge</th>\n";
-		echo "<th>VE</th>\n";
-		echo "<th>Bezeichnung</th>\n";
-		echo "<th>Artikelnr.</th>\n";
-		echo "<th>Preis/VE</th>\n";
-		echo "<th>USt</th>\n";
-		echo "<th>Brutto</th>\n";
-		echo "<th>Position</th>";
-		echo "</tr>\n";
-		echo "<tbody id='detailTable'>";
-		$i= 1; 
-		foreach($detail->result as $det)
-		{
-			$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
-			getDetailRow($i, $det->position, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
-			
-			$summe+=$brutto; 
-			$i++; 
-		}
-		getDetailRow($i);
-		echo "</tbody>";
-		echo "<tfoot><tr>"; 
-		echo "<td></td>"; 
-		echo "<td></td>";
-		echo "<td></td>";
-		echo "<td></td>";
-		echo "<td></td>";
-		echo "<td></td>";
-		echo "<td colspan ='2'>Gesamtpreis/Brutto: </td>";
-		echo "<td id = 'brutto'></td>";
-		echo "</tr></tfoot>";
-		
-		echo "</table>\n";
-		echo "<br><br>\n"; 
-		
-		
-		echo '
-		<script type="text/javascript">
-		
-		var anzahlRows='.$i.';
-		var uid = "'.$user.'";
-
-		
-		function deleteBtnBestellt(bestellung_id, user_uid)
-		{
-			$("#btn_bestellt").html(); 
-			
-			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnBestellt: "true"},
-						function(data){
-					
-
-							$("#btn_bestellt").html("Bestellt am: " +data); 
-							document.editForm.storniert.disabled=false; 
+			function deleteBtnBestellt(bestellung_id, user_uid)
+			{
+				$("#btn_bestellt").html(); 
+				
+				$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnBestellt: "true"},
+							function(data){
 						
-						});	
-			 
-		}
-		
-		function deleteBtnStorno(bestellung_id, user_uid)
-		{
-			$("#btn_storniert").html(); 
+	
+								$("#btn_bestellt").html("Bestellt am: " +data); 
+								document.editForm.storniert.disabled=false; 
+							
+							});	
+				 
+			}
 			
-			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnStorno: "true"},
-						function(data){
-						$("#btn_storniert").html("Storniert am: " +data); 
-						document.editForm.btn_submit.disabled=true; 
-						});	
-				
-		}
-		
-		/*
-		Berechnet die Brutto Summe für eine Zeile
-		*/
-		function calcLine(id)
-	   	{
-	    	var brutto=0;
-
-	    	var menge = $("#menge_"+id).val();
-	    	var betrag = $("#preisprove_"+id).val();
-	    	var mwst = $("#mwst_"+id).val();
-	    	
-	    	if(betrag!="" && mwst!="" && menge!="")
-	    	{
-	    		menge = parseFloat(menge);
-				betrag = parseFloat(betrag);
-				mwst = parseFloat(mwst);
-				
-				brutto = menge * (brutto + (betrag+(betrag*mwst/100)));
-	    	}
-	    	brutto = Math.round(brutto*100)/100;
-	    	
-		   	document.getElementById("brutto_"+id).value = brutto.toFixed(2);
-		
-		    summe();
-	   	}
-
-		/*
-		Berechnet die gesamte Brutto Summe für eine Bestellung
-		*/
-		function summe()
-		{
-			var i=1;
-			var netto=0;
-			var brutto=0;
-			while(i<=anzahlRows)
+			function deleteBtnStorno(bestellung_id, user_uid)
 			{
-			
-				var menge =$("#menge_"+i).val();
-				var betrag = $("#preisprove_"+i).val();
-				var mwst = $("#mwst_"+i).val();
+				$("#btn_storniert").html(); 
+				
+				$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnStorno: "true"},
+							function(data){
+							$("#btn_storniert").html("Storniert am: " +data); 
+							document.editForm.btn_submit.disabled=true; 
+							});	
 					
-				if(betrag!="" && mwst!="" && menge!="")
-				{
-					menge = parseFloat(menge);
+			}
+			
+			/*
+			Berechnet die Brutto Summe für eine Zeile
+			*/
+			function calcLine(id)
+		   	{
+		    	var brutto=0;
+	
+		    	var menge = $("#menge_"+id).val();
+		    	var betrag = $("#preisprove_"+id).val();
+		    	var mwst = $("#mwst_"+id).val();
+		    	
+		    	if(betrag!="" && mwst!="" && menge!="")
+		    	{
+		    		menge = parseFloat(menge);
 					betrag = parseFloat(betrag);
 					mwst = parseFloat(mwst);
 					
-					netto = netto + betrag;
-					
-					brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
-				}
-				i=i+1;
-			}
-			netto = Math.round(netto*100)/100;
-			brutto = Math.round(brutto*100)/100;
-			brutto = brutto.toFixed(2);
-			$("#netto").html(netto);
-			$("#brutto").html(brutto);
-		}
-		
-		$(document).ready(function() 
-		{
-			summe();
-		});
-		
-		/**
-		 * Fuegt eine neue Zeile fuer den Betrag hinzu wenn die 
-		 * uebergebene id, die der letzte Zeile ist
-		 * und der Betrag eingetragen wurde
-		 */
-		function checkNewRow(id)
-		{
-			var betrag="";
-			betrag = $("#preisprove_"+id).val();
+					brutto = menge * (brutto + (betrag+(betrag*mwst/100)));
+		    	}
+		    	brutto = Math.round(brutto*100)/100;
+		    	
+			   	document.getElementById("brutto_"+id).value = brutto.toFixed(2);
 			
-			// Wenn der betrag nicht leer ist,
-			// und die letzte reihe ist, 
-			// dann eine neue Zeile hinzufuegen
-			if(betrag.length>0 && anzahlRows==id)
+			    summe();
+		   	}
+	
+			/*
+			Berechnet die gesamte Brutto Summe für eine Bestellung
+			*/
+			function summe()
 			{
-				$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
-						function(data){
-							$("#detailTable").append(data);
-							anzahlRows=anzahlRows+1;
-						});
+				var i=1;
+				var netto=0;
+				var brutto=0;
+				while(i<=anzahlRows)
+				{
+				
+					var menge =$("#menge_"+i).val();
+					var betrag = $("#preisprove_"+i).val();
+					var mwst = $("#mwst_"+i).val();
+						
+					if(betrag!="" && mwst!="" && menge!="")
+					{
+						menge = parseFloat(menge);
+						betrag = parseFloat(betrag);
+						mwst = parseFloat(mwst);
+						
+						netto = netto + betrag;
+						
+						brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
+					}
+					i=i+1;
+				}
+				netto = Math.round(netto*100)/100;
+				brutto = Math.round(brutto*100)/100;
+				brutto = brutto.toFixed(2);
+				$("#netto").html(netto);
+				$("#brutto").html(brutto);
 			}
-		}
-		
-		</script>';
-		
-		
-		
-		// div Aufteilung --> kann ein und ausgeblendet werden
-		echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
+			
+			$(document).ready(function() 
+			{
+				summe();
+			});
+			
+			/**
+			 * Fuegt eine neue Zeile fuer den Betrag hinzu wenn die 
+			 * uebergebene id, die der letzte Zeile ist
+			 * und der Betrag eingetragen wurde
+			 */
+			function checkNewRow(id)
+			{
+				var betrag="";
+				betrag = $("#preisprove_"+id).val();
+				
+				// Wenn der betrag nicht leer ist,
+				// und die letzte reihe ist, 
+				// dann eine neue Zeile hinzufuegen
+				if(betrag.length>0 && anzahlRows==id)
+				{
+					$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
+							function(data){
+								$("#detailTable").append(data);
+								anzahlRows=anzahlRows+1;
+								var test = 0; 
+								test = document.getElementById("detail_anz").value;
+								document.getElementById("detail_anz").value = parseFloat(test) +1;
+							});
+				}
+	
+			}
+			
+			</script>';
+			
+			
+			
+			// div Aufteilung --> kann ein und ausgeblendet werden
+			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
+	
+			echo "<div id='aufteilung'>\n";
+			echo "<table border=1>"; 
+			echo "<tr>\n"; 
+			foreach($aufteilung->result as $auf)
+			{
+				echo "<td>".$auf->oe_kurzbz.$auf->anteil."</td>"; 
+			}
+			echo "</tr>"; 
+			echo "</table>";
+			echo "</div>"; 
+			echo "<br><br>";
+			$disabled ='';
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
+				$disabled ='disabled';
+			echo "<input type='submit' value='Speichern' id='btn_submit' $disabled></input>\n"; 
 
-		echo "<div id='aufteilung'>\n";
-		echo "<table border=1>"; 
-		echo "<tr>\n"; 
-		foreach($aufteilung->result as $auf)
-		{
-			echo "<td>".$auf->oe_kurzbz.$auf->anteil."</td>"; 
 		}
-		echo "</tr>"; 
-		echo "</table>";
-		echo "</div>"; 
-		echo "<br><br>";
-		echo "<input type='submit' value='Speichern' id='btn_submit' ></input>\n"; 
+		else 
+		{
+			// Update auf Bestellung
+			$date = new datum(); 
+			
+			$bestellung_id = $_GET['bestellung'];
+			$bestellung_detail_anz = $_POST['detail_anz'];
+			$bestellung_new = new wawi_bestellung(); 
+			$bestellung_new->load($bestellung_id);
+			
+			$bestellung_new->new = false; 
+			$bestellung_new->besteller_uid=$user; 
+			$bestellung_new->konto_id = $_POST['filter_konto'];
+			$bestellung_new->firma_id = $_POST['firma_id'];
+			$bestellung_new->lieferadresse = $_POST['filter_lieferadresse'];
+			$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
+			$bestellung_new->titel = $_POST['titel'];
+			$bestellung_new->bemerkung = $_POST['bemerkung'];
+			$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
+			$bestellung_new->updateamum = date('Y-m-d H:i:s');
+			$bestellung_new->updatevon = $user; 
+			
+			// letzte leere zeile nicht speichern
+			for($i = 1; $i < $bestellung_detail_anz; $i++)
+			{
+				// gibt es ein bestelldetail schon
+				$detail_id = $_POST["bestelldetailid_$i"]; 
+				if($detail_id != '')
+				{
+					// Update
+					$bestell_detail = new wawi_bestelldetail(); 
+					$bestell_detail->load($detail_id);
+					
+					$bestell_detail->position = $_POST["pos_$i"];
+					$bestell_detail->menge = $_POST["menge_$i"];
+					$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
+					$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+					$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
+					$bestell_detail->preisprove = $_POST["preisprove_$i"];
+					$bestell_detail->mwst = $_POST["mwst_$i"];
+					$bestell_detail->updateamum = date('Y-m-d H:i:s');
+					$bestell_detail->updatevon = $user;
+					$bestell_detail->new = false; 
+					
+				}
+				else 
+				{
+					// Insert
+					$bestell_detail = new wawi_bestelldetail(); 
+					
+					$bestell_detail->bestellung_id = $_GET['bestellung'];
+					$bestell_detail->position = $_POST["pos_$i"];
+					$bestell_detail->menge = $_POST["menge_$i"];
+					$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
+					$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+					$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
+					$bestell_detail->preisprove = $_POST["preisprove_$i"];
+					$bestell_detail->mwst = $_POST["mwst_$i"];
+					$bestell_detail->sort = $_POST["pos_$i"];
+					$bestell_detail->insertamum = date('Y-m-d H:i:s');
+					$bestell_detail->insertvon = $user;
+					$bestell_detail->updateamum = date('Y-m-d H:i:s');
+					$bestell_detail->updatevon = $user;
+					$bestell_detail->new = true; 
+				}
+				if(!$bestell_detail->save())
+				{
+					echo $bestell_detail->errormsg; 
+				}
+				
+			}
+			
+			if($bestellung_new->save())
+			{
+				echo "erfolgreich gespeichert. <br><br>";
+			}
+			echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";  
+			
+			
+			
+		}
 	}
 	
-	function getDetailRow($i, $pos='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
+	
+	
+	function getDetailRow($i, $bestelldetail_id='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
 	{
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a>delete</a></td>\n";
-		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' ></input></td>\n";
+		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
 		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'</input></td>\n";
@@ -986,6 +1087,23 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
-		echo "<td>".$i."</td>"; 
+/*		$detail_tag = new wawi_tags(); 
+		$detail_tag->GetTagsByBesteldetail($bestelldetail_id);
+		$help = $detail_tag->GetStringTags(); */
+		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value=''></input></td>"; 
+		
+	/*	echo '	<script type="text/javascript">
+						$("#detail_tag_2").autocomplete("wawi_autocomplete.php", 
+						{
+							minChars:1,
+							matchSubset:1,matchContains:1,
+							width:500,
+							multiple: true,
+							multipleSeparator: "; ",
+							extraParams:{"work":"detail_tags", "detail_id":"'.$bestelldetail_id.'"}
+						});
+					</script>';*/
+		
+		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
 	}
