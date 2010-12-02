@@ -797,7 +797,7 @@ if($aktion == 'suche')
 			echo "<br>";
 			
 			//tabelle Positonen
-			echo "<table border =1 width='70%'>\n";
+			echo "<table border =0 width='70%'>\n";
 			echo "<tr>\n";
 			echo "<th>Löschen</th>\n";
 			echo "<th>Pos</th>\n";
@@ -969,8 +969,11 @@ if($aktion == 'suche')
 			</script>';
 			
 			
-			
+			echo "<input type='submit' value='Speichern' id='btn_submit' $disabled></input>\n"; 
+			echo "<br><br>"; 
 			// div Aufteilung --> kann ein und ausgeblendet werden
+			
+			
 			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
 	
 			echo "<div id='aufteilung'>\n";
@@ -987,7 +990,7 @@ if($aktion == 'suche')
 			$disabled ='';
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
 				$disabled ='disabled';
-			echo "<input type='submit' value='Speichern' id='btn_submit' $disabled></input>\n"; 
+
 
 		}
 		else 
