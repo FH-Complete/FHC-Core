@@ -345,7 +345,7 @@ cellSeparator (default value: "|")
 				
 			$tags = new wawi_tags(); 
 			
-			if (!$tags->GetTagsByBestellung($bestell_id))
+			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
 				
 			for ($i=0;$i<count($tags->result);$i++)
