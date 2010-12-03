@@ -129,7 +129,7 @@ class wawi_rechnung extends basis_db
 		$first = true; 
 		$qry = "
 		SELECT 
-			distinct on (tbl_rechnung.rechnung_id) tbl_rechnung.*  
+			distinct on (tbl_rechnung.rechnung_id) tbl_rechnung.*, tbl_bestellung.bestell_nr
 		FROM 
 			wawi.tbl_rechnung
 			LEFT JOIN wawi.tbl_bestellung USING (bestellung_id) 
@@ -205,6 +205,8 @@ class wawi_rechnung extends basis_db
 			$obj->updatevon = $row->updatevon;
 			$obj->insertamum = $row->insertamum;
 			$obj->insertvon = $row->insertvon;
+			
+			$obj->bestell_nr = $row->bestell_nr;
 			
 			$this->result[] = $obj; 
 		}
@@ -507,5 +509,45 @@ class wawi_rechnung extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}	
+	}
+	
+	/**
+	 * Liefert die Anzahl der Rechnungen zu einer Bestellung
+	 *
+	 * @param $bestellung_id
+	 * @return Anzahl der Rechnungen oder false im Fehlerfall
+	 */
+	public function count($bestellung_id)
+	{
+		$qry = "SELECT count(*) as anzahl FROM wawi.tbl_rechnung WHERE bestellung_id='".addslashes($bestellung_id)."'";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl;
+			}
+			else
+			{
+				$this->errormsg='Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	public function getBrutto($rechnung_id)
+	{
+		$this->loadBetraege($rechnung_id);
+		$brutto=0;
+		foreach($this->result as $row)
+		{
+			$brutto += ($row->betrag*($row->mwst+100)/100);
+		}
+		return $brutto;
 	}
 }

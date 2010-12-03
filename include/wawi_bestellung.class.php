@@ -167,7 +167,7 @@ class wawi_bestellung extends basis_db
 	 * @param $mitarbeiter_uid
 	 * @param $rechnung
 	 */
-	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma)
+	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null)
 	{
 		$first = true; 
 		$qry = "SELECT distinct on (bestellung.bestellung_id) *, status.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
@@ -176,141 +176,48 @@ class wawi_bestellung extends basis_db
 		
 		LEFT JOIN wawi.tbl_bestellung_bestellstatus status USING (bestellung_id) 
 		LEFT JOIN wawi.tbl_kostenstelle kostenstelle USING (kostenstelle_id) 
-		LEFT JOIN public.tbl_organisationseinheit orgaeinheit ON (orgaeinheit.oe_kurzbz = kostenstelle.oe_kurzbz)  "; 
+		LEFT JOIN public.tbl_organisationseinheit orgaeinheit ON (orgaeinheit.oe_kurzbz = kostenstelle.oe_kurzbz)  
+		WHERE 1=1 "; 
 		
 		if ($bestellnr != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= "  UPPER(bestellung.bestell_nr) LIKE UPPER('%$bestellnr%')"; 
-		}
-		if ($titel != '')	
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= " UPPER(bestellung.titel)  LIKE UPPER('%$titel%')"; 
-		}	
-		if ($evon != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';	
-			$qry.= ' bestellung.insertamum > date('.$this->addslashes($evon).')';
-		}		
-		if ($ebis != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= ' bestellung.insertamum < '.$this->addslashes($ebis);
-		}
-		if ($bvon != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= " status.bestellstatus_kurzbz = 'Bestellung' and status.insertamum > ".$this->addslashes($bvon);
-		}
-		if ($bbis != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= " status.bestellstatus_kurzbz = 'Bestellung' and status.insertamum < ".$this->addslashes($bbis);
-		}
-		if ($firma_id != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= ' bestellung.firma_id = '.$this->addslashes($firma_id);
-		}
-		if ($filter_firma != '')
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' or ';
-			$qry.= ' bestellung.firma_id = '.$this->addslashes($filter_firma);
-		}
-		if ($oe_kurzbz != '')
-		{
-		if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= ' orgaeinheit.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
-		}
-		if ($konto_id != '')	
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= ' bestellung.konto_id = '.$this->addslashes($konto_id);
-		}
-		if ($mitarbeiter_uid != '')	
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= ' bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid);
-		}
-		if($rechnung)
-		{
-			if($first == true)
-			{
-				$qry.= 'where ';
-				$first = false; 
-			}
-			else 
-				$qry.= ' and ';
-			$qry.= ' not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
-		}
+			$qry.= " AND UPPER(bestellung.bestell_nr) LIKE UPPER('%".addslashes($bestellnr)."%')"; 
 
+		if ($titel != '')	
+			$qry.= " AND UPPER(bestellung.titel) LIKE UPPER('%".addslashes($titel)."%')"; 
+	
+		if ($evon != '')
+			$qry.= ' AND bestellung.insertamum > date('.$this->addslashes($evon).')';
+				
+		if ($ebis != '')
+			$qry.= ' AND bestellung.insertamum < '.$this->addslashes($ebis);
+
+		if ($bvon != '')
+			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum > ".$this->addslashes($bvon);
+		
+		if ($bbis != '')
+			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum < ".$this->addslashes($bbis);
+
+		if ($firma_id != '')
+			$qry.= ' AND bestellung.firma_id = '.$this->addslashes($firma_id);
+
+		if ($filter_firma != '')
+			$qry.= ' AND bestellung.firma_id = '.$this->addslashes($filter_firma);
+		
+		if ($oe_kurzbz != '')
+			$qry.= ' AND orgaeinheit.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
+		
+		if ($konto_id != '')	
+			$qry.= ' AND bestellung.konto_id = '.$this->addslashes($konto_id);
+		
+		if ($mitarbeiter_uid != '')	
+			$qry.= ' AND bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid);
+		
+		if($rechnung)
+			$qry.= ' AND not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
+		
+		if($kostenstelle_id!='')
+			$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
+		echo $qry;
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";

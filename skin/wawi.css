@@ -115,3 +115,19 @@ table.dark td
 {
 	text-align: right;
 }
+
+option.rechnung_nichtfreigegeben
+{
+	background-color: lightred;
+}
+
+option.rechnung_freigegebenvorhanden
+{
+	background-color: lightyellow;
+}
+
+option.rechnung_freigegeben
+{
+	background-color: lightgreen;
+}
+	
