@@ -55,8 +55,7 @@ if(isset($_POST['getKonto']))
 				}
 			}
 			else 
-				echo "<option value =''>Keine Konten zu dieser Kst</option>";
-		
+				echo "<option value =''>Keine Konten zu dieser Kst</option>";	
 	}
 	else
 		echo "<option value =''>Keine Konten zu dieser Kst</option>";
@@ -79,7 +78,6 @@ if(isset($_POST['getFirma']))
 			{
 				echo "<option value=".$fi->firma_id." >".$fi->name."</option>\n";
 			}
-			
 		}
 		else
 		{
@@ -117,7 +115,6 @@ if(isset($_POST['getSearchKonto']))
 			foreach($konto->result as $ko)
 			{
 				echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
-		
 			}
 		}
 		else 
@@ -194,8 +191,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	if($bestellstatus->setStorno())
 	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
 		exit; 
-}
-	
+}	
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -249,12 +245,10 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	{
 	    return row[0] + " <br>" + row[1] + "<br> ";
 	}	  		  
- 	
 	function conf_del()
 	{
 		return confirm('Diese Bestellung wirklich löschen?');
 	}
-
 	$(function() {
 		$( "#datepicker_evon" ).datepicker($.datepicker.regional['de']);
 	});
@@ -306,7 +300,6 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	  		  $('#firma_id').val(item[1]);
 	  	  });	  		  
 	}); 
-	
 	</script>
 </head>
 <body>
@@ -318,15 +311,12 @@ $user=get_uid();
 $berechtigung_kurzbz='wawi/bestellung'; 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-
 $kst=new wawi_kostenstelle(); 
 $kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
 
-
 if (isset($_GET['method']))
 	$aktion = $_GET['method'];
-	
-	
+		
 if($aktion == 'suche')
 {	 
 	if(!isset($_POST['submit']))
@@ -353,7 +343,6 @@ if($aktion == 'suche')
 		{
 			$suchdatum="01.09.".$datum['year'];
 		}
-
 		echo "<h2>Bestellung suchen</h2>\n"; 
 		echo "<form action ='bestellung.php?method=suche' method='post' name='sucheForm'>\n";
 		echo "<table border =0>\n";
@@ -476,6 +465,8 @@ if($aktion == 'suche')
 			// Filter firma oder firma id werden angezeigt
 			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma))
 			{
+				$brutto = 0; 
+				$gesamtpreis =0; 
 				$firma = new firma();
 				$date = new datum(); 
 				
@@ -495,16 +486,17 @@ if($aktion == 'suche')
 				foreach($bestellung->result as $row)
 				{	
 					$brutto = $bestellung->getBrutto($row->bestellung_id);
+					$gesamtpreis +=$brutto; 
+					
 					$firmenname = '';
 					if(is_numeric($row->firma_id))
 					{
 						$firma->load($row->firma_id);	
 						$firmenname = $firma->name; 
 					}
-
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
-					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
+					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete_x.png\"></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung\"> <img src=\"../skin/images/Calculator.png\"> </a></td>";
 					echo '<td>'.$row->bestell_nr."</td>\n";
 					echo '<td>'.$row->bestellung_id."</td>\n";
 					echo '<td>'.$firmenname."</td>\n";
@@ -514,10 +506,10 @@ if($aktion == 'suche')
 					echo '<td>'.$row->titel."</td>\n";
 					echo '<td>'.$row->updateamum.' '.$row->updatevon ."</td>\n"; 
 		
-					echo "</tr>\n";
-					
+					echo "</tr>\n";	
 				}
-				echo "</tbody></table>\n";	
+				echo "</tbody>\n";
+				echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2)." €</td></tr></tfooter></table>\n";	
 			}
 			else 
 			echo $bestellung->errormsg;
@@ -530,7 +522,6 @@ if($aktion == 'suche')
 		// Maske für neue Bestellung anzeigen
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
 			die('Sie haben keine Berechtigung zum Anlegen von Bestellungen');
-		
 		
 		echo "<h2>Neue Bestellung</h2>";
 		echo "<form action ='bestellung.php?method=save' method='post' name='newForm'>\n";
@@ -570,7 +561,6 @@ if($aktion == 'suche')
 		if(isset($_POST))
 		{
 			// Die Bestellung wird gespeichert und die neue id zurückgegeben
-			var_dump($_POST);
 			if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
 				die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
 			
@@ -593,7 +583,6 @@ if($aktion == 'suche')
 			$newBestellung->insertvon = $user; 
 			$newBestellung->updateamum = date('Y-m-d H:i:s');
 			$newBestellung->updatevon = $user; 
-			
 			$newBestellung->new = true; 
 			$newBestellung->freigegeben = false; 
 			
@@ -615,7 +604,6 @@ if($aktion == 'suche')
 		
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$bestellung = new wawi_bestellung(); 
-		
 		if($bestellung->delete($id))
 		{
 			echo 'Bestellung erfolgreich gelöscht. <br>';
@@ -656,8 +644,6 @@ if($aktion == 'suche')
 			$status= new wawi_bestellstatus();
 			$bestell_tag = new wawi_tags(); 
 
-			
-			
 			$summe= 0; 
 			$konto_vorhanden = false; 
 			
@@ -723,7 +709,6 @@ if($aktion == 'suche')
 				echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
 			}
 			echo "</td><td>Rechnungsadresse:</td>\n"; 
-			
 			echo "<td><Select name='filter_rechnungsadresse' id='filter_rechnungsadresse' style='width: 400px;'>\n";
 			foreach($allStandorte->result as $standorte)
 			{
@@ -762,7 +747,6 @@ if($aktion == 'suche')
 			$tag_help = $bestell_tag->GetStringTags();
 			echo "<td><input type='text' id='tags' name='tags' size='32' value='".$tag_help."'>\n";		
 		
-			
 			echo '	<script type="text/javascript">
 						$("#tags").autocomplete("wawi_autocomplete.php", 
 						{
@@ -785,7 +769,6 @@ if($aktion == 'suche')
 				$disabled = 'disabled';
 				echo "<span id='btn_storniert'>";
 				echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
-				
 				echo "</span>";
 			}
 			else 
@@ -816,7 +799,6 @@ if($aktion == 'suche')
 			{
 				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
 				getDetailRow($i, $det->bestelldetail_id, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
-				
 				$summe+=$brutto; 
 				$i++; 
 			}
@@ -835,18 +817,14 @@ if($aktion == 'suche')
 			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' value='$test'></input></td>"; 
 			echo "</tr>";
 			echo "</tfoot>";
-			
 			echo "</table>\n";
 			echo "<br><br>\n"; 
-			
-			
 			echo '
 			<script type="text/javascript">
 			
 			var anzahlRows='.$i.';
 			var uid = "'.$user.'";
 	
-			
 			function deleteBtnBestellt(bestellung_id, user_uid)
 			{
 				$("#btn_bestellt").html(); 
@@ -857,7 +835,6 @@ if($aktion == 'suche')
 	
 								$("#btn_bestellt").html("Bestellt am: " +data); 
 								document.editForm.storniert.disabled=false; 
-							
 							});	
 				 
 			}
@@ -870,8 +847,7 @@ if($aktion == 'suche')
 							function(data){
 							$("#btn_storniert").html("Storniert am: " +data); 
 							document.editForm.btn_submit.disabled=true; 
-							});	
-					
+							});
 			}
 			
 			/*
@@ -894,9 +870,7 @@ if($aktion == 'suche')
 					brutto = menge * (brutto + (betrag+(betrag*mwst/100)));
 		    	}
 		    	brutto = Math.round(brutto*100)/100;
-		    	
 			   	document.getElementById("brutto_"+id).value = brutto.toFixed(2);
-			
 			    summe();
 		   	}
 	
@@ -968,14 +942,12 @@ if($aktion == 'suche')
 			
 			</script>';
 			
-			
 			echo "<input type='submit' value='Speichern' id='btn_submit' $disabled></input>\n"; 
 			echo "<br><br>"; 
+			
 			// div Aufteilung --> kann ein und ausgeblendet werden
-			
-			
 			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
-	
+			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
 			echo "<table border=1>"; 
 			echo "<tr>\n"; 
@@ -990,8 +962,6 @@ if($aktion == 'suche')
 			$disabled ='';
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
 				$disabled ='disabled';
-
-
 		}
 		else 
 		{
@@ -1036,7 +1006,6 @@ if($aktion == 'suche')
 					$bestell_detail->updateamum = date('Y-m-d H:i:s');
 					$bestell_detail->updatevon = $user;
 					$bestell_detail->new = false; 
-					
 				}
 				else 
 				{
@@ -1062,22 +1031,16 @@ if($aktion == 'suche')
 				{
 					echo $bestell_detail->errormsg; 
 				}
-				
 			}
 			
 			if($bestellung_new->save())
 			{
 				echo "erfolgreich gespeichert. <br><br>";
 			}
-			echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";  
-			
-			
-			
+			echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";		
 		}
 	}
-	
-	
-	
+
 	function getDetailRow($i, $bestelldetail_id='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
 	{
 		echo "<tr id ='row_$i'>\n";
@@ -1090,7 +1053,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
-/*		$detail_tag = new wawi_tags(); 
+	/*	$detail_tag = new wawi_tags(); 
 		$detail_tag->GetTagsByBesteldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); */
 		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value=''></input></td>"; 
