@@ -53,6 +53,31 @@ class wawi_tags extends basis_db
 			$this->load($tag);
 	}
 
+	
+	public function getAll()
+	{
+		$qry = "Select * from public.tbl_tag; ";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$tag = new wawi_tags();
+				
+				$tag->tag = $row->tag; 
+
+				$this->result[] = $tag; 
+			}	
+			return true; 
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten."; 
+			return false; 
+		}
+		
+	}
+	
 	/**
 	 * 
 	 * Gibt die Tags einer Bestellung zurück
