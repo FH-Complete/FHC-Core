@@ -29,6 +29,7 @@ require_once '../include/datum.class.php';
 require_once '../include/benutzerberechtigung.class.php';
 require_once '../include/standort.class.php';
 require_once '../include/adresse.class.php';
+require_once '../include/studiengang.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
@@ -272,7 +273,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 			sortList: [[1,0]],
 			widgets: ['zebra']
 		}); 
-		
+	    $('#aufteilung').toggle();
 	    $('#aufteilung_link').click(function() {
 	          $('#aufteilung').toggle();
 	          return false;
@@ -602,6 +603,7 @@ if($aktion == 'suche')
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
 			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
 		
+		// Bestellung löschen
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$bestellung = new wawi_bestellung(); 
 		if($bestellung->delete($id))
@@ -643,6 +645,8 @@ if($aktion == 'suche')
 			$allStandorte->getStandorteWithTyp('Intern');
 			$status= new wawi_bestellstatus();
 			$bestell_tag = new wawi_tags(); 
+			$studiengang = new studiengang(); 
+			$studiengang->getAll('typ, kurzbz', null); 
 
 			$summe= 0; 
 			$konto_vorhanden = false; 
@@ -942,6 +946,10 @@ if($aktion == 'suche')
 			
 			</script>';
 			
+			$disabled ='';
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
+				$disabled ='disabled';
+			
 			echo "<input type='submit' value='Speichern' id='btn_submit' $disabled></input>\n"; 
 			echo "<br><br>"; 
 			
@@ -949,19 +957,89 @@ if($aktion == 'suche')
 			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
-			echo "<table border=1>"; 
+			echo "<table border=0 width='65%' class='dark'>"; 
 			echo "<tr>\n"; 
-			foreach($aufteilung->result as $auf)
+			$help = 0; 
+			$anteil = 0;
+			$summe = 0;
+			// alle studiengänge, auch inaktive
+			foreach($studiengang->result as $stud)
 			{
-				echo "<td>".$auf->oe_kurzbz.$auf->anteil."</td>"; 
+				$vorhanden = false;
+				if($stud->studiengang_kz < 10000)
+				{
+					if($help%6 == 0)
+					{
+						echo"</tr><tr>"; 
+					}
+					
+					foreach($aufteilung->result as $auf)
+					{
+						// wenn in aufteilung vorhanden
+						if(mb_strtoupper($auf->oe_kurzbz) == mb_strtoupper($stud->oe_kurzbz))
+						{
+							$anteil = $auf->anteil;
+							$vorhanden = true;
+						}					
+					}
+					
+					if($stud->aktiv || $vorhanden)
+					{
+						$summe += $anteil; 
+						echo "<td style='text-align:right;'>".mb_strtoupper($stud->oe_kurzbz).":</td> <td><input type='text' size='6' name='aufteilung_$help' onChange='summe_aufteilung()' id='aufteilung_$help' value='".number_format($anteil, 2, ",",".")."'> % </td>\n";
+						$help++;
+						$anteil = 0;
+					} 
+				}
 			}
 			echo "</tr>"; 
+			echo "<tfoot>\n";
+			echo '<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td colspan="2" style="text-align:right;">Summe:</td>
+					';
+			echo "<td><input type='text' size ='6' id='aufteilung_summe' name='aufteilung_summe' value ='".number_format($summe, 2, ",",".")."'>%</td>";
+			echo "</tr></tfoot>"; 
 			echo "</table>";
 			echo "</div>"; 
 			echo "<br><br>";
-			$disabled ='';
-			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
-				$disabled ='disabled';
+			
+						echo '
+			<script type="text/javascript">
+			
+			var anz='.$help.';
+
+			/*
+			Berechnet die Prozentuelle Aufteilung
+			*/
+			function summe_aufteilung()
+			{
+				var i=0;
+				var aufteilung=0;
+				var summe = 0; 
+
+				while(i<anz)
+				{
+					
+					aufteilung =$("#aufteilung_"+i).val();
+					aufteilung=parseFloat(aufteilung); 
+					summe = parseFloat(summe);	
+					summe = summe + aufteilung; 
+
+					i=i+1;
+				}
+				 document.getElementById("aufteilung_summe").value = parseFloat(summe).toFixed(2);
+			}
+			
+			</script>';	
 		}
 		else 
 		{
