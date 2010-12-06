@@ -423,6 +423,9 @@ elseif($aktion == 'save')
 		$rechnung->updatevon = $user;
 		$rechnung->rechnungstyp_kurzbz = $rechnungstyp_kurzbz;
 		
+		if(isset($_POST['transfer_datum']) && $rechte->isBerechtigt('wawi/rechnung_transfer', null, 'suid'))
+			$rechnung->transfer_datum = $date->formatDatum($_POST['transfer_datum']);
+		
 		if($rechnung->save())
 		{
 			foreach($betraege as $row)
@@ -634,6 +637,11 @@ if($aktion=='update')
 		
 		echo '<option value="'.$row->rechnungstyp_kurzbz.'" '.$selected.'>'.$row->beschreibung.'</option>';
 	}	
+	
+	$disabled='';
+	if(!$rechte->isBerechtigt('wawi/rechnungen_freigeben',null, 'suid'))
+		$disabled='disabled="disabled"';
+	
 	echo '</SELECT>
 		</td>
 	</tr>
@@ -653,6 +661,21 @@ if($aktion=='update')
 			<script type="text/javascript">
 				$("#buchungsdatum" ).datepicker($.datepicker.regional["de"]);
 			</script>
+			<br /> <br />
+			Transferdatum (tt.mm.JJJJ)<br />';
+	if(!$rechte->isBerechtigt('wawi/rechnung_transfer',null, 'suid'))
+	{
+		echo $date->formatDatum($rechnung->transfer_datum,'d.m.Y'); 
+	}
+	else
+	{
+		echo '
+			<input type="text" name="transfer_datum" size="10" id="transfer_datum" value="'.$date->formatDatum($rechnung->transfer_datum,'d.m.Y').'">
+			<script type="text/javascript">
+				$("#transfer_datum" ).datepicker($.datepicker.regional["de"]);
+			</script>';
+	}
+	echo '
 		</td>
 		<td valign="top" colspan="2">
 			<table>
@@ -661,6 +684,7 @@ if($aktion=='update')
 					<td>Bezeichnung</td>
 					<td>Betrag Netto</td>
 					<td>MwSt</td>
+					<td>Brutto</td>
 				</tr>
 			</thead>
 			<tbody id="betrag_table">';
@@ -731,22 +755,81 @@ if($aktion=='update')
 				{
 					var betrag = $("#betrag_"+i).val();
 					var mwst = $("#mwst_"+i).val();
+					var brutto_row = $("#brutto_"+i).val();
+					betrag = betrag.replace(",",".");
+					mwst = mwst.replace(",",".");
+					brutto_row = brutto_row.replace(",",".");
 					
 					if(betrag!="" && mwst!="")
 					{
 						betrag = parseFloat(betrag);
 						mwst = parseFloat(mwst);
-						
+						brutto_row = parseFloat(brutto_row);
 						netto = netto + betrag;
 						
-						brutto = brutto + (betrag+(betrag*mwst/100));
+						brutto = brutto + brutto_row;
 					}
 					i=i+1;
 				}
+				
+				//auf 2 nachkommastellen runden
 				netto = Math.round(netto*100)/100;
 				brutto = Math.round(brutto*100)/100;
+				
 				$("#netto").html(netto);
 				$("#brutto").html(brutto);
+			}
+			
+			/**
+			 * Berechnet den Nettopreis
+			 */
+			function netto(id)
+			{
+				var brutto = $("#brutto_"+id).val();
+				var mwst = $("#mwst_"+id).val();
+				brutto = brutto.replace(",",".");
+				mwst = mwst.replace(",",".");
+				brutto = parseFloat(brutto);
+				mwst = parseFloat(mwst);
+				
+				if(!isNaN(brutto) && !isNaN(mwst))
+				{
+					// Nettopreis berechnen
+					var netto = brutto/(100+mwst)*100;
+					
+					//auf 2 Nachkommastellen runden
+					netto = Math.round(netto*100)/100;
+					
+					$("#betrag_"+id).val(netto);
+				}
+				else
+					$("#betrag_"+id).val(0);
+			}
+
+			/**
+			 * Berechnet den Bruttopreis
+			 */
+			function brutto(id)
+			{
+				var netto = $("#betrag_"+id).val();
+				var mwst = $("#mwst_"+id).val();
+				netto = netto.replace(",",".");
+				mwst = mwst.replace(",",".");
+				netto = parseFloat(netto);
+				mwst = parseFloat(mwst);
+				
+				if(!isNaN(netto) && !isNaN(mwst))
+				{
+					// Nettopreis berechnen
+					var brutto = netto*(100+mwst)/100;
+					
+					//auf 2 Nachkommastellen runden
+					brutto = Math.round(brutto*100)/100;
+					
+					$("#brutto_"+id).val(brutto);
+				}
+				else
+					$("#brutto_"+id).val(0);
 			}
 			
 			$(document).ready(function() 
@@ -754,6 +837,20 @@ if($aktion=='update')
 				summe();
 			});
 			
+			function bruttonetto(id)
+			{
+				var inetto = $("#betrag_"+id).val();
+				var ibrutto = $("#brutto_"+id).val();
+				
+				if(inetto=="" || inetto==0)
+				{
+					netto(id);
+				}
+				else
+				{
+					brutto(id);
+				}
+			}
 			</script>
 		</td>
 	</tr>
@@ -783,10 +880,13 @@ function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $
 					<input type="text" name="bezeichnung_'.$i.'" value="'.$bezeichnung.'">
 				</td>
 				<td>
-					<input class="number" type="text" size="12" maxlength="12" id="betrag_'.$i.'" name="betrag_'.$i.'" value="'.$betrag.'"  onblur="checkNewRow('.$i.')" onchange="summe()"> &euro; 
+					<input class="number" type="text" size="12" maxlength="12" id="betrag_'.$i.'" name="betrag_'.$i.'" value="'.$betrag.'"  onblur="checkNewRow('.$i.')" onchange="brutto('.$i.'); summe()"> &euro; 
 				</td>
 				<td>
-					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="summe()"> %
+					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="bruttonetto('.$i.'); summe(); "> %
+				</td>
+				<td>
+					<input class="number" type="text" size="12" maxlenght="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.($betrag*(100+$mwst)/100).'" onchange="netto('.$i.'); summe();"> &euro;
 				</td>
 			</tr>';
 }
