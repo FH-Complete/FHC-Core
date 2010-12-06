@@ -54,6 +54,11 @@ $menu=array
 			'name'=>'Rechnung', 'permissions'=>array('wawi/rechnung'),'link'=>'rechnung.php?method=suche', 'target'=>'content',
 			'RechnungNeu'=>array('name'=>'Neu', 'link'=>'rechnung.php?method=new', 'target'=>'content'),
 		),
-	)	
+		'Personensuche'=>array
+		(
+			'name'=>'Personensuche', 'link'=>'https://cis.technikum-wien.at/cis/private/tools/psearch.php', 'target'=>'content',
+		)
+	)
+	
 );
 ?>
