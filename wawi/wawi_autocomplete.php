@@ -43,7 +43,7 @@
   	require_once('../include/betriebsmittelstatus.class.php');
   	require_once('../include/betriebsmittel_betriebsmittelstatus.class.php');
   	require_once ('../include/firma.class.php');
-  	require_once ('../include/wawi_tags.class.php');
+  	require_once ('../include/tags.class.php');
 
   	if (!$uid = get_uid())
 		die('Keine UID gefunden:'.$uid.' !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -343,7 +343,7 @@ cellSeparator (default value: "|")
 			if (is_null($bestell_id) || $tag_search=='')
 				exit();	
 				
-			$tags = new wawi_tags(); 
+			$tags = new tags(); 
 			
 			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
@@ -360,9 +360,9 @@ cellSeparator (default value: "|")
 			if (is_null($detail) || $tag_search=='')
 				exit();	
 				
-			$tags = new wawi_tags(); 
+			$tags = new tags(); 
 			
-			if (!$tags->GetTagsByBesteldetail($detail))
+			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
 				
 			for ($i=0;$i<count($tags->result);$i++)

@@ -36,7 +36,7 @@ require_once '../include/wawi_kostenstelle.class.php';
 require_once '../include/wawi_bestelldetails.class.php';
 require_once '../include/wawi_aufteilung.class.php'; 
 require_once '../include/wawi_bestellstatus.class.php';
-require_once '../include/wawi_tags.class.php';
+require_once '../include/tags.class.php';
 
 $aktion ='';
 $test = 0;
@@ -273,7 +273,10 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 			sortList: [[1,0]],
 			widgets: ['zebra']
 		}); 
+
+
 	    $('#aufteilung').toggle();
+	    
 	    $('#aufteilung_link').click(function() {
 	          $('#aufteilung').toggle();
 	          return false;
@@ -503,14 +506,14 @@ if($aktion == 'suche')
 					echo '<td>'.$firmenname."</td>\n";
 					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
 					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
-					echo '<td>'.number_format($brutto,2)."</td>\n"; 
+					echo '<td>'.number_format($brutto, 2, ",",".")."</td>\n"; 
 					echo '<td>'.$row->titel."</td>\n";
 					echo '<td>'.$row->updateamum.' '.$row->updatevon ."</td>\n"; 
 		
 					echo "</tr>\n";	
 				}
 				echo "</tbody>\n";
-				echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2)." €</td></tr></tfooter></table>\n";	
+				echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2, ",",".")." €</td></tr></tfooter></table>\n";	
 			}
 			else 
 			echo $bestellung->errormsg;
@@ -644,7 +647,7 @@ if($aktion == 'suche')
 			$allStandorte = new standort(); 
 			$allStandorte->getStandorteWithTyp('Intern');
 			$status= new wawi_bestellstatus();
-			$bestell_tag = new wawi_tags(); 
+			$bestell_tag = new tags(); 
 			$studiengang = new studiengang(); 
 			$studiengang->getAll('typ, kurzbz', null); 
 
@@ -795,7 +798,7 @@ if($aktion == 'suche')
 			echo "<th>Preis/VE</th>\n";
 			echo "<th>USt</th>\n";
 			echo "<th>Brutto</th>\n";
-			echo "<th>Tags</th>";
+			echo "<th><div id='tags_headline' style='display:none'>Tags</div><a id='tags_link'><img src='../skin/images/plus.png'> </a></th>";
 			echo "</tr>\n";
 			echo "<tbody id='detailTable'>";
 			$i= 1; 
@@ -829,6 +832,18 @@ if($aktion == 'suche')
 			var anzahlRows='.$i.';
 			var uid = "'.$user.'";
 	
+			 $("#tags_link").click(function() {
+			 i=1; 
+			 while(i<=anzahlRows)
+			 {
+				 $("#detail_tag_"+i).toggle();		 
+ 				i=i+1;        		
+			 }
+			  $("#tags_headline").toggle();
+			  $("#tags_link").toggle();
+			 return false;
+	        });
+			
 			function deleteBtnBestellt(bestellung_id, user_uid)
 			{
 				$("#btn_bestellt").html(); 
@@ -972,7 +987,6 @@ if($aktion == 'suche')
 					{
 						echo"</tr><tr>"; 
 					}
-					
 					foreach($aufteilung->result as $auf)
 					{
 						// wenn in aufteilung vorhanden
@@ -982,11 +996,10 @@ if($aktion == 'suche')
 							$vorhanden = true;
 						}					
 					}
-					
 					if($stud->aktiv || $vorhanden)
 					{
 						$summe += $anteil; 
-						echo "<td style='text-align:right;'>".mb_strtoupper($stud->oe_kurzbz).":</td> <td><input type='text' size='6' name='aufteilung_$help' onChange='summe_aufteilung()' id='aufteilung_$help' value='".number_format($anteil, 2, ",",".")."'> % </td>\n";
+						echo "<td style='text-align:right;'>".mb_strtoupper($stud->oe_kurzbz).":</td> <td><input type='text' size='6' name='aufteilung_$help' onChange='summe_aufteilung()' id='aufteilung_$help' value='".number_format($anteil, 2, ",",".")."'> % </td><input type='hidden' name='oe_kurzbz_$help' value='$stud->oe_kurzbz'>\n";
 						$help++;
 						$anteil = 0;
 					} 
@@ -995,7 +1008,7 @@ if($aktion == 'suche')
 			echo "</tr>"; 
 			echo "<tfoot>\n";
 			echo '<tr>
-					<td></td>
+					<td><input type="hidden" name="anz_aufteilung" value="'.$help.'"></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -1046,10 +1059,13 @@ if($aktion == 'suche')
 			// Update auf Bestellung
 			$date = new datum(); 
 			
+			var_dump($_POST); 
+			
 			$bestellung_id = $_GET['bestellung'];
 			$bestellung_detail_anz = $_POST['detail_anz'];
 			$bestellung_new = new wawi_bestellung(); 
 			$bestellung_new->load($bestellung_id);
+			$aufteilung_anzahl = $_POST['anz_aufteilung'];
 			
 			$bestellung_new->new = false; 
 			$bestellung_new->besteller_uid=$user; 
@@ -1062,16 +1078,66 @@ if($aktion == 'suche')
 			$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
 			$bestellung_new->updateamum = date('Y-m-d H:i:s');
 			$bestellung_new->updatevon = $user; 
+			$tags = explode(";", $_POST['tags']);
+			$help_tags = new tags(); 
+			$help_tags->bestellung_id = $bestellung_id; 
+			$help_tags->deleteBestellungTag($tags);
 			
+			foreach ($tags as $bestelltags)
+			{
+				//echo $bestelltags."<br>"; 
+				$tag_bestellung = new tags(); 
+				$tag_bestellung->tag = trim($bestelltags); 
+				$tag_bestellung->bestellung_id = $bestellung_id; 
+				$tag_bestellung->insertvon = $user; 
+				$tag_besetllung->insertamum = date('Y-m-d H:i:s');
+				
+				if(!$tag_bestellung->TagExists())
+				{
+					$tag_bestellung->saveTag(); 
+					$tag_bestellung->saveBestellungTag();
+				}
+				else
+				{
+					if(!$tag_bestellung->BestellungTagExists())
+						$tag_bestellung->saveBestellungTag();
+				}
+			} 
 			// letzte leere zeile nicht speichern
 			for($i = 1; $i < $bestellung_detail_anz; $i++)
 			{
 				// gibt es ein bestelldetail schon
 				$detail_id = $_POST["bestelldetailid_$i"]; 
+				$bestell_detail = new wawi_bestelldetail(); 		
+				
 				if($detail_id != '')
 				{
 					// Update
-					$bestell_detail = new wawi_bestelldetail(); 
+					$tags_detail = explode(";", $_POST["detail_tag_$i"]);
+
+					$help_detailtags = new tags(); 
+					$help_detailtags->bestelldetail_id = $detail_id; 
+					$help_detailtags->deleteBestelldetailTag($tags_detail);
+					
+					foreach ($tags_detail as $det)
+					{
+						$detail_tag = new tags(); 
+						$detail_tag->tag = trim($det); 
+						$detail_tag->bestelldetail_id = $detail_id; 
+						$detail_tag->insertvon = $user; 
+						$detail_tag->insertamum = date('Y-m-d H:i:s');
+						
+						if(!$detail_tag->TagExists())
+						{
+							$detail_tag->saveTag();
+							$detail_tag->saveBestelldetailTag();
+						}
+						else
+						{
+							if(!$detail_tag->BestelldetailTagExists())
+								$detail_tag->saveBestelldetailTag();
+						}
+					} 
 					$bestell_detail->load($detail_id);
 					
 					$bestell_detail->position = $_POST["pos_$i"];
@@ -1088,8 +1154,6 @@ if($aktion == 'suche')
 				else 
 				{
 					// Insert
-					$bestell_detail = new wawi_bestelldetail(); 
-					
 					$bestell_detail->bestellung_id = $_GET['bestellung'];
 					$bestell_detail->position = $_POST["pos_$i"];
 					$bestell_detail->menge = $_POST["menge_$i"];
@@ -1110,6 +1174,35 @@ if($aktion == 'suche')
 					echo $bestell_detail->errormsg; 
 				}
 			}
+
+			for($i=0; $i<$aufteilung_anzahl; $i++)
+			{
+				$aufteilung = new wawi_aufteilung(); 
+				$aufteilung->bestellung_id = $bestellung_id;
+				$aufteilung->oe_kurzbz = $_POST['oe_kurzbz_'.$i];
+				$aufteilung->anteil = $_POST['aufteilung_'.$i]; 
+				
+				if($aufteilung->AufteilungExists())
+				{
+					// Update
+					$aufteilung->updateamum = date('Y-m-d H:i:s');
+					$aufteilung->updatevon = $user; 
+					$aufteilung->new = false; 
+				}
+				else
+				{
+					// Insert
+					$aufteilung->updateamum = date('Y-m-d H:i:s');
+					$aufteilung->updatevon = $user; 
+					$aufteilung->insertamum = date('Y-m-d H:i:s');
+					$aufteilung->insertvon = $user; 
+					$aufteilung->new = true; 
+				}
+				
+				$aufteilung->saveAufteilung(); 
+				
+			}
+			
 			
 			if($bestellung_new->save())
 			{
@@ -1126,27 +1219,27 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
-		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'</input></td>\n";
+		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
-	/*	$detail_tag = new wawi_tags(); 
+		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBesteldetail($bestelldetail_id);
-		$help = $detail_tag->GetStringTags(); */
-		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value=''></input></td>"; 
+		$help = $detail_tag->GetStringTags(); 
+		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' style='display:none' value='$help' ></input></td>"; 
 		
-	/*	echo '	<script type="text/javascript">
-						$("#detail_tag_2").autocomplete("wawi_autocomplete.php", 
+		echo "	<script type='text/javascript'>
+						$('#detail_tag_'+$i).autocomplete('wawi_autocomplete.php', 
 						{
 							minChars:1,
 							matchSubset:1,matchContains:1,
 							width:500,
 							multiple: true,
-							multipleSeparator: "; ",
-							extraParams:{"work":"detail_tags", "detail_id":"'.$bestelldetail_id.'"}
+							multipleSeparator: '; ',
+							extraParams:{'work':'detail_tags', 'detail_id':'.$bestelldetail_id.'}
 						});
-					</script>';*/
+					</script>";
 		
 		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
