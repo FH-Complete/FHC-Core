@@ -217,7 +217,7 @@ class wawi_bestellung extends basis_db
 		
 		if($kostenstelle_id!='')
 			$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
-		echo $qry;
+		
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";
