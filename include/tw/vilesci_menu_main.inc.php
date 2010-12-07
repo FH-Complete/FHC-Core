@@ -26,6 +26,27 @@
 $menu=array
 (
 	//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
+	'LVPlan'=> 		array
+	(
+		'name'=>'LV-Plan', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan'), 'image'=>'lvplan.png',
+		'link'=>'left.php?categorie=LVPlan', 'target'=>'nav',
+		'Gruppenverwaltung'=>array('name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
+		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+		'Lehrfach'=>array('name'=>'Lehrfach', 'link'=>'lehre/lehrfach.php', 'target'=>'main'),
+		'Verplanungsuebersicht'=>array('name'=>'Verplanungsübersicht', 'link'=>'lehre/check/verplanungsuebersicht.php', 'target'=>'main'),
+		'LV-Planung'=>array
+		(
+			'name'=>'LV-Planung', 'permissions'=>array('admin','lv-plan','support'),
+			'Wartung'=>array('name'=>'Wartung', 'link'=>'lehre/lvplanwartung.php', 'target'=>'main'),
+			'Check'=>array('name'=>'Checken', 'link'=>'lehre/check/index.html', 'target'=>'main'),
+			'Kollision'=>array('name'=>'Kollision Student', 'link'=>'lehre/stpl_benutzer_kollision_frameset.html', 'target'=>'main'),
+			'Stundenplan'=>array('name'=>'Stundenplan', 'link'=>'../cis/private/lvplan/index.html', 'target'=>'main'),
+			'Zeitwuensche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
+			'LVPlanSync'=>array('name'=>'Sync', 'link'=>'../system/sync/index.html', 'target'=>'main'),
+			'Ueberbuchungen'=>array('name'=>'Überbuchungen', 'link'=>'lehre/check/ueberbuchung.php', 'target'=>'main'),
+		),
+		'Raummitteilung'=>array('name'=>'Raummitteilung', 'link'=>'lehre/raummitteilung.php', 'target'=>'main'),
+	),
 	'Lehre'=> 		array
 	(
 		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support', 'lehre'), 'image'=>'x-office-presentation.png',
@@ -66,7 +87,8 @@ $menu=array
 			//'Delete'=>array('name'=>'Delete', 'link'=>'lehre/stdplan_delete.php', 'target'=>'main'),
 			//'Import'=>array('name'=>'Import', 'link'=>'lehre/import/index.hml', 'target'=>'main'),
 			//'Export'=>array('name'=>'Export', 'link'=>'lehre/export/index.html', 'target'=>'main')
-		)
+		),
+		'Raummitteilung'=>array('name'=>'Raummitteilung', 'link'=>'lehre/raummitteilung.php', 'target'=>'main'),
 	),
 	'Personen'=> 	array
 	(
