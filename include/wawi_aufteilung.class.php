@@ -167,5 +167,54 @@ class wawi_aufteilung extends basis_db
 		}
 	}
 	
+	/**
+	 * 
+	 * return true wenn es den Aufteilungseintrag schon gibt, false wenn es ihn noch nicht gibt
+	 */
+	public function AufteilungExists()
+	{
+		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($this->bestellung_id)." and oe_kurzbz = ".$this->addslashes($this->oe_kurzbz).";";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+				return true; 
+			else
+				return false;
+		}
+		else
+			return false; 
+	}
+	
+	/**
+	 * 
+	 * Speichert die Aufteilung in der Datenbank
+	 */
+	public function saveAufteilung()
+	{
+		
+		if($this->new = true)
+		{
+			// insert
+			$qry= "Insert into wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) values ("
+			.$this->addslashes($this->bestellung_id).", "
+			.$this->addslashes($this->oe_kurzbz).", "
+			.$this->addslashes($this->anteil).", "
+			.$this->addslashes($this->updateamum).", "
+			.$this->addslashes($this->updatevon).", "
+			.$this->addslashes($this->insertamum).", "
+			.$this->addslashes($this->insertvon).");";
+		}
+		else
+		{
+			// update
+		}
+		
+		if($this->db_query($qry))
+			return true; 
+		else
+			return false; 
+			
+	}
 	
 }
