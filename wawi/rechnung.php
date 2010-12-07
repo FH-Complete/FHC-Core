@@ -67,7 +67,7 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.autocomplete.min.js" ></script>
 	<script type="text/javascript" src="../include/js/jquery-ui.js" ></script>
-	<script type="text/javascript" src="..//include/js/jquery.ui.datepicker-de.js"></script> 
+	<script type="text/javascript" src="../include/js/jquery.ui.datepicker-de.js"></script> 
 	
 	
 	<script type="text/javascript">
