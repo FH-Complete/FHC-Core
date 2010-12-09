@@ -49,10 +49,13 @@ require_once('../../include/variable.class.php');
 	<h2>Raummitteilung</h2>
 <?php
 $von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y'));
-$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y'));
+$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y', mktime(0,0,0,date('m'),date('d')+7,date('Y'))));
 $von_stunde = (isset($_POST['von_stunde'])?$_POST['von_stunde']:1);
 $bis_stunde = (isset($_POST['bis_stunde'])?$_POST['bis_stunde']:1);
 $ort_kurzbz = (isset($_POST['ort_kurzbz'])?$_POST['ort_kurzbz']:'');
+$inkl_studenten = isset($_POST['inkl_studenten']);
+if($ort_kurzbz=='')
+	$inkl_studenten=true;
 $datum_obj = new datum();
 $db = new basis_db();
 $user = get_uid();
@@ -108,6 +111,7 @@ for($i=1;$i<15;$i++)
 }
 			
 echo '</SELECT>';
+echo ' inklusive Studenten<input type="checkbox" name="inkl_studenten" '.($inkl_studenten?'checked':'').'>';
 echo ' <input type="submit" name="show" value="Anzeigen"/>';
 echo '</form>';
 
@@ -148,13 +152,16 @@ if(isset($_POST['show']))
 
 		if(count($lehreinheiten)>0)
 		{
-			// Studenten aus dem LV-Plan
 			$les = $db->implode4SQL($lehreinheiten);
-			$qry = "SELECT distinct uid FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id IN($les)";
-			if($result = $db->db_query($qry))
+			if($inkl_studenten)
 			{
-				while($row = $db->db_fetch_object($result))
-					$mails[]=$row->uid.'@'.DOMAIN;
+				// Studenten aus dem LV-Plan
+				$qry = "SELECT distinct uid FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id IN($les)";
+				if($result = $db->db_query($qry))
+				{
+					while($row = $db->db_fetch_object($result))
+						$mails[]=$row->uid.'@'.DOMAIN;
+				}
 			}
 			
 			//Lektoren aus dem LV-Plan
@@ -183,44 +190,46 @@ if(isset($_POST['show']))
 			$stsem = getStudiensemesterFromDatum($row->datum);
 			//Reservierer
 			$mails[]=$row->uid.'@'.DOMAIN;
-			
-			if($row->studiengang_kz!=0 && $row->gruppe_kurzbz=='')
+			if($inkl_studenten)
 			{
-				//Studierende aus Lehrverbandsgruppen
-				$qry = "SELECT
-							student_uid as uid
-						FROM
-							public.tbl_studentlehrverband
-						WHERE
-							studiensemester_kurzbz='".$stsem."'
-							AND studiengang_kz='".$row->studiengang_kz."'";
-				if($row->semester!='')
-					$qry.=" AND semester='".$row->semester."'";
-				if($row->verband!='')
-					$qry.=" AND verband='".$row->verband."'";
-				if($row->gruppe!='')
-					$qry.=" AND gruppe='".$row->gruppe."'";
-					
-				if($result_gruppe = $db->db_query($qry))
+				if($row->studiengang_kz!=0 && $row->gruppe_kurzbz=='')
 				{
-					while($row_gruppe = $db->db_fetch_object($result_gruppe))
-						$mails[] = $row_gruppe->uid.'@'.DOMAIN;
-				}		
-			}
-			elseif($row->gruppe_kurzbz!='')
-			{
-				//Studierende aus den Spezialgruppen
-				$qry = "SELECT 
-							uid 
-						FROM 
-							public.tbl_benutzergruppe 
-						WHERE 
-							gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' 
-							AND studiensemester_kurzbz='".$stsem."'";
-				if($result_gruppe = $db->db_query($qry))
+					//Studierende aus Lehrverbandsgruppen
+					$qry = "SELECT
+								student_uid as uid
+							FROM
+								public.tbl_studentlehrverband
+							WHERE
+								studiensemester_kurzbz='".$stsem."'
+								AND studiengang_kz='".$row->studiengang_kz."'";
+					if($row->semester!='')
+						$qry.=" AND semester='".$row->semester."'";
+					if($row->verband!='')
+						$qry.=" AND verband='".$row->verband."'";
+					if($row->gruppe!='')
+						$qry.=" AND gruppe='".$row->gruppe."'";
+						
+					if($result_gruppe = $db->db_query($qry))
+					{
+						while($row_gruppe = $db->db_fetch_object($result_gruppe))
+							$mails[] = $row_gruppe->uid.'@'.DOMAIN;
+					}		
+				}
+				elseif($row->gruppe_kurzbz!='')
 				{
-					while($row_gruppe = $db->db_fetch_object($result_gruppe))
-						$mails[] = $row_gruppe->uid.'@'.DOMAIN;
+					//Studierende aus den Spezialgruppen
+					$qry = "SELECT 
+								uid 
+							FROM 
+								public.tbl_benutzergruppe 
+							WHERE 
+								gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' 
+								AND studiensemester_kurzbz='".$stsem."'";
+					if($result_gruppe = $db->db_query($qry))
+					{
+						while($row_gruppe = $db->db_fetch_object($result_gruppe))
+							$mails[] = $row_gruppe->uid.'@'.DOMAIN;
+					}
 				}
 			}
 		}
@@ -266,12 +275,17 @@ if(isset($_POST['show']))
 				if(art=='to')
 					window.location.href='mailto:'+mailto;
 				else
-					window.location.href='mailto:?'+art+'='+mailto;
-				
-				
+					window.location.href='mailto:?'+art+'='+mailto;					
 			}
 		}
 		</script>";
+	
+	echo '<hr>enthaltene Personen:<br />';
+	//Liste der Personen anzeigen
+	foreach($mails as $row)
+		echo "<br />$row";
+	
+	
 }
 ?>
 </body>
