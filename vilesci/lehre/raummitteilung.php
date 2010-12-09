@@ -117,6 +117,19 @@ if(isset($_POST['show']))
 	$von = $datum_obj->formatDatum($von, 'Y-m-d');
 	$bis = $datum_obj->formatDatum($bis, 'Y-m-d');
 	
+	if($von===false || $von=='')
+		die('Das Von Datum ist ungueltig');
+	if($bis===false || $bis=='')
+		die('Das Bis Datum ist ungueltig');
+		
+	if(!is_numeric($von_stunde) || $von_stunde=='')
+		die('Von Stunde ist ungueltig');
+	if(!is_numeric($bis_stunde) || $bis_stunde=='')
+		die('Bis Stunde ist ungueltig');
+	
+	if(!check_ort($ort_kurzbz))
+		die('Ort ist ungueltig');
+	
 	//LV-Plan
 	$qry = "SELECT distinct lehreinheit_id FROM 
 				lehre.tbl_stundenplan 
