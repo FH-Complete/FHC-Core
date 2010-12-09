@@ -20,9 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
- 
- 
-/*--------------------------------------------------------------------------------------------
+/*
  * Pinboard
  * Zeigt alle Pinboardeintraege an. Am rechten Rand werden
  * Studiengangsleiter, Studiengangsleiter Stellvertreter, Assistentin
@@ -32,42 +30,32 @@
  * course_id: Studiengang
  * term_id: Semester
  * showall: Zeigt alle Pinboardeintraege an
- --------------------------------------------------------------------------------------------*/
- 
- 
-// ---------------- CIS Include Dateien einbinden
-	require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
+ */
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/news.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+
 	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-		
-// ---------------- Diverse Funktionen und UID des Benutzers ermitteln
-	require_once('../../../include/functions.inc.php');
+		die('Fehler beim Herstellen der Datenbankverbindung');
+
 	if (!$user=get_uid())
 		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
-
-		
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/studiensemester.class.php');
-	require_once('../../../include/news.class.php');
-	require_once('../../../include/mitarbeiter.class.php');
-
-		// Open der NEWs-Classe
+	
 	if (!$news = new news())
-			die('News Fehler! '.$news->errormsg);
+		die('News Fehler! '.$news->errormsg);
 	
 	// Init	
 	$error='';
-  $short='';
+	$short='';
 	$short_long ='';
 	$stg_bezeichnung='';
 	
-  $datum_content='';
-  $stsem_content='';
+	$datum_content='';
+	$stsem_content='';
 	$stsemarr = array();
 
 	// Parameter einlesen		
@@ -80,9 +68,7 @@
 	$studiengang_kz=(isset($_REQUEST['course_id'])?$_REQUEST['course_id']:(isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:''));
 	$semester=(isset($_REQUEST['term_id'])?$_REQUEST['term_id']:(isset($_REQUEST['semester'])?$_REQUEST['semester']:0));
 	$studiensemester_kurzbz=trim((isset($_REQUEST['studiensemester_kurzbz']) && is_numeric($_REQUEST['studiensemester_kurzbz']) ? $_REQUEST['studiensemester_kurzbz']:''));
-	
-#echo "<p>fachbereich_kurzbz:$fachbereich_kurzbz, studiengang_kz:$studiengang_kz, semester:$semester,$studiensemester_kurzbz: studiensemester_kurzbz </p>";	
-	
+		
 	$senat=false;
 	if (!empty($fachbereich_kurzbz) && mb_strtolower($fachbereich_kurzbz)==mb_strtolower('Senat'))
 		$senat = true;	
@@ -107,8 +93,6 @@
 			$semester = '';		
 		}
 	}
-
-	
 	
 	function print_STGnews($studiengang_kz, $semester, $showall=false, $fachbereich_kurzbz)
 	{
@@ -177,25 +161,23 @@
 		return $zaehler;
 	}
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<script language="Javascript">
-function show(id)
-{
-	document.getElementById(id+'Text').style.display = 'block';
-	document.getElementById(id+'Verfasser').style.display = 'block';
-	document.getElementById(id+'Verfasser').style.width = '100%';
-	document.getElementById(id+'Mehr').style.display = 'none';
-	return false;
-}
-</script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<script language="Javascript">
+	function show(id)
+	{
+		document.getElementById(id+'Text').style.display = 'block';
+		document.getElementById(id+'Verfasser').style.display = 'block';
+		document.getElementById(id+'Verfasser').style.width = '100%';
+		document.getElementById(id+'Mehr').style.display = 'none';
+		return false;
+	}
+	</script>
 </head>
-
 <body>
 <table class="tabcontent" id="inhalt">
   <tr>
@@ -337,18 +319,16 @@ function show(id)
 							if($row_course_leader->telefonklappe != "")
 							{
 								$hauptnummer='';
-								/*
-								$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
-										WHERE standort_kurzbz='".addslashes($row_course_leader->standort_kurzbz)."' AND
-										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
-										tbl_adresse.firma_id=tbl_firma.firma_id";
-								*/
-								$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader->standort_id)."' AND kontakttyp='telefon'";
-								if($result_standort = $db->db_query($qry_standort))
+								
+								if($row_course_leader->standort_id!='')
 								{
-									if($row_standort = $db->db_fetch_object($result_standort))
+									$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader->standort_id)."' AND kontakttyp='telefon'";
+									if($result_standort = $db->db_query($qry_standort))
 									{
-										$hauptnummer = $row_standort->kontakt;
+										if($row_standort = $db->db_fetch_object($result_standort))
+										{
+											$hauptnummer = $row_standort->kontakt;
+										}
 									}
 								}
 								
@@ -431,21 +411,18 @@ function show(id)
 									if($row_course_leader_deputy->telefonklappe != "")
 									{
 										$hauptnummer='';
-										/*
-										$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
-												WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
-												tbl_adresse.adresse_id=tbl_standort.adresse_id AND
-												tbl_adresse.firma_id=tbl_firma.firma_id";
-										*/
-										$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader_deputy->standort_id)."' AND kontakttyp='telefon'";
-										if($result_standort = $db->db_query($qry_standort))
+										
+										if($row_course_leader_deputy->standort_id!='')
 										{
-											if($row_standort = $db->db_fetch_object($result_standort))
+											$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader_deputy->standort_id)."' AND kontakttyp='telefon'";
+											if($result_standort = $db->db_query($qry_standort))
 											{
-												$hauptnummer = $row_standort->kontakt;
+												if($row_standort = $db->db_fetch_object($result_standort))
+												{
+													$hauptnummer = $row_standort->kontakt;
+												}
 											}
-										}
-				
+										}				
 										echo $hauptnummer.' - '.$row_course_leader_deputy->telefonklappe;
 									}
 									else
@@ -520,22 +497,20 @@ function show(id)
 									if($row_course_leader_deputy->telefonklappe != "")
 									{
 										$hauptnummer='';
-										/*
-										$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
-												WHERE standort_kurzbz='".addslashes($row_course_leader_deputy->standort_kurzbz)."' AND
-												tbl_adresse.adresse_id=tbl_standort.adresse_id AND
-												tbl_adresse.firma_id=tbl_firma.firma_id";
-										*/
-										$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader_deputy->standort_id)."' AND kontakttyp='telefon'";
 										
-										if($result_standort = $db->db_query($qry_standort))
+										if($row_course_leader_deputy->standort_id!='')
 										{
-											if($row_standort = $db->db_fetch_object($result_standort))
+											$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_leader_deputy->standort_id)."' AND kontakttyp='telefon'";
+											
+											if($result_standort = $db->db_query($qry_standort))
 											{
-												$hauptnummer = $row_standort->kontakt;
+												if($row_standort = $db->db_fetch_object($result_standort))
+												{
+													$hauptnummer = $row_standort->kontakt;
+												}
 											}
 										}
-				
+										
 										echo $hauptnummer.' - '.$row_course_leader_deputy->telefonklappe;
 									}
 									else
@@ -608,19 +583,17 @@ function show(id)
 							if($row_course_secretary->telefonklappe != "")
 							{
 								$hauptnummer='';
-								/*
-								$qry_standort = "SELECT tbl_firma.telefon as nummer FROM public.tbl_standort, public.tbl_adresse, public.tbl_firma
-										WHERE standort_kurzbz='".addslashes($row_course_secretary->standort_kurzbz)."' AND
-										tbl_adresse.adresse_id=tbl_standort.adresse_id AND
-										tbl_adresse.firma_id=tbl_firma.firma_id";
-								*/
-								$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_secretary->standort_id)."' AND kontakttyp='telefon'";
-										
-								if($result_standort = $db->db_query($qry_standort))
+
+								if($row_course_secretary->standort_id!='')
 								{
-									if($row_standort = $db->db_fetch_object($result_standort))
+									$qry_standort = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='".addslashes($row_course_secretary->standort_id)."' AND kontakttyp='telefon'";
+											
+									if($result_standort = $db->db_query($qry_standort))
 									{
-										$hauptnummer = $row_standort->kontakt;
+										if($row_standort = $db->db_fetch_object($result_standort))
+										{
+											$hauptnummer = $row_standort->kontakt;
+										}
 									}
 								}
 
@@ -652,7 +625,7 @@ function show(id)
 				echo "<p>Studentenvertreter:</font><font face='Arial, Helvetica, sans-serif' size='2'><br>";
 				$sql_query = "SELECT tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, tbl_person.titelpost, tbl_benutzer.uid 
 								FROM public.tbl_person, public.tbl_benutzer,public.tbl_benutzerfunktion 
-								WHERE oe_kurzbz='$stg_oe_obj->oe_kurzbz' AND funktion_kurzbz='stdv' 
+								WHERE oe_kurzbz='".addslashes($stg_oe_obj->oe_kurzbz)."' AND funktion_kurzbz='stdv' 
 								AND  tbl_person.aktiv and tbl_person.person_id=public.tbl_benutzer.person_id 
 								AND public.tbl_benutzer.aktiv AND tbl_benutzerfunktion.uid=tbl_benutzer.uid
 								AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
