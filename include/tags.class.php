@@ -217,8 +217,6 @@ class tags extends basis_db
 		{
 			$qry = "Insert into public.tbl_tag (tag) values (".$this->addslashes($this->tag).");";
 			
-			echo $qry; 
-			
 			if($this->db_query($qry))
 			{
 				return true; 
