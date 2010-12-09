@@ -37,7 +37,9 @@ class wawi_aufteilung extends basis_db
 	public $insertamum; 		// timestamp
 	public $insertvon; 			// char
 	public $updateamum; 		// timestamp
-	public $upatevon; 			// char
+	public $updatevon; 			// char
+	
+	public $bestellung_id; 	
 	
 	/**
 	 * 
@@ -167,18 +169,57 @@ class wawi_aufteilung extends basis_db
 		}
 	}
 	
+	
 	/**
 	 * 
-	 * return true wenn es den Aufteilungseintrag schon gibt, false wenn es ihn noch nicht gibt
+	 * Gibt alle Aufteilungen zurück die einer Bestellung zugeordnet sind
+	 * @param $bestellung_id
+	 */
+	public function getAufteilungFromBestellung($bestellung_id)
+	{
+		
+		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$bestellung_id.";";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$aufteilung = new wawi_aufteilung(); 
+				
+				$aufteilung->aufteilung_id = $row->aufteilung_id;  
+				$aufteilung->bestellung_id = $row->bestellung_id; 
+				$aufteilung->oe_kurzbz = $row->oe_kurzbz; 
+				$aufteilung->anteil = $row->anteil; 
+				$aufteilung->insertamum = $row->insertamum; 
+				$aufteilung->insertvon = $row->insertvon; 
+				$aufteilung->updateamum = $row->updateamum; 
+				$aufteilung->updatevon = $row->updatevon; 
+				
+				$this->result[] = $aufteilung; 
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage."; 
+			return false; 
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * return true wenn es den Aufteilungseintrag in tbl_aufteilung schon gibt, false wenn es ihn noch nicht gibt
 	 */
 	public function AufteilungExists()
 	{
 		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($this->bestellung_id)." and oe_kurzbz = ".$this->addslashes($this->oe_kurzbz).";";
-		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-				return true; 
+			{
+				$this->aufteilung_id = $row->aufteilung_id; 
+				return true;
+			} 
 			else
 				return false;
 		}
@@ -192,8 +233,9 @@ class wawi_aufteilung extends basis_db
 	 */
 	public function saveAufteilung()
 	{
-		
-		if($this->new = true)
+		$this->anteil = mb_str_replace(",",".",$this->anteil);
+		$this->anteil = number_format($this->anteil,2,".",",");
+		if($this->new == true)
 		{
 			// insert
 			$qry= "Insert into wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) values ("
@@ -208,13 +250,19 @@ class wawi_aufteilung extends basis_db
 		else
 		{
 			// update
+			$qry = "Update wawi.tbl_aufteilung set 
+			bestellung_id = ".$this->addslashes($this->bestellung_id).", 
+			oe_kurzbz = ".$this->addslashes($this->oe_kurzbz).", 
+			anteil = ".$this->addslashes($this->anteil).",
+			updateamum = ".$this->addslashes($this->updateamum).",
+			updatevon = ".$this->addslashes($this->updatevon)."
+			where aufteilung_id = ".$this->addslashes($this->aufteilung_id).";"; 
 		}
-		
+
 		if($this->db_query($qry))
 			return true; 
 		else
 			return false; 
-			
 	}
 	
 }

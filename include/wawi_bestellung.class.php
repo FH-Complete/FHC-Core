@@ -23,6 +23,8 @@
  * Klasse WaWi Bestellung
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once (dirname(__FILE__).'/wawi_bestelldetails.class.php');
+require_once (dirname(__FILE__).'/wawi_aufteilung.class.php');
 
 class wawi_bestellung extends basis_db
 {
@@ -451,6 +453,88 @@ class wawi_bestellung extends basis_db
 			}
 			return $brutto; 			
 		}
+	}
+	
+	function copyBestellung($bestellung_id)
+	{
+		$error = false; 
+		
+		// Bestellung kopieren
+		$qry_bestellung = "BEGIN; INSERT INTO wawi.tbl_bestellung (besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
+		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, 
+		rechnungsadresse, freigegeben, bestell_nr, titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
+		bestellung_id = ".$bestellung_id.";";
+
+		if(!$this->db_query($qry_bestellung))
+			$error = true; 
+				
+		// neue Bestellid abfragen	
+		$qry_currval = "SELECT currval('wawi.seq_bestellung_bestellung_id') as id;";
+		if($this->db_query($qry_currval))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$newBestellung_id = $row->id;	
+			}
+		}	
+		else
+		{
+			$error = true; 
+		}				
+
+		$bestelldetail = new wawi_bestelldetail(); 
+		$bestelldetail->getAllDetailsFromBestellung($bestellung_id);
+		
+		// Bestelldetails kopieren
+		foreach ($bestelldetail->result as $detail)
+		{
+			$qry_detail ="INSERT INTO wawi.tbl_bestelldetail (bestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
+			text, insertamum, insertvon, updateamum, updatevon) SELECT $newBestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
+			text, insertamum, insertvon, updateamum, updatevon FROM wawi.tbl_bestelldetail 
+			WHERE bestelldetail_id = ".$detail->bestelldetail_id.";"; 
+			if (!$this->db_query($qry_detail))
+				$error = true; 
+				
+			// neue Bestelldetail id abfragen
+			$qry_currval = "SELECT currval('wawi.seq_bestelldetail_bestelldetail_id') as id;";
+			if($this->db_query($qry_currval))
+			{
+				if($row = $this->db_fetch_object())
+				{
+					$newBestellDetail_id = $row->id;	
+				}
+			}	
+			else
+			{
+				$error = true; 
+			}	
+			
+			// zugehörigen TAG kopieren
+			$qry_detailtag = "INSERT INTO wawi.tbl_bestelldetailtag (tag, bestelldetail_id, insertamum, insertvon) 
+			SELECT tag, ".$this->addslashes($newBestellDetail_id).", insertamum, insertvon FROM wawi.tbl_bestelldetailtag 
+			WHERE bestelldetail_id = ".$this->addslashes($detail->bestelldetail_id).";"; 
+			
+			if (!$this->db_query($qry_detailtag))
+				$error = true; 
+				
+		}
+		
+			$qry_aufteilung = "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) 
+			SELECT ".$this->addslashes($newBestellung_id)." ,  oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$bestellung_id.";"; 
+			if (!$this->db_query($qry_aufteilung))
+				$error = true; 
+		
+		if(!$error)
+		{
+			echo "Erfolgreich kopiert."; 
+			$this->db_query('COMMIT');
+		}
+		else
+		{
+			echo "Fehler beim kopieren aufgetreten."; 
+			$this->db_query('ROLLBACK');
+		}
+		
 	}
 	
 }
