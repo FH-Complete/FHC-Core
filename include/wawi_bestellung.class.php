@@ -458,13 +458,14 @@ class wawi_bestellung extends basis_db
 	function copyBestellung($bestellung_id)
 	{
 		$error = false; 
+		$this->db_query('BEGIN;'); 
 		
 		// Bestellung kopieren
-		$qry_bestellung = "BEGIN; INSERT INTO wawi.tbl_bestellung (besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
-		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, freigegeben, bestell_nr, titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
+		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
+		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT nextval('wawi.seq_bestellung_bestellung_id'), besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, 
+		rechnungsadresse, freigegeben, currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
-
+		echo $qry_bestellung;
 		if(!$this->db_query($qry_bestellung))
 			$error = true; 
 				
@@ -478,9 +479,7 @@ class wawi_bestellung extends basis_db
 			}
 		}	
 		else
-		{
-			$error = true; 
-		}				
+			$error = true; 			
 
 		$bestelldetail = new wawi_bestelldetail(); 
 		$bestelldetail->getAllDetailsFromBestellung($bestellung_id);
@@ -519,11 +518,24 @@ class wawi_bestellung extends basis_db
 				
 		}
 		
-			$qry_aufteilung = "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) 
-			SELECT ".$this->addslashes($newBestellung_id)." ,  oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$bestellung_id.";"; 
-			if (!$this->db_query($qry_aufteilung))
-				$error = true; 
+		// aufteilung kopieren
+		$qry_aufteilung = "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) 
+		SELECT ".$this->addslashes($newBestellung_id)." ,  oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$bestellung_id.";"; 
+		if (!$this->db_query($qry_aufteilung))
+			$error = true; 
+
+		// projekt bestellung kopieren
+		$qry_project ="INSERT INTO wawi.tbl_projekt_bestellung (projekt_kurzbz, bestellung_id, anteil) SELECT projekt_kurzbz, ".$this->addslashes($newBestellung_id).", anteil 
+		from wawi.tbl_projekt_bestellung WHERE bestellung_id = ".$bestellung_id.";"; 
+		if (!$this->db_query($qry_project))
+			$error = true; 
 		
+		// bestelltag kopieren
+		$qry_bestelltag ="INSERT INTO wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) SELECT tag, ".$this->addslashes($newBestellung_id).", insertamum, insertvon 
+		from wawi.tbl_bestellungtag WHERE bestellung_id = ".$bestellung_id.";";
+		if (!$this->db_query($qry_bestelltag))
+			$error = true; 	
+			
 		if(!$error)
 		{
 			echo "Erfolgreich kopiert."; 
@@ -534,7 +546,6 @@ class wawi_bestellung extends basis_db
 			echo "Fehler beim kopieren aufgetreten."; 
 			$this->db_query('ROLLBACK');
 		}
-		
 	}
-	
+
 }
