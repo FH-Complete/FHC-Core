@@ -245,7 +245,12 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	function formatItem(row) 
 	{
 	    return row[0] + " <br>" + row[1] + "<br> ";
-	}	  		  
+	}	
+	function formatItemTag(row) 
+	{
+	    return row[0];
+	}
+	  		  
 	function conf_del()
 	{
 		return confirm('Diese Bestellung wirklich löschen?');
@@ -500,7 +505,7 @@ if($aktion == 'suche')
 					}
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
-					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete_x.png\"></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung\"> <img src=\"../skin/images/Calculator.png\"> </a></td>";
+					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bestellung bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Bestellung löschen'> <img src=\"../skin/images/delete_x.png\"></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung anlegen\"> <img src=\"../skin/images/Calculator.png\"> </a><a href= \"bestellung.php?method=copy&id=$row->bestellung_id\" title=\"Bestellung kopieren\"> <img src=\"../skin/images/copy.png\"> </a></td>";
 					echo '<td>'.$row->bestell_nr."</td>\n";
 					echo '<td>'.$row->bestellung_id."</td>\n";
 					echo '<td>'.$firmenname."</td>\n";
@@ -528,7 +533,7 @@ if($aktion == 'suche')
 			die('Sie haben keine Berechtigung zum Anlegen von Bestellungen');
 		
 		echo "<h2>Neue Bestellung</h2>";
-		echo "<form action ='bestellung.php?method=save' method='post' name='newForm'>\n";
+		echo "<form action ='bestellung.php?method=save&new=true' method='post' name='newForm'>\n";
 		echo "<table border = 0>\n";
 		echo "<tr>\n";
 		echo "<td>Titel:</td>\n";
@@ -597,7 +602,7 @@ if($aktion == 'suche')
 			else 
 			{
 				echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
-				echo "<a href = bestellung.php?method=update&id=".$bestell_id."> Link drücken </a>zum editieren der Bestellung";  
+				echo "<a href = bestellung.php?method=update&id=".$bestell_id."&new=true> Link drücken </a>zum editieren der Bestellung";  
 			}
 		}
 	} 
@@ -617,6 +622,17 @@ if($aktion == 'suche')
 		{
 			echo $bestellung->errormsg; 
 		}
+	}
+	else if($_GET['method']=='copy')
+	{ 
+		$bestellung_id = $_GET['id'];
+		$bestellung = new wawi_bestellung(); 
+		if ($bestellung->copyBestellung($bestellung_id))
+		{
+			echo $bestellung_id;
+		}
+		 
+		
 	}
 	else if($_GET['method']=='update')
 	{ 
@@ -640,7 +656,18 @@ if($aktion == 'suche')
 			$kostenstelle = new wawi_kostenstelle(); 
 			$kostenstelle->load($bestellung->kostenstelle_id);
 			$aufteilung = new wawi_aufteilung(); 
-			$aufteilung->getAufteilungFromKostenstelle($bestellung->kostenstelle_id);
+			
+			// Bei neuer Bestellung Default Aufteilung holen ansonsten von bestehender bestellung
+			if(isset($_GET['new']))
+			{
+				$aufteilung->getAufteilungFromKostenstelle($bestellung->kostenstelle_id);
+			}
+			else
+			{
+				$aufteilung->getAufteilungFromBestellung($bestellung->bestellung_id);
+			}
+			
+			
 			$firma = new firma(); 
 			$firma->load($bestellung->firma_id);  
 			$liefertermin = $date->formatDatum($bestellung->liefertermin, 'd.m.Y'); 
@@ -657,7 +684,7 @@ if($aktion == 'suche')
 			echo "<h2>Bearbeiten</h2>";
 			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
 			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
-			
+			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'">Bestellung kopieren</a>'; 
 			//tabelle Bestelldetails
 			echo "<table border = 0 width= '100%' class='dark'>\n";
 			echo "<tr>\n"; 	
@@ -762,6 +789,7 @@ if($aktion == 'suche')
 							width:500,
 							multiple: true,
 							multipleSeparator: "; ",
+							formatItem:formatItemTag,
 							extraParams:{"work":"tags", "bestell_id":"'.$bestellung->bestellung_id.'"}
 						});
 					</script>';
@@ -786,7 +814,7 @@ if($aktion == 'suche')
 			echo "</table>\n";
 			echo "<br>";
 			
-			//tabelle Positonen
+			//tabelle Details
 			echo "<table border =0 width='70%'>\n";
 			echo "<tr>\n";
 			echo "<th>Löschen</th>\n";
@@ -1057,9 +1085,8 @@ if($aktion == 'suche')
 		else 
 		{
 			// Update auf Bestellung
-			$date = new datum(); 
-			
-			var_dump($_POST); 
+			$date = new datum(); 	
+			//var_dump($_POST); 
 			
 			$bestellung_id = $_GET['bestellung'];
 			$bestellung_detail_anz = $_POST['detail_anz'];
@@ -1085,7 +1112,6 @@ if($aktion == 'suche')
 			
 			foreach ($tags as $bestelltags)
 			{
-				//echo $bestelltags."<br>"; 
 				$tag_bestellung = new tags(); 
 				$tag_bestellung->tag = trim($bestelltags); 
 				$tag_bestellung->bestellung_id = $bestellung_id; 
@@ -1106,13 +1132,15 @@ if($aktion == 'suche')
 			// letzte leere zeile nicht speichern
 			for($i = 1; $i < $bestellung_detail_anz; $i++)
 			{
-				// gibt es ein bestelldetail schon
 				$detail_id = $_POST["bestelldetailid_$i"]; 
 				$bestell_detail = new wawi_bestelldetail(); 		
 				
+				// gibt es ein bestelldetail schon
 				if($detail_id != '')
 				{
 					// Update
+					$bestell_detail->load($detail_id);
+					
 					$tags_detail = explode(";", $_POST["detail_tag_$i"]);
 
 					$help_detailtags = new tags(); 
@@ -1138,7 +1166,6 @@ if($aktion == 'suche')
 								$detail_tag->saveBestelldetailTag();
 						}
 					} 
-					$bestell_detail->load($detail_id);
 					
 					$bestell_detail->position = $_POST["pos_$i"];
 					$bestell_detail->menge = $_POST["menge_$i"];
@@ -1169,6 +1196,7 @@ if($aktion == 'suche')
 					$bestell_detail->updatevon = $user;
 					$bestell_detail->new = true; 
 				}
+				
 				if(!$bestell_detail->save())
 				{
 					echo $bestell_detail->errormsg; 
@@ -1198,11 +1226,8 @@ if($aktion == 'suche')
 					$aufteilung->insertvon = $user; 
 					$aufteilung->new = true; 
 				}
-				
 				$aufteilung->saveAufteilung(); 
-				
 			}
-			
 			
 			if($bestellung_new->save())
 			{
@@ -1244,3 +1269,4 @@ if($aktion == 'suche')
 		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
 	}
+	
