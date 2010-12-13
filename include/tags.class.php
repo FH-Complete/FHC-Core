@@ -137,7 +137,7 @@ class tags extends basis_db
 	 * Gibt alle Tags eines Bestelldetails zurück
 	 * @param $bestelldetail_id
 	 */
-	public function GetTagsByBesteldetail($bestelldetail_id)
+	public function GetTagsByBestelldetail($bestelldetail_id)
 	{
 		if($bestelldetail_id == '')
 		{

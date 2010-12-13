@@ -1578,6 +1578,8 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_kontakt TO wawi;
 			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_standort TO wawi;
 			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_personfunktionstandort TO wawi;
+			GRANT SELECT ON public.tbl_studiensemester TO wawi;
+			GRANT SELECT ON public.tbl_studiengang TO wawi;
 			
 			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_firma_firma_id_seq TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_person_person_id_seq TO wawi;
@@ -1588,6 +1590,8 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE ON SEQUENCE public.tbl_personfunktionstandort_personfunktionstandort_id_seq TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_default_aufteilung_id TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_aufteilung_aufteilung_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestellung_bestellung_id TO wawi;
+			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestelldetail_bestelldetail_id TO wawi;
 			
 			
 			-- INDEX

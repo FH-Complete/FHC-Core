@@ -1250,7 +1250,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
 		$detail_tag = new tags(); 
-		$detail_tag->GetTagsByBesteldetail($bestelldetail_id);
+		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); 
 		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' style='display:none' value='$help' ></input></td>"; 
 		
