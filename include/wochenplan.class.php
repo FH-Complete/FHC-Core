@@ -235,7 +235,11 @@ class wochenplan extends basis_db
 			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person FROM public.tbl_ort WHERE ort_kurzbz='".addslashes($this->ort_kurzbz)."'";
 			//echo $sql_query;
 			if (!$this->db_query($sql_query))
+			{
 				$this->errormsg=$this->db_last_error();
+				return false;
+			}
+
 			if($row = $this->db_fetch_object())
 			{
 				$this->ort_bezeichnung = $row->bezeichnung;
@@ -244,6 +248,11 @@ class wochenplan extends basis_db
 				$this->ort_ausstattung = $row->ausstattung;
 				$this->ort_max_person = $row->max_person;
 				$this->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
+			}
+			else
+			{
+				$this->errormsg="Dieser Ort existiert nicht";
+				return false;
 			}
 		}
 
