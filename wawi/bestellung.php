@@ -19,9 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
-
-require_once('auth.php');
 require_once '../config/wawi.config.inc.php';
+require_once('auth.php');
+
 require_once '../include/firma.class.php';
 require_once '../include/organisationseinheit.class.php';
 require_once '../include/mitarbeiter.class.php';
@@ -197,16 +197,18 @@ if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 	$bestellstatus = new wawi_bestellstatus(); 
 	$bestellstatus->bestellung_id = $_POST['id'];
 	$bestellstatus->bestellstatus_kurzbz = 'Bestellung';
-	//$bestellstatus->uid = $_POST['user'];
-	//$bestellstatus->oe_kurzbz = ?
+	$bestellstatus->uid = '';
+	$bestellstatus->oe_kurzbz = '';
 	$bestellstatus->datum = date('Y-m-d H:i:s');
-	//$bestellstatus->insertvon = $user;
+	$bestellstatus->insertvon = $_POST['user_id'];
 	$bestellstatus->insertamum = date('Y-m-d H:i:s');
-	//$bestellstatus->updatevon = $user;
+	$bestellstatus->updatevon = $_POST['user_id'];
 	$bestellstatus->updateamum = date('Y-m-d H:i:s');
 	
-	if($bestellstatus->setBestellung())
+	if($bestellstatus->save())
 	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
+	else 
+	echo $bestellstatus->errormsg; 
 		exit; 
 }
 
@@ -216,17 +218,19 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	
 	$bestellstatus = new wawi_bestellstatus(); 
 	$bestellstatus->bestellung_id = $_POST['id'];
-	$bestellstatus->bestellstatus_kurzbz = 'Bestellung';
-	//$bestellstatus->uid = $_POST['user'];
-	//$bestellstatus->oe_kurzbz = ?
+	$bestellstatus->bestellstatus_kurzbz = 'Storno';
+	$bestellstatus->uid = '';
+	$bestellstatus->oe_kurzbz = '';
 	$bestellstatus->datum = date('Y-m-d H:i:s');
-	//$bestellstatus->insertvon = $user;
+	$bestellstatus->insertvon = $_POST['user_id'];
 	$bestellstatus->insertamum = date('Y-m-d H:i:s');
-	//$bestellstatus->updatevon = $user;
+	$bestellstatus->updatevon = $_POST['user_id'];
 	$bestellstatus->updateamum = date('Y-m-d H:i:s');
 	
-	if($bestellstatus->setStorno())
+	if($bestellstatus->save())
 	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
+	else 
+	echo $bestellstatus->errormsg; 
 		exit; 
 }	
 ?>
@@ -685,6 +689,16 @@ if($aktion == 'suche')
 	}	
 	if($_GET['method']=='update')
 	{ 
+		
+	echo '	<script type="text/javascript">
+			function FensterOeffnen (adresse) 
+			{
+				MeinFenster = window.open(adresse, "Info", "width=400,height=500,left=100,top=200");
+		  		MeinFenster.focus();
+			}
+			</script>'; 
+		
+		
 		// Bestellung Editieren	
 		if(!isset($_GET['bestellung']))
 		{
@@ -739,7 +753,7 @@ if($aktion == 'suche')
 			echo "<td>Titel: </td>\n";
 			echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
 			echo "<td>Erstellt am:</td>\n"; 
-			echo "<td><p name='erstellt'>".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</p></td>\n";
+			echo "<td><p name='erstellt' title ='".$bestellung->insertvon."' >".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</p></td>\n";
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Firma: </td>\n";
@@ -818,7 +832,9 @@ if($aktion == 'suche')
 			}
 			else
 			{
-				echo "Bestellt am: ".$date->formatDatum($status->datum,'d.m.Y'); 
+				$status_help = new wawi_bestellstatus(); 
+				$status_help->getBestelltFromBestellung($bestellung->bestellung_id); 
+				echo '<p title ="'.$status_help->insertvon.'">Bestellt am: '.$date->formatDatum($status->datum,'d.m.Y').'</p>'; 
 			}
 			
 			echo "</td>\n";
@@ -872,7 +888,7 @@ if($aktion == 'suche')
 			echo "<th>Bezeichnung</th>\n";
 			echo "<th>Artikelnr.</th>\n";
 			echo "<th>Preis/VE</th>\n";
-			echo "<th>USt</th>\n";
+			echo "<th>USt <a href = 'mwst.html' onclick='FensterOeffnen(this.href); return false'> <img src='../skin/images/question.png'> </a></th>\n";
 			echo "<th>Brutto</th>\n";
 			echo "<th><div id='tags_headline' style='display:none'>Tags</div><a id='tags_link'><img src='../skin/images/plus.png'> </a></th>";
 			echo "</tr>\n";
@@ -924,7 +940,7 @@ if($aktion == 'suche')
 			 return false;
 	        });
 			
-			function deleteBtnBestellt(bestellung_id, user_uid)
+			function deleteBtnBestellt(bestellung_id)
 			{
 				$("#btn_bestellt").html(); 
 				
@@ -938,7 +954,7 @@ if($aktion == 'suche')
 				 
 			}
 			
-			function deleteBtnStorno(bestellung_id, user_uid)
+			function deleteBtnStorno(bestellung_id)
 			{
 				$("#btn_storniert").html(); 
 				
@@ -1068,10 +1084,12 @@ if($aktion == 'suche')
 			</script>';
 			
 			$disabled ='';
-			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') )
 				$disabled ='disabled';
 			
-			echo "<input type='submit' value='Speichern' id='btn_submit' $disabled></input>\n"; 
+				
+			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled></input>\n"; 
+			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
 			echo "<br><br>"; 
 			
 			// div Aufteilung --> kann ein und ausgeblendet werden
@@ -1165,155 +1183,194 @@ if($aktion == 'suche')
 			// Update auf Bestellung
 			$date = new datum(); 	
 			//var_dump($_POST); 
+			$save = false; 
 			
 			$bestellung_id = $_GET['bestellung'];
-			$bestellung_detail_anz = $_POST['detail_anz'];
 			$bestellung_new = new wawi_bestellung(); 
 			$bestellung_new->load($bestellung_id);
-			$aufteilung_anzahl = $_POST['anz_aufteilung'];
-			
-			$bestellung_new->new = false; 
-			$bestellung_new->besteller_uid=$user; 
-			$bestellung_new->konto_id = $_POST['filter_konto'];
-			$bestellung_new->firma_id = $_POST['firma_id'];
-			$bestellung_new->lieferadresse = $_POST['filter_lieferadresse'];
-			$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
-			$bestellung_new->titel = $_POST['titel'];
-			$bestellung_new->bemerkung = $_POST['bemerkung'];
-			$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
-			$bestellung_new->updateamum = date('Y-m-d H:i:s');
-			$bestellung_new->updatevon = $user; 
-			$tags = explode(";", $_POST['tags']);
-			$help_tags = new tags(); 
-			$help_tags->bestellung_id = $bestellung_id; 
-			$help_tags->deleteBestellungTag($tags);
-			
-			foreach ($tags as $bestelltags)
-			{
-				$tag_bestellung = new tags(); 
-				$tag_bestellung->tag = trim($bestelltags); 
-				$tag_bestellung->bestellung_id = $bestellung_id; 
-				$tag_bestellung->insertvon = $user; 
-				$tag_besetllung->insertamum = date('Y-m-d H:i:s');
+			$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
 				
-				if(!$tag_bestellung->TagExists())
-				{
-					$tag_bestellung->saveTag(); 
-					$tag_bestellung->saveBestellungTag();
-				}
-				else
-				{
-					if(!$tag_bestellung->BestellungTagExists())
-						$tag_bestellung->saveBestellungTag();
-				}
-			} 
-			// letzte leere zeile nicht speichern
-			for($i = 1; $i < $bestellung_detail_anz; $i++)
+			if(isset($_POST['btn_abschicken']) || isset($_POST['btn_submit']))
 			{
-				$detail_id = $_POST["bestelldetailid_$i"]; 
-				$bestell_detail = new wawi_bestelldetail(); 		
-				
-				// gibt es ein bestelldetail schon
-				if($detail_id != '')
-				{
-					// Update
-					$bestell_detail->load($detail_id);
-					
-					$tags_detail = explode(";", $_POST["detail_tag_$i"]);
+				$aufteilung_anzahl = $_POST['anz_aufteilung'];
+				$bestellung_detail_anz = $_POST['detail_anz'];
 
-					$help_detailtags = new tags(); 
-					$help_detailtags->bestelldetail_id = $detail_id; 
-					$help_detailtags->deleteBestelldetailTag($tags_detail);
-					
-					foreach ($tags_detail as $det)
-					{
-						$detail_tag = new tags(); 
-						$detail_tag->tag = trim($det); 
-						$detail_tag->bestelldetail_id = $detail_id; 
-						$detail_tag->insertvon = $user; 
-						$detail_tag->insertamum = date('Y-m-d H:i:s');
-						
-						if(!$detail_tag->TagExists())
-						{
-							$detail_tag->saveTag();
-							$detail_tag->saveBestelldetailTag();
-						}
-						else
-						{
-							if(!$detail_tag->BestelldetailTagExists())
-								$detail_tag->saveBestelldetailTag();
-						}
-					} 
-					
-					$bestell_detail->position = $_POST["pos_$i"];
-					$bestell_detail->menge = $_POST["menge_$i"];
-					$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-					$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
-					$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-					$bestell_detail->preisprove = $_POST["preisprove_$i"];
-					$bestell_detail->mwst = $_POST["mwst_$i"];
-					$bestell_detail->updateamum = date('Y-m-d H:i:s');
-					$bestell_detail->updatevon = $user;
-					$bestell_detail->new = false; 
-				}
+				$bestellung_new->new = false; 
+				$bestellung_new->besteller_uid=$user; 
+				if(is_numeric($_POST['filter_konto']))
+					$bestellung_new->konto_id = $_POST['filter_konto'];
 				else 
+					$bestellung_new->konto_id = '';
+				$bestellung_new->firma_id = $_POST['firma_id'];
+				$bestellung_new->lieferadresse = $_POST['filter_lieferadresse'];
+				$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
+				$bestellung_new->titel = $_POST['titel'];
+				$bestellung_new->bemerkung = $_POST['bemerkung'];
+				$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
+				$bestellung_new->updateamum = date('Y-m-d H:i:s');
+				$bestellung_new->updatevon = $user; 
+				$tags = explode(";", $_POST['tags']);
+				$help_tags = new tags(); 
+				$help_tags->bestellung_id = $bestellung_id; 
+				$help_tags->deleteBestellungTag($tags);
+				
+				foreach ($tags as $bestelltags)
 				{
-					// Insert
-					$bestell_detail->bestellung_id = $_GET['bestellung'];
-					$bestell_detail->position = $_POST["pos_$i"];
-					$bestell_detail->menge = $_POST["menge_$i"];
-					$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-					$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
-					$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-					$bestell_detail->preisprove = $_POST["preisprove_$i"];
-					$bestell_detail->mwst = $_POST["mwst_$i"];
-					$bestell_detail->sort = $_POST["pos_$i"];
-					$bestell_detail->insertamum = date('Y-m-d H:i:s');
-					$bestell_detail->insertvon = $user;
-					$bestell_detail->updateamum = date('Y-m-d H:i:s');
-					$bestell_detail->updatevon = $user;
-					$bestell_detail->new = true; 
+					$tag_bestellung = new tags(); 
+					$tag_bestellung->tag = trim($bestelltags); 
+					$tag_bestellung->bestellung_id = $bestellung_id; 
+					$tag_bestellung->insertvon = $user; 
+					$tag_besetllung->insertamum = date('Y-m-d H:i:s');
+					
+					if(!$tag_bestellung->TagExists())
+					{
+						$tag_bestellung->saveTag(); 
+						$tag_bestellung->saveBestellungTag();
+					}
+					else
+					{
+						if(!$tag_bestellung->BestellungTagExists())
+							$tag_bestellung->saveBestellungTag();
+					}
+				} 
+				// letzte leere zeile nicht speichern
+				for($i = 1; $i < $bestellung_detail_anz; $i++)
+				{
+					$detail_id = $_POST["bestelldetailid_$i"]; 
+					$bestell_detail = new wawi_bestelldetail(); 		
+					
+					// gibt es ein bestelldetail schon
+					if($detail_id != '')
+					{
+						// Update
+						$bestell_detail->load($detail_id);
+						
+						$tags_detail = explode(";", $_POST["detail_tag_$i"]);
+	
+						$help_detailtags = new tags(); 
+						$help_detailtags->bestelldetail_id = $detail_id; 
+						$help_detailtags->deleteBestelldetailTag($tags_detail);
+						
+						foreach ($tags_detail as $det)
+						{
+							$detail_tag = new tags(); 
+							$detail_tag->tag = trim($det); 
+							$detail_tag->bestelldetail_id = $detail_id; 
+							$detail_tag->insertvon = $user; 
+							$detail_tag->insertamum = date('Y-m-d H:i:s');
+							
+							if(!$detail_tag->TagExists())
+							{
+								$detail_tag->saveTag();
+								$detail_tag->saveBestelldetailTag();
+							}
+							else
+							{
+								if(!$detail_tag->BestelldetailTagExists())
+									$detail_tag->saveBestelldetailTag();
+							}
+						} 
+						
+						$bestell_detail->position = $_POST["pos_$i"];
+						$bestell_detail->menge = $_POST["menge_$i"];
+						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
+						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
+						$bestell_detail->preisprove = $_POST["preisprove_$i"];
+						$bestell_detail->mwst = $_POST["mwst_$i"];
+						$bestell_detail->updateamum = date('Y-m-d H:i:s');
+						$bestell_detail->updatevon = $user;
+						$bestell_detail->new = false; 
+					}
+					else 
+					{
+						// Insert
+						$bestell_detail->bestellung_id = $_GET['bestellung'];
+						$bestell_detail->position = $_POST["pos_$i"];
+						$bestell_detail->menge = $_POST["menge_$i"];
+						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
+						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
+						$bestell_detail->preisprove = $_POST["preisprove_$i"];
+						$bestell_detail->mwst = $_POST["mwst_$i"];
+						$bestell_detail->sort = $_POST["pos_$i"];
+						$bestell_detail->insertamum = date('Y-m-d H:i:s');
+						$bestell_detail->insertvon = $user;
+						$bestell_detail->updateamum = date('Y-m-d H:i:s');
+						$bestell_detail->updatevon = $user;
+						$bestell_detail->new = true; 
+					}
+					
+					if(!$bestell_detail->save())
+					{
+						echo $bestell_detail->errormsg; 
+					}
+				}
+	
+				for($i=0; $i<$aufteilung_anzahl; $i++)
+				{
+					$aufteilung = new wawi_aufteilung(); 
+					$aufteilung->bestellung_id = $bestellung_id;
+					$aufteilung->oe_kurzbz = $_POST['oe_kurzbz_'.$i];
+					$aufteilung->anteil = $_POST['aufteilung_'.$i]; 
+					
+					if($aufteilung->AufteilungExists())
+					{
+						// Update
+						$aufteilung->updateamum = date('Y-m-d H:i:s');
+						$aufteilung->updatevon = $user; 
+						$aufteilung->new = false; 
+					}
+					else
+					{
+						// Insert
+						$aufteilung->updateamum = date('Y-m-d H:i:s');
+						$aufteilung->updatevon = $user; 
+						$aufteilung->insertamum = date('Y-m-d H:i:s');
+						$aufteilung->insertvon = $user; 
+						$aufteilung->new = true; 
+					}
+					$aufteilung->saveAufteilung(); 
 				}
 				
-				if(!$bestell_detail->save())
+				if($bestellung_new->save())
 				{
-					echo $bestell_detail->errormsg; 
+					echo "erfolgreich gespeichert. <br><br>";
+					$save = true; 
+					$_GET['method']= 'update';
+					$_GET['id']= $bestellung_id; 
 				}
+				echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";		
 			}
-
-			for($i=0; $i<$aufteilung_anzahl; $i++)
+			// Bestellung freigeben
+			if(isset($_POST['btn_abschicken']) )
 			{
-				$aufteilung = new wawi_aufteilung(); 
-				$aufteilung->bestellung_id = $bestellung_id;
-				$aufteilung->oe_kurzbz = $_POST['oe_kurzbz_'.$i];
-				$aufteilung->anteil = $_POST['aufteilung_'.$i]; 
-				
-				if($aufteilung->AufteilungExists())
+				$status_abgeschickt = new wawi_bestellstatus(); 
+				if(!$status_abgeschickt->isStatiVorhanden($bestellung_id, 'Abgeschickt'))
 				{
-					// Update
-					$aufteilung->updateamum = date('Y-m-d H:i:s');
-					$aufteilung->updatevon = $user; 
-					$aufteilung->new = false; 
+					$status_abgeschickt->bestellung_id = $bestellung_id; ; 
+					$status_abgeschickt->bestellstatus_kurzbz ='Abgeschickt'; 
+					$status_abgeschickt->uid = $user; 
+					$status_abgeschickt->oe_kurzbz = ''; 
+					$status_abgeschickt->datum = date('Y-m-d H:i:s'); 
+					$status_abgeschickt->insertvon = $user; 
+					$status_abgeschickt->insertamum = date('Y-m-d H:i:s'); 
+					$status_abgeschickt->updatevon = $user;
+					$status_abgeschickt->updateamum = date('Y-m-d H:i:s'); 
+					
+					$bestellung_new->load($bestellung_id); 
+					$bestellung_oe = $bestellung_new->getOe(); 
+					echo "bestellung ".$bestellung_oe; 
+					if($status_abgeschickt->save())
+					{
+						
+					} 
+					else 
+					{
+						
+					}
 				}
-				else
-				{
-					// Insert
-					$aufteilung->updateamum = date('Y-m-d H:i:s');
-					$aufteilung->updatevon = $user; 
-					$aufteilung->insertamum = date('Y-m-d H:i:s');
-					$aufteilung->insertvon = $user; 
-					$aufteilung->new = true; 
-				}
-				$aufteilung->saveAufteilung(); 
 			}
-			
-			if($bestellung_new->save())
-			{
-				echo "erfolgreich gespeichert. <br><br>";
-				$_GET['method']= 'update';
-				$_GET['id']= $bestellung_id; 
-			}
-			echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";		
 		}
 	}
 
@@ -1327,7 +1384,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
-		echo "<td><input type='text' size='5' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' disabled></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
