@@ -20,7 +20,7 @@
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
 /**
- * Auswertung der Bestellungen auf Kostenstellen und Tags
+ * Auswertung der Bestellungen und Rechnungen auf Kostenstellen und Tags
  */
 require_once('../../config/wawi.config.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -30,6 +30,7 @@ require_once('../../include/wawi_bestellung.class.php');
 require_once('../../include/wawi_kostenstelle.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/tags.class.php');
+require_once('../../include/geschaeftsjahr.class.php');
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -52,15 +53,6 @@ if(count($kst_array)==0)
 	<script type="text/javascript" src="../../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../../include/js/jquery.tablesorter.js"></script>
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{
-		$("#myTable").tablesorter(
-		{
-			sortList: [[1,0]],
-			widgets: ['zebra']
-		});			
- 	});
-
  	function alleMarkieren(checked)
  	{
  	 	inputs = document.getElementsByTagName('input');
@@ -86,29 +78,22 @@ if(isset($_POST['show']))
 	$db = new basis_db();
 	
 	//Vom Studiensemester
-	$studiensemester = $_POST['studiensemester'];
-	$stsem = new studiensemester();
-	$stsem->load($studiensemester);
-	$beginn = $stsem->start;
-	$studiensemester2 = $stsem->getNextFrom($stsem->getNextFrom($studiensemester));
-	$ende = $stsem->start;
-	if($beginn==$ende)
-		$ende = $stsem->ende;
+	$geschaeftsjahr = $_POST['geschaeftsjahr'];
+	$gj= new geschaeftsjahr();
+	$gj->load($geschaeftsjahr);
 		
 	$kst_tags=array();
 	$tags_array=array();
 	
+	//Tabelle auf Basis der Bestellungen
 	$qry = "SELECT 
 				(menge*preisprove*(100+mwst)/100) as brutto, tbl_bestellung.bestellung_id, 
 				tbl_bestellung.kostenstelle_id, tbl_bestelldetail.bestelldetail_id
 			FROM 
 				wawi.tbl_bestellung 
-				JOIN wawi.tbl_bestellung_bestellstatus USING(bestellung_id)
 				JOIN wawi.tbl_bestelldetail USING(bestellung_id)
 			WHERE
-				tbl_bestellung_bestellstatus.bestellstatus_kurzbz='Bestellung'
-				AND tbl_bestellung_bestellstatus.datum>='$beginn' AND tbl_bestellung_bestellstatus.datum<'$ende' 
-				AND tbl_bestellung.freigegeben
+				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
 				AND
 				(
 				EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
@@ -145,10 +130,133 @@ if(isset($_POST['show']))
 	}
 	else
 		die('Fehler bei Datenbankzugriff');
-	//$tags_array = array_unique($tags_array);
-	//var_dump($tags_array);
-	//var_dump($kst_tags);
-	echo '<table class="tablesorter" id="myTable">
+
+	echo '<H2>Bestellungen</H2>';
+	draw_tag_table($tags_array, $kst_tags,'bestellung');
+	
+	//Tabelle auf Basis der Rechnungen
+	$kst_tags=array();
+	$tags_array=array();
+	$qry = "SELECT 
+				(betrag*(100+mwst)/100) as brutto, tbl_bestellung.bestellung_id, 
+				tbl_bestellung.kostenstelle_id
+			FROM 
+				wawi.tbl_bestellung 
+				JOIN wawi.tbl_rechnung USING(bestellung_id)
+				JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
+			WHERE
+				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
+				AND EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
+				AND tbl_rechnung.freigegeben
+			";
+	
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			//Bestelldetailtags laden
+			$tags = new tags();
+			$tags->GetTagsByBestellung($row->bestellung_id);
+			
+			foreach($tags->result as $tag)
+			{
+				if(!isset($tags_array[$tag->tag]))
+					$tags_array[$tag->tag]=0;
+				if(isset($kst_tags[$row->kostenstelle_id]) && isset($kst_tags[$row->kostenstelle_id][$tag->tag]))
+					$kst_tags[$row->kostenstelle_id][$tag->tag]+=$row->brutto;
+				else
+					$kst_tags[$row->kostenstelle_id][$tag->tag]=$row->brutto;
+				
+			}
+		}
+	}
+	else
+		die('Fehler bei Datenbankzugriff');
+	
+	echo '<H2>Rechnungen</H2>';
+	draw_tag_table($tags_array, $kst_tags,'rechnung');
+}
+else
+{
+	$kostenstelle = new wawi_kostenstelle();
+	$kostenstelle->loadArray($kst_array);
+	echo 'Bitte markieren sie die Kostenstellen die auf der Auswertung aufscheinen sollen:<br /><br />
+	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+		<table>
+		
+		<tbody>';
+	$anzahl=0;
+	$gesamt = count($kst_array);
+	echo '<td valign="top"><table>';
+	foreach($kostenstelle->result as $kst)
+	{
+		if($anzahl%(($gesamt/3)+1)==0)
+		{
+			echo '</table></td><td valign="top"><table>';
+		}
+		echo '<tr>
+				<td><input type="checkbox" name="kst[]" value="'.$kst->kostenstelle_id.'"></td>
+				<td nowrap>'.$kst->bezeichnung.'</td>
+			</tr>';
+		$anzahl++;
+	}
+	echo '</table></td>';
+	
+	echo '</tbody>
+	<tfoot>
+		<tr>
+			<td><input type="checkbox" name="allemarkieren" onclick="alleMarkieren(this.checked)"></td>
+			<td>Alle markieren</td>
+		</tr>
+	</tfoot>
+	</table>
+	<br />
+	Geschäftsjahr
+	<SELECT name="geschaeftsjahr" >';
+	$gj = new geschaeftsjahr();
+	$geschaeftsjahr = $gj->getakt();
+	
+	$gj->getAll();
+
+	foreach ($gj->result as $gjahr)
+	{
+		if($gjahr->geschaeftsjahr_kurzbz==$geschaeftsjahr)
+			$selected='selected';
+		else 
+			$selected='';
+		echo '<option value="'.$gjahr->geschaeftsjahr_kurzbz.'" '.$selected.'>'.$gjahr->geschaeftsjahr_kurzbz.'</option>';				
+	}
+	echo '
+	</SELECT>
+	<br />
+	<br />
+	<input type="submit" value="Anzeigen" name="show">
+	</form>';
+}
+?>
+<br /><br /><br /><br /><br /><br /><br /><br />
+</body>
+</html>
+<?php
+/**
+ * Zeichnet eine Tabelle mit Kostenstellen und Tags
+ * @param $tags_array Array mit allen vorkommenden Tags
+ * @param $kst_tags 2 Dimensionales Array mit Kostenstellen, Tags und Bruttobetrag
+ */
+function draw_tag_table($tags_array, $kst_tags, $table_id)
+{
+	echo '
+	<script type="text/javascript">
+	$(document).ready(function() 
+	{
+		$("#'.$table_id.'").tablesorter(
+		{
+			sortList: [[0,0]],
+			widgets: [\'zebra\']
+		});
+ 	});
+ 	</script>
+	<table class="tablesorter" id="'.$table_id.'">
 		<thead>
 			<tr>
 				<th>Kostenstelle</th>';
@@ -204,71 +312,4 @@ if(isset($_POST['show']))
 		</tfoot>
 	</table>';
 }
-else
-{
-	$kostenstelle = new wawi_kostenstelle();
-	$kostenstelle->loadArray($kst_array);
-	echo 'Bitte markieren sie die Kostenstellen die auf der Auswertung aufscheinen sollen:<br /><br />
-	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
-		<table>
-		
-		<tbody>';
-	$anzahl=0;
-	$gesamt = count($kst_array);
-	echo '<td valign="top"><table>';
-	foreach($kostenstelle->result as $kst)
-	{
-		if($anzahl%(($gesamt/3)+1)==0)
-		{
-			echo '</table></td><td valign="top"><table>';
-		}
-		echo '<tr>
-				<td><input type="checkbox" name="kst[]" value="'.$kst->kostenstelle_id.'"></td>
-				<td nowrap>'.$kst->bezeichnung.'</td>
-			</tr>';
-		$anzahl++;
-	}
-	echo '</table></td>';
-	
-	echo '</tbody>
-	<tfoot>
-		<tr>
-			<td><input type="checkbox" name="allemarkieren" onclick="alleMarkieren(this.checked)"></td>
-			<td>Alle markieren</td>
-		</tr>
-	</tfoot>
-	</table>
-	<br />
-	Studienjahr
-	<SELECT name="studiensemester" >';
-	$studsem = new studiensemester();
-	$ws = $studsem->getaktorNext(1);
-	
-	$studsem->getAll();
-
-	foreach ($studsem->studiensemester as $stsemester)
-	{
-		if($stsemester->studiensemester_kurzbz==$ws)
-			$selected='selected';
-		else 
-			$selected='';
-		if(substr($stsemester->studiensemester_kurzbz, 0, 2)=='WS')
-		{
-			$stsem_obj = new studiensemester();
-			$ss1 = $stsem_obj->getNextFrom($stsemester->studiensemester_kurzbz);
-			$ws1 = $stsemester->studiensemester_kurzbz;
-			echo '<option value="'.$stsemester->studiensemester_kurzbz.'" '.$selected.'>'.$ws1.'/'.$ss1.'</option>';			
-		}
-		
-	}
-	echo '
-	</SELECT>
-	<br />
-	<br />
-	<input type="submit" value="Anzeigen" name="show">
-	</form>';
-}
 ?>
-<br /><br /><br /><br /><br /><br /><br /><br />
-</body>
-</html>
