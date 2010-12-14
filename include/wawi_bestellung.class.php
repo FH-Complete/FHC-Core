@@ -465,7 +465,7 @@ class wawi_bestellung extends basis_db
 		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT nextval('wawi.seq_bestellung_bestellung_id'), besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, 
 		rechnungsadresse, freigegeben, currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
-		echo $qry_bestellung;
+		//echo $qry_bestellung;
 		if(!$this->db_query($qry_bestellung))
 			$error = true; 
 				
@@ -538,13 +538,13 @@ class wawi_bestellung extends basis_db
 			
 		if(!$error)
 		{
-			echo "Erfolgreich kopiert."; 
 			$this->db_query('COMMIT');
+			return $newBestellung_id; 
 		}
 		else
 		{
-			echo "Fehler beim kopieren aufgetreten."; 
 			$this->db_query('ROLLBACK');
+			return false; 
 		}
 	}
 
