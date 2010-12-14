@@ -154,6 +154,42 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 	}
 }
 
+if(isset($_POST['deleteDetail']) && isset($_POST['id']))
+{
+	if(is_numeric($_POST['id']))
+	{
+		$detail = new wawi_bestelldetail(); 
+		$detail->delete($_POST['id']); 
+		exit;
+	}
+	else
+	{
+		die('ID ungueltig');
+	}
+}
+
+if(isset($_POST['saveDetail']))
+{
+		$detail = new wawi_bestelldetail(); 
+		$detail->bestellung_id = $_POST['bestellung']; 
+		$detail->position = $_POST['pos'];
+		$detail->menge = $_POST['menge']; 
+		$detail->verpackungseinheit = $_POST['ve']; 
+		$detail->beschreibung = $_POST['beschreibung']; 
+		$detail->artikelnummer = $_POST['artikelnr']; 
+		$detail->preisprove = $_POST['preis']; 
+		$detail->mwst = $_POST['mwst']; 
+		$detail->insertamum = date('Y-m-d H:i:s'); 
+		$detail->updateamum = date('Y-m-d H:i:s'); 
+		$detail->new = true; 
+		if(!$detail->save())
+			echo $detail->errormsg;
+		echo $detail->bestelldetail_id;  
+		exit;
+}
+
+
+
 if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 {
 	$date = new datum(); 
@@ -601,8 +637,9 @@ if($aktion == 'suche')
 			}
 			else 
 			{
-				echo "Bestellung mit der ID ".$bestell_id." erfolgreich angelegt. ";
-				echo "<a href = bestellung.php?method=update&id=".$bestell_id."&new=true> Link drücken </a>zum editieren der Bestellung";  
+				echo "Bestellung erfolgreich angelegt. "; 
+				$_GET['method']= 'update';
+				$_GET['id'] = $bestell_id; 
 			}
 		}
 	} 
@@ -623,18 +660,30 @@ if($aktion == 'suche')
 			echo $bestellung->errormsg; 
 		}
 	}
+	else if($_GET['method']=='deletedetail')
+	{
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
+			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
+		
+		// Bestellung löschen
+		$id = (isset($_GET['id'])?$_GET['id']:null);
+		$detail = new wawi_bestelldetail(); 
+		$detail->delete($id); 
+		
+	}
 	else if($_GET['method']=='copy')
 	{ 
 		$bestellung_id = $_GET['id'];
 		$bestellung = new wawi_bestellung(); 
-		if ($bestellung->copyBestellung($bestellung_id))
+		if ($bestellung_neu = $bestellung->copyBestellung($bestellung_id))
 		{
-			echo $bestellung_id;
+			//header ("Location: bestellung.php?method=update&id=$bestellung_neu");
+			$_GET['method']='update';
+			$_GET['id']=$bestellung_neu;
 		}
-		 
-		
-	}
-	else if($_GET['method']=='update')
+
+	}	
+	if($_GET['method']=='update')
 	{ 
 		// Bestellung Editieren	
 		if(!isset($_GET['bestellung']))
@@ -666,7 +715,6 @@ if($aktion == 'suche')
 			{
 				$aufteilung->getAufteilungFromBestellung($bestellung->bestellung_id);
 			}
-			
 			
 			$firma = new firma(); 
 			$firma->load($bestellung->firma_id);  
@@ -817,7 +865,7 @@ if($aktion == 'suche')
 			//tabelle Details
 			echo "<table border =0 width='70%'>\n";
 			echo "<tr>\n";
-			echo "<th>Löschen</th>\n";
+			echo "<th></th>\n";
 			echo "<th>Pos</th>\n";
 			echo "<th>Menge</th>\n";
 			echo "<th>VE</th>\n";
@@ -838,6 +886,9 @@ if($aktion == 'suche')
 				$i++; 
 			}
 			getDetailRow($i);
+			
+
+			
 			$test = $i; 
 			echo "</tbody>";
 			echo "<tfoot><tr>"; 
@@ -858,6 +909,7 @@ if($aktion == 'suche')
 			<script type="text/javascript">
 			
 			var anzahlRows='.$i.';
+			var bestellung_id ='.$bestellung->bestellung_id.';
 			var uid = "'.$user.'";
 	
 			 $("#tags_link").click(function() {
@@ -978,6 +1030,7 @@ if($aktion == 'suche')
 					$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
 							function(data){
 								$("#detailTable").append(data);
+								saveDetail(anzahlRows);
 								anzahlRows=anzahlRows+1;
 								var test = 0; 
 								test = document.getElementById("detail_anz").value;
@@ -987,6 +1040,31 @@ if($aktion == 'suche')
 	
 			}
 			
+			function saveDetail(i )
+			{
+			var pos = $("#pos_"+i).val(); 
+			var menge =  $("#menge_"+i).val();
+			var ve =  $("#ve_"+i).val(); 
+			var beschreibung =  $("#beschreibung_"+i).val(); 
+			var artikelnr =  $("#artikelnr_"+i).val(); 
+			var preis =  $("#preisprove_"+i).val(); 
+			var mwst =  $("#mwst_"+i).val(); 
+			var brutto =  $("#brutto_"+i).val(); 
+			$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, saveDetail: "true"},
+				function(data){
+					alert(data);
+				});  
+			}
+			
+			// löscht einen Bestelldetaileintrag
+			function removeDetail(i, bestelldetail_id)
+			{
+				$("#row_"+i).remove();
+				$.post("bestellung.php", {id: bestelldetail_id, deleteDetail: "true"},
+				function(data){
+				}); 
+			}
+		
 			</script>';
 			
 			$disabled ='';
@@ -1232,6 +1310,8 @@ if($aktion == 'suche')
 			if($bestellung_new->save())
 			{
 				echo "erfolgreich gespeichert. <br><br>";
+				$_GET['method']= 'update';
+				$_GET['id']= $bestellung_id; 
 			}
 			echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";		
 		}
@@ -1240,7 +1320,7 @@ if($aktion == 'suche')
 	function getDetailRow($i, $bestelldetail_id='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
 	{
 		echo "<tr id ='row_$i'>\n";
-		echo "<td><a>delete</a></td>\n";
+		echo "<td><a onClick='removeDetail($i, $bestelldetail_id)' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_x.png\"> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
