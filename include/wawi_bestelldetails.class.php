@@ -302,7 +302,7 @@ class wawi_bestelldetail extends basis_db
 		}
 		$qry = "SELECT * from wawi.tbl_bestelldetail as detail
 				where
-				detail.bestellung_id = ".$bestell_id.";";
+				detail.bestellung_id = ".$bestell_id." order by position;";
 		
 		if($this->db_query($qry))
 		{
