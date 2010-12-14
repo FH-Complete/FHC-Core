@@ -173,13 +173,18 @@ class wawi_bestellstatus extends basis_db
 	
 	/**
 	 * 
-	 * Setzt den Status einer Bestellung auf Bestellt
+	 * Speichert den Status in die Datenbank
 	 */
-	public function setBestellung()
-	{	
+	public function save()
+	{
+		if(!is_numeric($this->bestellung_id))
+		{
+			return false; 
+		}
+		
 		$qry = "INSERT INTO wawi.tbl_bestellung_bestellstatus (bestellung_id, bestellstatus_kurzbz, uid, oe_kurzbz, datum, insertvon, insertamum, updatevon, updateamum)
 		VALUES
-		(".($this->bestellung_id).", 'Bestellung',".$this->addslashes($this->uid).", ".$this->addslashes($this->oe_kurzbz).", '".($this->datum)."',
+		(".($this->bestellung_id).", ".$this->addslashes($this->bestellstatus_kurzbz).", ".$this->addslashes($this->uid).", ".$this->addslashes($this->oe_kurzbz).", '".($this->datum)."',
 		 ".$this->addslashes($this->insertvon).", ".$this->addslashes($this->insertamum).", ".$this->addslashes($this->updatevon).", ".$this->addslashes($this->updateamum).");";
 		
 		if(!$this->db_query($qry))
@@ -193,21 +198,42 @@ class wawi_bestellstatus extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Gibt das Bestelldetail einer Bestellung zur übergebenen BestellungID zurück
+	 * @param $bestellung_id
 	 */
-	public function setStorno()
+	public function getBestelltFromBestellung($bestellung_id)
 	{
-		$qry = "INSERT INTO wawi.tbl_bestellung_bestellstatus (bestellung_id, bestellstatus_kurzbz, uid, oe_kurzbz, datum, insertvon, insertamum, updatevon, updateamum)
-		VALUES
-		(".($this->bestellung_id).", 'Storno',".$this->addslashes($this->uid).", ".$this->addslashes($this->oe_kurzbz).", '".($this->datum)."',
-		 ".$this->addslashes($this->insertvon).", ".$this->addslashes($this->insertamum).", ".$this->addslashes($this->updatevon).", ".$this->addslashes($this->updateamum).");";
-		
-		if(!$this->db_query($qry))
+		if(!is_numeric($bestellung_id) || $bestellung_id == '')
 		{
-			$this->errormsg ="Fehler bei der Abfrage aufgetreten."; 
+			$this->errormsg = "Bestellung ID fehlerhaft."; 
 			return false; 
 		}
-
-		return true; 
+		
+		$qry ="select * from wawi.tbl_bestellung_bestellstatus where bestellstatus_kurzbz = 'Bestellung' and bestellung_id = '".$bestellung_id."';"; 
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->bestellung_bestellstatus_id = $row->bestellung_bestellstatus_id; 
+				$this->bestellung_id = $row->bestellung_id; 
+				$this->bestellstatus_kurzbz = $row->bestellstatus_kurzbz; 
+				$this->uid = $row->uid; 
+				$this->oe_kurzbz= $row->oe_kurzbz; 
+				$this->datum = $row->datum; 
+				$this->insertvon = $row->insertvon; 
+				$this->insertamum = $row->insertamum; 
+				$this->updatevon = $row->updatevon; 
+				$this->updateamum = $row->updateamum; 
+				
+				return true; 
+			}
+			else
+			{
+				return false; 
+			}
+		}
+		else
+			return false; 
 	}
 }

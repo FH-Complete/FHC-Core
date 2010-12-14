@@ -455,6 +455,11 @@ class wawi_bestellung extends basis_db
 		}
 	}
 	
+	/**
+	 * 
+	 * Kopiert eine bestehende Bestellung 
+	 * @param $bestellung_id
+	 */
 	function copyBestellung($bestellung_id)
 	{
 		$error = false; 
@@ -546,6 +551,31 @@ class wawi_bestellung extends basis_db
 			$this->db_query('ROLLBACK');
 			return false; 
 		}
+	}
+	
+	/**
+	 * 
+	 * Liefert die oe_kurzbz einer bestellung zurück. JOIN über Kostenstelle
+	 */
+	public function getOe()
+	{
+		$qry = "select kostenstelle.oe_kurzbz 
+		from wawi.tbl_kostenstelle as kostenstelle, wawi.tbl_bestellung as bestellung 
+		where bestellung.kostenstelle_id = kostenstelle.kostenstelle_id and bestellung.bestellung_id = ".$this->bestellung_id.";"; 
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->oe_kurzbz; 
+			}
+			else
+			{
+				return false; 
+			}
+		}
+		else 
+		return false; 
 	}
 
 }
