@@ -68,6 +68,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 require_once('../../../include/reservierung.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/ort.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -186,6 +187,10 @@ else if (isset($_GET['reserve']))
 // Reservieren
 if (isset($reserve) && $raumres)
 {
+	$ort_obj = new ort();
+	if(!$ort_obj->load($ort_kurzbz))
+		die('Dieser Ort existiert nicht');
+	
 	if(!$erg_std=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
 		die($db->db_last_error());
