@@ -1730,6 +1730,43 @@ if(!@$db->db_query("SELECT content FROM public.tbl_sprache LIMIT 1"))
 		echo ' public.tbl_sprache: Spalte content hinzugefuegt!<br>';
 }
 
+// tbl_geschaeftsjahr hinzufuegen
+if(!@$db->db_query("SELECT 1 FROM public.tbl_geschaeftsjahr LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE public.tbl_geschaeftsjahr
+	(
+		geschaeftsjahr_kurzbz varchar(32) NOT NULL,
+		start date,
+		ende date,
+		bezeichnung varchar(256)
+	);
+	ALTER TABLE public.tbl_geschaeftsjahr ADD CONSTRAINT pk_tbl_geschaeftsjahr PRIMARY KEY (geschaeftsjahr_kurzbz);
+	
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2003-2004','2003-09-01','2004-08-31','Geschäftsjahr 2003-2004');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2004-2005','2004-09-01','2005-08-31','Geschäftsjahr 2004-2005');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2005-2006','2005-09-01','2006-08-31','Geschäftsjahr 2005-2006');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2006-2007','2006-09-01','2007-08-31','Geschäftsjahr 2006-2007');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2007-2008','2007-09-01','2008-08-31','Geschäftsjahr 2007-2008');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2008-2009','2008-09-01','2009-08-31','Geschäftsjahr 2008-2009');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2009-2010','2009-09-01','2010-08-31','Geschäftsjahr 2009-2010');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2010-2011','2010-09-01','2011-08-31','Geschäftsjahr 2010-2011');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2011-2012','2011-09-01','2012-08-31','Geschäftsjahr 2011-2012');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2012-2013','2012-09-01','2013-08-31','Geschäftsjahr 2012-2013');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2013-2014','2013-09-01','2014-08-31','Geschäftsjahr 2013-2014');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2014-2015','2014-09-01','2015-08-31','Geschäftsjahr 2014-2015');
+	
+	GRANT SELECT ON public.tbl_geschaeftsjahr TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_geschaeftsjahr TO vilesci;
+	GRANT SELECT ON public.tbl_geschaeftsjahr TO wawi;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_geschaeftsjahr: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_geschaeftsjahr hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -1834,6 +1871,7 @@ $tabellen=array(
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
+	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
@@ -1899,7 +1937,7 @@ $tabellen=array(
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),
-	"wawi.tbl_rechnungstyp"  => array("rechnungstyp_kurzbz","beschreibung"),
+	"wawi.tbl_rechnungstyp"  => array("rechnungstyp_kurzbz","beschreibung","berechtigung_kurzbz","ext_id"),
 	"wawi.tbl_rechnung"  => array("rechnung_id","bestellung_id","buchungsdatum","rechnungsnr","rechnungsdatum","transfer_datum","buchungstext","insertamum","insertvon","updateamum","updatevon","rechnungstyp_kurzbz","freigegeben","freigegebenvon","freigegebenamum"),
 	"wawi.tbl_rechnungsbetrag"  => array("rechnungsbetrag_id","rechnung_id","mwst","betrag","bezeichnung"),
 	"wawi.tbl_aufteilung"  => array("aufteilung_id","bestellung_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
