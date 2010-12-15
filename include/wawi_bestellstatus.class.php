@@ -149,11 +149,10 @@ class wawi_bestellstatus extends basis_db
 			$this->errormsg = "Status Kurzbezeichnung ist fehlerhaft."; 
 			return false; 
 		}
-		
+	
 		$qry = "select bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus
 		where 
 		bestellung_id = ".$this->addslashes($bestellung_id)." and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz).";";
-		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -201,7 +200,7 @@ class wawi_bestellstatus extends basis_db
 	 * Gibt das Bestelldetail einer Bestellung zur übergebenen BestellungID zurück
 	 * @param $bestellung_id
 	 */
-	public function getBestelltFromBestellung($bestellung_id)
+	public function getStatiFromBestellung($status, $bestellung_id)
 	{
 		if(!is_numeric($bestellung_id) || $bestellung_id == '')
 		{
@@ -209,12 +208,12 @@ class wawi_bestellstatus extends basis_db
 			return false; 
 		}
 		
-		$qry ="select * from wawi.tbl_bestellung_bestellstatus where bestellstatus_kurzbz = 'Bestellung' and bestellung_id = '".$bestellung_id."';"; 
-		
+		$qry ="select * from wawi.tbl_bestellung_bestellstatus where bestellstatus_kurzbz = ".$this->addslashes($status)." and bestellung_id = ".$this->addslashes($bestellung_id).";"; 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
+
 				$this->bestellung_bestellstatus_id = $row->bestellung_bestellstatus_id; 
 				$this->bestellung_id = $row->bestellung_id; 
 				$this->bestellstatus_kurzbz = $row->bestellstatus_kurzbz; 
@@ -227,10 +226,6 @@ class wawi_bestellstatus extends basis_db
 				$this->updateamum = $row->updateamum; 
 				
 				return true; 
-			}
-			else
-			{
-				return false; 
 			}
 		}
 		else

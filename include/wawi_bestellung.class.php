@@ -468,7 +468,7 @@ class wawi_bestellung extends basis_db
 		// Bestellung kopieren
 		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
 		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT nextval('wawi.seq_bestellung_bestellung_id'), besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, freigegeben, currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
+		rechnungsadresse, freigegeben, currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, now(), updatevon, now(), insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
 		//echo $qry_bestellung;
 		if(!$this->db_query($qry_bestellung))
@@ -494,7 +494,7 @@ class wawi_bestellung extends basis_db
 		{
 			$qry_detail ="INSERT INTO wawi.tbl_bestelldetail (bestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
 			text, insertamum, insertvon, updateamum, updatevon) SELECT $newBestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
-			text, insertamum, insertvon, updateamum, updatevon FROM wawi.tbl_bestelldetail 
+			text, now(), insertvon, now(), updatevon FROM wawi.tbl_bestelldetail 
 			WHERE bestelldetail_id = ".$detail->bestelldetail_id.";"; 
 			if (!$this->db_query($qry_detail))
 				$error = true; 
