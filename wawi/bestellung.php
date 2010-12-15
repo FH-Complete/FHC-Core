@@ -876,10 +876,24 @@ if($aktion == 'suche')
 			echo "</td>\n"; 
 			echo "<td>Freigabe:</td>\n";
 			echo "<td colspan =2>";
-
-			$rechte->getBerechtigungen($user); 
-			if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
-				echo "<input type='button' value='KST Freigabe'>"; 
+			
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Freigabe'))
+			{	
+				echo "Freigegeben von KST"; 
+			}
+			else 
+			{
+				$rechte->getBerechtigungen($user); 
+				$disabled = '';
+				if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
+				{	
+					if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
+						$disabled = 'disabled';
+					echo "<input type='submit' value='KST Freigabe' name ='btn_freigabe_kst' $disabled>"; 
+				}
+			}
+			
+			
 			echo "</td></tr>";
 			echo "</table>\n";
 			echo "<br>";
@@ -1200,7 +1214,7 @@ if($aktion == 'suche')
 			$bestellung_new->load($bestellung_id);
 			$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
 				
-			if(isset($_POST['btn_abschicken']) || isset($_POST['btn_submit']))
+			if(isset($_POST['btn_abschicken']) || isset($_POST['btn_submit']) || isset($_POST['btn_freigabe_kst']))
 			{
 				$aufteilung_anzahl = $_POST['anz_aufteilung'];
 				$bestellung_detail_anz = $_POST['detail_anz'];
@@ -1389,6 +1403,29 @@ if($aktion == 'suche')
 							echo '<br> Mail verschickt!';
 					}
 				}
+			}
+			if(isset($_POST['btn_freigabe_kst']) )
+			{
+				// Freigabestatus für Kostenstelle
+				$bestellung_new->load($bestellung_id); 
+				$status = new wawi_bestellstatus(); 
+				$status->bestellung_id = $bestellung_new->bestellung_id; 
+				$status->bestellstatus_kurzbz = 'Freigabe';
+				$status->uid = $user; 
+				$status->oe_kurzbz = '';
+				$status->datum = date('Y-m-d H:i:s');
+				$status->insertvon = $user; 
+				$status->insertamum = date('Y-m-d H:i:s');
+				$status->updateamum = date('Y-m-d H:i:s'); 
+				$status->updatevon = $user; 
+				
+				if(!$status->save())
+				{
+					echo "Fehler beim Setzen auf Status Freigabe."; 
+				}
+				
+				$bestellung_brutto = $bestellung_new->getBrutto($bestellung_new->bestellung_id); 
+				echo $bestellung_brutto; 
 			}
 		}
 	}
