@@ -1042,7 +1042,7 @@ class moodle_course extends basis_db
 			return false;
 		}
 
-
+		/*
 		$qry = "DELETE FROM public.mdl_context where contextlevel='50' and instanceid=".$this->addslashes($this->mdl_course_id)." ;";
 		if(!pg_query($this->conn_moodle, $qry))
 		{
@@ -1050,43 +1050,71 @@ class moodle_course extends basis_db
 				$this->errormsg = 'Fehler beim Entfernen des Context eintrages.  '. pg_last_error();
 				return false;
 		}		
-				
+		*/		
 		//zum vorherigen Pfad die aktuelle id hinzufuegen
-		$path = "(SELECT '$this->mdl_context_path' || '/' || ".$this->mdl_course_id.")";
+		$path = $this->mdl_context_path.'/'.$this->mdl_course_id;
 		//vorherige tiefe um 1 erhoehen
 		$depth = $this->mdl_context_depth+1;
-		
-		//Context eintragen
-		$qry = "INSERT INTO public.mdl_context(contextlevel, instanceid, path, depth) VALUES('50', ".
-		$this->addslashes($this->mdl_course_id).",".$path.",".$this->addslashes($depth).");";
-		if(pg_query($this->conn_moodle, $qry))
+	
+		$update=false;
+		$qry = "SELECT id FROM public.mdl_context WHERE contextlevel='50' and instanceid=".$this->addslashes($this->mdl_course_id)." ;";
+		if($result = pg_query($this->conn_moodle, $qry))
 		{
-			$qry = "SELECT currval('mdl_context_id_seq') as id";
-			if($result = pg_query($this->conn_moodle, $qry))
+			if($row = pg_fetch_object($result))
 			{
-				if($row = pg_fetch_object($result))
+				$this->mdl_context_id = $row->id;
+				$update=true;
+			}
+		}
+		if($update)
+		{
+			$qry = "UPDATE public.mdl_context SET 
+				contextlevel=50,
+				instanceid=".$this->addslashes($this->mdl_course_id).",
+				path=".$this->addslashes($path).",
+				depth=".$this->addslashes($depth)."
+				WHERE id='".addslashes($this->mdl_context_id)."';";
+			if(!pg_query($this->conn_moodle, $qry))
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Update des Contexts';
+				return false;
+			} 
+		}
+		else
+		{
+			//Context eintragen
+			$qry = "INSERT INTO public.mdl_context(contextlevel, instanceid, path, depth) VALUES('50', ".
+			$this->addslashes($this->mdl_course_id).",'".$this->addslashes($path)."',".$this->addslashes($depth).");";
+			if(pg_query($this->conn_moodle, $qry))
+			{
+				$qry = "SELECT currval('mdl_context_id_seq') as id";
+				if($result = pg_query($this->conn_moodle, $qry))
 				{
-					$this->mdl_context_id = $row->id;
+					if($row = pg_fetch_object($result))
+					{
+						$this->mdl_context_id = $row->id;
+					}
+					else 
+					{
+						pg_query($this->conn_moodle, 'ROLLBACK');
+						$this->errormsg = 'Fehler beim Auslesen der Sequence ::'. pg_last_error($result).' '. pg_last_error();
+						return false;
+					}
 				}
 				else 
-				{
+				{	
 					pg_query($this->conn_moodle, 'ROLLBACK');
-					$this->errormsg = 'Fehler beim Auslesen der Sequence ::'. pg_last_error($result).' '. pg_last_error();
+					$this->errormsg = 'Fehler beim Select der Sequence :'. pg_last_error();
 					return false;
 				}
 			}
 			else 
-			{	
+			{
 				pg_query($this->conn_moodle, 'ROLLBACK');
-				$this->errormsg = 'Fehler beim Select der Sequence :'. pg_last_error();
+				$this->errormsg = 'Fehler beim INSERT';
 				return false;
 			}
-		}
-		else 
-		{
-			pg_query($this->conn_moodle, 'ROLLBACK');
-			$this->errormsg = 'Fehler beim INSERT';
-			return false;
 		}
 				
 		
