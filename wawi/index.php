@@ -25,6 +25,21 @@ require_once('auth.php');
 $menu = isset($_GET['menu'])?$_GET['menu']:'menu.php';
 $content = isset($_GET['content'])?$_GET['content']:'home.php';
 
+//Vorhandene Parameter an Content dazuhaengen
+$first=true;
+foreach($_GET as $name=>$param)
+{
+	if($name!='menu' && $name!='content')
+	{
+		if($first)
+		{
+			$content.="?$name=$param";
+			$first=false;
+		}
+		else
+			$content.="&$name=$param";
+	}
+}
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
