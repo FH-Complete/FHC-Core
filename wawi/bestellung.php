@@ -30,6 +30,7 @@ require_once '../include/benutzerberechtigung.class.php';
 require_once '../include/standort.class.php';
 require_once '../include/adresse.class.php';
 require_once '../include/studiengang.class.php';
+require_once '../include/mail.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
@@ -679,7 +680,7 @@ if($aktion == 'suche')
 	{ 
 		$bestellung_id = $_GET['id'];
 		$bestellung = new wawi_bestellung(); 
-		if ($bestellung_neu = $bestellung->copyBestellung($bestellung_id))
+		if ($bestellung_neu = $bestellung->copyBestellung($bestellung_id, $user))
 		{
 			//header ("Location: bestellung.php?method=update&id=$bestellung_neu");
 			$_GET['method']='update';
@@ -753,20 +754,22 @@ if($aktion == 'suche')
 			echo "<td>Titel: </td>\n";
 			echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
 			echo "<td>Erstellt am:</td>\n"; 
-			echo "<td><p name='erstellt' title ='".$bestellung->insertvon."' >".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</p></td>\n";
+			echo "<td colspan ='2'><span name='erstellt' title ='".$bestellung->insertvon."' >".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</span></td>\n";
+			echo "<td></td>"; 
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Firma: </td>\n";
 			echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
 			echo "<input type='text' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
 			echo "<td>Liefertermin:</td>\n"; 
-			echo "<td><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
+			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
+			echo "<td></td>"; 
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Kostenstelle: </td>\n";
 			echo "<td><input type='text' name='kostenstelle_id' id='kostenstelle_id' value='$kostenstelle->bezeichnung' disabled size ='60'></input></td>\n";
 			echo "<td>Lieferadresse:</td>\n"; 
-			echo "<td><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
+			echo "<td colspan ='2'><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
 			
 			$select_help = false; 
 			foreach($allStandorte->result as $standorte)
@@ -784,7 +787,7 @@ if($aktion == 'suche')
 				echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 			}		
 			
-			echo "</td></tr>\n"; 
+			echo "</td><td></td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Konto: </td>\n";
 			echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
@@ -805,7 +808,7 @@ if($aktion == 'suche')
 				echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
 			}
 			echo "</td><td>Rechnungsadresse:</td>\n"; 
-			echo "<td><Select name='filter_rechnungsadresse' id='filter_rechnungsadresse' style='width: 400px;'>\n";
+			echo "<td colspan ='2'><Select name='filter_rechnungsadresse' id='filter_rechnungsadresse' style='width: 400px;'>\n";
 			foreach($allStandorte->result as $standorte)
 			{
 				$selected ='';
@@ -817,12 +820,12 @@ if($aktion == 'suche')
 					
 				echo "<option value='".$standort_rechnungsadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_rechnungsadresse->strasse.', '.$standort_rechnungsadresse->plz.' '.$standort_rechnungsadresse->ort."</option>\n";
 			}		
-			echo "</td></tr>\n"; 
+			echo "</td><td></td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Bemerkungen: </td>\n";
 			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
-			echo "<td>Bestellt:</td>\n"; 
-			echo "<td>\n";
+			echo "<td>Status:</td>\n"; 
+			echo "<td width ='200px'>\n";
 	
 			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
 			{
@@ -833,12 +836,24 @@ if($aktion == 'suche')
 			else
 			{
 				$status_help = new wawi_bestellstatus(); 
-				$status_help->getBestelltFromBestellung($bestellung->bestellung_id); 
-				echo '<p title ="'.$status_help->insertvon.'">Bestellt am: '.$date->formatDatum($status->datum,'d.m.Y').'</p>'; 
+				$status_help->getStatiFromBestellung('Bestellung', $bestellung->bestellung_id); 
+				echo '<span title ="'.$status_help->insertvon.'">Bestellt am: '.$date->formatDatum($status->datum,'d.m.Y').'</span>'; 
 			}
-			
-			echo "</td>\n";
-			echo "</tr>\n"; 
+			echo "</td><td>\n";		
+			$disabled='';
+			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
+			{
+				if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
+				$disabled = 'disabled';
+				echo "<span id='btn_storniert'>";
+				echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
+				echo "</span>";
+			}
+			else 
+			{
+				echo "<span>Storniert am: ".$date->formatDatum($status->datum, 'd.m.Y')."</span>";
+			}
+			echo"</td></tr>\n"; 
 			echo "<tr>\n";
 			echo"<td>Tags:</td>\n"; 
 			$bestell_tag->GetTagsByBestellung($bestellung->bestellung_id);
@@ -859,21 +874,12 @@ if($aktion == 'suche')
 					</script>';
 		
 			echo "</td>\n"; 
-			echo "<td>Storniert:</td>\n";
-			echo "<td>";
-			$disabled='';
-			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
-			{
-				if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
-				$disabled = 'disabled';
-				echo "<span id='btn_storniert'>";
-				echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
-				echo "</span>";
-			}
-			else 
-			{
-				echo "Storniert am: ".$date->formatDatum($status->datum, 'd.m.Y');
-			}
+			echo "<td>Freigabe:</td>\n";
+			echo "<td colspan =2>";
+
+			$rechte->getBerechtigungen($user); 
+			if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
+				echo "<input type='button' value='KST Freigabe'>"; 
 			echo "</td></tr>";
 			echo "</table>\n";
 			echo "<br>";
@@ -902,8 +908,6 @@ if($aktion == 'suche')
 				$i++; 
 			}
 			getDetailRow($i);
-			
-
 			
 			$test = $i; 
 			echo "</tbody>";
@@ -1046,7 +1050,7 @@ if($aktion == 'suche')
 					$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
 							function(data){
 								$("#detailTable").append(data);
-								saveDetail(anzahlRows);
+								//saveDetail(anzahlRows);
 								anzahlRows=anzahlRows+1;
 								var test = 0; 
 								test = document.getElementById("detail_anz").value;
@@ -1091,8 +1095,14 @@ if($aktion == 'suche')
 			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
 			echo "<br><br>"; 
-			
+
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
+			{
+				echo "Bestellung wurde am ".$date->formatDatum($status->datum,'d.m.Y')." abgeschickt."; 
+			}
+
 			// div Aufteilung --> kann ein und ausgeblendet werden
+			echo "<br>";
 			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
@@ -1348,6 +1358,8 @@ if($aktion == 'suche')
 				$status_abgeschickt = new wawi_bestellstatus(); 
 				if(!$status_abgeschickt->isStatiVorhanden($bestellung_id, 'Abgeschickt'))
 				{
+					$bestellung_new->load($bestellung_id); 
+										
 					$status_abgeschickt->bestellung_id = $bestellung_id; ; 
 					$status_abgeschickt->bestellstatus_kurzbz ='Abgeschickt'; 
 					$status_abgeschickt->uid = $user; 
@@ -1357,17 +1369,24 @@ if($aktion == 'suche')
 					$status_abgeschickt->insertamum = date('Y-m-d H:i:s'); 
 					$status_abgeschickt->updatevon = $user;
 					$status_abgeschickt->updateamum = date('Y-m-d H:i:s'); 
-					
-					$bestellung_new->load($bestellung_id); 
-					$bestellung_oe = $bestellung_new->getOe(); 
-					echo "bestellung ".$bestellung_oe; 
-					if($status_abgeschickt->save())
+
+					if(!$status_abgeschickt->save())
 					{
-						
-					} 
-					else 
+						echo "Fehler beim Setzen auf Status Abgeschickt.";
+					}
+					// wer ist freigabeberechtigt auf kostenstelle
+					$rechte = new benutzerberechtigung();
+					$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
+					foreach($uids as $uid)
 					{
-						
+						// E-Mail an Kostenstellenverantwortliche senden
+						$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+						$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+						$mail->setHTMLContent($msg); 
+						if(!$mail->send())
+							echo 'Fehler beim Senden des Mails';
+						else
+							echo '<br> Mail verschickt!';
 					}
 				}
 			}
