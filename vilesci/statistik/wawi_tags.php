@@ -84,7 +84,7 @@ if(isset($_POST['show']))
 		
 	$kst_tags=array();
 	$tags_array=array();
-	
+	$kstIN=$db->implode4SQL($_POST['kst']);
 	//Tabelle auf Basis der Bestellungen
 	$qry = "SELECT 
 				(menge*preisprove*(100+mwst)/100) as brutto, tbl_bestellung.bestellung_id, 
@@ -100,6 +100,7 @@ if(isset($_POST['show']))
 				OR
 				EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag WHERE bestelldetail_id=tbl_bestelldetail.bestelldetail_id)
 				) 
+				AND kostenstelle_id IN($kstIN)
 			";
 	
 	if($result = $db->db_query($qry))
@@ -148,6 +149,7 @@ if(isset($_POST['show']))
 				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
 				AND EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
 				AND tbl_rechnung.freigegeben
+				AND kostenstelle_id IN ($kstIN)
 			";
 	
 	if($result = $db->db_query($qry))

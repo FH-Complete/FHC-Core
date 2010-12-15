@@ -351,7 +351,7 @@ elseif($aktion == 'new')
 	echo '<h1>Rechnung Neu</h1>';
 	echo '<form action="rechnung.php" method="GET">';
 	echo '<input type="hidden" name="method" value="update"/>';
-	echo '<SELECT name="kostenstelle_id">';
+	echo 'Kostenstelle: <SELECT name="kostenstelle_id">';
 	$kostenstelle = new wawi_kostenstelle();
 	$kostenstelle->loadArray($rechte->getKostenstelle('wawi/rechnung'));
 	

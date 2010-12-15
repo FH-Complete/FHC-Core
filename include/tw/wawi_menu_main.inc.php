@@ -58,6 +58,14 @@ $menu=array
 		(
 			'name'=>'Personensuche', 'link'=>'https://cis.technikum-wien.at/cis/private/tools/psearch.php', 'target'=>'content',
 		)
+	),
+	'Auswertungen'=> 	array
+	(
+		'name'=>'Auswertungen', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
+		'Tags'=>array
+		(
+			'name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'../vilesci/statistik/wawi_tags.php', 'target'=>'content',
+		)
 	)
 	
 );
