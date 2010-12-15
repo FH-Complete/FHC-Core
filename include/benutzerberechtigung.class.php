@@ -878,5 +878,65 @@ class benutzerberechtigung extends basis_db
 		return $kostenstellen;
 	}
 
+	/**
+	 * Liefert die UID der Benutzer, die Freigabeberechtigt für eine bestimmte Kostenstelle oder
+	 * Organisationseinheit sind.
+	 * Es werden nur die Benutzer zurückgeliefert die genau auf diese Organisationseinheit das Freigaberecht haben
+	 * Uebergeordnete Benutzer werden nicht geliefert
+	 *  
+	 * @param $kostenstelle_id
+	 * @param $oe_kurzbz
+	 */
+	public function getFreigabeBenutzer($kostenstelle_id, $oe_kurzbz=null)
+	{
+		if($kostenstelle_id=='' && $oe_kurzbz=='')
+		{
+			$this->errormsg = 'Kostenstelle und Organisationseinheit darf nicht gleichzeitig leer sein';
+			return false;
+		}
+		
+		if($kostenstelle_id!='' && $oe_kurzbz!='')
+		{
+			$this->errormsg = 'Kostenstelle und Organisationseinheit darf nicht gleichzeitig gesetzt sein';
+			return false;
+		}
+		
+		$where = '';
+		if($kostenstelle_id!='')
+			$where.=" kostenstelle_id='".addslashes($kostenstelle_id)."'";
+		elseif($oe_kurzbz!='')
+			$where.=" oe_kurzbz='".addslashes($oe_kurzbz)."'";
+		$where .=" AND berechtigung_kurzbz='wawi/freigabe'";
+		$where .=" AND (start<=now() OR start is null) AND (ende>=now() OR ende is null)"; 
+
+		
+		$qry = "SELECT uid, negativ FROM system.tbl_benutzerrolle WHERE ".$where;			
+		$qry .= " UNION 
+			SELECT uid, negativ 
+			FROM 
+				system.tbl_benutzerrolle
+				JOIN system.tbl_rolle USING(rolle_kurzbz)
+				JOIN system.tbl_rolleberechtigung USING(berechtigung_kurzbz)
+			WHERE ".$where;
+		
+		$freigabebenutzer=array();
+		$not = array();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				if($row->negativ=='t')
+					$not[]=$row->uid;	
+				$freigabebenutzer[]=$row->uid;
+			}
+			
+			return array_diff($freigabebenutzer,$not);
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der FreigabeBenutzer';
+			return false;
+		}	 
+	}
 }
 ?>
