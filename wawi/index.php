@@ -31,9 +31,9 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>WaWi - Warenwirtschaft</title>
 </head>
-	<frameset cols="200,*">
-	  <frame src="'.$menu.'" name="menu" />
-	  <frame src="'.$content.'" name="content" />
+	<frameset cols="200,*" framespacing="1" border="1">
+	  <frame src="'.$menu.'" name="menu" frameborder="0"/>
+	  <frame src="'.$content.'" name="content" frameborder="0"/>
 	  <noframes>
 	    <body>
 	      <h1>Error</h1>
