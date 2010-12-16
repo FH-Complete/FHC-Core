@@ -151,7 +151,7 @@ class wawi_bestellstatus extends basis_db
 		}
 	
 		$qry = "select bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus
-		where 
+		WHERE 
 		bestellung_id = ".$this->addslashes($bestellung_id)." and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz).";";
 		if($this->db_query($qry))
 		{
@@ -200,7 +200,7 @@ class wawi_bestellstatus extends basis_db
 	 * Gibt das Bestelldetail einer Bestellung zur übergebenen BestellungID zurück
 	 * @param $bestellung_id
 	 */
-	public function getStatiFromBestellung($status, $bestellung_id)
+	public function getStatiFromBestellung($status, $bestellung_id, $oe_kurzbz ='')
 	{
 		if(!is_numeric($bestellung_id) || $bestellung_id == '')
 		{
@@ -208,7 +208,9 @@ class wawi_bestellstatus extends basis_db
 			return false; 
 		}
 		
-		$qry ="select * from wawi.tbl_bestellung_bestellstatus where bestellstatus_kurzbz = ".$this->addslashes($status)." and bestellung_id = ".$this->addslashes($bestellung_id).";"; 
+		$qry ="select * from wawi.tbl_bestellung_bestellstatus 
+		WHERE 
+		bestellstatus_kurzbz = ".$this->addslashes($status)." and bestellung_id = ".$this->addslashes($bestellung_id).";"; 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -231,4 +233,48 @@ class wawi_bestellstatus extends basis_db
 		else
 			return false; 
 	}
+	
+	/**
+	 * 
+	 * liefert die Freigaben zu Kostenstellen oder Organisationseinheiten zurück, true wenn es einen Eintrag gibt, false wenn nicht
+	 * wenn oe_kurzbz nicht mitangegeben wird, wird auf Kostenstelle Freigabe geprüft
+	 * @param $bestellung_id
+	 * @param $kostenstelle
+	 */
+	public function getFreigabeFromBestellung($bestellung_id, $oe_kurzbz='')
+	{
+		if($oe_kurzbz == '')
+			$oe = 'is '.$this->addslashes($oe_kurzbz);
+		else
+			$oe = '= '.$this->addslashes($oe_kurzbz); 
+		
+		$qry = "Select * FROM wawi.tbl_bestellung_bestellstatus 
+		WHERE 
+		bestellung_id = ".$this->addslashes($bestellung_id)." and oe_kurzbz ".$oe." and bestellstatus_kurzbz = 'Freigabe';";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->bestellung_bestellstatus_id = $row->bestellung_bestellstatus_id; 
+				$this->bestellung_id = $row->bestellung_id; 
+				$this->bestellstatus_kurzbz = $row->bestellstatus_kurzbz; 
+				$this->uid = $row->uid; 
+				$this->oe_kurzbz = $row->oe_kurzbz; 
+				$this->datum = $row->datum; 
+				$this->insertvon = $row->insertvon; 
+				$this->insertamum = $row->insertamum; 
+				$this->updatevon = $row->updatevon; 
+				$this->updateamum = $row->updateamum; 
+				
+				return true;
+			}
+			else
+				return false; 
+		}
+		else 
+			return false; 
+		
+	}
+	
 }
