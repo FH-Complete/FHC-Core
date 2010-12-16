@@ -893,6 +893,17 @@ if($aktion == 'suche')
 				}
 			}
 			
+			// Welche OEs müssen noch freigeben
+			if($status->getFreigabeFromBestellung($bestellung->bestellung_id)) 
+			{	
+				$bestellung->FreigabeOe($bestellung->bestellung_id); 
+				echo "<input type='submit' value='KST Freigabe' name ='btn_freigabe_kst'>"; 
+			}
+			else 
+			{
+
+			}
+			
 			
 			echo "</td></tr>";
 			echo "</table>\n";
@@ -1456,7 +1467,7 @@ if($aktion == 'suche')
 					}
 					
 					$bestellung_brutto = $bestellung_new->getBrutto($bestellung_new->bestellung_id); 
-					echo $bestellung_brutto; 
+					echo "Summe: ".$bestellung_brutto; 
 				}
 			}
 		}
