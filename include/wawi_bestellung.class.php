@@ -25,6 +25,7 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once (dirname(__FILE__).'/wawi_bestelldetails.class.php');
 require_once (dirname(__FILE__).'/wawi_aufteilung.class.php');
+require_once (dirname(__FILE__).'/organisationseinheit.class.php');
 
 class wawi_bestellung extends basis_db
 {
@@ -580,10 +581,17 @@ class wawi_bestellung extends basis_db
 
 	/**
 	 * 
-	 * Liefert true zurück wenn es schon eine Freigabe auf die KST gegeben hat
+	 * Gibt alle OEs zurück die freigegeben werden müssen
 	 */
-	public function freigabeKstErfolgt()
+	public function FreigabeOe($bestellung_id)
 	{
+		$oe = new organisationseinheit(); 
+		$bestellung = new wawi_bestellung(); 
+		$bestellung->load($bestellung_id); 
+		
+		$oe->load($bestellung->getOe()); 
+		
+		echo $oe->oe_kurzbz; 
 		
 	}
 
