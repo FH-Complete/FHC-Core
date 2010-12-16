@@ -460,15 +460,15 @@ class wawi_bestellung extends basis_db
 	 * Kopiert eine bestehende Bestellung 
 	 * @param $bestellung_id
 	 */
-	function copyBestellung($bestellung_id)
+	function copyBestellung($bestellung_id, $user)
 	{
 		$error = false; 
 		$this->db_query('BEGIN;'); 
 		
 		// Bestellung kopieren
 		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
-		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT nextval('wawi.seq_bestellung_bestellung_id'), besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, freigegeben, currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, now(), updatevon, now(), insertvon, ext_id FROM wawi.tbl_bestellung WHERE 
+		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT nextval('wawi.seq_bestellung_bestellung_id'), ".$this->addslashes($user).", kostenstelle_id, konto_id, firma_id, lieferadresse, 
+		rechnungsadresse, 'false', currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
 		//echo $qry_bestellung;
 		if(!$this->db_query($qry_bestellung))
@@ -494,7 +494,7 @@ class wawi_bestellung extends basis_db
 		{
 			$qry_detail ="INSERT INTO wawi.tbl_bestelldetail (bestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
 			text, insertamum, insertvon, updateamum, updatevon) SELECT $newBestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
-			text, now(), insertvon, now(), updatevon FROM wawi.tbl_bestelldetail 
+			text, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user)." FROM wawi.tbl_bestelldetail 
 			WHERE bestelldetail_id = ".$detail->bestelldetail_id.";"; 
 			if (!$this->db_query($qry_detail))
 				$error = true; 
@@ -515,7 +515,7 @@ class wawi_bestellung extends basis_db
 			
 			// zugehörigen TAG kopieren
 			$qry_detailtag = "INSERT INTO wawi.tbl_bestelldetailtag (tag, bestelldetail_id, insertamum, insertvon) 
-			SELECT tag, ".$this->addslashes($newBestellDetail_id).", insertamum, insertvon FROM wawi.tbl_bestelldetailtag 
+			SELECT tag, ".$this->addslashes($newBestellDetail_id).", now(), ".$this->addslashes($user)." FROM wawi.tbl_bestelldetailtag 
 			WHERE bestelldetail_id = ".$this->addslashes($detail->bestelldetail_id).";"; 
 			
 			if (!$this->db_query($qry_detailtag))
@@ -525,7 +525,7 @@ class wawi_bestellung extends basis_db
 		
 		// aufteilung kopieren
 		$qry_aufteilung = "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) 
-		SELECT ".$this->addslashes($newBestellung_id)." ,  oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$bestellung_id.";"; 
+		SELECT ".$this->addslashes($newBestellung_id)." ,  oe_kurzbz, anteil, updateamum, updatevon, now(), ".$this->addslashes($user)." FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$bestellung_id.";"; 
 		if (!$this->db_query($qry_aufteilung))
 			$error = true; 
 
@@ -536,7 +536,7 @@ class wawi_bestellung extends basis_db
 			$error = true; 
 		
 		// bestelltag kopieren
-		$qry_bestelltag ="INSERT INTO wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) SELECT tag, ".$this->addslashes($newBestellung_id).", insertamum, insertvon 
+		$qry_bestelltag ="INSERT INTO wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) SELECT tag, ".$this->addslashes($newBestellung_id).", now(), ".$this->addslashes($user)." 
 		from wawi.tbl_bestellungtag WHERE bestellung_id = ".$bestellung_id.";";
 		if (!$this->db_query($qry_bestelltag))
 			$error = true; 	
@@ -576,6 +576,15 @@ class wawi_bestellung extends basis_db
 		}
 		else 
 		return false; 
+	}
+
+	/**
+	 * 
+	 * Liefert true zurück wenn es schon eine Freigabe auf die KST gegeben hat
+	 */
+	public function freigabeKstErfolgt()
+	{
+		
 	}
 
 }
