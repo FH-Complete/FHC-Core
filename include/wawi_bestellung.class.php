@@ -587,11 +587,38 @@ class wawi_bestellung extends basis_db
 	{
 		$oe = new organisationseinheit(); 
 		$bestellung = new wawi_bestellung(); 
+		
 		$bestellung->load($bestellung_id); 
+		$brutto = $bestellung->getBrutto($bestellung_id);
+		$brutto = number_format($brutto,2,".","");
+		$oe_bestellung = $bestellung->getOe(); 
+		// oe der bestellung
+		$oe->load($oe_bestellung); 
+		$oes = array(); 
 		
-		$oe->load($bestellung->getOe()); 
-		
-		echo $oe->oe_kurzbz; 
+		$qry = "WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz, freigabegrenze) as 
+			(
+				SELECT oe_kurzbz, oe_parent_kurzbz, freigabegrenze FROM public.tbl_organisationseinheit 
+				WHERE oe_kurzbz='".addslashes($oe_bestellung)."' and aktiv = true 
+				UNION ALL
+				SELECT o.oe_kurzbz, o.oe_parent_kurzbz, o.freigabegrenze FROM public.tbl_organisationseinheit o, oes 
+				WHERE o.oe_kurzbz=oes.oe_parent_kurzbz and aktiv = true
+			)
+			SELECT oe_kurzbz
+			FROM oes
+			WHERE freigabegrenze<='$brutto'
+			GROUP BY oe_kurzbz,freigabegrenze ORDER BY freigabegrenze"; 
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$oes[] = $row->oe_kurzbz; 
+			}
+			return $oes; 
+		}
+		else
+			return false; 
 		
 	}
 
