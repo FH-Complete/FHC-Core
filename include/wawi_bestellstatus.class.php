@@ -137,8 +137,9 @@ class wawi_bestellstatus extends basis_db
 	 * @param $bestellung_id
 	 * @param $status_kurzbz
 	 */
-	public function isStatiVorhanden($bestellung_id, $status_kurzbz)
+	public function isStatiVorhanden($bestellung_id, $status_kurzbz='', $oe_kurzbz ='')
 	{
+		$status='';
 		if(!is_numeric($bestellung_id) || $bestellung_id == '')
 		{
 			$this->errormsg = "Bestellung ID fehlerhaft."; 
@@ -149,15 +150,26 @@ class wawi_bestellstatus extends basis_db
 			$this->errormsg = "Status Kurzbezeichnung ist fehlerhaft."; 
 			return false; 
 		}
-	
+ 
+		if($oe_kurzbz!='')
+		{
+			$status .= " and oe_kurzbz = ".$this->addslashes($oe_kurzbz); 
+		}
+		if($status_kurzbz!='')
+		{
+			$status.=" and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz);
+		}
+		
 		$qry = "select bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus
 		WHERE 
-		bestellung_id = ".$this->addslashes($bestellung_id)." and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz).";";
+		bestellung_id = ".$this->addslashes($bestellung_id).$status.";";
+		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->datum = $row->datum; 
+				$this->insertvon = $row->insertvon; 
 				return true;
 			}
 			else 
