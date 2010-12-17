@@ -39,7 +39,7 @@ require_once('../include/benutzerberechtigung.class.php');
 	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
 
-	<script language="Javascript">
+	<script type="text/javascript">
 		$(document).ready(function() 
 			{ 
 			    $("#myTable").tablesorter(
@@ -101,7 +101,7 @@ if(isset($_GET['method']))
 					echo "<form action=\"kostenstellenuebersicht.php?method=save&id=$kostenstelle->kostenstelle_id\" method=\"post\">\n";
 					echo '<table border=0>';
 					echo '<tr>';					
-					echo " Organisationseinheit: <SELECT name='filter_oe_kurzbz'>\n";
+					echo "<td>Organisationseinheit</td><td><SELECT name='filter_oe_kurzbz'>\n";
 					echo "<option value=''>-- Keine Auswahl --</option>\n";
 					
 					foreach ($oeinheiten as $oei)
@@ -123,7 +123,7 @@ if(isset($_GET['method']))
 					
 					echo "</SELECT>\n";	
 					
-			 	 	echo "<tr>\n";
+			 	 	echo "</td><tr>\n";
 			 	 	echo "<td>Bezeichnung</td>\n";
 			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"bezeichnung\" value=\"$kostenstelle->bezeichnung\"></td>\n";
 			 	 	echo "</tr>\n";
@@ -143,13 +143,13 @@ if(isset($_GET['method']))
 			 	 	echo "<td>Aktiv?</td>\n";
 			 	 	echo "<td><input type=\"checkbox\" name=\"aktiv\" value=\"aktiv\" $checked>\n";
 			 	 	echo "</tr>\n";
-			 	 	echo "<tr><td>&nbsp;</td><tr>\n"; 	 	
+			 	 	echo "<tr><td>&nbsp;</td></tr>\n"; 	 	
 			  		echo "<tr>\n";
 			  		echo "<td><a href=kostenstellenuebersicht.php> zurueck </a></td>\n";
 			  		echo "<td><input type='submit' value='update'></td>";
 			  		echo "</tr>\n";
-			  		echo "</form>\n";
 			  		echo "</table>\n";
+			  		echo "</form>\n";
 			
 				}
 				else 
@@ -179,7 +179,7 @@ if(isset($_GET['method']))
 			echo "<form action=\"kostenstellenuebersicht.php?method=save\" method=\"post\">\n";
 			echo "<table border=0>\n";
 			echo "<tr>\n";
-			echo " Organisationseinheit: <SELECT name='filter_oe_kurzbz'>\n";
+			echo "<td>Organisationseinheit</td><td> <SELECT name='filter_oe_kurzbz'>\n";
 			echo "<option value=''>-- Keine Auswahl --</option>\n";
 
 			foreach ($oeinheiten as $oei)
@@ -197,7 +197,7 @@ if(isset($_GET['method']))
 				}	
 			}
 			echo "</SELECT>\n";
-	 	 	echo "</tr>\n";
+	 	 	echo "</td></tr>\n";
 	 	 	echo "<tr>\n";
 	 	 	echo "<td>Bezeichnung</td>\n";
 	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"256\" name=\"bezeichnung\" value=\"\"></td>\n";
@@ -214,13 +214,13 @@ if(isset($_GET['method']))
 	 	 	echo "<td>Kostenstellen Nr.</td>\n";
 	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"4\" name=\"kostenstelle_nr\" value=\"\"></td>\n";
 	 	 	echo "</tr>\n";
-	 	 	echo "<tr><td>&nbsp;</td><tr>\n"; 	 	
+	 	 	echo "<tr><td>&nbsp;</td></tr>\n"; 	 	
 	  		echo "<tr>\n";
 	  		echo "<td><a href=kostenstellenuebersicht.php> zurueck </a></td>\n";
 	  		echo "<td><input type='submit' value='Anlegen'></td>\n";
 	  		echo "</tr>\n";
-	  		echo "</form>\n";
 	  		echo "</table>\n";
+	  		echo "</form>\n";
 		}
 	}
 	else if($_GET['method']=='delete')

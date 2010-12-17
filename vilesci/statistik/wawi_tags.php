@@ -189,10 +189,11 @@ else
 		<tbody>';
 	$anzahl=0;
 	$gesamt = count($kst_array);
-	echo '<td valign="top"><table>';
+	echo '<tr><td valign="top"><table>';
+	
 	foreach($kostenstelle->result as $kst)
 	{
-		if($anzahl%(($gesamt/3)+1)==0)
+		if($anzahl%(($gesamt/3)+1)==0 && $anzahl!=0)
 		{
 			echo '</table></td><td valign="top"><table>';
 		}
@@ -202,15 +203,16 @@ else
 			</tr>';
 		$anzahl++;
 	}
-	echo '</table></td>';
+	echo '</table></td></tr>';
 	
 	echo '</tbody>
-	<tfoot>
-		<tr>
-			<td><input type="checkbox" name="allemarkieren" onclick="alleMarkieren(this.checked)"></td>
-			<td>Alle markieren</td>
-		</tr>
-	</tfoot>
+	</table>
+	<br />
+	<table>
+	<tr>
+		<td><input type="checkbox" name="allemarkieren" onclick="alleMarkieren(this.checked)"></td>
+		<td>Alle markieren</td>
+	</tr>
 	</table>
 	<br />
 	Geschäftsjahr

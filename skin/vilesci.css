@@ -583,5 +583,19 @@ table.sortable thead
 {
 	color: #ff0000;
 }
-		.ausblenden {display:none;}
-		.einblenden {display:block;}	 
+
+.ausblenden 
+{
+	display:none;
+}
+
+.einblenden 
+{
+	display:block;
+}
+
+/* Inaktive Elemente in einem DropDown */
+option.inactive
+{
+	text-decoration:line-through;
+}
