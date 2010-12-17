@@ -802,6 +802,7 @@ class benutzerberechtigung extends basis_db
 		$timestamp=time();
 		$all=false;
 		$oe = new organisationseinheit();
+
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
@@ -842,6 +843,7 @@ class benutzerberechtigung extends basis_db
 					}
 				}
 			}
+			
 		}
 		
 		$qry = "SELECT distinct kostenstelle_id FROM wawi.tbl_kostenstelle";
