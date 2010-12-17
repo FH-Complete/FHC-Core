@@ -40,7 +40,7 @@ require_once('../include/sprache.class.php');
 	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
 
-	<script language="Javascript">
+	<script type="text/javascript">
 		$(document).ready(function() 
 			{ 
 			    $("#myTable").tablesorter(
@@ -112,7 +112,7 @@ if(isset($_GET['method']))
 			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"".$konto->beschreibung[$i]."\"></td>\n";
 			 	 		echo "</tr>\n";
 					}
-					$i++;			
+					$i++;
 				}
 		 	 	echo "<tr>\n";
 		 	 	echo "<td>Kurzbezeichnung</td>\n";
@@ -122,13 +122,13 @@ if(isset($_GET['method']))
 		 	 	echo "<td>Aktiv?</td>\n";
 		 	 	echo "<td><input type=\"checkbox\" name=\"aktiv\" value=\"aktiv\" $checked>\n";
 		 	 	echo "</tr>\n";
-		 	 	echo "<tr><td>&nbsp;</td><tr>\n"; 	 	
+		 	 	echo "<tr><td>&nbsp;</td></tr>\n"; 	 	
 		  		echo "<tr>\n";
 		  		echo "<td><a href=kontouebersicht.php> zurueck </a></td>\n";
 		  		echo "<td><input type='submit' value='update'></td>\n";
 		  		echo "</tr>\n";
-		  		echo "</form>\n";
 		  		echo "</table>\n";
+		  		echo "</form>\n";
 			}
 			else 
 			{
@@ -162,16 +162,16 @@ if(isset($_GET['method']))
 					}
 					$i++;			
 				}
-		 	 	echo "<td>Kurzbezeichnung</td>\n";
+		 	 	echo "<tr><td>Kurzbezeichnung</td>\n";
 		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>\n";
 		 	 	echo "</tr>\n";
-		 	 	echo "<tr><td>&nbsp;</td><tr>\n"; 	 	
+		 	 	echo "<tr><td>&nbsp;</td></tr>\n"; 	 	
 		  		echo "<tr>\n";
 		  		echo "<td><a href=kontouebersicht.php> zurueck </a></td>\n";
 		  		echo "<td><input type='submit' value='Anlegen'></td>\n";
 		  		echo "</tr>\n";
-		  		echo "</form>\n";
 		  		echo "</table>\n";
+		  		echo "</form>\n";
 		}
 	}
 	else if($_GET['method']== "save")

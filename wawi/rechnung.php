@@ -205,8 +205,8 @@ if($aktion == 'suche')
 				echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'">'.$oei->bezeichnung."</option>\n";
 			}	
 		}
-		echo "</td>\n";
 		echo "</SELECT>\n";
+		echo "</td>\n";
 		echo "</tr>\n";		
 		echo "<tr>\n";
 		echo "<td> Firma: </td>\n";
@@ -224,8 +224,8 @@ if($aktion == 'suche')
 			echo '<option value='.$kst->kostenstelle_id.' >'.$kst->bezeichnung."</option>\n";
 	
 		}
-		echo "</td>\n";
 		echo "</SELECT>\n";
+		echo "</td>\n";
 		echo "</tr>\n";	
 		echo "<tr>\n";
 		echo "<td> Konto: </td>\n";
@@ -236,10 +236,9 @@ if($aktion == 'suche')
 			echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
 	
 		}
-		echo "</td>\n";
 		echo "</SELECT>\n";
+		echo "</td>\n";
 		echo "</tr>\n";	
-		echo "<tr>\n";
 		echo "<tr><td>&nbsp;</td></tr>\n";
 		echo "<tr><td><input type='submit' name ='submit' value='Suche'></td></tr>\n";
 		echo "</table>\n";
@@ -856,6 +855,7 @@ if($aktion=='update')
 		<td><input type="submit" value="Speichern"/></td>
 	</tr>
 	</table>	
+	</form>
 	';
 
 }
@@ -884,7 +884,7 @@ function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $
 					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="bruttonetto('.$i.'); summe(); "> %
 				</td>
 				<td>
-					<input class="number" type="text" size="12" maxlenght="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.($betrag*(100+$mwst)/100).'" onchange="netto('.$i.'); summe();"> &euro;
+					<input class="number" type="text" size="12" maxlength="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.($betrag*(100+$mwst)/100).'" onchange="netto('.$i.'); summe();"> &euro;
 				</td>
 			</tr>';
 }
