@@ -40,6 +40,7 @@ $anzahl_insert=0;
 $anzahl_update=0;
 $anzahl_delete=0;
 $anzahl_fehler=0;
+$starttime=date("d.m.Y H:i:s");
 $datum_obj = new datum();
 ?>
 <html>
@@ -261,7 +262,7 @@ if($result=pg_query($conn_wawi, $qry))
 	}
 	//Mail versenden
 	$statistik="Rechnung Sync\n--------------\n";
-	$statistik.="Beginn: ".date("d.m.Y H:i:s")." von ".DB_NAME." - Anzahl Einträge: ".$anzahl_gesamt."\n\n";
+	$statistik.="Beginn: ".$starttime." von ".DB_NAME." - Anzahl Einträge: ".$anzahl_gesamt."\n\n";
 	$statistik.="\nEingefügte Datensätze: $anzahl_insert";
 	$statistik.="\nGeänderte Datensätze: $anzahl_update";
 	$statistik.="\nFehler: $anzahl_fehler\n";

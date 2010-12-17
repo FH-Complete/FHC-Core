@@ -36,7 +36,8 @@ $count_update_detail = 0;
 $count_update = 0;
 $count_delete = 0;
 $error_count = 0;
-
+$errormsg = '';
+$starttime=date("d.m.Y H:i:s");
 
 $bool_insert = false;
 $firma_id = '';
@@ -96,7 +97,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 				{
 					//fehler aufgetreten
 					$error_count++;
-					echo $qry_firma; 
+					$errormsg.= $qry_firma.' '.pg_last_error($con_wawi); 
 				}
 			}
 			else
@@ -114,14 +115,18 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					if($row_neu = $db->db_fetch_object($result_check))
 					{
 						//update der bestellung
-						 
+						if($row->bestellung_id_freigegeben != null)
+							$freigegeben = "t";
+					 	else 
+					 		$freigegeben = "f"; 
+					 	
 						if($row_neu->besteller_uid != $row->besteller_neu || $row_neu->kostenstelle_id != $row->kostenstelle_id || $row_neu->konto_id != $row->konto_id || $row_neu->firma_id != $firma || $row_neu->bestell_nr != $row->bestellnr ||
 							$row_neu->titel != $row->newtitel || $row_neu->bemerkung != $row->bemerkungen || $row_neu->liefertermin != $row->geliefert || $row_neu->updatevon != $row->lusername || 
 							 $row_neu->insertvon != $row->cusername || $date->formatDatum($row_neu->updateamum, 'Y-m-d H:i:s') != $date->formatDatum($row->lupdate, 'Y-m-d H:i:s') || 
-							 $date->formatDatum($row_neu->insertamum, 'Y-m-d H:i:s') != $date->formatDatum($row->cdate, 'Y-m-d H:i:s'))
+							 $date->formatDatum($row_neu->insertamum, 'Y-m-d H:i:s') != $date->formatDatum($row->cdate, 'Y-m-d H:i:s') || $row_neu->freigegeben!=$freigegeben)
 						{	
 							$qry="UPDATE wawi.tbl_bestellung SET besteller_uid = ".$db->addslashes($row->besteller_neu).", kostenstelle_id = ".$db->addslashes($row->kostenstelle_id).", konto_id = ".$db->addslashes($row->konto_id).", firma_id =
-							".$db->addslashes($firma)." ,bestell_nr = ".$db->addslashes($row->bestellnr).", titel = ".$db->addslashes($row->newtitel).", bemerkung = ".$db->addslashes($row->bemerkungen).", liefertermin= 
+							".$db->addslashes($firma)." ,bestell_nr = ".$db->addslashes($row->bestellnr).", titel = ".$db->addslashes($row->newtitel).", bemerkung = ".$db->addslashes($row->bemerkungen).", freigegeben=".($freigegeben=='t'?'true':'false').", liefertermin= 
 							".$db->addslashes($row->geliefert).", updateamum = ".$db->addslashes($row->lupdate).", updatevon = ".$db->addslashes($row->lusername).", insertamum = ".$db->addslashes($row->cdate).", insertvon =
 							".$db->addslashes($row->cusername)." WHERE bestellung_id = ".$db->addslashes($row->bestellung_id).";"; 
 					
@@ -129,10 +134,10 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							{
 								// Fehler
 								$error_count++;
-								echo $qry; 
+								$errormsg.= $qry.' '.$db->db_last_error(); 
 							}
 							$count_update++;
-							echo "Update Bestellung_id: ".$row->bestellung_id.'<br>'; 
+							$errormsg.= "Update Bestellung_id: ".$row->bestellung_id.'<br>'; 
 						}
 							
 					}
@@ -154,7 +159,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 									{
 										// Fehler
 										$error_count++;
-										echo $qry_stati;
+										$errormsg.= $qry_stati.' '.$db->db_last_error();
 									}
 
 									$count_insert_status++;
@@ -180,9 +185,8 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 								{
 									// Fehler
 									$error_count++;
-									echo $qry_stati; 
+									$errormsg.= $qry_stati.' '.$db->db_last_error(); 
 								}
-								echo "rek";
 								$count_insert_status++;
 							}
 						}
@@ -205,7 +209,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 								{
 									// Fehler
 									$error_count++;
-									echo $qry_stati;
+									$errormsg.= $qry_stati.' '.$db->db_last_error();
 								}
 								$count_insert_status++;
 							}
@@ -228,7 +232,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 								{
 									// Fehler
 									$error_count++;
-									echo $qry_stati;
+									$errormsg.= $qry_stati.' '.$db->db_last_error();
 								}
 								$count_insert_status++;
 							}
@@ -251,7 +255,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 								{
 									// Fehler
 									$error_count++;
-									echo $qry_stati;
+									$errormsg.= $qry_stati.' '.$db->db_last_error();
 								}
 								$count_insert_status++;
 							}
@@ -274,7 +278,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 								{
 									// Fehler
 									$error_count++;
-									echo $qry_stati;
+									$errormsg.= $qry_stati.' '.$db->db_last_error();
 								}	
 								$count_insert_status++;
 							}				
@@ -303,7 +307,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					{
 						// Fehler
 						$error_count++;
-						echo $qry;
+						$errormsg.= $qry.' '.$db->db_last_error();
 					}
 					
 					$bool_insert=true;
@@ -321,7 +325,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						{
 							// Fehler
 							$error_count++;
-							echo $qry_stati;
+							$errormsg.= $qry_stati.' '.$db->db_last_error();
 						}
 						$count_insert_status++;
 					}
@@ -337,7 +341,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						{
 							// Fehler
 							$error_count++;
-							echo $qry_stati;
+							$errormsg.= $qry_stati.' '.$db->db_last_error();
 						}
 						$count_insert_status++;
 					}
@@ -353,7 +357,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						{
 							// Fehler
 							$error_count++;
-							echo $qry_stati;
+							$errormsg.= $qry_stati.' '.$db->db_last_error();
 						}
 						$count_insert_status++;
 					}
@@ -369,7 +373,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						{
 							// Fehler
 							$error_count++;
-							echo $qry_stati;
+							$errormsg.= $qry_stati.' '.$db->db_last_error();
 						}
 						$count_insert_status++;
 					}
@@ -385,7 +389,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						{
 							// Fehler
 							$error_count++;
-							echo $qry_stati;
+							$errormsg.= $qry_stati.' '.$db->db_last_error();
 						}
 						$count_insert_status++;
 					}
@@ -401,7 +405,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						{
 							// Fehler
 							$error_count++;
-							echo $qry_stati;
+							$errormsg.= $qry_stati.' '.$db->db_last_error();
 						}	
 						$count_insert_status++;				
 					}
@@ -410,7 +414,12 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 			}
 			
 			// alle bestelldetails zu bestellung holen
-			$qry = "SELECT * FROM public.bestelldetail WHERE bestellung_id = $row->bestellung_id";
+			$qry = "SELECT 
+						*, benutzer.username_neu as lusername
+					FROM 
+						public.bestelldetail
+						LEFT JOIN public.benutzer ON(bestelldetail.luser=benutzer.user_id) 
+					WHERE bestellung_id = $row->bestellung_id";
 			if($result_detail = pg_query($con_wawi, $qry))
 			{
 				while($row = pg_fetch_object($result_detail))
@@ -430,7 +439,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							".$db->addslashes($row->menge).",".$db->addslashes($row->ve).",".$db->addslashes($row->beschreibung).",
 							".$db->addslashes($row->artikelnr).",".$db->addslashes($row->preisve).",".$db->addslashes($row->mwst).",
 							".$db->addslashes($row->erhalten).",".$db->addslashes($row->pos).", false ,".$db->addslashes($row->lupdate).",
-							".$db->addslashes($row->luser).",".$db->addslashes($row->lupdate).",".$db->addslashes($row->luser).")"; 			
+							".$db->addslashes($row->lusername).",".$db->addslashes($row->lupdate).",".$db->addslashes($row->lusername).")"; 			
 							
 							//echo $qry; 
 							
@@ -438,7 +447,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							{
 								// Fehler
 								$error_count++;
-								echo $qry;
+								$errormsg.= $qry.' '.$db->db_last_error();
 							}	
 							$count_insert_detail++;			
 						}
@@ -449,26 +458,26 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							{
 		
 								if($row_neu->bestellung_id != $row->bestellung_id || $row_neu->position != $row->pos || $row_neu->menge != $row->menge  ||$row_neu->verpackungseinheit != $row->ve ||
-								$row_neu->beschreibung != $row->beschreibung || $row_neu->artikelnummer != $row->artikelnr || $row_neu->preisprove != $row->preisve || $row_neu->mwst != $row->mwst) 
+								$row_neu->beschreibung != $row->beschreibung || $row_neu->artikelnummer != $row->artikelnr || round($row_neu->preisprove,2) != round($row->preisve,2) || $row_neu->mwst != $row->mwst) 
 								{	
 
-									echo $row->preisve."<br>";
-									echo $row_neu->preisprove."<br><br>";
+									//echo $row->preisve."<br>";
+									//echo $row_neu->preisprove."<br><br>";
 									
 									$qry = "UPDATE wawi.tbl_bestelldetail SET position = 
 									".$db->addslashes($row->pos).", menge = ".$db->addslashes($row->menge).", verpackungseinheit = ".$db->addslashes($row->ve).", beschreibung =
 									".$db->addslashes($row->beschreibung).", artikelnummer = ".$db->addslashes($row->artikelnr).", preisprove =
 									".$db->addslashes($row->preisve).", mwst = ".$db->addslashes($row->mwst).", erhalten = ".$db->addslashes($row->erhalten).", sort = 
-									".$db->addslashes($row->pos).", text = false, insertamum = ".$db->addslashes($row->lupdate).", insertvon = ".$db->addslashes($row->luser).", updateamum = 
-									".$db->addslashes($row->lupdate).", updatevon = ".$db->addslashes($row->luser)." where bestelldetail_id = ".$db->addslashes($row->bestelldetail_id).";";
+									".$db->addslashes($row->pos).", text = false, insertamum = ".$db->addslashes($row->lupdate).", insertvon = ".$db->addslashes($row->lusername).", updateamum = 
+									".$db->addslashes($row->lupdate).", updatevon = ".$db->addslashes($row->lusername)." WHERE bestelldetail_id = ".$db->addslashes($row->bestelldetail_id).";";
 									if($db->db_query($qry) != true)
 									{
 										// Fehler
 										$error_count++;
-										echo $qry;
+										$errormsg.= $qry.' '.$db->db_last_error();
 									}
 									$count_update_detail++;
-									echo "Update Bestelldetail_id: ".$row->bestelldetail_id.'<br>'; 
+									$errormsg.= "Update Bestelldetail_id: ".$row->bestelldetail_id.'<br>'; 
 								}
 							}
 						}
@@ -480,40 +489,57 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 	}
 	else
 	{
-				$error_count++;
-				echo "Verbindung zu Datenbank fehlgeschlagen.";
+		$error_count++;
+		$errormsg.= "Verbindung zu Datenbank fehlgeschlagen.";
 	}
 	
 	// delete --> bestellungen die es im wawi nicht mehr gibt
-	$qry_delete = "SELECT
-				    *
+	$qry_delete = "DELETE
 				FROM
 				wawi.tbl_bestellung 
 				WHERE NOT EXISTS (
 				SELECT bestellung_id FROM 
 				    dblink(
-				        'host=antigone dbname=-devwawi user=wawi password=iwaw'::text,
+				        '".CONN_STRING_WAWI."'::text,
 				        'SELECT bestellung_id FROM public.bestellung WHERE bestellung_id=' || tbl_bestellung.bestellung_id
 				          )
-				    as vw_devvilesci_alias(bestellung_id integer));";
+				    as foo(bestellung_id integer));";
 	
 	if($result_delete = $db->db_query($qry_delete))
 	{
-		if($row_delete = $db->db_fetch_object($result_delete))
-		{
-			$qry_delete = "Delete FROM wawi.tbl_bestellung WHERE bestellung_id = $row_delete->bestellung_id";
-			if($db->db_query($qry_delete) != true)
-			{
-				$error_count++;
-				echo $qry_delete;
-			}	
-			$count_delete++;
-		}
+		$count_delete += $db->db_affected_rows($result_delete);
 	}
-		
+	else
+	{
+		$error_count++;
+		$errormsg.= "Fehler beim Löschen der Bestellungen! ".$db->db_last_error();
+	}
+	
+	// delete --> bestelldetails die es im wawi nicht mehr gibt
+	$qry_delete = "DELETE
+				FROM
+				wawi.tbl_bestelldetail
+				WHERE NOT EXISTS (
+				SELECT bestelldetail_id FROM 
+				    dblink(
+				        '".CONN_STRING_WAWI."'::text,
+				        'SELECT bestelldetail_id FROM public.bestelldetail WHERE bestelldetail_id=' || tbl_bestelldetail.bestelldetail_id
+				          )
+				    as foo(bestelldetail_id integer));";
+	
+	if($result_delete = $db->db_query($qry_delete))
+	{
+		$count_delete += $db->db_affected_rows($result_delete);
+	}
+	else
+	{
+		$error_count++;
+		$errormsg.= "Fehler beim Löschen der Bestelldetails! ".$db->db_last_error();
+	}
+	
 	if ($count_insert >0)
 	{
-		$max_qry= "SELECT MAX(bestellung_id) as max from wawi.tbl_bestellung";
+		$max_qry= "SELECT MAX(bestellung_id) as max FROM wawi.tbl_bestellung";
 		if($result_max = $db->db_query($max_qry))
 		{
 			if($row_max = $db->db_fetch_object($result_max))
@@ -524,7 +550,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 			else 
 			{
 				$error_count++;
-				echo $set_qry;
+				$errormsg.= $set_qry.' '.$db->db_last_error();
 			}
 		}
 		else 
@@ -544,7 +570,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 			else 
 			{
 				$error_count++;
-				echo $set_qry;
+				$errormsg.= $set_qry.' '.$db->db_last_error();
 			}
 		}
 		else 
@@ -564,26 +590,18 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 			else 
 			{
 				$error_count++;
-				echo $set_qry;
+				$errormsg.= $set_qry.' '.$db->db_last_error();
 			}
 		}
 		else 
 		$error_count++;
 	}
-				
-				
-	$msg = '';			
-	$msg.= "\ninsert ".$count_insert."\n";
-	$msg.= "insert_detail ".$count_insert_detail."\n";
-	$msg.= "insert_stati ".$count_insert_status."\n";
-	$msg.= "update ".$count_update."\n";
-	$msg.= "udate_detail ".$count_update_detail."\n";
-	$msg.= "delete ".$count_delete."\n";
-	$msg.= "error ".$error_count;
 	
-	echo $msg; 
+	echo $errormsg;
 	
 	$send_msg = "
+	Bestellungen Syncro
+	Beginn: ".$starttime." von ".DB_NAME."
 	$count_update Bestellungen wurden geändert.
 	$count_update_detail Bestelldetails wurden geändert.
 	$count_insert Bestellungen wurden hinzugefügt.
@@ -591,13 +609,14 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 	$count_insert_status Bestellstati wurden hinzugefügt. 
 	$count_delete Bestellungen wurden gelöscht.
 	$error_count Fehler sind dabei aufgetreten. 
-";
 	
-	$mail = new mail(MAIL_ADMIN, 'vilesci.technikum-wien.at', 'WaWi Syncro - Bestellung', $send_msg.$msg);
+";
+	echo $send_msg;
+	
+	$mail = new mail(MAIL_ADMIN, 'vilesci@technikum-wien.at', 'WaWi Syncro - Bestellung', $send_msg.$errormsg);
 	if(!$mail->send())
 		echo 'Fehler beim Senden des Mails';
 	else
 		echo '<br> Mail verschickt!';
-	
-
 }
+?>

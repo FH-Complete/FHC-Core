@@ -31,7 +31,7 @@ $db = new basis_db();
 foreach($kostenstelle->result as $row)
 {
 	$qry = "INSERT INTO wawi.tbl_konto_kostenstelle(konto_id, kostenstelle_id, insertamum, insertvon) 
-			SELECT konto_id, $row->kostenstelle_id, now(),'oesi' FROM wawi.tbl_konto WHERE konto_id<1000
+			SELECT konto_id, $row->kostenstelle_id, now(),'oesi' FROM wawi.tbl_konto WHERE kontonr::integer<100
 			AND konto_id NOT IN(SELECT konto_id FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id='$row->kostenstelle_id')";
 
 	if(!$db->db_query($qry))
