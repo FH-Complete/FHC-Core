@@ -23,6 +23,7 @@
  * Auswertung der Bestellungen und Rechnungen auf Kostenstellen und Tags
  */
 require_once('../../config/wawi.config.inc.php');
+require_once('../auth.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/wawi_rechnung.class.php');
@@ -39,7 +40,7 @@ $rechte->getBerechtigungen($user);
 $kst_array = $rechte->getKostenstelle();
 
 if(count($kst_array)==0)
-	die('Sie benötigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
+	die('Sie benoetigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>

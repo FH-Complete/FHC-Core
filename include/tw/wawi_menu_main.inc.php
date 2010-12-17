@@ -64,7 +64,7 @@ $menu=array
 		'name'=>'Auswertungen', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
 		'Tags'=>array
 		(
-			'name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'../vilesci/statistik/wawi_tags.php', 'target'=>'content',
+			'name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content',
 		)
 	)
 	
