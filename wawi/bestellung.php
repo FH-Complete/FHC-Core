@@ -1448,7 +1448,7 @@ if($aktion == 'suche')
 								else
 									echo '<br> Mail verschickt!';
 							}
-							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
+								
 						}
 					}
 
