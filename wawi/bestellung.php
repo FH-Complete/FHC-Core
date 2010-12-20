@@ -40,7 +40,7 @@ require_once '../include/wawi_bestellstatus.class.php';
 require_once '../include/tags.class.php';
 
 $aktion ='';
-$test = 0;
+$test = 0;			// Bestelldetail Anzahl
 
 if(isset($_POST['getKonto']))
 {
@@ -1448,11 +1448,8 @@ if($aktion == 'suche')
 								else
 									echo '<br> Mail verschickt!';
 							}
-								
 						}
 					}
-
-
 				}
 			}
 			// kostenstelle gibt frei
@@ -1486,6 +1483,23 @@ if($aktion == 'suche')
 						{
 							echo "Fehler beim Setzen auf Status Freigabe.<br>"; 
 							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
+							
+							// wer ist freigabeberechtigt auf Organisationseinheit
+							$rechte = new benutzerberechtigung();
+							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
+							foreach($uids as $uid)
+							{
+								// E-Mail an Kostenstellenverantwortliche senden
+								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+								$mail->setHTMLContent($msg); 
+								if(!$mail->send())
+									echo 'Fehler beim Senden des Mails';
+								else
+									echo '<br> Mail verschickt!';
+							}
+							
+							
 						}
 						else 
 						{
