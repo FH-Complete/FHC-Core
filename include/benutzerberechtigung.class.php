@@ -805,6 +805,9 @@ class benutzerberechtigung extends basis_db
 
 		foreach ($this->berechtigungen as $b)
 		{
+			if(!mb_strstr($b->berechtigung_kurzbz,'wawi/'))
+				continue;
+			
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
@@ -826,7 +829,7 @@ class benutzerberechtigung extends basis_db
 				}
 				else 
 				{
-					if(!is_null($b->oe_kurzbz))
+					if($b->oe_kurzbz!='')
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
@@ -869,7 +872,7 @@ class benutzerberechtigung extends basis_db
 			if(count($not)>0)
 				$qry.=" AND oe_kurzbz NOT IN(".$this->implode4SQL($not).")";
 		}
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
