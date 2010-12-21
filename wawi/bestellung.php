@@ -656,13 +656,16 @@ if($aktion == 'suche')
 		// Bestellung löschen
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$bestellung = new wawi_bestellung(); 
-		if($bestellung->delete($id))
+		if($bestellung->RechnungVorhanden($id))
 		{
-			echo 'Bestellung erfolgreich gelöscht. <br>';
+			echo 'Kann nicht gelöscht werden. Der Bestellung ist noch eine Rechnung zugeordnet.'; 
 		}
-		else
+		else 
 		{
-			echo $bestellung->errormsg; 
+			if($bestellung->delete($id))
+				echo 'Bestellung erfolgreich gelöscht. <br>';
+			else
+				echo $bestellung->errormsg; 
 		}
 	}
 	else if($_GET['method']=='deletedetail')
@@ -682,7 +685,6 @@ if($aktion == 'suche')
 		$bestellung = new wawi_bestellung(); 
 		if ($bestellung_neu = $bestellung->copyBestellung($bestellung_id, $user))
 		{
-			//header ("Location: bestellung.php?method=update&id=$bestellung_neu");
 			$_GET['method']='update';
 			$_GET['id']=$bestellung_neu;
 		}
@@ -771,7 +773,6 @@ if($aktion == 'suche')
 			echo "<td>Lieferadresse:</td>\n"; 
 			echo "<td colspan ='2'><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
 			
-			$select_help = false; 
 			foreach($allStandorte->result as $standorte)
 			{
 				$selected ='';
@@ -781,9 +782,7 @@ if($aktion == 'suche')
 				if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
 				{	
 					$selected ='selected';	
-					$select_help = true; 
 				}
-				
 				echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 			}		
 			
@@ -883,14 +882,14 @@ if($aktion == 'suche')
 			}
 			else 
 			{
-				//$rechte->getBerechtigungen($user); 
+				$rechte->getBerechtigungen($user); 
 				$disabled = '';
-				/*if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
-				{	*/
+				if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
+				{	
 					if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 						$disabled = 'disabled';
 					echo "<input type='submit' value='KST Freigabe' name ='btn_freigabe' $disabled>"; 
-				//}
+				}
 			}
 			
 			// Welche OEs müssen noch freigeben wenn KST schon freigegeben hat
@@ -915,7 +914,12 @@ if($aktion == 'suche')
 				}
 				if($freigabe == false)
 				{
-					echo "alle freigegeben."; 
+					if(!$bestellung->isFreigegeben($bestellung->bestellung_id))
+					{
+						$bestellung->SetFreigegeben($bestellung->bestellung_id); 
+					}
+					else
+						echo "alle freigegeben";  
 				}
 			}
 
@@ -1439,6 +1443,7 @@ if($aktion == 'suche')
 							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
 							foreach($uids as $uid)
 							{
+								echo $uid; 
 								// E-Mail an Kostenstellenverantwortliche senden
 								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
 								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
@@ -1451,7 +1456,7 @@ if($aktion == 'suche')
 						}
 					}
 				}
-			}
+			
 			// kostenstelle gibt frei
 			if(isset($_POST['btn_freigabe']) )
 			{
@@ -1483,28 +1488,42 @@ if($aktion == 'suche')
 						{
 							echo "Fehler beim Setzen auf Status Freigabe.<br>"; 
 							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
-							
-							// wer ist freigabeberechtigt auf Organisationseinheit
-							$rechte = new benutzerberechtigung();
-							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
-							foreach($uids as $uid)
-							{
-								// E-Mail an Kostenstellenverantwortliche senden
-								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
-								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
-								$mail->setHTMLContent($msg); 
-								if(!$mail->send())
-									echo 'Fehler beim Senden des Mails';
-								else
-									echo '<br> Mail verschickt!';
-							}
-							
-							
 						}
 						else 
 						{
 							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a><br>";	
 							echo "FREIGABE KOSTENSTELLE erfolgreich";
+							
+							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
+							$oes = array(); 
+							$oes = $bestellung_new->FreigabeOe($bestellung_id); 
+							$freigabe= false; 
+							foreach($oes as $o)
+							{
+								if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
+								{
+									$rechte = new benutzerberechtigung();
+									$uids = $rechte->getFreigabeBenutzer(null, $o); 
+									$freigabe = true; 
+									break; 
+								}
+							}
+							if(!$freigabe == false)
+							{
+								// es wurde noch nicht alles Freigegeben
+								foreach($uids as $uid)
+								{
+									echo $uid; 
+									// E-Mail an Kostenstellenverantwortliche senden
+									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+									$mail->setHTMLContent($msg); 
+									if(!$mail->send())
+										echo 'Fehler beim Senden des Mails';
+									else
+										echo '<br> Mail verschickt!';
+								}
+							}
 						}
 					}
 				}
@@ -1542,11 +1561,41 @@ if($aktion == 'suche')
 						{
 							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a><br>";	
 							echo "FREIGABE OE erfolgreich";
+							
+							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
+							$oes = array(); 
+							$oes = $bestellung_new->FreigabeOe($bestellung_id); 
+							$freigabe = false; 
+							foreach($oes as $o)
+							{
+								if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
+								{
+									$rechte = new benutzerberechtigung();
+									$uids = $rechte->getFreigabeBenutzer(null, $o); 
+									$freigabe = true; 
+									break; 
+								}
+							}
+							if(!$freigabe == false)
+							{
+								// es wurde noch nicht alles Freigegeben
+								foreach($uids as $uid)
+								{
+									// E-Mail an Kostenstellenverantwortliche senden
+									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+									$mail->setHTMLContent($msg); 
+									if(!$mail->send())
+										echo 'Fehler beim Senden des Mails';
+									else
+										echo '<br> Mail verschickt!';
+								}
+							}
 						}
 					}
 				}
 			}
-		
+		}
 	}
 
 	function getDetailRow($i, $bestelldetail_id='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')

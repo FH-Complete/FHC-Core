@@ -427,11 +427,17 @@ class wawi_bestellung extends basis_db
 	}
 	/**
 	 * 
-	 * Rechnet den Bruttopreis einer Rechnung aus
+	 * Rechnet den Bruttopreis einer Rechnung aus, false im Fehlerfall
 	 * @param $bestellung_id dessen Bruttopreis ausgerechnet werden soll
 	 */
 	public function getBrutto($bestellung_id)
 	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}		
+		
 		$brutto = 0;
 		$qry_brutto= "select sum(brutto) as brutto 
 					from 
@@ -463,6 +469,12 @@ class wawi_bestellung extends basis_db
 	 */
 	function copyBestellung($bestellung_id, $user)
 	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}		
+		
 		$error = false; 
 		$this->db_query('BEGIN;'); 
 		
@@ -585,6 +597,12 @@ class wawi_bestellung extends basis_db
 	 */
 	public function FreigabeOe($bestellung_id)
 	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}		
+		
 		$oe = new organisationseinheit(); 
 		$bestellung = new wawi_bestellung(); 
 		
@@ -619,7 +637,86 @@ class wawi_bestellung extends basis_db
 		}
 		else
 			return false; 
+	}
+	
+	/**
+	 * 
+	 * Gibt true zurück wenn schon eine Rechnung zur Übergebenen Bestellung vorhanden ist, andernfalls false
+	 * @param $bestellung_id
+	 */
+	public function RechnungVorhanden($bestellung_id)
+	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}		
+	
+		$qry = "SELECT * FROM wawi.tbl_rechnung WHERE bestellung_id = ".$bestellung_id.";";
 		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return true; 
+			}
+			return false; 
+		}
+		else 
+			return false; 
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $bestellung_id
+	 */
+	public function SetFreigegeben($bestellung_id)
+	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}		
+
+		$qry = "UPDATE wawi.tbl_bestellung SET freigegeben = true where bestellung_id = ".$bestellung_id.";"; 
+		
+		if($this->db_query($qry))
+			return true; 
+		else 
+		{
+			$this->errormsg ="Fehler beim Setzen von Freigegeben"; 
+			return false;
+		} 
+	}
+	
+	/**
+	 * 
+	 * true wenn die Bestellung schon freigegeben wurde
+	 * @param $bestellung_id
+	 */
+	public function isFreigegeben($bestellung_id)
+	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}		
+
+		$qry = "SELECT * FROM wawi.tbl_bestellung WHERE freigegeben = true AND bestellung_id = ".$bestellung_id.";"; 
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return true;
+			} 
+		}
+		else 
+		{
+			return false;
+		} 
+		return false; 
 	}
 
 }
