@@ -973,7 +973,7 @@ class mitarbeiter extends benutzer
 		}
 		
 		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
-		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE (funktion_kurzbz='oezuordnung' AND (false ";
+		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE ((funktion_kurzbz='oezuordnung' AND (false ";
 		
 		if($oe!='')
 			$qry.=" OR oe_kurzbz in($oe)";
@@ -983,7 +983,7 @@ class mitarbeiter extends benutzer
 		if($oe!='')
 			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
 		
-		$qry.= " AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+		$qry.= ") AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		
 		if($this->db_query($qry))
