@@ -934,6 +934,7 @@ if($aktion == 'suche')
 			echo "<tr>\n";
 			echo "<th></th>\n";
 			echo "<th>Pos</th>\n";
+			echo "<th>Sort</th>\n"; 
 			echo "<th>Menge</th>\n";
 			echo "<th>VE</th>\n";
 			echo "<th>Bezeichnung</th>\n";
@@ -948,7 +949,7 @@ if($aktion == 'suche')
 			foreach($detail->result as $det)
 			{
 				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
-				getDetailRow($i, $det->bestelldetail_id, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
+				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
 				$summe+=$brutto; 
 				$i++; 
 			}
@@ -958,6 +959,7 @@ if($aktion == 'suche')
 			echo "</tbody>";
 			echo "<tfoot><tr>"; 
 			echo "<td></td>"; 
+			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
@@ -1516,7 +1518,6 @@ if($aktion == 'suche')
 								// es wurde noch nicht alles Freigegeben
 								foreach($uids as $uid)
 								{
-									echo $uid; 
 									// E-Mail an Kostenstellenverantwortliche senden
 									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
 									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
@@ -1601,11 +1602,12 @@ if($aktion == 'suche')
 		}
 	}
 
-	function getDetailRow($i, $bestelldetail_id='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
+	function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
 	{
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='removeDetail($i, $bestelldetail_id)' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_x.png\"> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
+		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
 		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
