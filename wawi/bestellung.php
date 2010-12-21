@@ -658,7 +658,7 @@ if($aktion == 'suche')
 		$bestellung = new wawi_bestellung(); 
 		if($bestellung->RechnungVorhanden($id))
 		{
-			echo 'Kann nicht gelöscht werden. Der Bestellung ist noch eine Rechnung zugeordnet.'; 
+			echo 'Kann nicht gelöscht werden. Der Bestellung ist eine Rechnung zugeordnet.'; 
 		}
 		else 
 		{
@@ -902,10 +902,14 @@ if($aktion == 'suche')
 				{
 					if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Freigabe', $o))
 					{
-						echo "<input type='submit' value='$o' name ='btn_freigabe'>"; 
-						echo "<input type='hidden' value='$o' name ='freigabe_oe' id ='freigabe_id'>";   
+						if($rechte->isberechtigt('wawi/freigabe',$o, 'su', null))
+						{	
+							echo "<input type='submit' value='$o' name ='btn_freigabe'>"; 
+							echo "<input type='hidden' value='$o' name ='freigabe_oe' id ='freigabe_id'>";   
+							$freigabe = true; 
+							break; 
+						}
 						$freigabe = true; 
-						break; 
 					}
 					else 
 					{
@@ -918,8 +922,6 @@ if($aktion == 'suche')
 					{
 						$bestellung->SetFreigegeben($bestellung->bestellung_id); 
 					}
-					else
-						echo "alle freigegeben";  
 				}
 			}
 
@@ -1141,9 +1143,10 @@ if($aktion == 'suche')
 			echo "<br><br>"; 
 
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
-			{
 				echo "Bestellung wurde am ".$date->formatDatum($status->datum,'d.m.Y')." abgeschickt."; 
-			}
+
+			if($bestellung->isFreigegeben($bestellung->bestellung_id))
+				echo "<p class='freigegeben'>Die Bestellung wurde freigegeben</p>"; 
 
 			// div Aufteilung --> kann ein und ausgeblendet werden
 			echo "<br>";

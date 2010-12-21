@@ -130,4 +130,9 @@ option.rechnung_freigegeben
 {
 	background-color: lightgreen;
 }
+
+p.freigegeben
+{
+	color:green; 
+}
 	
