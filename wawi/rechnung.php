@@ -356,7 +356,7 @@ elseif($aktion == 'new')
 	
 	foreach($kostenstelle->result as $row)
 	{
-		echo '<option value="'.$row->kostenstelle_id.'">'.$row->bezeichnung.'</option>';
+		echo '<option value="'.$row->kostenstelle_id.'">'.$row->bezeichnung.' ('.$row->kurzbz.') - '.mb_strtoupper($row->oe_kurzbz).'</option>';
 	}
 	echo '</SELECT>';
 	echo '<input type="submit" name="submit" value="Weiter"/>';

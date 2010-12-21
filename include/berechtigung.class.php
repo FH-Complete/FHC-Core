@@ -40,6 +40,69 @@ class berechtigung extends basis_db
 	}
 	
 	/**
+	 * Laedt eine Berechtigung
+	 * @param $berechtigung_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($berechtigung_kurzbz)
+	{
+		$qry = "SELECT * FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='".addslashes($berechtigung_kurzbz)."'";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->berechtigung_kurzbz=$row->berechtigung_kurzbz;
+				$this->beschreibung = $row->beschreibung;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert eine Berechtigung
+	 *
+	 */
+	public function save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+			
+		if($new)
+		{
+			$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES(".
+					$this->addslashes($this->berechtigung_kurzbz).','.
+					$this->addslashes($this->beschreibung).');';
+		}
+		else 
+		{
+			$qry = 'UPDATE system.tbl_berechtigung 
+					SET beschreibung='.$this->addslashes($this->beschreibung).'
+					WHERE berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).';';
+		}
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Speichern: '.$this->db_last_error();
+			return false;
+		}
+	}
+	
+	/**
 	 * Holt alle BerechtigungsRollen
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */

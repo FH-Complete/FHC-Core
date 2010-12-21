@@ -1593,7 +1593,6 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestellung_bestellung_id TO wawi;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_bestelldetail_bestelldetail_id TO wawi;
 			
-			
 			-- INDEX
 			
 			CREATE INDEX idx_bestelldetail_bestellung_id ON wawi.tbl_bestelldetail (bestellung_id);
