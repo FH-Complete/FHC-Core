@@ -352,7 +352,7 @@ else
 }
 //wenn die Gemeinde leer ist und im Ort etwas steht
 //dann umdrehen (Das passiert wenn die Daten aus dem Mail von der www importiert werden)
-if($gemeinde=='' && $ort!='')
+if($gemeinde=='' && $ort!='' && !isset($_REQUEST['gemeinde_txt']))
 {
 	$importort=$ort;
 	$gemeinde=$ort;
