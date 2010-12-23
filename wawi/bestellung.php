@@ -554,7 +554,7 @@ if($aktion == 'suche')
 					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
 					echo '<td>'.number_format($brutto, 2, ",",".")."</td>\n"; 
 					echo '<td>'.$row->titel."</td>\n";
-					echo '<td>'.$row->updateamum.' '.$row->updatevon ."</td>\n"; 
+					echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y').' '.$row->updatevon ."</td>\n"; 
 		
 					echo "</tr>\n";	
 				}
@@ -692,8 +692,7 @@ if($aktion == 'suche')
 	}	
 	if($_GET['method']=='update')
 	{ 
-		
-	echo '	<script type="text/javascript">
+		echo '	<script type="text/javascript">
 			function FensterOeffnen (adresse) 
 			{
 				MeinFenster = window.open(adresse, "Info", "width=400,height=500,left=100,top=200");
@@ -725,13 +724,9 @@ if($aktion == 'suche')
 			
 			// Bei neuer Bestellung Default Aufteilung holen ansonsten von bestehender bestellung
 			if(isset($_GET['new']))
-			{
 				$aufteilung->getAufteilungFromKostenstelle($bestellung->kostenstelle_id);
-			}
 			else
-			{
 				$aufteilung->getAufteilungFromBestellung($bestellung->bestellung_id);
-			}
 			
 			$firma = new firma(); 
 			$firma->load($bestellung->firma_id);  
@@ -825,7 +820,6 @@ if($aktion == 'suche')
 			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
 			echo "<td>Status:</td>\n"; 
 			echo "<td width ='200px'>\n";
-	
 			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
 			{
 				echo "<span id='btn_bestellt'>";	
