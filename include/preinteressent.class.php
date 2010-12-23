@@ -391,14 +391,22 @@ class preinteressent extends basis_db
 	}
 	
 	/**
+	 * 
 	 * Laedt die Preinteressenten
-	 * eines Studienganges welche noch nicht
-	 * uebernommen wurden
+	 * 
 	 * @param $studiengang_kz
-	 *        $studiensemester_kurzbz
-	 * @return true wenn ok, false im Fehlerfall
+	 * @param $studiensemester_kurzbz
+	 * @param $filter Filtert nach Nachname, Vorname, Kontakt, und Erfassungsdatum
+	 * @param $nichtfreigegeben  Wenn true werden nur personen geliefert die noch nicht freigegeben wurden
+	 * @param $uebernommen Wenn true werden nur Personen geliefert die bereits freigegeben sind aber noch nicht uebernommen
+	 * @param $kontaktmedium Wenn -1 werden alle geliefert die das Kontaktmedium nicht gesetzt haben, sonst bei denen das uebergeben Kontaktmedium ausgewaehlt ist
+	 * @param $absage
+	 * @param $erfassungsdatum_von
+	 * @param $erfassungsdatum_bis
+	 * @param $einverstaendnis
+	 * @param $preinteressent Wenn true werden nur die Personen angezeigt die noch nicht als Interessent oder Student in einem Studiengang vorhanden sind
 	 */
-	public function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null, $einverstaendnis=null)
+	public function loadPreinteressenten($studiengang_kz='', $studiensemester_kurzbz=null, $filter='', $nichtfreigegeben=null, $uebernommen=null, $kontaktmedium=null, $absage=false, $erfassungsdatum_von=null, $erfassungsdatum_bis=null, $einverstaendnis=null, $preinteressent=null)
 	{
 		$qry = "SELECT distinct tbl_preinteressent.* 
 				FROM public.tbl_preinteressent JOIN public.tbl_person USING(person_id) 
@@ -430,7 +438,12 @@ class preinteressent extends basis_db
 		if($uebernommen==true)
 			$qry.=" AND tbl_preinteressentstudiengang.freigabedatum is not null AND tbl_preinteressentstudiengang.uebernahmedatum is null";
 		if(!is_null($kontaktmedium))
-			$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz='".addslashes($kontaktmedium)."'";
+		{
+			if($kontaktmedium=='-1')
+				$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz is null";
+			else
+				$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz='".addslashes($kontaktmedium)."'";
+		}
 
 		if(!is_null($erfassungsdatum_bis))
 			$qry.=" AND erfassungsdatum<='".addslashes($erfassungsdatum_bis)."'";
@@ -445,6 +458,9 @@ class preinteressent extends basis_db
 		
 		if($einverstaendnis)
 			$qry.=" AND einverstaendnis=true";
+		
+		if($preinteressent)
+			$qry.=" AND NOT EXISTS (SELECT * FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id)";
 		
 		if($this->db_query($qry))
 		{
