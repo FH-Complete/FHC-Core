@@ -202,6 +202,9 @@ class lehreinheitmitarbeiter extends basis_db
 		if(!$this->validate())
 			return false;
 
+		$this->planstunden = (int)mb_str_replace(',', '.', $this->planstunden);
+		$this->semesterstunden = mb_str_replace(',', '.', $this->semesterstunden);
+		
 		if($new)
 		{
 			//Pruefen ob dieser Mitarbeiter schon zugeordnet ist
