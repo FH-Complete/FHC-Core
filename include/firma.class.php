@@ -365,7 +365,6 @@ class firma extends basis_db
 			$qry.= " WHERE ";
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search)));		
 			$qry.="  UPPER(trim(public.tbl_firma.name)) like '%".$matchcode."%'";
-		
 		}
 		
 		$qry.= " ORDER BY NAME"; 
@@ -776,7 +775,6 @@ class firma extends basis_db
 		}
 		return $this->firma_organisationseinheit_id;
 	}
-
 
 }
 ?>
