@@ -871,7 +871,6 @@ if($aktion == 'suche')
 							extraParams:{"work":"tags", "bestell_id":"'.$bestellung->bestellung_id.'"}
 						});
 					</script>';
-		
 			echo "</td>\n"; 
 			echo "<td>Freigabe:</td>\n";
 			echo "<td colspan =2>";
@@ -919,9 +918,7 @@ if($aktion == 'suche')
 				if($freigabe == false)
 				{
 					if(!$bestellung->isFreigegeben($bestellung->bestellung_id))
-					{
 						$bestellung->SetFreigegeben($bestellung->bestellung_id); 
-					}
 				}
 			}
 
@@ -949,7 +946,7 @@ if($aktion == 'suche')
 			foreach($detail->result as $det)
 			{
 				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
-				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto));
+				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto), $bestellung->bestellung_id);
 				$summe+=$brutto; 
 				$i++; 
 			}
@@ -1104,8 +1101,7 @@ if($aktion == 'suche')
 								test = document.getElementById("detail_anz").value;
 								document.getElementById("detail_anz").value = parseFloat(test) +1;
 							});
-				}
-	
+				}	
 			}
 			
 			function saveDetail(i )
@@ -1132,14 +1128,12 @@ if($aktion == 'suche')
 				function(data){
 				}); 
 			}
-		
 			</script>';
 			
 			$disabled ='';
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') )
 				$disabled ='disabled';
 			
-				
 			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
 			echo "<br><br>"; 
@@ -1241,7 +1235,7 @@ if($aktion == 'suche')
 		{
 			// Update auf Bestellung
 			$date = new datum(); 	
-		//	var_dump($_POST); 
+			//	var_dump($_POST); 
 			$save = false; 
 			
 			$bestellung_id = $_GET['bestellung'];
@@ -1339,7 +1333,6 @@ if($aktion == 'suche')
 										$detail_tag->saveBestelldetailTag();
 								}
 							} 
-							
 							$bestell_detail->position = $_POST["pos_$i"];
 							$bestell_detail->menge = $_POST["menge_$i"];
 							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
@@ -1440,15 +1433,13 @@ if($aktion == 'suche')
 							$status_abgeschickt->updateamum = date('Y-m-d H:i:s'); 
 		
 							if(!$status_abgeschickt->save())
-							{
 								echo "Fehler beim Setzen auf Status Abgeschickt.";
-							}
+
 							// wer ist freigabeberechtigt auf kostenstelle
 							$rechte = new benutzerberechtigung();
 							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
 							foreach($uids as $uid)
 							{
-								echo $uid; 
 								// E-Mail an Kostenstellenverantwortliche senden
 								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
 								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
@@ -1456,7 +1447,7 @@ if($aktion == 'suche')
 								if(!$mail->send())
 									echo 'Fehler beim Senden des Mails';
 								else
-									echo '<br> Mail verschickt!';
+									echo '<br> Mail verschickt an '.$uid.'!';
 							}
 						}
 					}
@@ -1542,7 +1533,6 @@ if($aktion == 'suche')
 					}
 					else
 					{
-
 						// Freigabestatus für Kostenstelle
 						$bestellung_new->load($bestellung_id); 
 						$status = new wawi_bestellstatus(); 
@@ -1602,10 +1592,22 @@ if($aktion == 'suche')
 		}
 	}
 
-	function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='')
+	// gibt eine Bestelldetailzeile aus
+	function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='', $bestell_id='')
 	{
+		$removeDetail ='';
+		$status= new wawi_bestellstatus(); 
+		// wenn status Storno oder Abgeschickt, kein löschen der Details mehr möglich
+		if(!$status->isStatiVorhanden($bestell_id,'Storno'))
+		{
+			if(!$status->isStatiVorhanden($bestell_id,'Abgeschickt'))
+			{
+				$removeDetail = "removeDetail(".$i.", ".$bestelldetail_id.")"; 
+			}
+		}
+		
 		echo "<tr id ='row_$i'>\n";
-		echo "<td><a onClick='removeDetail($i, $bestelldetail_id)' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_x.png\"> </a></td>\n";
+		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_x.png\"> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
