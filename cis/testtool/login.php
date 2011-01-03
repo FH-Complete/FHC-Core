@@ -168,17 +168,18 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <?php
 	if (isset($prestudent_id))
 	{	
+		$prestudent = new prestudent($prestudent_id);
+		$stg_obj = new studiengang($prestudent->studiengang_kz);		
+		$pruefling = new pruefling();
+		
 		echo '<form method="GET">';	
 		echo '<br>Sie sind angemeldet als '.$_SESSION['vorname'].' '.$_SESSION['nachname'];
 		echo ' ('.$_SESSION['gebdatum'].') ID: '.$_SESSION['prestudent_id'];		
 		echo '&nbsp; <INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
+		echo ' (Studiengang '.$stg_obj->bezeichnung.')';
 		echo '<br><br>';
-				
-		$prestudent = new prestudent($prestudent_id);
-		$stg_obj = new studiengang($prestudent->studiengang_kz);
 		
-		$pruefling = new pruefling();
 		if($pruefling->getPruefling($prestudent_id))
 		{
 		
@@ -186,7 +187,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
 			echo '<table>';
 			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'"></td></tr>';
-			echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
+			//echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
 			echo '<tr><td></td><td><input type="submit" name="save" value="OK"></td>';
 			echo '</table>';
 			echo '</FORM><br><br>';
