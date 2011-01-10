@@ -317,14 +317,14 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'StartKW muss zwischen 1 und 53 liegen';
 			return false;
 		}
-		if(mb_strlen($this->raumtyp)>8)
+		if(mb_strlen($this->raumtyp)>16)
 		{
-			$this->errormsg = 'Raumtyp darf nicht laenger als 8 Zeichen sein';
+			$this->errormsg = 'Raumtyp darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->raumtypalternativ)>8)
+		if(mb_strlen($this->raumtypalternativ)>16)
 		{
-			$this->errormsg = 'Raumtypalternativ darf nicht alenger als 8 Zeichen sein';
+			$this->errormsg = 'Raumtypalternativ darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if($this->raumtypalternativ=='')

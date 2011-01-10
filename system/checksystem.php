@@ -1766,6 +1766,80 @@ if(!@$db->db_query("SELECT 1 FROM public.tbl_geschaeftsjahr LIMIT 1"))
 		echo 'Tabelle public.tbl_geschaeftsjahr hinzugefuegt!<br>';
 }
 
+//Raumtyp_kurzbz von 8 auf 16 Zeichen verlaengern (tbl_lehreinheit)
+if($result = $db->db_query("SELECT character_maximum_length FROM information_schema.columns WHERE column_name='raumtyp' AND table_name='tbl_lehreinheit' AND table_schema='lehre';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->character_maximum_length==8)
+		{
+			$qry = "
+			DROP VIEW lehre.vw_lva_stundenplan;
+			DROP VIEW lehre.vw_lva_stundenplandev;
+			DROP VIEW campus.vw_student_lehrveranstaltung;
+			DROP VIEW campus.vw_lehreinheit;
+			
+			ALTER TABLE lehre.tbl_lehreinheit ALTER COLUMN raumtyp TYPE varchar(16);
+			ALTER TABLE lehre.tbl_lehreinheit ALTER COLUMN raumtypalternativ TYPE varchar(16);
+			
+			CREATE VIEW lehre.vw_lva_stundenplandev AS
+			SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, ( SELECT count(*) AS count
+			FROM lehre.tbl_stundenplandev
+			WHERE tbl_stundenplandev.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplandev.semester = lvb.semester AND (tbl_stundenplandev.verband = lvb.verband OR (tbl_stundenplandev.verband IS NULL OR tbl_stundenplandev.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplandev.gruppe = lvb.gruppe OR (tbl_stundenplandev.gruppe IS NULL OR tbl_stundenplandev.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplandev.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplandev.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+			FROM lehre.tbl_lehreinheit le
+			JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+			JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+			JOIN public.tbl_studiengang ON lvb.studiengang_kz = tbl_studiengang.studiengang_kz
+			JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+			JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+			
+			CREATE VIEW lehre.vw_lva_stundenplan AS
+			SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, ( SELECT count(*) AS count
+			FROM lehre.tbl_stundenplan
+			WHERE tbl_stundenplan.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplan.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplan.semester = lvb.semester AND (tbl_stundenplan.verband = lvb.verband OR (tbl_stundenplan.verband IS NULL OR tbl_stundenplan.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplan.gruppe = lvb.gruppe OR (tbl_stundenplan.gruppe IS NULL OR tbl_stundenplan.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplan.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplan.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+			FROM lehre.tbl_lehreinheit le
+			JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+			JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+			JOIN public.tbl_studiengang USING (studiengang_kz)
+			JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+			JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid);
+			
+			CREATE VIEW campus.vw_student_lehrveranstaltung AS
+			SELECT tbl_benutzergruppe.uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+           	FROM lehre.tbl_lehreinheitgruppe, tbl_benutzergruppe, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+          	WHERE tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
+			UNION 
+         	SELECT tbl_studentlehrverband.student_uid AS uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+           	FROM lehre.tbl_lehreinheitgruppe, tbl_studentlehrverband, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+          	WHERE tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_studentlehrverband.studiensemester_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester AND (btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text) OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND (btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text) OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL);
+          
+          	CREATE VIEW campus.vw_lehreinheit AS
+			SELECT tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre, tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon, tbl_lehreinheit.lehrfach_id, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehrveranstaltung.aktiv, tbl_lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor, tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz, tbl_lehrveranstaltung.bezeichnung_english AS lv_bezeichnung_english
+			FROM lehre.tbl_lehreinheit
+			JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+			JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+			JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+			JOIN tbl_mitarbeiter USING (mitarbeiter_uid)
+			JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
+			JOIN tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz;
+   
+			GRANT SELECT on lehre.vw_lva_stundenplan TO GROUP web;
+			GRANT SELECT on lehre.vw_lva_stundenplan TO GROUP admin;
+			GRANT SELECT on lehre.vw_lva_stundenplandev TO GROUP admin;
+			GRANT SELECT on lehre.vw_lva_stundenplandev TO GROUP web;
+			GRANT SELECT on campus.vw_student_lehrveranstaltung TO GROUP web;
+			GRANT SELECT on campus.vw_student_lehrveranstaltung TO GROUP admin;
+			GRANT SELECT on campus.vw_lehreinheit TO GROUP web;
+			GRANT SELECT on campus.vw_lehreinheit TO GROUP admin;
+			";
+			if(!$db->db_query($qry))
+				echo '<strong>lehre.tbl_lehreinheit: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo 'lehre.tbl_lehreinheit: Spalte raumtyp und raumtypalternativ auf 16 Zeichen verlaengert<br>';
+		}
+	}
+}
+
 echo '<br>';
 
 $tabellen=array(
