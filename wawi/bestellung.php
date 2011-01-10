@@ -1011,7 +1011,7 @@ if($aktion == 'suche')
 			/*
 			Berechnet die Brutto Summe für eine Zeile
 			*/
-			function calcLine(id)
+			function calcBrutto(id)
 		   	{
 		    	var brutto=0;
 	
@@ -1021,6 +1021,10 @@ if($aktion == 'suche')
 		    	
 		    	if(betrag!="" && mwst!="" && menge!="")
 		    	{
+		    	
+		    		betrag = betrag.replace(",",".");
+					mwst = mwst.replace(",",".");
+					
 		    		menge = parseFloat(menge);
 					betrag = parseFloat(betrag);
 					mwst = parseFloat(mwst);
@@ -1059,6 +1063,21 @@ if($aktion == 'suche')
 		    	}
 			    summe();
 		   	}
+		   	
+		   	function bruttonetto(id)
+			{
+				var inetto = $("#preisprove_"+id).val();
+				var ibrutto = $("#brutto_"+id).val();
+				
+				if(inetto=="" || inetto==0)
+				{
+					netto(id);
+				}
+				else
+				{
+					brutto(id);
+				}
+			}
 		   	
 		   	
 			/*
@@ -1633,12 +1652,12 @@ if($aktion == 'suche')
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_x.png\"> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
-		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcLine($i);'></input></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
 		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
-		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
-		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
+		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);'></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
