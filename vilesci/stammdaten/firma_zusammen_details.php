@@ -936,7 +936,14 @@ function zusammenlegen($firmendaten)
 		echo 'Fehler beim Aendern der Finanzamtzuordnung';
 		$error=true;
 	}
-			
+
+	//WaWi Bestellungen umhaengen
+	$qry = "UPDATE wawi.tbl_bestellung SET firma_id='$firma_id_bleibt' WHERE firma_id='$firma_id_geloescht'";
+	if(!$db->db_query($qry))
+	{
+		echo 'Fehler beim Aendern der Wawi Bestellung';
+		$error=true;
+	}
 	// Firma loeschen
 	$firma = new firma();
 	if(!$firma->delete($firma_id_geloescht))
