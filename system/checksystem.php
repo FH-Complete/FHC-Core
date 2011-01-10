@@ -1840,6 +1840,33 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 	}
 }
 
+// tbl_budget hinzufuegen
+if(!@$db->db_query("SELECT 1 FROM wawi.tbl_budget LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE wawi.tbl_budget
+	(
+		geschaeftsjahr_kurzbz varchar(32) NOT NULL,
+		kostenstelle_id bigint NOT NULL,
+		budget numeric(12,2) NOT NULL
+	);
+	
+	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT pk_budget PRIMARY KEY (geschaeftsjahr_kurzbz, kostenstelle_id);
+
+	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT fk_budget_kostenstelle FOREIGN KEY(kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT fk_budget_geschaeftsjahr FOREIGN KEY(geschaeftsjahr_kurzbz) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	GRANT SELECT, INSERT, DELETE, UPDATE ON wawi.tbl_budget TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budget TO wawi;
+	
+	ALTER TABLE wawi.tbl_kostenstelle DROP COLUMN budget;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_budget: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle wawi.tbl_budget hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2000,9 +2027,10 @@ $tabellen=array(
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),
+	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
-	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","budget","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
+	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
