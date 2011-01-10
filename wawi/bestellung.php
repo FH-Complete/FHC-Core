@@ -1032,6 +1032,35 @@ if($aktion == 'suche')
 			    summe();
 		   	}
 	
+		   	function calcNetto(id)
+		   	{
+		    	var brutto=0;
+	
+		    	var menge = $("#menge_"+id).val();
+		    	var brutto = $("#brutto_"+id).val();
+		    	var mwst = $("#mwst_"+id).val();
+		    	
+		    	if(brutto!="" && mwst!="" && menge!="")
+		    	{
+			    	brutto = brutto.replace(",",".");
+					mwst = mwst.replace(",",".");
+					menge = parseFloat(menge);
+					brutto = parseFloat(brutto);
+					mwst = parseFloat(mwst);
+					
+					// Nettopreis berechnen
+					var netto = brutto/(100+mwst)*100;
+					var netto = netto / menge;
+					
+					//auf 2 Nachkommastellen runden
+					netto = Math.round(netto*100)/100;
+					netto.toFixed(2); 
+					$("#preisprove_"+id).val(netto);
+		    	}
+			    summe();
+		   	}
+		   	
+		   	
 			/*
 			Berechnet die gesamte Brutto Summe für eine Bestellung
 			*/
@@ -1610,7 +1639,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcLine($i);'></input></td>\n";
 		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcLine($i);'></input></td>\n";
-		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' ></input></td>\n";
+		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);'></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); 
