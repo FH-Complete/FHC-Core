@@ -46,6 +46,7 @@ class wawi_bestellung extends basis_db
 	public $insertamum; 		// timestamp
 	public $insertvon; 			// char
 	public $ext_id;				// int 
+	public $zahlungstyp_kurzbz; // varchar
 	
 	public $result = array(); 
 	public $user; 
@@ -105,6 +106,7 @@ class wawi_bestellung extends basis_db
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon; 
 			$this->ext_id = $row->ext_id; 
+			$this->zahlungstyp_kurzbz = $row->zahlungstyp_kurzbz; 
 		}
 		else
 		{
@@ -149,6 +151,7 @@ class wawi_bestellung extends basis_db
 			$bestellung->insertamum = $row->insertamum; 
 			$bestellung->insertvon = $row->insertvon; 
 			$bestellung->ext_id = $row->ext_id; 
+			$bestellung->zahlungstyp_kurzbz = $row->$zahlungstyp_kurzbz; 
 			
 			$this->result[] = $bestellung; 
 		}
@@ -247,6 +250,7 @@ class wawi_bestellung extends basis_db
 			$bestellung->insertamum = $row->insert; 
 			$bestellung->insertvon = $row->insert_von; 
 			$bestellung->ext_id = $row->ext_id; 
+			$bestellung->zahlungstyp_kurzbz = $row->zahlungstyp_kurzbz; 
 			
 			$this->result[] = $bestellung; 
 		}
@@ -353,7 +357,7 @@ class wawi_bestellung extends basis_db
 				$freigegeben_new = 'true';
 				
 			$qry = 'BEGIN; INSERT INTO wawi.tbl_bestellung (besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, 
-			freigegeben, bestell_nr, titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES ('.
+			freigegeben, bestell_nr, titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id, zahlungstyp_kurzbz) VALUES ('.
 			$this->addslashes($this->besteller_uid).', '.
 			$this->addslashes($this->kostenstelle_id).', '.
 			$this->addslashes($this->konto_id).', '.
@@ -369,7 +373,8 @@ class wawi_bestellung extends basis_db
 			$this->addslashes($this->updatevon).', '.
 			$this->addslashes($this->insertamum).', '.
 			$this->addslashes($this->insertvon).', '.
-			$this->addslashes($this->ext_id).')';
+			$this->addslashes($this->ext_id).', '.
+			$this->addslashes($this->zahlungstyp_kurzbz).')';
 
 		}
 		else
@@ -389,7 +394,8 @@ class wawi_bestellung extends basis_db
 			liefertermin = '.$this->addslashes($this->liefertermin).',
 			updateamum = '.$this->addslashes($this->updateamum).',
 			updatevon ='.$this->addslashes($this->updatevon).',
-			ext_id = '.$this->addslashes($this->ext_id).' WHERE bestellung_id = '.$this->bestellung_id.';'; 
+			ext_id ='.$this->addslashes($this->ext_id).',
+			zahlungstyp_kurzbz = '.$this->addslashes($this->zahlungstyp_kurzbz).' WHERE bestellung_id = '.$this->bestellung_id.';'; 
 		}
 		if($this->db_query($qry))
 		{
