@@ -729,6 +729,17 @@
 	});
 	
 	ts.addParser({
+		id: "digitmittausenderpunkt",
+		is: function(s) {
+			return /^[0-9.,]/.test(s);
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat(s.replace('.',""));
+		},
+		type: "numeric"
+	});
+	
+	ts.addParser({
 		id: "integer",
 		is: function(s,table) {
 			var c = table.config;
@@ -743,10 +754,10 @@
 	ts.addParser({
 		id: "currency",
 		is: function(s) {
-			return /^[£$€?.,]/.test(s);
+			return /^[£$€?.]/.test(s);
 		},
 		format: function(s) {
-			return $.tablesorter.formatFloat(s.replace(new RegExp(/[^0-9.,]/g),""));
+			return $.tablesorter.formatFloat(s.replace(new RegExp(/[^0-9.]/g),""));
 		},
 		type: "numeric"
 	});
