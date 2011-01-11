@@ -173,7 +173,7 @@ class wawi_bestellung extends basis_db
 	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null)
 	{
 		$first = true; 
-		$qry = "SELECT distinct on (bestellung.bestellung_id) *, status.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
+		$qry = "SELECT distinct on (bestellung.bestellung_id) *, bestellung.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
 		FROM 
 		wawi.tbl_bestellung bestellung
 		
