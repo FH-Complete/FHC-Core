@@ -1884,8 +1884,8 @@ if(!@$db->db_query("SELECT 1 FROM wawi.tbl_zahlungstyp LIMIT 1"))
 
 	ALTER TABLE wawi.tbl_bestellung ADD CONSTRAINT fk_bestellung_zahlungstyp FOREIGN KEY(zahlungstyp_kurzbz) REFERENCES wawi.tbl_zahlungstyp (zahlungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
 	
-	GRANT SELECT, INSERT, DELETE, UPDATE ON wawi.tbl_budget TO admin;
-	GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budget TO wawi;
+	GRANT SELECT, INSERT, DELETE, UPDATE ON wawi.tbl_zahlungstyp TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_zahlungstyp TO wawi;
 	
 	";
 	
