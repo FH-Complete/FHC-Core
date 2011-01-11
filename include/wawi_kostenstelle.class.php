@@ -23,6 +23,7 @@
  * Klasse WaWi Kostenstelle
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/geschaeftsjahr.class.php');
 
 class wawi_kostenstelle extends basis_db
 {
@@ -35,7 +36,6 @@ class wawi_kostenstelle extends basis_db
 	public $bezeichnung;				// string
 	public $kurzbz; 					// string
 	public $aktiv; 						// boolean
-	public $budget;						// integer
 	public $updateamum;					// timestamp
 	public $updatevon;					// string
 	public $insertamum;					// timestamp
@@ -88,7 +88,6 @@ class wawi_kostenstelle extends basis_db
 			$this->bezeichnung = $row->bezeichnung;
 			$this->kurzbz = $row->kurzbz;
 			$this->aktiv = ($row->aktiv=='t'?true:false);
-			$this->budget = $row->budget; 
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
@@ -139,7 +138,6 @@ class wawi_kostenstelle extends basis_db
 			$obj->bezeichnung = $row->bezeichnung;
 			$obj->kurzbz = $row->kurzbz;
 			$obj->aktiv = ($row->aktiv=='t'?true:false);
-			$obj->budget = $row->budget; 
 			$obj->updateamum = $row->updateamum;
 			$obj->updatevon = $row->updatevon;
 			$obj->insertamum = $row->insertamum;
@@ -253,13 +251,12 @@ class wawi_kostenstelle extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO wawi.tbl_kostenstelle (oe_kurzbz, bezeichnung, kurzbz, aktiv, budget, updateamum, updatevon,
+			$qry='BEGIN;INSERT INTO wawi.tbl_kostenstelle (oe_kurzbz, bezeichnung, kurzbz, aktiv, updateamum, updatevon,
 			insertamum,	insertvon, ext_id, kostenstelle_nr, deaktiviertamum, deaktiviertvon ) VALUES('.
 			      $this->addslashes($this->oe_kurzbz).', '.
 			      $this->addslashes($this->bezeichnung).', '.
 			      $this->addslashes($this->kurzbz).', '.
 			      ($this->aktiv?'true':'false').', '.
-			      $this->addslashes($this->budget).', '.
 				  $this->addslashes($this->updateamum).', '.
 			      $this->addslashes($this->updatevon).', '.				  
 			      $this->addslashes($this->insertamum).', '.
@@ -283,7 +280,6 @@ class wawi_kostenstelle extends basis_db
 				' bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				' kurzbz='.$this->addslashes($this->kurzbz).', '.
 		      	' aktiv='.($this->aktiv?'true':'false').', '.
-				' budget='.$this->addslashes($this->budget).', '.
 				' updateamum='.$this->addslashes($this->updateamum).', '.			
 				' updatevon='.$this->addslashes($this->updatevon).', '.	
 				' insertamum='.$this->addslashes($this->insertamum).', '.
@@ -518,7 +514,6 @@ class wawi_kostenstelle extends basis_db
 			$obj->bezeichnung = $row->bezeichnung;
 			$obj->kurzbz = $row->kurzbz;
 			$obj->aktiv = ($row->aktiv=='t'?true:false);
-			$obj->budget = $row->budget; 
 			$obj->updateamum = $row->updateamum;
 			$obj->updatevon = $row->updatevon;
 			$obj->insertamum = $row->insertamum;
@@ -531,5 +526,40 @@ class wawi_kostenstelle extends basis_db
 			$this->result[] = $obj; 
 		}
 		return true; 
+	}
+	
+	/**
+	 * Liefert das Budget einer Kostenstelle in einem Geschaeftsjahr
+	 *
+	 * @param $kostenstelle_id ID der Kostenstelle
+	 * @param $geschaeftsjahr_kurzbz Geschaeftsjahr, wenn keines Uebergeben wird, wird das aktuelle genommen
+	 */
+	public function getBudget($kostenstelle_id, $geschaeftsjahr_kurzbz=null)
+	{
+		if(is_null($geschaeftsjahr_kurzbz))
+		{
+			$gj = new geschaeftsjahr();
+			$geschaeftsjahr_kurzbz = $gj->getAkt();
+		}
+		
+		$qry = "SELECT budget FROM wawi.tbl_budget WHERE kostenstelle_id=".$this->addslashes($kostenstelle_id)." AND geschaeftsjahr_kurzbz=".$this->addslashes($geschaeftsjahr_kurzbz).";";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->budget;
+			}
+			else
+			{
+				$this->errormsg = 'Es gibt kein Budget für diese Kostenstelle';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Budgets';
+			return false;
+		}
 	}
 }

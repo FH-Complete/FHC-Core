@@ -425,9 +425,10 @@ else
 		{
 			//Zeilen der Tabelle ausgeben
 			echo "<tr>\n";
-			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&id=$row->konto_id\" title='Bearbeiten'> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&id=$row->konto_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>\n";
+			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&amp;id=$row->konto_id\" title='Bearbeiten'> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&amp;id=$row->konto_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a></td>\n";
 			echo '<td>'.$row->kontonr."</td>\n";
 			echo '<td>'.$row->kurzbz."</td>\n";
+			
 			$i = 1; 
 			foreach($sprache->result as $s)
 			{
@@ -438,7 +439,7 @@ else
 				$i++;
 			}
 				
-			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
+			echo '<td>'.($row->aktiv?'ja':'nein')."</td>\n";
 			echo "</tr>\n";
 			
 		}

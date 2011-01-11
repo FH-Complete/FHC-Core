@@ -120,16 +120,6 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							$update_count++;
 						}
 						
-						if($row_neu->budget != $row->budget)
-						{
-							if($bedingung!='')
-								$bedingung.=',';
-							$bedingung .= " budget=".$db->addslashes($row->budget);
-							$updated_lines .= "budget von: \"".$row_neu->budget."\" auf: \"".$row->budget."\"\n";
-							
-							$update_count++;
-						}
-						
 						if($row_neu->ext_id != $row->kostenstelle_id)
 						{
 							if($bedingung!='')
@@ -237,6 +227,42 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 							$error_count++;
 						}
 					}
+					
+					if($row->budget=='')
+					{
+						$row->budget=0;
+					}
+					$gj = 'GJ2010-2011';
+					//Budget
+					$qry_budget = "SELECT budget FROM wawi.tbl_budget WHERE kostenstelle_id = '$row_neu->kostenstelle_id' AND geschaeftsjahr_kurzbz='$gj'";
+					if($result_budget = $db->db_query($qry_budget))
+					{
+						$qry_budget='';
+						if($row_budget = $db->db_fetch_object($result_budget))
+						{
+							if($row_budget->budget!=$row->budget)
+							{
+								$qry_budget = "UPDATE wawi.tbl_budget SET budget='$row->budget WHERE kostenstelle_id='$row_neu->kostenstelle_id' AND geschaeftsjahr_kurzbz='$gj'";
+								$updated_lines .= "budget im gj $gj von: \"".$row_budget->budget."\" auf: \"".$row->budget."\"\n";
+								$update_count++;
+							}
+						}
+						else
+						{
+							$qry_budget = "INSERT INTO wawi.tbl_budget(kostenstelle_id, geschaeftsjahr_kurzbz, budget) VALUES('".$row_neu->kostenstelle_id."','".$gj."','".$row->budget."');";
+							$updated_lines .= "budget im gj $gj auf: \"".$row->budget."\"\n";
+							$insert_count++;
+						}
+						
+						if($qry_budget!='')
+						{
+							if(!$db->db_query($qry_budget))
+							{
+								$error_count++;
+								$errormsg.="Fehler beim Aktualisieren des Budgets:".$qry_budget;
+							}
+						}
+					}						
 				}
 				else
 				{
