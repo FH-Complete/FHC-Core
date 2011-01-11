@@ -677,6 +677,13 @@
 				return RegExp(exp).test($.trim(s));
 			};
 			
+			this.isInt = function(s,config) {
+				if(isNaN(parseInt(s)))
+					return false;
+				else
+					return true;
+			};
+			
 			this.clearTableBody = function(table) {
 				if($.browser.msie) {
 					function empty() {
@@ -722,12 +729,24 @@
 	});
 	
 	ts.addParser({
-		id: "currency",
-		is: function(s) {
-			return /^[£$€?.]/.test(s);
+		id: "integer",
+		is: function(s,table) {
+			var c = table.config;
+			return $.tablesorter.isInt(s,c);
 		},
 		format: function(s) {
-			return $.tablesorter.formatFloat(s.replace(new RegExp(/[^0-9.]/g),""));
+			return $.tablesorter.formatInt(s);
+		},
+		type: "numeric"
+	});
+	
+	ts.addParser({
+		id: "currency",
+		is: function(s) {
+			return /^[£$€?.,]/.test(s);
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat(s.replace(new RegExp(/[^0-9.,]/g),""));
 		},
 		type: "numeric"
 	});

@@ -52,7 +52,7 @@ require_once('../include/benutzerberechtigung.class.php');
 
 		function conf_del()
 		{
-			return confirm('Diese Gruppe wirklich löschen?');
+			return confirm('Wollen Sie diese Kostenstelle wirklich löschen?');
 		}
 			
 	</script>
@@ -306,7 +306,7 @@ if(isset($_GET['method']))
 	else if ($_GET['method']=="allocate")
 	{
 		// zu konto zuordnen
-		if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'su',$_GET['id']))
+		if(!$rechte->isBerechtigt('wawi/kostenstelle',null, 'su',$_GET['id']))
 				die('Sie haben keine Berechtigung zum Ändern der Kostenstelle');
 		
 		echo '<h1>Kostenstelle - Konten zuordnen</h1><br>';
@@ -377,7 +377,7 @@ if(isset($_GET['method']))
 	}
 	else if ($_GET['method']=="merge") 
 	{			
-		if(!$rechte->isberechtigt('wawi/kostenstelle',null, 'suid'))
+		if(!$rechte->isBerechtigt('wawi/kostenstelle',null, 'suid'))
 				die('Sie haben keine Berechtigung zum Zusammenlegen von Kostenstellen');
 		
 		echo '<h1>Kostenstelle - Zusammenlegen</h1>';
@@ -510,7 +510,7 @@ else
 { 
 	// alle anzeigen
 	echo "<h1>Kostenstelle - &Uuml;bersicht</h1>\n";
-	if(!$rechte->isberechtigt('wawi/kostenstelle',null, 's'))
+	if(!$rechte->isBerechtigt('wawi/kostenstelle',null, 's'))
 		die('Sie haben keine Berechtigung zum Anzeigen der Kostenstellen');
 			
 	if($kostenstelle->getAll())
@@ -540,7 +540,8 @@ else
 			echo '<td>'.$row->kostenstelle_nr."</td>\n";
 			echo '<td>'.$row->bezeichnung."</td>\n";
 			echo '<td>'.$row->kurzbz."</td>\n";
-			echo '<td>'.number_format($row->budget, 2, ",",".")."</td>\n";
+			$budget = $kostenstelle->getBudget($row->kostenstelle_id);
+			echo '<td class="number">'.number_format($budget, 2, ",",".")."</td>\n";
 			echo '<td>'.$row->oe_kurzbz."</td>\n";
 			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
 			echo "</tr>\n";
