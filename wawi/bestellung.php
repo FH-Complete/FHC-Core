@@ -37,6 +37,7 @@ require_once '../include/wawi_kostenstelle.class.php';
 require_once '../include/wawi_bestelldetails.class.php';
 require_once '../include/wawi_aufteilung.class.php'; 
 require_once '../include/wawi_bestellstatus.class.php';
+require_once '../include/wawi_zahlungstyp.class.php';
 require_once '../include/tags.class.php';
 
 $aktion ='';
@@ -743,8 +744,8 @@ if($aktion == 'suche')
 			
 			echo "<h2>Bearbeiten</h2>";
 			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
-			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."</h4>";
-			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'">Bestellung kopieren</a>'; 
+			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."";
+			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> Bestellung kopieren</a></h4>'; 
 			//tabelle Bestelldetails
 			echo "<table border = 0 width= '100%' class='dark'>\n";
 			echo "<tr>\n"; 	
@@ -917,6 +918,19 @@ if($aktion == 'suche')
 			}
 
 			echo "</td></tr>";
+			echo "<tr><td>Zahlungstyp:</td>"; 
+			echo "<td><SELECT name='filter_zahlungstyp' id='search_zahlungstyp' style='width: 230px;'>\n"; 
+			echo "<option value=''>-- Kein Typ ausgewählt --</option>"; 
+			$zahlungstyp = new wawi_zahlungstyp(); 
+			$zahlungstyp->getAll(); 
+			foreach($zahlungstyp->result as $typ)
+			{ 
+				$selected = ''; 
+				if($bestellung->zahlungstyp_kurzbz == $typ->zahlungstyp_kurzbz)
+					$selected = "selected"; 
+				echo '<option value='.$typ->zahlungstyp_kurzbz.' '.$selected.'>'.$typ->bezeichnung."</option>\n";
+			}
+			echo "</td></tr>"; 
 			echo "</table>\n";
 			echo "<br>";
 			
@@ -956,7 +970,7 @@ if($aktion == 'suche')
 			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
-			echo "<td colspan ='2'>Gesamtpreis/Brutto: </td>";
+			echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis/Brutto: € </td>";
 			echo "<td id = 'brutto'></td>";
 			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' value='$test'></input></td>"; 
 			echo "</tr>";
@@ -1064,7 +1078,7 @@ if($aktion == 'suche')
 			    summe();
 		   	}
 		   	
-		   	function bruttonetto(id)
+		   	function calcBruttoNetto(id)
 			{
 				var inetto = $("#preisprove_"+id).val();
 				var ibrutto = $("#brutto_"+id).val();
@@ -1314,6 +1328,7 @@ if($aktion == 'suche')
 					$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
 					$bestellung_new->updateamum = date('Y-m-d H:i:s');
 					$bestellung_new->updatevon = $user; 
+					$bestellung_new->zahlungstyp_kurzbz = $_POST['filter_zahlungstyp'];
 					$tags = explode(";", $_POST['tags']);
 					$help_tags = new tags(); 
 					$help_tags->bestellung_id = $bestellung_id; 
@@ -1380,7 +1395,7 @@ if($aktion == 'suche')
 							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-							$bestell_detail->preisprove = $_POST["preisprove_$i"];
+							$bestell_detail->preisprove = mb_str_replace(',','.', $_POST["preisprove_$i"]);
 							$bestell_detail->mwst = $_POST["mwst_$i"];
 							$bestell_detail->updateamum = date('Y-m-d H:i:s');
 							$bestell_detail->updatevon = $user;
@@ -1395,7 +1410,7 @@ if($aktion == 'suche')
 							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-							$bestell_detail->preisprove = $_POST["preisprove_$i"];
+							$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
 							$bestell_detail->mwst = $_POST["mwst_$i"];
 							$bestell_detail->sort = $_POST["pos_$i"];
 							$bestell_detail->insertamum = date('Y-m-d H:i:s');
@@ -1404,7 +1419,6 @@ if($aktion == 'suche')
 							$bestell_detail->updatevon = $user;
 							$bestell_detail->new = true; 
 						}
-						
 						if(!$bestell_detail->save())
 						{
 							echo $bestell_detail->errormsg; 
@@ -1657,7 +1671,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
-		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);'></input></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);'></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
