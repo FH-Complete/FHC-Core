@@ -43,7 +43,7 @@ class wawi_aufteilung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Konstruktor
 	 * @param unknown_type $aufteilung_id
 	 */
 	public function __construct($aufteilung_id=null)
@@ -101,7 +101,7 @@ class wawi_aufteilung extends basis_db
 		
 		if($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			while($row = $this->db_fetch_object())
 			{
 				$aufteilung = new wawi_aufteilung(); 
 				
