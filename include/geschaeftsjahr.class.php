@@ -20,7 +20,7 @@
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
 require_once('basis_db.class.php');
-require_onve('datum.class.php'); 
+require_once('datum.class.php'); 
 
 class geschaeftsjahr extends basis_db
 {
