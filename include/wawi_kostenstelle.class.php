@@ -562,4 +562,61 @@ class wawi_kostenstelle extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Speichert das Budget einer Kostenstelle
+	 * 
+	 * @param $kostenstelle_id
+	 * @param $geschaeftsjahr_kurzbz
+	 * @param $budget
+	 */
+	public function setBudget($kostenstelle_id, $geschaeftsjahr_kurzbz, $budget)
+	{
+		if($kostenstelle_id=='')
+		{
+			$this->errormsg = 'KostenstelleID muss uebergeben weden';
+			return false;
+		}
+		if($geschaeftsjahr_kurzbz=='')
+		{
+			$this->errormsg = 'Geschaeftsjahr muss uebergeben werden';
+			return false;
+		}
+		if($budget=='')
+			$budget='0';
+		
+		if(!is_numeric($budget))
+		{
+			$this->errormsg = 'Budget ist ungueltig';
+			return false;
+		}
+		
+		$qry = '';
+		if($old_budget = $this->getBudget($kostenstelle_id, $geschaeftsjahr_kurzbz))
+		{
+			if($old_budget!=$budget)
+			{
+				$qry = "UPDATE wawi.tbl_budget SET budget=".$this->addslashes($budget)." WHERE kostenstelle_id=".$this->addslashes($kostenstelle_id)." AND geschaeftsjahr_kurzbz=".$this->addslashes($geschaeftsjahr_kurzbz).";";
+			}
+		}
+		else
+		{
+			$qry = "INSERT INTO wawi.tbl_budget(kostenstelle_id, geschaeftsjahr_kurzbz, budget) VALUES(".$this->addslashes($kostenstelle_id).",".$this->addslashes($geschaeftsjahr_kurzbz).",".$this->addslashes($budget).");";
+		}
+		
+		if($qry!='')
+		{
+			if($this->db_query($qry))
+			{
+				return true;
+			}
+			else
+			{
+				$this->errormsg='Fehler beim Speichern des Budgets';
+				return false;
+			}
+		}
+		else
+			return true;
+	}
 }

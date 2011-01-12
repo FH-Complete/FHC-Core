@@ -66,10 +66,6 @@ checkBerechtigung('wawi/rechnung_transfer','Setzen des TransferDatums von Rechnu
  * 
  * Direkte Kostenstellenzuordnung
  * UNION
- * Kostenstellenzuordnung über Gruppen
- * UNION
- * Studiengangszuordnung über Gruppen
- * UNION
  * Direkte Studiengangszuordnung
  */
 $qry="
@@ -81,7 +77,22 @@ $qry="
 		public.kostenstelle_benutzer 
 		JOIN public.benutzer USING(user_id)
 	UNION
-	SELECT 
+	SELECT
+		username_neu, lesen, schreiben, freigeben, verwalten, null as kostenstelle_id, oe_kurzbz
+	FROM
+		public.studiengang_benutzer
+		JOIN public.benutzer USING(user_id)
+		JOIN public.studiengang USING(studiengang_id)		
+	";
+/*
+ * Wird nicht uebernommen:
+ * 
+ * Kostenstellenzuordnung über Gruppen
+ * UNION
+ * Studiengangszuordnung über Gruppen
+ * UNION
+
+SELECT 
 		username_neu, lesen, schreiben, freigeben, verwalten, kostenstelle_id, null as oe_kurzbz
 	FROM
 		public.kostenstelle_gruppe
@@ -96,13 +107,7 @@ $qry="
 		JOIN public.benutzer USING(user_id)
 		JOIN public.studiengang USING(studiengang_id)
 	UNION
-	SELECT
-		username_neu, lesen, schreiben, freigeben, verwalten, null as kostenstelle_id, oe_kurzbz
-	FROM
-		public.studiengang_benutzer
-		JOIN public.benutzer USING(user_id)
-		JOIN public.studiengang USING(studiengang_id)		
-	";
+*/
 if($result=pg_query($conn_wawi, $qry))
 {
 

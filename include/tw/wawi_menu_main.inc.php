@@ -26,7 +26,7 @@ $menu=array
 (
 	'Administration'=> 		array
 	(
-		'name'=>'Administration', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('wawi/kostenstelle','wawi/konto'), 
+		'name'=>'Administration', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('wawi/kostenstelle','wawi/konto','wawi/budget'), 
 
 		'Konto'=>array
 		(
@@ -39,6 +39,7 @@ $menu=array
 			'name'=>'Kostenstelle', 'permissions'=>array('wawi/kostenstelle'),'link'=>'kostenstellenuebersicht.php', 'target'=>'content',
 			'KostenstelleNeu'=>array('name'=>'Neu', 'link'=>'kostenstellenuebersicht.php?method=update', 'target'=>'content'),
 			'KostenstelleZusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'kostenstellenuebersicht.php?method=merge', 'target'=>'content'),
+			'Budgeteingabe'=>array('name'=>'Budgeteingabe', 'permissions'=>array('wawi/budget'), 'link'=>'budget.php', 'target'=>'content'),
 		),
 	),
 	'Benutzerbereich'=> 	array
