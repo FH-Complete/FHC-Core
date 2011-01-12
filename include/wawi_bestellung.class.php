@@ -724,5 +724,71 @@ class wawi_bestellung extends basis_db
 		} 
 		return false; 
 	}
+	
+	/**
+	 * 
+	 * Liefert die nächste Bestellnummer der Kostenstelle zurück
+	 * @param $kostenstelle_id
+	 */
+	public function createBestellNr($kostenstelle_id)
+	{
+		// kostenstelle holen
+	$qry="select * from kostenstelle where kostenstelle_id=$kostenstelle_id";
+	$result=@pg_query($conn, $qry);
+	$row=@pg_fetch_object($result);
+	$kostenstelle_kz=$row->kurzzeichen;
+	// studiengang-id zur kostenstelle
+	$studiengang_id=$row->studiengang_id;
+	// studiengang holen
+	$qry="select * from studiengang where studiengang_id=$studiengang_id";
+	$result=@pg_query($conn, $qry);
+	$row=@pg_fetch_object($result);
+	$studiengang_kz=$row->kurzzeichen;
+
+	$akt_timestamp=time();
+	$akt_datum=getdate($akt_timestamp);
+	$akt_mon=$akt_datum[mon];
+	$akt_year=$akt_datum[year];
+	if ($akt_mon<9)
+		$akt_year--;
+	$akt_year=substr($akt_year,2,2);
+	$laenge=strlen($studiengang_kz.$akt_year.$kostenstelle_kz);
+	$sql_query="SELECT distinct substr(bestellnr,$laenge+1,3) as nr FROM bestellung ".
+	" WHERE bestellnr LIKE '$studiengang_kz$akt_year$kostenstelle_kz"."___' ".
+	"ORDER BY nr ";
+	//echo $sql_query."<br>";
+	$result=@pg_query($conn, $sql_query);
+	$i=0;
+	if (@pg_num_rows($result)==0)
+		$bnum="000";
+	else
+	{
+		while ($row=@pg_fetch_object($result))
+		{
+			$bnum=$row->nr;
+			if ($i!=(int)$bnum)
+			{
+				if ($i==0)
+				{
+					$bnum=-1;
+				}
+				else
+				{
+					$row=@pg_fetch_object($result, --$i);
+					$bnum=$row->nr;
+					$i=@pg_num_rows($result);
+					//echo "Nachher: i=$i bnum=$bnum<br>";
+				}
+				break;
+			}
+			$i++;
+		}
+		$bnum++;
+	}
+	for ($i=0;strlen($bnum)<3;$i++)
+	$bnum="0".$bnum;
+	$bnum=sprintf("%s%s%s%s",$studiengang_kz,$akt_year,$kostenstelle_kz,$bnum);
+	return $bnum;
+	}
 
 }
