@@ -25,6 +25,7 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/geschaeftsjahr.class.php');
 
+
 class wawi_kostenstelle extends basis_db
 {
 	public $new; 						// boolean
@@ -562,6 +563,7 @@ class wawi_kostenstelle extends basis_db
 			return false;
 		}
 	}
+	
 	
 	/**
 	 * Speichert das Budget einer Kostenstelle
