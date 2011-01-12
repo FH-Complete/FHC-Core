@@ -20,6 +20,7 @@
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
 require_once('basis_db.class.php');
+require_onve('datum.class.php'); 
 
 class geschaeftsjahr extends basis_db
 {
@@ -223,6 +224,30 @@ class geschaeftsjahr extends basis_db
 			$this->errormsg = 'Fehler beim Ermitteln des vorangegangenen Geschaeftsjahr';
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * Liefert das Geschäftsjahr eines Datums zurück
+	 * @param $datum
+	 */
+	public function getSpecific($datum)
+	{
+		$date = new datum; 
+		$newDatum = $date->formatDatum($datum,'Y-m-d');
+		
+		$qry = "SELECT * FROM public.tbl_geschaeftsjahr 
+		WHERE '$newDatum' > public.tbl_geschaeftsjahr.start AND 
+		'$newDatum' < public.tbl_geschaeftsjahr.ende;";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->geschaeftsjahr_kurbz; 
+			}
+		}
+		return false; 
 	}
 }
 ?>
