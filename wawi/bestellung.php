@@ -1396,8 +1396,11 @@ if($aktion == 'suche')
 										$detail_tag->saveBestelldetailTag();
 								}
 							} 
+							$menge = $_POST["menge_$i"]; 
+							if($menge == '')
+								$menge = '0'; 
 							$bestell_detail->position = $_POST["pos_$i"];
-							$bestell_detail->menge = $_POST["menge_$i"];
+							$bestell_detail->menge = $menge;
 							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
@@ -1410,9 +1413,12 @@ if($aktion == 'suche')
 						else 
 						{
 							// Insert
+							$menge = $_POST["menge_$i"]; 
+							if($menge == '')
+								$menge = '0'; 
 							$bestell_detail->bestellung_id = $_GET['bestellung'];
 							$bestell_detail->position = $_POST["pos_$i"];
-							$bestell_detail->menge = $_POST["menge_$i"];
+							$bestell_detail->menge = $menge;
 							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
