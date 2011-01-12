@@ -25,6 +25,8 @@ require_once('../include/organisationseinheit.class.php');
 require_once('auth.php');
 require_once('../include/wawi_kostenstelle.class.php');
 require_once('../include/wawi_konto.class.php');
+require_once('../include/wawi_rechnung.class.php');
+require_once('../include/geschaeftsjahr.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -340,7 +342,8 @@ if(isset($_GET['method']))
 					if(!$kostenstelle->check_konto_kostenstelle($kostenstelle_id, $konto_id))
 					{
 						if(!$kostenstelle->save_konto_kostenstelle($kostenstelle_id, $konto_id))
-							$message = 'Es ist ein Fehler beim Speichern aufgetreten.<br><br>';					}
+							$message = 'Es ist ein Fehler beim Speichern aufgetreten.<br><br>';					
+					}
 				}
 			}
 			if(!$kostenstelle->delete_konto_kostenstelle($kostenstelle_id, $active))
@@ -517,33 +520,52 @@ else
 	{
 		//echo '<a href="kostenstellenuebersicht.php?method=update">neue Kostenstelle anlegen </a><br>';
 		//echo '<a href="kostenstellenuebersicht.php?method=merge">Konten zusammenlegen </a><br><br>';
+		$gj = new geschaeftsjahr();
+		$geschaeftsjahr_kurzbz = $gj->getakt();
 		
 		echo "<table id='myTable' class='tablesorter'> <thead>\n";
 		
 		echo '<tr>
 				<th></th>
-				<th>Kostenstelle_id</th>
-				<th>Kostenstelle_Nr</th>
+				<th>ID</th>
+				<th>Nr</th>
 				<th>Bezeichnung</th>
 				<th>Kurzbezeichnung</th>
-				<th>Budget</th>
+				<th>Restbudget für <br>'.$geschaeftsjahr_kurzbz.'</th>
 				<th>Organisationseinheit</th>
-				<th>aktiv</th>
+				<th>Aktiv</th>
 			  </tr></thead><tbody>';
-	
+		
+		$rechnung = new wawi_rechnung();
 		foreach($kostenstelle->result as $row)
 		{
 			//Zeilen der Tabelle ausgeben
 			echo "<tr>\n";
-			echo "<td nowrap> <a href=\"kostenstellenuebersicht.php?method=allocate&id=$row->kostenstelle_id\" title=\"Konten zuordnen\"><img src=\"../skin/images/addKonto.png\"></a> <a href= \"kostenstellenuebersicht.php?method=update&id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kostenstellenuebersicht.php?method=delete&id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>\n";
+			echo "
+				<td nowrap> 
+				<a href=\"kostenstellenuebersicht.php?method=allocate&amp;id=$row->kostenstelle_id\" title=\"Konten zuordnen\"> <img src=\"../skin/images/addKonto.png\"></a> 
+				<a href= \"kostenstellenuebersicht.php?method=update&amp;id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a>
+				<a href=\"kostenstellenuebersicht.php?method=delete&amp;id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>\n
+				</td>
+				";
 			echo '<td>'.$row->kostenstelle_id."</td>\n";
 			echo '<td>'.$row->kostenstelle_nr."</td>\n";
-			echo '<td>'.$row->bezeichnung."</td>\n";
+			echo '<td>'.htmlspecialchars($row->bezeichnung)."</td>\n";
 			echo '<td>'.$row->kurzbz."</td>\n";
 			$budget = $kostenstelle->getBudget($row->kostenstelle_id);
-			echo '<td class="number">'.number_format($budget, 2, ",",".")."</td>\n";
+			$ausgaben  = $rechnung->getAusgaben($geschaeftsjahr_kurzbz, $row->kostenstelle_id);
+
+			$restbudget = $budget-$ausgaben;
+			if($restbudget>0)
+				$class="number_positive";
+			elseif($restbudget<0)
+				$class="number_negative";
+			else
+				$class="number";
+			
+			echo '<td class="'.$class.'">'.number_format($restbudget, 2, ",",".")."</td>\n";
 			echo '<td>'.$row->oe_kurzbz."</td>\n";
-			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
+			echo '<td>'.($row->aktiv?'ja':'nein')."</td>\n";
 			echo "</tr>\n";
 			
 		}

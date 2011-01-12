@@ -81,7 +81,6 @@ BODY
 
 table.tablesorter tbody td 
 {
-	color: #3D3D3D;
 	padding: 4px;
 	background-color: #EEEEEE;
 	vertical-align: top;
@@ -114,6 +113,16 @@ table.dark td
 .number
 {
 	text-align: right;
+}
+.number_negative
+{
+	text-align: right;
+	color: red;
+}
+.number_positive
+{
+	text-align: right;
+	color: green;
 }
 
 option.rechnung_nichtfreigegeben

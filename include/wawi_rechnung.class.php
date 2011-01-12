@@ -23,6 +23,7 @@
  * Klasse WaWi Rechnung
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/geschaeftsjahr.class.php');
 
 class wawi_rechnung extends basis_db
 {
@@ -540,6 +541,11 @@ class wawi_rechnung extends basis_db
 		}
 	}
 	
+	/**
+	 * Liefert den gesamten Bruttobetrag von einer Rechnung
+	 * 
+	 * @param $rechnung_id
+	 */
 	public function getBrutto($rechnung_id)
 	{
 		$this->loadBetraege($rechnung_id);
@@ -549,5 +555,62 @@ class wawi_rechnung extends basis_db
 			$brutto += ($row->betrag*($row->mwst+100)/100);
 		}
 		return $brutto;
+	}
+	
+	/**
+	 * Liefert die Summe der Brutto Rechnungsbeträge einer Kostenstelle in einem Geschäftsjahr
+	 *
+	 * @param $geschaeftsjahr_kurzbz
+	 * @param $kostenstelle_id
+	 */
+	public function getAusgaben($geschaeftsjahr_kurzbz, $kostenstelle_id)
+	{
+		if(!is_numeric($kostenstelle_id))
+		{
+			$this->errormsg = 'KostenstelleID ist ungueltig';
+			return false;
+		}
+		
+		$gj = new geschaeftsjahr();
+		if(!$gj->load($geschaeftsjahr_kurzbz))
+		{
+			$this->errormsg = 'Fehler beim Laden des Geschaeftsjahres';
+			return false;
+		}
+		
+		$qry = "
+				SELECT sum(brutto) as gesamt
+				FROM 
+				(
+				SELECT 
+					(tbl_rechnungsbetrag.betrag*(tbl_rechnungsbetrag.mwst+100)/100) as brutto
+				FROM 
+					wawi.tbl_rechnung 
+					JOIN wawi.tbl_bestellung USING(bestellung_id)
+					JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
+				WHERE
+					kostenstelle_id='$kostenstelle_id'
+					AND tbl_bestellung.insertamum>='".$gj->start."'
+					AND tbl_bestellung.insertamum<='".$gj->ende."'
+				) as a
+				";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->gesamt;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Berechnen der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }
