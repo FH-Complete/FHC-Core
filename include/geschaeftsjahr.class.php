@@ -237,8 +237,8 @@ class geschaeftsjahr extends basis_db
 		$newDatum = $date->formatDatum($datum,'Y-m-d');
 		
 		$qry = "SELECT * FROM public.tbl_geschaeftsjahr 
-		WHERE '$newDatum' > public.tbl_geschaeftsjahr.start AND 
-		'$newDatum' < public.tbl_geschaeftsjahr.ende;";
+		WHERE '$newDatum' >= public.tbl_geschaeftsjahr.start AND 
+		'$newDatum' <= public.tbl_geschaeftsjahr.ende;";
 		
 		if($this->db_query($qry))
 		{
