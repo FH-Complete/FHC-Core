@@ -1503,6 +1503,9 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			NO MINVALUE
 			CACHE 1;
 			
+			CREATE INDEX idx_aufteilung_bestellung_id ON tbl_aufteilung USING btree (bestellung_id); 
+			
+			
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT pk_wawi_aufteilung PRIMARY KEY (aufteilung_id);
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT fk_aufteilung_bestellung FOREIGN KEY (bestellung_id) REFERENCES wawi.tbl_bestellung (bestellung_id) ON DELETE CASCADE ON UPDATE CASCADE;
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT fk_aufteilung_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
