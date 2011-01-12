@@ -31,6 +31,7 @@ require_once '../include/standort.class.php';
 require_once '../include/adresse.class.php';
 require_once '../include/studiengang.class.php';
 require_once '../include/mail.class.php';
+require_once '../include/geschaeftsjahr.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
@@ -935,11 +936,16 @@ if($aktion == 'suche')
 					$selected = "selected"; 
 				echo '<option value='.$typ->zahlungstyp_kurzbz.' '.$selected.'>'.$typ->bezeichnung."</option>\n";
 			}
-			
-			echo "</td></tr>"; 
+			echo "</td>\n"; 
+			echo "<td>Rest-Budget:</td>\n";
+			$geschaeftsjahr = new geschaeftsjahr(); 
+			$gJahr = $geschaeftsjahr->getSpecific($bestellung->insertamum); 
+			$budget = $kostenstelle->getBudget($bestellung->kostenstelle_id,$gJahr); 
+			$spentBudget = $bestellung->getSpentBudget($bestellung->kostenstelle_id, $gJahr); 
+			$restBudget = $budget - $spentBudget; 
+			echo "<td colspan=2>$restBudget</td></tr>"; 			
 			echo "</table>\n";
 			echo "<br>";
-			
 			//tabelle Details
 			echo "<table border =0 width='70%'>\n";
 			echo "<tr>\n";
