@@ -73,14 +73,15 @@ if(isset($_POST['getFirma']))
 		if($_POST['id'] == 'opt_auswahl')
 		{
 			// anzeige aller Firmen
-			$firmaAll = new firma(); 
+		/*	$firmaAll = new firma(); 
 			$firmaAll->getAll(); 
 			
 			echo "<option value=''>-- auswählen --</option>\n";
 			foreach ($firmaAll->result as $fi)
 			{
 				echo "<option value=".$fi->firma_id." >".$fi->name."</option>\n";
-			}
+			}*/
+			echo "<option value=''>-- auswählen --</option>\n";
 		}
 		else
 		{
@@ -385,7 +386,7 @@ if($aktion == 'suche')
 		$datum = new datum(); 
 		$datum=getdate(); 
 		$firmaAll = new firma(); 
-		$firmaAll->getAll(); 
+		//$firmaAll->getAll(); 
 		if ($datum['mon']<=9)
 		{
 			$suchdatum="01.09.".($datum['year']-1);
