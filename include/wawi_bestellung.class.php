@@ -26,6 +26,8 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once (dirname(__FILE__).'/wawi_bestelldetails.class.php');
 require_once (dirname(__FILE__).'/wawi_aufteilung.class.php');
 require_once (dirname(__FILE__).'/organisationseinheit.class.php');
+require_once (dirname(__FILE__).'/wawi_kostenstelle.class.php');
+require_once (dirname(__FILE__).'/geschaeftsjahr.class.php');
 
 class wawi_bestellung extends basis_db
 {
@@ -466,6 +468,42 @@ class wawi_bestellung extends basis_db
 			}
 			return $brutto; 			
 		}
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $kostenstelle_id
+	 * @param unknown_type $geschaeftsjahr_kurzbz
+	 */
+	public function getSpentBudget($kostenstelle_id, $geschaeftsjahr_kurzbz)
+	{
+		$geschaeftsjahr = new geschaeftsjahr(); 
+		$geschaeftsjahr->load($geschaeftsjahr_kurzbz); 
+		$start = $geschaeftsjahr->start; 
+		$ende = $geschaeftsjahr->ende; 
+		$bestellung_id = array(); 
+		$brutto = 0; 
+		
+		$qry = "select bestellung.bestellung_id, bestellung.kostenstelle_id 
+				FROM wawi.tbl_bestellung bestellung where bestellung.kostenstelle_id = '$kostenstelle_id' 
+				AND bestellung.insertamum >= '$start' and bestellung.insertamum <= '$ende' "; 
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$bestellung_id[] = $row->bestellung_id; 
+			}
+		}
+		else 
+			return false; 
+
+		foreach($bestellung_id as $bestellung)
+		{
+			$brutto += $this->getBrutto($bestellung); 
+		}
+		return $brutto; 
 	}
 	
 	/**
