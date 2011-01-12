@@ -244,7 +244,7 @@ class geschaeftsjahr extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->geschaeftsjahr_kurbz; 
+				return $row->geschaeftsjahr_kurzbz; 
 			}
 		}
 		return false; 
