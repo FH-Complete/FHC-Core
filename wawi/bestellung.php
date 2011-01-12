@@ -636,6 +636,10 @@ if($aktion == 'suche')
 			$newBestellung->updatevon = $user; 
 			$newBestellung->new = true; 
 			$newBestellung->freigegeben = false; 
+			// vordefinierte Werte
+			$newBestellung->zahlungstyp_kurzbz = 'rechnung';
+			$newBestellung->lieferadresse = '1';
+			$newBestellung->rechnungsadresse = '1';
 			
 			if (!$bestell_id = $newBestellung->save())
 			{
@@ -674,7 +678,7 @@ if($aktion == 'suche')
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
 			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
 		
-		// Bestellung löschen
+		// Detail löschen
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$detail = new wawi_bestelldetail(); 
 		$detail->delete($id); 
@@ -930,6 +934,7 @@ if($aktion == 'suche')
 					$selected = "selected"; 
 				echo '<option value='.$typ->zahlungstyp_kurzbz.' '.$selected.'>'.$typ->bezeichnung."</option>\n";
 			}
+			
 			echo "</td></tr>"; 
 			echo "</table>\n";
 			echo "<br>";
