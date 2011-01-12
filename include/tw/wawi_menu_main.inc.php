@@ -58,6 +58,10 @@ $menu=array
 		'Personensuche'=>array
 		(
 			'name'=>'Personensuche', 'link'=>'https://cis.technikum-wien.at/cis/private/tools/psearch.php', 'target'=>'content',
+		),
+		'Firma'=>array
+		(
+			'name'=>'Firma anlegen', 'link'=>'firma.php?method=new', 'target'=>'content',
 		)
 	),
 	'Auswertungen'=> 	array
