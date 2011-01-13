@@ -79,27 +79,6 @@ BODY
 	margin-left:5pt;
 }
 
-table.tablesorter tbody td 
-{
-	padding: 4px;
-	background-color: #EEEEEE;
-	vertical-align: top;
-}
-
-table.tablesorter tbody tr.odd td 
-{
-	background-color:lightgray;
-}
-
-table.tablesorter thead tr th, table.tablesorter tfoot tr th 
-{
-	background:#E1DD00;
-    background:#DCE4EF;
-	border: 1px solid #FFF;
-	font-size: 8pt;
-	padding: 4px;
-}
-
 ul 
 {
 	padding-left: 10px;
