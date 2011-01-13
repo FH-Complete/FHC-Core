@@ -61,7 +61,8 @@ $menu=array
 		),
 		'Firma'=>array
 		(
-			'name'=>'Firma anlegen', 'link'=>'firma.php?method=new', 'target'=>'content',
+			'name'=>'Firma', 'link'=>'firma.php', 'target'=>'content','permissions'=>array('wawi/firma'),
+			'FirmaNeu'=>array('name'=>'Neu', 'link'=>'firma.php?method=new', 'target'=>'content'),
 		)
 	),
 	'Auswertungen'=> 	array

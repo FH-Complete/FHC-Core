@@ -31,20 +31,32 @@
 		{
 			document.location="login.php";
 		}
-		window.setTimeout("login()", 2500);
 	</script>
 </head>
 <body>
 <?php
 	session_start();
 	session_destroy();
+	
+	if(isset($_SERVER['REMOTE_USER']))
+	{
+		echo 'ACHTUNG! Sie sind per BASIC-Authentifizierung angemeldet. Ein Logout ist hierbei nicht möglich. Um sich korrekt auszuloggen schliessen Sie bitte ALLE Browserfenster.';
+	}
+	else
+	{
+		echo '
+		<center>
+		<strong>
+		<br />
+		<br />
+		Sie wurden erfolgreich ausgeloggt!!<br /> Sie werden sofort weitergeleitet!<br />
+		</strong>
+		<script type="text/javascript">
+		window.setTimeout("login()", 2500);
+		</script>
+		';
+	}
 ?>
-<center>
-<strong>
-<br />
-<br />
-Sie wurden erfolgreich ausgeloggt!!<br /> Sie werden sofort weitergeleitet!<br />
-</strong>
 <br />
 Sollten Sie nicht weitergeleitet werden klicken Sie bitte <a href="login.php">hier</a>
 </center>

@@ -393,6 +393,41 @@ class kontakt extends basis_db
 	}
 	
 	/**
+	 * Laedt einen Kontakt eines Standortes
+	 * Es wird nur der erste Eintrag zurueckgeliefert!
+	 * 
+	 * @param $standort_id
+	 * @param $kontakttyp
+	 */
+	public function loadFirmaKontakttyp($standort_id, $kontakttyp)
+	{
+		if(!is_numeric($standort_id))
+		{
+			$this->errormsg='StandortID ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_kontakt WHERE standort_id='".addslashes($standort_id)."' AND kontakttyp='".addslashes($kontakttyp)."' ORDER BY kontakt_id LIMIT 1";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->kontakt = $row->kontakt;
+				$this->kontakt_id = $row->kontakt_id;
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
 	 * Laedt alle Kontakttypen
 	 * @return true wenn ok
 	 * false im Fehlerfall
