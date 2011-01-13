@@ -19,7 +19,12 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
-
+/**
+ * Firmenverwaltung fuer WaWi
+ * 
+ * Dies ist eine abgespeckte Version der Firmenverwaltung zum einfachen Anlegen und
+ * Bearbeiten von Firmen.
+ */
 require_once('../config/wawi.config.inc.php');
 require_once('auth.php');
 require_once('../include/benutzerberechtigung.class.php');
@@ -36,6 +41,12 @@ require_once('../include/nation.class.php');
 <head>
 	<title>WaWi Firma</title>	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
+	<link rel="stylesheet" href="../include/js/jquery.css" type="text/css"/>	
+	
+	<script type="text/javascript" src="../include/js/jquery.js"></script> 
+	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
+	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
@@ -45,9 +56,10 @@ $user=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('basis/firma'))
+if(!$rechte->isBerechtigt('wawi/firma'))
 	die('Sie haben keine Berechtigung für diese Seite');
-$method = isset($_GET['method'])?$_GET['method']:'';
+
+$method = isset($_GET['method'])?$_GET['method']:'search';
 $strasse = '';
 $name = '';
 $plz = '';
@@ -56,7 +68,9 @@ $telefon = '';
 $fax = '';
 $email = '';
 $nation = 'A';
+$id = isset($_GET['id'])?$_GET['id']:'';
 
+//Speichern der Daten
 if(isset($_POST['save']))
 {
 	if(!isset($_POST['strasse']) || !isset($_POST['name']) || !isset($_POST['plz']) || !isset($_POST['ort']) ||
@@ -73,7 +87,16 @@ if(isset($_POST['save']))
 	$email = $_POST['email'];
 	$nation = $_POST['nation'];
 	
+	//Bei einem Update werden die IDs der Datensaetze uebergeben
+	$adresse_id = $_POST['adresse_id'];
+	$firma_id = $_POST['firma_id'];
+	$standort_id = $_POST['standort_id'];
+	$fax_id = $_POST['fax_id'];
+	$telefon_id = $_POST['telefon_id'];
+	$email_id = $_POST['email_id'];
+	
 	$errormsg='';
+	
 	if($email!='' && !mb_strstr($email,'@'))
 	{
 		$errormsg = 'Email muss ein @ enthalten';
@@ -90,51 +113,99 @@ if(isset($_POST['save']))
 	
 	if(!$error)
 	{
-		
+		//Firmendatensatz anlegen/updaten
 		$firma = new firma();
-		$firma->firmentyp_kurzbz='Firma';
+		
+		if($firma_id!='')
+		{
+			if(!$firma->load($firma_id))
+				die('Firma wurde nicht gefunden');
+			$firma->new  = false;
+			$firma->updateamum = date('Y-m-d H:i:s');
+			$firma->updatevon = $user;
+		}
+		else
+		{
+			$firma->schule=false;
+			$firma->gesperrt=false;
+			$firma->aktiv=true;
+			$firma->insertamum = date('Y-m-d H:i:s');
+			$firma->insertvon = $user;
+			$firma->new = true;
+			$firma->firmentyp_kurzbz='Firma';
+		}
+		
 		$firma->name=$name;
-		$firma->schule=false;
-		$firma->gesperrt=false;
-		$firma->aktiv=true;
-		$firma->insertamum = date('Y-m-d H:i:s');
-		$firma->insertvon = $user;
-		$firma->new = true;
+		
 		
 		if($firma->save())
 		{
+			//Adressdatensatz anlegen/updaten
 			$adresse = new adresse();
-					
+			
+			if($adresse_id!='')
+			{
+				$adresse->load($adresse_id);
+				$adresse->udpateamum = date('Y-m-d H:i:s');
+				$adresse->updatevon = $user;
+				$adresse->new = false;
+			}
+			else
+			{
+				$adresse->zustelladresse = true;
+				$adresse->heimatadresse = false;
+				$adresse->new = true;
+				$adresse->insertamum = date('Y-m-d H:i:s');
+				$adresse->insertvon = $user;
+			}
+			
 			$adresse->strasse = $strasse;
 			$adresse->plz = $plz;
 			$adresse->ort = $ort;
 			$adresse->nation = $nation;
-			$adresse->zustelladresse = true;
-			$adresse->heimatadresse = false;
-			$adresse->insertamum = date('Y-m-d H:i:s');
-			$adresse->insertvon = $user;
-			$adresse->new = true;
 			
 			if($adresse->save())
 			{		
+				//Standort anlegen/updaten
 				$standort = new standort();
+				
+				if($standort_id!='')
+				{
+					$standort->load($standort_id);
+					$standort->new = false;
+					$standort->insertamum = date('Y-m-d H:i:s');
+					$standort->insertvon = $user;
+					$standort->new = false;
+				}
+				else
+				{
+					$standort->insertamum = date('Y-m-d H:i:s');
+					$standort->insertvon = $user;
+					$standort->new = true;
+				}
+				
 				$standort->firma_id = $firma->firma_id;
-				$standort->adresse_id = $adresse->adresse_id;
+				$standort->adresse_id = $adresse->adresse_id;				
 				$standort->kurzbz = mb_substr($firma->name, 0,16);
-				$standort->insertamum = date('Y-m-d H:i:s');
-				$standort->insertvon = $user;
-				$standort->new = true;
 				
 				if($standort->save())
 				{
+					//Kontaktdaten anlegen/updaten
 					if($fax!='')
 					{
 						$kontakt = new kontakt();
+						if($fax_id!='')
+						{
+							$kontakt->load($fax_id);
+							$kontakt->new = false;
+						}
+						else
+							$kontakt->new = true;
+						
 						$kontakt->kontakttyp='fax';
 						$kontakt->standort_id = $standort->standort_id;
 						$kontakt->kontakt = $fax;
-						$kontakt->new = true;
-						
+												
 						if(!$kontakt->save())
 						{
 							$errormsg.=$kontakt->errormsg;
@@ -144,11 +215,19 @@ if(isset($_POST['save']))
 					if($telefon!='')
 					{
 						$kontakt = new kontakt();
+						if($telefon_id!='')
+						{
+							$kontakt->load($telefon_id);
+							$kontakt->new = false;
+						}
+						else
+						{
+							$kontakt->new = true;
+						}
 						$kontakt->kontakttyp='telefon';
 						$kontakt->standort_id = $standort->standort_id;
 						$kontakt->kontakt = $telefon;
-						$kontakt->new = true;
-						
+												
 						if(!$kontakt->save())
 						{
 							$errormsg.=$kontakt->errormsg;
@@ -159,11 +238,20 @@ if(isset($_POST['save']))
 					if($email!='')
 					{
 						$kontakt = new kontakt();
+						if($email_id!='')
+						{
+							$kontakt->load($email_id);
+							$kontakt->new = false;
+						}
+						else
+						{
+							$kontakt->new = true;
+						}
+							
 						$kontakt->kontakttyp='email';
 						$kontakt->standort_id = $standort->standort_id;
 						$kontakt->kontakt = $email;
-						$kontakt->new = true;
-						
+												
 						if(!$kontakt->save())
 						{
 							$errormsg.=$kontakt->errormsg;
@@ -189,26 +277,104 @@ if(isset($_POST['save']))
 			$error=true;
 		}
 	}
-			
+	
 	if($error)
 	{
 		echo '<span class="error">Fehler: '.$errormsg.'</span>';
 		$db->db_query('ROLLBACK;');
-		$method='new';
+		if($firma_id!='')
+		{
+			$method='update';
+			$id = $firma_id;
+		}
+		else
+			$method='new';
 	}
 	else
 	{
 		$db->db_query('COMMIT;');
 		echo 'Die Firma wurde erfolgreich gespeichert';
+		$method='update';
+		$id=$firma_id;
 	}	
 }
 
-if($method=='new')
+// Update / Neuanlage
+if($method=='new' || $method=='update')
 {
-	echo '<h1>Neue Firma</h1>';
+	$firma_id='';
+	$standort_id='';
+	$adresse_id='';
+	$fax_id='';
+	$email_id='';
+	$telefon_id='';
+	
+	if($method=='new')
+		echo '<h1>Neue Firma</h1>';
+	else
+	{
+		echo '<h1>Firma Bearbeiten</h1>';
+
+		if(!is_numeric($id))
+			die('ID ist ungueltig');
+			
+		//Firma Laden
+		$firma = new firma();
+		if(!$firma->load($id))
+			die('Firma konnte nicht geladen werden');
+		
+		$name = $firma->name;
+		$firma_id = $firma->firma_id;
+		
+		//Standort Laden
+		$standort = new standort();
+		$standort->load_firma($firma_id);
+		if(isset($standort->result[0]))
+		{
+			$standort_id = $standort->result[0]->standort_id;
+			$adresse_id = $standort->result[0]->adresse_id;
+			
+			//Adresse Laden
+			$adresse = new adresse();
+			$adresse->load($adresse_id);
+							
+			$strasse = $adresse->strasse; 
+			$plz = $adresse->plz;
+			$ort = $adresse->ort;
+			$nation = $adresse->nation;
+			if($nation=='')
+				$nation='A';
+			
+			//Kontaktdaten Laden
+			$kontakt = new kontakt();
+			$kontakt->loadFirmaKontakttyp($standort_id, 'telefon');
+			
+			$telefon = $kontakt->kontakt;
+			$telefon_id = $kontakt->kontakt_id;
+			
+			$kontakt = new kontakt();
+			$kontakt->loadFirmaKontakttyp($standort_id, 'fax');
+			
+			$fax = $kontakt->kontakt;
+			$fax_id = $kontakt->kontakt_id;
+			
+			$kontakt = new kontakt();
+			$kontakt->loadFirmaKontakttyp($standort_id, 'email');
+			
+			$email = $kontakt->kontakt;
+			$email_id = $kontakt->kontakt_id;
+		}
+	}
+	
 	
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
 	echo '
+	<input type="hidden" name="firma_id" value="'.$firma_id.'">
+	<input type="hidden" name="standort_id" value="'.$standort_id.'">
+	<input type="hidden" name="adresse_id" value="'.$adresse_id.'">
+	<input type="hidden" name="telefon_id" value="'.$telefon_id.'">
+	<input type="hidden" name="fax_id" value="'.$fax_id.'">
+	<input type="hidden" name="email_id" value="'.$email_id.'">
 	<table>
 	<tr>
 		<td>Name:</td>
@@ -265,6 +431,63 @@ if($method=='new')
 	
 	echo '</form>';
 }
+
+//Suchen von Firmen
+if($method=='search')
+{
+	$filter = (isset($_POST['filter'])?$_POST['filter']:'');
+	
+	echo '<H1>Firma suchen</H1>';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?method=search" method="POST">';
+	echo '<input type="text" size="30" name="filter" value="'.$filter.'">';
+	echo ' <input type="submit" name="send" value="Suchen">';
+	echo '</form>';
+	
+	if($filter!='')
+	{
+		$firma = new firma();
+		if($firma->searchFirma($filter))
+		{
+			echo '<br /><br />
+				<script type="text/javascript">
+				$(document).ready(function() 
+				{ 
+	    			$("#myTable").tablesorter(
+					{
+						sortList: [[2,0]],
+						widgets: ["zebra"]
+					});
+				});				
+				</script>
+				
+				<table id="myTable" class="tablesorter">
+				<thead>
+				<tr>
+					<th>&nbsp;</th>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Adresse</th>
+				</tr>
+				</thead>
+				<tbody>';
+			
+			
+			foreach($firma->result as $row)
+			{
+				echo '<tr>';
+				echo '<td><a href="firma.php?method=update&amp;id='.$row->firma_id.'" title="Bearbeiten"> <img src="../skin/images/edit.gif"> </a></td>';
+				echo '<td>',$row->firma_id,'</td>';
+				echo '<td>',$row->name,'</td>';
+				echo '<td>',$row->strasse,' ',$row->plz,' ',$row->ort,'</td>';
+				echo '</tr>';
+			}
+			
+			echo '</tbody></table>';
+		}
+	}
+	
+}
+
 ?>
-</html>
 </body>
+</html>

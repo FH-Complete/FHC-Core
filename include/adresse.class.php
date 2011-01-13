@@ -163,6 +163,11 @@ class adresse extends basis_db
 	
 	/**
 	 * Laedt alle Adressen zu der Firma die uebergeben wird
+	 * 
+	 * ACHTUNG: Diese Funktion wird nur mehr fuer Lehrauftraege benoetigt.
+	 * Die Adresse zu einer Firma wird nun ueber die Tabelle Standort hergestellt!
+	 * 
+	 * @deprec  2.0
 	 * @param $firma_id ID der Firma zu der die Adressen geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
