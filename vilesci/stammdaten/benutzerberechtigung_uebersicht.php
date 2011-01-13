@@ -45,7 +45,7 @@ function confdel()
 
 </head>
 
-<body class="background_main">
+<body class="background_main" onload="document.getElementById(\'searchbox\').focus()">
 <h2>Benutzerberechtigungen &Uuml;bersicht</h2>';
 
 if (!$db = new basis_db())
@@ -73,7 +73,7 @@ $htmlstr='
 	<td>
 		<form accept-charset="UTF-8" name="search" method="GET">
 	  		Bitte Suchbegriff eingeben: 
-	  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+	  		<input type="text" id="searchbox" name="searchstr" size="30" value="'.$searchstr.'">
 	  		<input type="submit" value="Suchen">
 	  	</form>
 	</td>

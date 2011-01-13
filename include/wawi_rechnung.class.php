@@ -124,8 +124,9 @@ class wawi_rechnung extends basis_db
 	 * @param $oe_kurzbz
 	 * @param $konto_id
 	 * @param $kostenstelle_id
+	 * @param $betrag
 	 */
-	public function getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $konto_id, $kostenstelle_id)
+	public function getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $konto_id, $kostenstelle_id, $betrag)
 	{
 		$first = true; 
 		$qry = "
@@ -180,7 +181,12 @@ class wawi_rechnung extends basis_db
 		if ($bestellnummer != '')	
 			$qry.= ' AND tbl_bestellung.bestell_nr = '.$this->addslashes($bestellnummer);
 		
+		if ($betrag != '')
+			$qry.= ' AND (\''.$betrag.'\' = (SELECT sum(betrag) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id)
+					   OR \''.$betrag.'\' = (SELECT sum((betrag*(mwst+100)/100)) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id))';
+		
 		$qry.=" LIMIT 1000";
+		
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";

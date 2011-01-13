@@ -176,6 +176,10 @@ if($aktion == 'suche')
 		echo "<td>von <input type='text' id='buchungsdatum_von' size='12' name='buchungsdatum_von'> bis <input type='text' id='buchungsdatum_bis' size='12' name='buchungsdatum_bis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
+		echo "<tr>\n";
+		echo "<td>Betrag</td>\n";
+		echo "<td><input type='text' size='6' maxlength='16' name='filter_betrag'></td>\n";
+		echo "</tr>\n";
 		echo "<td><b>Bestelldaten</b></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
@@ -191,7 +195,7 @@ if($aktion == 'suche')
 		echo "<td>von <input type='text' id='bestelldatum_von' size='12' name='bestelldatum_von'> bis <input type='text' id='bestelldatum_bis' size='12' name='bestelldatum_bis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
-		echo "<td> Organisationseinheit: </td>\n";
+		echo "<td> Organisationseinheit </td>\n";
 		echo "<td><SELECT name='filter_oe_kurzbz' onchange='loadFirma(this.value)'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";
 		foreach ($oe->result as $oei)
@@ -209,14 +213,14 @@ if($aktion == 'suche')
 		echo "</td>\n";
 		echo "</tr>\n";		
 		echo "<tr>\n";
-		echo "<td> Firma: </td>\n";
+		echo "<td> Firma </td>\n";
 		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''>\n";
 		echo "</td>\n";
 		echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  >\n";
 		echo "</td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
-		echo "<td> Kostenstelle: </td>\n";
+		echo "<td> Kostenstelle </td>\n";
 		echo "<td><SELECT name='filter_kostenstelle'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";	
 		foreach($kostenstelle->result as $kst)
@@ -228,7 +232,7 @@ if($aktion == 'suche')
 		echo "</td>\n";
 		echo "</tr>\n";	
 		echo "<tr>\n";
-		echo "<td> Konto: </td>\n";
+		echo "<td> Konto </td>\n";
 		echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";	
 		foreach($konto->result as $ko)
@@ -261,6 +265,7 @@ if($aktion == 'suche')
 		$oe_kurzbz = $_POST['filter_oe_kurzbz'];
 		$filter_konto = $_POST['filter_konto'];
 		$filter_kostenstelle = $_POST['filter_kostenstelle'];
+		$filter_betrag = mb_str_replace(',','.',$_POST['filter_betrag']);
 		
 		$rechnung = new wawi_rechnung();
 		
@@ -287,7 +292,7 @@ if($aktion == 'suche')
 		&& $bestelldatum_von!==false && $bestelldatum_bis!==false
 		)
 		{
-			if($rechnung->getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $filter_konto, $filter_kostenstelle))
+			if($rechnung->getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $filter_konto, $filter_kostenstelle, $filter_betrag))
 			{
 				$date = new datum(); 
 				

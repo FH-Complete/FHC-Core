@@ -65,6 +65,7 @@ $start = '';
 $ende = '';
 $neu = false;
 $negativ = false;
+$filter=(isset($_GET['filter'])?$_GET['filter']:'alle');
 
 if(isset($_POST['del']))
 {
@@ -203,7 +204,14 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$rights->loadBenutzerRollen(null, $funktion_kurzbz);
 	}
 	
-	$htmlstr .= "<br><div class='kopf'>Berechtigungen <b>".$uid.$funktion_kurzbz."</b></div>\n";
+	
+	$htmlstr .= "Berechtigungen <b>".$uid.$funktion_kurzbz."</b>\n";
+	$htmlstr .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filter:
+	  <a href="benutzerberechtigung_details.php?filter=alle&amp;uid='.$uid.'&amp;funktion_kurzbz='.$funktion_kurzbz.'" '.($filter=='alle'?'style="font-weight:bold"':'').'>Alle</a> 
+	| <a href="benutzerberechtigung_details.php?filter=wawi&amp;uid='.$uid.'&amp;funktion_kurzbz='.$funktion_kurzbz.'" '.($filter=='wawi'?'style="font-weight:bold"':'').'>nur WaWi</a>
+	| <a href="benutzerberechtigung_details.php?filter=ohnewawi&amp;uid='.$uid.'&amp;funktion_kurzbz='.$funktion_kurzbz.'" '.($filter=='ohnewawi'?'style="font-weight:bold"':'').'>ohne WaWi</a>
+	
+	';
 	$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr .= "<tr></tr>\n";
 	$htmlstr .= "<tr>
@@ -222,7 +230,20 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				</tr>\n";
 	foreach($rights->berechtigungen as $b)
 	{
-		$htmlstr .= "<form action='benutzerberechtigung_details.php' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";
+		switch($filter)
+		{
+			case 'alle'; break;
+			case 'wawi';
+					if(!mb_strstr($b->berechtigung_kurzbz,'wawi'))
+						continue 2;
+					break;
+			case 'ohnewawi';
+					if(mb_strstr($b->berechtigung_kurzbz,'wawi'))
+						continue 2;
+					break;
+			default: break;
+		}
+		$htmlstr .= "<form action='benutzerberechtigung_details.php?filter=".$filter."' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value='".$b->benutzerberechtigung_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='".$b->uid."'>\n";
 		$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$b->funktion_kurzbz."'>\n";
