@@ -1603,6 +1603,9 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			CREATE INDEX idx_bestelldetail_bestellung_id ON wawi.tbl_bestelldetail (bestellung_id);
 			CREATE INDEX idx_bestellung_kostenstelle_id ON wawi.tbl_bestellung (kostenstelle_id);
 			CREATE INDEX idx_bestellung_freigegeben ON wawi.tbl_bestellung (freigegeben);
+			CREATE INDEX idx_rechnungsbetrag_rechnung_id ON wawi.tbl_rechnungsbetrag (rechnung_id);
+			CREATE INDEX idx_rechnung_bestellung_id ON tbl_rechnung (bestellung_id)
+			CREATE INDEX idx_bestellung_bestellstatus_bestellung_id ON tbl_bestellung_bestellstatus (bestellung_id)
 			
 			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Zahlung','Zahlung');
 			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Gutschrift','Gutschrift');
