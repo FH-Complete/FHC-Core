@@ -73,15 +73,6 @@ if(isset($_POST['getFirma']))
 	{
 		if($_POST['id'] == 'opt_auswahl')
 		{
-			// anzeige aller Firmen
-		/*	$firmaAll = new firma(); 
-			$firmaAll->getAll(); 
-			
-			echo "<option value=''>-- auswählen --</option>\n";
-			foreach ($firmaAll->result as $fi)
-			{
-				echo "<option value=".$fi->firma_id." >".$fi->name."</option>\n";
-			}*/
 			echo "<option value=''>-- auswählen --</option>\n";
 		}
 		else
@@ -943,7 +934,8 @@ if($aktion == 'suche')
 			$budget = $kostenstelle->getBudget($bestellung->kostenstelle_id,$gJahr); 
 			$spentBudget = $bestellung->getSpentBudget($bestellung->kostenstelle_id, $gJahr); 
 			$restBudget = $budget - $spentBudget; 
-			echo "<td colspan=2>$restBudget</td></tr>"; 			
+			$restBudget = sprintf('%01.2f',$restBudget); 
+			echo "<td colspan=2 id='restbudget'>$restBudget</td></tr>"; 			
 			echo "</table>\n";
 			echo "<br>";
 			//tabelle Details
@@ -1174,18 +1166,18 @@ if($aktion == 'suche')
 			
 			function saveDetail(i )
 			{
-			var pos = $("#pos_"+i).val(); 
-			var menge =  $("#menge_"+i).val();
-			var ve =  $("#ve_"+i).val(); 
-			var beschreibung =  $("#beschreibung_"+i).val(); 
-			var artikelnr =  $("#artikelnr_"+i).val(); 
-			var preis =  $("#preisprove_"+i).val(); 
-			var mwst =  $("#mwst_"+i).val(); 
-			var brutto =  $("#brutto_"+i).val(); 
-			$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, saveDetail: "true"},
-				function(data){
-					alert(data);
-				});  
+				var pos = $("#pos_"+i).val(); 
+				var menge =  $("#menge_"+i).val();
+				var ve =  $("#ve_"+i).val(); 
+				var beschreibung =  $("#beschreibung_"+i).val(); 
+				var artikelnr =  $("#artikelnr_"+i).val(); 
+				var preis =  $("#preisprove_"+i).val(); 
+				var mwst =  $("#mwst_"+i).val(); 
+				var brutto =  $("#brutto_"+i).val(); 
+				$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, saveDetail: "true"},
+					function(data){
+						alert(data);
+					});  
 			}
 			
 			// löscht einen Bestelldetaileintrag
@@ -1196,13 +1188,34 @@ if($aktion == 'suche')
 				function(data){
 				}); 
 			}
+			
+			/
+			function conf_del_budget(aktBrutto)
+			{
+				var bestellungPreis = ($("#brutto").html()); 
+				var restBudget = ($("#restbudget").html());  
+				var differenz = 0; 
+				
+				bestellungPreis = parseFloat(bestellungPreis);
+				restBudget = parseFloat(restBudget);
+				differenz = parseFloat(differenz);
+				
+				differenz = restBudget - bestellungPreis + aktBrutto; 
+
+				if(differenz < 0)
+				{
+					return confirm("Die Bestellung würde das Budget überziehen. Trotzdem fortfahren?");
+				}
+			}
 			</script>';
 			
 			$disabled ='';
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') )
 				$disabled ='disabled';
 			
-			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled></input>\n"; 
+			$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
+				
+			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)'></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
 			echo "<br><br>"; 
 

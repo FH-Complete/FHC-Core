@@ -33,15 +33,16 @@ require_once('../include/benutzerberechtigung.class.php');
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
 	<title>WaWi Kostenstellen</title>	
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
-
 	<script type="text/javascript">
+	
 		$(document).ready(function() 
 			{ 
 			    $("#myTable").tablesorter(
