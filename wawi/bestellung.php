@@ -236,11 +236,10 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 <head>
 	<title>WaWi Bestellung</title>	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
+
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
-	<link rel="stylesheet" href="../skin/jquery-ui.css" type="text/css"/>
-	<link rel="stylesheet" href="../include/js/jquery.css" type="text/css"/>	
-	<link rel="stylesheet" href="../include/js/jquery.autocomplete.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
