@@ -55,17 +55,14 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 <html>
 <head>
 	<title>WaWi Rechnung</title>	
-
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
-	
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
-	<script type="text/javascript" src="../include/js/jquery.autocomplete.min.js" ></script>
-	<script type="text/javascript" src="../include/js/jquery-ui.js" ></script>
 	<script type="text/javascript" src="../include/js/jquery.ui.datepicker-de.js"></script> 
 		
 	<script type="text/javascript">
