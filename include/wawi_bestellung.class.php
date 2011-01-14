@@ -774,28 +774,28 @@ class wawi_bestellung extends basis_db
 	public function createBestellNr($kostenstelle_id)
 	{
 		// kostenstelle holen
-	$qry="select * from kostenstelle where kostenstelle_id=$kostenstelle_id";
-	$result=@pg_query($conn, $qry);
-	$row=@pg_fetch_object($result);
-	$kostenstelle_kz=$row->kurzzeichen;
-	// studiengang-id zur kostenstelle
-	$studiengang_id=$row->studiengang_id;
-	// studiengang holen
-	$qry="select * from studiengang where studiengang_id=$studiengang_id";
-	$result=@pg_query($conn, $qry);
-	$row=@pg_fetch_object($result);
-	$studiengang_kz=$row->kurzzeichen;
+	$qry="select * from wawi.tbl_kostenstelle where kostenstelle_id=$kostenstelle_id;";
+	
+	if($this->db_query($qry))
+	{
+		if($row = $this->db_fetch_object())
+		{
+			$kostenstelle_kz=$row->kurzbz;
+			$oe_kurzbz = $row->oe_kurzbz; 
+		}
+	}	
+	
 
 	$akt_timestamp=time();
 	$akt_datum=getdate($akt_timestamp);
-	$akt_mon=$akt_datum[mon];
-	$akt_year=$akt_datum[year];
+	$akt_mon=$akt_datum['mon'];
+	$akt_year=$akt_datum['year'];
 	if ($akt_mon<9)
 		$akt_year--;
 	$akt_year=substr($akt_year,2,2);
-	$laenge=strlen($studiengang_kz.$akt_year.$kostenstelle_kz);
-	$sql_query="SELECT distinct substr(bestellnr,$laenge+1,3) as nr FROM bestellung ".
-	" WHERE bestellnr LIKE '$studiengang_kz$akt_year$kostenstelle_kz"."___' ".
+	$laenge=strlen($oe_kurzbz.$akt_year.$kostenstelle_kz);
+	$sql_query="SELECT distinct substr(bestellnr,$laenge+1,3) as nr FROM wawit.tblbestellung ".
+	" WHERE bestellnr LIKE '$oe_kurzbz$akt_year$kostenstelle_kz"."___' ".
 	"ORDER BY nr ";
 	//echo $sql_query."<br>";
 	$result=@pg_query($conn, $sql_query);
@@ -828,7 +828,7 @@ class wawi_bestellung extends basis_db
 	}
 	for ($i=0;strlen($bnum)<3;$i++)
 	$bnum="0".$bnum;
-	$bnum=sprintf("%s%s%s%s",$studiengang_kz,$akt_year,$kostenstelle_kz,$bnum);
+	$bnum=sprintf("%s%s%s%s",$oe_kurzbz,$akt_year,$kostenstelle_kz,$bnum);
 	return $bnum;
 	}
 
