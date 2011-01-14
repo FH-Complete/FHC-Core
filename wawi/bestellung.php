@@ -242,13 +242,9 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
-	<script type="text/javascript" src="../include/js/jquery.autocomplete.min.js" ></script>
-	<script type="text/javascript" src="../include/js/jquery-ui.js" ></script>
-	<script type="text/javascript" src="..//include/js/jquery.ui.datepicker-de.js"></script> 
-	
-	
+	<script type="text/javascript" src="../include/js/jquery.ui.datepicker-de.js"></script> 	
+
 	<script type="text/javascript">
 	function conf_del()
 	{
@@ -1188,7 +1184,7 @@ if($aktion == 'suche')
 				}); 
 			}
 			
-			/
+			
 			function conf_del_budget(aktBrutto)
 			{
 				var bestellungPreis = ($("#brutto").html()); 
@@ -1229,7 +1225,7 @@ if($aktion == 'suche')
 			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
-			echo "<table border=0 width='65%' class='dark'>"; 
+			echo "<table border=0 width='65%' class='aufteilung'>"; 
 			echo "<tr>\n"; 
 			$help = 0; 
 			$anteil = 0;
