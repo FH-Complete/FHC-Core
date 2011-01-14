@@ -37,8 +37,7 @@ require_once('../include/sprache.class.php');
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
+
 	<script type="text/javascript">
 	
 		$(document).ready(function() 
