@@ -627,7 +627,7 @@ if($aktion == 'suche')
 			$newBestellung->zahlungstyp_kurzbz = 'rechnung';
 			$newBestellung->lieferadresse = '1';
 			$newBestellung->rechnungsadresse = '1';
-			
+			$newBestellung->bestell_nr = $newBestellung->createBestellNr($newBestellung->kostenstelle_id); 
 			if (!$bestell_id = $newBestellung->save())
 			{
 				echo $newBestellung->errormsg; 
