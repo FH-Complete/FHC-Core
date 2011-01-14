@@ -23,9 +23,7 @@ Alle JS Files im Ordner trunk/include/js
 jquery.js
  ->autocomplete
  ->datepicker
-
-jquery.tablesorter.js
  ->tablesorter
 
 jquery.ui.datepicker-de-js
- ->Deutsches Schema für datepicker
+ ->Deutsches Schema fï¿½r datepicker
