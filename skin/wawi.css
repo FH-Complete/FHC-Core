@@ -84,6 +84,10 @@ ul
 	padding-left: 10px;
 }
 
+table.aufteilung 
+{
+	background:lightgray;
+}
 table.dark td
 {
 	background:lightgray;
@@ -123,4 +127,9 @@ p.freigegeben
 {
 	color:green; 
 }
+
+.error
+{
+	
+}	
 	
