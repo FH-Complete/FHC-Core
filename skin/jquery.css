@@ -21,7 +21,7 @@
 		in relative units scroll will be broken in firefox	*/
 		line-height: 16px;	overflow: hidden;
 	}
-	.ac_loading {background: #ffffff url('indicator.gif') right center no-repeat;	}
+	.ac_loading {background: #ffffff url('images/indicator.gif') right center no-repeat;	}
 	.ac_odd {background-color: #eee;}
 	.ac_over {background-color: navy;color: white;font-weight: bold;}
 	.ac_input {border: 1px solid WindowFrame;background-color: #FBFBFB;}

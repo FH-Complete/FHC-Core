@@ -213,19 +213,7 @@ class wawi_kostenstelle extends basis_db
 			$this->errormsg = 'Kurzbezeichnung darf nicht laenger als 32 Zeichen sein.';
 			return false;
 		}
-		
-		if(!is_numeric($this->budget))
-		{
-			if($this->budget == '')
-				return true; 
-			else 
-			{
-				$this->errormsg = 'Kein gültiges Budget eingegeben.';
-				return false;
-			} 
-		}
-
-				
+						
 		$this->errormsg = '';
 		return true;
 	}
@@ -343,6 +331,7 @@ class wawi_kostenstelle extends basis_db
 		$sql_query_upd1.="UPDATE wawi.tbl_aufteilung_default SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1'; ";
 		$sql_query_upd1.="UPDATE wawi.tbl_konto_kostenstelle SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1' AND konto_id NOT IN(SELECT konto_id FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id='$id2'); ";
 		$sql_query_upd1.="DELETE FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id='$id1';";
+		$sql_query_upd1.="DELETE FROM wawi.tbl_budget WHERE kostenstelle_id='$id1';";
 		$sql_query_upd1.="UPDATE wawi.tbl_bestellung SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1'; ";
 		$sql_query_upd1.="UPDATE system.tbl_benutzerrolle SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1'; ";
 		

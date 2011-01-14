@@ -134,10 +134,6 @@ if(isset($_GET['method']))
 			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kurzbezeichnung\" value=\"$kostenstelle->kurzbz\"></td>\n";
 			 	 	echo "</tr>\n";
 			 	 	echo "<tr>\n";
-			 	 	echo "<td>Budget</td>\n";
-			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"budget\" value=\"$kostenstelle->budget\"></td>\n";
-			 	 	echo "</tr>\n";	
-			 	 	echo "<tr>\n";
 			 	 	echo "<td>Kostenstellen Nr.</td>\n";
 			 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kostenstelle_nr\" value=\"$kostenstelle->kostenstelle_nr\"></td>\n";
 			 	 	echo "</tr>\n";	 	 	
@@ -207,10 +203,6 @@ if(isset($_GET['method']))
 	 	 	echo "<tr>\n";
 	 	 	echo "<td>Kurzbezeichnung</td>\n";
 	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>\n";
-	 	 	echo "</tr>\n";
-	 	 	echo "<tr>\n";
-	 	 	echo "<td>Budget</td>\n";
-	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"budget\" value=\"\"></td>\n";
 	 	 	echo "</tr>\n";
 	 	 	echo "<tr>\n";
 	 	 	echo "<td>Kostenstellen Nr.</td>\n";
@@ -292,7 +284,6 @@ if(isset($_GET['method']))
 		$kostenstelle->oe_kurzbz = $_POST['filter_oe_kurzbz'];
 		$kostenstelle->bezeichnung = $_POST['bezeichnung'];
 		$kostenstelle->kurzbz = $_POST['kurzbezeichnung'];
-		$kostenstelle->budget = $_POST['budget'];
 		$kostenstelle->kostenstelle_nr = $_POST['kostenstelle_nr'];
 		$kostenstelle->updateamum = date('Y-m-d H:i:s');
 		$kostenstelle->updatevon = $user; 
