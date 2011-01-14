@@ -45,8 +45,7 @@ require_once('../include/nation.class.php');
 	<link rel="stylesheet" href="../include/js/jquery.css" type="text/css"/>	
 	
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.metadata.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.tablesorter.js"></script>
+
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
