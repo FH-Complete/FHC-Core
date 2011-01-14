@@ -35,7 +35,7 @@ require_once '../include/geschaeftsjahr.class.php';
 require_once '../include/wawi_konto.class.php';
 require_once '../include/wawi_bestellung.class.php';
 require_once '../include/wawi_kostenstelle.class.php';
-require_once '../include/wawi_bestelldetails.class.php';
+require_once '../include/wawi_bestelldetail.class.php';
 require_once '../include/wawi_aufteilung.class.php'; 
 require_once '../include/wawi_bestellstatus.class.php';
 require_once '../include/wawi_zahlungstyp.class.php';
