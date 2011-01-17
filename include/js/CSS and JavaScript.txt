@@ -24,6 +24,5 @@ jquery.js
  ->autocomplete
  ->datepicker
  ->tablesorter
+ ->Deutsches Schema fuer datepicker
 
-jquery.ui.datepicker-de-js
- ->Deutsches Schema f�r datepicker
