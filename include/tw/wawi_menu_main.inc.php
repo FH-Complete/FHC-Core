@@ -65,9 +65,9 @@ $menu=array
 			'FirmaNeu'=>array('name'=>'Neu', 'link'=>'firma.php?method=new', 'target'=>'content'),
 		)
 	),
-	'Auswertungen'=> 	array
+	'Berichte'=> 	array
 	(
-		'name'=>'Auswertungen', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
+		'name'=>'Berichte', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
 		'Tags'=>array
 		(
 			'name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content',

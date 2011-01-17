@@ -198,12 +198,7 @@ $menu=array
 			'AfA'=>array('name'=>'AfA', 'link'=>'inventar/inventar_afa.php', 'target'=>'main'),
 			'Inventur'=>array('name'=>'Inventur', 'link'=>'inventar/inventar_inventur.php', 'target'=>'main'),
 			'Etiketten'=>array('name'=>'Etiketten', 'link'=>'inventar/etiketten.php', 'target'=>'main'),
-		),			
-		'WAWI'=>	array
-		(
-			'name'=>'WAWI', 'permissions'=>array('admin','wawi','support','wawi/inventar'),
-					'Suche'=>array('name'=>'Suche', 'link'=>'inventar/bestellung.php', 'target'=>'main'),
-		),
+		)
 	),	
 	'Admin'=>	array
 	(

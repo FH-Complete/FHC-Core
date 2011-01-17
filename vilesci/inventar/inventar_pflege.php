@@ -33,14 +33,17 @@
 	require_once('../../include/person.class.php');
 	require_once('../../include/mitarbeiter.class.php');
   	require_once('../../include/ort.class.php');
+  	require_once('../../include/datum.class.php');
 	require_once('../../include/studiengang.class.php');
   	require_once('../../include/organisationseinheit.class.php');
-  	require_once('../../include/wawi.class.php');
   	require_once('../../include/betriebsmittel.class.php');
   	require_once('../../include/betriebsmitteltyp.class.php');
   	require_once('../../include/betriebsmittelstatus.class.php');
   	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 	require_once('../../include/betriebsmittelperson.class.php');
+	require_once('../../include/wawi_bestelldetail.class.php');
+	require_once('../../include/wawi_bestellung.class.php');
+	require_once('../../include/wawi_kostenstelle.class.php');
 	
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -53,6 +56,7 @@
 	$recht=false;
 	$schreib_recht=false;
 	$default_status_vorhanden='vorhanden';
+	$datum_obj = new datum();
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
@@ -131,11 +135,6 @@
 	$oOrganisationseinheit = new organisationseinheit();
 	$oOrganisationseinheit->result=array();
 	$oOrganisationseinheit->errormsg='';
-
-	$oWawi = new wawi();
-	$oWawi->result=array();
-	$oWawi->debug=$debug;
-	$oWawi->errormsg='';
 
 	$oBetriebsmitteltyp = new betriebsmitteltyp();
 	$oBetriebsmitteltyp->result=array();
@@ -273,105 +272,49 @@
 		else if ($oStudiengang->errormsg)
 			$errormsg[]=$oStudiengang->errormsg;
 
+		$bestelldetail = new wawi_bestelldetail();
+		$bestellung = new wawi_bestellung();
+		
 		// Bestellposition
 		if ($bestelldetail_id)
 		{
-			if (!$oWawi->bestellpositionen($bestellung_id,null,$bestelldetail_id))
-				$errormsg[]=$oWawi->errormsg;
-			if (!isset($oWawi->result[0]) && !$oWawi->bestellpositionen($bestellung_id,null,null,$bestelldetail_id))
-				$errormsg[]=$oWawi->errormsg;
-			if (isset($oWawi->result[0]->bestelldetail_id))
-				$bestelldetail_id=$oWawi->result[0]->bestelldetail_id;
+			if(!$bestelldetail->load($bestelldetail_id))
+				$errormsg[]=$bestelldetail->errormsg;
+			$bestelldetail->result[] = $bestelldetail;
 		}
-		// Bestellung
 		else
 		{
-			if (!$oWawi->bestellung(null,null,$bestellung_id))
-				$errormsg[]=$oWawi->errormsg;
+			if(!$bestelldetail->getAllDetailsFromBestellung($bestellung_id))
+				$errormsg[]=$bestelldetail->errormsg;
 		}
-		if (!isset($oWawi->result[0]))
-			$errormsg[]='Bestelldaten sind falsch!';
-
-		// Bestelldatenverarbeiten
-		for ($i=0;$i<count($oWawi->result);$i++)
+		
+		//Bestellung
+		if (!$bestellung->load($bestellung_id))
+			$errormsg[]=$bestellung->errormsg;
+		else
 		{
-
-			$beschreibung=trim($oWawi->result[$i]->titel);
-			if (isset($oWawi->result[$i]->beschreibung))
-				$beschreibung.=($beschreibung?"\n":'').trim($oWawi->result[$i]->beschreibung).' '.trim($oWawi->result[$i]->artikelnr);
-
-		  	$verwendung=trim($oWawi->result[$i]->kostenstelle_bezeichnung);
-			if (isset($oWawi->result[$i]->konto_beschreibung))
-				$verwendung.=($verwendung?"\n":'').trim($oWawi->result[$i]->konto_beschreibung);
-
-
-		  	$anmerkung=trim($oWawi->result[$i]->bemerkungen);
-		  	$hersteller=trim($oWawi->result[$i]->firmenname);
-
-		  	$anzahl=trim(isset($oWawi->result[$i]->menge)?$oWawi->result[$i]->menge:$anzahl);
-
-			$wawi=$oWawi->result[$i];
-			// StgKz leer - pruefen ob in den Kostenstellen das StgKZ belegt ist
-			if ((!isset($wawi->studiengang_id) || !$wawi->studiengang_id)
-			&& isset($wawi->studiengang_kostenstelle_studiengang_id))
+			$beschreibung=trim($bestellung->titel);
+			$besteller=$bestellung->besteller_uid;
+			
+			$kostenstelle = new wawi_kostenstelle();
+			$kostenstelle->load($bestellung->kostenstelle_id);
+			$oe_kurzbz=$kostenstelle->oe_kurzbz;
+			$anmerkung=trim($bestellung->bemerkung);
+			
+			foreach($bestelldetail->result as $row)
 			{
-					$wawi->studiengang_id=$wawi->studiengang_kostenstelle_studiengang_id;
-					$wawi->studiengang_bezeichnung=$wawi->studiengang_kostenstelle_bezeichnung;
-					$wawi->studiengang_kurzzeichen=$wawi->studiengang_kostenstelle_kurzzeichen;
-			}
-			$wawi->studiengang_kurzzeichen=trim($wawi->studiengang_kurzzeichen);
-			$wawi->studiengang_bezeichnung=trim($wawi->studiengang_bezeichnung);
+				if (isset($row->beschreibung))
+					$anmerkung.=($anmerkung?"\n":'').trim($row->beschreibung).' '.trim($row->artikelnummer);
+	
+				/*
+			  	$verwendung=trim($row->kostenstelle_bezeichnung);
+				if (isset($row->konto_beschreibung))
+					$verwendung.=($verwendung?"\n":'').trim($row->konto_beschreibung);
 
-			if (isset($wawi->besteller) )
-			  	$besteller=$wawi->besteller;
-
-			// In Studiengangarray suchen mit Key = Kurzzeichen
-			if (isset($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]) && isset($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->oe_kurzbz) )
-			{
-				$wawi->oe_kurzbz=trim($studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->oe_kurzbz);
-				if (empty($wawi->studiengang_bezeichnung))
-					$wawi->studiengang_bezeichnung=$studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->bezeichnung;
-				if (empty($wawi->studiengang_kurzzeichen))
-					$wawi->studiengang_kurzzeichen=$studiengang_kurzbzlang[$wawi->studiengang_kurzzeichen]->kurzzeichen;
-				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
+			  	$hersteller=trim($row->firmenname);
+				*/
+			  	$anzahl=trim(isset($row->menge)?$row->menge:$anzahl);	
 			}
-			elseif (isset($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]) && isset($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->oe_kurzbz) )
-			{
-				$wawi->oe_kurzbz=trim($studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->oe_kurzbz);
-				if (empty($wawi->studiengang_bezeichnung))
-					$wawi->studiengang_bezeichnung=$studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->bezeichnung;
-				if (empty($wawi->studiengang_kurzzeichen))
-					$wawi->studiengang_kurzzeichen=$studiengang_kurzbzlang[$wawi->studiengang_bezeichnung]->kurzzeichen;
-				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-			}
-			elseif (isset($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]) && isset($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->oe_kurzbz) )
-			{
-				$wawi->oe_kurzbz=trim($studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->oe_kurzbz);
-				if (empty($wawi->studiengang_bezeichnung))
-					$wawi->studiengang_bezeichnung=$studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->bezeichnung;
-				if (empty($wawi->studiengang_kurzzeichen))
-					$wawi->studiengang_kurzzeichen=$studiengang_kuerzel[$wawi->studiengang_kurzzeichen]->kurzzeichen;
-				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-			}
-			elseif (isset($studiengang_kuerzel[$wawi->studiengang_bezeichnung]) && isset($studiengang_kuerzel[$wawi->studiengang_bezeichnung]->oe_kurzbz) )
-			{
-				$wawi->oe_kurzbz=trim($studiengang_kuerzel[$wawi->studiengang_bezeichnung]->oe_kurzbz);
-				if (empty($wawi->studiengang_bezeichnung))
-					$wawi->studiengang_bezeichnung=$studiengang_kuerzel[$wawi->studiengang_bezeichnung]->bezeichnung;
-				if (empty($wawi->studiengang_kurzzeichen))
-					$wawi->studiengang_kurzzeichen=$studiengang_kuerzel[$wawi->studiengang_bezeichnung]->kurzzeichen;
-				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung .' '.$wawi->oe_kurzbz;
-			}
-			elseif ($oOrganisationseinheit->load($wawi->studiengang_bezeichnung))
-			{
-				$wawi->oe_kurzbz=trim($wawi->studiengang_bezeichnung);
-				$anmerkung.=($anmerkung?"\n":'').'Studiengang: '.$wawi->studiengang_bezeichnung;
-			}
-			else
-				$anmerkung.=($anmerkung?"\n":'').'WAWI Stg.: '.$wawi->studiengang_id.' '.$wawi->studiengang_kurzzeichen.', '.$wawi->studiengang_bezeichnung;
-
-			if (!$oe_kurzbz)
-				$oe_kurzbz=(isset($wawi->oe_kurzbz) && $wawi->oe_kurzbz?$wawi->oe_kurzbz:'etw');
 		}
 	}
 
@@ -384,17 +327,33 @@
 	<head>
 		<title>Inventar</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
+		
+		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">		
 		
 		<script src="../../include/js/jquery.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
-		<script type="text/javascript" language="JavaScript1.2">
+
+		<style type="text/css">
+		table.navbar td
+		{
+			text-align: left;
+		}
+		</style>
+		<script type="text/javascript">
+			//Formatiert den Output der Autocomplete Elemente
 			function formatItem(row) 
 			{
-				return row[0] + ' <li>' + row[1] + '</li> ';
+				return row[0] + ' <br>' + row[1];
+			}
+
+			// Prueft die laenge einer textarea
+			function checklength(item, maxlength)
+			{
+				if(item.value.length>maxlength-1)
+				{
+					item.value=item.value.substring(0,item.value.length-1);
+				}
 			}
 		</script>
 	</head>
@@ -615,7 +574,7 @@
 					<table class="navbar">
 						<tr>
 							<td valign="top">&nbsp;<label for="beschreibung">Beschreibung</label>&nbsp;</td>
-							<td><textarea id="beschreibung" name="beschreibung" cols="80" rows="5"><?php echo $beschreibung;?></textarea></td>
+							<td><textarea id="beschreibung" name="beschreibung" cols="80" rows="3" onkeypress="checklength(this,256)"><?php echo $beschreibung;?></textarea></td>
 						</tr>
 						<tr>
 							<td valign="top">&nbsp;<label for="anmerkung">Anmerkung</label>&nbsp;</td>
@@ -623,8 +582,8 @@
 
 						</tr>
 						<tr>
-							<td valign="top">&nbsp;<label for="verwendung">Verwendung</label>&nbsp;</td>
-							<td><textarea id="verwendung" name="verwendung" cols="80" rows="5"><?php echo $verwendung;?></textarea></td>
+							<td valign="top">&nbsp;<label for="verwendung" >Verwendung</label>&nbsp;</td>
+							<td><textarea id="verwendung" name="verwendung" cols="80" rows="3" onkeypress="checklength(this,256)"><?php echo $verwendung;?></textarea></td>
 						</tr>
 					</table>
 
@@ -635,29 +594,10 @@
 							<td>
 								<input id="leasing_bis" name="leasing_bis" size="10" maxlength="11" value="<?php echo $leasing_bis;?>">
 								<script type="text/javascript" language="JavaScript1.2">
-								$(function() 
+								$(document).ready(function() 
 								{
-									$("#leasing_bis").datepicker({
-																arrows:true,
-																clearText: 'l&ouml;schen', clearStatus: 'aktuelles Datum l&ouml;schen',
-																closeText: 'schlie&szlig;en', closeStatus: 'ohne &Auml;nderungen schlie&szlig;en',
-																prevText: 'zur&uuml;ck', prevStatus: 'letzten Monat zeigen',
-																nextText: 'vor', nextStatus: 'n&auml;chsten Monat zeigen',
-																currentText: 'heute', currentStatus: '',
-																monthNames: ['Januar','Februar','M&auml;rz','April','Mai','Juni',
-																'Juli','August','September','Oktober','November','Dezember'],
-																monthNamesShort: ['Jan','Feb','M?r','Apr','Mai','Jun',
-																'Jul','Aug','Sep','Okt','Nov','Dez'],
-																monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
-																weekHeader: 'Wo', weekStatus: 'Woche des Monats',
-																dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-																dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-																dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-																dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'W&auml;hle D, M d',
-																dateFormat: 'dd-mm-yy', firstDay: 1,
-																initStatus: 'W&auml;hle ein Datum', isRTL: false
-																});
-									});
+									$( "#leasing_bis" ).datepicker($.datepicker.regional['de']);
+								});
 								</script>
 							</td>
 
@@ -804,7 +744,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			$oBetriebsmittel->afa=$afa_array[$pos];
 			$oBetriebsmittel->verwendung=$verwendung_array[$pos];
 			$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
-			$oBetriebsmittel->leasing_bis=$leasing_bis_array[$pos];
+			$oBetriebsmittel->leasing_bis=$datum_obj->formatDatum($leasing_bis_array[$pos],'Y-m-d');
 			
 			if ($oBetriebsmittel->save())
 			{
@@ -956,7 +896,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>druck&nbsp;<img border="0" src="../../skin/images/printer.png" title="drucken" > </td>
 								</tr>
 							</table>
-						</td>	
+							
 							<script type="text/javascript" language="JavaScript1.2">			
 							   $(document).ready(function()           // Prueft, ob das Dokument geladen ist
 							   {  
@@ -971,6 +911,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 							});
 
 						</script>
+						</td>
 					</tr>
 				</table>
 
@@ -986,15 +927,15 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			   {
 				   $("div#container_shows<?php echo $pos; ?>").click(function(event)  // Bei Klick auf div#
 				   {
-				      if ($("#vorlage<?php echo $pos; ?>").val() == 'false') 
+				      if ($("#vorlage<?php echo $pos; ?>").val() == 'true') 
 					  {
 				         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam oeffnen
-				         $("#vorlage<?php echo $pos; ?>").val('true');
+				         $("#vorlage<?php echo $pos; ?>").val('false');
 			    	  }
 					  else
 					  {
 			        	 $("div#container<?php echo $pos; ?>").hide("slow");         // div# langsam verbergen
-				         $("#vorlage<?php echo $pos; ?>").val('false');
+				         $("#vorlage<?php echo $pos; ?>").val('true');
 				      }
 				   });
 				});
@@ -1188,7 +1129,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 							<table class="navbar">
 								<tr>
 									<td valign="top">&nbsp;<label for="beschreibung_array<?php echo $pos; ?>">Beschreibung</label>&nbsp;</td>
-									<td><textarea id="beschreibung_array<?php echo $pos; ?>" name="beschreibung_array[]" cols="80" rows="5"><?php echo $beschreibung_array[$pos]; ?></textarea></td>
+									<td><textarea id="beschreibung_array<?php echo $pos; ?>" name="beschreibung_array[]" cols="80" rows="3" onkeypress="checklength(this,256)"><?php echo $beschreibung_array[$pos]; ?></textarea></td>
 								</tr>
 								<tr>
 
@@ -1197,7 +1138,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 								</tr>
 								<tr>
 									<td valign="top">&nbsp;<label for="verwendung_array<?php echo $pos; ?>">Verwendung</label>&nbsp;</td>
-									<td><textarea id="verwendung_array<?php echo $pos; ?>" name="verwendung_array[]" cols="80" rows="5"><?php echo $verwendung_array[$pos]; ?></textarea></td>
+									<td><textarea id="verwendung_array<?php echo $pos; ?>" name="verwendung_array[]" cols="80" rows="3" onkeypress="checklength(this,256)"><?php echo $verwendung_array[$pos]; ?></textarea></td>
 								</tr>
 							</table>
 
@@ -1207,28 +1148,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>
 										<input id="leasing_bis_array<?php echo $pos; ?>" name="leasing_bis_array[]" size="10" maxlength="11" value="<?php echo $leasing_bis_array[$pos]; ?>">
 										<script type="text/javascript" language="JavaScript1.2">
-										$(function() 
+										$(document).ready(function() 
 										{
-												$("#leasing_bis_array<?php echo $pos; ?>").datepicker({arrows:true,
-																		clearText: 'l&ouml;schen', clearStatus: 'aktuelles Datum l&ouml;schen',
-																		closeText: 'schlie&szlig;en', closeStatus: 'ohne &Auml;nderungen schlie&szlig;en',
-																		prevText: '&#x3c;zur&uuml;ck', prevStatus: 'letzten Monat zeigen',
-																		nextText: 'vor&#x3e;', nextStatus: 'n&auml;chsten Monat zeigen',
-																		currentText: 'heute', currentStatus: '',
-																		monthNames: ['Januar','Februar','M&auml;rz','April','Mai','Juni',
-																		'Juli','August','September','Oktober','November','Dezember'],
-																		monthNamesShort: ['Jan','Feb','M?r','Apr','Mai','Jun',
-																		'Jul','Aug','Sep','Okt','Nov','Dez'],
-																		monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
-																		weekHeader: 'Wo', weekStatus: 'Woche des Monats',
-																		dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-																		dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-																		dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-																		dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'W&auml;hle D, M d',
-																		dateFormat: 'yy.mmm.dd', firstDay: 1,
-																		initStatus: 'W&auml;hle ein Datum', isRTL: false
-																		} );
-											});
+												$( "#leasing_bis_array<?php echo $pos; ?>" ).datepicker($.datepicker.regional['de']);
+										});
 										</script>
 									</td>
 									<td>&nbsp;<label for="afa_array<?php echo $pos; ?>">AfA Jahre</label>&nbsp;</td>
@@ -1258,15 +1181,15 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				{
 			   		$("div#container_show<?php echo $pos; ?>").click(function(event) // Bei Klick auf div#
 					{  
-					      if ($("#vorlage<?php echo $pos; ?>").val() == 'false') 
+					      if ($("#vorlage<?php echo $pos; ?>").val() == 'true') 
 						  {
-					         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam ?ffnen
-			    		     $("#vorlage<?php echo $pos; ?>").val('true');
+					         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam oeffnen
+			    		     $("#vorlage<?php echo $pos; ?>").val('false');
 					      }
 						  else 
 						  {
 					         $("div#container<?php echo $pos; ?>").hide("slow");         // div# langsam verbergen
-			    		     $("#vorlage<?php echo $pos; ?>").val('false');
+			    		     $("#vorlage<?php echo $pos; ?>").val('true');
 				      		}
 			   });
 			});
@@ -1283,6 +1206,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			</fieldset>
 			<hr>
 			</div> <!-- ENDE Daten Container -->
+	</div>
 <?php
 @flush();
 } // Ende Anzahl Schleife

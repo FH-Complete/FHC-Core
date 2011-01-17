@@ -35,12 +35,13 @@
 	require_once('../../include/ort.class.php');
 	require_once('../../include/studiengang.class.php');
   	require_once('../../include/organisationseinheit.class.php');
-  	require_once('../../include/wawi.class.php');
   	require_once('../../include/betriebsmittel.class.php');
   	require_once('../../include/betriebsmittelperson.class.php');
   	require_once('../../include/betriebsmitteltyp.class.php');
   	require_once('../../include/betriebsmittelstatus.class.php');
   	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
+  	require_once('../../include/wawi_bestellung.class.php');
+  	require_once('../../include/firma.class.php');
 
   	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -55,15 +56,10 @@
 	if(!$rechte->isBerechtigt('wawi/inventar:begrenzt', null, 's'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 
-// ------------------------------------------------------------------------------------------
-// Initialisierung
-// ------------------------------------------------------------------------------------------
 	$errormsg=array();
 	$default_status_vorhanden='vorhanden';
 
-// ------------------------------------------------------------------------------------------
-// Parameter Aufruf uebernehmen
-// ------------------------------------------------------------------------------------------
+	// Parameter Aufruf uebernehmen
   	$nummer=trim((isset($_REQUEST['nummer']) ? $_REQUEST['nummer']:''));
   	$seriennummer=trim((isset($_REQUEST['seriennummer']) ? $_REQUEST['seriennummer']:''));
   	$ort_kurzbz=trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:''));
@@ -88,18 +84,10 @@
   	$work=trim(isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['ajax'])?$_REQUEST['ajax']:false));
 	$work=strtolower($work);
 
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung
-// ------------------------------------------------------------------------------------------
 	// Class - Datenbank	
 	$oBetriebsmittel = new betriebsmittel();
 	$oBetriebsmittel->result=array();
 	$oBetriebsmittel->debug=$debug;	
-
-	$oWawi = new wawi();
-	$oWawi->result=array();
-	$oWawi->debug=$debug;
-	$oWawi->errormsg='';
 
 	$oPerson = new person();
 	$oPerson->result=array();
@@ -108,18 +96,15 @@
 	$oOrganisationseinheit = new organisationseinheit();
 	$oOrganisationseinheit->result=array();
 
-// ------------------------------------------------------------------------------------------
-//	Datenlesen
-// ------------------------------------------------------------------------------------------
-/* jQuery autocomplete
-lineSeparator = (default value: "\n")
-	The character that separates lines in the results from the backend.
-cellSeparator (default value: "|")
-	The character that separates cells in the results from the backend.
-*/
+	/* jQuery autocomplete
+	lineSeparator = (default value: "\n")
+		The character that separates lines in the results from the backend.
+	cellSeparator (default value: "|")
+		The character that separates cells in the results from the backend.
+	*/
 	switch ($work)
 	{
-// SerienNummer - Inventarnummern suche
+		// SerienNummer - Inventarnummern suche
 		case 'seriennummer':
 		 	$seriennummer=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($seriennummer) || $seriennummer=='')
@@ -139,7 +124,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->seriennummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
 			break;
 
-// Hersteller
+		// Hersteller
 		case 'hersteller':
 		 	$hersteller=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($hersteller) || $hersteller=='')
@@ -159,7 +144,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->hersteller).'|'. ''."\n";
 			break;
 
-// Bestellung
+		// Bestellung
 		case 'bestellung_id':
 		 	$bestellung_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($bestellung_id) || $bestellung_id=='')
@@ -179,7 +164,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->seriennummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
 			break;
 
-// Betriebsmittel Inventarnummer
+		// Betriebsmittel Inventarnummer
 		case 'inventarnummer':
 		 	$inventarnummer=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($inventarnummer) || $inventarnummer=='')
@@ -199,7 +184,7 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->inventarnummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
 			break;
 
-// Ort - Inventarorte suche
+		// Ort - Inventarorte suche
 		case 'inventar_ort':
 		 	$ort_kurzbz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($ort_kurzbz) || $ort_kurzbz=='')
@@ -224,7 +209,7 @@ cellSeparator (default value: "|")
 			}		
 			break;
 
-// Ort - FH Technikum suche
+		// Ort - FH Technikum suche
 		case 'ort':
 		 	$ort_kurzbz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($ort_kurzbz) || $ort_kurzbz=='')
@@ -249,7 +234,7 @@ cellSeparator (default value: "|")
 			}
 			break;
 			
-// Person - FH Technikum suche
+		// Person - FH Technikum suche
 		case 'person':
 		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($person_id) || $person_id=='')
@@ -351,214 +336,68 @@ cellSeparator (default value: "|")
 			}
 			break;
 
-		// Suche
-		case 'wawi_search':
-		 	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($search) || $search=='')
-				exit();
-			$oWawi->result=array();
-			if ($oWawi->bestellpositionen("$search"))
-			{
-				for ($i=0;$i<count($oWawi->result);$i++)
-					echo html_entity_decode($oWawi->result[$i]->bestellung_id).'|'.', '.html_entity_decode($oWawi->result[$i]->jahr_monat_tag).',  '.html_entity_decode($oWawi->result[$i]->bestellnr).', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.($oWawi->result[$i]->titel?html_entity_decode($oWawi->result[$i]->titel):'').' '.($oWawi->result[$i]->bemerkungen?html_entity_decode($oWawi->result[$i]->bemerkungen):'').($oWawi->result[$i]->beschreibung?"\n".' -- '.html_entity_decode($oWawi->result[$i]->beschreibung):'')."\n";
-			}
-			break;
-
 		// Bestellung
 		case 'wawi_bestellnr':
-		 	$bestellnr=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($bestellnr) || $bestellnr=='')
+		 	$filter=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			if (is_null($filter) || $filter=='')
 				exit();
-			if (!$oWawi->bestellung(null,$jahr_monat,null,"$bestellnr"))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-				echo html_entity_decode($oWawi->result[$i]->bestellnr).'|'.', '.html_entity_decode($oWawi->result[$i]->jahr_monat_tag).',  '.html_entity_decode($oWawi->result[$i]->bestellung_id).', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->titel).' '.html_entity_decode($oWawi->result[$i]->bemerkungen)."\n";
-			if ($oWawi->errormsg)
-				exit($oWawi->errormsg."\n");
+			$bestellung = new wawi_bestellung();
 
-			echo "| *** Bestell ID *** \n";
-			$oWawi->result=array();
-			if ($oWawi->bestellung(null,$jahr_monat,"$bestellnr*"))
+			if ($bestellung->getAllSearch($filter, '', '', '', '', '', '', '', '', '', '', ''))
 			{
-				for ($i=0;$i<count($oWawi->result);$i++)
-					echo html_entity_decode($oWawi->result[$i]->bestellnr).'|'.', '.html_entity_decode($oWawi->result[$i]->jahr_monat_tag).',  '.html_entity_decode($oWawi->result[$i]->bestellung_id).', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->titel).' '.html_entity_decode($oWawi->result[$i]->bemerkungen)."\n";
+				foreach($bestellung->result as $row)
+					echo html_entity_decode($row->bestellung_id).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
 			}
+			else
+				exit($bestellung->errormsg."\n");
 
+			break;
 			break;
 
 		// Bestellung ID
 		case 'wawi_bestellung_id':
-		 	$bestellung_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($bestellung_id) || $bestellung_id=='')
+		 	$filter=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			if (is_null($filter) || $filter=='')
 				exit();
-			if ($oWawi->bestellung(null,$jahr_monat,"$bestellung_id*"))
+			$bestellung = new wawi_bestellung();
+
+			if ($bestellung->getBestellung($filter))
 			{
-				for ($i=0;$i<count($oWawi->result);$i++)
-					echo html_entity_decode($oWawi->result[$i]->bestellung_id).'|'.', '.html_entity_decode($oWawi->result[$i]->jahr_monat_tag).',  '.html_entity_decode($oWawi->result[$i]->bestellnr).', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->titel).' '.html_entity_decode($oWawi->result[$i]->bemerkungen)."\n";
+				foreach($bestellung->result as $row)
+					echo html_entity_decode($row->bestellung_id).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
 			}
-			if ($oWawi->errormsg)
-				exit($oWawi->errormsg."\n");
-			$oWawi->result=array();
-			if (!$oWawi->bestellung(null,$jahr_monat,null,"$bestellung_id%"))
-				exit($oWawi->errormsg."\n");
-			echo "| *** Bestellnr *** \n";
-			for ($i=0;$i<count($oWawi->result);$i++)
-				echo html_entity_decode($oWawi->result[$i]->bestellung_id).'|'.', '.html_entity_decode($oWawi->result[$i]->jahr_monat_tag).',  '.html_entity_decode($oWawi->result[$i]->bestellnr).', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->titel).' '.html_entity_decode($oWawi->result[$i]->bemerkungen)."\n";
+			else
+				exit($bestellung->errormsg."\n");
+
 			break;
 
 
 		// Bestelldetail ID
 		case 'wawi_bestelldetail_id':
-		 	$bestelldetail_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($bestellung_id) || $bestellung_id=='' || is_null($bestelldetail_id) || $bestelldetail_id=='')
+		 	$filter=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			if (is_null($bestellung_id) || $bestellung_id=='' || is_null($filter) || $filter=='')
 				exit();
-			if ($oWawi->bestellpositionen($bestellung_id,null,"%$bestelldetail_id"))
-			{
-				for ($i=0;$i<count($oWawi->result);$i++)
-					echo html_entity_decode($oWawi->result[$i]->bestelldetail_id).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung).',  '.html_entity_decode($oWawi->result[$i]->artikelnr).' Preis VE '.html_entity_decode(number_format($oWawi->result[$i]->preisve,2)).', Menge '.html_entity_decode($oWawi->result[$i]->menge).', Pos.summe '.html_entity_decode(number_format($oWawi->result[$i]->summe,2))."\n";
-			}
-			if ($oWawi->errormsg)
-				exit($oWawi->errormsg."\n");
-
-			if (!$oWawi->bestellpositionen($bestellung_id,null,null,null))
-				exit($oWawi->errormsg."\n");
-
-			echo "| *** alle Positionen *** \n";
-			for ($i=0;$i<count($oWawi->result);$i++)
-					echo html_entity_decode($oWawi->result[$i]->bestelldetail_id).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung).',  '.html_entity_decode($oWawi->result[$i]->artikelnr).' Preis VE '.html_entity_decode(number_format($oWawi->result[$i]->preisve,2)).', Menge '.html_entity_decode($oWawi->result[$i]->menge).', Pos.summe '.html_entity_decode(number_format($oWawi->result[$i]->summe,2))."\n";
+			
+			$bestelldetail = new wawi_bestelldetail();
+			$bestelldetail->getAllDetailsFromBestellung($bestellung_id, $filter);
+			
+			foreach($bestelldetail->result as $row)
+				echo html_entity_decode($row->bestelldetail_id).'|'.', '.html_entity_decode($row->beschreibung).',  '.html_entity_decode($row->artikelnummer).' Preis VE '.html_entity_decode(number_format($row->preisprove,2)).', Menge '.html_entity_decode($row->menge)."\n";
 			break;
 			
-		// Firmen ID
-		case 'wawi_firma_id':
-		 	$firma_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($firma_id) ||$firma_id=='')
-				exit();
-			$oWawi = new wawi();
-			$oWawi->result=array();
-			$oWawi->debug=$debug;
-			if (!$oWawi->firma("$firma_id%",null))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-				echo html_entity_decode($oWawi->result[$i]->firma_id).'|'.', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->strasse).' '.html_entity_decode($oWawi->result[$i]->plz).' '.html_entity_decode($oWawi->result[$i]->ort)."\n";
-			break;
-
+		
 		// Firmen Search
 		case 'wawi_firma_search':
 		 	$firma_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($firma_search) ||$firma_search=='')
 				exit();
-			if (!$oWawi->firma(null,"$firma_search"))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-				echo html_entity_decode($oWawi->result[$i]->firma_id).'|'.', '.html_entity_decode($oWawi->result[$i]->firmenname).', '.html_entity_decode($oWawi->result[$i]->strasse).' '.html_entity_decode($oWawi->result[$i]->plz).' '.html_entity_decode($oWawi->result[$i]->ort)."\n";
+			$firma = new firma();
+			$firma->searchFirma($firma_search);
+			foreach($firma->result as $row)
+				echo html_entity_decode($row->firma_id).'|'.', '.html_entity_decode($row->name)."\n";
+			
 			break;
 
-		// Kostenstelle ID
-		case 'wawi_kostenstelle_id':
-		 	$kostenstelle_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($kostenstelle_id) || $kostenstelle_id=='')
-				exit();
-			if (!$oWawi->kostenstelle("$kostenstelle_id%",null))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->kostenstelle_id).'|'.', Nr :'.html_entity_decode($oWawi->result[$i]->kostenstelle_nr).', '.html_entity_decode($oWawi->result[$i]->bezeichnung).', Stg.:'.html_entity_decode($oWawi->result[$i]->stg_kurzzeichen).' '.html_entity_decode($oWawi->result[$i]->stg_bez).' '
-					.' '.($oWawi->result[$i]->stg_aktiv==true || $oWawi->result[$i]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
-			}
-			break;
-
-		// Kostenstelle Nr
-		case 'wawi_kostenstelle_nr':
-		 	$kostenstelle_nr=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($kostenstelle_nr) || $kostenstelle_nr=='')
-				exit();
-			if (!$oWawi->kostenstelle(null,null,null,null,"$kostenstelle_nr%"))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->kostenstelle_nr).'|'.', ID :'.html_entity_decode($oWawi->result[$i]->kostenstelle_id).', '.html_entity_decode($oWawi->result[$i]->bezeichnung).', Stg.:'.html_entity_decode($oWawi->result[$i]->stg_kurzzeichen).' '.html_entity_decode($oWawi->result[$i]->stg_bez).' '
-					.' '.($oWawi->result[$i]->stg_aktiv==true || $oWawi->result[$i]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
-			}
-			break;
-
-		// Kostenstelle Serch
-		case 'wawi_kostenstelle_search':
-		 	$kostenstelle_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($kostenstelle_search) || $kostenstelle_search=='')
-				exit();
-			if (!$oWawi->kostenstelle(null,$kostenstelle_search))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->kostenstelle_nr).'|' .', '. html_entity_decode($oWawi->result[$i]->bezeichnung).' , ID :'.html_entity_decode($oWawi->result[$i]->kostenstelle_id).', Nr.:'.html_entity_decode($oWawi->result[$i]->kostenstelle_nr).', Stg.:'.html_entity_decode($oWawi->result[$i]->stg_kurzzeichen).' '.html_entity_decode($oWawi->result[$i]->stg_bez).' '
-					.' '.($oWawi->result[$i]->stg_aktiv==true || $oWawi->result[$i]->stg_aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
-			}
-			break;
-
-		// Konto ID
-		case 'wawi_konto_id':
-		 	$konto_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($konto_id) || $konto_id=='')
-				exit();
-			if (!$oWawi->konto("$konto_id"))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->konto).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung)
-				."\n";
-			}
-			break;
-
-		// Konto ID
-		case 'wawi_konto_search':
-		 	$konto_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($konto_search) || $konto_search=='')
-				exit();
-			if (!$oWawi->konto(null,null,"$konto_search"))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->konto).'|'.', '.html_entity_decode($oWawi->result[$i]->beschreibung)
-				."\n";
-			}
-			break;
-
-		// Studiengang ID
-		case 'wawi_studiengang_id':
-		 	$studiengang_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($studiengang_id) || $studiengang_id=='')
-				exit();
-			if ($kostenstelle_id && !$oWawi->studiengang_kostenstelle("$studiengang_id%",null,null,$kostenstelle_id))
-				exit($oWawi->errormsg."\n");
-			elseif (!$kostenstelle_id && !$oWawi->studiengang("$studiengang_id%",null,null))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->studiengang_id).'|'.', '.html_entity_decode($oWawi->result[$i]->kurzzeichen) .' '.html_entity_decode($oWawi->result[$i]->bezeichnung)
-					.' '.($oWawi->result[$i]->aktiv==true || $oWawi->result[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
-			}
-			break;
-
-		// Studiengang Suche
-		case 'wawi_studiengang_search':
-		 	$studiengang_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($studiengang_search) || $studiengang_search=='')
-				exit();
-			if ($kostenstelle_id && !$oWawi->studiengang_kostenstelle(null,null,"$studiengang_id%",$kostenstelle_id))
-				exit($oWawi->errormsg."\n");
-			else if (!$oWawi->studiengang(null,null,$studiengang_search))
-				exit($oWawi->errormsg."\n");
-			for ($i=0;$i<count($oWawi->result);$i++)
-			{
-				echo html_entity_decode($oWawi->result[$i]->studiengang_id).'|'.', '.html_entity_decode($oWawi->result[$i]->kurzzeichen) .' '.html_entity_decode($oWawi->result[$i]->bezeichnung) 
-					.' '.($oWawi->result[$i]->aktiv==true || $oWawi->result[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
-			}
-			break;
 	    default:
    	   		echo " Funktion $work fehlt! ";
 			break;
