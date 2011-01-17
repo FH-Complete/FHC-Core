@@ -222,9 +222,7 @@ if(isset($_POST['updateliste']))
 		$(document).ready(function() {
 			if(document.getElementById('inventarnummer'))
 				document.getElementById('inventarnummer').focus();
-			/*$('#inventarnummer').change(function(){
-			inventarnummerchange();
-			});*/
+
 			$('#inventarnummer').keypress(function(event){
 				if(event.keyCode=='13')
 					inventarnummerchange();
@@ -279,6 +277,11 @@ if(isset($_POST['updateliste']))
 				}
 			);
 		}
+		
+		function formatItem(row) 
+		{
+		    return row[0] + " <i>" + row[1] + "<\/i> ";
+		}
 		</script>
 	</head>
 	<body>
@@ -294,9 +297,7 @@ if(isset($_POST['updateliste']))
 						function selectItem(li) {
 						   return false;
 						}
-						function formatItem(row) {
-						    return row[0] + " <i>" + row[1] + "<\/i> ";
-						}
+						
 						$(document).ready(function() {
 							  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', {
 								minChars:2,
@@ -316,10 +317,7 @@ if(isset($_POST['updateliste']))
 				<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
 					<input id="person_id" name="person_id" size="13" maxlength="14" value="<?php echo $person_id; ?>">
 						<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "<\/li> ";
-						}
+					
 						$(document).ready(function() 
 						{
 							  $('#person_id').autocomplete('inventar_autocomplete.php', 

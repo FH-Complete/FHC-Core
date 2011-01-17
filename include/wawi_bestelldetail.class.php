@@ -293,16 +293,25 @@ class wawi_bestelldetail extends basis_db
 	 * Gibt alle Details einer Bestellung zurück
 	 * @param $bestell_id
 	 */
-	public function getAllDetailsFromBestellung($bestell_id)
+	public function getAllDetailsFromBestellung($bestell_id, $filter=null)
 	{
 		if(!is_numeric($bestell_id))
 		{
 			$this->errormsg ='Keine gültige Bestell ID.';
 			return false; 
 		}
-		$qry = "SELECT * from wawi.tbl_bestelldetail as detail
-				where
-				detail.bestellung_id = ".$bestell_id." order by position;";
+		$qry = "SELECT * FROM wawi.tbl_bestelldetail
+				WHERE
+				bestellung_id = '".$bestell_id."'";
+		
+		if(!is_null($filter))
+		{
+			$qry.=" AND (beschreibung like '%".addslashes($filter)."%' 
+						 OR bestelldetail_id::text like '%".addslashes($filter)."%'
+						 OR artikelnummer like '%".addslashes($filter)."%'
+						 )";
+		}
+		$qry.=" ORDER BY position;";
 		
 		if($this->db_query($qry))
 		{
@@ -337,5 +346,4 @@ class wawi_bestelldetail extends basis_db
 			return false;
 		}
 	}
-	
 }

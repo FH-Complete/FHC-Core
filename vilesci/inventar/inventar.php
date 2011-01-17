@@ -20,26 +20,23 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/ort.class.php');
+require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/person.class.php');	
+require_once('../../include/betriebsmittel.class.php');
+require_once('../../include/betriebsmittelperson.class.php');
+require_once('../../include/betriebsmitteltyp.class.php');
+require_once('../../include/betriebsmittelstatus.class.php');
+require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
+require_once('../../include/datum.class.php');
 
-// ---------------- Vilesci Include Dateien einbinden
-	require_once('../../config/vilesci.config.inc.php');
-  	require_once('../../include/functions.inc.php');
-	require_once('../../include/benutzer.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/mitarbeiter.class.php');
-	require_once('../../include/ort.class.php');
-  	require_once('../../include/organisationseinheit.class.php');
-  	require_once('../../include/wawi.class.php');	
-  	require_once('../../include/person.class.php');	
-  	require_once('../../include/betriebsmittel.class.php');
-  	require_once('../../include/betriebsmittelperson.class.php');
-  	require_once('../../include/betriebsmitteltyp.class.php');
-  	require_once('../../include/betriebsmittelstatus.class.php');
-  	require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
-  	require_once('../../include/datum.class.php');
-
-	if (!$uid = get_uid())
-		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if (!$uid = get_uid())
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 // ------------------------------------------------------------------------------------------
 // Initialisierung
@@ -328,17 +325,26 @@
 	<head>
 		<title>Inventar - Betriebsmittel - Suche</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
 
+		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>
+		<style type="text/css">
+		table.navbar td
+		{
+			text-align: left;
+		}
+		</style>
 		<script type="text/javascript" language="JavaScript1.2">
 		<!--
-		var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
+			function formatItem(row) 
+			{
+			    return row[0] + " <br>" + row[1];
+			}
+			
+			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
+			
 			function set_status(output_id,betriebsmittelbetriebsmittelstatus_id,betriebsmittel_id,inventarnummer,bestellung_id,bestelldetail_id,betriebsmittelstatus_kurzbz)
 			{
 				document.getElementById(output_id).innerHTML = '<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >';
@@ -393,10 +399,6 @@
 				<td><label for="inventarnummer">Inv.nr.</label>&nbsp;
 					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>">&nbsp;
 					<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
 						$(document).ready(function() 
 						{
 							  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
@@ -413,36 +415,11 @@
 
 					<td><label for="seriennummer">Seriennr.</label>&nbsp;
 					<input id="seriennummer"  name="seriennummer" type="text" size="10" maxlength="60" value="<?php echo $seriennummer;?>">&nbsp;
-					<script type="text/javascript">
-						function selectItem(li) 
-						{
-						   return false;
-						}
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
-						$(document).ready(function() 
-						{
-							  $('#seriennummer').autocomplete('inventar_autocomplete.php', 
-							  {
-								minChars:3,
-								matchSubset:1,matchContains:1,
-								width:500,
-								onItemSelect:selectItem,
-								formatItem:formatItem,
-								extraParams:{'work':'seriennummer'}
-						  });
-					  });
-					</script>
+					</td>
 
 					<td><label for="ort_kurzbz">Ort</label>&nbsp;
 						<input id="ort_kurzbz" name="ort_kurzbz" size="10" maxlength="40" value="<?php echo $ort_kurzbz;?>">&nbsp;
 						<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
 						$(document).ready(function() 
 						{
 							  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', 
@@ -496,8 +473,8 @@
 					<select id="oe_kurzbz" name="oe_kurzbz" >
 						  <?php
 								if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 's'))
-									echo '<option '.(empty($oe_kurzbz)?' selected="selected" ':''); ?>  value="">bitte ausw&auml;hlen&nbsp;</option>
-							<?php
+									echo '<option '.(empty($oe_kurzbz)?' selected="selected" ':'').' value="">bitte ausw&auml;hlen&nbsp;</option>';
+							
 								for ($i=0;$i<count($resultOrganisationseinheit) ;$i++)
 								{
 									if ($resultOrganisationseinheit[$i]->oe_kurzbz)
@@ -535,10 +512,6 @@
 				<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
 					<input id="person_id" name="person_id" size="13" maxlength="14" value="<?php echo $person_id; ?>">
 						<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
 						$(document).ready(function() 
 						{
 							  $('#person_id').autocomplete('inventar_autocomplete.php', 
@@ -562,9 +535,6 @@
 			<tr>
 					<td><label for="bestellnr">Bestellnr.</label>&nbsp;	<input id="bestellnr" name="bestellnr" size="10" maxlength="30" type="Text" value="<?php echo $bestellnr; ?>" >&nbsp;
 						<script type="text/javascript">
-							function formatItem(row) {
-							    return row[0] + " <li>" + row[1] + "</li> ";
-							}
 							$(document).ready(function() 
 							{
 								  $('#bestellnr').autocomplete('inventar_autocomplete.php', 
@@ -581,15 +551,11 @@
 				<!-- Bestell ID Eindeutigenummer -->
 				<td><label for="bestellung_id">Bestell ID</label>&nbsp;<input id="bestellung_id" name="bestellung_id" size="10" maxlength="30" type="Text" value="<?php echo $bestellung_id; ?>" >&nbsp;
 						<script type="text/javascript">
-							function formatItem(row) 
-							{
-							    return row[0] + " <li>" + row[1] + "</li> ";
-							}
 							$(document).ready(function() 
 							{
 								  $('#bestellung_id').autocomplete('inventar_autocomplete.php', 
 								  {
-									minChars:4,
+									minChars:2,
 									matchSubset:1,matchContains:1,
 									width:500,
 									formatItem:formatItem,
@@ -602,10 +568,6 @@
 				<td>&nbsp;<label for="firma_id">Lieferant</label>&nbsp;
 					<input id="firma_id" name="firma_id" size="10" maxlength="30" value="<?php echo $firma_id; ?>" >&nbsp;
 					<script type="text/javascript">
-							function formatItem(row) 
-							{
-							    return row[0] + " <li>" + row[1] + "</li> ";
-							}
 							$(document).ready(function() 
 							{
 								  $('#firma_id').autocomplete('inventar_autocomplete.php', 
@@ -623,10 +585,7 @@
 				<td>&nbsp;<label for="hersteller">Hersteller</label>&nbsp;
 					<input id="hersteller" name="hersteller" type="text" size="10" maxlength="30" value="<?php echo $hersteller;?>" >&nbsp;
 					<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
+						
 						$(document).ready(function() 
 						{
 							  $('#hersteller').autocomplete('inventar_autocomplete.php', 
@@ -859,84 +818,10 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		$bestellung_ivalid_style='';
 		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
 			$bestellung_ivalid_style='style="color: red;"';
-		
-
-		
-
-			$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
-		/*
-			$htmlstring.='<td align="right">
-					<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',this.value,0);" id="bestellung_id'.$pos.'" name="bestellung_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestellung_id .'">
-					<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
-						$(document).ready(function() 
-						{
-							  $("#bestellung_id'.$pos.'").autocomplete("inventar_autocomplete.php", {
-								minChars:2,
-								matchSubset:1,matchContains:1,
-								width:600,
-						        scrollHeight: 200, 													
-								formatItem:formatItem,
-								extraParams:{"work":"wawi_search"}
-							  });
-						    $("#bestellung_id'.$pos.'").change(function () 
-							{
-								$("#bestellung_id'.$pos.'").blur();
-					        })
-							  
-					  });
-					</script>
-			&nbsp;</td>
-		';
-
-		$htmlstring.='
-			<td align="right">';
-		
-		
-		
-		if ($schreib_recht && $resultBetriebsmittel[$pos]->bestellung_id)
-		{
-			$htmlstring.='
-					<input style="font-size:smaller;" onblur="set_position(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',this.value);" id="bestelldetail_id'.$pos.'" name="bestelldetail_id'.$pos.'" size="6" maxlength="41" value="'. $resultBetriebsmittel[$pos]->bestelldetail_id .'">
-					<script type="text/javascript">
-						function formatItem(row) 
-						{
-						    return row[0] + " <li>" + row[1] + "</li> ";
-						}
 					
-						$(document).ready(function() 
-						{
-							  $("#bestelldetail_id'.$pos.'").autocomplete("inventar_autocomplete.php", 
-							  {
-								minChars:1,
-								matchSubset:1,matchContains:1,
-								width:600,
-						        scrollHeight: 200, 											
-								formatItem:formatItem,
-								extraParams:{"work":"wawi_bestelldetail_id"
-											,"bestellung_id":"'.$resultBetriebsmittel[$pos]->bestellung_id.'"}
-							  });
+		//$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
+		$htmlstring.='<td align="right"><a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
 
-						    $("#bestelldetail_id'.$pos.'").change(function () {
-								$("#bestelldetail_id'.$pos.'").blur();
-					        })
-							  
-						  });
-
-						  
-					</script>
-		';
-		}
-		else
-		{
-			$htmlstring.='<a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestelldetail_id.'</a>';
-		}
-
-		$htmlstring.='&nbsp;</td>';
-		*/
 		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
 		$htmlstring.='<td align="right">'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum,'d.m.Y').'&nbsp;</td>';
@@ -1058,22 +943,18 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<input style="display:none" name="bestelldetail_id" value="'.$resBetriebsmittel->bestelldetail_id.'" >						
 					<input onchange="setTimeout(\'document.sendform0.submit()\',1500);" id="bestellung_ids" name="bestellung_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestellung_id.'" >
 					<script type="text/javascript">
-								function formatItem(row) 
-								{
-								    return row[0] + " <li>" + row[1] + "</li> ";
-								}
-								$(document).ready(function() 
-								{
-									  $("#bestellung_ids").autocomplete("inventar_autocomplete.php", 
-									  {
-										minChars:4,
-										matchSubset:1,matchContains:1,
-										width:500,
-										formatItem:formatItem,
-										extraParams:{"work":"wawi_bestellung_id"}
-									  });
+						$(document).ready(function() 
+						{
+							  $("#bestellung_ids").autocomplete("inventar_autocomplete.php", 
+							  {
+								minChars:4,
+								matchSubset:1,matchContains:1,
+								width:500,
+								formatItem:formatItem,
+								extraParams:{"work":"wawi_bestellung_id"}
 							  });
-							</script>
+					  });
+					</script>
 				</td>
 			</form>';
 		else		
@@ -1089,25 +970,21 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
 					<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_ids"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
 					<script type="text/javascript">
-								function formatItem(row) 
-								{
-								    return row[0] + " <li>" + row[1] + "</li> ";
-								}
-								$(document).ready(function() 
-								{
-									  $("#bestelldetail_ids").autocomplete("inventar_autocomplete.php", 
-									  {
-										minChars:1,
-										matchSubset:1,matchContains:1,
-										width:500,
-										formatItem:formatItem,
-										extraParams:{
-													"work":"wawi_bestelldetail_id"
-													,"bestellung_id":"'.$resBetriebsmittel->bestellung_id.'"
-													}
-									  });
+						$(document).ready(function() 
+						{
+							  $("#bestelldetail_ids").autocomplete("inventar_autocomplete.php", 
+							  {
+								minChars:1,
+								matchSubset:1,matchContains:1,
+								width:500,
+								formatItem:formatItem,
+								extraParams:{
+											"work":"wawi_bestelldetail_id"
+											,"bestellung_id":"'.$resBetriebsmittel->bestellung_id.'"
+											}
 							  });
-							</script>
+					  });
+					</script>
 				</td>
 			</form>';
 		else

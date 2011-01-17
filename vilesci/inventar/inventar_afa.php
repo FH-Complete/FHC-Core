@@ -31,7 +31,6 @@
 	require_once('../../include/mitarbeiter.class.php');
 	require_once('../../include/ort.class.php');
  	require_once('../../include/organisationseinheit.class.php');
- 	require_once('../../include/wawi.class.php');
  	require_once('../../include/betriebsmittel.class.php');
  	require_once('../../include/betriebsmittelperson.class.php');
  	require_once('../../include/betriebsmitteltyp.class.php');
@@ -219,11 +218,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+
 		<script src="../../include/js/jquery.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
 				
 		<script type="text/javascript">
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
@@ -274,6 +270,10 @@
 			    mydiv.style.display = (mydiv.style.display=='block'?'none':'block');
 			  }
 			}
+			function formatItem(row) 
+			{
+			    return row[0] + " <i>" + row[1] + "</i> ";
+			}
 		</script>
 	</head>
 	<body>
@@ -290,10 +290,6 @@
 						function selectItem(li) 
 						{
 						   return false;
-						}
-						function formatItem(row) 
-						{
-						    return row[0] + " <i>" + row[1] + "</i> ";
 						}
 						$(document).ready(function() 
 						{
@@ -319,9 +315,6 @@
 						function selectItem(li) {
 						   return false;
 						}
-						function formatItem(row) {
-						    return row[0] + " <i>" + row[1] + "</i> ";
-						}
 						$(document).ready(function() {
 							  $('#seriennummer').autocomplete('inventar_autocomplete.php', {
 								minChars:4,
@@ -346,9 +339,7 @@
 						function selectItem(li) {
 						   return false;
 						}
-						function formatItem(row) {
-						    return row[0] + " <i>" + row[1] + "</i> ";
-						}
+						
 						$(document).ready(function() {
 							  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', {
 								minChars:2,
@@ -417,9 +408,7 @@
 						function selectItem(li) {
 						   return false;
 						}
-						function formatItem(row) {
-						    return row[0] + " <i>" + row[1] + "</i> ";
-						}
+						
 						$(document).ready(function() {
 							  $('#bestellnr').autocomplete('inventar_autocomplete.php', {
 								minChars:5,
@@ -441,9 +430,7 @@
 							function selectItem(li) {
 							   return false;
 							}
-							function formatItem(row) {
-							    return row[0] + " <i>" + row[1] + "</i> ";
-							}
+						
 							$(document).ready(function() {
 								  $('#bestellung_id').autocomplete('inventar_autocomplete.php', {
 									minChars:3,
@@ -463,9 +450,7 @@
 							function selectItem(li) {
 							   return false;
 							}
-							function formatItem(row) {
-							    return row[0] + " <i>" + row[1] + "</i> ";
-							}
+							
 							$(document).ready(function() {
 								  $('#firma_id').autocomplete('inventar_autocomplete.php', {
 									minChars:4,
@@ -484,9 +469,7 @@
 						function selectItem(li) {
 						   return false;
 						}
-						function formatItem(row) {
-						    return row[0] + " <i>" + row[1] + "</i> ";
-						}
+						
 						$(document).ready(function() {
 							  $('#hersteller').autocomplete('inventar_autocomplete.php', {
 								minChars:4,
@@ -764,9 +747,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 							function selectItem(li) {
 							   return false;
 							}
-							function formatItem(row) {
-							    return row[0] + " <i>" + row[1] + "</i> ";
-							}
+							
 							$(document).ready(function() {
 								  $(\'#bestelldetail_id\').autocomplete(\'inventar_autocomplete.php\', {
 									minChars:1,
