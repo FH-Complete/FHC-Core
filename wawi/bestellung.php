@@ -1181,6 +1181,7 @@ if($aktion == 'suche')
 				$.post("bestellung.php", {id: bestelldetail_id, deleteDetail: "true"},
 				function(data){
 				}); 
+				
 			}
 			
 			
@@ -1375,6 +1376,11 @@ if($aktion == 'suche')
 					// letzte leere zeile nicht speichern
 					for($i = 1; $i < $bestellung_detail_anz; $i++)
 					{
+						// wenn ein Detail gelöscht wird Durchlauf überspringen
+						if(!isset($_POST["bestelldetailid_$i"]))
+						{
+							continue; 
+						}
 						$detail_id = $_POST["bestelldetailid_$i"]; 
 						$bestell_detail = new wawi_bestelldetail(); 		
 						
