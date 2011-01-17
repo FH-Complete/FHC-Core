@@ -743,15 +743,13 @@ if($aktion == 'suche')
 			echo "<td><input name= 'titel' type='text' size='60' maxlength='256' value ='".$bestellung->titel."'></td>\n";
 			echo "<td>Erstellt am:</td>\n"; 
 			echo "<td colspan ='2'><span name='erstellt' title ='".$bestellung->insertvon."' >".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</span></td>\n";
-			echo "<td></td>"; 
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Firma: </td>\n";
 			echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
-			echo "<input type='text' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
+			echo "<input type='hidden' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
 			echo "<td>Liefertermin:</td>\n"; 
 			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
-			echo "<td></td>"; 
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Kostenstelle: </td>\n";
@@ -772,7 +770,7 @@ if($aktion == 'suche')
 				echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 			}		
 			
-			echo "</td><td></td></tr>\n"; 
+			echo "</td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Konto: </td>\n";
 			echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
@@ -805,7 +803,7 @@ if($aktion == 'suche')
 					
 				echo "<option value='".$standort_rechnungsadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_rechnungsadresse->strasse.', '.$standort_rechnungsadresse->plz.' '.$standort_rechnungsadresse->ort."</option>\n";
 			}		
-			echo "</td><td></td></tr>\n"; 
+			echo "</td</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Bemerkungen: </td>\n";
 			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
@@ -1224,7 +1222,7 @@ if($aktion == 'suche')
 			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
-			echo "<table border=0 width='65%' class='aufteilung'>"; 
+			echo "<table border=0 width='70%' class='aufteilung'>"; 
 			echo "<tr>\n"; 
 			$help = 0; 
 			$anteil = 0;
@@ -1696,7 +1694,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
-		echo "<td><input type='text' size='80' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
+		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBrutto($i);'></input></td>\n";
