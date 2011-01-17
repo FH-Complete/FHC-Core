@@ -1378,9 +1378,7 @@ if($aktion == 'suche')
 					{
 						// wenn ein Detail gelöscht wird Durchlauf überspringen
 						if(!isset($_POST["bestelldetailid_$i"]))
-						{
 							continue; 
-						}
 						$detail_id = $_POST["bestelldetailid_$i"]; 
 						$bestell_detail = new wawi_bestelldetail(); 		
 						
