@@ -242,7 +242,6 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
-	<script type="text/javascript" src="../include/js/jquery.ui.datepicker-de.js"></script> 	
 
 	<script type="text/javascript">
 	function conf_del()
