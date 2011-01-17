@@ -85,6 +85,9 @@
  * @author Christian Bach/christian.bach@polyester.se
  */
 
+
+
+
 (function($) {
 	$.extend({
 		tablesorter: new function() {
