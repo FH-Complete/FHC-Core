@@ -926,6 +926,7 @@ class benutzerberechtigung extends basis_db
 		
 		$freigabebenutzer=array();
 		$not = array();
+ 
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
