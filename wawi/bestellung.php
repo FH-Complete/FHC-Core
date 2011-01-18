@@ -691,13 +691,374 @@ if($aktion == 'suche')
 		  		MeinFenster.focus();
 			}
 			</script>'; 
-		
-		
+
 		// Bestellung Editieren	
-		if(!isset($_GET['bestellung']))
+		if(isset($_GET['bestellung']))
 		{
-			if(!$rechte->isberechtigt('wawi/bestellung',null, 'su'))
-				die('Sie haben keine Berechtigung zum Bearbeiten von Bestellungen');
+			// Update auf Bestellung
+			$date = new datum(); 	
+			//	var_dump($_POST); 
+			$save = false; 
+			
+			$bestellung_id = $_GET['bestellung'];
+			$bestellung_new = new wawi_bestellung(); 
+			$bestellung_new->load($bestellung_id);
+			$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
+			$status = new wawi_bestellstatus(); 
+				
+			// speichern 
+			if(isset($_POST['btn_abschicken']) || isset($_POST['btn_submit']))
+			{
+				// wenn es status Storno oder Abgeschickt schon gibt, darf nicht gespeichert werden
+				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung_new->bestellung_id, 'Abgeschickt'))
+				{
+					echo "Kein Speichern mehr möglich.<br>"; 
+					echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
+				}
+				else
+				{
+					$aufteilung_anzahl = $_POST['anz_aufteilung'];
+					$bestellung_detail_anz = $_POST['detail_anz'];
+	
+					$bestellung_new->new = false; 
+					$bestellung_new->besteller_uid=$user; 
+					if(is_numeric($_POST['filter_konto']))
+						$bestellung_new->konto_id = $_POST['filter_konto'];
+					else 
+						$bestellung_new->konto_id = '';
+					$bestellung_new->firma_id = $_POST['firma_id'];
+					$bestellung_new->lieferadresse = $_POST['filter_lieferadresse'];
+					$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
+					$bestellung_new->titel = $_POST['titel'];
+					$bestellung_new->bemerkung = $_POST['bemerkung'];
+					$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
+					$bestellung_new->updateamum = date('Y-m-d H:i:s');
+					$bestellung_new->updatevon = $user; 
+					$bestellung_new->zahlungstyp_kurzbz = $_POST['filter_zahlungstyp'];
+					$tags = explode(";", $_POST['tags']);
+					$help_tags = new tags(); 
+					$help_tags->bestellung_id = $bestellung_id; 
+					$help_tags->deleteBestellungTag($tags);
+					
+					foreach ($tags as $bestelltags)
+					{
+						$tag_bestellung = new tags(); 
+						$tag_bestellung->tag = trim($bestelltags); 
+						$tag_bestellung->bestellung_id = $bestellung_id; 
+						$tag_bestellung->insertvon = $user; 
+						$tag_besetllung->insertamum = date('Y-m-d H:i:s');
+						
+						if(!$tag_bestellung->TagExists())
+						{
+							$tag_bestellung->saveTag(); 
+							$tag_bestellung->saveBestellungTag();
+						}
+						else
+						{
+							if(!$tag_bestellung->BestellungTagExists())
+								$tag_bestellung->saveBestellungTag();
+						}
+					} 
+					// letzte leere zeile nicht speichern
+					for($i = 1; $i < $bestellung_detail_anz; $i++)
+					{
+						// wenn ein Detail gelöscht wird Durchlauf überspringen
+						if(!isset($_POST["bestelldetailid_$i"]))
+							continue; 
+						$detail_id = $_POST["bestelldetailid_$i"]; 
+						$bestell_detail = new wawi_bestelldetail(); 		
+						
+						// gibt es ein bestelldetail schon
+						if($detail_id != '')
+						{
+							// Update
+							$bestell_detail->load($detail_id);
+							
+							$tags_detail = explode(";", $_POST["detail_tag_$i"]);
+		
+							$help_detailtags = new tags(); 
+							$help_detailtags->bestelldetail_id = $detail_id; 
+							$help_detailtags->deleteBestelldetailTag($tags_detail);
+							
+							foreach ($tags_detail as $det)
+							{
+								$detail_tag = new tags(); 
+								$detail_tag->tag = trim($det); 
+								$detail_tag->bestelldetail_id = $detail_id; 
+								$detail_tag->insertvon = $user; 
+								$detail_tag->insertamum = date('Y-m-d H:i:s');
+								
+								if(!$detail_tag->TagExists())
+								{
+									$detail_tag->saveTag();
+									$detail_tag->saveBestelldetailTag();
+								}
+								else
+								{
+									if(!$detail_tag->BestelldetailTagExists())
+										$detail_tag->saveBestelldetailTag();
+								}
+							} 
+							$menge = $_POST["menge_$i"]; 
+							if($menge == '')
+								$menge = '0'; 
+							$bestell_detail->position = $_POST["pos_$i"];
+							$bestell_detail->menge = $menge;
+							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
+							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
+							$bestell_detail->preisprove = mb_str_replace(',','.', $_POST["preisprove_$i"]);
+							$bestell_detail->mwst = $_POST["mwst_$i"];
+							$bestell_detail->updateamum = date('Y-m-d H:i:s');
+							$bestell_detail->updatevon = $user;
+							$bestell_detail->new = false; 
+						}
+						else 
+						{
+							// Insert
+							$menge = $_POST["menge_$i"]; 
+							if($menge == '')
+								$menge = '0'; 
+							$bestell_detail->bestellung_id = $_GET['bestellung'];
+							$bestell_detail->position = $_POST["pos_$i"];
+							$bestell_detail->menge = $menge;
+							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
+							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
+							$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
+							$bestell_detail->mwst = $_POST["mwst_$i"];
+							$bestell_detail->sort = $_POST["pos_$i"];
+							$bestell_detail->insertamum = date('Y-m-d H:i:s');
+							$bestell_detail->insertvon = $user;
+							$bestell_detail->updateamum = date('Y-m-d H:i:s');
+							$bestell_detail->updatevon = $user;
+							$bestell_detail->new = true; 
+						}
+						if(!$bestell_detail->save())
+						{
+							echo $bestell_detail->errormsg; 
+						}
+					}
+		
+					for($i=0; $i<$aufteilung_anzahl; $i++)
+					{
+						$aufteilung = new wawi_aufteilung(); 
+						$aufteilung->bestellung_id = $bestellung_id;
+						$aufteilung->oe_kurzbz = $_POST['oe_kurzbz_'.$i];
+						$aufteilung->anteil = $_POST['aufteilung_'.$i]; 
+						
+						if($aufteilung->AufteilungExists())
+						{
+							// Update
+							$aufteilung->updateamum = date('Y-m-d H:i:s');
+							$aufteilung->updatevon = $user; 
+							$aufteilung->new = false; 
+						}
+						else
+						{
+							// Insert
+							$aufteilung->updateamum = date('Y-m-d H:i:s');
+							$aufteilung->updatevon = $user; 
+							$aufteilung->insertamum = date('Y-m-d H:i:s');
+							$aufteilung->insertvon = $user; 
+							$aufteilung->new = true; 
+						}
+						$aufteilung->saveAufteilung(); 
+					}
+					
+					if($bestellung_new->save())
+					{
+						echo "erfolgreich gespeichert. <br><br>";
+						$save = true; 
+					}
+	
+				}
+
+			}
+			// Bestellung freigeben wird in gang gesetzt --> durch Abschick Button
+			if(isset($_POST['btn_abschicken']) )
+			{	
+				// wenn status Storno vorhanden ist kann nicht mehr freigegeben werden
+				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
+				{
+					echo "Keine Freigabe mehr möglich, da Storniert wurde.<br>"; 
+					echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
+				}
+				else
+				{
+						$status_abgeschickt = new wawi_bestellstatus(); 
+						if(!$status_abgeschickt->isStatiVorhanden($bestellung_id, 'Abgeschickt'))
+						{
+							$bestellung_new->load($bestellung_id); 
+												
+							$status_abgeschickt->bestellung_id = $bestellung_id; ; 
+							$status_abgeschickt->bestellstatus_kurzbz ='Abgeschickt'; 
+							$status_abgeschickt->uid = $user; 
+							$status_abgeschickt->oe_kurzbz = ''; 
+							$status_abgeschickt->datum = date('Y-m-d H:i:s'); 
+							$status_abgeschickt->insertvon = $user; 
+							$status_abgeschickt->insertamum = date('Y-m-d H:i:s'); 
+							$status_abgeschickt->updatevon = $user;
+							$status_abgeschickt->updateamum = date('Y-m-d H:i:s'); 
+		
+							if(!$status_abgeschickt->save())
+								echo "Fehler beim Setzen auf Status Abgeschickt.";
+
+							// wer ist freigabeberechtigt auf kostenstelle
+							$rechte = new benutzerberechtigung();
+							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
+							foreach($uids as $uid)
+							{
+								// E-Mail an Kostenstellenverantwortliche senden
+								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+								$mail->setHTMLContent($msg); 
+								if(!$mail->send())
+									echo 'Fehler beim Senden des Mails';
+								else
+									echo '<br> Mail verschickt an '.$uid.'!';
+							}
+						}
+					}
+				}
+			
+			// kostenstelle gibt frei
+			if(isset($_POST['btn_freigabe']) )
+			{
+				if(!isset($_POST['freigabe_oe']))
+				{
+					// Kostenstelle gibt frei
+					// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
+					if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
+					{
+						echo "Keine Freigabe mehr möglich, da Storniert wurde.<br>"; 
+					}
+					else
+					{ 
+						// Freigabestatus für Kostenstelle
+						$bestellung_new->load($bestellung_id); 
+						$status = new wawi_bestellstatus(); 
+						$status->bestellung_id = $bestellung_new->bestellung_id; 
+						$status->bestellstatus_kurzbz = 'Freigabe';
+						$status->uid = $user; 
+						$status->oe_kurzbz = '';
+						$status->datum = date('Y-m-d H:i:s');
+						$status->insertvon = $user; 
+						$status->insertamum = date('Y-m-d H:i:s');
+						$status->updateamum = date('Y-m-d H:i:s'); 
+						$status->updatevon = $user; 
+						
+						if(!$status->save())
+						{
+							echo "Fehler beim Setzen auf Status Freigabe.<br>"; 
+						}
+						else 
+						{	
+							echo "FREIGABE KOSTENSTELLE erfolgreich";
+							
+							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
+							$oes = array(); 
+							$oes = $bestellung_new->FreigabeOe($bestellung_id); 
+							$freigabe= false; 
+							foreach($oes as $o)
+							{
+								if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
+								{
+									$rechte = new benutzerberechtigung();
+									$uids = $rechte->getFreigabeBenutzer(null, $o); 
+									$freigabe = true; 
+									break; 
+								}
+							}
+							if(!$freigabe == false)
+							{
+								// es wurde noch nicht alles Freigegeben
+								foreach($uids as $uid)
+								{
+									// E-Mail an Kostenstellenverantwortliche senden
+									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+									$mail->setHTMLContent($msg); 
+									if(!$mail->send())
+										echo 'Fehler beim Senden des Mails';
+									else
+										echo '<br> Mail verschickt!';
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					// OE gibt frei
+					// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
+					if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
+					{
+						echo "Keine Freigabe mehr möglich, da Storniert wurde.<br>"; 
+						echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
+					}
+					else
+					{
+						// Freigabestatus für Kostenstelle
+						$bestellung_new->load($bestellung_id); 
+						$status = new wawi_bestellstatus(); 
+						$status->bestellung_id = $bestellung_new->bestellung_id; 
+						$status->bestellstatus_kurzbz = 'Freigabe';
+						$status->uid = $user; 
+						$status->oe_kurzbz = $_POST['freigabe_oe'];
+						$status->datum = date('Y-m-d H:i:s');
+						$status->insertvon = $user; 
+						$status->insertamum = date('Y-m-d H:i:s');
+						$status->updateamum = date('Y-m-d H:i:s'); 
+						$status->updatevon = $user; 
+						
+						if(!$status->save())
+						{
+							echo "Fehler beim Setzen auf Status Freigabe.<br>"; 
+							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
+						}
+						else 
+						{
+							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a><br>";	
+							echo "FREIGABE OE erfolgreich";
+							
+							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
+							$oes = array(); 
+							$oes = $bestellung_new->FreigabeOe($bestellung_id); 
+							$freigabe = false; 
+							foreach($oes as $o)
+							{
+								if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
+								{
+									$rechte = new benutzerberechtigung();
+									$uids = $rechte->getFreigabeBenutzer(null, $o); 
+									$freigabe = true; 
+									break; 
+								}
+							}
+							if(!$freigabe == false)
+							{
+								// es wurde noch nicht alles Freigegeben
+								foreach($uids as $uid)
+								{
+									// E-Mail an Kostenstellenverantwortliche senden
+									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
+									$mail->setHTMLContent($msg); 
+									if(!$mail->send())
+										echo 'Fehler beim Senden des Mails';
+									else
+										echo '<br> Mail verschickt!';
+								}
+							}
+						}
+					}
+				}
+			}
+			$_GET['method']='update';
+			$_GET['id']=$bestellung_new->bestellung_id;		
+		}
+
 			
 			$id = (isset($_GET['id'])?$_GET['id']:null);
 	
@@ -1100,20 +1461,23 @@ if($aktion == 'suche')
 				var brutto=0;
 				while(i<=anzahlRows)
 				{
-				
 					var menge =$("#menge_"+i).val();
 					var betrag = $("#preisprove_"+i).val();
 					var mwst = $("#mwst_"+i).val();
-						
-					if(betrag!="" && mwst!="" && menge!="")
+					
+					// wenn es spalte nicht gibt, auslassen
+					if(typeof(menge) != "undefined")
 					{
-						menge = parseFloat(menge);
-						betrag = parseFloat(betrag);
-						mwst = parseFloat(mwst);
-						
-						netto = netto + betrag;
-						
-						brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
+						if(betrag!="" && mwst!="" && menge!="")
+						{
+							menge = parseFloat(menge);
+							betrag = parseFloat(betrag);
+							mwst = parseFloat(mwst);
+							
+							netto = netto + betrag;
+							
+							brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
+						}
 					}
 					i=i+1;
 				}
@@ -1179,6 +1543,7 @@ if($aktion == 'suche')
 				$.post("bestellung.php", {id: bestelldetail_id, deleteDetail: "true"},
 				function(data){
 				}); 
+				summe(); 
 				
 			}
 			
@@ -1304,375 +1669,15 @@ if($aktion == 'suche')
 			}
 			
 			</script>';	
-		}
-		else 
-		{
-			// Update auf Bestellung
-			$date = new datum(); 	
-			//	var_dump($_POST); 
-			$save = false; 
 			
-			$bestellung_id = $_GET['bestellung'];
-			$bestellung_new = new wawi_bestellung(); 
-			$bestellung_new->load($bestellung_id);
-			$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
-			$status = new wawi_bestellstatus(); 
-				
-			// speichern 
-			if(isset($_POST['btn_abschicken']) || isset($_POST['btn_submit']))
-			{
-				// wenn es status Storno oder Abgeschickt schon gibt, darf nicht gespeichert werden
-				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung_new->bestellung_id, 'Abgeschickt'))
-				{
-					echo "Kein Speichern mehr möglich.<br>"; 
-					echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
-				}
-				else
-				{
-					$aufteilung_anzahl = $_POST['anz_aufteilung'];
-					$bestellung_detail_anz = $_POST['detail_anz'];
-	
-					$bestellung_new->new = false; 
-					$bestellung_new->besteller_uid=$user; 
-					if(is_numeric($_POST['filter_konto']))
-						$bestellung_new->konto_id = $_POST['filter_konto'];
-					else 
-						$bestellung_new->konto_id = '';
-					$bestellung_new->firma_id = $_POST['firma_id'];
-					$bestellung_new->lieferadresse = $_POST['filter_lieferadresse'];
-					$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
-					$bestellung_new->titel = $_POST['titel'];
-					$bestellung_new->bemerkung = $_POST['bemerkung'];
-					$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
-					$bestellung_new->updateamum = date('Y-m-d H:i:s');
-					$bestellung_new->updatevon = $user; 
-					$bestellung_new->zahlungstyp_kurzbz = $_POST['filter_zahlungstyp'];
-					$tags = explode(";", $_POST['tags']);
-					$help_tags = new tags(); 
-					$help_tags->bestellung_id = $bestellung_id; 
-					$help_tags->deleteBestellungTag($tags);
-					
-					foreach ($tags as $bestelltags)
-					{
-						$tag_bestellung = new tags(); 
-						$tag_bestellung->tag = trim($bestelltags); 
-						$tag_bestellung->bestellung_id = $bestellung_id; 
-						$tag_bestellung->insertvon = $user; 
-						$tag_besetllung->insertamum = date('Y-m-d H:i:s');
-						
-						if(!$tag_bestellung->TagExists())
-						{
-							$tag_bestellung->saveTag(); 
-							$tag_bestellung->saveBestellungTag();
-						}
-						else
-						{
-							if(!$tag_bestellung->BestellungTagExists())
-								$tag_bestellung->saveBestellungTag();
-						}
-					} 
-					// letzte leere zeile nicht speichern
-					for($i = 1; $i < $bestellung_detail_anz; $i++)
-					{
-						// wenn ein Detail gelöscht wird Durchlauf überspringen
-						if(!isset($_POST["bestelldetailid_$i"]))
-							continue; 
-						$detail_id = $_POST["bestelldetailid_$i"]; 
-						$bestell_detail = new wawi_bestelldetail(); 		
-						
-						// gibt es ein bestelldetail schon
-						if($detail_id != '')
-						{
-							// Update
-							$bestell_detail->load($detail_id);
-							
-							$tags_detail = explode(";", $_POST["detail_tag_$i"]);
-		
-							$help_detailtags = new tags(); 
-							$help_detailtags->bestelldetail_id = $detail_id; 
-							$help_detailtags->deleteBestelldetailTag($tags_detail);
-							
-							foreach ($tags_detail as $det)
-							{
-								$detail_tag = new tags(); 
-								$detail_tag->tag = trim($det); 
-								$detail_tag->bestelldetail_id = $detail_id; 
-								$detail_tag->insertvon = $user; 
-								$detail_tag->insertamum = date('Y-m-d H:i:s');
-								
-								if(!$detail_tag->TagExists())
-								{
-									$detail_tag->saveTag();
-									$detail_tag->saveBestelldetailTag();
-								}
-								else
-								{
-									if(!$detail_tag->BestelldetailTagExists())
-										$detail_tag->saveBestelldetailTag();
-								}
-							} 
-							$menge = $_POST["menge_$i"]; 
-							if($menge == '')
-								$menge = '0'; 
-							$bestell_detail->position = $_POST["pos_$i"];
-							$bestell_detail->menge = $menge;
-							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
-							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-							$bestell_detail->preisprove = mb_str_replace(',','.', $_POST["preisprove_$i"]);
-							$bestell_detail->mwst = $_POST["mwst_$i"];
-							$bestell_detail->updateamum = date('Y-m-d H:i:s');
-							$bestell_detail->updatevon = $user;
-							$bestell_detail->new = false; 
-						}
-						else 
-						{
-							// Insert
-							$menge = $_POST["menge_$i"]; 
-							if($menge == '')
-								$menge = '0'; 
-							$bestell_detail->bestellung_id = $_GET['bestellung'];
-							$bestell_detail->position = $_POST["pos_$i"];
-							$bestell_detail->menge = $menge;
-							$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-							$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
-							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-							$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
-							$bestell_detail->mwst = $_POST["mwst_$i"];
-							$bestell_detail->sort = $_POST["pos_$i"];
-							$bestell_detail->insertamum = date('Y-m-d H:i:s');
-							$bestell_detail->insertvon = $user;
-							$bestell_detail->updateamum = date('Y-m-d H:i:s');
-							$bestell_detail->updatevon = $user;
-							$bestell_detail->new = true; 
-						}
-						if(!$bestell_detail->save())
-						{
-							echo $bestell_detail->errormsg; 
-						}
-					}
-		
-					for($i=0; $i<$aufteilung_anzahl; $i++)
-					{
-						$aufteilung = new wawi_aufteilung(); 
-						$aufteilung->bestellung_id = $bestellung_id;
-						$aufteilung->oe_kurzbz = $_POST['oe_kurzbz_'.$i];
-						$aufteilung->anteil = $_POST['aufteilung_'.$i]; 
-						
-						if($aufteilung->AufteilungExists())
-						{
-							// Update
-							$aufteilung->updateamum = date('Y-m-d H:i:s');
-							$aufteilung->updatevon = $user; 
-							$aufteilung->new = false; 
-						}
-						else
-						{
-							// Insert
-							$aufteilung->updateamum = date('Y-m-d H:i:s');
-							$aufteilung->updatevon = $user; 
-							$aufteilung->insertamum = date('Y-m-d H:i:s');
-							$aufteilung->insertvon = $user; 
-							$aufteilung->new = true; 
-						}
-						$aufteilung->saveAufteilung(); 
-					}
-					
-					if($bestellung_new->save())
-					{
-						echo "erfolgreich gespeichert. <br><br>";
-						$save = true; 
-						$_GET['method']= 'update';
-						$_GET['id']= $bestellung_id; 
-					}
-					echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";		
-				}
-
-			}
-			// Bestellung freigeben wird in gang gesetzt --> durch Abschick Button
-			if(isset($_POST['btn_abschicken']) )
-			{	
-				// wenn status Storno vorhanden ist kann nicht mehr freigegeben werden
-				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
-				{
-					echo "Keine Freigabe mehr möglich, da Storniert wurde.<br>"; 
-					echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
-				}
-				else
-				{
-						$status_abgeschickt = new wawi_bestellstatus(); 
-						if(!$status_abgeschickt->isStatiVorhanden($bestellung_id, 'Abgeschickt'))
-						{
-							$bestellung_new->load($bestellung_id); 
-												
-							$status_abgeschickt->bestellung_id = $bestellung_id; ; 
-							$status_abgeschickt->bestellstatus_kurzbz ='Abgeschickt'; 
-							$status_abgeschickt->uid = $user; 
-							$status_abgeschickt->oe_kurzbz = ''; 
-							$status_abgeschickt->datum = date('Y-m-d H:i:s'); 
-							$status_abgeschickt->insertvon = $user; 
-							$status_abgeschickt->insertamum = date('Y-m-d H:i:s'); 
-							$status_abgeschickt->updatevon = $user;
-							$status_abgeschickt->updateamum = date('Y-m-d H:i:s'); 
-		
-							if(!$status_abgeschickt->save())
-								echo "Fehler beim Setzen auf Status Abgeschickt.";
-
-							// wer ist freigabeberechtigt auf kostenstelle
-							$rechte = new benutzerberechtigung();
-							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
-							foreach($uids as $uid)
-							{
-								// E-Mail an Kostenstellenverantwortliche senden
-								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
-								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
-								$mail->setHTMLContent($msg); 
-								if(!$mail->send())
-									echo 'Fehler beim Senden des Mails';
-								else
-									echo '<br> Mail verschickt an '.$uid.'!';
-							}
-						}
-					}
-				}
 			
-			// kostenstelle gibt frei
-			if(isset($_POST['btn_freigabe']) )
-			{
-				if(!isset($_POST['freigabe_oe']))
-				{
-					// Kostenstelle gibt frei
-					// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
-					if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
-					{
-						echo "Keine Freigabe mehr möglich, da Storniert wurde.<br>"; 
-						echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
-					}
-					else
-					{ 
-						// Freigabestatus für Kostenstelle
-						$bestellung_new->load($bestellung_id); 
-						$status = new wawi_bestellstatus(); 
-						$status->bestellung_id = $bestellung_new->bestellung_id; 
-						$status->bestellstatus_kurzbz = 'Freigabe';
-						$status->uid = $user; 
-						$status->oe_kurzbz = '';
-						$status->datum = date('Y-m-d H:i:s');
-						$status->insertvon = $user; 
-						$status->insertamum = date('Y-m-d H:i:s');
-						$status->updateamum = date('Y-m-d H:i:s'); 
-						$status->updatevon = $user; 
-						
-						if(!$status->save())
-						{
-							echo "Fehler beim Setzen auf Status Freigabe.<br>"; 
-							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
-						}
-						else 
-						{
-							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a><br>";	
-							echo "FREIGABE KOSTENSTELLE erfolgreich";
-							
-							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
-							$oes = array(); 
-							$oes = $bestellung_new->FreigabeOe($bestellung_id); 
-							$freigabe= false; 
-							foreach($oes as $o)
-							{
-								if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
-								{
-									$rechte = new benutzerberechtigung();
-									$uids = $rechte->getFreigabeBenutzer(null, $o); 
-									$freigabe = true; 
-									break; 
-								}
-							}
-							if(!$freigabe == false)
-							{
-								// es wurde noch nicht alles Freigegeben
-								foreach($uids as $uid)
-								{
-									// E-Mail an Kostenstellenverantwortliche senden
-									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
-									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
-									$mail->setHTMLContent($msg); 
-									if(!$mail->send())
-										echo 'Fehler beim Senden des Mails';
-									else
-										echo '<br> Mail verschickt!';
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					// OE gibt frei
-					// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
-					if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
-					{
-						echo "Keine Freigabe mehr möglich, da Storniert wurde.<br>"; 
-						echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
-					}
-					else
-					{
-						// Freigabestatus für Kostenstelle
-						$bestellung_new->load($bestellung_id); 
-						$status = new wawi_bestellstatus(); 
-						$status->bestellung_id = $bestellung_new->bestellung_id; 
-						$status->bestellstatus_kurzbz = 'Freigabe';
-						$status->uid = $user; 
-						$status->oe_kurzbz = $_POST['freigabe_oe'];
-						$status->datum = date('Y-m-d H:i:s');
-						$status->insertvon = $user; 
-						$status->insertamum = date('Y-m-d H:i:s');
-						$status->updateamum = date('Y-m-d H:i:s'); 
-						$status->updatevon = $user; 
-						
-						if(!$status->save())
-						{
-							echo "Fehler beim Setzen auf Status Freigabe.<br>"; 
-							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
-						}
-						else 
-						{
-							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a><br>";	
-							echo "FREIGABE OE erfolgreich";
-							
-							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
-							$oes = array(); 
-							$oes = $bestellung_new->FreigabeOe($bestellung_id); 
-							$freigabe = false; 
-							foreach($oes as $o)
-							{
-								if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
-								{
-									$rechte = new benutzerberechtigung();
-									$uids = $rechte->getFreigabeBenutzer(null, $o); 
-									$freigabe = true; 
-									break; 
-								}
-							}
-							if(!$freigabe == false)
-							{
-								// es wurde noch nicht alles Freigegeben
-								foreach($uids as $uid)
-								{
-									// E-Mail an Kostenstellenverantwortliche senden
-									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
-									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
-									$mail->setHTMLContent($msg); 
-									if(!$mail->send())
-										echo 'Fehler beim Senden des Mails';
-									else
-										echo '<br> Mail verschickt!';
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+			
+			
+			
+			
+			
+			
+		
 	}
 
 	// gibt eine Bestelldetailzeile aus
@@ -1690,7 +1695,7 @@ if($aktion == 'suche')
 		}
 		
 		echo "<tr id ='row_$i'>\n";
-		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_x.png\"> </a></td>\n";
+		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBrutto($i);'></input></td>\n";
