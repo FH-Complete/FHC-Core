@@ -225,7 +225,7 @@ class wawi_bestellung extends basis_db
 		
 		if($kostenstelle_id!='')
 			$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
-		
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";
@@ -413,9 +413,9 @@ class wawi_bestellung extends basis_db
 			$this->addslashes($this->konto_id).', '.
 			$this->addslashes($this->firma_id).', '.
 			$this->addslashes($this->lieferadresse).', '.
-			$this->addslashes($this->rechnungsadresse).", ".
-			$freigegeben_new.",
-			currval('wawi.seq_bestellung_bestellung_id'), ".
+			$this->addslashes($this->rechnungsadresse).', '.
+			$freigegeben_new.','.
+			$this->addslashes($this->bestell_nr).', '.
 			$this->addslashes($this->titel).', '.
 			$this->addslashes($this->bemerkung).', '.
 			$this->addslashes($this->liefertermin).', '.
@@ -575,8 +575,9 @@ class wawi_bestellung extends basis_db
 		
 		// Bestellung kopieren
 		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
-		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT nextval('wawi.seq_bestellung_bestellung_id'), ".$this->addslashes($user).", kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, 'false', currval('wawi.seq_bestellung_bestellung_id'), titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
+		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT 
+		nextval('wawi.seq_bestellung_bestellung_id'), ".$this->addslashes($user).", kostenstelle_id, konto_id, firma_id, lieferadresse, 
+		rechnungsadresse, 'false', bestell_nr, titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
 		//echo $qry_bestellung;
 		if(!$this->db_query($qry_bestellung))
@@ -833,7 +834,7 @@ class wawi_bestellung extends basis_db
 		}
 	}	
 	
-
+	$oe_kurzbz = mb_strtoupper($oe_kurzbz);
 	$akt_timestamp=time();
 	$akt_datum=getdate($akt_timestamp);
 	$akt_mon=$akt_datum['mon'];
@@ -842,11 +843,15 @@ class wawi_bestellung extends basis_db
 		$akt_year--;
 	$akt_year=substr($akt_year,2,2);
 	$laenge=strlen($oe_kurzbz.$akt_year.$kostenstelle_kz);
-	$sql_query="SELECT distinct substr(bestellnr,$laenge+1,3) as nr FROM wawit.tblbestellung ".
-	" WHERE bestellnr LIKE '$oe_kurzbz$akt_year$kostenstelle_kz"."___' ".
+	$sql_query="SELECT distinct substr(wawi.tbl_bestellung.bestell_nr,$laenge+1,3) as nr FROM wawi.tbl_bestellung ".
+	" WHERE wawi.tbl_bestellung.bestell_nr LIKE '$oe_kurzbz$akt_year$kostenstelle_kz"."___' ".
 	"ORDER BY nr ";
-	//echo $sql_query."<br>";
+	echo $sql_query."<br>";
 	$result=@pg_query($conn, $sql_query);
+//	sprintf('%f30')
+	//SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung WHERE wawi.tbl_bestellung.bestell_nr LIKE 'BIF10IF___' 
+	
+	
 	$i=0;
 	if (@pg_num_rows($result)==0)
 		$bnum="000";
@@ -876,6 +881,7 @@ class wawi_bestellung extends basis_db
 	}
 	for ($i=0;strlen($bnum)<3;$i++)
 	$bnum="0".$bnum;
+	$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
 	$bnum=sprintf("%s%s%s%s",$oe_kurzbz,$akt_year,$kostenstelle_kz,$bnum);
 	return $bnum;
 	}
