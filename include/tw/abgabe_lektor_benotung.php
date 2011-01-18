@@ -72,7 +72,6 @@ $titel='';
 $beurteiler='';
 $ende='';
 
-
 function getmax($val1,$val2)
 {
 	return ($val1>$val2)?$val1:$val2;
@@ -132,11 +131,14 @@ else
 	// Titels weiter nach oben geschoben, um Platz fuer den mehrzeiligen Titel zu schaffen
 	// Hier wird berechnet, wie viele Zeilen fuer den Titel benoetigt werden
 	$titel_len = mb_strlen($titel);
-	$zeichenprozeile=110;
+	$zeichenprozeile=80;
 	$zeilen = round((($titel_len/$zeichenprozeile)+0.5),0);
 	$zeilenhoehe=15;
 	$titelabzug = ($zeilen*$zeilenhoehe);
 
+	
+	if($punkte1>100 || $punkte2>100 || $punkte3>100)
+		die('<html><body><br><br>Die Punkteanzahl darf nicht groesser als 100 sein! <a href="javascript:history.back();">Zurueck</a></body></html>');
 	
 	if($projekttyp_kurzbz=='Bachelor')
 	{
@@ -399,7 +401,7 @@ else
 		$pdf->MultiCell(240,12,"Unterschrift",0,'C',0);
 		$maxY=$pdf->GetY();
 		$pdf->footerset[1]=1;
-		$pdf->Output('Beurteilung_'.$nachname_clean.'.pdf','I');
+		$pdf->Output('Beurteilung_'.$nachname_clean.'.pdf','D');
 		
 	}
 	else //diplomarbeit
@@ -690,8 +692,9 @@ else
 		$pdf->MultiCell(240,12,"Unterschrift",0,'C',0);
 		$maxY=$pdf->GetY();
 		$pdf->footerset[1]=1;
-		$pdf->Output('Beurteilung_'.$nachname_clean.'.pdf','I');
+		$pdf->Output('Beurteilung_'.$nachname_clean.'.pdf','D');
 	}
+	exit();
 }
 
 
@@ -787,6 +790,13 @@ else
 			
 			function inputcheck()
 			{
+				if(document.getElementById("punkte1").value>100 ||
+				   document.getElementById("punkte2").value>100 ||
+				   document.getElementById("punkte3").value>100)
+				{
+					alert("Es duerfen pro Kategorie maximal 100 Punkte vergeben werden!");
+					return false;
+				}
 				if(document.getElementById("summe2").value=="NaN")
 				{
 					alert("Eingabe ung&uuml;ltig! Bitte nur Ziffern eingeben.");
@@ -1046,16 +1056,15 @@ else
 		$htmlstr .="</form>";
 		$htmlstr .="</body></html>";
 		echo $htmlstr;
+		echo '<script type="text/javascript">
+		<!--
+			initInputHighlightScript();
+		//-->
+		</script>';
 	}
 	else 
 	{
 		die('Betreuung nicht gefunden!');
 	}	
 }
-echo '<script type="text/javascript">
-<!--
-	initInputHighlightScript();
-//-->
-</script>';
-
 ?>
