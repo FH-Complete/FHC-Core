@@ -678,6 +678,7 @@ if($aktion == 'suche')
 		{
 			$_GET['method']='update';
 			$_GET['id']=$bestellung_neu;
+			echo "Erfolgreich kopiert"; 
 		}
 
 	}	
@@ -735,7 +736,7 @@ if($aktion == 'suche')
 			echo "<h2>Bearbeiten</h2>";
 			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
 			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."";
-			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> Bestellung kopieren</a></h4>'; 
+			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> <img src="../skin/images/copy.png" title="Bestellung kopieren" class="cursor"></a></h4>'; 
 			//tabelle Bestelldetails
 			echo "<table border = 0 width= '100%' class='dark'>\n";
 			echo "<tr>\n"; 	
@@ -942,7 +943,7 @@ if($aktion == 'suche')
 			echo "<th>Preis/VE</th>\n";
 			echo "<th>USt <a href = 'mwst.html' onclick='FensterOeffnen(this.href); return false'> <img src='../skin/images/question.png'> </a></th>\n";
 			echo "<th>Brutto</th>\n";
-			echo "<th><div id='tags_headline' style='display:none'>Tags</div><a id='tags_link'><img src='../skin/images/plus.png'> </a></th>";
+			echo "<th><div id='tags_headline' style='display:none'>Tags</div><a id='tags_link'><img src='../skin/images/plus.png' title='Detailtags anzeigen' class ='cursor'> </a></th>";
 			echo "</tr>\n";
 			echo "<tbody id='detailTable'>";
 			$i= 1; 
@@ -1219,7 +1220,7 @@ if($aktion == 'suche')
 
 			// div Aufteilung --> kann ein und ausgeblendet werden
 			echo "<br>";
-			echo "<a id='aufteilung_link'>Aufteilung</a>\n"; 
+			echo "<a id='aufteilung_link' class='cursor' ><img src='../skin/images/right.png'>Aufteilung anzeigen / ausblenden</a>\n"; 
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
 			echo "<table border=0 width='70%' class='aufteilung'>"; 
@@ -1694,7 +1695,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
-		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung'></input></td>\n";
+		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='checkNewRow($i)'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBrutto($i);'></input></td>\n";
