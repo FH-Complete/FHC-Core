@@ -627,6 +627,7 @@ if($aktion == 'suche')
 			$newBestellung->lieferadresse = '1';
 			$newBestellung->rechnungsadresse = '1';
 			$newBestellung->bestell_nr = $newBestellung->createBestellNr($newBestellung->kostenstelle_id); 
+			echo $newBestellung->bestell_nr; 
 			if (!$bestell_id = $newBestellung->save())
 			{
 				echo $newBestellung->errormsg; 
