@@ -137,6 +137,9 @@ if($result=pg_query($conn_wawi, $qry))
 		
 			// wawi/rechnung $art $kostenstelle_id/$oe_kurzbz
 			addBerechtigung($row->username_neu, 'wawi/rechnung', $art, $row->oe_kurzbz, $row->kostenstelle_id);
+			
+			// wawi/firma sui Firmenverwaltung fuer alle freischalten die eine berechtigung im wawi haben
+			addBerechtigung($row->username_neu, 'wawi/firma', 'sui');
 		}
 	}
 	

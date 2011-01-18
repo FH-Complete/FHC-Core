@@ -68,10 +68,8 @@ $menu=array
 	'Berichte'=> 	array
 	(
 		'name'=>'Berichte', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
-		'Tags'=>array
-		(
-			'name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content',
-		)
+		'Kostenstelle'=>array ('name'=>'Kostenstelle', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/kostenstelle.php', 'target'=>'content'),
+		'Tags'=>array ('name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content')
 	)
 	
 );

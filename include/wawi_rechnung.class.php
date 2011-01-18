@@ -305,9 +305,9 @@ class wawi_rechnung extends basis_db
 			$this->addslashes($this->bestellung_id).', '.
 			$this->addslashes($this->rechnungstyp_kurzbz).', '.
 			$this->addslashes($this->buchungsdatum).', '.
-			($this->rechnungsnr==''?"currval('wawi.seq_rechnung_rechnung_id')":$this->addslashes($this->rechnungsnr)).", ".
+			$this->addslashes($this->rechnungsnr).', '.
 			$this->addslashes($this->rechnungsdatum).', '.
-			$this->addslashes($this->transfer_datum).", ".
+			$this->addslashes($this->transfer_datum).', '.
 			$this->addslashes($this->buchungstext).', '.
 			($this->freigegeben?'true':'false').','.
 			$this->addslashes($this->freigegebenvon).', '.
