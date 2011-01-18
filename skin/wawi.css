@@ -37,16 +37,26 @@ A:visited
 	color: blue;
 }
 
+A:focu
+{
+	cursor:hand; 
+}
+A:hover
+{
+	text-decoration: underline;
+	color: black;
+	cursor:hand;
+}
 A:active 
 {
 	text-decoration: underline;
 	color: blue;
 }
 
-A:hover
+.cursor:hover
 {
-	text-decoration: underline;
-	color: black;
+	cursor: pointer;
+	
 }
 
 BODY,H1,H2,H3,H4,H5,H6,P,I,TD,TH 
