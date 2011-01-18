@@ -27,22 +27,20 @@
  *******************************************************************************************************/
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/basis_db.class.php');
-
-if (!$db = new basis_db())
-	die('Fehler beim Herstellen der Datenbankverbindung');
-			 
- 
-// Pfad zu fpdf
-define('FPDF_FONTPATH','../../include/pdf/font/');
-// library einbinden
-require_once('../../include/pdf/fpdf.php');
-
+require_once('../../include/projektarbeit.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
+ 
+// Pfad zu fpdf
+define('FPDF_FONTPATH','../../include/pdf/font/');
+// library einbinden
+require_once('../../include/pdf/fpdf.php');
 require_once('../../include/pdf.inc.php');
 
 $getuid=get_uid();
@@ -80,19 +78,26 @@ function getmax($val1,$val2)
 	return ($val1>$val2)?$val1:$val2;
 
 }
+$projektarbeit_obj = new projektarbeit();
+if(!$projektarbeit_obj->load($_REQUEST['projektarbeit_id']))
+	die('Projektarbeit konnte nicht geladen werden');
+
+$titel = $projektarbeit_obj->titel;
+$benutzer_autor = new benutzer();
+if(!$benutzer_autor->load($projektarbeit_obj->student_uid))
+	die('Studierender kann nicht geladen werden');
+$nachname_clean = convertProblemChars($benutzer_autor->nachname);
 
 if(!isset($_POST['projektarbeit_id']))
 {
 	$uid = (isset($_GET['uid'])?$_GET['uid']:'-1');
 	$projektarbeit_id = (isset($_GET['projektarbeit_id'])?$_GET['projektarbeit_id']:'-1');
-	$titel = (isset($_GET['titel'])?$_GET['titel']:'-1');
 }
 else 
 {
 	$projektarbeit_id=(isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
 	$uid=(isset($_POST['uid'])?$_POST['uid']:'-1');
 	$matrikelnr=(isset($_POST['matrikelnr'])?$_POST['matrikelnr']:'-1');
-	$titel=(isset($_POST['titel'])?$_POST['titel']:'');
 	$studiengang=(isset($_POST['studiengang'])?$_POST['studiengang']:'');
 	$stgtyp=(isset($_POST['stgtyp'])?$_POST['stgtyp']:'');
 	$projekttyp_kurzbz=(isset($_POST['projekttyp_kurzbz'])?$_POST['projekttyp_kurzbz']:'');
@@ -108,7 +113,6 @@ else
 	$punkteges2=(isset($_POST['punkteges2'])?$_POST['punkteges2']:'');
 	$punkte3=(isset($_POST['punkte3'])?$_POST['punkte3']:'');
 	$punkteges3=(isset($_POST['punkteges3'])?$_POST['punkteges3']:'');
-	//$summe1=(isset($_POST['summe1'])?$_POST['summe1']:'');
 	$summe2=(isset($_POST['summe2'])?$_POST['summe2']:'');
 	$note=(isset($_POST['note'])?$_POST['note']:'');
 	$ende=(isset($_POST['ende'])?$_POST['ende']:'');
@@ -124,7 +128,15 @@ else
 	$titelpost=mb_convert_encoding(trim($titelpost),'ISO-8859-15','UTF-8');
 	$studiengang=mb_convert_encoding(trim($studiengang),'ISO-8859-15','UTF-8');
 	
-	
+	// Wenn der Titel zu lang ist fuer eine Zeile, dann wird der gesammte Block oberhalb des
+	// Titels weiter nach oben geschoben, um Platz fuer den mehrzeiligen Titel zu schaffen
+	// Hier wird berechnet, wie viele Zeilen fuer den Titel benoetigt werden
+	$titel_len = mb_strlen($titel);
+	$zeichenprozeile=110;
+	$zeilen = round((($titel_len/$zeichenprozeile)+0.5),0);
+	$zeilenhoehe=15;
+	$titelabzug = ($zeilen*$zeilenhoehe);
+
 	
 	if($projekttyp_kurzbz=='Bachelor')
 	{
@@ -143,17 +155,16 @@ else
 
 		$pdf->SetFont('Arial','',12);
 		$pdf->SetFillColor(190,190,190);
-		$pdf->SetXY(30,110);
+		$pdf->SetXY(30,110-$titelabzug);
 		$pdf->SetFont('Arial','',10);
 		$pdf->MultiCell(0,15,'Studiengang: ');
-		$pdf->SetXY(30,125);
+		$pdf->SetXY(30,125-$titelabzug);
 		$pdf->SetFont('Arial','',12);
 		$pdf->MultiCell(0,15,$stgtyp.'studiengang '.$studiengang);
 		$pdf->SetFont('Arial','',14);
-		$pdf->SetXY(30,170);
+		$pdf->SetXY(30,170-$titelabzug);
 		
 		$pdf->MultiCell(0,15,'Beurteilung Bachelorarbeit');
-
 	
 		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
 		if(!$erg_beu=@$db->db_query($qry_beu))
@@ -183,12 +194,12 @@ else
 		$maxY=$pdf->GetY()+18;
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,18,'Titel',1,'L',0);
+		$pdf->MultiCell(80,15*$zeilen,'Titel',1,'L',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(450,18,$titel,0,'L',0);
+		$pdf->MultiCell(450-$titelabzug,15,$titel,0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(450,18,'',1,'L',0);
+		$pdf->MultiCell(450,15*$zeilen,'',1,'L',0);
 		
 		//Autor
 		$maxY=$pdf->GetY();
@@ -388,7 +399,7 @@ else
 		$pdf->MultiCell(240,12,"Unterschrift",0,'C',0);
 		$maxY=$pdf->GetY();
 		$pdf->footerset[1]=1;
-		$pdf->Output('Beurteilung.pdf','I');
+		$pdf->Output('Beurteilung_'.$nachname_clean.'.pdf','I');
 		
 	}
 	else //diplomarbeit
@@ -405,14 +416,14 @@ else
 		$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
 		$pdf->SetFont('Arial','',12);
 		$pdf->SetFillColor(190,190,190);
-		$pdf->SetXY(30,110);
+		$pdf->SetXY(30,110-$titelabzug);
 		$pdf->SetFont('Arial','',10);
 		$pdf->MultiCell(0,15,'Studiengang: ');
-		$pdf->SetXY(30,125);
+		$pdf->SetXY(30,125-$titelabzug);
 		$pdf->SetFont('Arial','',12);
 		$pdf->MultiCell(0,15,$stgtyp.'studiengang '.$studiengang);
 		$pdf->SetFont('Arial','',14);
-		$pdf->SetXY(30,150);
+		$pdf->SetXY(30,150-$titelabzug);
 		$pdf->MultiCell(0,15,'Beurteilung Master Thesis - 1. BegutachterIn');
 
 		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
@@ -443,12 +454,12 @@ else
 		$maxY=$pdf->GetY()+4;
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,18,'Titel',1,'L',0);
+		$pdf->MultiCell(80,15*$zeilen,'Titel',1,'L',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(450,18,$titel,0,'L',0);
+		$pdf->MultiCell(450-$titelabzug,15,$titel,0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(450,18,'',1,'L',0);
+		$pdf->MultiCell(450,15*$zeilen,'',1,'L',0);
 		
 		//Autor
 		$maxY=$pdf->GetY();
@@ -679,7 +690,7 @@ else
 		$pdf->MultiCell(240,12,"Unterschrift",0,'C',0);
 		$maxY=$pdf->GetY();
 		$pdf->footerset[1]=1;
-		$pdf->Output('Beurteilung.pdf','I');
+		$pdf->Output('Beurteilung_'.$nachname_clean.'.pdf','I');
 	}
 }
 
@@ -696,9 +707,9 @@ $sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projek
 	WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 	AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
 							WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-							AND public.tbl_benutzer.uid='$getuid')
+							AND public.tbl_benutzer.uid='".addslashes($getuid)."')
 	AND lehre.tbl_projektarbeit.note IS NULL 
-	AND lehre.tbl_projektarbeit.projektarbeit_id=".$projektarbeit_id."
+	AND lehre.tbl_projektarbeit.projektarbeit_id='".addslashes($projektarbeit_id)."'
 	ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 	ORDER BY nachname";
 
@@ -708,24 +719,17 @@ if(!$erg=$db->db_query($sql_query))
 }
 else
 {
-	
 	if($row=$db->db_fetch_object($erg))
 	{
 			// UTF-8 encoden
-		/*while (list($key, $value) = each($row)) 
-		{
-			if (!empty($value))
-		    	$row->$key=mb_convert_encoding(trim($value),'ISO-8859-15','UTF-8');
-		}*/
 
 		echo '
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<html>
 		<head>
-		<title>DA/BA-Benotung</title>
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+			<title>DA/BA-Benotung</title>
+			<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+			<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<style type="text/css">			
 			.textInput,textarea 
 			{
@@ -740,7 +744,6 @@ else
 
 		</style>
 
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script language="Javascript">
 			var currentlyActiveInputRef = false;
 			var currentlyActiveInputClassName = false;
