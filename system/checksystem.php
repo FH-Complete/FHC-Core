@@ -1392,6 +1392,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			INSERT INTO wawi.tbl_bestellstatus(bestellstatus_kurzbz, beschreibung) VALUES('Storno','Stornierung einer Bestellung');
 			INSERT INTO wawi.tbl_bestellstatus(bestellstatus_kurzbz, beschreibung) VALUES('Lieferung','Ware wurde geliefert');
 			INSERT INTO wawi.tbl_bestellstatus(bestellstatus_kurzbz, beschreibung) VALUES('Bestellung','Ware wurde bestellt');
+			INSERT INTO wawi.tbl_bestellstatus(bestellstatus_kurzbz, beschreibung) VALUES('Abgeschickt','Bestellvorgang wurde eingeleitet');
 			
 			CREATE TABLE wawi.tbl_bestellung_bestellstatus
 			(
@@ -1607,8 +1608,9 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			CREATE INDEX idx_rechnung_bestellung_id ON tbl_rechnung (bestellung_id)
 			CREATE INDEX idx_bestellung_bestellstatus_bestellung_id ON tbl_bestellung_bestellstatus (bestellung_id)
 			
-			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Zahlung','Zahlung');
+			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Rechnung','Rechnung');
 			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Gutschrift','Gutschrift');
+			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Honorarnote','Honorarnote');
 	";
 	
 	if(!$db->db_query($qry))
@@ -1750,6 +1752,9 @@ if(!@$db->db_query("SELECT 1 FROM public.tbl_geschaeftsjahr LIMIT 1"))
 	);
 	ALTER TABLE public.tbl_geschaeftsjahr ADD CONSTRAINT pk_tbl_geschaeftsjahr PRIMARY KEY (geschaeftsjahr_kurzbz);
 	
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2000-2001','2000-09-01','2001-08-31','Geschäftsjahr 2000-2001');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2001-2002','2001-09-01','2002-08-31','Geschäftsjahr 2001-2002');
+	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2002-2003','2002-09-01','2003-08-31','Geschäftsjahr 2002-2003');
 	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2003-2004','2003-09-01','2004-08-31','Geschäftsjahr 2003-2004');
 	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2004-2005','2004-09-01','2005-08-31','Geschäftsjahr 2004-2005');
 	INSERT INTO public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz, start, ende, bezeichnung) VALUES('GJ2005-2006','2005-09-01','2006-08-31','Geschäftsjahr 2005-2006');
