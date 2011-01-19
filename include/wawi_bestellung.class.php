@@ -564,6 +564,11 @@ class wawi_bestellung extends basis_db
 	 */
 	function copyBestellung($bestellung_id, $user)
 	{
+		// neue Bestellnummer erstellen
+		$bestellung = new wawi_bestellung();
+		$bestellung->load($bestellung_id);  
+		$newBestellNummer = $bestellung->createBestellNr($bestellung->kostenstelle_id); 
+
 		if(!is_numeric($bestellung_id))
 		{
 			$this->errormsg = "Keine gültige Bestell ID";
@@ -577,9 +582,9 @@ class wawi_bestellung extends basis_db
 		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
 		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT 
 		nextval('wawi.seq_bestellung_bestellung_id'), ".$this->addslashes($user).", kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, 'false', bestell_nr, titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
+		rechnungsadresse, 'false', '$newBestellNummer', titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
-		//echo $qry_bestellung;
+
 		if(!$this->db_query($qry_bestellung))
 			$error = true; 
 				
@@ -842,45 +847,24 @@ class wawi_bestellung extends basis_db
 	if ($akt_mon<9)
 		$akt_year--;
 	$akt_year=substr($akt_year,2,2);
-	$laenge=strlen($oe_kurzbz.$akt_year.$kostenstelle_kz);
-	$sql_query="SELECT distinct substr(wawi.tbl_bestellung.bestell_nr,$laenge+1,3) as nr FROM wawi.tbl_bestellung ".
-	" WHERE wawi.tbl_bestellung.bestell_nr LIKE '$oe_kurzbz$akt_year$kostenstelle_kz"."___' ".
-	"ORDER BY nr ";
-	echo $sql_query."<br>";
-	$result=@pg_query($conn, $sql_query);
-//	sprintf('%f30')
-	//SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung WHERE wawi.tbl_bestellung.bestell_nr LIKE 'BIF10IF___' 
 	
-	
-	$i=0;
-	if (@pg_num_rows($result)==0)
-		$bnum="000";
+	$kuerzel = $oe_kurzbz.$akt_year.$kostenstelle_kz.'___'; 
+	$qry = "SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung WHERE wawi.tbl_bestellung.bestell_nr LIKE '$kuerzel';";
+
+	if($this->db_query($qry))
+	{
+		if($row = $this->db_fetch_object())
+		{	$bnum = $row->max + 1; 
+			$bnum = sprintf("%03s",$bnum); }
+		else 
+			$bnum = '000';
+	}
 	else
 	{
-		while ($row=@pg_fetch_object($result))
-		{
-			$bnum=$row->nr;
-			if ($i!=(int)$bnum)
-			{
-				if ($i==0)
-				{
-					$bnum=-1;
-				}
-				else
-				{
-					$row=@pg_fetch_object($result, --$i);
-					$bnum=$row->nr;
-					$i=@pg_num_rows($result);
-					//echo "Nachher: i=$i bnum=$bnum<br>";
-				}
-				break;
-			}
-			$i++;
-		}
-		$bnum++;
+		$this->errormsg ="Fehler bei der Datenbankabfrage aufgetreten"; 
+		return false; 
 	}
-	for ($i=0;strlen($bnum)<3;$i++)
-	$bnum="0".$bnum;
+		
 	$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
 	$bnum=sprintf("%s%s%s%s",$oe_kurzbz,$akt_year,$kostenstelle_kz,$bnum);
 	return $bnum;
