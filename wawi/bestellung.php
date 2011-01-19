@@ -1670,15 +1670,7 @@ if($aktion == 'suche')
 			}
 			
 			</script>';	
-			
-			
-			
-			
-			
-			
-			
-			
-		
+
 	}
 
 	// gibt eine Bestelldetailzeile aus
@@ -1694,7 +1686,7 @@ if($aktion == 'suche')
 				$removeDetail = "removeDetail(".$i.", ".$bestelldetail_id.")"; 
 			}
 		}
-		
+		$preisprove = sprintf("%01.2f",$preisprove); 
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
