@@ -590,8 +590,21 @@ if($aktion == 'suche')
 		echo "</td>\n"; 
 		echo "<tr>\n";
 		echo "<td>&nbsp;</td>\n";
-		echo "<tr><td><input type='submit' name='submit' value='Anlegen'></td></tr>\n";
+		echo "<tr><td><input type='submit' id='submit' name='submit' value='Anlegen' onclick='return checkKst();'></td></tr>\n";
 		echo "</table>\n";
+		
+		echo '
+			<script type="text/javascript">
+			function checkKst()
+			{
+					if(document.newForm.filter_kst.options[0].selected == true) 
+						{
+							alert("Keine Kostenstelle ausgewählt.");
+							return false; 
+						}
+					return true; 
+			}
+			</script>';
 	}
 	else if($aktion == 'save')
 	{
