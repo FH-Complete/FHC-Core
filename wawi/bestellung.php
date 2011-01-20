@@ -640,7 +640,6 @@ if($aktion == 'suche')
 			$newBestellung->lieferadresse = '1';
 			$newBestellung->rechnungsadresse = '1';
 			$newBestellung->bestell_nr = $newBestellung->createBestellNr($newBestellung->kostenstelle_id); 
-			echo $newBestellung->bestell_nr; 
 			if (!$bestell_id = $newBestellung->save())
 			{
 				echo $newBestellung->errormsg; 
@@ -924,7 +923,7 @@ if($aktion == 'suche')
 							foreach($uids as $uid)
 							{
 								// E-Mail an Kostenstellenverantwortliche senden
-								$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+								$msg ="Eine Bestellung wurde angelegt und muss von Ihnen noch freigegeben werden. \n <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> Link zur Bestellung $bestellung_new->bestellung_id </a>"; 
 								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
 								$mail->setHTMLContent($msg); 
 								if(!$mail->send())
@@ -989,8 +988,8 @@ if($aktion == 'suche')
 								// es wurde noch nicht alles Freigegeben
 								foreach($uids as $uid)
 								{
-									// E-Mail an Kostenstellenverantwortliche senden
-									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+									// E-Mail an OE_Verantwortlichen senden
+									$msg ="Eine Bestellung wurde angelegt und muss von Ihnen noch freigegeben werden. \n <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> Link zur Bestellung $bestellung_new->bestellung_id </a>"; 
 									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
 									$mail->setHTMLContent($msg); 
 									if(!$mail->send())
@@ -1055,8 +1054,8 @@ if($aktion == 'suche')
 								// es wurde noch nicht alles Freigegeben
 								foreach($uids as $uid)
 								{
-									// E-Mail an Kostenstellenverantwortliche senden
-									$msg ="$bestellung_new->bestellung_id freigeben. <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> drücken </a>"; 
+									// E-Mail an OE_Verantwortlichen senden
+									$msg ="Eine Bestellung wurde angelegt und muss von Ihnen noch freigegeben werden. \n <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> Link zur Bestellung $bestellung_new->bestellung_id </a>"; 
 									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
 									$mail->setHTMLContent($msg); 
 									if(!$mail->send())
@@ -1072,8 +1071,7 @@ if($aktion == 'suche')
 			$_GET['method']='update';
 			$_GET['id']=$bestellung_new->bestellung_id;		
 		}
-
-			
+			// Bestellung Editieren
 			$id = (isset($_GET['id'])?$_GET['id']:null);
 	
 			$bestellung = new wawi_bestellung(); 
@@ -1234,6 +1232,7 @@ if($aktion == 'suche')
 			echo "<td>Freigabe:</td>\n";
 			echo "<td colspan =2>";
 			
+			// KST Freigabe
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Freigabe'))
 			{	
 				echo "<span title='$status->insertvon'>KST:".$date->formatDatum($status->datum,'d.m.Y')." </span>"; 
@@ -1241,11 +1240,12 @@ if($aktion == 'suche')
 			else 
 			{
 				$rechte->getBerechtigungen($user); 
-				$disabled = '';
-				if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
-				{	
-					if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
-						$disabled = 'disabled';
+				$disabled = 'disabled';
+				if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
+				{
+					if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
+						$disabled = '';
+
 					echo "<input type='submit' value='KST Freigabe' name ='btn_freigabe' $disabled>"; 
 				}
 			}
@@ -1310,7 +1310,7 @@ if($aktion == 'suche')
 			echo "<tr>\n";
 			echo "<th></th>\n";
 			echo "<th>Pos</th>\n";
-			echo "<th>Sort</th>\n"; 
+			//echo "<th>Sort</th>\n"; 
 			echo "<th>Menge</th>\n";
 			echo "<th>VE</th>\n";
 			echo "<th>Bezeichnung</th>\n";
@@ -1335,7 +1335,7 @@ if($aktion == 'suche')
 			echo "</tbody>";
 			echo "<tfoot><tr>"; 
 			echo "<td></td>"; 
-			echo "<td></td>";
+		//	echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
@@ -1343,7 +1343,7 @@ if($aktion == 'suche')
 			echo "<td></td>";
 			echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis/Brutto: € </td>";
 			echo "<td id = 'brutto'></td>";
-			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' value='$test'></input></td>"; 
+			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' class='number' value='$test'></input></td>"; 
 			echo "</tr>";
 			echo "</tfoot>";
 			echo "</table>\n";
@@ -1454,13 +1454,13 @@ if($aktion == 'suche')
 				var inetto = $("#preisprove_"+id).val();
 				var ibrutto = $("#brutto_"+id).val();
 				
-				if(inetto=="" || inetto==0)
+				if(inetto=="" || inetto==0 || inetto=="0,00")
 				{
-					netto(id);
+					calcNetto(id);
 				}
 				else
 				{
-					brutto(id);
+					calcBrutto(id);
 				}
 			}
 		   	
@@ -1703,13 +1703,13 @@ if($aktion == 'suche')
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
-		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
-		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBrutto($i);'></input></td>\n";
+		//echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
 		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='checkNewRow($i)'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
-		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBrutto($i);'></input></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);'></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
