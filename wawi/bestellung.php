@@ -1484,6 +1484,8 @@ if($aktion == 'suche')
 					{
 						if(betrag!="" && mwst!="" && menge!="")
 						{
+							betrag = betrag.replace(",",".");
+							mwst = mwst.replace(",",".");
 							menge = parseFloat(menge);
 							betrag = parseFloat(betrag);
 							mwst = parseFloat(mwst);
@@ -1571,6 +1573,7 @@ if($aktion == 'suche')
 				bestellungPreis = parseFloat(bestellungPreis);
 				restBudget = parseFloat(restBudget);
 				differenz = parseFloat(differenz);
+				aktBrutto = parseFloat(aktBrutto); 
 				
 				differenz = restBudget - bestellungPreis + aktBrutto; 
 
@@ -1582,11 +1585,12 @@ if($aktion == 'suche')
 			</script>';
 			
 			$disabled ='';
-			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') )
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') || ($bestellung->freigegeben == 't'))
 				$disabled ='disabled';
 			
 			$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
-				
+			if($aktBrutto =='')
+				$aktBrutto ="0"; 	
 			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)'></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
 			echo "<br><br>"; 
