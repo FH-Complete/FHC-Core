@@ -622,6 +622,51 @@ else
 	//Wenn kein Demo vorhanden ist
 	echo "<br/><br/><br/><center><b>Start druecken um zu beginnen</b></center>";
 }
+
+
+
+
+/*
+//Test mit Button unten
+echo '<br/><br/><br/><table width="100%"><tr><td valign="top" align="center">';
+
+if($demo)
+{
+	//Wenn es sich um ein Demobeispiel handelt, dann wird die Maximale Gesamtzeit angezeigt
+	echo $minute.':'.$sekunde.' Minuten ';
+	echo '<br/><br/>';
+	echo "<input type=\"button\" value=\"Start des Teilgebiets\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;start=true'\" />";
+}
+else
+{
+	//Wenn es sich um eine Testfrage handelt, dann wird die verbleibende Zeit angezeigt
+	$qry = "SELECT '$gebiet->zeit'-(now()-min(begintime)) as time 
+			FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
+			WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
+	$result = $db->db_query($qry);
+	$row = $db->db_fetch_object($result);
+	//Zeit in Sekunden umrechnen
+	list($stunde, $minute, $sekunde) = split(':',$row->time);
+	$zeit = (int) ($stunde*60*60+$minute*60+$sekunde);
+	//Wenn die Zeit negativ ist und die Stunde 0 ist,
+	//dann muss die Zeit mit -1 multipliziert werden
+	if(substr($stunde,0,1)=='-' && $stunde==0)
+	{
+		$zeit = $zeit*-1;
+	}
+
+	echo '<span id="counter"></span> Minuten';
+	echo "<script>count_down($zeit)</script>";
+}
+echo '</td></tr>';
+echo '</table>';
+*/
+
+
+
+
+
+
 ?>
 
 </body>
