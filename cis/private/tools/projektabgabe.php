@@ -145,8 +145,9 @@ if($aktion!='zip')
 							LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
-							AND public.tbl_benutzer.aktiv 
+							
 						";
+					//AND public.tbl_benutzer.aktiv 
 			if ($stg_kz!='')
 				$qry_termin.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
 			if ($abgabetyp!='')
@@ -210,6 +211,7 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 	{
 		$qry="";
 ##		$qry.="SELECT * 	FROM (";
+ 
 		$qry.="	SELECT public.tbl_studiengang.bezeichnung as stgbez, campus.tbl_paabgabe.datum as termin,* FROM lehre.tbl_projektarbeit 
 			JOIN campus.tbl_paabgabe USING(projektarbeit_id)
 			LEFT JOIN public.tbl_benutzer ON(uid=student_uid) 
@@ -218,9 +220,10 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 			LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 			LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
-			AND public.tbl_benutzer.aktiv 
-			AND lehre.tbl_projektarbeit.note IS NULL 
+			 			
 			";
+			//AND public.tbl_benutzer.aktiv
+			//AND lehre.tbl_projektarbeit.note IS NULL
 			if ($stg_kz!='')
 				$qry.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
 			if ($abgabetyp!='')
