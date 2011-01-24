@@ -1326,6 +1326,7 @@ if($aktion == 'suche')
 			foreach($detail->result as $det)
 			{
 				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
+	
 				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto), $bestellung->bestellung_id);
 				$summe+=$brutto; 
 				$i++; 
@@ -1607,7 +1608,7 @@ if($aktion == 'suche')
 			echo "<a id='aufteilung_link' class='cursor' ><img src='../skin/images/right.png'>Aufteilung anzeigen / ausblenden</a>\n"; 
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
-			echo "<table border=0 width='70%' class='aufteilung'>"; 
+			echo "<table border=0 width='75%' class='aufteilung'>"; 
 			echo "<tr>\n"; 
 			$help = 0; 
 			$anteil = 0;
