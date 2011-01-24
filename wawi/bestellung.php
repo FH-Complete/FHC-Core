@@ -1103,14 +1103,26 @@ if($aktion == 'suche')
 			$bestell_tag = new tags(); 
 			$studiengang = new studiengang(); 
 			$studiengang->getAll('typ, kurzbz', null); 
+			
+			//budget berechnung
+			$geschaeftsjahr = new geschaeftsjahr(); 
+			$gJahr = $geschaeftsjahr->getSpecific($bestellung->insertamum); 
+			$budget = $kostenstelle->getBudget($bestellung->kostenstelle_id,$gJahr); 
+			$spentBudget = $bestellung->getSpentBudget($bestellung->kostenstelle_id, $gJahr); 
+			$restBudget = $budget - $spentBudget; 
 
 			$summe= 0; 
 			$konto_vorhanden = false; 
+			$alert ='';
 			
-			echo "<h2>Bearbeiten</h2>";
+			if($restBudget < 0)
+				$alert = 'Ihr aktuelles Budget ist bereits überzogen.';
+			echo "<h2>Bearbeiten</h2><span width='100%' style='text-align:center;'><p style='color:red;'>$alert</p></span>";
 			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
 			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."";
 			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> <img src="../skin/images/copy.png" title="Bestellung kopieren" class="cursor"></a></h4>'; 
+			
+			
 			//tabelle Bestelldetails
 			echo "<table border = 0 width= '100%' class='dark'>\n";
 			echo "<tr>\n"; 	
@@ -1297,11 +1309,7 @@ if($aktion == 'suche')
 			}
 			echo "</td>\n"; 
 			echo "<td>Rest-Budget:</td>\n";
-			$geschaeftsjahr = new geschaeftsjahr(); 
-			$gJahr = $geschaeftsjahr->getSpecific($bestellung->insertamum); 
-			$budget = $kostenstelle->getBudget($bestellung->kostenstelle_id,$gJahr); 
-			$spentBudget = $bestellung->getSpentBudget($bestellung->kostenstelle_id, $gJahr); 
-			$restBudget = $budget - $spentBudget; 
+			
 			$restBudget = sprintf('%01.2f',$restBudget); 
 			echo "<td colspan=2 id='restbudget'>$restBudget</td></tr>"; 			
 			echo "</table>\n";
