@@ -433,9 +433,8 @@ class wawi_konto extends basis_db
 		
 			$qry = 'select konto.*, '.$qry_beschreibung.' 
 			from wawi.tbl_konto konto, wawi.tbl_konto_kostenstelle kst 
-			where kst.konto_id = konto.konto_id and kst.kostenstelle_id ='.$kostenstelle_id.';';
+			where kst.konto_id = konto.konto_id and kst.kostenstelle_id ='.$kostenstelle_id.' ORDER by konto.beschreibung;';
 			
-			//echo $qry; 
 			if(!$this->db_query($qry))
 			{
 				$this->errormsg = "Fehler bei der Abfrage aufgetreten.";
