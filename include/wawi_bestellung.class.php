@@ -838,7 +838,11 @@ class wawi_bestellung extends basis_db
 			$oe_kurzbz = $row->oe_kurzbz; 
 		}
 	}	
-	
+	// wenn kurzbz länger ist -> abschneiden
+	if(mb_strlen($oe_kurzbz)>3)
+	{
+		$oe_kurzbz = mb_substr($oe_kurzbz, 0,3);  
+	}
 	$oe_kurzbz = mb_strtoupper($oe_kurzbz);
 	$akt_timestamp=time();
 	$akt_datum=getdate($akt_timestamp);
@@ -855,9 +859,8 @@ class wawi_bestellung extends basis_db
 	{
 		if($row = $this->db_fetch_object())
 		{	$bnum = $row->max + 1; 
-			$bnum = sprintf("%03s",$bnum); }
-		else 
-			$bnum = '000';
+			$bnum = sprintf("%03s",$bnum); 
+		}
 	}
 	else
 	{
@@ -866,6 +869,7 @@ class wawi_bestellung extends basis_db
 	}
 		
 	$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
+
 	$bnum=sprintf("%s%s%s%s",$oe_kurzbz,$akt_year,$kostenstelle_kz,$bnum);
 	return $bnum;
 	}
