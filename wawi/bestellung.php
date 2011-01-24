@@ -633,6 +633,7 @@ if($aktion == 'suche')
 			$newBestellung->insertvon = $user; 
 			$newBestellung->updateamum = date('Y-m-d H:i:s');
 			$newBestellung->updatevon = $user; 
+			$newBestellung->besteller_uid = $user; 
 			$newBestellung->new = true; 
 			$newBestellung->freigegeben = false; 
 			// vordefinierte Werte
