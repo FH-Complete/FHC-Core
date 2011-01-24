@@ -51,7 +51,7 @@
 					</fo:block-container>
 
 					
-					<fo:block-container position="absolute" top="115mm" left="30mm">
+					<fo:block-container position="absolute" top="108mm" left="30mm">
 						<fo:block content-width="180mm" line-height="18pt" font-family="sans-serif" font-size="18pt">
 							<xsl:value-of select="bezeichnung" />
 						</fo:block>
