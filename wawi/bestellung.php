@@ -183,6 +183,28 @@ if(isset($_POST['saveDetail']))
 		exit;
 }
 
+if(isset($_POST['updateDetail']))
+{
+		$detail = new wawi_bestelldetail(); 
+		$detail->bestelldetail_id = $_POST['detail_id'];
+		$detail->bestellung_id = $_POST['bestellung']; 
+		$detail->position = $_POST['pos'];
+		$detail->menge = $_POST['menge']; 
+		$detail->verpackungseinheit = $_POST['ve']; 
+		$detail->beschreibung = $_POST['beschreibung']; 
+		$detail->artikelnummer = $_POST['artikelnr']; 
+		$detail->preisprove = $_POST['preis']; 
+		$detail->mwst = $_POST['mwst']; 
+		$detail->insertamum = date('Y-m-d H:i:s'); 
+		$detail->updateamum = date('Y-m-d H:i:s'); 
+		$detail->erhalten = false; 
+		$detail->text = false; 
+		$detail->new = false; 
+		if(!$detail->save())
+			echo $detail->errormsg;
+		echo $detail->bestelldetail_id;  
+		exit;
+}
 
 
 if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
@@ -1364,6 +1386,7 @@ if($aktion == 'suche')
 			var anzahlRows='.$i.';
 			var bestellung_id ='.$bestellung->bestellung_id.';
 			var uid = "'.$user.'";
+			var focusRow ="1"; 
 	
 			 $("#tags_link").click(function() {
 			 i=1; 
@@ -1499,9 +1522,7 @@ if($aktion == 'suche')
 							menge = parseFloat(menge);
 							betrag = parseFloat(betrag);
 							mwst = parseFloat(mwst);
-							
 							netto = netto + betrag;
-							
 							brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
 						}
 					}
@@ -1546,7 +1567,8 @@ if($aktion == 'suche')
 				}	
 			}
 			
-			function saveDetail(i )
+			// speichert eine Bestelldetailzeile
+			function saveDetail(i)
 			{
 				var pos = $("#pos_"+i).val(); 
 				var menge =  $("#menge_"+i).val();
@@ -1554,19 +1576,39 @@ if($aktion == 'suche')
 				var beschreibung =  $("#beschreibung_"+i).val(); 
 				var artikelnr =  $("#artikelnr_"+i).val(); 
 				var preis =  $("#preisprove_"+i).val(); 
+				preis = preis.replace(",",".");
 				var mwst =  $("#mwst_"+i).val(); 
+				mwst = mwst.replace(",",".");
 				var brutto =  $("#brutto_"+i).val(); 
-				$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, saveDetail: "true"},
-					function(data){
-						alert(data);
-					});  
+				brutto = brutto.replace(",",".");
+				
+				var detailid= $("#bestelldetailid_"+i).val();
+				if(detailid != "")
+				{
+				alert("update"); 
+						$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, detail_id: detailid, updateDetail: "true"},
+						function(data){
+							alert(data);
+						});  
+				}
+				else
+				{
+					alert("new"); 
+					$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, saveDetail: "true"},
+						function(data){
+						alert(data); 
+						alert(i); 
+							document.getElementById("bestelldetailid_"+i).value = data;
+						});  
+				}
 			}
 			
 			// löscht einen Bestelldetaileintrag
-			function removeDetail(i, bestelldetail_id)
+			function removeDetail(i)
 			{
+				var detail_id= $("#bestelldetailid_"+i).val();
 				$("#row_"+i).remove();
-				$.post("bestellung.php", {id: bestelldetail_id, deleteDetail: "true"},
+				$.post("bestellung.php", {id: detail_id, deleteDetail: "true"},
 				function(data){
 				}); 
 				summe(); 
@@ -1590,6 +1632,17 @@ if($aktion == 'suche')
 				if(differenz < 0)
 				{
 					return confirm("Die Bestellung würde das Budget überziehen. Trotzdem fortfahren?");
+				}
+			}
+			
+			// ändert sich der fokus der Bestelldetailzeile -> speichern der geänderten
+			function checkSave(rowid)
+			{
+				if(focusRow != rowid)
+				{
+					alert("Speichere Row: "+focusRow); 
+					saveDetail(focusRow);
+					focusRow = rowid;  
 				}
 			}
 			</script>';
@@ -1710,7 +1763,7 @@ if($aktion == 'suche')
 		{
 			if(!$status->isStatiVorhanden($bestell_id,'Abgeschickt'))
 			{
-				$removeDetail = "removeDetail(".$i.", ".$bestelldetail_id.")"; 
+				$removeDetail = "removeDetail(".$i.")"; 
 			}
 		}
 		$preisprove = sprintf("%01.2f",$preisprove); 
@@ -1721,7 +1774,7 @@ if($aktion == 'suche')
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
 		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='checkNewRow($i)'></input></td>\n";
-		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr'></input></td>\n";
+		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus=checkSave($i); ></input></td>\n";
 		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
 		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);'></input></td>\n";
@@ -1742,7 +1795,7 @@ if($aktion == 'suche')
 						});
 					</script>";
 		
-		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
+		echo "<td><input type='text' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
 	}
 	

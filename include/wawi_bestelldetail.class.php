@@ -246,9 +246,9 @@ class wawi_bestelldetail extends basis_db
 			artikelnummer = '.$this->addslashes($this->artikelnummer).',
 			preisprove = '.$this->addslashes($this->preisprove).',
 			mwst = '.$this->addslashes($this->mwst).',
-			erhalten = '.$this->addslashes($this->erhalten).',
+			erhalten = '.($this->erhalten?'true':'false').',
 			sort = '.$this->addslashes($this->sort).',
-			text = '.$this->addslashes($this->text).',
+			text = '.($this->text?'true':'false').',
 			updateamum = '.$this->addslashes($this->updateamum).',
 			updatevon = '.$this->addslashes($this->updatevon).' WHERE bestelldetail_id = '.$this->bestelldetail_id.';'; 
 		}
