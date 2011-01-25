@@ -1588,7 +1588,6 @@ if($aktion == 'suche')
 				alert("update"); 
 						$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, detail_id: detailid, updateDetail: "true"},
 						function(data){
-							alert(data);
 						});  
 				}
 				else
@@ -1596,8 +1595,6 @@ if($aktion == 'suche')
 					alert("new"); 
 					$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, saveDetail: "true"},
 						function(data){
-						alert(data); 
-						alert(i); 
 							document.getElementById("bestelldetailid_"+i).value = data;
 						});  
 				}
@@ -1769,15 +1766,15 @@ if($aktion == 'suche')
 		$preisprove = sprintf("%01.2f",$preisprove); 
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
-		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i'></input></td>\n";
+		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus=checkSave($i);></input></td>\n";
 		//echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
-		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);'></input></td>\n";
-		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve'></input></td>\n";
-		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='checkNewRow($i)'></input></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus=checkSave($i);></input></td>\n";
+		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=checkSave($i);></input></td>\n";
+		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='checkNewRow($i);' onfocus=checkSave($i);></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus=checkSave($i); ></input></td>\n";
-		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i)' onChange='calcBrutto($i);'></input></td>\n";
-		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);'></input></td>\n";
-		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);'></input></td>\n";
+		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i);' onChange='calcBrutto($i);' onfocus=checkSave($i);></input></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus=checkSave($i);></input></td>\n";
+		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onCHange ='calcNetto($i);' onfocus=checkSave($i);></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); 
