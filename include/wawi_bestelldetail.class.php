@@ -321,7 +321,7 @@ class wawi_bestelldetail extends basis_db
 				
 				$detail->bestelldetail_id = $row->bestelldetail_id;
 				$detail->bestellung_id = $row->bestellung_id; 
-				$detail->positoin = $row->position; 
+				$detail->position = $row->position; 
 				$detail->menge = $row->menge; 
 				$detail->verpackungseinheit = $row->verpackungseinheit; 
 				$detail->beschreibung = $row->beschreibung; 

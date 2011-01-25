@@ -171,13 +171,16 @@ $datum_obj = new datum();
 					<th>Kz</th>
 					<th>Bestellungen</th>
 					<th>Rechnungen</th>
+					<th>Restbudget (Bestellung)</th>
 					<th>Restbudget (Rechnung)</th>
+					<th>Budget</th>
 				</tr>
 			</thead>
 			<tbody>';
 	
 	$gesamt_rechnung = 0;
 	$gesamt_bestellung = 0;
+	$gesamt_budget = 0;
 	
 	foreach($kst_array as $row)
 	{
@@ -193,7 +196,7 @@ $datum_obj = new datum();
 		$kostenstelle = new wawi_kostenstelle();
 		$kostenstelle->load($id);
 		$budget = $kostenstelle->getBudget($id, $gj->geschaeftsjahr_kurzbz);
-		$restbudget = $budget - $brutto['rechnung'];
+		
 		echo '<tr>';
 
 		echo '<td>',$id,'</td>';
@@ -201,17 +204,33 @@ $datum_obj = new datum();
 		echo '<td>',$kostenstelle->kurzbz,'</td>';
 		echo '<td class="number">',number_format($brutto['bestellung'],2,',','.'),'</td>';
 		echo '<td class="number">',number_format($brutto['rechnung'],2,',','.'),'</td>';
+		
+		//Restbudget fuer Bestellungen
+		$restbudget = $budget - $brutto['bestellung'];
 		if($restbudget>0)
 			$class='number_positive';
 		elseif($restbudget<0)
 			$class='number_negative';
 		else
 			$class='number';
-		echo '<td class="',$class,'">',number_format($restbudget,2,',','.').'</td>';
+		echo '<td class="',$class,'">',number_format($restbudget,2,',','.'),'</td>';
+		
+		//Restbudget fuer Rechnungen
+		$restbudget = $budget - $brutto['rechnung'];
+		if($restbudget>0)
+			$class='number_positive';
+		elseif($restbudget<0)
+			$class='number_negative';
+		else
+			$class='number';
+		echo '<td class="',$class,'">',number_format($restbudget,2,',','.'),'</td>';
+		
+		echo '<td class="number">',number_format($budget,2,',','.'),'</td>';
 		echo '</tr>';
 		
 		$gesamt_rechnung += $brutto['rechnung'];
 		$gesamt_bestellung += $brutto['bestellung'];
+		$gesamt_budget += $budget;
 	}
 	echo '
 		</tbody>
@@ -223,6 +242,8 @@ $datum_obj = new datum();
 				<th class="number">',number_format($gesamt_bestellung,2,',','.'),'</th>
 				<th class="number">',number_format($gesamt_rechnung,2,',','.'),'</th>
 				<th></th>
+				<th></th>
+				<th class="number">',number_format($gesamt_budget,2,',','.'),'</th>
 			</tr>
 		</tfoot>
 		</table>';

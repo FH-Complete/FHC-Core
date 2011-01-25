@@ -1,7 +1,8 @@
 <?php
 	session_start();
 
-	$path = dirname($_SERVER['PHP_SELF']);
+	$path = dirname(__FILE__);
+	$path = mb_substr($path, mb_strlen($_SERVER['DOCUMENT_ROOT']));
 	
 	if (!isset($_SESSION['user']) || $_SESSION['user']=='') 
 	{
