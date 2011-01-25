@@ -646,6 +646,7 @@ if($frage_id!='')
 	echo "<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id' />";
 	echo '<table>';
+	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' value='$vorschlag->nummer' /></td></tr>";
 	echo '<tr>';
 	echo "<td>Punkte</td><td><input type='text' size='8' name='punkte' value='$vorschlag->punkte' /></td>";
 	echo '</tr>';
@@ -658,7 +659,7 @@ if($frage_id!='')
 	echo '<tr>';
 	//Upload Feld fuer Audio
 	echo "<td>Audio:</td><td><input type='file' name='audio' /></td></tr>";
-	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' value='$vorschlag->nummer' /></td></tr>";
+	
 	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	echo "</table>";
 	echo "</form>";
