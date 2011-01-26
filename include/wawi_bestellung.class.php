@@ -579,10 +579,10 @@ class wawi_bestellung extends basis_db
 		$this->db_query('BEGIN;'); 
 		
 		// Bestellung kopieren
-		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, freigegeben, bestell_nr,
+		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, zahlungstyp_kurzbz, freigegeben, bestell_nr,
 		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT 
 		nextval('wawi.seq_bestellung_bestellung_id'), ".$this->addslashes($user).", kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, 'false', '$newBestellNummer', titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
+		rechnungsadresse, zahlungstyp_kurzbz, 'false', '$newBestellNummer', titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
 		bestellung_id = ".$bestellung_id.";";
 
 		if(!$this->db_query($qry_bestellung))
