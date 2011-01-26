@@ -206,7 +206,6 @@ if(isset($_POST['updateDetail']))
 		exit;
 }
 
-
 if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 {
 	$date = new datum(); 
@@ -221,7 +220,6 @@ if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 	$bestellstatus->insertamum = date('Y-m-d H:i:s');
 	$bestellstatus->updatevon = $_POST['user_id'];
 	$bestellstatus->updateamum = date('Y-m-d H:i:s');
-	
 	if($bestellstatus->save())
 	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
 	else 
@@ -232,7 +230,6 @@ if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 {
 	$date = new datum(); 
-	
 	$bestellstatus = new wawi_bestellstatus(); 
 	$bestellstatus->bestellung_id = $_POST['id'];
 	$bestellstatus->bestellstatus_kurzbz = 'Storno';
@@ -243,7 +240,6 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	$bestellstatus->insertamum = date('Y-m-d H:i:s');
 	$bestellstatus->updatevon = $_POST['user_id'];
 	$bestellstatus->updateamum = date('Y-m-d H:i:s');
-	
 	if($bestellstatus->save())
 	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
 	else 
@@ -258,13 +254,10 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 <head>
 	<title>WaWi Bestellung</title>	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
-
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
-
 	<script type="text/javascript">
 	function conf_del()
 	{
@@ -395,13 +388,10 @@ if($aktion == 'suche')
 		$firmaAll = new firma(); 
 		//$firmaAll->getAll(); 
 		if ($datum['mon']<=9)
-		{
 			$suchdatum="01.09.".($datum['year']-1);
-		}
 		else
-		{
 			$suchdatum="01.09.".$datum['year'];
-		}
+			
 		echo "<h2>Bestellung suchen</h2>\n"; 
 		echo "<form action ='bestellung.php?method=suche' method='post' name='sucheForm'>\n";
 		echo "<table border =0>\n";
@@ -428,13 +418,9 @@ if($aktion == 'suche')
 		foreach ($oeinheiten as $oei)
 		{
 			if($oei->aktiv)
-			{
 				echo '<option value="'.$oei->oe_kurzbz.'" >'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung."</option>\n";
-			}
 			else 
-			{
 				echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'">'.$oei->bezeichnung."</option>\n";
-			}	
 		}
 		echo "</td>\n";
 		echo "</SELECT>\n";
@@ -679,7 +665,7 @@ if($aktion == 'suche')
 	{
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
 			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
-		
+			
 		// Bestellung löschen
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$bestellung = new wawi_bestellung(); 
@@ -735,7 +721,6 @@ if($aktion == 'suche')
 			$date = new datum(); 	
 			//	var_dump($_POST); 
 			$save = false; 
-			
 			$bestellung_id = $_GET['bestellung'];
 			$bestellung_new = new wawi_bestellung(); 
 			$bestellung_new->load($bestellung_id);
@@ -809,13 +794,10 @@ if($aktion == 'suche')
 						{
 							// Update
 							$bestell_detail->load($detail_id);
-							
 							$tags_detail = explode(";", $_POST["detail_tag_$i"]);
-		
 							$help_detailtags = new tags(); 
 							$help_detailtags->bestelldetail_id = $detail_id; 
 							$help_detailtags->deleteBestelldetailTag($tags_detail);
-							
 							foreach ($tags_detail as $det)
 							{
 								$detail_tag = new tags(); 
@@ -871,9 +853,7 @@ if($aktion == 'suche')
 							$bestell_detail->new = true; 
 						}
 						if(!$bestell_detail->save())
-						{
 							echo $bestell_detail->errormsg; 
-						}
 					}
 		
 					for($i=0; $i<$aufteilung_anzahl; $i++)
@@ -882,7 +862,6 @@ if($aktion == 'suche')
 						$aufteilung->bestellung_id = $bestellung_id;
 						$aufteilung->oe_kurzbz = $_POST['oe_kurzbz_'.$i];
 						$aufteilung->anteil = $_POST['aufteilung_'.$i]; 
-						
 						if($aufteilung->AufteilungExists())
 						{
 							// Update
@@ -901,15 +880,12 @@ if($aktion == 'suche')
 						}
 						$aufteilung->saveAufteilung(); 
 					}
-					
 					if($bestellung_new->save())
 					{
 						echo "erfolgreich gespeichert. <br><br>";
 						$save = true; 
 					}
-	
 				}
-
 			}
 			// Bestellung freigeben wird in gang gesetzt --> durch Abschick Button
 			if(isset($_POST['btn_abschicken']) )
@@ -936,7 +912,6 @@ if($aktion == 'suche')
 							$status_abgeschickt->insertamum = date('Y-m-d H:i:s'); 
 							$status_abgeschickt->updatevon = $user;
 							$status_abgeschickt->updateamum = date('Y-m-d H:i:s'); 
-		
 							if(!$status_abgeschickt->save())
 								echo "Fehler beim Setzen auf Status Abgeschickt.";
 
@@ -957,7 +932,6 @@ if($aktion == 'suche')
 						}
 					}
 				}
-			
 			// kostenstelle gibt frei
 			if(isset($_POST['btn_freigabe']) )
 			{
@@ -1132,7 +1106,6 @@ if($aktion == 'suche')
 			$budget = $kostenstelle->getBudget($bestellung->kostenstelle_id,$gJahr); 
 			$spentBudget = $bestellung->getSpentBudget($bestellung->kostenstelle_id, $gJahr); 
 			$restBudget = $budget - $spentBudget; 
-
 			$summe= 0; 
 			$konto_vorhanden = false; 
 			$alert ='';
@@ -1143,7 +1116,6 @@ if($aktion == 'suche')
 			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
 			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."";
 			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> <img src="../skin/images/copy.png" title="Bestellung kopieren" class="cursor"></a></h4>'; 
-			
 			
 			//tabelle Bestelldetails
 			echo "<table border = 0 width= '100%' class='dark'>\n";
@@ -1178,7 +1150,6 @@ if($aktion == 'suche')
 				}
 				echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 			}		
-			
 			echo "</td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Konto: </td>\n";
@@ -1192,7 +1163,6 @@ if($aktion == 'suche')
 					$konto_vorhanden = true; 
 				}		
 				echo '<option value='.$ko->konto_id.' '.$selected.'>'.$ko->kurzbz."</option>\n";
-		
 			}
 			//wenn die konto_id von der bestellung nicht in den Konten die der Kostenstelle zugeordnet sind befidet --> selbst hinschreiben
 			if(!$konto_vorhanden)
@@ -1363,7 +1333,6 @@ if($aktion == 'suche')
 			foreach($detail->result as $det)
 			{
 				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
-	
 				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto), $bestellung->bestellung_id);
 				$summe+=$brutto; 
 				$i++; 
@@ -1442,21 +1411,17 @@ if($aktion == 'suche')
 			function calcBrutto(id)
 		   	{
 		    	var brutto=0;
-	
 		    	var menge = $("#menge_"+id).val();
 		    	var betrag = $("#preisprove_"+id).val();
 		    	var mwst = $("#mwst_"+id).val();
 		    	
 		    	if(betrag!="" && mwst!="" && menge!="")
 		    	{
-		    	
 		    		betrag = betrag.replace(",",".");
 					mwst = mwst.replace(",",".");
-					
 		    		menge = parseFloat(menge);
 					betrag = parseFloat(betrag);
 					mwst = parseFloat(mwst);
-					
 					brutto = menge * (brutto + (betrag+(betrag*mwst/100)));
 		    	}
 		    	brutto = Math.round(brutto*100)/100;
@@ -1467,7 +1432,6 @@ if($aktion == 'suche')
 		   	function calcNetto(id)
 		   	{
 		    	var brutto=0;
-	
 		    	var menge = $("#menge_"+id).val();
 		    	var brutto = $("#brutto_"+id).val();
 		    	var mwst = $("#mwst_"+id).val();
@@ -1506,7 +1470,6 @@ if($aktion == 'suche')
 					calcBrutto(id);
 				}
 			}
-		   	
 		   	
 			/*
 			Berechnet die gesamte Brutto Summe für eine Bestellung
@@ -1620,23 +1583,18 @@ if($aktion == 'suche')
 				function(data){
 				}); 
 				summe(); 
-				
 			}
-			
 			
 			function conf_del_budget(aktBrutto)
 			{
 				var bestellungPreis = ($("#brutto").html()); 
 				var restBudget = ($("#restbudget").html());  
 				var differenz = 0; 
-				
 				bestellungPreis = parseFloat(bestellungPreis);
 				restBudget = parseFloat(restBudget);
 				differenz = parseFloat(differenz);
 				aktBrutto = parseFloat(aktBrutto); 
-				
 				differenz = restBudget - bestellungPreis + aktBrutto; 
-
 				if(differenz < 0)
 				{
 					return confirm("Die Bestellung würde das Budget überziehen. Trotzdem fortfahren?");
@@ -1657,7 +1615,6 @@ if($aktion == 'suche')
 			function checkUst(i)
 			{
 				var mwst =  $("#mwst_"+i).val();
-				
 				if(mwst > 99 || mwst < 0 || isNaN(mwst) == true)
 				{
 					alert("Ungültige Mehrwertssteuer eingetragen."); 
@@ -1742,9 +1699,8 @@ if($aktion == 'suche')
 			echo "</div>"; 
 			echo "<br><br>";
 			
-						echo '
+			echo '
 			<script type="text/javascript">
-			
 			var anz='.$help.';
 
 			/*
@@ -1758,19 +1714,15 @@ if($aktion == 'suche')
 
 				while(i<anz)
 				{
-					
 					aufteilung =$("#aufteilung_"+i).val();
 					aufteilung=parseFloat(aufteilung); 
 					summe = parseFloat(summe);	
 					summe = summe + aufteilung; 
-
 					i=i+1;
 				}
 				 document.getElementById("aufteilung_summe").value = parseFloat(summe).toFixed(2);
 			}
-			
 			</script>';	
-
 	}
 
 	// gibt eine Bestelldetailzeile aus
@@ -1795,7 +1747,6 @@ if($aktion == 'suche')
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 		echo "<td><a title='down'><img src='../skin/images/arrow-single-down-green.png' class='cursor'></a></td>\n";
 		echo "<td><a title='up'><img src='../skin/images/arrow-single-up-green.png' class='cursor'></a></td>\n";
-		
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus=$checkSave></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus=$checkSave></input></td>\n";
