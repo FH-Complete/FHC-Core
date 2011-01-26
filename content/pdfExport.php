@@ -101,6 +101,8 @@ if(isset($_GET['uid']))
 	$params.='&uid='.$_GET['uid'];
 if(isset($_GET['person_id']))
 	$params.='&person_id='.$_GET['person_id'];
+if(isset($_GET['id']))
+	$params.='&id='.$_GET['id'];
 if(isset($_GET['prestudent_id']))
 	$params.='&prestudent_id='.$_GET['prestudent_id'];
 if(isset($_GET['buchungsnummern']))
@@ -243,7 +245,6 @@ if (!isset($_REQUEST["archive"]))
 		$proc->importStyleSheet($xsl_doc); // attach the xsl rules
 		
 		$buffer = $proc->transformToXml($xml_doc);
-		
 		if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
 		{
 			echo('Failed to generate PDF');

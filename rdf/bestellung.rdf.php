@@ -83,7 +83,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		header("Content-type: application/xhtml+xml");
 		echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		
-		echo "\n<bestellung>\n";
+		echo "\n<bestellungen><bestellung>\n";
 		echo "	<bestell_nr><![CDATA[$bestellung->bestell_nr]]></bestell_nr>\n";
 		echo "	<titel><![CDATA[$bestellung->titel]]></titel>\n";
 		echo "	<kontaktperson>\n";
@@ -134,11 +134,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "			<preisprove><![CDATA[",number_format($row->preisprove,2,',','.'),"]]></preisprove>\n";
 			echo "			<mwst><![CDATA[",number_format($row->mwst,2,',','.'),"]]></mwst>\n";
 			$summe_brutto_detail=$row->menge*$row->preisprove/100*($row->mwst+100);
+			$summe_netto_detail=$row->menge*$row->preisprove;
 			echo "			<summe_brutto><![CDATA[",number_format($summe_brutto_detail,2,',','.'),"]]></summe_brutto>\n";
+			echo "			<summe_netto><![CDATA[",number_format($summe_netto_detail,2,',','.'),"]]></summe_netto>\n";
 			echo "		</detail>\n";
 			$summe_brutto+=$summe_brutto_detail;
 			$summe_netto+=$row->menge*$row->preisprove;
-			$summe_mwst+=$row->mwst;
+			$summe_mwst+=$row->menge*$row->preisprove/100*$row->mwst;
 		}
 		
 		echo "	</details>\n";
@@ -146,7 +148,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "	<summe_netto>",number_format($summe_netto,2,',','.'),"</summe_netto>\n";
 		echo "	<summe_mwst>",number_format($summe_mwst,2,',','.'),"</summe_mwst>\n";
 		echo "	<summe_brutto>",number_format($summe_brutto,2,',','.'),"</summe_brutto>\n";
-		echo "</bestellung>";
+		echo "</bestellung></bestellungen>";
 	}
 	else
 		die('Parameter id missing');
