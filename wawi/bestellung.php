@@ -1235,10 +1235,15 @@ if($aktion == 'suche')
 			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
 			{
 				if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
-				$disabled = 'disabled';
-				echo "<span id='btn_storniert'>";
-				echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
-				echo "</span>";
+					$disabled = 'disabled';
+					
+				$rechte->getBerechtigungen($user); 
+				if($rechte->isberechtigt('wawi/storno',null, 'suid', $bestellung->kostenstelle_id))
+				{
+					echo "<span id='btn_storniert'>";
+					echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
+					echo "</span>";
+				}
 			}
 			else 
 			{
@@ -1769,28 +1774,30 @@ if($aktion == 'suche')
 	{
 		$removeDetail ='';
 		$checkSave = ''; 
+		$checkRow = '';
 		$status= new wawi_bestellstatus(); 
 		// wenn status Storno oder Abgeschickt, kein löschen der Details mehr möglich
 		if(!$status->isStatiVorhanden($bestell_id,'Storno'))
 		{
 			if(!$status->isStatiVorhanden($bestell_id,'Abgeschickt'))
 			{
-				$removeDetail = "removeDetail(".$i.")"; 
-				$checkSave = "checkSave(".$i.")"; 
+				$removeDetail = "removeDetail(".$i.");"; 
+				$checkSave = "checkSave(".$i.");"; 
+				$checkRow = "checkNewRow(".$i.");"; 
 			}
 		}
 		$preisprove = sprintf("%01.2f",$preisprove); 
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
-		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus=$checkSave;></input></td>\n";
+		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus=$checkSave></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
-		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus=$checkSave;></input></td>\n";
-		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave;></input></td>\n";
-		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='checkNewRow($i);' onfocus=$checkSave;></input></td>\n";
-		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus=$checkSave; ></input></td>\n";
-		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='checkNewRow($i);' onChange='calcBrutto($i);' onfocus=$checkSave;></input></td>\n";
-		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus=$checkSave; onblur='checkUst($i)'></input></td>\n";
-		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onfocus=$checkSave;></input></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus=$checkSave></input></td>\n";
+		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave></input></td>\n";
+		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='$checkRow' onfocus=$checkSave></input></td>\n";
+		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus=$checkSave></input></td>\n";
+		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='$checkRow' onChange='calcBrutto($i);' onfocus=$checkSave></input></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus=$checkSave onblur='checkUst($i)'></input></td>\n";
+		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onfocus=$checkSave></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); 
