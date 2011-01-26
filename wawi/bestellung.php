@@ -1345,6 +1345,8 @@ if($aktion == 'suche')
 			echo "<table border =0 width='70%'>\n";
 			echo "<tr>\n";
 			echo "<th></th>\n";
+			echo "<th></th>\n";
+			echo "<th></th>\n";
 			echo "<th>Pos</th>\n";
 			echo "<th>Sort</th>\n"; 
 			echo "<th>Menge</th>\n";
@@ -1373,6 +1375,8 @@ if($aktion == 'suche')
 			echo "</tbody>";
 			echo "<tfoot><tr>"; 
 			echo "<td></td>"; 
+			echo "<td></td>";
+			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
@@ -1789,6 +1793,9 @@ if($aktion == 'suche')
 		$preisprove = sprintf("%01.2f",$preisprove); 
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
+		echo "<td><a title='down'><img src='../skin/images/arrow-single-down-green.png' class='cursor'></a></td>\n";
+		echo "<td><a title='up'><img src='../skin/images/arrow-single-up-green.png' class='cursor'></a></td>\n";
+		
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus=$checkSave></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus=$checkSave></input></td>\n";
@@ -1815,7 +1822,7 @@ if($aktion == 'suche')
 						});
 					</script>";
 		
-		echo "<td><input type='text' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
+		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
 	}
 	
