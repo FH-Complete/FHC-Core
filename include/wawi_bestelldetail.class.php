@@ -311,7 +311,7 @@ class wawi_bestelldetail extends basis_db
 						 OR artikelnummer like '%".addslashes($filter)."%'
 						 )";
 		}
-		$qry.=" ORDER BY position;";
+		$qry.=" ORDER BY sort, position;";
 		
 		if($this->db_query($qry))
 		{
