@@ -74,9 +74,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:table-column column-width="12mm"/>
 					<fo:table-column column-width="65mm"/>
 					<fo:table-column column-width="40mm"/>
-					<fo:table-column column-width="20mm"/>
+					<fo:table-column column-width="24mm"/>
 					<fo:table-column column-width="12mm"/>
-					<fo:table-column column-width="10mm"/>
+					<fo:table-column column-width="8mm"/>
 					<fo:table-column column-width="10mm"/>
 					<fo:table-column column-width="17mm"/>
 					<fo:table-body>
@@ -100,9 +100,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:table-column column-width="12mm"/>
 					<fo:table-column column-width="65mm"/>
 					<fo:table-column column-width="40mm"/>
-					<fo:table-column column-width="20mm"/>
+					<fo:table-column column-width="24mm"/>
 					<fo:table-column column-width="12mm"/>
-					<fo:table-column column-width="10mm"/>
+					<fo:table-column column-width="8mm"/>
 					<fo:table-column column-width="10mm"/>
 					<fo:table-column column-width="17mm"/>
 					<fo:table-body>
@@ -176,9 +176,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="12mm"><xsl:text> </xsl:text><xsl:value-of select="lehreinheit_id" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="65mm"><xsl:text> </xsl:text><xsl:value-of select="lehrveranstaltung" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="40mm"><xsl:text> </xsl:text><xsl:value-of select="fachbereich" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="20mm" text-align="center"><xsl:value-of select="gruppe" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="24mm" text-align="center"><xsl:value-of select="gruppe" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="12mm" text-align="right"><xsl:value-of select="stunden" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm" text-align="right"><xsl:value-of select="satz" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="8mm" text-align="right"><xsl:value-of select="satz" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm" text-align="right"><xsl:value-of select="faktor" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="17mm" text-align="right">EURO <xsl:value-of select="brutto" /></fo:block></fo:table-cell>
 		</fo:table-row>
@@ -194,9 +194,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						<fo:table-column column-width="12mm"/>
 						<fo:table-column column-width="65mm"/>
 						<fo:table-column column-width="40mm"/>
-						<fo:table-column column-width="20mm"/>
+						<fo:table-column column-width="24mm"/>
 						<fo:table-column column-width="12mm"/>
-						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="8mm"/>
 						<fo:table-column column-width="10mm"/>
 						<fo:table-column column-width="17mm"/>
 						<fo:table-body>

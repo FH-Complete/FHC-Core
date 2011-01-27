@@ -1222,7 +1222,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				bestell_nr varchar(16),
 				titel varchar(256),
 				bemerkung varchar(256),
-				liefertermin date,
+				liefertermin varchar(16),
 				besteller_uid varchar(32),
 				lieferadresse bigint,
 				kostenstelle_id bigint,
@@ -1907,6 +1907,22 @@ if(!@$db->db_query("SELECT 1 FROM wawi.tbl_zahlungstyp LIMIT 1"))
 	else 
 		echo 'Tabelle wawi.tbl_zahlungstyp hinzugefuegt!<br>';
 }
+
+// oe_kurzbz zur tbl_vorlagestudeingang hinzufuegen
+if(!@$db->db_query("SELECT oe_kurzbz FROM public.tbl_vorlagestudiengang LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN oe_kurzbz varchar(32);
+	UPDATE public.tbl_vorlagestudiengang SET oe_kurzbz = (SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz=tbl_vorlagestudiengang.studiengang_kz);
+	ALTER TABLE public.tbl_vorlagestudiengang ALTER COLUMN oe_kurzbz SET NOT NULL;
+	ALTER TABLE public.tbl_vorlagestudiengang ADD CONSTRAINT fk_vorlagestudiengang_organisationseinheit FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlagestudiengang: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_vorlagestudiengang Spalte oe_kurzbz hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2043,7 +2059,7 @@ $tabellen=array(
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
-	"public.tbl_vorlagestudiengang"  => array("vorlage_kurzbz","studiengang_kz","version","text"),
+	"public.tbl_vorlagestudiengang"  => array("vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz"),
 	"sync.tbl_zutrittskarte"  => array("key","name","firstname","groupe","logaswnumber","physaswnumber","validstart","validend","text1","text2","text3","text4","text5","text6","pin"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
