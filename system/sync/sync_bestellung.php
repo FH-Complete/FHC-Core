@@ -121,13 +121,13 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					 		$freigegeben = "f"; 
 					 	
 						if($row_neu->besteller_uid != $row->besteller_neu || $row_neu->kostenstelle_id != $row->kostenstelle_id || $row_neu->konto_id != $row->konto_id || $row_neu->firma_id != $firma || $row_neu->bestell_nr != $row->bestellnr ||
-							$row_neu->titel != $row->newtitel || $row_neu->bemerkung != $row->bemerkungen || $row_neu->liefertermin != $row->geliefert || $row_neu->updatevon != $row->lusername || 
+							$row_neu->titel != $row->newtitel || $row_neu->bemerkung != $row->bemerkungen || $row_neu->liefertermin != $row->liefertermin || $row_neu->updatevon != $row->lusername || 
 							 $row_neu->insertvon != $row->cusername || $date->formatDatum($row_neu->updateamum, 'Y-m-d H:i:s') != $date->formatDatum($row->lupdate, 'Y-m-d H:i:s') || 
 							 $date->formatDatum($row_neu->insertamum, 'Y-m-d H:i:s') != $date->formatDatum($row->erstellung, 'Y-m-d H:i:s') || $row_neu->freigegeben!=$freigegeben)
 						{	
 							$qry="UPDATE wawi.tbl_bestellung SET besteller_uid = ".$db->addslashes($row->besteller_neu).", kostenstelle_id = ".$db->addslashes($row->kostenstelle_id).", konto_id = ".$db->addslashes($row->konto_id).", firma_id =
 							".$db->addslashes($firma)." ,bestell_nr = ".$db->addslashes($row->bestellnr).", titel = ".$db->addslashes($row->newtitel).", bemerkung = ".$db->addslashes($row->bemerkungen).", freigegeben=".($freigegeben=='t'?'true':'false').", liefertermin= 
-							".$db->addslashes($row->geliefert).", updateamum = ".$db->addslashes($row->lupdate).", updatevon = ".$db->addslashes($row->lusername).", insertamum = ".$db->addslashes($row->erstellung).", insertvon =
+							".$db->addslashes($row->liefertermin).", updateamum = ".$db->addslashes($row->lupdate).", updatevon = ".$db->addslashes($row->lusername).", insertamum = ".$db->addslashes($row->erstellung).", insertvon =
 							".$db->addslashes($row->cusername)." WHERE bestellung_id = ".$db->addslashes($row->bestellung_id).";"; 
 					
 							if($db->db_query($qry) != true)
@@ -300,7 +300,7 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					".$db->addslashes($row->bestellung_id).",".$db->addslashes($row->besteller_neu).",".$db->addslashes($row->kostenstelle_id).",
 					".$db->addslashes($row->konto_id).",".$db->addslashes($firma).",".$db->addslashes('1').",".$db->addslashes('1').",
 					".$freigegeben.",".$db->addslashes($row->bestellnr).",".$db->addslashes($row->newtitel).",".$db->addslashes($row->bemerkungen).",
-					".$db->addslashes($row->geliefert).",".$db->addslashes($row->lupdate).",".$db->addslashes($row->lusername).",".$db->addslashes($row->erstellung).",
+					".$db->addslashes($row->liefertermin).",".$db->addslashes($row->lupdate).",".$db->addslashes($row->lusername).",".$db->addslashes($row->erstellung).",
 					".$db->addslashes($row->cusername).",".$db->addslashes($row->bestellung_id).")"; 
 					//echo $qry; 
 					if($db->db_query($qry) != true)
