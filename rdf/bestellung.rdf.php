@@ -66,7 +66,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$firma = new firma();
 		$firma->load($bestellung->firma_id);
-		
+		$kundennummer = $firma->get_kundennummer($bestellung->firma_id, $kostenstelle->oe_kurzbz);
+	
 		$standort = new standort();
 		$standort->load_firma($firma->firma_id);
 		if(isset($standort->result[0]))
@@ -80,12 +81,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$kontakt = new kontakt();
 		$kontakt->loadFirmaKontakttyp($standort->standort_id, 'fax');
 		$fax = $kontakt->kontakt;
+		
 		header("Content-type: application/xhtml+xml");
 		echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		
 		echo "\n<bestellungen><bestellung>\n";
 		echo "	<bestell_nr><![CDATA[$bestellung->bestell_nr]]></bestell_nr>\n";
 		echo "	<titel><![CDATA[$bestellung->titel]]></titel>\n";
+		echo "	<liefertermin><![CDATA[$bestellung->liefertermin]]></liefertermin>\n";
+		echo "	<kundennummer><![CDATA[$kundennummer]]></kundennummer>\n";
 		echo "	<kontaktperson>\n";
 		echo "		<titelpre><![CDATA[$besteller->titelpre]]></titelpre>\n";
 		echo "		<vorname><![CDATA[$besteller->vorname]]></vorname>\n";

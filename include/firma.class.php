@@ -25,6 +25,7 @@
  * @create 18-12-2006
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 
 class firma extends basis_db
 {
@@ -559,6 +560,42 @@ class firma extends basis_db
 			return false;
 		}
 	}	
+
+	/**
+	 * Liefert die Kundennummer einer Firma zu einer Organisationseinheit
+	 * Wenn fuer diese Organisationseinheit kein Eintrag vorhanden ist, wird
+	 * in den uebergeordneten OEs gesucht
+	 *
+	 * @param firma_id
+	 * @param oe_kurzbz
+	 * @return kundennummer oder false wenn nicht vorhanden 
+	 */
+	public function get_kundennummer($firma_id, $oe_kurzbz)
+	{
+		$qry = "SELECT kundennummer FROM public.tbl_firma_organisationseinheit 
+				WHERE firma_id='".addslashes($firma_id)."' AND oe_kurzbz='".addslashes($oe_kurzbz)."';";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->kundennummer;
+			}
+			else
+			{
+				$oe = new organisationseinheit();
+				if($oe->load($oe_kurzbz))
+				{
+					if($oe->oe_parent_kurzbz!='')
+						return $this->get_kundennummer($firma_id, $oe->oe_parent_kurzbz);
+					else
+						return false;
+				}
+				else
+					return false;
+			}
+		}
+	}
 
 	/**
 	 * Laedt alle Firmen -  Organisationseinheiten nach Firmen ID und/oder OE Kurzbz 

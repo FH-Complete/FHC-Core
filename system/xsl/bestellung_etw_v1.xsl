@@ -71,8 +71,8 @@
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
-									<fo:block font-size="10pt" content-width="50mm">
-										!! fehlt noch in xml !!
+									<fo:block font-size="10pt" content-width="50mm" padding-left="1mm">
+										<xsl:value-of select="kundennummer" />
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -83,8 +83,8 @@
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
-									<fo:block font-size="10pt" content-width="50mm">
-										!! gibts nicht mehr? !!
+									<fo:block font-size="10pt" content-width="50mm" padding-left="1mm">
+										<xsl:value-of select="liefertermin" />
 										</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -96,7 +96,7 @@
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
-									<fo:block font-size="10pt" content-width="50mm">
+									<fo:block font-size="10pt" content-width="50mm" padding-left="1mm">
 										<xsl:value-of select="konto" />
 										</fo:block>
 								</fo:table-cell>
@@ -109,7 +109,7 @@
 										</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
-									<fo:block font-size="10pt" content-width="50mm">
+									<fo:block font-size="10pt" content-width="50mm" padding-left="1mm">
 										<xsl:value-of select="kostenstelle" />
 										</fo:block>
 								</fo:table-cell>
@@ -559,7 +559,7 @@
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="100mm">
+				<fo:block font-size="8pt" content-width="99mm" padding-left="1mm">
 					<xsl:value-of select="beschreibung" />
 				</fo:block>
 			</fo:table-cell>
