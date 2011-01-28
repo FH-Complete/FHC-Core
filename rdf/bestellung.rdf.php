@@ -81,6 +81,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$kontakt = new kontakt();
 		$kontakt->loadFirmaKontakttyp($standort->standort_id, 'fax');
 		$fax = $kontakt->kontakt;
+
+		$datum_obj = new datum();
 		
 		header("Content-type: application/xhtml+xml");
 		echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
@@ -149,6 +151,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		echo "	</details>\n";
 		echo "	<datum><![CDATA[",date('d.m.Y'),"]]></datum>\n";
+		echo "	<erstelldatum><![CDATA[",$datum_obj->formatDatum($bestellung->insertamum, 'd.m.Y'),"]]></erstelldatum>\n";
 		echo "	<summe_netto>",number_format($summe_netto,2,',','.'),"</summe_netto>\n";
 		echo "	<summe_mwst>",number_format($summe_mwst,2,',','.'),"</summe_mwst>\n";
 		echo "	<summe_brutto>",number_format($summe_brutto,2,',','.'),"</summe_brutto>\n";
