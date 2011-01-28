@@ -120,7 +120,13 @@
 	}
 
 	$stsem_obj = new studiensemester();
-	$studiensemester = $stsem_obj->getNearest();
+	if(date("m")>=1 || date("m")<=2)
+	{
+		$stsem_obj->getNextStudiensemester();
+		$studiensemester = $stsem_obj->studiensemester_kurzbz;
+	}
+	else
+		$studiensemester = $stsem_obj->getNearest();
 	$where=" studiensemester_kurzbz='".$studiensemester."'";
 	if (!empty($semester))
 		$where.=" AND semester=$semester";
