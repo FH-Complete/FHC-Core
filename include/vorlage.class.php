@@ -44,17 +44,46 @@ class vorlage extends basis_db
 	}
 
 	/**
-	 * Liefert die Aktuelle Vorlage
+	 * Liefert die aktuelle Vorlage
+	 * 
 	 *
-	 * @param $studiengang_kz
-	 * @param $vorlage_kurzbz
+	 * @param $oe_kurzbz Organisationseinheit der Vorlage
+	 * 		Fuer Kompatibilitaetszwecke kann hier statt der oe_kurzbz auch die Studiengangskennzahl uebergeben werden. 
+	 *		Dies wird in den kommenden Versionen jedoch nicht mehr moeglich sein! 		
+	 * @param $vorlage_kurzbz Name der Vorlage
+	 * @param $version optional kann die Versionsnummer der Vorlage uebergeben werden
 	 * @return boolean
 	 */
-	public function getAktuelleVorlage($studiengang_kz, $vorlage_kurzbz)
+	public function getAktuelleVorlage($oe_kurzbz, $vorlage_kurzbz, $version=null)
 	{
-		$qry = "SELECT * FROM public.tbl_vorlagestudiengang WHERE 
-				(studiengang_kz=0 OR studiengang_kz='".addslashes($studiengang_kz)."') AND 
-				vorlage_kurzbz='".addslashes($vorlage_kurzbz)."' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
+		$studiengang_kz='';
+		if(is_numeric($oe_kurzbz))
+		{
+			$studiengang_kz=$oe_kurzbz;
+		}
+		
+		if($studiengang_kz!='')
+		{
+			$qry = "SELECT * FROM public.tbl_vorlagestudiengang WHERE 
+					(studiengang_kz=0 OR studiengang_kz='".addslashes($studiengang_kz)."') AND 
+					vorlage_kurzbz='".addslashes($vorlage_kurzbz)."'";
+			if(!is_null($version) && $version!='')
+			{
+				$qry.=" AND version=='".addslashes($version)."'";
+			}
+			$qry .=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
+		}
+		else
+		{
+			$qry = "SELECT * FROM public.tbl_vorlagestudiengang 
+					WHERE oe_kurzbz='".addslashes($oe_kurzbz)."' 
+						AND vorlage_kurzbz='".addslashes($vorlage_kurzbz)."'";
+			if(!is_null($version) && $version!='')
+			{
+				$qry.=" AND version=='".addslashes($version)."'";
+			}
+			$qry.=" ORDER BY version DESC LIMIT 1";
+		}
 
 		if($this->db_query($qry))
 		{
@@ -68,8 +97,28 @@ class vorlage extends basis_db
 			}
 			else 
 			{
-				$this->errormsg = 'Keine Vorlage gefunden';
-				return false;
+				if($studiengang_kz!='')
+				{
+					$this->errormsg = 'Keine Vorlage gefunden';
+					return false;
+				}
+				else
+				{
+					//Wenn keine Vorlage zu dieser Organisationseinheit gefunden wurde,
+					//nachsehen ob fuer eine der uebergeordneten OEs eine Vorlage vorhanden ist.
+					$oe = new organisationseinheit();
+					$oe->load($oe_kurzbz);
+					
+					if($oe->oe_parent_kurzbz!='')
+					{
+						return $this->getAktuelleVorlage($oe->oe_parent_kurzbz, $vorlage_kurzbz, $version);
+					}
+					else
+					{
+						$this->errormsg = 'Keine Vorlage gefunden';
+						return false;
+					}
+				}
 			}
 		}
 		else 
