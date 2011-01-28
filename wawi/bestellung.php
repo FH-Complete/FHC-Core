@@ -174,7 +174,10 @@ if(isset($_POST['saveDetail']))
 		$detail->artikelnummer = $_POST['artikelnr']; 
 		$detail->preisprove = $_POST['preis']; 
 		$detail->mwst = $_POST['mwst']; 
-		$detail->sort = $_POST['sort'];
+		if($_POST['sort'] != '')
+			$detail->sort = $_POST['sort'];
+		else 
+			$detail->sort = $_POST['pos']; 
 		$detail->insertamum = date('Y-m-d H:i:s'); 
 		$detail->updateamum = date('Y-m-d H:i:s'); 
 		$detail->new = true; 
@@ -664,13 +667,15 @@ if($aktion == 'suche')
 		}
 	} 
 	else if($_GET['method']=='delete')
-	{
-		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
-			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
-			
+	{		
 		// Bestellung löschen
 		$id = (isset($_GET['id'])?$_GET['id']:null);
 		$bestellung = new wawi_bestellung(); 
+		$bestellung->load($id); 
+		
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid', $bestellung->kostenstelle_id))
+			die('Sie haben keine Berechtigung zum Löschen von Bestellungen');
+			
 		if($bestellung->RechnungVorhanden($id))
 		{
 			echo 'Kann nicht gelöscht werden. Der Bestellung ist eine Rechnung zugeordnet.'; 
@@ -852,7 +857,11 @@ if($aktion == 'suche')
 							$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
 							$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
 							$bestell_detail->mwst = $_POST["mwst_$i"];
-							$bestell_detail->sort = $_POST["sort_$i"];
+							if($_POST["sort_$i"] != '')
+								$bestell_detail->sort = $_POST["sort_$i"];
+							else
+								$bestell_detail->sort = $_POST["pos_$i"];
+							
 							$bestell_detail->insertamum = date('Y-m-d H:i:s');
 							$bestell_detail->insertvon = $user;
 							$bestell_detail->updateamum = date('Y-m-d H:i:s');
@@ -928,9 +937,20 @@ if($aktion == 'suche')
 							foreach($uids as $uid)
 							{
 								// E-Mail an Kostenstellenverantwortliche senden
-								$msg ="Eine Bestellung wurde angelegt und muss von Ihnen noch freigegeben werden. \n <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> Link zur Bestellung $bestellung_new->bestellung_id </a>"; 
-								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
-								$mail->setHTMLContent($msg); 
+								$email="Dies ist eine automatische E-Mail.\n\n";
+								$email.="Es wurde eine neue Bestellung auf Kostenstelle '".$bestellung_new->kostenstelle_id."' erstellt bzw. eine bestehende ge&auml;ndert. Bitte geben Sie die Bestellung frei.\n\n";
+								$email.="Bestellnummer: $bestellung_new->bestell_nr\n";
+								$email.="Titel: ".$bestellung_new->titel."\n";
+								$email.="Firma: ".$bestellung_new->firma_id."\n";
+								$email.="Erstellt am: ".$bestellung_new->insertamum."\n";
+								$email.="Kostenstelle: ".$bestellung_new->kostenstelle_id."\nKonto: ".$bestellung_new->konto_id."\n";
+								
+								$email.="Link: https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id \n";
+						
+								
+								
+								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $email);
+								$mail->setHTMLContent($email); 
 								if(!$mail->send())
 									echo 'Fehler beim Senden des Mails';
 								else
@@ -1630,36 +1650,17 @@ if($aktion == 'suche')
 					calcBruttoNetto(i); 
 				}
 			}
-			
-		function nauf(row_id)
-		{
-		
-			var sort = ($("#sort_"+row_id).html()); 	
-		
-			var table = document.getElementById("detailTable");
-			var row = document.getElementById("row_"+row_id);
-			var prev_row = row.previousSibling;
-			table.insertBefore(row, prev_row);
-		}
-		
-		function nunter(row_id)
-		{
-			//erstmal holen wir uns die Tabelle
-			var table = document.getElementById("detailTable");
-		
-			//...und die Zeile die verschoben werden soll
-			var row = document.getElementById("row_"+row_id);
-		
-			//Dann ermitteln wir die nächste Zeile
-			var next_row = row.nextSibling;
-		
-			// ...und die übernächste (da es die Funktion insertAfter() nicht gibt
-			var next_after_row = next_row.nextSibling;
-		
-			//nun fügen wir die aktuelle Zeile einfach vor der übernächsten ein
-			table.insertBefore(row, next_after_row);
-		}
-
+	
+			$(document).ready(function(){
+			    $(".up,.down").click(function(){
+			        var row = $(this).parents("tr:first");
+			        if ($(this).is(".up")) {
+			            row.insertBefore(row.prev());
+			        } else {
+			            row.insertAfter(row.next());
+			        }
+			    });
+			});
 			
 			</script>';
 			
@@ -1784,10 +1785,13 @@ if($aktion == 'suche')
 			}
 		}
 		$preisprove = sprintf("%01.2f",$preisprove); 
+		
+		
+		//<img src='../skin/images/arrow-single-up-green.png' class='cursor'>
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
-		echo "<td><a title='down' onClick='$detailDown'><img src='../skin/images/arrow-single-down-green.png' class='cursor'></a></td>\n";
-		echo "<td><a title='up' onClick='$detailUp'><img src='../skin/images/arrow-single-up-green.png' class='cursor'></a></td>\n";
+		echo "<td><a href='#' class='down'>Down</a></td>\n";
+		echo "<td> <a href='#' class='up'>Up</a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus='$checkSave'></input></td>\n";
@@ -1812,6 +1816,7 @@ if($aktion == 'suche')
 							multipleSeparator: '; ',
 							extraParams:{'work':'detail_tags', 'detail_id':'.$bestelldetail_id.'}
 						});
+
 					</script>";
 		
 		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
