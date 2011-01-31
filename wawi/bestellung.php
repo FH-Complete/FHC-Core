@@ -726,7 +726,7 @@ if($aktion == 'suche')
 		{
 			// Update auf Bestellung
 			$date = new datum(); 	
-			//	var_dump($_POST); 
+				var_dump($_POST); 
 			$save = false; 
 			$bestellung_id = $_GET['bestellung'];
 			$bestellung_new = new wawi_bestellung(); 
@@ -1212,7 +1212,7 @@ if($aktion == 'suche')
 			echo "</td</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Bemerkungen: </td>\n";
-			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value =''></input></td>\n";
+			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value ='$bestellung->bemerkung'></input></td>\n";
 			echo "<td>Status:</td>\n"; 
 			echo "<td width ='200px'>\n";
 			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
