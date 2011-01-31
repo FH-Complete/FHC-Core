@@ -1365,7 +1365,7 @@ if($aktion == 'suche')
 				$i++; 
 			}
 			if($bestellung->freigegeben != 't')
-				getDetailRow($i,null,null,null,null,null,null,null,null,null,$bestellung->bestellung_id);
+				getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id);
 			
 			$test = $i; 
 			echo "</tbody>";
@@ -1673,6 +1673,7 @@ if($aktion == 'suche')
 				$aktBrutto ="0"; 	
 			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)'></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
+			echo "<a href ='pdfExport.php?xml=bestellung.rdf.php&xsl=Bestellung&id=$bestellung->bestellung_id'>PDF erstellen</a>"; 
 			echo "<br><br>"; 
 
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
@@ -1790,8 +1791,8 @@ if($aktion == 'suche')
 		//<img src='../skin/images/arrow-single-up-green.png' class='cursor'>
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
-		echo "<td><a href='#' class='down'>Down</a></td>\n";
-		echo "<td> <a href='#' class='up'>Up</a></td>\n";
+		echo "<td><a href='#' class='down'><img src='../skin/images/arrow-single-down-green.png' class='cursor'></a></td>\n";
+		echo "<td> <a href='#' class='up'><img src='../skin/images/arrow-single-up-green.png' class='cursor'></a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus='$checkSave'></input></td>\n";
