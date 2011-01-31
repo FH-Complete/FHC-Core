@@ -163,7 +163,6 @@ class wawi_bestellstatus extends basis_db
 		$qry = "select bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus
 		WHERE 
 		bestellung_id = ".$this->addslashes($bestellung_id).$status.";";
-		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
