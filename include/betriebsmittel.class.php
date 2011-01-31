@@ -739,8 +739,8 @@ class betriebsmittel extends basis_db
 		$qry.=',tbl_betriebsmittelstatus.beschreibung as betriebsmittelstatus_beschreibung ';
 		$qry.=',tbl_betriebsmitteltyp.beschreibung as betriebsmitteltyp_beschreibung ';
 		$qry.=', CASE WHEN EXISTS(SELECT retouram FROM wawi.tbl_betriebsmittelperson WHERE betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id AND retouram is NULL) THEN \'t\' ELSE \'f\' END ausgegeben';
-		$qry.=', tbl_betriebsmittel.*';
-		$qry.=', wawi_be.*';
+		$qry.=', tbl_betriebsmittel.*, tbl_bestellung.titel as titel';
+		$qry.=', tbl_bestellung.bestell_nr as bestellnr, tbl_firma.name as firmenname, tbl_firma.firma_id as firma_id';
 
 		//AfA Datum ermitteln
 		$qry.=", trim(to_char(date_part('year', 
@@ -767,14 +767,9 @@ class betriebsmittel extends basis_db
 		$qry.=' LEFT JOIN wawi.tbl_betriebsmittelstatus on (tbl_betriebsmittelstatus.betriebsmittelstatus_kurzbz=tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz ) ';
 		$qry.=' LEFT JOIN public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz ) ';
 		$qry.=' LEFT JOIN wawi.tbl_betriebsmittelperson on (tbl_betriebsmittelperson.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id ) ';
+		$qry.=' LEFT JOIN wawi.tbl_bestellung USING(bestellung_id)
+				LEFT JOIN public.tbl_firma ON(tbl_firma.firma_id=tbl_bestellung.firma_id )'; 
 		
-		// Verbindung zum WAWI aufbauen
-		$qry.=' LEFT JOIN  dblink(\''.CONN_STRING_WAWI.'\',\'
-		SELECT distinct bestellung.bestellung_id,bestellung.bestellnr,bestellung.titel,bestellung.firma_id,firma.firmenname from public.bestellung
-			LEFT JOIN public.firma on ( firma.firma_id=bestellung.firma_id ) \' )
-			 as wawi_be(bestellung_id int, bestellnr char(32), titel char(120), firma_id int, firmenname char(160) )
-			 	 on ( cast(wawi_be.bestellung_id as INTEGER)=cast(tbl_betriebsmittel.bestellung_id as INTEGER) and cast(tbl_betriebsmittel.bestellung_id as INTEGER)>0 ) ';
-
 		$qry.=" WHERE not tbl_betriebsmittel.betriebsmittel_id is null ";
 		$where=$this->betriebsmittel_inventar_get_where($inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id);
 		if ($where!='' && !$where)
@@ -832,15 +827,9 @@ class betriebsmittel extends basis_db
 		$qry.=' left outer join wawi.tbl_betriebsmittelstatus on (tbl_betriebsmittelstatus.betriebsmittelstatus_kurzbz=tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz ) ';
 		$qry.=' left outer join public.tbl_ort on (tbl_ort.ort_kurzbz=tbl_betriebsmittel.ort_kurzbz ) ';
 		$qry.=' left outer join wawi.tbl_betriebsmittelperson on (tbl_betriebsmittelperson.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id ) ';
-
-		// Verbindung zum WAWI aufbauen
-		if ( $bestellnr || $firma_id || $beschreibung )
-			$qry.=' left outer join  dblink(\''.CONN_STRING_WAWI.'\',\'
-			select distinct bestellung.bestellung_id,bestellung.bestellnr,bestellung.titel,bestellung.firma_id,firma.firmenname from public.bestellung
-				left join public.firma on ( firma.firma_id=bestellung.firma_id ) \' )
-				 as wawi_be(bestellung_id int, bestellnr char(32), titel char(120), firma_id int, firmenname char(160) )
-			 	 on ( cast(wawi_be.bestellung_id as INTEGER)=cast(tbl_betriebsmittel.bestellung_id as INTEGER) and cast(tbl_betriebsmittel.bestellung_id as INTEGER)>0 ) ';
-
+		$qry.=' left outer join wawi.tbl_bestellung using(bestellung_id)';
+		$qry.=' left outer join public.tbl_firma using(firma_id)';
+		
 		$qry.=" where not tbl_betriebsmittel.bestellung_id is null ";
 		$where='';
 		$where=$this->betriebsmittel_inventar_get_where($inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer);
@@ -850,6 +839,7 @@ class betriebsmittel extends basis_db
 			$order='tbl_betriebsmittel.bestellung_id';
 
 		$qry.=$where.(!is_null($order) && !empty($order)?' ORDER BY '. $order:'').(!$where?' limit 20 ':' limit 50 ');
+		
 		if(!$result=$this->db_query($qry))
 		{
 			$this->errormsg ='Probleme beim lesen der Betriebsmittel '.($this->debug?$this->db_last_error() ."<br />$qry<br />":'') ;
@@ -916,7 +906,7 @@ class betriebsmittel extends basis_db
 			$where.=" AND ( UPPER(trim(tbl_betriebsmittel.beschreibung)) like '%".$matchcode."%' ";
 			$where.=" or UPPER(trim(tbl_betriebsmittel.verwendung)) like '%".$matchcode."%'  ";
 			if ( $bestellnr || $firma_id || $beschreibung )
-					$where.=" or UPPER(trim(wawi_be.titel)) like '%". $matchcode ."%' " ;
+					$where.=" or UPPER(trim(tbl_bestellung.titel)) like '%". $matchcode ."%' " ;
 			$where.=" or UPPER(trim(tbl_betriebsmittel.anmerkung)) like '%".$matchcode."%' ) ";
 		}
 
@@ -1058,17 +1048,17 @@ class betriebsmittel extends basis_db
 		if (!is_null($bestellnr) && !empty($bestellnr) )
 		{
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($bestellnr))));
-			$where.=" AND UPPER(trim(wawi_be.bestellnr)) like '%".$matchcode."%' " ;
+			$where.=" AND UPPER(trim(tbl_bestellung.bestell_nr)) like '%".$matchcode."%' " ;
 		}
 		// Lieferant
 		if (!is_null($firma_id) && $firma_id!='' && is_numeric($firma_id))
 		{
-			$where.=" AND wawi_be.firma_id=". trim($firma_id) ;
+			$where.=" AND tbl_bestellung.firma_id=". trim($firma_id) ;
 		}
 		elseif (!is_null($firma_id) && $firma_id!='' )
 		{
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($firma_id))));
-			$where.=" AND UPPER(trim(wawi_be.firmenname)) like '%". $matchcode ."%'  " ;
+			$where.=" AND UPPER(trim(tbl_firma.name)) like '%". $matchcode ."%'  " ;
 		}
 		
 		if (!is_null($betriebsmittelstatus_kurzbz) && !empty($betriebsmittelstatus_kurzbz) )

@@ -104,7 +104,7 @@ foreach($menu AS $m1)
 			{
 				if (isset($m2['permissions']) && !checkpermission($m2['permissions']))
 					continue;
-				echo "\n\t\t".'<img title="'.$m2['name'].'" src="../skin/images/bullet_go.png" alt="page go" border="0">&nbsp;';
+				echo "\n\t\t".'<img title="'.$m2['name'].'" src="../skin/images/bullet_arrow_down.png" alt="page go" border="0">&nbsp;';
 				if (isset($m2['link']))
 					echo '<a href="'.$m2['link'].'" ';
 				if (isset($m2['target']))

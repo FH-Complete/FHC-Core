@@ -26,7 +26,7 @@
 	header( 'Pragma: no-cache' );
 	header('Content-Type: text/html;charset=UTF-8');
 
-	require_once('../config/vilesci.config.inc.php');
+	require_once('../config/wawi.config.inc.php');
 	require_once('auth.php');
   	require_once('../include/functions.inc.php');
 	require_once('../include/benutzerberechtigung.class.php');
