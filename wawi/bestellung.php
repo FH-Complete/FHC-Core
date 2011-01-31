@@ -726,7 +726,7 @@ if($aktion == 'suche')
 		{
 			// Update auf Bestellung
 			$date = new datum(); 	
-				var_dump($_POST); 
+			//	var_dump($_POST); 
 			$save = false; 
 			$bestellung_id = $_GET['bestellung'];
 			$bestellung_new = new wawi_bestellung(); 
@@ -936,20 +936,27 @@ if($aktion == 'suche')
 							$uids = $rechte->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
 							foreach($uids as $uid)
 							{
-								// E-Mail an Kostenstellenverantwortliche senden
-								$email="Dies ist eine automatische E-Mail.\n\n";
-								$email.="Es wurde eine neue Bestellung auf Kostenstelle '".$bestellung_new->kostenstelle_id."' erstellt bzw. eine bestehende ge&auml;ndert. Bitte geben Sie die Bestellung frei.\n\n";
-								$email.="Bestellnummer: $bestellung_new->bestell_nr\n";
-								$email.="Titel: ".$bestellung_new->titel."\n";
-								$email.="Firma: ".$bestellung_new->firma_id."\n";
-								$email.="Erstellt am: ".$bestellung_new->insertamum."\n";
-								$email.="Kostenstelle: ".$bestellung_new->kostenstelle_id."\nKonto: ".$bestellung_new->konto_id."\n";
+								$kst_mail = new wawi_kostenstelle(); 
+								$kst_mail->load($bestellung_new->kostenstelle_id); 
+								$firma_mail = new firma(); 
+								$firma_mail->load($bestellung_new->firma_id); 
+								$konto_mail = new wawi_konto(); 
+								$konto_mail->load($bestellung_new->konto_id); 
 								
-								$email.="Link: https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id \n";
+								// E-Mail an Kostenstellenverantwortliche senden
+								$email= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+								$email.="Es wurde eine neue Bestellung auf Kostenstelle '".$kst_mail->bezeichnung."' erstellt bzw. eine bestehende ge&auml;ndert. Bitte geben Sie die Bestellung frei.<br>";
+								$email.="Bestellnummer: ".$bestellung_new->bestell_nr."<br>";
+								$email.="Titel: ".$bestellung_new->titel."<br>";
+								$email.="Firma: ".$firma_mail->name."<br>";
+								$email.="Erstellt am: ".$bestellung_new->insertamum."<br>";
+								$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
+								
+								$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id'>zur Bestellung </a>";
 						
 								
 								
-								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $email);
+								$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 								$mail->setHTMLContent($email); 
 								if(!$mail->send())
 									echo 'Fehler beim Senden des Mails';
@@ -1019,7 +1026,7 @@ if($aktion == 'suche')
 									if(!$mail->send())
 										echo 'Fehler beim Senden des Mails';
 									else
-										echo '<br> Mail verschickt!';
+										echo "<br> Mail verschickt an $uid!";
 								}
 							}
 						}
@@ -1055,8 +1062,7 @@ if($aktion == 'suche')
 							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";	
 						}
 						else 
-						{
-							echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a><br>";	
+						{	
 							echo "FREIGABE OE erfolgreich";
 							
 							// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
