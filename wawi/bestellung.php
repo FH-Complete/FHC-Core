@@ -315,9 +315,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	$(function() {
 		$( "#datepicker_bbis" ).datepicker($.datepicker.regional['de']);
 	});
-	$(function() {
-		$( "#datepicker_liefertermin" ).datepicker($.datepicker.regional['de']);
-	});
+	
 	
 	$(document).ready(function() 
 	{ 
@@ -741,7 +739,6 @@ if($aktion == 'suche')
 				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung_new->bestellung_id, 'Abgeschickt'))
 				{
 					echo "Kein Speichern mehr möglich.<br>"; 
-					echo "<a href = bestellung.php?method=update&id=".$bestellung_id."> Zurück zur Bestellung </a>";
 				}
 				else
 				{
@@ -1125,7 +1122,6 @@ if($aktion == 'suche')
 			
 			$firma = new firma(); 
 			$firma->load($bestellung->firma_id);  
-			$liefertermin = $date->formatDatum($bestellung->liefertermin, 'd.m.Y'); 
 			$allStandorte = new standort(); 
 			$allStandorte->getStandorteWithTyp('Intern');
 			$status= new wawi_bestellstatus();
@@ -1163,11 +1159,11 @@ if($aktion == 'suche')
 			echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
 			echo "<input type='hidden' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
 			echo "<td>Liefertermin:</td>\n"; 
-			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='11' maxlength='10' id ='datepicker_liefertermin' value='".$liefertermin."'></input></td>\n";
+			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='16' maxlength='16' value='".$bestellung->liefertermin."'></input></td>\n";
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Kostenstelle: </td>\n";
-			echo "<td><input type='text' name='kostenstelle_id' id='kostenstelle_id' value='$kostenstelle->bezeichnung' disabled size ='60'></input></td>\n";
+			echo "<td><input type='text' name='kostenstelle_id' id='kostenstelle_id' value='$kostenstelle->bezeichnung'  size ='60'></input></td>\n";
 			echo "<td>Lieferadresse:</td>\n"; 
 			echo "<td colspan ='2'><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
 			
@@ -1221,38 +1217,50 @@ if($aktion == 'suche')
 			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value ='$bestellung->bemerkung'></input></td>\n";
 			echo "<td>Status:</td>\n"; 
 			echo "<td width ='200px'>\n";
-			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
-			{
-				echo "<span id='btn_bestellt'>";	
-				echo "<input type='button' value ='Bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)'></input>";
-				echo "</span>";
-			}
-			else
+			echo "<span id='btn_bestellt'>";	
+			
+			$new = 0; 
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
 			{
 				$status_help = new wawi_bestellstatus(); 
 				$status_help->getStatiFromBestellung('Bestellung', $bestellung->bestellung_id); 
 				echo '<span title ="'.$status_help->insertvon.'">Bestellt am: '.$date->formatDatum($status->datum,'d.m.Y').'</span>'; 
+				$new++;
 			}
-			echo "</td><td>\n";		
-			$disabled='';
-			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
-			{
-				if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
-					$disabled = 'disabled';
-					
-				$rechte->getBerechtigungen($user); 
-				if($rechte->isberechtigt('wawi/storno',null, 'suid', $bestellung->kostenstelle_id))
-				{
-					echo "<span id='btn_storniert'>";
-					echo "<input type='button' value='Storniert' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' ></input>";
-					echo "</span>";
-				}
-			}
-			else 
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
 			{
 				echo "<span>Storniert am: ".$date->formatDatum($status->datum, 'd.m.Y')."</span>";
+				$new++;
 			}
+			if($new == 0)
+			{
+				echo "<span name='erstellt' title ='".$bestellung->insertvon."' >Erstellt am: ".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</span>"; 
+			}
+			echo "</span>";
+			echo "</td><td>\n";		
+			
+			$disabled='';
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung'))
+			{
+				$disabled ='disabled';
+			}
+
+			echo "<input type='button' value ='bestellen' id='bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)' class='cursor' $disabled></input>";
+				
+			$rechte->getBerechtigungen($user); 
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
+			{
+				$disabled ='disabled';
+			}
+			if($rechte->isberechtigt('wawi/storno',null, 'suid', $bestellung->kostenstelle_id))
+			{
+				echo "<input type='button' value='stornieren' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' class='cursor' ></input>";
+			}
+			
 			echo"</td></tr>\n"; 
+			
+			
+			
 			echo "<tr>\n";
 			echo"<td>Tags:</td>\n"; 
 			$bestell_tag->GetTagsByBestellung($bestellung->bestellung_id);
@@ -1415,26 +1423,29 @@ if($aktion == 'suche')
 			function deleteBtnBestellt(bestellung_id)
 			{
 				$("#btn_bestellt").html(); 
-				
+				$("btn_bestellt").empty(); 
 				$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnBestellt: "true"},
 							function(data){
 						
 	
 								$("#btn_bestellt").html("Bestellt am: " +data); 
-								document.editForm.storniert.disabled=false; 
+								document.editForm.storniert.disabled=true; 
+								document.editForm.bestellt.disabled=true;
 							});	
 				 
 			}
 			
 			function deleteBtnStorno(bestellung_id)
 			{
-				$("#btn_storniert").html(); 
+				$("#btn_bestellt").html(); 
 				
 				$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnStorno: "true"},
 							function(data){
-							$("#btn_storniert").html("Storniert am: " +data); 
+							$("#btn_bestellt").html("Storniert am: " +data); 
 							document.editForm.btn_submit.disabled=true; 
 							document.editForm.btn_abschicken.disabled=true;
+							document.editForm.storniert.disabled=true
+							document.editForm.bestellt.disabled=true
 							});
 			}
 			
@@ -1679,7 +1690,7 @@ if($aktion == 'suche')
 				$aktBrutto ="0"; 	
 			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)'></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
-			echo "<a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>PDF erstellen</a>"; 
+			echo "<div style = 'text-align:right;'><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
 			echo "<br><br>"; 
 
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
