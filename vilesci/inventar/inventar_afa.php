@@ -727,10 +727,10 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 
 	$htmlstring.='<tr>
 				<th align="right">Bestellnr.&nbsp;:&nbsp;</th>
-				<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>
+				<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>
 
 				<th align="right" nowrap>Bestell ID.&nbsp;:&nbsp;</th>
-				<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>
+				<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>
 
 				<th align="right" nowrap>Bestellpos. ID.&nbsp;:&nbsp;</th>
 				';

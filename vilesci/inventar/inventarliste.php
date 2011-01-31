@@ -26,7 +26,6 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/ort.class.php');
 require_once('../../include/organisationseinheit.class.php');
-require_once('../../include/wawi.class.php');	
 require_once('../../include/person.class.php');	
 require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
@@ -34,6 +33,7 @@ require_once('../../include/betriebsmitteltyp.class.php');
 require_once('../../include/betriebsmittelstatus.class.php');
 require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/wawi_bestelldetail.class.php');
 
 if (!$uid = get_uid())
 	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -117,6 +117,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				<th class="table-sortable:default">Ser.nr.</th>
 				<th class="table-sortable:default">Ort</th>
 				<th class="table-sortable:default">Bestellnr</th>
+				<th class="table-sortable:default">BruttoEKP</th>
 				<th class="table-sortable:default">Datum</th>
 				<th class="table-sortable:default">Org.</th>
 				<th class="table-sortable:default">Inventur</th>
@@ -164,13 +165,18 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			<td>'.$resultBetriebsmittel[$pos]->ort_kurzbz.'&nbsp;</td>
 			';
 
-		$htmlstring.='<td align="right">'.$resultBetriebsmittel[$pos]->bestellnr.'&nbsp;</td>';
-		/*
+		$htmlstring.='<td align="right"><a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank">'.$resultBetriebsmittel[$pos]->bestellnr.'&nbsp;</a></td>';
+		
 		$htmlstring.='
 			<td align="right">';
-		$htmlstring.=$resultBetriebsmittel[$pos]->bestelldetail_id;
+		if($resultBetriebsmittel[$pos]->bestelldetail_id!='')
+		{
+			$bestelldetail = new wawi_bestelldetail();
+			$bestelldetail->load($resultBetriebsmittel[$pos]->bestelldetail_id);
+			$htmlstring.= $bestelldetail->preisprove/100*(100+$bestelldetail->mwst);
+		}
 		$htmlstring.='&nbsp;</td>';
-		*/
+		
 		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
 		$htmlstring.='<td align="right">'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum, 'Y-m-d').'&nbsp;</td>';

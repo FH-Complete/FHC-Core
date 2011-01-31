@@ -346,7 +346,7 @@
 			if ($bestellung->getAllSearch($filter, '', '', '', '', '', '', '', '', '', '', ''))
 			{
 				foreach($bestellung->result as $row)
-					echo html_entity_decode($row->bestellung_id).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
+					echo html_entity_decode($row->bestell_nr).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
 			}
 			else
 				exit($bestellung->errormsg."\n");

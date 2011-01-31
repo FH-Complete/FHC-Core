@@ -929,7 +929,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 
 			$htmlstring.='<tr>';
 			$htmlstring.='<th align="right">Bestellnr.&nbsp;:&nbsp;</th>
-						<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>';
+						<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>';
 
 			$htmlstring.='<th align="right" nowrap>Bestell ID.&nbsp;:&nbsp;</th>';
 
@@ -958,7 +958,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 				</td>
 			</form>';
 		else		
-			$htmlstring.='<td><a href="bestellung.php?bestellung_id='.$resBetriebsmittel->bestellung_id.' &amp;bestelldetail_id='.$resBetriebsmittel->bestelldetail_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>';
+			$htmlstring.='<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>';
 
 		$htmlstring.='<th align="right" nowrap>Bestellpos. ID.&nbsp;:&nbsp;</th>';
 		if ($schreib_recht && $resBetriebsmittel->bestellung_id)
@@ -1004,7 +1004,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 
 			$htmlstring.='<tr>
 						<th align="right">Lieferant&nbsp;:&nbsp;</th>
-						<td colspan="3"><a href="firma_detail.php?firma_id='.$resBetriebsmittel->firma_id.'">'.$resBetriebsmittel->firma_id.'</a> '.$resBetriebsmittel->firmenname.'</td>
+						<td colspan="3">'.$resBetriebsmittel->firmenname.' ('.$resBetriebsmittel->firma_id.')</td>
 						<th align="right">Hersteller&nbsp;:&nbsp;</th>
 						<td>'.$resBetriebsmittel->hersteller.'</td>
 					</tr>';
