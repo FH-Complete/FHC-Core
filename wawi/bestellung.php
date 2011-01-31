@@ -1673,7 +1673,7 @@ if($aktion == 'suche')
 				$aktBrutto ="0"; 	
 			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)'></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
-			echo "<a href ='pdfExport.php?xml=bestellung.rdf.php&xsl=Bestellung&id=$bestellung->bestellung_id'>PDF erstellen</a>"; 
+			echo "<a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>PDF erstellen</a>"; 
 			echo "<br><br>"; 
 
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
