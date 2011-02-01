@@ -1029,9 +1029,27 @@ if($aktion == 'suche')
 								foreach($uids as $uid)
 								{
 									// E-Mail an OE_Verantwortlichen senden
-									$msg ="Eine Bestellung wurde angelegt und muss von Ihnen noch freigegeben werden. \n <a href=https://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id> Link zur Bestellung $bestellung_new->bestellung_id </a>"; 
-									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', $msg);
-									$mail->setHTMLContent($msg); 
+									
+									$kst_mail = new wawi_kostenstelle(); 
+								$kst_mail->load($bestellung_new->kostenstelle_id); 
+								$firma_mail = new firma(); 
+								$firma_mail->load($bestellung_new->firma_id); 
+								$konto_mail = new wawi_konto(); 
+								$konto_mail->load($bestellung_new->konto_id); 
+								
+								// E-Mail an Kostenstellenverantwortliche senden
+								$email= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+								$email.="Es wurde eine neue Bestellung auf Kostenstelle '".$kst_mail->bezeichnung."' erstellt bzw. eine bestehende ge&auml;ndert. Bitte geben Sie die Bestellung frei.<br>";
+								$email.="Bestellnummer: ".$bestellung_new->bestell_nr."<br>";
+								$email.="Titel: ".$bestellung_new->titel."<br>";
+								$email.="Firma: ".$firma_mail->name."<br>";
+								$email.="Erstellt am: ".$bestellung_new->insertamum."<br>";
+								$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
+								
+								$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung_new->bestellung_id'>zur Bestellung </a>";
+							 
+									$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+									$mail->setHTMLContent($email); 
 									if(!$mail->send())
 										echo 'Fehler beim Senden des Mails';
 									else
@@ -1175,7 +1193,7 @@ if($aktion == 'suche')
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			$disabled = '';
-			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno'))
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 				$disabled = 'disabled';
 			echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)' $disabled id='filter_kst'>\n";
 			echo "<option value ='opt_kostenstelle'>-- Kostenstelle auswählen --</option>\n";
@@ -1398,12 +1416,12 @@ if($aktion == 'suche')
 			foreach($detail->result as $det)
 			{
 				$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
-				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto), $bestellung->bestellung_id);
+				getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto), $bestellung->bestellung_id, $det->position);
 				$summe+=$brutto; 
 				$i++; 
 			}
 			if($bestellung->freigegeben != 't')
-				getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id);
+				getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id,null);
 			
 			$test = $i; 
 			echo "</tbody>";
@@ -1827,7 +1845,7 @@ if($aktion == 'suche')
 	}
 
 	// gibt eine Bestelldetailzeile aus
-	function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='', $bestell_id='')
+	function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='', $bestell_id='', $pos='')
 	{
 		$removeDetail ='';
 		$checkSave = ''; 
@@ -1847,13 +1865,15 @@ if($aktion == 'suche')
 		}
 		$preisprove = sprintf("%01.2f",$preisprove); 
 		
+		if($sort == '')
+			$sort = $i; 
 		
 		//<img src='../skin/images/arrow-single-up-green.png' class='cursor'>
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 		echo "<td><a href='#' class='down'><img src='../skin/images/arrow-single-down-green.png' class='cursor'></a></td>\n";
 		echo "<td> <a href='#' class='up'><img src='../skin/images/arrow-single-up-green.png' class='cursor'></a></td>\n";
-		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$i' onfocus='$checkSave'></input></td>\n";
+		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave></input></td>\n";
@@ -1880,7 +1900,7 @@ if($aktion == 'suche')
 
 					</script>";
 		
-		echo "<td><input type='text' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
+		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
 	}
 	
