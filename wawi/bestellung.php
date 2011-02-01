@@ -724,9 +724,11 @@ if($aktion == 'suche')
 		{
 			// Update auf Bestellung
 			$date = new datum(); 	
-			//	var_dump($_POST); 
+				//var_dump($_POST); 
 			$save = false; 
 			$bestellung_id = $_GET['bestellung'];
+			$bestellung_old = new wawi_bestellung(); 
+			$bestellung_old->load($bestellung_id); 
 			$bestellung_new = new wawi_bestellung(); 
 			$bestellung_new->load($bestellung_id);
 			$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
@@ -742,6 +744,8 @@ if($aktion == 'suche')
 				}
 				else
 				{
+					
+
 					$aufteilung_anzahl = $_POST['anz_aufteilung'];
 					$bestellung_detail_anz = $_POST['detail_anz'];
 	
@@ -756,10 +760,16 @@ if($aktion == 'suche')
 					$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
 					$bestellung_new->titel = $_POST['titel'];
 					$bestellung_new->bemerkung = $_POST['bemerkung'];
-					$bestellung_new->liefertermin = $date->formatDatum($_POST['liefertermin'], 'Y-m-d'); 
+					$bestellung_new->liefertermin = $_POST['liefertermin']; 
 					$bestellung_new->updateamum = date('Y-m-d H:i:s');
 					$bestellung_new->updatevon = $user; 
 					$bestellung_new->zahlungstyp_kurzbz = $_POST['filter_zahlungstyp'];
+					$bestellung_new->kostenstelle_id = $_POST['filter_kst'];
+									
+					// wenn sich kostenstelle geändert hat, neue bestellnummer generieren
+					if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id)
+						$bestellung_new->bestell_nr = $bestellung_new->createBestellNr($bestellung_new->kostenstelle_id);
+					
 					$tags = explode(";", $_POST['tags']);
 					$help_tags = new tags(); 
 					$help_tags->bestellung_id = $bestellung_id; 
@@ -1162,8 +1172,20 @@ if($aktion == 'suche')
 			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='16' maxlength='16' value='".$bestellung->liefertermin."'></input></td>\n";
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
-			echo "<td>Kostenstelle: </td>\n";
-			echo "<td><input type='text' name='kostenstelle_id' id='kostenstelle_id' value='$kostenstelle->bezeichnung'  size ='60'></input></td>\n";
+			$disabled = '';
+			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno'))
+				$disabled = 'disabled';
+			echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)' $disabled id='filter_kst'>\n";
+			echo "<option value ='opt_kostenstelle'>-- Kostenstelle auswählen --</option>\n";
+
+			foreach ($kst->result as $ks)
+			{
+				$selected = ''; 
+				if($ks->kostenstelle_id == $bestellung->kostenstelle_id)
+					$selected = 'selected';
+				echo "<option name ='kostenstelle_id' value=".$ks->kostenstelle_id." $selected>".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
+			}				
+			echo "</SELECT></td>\n";
 			echo "<td>Lieferadresse:</td>\n"; 
 			echo "<td colspan ='2'><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
 			
@@ -1182,7 +1204,7 @@ if($aktion == 'suche')
 			echo "</td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Konto: </td>\n";
-			echo "<td><SELECT name='filter_konto' id='searchKonto' style='width: 230px;'>\n"; 
+			echo "<td><SELECT name='filter_konto' id='konto' style='width: 230px;'>\n"; 
 			foreach($konto->result as $ko)
 			{ 
 				$selected ='';
@@ -1420,6 +1442,7 @@ if($aktion == 'suche')
 			 return false;
 	        });
 			
+	        // Status bestellt wird gesetzt
 			function deleteBtnBestellt(bestellung_id)
 			{
 				$("#btn_bestellt").html(); 
@@ -1431,10 +1454,12 @@ if($aktion == 'suche')
 								$("#btn_bestellt").html("Bestellt am: " +data); 
 								document.editForm.storniert.disabled=true; 
 								document.editForm.bestellt.disabled=true;
+								document.editForm.filter_kst.disabled=true; 
 							});	
 				 
 			}
 			
+			// Status storno wird gesetzt
 			function deleteBtnStorno(bestellung_id)
 			{
 				$("#btn_bestellt").html(); 
@@ -1446,6 +1471,7 @@ if($aktion == 'suche')
 							document.editForm.btn_abschicken.disabled=true;
 							document.editForm.storniert.disabled=true
 							document.editForm.bestellt.disabled=true
+							document.editForm.filter_kst.disabled=true;
 							});
 			}
 			
@@ -1688,8 +1714,8 @@ if($aktion == 'suche')
 			$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
 			if($aktBrutto =='')
 				$aktBrutto ="0"; 	
-			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)'></input>\n"; 
-			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled></input>\n"; 
+			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)' class='cursor'></input>\n"; 
+			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'></input>\n"; 
 			echo "<div style = 'text-align:right;'><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
 			echo "<br><br>"; 
 
