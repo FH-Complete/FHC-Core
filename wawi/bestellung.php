@@ -1695,56 +1695,33 @@ if($aktion == 'suche')
 					calcBruttoNetto(i); 
 				}
 			}
-	
+			
 			$(document).ready(function(){
 			    $(".up,.down").click(function(){
 			        var row = $(this).parents("tr:first");
-			        
-			        id = row[0].id.substring("row_".length);
-			        
-			        sort = document.getElementById("sort_"+id);
-			       	        			        
+			                			        
 			        if ($(this).is(".up")) 
 			        {
-			        	// wenn ganz oben nicht mehr weiter rauf schieben
-			        	if(parseInt(sort.value)>1)
-			        	{
-			        		prev = row.prev();
-			        		id2 = prev[0].id.substring("row_".length);
-				        	sort2 = document.getElementById("sort_"+id2);
-				        	if(isNaN(parseInt(sort.value)) || sort.value=="")
-				        		sort.value=anzahlRows;
-				        	if(isNaN(parseInt(sort2.value)) || sort2.value=="")
-				        		sort2.value=anzahlRows;
-				        	// sort mit dem darüberliegenden vertauschen und zeile tauschen
-			        		help = sort.value;
-			        		sort.value=sort2.value;
-			        		sort2.value=help;
-				            row.insertBefore(row.prev());
-						}
-			        } 
+			               row.insertBefore(row.prev());
+				    } 
 			        else 
 			        {
-			        	// wenn ganz unten, nicht mehr weiter nach unten schieben
-			        	if(parseInt(sort.value)<=anzahlRows)
-			        	{
-			        		next = row.next();	
-			        		id2 = next[0].id.substring("row_".length);
-			        		sort2 = document.getElementById("sort_"+id2);
-			        		if(isNaN(parseInt(sort.value)) || sort.value=="")
-				        		sort.valuea=nzahlRows;
-				        	if(isNaN(parseInt(sort2.value)) || sort2.value=="")
-				        		sort2.value=anzahlRows;
-				        	// sort mit dem darunterliegenden vertauschen und zeile tauschen
-			        		help = sort.value;
-			        		sort.value=sort2.value;
-			        		sort2.value=help;
 			            	row.insertAfter(row.next());
-			            }
+			        }
+			        
+			        rows = $("#detailTable").children();
+			        var anzahl = rows.length;
+			        var i=0;
+			        while(i<anzahl)
+			        {
+			        	id = rows[i].id.substring("row_".length);
+			        	
+			        	sort = document.getElementById("sort_"+id);
+			        	sort.value=i;
+			        	i++;
 			        }
 			    });
 			});
-			
 			</script>';
 			
 			$disabled ='';
