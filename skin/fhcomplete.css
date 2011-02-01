@@ -19,3 +19,9 @@
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
 @charset "utf-8";
+
+.error
+{
+	color: red;
+}
+	

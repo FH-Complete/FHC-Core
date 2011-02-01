@@ -60,11 +60,16 @@ if (isset($_POST['username']))
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Login - Bestellwesen Technikum Wien V 2.0.0</title>
+	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css">
 </head>
 <body onload="document.getElementById('username').focus();">
 	<br />
 	<br />
+	<?php
+		if($errormsg!='')
+			echo '<center><span class="error">'.$errormsg.'</span></center><br /><br />';
+	?>
 	<form name="login" action="login.php" method=post>
 	<table border=0 bgcolor="#eeeeee" align="center" cellspacing=0 cellpadding=4>
 	<th colspan=2 bgcolor="#666666"><font color="white">Login</font></th>
