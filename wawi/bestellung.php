@@ -425,8 +425,9 @@ if($aktion == 'suche')
 			else 
 				echo '<option style="text-decoration:line-through;" value="'.$oei->oe_kurzbz.'">'.$oei->bezeichnung."</option>\n";
 		}
-		echo "</td>\n";
+		
 		echo "</SELECT>\n";
+		echo "</td>\n";
 		echo "</tr>\n";		
 		echo "<tr>\n";
 		echo "<td> Firma: </td>\n";
@@ -437,7 +438,7 @@ if($aktion == 'suche')
 		{
 			echo "<option value=".$fi->firma_id." >".$fi->name."</option>\n";
 		}
-		echo "</td>\n";
+		
 		echo "</SELECT>\n";
 		echo "</td>\n";
 		echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  >\n";
@@ -452,8 +453,9 @@ if($aktion == 'suche')
 			echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
 	
 		}
-		echo "</td>\n";
+
 		echo "</SELECT>\n";
+		echo "</td>\n";
 		echo "</tr>\n";	
 		echo "<tr>\n";
 		echo "<td> Änderung durch: </td>\n";
@@ -1152,7 +1154,7 @@ if($aktion == 'suche')
 			if($restBudget < 0)
 				$alert = 'Ihr aktuelles Budget ist bereits überzogen.';
 			echo "<h2>Bearbeiten</h2><span width='100%' style='text-align:center;'><p style='color:red;'>$alert</p></span>";
-			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm'>\n";
+			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm' onSubmit='document.getElementById(\"filter_kst\").disabled=false;'>\n";
 			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."";
 			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> <img src="../skin/images/copy.png" title="Bestellung kopieren" class="cursor"></a></h4>'; 
 			
@@ -1697,10 +1699,48 @@ if($aktion == 'suche')
 			$(document).ready(function(){
 			    $(".up,.down").click(function(){
 			        var row = $(this).parents("tr:first");
-			        if ($(this).is(".up")) {
-			            row.insertBefore(row.prev());
-			        } else {
-			            row.insertAfter(row.next());
+			        
+			        id = row[0].id.substring("row_".length);
+			        
+			        sort = document.getElementById("sort_"+id);
+			       	        			        
+			        if ($(this).is(".up")) 
+			        {
+			        	// wenn ganz oben nicht mehr weiter rauf schieben
+			        	if(parseInt(sort.value)>1)
+			        	{
+			        		prev = row.prev();
+			        		id2 = prev[0].id.substring("row_".length);
+				        	sort2 = document.getElementById("sort_"+id2);
+				        	if(isNaN(parseInt(sort.value)) || sort.value=="")
+				        		sort.value=anzahlRows;
+				        	if(isNaN(parseInt(sort2.value)) || sort2.value=="")
+				        		sort2.value=anzahlRows;
+				        	// sort mit dem darüberliegenden vertauschen und zeile tauschen
+			        		help = sort.value;
+			        		sort.value=sort2.value;
+			        		sort2.value=help;
+				            row.insertBefore(row.prev());
+						}
+			        } 
+			        else 
+			        {
+			        	// wenn ganz unten, nicht mehr weiter nach unten schieben
+			        	if(parseInt(sort.value)<=anzahlRows)
+			        	{
+			        		next = row.next();	
+			        		id2 = next[0].id.substring("row_".length);
+			        		sort2 = document.getElementById("sort_"+id2);
+			        		if(isNaN(parseInt(sort.value)) || sort.value=="")
+				        		sort.valuea=nzahlRows;
+				        	if(isNaN(parseInt(sort2.value)) || sort2.value=="")
+				        		sort2.value=anzahlRows;
+				        	// sort mit dem darunterliegenden vertauschen und zeile tauschen
+			        		help = sort.value;
+			        		sort.value=sort2.value;
+			        		sort2.value=help;
+			            	row.insertAfter(row.next());
+			            }
 			        }
 			    });
 			});
@@ -1863,7 +1903,7 @@ if($aktion == 'suche')
 
 					</script>";
 		
-		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
+		echo "<td><input type='text' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
 		echo "</tr>\n";
 	}
 	
