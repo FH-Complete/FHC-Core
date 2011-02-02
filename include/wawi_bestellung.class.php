@@ -769,6 +769,33 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
+	 * Aktualisiert eine Bestellung mit der übergebenen Bestellnummer
+	 * @param $bestellung_id
+	 * @param $bestellnr
+	 */
+	public function updateBestellNr($bestellung_id, $bestellnr)
+	{
+		if(!is_numeric($bestellung_id))
+		{
+			$this->errormsg = "Keine gültige Bestell ID";
+			return false; 
+		}	
+		
+		$qry = "UPDATE wawi.tbl_bestellung SET bestell_nr = '".$bestellnr."' where bestellung_id = '".$bestellung_id."';"; 
+		
+		if($this->db_query($qry))
+			return true; 
+		else 
+		{
+			$this->errormsg ="Fehler beim Setzen von Freigegeben"; 
+			return false;
+		} 
+	}
+	
+	
+	
+	/**
+	 * 
 	 * Enter description here ...
 	 * @param unknown_type $bestellung_id
 	 */
