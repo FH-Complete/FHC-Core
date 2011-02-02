@@ -211,6 +211,27 @@ if(isset($_POST['updateDetail']))
 		exit;
 }
 
+if(isset($_POST['deleteBtnGeliefert']) && isset($_POST['id']))
+{
+	$date = new datum(); 
+	
+	$bestellstatus = new wawi_bestellstatus(); 
+	$bestellstatus->bestellung_id = $_POST['id'];
+	$bestellstatus->bestellstatus_kurzbz = 'Lieferung';
+	$bestellstatus->uid = $_POST['user_id'];
+	$bestellstatus->oe_kurzbz = '';
+	$bestellstatus->datum = date('Y-m-d H:i:s');
+	$bestellstatus->insertvon = $_POST['user_id'];
+	$bestellstatus->insertamum = date('Y-m-d H:i:s');
+	$bestellstatus->updatevon = $_POST['user_id'];
+	$bestellstatus->updateamum = date('Y-m-d H:i:s');
+	if($bestellstatus->save())
+	echo $date->formatDatum($bestellstatus->datum, 'd.m.Y');  
+	else 
+	echo $bestellstatus->errormsg; 
+		exit; 
+}
+
 if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 {
 	$date = new datum(); 
@@ -1171,8 +1192,8 @@ if($aktion == 'suche')
 			
 			if($restBudget < 0)
 				$alert = 'Ihr aktuelles Budget ist bereits überzogen.';
-			echo "<h2>Bearbeiten</h2><span width='100%' style='text-align:center;'><p style='color:red;'>$alert</p></span>";
-			echo "<form action ='bestellung.php?method=update&bestellung=$bestellung->bestellung_id' method='post' name='editForm' id='editForm' onSubmit='document.getElementById(\"filter_kst\").disabled=false;'>\n";
+			echo "<h2>Bearbeiten</h2><div width='100%' style='text-align:center; color:red'>$alert</div>";
+			echo "<form action =\"bestellung.php?method=update&bestellung=$bestellung->bestellung_id\" method='post' name='editForm' id='editForm' onSubmit='document.getElementById(\"filter_kst\").disabled=false;'>\n";
 			echo "<h4>Bestellnummer: ".$bestellung->bestell_nr."";
 			echo '<a href= "bestellung.php?method=copy&id='.$bestellung->bestellung_id.'"> <img src="../skin/images/copy.png" title="Bestellung kopieren" class="cursor"></a></h4>'; 
 			
@@ -1186,10 +1207,10 @@ if($aktion == 'suche')
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Firma: </td>\n";
-			echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'></input>\n";
+			echo "<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'>\n";
 			echo "<input type='hidden' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
 			echo "<td>Liefertermin:</td>\n"; 
-			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='16' maxlength='16' value='".$bestellung->liefertermin."'></input></td>\n";
+			echo "<td colspan ='2'><input type='text' name ='liefertermin'  size='16' maxlength='16' value='".$bestellung->liefertermin."'></td>\n";
 			echo "</tr>\n"; 
 			echo "<tr>\n"; 	
 			$disabled = '';
@@ -1203,7 +1224,7 @@ if($aktion == 'suche')
 				$selected = ''; 
 				if($ks->kostenstelle_id == $bestellung->kostenstelle_id)
 					$selected = 'selected';
-				echo "<option name ='kostenstelle_id' value=".$ks->kostenstelle_id." $selected>".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
+				echo "<option value=".$ks->kostenstelle_id." $selected>".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
 			}				
 			echo "</SELECT></td>\n";
 			echo "<td>Lieferadresse:</td>\n"; 
@@ -1221,7 +1242,7 @@ if($aktion == 'suche')
 				}
 				echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
 			}		
-			echo "</td></tr>\n"; 
+			echo "</select></td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Konto: </td>\n";
 			echo "<td><SELECT name='filter_konto' id='konto' style='width: 230px;'>\n"; 
@@ -1240,7 +1261,7 @@ if($aktion == 'suche')
 			{
 				echo '<option value='.$bestellung->konto_id.' selected>'.$konto_bestellung->kurzbz."</option>\n";
 			}
-			echo "</td><td>Rechnungsadresse:</td>\n"; 
+			echo "</select></td><td>Rechnungsadresse:</td>\n"; 
 			echo "<td colspan ='2'><Select name='filter_rechnungsadresse' id='filter_rechnungsadresse' style='width: 400px;'>\n";
 			foreach($allStandorte->result as $standorte)
 			{
@@ -1253,10 +1274,10 @@ if($aktion == 'suche')
 					
 				echo "<option value='".$standort_rechnungsadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_rechnungsadresse->strasse.', '.$standort_rechnungsadresse->plz.' '.$standort_rechnungsadresse->ort."</option>\n";
 			}		
-			echo "</td</tr>\n"; 
+			echo "</select></td></tr>\n"; 
 			echo "<tr>\n"; 	
 			echo "<td>Bemerkungen: </td>\n";
-			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value ='$bestellung->bemerkung'></input></td>\n";
+			echo "<td><input type='text' name='bemerkung' size='60' maxlength='256' value ='$bestellung->bemerkung'></td>\n";
 			echo "<td>Status:</td>\n"; 
 			echo "<td width ='200px'>\n";
 			echo "<span id='btn_bestellt'>";	
@@ -1287,8 +1308,9 @@ if($aktion == 'suche')
 				$disabled ='disabled';
 			}
 
-			echo "<input type='button' value ='bestellen' id='bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)' class='cursor' $disabled></input>";
-				
+			echo "<input type='button' value ='bestellen' id='bestellt' onclick='deleteBtnBestellt($bestellung->bestellung_id)' class='cursor' $disabled>";
+			echo "<input type='button' value ='geliefert' id='geliefert' onclick='' class='cursor' $disabled>";	
+			$disabled = ''; 
 			$rechte->getBerechtigungen($user); 
 			if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 			{
@@ -1296,7 +1318,7 @@ if($aktion == 'suche')
 			}
 			if($rechte->isberechtigt('wawi/storno',null, 'suid', $bestellung->kostenstelle_id))
 			{
-				echo "<input type='button' value='stornieren' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' class='cursor' ></input>";
+				echo "<input type='button' value='stornieren' id='storniert' name='storniert' $disabled onclick='deleteBtnStorno($bestellung->bestellung_id)' class='cursor' >";
 			}
 			
 			echo"</td></tr>\n"; 
@@ -1387,7 +1409,7 @@ if($aktion == 'suche')
 					$selected = "selected"; 
 				echo '<option value='.$typ->zahlungstyp_kurzbz.' '.$selected.'>'.$typ->bezeichnung."</option>\n";
 			}
-			echo "</td>\n"; 
+			echo "</select></td>\n"; 
 			echo "<td>Rest-Budget:</td>\n";
 			
 			$restBudget = sprintf('%01.2f',$restBudget); 
@@ -1437,7 +1459,7 @@ if($aktion == 'suche')
 			echo "<td></td>";
 			echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis/Brutto: € </td>";
 			echo "<td id = 'brutto'></td>";
-			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' class='number' value='$test'></input></td>"; 
+			echo "<td><input type='hidden' name='detail_anz' id='detail_anz' class='number' value='$test'></td>"; 
 			echo "</tr>";
 			echo "</tfoot>";
 			echo "</table>\n";
@@ -1516,6 +1538,19 @@ if($aktion == 'suche')
 								document.editForm.storniert.disabled=true; 
 								document.editForm.bestellt.disabled=true;
 								document.editForm.filter_kst.disabled=true; 
+							});	
+				 
+			}
+			
+			 // Status geliefert wird gesetzt
+			function deleteBtnGeliefert(bestellung_id)
+			{
+				$("#btn_bestellt").html(); 
+				$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnGeliefert: "true"},
+							function(data){
+								$("#btn_bestellt").html("Bestellt am: " +data); 
+								document.editForm.filter_kst.disabled=true; 
+								echo (document.editForm.geliefert.disabled); 
 							});	
 				 
 			}
@@ -1797,8 +1832,8 @@ if($aktion == 'suche')
 			$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
 			if($aktBrutto =='')
 				$aktBrutto ="0"; 	
-			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto);' class='cursor'></input>\n"; 
-			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'></input>\n"; 
+			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto);' class='cursor'>\n"; 
+			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'>\n"; 
 			echo "<div style = 'text-align:right;'><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
 			echo "<br><br>"; 
 
@@ -1814,7 +1849,7 @@ if($aktion == 'suche')
 			echo "<br>"; 
 			echo "<div id='aufteilung'>\n";
 			echo "<table border=0 width='75%' class='aufteilung'>"; 
-			echo "<tr>\n"; 
+			echo "<tr><td></td>\n"; 
 			$help = 0; 
 			$anteil = 0;
 			$summe = 0;
@@ -1840,7 +1875,7 @@ if($aktion == 'suche')
 					if($stud->aktiv || $vorhanden)
 					{
 						$summe += $anteil; 
-						echo "<td style='text-align:right;'>".mb_strtoupper($stud->oe_kurzbz).":</td> <td><input type='text' size='6' name='aufteilung_$help' onChange='summe_aufteilung()' id='aufteilung_$help' value='".number_format($anteil, 2, ",",".")."'> % </td><input type='hidden' name='oe_kurzbz_$help' value='$stud->oe_kurzbz'>\n";
+						echo "<td style='text-align:right;'>".mb_strtoupper($stud->oe_kurzbz).":</td> <td><input type='text' size='6' name='aufteilung_$help' onChange='summe_aufteilung()' id='aufteilung_$help' value='".number_format($anteil, 2, ",",".")."'> % <input type='hidden' name='oe_kurzbz_$help' value='$stud->oe_kurzbz'></td>\n";
 						$help++;
 						$anteil = 0;
 					} 
@@ -1864,7 +1899,7 @@ if($aktion == 'suche')
 			echo "</tr></tfoot>"; 
 			echo "</table>";
 			echo "</div>"; 
-			echo "<br><br>";
+			echo "<br><br></form>";
 			
 			echo '
 			<script type="text/javascript">
@@ -1921,24 +1956,17 @@ if($aktion == 'suche')
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 		echo "<td><a href='#' class='down' onClick='verschieben(this);'><img src='../skin/images/arrow-single-down-green.png' class='cursor' ></a></td>\n";
 		echo "<td> <a href='#' class='up' onClick='verschieben(this);'><img src='../skin/images/arrow-single-up-green.png' class='cursor' ></a></td>\n";
-		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' onfocus='$checkSave'></input></td>\n";
-		
-		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus='$checkSave'></input></td>\n";
-		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave></input></td>\n";
-		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='$checkRow' onfocus='$checkSave'></input></td>\n";
-		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus='$checkSave'></input></td>\n";
-		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' oninput='$checkRow' onChange='calcBrutto($i);' onfocus='$checkSave'></input></td>\n";
-		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus='$checkSave' onblur='checkUst($i)'></input></td>\n";
-		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onfocus='$checkSave'></input></td>\n";
+		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' onfocus='$checkSave'></td>\n";
+		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge' onChange='calcBruttoNetto($i);' onfocus='$checkSave'></td>\n";
+		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave></td>\n";
+		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='$checkRow' onfocus='$checkSave'></td>\n";
+		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus='$checkSave'></td>\n";
+		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' oninput='$checkRow' onChange='calcBrutto($i);' onfocus='$checkSave'></td>\n";
+		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus='$checkSave' onblur='checkUst($i)'></td>\n";
+		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onfocus='$checkSave'></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); 
-		/*$style='';
-		if($help== '')
-			$style = "style='display:none'"; 
-		*/
-		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value='$help' ></input></td>"; 
-		
 		echo "	<script type='text/javascript'>
 						$('#detail_tag_'+$i).autocomplete('wawi_autocomplete.php', 
 						{
@@ -1951,9 +1979,10 @@ if($aktion == 'suche')
 						});
 
 					</script>";
-		
-		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
-		echo "<td><input type='hidden' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
+		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value='$help' ></td>"; 
+		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></td>";
+		echo "<td><input type='hidden' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></td>\n";
 		echo "</tr>\n";
+	
 	}
 	
