@@ -177,17 +177,7 @@ class wawi_bestelldetail extends basis_db
 		{
 			$this->errormsg = "Bestellung_id fehlerhaft.";
 			return false;
-		}
-		if(!is_numeric($this->position))
-		{
-			$this->errormsg = "Position fehlerhaft.";
-			return false;
-		}		
-		if(!is_numeric($this->menge))
-		{
-			$this->errormsg = "Menge fehlerhaft.";
-			return false;
-		}
+		}	
 		if(mb_strlen($this->verpackungseinheit)>16)
 		{
 			$this->errormsg ="Verpackungseinheit fehlerhaft.";
