@@ -739,7 +739,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter).".*'";
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter).".*'"; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -756,6 +756,7 @@ class mitarbeiter extends benutzer
 
 				$this->result[] = $obj;
 			}
+			
 			return true;
 		}
 		else
