@@ -1401,7 +1401,7 @@ if($aktion == 'suche')
 			echo "<th></th>\n";
 			echo "<th></th>\n";
 			echo "<th>Pos</th>\n";
-			echo "<th>Sort</th>\n"; 
+		//	echo "<th>Sort</th>\n"; 
 			echo "<th>Menge</th>\n";
 			echo "<th>VE</th>\n";
 			echo "<th>Bezeichnung</th>\n";
@@ -1409,7 +1409,7 @@ if($aktion == 'suche')
 			echo "<th>Preis/VE</th>\n";
 			echo "<th>USt <a href = 'mwst.html' onclick='FensterOeffnen(this.href); return false' title='Hilfe zur USt'> <img src='../skin/images/question.png'> </a></th>\n";
 			echo "<th>Brutto</th>\n";
-			echo "<th><div id='tags_headline' style='display:none'>Tags</div><a id='tags_link'><img src='../skin/images/plus.png' title='Detailtags anzeigen' class ='cursor'> </a></th>";
+			echo "<th><div id='tags_headline' style='display:none'>Tags</div><a id='tags_link' onClick='hideTags();'><img src='../skin/images/plus.png' title='Detailtags anzeigen' class ='cursor'> </a></th>";
 			echo "</tr>\n";
 			echo "<tbody id='detailTable'>";
 			$i= 1; 
@@ -1427,8 +1427,8 @@ if($aktion == 'suche')
 			echo "</tbody>";
 			echo "<tfoot><tr>"; 
 			echo "<td></td>"; 
-			echo "<td></td>";
-			echo "<td></td>";
+			//echo "<td></td>";
+			//echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
 			echo "<td></td>";
@@ -1450,7 +1450,8 @@ if($aktion == 'suche')
 			var uid = "'.$user.'";
 			var focusRow ="1"; 
 	
-			 $("#tags_link").click(function() {
+			
+	        function hideTags() {
 			 i=1; 
 			 while(i<=anzahlRows)
 			 {
@@ -1460,8 +1461,48 @@ if($aktion == 'suche')
 			  $("#tags_headline").toggle();
 			  $("#tags_link").toggle();
 			 return false;
-	        });
-			
+	        }
+	        
+	        function hideTags2() 
+	        {
+				var i=1;
+				var show=false;
+				while(i<=anzahlRows)
+				{
+					if($("#detail_tag_"+i).val()!="")
+					{
+						show=true;
+					}
+					i=i+1;        		
+				}
+				
+				if(show)
+				{
+					var i=1;
+					while(i<=anzahlRows)
+					{
+						
+						$("#detail_tag_"+i).show();
+						i=i+1;        		
+					}
+					$("#tags_headline").hide();
+					$("#tags_link").hide();
+				}
+				else
+				{
+					var i=1;
+					while(i<=anzahlRows)
+					{
+						$("#detail_tag_"+i).hide();
+						i=i+1;
+					}
+					$("#tags_headline").show();
+					$("#tags_link").show();
+				}
+	        }
+	        
+	        
+	        
 	        // Status bestellt wird gesetzt
 			function deleteBtnBestellt(bestellung_id)
 			{
@@ -1626,8 +1667,10 @@ if($aktion == 'suche')
 								var test = 0; 
 								test = document.getElementById("detail_anz").value;
 								document.getElementById("detail_anz").value = parseFloat(test) +1;
+								hideTags2();
 							});
-				}	
+				}		
+				return false;
 			}
 			
 			// speichert eine Bestelldetailzeile
@@ -1685,7 +1728,7 @@ if($aktion == 'suche')
 				restBudget = parseFloat(restBudget);
 				differenz = parseFloat(differenz);
 				aktBrutto = parseFloat(aktBrutto); 
-				differenz = restBudget - bestellungPreis + aktBrutto; 
+				differenz = restBudget - bestellungPreis + aktBrutto;
 				if(differenz < 0)
 				{
 					return confirm("Die Bestellung würde das Budget überziehen. Trotzdem fortfahren?");
@@ -1714,11 +1757,16 @@ if($aktion == 'suche')
 				}
 			}
 			
-			$(document).ready(function(){
-			    $(".up,.down").click(function(){
-			        var row = $(this).parents("tr:first");
+		$(document).ready(function()
+		{
+			hideTags2();
+		});
+		
+			function verschieben(obj)
+			{
+					var row = $(obj).parents("tr:first");
 			                			        
-			        if ($(this).is(".up")) 
+			        if ($(obj).is(".up")) 
 			        {
 			               row.insertBefore(row.prev());
 				    } 
@@ -1738,8 +1786,8 @@ if($aktion == 'suche')
 			        	sort.value=i;
 			        	i++;
 			        }
-			    });
-			});
+			  }
+		
 			</script>';
 			
 			$disabled ='';
@@ -1749,7 +1797,7 @@ if($aktion == 'suche')
 			$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
 			if($aktBrutto =='')
 				$aktBrutto ="0"; 	
-			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto)' class='cursor'></input>\n"; 
+			echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' $disabled onclick='return conf_del_budget($aktBrutto);' class='cursor'></input>\n"; 
 			echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'></input>\n"; 
 			echo "<div style = 'text-align:right;'><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
 			echo "<br><br>"; 
@@ -1858,7 +1906,7 @@ if($aktion == 'suche')
 			{
 				$removeDetail = "removeDetail(".$i.");"; 
 				$checkSave = "checkSave(".$i.");"; 
-				$checkRow = "checkNewRow(".$i.");"; 
+				$checkRow = "setTimeout(\"checkNewRow(".$i.")\",100);"; 
 				$detailDown = "nunter(".$i.");"; 
 				$detailUp = "nauf(".$i.");"; 
 			}
@@ -1871,21 +1919,25 @@ if($aktion == 'suche')
 		//<img src='../skin/images/arrow-single-up-green.png' class='cursor'>
 		echo "<tr id ='row_$i'>\n";
 		echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
-		echo "<td><a href='#' class='down'><img src='../skin/images/arrow-single-down-green.png' class='cursor'></a></td>\n";
-		echo "<td> <a href='#' class='up'><img src='../skin/images/arrow-single-up-green.png' class='cursor'></a></td>\n";
+		echo "<td><a href='#' class='down' onClick='verschieben(this);'><img src='../skin/images/arrow-single-down-green.png' class='cursor' ></a></td>\n";
+		echo "<td> <a href='#' class='up' onClick='verschieben(this);'><img src='../skin/images/arrow-single-up-green.png' class='cursor' ></a></td>\n";
 		echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' onfocus='$checkSave'></input></td>\n";
-		echo "<td><input type='text' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
+		
 		echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge', onChange='calcBruttoNetto($i);' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave></input></td>\n";
 		echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='$checkRow' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus='$checkSave'></input></td>\n";
-		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='$checkRow' onChange='calcBrutto($i);' onfocus='$checkSave'></input></td>\n";
+		echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' oninput='$checkRow' onChange='calcBrutto($i);' onfocus='$checkSave'></input></td>\n";
 		echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus='$checkSave' onblur='checkUst($i)'></input></td>\n";
 		echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onfocus='$checkSave'></input></td>\n";
 		$detail_tag = new tags(); 
 		$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 		$help = $detail_tag->GetStringTags(); 
-		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' style='display:none' value='$help' ></input></td>"; 
+		/*$style='';
+		if($help== '')
+			$style = "style='display:none'"; 
+		*/
+		echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value='$help' ></input></td>"; 
 		
 		echo "	<script type='text/javascript'>
 						$('#detail_tag_'+$i).autocomplete('wawi_autocomplete.php', 
@@ -1901,6 +1953,7 @@ if($aktion == 'suche')
 					</script>";
 		
 		echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></input></td>";
+		echo "<td><input type='hidden' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></input></td>\n";
 		echo "</tr>\n";
 	}
 	
