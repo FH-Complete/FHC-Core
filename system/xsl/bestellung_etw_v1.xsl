@@ -549,12 +549,12 @@
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="10mm" text-align="right">
+				<fo:block font-size="8pt" content-width="10mm" text-align="center">
 					<xsl:value-of select="menge" />
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="7mm">
+				<fo:block font-size="8pt" content-width="7mm" text-align="center">
 					<xsl:value-of select="verpackungseinheit" />
 				</fo:block>
 			</fo:table-cell>

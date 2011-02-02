@@ -32,10 +32,12 @@ require_once('../../include/wawi_kostenstelle.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/tags.class.php');
 require_once('../../include/geschaeftsjahr.class.php');
+require_once('../../include/datum.class.php');
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+$datum_obj = new datum();
 
 $kst_array = $rechte->getKostenstelle();
 
@@ -45,7 +47,7 @@ if(count($kst_array)==0)
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-	<title>WaWi - Tags - Auswertung</title>
+	<title>WaWi - Tags - Bericht</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/wawi.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
@@ -56,20 +58,12 @@ if(count($kst_array)==0)
 	<script type="text/javascript">
  	function alleMarkieren(checked)
  	{
- 	 	inputs = document.getElementsByTagName('input');
-
- 	 	for each(i in inputs)
- 	 	{
- 	 	 	if(i.type=='checkbox')
- 	 	 	{
- 	 	 	 	i.checked=checked;
- 	 	 	}
- 	 	}
+ 	 	checkbox = $(':checkbox').attr('checked',checked);
  	}
 	</script>
 </head>
 <body>
-<h1>Auswertung - Tags</h1>
+<h1>Bericht - Tags</h1>
 <?php
 if(isset($_POST['show']))
 {
@@ -132,7 +126,8 @@ if(isset($_POST['show']))
 	}
 	else
 		die('Fehler bei Datenbankzugriff');
-
+	
+	echo '<span style="font-size: small">Zeitraum: ',$datum_obj->formatDatum($gj->start,'d.m.Y'),' - ',$datum_obj->formatDatum($gj->ende,'d.m.Y').'</span>';
 	echo '<H2>Bestellungen</H2>';
 	draw_tag_table($tags_array, $kst_tags,'bestellung');
 	

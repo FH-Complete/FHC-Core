@@ -139,7 +139,7 @@ if($result=pg_query($conn_wawi, $qry))
 			addBerechtigung($row->username_neu, 'wawi/rechnung', $art, $row->oe_kurzbz, $row->kostenstelle_id);
 			
 			// wawi/firma sui Firmenverwaltung fuer alle freischalten die eine berechtigung im wawi haben
-			addBerechtigung($row->username_neu, 'wawi/firma', 'sui');
+			addBerechtigung($row->username_neu, 'wawi/firma', 'sui', null, null);
 		}
 	}
 	
@@ -189,6 +189,9 @@ if($result=pg_query($conn_wawi, $qry))
 			addBerechtigung($row->username_neu, 'wawi/rechnung', 'suid', 'gst', null);
 			addBerechtigung($row->username_neu, 'wawi/rechnung_transfer', 'suid', 'gst', null);
 			addBerechtigung($row->username_neu, 'wawi/rechnung_freigeben', 'suid', 'gst', null);
+			addBerechtigung($row->username_neu, 'wawi/firma', 'suid', null, null);
+			addBerechtigung($row->username_neu, 'wawi/budget', 'suid', 'gst', null);
+			addBerechtigung($row->username_neu, 'wawi/storno', 'suid', 'gst', null);
 		}
 	}
 	//Mail versenden

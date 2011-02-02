@@ -213,7 +213,7 @@ if($result=pg_query($conn_wawi, $qry))
 						updateamum, updatevon) VALUES("
 						.$db->addslashes($row->r_id).","
 						.$db->addslashes($row->bestellung_id).","
-						."'Zahlung',"
+						."'Rechnung',"
 						.$db->addslashes($row->buchungsdatum).","
 						.$db->addslashes($row->rechnungsnr).","
 						.$db->addslashes($row->rechnungsdatum).","
