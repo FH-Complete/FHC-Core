@@ -273,10 +273,10 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 					// Insert neuen Eintrag	
 					$insert_qry = 	"INSERT INTO 
 									wawi.tbl_kostenstelle
-									(kostenstelle_id, oe_kurzbz, bezeichnung, kurzbz, aktiv, budget, updateamum, updatevon, insertamum, insertvon, ext_id, kostenstelle_nr, deaktiviertvon, deaktiviertamum) 
+									(kostenstelle_id, oe_kurzbz, bezeichnung, kurzbz, aktiv, updateamum, updatevon, insertamum, insertvon, ext_id, kostenstelle_nr, deaktiviertvon, deaktiviertamum) 
 									VALUES (
 									".$db->addslashes($row->kostenstelle_id).",".$db->addslashes($row->oe_kurzbz).",".$db->addslashes($row->kostenbezeichnung).",
-									".$db->addslashes($row->kostenkurzzeichen).", $aktiv, ".$db->addslashes($row->budget).",".$db->addslashes($row->lkostenupdate).",
+									".$db->addslashes($row->kostenkurzzeichen).", $aktiv,".$db->addslashes($row->lkostenupdate).",
 									".$db->addslashes($row->lusername).",".$db->addslashes($row->ckostendate).",".$db->addslashes($row->cusername).",
 									".$db->addslashes($row->kostenstelle_id).",".$db->addslashes($row->kostenstelle_nr).",
 									".$db->addslashes($row->dusername).",".$db->addslashes($row->deletedate).");";
@@ -287,6 +287,20 @@ if($con_wawi = pg_connect(CONN_STRING_WAWI))
 						$errormsg.= "Fehler bei Insert aufgetreten. ID: $row->kostenstelle_id";
 						$error_count++;
 						$insert_count--;
+					}
+					
+					if($row->budget=='')
+					{
+						$row->budget=0;
+					}
+					$gj = 'GJ2010-2011';
+					
+					$qry_budget = "INSERT INTO wawi.tbl_budget(kostenstelle_id, geschaeftsjahr_kurzbz, budget) VALUES('".$row->kostenstelle_id."','".$gj."','".$row->budget."');";
+						
+					if(!$db->db_query($qry_budget))
+					{
+						$error_count++;
+						$errormsg.="Fehler beim Aktualisieren des Budgets:".$qry_budget;
 					}
 				}
 			}

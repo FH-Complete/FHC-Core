@@ -1175,7 +1175,6 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 				bezeichnung varchar(256),
 				kurzbz varchar(32),
 				aktiv boolean NOT NULL,
-				budget numeric(12,2),
 				updateamum timestamp,
 				updatevon varchar(32),
 				insertamum timestamp,
@@ -1361,6 +1360,19 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT, UPDATE, INSERT, DELETE ON wawi.tbl_rechnungsbetrag TO admin;
 			GRANT SELECT, UPDATE ON SEQUENCE wawi.seq_rechnungsbetrag_rechnungsbetrag_id TO admin;
 			
+			CREATE TABLE wawi.tbl_budget
+			(
+				geschaeftsjahr_kurzbz varchar(32) NOT NULL,
+				kostenstelle_id bigint NOT NULL,
+				budget numeric(12,2) NOT NULL
+			);
+			
+			ALTER TABLE wawi.tbl_budget ADD CONSTRAINT pk_budget PRIMARY KEY (geschaeftsjahr_kurzbz, kostenstelle_id);
+		
+			ALTER TABLE wawi.tbl_budget ADD CONSTRAINT fk_budget_kostenstelle FOREIGN KEY(kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE CASCADE ON UPDATE CASCADE;
+						
+			GRANT SELECT, INSERT, DELETE, UPDATE ON wawi.tbl_budget TO admin;
+			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budget TO wawi;
 			-- Projekt Bestellung
 			
 			CREATE TABLE wawi.tbl_projekt_bestellung
@@ -1504,7 +1516,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			NO MINVALUE
 			CACHE 1;
 			
-			CREATE INDEX idx_aufteilung_bestellung_id ON tbl_aufteilung USING btree (bestellung_id); 
+			CREATE INDEX idx_aufteilung_bestellung_id ON wawi.tbl_aufteilung USING btree (bestellung_id); 
 			
 			
 			ALTER TABLE wawi.tbl_aufteilung ADD CONSTRAINT pk_wawi_aufteilung PRIMARY KEY (aufteilung_id);
@@ -1599,14 +1611,17 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			GRANT SELECT ON bis.tbl_nation TO wawi;
 			GRANT USAGE ON SCHEMA bis TO wawi;
 			
+			GRANT USAGE ON SCHEMA campus TO wawi;
+			GRANT SELECT ON campus.vw_mitarbeiter TO wawi;
+			
 			-- INDEX
 			
 			CREATE INDEX idx_bestelldetail_bestellung_id ON wawi.tbl_bestelldetail (bestellung_id);
 			CREATE INDEX idx_bestellung_kostenstelle_id ON wawi.tbl_bestellung (kostenstelle_id);
 			CREATE INDEX idx_bestellung_freigegeben ON wawi.tbl_bestellung (freigegeben);
 			CREATE INDEX idx_rechnungsbetrag_rechnung_id ON wawi.tbl_rechnungsbetrag (rechnung_id);
-			CREATE INDEX idx_rechnung_bestellung_id ON tbl_rechnung (bestellung_id)
-			CREATE INDEX idx_bestellung_bestellstatus_bestellung_id ON tbl_bestellung_bestellstatus (bestellung_id)
+			CREATE INDEX idx_rechnung_bestellung_id ON wawi.tbl_rechnung (bestellung_id);
+			CREATE INDEX idx_bestellung_bestellstatus_bestellung_id ON wawi.tbl_bestellung_bestellstatus (bestellung_id);
 			
 			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Rechnung','Rechnung');
 			INSERT INTO wawi.tbl_rechnungstyp(rechnungstyp_kurzbz, beschreibung) VALUES('Gutschrift','Gutschrift');
@@ -1771,6 +1786,8 @@ if(!@$db->db_query("SELECT 1 FROM public.tbl_geschaeftsjahr LIMIT 1"))
 	GRANT SELECT ON public.tbl_geschaeftsjahr TO web;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_geschaeftsjahr TO vilesci;
 	GRANT SELECT ON public.tbl_geschaeftsjahr TO wawi;
+	
+	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT fk_budget_geschaeftsjahr FOREIGN KEY(geschaeftsjahr_kurzbz) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
 	";
 	
 	if(!$db->db_query($qry))
@@ -1853,34 +1870,6 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 	}
 }
 
-// tbl_budget hinzufuegen
-if(!@$db->db_query("SELECT 1 FROM wawi.tbl_budget LIMIT 1"))
-{
-	$qry = "
-	CREATE TABLE wawi.tbl_budget
-	(
-		geschaeftsjahr_kurzbz varchar(32) NOT NULL,
-		kostenstelle_id bigint NOT NULL,
-		budget numeric(12,2) NOT NULL
-	);
-	
-	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT pk_budget PRIMARY KEY (geschaeftsjahr_kurzbz, kostenstelle_id);
-
-	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT fk_budget_kostenstelle FOREIGN KEY(kostenstelle_id) REFERENCES wawi.tbl_kostenstelle (kostenstelle_id) ON DELETE CASCADE ON UPDATE CASCADE;
-	ALTER TABLE wawi.tbl_budget ADD CONSTRAINT fk_budget_geschaeftsjahr FOREIGN KEY(geschaeftsjahr_kurzbz) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
-	
-	GRANT SELECT, INSERT, DELETE, UPDATE ON wawi.tbl_budget TO admin;
-	GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budget TO wawi;
-	
-	ALTER TABLE wawi.tbl_kostenstelle DROP COLUMN budget;
-	";
-	
-	if(!$db->db_query($qry))
-		echo '<strong>wawi.tbl_budget: '.$db->db_last_error().'</strong><br>';
-	else 
-		echo 'Tabelle wawi.tbl_budget hinzugefuegt!<br>';
-}
-
 // tbl_zahlungstyp hinzufuegen
 if(!@$db->db_query("SELECT 1 FROM wawi.tbl_zahlungstyp LIMIT 1"))
 {
@@ -1896,6 +1885,11 @@ if(!@$db->db_query("SELECT 1 FROM wawi.tbl_zahlungstyp LIMIT 1"))
 	ALTER TABLE wawi.tbl_zahlungstyp ADD CONSTRAINT pk_zahlungstyp PRIMARY KEY (zahlungstyp_kurzbz);
 
 	ALTER TABLE wawi.tbl_bestellung ADD CONSTRAINT fk_bestellung_zahlungstyp FOREIGN KEY(zahlungstyp_kurzbz) REFERENCES wawi.tbl_zahlungstyp (zahlungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	INSERT INTO wawi.tbl_zahlungstyp(zahlungstyp_kurzbz, bezeichnung) VALUES('rechnung','Rechnung');
+	INSERT INTO wawi.tbl_zahlungstyp(zahlungstyp_kurzbz, bezeichnung) VALUES('kreditkarte','Kreditkarte');
+	INSERT INTO wawi.tbl_zahlungstyp(zahlungstyp_kurzbz, bezeichnung) VALUES('vorauszahlung','Vorauszahlung');
+	INSERT INTO wawi.tbl_zahlungstyp(zahlungstyp_kurzbz, bezeichnung) VALUES('nachnahme','Nachnahme');
 	
 	GRANT SELECT, INSERT, DELETE, UPDATE ON wawi.tbl_zahlungstyp TO admin;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_zahlungstyp TO wawi;

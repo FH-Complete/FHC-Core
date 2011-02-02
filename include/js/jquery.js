@@ -1080,11 +1080,23 @@ if(options.matchSubset){for(var i=q.length-1;i>=options.minChars;i--){var c=data
   		},
   		type: "numeric"
   	});
+
+  	ts.addParser({
+  	    id: "dedate",
+  	    is: function(s) {
+  	        return /^\d{1,2}.\d{1,2}.\d{2,4}$/.test(s);
+  	    },
+  	    format: function(s) {
+  	        s = s.replace(/(\d{1,2}).(\d{1,2}).(\d{2,4})/, "$2/$1/$3");
+  			return $.tablesorter.formatFloat(new Date(s).getTime());
+  	    },
+  	  type: "numeric"
+  	});
   	
   	ts.addParser({
   		id: "digitmittausenderpunkt",
   		is: function(s) {
-  			return /^[0-9.,]/.test(s);
+  			return /^[0-9]*[.][0-9]*[,]*[0-9]*$/.test(s);
   		},
   		format: function(s) {
   			return $.tablesorter.formatFloat(s.replace('.',""));
@@ -1199,19 +1211,6 @@ if(options.matchSubset){for(var i=q.length-1;i>=options.minChars;i--){var c=data
   			return $.tablesorter.formatFloat(new Date(s).getTime());
   		},
   		type: "numeric"
-  	});
-
-
-  	ts.addParser({
-  	    id: "dedate",
-  	    is: function(s) {
-  	        return /\d{1,2}.\d{1,2}.\d{2,4}/.test(s);
-  	    },
-  	    format: function(s) {
-  	        s = s.replace(/(\d{1,2}).(\d{1,2}).(\d{2,4})/, "$2/$1/$3");
-  			return $.tablesorter.formatFloat(new Date(s).getTime());
-  	    },
-  	  type: "numeric"
   	});
 
   	ts.addParser({
