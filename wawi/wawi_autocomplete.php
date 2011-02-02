@@ -108,9 +108,10 @@
 				exit();	
 			$sMitarbeiter = new mitarbeiter();
 			$mitarbeiter_all = array(); 
-			$mitarbeiter_all = $sMitarbeiter->getMitarbeiter(null,null,null,$mitarbeiter_search);
-			for ($i=0;$i<count($mitarbeiter_all);$i++)
-				echo html_entity_decode($mitarbeiter_all[$i]->vorname).' '.html_entity_decode($mitarbeiter_all[$i]->nachname).'|'.html_entity_decode($mitarbeiter_all[$i]->uid)."\n";
+			$sMitarbeiter->getMitarbeiterFilter($mitarbeiter_search);
+	
+			for ($i=0;$i<count($sMitarbeiter->result);$i++)
+				echo html_entity_decode($sMitarbeiter->result[$i]->vorname).' '.html_entity_decode($sMitarbeiter->result[$i]->nachname).'|'.html_entity_decode($sMitarbeiter->result[$i]->uid)."\n";
 			break;
 	}
 	exit();
