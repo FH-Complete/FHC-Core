@@ -1188,6 +1188,7 @@ if($aktion == 'suche')
 			$restBudget = $budget - $spentBudget; 
 			$summe= 0; 
 			$konto_vorhanden = false; 
+			$kst_vorhanden =false; 
 			$alert ='';
 			
 			if($restBudget < 0)
@@ -1223,10 +1224,17 @@ if($aktion == 'suche')
 			{
 				$selected = ''; 
 				if($ks->kostenstelle_id == $bestellung->kostenstelle_id)
+				{
 					$selected = 'selected';
+					$kst_vorhanden = true; 
+				}
 				echo "<option value=".$ks->kostenstelle_id." $selected>".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
-			}				
-			echo "</SELECT></td>\n";
+			}	
+			// wenn user nicht auf kst berechtigt ist, trotzdem anzeigen zum freigeben 
+			if(!$kst_vorhanden)	
+				echo "<option value=".$bestellung->kostenstelle_id." selected >".$kostenstelle->bezeichnung."(".mb_strtoupper($kostenstelle->kurzbz).") - ".mb_strtoupper($kostenstelle->oe_kurzbz)."</option>\n";	
+			
+				echo "</SELECT></td>\n";
 			echo "<td>Lieferadresse:</td>\n"; 
 			echo "<td colspan ='2'><Select name='filter_lieferadresse' id='filter_lieferadresse' style='width: 400px;'>\n";
 			
