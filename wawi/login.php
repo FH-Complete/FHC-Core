@@ -44,6 +44,8 @@ if (isset($_POST['username']))
 		else
 			$path = dirname($_SERVER['PHP_SELF']).'/index.php';
 		
+		if(substr($path,0,1)=='/')
+			$path=substr($path,1);
 		//echo 'REDIRECT TO '.SERVER_ROOT.$path;
 		//echo "user: ".$_SESSION['user'];
 		header('Location: '.SERVER_ROOT.$path);
