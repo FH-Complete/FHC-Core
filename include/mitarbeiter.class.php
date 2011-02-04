@@ -765,7 +765,50 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
+	
+	/**
+	 * Sucht die Mitarbeiter deren
+	 * Nachname, Vorname, UID $filter enthaelt
+	 * @param $filter
+	 */
+	public function search($filter)
+	{
+		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
+			FROM campus.vw_mitarbeiter 
+			WHERE 
+				lower(nachname) like lower('%".addslashes($filter)."%')
+				OR lower(uid) like lower('%".addslashes($filter)."%')
+				OR lower(vorname) like lower('%".addslashes($filter)."%')
+				OR lower(vorname || ' ' || nachname) like lower('%".addslashes($filter)."%')
+				OR lower(nachname || ' ' || vorname) like lower('%".addslashes($filter)."%')
+			ORDER BY nachname, vorname";
+		//echo $qry;
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new mitarbeiter();
 
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->vornamen = $row->vornamen;
+
+				$this->result[] = $obj;
+			}
+			
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 	/**
 	 * Liefert die Personen die den Suchkriterien entsprechen
 	 *

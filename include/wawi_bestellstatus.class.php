@@ -153,16 +153,19 @@ class wawi_bestellstatus extends basis_db
  
 		if($oe_kurzbz!='')
 		{
-			$status .= " and oe_kurzbz = ".$this->addslashes($oe_kurzbz); 
+			$status .= " AND oe_kurzbz = ".$this->addslashes($oe_kurzbz); 
 		}
 		if($status_kurzbz!='')
 		{
-			$status.=" and bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz);
+			$status.=" AND bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz);
 		}
 		
-		$qry = "select bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus
-		WHERE 
-		bestellung_id = ".$this->addslashes($bestellung_id).$status.";";
+		$qry = "SELECT bestellstatus.* 
+				FROM wawi.tbl_bestellung_bestellstatus as bestellstatus
+				WHERE 
+					bestellung_id = ".$this->addslashes($bestellung_id).$status."
+				ORDER BY insertamum LIMIT 1;";
+		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
