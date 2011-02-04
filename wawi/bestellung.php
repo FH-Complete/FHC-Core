@@ -159,13 +159,20 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 }
 
 if(isset($_POST['deleteDetail']) && isset($_POST['id']))
-{
-	if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+{	
 	if(is_numeric($_POST['id']))
 	{
-		$detail = new wawi_bestelldetail(); 
+		$detail = new wawi_bestelldetail();
+		$bestellung = new wawi_bestellung();
+		
+		if(!$detail->load($_POST['id']))
+			die('Eintrag wurde nicht gefunden');
+		if(!$bestellung->load($detail->bestellung_id))
+			die('Bestellung konnte nicht geladen werden');
+		
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid', $bestellung->kostenstelle_id))
+			die('Sie haben keine Berechtigung fuer diese Aktion');
+		 
 		$detail->delete($_POST['id']); 
 		exit;
 	}
@@ -177,8 +184,12 @@ if(isset($_POST['deleteDetail']) && isset($_POST['id']))
 
 if(isset($_POST['saveDetail']))
 {
-	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
+	$bestellung = new wawi_bestellung();
+	if(!$bestellung->load($_POST['bestellung']))
+		die('Bestellung konnte nicht geladen werden');
+	
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui', $bestellung->kostenstelle_id))
+		die('Sie haben keine Berechtigung zum Aendern der Daten');
 	
 	$detail = new wawi_bestelldetail(); 
 	$detail->bestellung_id = $_POST['bestellung']; 
@@ -204,8 +215,12 @@ if(isset($_POST['saveDetail']))
 
 if(isset($_POST['updateDetail']))
 {
-	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
+	$bestellung = new wawi_bestellung();
+	if(!$bestellung->load($_POST['bestellung']))
+		die('Bestellung konnte nicht geladen werden');
+	
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui', $bestellung->kostenstelle_id))
+		die('Sie haben keine Berechtigung zum Aendern der Daten');
 		
 	$detail = new wawi_bestelldetail(); 
 	$detail->bestelldetail_id = $_POST['detail_id'];
@@ -231,13 +246,13 @@ if(isset($_POST['updateDetail']))
 
 if(isset($_POST['deleteBtnGeliefert']) && isset($_POST['id']))
 {
-	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
 	$bestellung = new wawi_bestellung();
 	if(!$bestellung->load($_POST['id']))
 		die('Bestellung konnte nicht geladen werden');
-	
+		
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui', $bestellung->kostenstelle_id))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+		
 	$bestellstatus = new wawi_bestellstatus(); 
 	$bestellstatus->bestellung_id = $_POST['id'];
 	$bestellstatus->bestellstatus_kurzbz = 'Lieferung';
@@ -259,13 +274,13 @@ if(isset($_POST['deleteBtnGeliefert']) && isset($_POST['id']))
 }
 
 if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
-{
-	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+{	
 	$bestellung = new wawi_bestellung();
 	if(!$bestellung->load($_POST['id']))
 		die('Bestellung konnte nicht geladen werden');
+		
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui', $bestellung->kostenstelle_id))
+		die('Sie haben keine Berechtigung fuer diese Aktion');	
 	
 	$bestellstatus = new wawi_bestellstatus(); 
 	$bestellstatus->bestellung_id = $_POST['id'];
@@ -289,13 +304,13 @@ if(isset($_POST['deleteBtnBestellt']) && isset($_POST['id']))
 
 if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 {
-	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
-
 	$bestellung = new wawi_bestellung();
 	if(!$bestellung->load($_POST['id']))
 		die('Bestellung konnte nicht geladen werden');
 		
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui', $bestellung->kostenstelle_id))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+				
 	$date = new datum(); 
 	$bestellstatus = new wawi_bestellstatus(); 
 	$bestellstatus->bestellung_id = $_POST['id'];
@@ -809,6 +824,10 @@ if($_GET['method']=='update')
 		$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
 		$status = new wawi_bestellstatus(); 
 			
+		if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui',$bestellung_old->kostenstelle_id)
+		&& !$rechte->isberechtigt('wawi/freigabe',null, 's',$bestellung_old->kostenstelle_id))
+			die('Sie haben keine Berechtigung fuer diese Bestellung');
+		
 		// speichern 
 		if(isset($_POST['btn_abschicken']) || isset($_POST['btn_submit']))
 		{
@@ -1144,12 +1163,17 @@ if($_GET['method']=='update')
 	
 	// Bestellung Editieren
 	$id = (isset($_GET['id'])?$_GET['id']:null);
-
-	//Session setzen damit von der Firmenanlage wieder zurueckgesprungen werden kann
-	$_SESSION['wawi/last_bestellung_id']=$id;
 	
 	$bestellung = new wawi_bestellung(); 
-	$bestellung->load($id); 
+	$bestellung->load($id);
+	 
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 's',$bestellung->kostenstelle_id)
+	&& !$rechte->isberechtigt('wawi/freigabe',null, 's',$bestellung->kostenstelle_id))
+			die('Sie haben keine Berechtigung fuer diese Bestellung <a href="javascript:history.back()">Zurück</a>');
+			
+	//Session setzen damit von der Firmenanlage wieder zurueckgesprungen werden kann
+	$_SESSION['wawi/last_bestellung_id']=$id;
+			
 	$detail = new wawi_bestelldetail(); 
 	$detail->getAllDetailsFromBestellung($id);
 	$anz_detail =  count($detail->result); 
@@ -1583,11 +1607,17 @@ if($_GET['method']=='update')
 			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnBestellt: "true"},
 						function(data){
 					
-
-							$("#btn_bestellt").html("Bestellt am: " +data); 
-							document.editForm.storniert.disabled=true; 
-							document.editForm.bestellt.disabled=true;
-							document.editForm.filter_kst.disabled=true; 
+							if(data.length>10)
+							{
+								alert(data);
+							}
+							else
+							{
+								$("#btn_bestellt").html("Bestellt am: " +data); 
+								document.editForm.storniert.disabled=true; 
+								document.editForm.bestellt.disabled=true;
+								document.editForm.filter_kst.disabled=true; 
+							}
 						});	
 			 
 		}
@@ -1598,8 +1628,15 @@ if($_GET['method']=='update')
 			$("#btn_bestellt").html(); 
 			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnGeliefert: "true"},
 						function(data){
-							$("#btn_bestellt").html("Geliefert am: " +data); 
-							document.editForm.geliefert.disabled=true;
+							if(data.length>10)
+							{
+								alert(data);
+							}
+							else
+							{
+								$("#btn_bestellt").html("Geliefert am: " +data); 
+								document.editForm.geliefert.disabled=true;
+							}
 						});	
 			 
 		}
@@ -1611,12 +1648,19 @@ if($_GET['method']=='update')
 			
 			$.post("bestellung.php", {id: bestellung_id, user_id: uid,  deleteBtnStorno: "true"},
 						function(data){
-						$("#btn_bestellt").html("Storniert am: " +data); 
-						document.editForm.btn_submit.disabled=true; 
-						document.editForm.btn_abschicken.disabled=true;
-						document.editForm.storniert.disabled=true
-						document.editForm.bestellt.disabled=true
-						document.editForm.filter_kst.disabled=true;
+							if(data.length>10)
+							{
+								alert(data);
+							}
+							else
+							{
+								$("#btn_bestellt").html("Storniert am: " +data); 
+								document.editForm.btn_submit.disabled=true; 
+								document.editForm.btn_abschicken.disabled=true;
+								document.editForm.storniert.disabled=true
+								document.editForm.bestellt.disabled=true
+								document.editForm.filter_kst.disabled=true;
+							}
 						});
 		}
 		
@@ -1778,6 +1822,10 @@ if($_GET['method']=='update')
 			{ 
 					$.post("bestellung.php", {pos: pos, menge: menge, ve: ve, beschreibung: beschreibung, artikelnr: artikelnr, preis: preis, mwst: mwst, brutto: brutto, bestellung: bestellung_id, detail_id: detailid, sort: sort, updateDetail: "true"},
 					function(data){ 
+						if(isNaN(data))
+						{
+							alert("Fehler:"+data);
+						}
 					});  
 			}
 			else
@@ -1788,6 +1836,10 @@ if($_GET['method']=='update')
 						{
 							document.getElementById("bestelldetailid_"+i).value = data;
 						}
+						else
+						{
+							alert("Fehler:"+data);
+						}
 					});  
 			}
 		}
@@ -1796,9 +1848,15 @@ if($_GET['method']=='update')
 		function removeDetail(i)
 		{
 			var detail_id= $("#bestelldetailid_"+i).val();
-			$("#row_"+i).remove();
+			
 			$.post("bestellung.php", {id: detail_id, deleteDetail: "true"},
 			function(data){
+				if(data=="")
+				{
+					$("#row_"+i).remove();
+				}
+				else
+					alert(data);
 			}); 
 			summe(); 
 		}
