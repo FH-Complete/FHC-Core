@@ -1505,19 +1505,30 @@ if($_GET['method']=='update')
 	
 	$test = $i; 
 	echo "</tbody>";
-	echo "<tfoot><tr>"; 
+	echo "<tfoot>";
+	echo "<tr>"; 
 	echo "<td></td>"; 
-	//echo "<td></td>";
-	//echo "<td></td>";
 	echo "<td></td>";
 	echo "<td></td>";
 	echo "<td></td>";
 	echo "<td></td>";
 	echo "<td></td>";
 	echo "<td></td>";
-	echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis/Brutto: € </td>";
-	echo "<td id='brutto' class='number'></td>";
-	echo "<td><input type='hidden' name='detail_anz' id='detail_anz' class='number' value='$test'></td>"; 
+	echo "<td><input type='hidden' name='detail_anz' id='detail_anz' class='number' value='$test'></td>";
+	echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis Netto:</td>";
+	echo "<td class='number'><span id='netto'></span> &euro;</td>";
+	echo "</tr>";
+	echo "<tr>"; 
+	echo "<td></td>"; 
+	echo "<td></td>";
+	echo "<td></td>";
+	echo "<td></td>";
+	echo "<td></td>";
+	echo "<td></td>";
+	echo "<td></td>";
+	echo "<td></td>";
+	echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis Brutto:</td>";
+	echo "<td class='number'><span id='brutto'></span> &euro;</td>";
 	echo "</tr>";
 	echo "</tfoot>";
 	echo "</table>\n";
@@ -1754,7 +1765,7 @@ if($_GET['method']=='update')
 						menge = parseFloat(menge);
 						betrag = parseFloat(betrag);
 						mwst = parseFloat(mwst);
-						netto = netto + betrag;
+						netto = netto + betrag*menge;
 						brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
 					}
 				}
@@ -1762,6 +1773,7 @@ if($_GET['method']=='update')
 			}
 			netto = Math.round(netto*100)/100;
 			brutto = Math.round(brutto*100)/100;
+			netto = netto.toFixed(2);
 			brutto = brutto.toFixed(2);
 			$("#netto").html(netto);
 			$("#brutto").html(brutto);
@@ -2078,7 +2090,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	echo "<td> <a href='#' class='up' onClick='verschieben(this);'><img src='../skin/images/arrow-single-up-green.png' class='cursor' ></a></td>\n";
 	echo "<td><input type='text' size='2' name='pos_$i' id='pos_$i' maxlength='2' value='$pos' onfocus='$checkSave'></td>\n";
 	echo "<td><input type='text' size='5' class='number' name='menge_$i' id='menge_$i' maxlength='7' value='$menge' onChange='calcBruttoNetto($i);' onfocus='$checkSave'></td>\n";
-	echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus=$checkSave></td>\n";
+	echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus='$checkSave'></td>\n";
 	echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='$checkRow' onfocus='$checkSave'></td>\n";
 	echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus='$checkSave'></td>\n";
 	echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' oninput='$checkRow' onChange='calcBrutto($i);' onfocus='$checkSave'></td>\n";
