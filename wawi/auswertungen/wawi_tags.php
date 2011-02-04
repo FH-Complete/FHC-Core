@@ -39,7 +39,10 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $datum_obj = new datum();
 
-$kst_array = $rechte->getKostenstelle();
+$kst_array = $rechte->getKostenstelle('wawi/bestellung');
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/rechnung'));
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/kostenstelle'));
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/freigabe'));
 
 if(count($kst_array)==0)
 	die('Sie benoetigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
@@ -177,6 +180,7 @@ if(isset($_POST['show']))
 else
 {
 	$kostenstelle = new wawi_kostenstelle();
+	
 	$kostenstelle->loadArray($kst_array);
 	echo 'Bitte markieren sie die Kostenstellen die auf der Auswertung aufscheinen sollen:<br /><br />
 	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">

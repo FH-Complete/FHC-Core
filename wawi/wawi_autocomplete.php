@@ -40,10 +40,7 @@
 	$rechte = new benutzerberechtigung();
 	if(!$rechte->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung fuer diese Seite');
-		
-	if(!$rechte->isBerechtigt('wawi/inventar:begrenzt', null, 's'))
-		die('Sie haben keine Berechtigung fuer diese Seite');
-
+	
 // ------------------------------------------------------------------------------------------
 // Initialisierung
 // ------------------------------------------------------------------------------------------
