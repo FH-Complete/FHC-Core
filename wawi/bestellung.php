@@ -388,7 +388,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	{ 
 	    $("#myTable").tablesorter(
 		{
-			sortList: [[1,0]],
+			sortList: [[4,1]],
 			widgets: ['zebra']
 		}); 
 
