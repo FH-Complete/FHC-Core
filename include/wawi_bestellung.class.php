@@ -174,8 +174,11 @@ class wawi_bestellung extends basis_db
 	 * @param $konto_id
 	 * @param $mitarbeiter_uid
 	 * @param $rechnung
+	 * @param $filter_firma
+	 * @param $kostenstelle_id
+	 * @param $tag
 	 */
-	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null)
+	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null, $tag=null)
 	{
 		$first = true; 
 		$qry = "SELECT distinct on (bestellung.bestellung_id) *, bestellung.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
@@ -225,7 +228,12 @@ class wawi_bestellung extends basis_db
 		
 		if($kostenstelle_id!='')
 			$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
-
+			
+		if($tag!='')
+			$qry.= ' AND (EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
+						OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
+						)';
+		
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";

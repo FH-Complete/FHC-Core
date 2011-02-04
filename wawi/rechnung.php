@@ -40,7 +40,7 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 {
 	if(is_numeric($_POST['id']))
 	{
-		echo getBetragRow($_POST['id']);
+		echo getBetragRow($_POST['id'], null, null, null, '20');
 		exit;
 	}
 	else
@@ -140,7 +140,7 @@ if($aktion == 'suche')
 	if(!$rechte->isBerechtigt('wawi/rechnung',null,'s'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 	
-	if(!isset($_POST['submit']))
+	if(!isset($_REQUEST['submit']))
 	{
 		// Suchmaske anzeigen
 		$oe = new organisationseinheit(); 
@@ -246,21 +246,24 @@ if($aktion == 'suche')
 	else
 	{		
 		// Suchergebnisse anzeigen
-		$rechnungsnr = $_POST['rechnungsnr'];
-		$bestellnummer = $_POST['bestellnummer'];
-		$rechnungsdatum_von = $_POST['rechnungsdatum_von'];
-		$rechnungsdatum_bis = $_POST['rechnungsdatum_bis'];
-		$buchungsdatum_von = $_POST['buchungsdatum_von'];
-		$buchungsdatum_bis = $_POST['buchungsdatum_bis'];
-		$erstelldatum_von = $_POST['erstelldatum_von'];
-		$erstelldatum_bis = $_POST['erstelldatum_bis'];
-		$bestelldatum_von = $_POST['bestelldatum_von'];
-		$bestelldatum_bis = $_POST['bestelldatum_bis'];
-		$firma_id = $_POST['firma_id'];
-		$oe_kurzbz = $_POST['filter_oe_kurzbz'];
-		$filter_konto = $_POST['filter_konto'];
-		$filter_kostenstelle = $_POST['filter_kostenstelle'];
-		$filter_betrag = mb_str_replace(',','.',$_POST['filter_betrag']);
+		$rechnungsnr = (isset($_REQUEST['rechnungsnr'])?$_REQUEST['rechnungsnr']:'');
+		$bestellnummer = (isset($_REQUEST['bestellnummer'])?$_REQUEST['bestellnummer']:'');
+		$rechnungsdatum_von = (isset($_REQUEST['rechnungsdatum_von'])?$_REQUEST['rechnungsdatum_von']:'');
+		$rechnungsdatum_bis = (isset($_REQUEST['rechnungsdatum_bis'])?$_REQUEST['rechnungsdatum_bis']:'');
+		$buchungsdatum_von = (isset($_REQUEST['buchungsdatum_von'])?$_REQUEST['buchungsdatum_von']:'');
+		$buchungsdatum_bis = (isset($_REQUEST['buchungsdatum_bis'])?$_REQUEST['buchungsdatum_bis']:'');
+		$erstelldatum_von = (isset($_REQUEST['erstelldatum_von'])?$_REQUEST['erstelldatum_von']:'');
+		$erstelldatum_bis = (isset($_REQUEST['erstelldatum_bis'])?$_REQUEST['erstelldatum_bis']:'');
+		$bestelldatum_von = (isset($_REQUEST['bestelldatum_von'])?$_REQUEST['bestelldatum_von']:'');
+		$bestelldatum_bis = (isset($_REQUEST['bestelldatum_bis'])?$_REQUEST['bestelldatum_bis']:'');
+		$firma_id = (isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
+		$oe_kurzbz = (isset($_REQUEST['filter_oe_kurzbz'])?$_REQUEST['filter_oe_kurzbz']:'');
+		$filter_konto = (isset($_REQUEST['filter_konto'])?$_REQUEST['filter_konto']:'');
+		$filter_kostenstelle = (isset($_REQUEST['filter_kostenstelle'])?$_REQUEST['filter_kostenstelle']:'');
+		if(isset($_REQUEST['filter_betrag']))
+			$filter_betrag = mb_str_replace(',','.',$_REQUEST['filter_betrag']);
+		else
+			$filter_betrag='';
 		
 		$rechnung = new wawi_rechnung();
 		
@@ -402,6 +405,14 @@ elseif($aktion == 'save')
 			//Update
 			if(!$rechnung->load($rechnung_id))
 				die('Rechnung wurde nicht gefunden');
+				
+			if($rechnung->rechnungstyp_kurzbz!=$rechnungstyp_kurzbz)
+			{
+				if($rechnungstyp_kurzbz=='Gutschrift')
+					$rechnung->freigegeben = false;
+				else 
+					$rechnung->freigegeben = true;
+			}
 		}
 		else
 		{
@@ -409,7 +420,10 @@ elseif($aktion == 'save')
 			$rechnung->new = true;
 			$rechnung->insertamum = date('Y-m-d');
 			$rechnung->insertvon = $user;
-			$rechnung->freigegeben = false;
+			if($rechnungstyp_kurzbz!='Gutschrift')
+				$rechnung->freigegeben = true;
+			else
+				$rechnung->freigegeben = false;
 		}	
 		$rechnung->rechnungsnr = $rechnungsnummer;
 		$rechnung->buchungstext = $buchungstext;
@@ -419,7 +433,7 @@ elseif($aktion == 'save')
 		$rechnung->updateamum = date('Y-m-d H:i:s');
 		$rechnung->updatevon = $user;
 		$rechnung->rechnungstyp_kurzbz = $rechnungstyp_kurzbz;
-		
+
 		if(isset($_POST['transfer_datum']) && $rechte->isBerechtigt('wawi/rechnung_transfer', null, 'suid'))
 			$rechnung->transfer_datum = $date->formatDatum($_POST['transfer_datum']);
 		
@@ -433,7 +447,7 @@ elseif($aktion == 'save')
 				$rb = new wawi_rechnung();
 				
 				//Leere Zeilen werden geloescht
-				if($row['betrag']=='' && $row['mwst']=='' && $row['bezeichnung']=='')
+				if($row['betrag']=='' && $row['bezeichnung']=='')
 				{
 					$rb->delete_betrag($row['id']);
 				}
@@ -518,10 +532,10 @@ if($aktion=='update')
 			die('Die Rechnung bzw Bestellung ist keiner gueltigen Kostenstelle zugeordnet');
 		
 		if(!$konto->load($bestellung->konto_id))
-			die('Die Rechnung bzw Bestellung ist keim gueltigen Konto zugeordnet');
+			echo 'Die Rechnung bzw Bestellung ist keinem gueltigen Konto zugeordnet!';
 			
 		if(!$firma->load($bestellung->firma_id))
-			die('Die Rechnung bzw Bestellung ist keiner gueltigen Firma zugeordnet');
+			echo 'Die Rechnung bzw Bestellung ist keiner gueltigen Firma zugeordnet!';
 		$kostenstelle_id=$bestellung->kostenstelle_id;
 		
 		echo '<table>
@@ -699,7 +713,7 @@ if($aktion=='update')
 	}
 	
 	//Unten eine Leere Zeile hinzufuegen
-	echo getBetragRow($i);
+	echo getBetragRow($i, null, null, null, '20');
 	
 	echo '
 			</tbody>
@@ -877,13 +891,13 @@ function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $
 					<input type="hidden" name="rechnungsbetrag_id_'.$i.'" value="'.$rechnungsbetrag_id.'">
 					<input type="text" name="bezeichnung_'.$i.'" value="'.$bezeichnung.'">
 				</td>
-				<td>
+				<td nowrap>
 					<input class="number" type="text" size="12" maxlength="12" id="betrag_'.$i.'" name="betrag_'.$i.'" value="'.$betrag.'"  onblur="checkNewRow('.$i.')" onchange="brutto('.$i.'); summe()"> &euro; 
 				</td>
-				<td>
+				<td nowrap>
 					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="bruttonetto('.$i.'); summe(); "> %
 				</td>
-				<td>
+				<td nowrap>
 					<input class="number" type="text" size="12" maxlength="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.($betrag*(100+$mwst)/100).'" onchange="netto('.$i.'); summe();"> &euro;
 				</td>
 			</tr>';

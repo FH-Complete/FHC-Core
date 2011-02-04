@@ -165,10 +165,19 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			<td>'.$resultBetriebsmittel[$pos]->ort_kurzbz.'&nbsp;</td>
 			';
 
-		$htmlstring.='<td align="right"><a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank">'.$resultBetriebsmittel[$pos]->bestellnr.'&nbsp;</a></td>';
+		$htmlstring.='<td align="right">';
+		if($resultBetriebsmittel[$pos]->bestellnr!='')
+		{
+			$htmlstring.='<a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank">'.$resultBetriebsmittel[$pos]->bestellnr.'&nbsp;</a>';
+			$htmlstring.='<a href="../../wawi/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank"><img src="../../skin/images/Calculator.png" /></a>';
+		}		
+		$htmlstring.='</td>';
 		
 		$htmlstring.='
 			<td align="right">';
+		
+		//Wenn Verbindung zu einem Bestelldetail vorhanden ist, wird der Bruttobetrag des Details
+		//in der Liste angezeigt
 		if($resultBetriebsmittel[$pos]->bestelldetail_id!='')
 		{
 			$bestelldetail = new wawi_bestelldetail();
@@ -191,8 +200,8 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		$htmlstring.='
 		</tr>
 		';
-	if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
-		$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;"><td colspan="12" class="error">Achtung! Bestellung nicht mehr vorhanden!</td></tr>';
+		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
+			$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;"><td colspan="12" class="error">Achtung! Bestellung nicht mehr vorhanden! ID: '.$resultBetriebsmittel[$pos]->bestellung_id.' NR:'.$resultBetriebsmittel[$pos]->bestellnr.'</td></tr>';
 	}
 	$htmlstring.='</table>';
 	return 	$htmlstring;

@@ -292,9 +292,13 @@ if(isset($_POST['save']))
 	else
 	{
 		$db->db_query('COMMIT;');
-		echo 'Die Firma wurde erfolgreich gespeichert';
+		echo 'Die Firma wurde erfolgreich gespeichert!';
+		
+		if(isset($_SESSION['wawi/last_bestellung_id']))
+			echo '<br><a href="bestellung.php?method=update&id=',$_SESSION['wawi/last_bestellung_id'],'">Zur&uuml;ck zur letzten Bestellung</a>';
+		
 		$method='update';
-		$id=$firma_id;
+		$id=$firma->firma_id;
 	}	
 }
 
