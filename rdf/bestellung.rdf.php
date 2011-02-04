@@ -65,23 +65,31 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$lieferadresse->load($bestellung->lieferadresse);
 		
 		$firma = new firma();
-		$firma->load($bestellung->firma_id);
-		$kundennummer = $firma->get_kundennummer($bestellung->firma_id, $kostenstelle->oe_kurzbz);
-	
 		$standort = new standort();
-		$standort->load_firma($firma->firma_id);
-		if(isset($standort->result[0]))
-			$standort = $standort->result[0];
-			
 		$empfaengeradresse = new adresse();
-		$empfaengeradresse->load($standort->adresse_id);
-		$kontakt = new kontakt();
-		$kontakt->loadFirmaKontakttyp($standort->standort_id, 'telefon');
-		$telefon = $kontakt->kontakt;
-		$kontakt = new kontakt();
-		$kontakt->loadFirmaKontakttyp($standort->standort_id, 'fax');
-		$fax = $kontakt->kontakt;
-
+		if($bestellung->firma_id!='')
+		{
+			$firma->load($bestellung->firma_id);
+			$kundennummer = $firma->get_kundennummer($bestellung->firma_id, $kostenstelle->oe_kurzbz);
+			
+			$standort->load_firma($firma->firma_id);
+			if(isset($standort->result[0]))
+				$standort = $standort->result[0];
+					
+			$empfaengeradresse->load($standort->adresse_id);
+			$kontakt = new kontakt();
+			$kontakt->loadFirmaKontakttyp($standort->standort_id, 'telefon');
+			$telefon = $kontakt->kontakt;
+			$kontakt = new kontakt();
+			$kontakt->loadFirmaKontakttyp($standort->standort_id, 'fax');
+			$fax = $kontakt->kontakt;
+		}
+		else
+		{
+			$telefon='';
+			$fax='';
+			$kundennummer='';
+		}
 		$datum_obj = new datum();
 		
 		header("Content-type: application/xhtml+xml");

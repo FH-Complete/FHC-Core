@@ -193,7 +193,7 @@ $menu=array
 		'Inventar'=>	array
 		(
 			'name'=>'Inventar', 'permissions'=>array('admin','wawi','support','wawi/inventar'),		
-			'Neu'=>array('name'=>'Neu', 'link'=>'inventar/inventar_pflege.php', 'target'=>'main'),
+			'Neu'=>array('name'=>'Neu', 'link'=>'inventar/inventar_pflege.php?vorlage=false', 'target'=>'main'),
 			'Suche'=>array('name'=>'Suche', 'link'=>'inventar/inventar.php', 'target'=>'main'),
 			'AfA'=>array('name'=>'AfA', 'link'=>'inventar/inventar_afa.php', 'target'=>'main'),
 			'Inventur'=>array('name'=>'Inventur', 'link'=>'inventar/inventar_inventur.php', 'target'=>'main'),

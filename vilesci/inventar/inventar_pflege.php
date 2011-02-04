@@ -355,6 +355,20 @@
 					item.value=item.value.substring(0,item.value.length-1);
 				}
 			}
+
+			function SubmitOhneVorlage()
+			{
+				first = document.getElementById('bestellung_id_array0')
+				document.getElementById('bestellung_id').value=first.value;
+				document.sendform.submit();
+			}
+			
+			function SubmitOhneVorlageDetail()
+			{
+				first = document.getElementById('bestelldetail_id_array0')
+				document.getElementById('bestelldetail_id').value=first.value;
+				document.sendform.submit();
+			}
 		</script>
 	</head>
 	<body>
@@ -947,7 +961,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 								<table class="navbar">
 										<tr>
 											<td>&nbsp;<label for="bestellung_id_array<?php echo $pos; ?>">Bestellung ID</label>&nbsp;
-												<input id="bestellung_id_array<?php echo $pos; ?>" name="bestellung_id_array[]" size="10" maxlength="41" value="<?php echo $bestellung_id_array[$pos]; ?>">
+												<input id="bestellung_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlage()',1300);}\"":""); ?> name="bestellung_id_array[]" size="10" maxlength="41" value="<?php echo $bestellung_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
 													$(document).ready(function() 
 													{
@@ -965,7 +979,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 												</script>
 											</td>
 											<td>&nbsp;<label for="bestelldetail_id_array<?php echo $pos; ?>">Bestelldetail ID</label>&nbsp;
-												<input id="bestelldetail_id_array<?php echo $pos; ?>" name="bestelldetail_id_array[]" size="6" maxlength="41" value="<?php echo $bestelldetail_id_array[$pos]; ?>">
+												<input id="bestelldetail_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlageDetail()',1300);}\"":""); ?> name="bestelldetail_id_array[]" size="6" maxlength="41" value="<?php echo $bestelldetail_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
 													$(document).ready(function() 
 													{

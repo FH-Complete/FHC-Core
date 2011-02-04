@@ -284,7 +284,7 @@ function draw_tag_table($tags_array, $kst_tags, $table_id)
 		{
 			if(isset($tags_value[$tags]))
 			{
-				echo '<td class="number">',number_format($tags_value[$tags],2,',','.'),'</td>';
+				echo '<td class="number"><a href="../bestellung.php?method=suche&submit=1&filter_tag=',$tags,'&filter_kostenstelle=',$kst,'">',number_format($tags_value[$tags],2,',','.'),'</a></td>';
 				//Kostenstellensumme berechnen
 				$kst_summe += $tags_value[$tags];
 				

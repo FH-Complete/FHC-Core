@@ -29,7 +29,7 @@ class wawi_rechnung extends basis_db
 {
 	public $rechnung_id; 		// serial
 	public $bestellung_id;		// int
-	public $rechnungstyp_kurzbz='Zahlung';// varchar
+	public $rechnungstyp_kurzbz='Rechnung';// varchar
 	public $buchungsdatum;		// date
 	public $rechnungsnr;		// varchar
 	public $rechnungsdatum;		// date
