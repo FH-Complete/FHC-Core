@@ -100,18 +100,16 @@
 			for ($i=0;$i<count($tags->result);$i++)
 				echo html_entity_decode($tags->result[$i]->tag)."\n";
 			break;
-			
-			// Mitarbeiter Search
+		
 		case 'wawi_mitarbeiter_search':
-		 	$mitarbeiter_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($mitarbeiter_search) ||$mitarbeiter_search=='')
+		 	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			if (is_null($search) ||$search=='')
 				exit();	
-			$sMitarbeiter = new mitarbeiter();
-			$mitarbeiter_all = array(); 
-			$sMitarbeiter->getMitarbeiterFilter($mitarbeiter_search);
+			$ma = new mitarbeiter();
+			$ma->search($search);
 	
-			for ($i=0;$i<count($sMitarbeiter->result);$i++)
-				echo html_entity_decode($sMitarbeiter->result[$i]->vorname).' '.html_entity_decode($sMitarbeiter->result[$i]->nachname).'|'.html_entity_decode($sMitarbeiter->result[$i]->uid)."\n";
+			foreach($ma->result as $row)
+				echo html_entity_decode($row->vorname).' '.html_entity_decode($row->nachname).'|'.html_entity_decode($row->uid)."\n";
 			break;
 	}
 	exit();

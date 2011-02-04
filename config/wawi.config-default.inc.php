@@ -39,6 +39,8 @@
 	define('MAIL_LVPLAN','info@technikum-wien.at');
 	define('MAIL_IT','info@technikum-wien.at');
 	define('MAIL_SUPPORT','info@technikum-wien.at');
+	
+	define('MAIL_ZENTRALEINKAUF','info@technikum-wien.at');
 
 	//Gibt an welche Funktion zur generierung des PDF Files herangezogen wird
 	//moegliche Werte: FOP | XSLFO2PDF

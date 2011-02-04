@@ -59,7 +59,7 @@ $menu=array
 		),
 		'Personensuche'=>array
 		(
-			'name'=>'Personensuche', 'link'=>'https://cis.technikum-wien.at/cis/private/tools/psearch.php', 'target'=>'content',
+			'name'=>'Personensuche', 'link'=>'https://cis.technikum-wien.at/cis/private/tools/psearch.php', 'target'=>'_blank',
 		),
 		'Firma'=>array
 		(
