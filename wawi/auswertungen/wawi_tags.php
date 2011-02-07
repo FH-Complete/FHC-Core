@@ -44,6 +44,8 @@ $kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/rechnung'));
 $kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/kostenstelle'));
 $kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/freigabe'));
 
+$kst_array = array_unique($kst_array);
+
 if(count($kst_array)==0)
 	die('Sie benoetigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
 ?>
@@ -199,7 +201,7 @@ else
 		}
 		echo '<tr>
 				<td><input type="checkbox" name="kst[]" value="'.$kst->kostenstelle_id.'"></td>
-				<td nowrap>'.$kst->bezeichnung.'</td>
+				<td nowrap>'.$kst->bezeichnung.' </td>
 			</tr>';
 		$anzahl++;
 	}
