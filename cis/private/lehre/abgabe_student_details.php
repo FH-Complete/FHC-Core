@@ -160,6 +160,10 @@ if($command=='add')
 	{
 		$error=true;
 	}
+	if(mb_strlen($kontrollschlagwoerter)>=150)
+	{
+		$kontrollschlagwoerter = mb_substr($kontrollschlagwoerter, 0, 146).'...';
+	}
 	if(strlen($abstract)<1)
 	{
 		$error=true;
@@ -184,6 +188,7 @@ if($command=='add')
 				abstract = '".addslashes($abstract)."', 
 				abstract_en = '".addslashes($abstract_en)."' 
 				WHERE projektarbeit_id = '".addslashes($projektarbeit_id)."'";
+		
 		if($result=$db->db_query($qry_upd))
 		{
 			$qry="UPDATE campus.tbl_paabgabe SET
