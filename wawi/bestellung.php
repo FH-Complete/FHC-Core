@@ -1031,8 +1031,10 @@ if($_GET['method']=='update')
 		// kostenstelle gibt frei
 		if(isset($_POST['btn_freigabe']) )
 		{
+			echo "drinnen";
 			if(!isset($_POST['freigabe_oe']))
 			{
+				echo "zwei";
 				// Kostenstelle gibt frei
 				// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
 				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
@@ -1216,7 +1218,7 @@ if($_GET['method']=='update')
 	$besteller_nachname=$besteller->nachname;
 	
 	if($restBudget < 0)
-		$ausgabemsg.='<span class="error">Ihr aktuelles Budget ist bereits überzogen.</a>';
+		$ausgabemsg.='<span class="error">Ihr aktuelles Budget ist bereits überzogen.</span>';
 	
 	//Meldungen Ausgeben
 	echo '<div style="float: right">',$ausgabemsg,'</div>';
@@ -1417,7 +1419,7 @@ if($_GET['method']=='update')
 			if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
 				$disabled = '';
 
-			echo "<input type='submit' value='KST Freigabe' name ='btn_freigabe' $disabled>"; 
+			echo "<input type='submit' value='KST Freigabe' ".($disabled==''?"name ='btn_freigabe'":$disabled).">"; 
 		}
 	}
 		
@@ -1447,11 +1449,11 @@ if($_GET['method']=='update')
 				echo "<span title='$status->insertvon'>".$o.":".$date->formatDatum($status->datum,'d.m.Y')." </span>"; 
 			}
 		}
-		if($freigabe == false)
+		/*if($freigabe == false)
 		{
 			if(!$bestellung->isFreigegeben($bestellung->bestellung_id))
 				$bestellung->SetFreigegeben($bestellung->bestellung_id); 
-		}
+		}*/
 	}
 
 	echo "</td></tr>";
@@ -1883,11 +1885,12 @@ if($_GET['method']=='update')
 			differenz = parseFloat(differenz);
 			aktBrutto = parseFloat(aktBrutto); 
 			differenz = restBudget - bestellungPreis + aktBrutto;
-			if(differenz < 0)
+			
+			if(differenz < 0 && !confirm("Die Bestellung würde das Budget überziehen. Trotzdem fortfahren?"))
 			{
-				return confirm("Die Bestellung würde das Budget überziehen. Trotzdem fortfahren?");
+				return false;
 			}
-			FelderSperren(false);
+			FelderSperren(false);			
 		}
 		
 		// ändert sich der fokus der Bestelldetailzeile -> speichern der geänderten
