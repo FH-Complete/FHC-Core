@@ -119,7 +119,7 @@ class wawi_konto extends basis_db
 	 * @param $order Sortierreihenfolge
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll($aktiv=null, $order='beschreibung DESC')
+	public function getAll($aktiv=null, $order='beschreibung ASC')
 	{
 		$qry_beschreibung = $this->getBezeichnungString('select');
 		$qry = "SELECT *, $qry_beschreibung FROM wawi.tbl_konto";
@@ -433,7 +433,7 @@ class wawi_konto extends basis_db
 		
 			$qry = 'select konto.*, '.$qry_beschreibung.' 
 			from wawi.tbl_konto konto, wawi.tbl_konto_kostenstelle kst 
-			where kst.konto_id = konto.konto_id and kst.kostenstelle_id ='.$kostenstelle_id.' ORDER by konto.beschreibung;';
+			where kst.konto_id = konto.konto_id and kst.kostenstelle_id ='.$kostenstelle_id.' ORDER by konto.beschreibung ASC;';
 			
 			if(!$this->db_query($qry))
 			{
@@ -484,13 +484,13 @@ class wawi_konto extends basis_db
 		$qry_beschreibung = $this->getBezeichnungString('select');
 	
 	
-		$qry = 'select konto.*, '.$qry_beschreibung.' 
+		$qry = 'select distinct konto.*, '.$qry_beschreibung.' 
 		from 
 		public.tbl_organisationseinheit as orga, wawi.tbl_kostenstelle as kst, wawi.tbl_konto_kostenstelle as kontokst, wawi.tbl_konto as konto where
 		orga.oe_kurzbz = kst.oe_kurzbz and 
 		kst.kostenstelle_id = kontokst.kostenstelle_id and 
 		kontokst.konto_id = konto.konto_id and 
-		orga.oe_kurzbz = '.$this->addslashes($oe_kurzbz).';';
+		orga.oe_kurzbz = '.$this->addslashes($oe_kurzbz).' ORDER BY konto.beschreibung;';
 
 		
 		//echo $qry; 
