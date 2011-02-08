@@ -627,7 +627,7 @@ class firma extends basis_db
 		if($oe_kurzbz!='')
 			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz='".addslashes($oe_kurzbz)."'";
 			
-		$qry.=" ORDER BY tbl_firma_organisationseinheit.oe_kurzbz ";
+		$qry.=" ORDER BY tbl_firma.name, tbl_firma_organisationseinheit.oe_kurzbz ";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
