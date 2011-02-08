@@ -1,0 +1,5 @@
+In diesem Verzeichnis muss ein symbolischer Link angelegt werden!
+
+ln -s ../content/pdfExport.php pdfExport.php
+
+Dies ist eine vorübergehende Lösung um die .htaccess Authentifizierung zu umgehen
