@@ -73,7 +73,7 @@ $id = isset($_GET['id'])?$_GET['id']:'';
 if(isset($_POST['save']))
 {
 	if(!isset($_POST['strasse']) || !isset($_POST['name']) || !isset($_POST['plz']) || !isset($_POST['ort']) ||
-	   !isset($_POST['telefon']) || !isset($_POST['fax']) || !isset($_POST['email']))
+	   !isset($_POST['telefon']) || !isset($_POST['fax']) || !isset($_POST['email']) || !isset($_POST['anmerkung']))
 		die('Ungueltige Parameteruebergabe');
 		
 	$error = false;
@@ -85,6 +85,7 @@ if(isset($_POST['save']))
 	$fax = $_POST['fax'];
 	$email = $_POST['email'];
 	$nation = $_POST['nation'];
+	$anmerkung = $_POST['anmerkung'];
 	
 	//Bei einem Update werden die IDs der Datensaetze uebergeben
 	$adresse_id = $_POST['adresse_id'];
@@ -135,6 +136,7 @@ if(isset($_POST['save']))
 		}
 		
 		$firma->name=$name;
+		$firma->anmerkung=$anmerkung;
 		
 		
 		if($firma->save())
@@ -311,6 +313,7 @@ if($method=='new' || $method=='update')
 	$fax_id='';
 	$email_id='';
 	$telefon_id='';
+	$anmerkung='';
 	
 	if($method=='new')
 		echo '<h1>Neue Firma</h1>';
@@ -327,6 +330,7 @@ if($method=='new' || $method=='update')
 			die('Firma konnte nicht geladen werden');
 		
 		$name = $firma->name;
+		$anmerkung = $firma->anmerkung;
 		$firma_id = $firma->firma_id;
 		
 		//Standort Laden
@@ -384,7 +388,7 @@ if($method=='new' || $method=='update')
 		<td><input type="text" name="name" maxlength="128" size="50" value="'.$name.'"/></td>
 	</tr>
 	<tr>
-		<td>Strasse:</td>
+		<td>Straße:</td>
 		<td><input type="text" name="strasse" size="30" maxlength="256" value="'.$strasse.'"/></td>
 	</tr>
 	<tr>
@@ -424,6 +428,10 @@ if($method=='new' || $method=='update')
 	<tr>
 		<td>E-Mail:</td>
 		<td><input type="text" name="email" maxlength="128" value="'.$email.'"/></td>
+	</tr>
+	<tr>
+		<td>Anmerkungen:</td>
+		<td><textarea name="anmerkung" cols="30" rows="3">'.$anmerkung.'</textarea></td>
 	</tr>
 	<tr>
 		<td></td>
