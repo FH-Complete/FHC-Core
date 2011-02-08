@@ -122,7 +122,7 @@ class wawi_kostenstelle extends basis_db
 						lower(kurzbz) LIKE lower('%".addslashes($filter)."%')";
 		}
 		
-		$qry.=';';
+		$qry.=' ORDER BY bezeichnung;';
 		
 		if(!$this->db_query($qry))
 		{
