@@ -1961,12 +1961,16 @@ if($_GET['method']=='update')
 	echo "<br><br>";
 	if($disabled!='')
 	{
-		echo '<script type="text/javascript"> 
-			$(document).ready(function()
-			{
-				FelderSperren(true);
-			});
-		</script>';
+		//Wenn die Advanced Berechtigung vorhanden ist, werden die Felder nicht gesperrt
+		if(!$rechte->isBerechtigt('wawi/bestellung_advanced',null, 'suid'))
+		{
+			echo '<script type="text/javascript"> 
+				$(document).ready(function()
+				{
+					FelderSperren(true);
+				});
+			</script>';
+		}
 	}
 	
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
