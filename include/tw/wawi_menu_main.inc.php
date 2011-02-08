@@ -50,6 +50,7 @@ $menu=array
 			'name'=>'Bestellung', 'permissions'=>array('wawi/bestellung'),'link'=>'bestellung.php?method=suche', 'target'=>'content',
 			'BestellungNeu'=>array('name'=>'Neu', 'link'=>'bestellung.php?method=new', 'target'=>'content'),
 			'BestellungSuchen'=>array('name'=>'Suchen', 'link'=>'bestellung.php?method=suche', 'target'=>'content'),
+			'MeineBestellungen'=>array('name'=>'Meine', 'link'=>'bestellung.php?method=suche&submit=true&mitarbeiter_uid='.get_uid().'&evon='.date('Y-m-d',mktime(0,0,0,date('m')-2,date('d'),date('Y'))), 'target'=>'content'),
 		),
 		'Rechnung'=>array
 		(
@@ -71,8 +72,13 @@ $menu=array
 	'Berichte'=> 	array
 	(
 		'name'=>'Berichte', 'opener'=>'true', 'hide'=>'false','permissions'=>array('wawi/bestellung','wawi/rechnung'),
-		'Kostenstelle'=>array ('name'=>'Kostenstelle', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/kostenstelle.php', 'target'=>'content'),
-		'Tags'=>array ('name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content')
+		'Auswertungen'=>array
+		(
+			'name'=>'', 'permissions'=>array('wawi/rechnung'),'link'=>'rechnung.php?method=suche', 'target'=>'content',
+			'Kostenstelle'=>array ('name'=>'Kostenstelle', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/kostenstelle.php', 'target'=>'content'),
+			'Tags'=>array ('name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content'),
+			'Aufteilung'=>array ('name'=>'Aufteilung', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/aufteilung.php', 'target'=>'content')
+		)
 	)
 	
 );
