@@ -528,7 +528,7 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Liefert den ausgegebenen Bruttobetrag einer Kostenstelle im Geschäftsjahr zurück
 	 * @param unknown_type $kostenstelle_id
 	 * @param unknown_type $geschaeftsjahr_kurzbz
 	 */
@@ -826,6 +826,65 @@ class wawi_bestellung extends basis_db
 		} 
 	}
 	
+	/**
+	 * 
+	 * Gibt alle Bestellungen zurück die im Zeitraum zwischen max und min liegen und die die keinen Liefer oder Storno Status besitzen
+	 * @param $min	in wochen
+	 * @param $max  in wochen
+	 */
+	public function loadBestellungForCheck($min, $max)
+	{
+		if(!is_numeric($min) || !is_numeric($max))
+		{
+			$this->errormsg = "Ungueltige Werte für min und max in Check-Skript.";
+			return false;
+		}
+		
+		$qry ="SELECT * FROM wawi.tbl_bestellung WHERE bestellung_id IN(
+		select b.bestellung_id
+		from wawi.tbl_bestellung as b
+		left join wawi.tbl_bestellung_bestellstatus as s using (bestellung_id)
+		where 
+		b.bestellung_id not in (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz in('Lieferung','Storno'))
+		and b.bestellung_id = b.bestellung_id and datum < CURRENT_DATE - '".$min." week'::interval AND datum > CURRENT_DATE - '".$max." week'::interval
+		)
+		order by bestellung_id";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$bestellung = new wawi_bestellung(); 
+				
+				$bestellung->bestellung_id = $row->bestellung_id; 
+				$bestellung->bestell_nr = $row->bestell_nr; 
+				$bestellung->titel = $row->titel; 
+				$bestellung->bemerkung = $row->bemerkung; 
+				$bestellung->liefertermin = $row->liefertermin; 
+				$bestellung->besteller_uid = $row->besteller_uid; 
+				$bestellung->lieferadresse = $row->lieferadresse; 
+				$bestellung->kostenstelle_id = $row->kostenstelle_id; 
+				$bestellung->konto_id = $row->konto_id; 
+				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
+				$bestellung->firma_id = $row->firma_id; 
+				$bestellung->freigegeben = ($row->freigegeben=='t'?true:false); 
+				$bestellung->updateamum = $row->updateamum; 
+				$bestellung->updatevon = $row->updatevon; 
+				$bestellung->insertamum = $row->insertamum; 
+				$bestellung->insertvon = $row->insertvon; 
+				$bestellung->ext_id = $row->ext_id; 
+				$bestellung->zahlungstyp_kurzbz = $row->zahlungstyp_kurzbz; 
+				
+				$this->result[] = $bestellung; 
+			}
+		}
+		else
+		{
+			$this->errormsg ="Fehler bei der Abfrage aufgetreten."; 
+			return false; 
+		}
+		return true;
+	}
 	/**
 	 * 
 	 * true wenn die Bestellung schon freigegeben wurde
