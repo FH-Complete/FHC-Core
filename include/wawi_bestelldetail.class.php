@@ -296,13 +296,13 @@ class wawi_bestelldetail extends basis_db
 		
 		if(!is_null($filter))
 		{
-			$qry.=" AND (beschreibung like '%".addslashes($filter)."%' 
+			$qry.=" AND (lower(beschreibung) like lower('%".addslashes($filter)."%') 
 						 OR bestelldetail_id::text like '%".addslashes($filter)."%'
 						 OR artikelnummer like '%".addslashes($filter)."%'
 						 )";
 		}
 		$qry.=" ORDER BY sort, position;";
-		
+		//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
