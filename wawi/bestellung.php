@@ -565,6 +565,7 @@ if($aktion == 'suche')
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 's'))
 			die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
 			
+		$status = new wawi_bestellstatus(); 
 		$bestellnummer = (isset($_REQUEST['bestellnr'])?$_REQUEST['bestellnr']:'');
 		$titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
 		$evon = (isset($_REQUEST['evon'])?$_REQUEST['evon']:'');
@@ -615,6 +616,7 @@ if($aktion == 'suche')
 						<th>Firma</th>
 						<th>Erstellung</th>
 						<th>Freigegeben</th>
+						<th>Geliefert</th>
 						<th>Brutto</th>
 						<th>Titel</th>
 						<th>Letzte Änderung</th>
@@ -622,9 +624,11 @@ if($aktion == 'suche')
 			
 				foreach($bestellung->result as $row)
 				{	
+					$geliefert = 'nein';
 					$brutto = $bestellung->getBrutto($row->bestellung_id);
 					$gesamtpreis +=$brutto; 
-					
+					if($status->isStatiVorhanden($row->bestellung_id, 'Lieferung'))
+						$geliefert = 'ja';
 					$firmenname = '';
 					if(is_numeric($row->firma_id))
 					{
@@ -639,6 +643,7 @@ if($aktion == 'suche')
 					echo '<td>'.$firmenname."</td>\n";
 					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
 					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
+					echo '<td>'.$geliefert.'</td>'; 
 					echo '<td>'.number_format($brutto, 2, ",",".")."</td>\n"; 
 					echo '<td>'.$row->titel."</td>\n";
 					echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y').' '.$row->updatevon ."</td>\n"; 
@@ -1272,7 +1277,7 @@ if($_GET['method']=='update')
 	}	
 	// wenn user nicht auf kst berechtigt ist, trotzdem anzeigen zum freigeben 
 	if(!$kst_vorhanden)	
-		echo "<option value=".$bestellung->kostenstelle_id." selected >".$kostenstelle->bezeichnung."(".mb_strtoupper($kostenstelle->kurzbz).") - ".mb_strtoupper($kostenstelle->oe_kurzbz)."</option>\n";	
+		echo "<option value='".$bestellung->kostenstelle_id."' selected >".$kostenstelle->bezeichnung."(".mb_strtoupper($kostenstelle->kurzbz).") - ".mb_strtoupper($kostenstelle->oe_kurzbz)."</option>\n";	
 	
 		echo "</SELECT></td>\n";
 	echo "<td>Lieferadresse:</td>\n"; 
