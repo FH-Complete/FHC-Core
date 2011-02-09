@@ -394,8 +394,8 @@ elseif($aktion == 'save')
 				$id = mb_substr($key, mb_strlen('rechnungsbetrag_id_'));
 				$betraege[$id]['id']=$_POST['rechnungsbetrag_id_'.$id];
 				$betraege[$id]['bezeichnung']=$_POST['bezeichnung_'.$id];
-				$betraege[$id]['betrag']=$_POST['betrag_'.$id];
-				$betraege[$id]['mwst']=$_POST['mwst_'.$id];
+				$betraege[$id]['betrag']=mb_str_replace(',','.',$_POST['betrag_'.$id]);
+				$betraege[$id]['mwst']=mb_str_replace(',','.',$_POST['mwst_'.$id]);
 			}
 		}
 		
@@ -559,6 +559,7 @@ if($aktion=='update')
 		$rechnung_id='';
 		$bestellung_id='';
 		$kostenstelle_id = $_GET['kostenstelle_id'];
+		$rechnung->buchungsdatum=date('Y-m-d');
 	}
 	elseif(isset($_GET['bestellung_id']))
 	{
@@ -568,6 +569,7 @@ if($aktion=='update')
 		if(!$bestellung->load($bestellung_id))
 			die('Bestellung existiert nicht');
 		$kostenstelle_id=$bestellung->kostenstelle_id;
+		$rechnung->buchungsdatum=date('Y-m-d');
 	}
 	else
 	{

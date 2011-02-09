@@ -91,7 +91,13 @@ if (isset($_POST['username']))
 	</table>
 
 </form>
-
+<br />
+<br />
+<br />
+<br />
+<br />
+<p style="font-size:small; text-align: center;">Auf diesem Server befinden sich Daten, die nicht für Aussenstehende bestimmt sind. <br>Es werden hier keine Zeugnisnoten oder dergleichen aufbewahrt, sondern lediglich Daten &uuml;ber die interne Struktur und Verwaltung der FH Technikum-Wien, die für Aussenstehende nicht von Interesse sind.<br>
+Jede Hack-Attacke oder sonstige mutwillige Versuche, die eine Manipulation oder ein Löschen dieser Daten zur Folge haben, werden strafrechtlich (nach §§126a, 126b, 126c StGB) verfolgt.</p>
 </body>
 
 </html>

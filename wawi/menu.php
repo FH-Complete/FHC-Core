@@ -50,7 +50,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 
 <body class="menue">
 <h3><a href="home.php" target="content">WaWi Home</a></h3>
-
+<a href="WaWi.pdf" target="_blank"><img src="../skin/images/pdfpic.gif" /> Handbuch</a>
 <hr>';
 
 function checkpermission($permissions)
@@ -153,6 +153,7 @@ foreach($menu AS $m1)
 // Logout Button
 echo '
 <hr>
+
 <a href="logout.php" target="_top"><b>Logout</b></a>
 <br />
 <p>
@@ -186,7 +187,8 @@ if($berechtigung_orig->isBerechtigt('system/loginasuser'))
 }
 echo '
 	</table>
-</p>
+</p><br>
+
 </body>
 </html>
 ';
