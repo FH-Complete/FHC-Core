@@ -693,6 +693,8 @@ elseif($aktion == 'new')
 	echo "<td>&nbsp;</td>\n";
 	echo "<tr><td><input type='submit' id='submit' name='submit' value='Anlegen' onclick='return checkKst();'></td></tr>\n";
 	echo "</table>\n";
+	echo "<span><br>Waren im Wert von &uuml;ber &euro; 500,- sind als Investition zu betrachten, darunter als geringwertiges Wirtschaftsgut (GWG). Dienstleistungen, Nahrungsmittel etc. sind Aufw&auml;nde.</span>";
+
 	
 	echo '
 		<script type="text/javascript">
@@ -1787,6 +1789,24 @@ if($_GET['method']=='update')
 		});
 		
 		/**
+		*	Fügt eine neue Zeile ein
+		*
+		*/
+		function newRow()
+		{
+			var id = anzahlRows; 
+			$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
+						function(data){
+							$("#detailTable").append(data);
+							anzahlRows=anzahlRows+1;
+							var test = 0; 
+							test = document.getElementById("detail_anz").value;
+							document.getElementById("detail_anz").value = parseFloat(test) +1;
+							hideTags2();
+						}); 
+		}
+		
+		/**
 		 * Fuegt eine neue Zeile fuer den Betrag hinzu wenn die 
 		 * uebergebene id, die der letzte Zeile ist
 		 * und der Betrag eingetragen wurde
@@ -1804,7 +1824,6 @@ if($_GET['method']=='update')
 				$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
 						function(data){
 							$("#detailTable").append(data);
-							//saveDetail(anzahlRows);
 							anzahlRows=anzahlRows+1;
 							var test = 0; 
 							test = document.getElementById("detail_anz").value;
@@ -1957,6 +1976,9 @@ if($_GET['method']=='update')
 		$aktBrutto ="0"; 	
 	echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' onclick='return conf_del_budget($aktBrutto);' class='cursor'>\n"; 
 	echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'>\n"; 
+	// neue Zeile hinzufügen nur mit Berechtigung
+	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id))
+		echo "<input type='button' value='neue Zeile' onclick='newRow();' class='cursor'>"; 
 	echo "<div style='float:right;'><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
 	echo "<br><br>";
 	if($disabled!='')
