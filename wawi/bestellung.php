@@ -1045,10 +1045,8 @@ if($_GET['method']=='update')
 		// kostenstelle gibt frei
 		if(isset($_POST['btn_freigabe']) )
 		{
-			echo "drinnen";
 			if(!isset($_POST['freigabe_oe']))
 			{
-				echo "zwei";
 				// Kostenstelle gibt frei
 				// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
 				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
@@ -1918,8 +1916,9 @@ if($_GET['method']=='update')
 			summe(); 
 		}
 		
-	/*	function conf_del_budget(aktBrutto)
+		function conf_del_budget(aktBrutto)
 		{
+			/*		
 			var bestellungPreis = ($("#brutto").html()); 
 			var restBudget = ($("#restbudget").html());  
 			var differenz = 0; 
@@ -1933,8 +1932,9 @@ if($_GET['method']=='update')
 			{
 				return false;
 			}
+			*/
 			FelderSperren(false);			
-		}*/
+		}
 		
 		// ändert sich der fokus der Bestelldetailzeile -> speichern der geänderten
 		function checkSave(rowid)
@@ -2283,7 +2283,7 @@ function sendBestellerMail($bestellung, $status)
 	switch($status)
 	{
 		case 'bestellt':	$email.=" <b>Ihre Bestellung wurde bestellt</b>"; break;
-		case 'geliefert':	$email.=" <b>Ihre Bestellung wurde geliefert</b>"; break;
+		case 'geliefert':	$email.=" <b>Ihre Bestellung wurde geliefert</b><br>Hinweis: Nach erfolgter Lieferung werden Waren ab einem Wert von EUR 250,-- pro Einzelposition inventarisiert. <br>"; break;
 		case 'freigabe':	$email.=" <b>Ihre Bestellung wurde freigegeben</b>"; break;
 		case 'storno':		$email.=" <b>Ihre Bestellung wurde storniert</b>"; break;
 	}
