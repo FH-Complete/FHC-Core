@@ -179,7 +179,7 @@ class wawi_rechnung extends basis_db
 			$qry.= ' AND tbl_bestellung.kostenstelle_id = '.$this->addslashes($kostenstelle_id);
 
 		if ($bestellnummer != '')	
-			$qry.= ' AND tbl_bestellung.bestell_nr = '.$this->addslashes($bestellnummer);
+			$qry.= ' AND UPPER(tbl_bestellung.bestell_nr) = UPPER('.$this->addslashes($bestellnummer).')';
 		
 		if ($betrag != '')
 			$qry.= ' AND (\''.$betrag.'\' = (SELECT sum(betrag) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id)

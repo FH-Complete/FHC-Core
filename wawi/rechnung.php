@@ -246,8 +246,8 @@ if($aktion == 'suche')
 	else
 	{		
 		// Suchergebnisse anzeigen
-		$rechnungsnr = (isset($_REQUEST['rechnungsnr'])?$_REQUEST['rechnungsnr']:'');
-		$bestellnummer = (isset($_REQUEST['bestellnummer'])?$_REQUEST['bestellnummer']:'');
+		$rechnungsnr = (isset($_REQUEST['rechnungsnr'])?trim($_REQUEST['rechnungsnr']):'');
+		$bestellnummer = (isset($_REQUEST['bestellnummer'])?trim($_REQUEST['bestellnummer']):'');
 		$rechnungsdatum_von = (isset($_REQUEST['rechnungsdatum_von'])?$_REQUEST['rechnungsdatum_von']:'');
 		$rechnungsdatum_bis = (isset($_REQUEST['rechnungsdatum_bis'])?$_REQUEST['rechnungsdatum_bis']:'');
 		$buchungsdatum_von = (isset($_REQUEST['buchungsdatum_von'])?$_REQUEST['buchungsdatum_von']:'');
