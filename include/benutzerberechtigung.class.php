@@ -761,16 +761,25 @@ class benutzerberechtigung extends basis_db
 				}
 				else 
 				{
-					if(!is_null($b->oe_kurzbz))
+					if($b->kostenstelle_id != '')
 					{
+						$kst = new wawi_kostenstelle(); 
+						$kst->load($b->kostenstelle_id);
+						$oe_kurzbz[] = $kst->oe_kurzbz; 
+					}
+					else
+					{
+						if(!is_null($b->oe_kurzbz))
+						{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
 							$oe_kurzbz[] = $row;
-					}
-					else 
-					{
-						$all=true;
-						break;
+						}
+						else 
+						{
+							$all=true;
+							break;
+						}
 					}
 				}
 			}
