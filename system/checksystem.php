@@ -1917,6 +1917,19 @@ if(!@$db->db_query("SELECT oe_kurzbz FROM public.tbl_vorlagestudiengang LIMIT 1"
 	else 
 		echo 'Tabelle public.tbl_vorlagestudiengang Spalte oe_kurzbz hinzugefuegt!<br>';
 }
+
+// kurzzeichen zu tbl_organisationseinheit hinzugefuegt zur generierung der Bestellnummer
+if(!@$db->db_query("SELECT kurzzeichen FROM public.tbl_organisationseinheit LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_organisationseinheit ADD COLUMN kurzzeichen varchar(16);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_organisationseinheit Spalte kurzzeichen hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2032,7 +2045,7 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze"),
+	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),

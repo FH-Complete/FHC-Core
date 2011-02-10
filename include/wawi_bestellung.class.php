@@ -922,50 +922,56 @@ class wawi_bestellung extends basis_db
 	public function createBestellNr($kostenstelle_id)
 	{
 		// kostenstelle holen
-	$qry="select * from wawi.tbl_kostenstelle where kostenstelle_id=$kostenstelle_id;";
+		$qry="SELECT 
+				tbl_kostenstelle.kurzbz, tbl_organisationseinheit.kurzzeichen 
+			FROM 
+				wawi.tbl_kostenstelle 
+				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+			WHERE 
+				kostenstelle_id='".addslashes($kostenstelle_id)."';";
 	
-	if($this->db_query($qry))
-	{
-		if($row = $this->db_fetch_object())
+		if($this->db_query($qry))
 		{
-			$kostenstelle_kz=$row->kurzbz;
-			$oe_kurzbz = $row->oe_kurzbz; 
+			if($row = $this->db_fetch_object())
+			{
+				$kostenstelle_kz=$row->kurzbz;
+				$kurzzeichen = $row->kurzzeichen; 
+			}
 		}
-	}	
-	// wenn kurzbz länger ist -> abschneiden
-	if(mb_strlen($oe_kurzbz)>3)
-	{
-		$oe_kurzbz = mb_substr($oe_kurzbz, 0,3);  
-	}
-	$oe_kurzbz = mb_strtoupper($oe_kurzbz);
-	$akt_timestamp=time();
-	$akt_datum=getdate($akt_timestamp);
-	$akt_mon=$akt_datum['mon'];
-	$akt_year=$akt_datum['year'];
-	if ($akt_mon<9)
-		$akt_year--;
-	$akt_year=substr($akt_year,2,2);
-	
-	$kuerzel = $oe_kurzbz.$akt_year.$kostenstelle_kz.'___'; 
-	$qry = "SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung WHERE wawi.tbl_bestellung.bestell_nr LIKE '$kuerzel';";
-
-	if($this->db_query($qry))
-	{
-		if($row = $this->db_fetch_object())
-		{	$bnum = $row->max + 1; 
-			$bnum = sprintf("%03s",$bnum); 
+		// wenn kurzbz länger ist -> abschneiden
+		if(mb_strlen($kurzzeichen)>3)
+		{
+			$kurzzeichen = mb_substr($kurzzeichen, 0,3);  
 		}
-	}
-	else
-	{
-		$this->errormsg ="Fehler bei der Datenbankabfrage aufgetreten"; 
-		return false; 
-	}
+		$kurzzeichen = mb_strtoupper($kurzzeichen);
+		$akt_timestamp=time();
+		$akt_datum=getdate($akt_timestamp);
+		$akt_mon=$akt_datum['mon'];
+		$akt_year=$akt_datum['year'];
+		if ($akt_mon<9)
+			$akt_year--;
+		$akt_year=substr($akt_year,2,2);
 		
-	$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
-
-	$bnum=sprintf("%s%s%s%s",$oe_kurzbz,$akt_year,$kostenstelle_kz,$bnum);
-	return $bnum;
+		$kuerzel = $kurzzeichen.$akt_year.$kostenstelle_kz.'___'; 
+		$qry = "SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung WHERE wawi.tbl_bestellung.bestell_nr LIKE '$kuerzel';";
+	
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{	$bnum = $row->max + 1; 
+				$bnum = sprintf("%03s",$bnum); 
+			}
+		}
+		else
+		{
+			$this->errormsg ="Fehler bei der Datenbankabfrage aufgetreten"; 
+			return false; 
+		}
+			
+		$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
+	
+		$bnum=sprintf("%s%s%s%s",$kurzzeichen,$akt_year,$kostenstelle_kz,$bnum);
+		return $bnum;
 	}
 
 }
