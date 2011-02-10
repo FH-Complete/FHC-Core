@@ -495,9 +495,14 @@ if($aktion == 'suche')
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td> Organisationseinheit: </td>\n";
+		$oe_array = $rechte->getOEkurzbz('wawi/bestellung');
+		$oe_berechtigt = new organisationseinheit(); 
+
+		$oe_berechtigt->loadArray($oe_array,'organisationseinheittyp_kurzbz', false);
+			//	var_dump($oe_berechtigt); 
 		echo "<td><SELECT name='filter_oe_kurzbz' onchange='loadFirma(this.value)'>\n"; 
 		echo "<option value='opt_auswahl'>-- auswählen --</option>\n";
-		foreach ($oeinheiten as $oei)
+		foreach ($oe_berechtigt->result as $oei)
 		{
 			if($oei->aktiv)
 				echo '<option value="'.$oei->oe_kurzbz.'" >'.$oei->organisationseinheittyp_kurzbz.' '.$oei->bezeichnung."</option>\n";
@@ -859,7 +864,7 @@ if($_GET['method']=='update')
 			$bestellung_new->kostenstelle_id = $_POST['filter_kst'];
 							
 			// wenn sich kostenstelle geändert hat, neue bestellnummer generieren
-			if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id && !$status->isStatiVorhanden($bestellung_id, 'Abgeschickt') ) 
+			if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id && !$status->isStatiVorhanden($bestellung_id, 'Bestellt') ) 
 			{
 					$bestellung_new->bestell_nr = $bestellung_new->createBestellNr($bestellung_new->kostenstelle_id);
 			}
