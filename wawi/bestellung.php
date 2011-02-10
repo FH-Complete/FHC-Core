@@ -864,7 +864,7 @@ if($_GET['method']=='update')
 			$bestellung_new->kostenstelle_id = $_POST['filter_kst'];
 							
 			// wenn sich kostenstelle geändert hat, neue bestellnummer generieren
-			if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id && !$status->isStatiVorhanden($bestellung_id, 'Bestellt') ) 
+			if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id && !$status->isStatiVorhanden($bestellung_id, 'Bestellung') ) 
 			{
 					$bestellung_new->bestell_nr = $bestellung_new->createBestellNr($bestellung_new->kostenstelle_id);
 			}
@@ -1644,7 +1644,11 @@ if($_GET['method']=='update')
 							else
 							{
 								$("#btn_bestellt").html("Bestellt am: " +data); 
-								document.editForm.storniert.disabled=true; 
+
+								if(typeof(document.editForm.storniert) != "undefined")
+								{
+									document.editForm.storniert.disabled=true;
+								}
 								document.editForm.bestellt.disabled=true;
 								document.editForm.filter_kst.disabled=true; 
 							}
@@ -1914,7 +1918,7 @@ if($_GET['method']=='update')
 			summe(); 
 		}
 		
-		function conf_del_budget(aktBrutto)
+	/*	function conf_del_budget(aktBrutto)
 		{
 			var bestellungPreis = ($("#brutto").html()); 
 			var restBudget = ($("#restbudget").html());  
@@ -1930,7 +1934,7 @@ if($_GET['method']=='update')
 				return false;
 			}
 			FelderSperren(false);			
-		}
+		}*/
 		
 		// ändert sich der fokus der Bestelldetailzeile -> speichern der geänderten
 		function checkSave(rowid)
