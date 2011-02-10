@@ -821,7 +821,7 @@ if($_GET['method']=='update')
 	{
 		// Update auf Bestellung
 		$date = new datum(); 	
-
+	
 		$save = false; 
 		$bestellung_id = $_GET['bestellung'];
 		$bestellung_old = new wawi_bestellung(); 
@@ -859,8 +859,10 @@ if($_GET['method']=='update')
 			$bestellung_new->kostenstelle_id = $_POST['filter_kst'];
 							
 			// wenn sich kostenstelle geändert hat, neue bestellnummer generieren
-			if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id)
-				$bestellung_new->bestell_nr = $bestellung_new->createBestellNr($bestellung_new->kostenstelle_id);
+			if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id && !$status->isStatiVorhanden($bestellung_id, 'Abgeschickt') ) 
+			{
+					$bestellung_new->bestell_nr = $bestellung_new->createBestellNr($bestellung_new->kostenstelle_id);
+			}
 			
 			$tags = explode(";", $_POST['tags']);
 			$help_tags = new tags(); 
@@ -1262,7 +1264,10 @@ if($_GET['method']=='update')
 	echo "<tr>\n"; 	
 	$disabled = '';
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
-		$disabled = 'disabled';
+		$disabled = 'disabled'; 
+	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id))	
+		$disabled = '';
+	
 	echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)' $disabled id='filter_kst'>\n";
 	
 	foreach ($kst->result as $ks)
@@ -1693,7 +1698,8 @@ if($_GET['method']=='update')
 	    	var menge = $("#menge_"+id).val();
 	    	var betrag = $("#preisprove_"+id).val();
 	    	var mwst = $("#mwst_"+id).val();
-	    	
+	    	if(mwst =="")
+					mwst = "0";
 	    	if(betrag!="" && mwst!="" && menge!="")
 	    	{
 	    		betrag = betrag.replace(",",".");
@@ -1714,6 +1720,8 @@ if($_GET['method']=='update')
 	    	var menge = $("#menge_"+id).val();
 	    	var brutto = $("#brutto_"+id).val();
 	    	var mwst = $("#mwst_"+id).val();
+	    	if(mwst =="")
+					mwst = "0";
 	    	
 	    	if(brutto!="" && mwst!="" && menge!="")
 	    	{
@@ -1763,6 +1771,8 @@ if($_GET['method']=='update')
 				var menge =$("#menge_"+i).val();
 				var betrag = $("#preisprove_"+i).val();
 				var mwst = $("#mwst_"+i).val();
+				if(mwst =="")
+					mwst = "0";
 				
 				// wenn es spalte nicht gibt, auslassen
 				if(typeof(menge) != "undefined")
@@ -1775,7 +1785,7 @@ if($_GET['method']=='update')
 						betrag = parseFloat(betrag);
 						mwst = parseFloat(mwst);
 						netto = netto + betrag*menge;
-						brutto = brutto + (menge * (betrag+(betrag*mwst/100)));
+						brutto = brutto + (menge * (betrag*((mwst+100)/100)));
 					}
 				}
 				i=i+1;
