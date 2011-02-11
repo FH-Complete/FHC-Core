@@ -478,47 +478,6 @@ class wawi_kostenstelle extends basis_db
 	}
 	
 	/**
-	 * Laedt die Kostenstellen die als Array uebergeben werden
-	 */
-	public function loadArray($array)
-	{
-		if(count($array)==0)
-		{
-			$this->result = array();
-			return true;
-		}
-		$qry = 'SELECT * FROM wawi.tbl_kostenstelle WHERE kostenstelle_id IN('.$this->implode4SQL($array).') ORDER BY bezeichnung;';
-				
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = 'Fehler bei der Datenbankabfrage.';
-			return false; 
-		}
-		
-		while($row = $this->db_fetch_object())
-		{
-			$obj = new wawi_kostenstelle(); 
-			
-			$obj->kostenstelle_id = $row->kostenstelle_id;
-			$obj->oe_kurzbz = $row->oe_kurzbz; 
-			$obj->bezeichnung = $row->bezeichnung;
-			$obj->kurzbz = $row->kurzbz;
-			$obj->aktiv = ($row->aktiv=='t'?true:false);
-			$obj->updateamum = $row->updateamum;
-			$obj->updatevon = $row->updatevon;
-			$obj->insertamum = $row->insertamum;
-			$obj->insertvon = $row->insertvon;
-			$obj->ext_id = $row->ext_id; 				// ext_id = kostenstelle_id
-			$obj->kostenstelle_nr = $row->kostenstelle_nr;
-			$obj->deaktiviertamum = $row->deaktiviertamum;
-			$obj->deaktiviertvon = $row->deaktiviertvon; 	
-			
-			$this->result[] = $obj; 
-		}
-		return true; 
-	}
-	
-	/**
 	 * Liefert das Budget einer Kostenstelle in einem Geschaeftsjahr
 	 *
 	 * @param $kostenstelle_id ID der Kostenstelle
@@ -611,15 +570,14 @@ class wawi_kostenstelle extends basis_db
 			return true;
 	}
 	
-	
-/**
+	/**
 	 * Laedt die Kostenstellen die als Array uebergeben werden
 	 * @param $kurzbzs Array mit den kurzbezeichnungen
 	 * @param $order Sortierreihenfolge
 	 * @param $aktiv wenn true dann nur aktive sonst alle
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function loadKstArray($kst_id, $order=null, $aktiv=true)
+	public function loadArray($kst_id, $order=null, $aktiv=true)
 	{
 		if(count($kst_id)==0)
 			return true;
