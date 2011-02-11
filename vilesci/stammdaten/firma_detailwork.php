@@ -601,7 +601,11 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 		$htmlstr.= "<td><SELECT name='oe_kurzbz'>";
 		for ($ii=0;$ii<count($organisationseinheit_obj->result);$ii++)
 		{
-			$htmlstr.= "<OPTION value='".$organisationseinheit_obj->result[$ii]->oe_kurzbz."' ".($organisationseinheit_obj->result[$ii]->oe_kurzbz==$row->oe_kurzbz?' selected ':'')." >".$organisationseinheit_obj->result[$ii]->bezeichnung."</OPTION>";
+			if($organisationseinheit_obj->result[$ii]->aktiv==false)
+				$class='class="inactive"';
+			else
+				$class='';
+			$htmlstr.= "<OPTION $class value='".$organisationseinheit_obj->result[$ii]->oe_kurzbz."' ".($organisationseinheit_obj->result[$ii]->oe_kurzbz==$row->oe_kurzbz?' selected ':'')." >".$organisationseinheit_obj->result[$ii]->bezeichnung."</OPTION>";
 		}
 		$htmlstr.= "</SELECT>
 			<input type='Hidden' name='firma_organisationseinheit_id' value='".$row->firma_organisationseinheit_id."'>
