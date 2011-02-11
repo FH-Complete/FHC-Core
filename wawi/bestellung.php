@@ -51,7 +51,7 @@ $berechtigung_kurzbz='wawi/bestellung';
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $kst=new wawi_kostenstelle(); 
-$kst->loadKstArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
+$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
 
 if(isset($_POST['getKonto']))
 {
@@ -521,7 +521,7 @@ if($aktion == 'suche')
 		echo "</tr>\n";	
 		echo "<tr>\n";	
 		$kst_array = $rechte->getKostenstelle('wawi/bestellung');
-		$kostenstelle->loadKstArray($kst_array,'bezeichnung'); 
+		$kostenstelle->loadArray($kst_array,'bezeichnung'); 
 		
 		echo "<td> Kostenstelle: </td>\n";
 		echo "<td><SELECT name='filter_kostenstelle' id='searchKostenstelle' style='width: 230px;'>\n"; 
