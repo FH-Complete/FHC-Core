@@ -36,6 +36,8 @@ if (isset($_GET['method']))
 else 
 	$aktion = 'suche';
 
+$ausgabemsg='';
+
 if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 {
 	if(is_numeric($_POST['id']))
@@ -58,7 +60,8 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
-	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>	
+	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css"/>	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
@@ -133,7 +136,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $kst=new wawi_kostenstelle(); 
-$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
+$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz), 'bezeichnung'); 
 	
 if($aktion == 'suche')
 {	 
@@ -144,14 +147,11 @@ if($aktion == 'suche')
 	{
 		// Suchmaske anzeigen
 		$oe = new organisationseinheit(); 
-		$oe->getAll(); 
+		$oe->loadArray($rechte->getOEkurzbz($berechtigung_kurzbz));
 
 		$konto = new wawi_konto();
 		$konto->getAll();
 		
-		$kostenstelle = new wawi_kostenstelle();
-		$kostenstelle->getAll();
-
 		echo "<h2>Rechnung suchen</h2>\n"; 
 		echo "<form action ='rechnung.php?method=suche' method='post' name='sucheForm'>\n";
 		echo "<table border =0>\n";
@@ -218,9 +218,9 @@ if($aktion == 'suche')
 		echo "<td> Kostenstelle </td>\n";
 		echo "<td><SELECT name='filter_kostenstelle'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";	
-		foreach($kostenstelle->result as $kst)
+		foreach($kst->result as $row)
 		{
-			echo '<option value='.$kst->kostenstelle_id.' >'.$kst->bezeichnung."</option>\n";
+			echo '<option value='.$row->kostenstelle_id.' >'.$row->bezeichnung."</option>\n";
 	
 		}
 		echo "</SELECT>\n";
@@ -339,10 +339,10 @@ if($aktion == 'suche')
 					</table>';	
 			}
 			else 
-			echo "Fehler bei der Abfrage!";
+				echo "Fehler bei der Abfrage!";
 		}
 		else
-		echo "ungültiges Datumsformat";
+			echo "ungültiges Datumsformat";
 	}
 } 	
 elseif($aktion == 'new')
@@ -354,10 +354,8 @@ elseif($aktion == 'new')
 	echo '<form action="rechnung.php" method="GET">';
 	echo '<input type="hidden" name="method" value="update"/>';
 	echo 'Kostenstelle: <SELECT name="kostenstelle_id">';
-	$kostenstelle = new wawi_kostenstelle();
-	$kostenstelle->loadArray($rechte->getKostenstelle('wawi/rechnung'));
-	
-	foreach($kostenstelle->result as $row)
+		
+	foreach($kst->result as $row)
 	{
 		echo '<option value="'.$row->kostenstelle_id.'">'.$row->bezeichnung.' ('.$row->kurzbz.') - '.mb_strtoupper($row->oe_kurzbz).'</option>';
 	}
@@ -468,13 +466,13 @@ elseif($aktion == 'save')
 				}
 			}
 			
-			echo 'Daten wurden gespeichert!';
+			$ausgabemsg.='<span class="ok">Daten wurden gespeichert!</span><br>';
 			$_GET['id']=$rechnung->rechnung_id;
 			$aktion = 'update';
 		}
 		else
 		{
-			echo 'Fehler: '.$rechnung->errormsg;
+			echo '<span class="error">Fehler: '.$rechnung->errormsg.'</span><br>';
 		}
 	}
 	else
@@ -492,13 +490,13 @@ elseif($aktion=='delete')
 		$rechnung = new wawi_rechnung();
 		if($rechnung->delete($_GET['id']))
 		{
-			echo 'Rechnung wurde erfolgreich geloescht';
+			echo '<span class="ok">Rechnung wurde erfolgreich geloescht</span>';
 		}
 		else
 		{
 			echo '<span class="error">Fehler: '.$rechnung->errormsg.'</span>';
 		}
-		echo '<br /><br /><a href="javascript:history.back()">Zurück</a>';
+		echo '<br /><br /><a href="javascript:history.back()">Zurück</a>';		
 	}
 }
 
@@ -516,7 +514,9 @@ if($aktion=='update')
 	
 	if(isset($_GET['id']))
 	{
+		echo '<div style="float:right">'.$ausgabemsg.'</div>';
 		echo '<h1>Rechnung Bearbeiten</h1>';
+		
 		$rechnung_id = $_GET['id'];
 		if(!is_numeric($rechnung_id))
 			die('RechnungID ist ungueltig');
@@ -874,6 +874,14 @@ if($aktion=='update')
 	</form>
 	';
 
+	if($bestellung_id!='')
+	{
+		$bestellung = new wawi_bestellung();
+		$bestellung->load($bestellung_id);
+		
+		echo '<br><br><br><a href="rechnung.php?method=suche&submit=true&bestellnummer='.$bestellung->bestell_nr.'" style="font-size: small">alle Rechnungen zu Bestellung ',$bestellung->bestell_nr,' anzeigen</a>';
+	}
+		
 }
 
 /**
