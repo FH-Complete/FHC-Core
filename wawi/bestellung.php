@@ -51,7 +51,7 @@ $berechtigung_kurzbz='wawi/bestellung';
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $kst=new wawi_kostenstelle(); 
-$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
+$kst->loadKstArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
 
 if(isset($_POST['getKonto']))
 {
@@ -456,15 +456,12 @@ if($aktion == 'suche')
 			die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
 		
 		// Suchmaske anzeigen
-		$oe = new organisationseinheit(); 
-		$oe->getAll(); 
-		$oeinheiten= $oe->result; 
 		$konto = new wawi_konto();
 		$konto->getAll();
 		$konto_all = $konto->result;
 		
 		$kostenstelle = new wawi_kostenstelle();
-		$kostenstelle->getAll();
+		$oe_berechtigt = new organisationseinheit(); 
 		
 		$datum = new datum(); 
 		$datum=getdate(); 
@@ -496,10 +493,8 @@ if($aktion == 'suche')
 		echo "<tr>\n";
 		echo "<td> Organisationseinheit: </td>\n";
 		$oe_array = $rechte->getOEkurzbz('wawi/bestellung');
-		$oe_berechtigt = new organisationseinheit(); 
-
 		$oe_berechtigt->loadArray($oe_array,'organisationseinheittyp_kurzbz', false);
-			//	var_dump($oe_berechtigt); 
+		
 		echo "<td><SELECT name='filter_oe_kurzbz' onchange='loadFirma(this.value)'>\n"; 
 		echo "<option value='opt_auswahl'>-- auswählen --</option>\n";
 		foreach ($oe_berechtigt->result as $oei)
@@ -524,13 +519,16 @@ if($aktion == 'suche')
 		echo "</td>\n";
 		echo "</tr>\n";	
 		echo "</tr>\n";	
-		echo "<tr>\n";
+		echo "<tr>\n";	
+		$kst_array = $rechte->getKostenstelle('wawi/bestellung');
+		$kostenstelle->loadKstArray($kst_array,'bezeichnung'); 
+		
 		echo "<td> Kostenstelle: </td>\n";
 		echo "<td><SELECT name='filter_kostenstelle' id='searchKostenstelle' style='width: 230px;'>\n"; 
 		echo "<option value=''>-- auswählen --</option>\n";	
-		foreach($kostenstelle->result as $kst)
+		foreach($kostenstelle->result as $kostenst)
 		{
-			echo '<option value='.$kst->kostenstelle_id.' >'.$kst->bezeichnung."</option>\n";
+			echo '<option value='.$kostenst->kostenstelle_id.' >'.$kostenst->bezeichnung."</option>\n";
 		}
 
 		echo "</SELECT>\n";
