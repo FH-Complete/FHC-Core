@@ -881,7 +881,8 @@ if($_GET['method']=='update')
 					$tag_bestellung->tag = trim($bestelltags); 
 					$tag_bestellung->bestellung_id = $bestellung_id; 
 					$tag_bestellung->insertvon = $user; 
-					$tag_besetllung->insertamum = date('Y-m-d H:i:s');
+					$tag_bestellung->insertamum = date('Y-m-d H:i:s');
+					var_dump($tag_bestellung); 
 					
 					if(!$tag_bestellung->TagExists())
 					{
@@ -894,9 +895,11 @@ if($_GET['method']=='update')
 							$tag_bestellung->saveBestellungTag();
 					}
 				} 
-				// letzte leere zeile nicht speichern
 				for($i = 1; $i <= $bestellung_detail_anz; $i++)
 				{
+					// wenn letzte zeile leer ist, nicht speichern
+					if($i == $bestellung_detail_anz  && $_POST["ve_$i"] == '' && $_POST["menge_$i"] =='' && $_POST["beschreibung_$i"]=='' && $_POST["artikelnr_$i"] =='')
+						continue; 
 					// wenn ein Detail gelöscht wird Durchlauf überspringen
 					if(!isset($_POST["bestelldetailid_$i"]))
 						continue; 
