@@ -572,7 +572,7 @@ class wawi_kostenstelle extends basis_db
 	
 	/**
 	 * Laedt die Kostenstellen die als Array uebergeben werden
-	 * @param $kurzbzs Array mit den kurzbezeichnungen
+	 * @param $kst_id Array mit den kst_ids
 	 * @param $order Sortierreihenfolge
 	 * @param $aktiv wenn true dann nur aktive sonst alle
 	 * @return true wenn ok, false im Fehlerfall
