@@ -93,7 +93,7 @@ if(isset($_POST['show']))
 				wawi.tbl_bestellung 
 				JOIN wawi.tbl_bestelldetail USING(bestellung_id)
 			WHERE
-				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
+				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<='$gj->ende' 
 				AND
 				(
 				EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
@@ -149,7 +149,6 @@ if(isset($_POST['show']))
 			WHERE
 				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
 				AND EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
-				AND tbl_rechnung.freigegeben
 				AND kostenstelle_id IN ($kstIN)
 			";
 	
@@ -183,7 +182,7 @@ else
 {
 	$kostenstelle = new wawi_kostenstelle();
 	
-	$kostenstelle->loadArray($kst_array);
+	$kostenstelle->loadArray($kst_array, '',false);
 	echo 'Bitte markieren sie die Kostenstellen die auf der Auswertung aufscheinen sollen:<br /><br />
 	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 		<table>
@@ -192,7 +191,7 @@ else
 	$anzahl=0;
 	$gesamt = count($kst_array);
 	echo '<tr><td valign="top"><table>';
-	
+
 	foreach($kostenstelle->result as $kst)
 	{
 		if($anzahl%(($gesamt/3)+1)==0 && $anzahl!=0)
@@ -290,7 +289,13 @@ function draw_tag_table($tags_array, $kst_tags, $table_id)
 		{
 			if(isset($tags_value[$tags]))
 			{
-				echo '<td class="number"><a href="../bestellung.php?method=suche&submit=1&filter_tag=',$tags,'&filter_kostenstelle=',$kst,'">',number_format($tags_value[$tags],2,',','.'),'</a></td>';
+				echo '<td class="number">';
+				if($table_id=='bestellung')
+					echo '<a href="../bestellung.php?method=suche&submit=1&filter_tag=',$tags,'&filter_kostenstelle=',$kst,'">';
+				echo number_format($tags_value[$tags],2,',','.');
+				if($table_id=='bestellung')
+					echo '</a>';
+				echo '</td>';
 				//Kostenstellensumme berechnen
 				$kst_summe += $tags_value[$tags];
 				
