@@ -51,7 +51,7 @@ $berechtigung_kurzbz='wawi/bestellung';
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $kst=new wawi_kostenstelle(); 
-$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz)); 
+$kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz),'bezeichnung'); 
 
 if(isset($_POST['getKonto']))
 {
@@ -895,7 +895,7 @@ if($_GET['method']=='update')
 					}
 				} 
 				// letzte leere zeile nicht speichern
-				for($i = 1; $i < $bestellung_detail_anz; $i++)
+				for($i = 1; $i <= $bestellung_detail_anz; $i++)
 				{
 					// wenn ein Detail gelöscht wird Durchlauf überspringen
 					if(!isset($_POST["bestelldetailid_$i"]))
