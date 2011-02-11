@@ -38,8 +38,11 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-$kst_array = $rechte->getKostenstelle();
-
+$kst_array = $rechte->getKostenstelle('wawi/bestellung');
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/rechnung'));
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/kostenstelle'));
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/freigabe'));
+$kst_array = array_unique($kst_array);
 if(count($kst_array)==0)
 	die('Sie benoetigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
 
@@ -78,9 +81,8 @@ $datum_obj = new datum();
 <?php
 
 	$db = new basis_db();
-	
-	//Vom Studiensemester
-	
+	echo '<table><tr><td>';
+	//Geschaeftsjahr	
 	echo '
 	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 	Geschäftsjahr
@@ -104,10 +106,50 @@ $datum_obj = new datum();
 	<input type="submit" value="Anzeigen" name="show">
 	</form>';
 
-	$gj= new geschaeftsjahr();
-	$gj->load($geschaeftsjahr);
-
+	echo '</td><td width="100px"> &nbsp; </td><td>';
+	
+	//Kalenderjahr	
+	echo '
+	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+	Kalenderjahr
+	<SELECT name="kalenderjahr" >';
+		
+	$kalenderjahr = isset($_POST['kalenderjahr'])?$_POST['kalenderjahr']:date('Y');	
+	
+	for($i=date('Y')-5; $i<date('Y')+2; $i++)
+	{
+		if($i==$kalenderjahr)
+			$selected='selected';
+		else 
+			$selected='';
+		echo '<option value="',$i,'" ',$selected,'>1.1.',$i,' - 31.12.',$i,'</option>';				
+	}
+	echo '
+	</SELECT>
+	<input type="submit" value="Anzeigen" name="show">
+	</form>';
+	
+	echo '</td></tr></table>';
+	if(isset($_POST['kalenderjahr']))
+	{
+		//Kalenderjahr
+		$vondatum = $kalenderjahr.'-01-01';
+		$endedatum = $kalenderjahr.'-12-31';
+		$budgetanzeige=false;
+	}
+	else
+	{
+		//Geschaeftsjahr
+		$gj= new geschaeftsjahr();
+		$gj->load($geschaeftsjahr);
+		
+		$vondatum = $gj->start;
+		$endedatum = $gj->ende;
+		$budgetanzeige=true;
+	}
+	
 	$kstIN=$db->implode4SQL($kst_array);
+	
 	//Tabelle auf Basis der Bestellungen
 	$qry = "SELECT 
 				sum(menge*preisprove*(100+mwst)/100) as brutto_bestellung,
@@ -117,7 +159,7 @@ $datum_obj = new datum();
 				wawi.tbl_bestellung 
 				JOIN wawi.tbl_bestelldetail USING(bestellung_id)
 			WHERE
-				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
+				tbl_bestellung.insertamum>='".addslashes($vondatum)."' AND tbl_bestellung.insertamum<'".addslashes($endedatum)."' 
 				AND kostenstelle_id IN($kstIN)
 			GROUP BY kostenstelle_id
 			UNION
@@ -130,7 +172,7 @@ $datum_obj = new datum();
 				JOIN wawi.tbl_rechnung USING(bestellung_id)
 				JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
 			WHERE
-				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
+				tbl_bestellung.insertamum>='".addslashes($vondatum)."' AND tbl_bestellung.insertamum<'".addslashes($endedatum)."' 
 				AND kostenstelle_id IN($kstIN)
 			GROUP BY kostenstelle_id
 			";
@@ -151,7 +193,7 @@ $datum_obj = new datum();
 	else
 		die('Fehler bei Datenbankzugriff');
 
-	echo '<span style="font-size: small">Zeitraum: ',$datum_obj->formatDatum($gj->start,'d.m.Y'),' - ',$datum_obj->formatDatum($gj->ende,'d.m.Y').'</span>';
+	echo '<span style="font-size: small">Zeitraum: ',$datum_obj->formatDatum($vondatum,'d.m.Y'),' - ',$datum_obj->formatDatum($endedatum,'d.m.Y').'</span>';
 	echo '
 	<script type="text/javascript">
 	$(document).ready(function() 
@@ -170,10 +212,15 @@ $datum_obj = new datum();
 					<th>Bezeichnung</th>
 					<th>Kz</th>
 					<th>Bestellungen</th>
-					<th>Rechnungen</th>
+					<th>Rechnungen</th>';
+	if($budgetanzeige)
+	{
+		echo '
 					<th>Restbudget (Bestellung)</th>
 					<th>Restbudget (Rechnung)</th>
-					<th>Budget</th>
+					<th>Budget</th>';
+	}
+	echo '
 				</tr>
 			</thead>
 			<tbody>';
@@ -195,42 +242,46 @@ $datum_obj = new datum();
 		
 		$kostenstelle = new wawi_kostenstelle();
 		$kostenstelle->load($id);
-		$budget = $kostenstelle->getBudget($id, $gj->geschaeftsjahr_kurzbz);
-		
+				
 		echo '<tr>';
 
 		echo '<td>',$id,'</td>';
 		echo '<td>',$kostenstelle->bezeichnung,'</td>';
 		echo '<td>',$kostenstelle->kurzbz,'</td>';
-		echo '<td class="number">',number_format($brutto['bestellung'],2,',','.'),'</td>';
+		echo '<td class="number"><a href="../bestellung.php?method=suche&evon=',$vondatum,'&ebis=',$endedatum,'&filter_kostenstelle=',$id,'&submit=true">',number_format($brutto['bestellung'],2,',','.'),'</td>';
 		echo '<td class="number">',number_format($brutto['rechnung'],2,',','.'),'</td>';
 		
-		//Restbudget fuer Bestellungen
-		$restbudget = $budget - $brutto['bestellung'];
-		if($restbudget>0)
-			$class='number_positive';
-		elseif($restbudget<0)
-			$class='number_negative';
-		else
-			$class='number';
-		echo '<td class="',$class,'">',number_format($restbudget,2,',','.'),'</td>';
-		
-		//Restbudget fuer Rechnungen
-		$restbudget = $budget - $brutto['rechnung'];
-		if($restbudget>0)
-			$class='number_positive';
-		elseif($restbudget<0)
-			$class='number_negative';
-		else
-			$class='number';
-		echo '<td class="',$class,'">',number_format($restbudget,2,',','.'),'</td>';
-		
-		echo '<td class="number">',number_format($budget,2,',','.'),'</td>';
+		if($budgetanzeige)
+		{
+			$budget = $kostenstelle->getBudget($id, $gj->geschaeftsjahr_kurzbz);
+			//Restbudget fuer Bestellungen
+			$restbudget = $budget - $brutto['bestellung'];
+			if($restbudget>0)
+				$class='number_positive';
+			elseif($restbudget<0)
+				$class='number_negative';
+			else
+				$class='number';
+			echo '<td class="',$class,'">',number_format($restbudget,2,',','.'),'</td>';
+			
+			//Restbudget fuer Rechnungen
+			$restbudget = $budget - $brutto['rechnung'];
+			if($restbudget>0)
+				$class='number_positive';
+			elseif($restbudget<0)
+				$class='number_negative';
+			else
+				$class='number';
+			echo '<td class="',$class,'">',number_format($restbudget,2,',','.'),'</td>';
+			
+			echo '<td class="number">',number_format($budget,2,',','.'),'</td>';
+			$gesamt_budget += $budget;
+		}
 		echo '</tr>';
 		
 		$gesamt_rechnung += $brutto['rechnung'];
 		$gesamt_bestellung += $brutto['bestellung'];
-		$gesamt_budget += $budget;
+		
 	}
 	echo '
 		</tbody>
@@ -240,10 +291,15 @@ $datum_obj = new datum();
 				<th></th>
 				<th>Summe:</th>
 				<th class="number">',number_format($gesamt_bestellung,2,',','.'),'</th>
-				<th class="number">',number_format($gesamt_rechnung,2,',','.'),'</th>
+				<th class="number">',number_format($gesamt_rechnung,2,',','.'),'</th>';
+	if($budgetanzeige)
+	{
+		echo '
 				<th></th>
 				<th></th>
-				<th class="number">',number_format($gesamt_budget,2,',','.'),'</th>
+				<th class="number">',number_format($gesamt_budget,2,',','.'),'</th>';
+	}
+	echo '
 			</tr>
 		</tfoot>
 		</table>';

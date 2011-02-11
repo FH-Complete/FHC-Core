@@ -758,7 +758,7 @@ elseif($aktion == 'save')
 		}
 		else 
 		{
-			$ausgabemsg.='<span class="ok">Bestellung wurde erfolgreich angelegt!</span>'; 
+			$ausgabemsg.='<span class="ok">Bestellung wurde erfolgreich angelegt!</span><br>'; 
 			$_GET['method']= 'update';
 			$_GET['id'] = $bestell_id; 
 		}
@@ -896,12 +896,12 @@ if($_GET['method']=='update')
 				} 
 				for($i = 1; $i <= $bestellung_detail_anz; $i++)
 				{
-					// wenn letzte zeile leer ist, nicht speichern
-					if($i == $bestellung_detail_anz  && $_POST["ve_$i"] == '' && $_POST["menge_$i"] =='' && $_POST["beschreibung_$i"]=='' && $_POST["artikelnr_$i"] =='')
-						continue; 
 					// wenn ein Detail gelöscht wird Durchlauf überspringen
 					if(!isset($_POST["bestelldetailid_$i"]))
-						continue; 
+						continue;
+					// wenn letzte zeile leer ist, nicht speichern
+					if($i == $bestellung_detail_anz  && $_POST["ve_$i"] == '' && $_POST["menge_$i"] =='' && $_POST["beschreibung_$i"]=='' && $_POST["artikelnr_$i"] =='')
+						continue;  
 					$detail_id = $_POST["bestelldetailid_$i"]; 
 					$bestell_detail = new wawi_bestelldetail(); 		
 					
@@ -1523,7 +1523,7 @@ if($_GET['method']=='update')
 	}
 	if($bestellung->freigegeben != 't')
 		getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id,$i);
-	
+		
 	$test = $i; 
 	echo "</tbody>";
 	echo "<tfoot>";
