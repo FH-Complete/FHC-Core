@@ -882,7 +882,6 @@ if($_GET['method']=='update')
 					$tag_bestellung->bestellung_id = $bestellung_id; 
 					$tag_bestellung->insertvon = $user; 
 					$tag_bestellung->insertamum = date('Y-m-d H:i:s');
-					var_dump($tag_bestellung); 
 					
 					if(!$tag_bestellung->TagExists())
 					{
