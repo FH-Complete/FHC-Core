@@ -505,7 +505,7 @@ class wawi_bestellung extends basis_db
 		$brutto = 0;
 		$qry_brutto= "select sum(brutto) as brutto 
 					from 
-					(select detail.menge, detail.preisprove, detail.mwst, sum(detail.menge * detail.preisprove) * ((100+detail.mwst)/100) as brutto 
+					(select detail.menge, detail.preisprove, detail.mwst, sum(detail.menge * detail.preisprove) * ((100+COALESCE(detail.mwst,0))/100) as brutto 
 					from 
 					wawi.tbl_bestellung as bestellung, wawi.tbl_bestelldetail as detail 
 					where 
