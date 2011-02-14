@@ -202,6 +202,8 @@ class wawi_bestelldetail extends basis_db
 		if(!$this->validate())
 			return false; 
 			
+		$mwst = ($this->mwst == '' ? '0':$this->mwst); 
+			
 		if($this->new)
 		{
 			// insert
@@ -214,7 +216,7 @@ class wawi_bestelldetail extends basis_db
 			$this->addslashes($this->beschreibung).', '.
 			$this->addslashes($this->artikelnummer).', '.
 			$this->addslashes($this->preisprove).', '.
-			$this->addslashes($this->mwst).', 
+			$this->addslashes($mwst).', 
 			false, '.
 			$this->addslashes($this->sort).',  
 			false , '.
@@ -235,7 +237,7 @@ class wawi_bestelldetail extends basis_db
 			beschreibung = '.$this->addslashes($this->beschreibung).',
 			artikelnummer = '.$this->addslashes($this->artikelnummer).',
 			preisprove = '.$this->addslashes($this->preisprove).',
-			mwst = '.$this->addslashes($this->mwst).',
+			mwst = '.$this->addslashes($mwst).',
 			erhalten = '.($this->erhalten?'true':'false').',
 			sort = '.$this->addslashes($this->sort).',
 			text = '.($this->text?'true':'false').',
