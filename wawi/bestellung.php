@@ -148,7 +148,7 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 {
 	if(is_numeric($_POST['id']))
 	{
-		echo getDetailRow($_POST['id'],'','','','','','','','','','',$_POST['id']);
+		echo getDetailRow($_POST['id'],'','','','','','','','','',$_POST['bestellung_id'],$_POST['id']);
 		$test++; 
 		exit;
 	}
@@ -1821,7 +1821,7 @@ if($_GET['method']=='update')
 		function newRow()
 		{
 			var id = anzahlRows; 
-			$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
+			$.post("bestellung.php", {id: id+1, bestellung_id: bestellung_id, getDetailRow: "true"},
 						function(data){
 							$("#detailTable").append(data);
 							anzahlRows=anzahlRows+1;
@@ -2123,7 +2123,10 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	$removeDetail ='';
 	$checkSave = ''; 
 	$checkRow = '';
+	$user=get_uid();
 	$status= new wawi_bestellstatus(); 
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
 	// wenn status Storno oder Abgeschickt, kein löschen der Details mehr möglich
 	if(!$status->isStatiVorhanden($bestell_id,'Storno'))
 	{
@@ -2135,6 +2138,9 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 			$detailDown = "nunter(".$i.");"; 
 			$detailUp = "nauf(".$i.");"; 
 		}
+		
+		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && $rechte->isBerechtigt('wawi/bestellung_advanced'))
+			$removeDetail = "removeDetail(".$i.");";
 	}
 	$preisprove = sprintf("%01.2f",$preisprove); 
 	
