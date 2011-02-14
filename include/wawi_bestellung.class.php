@@ -221,7 +221,8 @@ class wawi_bestellung extends basis_db
 			$qry.= ' AND bestellung.konto_id = '.$this->addslashes($konto_id);
 		
 		if ($mitarbeiter_uid != '')	
-			$qry.= ' AND bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid);
+			$qry.= ' AND ( bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid).' OR bestellung.insertvon = '.$this->addslashes($mitarbeiter_uid)
+			.' OR bestellung.besteller_uid = '.$this->addslashes($mitarbeiter_uid).' )';
 		
 		if($rechnung)
 			$qry.= ' AND not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
