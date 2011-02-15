@@ -168,6 +168,7 @@ class lehreinheitmitarbeiter extends basis_db
 			$this->errormsg = 'Planstunden muss eine gueltige Zahl sein';
 			return false;
 		}
+		
 		if($this->semesterstunden!='' && !is_numeric($this->semesterstunden))
 		{
 			$this->errormsg = 'Semesterstunden muss eine gueltige Zahl sein';
@@ -202,7 +203,8 @@ class lehreinheitmitarbeiter extends basis_db
 		if(!$this->validate())
 			return false;
 
-		$this->planstunden = (int)mb_str_replace(',', '.', $this->planstunden);
+		if(!$this->planstunden=='')
+			$this->planstunden = (int)mb_str_replace(',', '.', $this->planstunden);
 		$this->semesterstunden = mb_str_replace(',', '.', $this->semesterstunden);
 		
 		if($new)
@@ -245,7 +247,7 @@ class lehreinheitmitarbeiter extends basis_db
 				$this->mitarbeiter_uid_old = $this->mitarbeiter_uid;
 				
 			//Wenn der Lektor geaendert wird, dann wird insertamum und insertvon neu gesetzt
-			//damit in den Chronjobs erkannt wird welche Lektoren an diesem Tag geaendert wurden.
+			//damit in den Cronjobs erkannt wird welche Lektoren an diesem Tag geaendert wurden.
 			$setinsert='';
 			if($this->mitarbeiter_uid_old!=$this->mitarbeiter_uid)
 			{
@@ -268,7 +270,7 @@ class lehreinheitmitarbeiter extends basis_db
 			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
 			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid_old).";";
 		}
-
+						
 		if($this->db_query($qry))
 		{
 			return true;
