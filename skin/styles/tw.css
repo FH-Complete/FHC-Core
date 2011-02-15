@@ -146,6 +146,28 @@ a
 	color: #008381; text-decoration: none;
 	cursor: pointer;
 }
+a.ItemTesttool
+{
+	color: #008381;
+	line-height:25px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-right:156px;
+	background-image: url(../skin/styles/button.png);
+	background-position:left;
+	background-repeat:no-repeat;
+}
+a:hover.ItemTesttool
+{
+	color: black;
+	line-height:25px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-right:156px;
+	background-image: url(../skin/styles/button_hover.png);
+	background-position:left;
+	background-repeat:no-repeat;
+}
 a.HyperItem
 {
 	color: Black; text-decoration: none;
@@ -261,23 +283,25 @@ td.ContentHeader
 }
 td.ContentHeader2
 {
-	background-color: #CCCCCC; /*mittel-grau*/
+	background-color: #CCCCCC; /*mittel-grau */
 	font-weight: normal;
 	height: 19px
 }
 td.ContentHeader3					
 {
-	background-color: #CCCCCC; /*mittel-grau*/
+	background-color: #CCCCCC; /*mittel-grau */
 	font-weight: bold;
 	height: 19px
 }
 td.MarkLine
 {
-	background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiß*/
+	background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */ 
 }
-td.Inaktiv  /*für Inaktive Items bei der Raumbeschreibung*/ {
-  background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiss*/
+td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */ 
+{ 
+  background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
   color: #CFCFCF;
+  text-decoration: line-through;
 }
 td.tdwidth10
 {
