@@ -238,8 +238,6 @@ class wawi_bestellung extends basis_db
 						OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
 						)';
 
-
-			echo $qry; 
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";
