@@ -470,9 +470,10 @@ if($aktion == 'suche')
 			$suchdatum="01.09.".($datum['year']-1);
 		else
 			$suchdatum="01.09.".$datum['year'];
-			
+				
 		echo "<h2>Bestellung suchen</h2>\n"; 
-		echo "<form action ='bestellung.php?method=suche' method='post' name='sucheForm'>\n";
+		echo "<form action ='bestellung.php' method='GET' name='sucheForm'>\n";
+		echo "<input type='hidden' name='method' value='suche'/>";
 		echo "<table border =0>\n";
 		echo "<tr>\n";
 		echo "<td>Bestellnummer</td>\n";
@@ -568,6 +569,8 @@ if($aktion == 'suche')
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 's'))
 			die('Sie haben keine Berechtigung zum Suchen von Bestellungen');
 			
+		$_SESSION['wawi/lastsearch']=$_SERVER['QUERY_STRING'];
+		
 		$status = new wawi_bestellstatus(); 
 		$bestellnummer = (isset($_REQUEST['bestellnr'])?$_REQUEST['bestellnr']:'');
 		$titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
@@ -2071,7 +2074,7 @@ if($_GET['method']=='update')
 		echo "<td><input type='submit' value='Erneut Abschicken' id='btn_erneut_abschicken' name='btn_erneut_abschicken' class='cursor'></td>"; 
 	echo"<td style='width:100%' align='right'>";
 	echo "<div ><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
-	echo "</td></tr></table><br><br>";
+	echo "</td></tr></table><br>";
 	if($disabled!='')
 	{
 		//Wenn die Advanced Berechtigung vorhanden ist, werden die Felder nicht gesperrt oder derjenige hat berechtigungen auf die kst oder oe und die bestellung ist noch nicht freigegeben
@@ -2087,6 +2090,8 @@ if($_GET['method']=='update')
 			</script>';
 		}
 	}
+	if(isset($_SESSION['wawi/lastsearch']))
+		echo '<input type="button" onclick="window.location.href=\'bestellung.php?'.$_SESSION['wawi/lastsearch'].'\'" value="Zurück zur Liste" /><br><br>';
 	
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 		echo "Bestellung wurde am ".$date->formatDatum($status->datum,'d.m.Y')." abgeschickt."; 
