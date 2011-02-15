@@ -210,24 +210,15 @@
     </TD>
     <TD>Hier nur in extremen Notf&auml;llen</TD>
   </TR>
-  <TR>
-    <TD>
-      <DIV align="right">-3</DIV>
-    </TD>
-    <TD>Hier auf gar keinen Fall !!!</TD>
-  </TR>
 </TABLE>
 <P>&nbsp;</P>
 <H3>Folgende Punkte sind zu beachten:</H3>
 <OL>
-  <LI> Verwenden Sie den Wert -3 nur wenn Sie zu dieser Stunde wirklich nicht
-    k&ouml;nnen, um eine bessere Optimierung zu erm&ouml;glichen.</LI>
-  <LI>Es mu&szlig; f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird,
-    mindestens das 2-fache an positiven Zeitw&uuml;nschen angegeben werden.<BR>
-    Beispiel: Sie unterrichten 4 Stunden/Woche, dann m&uuml;ssen Sie mindesten
-    8 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
+  <LI>Verwenden Sie den Wert -2 nur, wenn Sie zu dieser Stunde wirklich nicht k&ouml;nnen, um eine bessere Optimierung zu erm&ouml;glichen.</LI>
+  <LI>Es sollten f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird, mindestens das 3-fache an positiven Zeitw&uuml;nschen angegeben werden.<BR>
+    Beispiel: Sie unterrichten 4 Stunden/Woche, dann sollten Sie mindestens 12 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
 </OL>
-<P>Bei Problemen wenden Sie sich bitte an die <A href="mailto:stpl@technikum-wien.at">Stundenplanstelle</A>.</P>
+<P>Bei Problemen wenden Sie sich bitte an die <A href="mailto:lvplan@technikum-wien.at">Lehrveranstaltungsplanung</A>.</P>
 <P>&nbsp;</P>
 </body>
 </html>
