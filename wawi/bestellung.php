@@ -1042,16 +1042,19 @@ if($_GET['method']=='update')
 					// wer ist freigabeberechtigt auf kostenstelle
 					$rechte_fg = new benutzerberechtigung();
 					$uids = $rechte_fg->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
-					$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+					if(empty($uids))
+						$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
+					else 
+						$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
 				}
 			}
 		}
-		// kostenstelle gibt frei
+		// Kostenstelle hat freigegeben
 		if(isset($_POST['btn_freigabe']) )
 		{
 			if(!isset($_POST['freigabe_oe']))
 			{
-				// Kostenstelle gibt frei
+
 				// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
 				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
 				{
@@ -1090,7 +1093,10 @@ if($_GET['method']=='update')
 							{
 								$rechte_fg = new benutzerberechtigung();
 								$uids = $rechte_fg->getFreigabeBenutzer(null, $o); 
-								$freigabe = true; 
+								if(empty($uids))
+									$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
+								else 
+									$freigabe = true; 
 								break; 
 							}
 						}
@@ -1113,7 +1119,7 @@ if($_GET['method']=='update')
 			}
 			else
 			{
-				// OE gibt frei
+				// OE hat freigegeben
 				// wenn status Storno vorhanden, soll nicht mehr freigegeben werden. 
 				if($status->isStatiVorhanden($bestellung_new->bestellung_id, 'Storno'))
 				{
@@ -1152,7 +1158,10 @@ if($_GET['method']=='update')
 							{
 								$rechte_fg = new benutzerberechtigung();
 								$uids = $rechte_fg->getFreigabeBenutzer(null, $o); 
-								$freigabe = true; 
+								if(empty($uids))
+									$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
+								else 
+									$freigabe = true; 
 								break; 
 							}
 						}
@@ -1174,6 +1183,54 @@ if($_GET['method']=='update')
 					}
 				}
 			}
+		}
+		
+		// es soll die freigabenachricht erneut versendet werden, an dem der zum freigeben drann ist 
+		if(isset($_POST['btn_erneut_abschicken']))
+		{
+			if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe'))
+			{
+				// KST hat noch nicht freigegeben
+				$rechte_fg = new benutzerberechtigung();
+				$uids = $rechte_fg->getFreigabeBenutzer($bestellung_new->kostenstelle_id, null); 
+				if(empty($uids))
+					$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
+				else 
+					$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+			}
+			else
+			{
+				$bestellung_new->load($bestellung_id); 
+			
+					// wer ist freigabeberechtigt auf nächsthöhere Organisationseinheit
+					$oes = array(); 
+					$oes = $bestellung_new->FreigabeOe($bestellung_id); 
+					$freigabe= false; 
+					foreach($oes as $o)
+					{
+						if(!$status->isStatiVorhanden($bestellung_new->bestellung_id, 'Freigabe', $o))
+						{
+							$rechte_fg = new benutzerberechtigung();
+							$uids = $rechte_fg->getFreigabeBenutzer(null, $o); 
+							if(empty($uids))
+								$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
+							else 
+								$freigabe = true; 
+							break; 
+						}
+					}
+					if(!$freigabe == false)
+					{
+						$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+						// fehlermeldung wenn kein uid gefunden
+					}
+					else
+					{
+						$ausgabemsg.= '<span class="ok">Die Bestellung wurde komplett freigegeben</span><br>'; 
+					}
+				
+			}
+				
 		}
 		$_GET['method']='update';
 		$_GET['id']=$bestellung_new->bestellung_id;		
@@ -1272,7 +1329,7 @@ if($_GET['method']=='update')
 	$disabled = '';
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 		$disabled = 'disabled'; 
-	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id))	
+	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id) || ($rechte->isBerechtigt('wawi/freigabe', null, 'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben =='f'))	
 		$disabled = '';
 	
 	echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)' $disabled id='filter_kst'>\n";
@@ -1496,7 +1553,7 @@ if($_GET['method']=='update')
 	echo "</table>\n";
 	echo "<br>";
 	//tabelle Details
-	echo "<table border =0 width='70%'>\n";
+	echo "<table border ='0' width='70%'>\n";
 	echo "<tr>\n";
 	echo "<th></th>\n";
 	echo "<th></th>\n";
@@ -1531,13 +1588,17 @@ if($_GET['method']=='update')
 	echo "<td></td>"; 
 	echo "<td></td>";
 	echo "<td></td>";
-	echo "<td></td>";
-	echo "<td></td>";
-	echo "<td></td>";
+	echo "<td colspan='3'>"; 
+	
+	// neue Zeile hinzufügen nur mit Berechtigung
+	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id))
+		echo "<input type='button' value='neue Zeile' onclick='newRow();' class='cursor'>"; 
+	echo "</td>";
 	echo "<td></td>";
 	echo "<td><input type='hidden' name='detail_anz' id='detail_anz' class='number' value='$test'></td>";
 	echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis Netto:</td>";
 	echo "<td class='number'><span id='netto'></span> &euro;</td>";
+	echo "<td></td>"; 
 	echo "</tr>";
 	echo "<tr>"; 
 	echo "<td></td>"; 
@@ -1550,6 +1611,7 @@ if($_GET['method']=='update')
 	echo "<td></td>";
 	echo "<td colspan ='2' style='text-align:right;'>Gesamtpreis Brutto:</td>";
 	echo "<td class='number'><span id='brutto'></span> &euro;</td>";
+	echo"<td></td>"; 
 	echo "</tr>";
 	echo "</tfoot>";
 	echo "</table>\n";
@@ -1837,7 +1899,7 @@ if($_GET['method']=='update')
 		 * uebergebene id, die der letzte Zeile ist
 		 * und der Betrag eingetragen wurde
 		 */
-		function checkNewRow(id)
+		function checkNewRow(id, bestellung_id)
 		{
 			var betrag="";
 			betrag = $("#preisprove_"+id).val();
@@ -1847,7 +1909,7 @@ if($_GET['method']=='update')
 			// dann eine neue Zeile hinzufuegen
 			if(betrag.length>0 && anzahlRows==id)
 			{
-				$.post("bestellung.php", {id: id+1, getDetailRow: "true"},
+				$.post("bestellung.php", {id: id+1, bestellung_id: bestellung_id, getDetailRow: "true"},
 						function(data){
 							$("#detailTable").append(data);
 							anzahlRows=anzahlRows+1;
@@ -2002,18 +2064,21 @@ if($_GET['method']=='update')
 	$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
 	if($aktBrutto =='')
 		$aktBrutto ="0"; 	
-	echo "<input type='submit' value='Speichern' id='btn_submit' name='btn_submit' onclick='return conf_del_budget($aktBrutto);' class='cursor'>\n"; 
-	echo "<input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'>\n"; 
-	// neue Zeile hinzufügen nur mit Berechtigung
-	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id))
-		echo "<input type='button' value='neue Zeile' onclick='newRow();' class='cursor'>"; 
-	echo "<div style='float:right;'><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
-	echo "<br><br>";
+	echo '<table border ="0" style="width: auto"> <tr>'; 
+	echo "<td><div style='float:right;'><input type='submit' value='Speichern' id='btn_submit' name='btn_submit' onclick='return conf_del_budget($aktBrutto);' class='cursor'></td>"; 
+	echo "<td><input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'></td>"; 
+	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && $bestellung->freigegeben == 'f')
+		echo "<td><input type='submit' value='Erneut Abschicken' id='btn_erneut_abschicken' name='btn_erneut_abschicken' class='cursor'></td>"; 
+	echo"<td style='width:100%' align='right'>";
+	echo "<div ><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
+	echo "</td></tr></table><br><br>";
 	if($disabled!='')
 	{
-		//Wenn die Advanced Berechtigung vorhanden ist, werden die Felder nicht gesperrt
-		if(!$rechte->isBerechtigt('wawi/bestellung_advanced',null, 'suid'))
+		//Wenn die Advanced Berechtigung vorhanden ist, werden die Felder nicht gesperrt oder derjenige hat berechtigungen auf die kst oder oe und die bestellung ist noch nicht freigegeben
+		if(!($rechte->isBerechtigt('wawi/bestellung_advanced',null, 'suid') 
+		|| ($rechte->isBerechtigt('wawi/freigabe',null,'suid',$bestellung->kostenstelle_id)) && $bestellung->freigegeben == 'f'))
 		{
+			// Felder Sperren
 			echo '<script type="text/javascript"> 
 				$(document).ready(function()
 				{
@@ -2127,6 +2192,8 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	$status= new wawi_bestellstatus(); 
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
+	$bestellung = new wawi_bestellung();
+	$bestellung->load($bestell_id); 
 	// wenn status Storno oder Abgeschickt, kein löschen der Details mehr möglich
 	if(!$status->isStatiVorhanden($bestell_id,'Storno'))
 	{
@@ -2134,12 +2201,12 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 		{
 			$removeDetail = "removeDetail(".$i.");"; 
 			$checkSave = "checkSave(".$i.");"; 
-			$checkRow = "setTimeout(\"checkNewRow(".$i.")\",100);"; 
+			$checkRow = "setTimeout(\"checkNewRow(".$i.",".$bestell_id.")\",100);"; 
 			$detailDown = "nunter(".$i.");"; 
 			$detailUp = "nauf(".$i.");"; 
 		}
 		
-		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && $rechte->isBerechtigt('wawi/bestellung_advanced'))
+		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && ($rechte->isBerechtigt('wawi/bestellung_advanced') || ($rechte->isBerechtigt('wawi/freigabe', null,'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben == 'f')))
 			$removeDetail = "removeDetail(".$i.");";
 	}
 	$preisprove = sprintf("%01.2f",$preisprove); 
