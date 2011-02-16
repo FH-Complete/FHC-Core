@@ -178,15 +178,17 @@ class wawi_bestellung extends basis_db
 	 * @param $kostenstelle_id
 	 * @param $tag
 	 */
-	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null, $tag=null, $zahlungstyp=null)
+	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null, $tag=null, $zahlungstyp=null, $tagNotExists=false)
 	{
 		$first = true; 
 		$qry = "SELECT distinct on (bestellung.bestellung_id) *, bestellung.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
 		FROM 
 		wawi.tbl_bestellung bestellung
-		
 		LEFT JOIN wawi.tbl_bestellung_bestellstatus status USING (bestellung_id) 
 		LEFT JOIN wawi.tbl_kostenstelle kostenstelle USING (kostenstelle_id) 
+		LEFT JOIN wawi.tbl_bestellungtag bestelltag USING (bestellung_id) 
+		LEFT JOIN wawi.tbl_bestelldetail detail USING (bestellung_id)
+
 		LEFT JOIN public.tbl_organisationseinheit orgaeinheit ON (orgaeinheit.oe_kurzbz = kostenstelle.oe_kurzbz)  
 		WHERE 1=1 "; 
 		
@@ -237,7 +239,10 @@ class wawi_bestellung extends basis_db
 			$qry.= ' AND (EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
 						OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
 						)';
-
+		if($tagNotExists)
+			$qry.=' AND (NOT EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) 
+					 AND NOT EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) )';
+			
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";
