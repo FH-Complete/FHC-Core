@@ -855,9 +855,8 @@ class wawi_bestellung extends basis_db
 		left join wawi.tbl_bestellung_bestellstatus as s using (bestellung_id)
 		where 
 		b.bestellung_id not in 
-		(SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung' 
-		UNION SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz NOT in ('Abgeschickt'))
-		and b.bestellung_id = b.bestellung_id and datum < CURRENT_DATE - '".$min." week'::interval AND datum > CURRENT_DATE - '".$max." week'::interval
+		(SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung') and bestellstatus_kurzbz = ('Abgeschickt')
+		and b.bestellung_id = b.bestellung_id and b.insertamum < CURRENT_DATE - '".$min." week'::interval AND b.insertamum > CURRENT_DATE - '".$max." week'::interval
 		)
 		order by bestellung_id";
 		
