@@ -384,7 +384,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "		</select></td>\n";
 	
 	//Kostenstelle
-	$htmlstr .= "		<td><select name='kostenstelle_id' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
+	$htmlstr .= "		<td><select name='kostenstelle_id' onchange='markier(\"".(isset($b->benutzerberechtigung_id)?$b->benutzerberechtigung_id:'')."\")'>\n";
 	$htmlstr .= "			<option value=''>-- keine Auswahl --</option>\n";
 
 	foreach ($kostenstelle->result as $kst)
