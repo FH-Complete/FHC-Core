@@ -837,7 +837,7 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Gibt alle Bestellungen zurück die im Zeitraum zwischen max und min liegen und die die keinen Liefer oder Storno Status besitzen
+	 * Gibt alle Bestellungen zurück die im Zeitraum zwischen max und min liegen und einen abgeschickt status und keinen Bestellstatus besitzen
 	 * @param $min	in wochen
 	 * @param $max  in wochen
 	 */
@@ -854,7 +854,9 @@ class wawi_bestellung extends basis_db
 		from wawi.tbl_bestellung as b
 		left join wawi.tbl_bestellung_bestellstatus as s using (bestellung_id)
 		where 
-		b.bestellung_id not in (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz in('Lieferung','Storno'))
+		b.bestellung_id not in 
+		(SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung' 
+		UNION SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz NOT in ('Abgeschickt'))
 		and b.bestellung_id = b.bestellung_id and datum < CURRENT_DATE - '".$min." week'::interval AND datum > CURRENT_DATE - '".$max." week'::interval
 		)
 		order by bestellung_id";
