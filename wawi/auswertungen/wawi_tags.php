@@ -182,7 +182,7 @@ else
 {
 	$kostenstelle = new wawi_kostenstelle();
 	
-	$kostenstelle->loadArray($kst_array, '',false);
+	$kostenstelle->loadArray($kst_array, 'bezeichnung',false);
 	echo 'Bitte markieren sie die Kostenstellen die auf der Auswertung aufscheinen sollen:<br /><br />
 	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 		<table>
