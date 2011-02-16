@@ -459,6 +459,8 @@ if($aktion == 'suche')
 		$konto = new wawi_konto();
 		$konto->getAll();
 		$konto_all = $konto->result;
+		$zahlungstyp = new wawi_zahlungstyp(); 
+		$zahlungstyp->getAll(); 
 		
 		$kostenstelle = new wawi_kostenstelle();
 		$oe_berechtigt = new organisationseinheit(); 
@@ -482,7 +484,7 @@ if($aktion == 'suche')
 		echo "<tr>\n";
 		echo "<td>Titel</td>\n";
 		echo "<td><input type = 'text' size ='32' maxlength = '256' name = 'titel'></td>\n";
-		echo "<tr>\n";
+		echo "</tr>\n";
 		echo "<tr>\n"; 
 		echo "<td>Erstelldatum</td>\n";
 		echo "<td>von <input type ='text' id='datepicker_evon' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' id='datepicker_ebis' size ='12' name = 'ebis'></td>\n";
@@ -543,10 +545,39 @@ if($aktion == 'suche')
 		{
 			echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
 		}
-
 		echo "</SELECT>\n";
 		echo "</td>\n";
 		echo "</tr>\n";	
+		echo "<tr>\n"; 
+		echo "<td> Zahlungstyp: </td>\n"; 
+		echo "<td><SELECT name='filter_zahlungstyp' id='searchZahlungstyp' style='width: 230px;'>\n"; 
+		echo "<option value=''>-- auswählen --</option>\n";	
+		foreach($zahlungstyp->result as $zt)
+		{
+			echo '<option value='.$zt->zahlungstyp_kurzbz.' >'.$zt->bezeichnung."</option>\n";
+		}
+		echo "</SELECT>\n";
+		echo "</td>\n";
+		echo "</tr>\n"; 
+		echo "<tr>\n";
+		echo "<td>Tag:</td>\n";
+		echo "<td> <input id='tag' name='tag' size='32' maxlength='30' value=''  /></td>\n";
+		echo "</tr>\n";
+		
+		echo "<script type='text/javascript'>
+			    $('#tag').autocomplete('wawi_autocomplete.php', 
+	  		  	{
+	  			minChars:2,
+	  			matchSubset:1,matchContains:1,
+	  			width:500,
+	  			formatItem:formatItemTag,
+	  			extraParams:{'work':'tags'	
+		  		}
+	  	  	})
+			</script>"; 
+		
+		
+		echo "<tr>\n"; 
 		echo "<tr>\n";
 		echo "<td> Änderung durch: </td>\n";
 		echo "<td> <input id='mitarbeiter_name' name='mitarbeiter_name' size='32' maxlength='30' value=''  >\n";
@@ -558,6 +589,10 @@ if($aktion == 'suche')
 		echo "<td>Nur ohne Rechnung</td>\n";
 		echo "<td><input type ='checkbox' name ='rechnung'></td>\n";
 		echo "</tr>\n";
+		echo "<tr>"; 
+		echo "<td> Nur ohne Tags </td>";
+		echo "<td><input type='checkbox' name='tagsvorhanden'/></td>\n"; 
+		echo "</tr>";  
 		echo "<tr><td>&nbsp;</td></tr>\n";
 		echo "<tr><td><input type='submit' name ='submit' value='Suche'></td></tr>\n";
 		echo "</table>\n";
@@ -578,6 +613,8 @@ if($aktion == 'suche')
 		$ebis = (isset($_REQUEST['ebis'])?$_REQUEST['ebis']:'');
 		$bvon = (isset($_REQUEST['bvon'])?$_REQUEST['bvon']:'');
 		$bbis = (isset($_REQUEST['bbis'])?$_REQUEST['bbis']:'');
+		$tag = (isset($_REQUEST['tag'])?$_REQUEST['tag']:'');
+		$zahlungstyp = (isset($_REQUEST['filter_zahlungstyp'])?$_REQUEST['filter_zahlungstyp']:'');
 		$firma_id = (isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
 		if(!isset($_REQUEST['filter_oe_kurzbz']) || $_REQUEST['filter_oe_kurzbz'] == 'opt_auswahl')
 			$oe_kurzbz = '';
@@ -592,6 +629,10 @@ if($aktion == 'suche')
 			$rechnung = true; 
 		else
 			$rechnung = false; 
+		if (isset ($_REQUEST['tagsvorhanden']))
+			$tagsNotExists = true; 
+		else
+			$tagsNotExists = false; 
 		
 		$bestellung = new wawi_bestellung();
 		
@@ -607,7 +648,7 @@ if($aktion == 'suche')
 		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
 		{
 			// Filter firma oder firma id werden angezeigt
-			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $filter_tag))
+			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists))
 			{
 				$brutto = 0; 
 				$gesamtpreis =0; 
