@@ -682,6 +682,7 @@ if($aktion == 'suche')
 						$firma->load($row->firma_id);	
 						$firmenname = $firma->name; 
 					}
+
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
 					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bestellung bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Bestellung löschen'> <img src=\"../skin/images/delete_x.png\"></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung anlegen\"> <img src=\"../skin/images/Calculator.png\"> </a><a href= \"bestellung.php?method=copy&id=$row->bestellung_id\" title=\"Bestellung kopieren\"> <img src=\"../skin/images/copy.png\"> </a></td>";
@@ -845,6 +846,10 @@ elseif($_GET['method']=='copy')
 { 
 	$bestellung_id = $_GET['id'];
 	$bestellung = new wawi_bestellung(); 
+	$bestellung->load($bestellung_id); 
+	if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui', $bestellung->kostenstelle_id))
+		die('Sie haben keine Berechtigung zum Kopieren dieser Bestellung.');			
+		
 	if ($bestellung_neu = $bestellung->copyBestellung($bestellung_id, $user))
 	{
 		$_GET['method']='update';
@@ -1474,8 +1479,9 @@ if($_GET['method']=='update')
 	echo "</td><td>\n";		
 		
 	$disabled='';
-	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung')
-	 ||$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno'))
+	if(($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung')
+	 ||$status->isStatiVorhanden($bestellung->bestellung_id, 'Storno')
+	 || $rechte->isBerechtigt('wawi/bestellung_advanced',null,'suid') == false))
 	{
 		$disabled ='disabled';
 	}
