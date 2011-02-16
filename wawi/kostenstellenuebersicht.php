@@ -46,7 +46,7 @@ require_once('../include/benutzerberechtigung.class.php');
 			{ 
 			    $("#myTable").tablesorter(
 				{
-					sortList: [[1,0]],
+					sortList: [[3,0]],
 					widgets: ['zebra']
 				}); 
 			} 
