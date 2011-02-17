@@ -177,8 +177,11 @@ class wawi_bestellung extends basis_db
 	 * @param $filter_firma
 	 * @param $kostenstelle_id
 	 * @param $tag
+	 * @param $zahlungstyp
+	 * @param $tagNotExists
+	 * @param $bestellposition
 	 */
-	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null, $tag=null, $zahlungstyp=null, $tagNotExists=false)
+	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null, $tag=null, $zahlungstyp=null, $tagNotExists=false, $bestellposition=null)
 	{
 		$first = true; 
 		$qry = "SELECT distinct on (bestellung.bestellung_id) *, bestellung.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
@@ -243,6 +246,9 @@ class wawi_bestellung extends basis_db
 			$qry.=' AND (NOT EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) 
 					 AND NOT EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) )';
 			
+		if($bestellposition!='')
+			$qry.=" AND EXISTS (SELECT 1 FROM wawi.tbl_bestelldetail where UPPER(beschreibung) LIKE UPPER('%".addslashes($bestellposition)."%') AND bestellung_id=bestellung.bestellung_id)";
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage.";
