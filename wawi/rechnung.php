@@ -254,7 +254,7 @@ if($aktion == 'suche')
 		echo "</td>\n";
 		echo "</tr>\n"; 
 		echo "<tr><td>&nbsp;</td></tr>\n";
-		echo "<tr><td><input type='submit' name ='submit' value='Suche'></td></tr>\n";
+		echo "<tr><td><input type='submit' name ='submit' value='Suche' class='cursor'></td></tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
 	}
@@ -376,7 +376,7 @@ elseif($aktion == 'new')
 		echo '<option value="'.$row->kostenstelle_id.'">'.$row->bezeichnung.' ('.$row->kurzbz.') - '.mb_strtoupper($row->oe_kurzbz).'</option>';
 	}
 	echo '</SELECT>';
-	echo '<input type="submit" name="submit" value="Weiter"/>';
+	echo '<input type="submit" name="submit" value="Weiter" class="cursor"/>';
 	echo '</form>';
 	
 }
@@ -884,7 +884,7 @@ if($aktion=='update')
 		</td>
 	</tr>
 	<tr>
-		<td><input type="submit" value="Speichern"/></td>
+		<td><input type="submit" value="Speichern" class="cursor"/></td>
 	</tr>
 	</table>	
 	</form>
