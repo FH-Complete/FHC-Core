@@ -74,10 +74,10 @@
 			
 			// Bestellung Tags
 		case 'tags':
-			$bestell_id = $_REQUEST['bestell_id'];
+		//	$bestell_id = $_REQUEST['bestell_id'];
 			$tag_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($bestell_id) || $tag_search=='')
-				exit();	
+		//	if (is_null($bestell_id) || $tag_search=='')
+			//	exit();	
 			$tags = new tags(); 
 			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
@@ -87,10 +87,10 @@
 			
 			// Bestelldetail Tags
 		case 'detail_tags':
-			$detail = $_REQUEST['detail_id'];
+		//	$detail = $_REQUEST['detail_id'];
 			$tag_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($detail) || $tag_search=='')
-				exit();	
+			//if (is_null($detail) || $tag_search=='')
+			//	exit();	
 			$tags = new tags(); 
 			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
