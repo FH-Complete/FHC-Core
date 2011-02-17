@@ -596,7 +596,11 @@ if($aktion == 'suche')
 		echo "<tr>"; 
 		echo "<td> Nur ohne Tags </td>";
 		echo "<td><input type='checkbox' name='tagsvorhanden'/></td>\n"; 
-		echo "</tr>";  
+		echo "</tr>"; 
+		echo "<tr>\n";
+		echo "<td>Nur ohne Freigabe</td>\n";
+		echo "<td><input type ='checkbox' name ='ohneFreigabe'></td>\n";
+		echo "</tr>\n"; 
 		echo "<tr><td>&nbsp;</td></tr>\n";
 		echo "<tr><td><input type='submit' name ='submit' value='Suche' class='cursor'></td></tr>\n";
 		echo "</table>\n";
@@ -629,14 +633,10 @@ if($aktion == 'suche')
 		$filter_konto = (isset($_REQUEST['filter_konto'])?$_REQUEST['filter_konto']:'');
 		$mitarbeiter_uid =  (isset($_REQUEST['mitarbeiter_uid'])?$_REQUEST['mitarbeiter_uid']:'');
 		$filter_firma = (isset($_REQUEST['filter_firma'])?$_REQUEST['filter_firma']:'');
-		if (isset ($_REQUEST['rechnung']))
-			$rechnung = true; 
-		else
-			$rechnung = false; 
-		if (isset ($_REQUEST['tagsvorhanden']))
-			$tagsNotExists = true; 
-		else
-			$tagsNotExists = false; 
+		$rechnung = (isset ($_REQUEST['rechnung'])?true:false);
+		$tagsNotExists = (isset ($_REQUEST['tagsvorhanden'])?true:false); 
+		$ohneFreigabe = (isset ($_REQUEST['ohneFreigabe'])?true:false); 
+
 		$bestellposition= (isset($_REQUEST['bestellposition'])?$_REQUEST['bestellposition']:'');
 		$bestellung = new wawi_bestellung();
 		
@@ -652,7 +652,7 @@ if($aktion == 'suche')
 		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
 		{
 			// Filter firma oder firma id werden angezeigt
-			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists, $bestellposition))
+			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists, $bestellposition, $ohneFreigabe))
 			{
 				$brutto = 0; 
 				$gesamtpreis =0; 
