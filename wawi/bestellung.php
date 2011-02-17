@@ -486,6 +486,10 @@ if($aktion == 'suche')
 		echo "<td><input type = 'text' size ='32' maxlength = '256' name = 'titel'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n"; 
+		echo "<td>Bestellposition:</td>\n"; 
+		echo "<td><input type='text' name='bestellposition' size='32' maxlength='256'></td>"; 
+		echo "</tr>"; 
+		echo "<tr>\n"; 
 		echo "<td>Erstelldatum</td>\n";
 		echo "<td>von <input type ='text' id='datepicker_evon' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' id='datepicker_ebis' size ='12' name = 'ebis'></td>\n";
 		echo "</tr>\n";
@@ -594,7 +598,7 @@ if($aktion == 'suche')
 		echo "<td><input type='checkbox' name='tagsvorhanden'/></td>\n"; 
 		echo "</tr>";  
 		echo "<tr><td>&nbsp;</td></tr>\n";
-		echo "<tr><td><input type='submit' name ='submit' value='Suche'></td></tr>\n";
+		echo "<tr><td><input type='submit' name ='submit' value='Suche' class='cursor'></td></tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
 	}
@@ -633,7 +637,7 @@ if($aktion == 'suche')
 			$tagsNotExists = true; 
 		else
 			$tagsNotExists = false; 
-		
+		$bestellposition= (isset($_REQUEST['bestellposition'])?$_REQUEST['bestellposition']:'');
 		$bestellung = new wawi_bestellung();
 		
 		if($evon != '') 
@@ -648,7 +652,7 @@ if($aktion == 'suche')
 		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
 		{
 			// Filter firma oder firma id werden angezeigt
-			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists))
+			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists, $bestellposition))
 			{
 				$brutto = 0; 
 				$gesamtpreis =0; 
@@ -744,7 +748,7 @@ elseif($aktion == 'new')
 	echo "</td>\n"; 
 	echo "<tr>\n";
 	echo "<td>&nbsp;</td>\n";
-	echo "<tr><td><input type='submit' id='submit' name='submit' value='Anlegen' onclick='return checkKst();'></td></tr>\n";
+	echo "<tr><td><input type='submit' id='submit' name='submit' value='Anlegen' onclick='return checkKst();' class='cursor'></td></tr>\n";
 	echo "</table>\n";
 	echo "<span><br>Waren im Wert von &uuml;ber &euro; 500,- sind als Investition zu betrachten, darunter als geringwertiges Wirtschaftsgut (GWG). Dienstleistungen, Nahrungsmittel etc. sind Aufw&auml;nde.</span>";
 
@@ -2138,7 +2142,7 @@ if($_GET['method']=='update')
 		}
 	}
 	if(isset($_SESSION['wawi/lastsearch']))
-		echo '<input type="button" onclick="window.location.href=\'bestellung.php?'.$_SESSION['wawi/lastsearch'].'\'" value="Zurück zur Liste" /><br><br>';
+		echo '<input type="button" class="cursor" onclick="window.location.href=\'bestellung.php?'.$_SESSION['wawi/lastsearch'].'\'" value="Zurück zur Liste" /><br><br>';
 	
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 		echo "Bestellung wurde am ".$date->formatDatum($status->datum,'d.m.Y')." abgeschickt."; 
