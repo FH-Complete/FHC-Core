@@ -591,7 +591,6 @@ function eingabeOrganisationseinheit($firma_id,$firma_organisationseinheit_id,$o
 	$organisationseinheit_obj = new organisationseinheit();
 	$organisationseinheit_obj->getAll();
 
-
 	$i=0;
 	foreach ($firma->result as $row)
 	{

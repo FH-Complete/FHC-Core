@@ -52,18 +52,16 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 	}
 }
 	
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<title>WaWi Rechnung</title>	
-	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
-	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>
-	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css"/>	
-	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
+	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css">
+	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
+	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css">	
+	<link rel="stylesheet" href="../skin/wawi.css" type="text/css">
 
 	<script type="text/javascript" src="../include/js/jquery.js"></script> 
 	<script type="text/javascript" src="../include/js/jquery.ui.datepicker-de.js"></script> 	
@@ -84,7 +82,7 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 	
 	function formatItem(row) 
 	{
-	    return row[0] + " <br/>" + row[1];
+	    return row[0] + " <br>" + row[1];
 	}
 
 	
@@ -368,7 +366,7 @@ elseif($aktion == 'new')
 
 	echo '<h1>Rechnung Neu</h1>';
 	echo '<form action="rechnung.php" method="GET">';
-	echo '<input type="hidden" name="method" value="update"/>';
+	echo '<input type="hidden" name="method" value="update" >';
 	echo 'Kostenstelle: <SELECT name="kostenstelle_id">';
 		
 	foreach($kst->result as $row)
@@ -376,7 +374,7 @@ elseif($aktion == 'new')
 		echo '<option value="'.$row->kostenstelle_id.'">'.$row->bezeichnung.' ('.$row->kurzbz.') - '.mb_strtoupper($row->oe_kurzbz).'</option>';
 	}
 	echo '</SELECT>';
-	echo '<input type="submit" name="submit" value="Weiter" class="cursor"/>';
+	echo '<input type="submit" name="submit" value="Weiter" class="cursor" >';
 	echo '</form>';
 	
 }
@@ -607,7 +605,10 @@ if($aktion=='update')
 		<td>
 			<input type="text" name="rechnungsdatum" size="10" id="rechnungsdatum" value="'.$date->formatDatum($rechnung->rechnungsdatum,'d.m.Y').'">
 			<script type="text/javascript">
+			$(document).ready(function() 
+			{
 				$("#rechnungsdatum" ).datepicker($.datepicker.regional["de"]);
+			});
 			</script>	
 		</td>
 		<td>
@@ -688,7 +689,10 @@ if($aktion=='update')
 			Buchungsdatum (tt.mm.JJJJ)<br />
 			<input type="text" name="buchungsdatum" size="10" id="buchungsdatum" value="'.$date->formatDatum($rechnung->buchungsdatum,'d.m.Y').'">
 			<script type="text/javascript">
+			$(document).ready(function() 
+			{
 				$("#buchungsdatum" ).datepicker($.datepicker.regional["de"]);
+			});
 			</script>
 			<br /> <br />
 			Transferdatum (tt.mm.JJJJ)<br />';
@@ -701,7 +705,10 @@ if($aktion=='update')
 		echo '
 			<input type="text" name="transfer_datum" size="10" id="transfer_datum" value="'.$date->formatDatum($rechnung->transfer_datum,'d.m.Y').'">
 			<script type="text/javascript">
+			$(document).ready(function() 
+			{
 				$("#transfer_datum" ).datepicker($.datepicker.regional["de"]);
+			});
 			</script>';
 	}
 	echo '

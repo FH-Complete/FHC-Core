@@ -32,6 +32,7 @@
 	require_once('../include/benutzerberechtigung.class.php');
 	require_once('../include/mitarbeiter.class.php');
   	require_once ('../include/firma.class.php');
+  	require_once('../include/standort.class.php');
   	require_once ('../include/tags.class.php');
 
   	if (!$uid = get_uid())
@@ -69,7 +70,15 @@
 			if (!$sFirma->getAll($firma_search))
 				exit($sFirma->errormsg."\n");
 			for ($i=0;$i<count($sFirma->result);$i++)
-				echo html_entity_decode($sFirma->result[$i]->name).'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
+			{
+				$standort = new standort();
+				$standort->load_firma($sFirma->result[$i]->firma_id);
+				if(isset($standort->result[0]))
+					$kurzbz = $standort->result[0]->kurzbz;
+				else
+					$kurzbz = '';
+				echo html_entity_decode($sFirma->result[$i]->name).($kurzbz!=''?' ('.$kurzbz.')':'').'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
+			}
 			break;
 			
 			// Bestellung Tags
