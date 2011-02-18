@@ -84,12 +84,12 @@ $datum_obj = new datum();
 	echo '<table><tr><td>';
 	//Geschaeftsjahr	
 	echo '
-	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+	<form action="'.$_SERVER['PHP_SELF'].'" method="GET">
 	Geschäftsjahr
 	<SELECT name="geschaeftsjahr" >';
 	$gj = new geschaeftsjahr();
 	
-	$geschaeftsjahr = isset($_POST['geschaeftsjahr'])?$_POST['geschaeftsjahr']:$gj->getakt();	
+	$geschaeftsjahr = isset($_REQUEST['geschaeftsjahr'])?$_REQUEST['geschaeftsjahr']:$gj->getakt();	
 	
 	$gj->getAll();
 
@@ -110,11 +110,11 @@ $datum_obj = new datum();
 	
 	//Kalenderjahr	
 	echo '
-	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+	<form action="'.$_SERVER['PHP_SELF'].'" method="GET">
 	Kalenderjahr
 	<SELECT name="kalenderjahr" >';
 		
-	$kalenderjahr = isset($_POST['kalenderjahr'])?$_POST['kalenderjahr']:date('Y');	
+	$kalenderjahr = isset($_REQUEST['kalenderjahr'])?$_REQUEST['kalenderjahr']:date('Y');	
 	
 	for($i=date('Y')-5; $i<date('Y')+2; $i++)
 	{
@@ -130,7 +130,7 @@ $datum_obj = new datum();
 	</form>';
 	
 	echo '</td></tr></table>';
-	if(isset($_POST['kalenderjahr']))
+	if(isset($_REQUEST['kalenderjahr']))
 	{
 		//Kalenderjahr
 		$vondatum = $kalenderjahr.'-01-01';
