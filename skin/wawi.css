@@ -139,8 +139,8 @@ p.freigegeben
 	color:green; 
 }
 
-.error
+input[type="submit"],input[type="button"]
 {
-	
-}	
+	cursor: pointer;
+}
 	
