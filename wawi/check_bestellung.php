@@ -62,12 +62,10 @@ require_once '../include/firma.class.php';
 <body>
 <?php 
 
-//$aktion = (isset($_GET['method'])?$_GET['method']:'');
-//echo "method: $aktion"; 
-$min = (isset($_POST['min'])?$_REQUEST['min']:'3');
+$min = (isset($_POST['min'])?$_REQUEST['min']:'1');
 $max = (isset($_POST['max'])?$_REQUEST['max']:'42');
 
-echo '	<form action ="check_bestellung.php?method=suche" method="post" name="checkForm">
+echo '	<form action ="check_bestellung.php" method="post" name="checkForm">
 		<table>
 			<tr><td>min (Wochen): </td><td><input type="text" name="min" id="min" value="'.$min.'"></td></tr>
 			<tr><td>max (Wochen): </td><td><input type="text" name="max" id="max" value="'.$max.'"></td></tr>
