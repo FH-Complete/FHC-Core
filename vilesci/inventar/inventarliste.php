@@ -34,6 +34,7 @@ require_once('../../include/betriebsmittelstatus.class.php');
 require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/wawi_bestelldetail.class.php');
+require_once('../../include/Excel/excel.php');
 
 if (!$uid = get_uid())
 	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -68,144 +69,123 @@ $oBetriebsmittelstatus->result=array();
 	
 $resultBetriebsmittelstatus=$oBetriebsmittelstatus->result;
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-	<head>
-		<title>Inventar - Betriebsmittel - Suche</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-	</head>
-<body>
-';
 $oBetriebsmittel = new betriebsmittel();
 if (!$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id))
 		$errormsg[]=$oBetriebsmittel->errormsg;
 
+$resultBetriebsmittel = $oBetriebsmittel->result;
 
-echo output_inventar($debug,$oBetriebsmittel->result,$resultBetriebsmittelstatus,$schreib_recht,$delete_recht,$schreib_recht_administration,$default_status_vorhanden);
+$datum_obj = new datum();
+
+// Creating a workbook
+$workbook = new Spreadsheet_Excel_Writer();
+$workbook->setVersion(8);
+
+// sending HTTP headers
+$workbook->send("Inventarliste.xls");
+
+// Creating a worksheet
+$worksheet =& $workbook->addWorksheet("Inventarliste");
+$worksheet->setInputEncoding('utf-8');
+
+$format_bold =& $workbook->addFormat();
+$format_bold->setBold();
+$format_bold->setAlign('center');
+
+$format_date =& $workbook->addFormat();
+$format_date->setNumFormat('DD.MM.YYYY');
 	
-/**
- * Ausgabe der Bestellungen in Listenform
- *
- * @param unknown_type $debug
- * @param unknown_type $resultBetriebsmittel
- * @param unknown_type $resultBetriebsmittelstatus
- * @param unknown_type $schreib_recht
- * @param unknown_type $delete_recht
- * @param unknown_type $schreib_recht_administration
- * @return unknown
- */
-function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false,$delete_recht=false,$schreib_recht_administration=2)
+$format_right =& $workbook->addFormat();
+$format_right->setAlign('right');
+
+$spalte=0;
+$zeile=0;
+	
+if (is_null($resultBetriebsmittel) || !is_array($resultBetriebsmittel) || count($resultBetriebsmittel)<1)
+	return false;
+
+$worksheet->write($zeile,$spalte,'Inv.nr.',$format_bold);
+$maxlength[$spalte]=7;
+$worksheet->write($zeile,++$spalte,'Beschreibung',$format_bold);
+$maxlength[$spalte]=12;
+$worksheet->write($zeile,++$spalte,'Verwendung',$format_bold);
+$maxlength[$spalte]=10;
+$worksheet->write($zeile,++$spalte,'Seriennr.',$format_bold);
+$maxlength[$spalte]=10;
+$worksheet->write($zeile,++$spalte,'Ort',$format_bold);
+$maxlength[$spalte]=3;
+$worksheet->write($zeile,++$spalte,'Bestellnr',$format_bold);
+$maxlength[$spalte]=10;
+$worksheet->write($zeile,++$spalte,'Org.',$format_bold);
+$maxlength[$spalte]=5;
+$worksheet->write($zeile,++$spalte,'Datum',$format_bold);
+$maxlength[$spalte]=5;
+$worksheet->write($zeile,++$spalte,'Bruttobetrag',$format_bold);
+$maxlength[$spalte]=12;
+
+for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 {
-	$datum_obj=new datum();
-	
-	$htmlstring='';
-	if (is_null($resultBetriebsmittel) || !is_array($resultBetriebsmittel) || count($resultBetriebsmittel)<1)
-		return $htmlstring;
-	$htmlstring.='<table  id="t1" class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
-			<thead>';
-	if (is_array($resultBetriebsmittel) && count($resultBetriebsmittel)>1)
-		$htmlstring.='<tr><th colspan="12">'.count($resultBetriebsmittel).' Eintr&auml;ge gefundenen</th></tr>';
-	$htmlstring.='<tr>
-				<th class="table-sortable:default">Inv.nr.</th>
-				<th class="table-sortable:default">Beschreibung</th>
-				<th class="table-sortable:default">Verwendung</th>
-				<th class="table-sortable:default">Ser.nr.</th>
-				<th class="table-sortable:default">Ort</th>
-				<th class="table-sortable:default">Bestellnr</th>
-				<th class="table-sortable:default">BruttoEKP</th>
-				<th class="table-sortable:default">Datum</th>
-				<th class="table-sortable:default">Org.</th>
-				<th class="table-sortable:default">Inventur</th>
-				<th class="table-sortable:default">Entlehnt</th>
-				<th colspan="3" class="table-sortable:default">Status</th>
-			</tr>
-			</thead>
-		';
-
-	for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
+	$zeile++;
+	$spalte=0;
+	// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist	
+	$resultBetriebsmittel[$pos]->oe_kurzbz=trim($resultBetriebsmittel[$pos]->oe_kurzbz);
+	if (empty($resultBetriebsmittel[$pos]->oe_kurzbz))
 	{
-		if ($pos%2)
-			$classe='liste1';
-		else
-			$classe='liste0';
-
-		// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist	
-		$resultBetriebsmittel[$pos]->oe_kurzbz=trim($resultBetriebsmittel[$pos]->oe_kurzbz);
-		if (empty($resultBetriebsmittel[$pos]->oe_kurzbz))
-		{
-			$resultBetriebsmittel[$pos]->oe_kurzbz='Fehlt';
-			$oBetriebsmittelOrganisationseinheit = new betriebsmittel();
-			if ($oBetriebsmittelOrganisationseinheit->load_betriebsmittel_oe($resultBetriebsmittel[$pos]->betriebsmittel_id))
-				$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->oe_kurzbz;
-			else if ($oBetriebsmittelOrganisationseinheit->errormsg)	
-				$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
-		}
-		
-		$oOrganisationseinheit->bezeichnung='';
-		$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
-		// String - Daten Leerzeichen am Ende entfernen
-		$resultBetriebsmittel[$pos]->bestellnr=trim($resultBetriebsmittel[$pos]->bestellnr);
-
-		$resultBetriebsmittel[$pos]->titel=trim($resultBetriebsmittel[$pos]->titel);
-		$resultBetriebsmittel[$pos]->beschreibung=trim($resultBetriebsmittel[$pos]->beschreibung);
-
-		$resultBetriebsmittel[$pos]->firma_id=trim($resultBetriebsmittel[$pos]->firma_id);
-		$resultBetriebsmittel[$pos]->firmenname=trim($resultBetriebsmittel[$pos]->firmenname);
-						
-		$htmlstring.='<tr class="'.$classe.'">
-			<td>'.($resultBetriebsmittel[$pos]->inventarnummer?$resultBetriebsmittel[$pos]->inventarnummer:$resultBetriebsmittel[$pos]->betriebsmittel_id).'&nbsp;</td>
-			<td>'.StringCut((!empty($resultBetriebsmittel[$pos]->beschreibung)?$resultBetriebsmittel[$pos]->beschreibung:$resultBetriebsmittel[$pos]->betriebsmitteltyp),20).'&nbsp;</td>
-			<td>'.$resultBetriebsmittel[$pos]->verwendung.'&nbsp;</td>
-			<td>'.$resultBetriebsmittel[$pos]->seriennummer.'&nbsp;</td>
-			<td>'.$resultBetriebsmittel[$pos]->ort_kurzbz.'&nbsp;</td>
-			';
-
-		$htmlstring.='<td align="right">';
-		if($resultBetriebsmittel[$pos]->bestellnr!='')
-		{
-			$htmlstring.='<a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank">'.$resultBetriebsmittel[$pos]->bestellnr.'&nbsp;</a>';
-			$htmlstring.='<a href="../../wawi/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank"><img src="../../skin/images/Calculator.png" /></a>';
-		}		
-		$htmlstring.='</td>';
-		
-		$htmlstring.='
-			<td align="right">';
-		
-		//Wenn Verbindung zu einem Bestelldetail vorhanden ist, wird der Bruttobetrag des Details
-		//in der Liste angezeigt
-		if($resultBetriebsmittel[$pos]->bestelldetail_id!='')
-		{
-			$bestelldetail = new wawi_bestelldetail();
-			$bestelldetail->load($resultBetriebsmittel[$pos]->bestelldetail_id);
-			$htmlstring.= $bestelldetail->preisprove/100*(100+$bestelldetail->mwst);
-		}
-		$htmlstring.='&nbsp;</td>';
-		
-		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
-		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
-		$htmlstring.='<td align="right">'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum, 'Y-m-d').'&nbsp;</td>';
-		$htmlstring.='<td align="right">'.($resultBetriebsmittel[$pos]->ausgegeben=='t'?'Ja':'Nein').'&nbsp;</td>';
-		$htmlstring.='<td>';
-		// mit Berechtigung ist der Status zum bearbeiten
-		$betriebsmittelstatus_kurzbz_select=trim($resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
-		$htmlstring.=$betriebsmittelstatus_kurzbz_select;
-			
-		$htmlstring.='&nbsp;</td>';
-			
-		$htmlstring.='
-		</tr>
-		';
-		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
-			$htmlstring.='<tr class="'.$classe.'"  style="font-size:smaller;"><td colspan="12" class="error">Achtung! Bestellung nicht mehr vorhanden! ID: '.$resultBetriebsmittel[$pos]->bestellung_id.' NR:'.$resultBetriebsmittel[$pos]->bestellnr.'</td></tr>';
+		$resultBetriebsmittel[$pos]->oe_kurzbz='Fehlt';
+		$oBetriebsmittelOrganisationseinheit = new betriebsmittel();
+		if ($oBetriebsmittelOrganisationseinheit->load_betriebsmittel_oe($resultBetriebsmittel[$pos]->betriebsmittel_id))
+			$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->oe_kurzbz;
+		else if ($oBetriebsmittelOrganisationseinheit->errormsg)	
+			$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
 	}
-	$htmlstring.='</table>';
-	return 	$htmlstring;
+	
+	$oOrganisationseinheit->bezeichnung='';
+	$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
+	// String - Daten Leerzeichen am Ende entfernen
+	$resultBetriebsmittel[$pos]->bestellnr=trim($resultBetriebsmittel[$pos]->bestellnr);
+
+	$resultBetriebsmittel[$pos]->titel=trim($resultBetriebsmittel[$pos]->titel);
+	$resultBetriebsmittel[$pos]->beschreibung=trim($resultBetriebsmittel[$pos]->beschreibung);
+
+	$resultBetriebsmittel[$pos]->firma_id=trim($resultBetriebsmittel[$pos]->firma_id);
+	$resultBetriebsmittel[$pos]->firmenname=trim($resultBetriebsmittel[$pos]->firmenname);
+
+	
+	InsertCell($zeile,$spalte,$resultBetriebsmittel[$pos]->inventarnummer);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->beschreibung);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->verwendung);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->seriennummer);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->ort_kurzbz);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->bestellnr);
+	InsertCell($zeile,++$spalte,$oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz);
+	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y'),$format_date);
+			
+	//Wenn Verbindung zu einem Bestelldetail vorhanden ist, wird der Bruttobetrag des Details
+	//in der Liste angezeigt
+	if($resultBetriebsmittel[$pos]->bestelldetail_id!='')
+	{
+		$bestelldetail = new wawi_bestelldetail();
+		$bestelldetail->load($resultBetriebsmittel[$pos]->bestelldetail_id);
+		InsertCell($zeile,++$spalte,$bestelldetail->preisprove/100*(100+$bestelldetail->mwst), $format_right);
+	}		
+}
+$maxlength[1]=30;
+$maxlength[2]=30;
+foreach($maxlength as $i=>$breite)
+	$worksheet->setColumn(0, $i, $breite+2);
+$workbook->close();
+	
+
+function InsertCell($zeile, $spalte, $value, $format=null)
+{
+	global $maxlength, $worksheet;
+	
+	if(!is_null($format))
+		$worksheet->write($zeile,$spalte,$value, $format);
+	else
+		$worksheet->write($zeile,$spalte,$value);
+	
+	if(mb_strlen($value)>$maxlength[$spalte])
+		$maxlength[$spalte]=mb_strlen($value);
 }
 ?>
-</body>
-</html>
