@@ -953,5 +953,48 @@ class benutzerberechtigung extends basis_db
 			return false;
 		}	 
 	}
+	
+	public function getKostenstelleUser($kostenstelle_id)
+	{
+		$qry = "SELECT 
+					distinct uid, a.art, 
+					CASE WHEN a.berechtigung_kurzbz is null 
+						THEN tbl_rolleberechtigung.berechtigung_kurzbz 
+						ELSE a.berechtigung_kurzbz END as berechtigung_kurzbz
+				FROM
+				(
+				SELECT * FROM system.tbl_benutzerrolle WHERE kostenstelle_id='".addslashes($kostenstelle_id)."'
+				UNION 
+				SELECT * FROM system.tbl_benutzerrolle WHERE
+				oe_kurzbz = (SELECT oe_kurzbz FROM wawi.tbl_kostenstelle WHERE kostenstelle_id='".addslashes($kostenstelle_id)."')  
+				OR oe_kurzbz IN(
+				WITH RECURSIVE oes(oe_parent_kurzbz) as 
+				(
+					SELECT oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+					WHERE oe_kurzbz=(SELECT oe_kurzbz FROM wawi.tbl_kostenstelle WHERE kostenstelle_id='".addslashes($kostenstelle_id)."')
+					UNION ALL
+					SELECT o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+					WHERE o.oe_kurzbz=oes.oe_parent_kurzbz
+				)
+				SELECT oe_parent_kurzbz
+				FROM oes)
+				) as a
+				LEFT JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
+				WHERE (start is null OR start<=now()) AND (ende is null OR ende>=now()) AND negativ=false";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new benutzerberechtigung();
+								
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->uid = $row->uid;
+				$obj->art = $row->art;
+				
+				$this->berechtigungen[] = $obj;
+			}
+		}
+	}
 }
 ?>

@@ -94,6 +94,10 @@ if(isset($_POST['save']))
 	$fax_id = $_POST['fax_id'];
 	$telefon_id = $_POST['telefon_id'];
 	$email_id = $_POST['email_id'];
+	$kundennummer_erhalter_id = $_POST['kundennummer_erhalter_id'];
+	$kundennummer_erhalter = $_POST['kundennummer_erhalter'];
+	$kundennummer_gmbh_id = $_POST['kundennummer_gmbh_id'];
+	$kundennummer_gmbh = $_POST['kundennummer_gmbh'];
 	
 	$errormsg='';
 	
@@ -141,6 +145,74 @@ if(isset($_POST['save']))
 		
 		if($firma->save())
 		{
+			//Kundennummer Erhalter
+			if($kundennummer_erhalter_id!='' || $kundennummer_erhalter!='')
+			{
+				$firma_oe = new firma();
+				if($kundennummer_erhalter_id!='')
+				{
+					if(!$firma_oe->load_firmaorganisationseinheit($kundennummer_erhalter_id))
+					{
+						$error = true;
+						$errormsg.='Fehler beim Laden der Organisationseinheitenzuordnung';
+					}
+					$firma_oe->new = false;
+				}
+				else 
+				{
+					$firma_oe->firma_id = $firma->firma_id;
+					$firma_oe->new = true;
+					$firma_oe->oe_kurzbz='etw';
+					$firma_oe->insertamum = date('Y-m-d H:i:s');
+					$firma_oe->insertvon = $user;
+				}
+				
+				$firma_oe->updateamum = date('Y-m-d H:i:s');
+				$firma_oe->updatevon = $user;
+				$firma_oe->kundennummer=$kundennummer_erhalter;
+				
+				
+				if(!$firma_oe->saveorganisationseinheit())
+				{
+					$error = true;
+					$errormsg.='Fehler beim Speichern der Kundennummer:'.$firma_oe->errormsg;
+				}
+			}
+			
+			//Kundennummer GmbH
+			if($kundennummer_gmbh_id!='' || $kundennummer_gmbh!='')
+			{
+				$firma_oe = new firma();
+				if($kundennummer_gmbh_id!='')
+				{
+					if(!$firma_oe->load_firmaorganisationseinheit($kundennummer_gmbh_id))
+					{
+						$error = true;
+						$errormsg.='Fehler beim Laden der Organisationseinheitenzuordnung';
+					}
+					$firma_oe->new = false;
+				}
+				else 
+				{
+					$firma_oe->firma_id = $firma->firma_id;
+					$firma_oe->new = true;
+					$firma_oe->oe_kurzbz='gmbh';
+					$firma_oe->insertamum = date('Y-m-d H:i:s');
+					$firma_oe->insertvon = $user;
+				}
+				
+				$firma_oe->updateamum = date('Y-m-d H:i:s');
+				$firma_oe->updatevon = $user;
+				$firma_oe->kundennummer=$kundennummer_gmbh;
+				
+				
+				if(!$firma_oe->saveorganisationseinheit())
+				{
+					$error = true;
+					$errormsg.='Fehler beim Speichern der Kundennummer:'.$firma_oe->errormsg;
+				}
+			}
+			
 			//Adressdatensatz anlegen/updaten
 			$adresse = new adresse();
 			
@@ -314,6 +386,10 @@ if($method=='new' || $method=='update')
 	$email_id='';
 	$telefon_id='';
 	$anmerkung='';
+	$kundennummer_erhalter='';
+	$kundennummer_erhalter_id='';
+	$kundennummer_gmbh='';
+	$kundennummer_gmbh_id='';
 	
 	if($method=='new')
 		echo '<h1>Neue Firma</h1>';
@@ -332,6 +408,21 @@ if($method=='new' || $method=='update')
 		$name = $firma->name;
 		$anmerkung = $firma->anmerkung;
 		$firma_id = $firma->firma_id;
+		
+		$firma_oe = new firma();
+		$firma_oe->get_firmaorganisationseinheit($firma_id,'etw');
+		if(isset($firma_oe->result[0]))
+		{
+			$kundennummer_erhalter = $firma_oe->result[0]->kundennummer;
+			$kundennummer_erhalter_id = $firma_oe->result[0]->firma_organisationseinheit_id;
+		}
+		$firma_oe = new firma();
+		$firma_oe->get_firmaorganisationseinheit($firma_id,'gmbh');
+		if(isset($firma_oe->result[0]))
+		{
+			$kundennummer_gmbh = $firma_oe->result[0]->kundennummer;
+			$kundennummer_gmbh_id = $firma_oe->result[0]->firma_organisationseinheit_id;
+		}
 		
 		//Standort Laden
 		$standort = new standort();
@@ -382,14 +473,16 @@ if($method=='new' || $method=='update')
 	<input type="hidden" name="telefon_id" value="'.$telefon_id.'">
 	<input type="hidden" name="fax_id" value="'.$fax_id.'">
 	<input type="hidden" name="email_id" value="'.$email_id.'">
+	<input type="hidden" name="kundennummer_erhalter_id" value="'.$kundennummer_erhalter_id.'">
+	<input type="hidden" name="kundennummer_gmbh_id" value="'.$kundennummer_gmbh_id.'">
 	<table>
 	<tr>
 		<td>Name:</td>
-		<td><input type="text" name="name" maxlength="128" size="50" value="'.$name.'"/></td>
+		<td><input type="text" name="name" maxlength="128" size="80" value="'.$name.'"/></td>
 	</tr>
 	<tr>
 		<td>Straße:</td>
-		<td><input type="text" name="strasse" size="30" maxlength="256" value="'.$strasse.'"/></td>
+		<td><input type="text" name="strasse" size="40" maxlength="256" value="'.$strasse.'"/></td>
 	</tr>
 	<tr>
 		<td>Plz / Ort:</td>
@@ -427,11 +520,19 @@ if($method=='new' || $method=='update')
 	</tr>
 	<tr>
 		<td>E-Mail:</td>
-		<td><input type="text" name="email" maxlength="128" value="'.$email.'"/></td>
+		<td><input type="text" name="email" maxlength="128" size="40" value="'.$email.'"/></td>
+	</tr>
+	<tr>
+		<td>Kundennummer Erhalter:</td>
+		<td><input type="text" name="kundennummer_erhalter" maxlength="128" value="'.$kundennummer_erhalter.'"/></td>
+	</tr>
+	<tr>
+		<td>Kundennummer GmbH:</td>
+		<td><input type="text" name="kundennummer_gmbh" maxlength="128" value="'.$kundennummer_gmbh.'"/></td>
 	</tr>
 	<tr>
 		<td>Anmerkungen:</td>
-		<td><textarea name="anmerkung" cols="30" rows="3">'.$anmerkung.'</textarea></td>
+		<td><textarea name="anmerkung" cols="50" rows="3">'.$anmerkung.'</textarea></td>
 	</tr>
 	<tr>
 		<td></td>
