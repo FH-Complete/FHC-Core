@@ -29,7 +29,7 @@ if (isset($_POST['username']))
 {
 	session_start();
 
-	$username = $_POST['username'];
+	$username = trim($_POST['username']);
 	$passwort = $_POST['passwort'];
 
 	$hostname = $_SERVER['HTTP_HOST'];
