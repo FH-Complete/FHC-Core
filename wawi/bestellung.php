@@ -1546,7 +1546,7 @@ if($_GET['method']=='update')
 		$disabled = 'disabled';
 		if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 		{
-			if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id))
+			if($rechte->isberechtigt('wawi/freigabe',null, 'su', $bestellung->kostenstelle_id) || $rechte->isBerechtigt('wawi/bestellung_advanced', null, 'suid'))
 				$disabled = '';
 
 			echo "<input type='submit' value='KST Freigabe' ".($disabled==''?"name ='btn_freigabe'":$disabled).">"; 
@@ -1563,7 +1563,7 @@ if($_GET['method']=='update')
 		{
 			if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Freigabe', $o))
 			{
-				if($rechte->isberechtigt('wawi/freigabe',$o, 'su', null))
+				if($rechte->isberechtigt('wawi/freigabe',$o, 'su', null) || $rechte->isBerechtigt('wawi/bestellung_advanced', null, 'suid'))
 				{	
 					echo "<input type='submit' value='".mb_strtoupper($o)." Freigabe ' name ='btn_freigabe'>"; 
 					echo "<input type='hidden' value='$o' name ='freigabe_oe' id ='freigabe_id'>";   
