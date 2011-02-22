@@ -51,6 +51,7 @@ $menu=array
 			'BestellungNeu'=>array('name'=>'Neu', 'link'=>'bestellung.php?method=new', 'target'=>'content'),
 			'BestellungSuchen'=>array('name'=>'Suchen', 'link'=>'bestellung.php?method=suche', 'target'=>'content'),
 			'MeineBestellungen'=>array('name'=>'Meine', 'link'=>'bestellung.php?method=suche&submit=true&mitarbeiter_uid='.get_uid().'&evon='.date('Y-m-d',mktime(0,0,0,date('m')-2,date('d'),date('Y'))), 'target'=>'content'),
+			'CheckBestellungen'=>array('name'=>'Check Bestellungen', 'link'=>'check_bestellung.php', 'target'=>'content'),
 		),
 		'Rechnung'=>array
 		(
