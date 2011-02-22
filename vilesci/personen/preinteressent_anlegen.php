@@ -330,14 +330,14 @@ $where = '';
 $error = false;
 $importort='';
 //Parameter
-$titel = (isset($_POST['titel'])?$_POST['titel']:'');
-$titelpost = (isset($_POST['titelpost'])?$_POST['titelpost']:'');
-$nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
-$vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
-$geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
-$geburtsdatum = (isset($_POST['geburtsdatum'])?$_POST['geburtsdatum']:'');
-$nation = (isset($_POST['nation'])?$_POST['nation']:'A');
-$adresse = (isset($_POST['adresse'])?$_POST['adresse']:'');
+$titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
+$titelpost = (isset($_REQUEST['titelpost'])?$_REQUEST['titelpost']:'');
+$nachname = (isset($_REQUEST['nachname'])?$_REQUEST['nachname']:'');
+$vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
+$geschlecht = (isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:'');
+$geburtsdatum = (isset($_REQUEST['geburtsdatum'])?$_REQUEST['geburtsdatum']:'');
+$nation = (isset($_REQUEST['nation'])?$_REQUEST['nation']:'A');
+$adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
 $adresse_nation = (isset($_REQUEST['adresse_nation'])?$_REQUEST['adresse_nation']:'A');
 $plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
 if($adresse_nation=='A')
@@ -359,17 +359,17 @@ if($gemeinde=='' && $ort!='' && !isset($_REQUEST['gemeinde_txt']))
 	$ort='';
 }
 
-$email = (isset($_POST['email'])?$_POST['email']:'');
-$telefon = (isset($_POST['telefon'])?$_POST['telefon']:'');
-$mobil = (isset($_POST['mobil'])?$_POST['mobil']:'');
-$person_id = (isset($_POST['person_id'])?$_POST['person_id']:'');
-$svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
-$ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
+$email = (isset($_REQUEST['email'])?$_REQUEST['email']:'');
+$telefon = (isset($_REQUEST['telefon'])?$_REQUEST['telefon']:'');
+$mobil = (isset($_REQUEST['mobil'])?$_REQUEST['mobil']:'');
+$person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
+$svnr = (isset($_REQUEST['svnr'])?$_REQUEST['svnr']:'');
+$ersatzkennzeichen = (isset($_REQUEST['ersatzkennzeichen'])?$_REQUEST['ersatzkennzeichen']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 
 $stsem = new studiensemester();
 $stsem->getNextStudiensemester('WS');
-$studiensemester_kurzbz = (isset($_POST['studiensemester_kurzbz'])?$_POST['studiensemester_kurzbz']:$stsem->studiensemester_kurzbz);
+$studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:$stsem->studiensemester_kurzbz);
 
 if(isset($_REQUEST['schule_id']) && $_REQUEST['schule_id']!='')
 {
@@ -580,7 +580,7 @@ if(isset($_POST['save']))
 		
 		if(!$error)
 		{
-			foreach ($_POST as $key=>$param)
+			foreach ($_REQUEST as $key=>$param)
 			{
 				if(substr($key,0,4)=='stg_')
 				{
@@ -888,7 +888,11 @@ if($where!='')
 						echo '</table></td><td><table>';	
 					$lasttyp = $row->typ;
 				}
-				echo "<tr><td><input type='checkbox' name='stg_$row->studiengang_kz'></td><td>$row->kuerzel</td><td>$row->bezeichnung</td></tr>";
+				if(isset($_REQUEST['stg_'.$row->studiengang_kz]))
+					$checked='checked';
+				else
+					$checked='';
+				echo "<tr><td><input type='checkbox' name='stg_$row->studiengang_kz' $checked></td><td>$row->kuerzel</td><td>$row->bezeichnung</td></tr>";
 			}
 			echo '</table></td></tr></table>';
 		}
