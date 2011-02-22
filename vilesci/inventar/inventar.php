@@ -34,6 +34,7 @@ require_once('../../include/betriebsmitteltyp.class.php');
 require_once('../../include/betriebsmittelstatus.class.php');
 require_once('../../include/betriebsmittel_betriebsmittelstatus.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/wawi_rechnung.class.php');
 
 if (!$uid = get_uid())
 	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -720,7 +721,7 @@ if (!$uid = get_uid())
 		<input type="hidden" name="seriennummer" value="'.$seriennummer.'">
 		<input type="hidden" name="person_id" value="'.$person_id.'">
 		<input type="hidden" name="betriebsmittel_id" value="'.$betriebsmittel_id.'">
-		<input type="submit" value="Liste drucken" />
+		<input type="submit" value="Excel Export" />
 		</form>
 		';
 	// Inventardatenliste
@@ -819,8 +820,20 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
 			$bestellung_ivalid_style='style="color: red;"';
 					
+		
 		//$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
-		$htmlstring.='<td align="right"><a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
+		$htmlstring.='<td align="right">';
+		
+		//Wenn Rechnungen vorhanden sind, einen Link dazu anzeigen
+		$rechnung = new wawi_rechnung();
+		if($rechnung->count($resultBetriebsmittel[$pos]->bestellung_id)>0)
+		{
+			$htmlstring.='&nbsp;<a href="../../wawi/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank" '.$bestellung_ivalid_style.'><img src="../../skin/images/Calculator.png"></a>';
+		}
+		
+		$htmlstring.='<a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>';
+		
+		echo '</td>';
 
 		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
