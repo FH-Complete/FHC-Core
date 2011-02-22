@@ -67,7 +67,11 @@ $menu=array
 			'name'=>'Firma', 'link'=>'firma.php', 'target'=>'content','permissions'=>array('wawi/firma'),
 			'FirmaNeu'=>array('name'=>'Neu', 'link'=>'firma.php?method=new', 'target'=>'content'),
 			'FirmaSuchen'=>array('name'=>'Suchen', 'link'=>'firma.php', 'target'=>'content'),
-		)
+		),
+		'Berechtigungen'=>array
+		(
+			'name'=>'Berechtigungen', 'link'=>'berechtigung.php', 'target'=>'content',
+		),
 	),
 	'Berichte'=> 	array
 	(

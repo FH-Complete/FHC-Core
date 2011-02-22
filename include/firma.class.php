@@ -360,15 +360,36 @@ class firma extends basis_db
 	 */
 	public function getAll($firma_search = null)
 	{
-		$qry = "SElECT * FROM public.tbl_firma";
+		
 		if (!empty($firma_search))
 		{
-			$qry.= " WHERE ";
-			$matchcode=mb_strtoupper(addslashes(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search)));		
-			$qry.="  UPPER(trim(public.tbl_firma.name)) like '%".$matchcode."%'";
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search)));
+			//Zuerst werden die Ergebnisse geliefert, die mit $filter_search beginnen
+			//danach jene Ergebnisse bei denen $filter_search innerhalb des Namens vorkommt
+			$qry = "
+
+				SELECT 
+					firma_id, name, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
+					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort 
+				FROM public.tbl_firma 
+				WHERE 
+				UPPER(trim(public.tbl_firma.name)) like '".$matchcode."%'
+				UNION 
+				SELECT 
+					firma_id, name, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
+					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort 
+				FROM public.tbl_firma 
+				WHERE 
+				UPPER(trim(public.tbl_firma.name)) like '%".$matchcode."%'
+				AND UPPER(trim(public.tbl_firma.name)) NOT like '".$matchcode."%'
+				ORDER BY sort, name, firma_id";
+		}
+		else
+		{
+			$qry = "SELECT * FROM public.tbl_firma ORDER BY name";
 		}
 		
-		$qry.= " ORDER BY NAME"; 
+		 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
