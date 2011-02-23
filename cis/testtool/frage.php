@@ -335,7 +335,7 @@ if($levelgebiet)
 	
 }
 //Zeit des Gebietes holen
-echo '<table width="100%"><tr><td valign="top">'.$info.'</td><td align="center">'.$fortschrittsbalken.'</td></tr><tr><td>';
+echo '<table width="100%"><tr><td valign="top" width="50%">'.$info.'</td><td align="center">'.$fortschrittsbalken.'</td><td width="50%"></td></tr><tr><td>';
 
 if($demo)
 {
