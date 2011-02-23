@@ -826,7 +826,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		
 		//Wenn Rechnungen vorhanden sind, einen Link dazu anzeigen
 		$rechnung = new wawi_rechnung();
-		if($rechnung->count($resultBetriebsmittel[$pos]->bestellung_id)>0)
+		if($resultBetriebsmittel[$pos]->bestellung_id!='' && $rechnung->count($resultBetriebsmittel[$pos]->bestellung_id)>0)
 		{
 			$htmlstring.='&nbsp;<a href="../../wawi/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank" '.$bestellung_ivalid_style.'><img src="../../skin/images/Calculator.png"></a>';
 		}
