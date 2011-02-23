@@ -138,7 +138,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		$pruefling->new=true;
 			
 	$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
-	$pruefling->idnachweis = $_POST['idnachweis'];
+	$pruefling->idnachweis = isset($_POST['idnachweis'])?$_POST['idnachweis']:'';
 	$pruefling->registriert = date('Y-m-d H:i:s');
 	$pruefling->prestudent_id = $_SESSION['prestudent_id'];
 	$pruefling->semester = $_POST['semester'];
