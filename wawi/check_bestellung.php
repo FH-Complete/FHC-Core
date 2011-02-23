@@ -55,13 +55,9 @@ require_once '../include/firma.class.php';
 	}
 	</script>
 	
-	
-	
-	
 </head>
 <body>
 <?php 
-
 $min = (isset($_POST['min'])?$_REQUEST['min']:'1');
 $max = (isset($_POST['max'])?$_REQUEST['max']:'42');
 
@@ -85,11 +81,9 @@ echo '
 	}); 
 	</script>';
 
-if(isset($_POST['submit']))
-{
 	$date = new datum(); 
 	$firma = new firma(); 
-	if(is_numeric($min = $_POST['min']) && is_numeric($max = $_POST['max']))
+	if(is_numeric($min) && is_numeric($max))
 	{
 		$bestellung = new wawi_bestellung(); 
 		$bestellung->loadBestellungForCheck($min, $max);
@@ -145,6 +139,4 @@ if(isset($_POST['submit']))
 		echo '	</tbody>
 				</table>';
 	}
-}
-
 ?>
