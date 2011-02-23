@@ -143,7 +143,7 @@ if($gebiet->level_start!='')
 else 
 	$levelgebiet=false;
 
-list($stunde, $minute, $sekunde) = split(':',$gebiet->zeit);
+list($stunde, $minute, $sekunde) = explode(':',$gebiet->zeit);
 
 //Start des Pruefungsvorganges
 if(isset($_GET['start']))
@@ -335,13 +335,13 @@ if($levelgebiet)
 	
 }
 //Zeit des Gebietes holen
-echo '<table width="100%"><tr><td valign="top">'.$info.'</td><td align="center">'.$fortschrittsbalken.'</td><td valign="top" align="right">';
+echo '<table width="100%"><tr><td valign="top">'.$info.'</td><td align="center">'.$fortschrittsbalken.'</td></tr><tr><td>';
 
 if($demo)
 {
 	//Wenn es sich um ein Demobeispiel handelt, dann wird die Maximale Gesamtzeit angezeigt
+	echo "<input type=\"button\" value=\"Start\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;start=true'\" /> ";
 	echo $minute.':'.$sekunde.' Minuten ';
-	echo "<input type=\"button\" value=\"Start\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;start=true'\" />";
 }
 else
 {
@@ -352,7 +352,7 @@ else
 	$result = $db->db_query($qry);
 	$row = $db->db_fetch_object($result);
 	//Zeit in Sekunden umrechnen
-	list($stunde, $minute, $sekunde) = split(':',$row->time);
+	list($stunde, $minute, $sekunde) = explode(':',$row->time);
 	$zeit = (int) ($stunde*60*60+$minute*60+$sekunde);
 	//Wenn die Zeit negativ ist und die Stunde 0 ist,
 	//dann muss die Zeit mit -1 multipliziert werden
