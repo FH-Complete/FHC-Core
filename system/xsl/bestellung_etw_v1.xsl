@@ -34,7 +34,7 @@
 						<fo:inline font-weight="900">
 							<xsl:text>UID-Nummer: </xsl:text>
 						</fo:inline>
-						<xsl:text>ATU655565658</xsl:text>
+						<xsl:text>ATU65565658</xsl:text>
 					</fo:block>
 				</fo:block-container>
 				<fo:block-container position="absolute" top="15mm" left="115mm" height="15mm">
