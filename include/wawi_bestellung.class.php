@@ -362,12 +362,6 @@ class wawi_bestellung extends basis_db
 	 */
 	public function validate()
 	{
-		
-		if(!is_numeric($this->bestellung_id))
-		{
-			$this->errormsg = "Bestellung_id fehlerhaft.";
-			return false;
-		}
 		if(mb_strlen($this->besteller_uid)>32)
 		{
 			$this->errormsg ="Besteller_uid fehlerhaft.";
@@ -422,7 +416,7 @@ class wawi_bestellung extends basis_db
 	 */
 	public function save()
 	{
-	/*	if(!$this->validate())
+		/*if(!$this->validate())
 			return false; */
 		
 		if($this->new)
