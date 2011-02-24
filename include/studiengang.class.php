@@ -482,7 +482,7 @@ class studiengang extends basis_db
 		
 		if($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			if($row = $this->db_fetch_object())
 			{
 				$this->studiengang_kz=$row->studiengang_kz;
 				$this->kurzbz=$row->kurzbz;
@@ -515,6 +515,8 @@ class studiengang extends basis_db
 	            $this->aktiv=($row->aktiv=='t'?true:false);
 				$this->moodle=($row->moodle=='t'?true:false);
 				$this->mischform=($row->mischform=='t'?true:false);
+				
+				return true; 
 			}
 		}
 		else 
