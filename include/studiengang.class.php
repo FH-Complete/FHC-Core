@@ -475,5 +475,53 @@ class studiengang extends basis_db
 			return false;
 		}
 	}
+	
+	public function getStudiengangFromOe($oe_kurzbz)
+	{
+		$qry ="SELECT * FROM public.tbl_studiengang where oe_kurzbz =".$this->addslashes($oe_kurzbz); 
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->studiengang_kz=$row->studiengang_kz;
+				$this->kurzbz=$row->kurzbz;
+				$this->kurzbzlang=$row->kurzbzlang;
+				$this->bezeichnung=$row->bezeichnung;
+				$this->english=$row->english;
+				$this->typ=$row->typ;
+				$this->farbe=$row->farbe;
+				$this->email=$row->email;
+				$this->max_semester=$row->max_semester;
+				$this->max_verband=$row->max_verband;
+				$this->max_gruppe=$row->max_gruppe;
+				$this->erhalter_kz=$row->erhalter_kz;
+				$this->bescheid=$row->bescheid;
+				$this->bescheidbgbl1=$row->bescheidbgbl1;
+				$this->bescheidbgbl2=$row->bescheidbgbl2;
+				$this->bescheidgz=$row->bescheidgz;
+				$this->bescheidvom=$row->bescheidvom;
+				$this->ext_id=$row->ext_id;
+				$this->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				$this->zusatzinfo_html = $row->zusatzinfo_html;
+				$this->sprache = $row->sprache;
+				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+				$this->studienplaetze = $row->studienplaetze;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->lgartcode = $row->lgartcode;
+	            $this->telefon=$row->telefon;
+	            $this->titelbescheidvom=$row->titelbescheidvom;
+	            $this->aktiv=($row->aktiv=='t'?true:false);
+				$this->moodle=($row->moodle=='t'?true:false);
+				$this->mischform=($row->mischform=='t'?true:false);
+			}
+		}
+		else 
+		{
+			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten."; 
+			return false; 
+		}
+	}
 }
 ?>
