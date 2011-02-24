@@ -169,7 +169,6 @@ class wawi_aufteilung extends basis_db
 		}
 	}
 	
-	
 	/**
 	 * 
 	 * Gibt alle Aufteilungen zurück die einer Bestellung zugeordnet sind
@@ -204,7 +203,6 @@ class wawi_aufteilung extends basis_db
 			return false; 
 		}
 	}
-	
 	
 	/**
 	 * 
@@ -264,5 +262,5 @@ class wawi_aufteilung extends basis_db
 		else
 			return false; 
 	}
-	
+		
 }
