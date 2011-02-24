@@ -197,7 +197,7 @@ $worksheet->write(0, 0,"LV-Planung für $stsem1/$stsem2", $format_bold);
 $zeile=3;
 $spalte=0;
 
-$worksheet->write($zeile, $spalte,'Fachbereich', $format_colored1);
+$worksheet->write($zeile, $spalte,'Institut', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Kurzbz', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Bezeichnung', $format_colored1);
 $worksheet->write($zeile, ++$spalte,'Lehrform', $format_colored1);
