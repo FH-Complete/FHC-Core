@@ -293,18 +293,18 @@
 			$errormsg[]=$bestellung->errormsg;
 		else
 		{
-			$beschreibung=trim($bestellung->titel);
+			$anmerkung=trim($bestellung->titel);
 			$besteller=$bestellung->besteller_uid;
 			
 			$kostenstelle = new wawi_kostenstelle();
 			$kostenstelle->load($bestellung->kostenstelle_id);
 			$oe_kurzbz=$kostenstelle->oe_kurzbz;
-			$anmerkung=trim($bestellung->bemerkung);
+			$anmerkung.=trim($bestellung->bemerkung);
 			
 			foreach($bestelldetail->result as $row)
 			{
 				if (isset($row->beschreibung))
-					$anmerkung.=($anmerkung?"\n":'').trim($row->beschreibung).' '.trim($row->artikelnummer);
+					$beschreibung.=($beschreibung?"\n":'').trim($row->beschreibung).' '.trim($row->artikelnummer);
 	
 				/*
 			  	$verwendung=trim($row->kostenstelle_bezeichnung);
