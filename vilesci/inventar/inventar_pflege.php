@@ -284,8 +284,8 @@
 		}
 		else
 		{
-			if(!$bestelldetail->getAllDetailsFromBestellung($bestellung_id))
-				$errormsg[]=$bestelldetail->errormsg;
+			//if(!$bestelldetail->getAllDetailsFromBestellung($bestellung_id))
+			//	$errormsg[]=$bestelldetail->errormsg;
 		}
 		
 		//Bestellung
@@ -315,6 +315,7 @@
 				*/
 			  	$anzahl=trim(isset($row->menge)?$row->menge:$anzahl);	
 			}
+			$beschreibung = mb_substr($beschreibung, 0, 256);
 		}
 	}
 
