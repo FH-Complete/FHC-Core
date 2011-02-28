@@ -525,7 +525,6 @@ if($aktion == 'suche')
 		echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  >\n";
 		echo "</td>\n";
 		echo "</tr>\n";	
-		echo "</tr>\n";	
 		echo "<tr>\n";	
 		$kst_array = $rechte->getKostenstelle('wawi/bestellung');
 		$kostenstelle->loadArray($kst_array,'bezeichnung'); 
@@ -750,6 +749,7 @@ elseif($aktion == 'new')
 	echo "<td>&nbsp;</td>\n";
 	echo "<tr><td><input type='submit' id='submit' name='submit' value='Anlegen' onclick='return checkKst();' class='cursor'></td></tr>\n";
 	echo "</table>\n";
+	echo "</form>"; 
 	echo "<span><br>Waren im Wert von &uuml;ber &euro; 500,- sind als Investition zu betrachten, darunter als geringwertiges Wirtschaftsgut (GWG). Dienstleistungen, Nahrungsmittel etc. sind Aufw&auml;nde.</span>";
 
 	
