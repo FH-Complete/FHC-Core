@@ -34,6 +34,7 @@ $berechtigt_studiengang=array();
 $uid='';
 $berechtigung=new benutzerberechtigung();
 $dbo = new basis_db();
+$show_inout_block=false;
 
 // Berechtigungen ermitteln
 if(!isset($_SERVER['REMOTE_USER']))
@@ -52,6 +53,8 @@ else
 	$uid=get_uid();
 	$berechtigung->getBerechtigungen($uid);
 	$berechtigt_studiengang=$berechtigung->getStgKz('admin');
+	if($berechtigung->isBerechtigt('inout/uebersicht'))
+		$show_inout_block=true;
 }
 $orgform_sequence=array();
 
@@ -596,6 +599,39 @@ while ($row=$dbo->db_fetch_object())
 		<?php
 	}
 }
+
+//Incoming/Outgoing
+if($show_inout_block)
+{
+	echo '
+	<RDF:Description RDF:about="'.$rdf_url.'inout" >
+		<VERBAND:name>International</VERBAND:name>
+		<VERBAND:stg>IO</VERBAND:stg>
+		<VERBAND:stg_kz NC:parseType="Integer"></VERBAND:stg_kz>
+	</RDF:Description>
+	<RDF:Description RDF:about="'.$rdf_url.'inout/incoming">
+		<VERBAND:name>Incoming</VERBAND:name>
+		<VERBAND:stg></VERBAND:stg>
+		<VERBAND:stg_kz></VERBAND:stg_kz>
+		<VERBAND:sem></VERBAND:sem>
+		<VERBAND:ver></VERBAND:ver>
+		<VERBAND:grp></VERBAND:grp>
+		<VERBAND:orgform></VERBAND:orgform>
+		<VERBAND:typ>incoming</VERBAND:typ>
+	</RDF:Description>
+	<RDF:Description RDF:about="'.$rdf_url.'inout/outgoing">
+		<VERBAND:name>Outgoing</VERBAND:name>
+		<VERBAND:stg></VERBAND:stg>
+		<VERBAND:stg_kz></VERBAND:stg_kz>
+		<VERBAND:sem></VERBAND:sem>
+		<VERBAND:ver></VERBAND:ver>
+		<VERBAND:grp></VERBAND:grp>
+		<VERBAND:orgform></VERBAND:orgform>
+		<VERBAND:typ>outgoing</VERBAND:typ>
+	</RDF:Description>
+	';
+}
+
 draw_orgformpart($stg_kz);
 ?>
 
@@ -711,6 +747,19 @@ draw_orgformpart($stg_kz);
 		//Studiengang
 		echo "\t\t</RDF:Seq><!-- Studiengang -->\n\t</RDF:li>\n";
 	}
+
+	//Incoming/Outgoing
+	if($show_inout_block)
+	{
+		echo '
+		<RDF:li>
+			<RDF:Seq RDF:about="http://www.technikum-wien.at/lehrverbandsgruppe/inout">
+				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/incoming"/>
+				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/outgoing"/>
+			</RDF:Seq>
+		</RDF:li>';
+	}
+
 ?>
 
 </RDF:Seq>
