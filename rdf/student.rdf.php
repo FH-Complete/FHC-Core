@@ -416,9 +416,30 @@ if($xmlformat=='rdf')
 			}
 		}
 	}
-	elseif($typ=='incoming')
+	elseif($typ=='incoming' || $typ=='outgoing')
 	{
-		$qry = "SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		if($studiensemester_kurzbz=='')
+			$studiensemester_kurzbz=$semester_aktuell;
+		if($typ=='incoming')
+		{
+			$qry = "SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		}
+		else
+		{
+			$stsem_obj = new studiensemester();
+			$stsem_obj->load($studiensemester_kurzbz);
+			$qry = "SELECT prestudent_id 
+					FROM 
+						bis.tbl_bisio JOIN public.tbl_student USING(student_uid)  
+					WHERE 
+						(
+						(tbl_bisio.von>='".$stsem_obj->start."' AND tbl_bisio.von<='".$stsem_obj->ende."')
+						OR
+						(tbl_bisio.bis>='".$stsem_obj->start."' AND tbl_bisio.bis<='".$stsem_obj->ende."')
+						)
+						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=tbl_student.prestudent_id)
+					"; 
+		}
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
