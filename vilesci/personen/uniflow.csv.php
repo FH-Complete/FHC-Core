@@ -63,7 +63,7 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		echo mb_str_replace('&','und',"$row->uid;$row->oe_kurzbz;$row->organisationseinheittyp_kurzbz $row->bezeichnung;1\n");
+		echo mb_str_replace('&','und',"$row->uid;$row->organisationseinheittyp_kurzbz $row->bezeichnung;$row->organisationseinheittyp_kurzbz $row->bezeichnung;1\n");
 	}
 }
 
