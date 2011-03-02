@@ -66,7 +66,7 @@ class wawi_aufteilung extends basis_db
 			$this->errormsg = "Ungültige aufteilung_id.";
 			return false;
 		}
-		$qry = "SELECT * FROM wawi.tbl_aufteilung_default WHERE aufteilung_id =".$aufteilung_id.';';
+		$qry = "SELECT * FROM wawi.tbl_aufteilung_default WHERE aufteilung_id =".$this->addslashes($aufteilung_id).';';
 		 
 		if($this->db_query($qry))
 		{
@@ -142,7 +142,7 @@ class wawi_aufteilung extends basis_db
 		
 		$qry = "SELECT aufteilung.* from wawi.tbl_aufteilung_default as aufteilung, wawi.tbl_kostenstelle as kostenstelle 
 		where
-		kostenstelle.kostenstelle_id = aufteilung.kostenstelle_id and kostenstelle.kostenstelle_id = ".$kostenstelle_id.";";
+		kostenstelle.kostenstelle_id = aufteilung.kostenstelle_id and kostenstelle.kostenstelle_id = ".$this->addslashes($kostenstelle_id).";";
 		
 		if($this->db_query($qry))
 		{
@@ -177,7 +177,7 @@ class wawi_aufteilung extends basis_db
 	public function getAufteilungFromBestellung($bestellung_id)
 	{
 		
-		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$bestellung_id.";";
+		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($bestellung_id).";";
 		
 		if($this->db_query($qry))
 		{
