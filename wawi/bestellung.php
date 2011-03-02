@@ -702,7 +702,7 @@ if($aktion == 'suche')
 					echo "</tr>\n";	
 				}
 				echo "</tbody>\n";
-				echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2, ",",".")." €</td></tr></tfooter></table>\n";	
+				echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2, ",",".")." €</td></tr></tfooter></table>\n";	
 			}
 			else 
 			echo $bestellung->errormsg;
@@ -1471,7 +1471,9 @@ if($_GET['method']=='update')
 	}
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Lieferung') )
 	{
-		echo " <span style=\"white-space: nowrap;\">Geliefert am: ".$date->formatDatum($status->datum, 'd.m.Y')."</span>";
+		$status_help = new wawi_bestellstatus(); 
+		$status_help->getStatiFromBestellung('Lieferung', $bestellung->bestellung_id); 
+		echo " <span style=\"white-space: nowrap;\" title=$status_help->insertvon>Geliefert am: ".$date->formatDatum($status->datum, 'd.m.Y')."</span>";
 		$new++;
 	}
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') )
