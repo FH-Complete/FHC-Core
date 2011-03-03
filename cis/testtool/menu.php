@@ -49,7 +49,7 @@ if (isset($_SESSION['pruefling_id']))
 		</td></tr>';
 	echo '<tr><td nowrap><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;Gebiet</td></tr>';
 	echo '<tr><td nowrap>';
-	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible;">';
+	echo '<table /*width="100%"*/ border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible;">';
 	  	
 	$qry = "SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz='".addslashes($_SESSION['studiengang_kz'])."' AND semester='".addslashes($_SESSION['semester'])."' ORDER BY reihung";
 	//echo $qry;
@@ -100,10 +100,11 @@ if (isset($_SESSION['pruefling_id']))
 				}
 				
 				echo '<tr>
-							<td width="10" nowrap>&nbsp;</td>
-					   		<td nowrap>
-					   			<a class="Item" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.'</a>
+							<td width="10" class="ItemTesttoolLeft" nowrap>&nbsp;</td>
+					   		<td class="ItemTesttool" nowrap>
+					   			<a class="ItemTesttool" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$row->gebiet_bez.'</a>
 					   		</td>
+							<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>
 					   	</tr>';
 			}
 			else 

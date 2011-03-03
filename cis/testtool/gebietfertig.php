@@ -31,6 +31,10 @@
 
 <body>
 <br><br><br>
-<center><b>Die Maximalzeit für dieses Gebiet ist abgelaufen, oder alle Fragen wurden beantwortet!</b></center>
+<center><b>Die Maximalzeit für dieses Gebiet ist abgelaufen, oder alle Fragen wurden beantwortet.
+<br>_____________________________
+<br>
+<br>
+The time for this part has expired or you have answered all the questions.</b></center>
 </body>
 </html>

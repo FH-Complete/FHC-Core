@@ -340,7 +340,7 @@ echo '<table width="100%"><tr><td valign="top" width="50%">'.$info.'</td><td ali
 if($demo)
 {
 	//Wenn es sich um ein Demobeispiel handelt, dann wird die Maximale Gesamtzeit angezeigt
-	echo "<input type=\"button\" value=\"Start\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;start=true'\" /> ";
+	echo "<input type=\"button\" style=\"width:110px; height:40px; white-space:normal\" value=\"Gebiet starten Start chapter\" onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;start=true'\" /> ";
 	echo $minute.':'.$sekunde.' Minuten ';
 }
 else
@@ -518,7 +518,7 @@ if($frage->frage_id!='')
 	
 	if(!$demo)
 	{
-		echo "<input type=\"submit\" name=\"submitantwort\" value=\"Speichern\" />";
+		echo "<input style=\"width:150px; height:45px; white-space:normal\" type=\"submit\" name=\"submitantwort\" value=\"Speichern und weiter Save and next\" />";
 	}
 	echo "</form>";
 	echo '<br/><br/><br/>';
