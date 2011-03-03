@@ -1099,7 +1099,7 @@ if($_GET['method']=='update')
 					if(empty($uids))
 						$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
 					else 
-						$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+						$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new, $user);
 				}
 			}
 		}
@@ -1159,7 +1159,7 @@ if($_GET['method']=='update')
 						}
 						if(!$freigabe == false)
 						{
-							$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+							$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new, $user);
 						}
 						else
 						{
@@ -1225,7 +1225,7 @@ if($_GET['method']=='update')
 						if(!$freigabe == false)
 						{
 							// es wurde noch nicht alles Freigegeben
-							$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+							$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new, $user);
 						}
 						else
 						{
@@ -1253,7 +1253,7 @@ if($_GET['method']=='update')
 				if(empty($uids))
 					$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
 				else 
-					$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+					$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new, $user);
 			}
 			else
 			{
@@ -1278,7 +1278,7 @@ if($_GET['method']=='update')
 					}
 					if(!$freigabe == false)
 					{
-						$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new);
+						$ausgabemsg.=sendFreigabeMails($uids, $bestellung_new, $user);
 						// fehlermeldung wenn kein uid gefunden
 					}
 					else
@@ -2325,7 +2325,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
  * @param uids Array mit UIDs an die das Freigabemail gesendet werden soll
  * @param bestellung Bestellung Object mit der Bestellung die freigegeben werden soll
  */
-function sendFreigabeMails($uids, $bestellung)
+function sendFreigabeMails($uids, $bestellung, $user)
 {
 	global $date;
 	$msg = '';
@@ -2353,7 +2353,7 @@ function sendFreigabeMails($uids, $bestellung)
 	
 	foreach($uids as $uid)
 	{
-		$mail = new mail($uid.'@'.DOMAIN, 'no-reply', 'Freigabe Bestellung', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+		$mail = new mail($uid.'@'.DOMAIN, $user, 'Freigabe Bestellung '.$bestellung->bestell_nr, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 		$mail->setHTMLContent($email); 
 		if(!$mail->send())
 			$msg.= '<span class="error">Fehler beim Senden des Mails</span><br />';
