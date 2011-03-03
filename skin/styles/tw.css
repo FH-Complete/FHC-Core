@@ -150,23 +150,12 @@ a.ItemTesttool
 {
 	color: #008381;
 	line-height:25px;
-	padding-top:4px;
-	padding-bottom:4px;
-	padding-right:156px;
-	background-image: url(../skin/styles/button.png);
-	background-position:left;
-	background-repeat:no-repeat;
+	display:block;
 }
 a:hover.ItemTesttool
 {
 	color: black;
 	line-height:25px;
-	padding-top:4px;
-	padding-bottom:4px;
-	padding-right:156px;
-	background-image: url(../skin/styles/button_hover.png);
-	background-position:left;
-	background-repeat:no-repeat;
 }
 a.HyperItem
 {
@@ -302,6 +291,38 @@ td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */
   background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
   color: #CFCFCF;
   text-decoration: line-through;
+}
+td.ItemTesttool /*fuer die Button-Optik beim Testtool*/
+{
+	color: #008381;
+	line-height:25px;
+	background-image: url(../skin/images/testtool_button.png);
+	background-position:center;
+	background-repeat:repeat-x;
+}
+td.ItemTesttoolLeft
+{
+	color: #008381;
+	line-height:25px;
+	background-image: url(../skin/images/testtool_buttonleft.png);
+	background-position:left;
+	background-repeat:no-repeat;
+}
+td.ItemTesttoolRight
+{
+	color: #008381;
+	line-height:25px;
+	background-image: url(../skin/images/testtool_buttonright.png);
+	background-position:right;
+	background-repeat:no-repeat;
+}
+td:hover.ItemTesttool
+{
+	color: black;
+	line-height:25px;
+	background-image: url(../skin/images/testtool_button_hover.png);
+	background-position:center;
+	background-repeat:repeat-x;
 }
 td.tdwidth10
 {
