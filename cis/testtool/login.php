@@ -186,11 +186,11 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
 			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
 			echo '<table>';
-			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'"></td></tr>';
+			echo '<tr><td>Semester:</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'">&nbsp;<input type="submit" name="save" value="Semester ändern"></td></tr>';
 			//echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
-			echo '<tr><td></td><td><input type="submit" name="save" value="OK"></td>';
+			//echo '<tr><td></td><td><input type="submit" name="save" value="Semester ändern"></td>';
 			echo '</table>';
-			echo '</FORM><br><br>';
+			echo '</FORM><br>';
 			
 			//Wenn die Sprachwahl fuer diesen Studiengang aktiviert ist, dann die Sprachen anzeigen
 			if($stg_obj->testtool_sprachwahl)
@@ -218,7 +218,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 					}
 				}
 			}
-			
+			echo '<br><br><br><b>Klicken Sie links auf ein Teilgebiet</b><br><b>Select a topic on the left side</b>';
 			if($pruefling->pruefling_id!='')
 			{
 				$_SESSION['pruefling_id']=$pruefling->pruefling_id;
