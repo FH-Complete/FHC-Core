@@ -1347,7 +1347,9 @@ if($_GET['method']=='update')
 	$besteller_vorname=$besteller->vorname;
 	$besteller_nachname=$besteller->nachname;
 	
-	if($restBudget < 0)
+
+	
+	if($restBudget < 0 && $budget != 0)
 		$ausgabemsg.='<span class="error">Ihr aktuelles Budget ist bereits überzogen.</span>';
 	
 	//Meldungen Ausgeben
