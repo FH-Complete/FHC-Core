@@ -329,7 +329,9 @@ if (!$uid = get_uid())
 
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-
+		
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery.js" type="text/javascript"></script>
 		<style type="text/css">
 		table.navbar td
@@ -777,6 +779,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				<th colspan="3" class="table-sortable:default">Status</th>
 			</tr>
 			</thead>
+			<tbody>
 		';
 
 	for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
@@ -878,7 +881,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		</tr>
 		';
 	}
-	$htmlstring.='</table>';
+	$htmlstring.='</tbody></table>';
 	return 	$htmlstring;
 }
 // ===========================================================================================
