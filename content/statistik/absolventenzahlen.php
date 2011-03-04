@@ -89,7 +89,7 @@ echo "<h2>Absolventen&uuml;bersicht $stsem </h2>";
 if(isset($_REQUEST["trennung"]))
 {
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
-	echo '<input type="submit" value="Geschlechtertrennung ausblenden"/></form><br><br>';
+	echo '<input type="submit" value="Geschlechtertrennung ausblenden"/></form><br>(m&auml;nnl./weibl.)<br><br>';
 }
 else 
 {
