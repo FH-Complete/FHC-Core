@@ -1544,7 +1544,12 @@ if($_GET['method']=='update')
 	echo "</td>\n"; 
 	echo "<td>Freigabe:</td>\n";
 	echo "<td colspan =2>";
-	
+
+	if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && $bestellung->freigegeben != 't')
+	{
+		echo "<span>Bitte Abschicken zur Freigabe.</span>"; 
+	}
+
 	$freigabebutton = true; 
 	// Freigabe Buttons fuer Kostenstelle Anzeigen
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Freigabe'))
