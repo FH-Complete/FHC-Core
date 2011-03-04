@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:saxon="http://icl.com/saxon" extension-element-prefixes="saxon">
 	<xsl:output method="xml" version="1.0" indent="yes"/>
 	<xsl:template match="bestellungen">
 		<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
@@ -46,7 +46,9 @@
 				</fo:block-container>
 				<fo:block-container position="absolute" top="19mm" left="115.7mm" height="15mm">
 					<fo:block text-align="left" line-height="18pt" font-family="sans-serif" font-size="8pt">
+							<xsl:if test="string-length(kontaktperson/titelpre) &gt; 0">
 							<xsl:value-of select="kontaktperson/titelpre" /><xsl:text> </xsl:text>
+							</xsl:if>
 							<xsl:value-of select="kontaktperson/vorname" /><xsl:text> </xsl:text>
 							<xsl:value-of select="kontaktperson/nachname" /><xsl:text> </xsl:text>
 							<xsl:value-of select="kontaktperson/titelpost" />
@@ -60,11 +62,11 @@
 
 				<!-- kundennummer, konto, kostenstelle -->
 				<fo:block-container position="absolute" top="40mm" left="10mm">
-					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
 						<fo:table-column column-width="25mm"/>
-						<fo:table-column column-width="80mm"/>
+						<fo:table-column column-width="59.5mm"/>
 						<fo:table-body>
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="11pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 									<fo:block font-size="10pt" font-weight="bold">
 										 Kunden-Nr.:
@@ -76,7 +78,7 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="11pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 									<fo:block font-size="10pt" font-weight="bold">
 										 Liefertermin:
@@ -88,12 +90,11 @@
 										</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="11pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 									<fo:block font-size="10pt" font-weight="bold">
 										 Konto:
-										</fo:block>
+									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
 									<fo:block font-size="10pt" content-width="50mm" padding-left="1mm">
@@ -101,27 +102,26 @@
 										</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="11pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 									<fo:block font-size="10pt" font-weight="bold">
 										 Kostenstelle:
 										</fo:block>
 								</fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center">
-									<fo:block font-size="10pt" content-width="50mm" padding-left="1mm">
-										<xsl:value-of select="kostenstelle" />
-										</fo:block>
+								<fo:table-cell border-width="0.2mm" border-style="solid" content-width="55mm" vertical-align="top">
+									<fo:block font-size="10pt" padding-left="1mm" content-width="55mm">
+										<xsl:value-of select="substring(kostenstelle,0,32)" />
+									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
 				</fo:block-container>
-
+				
 				<!-- Empfaenger -->
-				<fo:block-container position="absolute" top="57.5mm" left="10mm">
-					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.3mm" border-style="solid">
-						<fo:table-column column-width="105.5mm"/>
+				<fo:block-container position="absolute" top="59.4mm" left="10mm">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
+						<fo:table-column column-width="85.4mm"/>
 						<fo:table-body>
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
@@ -130,7 +130,7 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="8pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" font-weight="bold">
 										<!-- empty -->
@@ -161,18 +161,18 @@
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" padding-left="5mm">
-										 Tel.: <xsl:value-of select="empfaenger/telefon" />
+										<xsl:text>Tel.:</xsl:text> <xsl:value-of select="empfaenger/telefon" />
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" padding-left="5mm">
-										 Fax: <xsl:value-of select="empfaenger/fax" />
+										<xsl:text>Fax:</xsl:text> <xsl:value-of select="empfaenger/fax" />
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="7pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" font-weight="bold">
 										<!-- empty -->
@@ -185,9 +185,9 @@
 				</fo:block-container>
 
 				<!-- Rechnungsanschrift / Lieferanschrift -->
-				<fo:block-container position="absolute" top="40mm" left="115.7mm">
+				<fo:block-container position="absolute" top="40mm" left="95.6mm">
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.3mm" border-style="solid">
-						<fo:table-column column-width="80mm"/>
+						<fo:table-column column-width="60.8mm"/>
 						<fo:table-body>
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
@@ -203,7 +203,7 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row line-height="10pt">
+							<fo:table-row line-height="9pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" padding-left="5mm">
 										 <xsl:value-of select="rechnungsadresse/strasse" />
@@ -260,8 +260,8 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row line-height="23pt">
-								<fo:table-cell border-width="0.2mm" border-style="solid" content-length="80mm" vertical-align="top">
+							<fo:table-row line-height="25pt">
+								<fo:table-cell  border-style="solid" content-width="58mm" vertical-align="top">
 									<fo:block font-size="10pt" padding-left="1mm">
 										<!-- Platzhalter fuer Titel -->
 									</fo:block>
@@ -272,10 +272,108 @@
 				</fo:block-container>
 
 				
-				<fo:block-container position="absolute" top="82mm" left="116mm">				
-					<fo:block font-size="10pt" padding-left="1mm" content-lengt="80mm">
-						 <xsl:value-of select="titel" />
+				<fo:block-container position="absolute" top="81mm" left="96mm">				
+					<fo:block font-size="10pt" padding-left="1mm" content-width="58mm">
+						 <xsl:value-of select="substring(titel,0,70)" />
 					</fo:block>
+				</fo:block-container>
+				
+				<!-- Aufteilung 1 -->
+				
+				<fo:block-container position="absolute" top="40mm" left="156.5mm">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="10mm"/>
+						<xsl:variable name="unique" select="1"/>
+						<fo:table-body>
+							<xsl:for-each select="aufteilungen_1/aufteilung">
+								<fo:table-row line-height="8pt">
+									<fo:table-cell display-align="center">
+										<fo:block font-size="7pt" content-width="7mm" text-align="left" padding-left="1mm">
+											 <xsl:value-of select="oe" />
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell display-align="center">
+										<fo:block font-size="7pt" content-width="10mm" text-align="right">
+											<xsl:value-of select="prozent"/>%
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</xsl:for-each>
+						</fo:table-body>
+					</fo:table>
+				</fo:block-container>
+				
+				<!-- Rahmen Aufteilung 1 -->
+				<fo:block-container position="absolute" top="40mm" left="156.5mm">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="10mm"/>
+						<xsl:variable name="unique" select="1"/>
+						<fo:table-body>
+							<xsl:for-each select="aufteilungen_1/aufteilung">
+								<fo:table-row line-height="8pt">
+									<fo:table-cell display-align="center" border-style="solid">
+										<fo:block font-size="7pt" content-width="7mm" text-align="center">
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell display-align="center" border-style="solid">
+										<fo:block font-size="7pt" content-width="10mm">
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</xsl:for-each>
+						</fo:table-body>
+					</fo:table>
+				</fo:block-container>
+				
+				<!-- Aufteilung 2 -->
+				
+				<fo:block-container position="absolute" top="40mm" left="176.6mm">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="10mm"/>
+						<fo:table-body>
+							<xsl:for-each select="aufteilungen_2/aufteilung">
+								<fo:table-row line-height="8pt">
+									<fo:table-cell display-align="center">
+										<fo:block font-size="7pt" content-width="7mm" text-align="left" padding-left="1mm">
+											 <xsl:value-of select="oe" />
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell display-align="center">
+										<fo:block font-size="7pt" content-width="10mm" text-align="right">
+											<xsl:value-of select="prozent" />%
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</xsl:for-each>
+						</fo:table-body>
+					</fo:table>
+				</fo:block-container>
+				
+				<!-- Rahmen Aufteilung 2 -->
+				
+				<fo:block-container position="absolute" top="40mm" left="176.6mm">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="10mm"/>
+						<xsl:variable name="unique" select="1"/>
+						<fo:table-body>
+							<xsl:for-each select="aufteilungen_2/aufteilung">
+								<fo:table-row line-height="8pt">
+									<fo:table-cell display-align="center" border-style="solid">
+										<fo:block font-size="7pt" content-width="7mm" text-align="center">
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell display-align="center" border-style="solid">
+										<fo:block font-size="7pt" content-width="10mm" text-align="right">
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</xsl:for-each>
+						</fo:table-body>
+					</fo:table>
 				</fo:block-container>
 				
 				<!-- Tabelle die ueber der Bestelldetail Tabelle liegt, um die vertikalen Linien zu Zeichnen -->
@@ -333,6 +431,7 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
+							
 							<fo:table-row line-height="135mm">
 								<fo:table-cell border-width="0.2mm" border-left-style="solid">
 									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
@@ -473,6 +572,18 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
+							<fo:table-row line-height="10pt">
+								<fo:table-cell  border-width="0.2mm" border-style="solid">
+									<fo:block font-size="10pt" font-weight="bold">
+										 Telefonr.:
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid">
+									<fo:block font-size="10pt" font-weight="bold" padding-left="1mm">
+										  <xsl:text>+43 1 333 40 77 - 212</xsl:text>
+									</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.3mm" border-left-style="solid" border-right-style="solid" border-bottom-style="solid">
@@ -585,4 +696,23 @@
 			</fo:table-cell>
 		</fo:table-row>
 	</xsl:template>
+	
+	<xsl:template match="aufteilungen">
+		<xsl:apply-templates select="aufteilung"/>
+	</xsl:template>
+	<xsl:template match="aufteilung">
+		<fo:table-row line-height="10pt">
+			<fo:table-cell display-align="center">
+				<fo:block font-size="8pt" content-width="7mm" text-align="left">
+					 <xsl:value-of select="oe" />
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell display-align="center">
+				<fo:block font-size="8pt" content-width="10mm" text-align="right">
+					<xsl:value-of select="prozent" />
+				</fo:block>
+			</fo:table-cell>
+		</fo:table-row>
+	</xsl:template>
+
 </xsl:stylesheet>
