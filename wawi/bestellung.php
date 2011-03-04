@@ -1297,8 +1297,9 @@ if($_GET['method']=='update')
 	$id = (isset($_GET['id'])?$_GET['id']:null);
 	
 	$bestellung = new wawi_bestellung(); 
-	$bestellung->load($id);
-	 
+	if(!$bestellung->load($id))
+		die("Bestellung ist nicht vorhanden."); 
+	
 	if(!$rechte->isberechtigt('wawi/bestellung',null, 's',$bestellung->kostenstelle_id)
 	&& !$rechte->isberechtigt('wawi/freigabe',null, 's',$bestellung->kostenstelle_id))
 			die('Sie haben keine Berechtigung fuer diese Bestellung <a href="javascript:history.back()">Zurück</a>');
