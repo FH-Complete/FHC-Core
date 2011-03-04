@@ -134,7 +134,7 @@ if(isset($_POST['show']))
 	
 	echo '<span style="font-size: small">Zeitraum: ',$datum_obj->formatDatum($gj->start,'d.m.Y'),' - ',$datum_obj->formatDatum($gj->ende,'d.m.Y').'</span>';
 	echo '<H2>Bestellungen</H2>';
-	draw_tag_table($tags_array, $kst_tags,'bestellung');
+	draw_tag_table($tags_array, $kst_tags,'bestellung', $gj);
 	
 	//Tabelle auf Basis der Rechnungen
 	$kst_tags=array();
@@ -176,7 +176,7 @@ if(isset($_POST['show']))
 		die('Fehler bei Datenbankzugriff');
 	
 	echo '<H2>Rechnungen</H2>';
-	draw_tag_table($tags_array, $kst_tags,'rechnung');
+	draw_tag_table($tags_array, $kst_tags,'rechnung', $gj);
 }
 else
 {
@@ -248,8 +248,11 @@ else
  * @param $tags_array Array mit allen vorkommenden Tags
  * @param $kst_tags 2 Dimensionales Array mit Kostenstellen, Tags und Bruttobetrag
  */
-function draw_tag_table($tags_array, $kst_tags, $table_id)
+function draw_tag_table($tags_array, $kst_tags, $table_id, $gj)
 {
+	$vondatum = $gj->start;
+	$endedatum = $gj->ende;
+	
 	echo '
 	<script type="text/javascript">
 	$(document).ready(function() 
@@ -291,7 +294,7 @@ function draw_tag_table($tags_array, $kst_tags, $table_id)
 			{
 				echo '<td class="number">';
 				if($table_id=='bestellung')
-					echo '<a href="../bestellung.php?method=suche&submit=1&filter_tag=',$tags,'&filter_kostenstelle=',$kst,'">';
+					echo '<a href="../bestellung.php?method=suche&submit=1&tag=',$tags,'&filter_kostenstelle=',$kst,'&evon=',$vondatum,'&ebis=',$endedatum,'">';
 				echo number_format($tags_value[$tags],2,',','.');
 				if($table_id=='bestellung')
 					echo '</a>';
