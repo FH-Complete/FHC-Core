@@ -38,6 +38,8 @@ require_once('../include/adresse.class.php');
 require_once('../include/firma.class.php');
 require_once('../include/standort.class.php');
 require_once('../include/kontakt.class.php');
+require_once('../include/wawi_aufteilung.class.php'); 
+require_once('../include/studiengang.class.php'); 
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
@@ -64,6 +66,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$lieferadresse = new adresse();
 		$lieferadresse->load($bestellung->lieferadresse);
 		
+		$aufteilung = new wawi_aufteilung(); 
+		$aufteilung->getAufteilungFromBestellung($bestellung->bestellung_id); 
+		
+		$studiengang = new studiengang(); 
+
 		$firma = new firma();
 		$standort = new standort();
 		$empfaengeradresse = new adresse();
@@ -156,8 +163,34 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$summe_netto+=$row->menge*$row->preisprove;
 			$summe_mwst+=$row->menge*$row->preisprove/100*$row->mwst;
 		}
-		
 		echo "	</details>\n";
+		echo "	<aufteilungen_1>\n";
+		$anzAufteilungen = sizeof($aufteilung->result); 	
+		$i = 0;	
+		foreach($aufteilung->result as $aufteilung_row)
+		{
+			if($i==15)
+			{
+				echo '</aufteilungen_1>';
+				echo '<aufteilungen_2>';
+			}
+			
+			$studiengang->getStudiengangFromOe($aufteilung_row->oe_kurzbz); 
+			// Diplomstudiengänge nicht laden
+			if($studiengang->typ !='d' && $aufteilung_row->oe_kurzbz !='Infrastruktur' && $aufteilung_row->oe_kurzbz != 'etw')
+			{
+				echo "		<aufteilung>\n";
+				echo "			<oe><![CDATA[".strtoupper($aufteilung_row->oe_kurzbz)."]]></oe>\n"; 
+				echo "			<prozent><![CDATA[$aufteilung_row->anteil]]></prozent>\n"; 
+				echo "		</aufteilung>\n"; 
+				$i++; 
+			}
+		}
+		if($i>15)
+			echo "	</aufteilungen_2>\n";
+		else
+		 	echo "	</aufteilungen_1>\n";
+
 		echo "	<datum><![CDATA[",date('d.m.Y'),"]]></datum>\n";
 		echo "	<erstelldatum><![CDATA[",$datum_obj->formatDatum($bestellung->insertamum, 'd.m.Y'),"]]></erstelldatum>\n";
 		echo "	<summe_netto>",number_format($summe_netto,2,',','.'),"</summe_netto>\n";
