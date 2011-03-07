@@ -273,7 +273,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Freigegeben" control="student-projektarbeit-checkbox-freigegeben"/>
 							<checkbox id="student-projektarbeit-checkbox-freigegeben" disabled="true" />
 							<label value="Gesperrt bis" control="student-projektarbeit-datum-gesperrtbis"/>
-							<box class="Datum" id="student-projektarbeit-datum-gesperrtbis" disabled="true" />
+							<box class="Datum" id="student-projektarbeit-datum-gesperrtbis" disabled="true" onchange="StudentProjektarbeitGesperrtChanged()" />
 						</row>
 						<row>
 							<label value="Anmerkung" control="student-projektarbeit-textbox-anmerkung"/>
