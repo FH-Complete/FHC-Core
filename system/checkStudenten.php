@@ -23,8 +23,8 @@
 // * Script zur Pruefung und Korrektur
 // * moeglicher Inkonsistenzen
 // *
-// * - Studenten ohne Prestudent_id werden korrigiert
-// * - Inkonsistenzen der Tabellen tbl_studentlehrverband, tbl_student werden korrigiert
+// * - Abbrecher dürfen nicht mehr aktiv sein
+// * - Studiengang muss beim Prestudenten und beim Studenten gleich sein
 // **********************************
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiensemester.class.php');
@@ -46,9 +46,12 @@ $statistik ='';
 $abunterbrecher_verschoben_error=0;
 $abunterbrecher_verschoben=0;
 
-// ****
-// * Bei Studenten mit fehlener Prestudent_id wird die passende id ermittelt und Eingetragen
-// ****
+/*
+ *  Studiengang muss beim Prestudenten und beim Studenten gleich sein
+*/
+
+
+
 $qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE prestudent_id is null";
 if($result = $db->db_query($qry))
 {
