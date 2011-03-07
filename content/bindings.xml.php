@@ -43,7 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:menulist anonid="binding-menulist-field" style="padding: 1px" editable="true" xbl:inherits="disabled, value" label="">
 				<xul:menupopup>
 					<xul:datepicker anonid="binding-datepicker-field" 
-								onselect="parentNode.parentNode.parentNode.parentNode.value=this.selection.currentDay+'.'+(parseInt(this.selection.currentMonth)+1)+'.'+this.selection.currentYear"/>
+								onselect="parentNode.parentNode.parentNode.parentNode.value=this.selection.currentDay+'.'+(parseInt(this.selection.currentMonth)+1)+'.'+this.selection.currentYear; var evt = parentNode.parentNode.ownerDocument.createEvent('HTMLEvents');evt.initEvent('change', true, true );parentNode.parentNode.dispatchEvent( evt );"/>
 				</xul:menupopup>		
 			</xul:menulist>
 			<xul:spacer flex="1"/>

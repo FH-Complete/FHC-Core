@@ -217,6 +217,16 @@ function StudentProjektarbeitDetailDisableFields(val)
 }
 
 // ****
+// * Wenn in das Gesperrt-Feld ein Wert eingetragen wird, dann wird das Freigegeben Hackerl entfernt
+function StudentProjektarbeitGesperrtChanged()
+{
+	if(document.getElementById('student-projektarbeit-datum-gesperrtbis').value!='')
+	{
+		document.getElementById('student-projektarbeit-checkbox-freigegeben').checked=false;
+	}
+}
+
+// ****
 // * Resetet die ProjektarbeitDetailFelder
 // ****
 function StudentProjektarbeitResetFields()
@@ -227,7 +237,7 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-datum-beginn').value='';
 	document.getElementById('student-projektarbeit-datum-ende').value='';
 	document.getElementById('student-projektarbeit-textbox-faktor').value='1.0';
-	document.getElementById('student-projektarbeit-checkbox-freigegeben').checked=false;
+	document.getElementById('student-projektarbeit-checkbox-freigegeben').checked=true;
 	document.getElementById('student-projektarbeit-datum-gesperrtbis').value='';
 	document.getElementById('student-projektarbeit-textbox-stundensatz').value='80.0';
 	document.getElementById('student-projektarbeit-textbox-gesamtstunden').value='3.0';
