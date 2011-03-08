@@ -42,10 +42,10 @@ require_once('../include/benutzer.class.php');
 <?php 
 
 $kostenstelle = new wawi_kostenstelle(); 
-$user=get_uid();
+$uid=get_uid();
 
 $rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
+$rechte->getBerechtigungen($uid);
 
 if(isset($_GET['kostenstelle_id']))
 {
@@ -60,7 +60,7 @@ if(isset($_GET['kostenstelle_id']))
 			die('Fehler beim Laden der Kostenstelle');
 		
 		echo '<h1>Berechtigungen - Kostenstelle '.$kst->bezeichnung.'</h1>';
-		echo '<a href="#Zurück" onclick="javascript:history.back();">Zurück</a>';
+		echo '<a href="berechtigung.php">Zurück</a>';
 		$rechte->getKostenstelleUser($kostenstelle_id);
 		
 		$rights = array();
@@ -139,18 +139,18 @@ if(isset($_GET['kostenstelle_id']))
 			</tr>
 			</thead>
 			<tbody>';
-		foreach($rights as $user)
+		foreach($rights as $user1)
 		{
 			echo '<tr>';
-			echo '<td>'.$user['nachname'].'</td>';
-			echo '<td>'.$user['vorname'].'</td>';
-			echo '<td>'.(isset($user['bestellung']['read'])?'X':'').'</td>';
-			echo '<td>'.(isset($user['bestellung']['write'])?'X':'').'</td>';
-			echo '<td>'.(isset($user['bestellung']['delete'])?'X':'').'</td>';
-			echo '<td>'.(isset($user['rechnung']['read'])?'X':'').'</td>';
-			echo '<td>'.(isset($user['rechnung']['write'])?'X':'').'</td>';
-			echo '<td>'.(isset($user['rechnung']['delete'])?'X':'').'</td>';
-			echo '<td>'.(isset($user['freigabe'])?'X':'').'</td>';
+			echo '<td>'.$user1['nachname'].'</td>';
+			echo '<td>'.$user1['vorname'].'</td>';
+			echo '<td>'.(isset($user1['bestellung']['read'])?'X':'').'</td>';
+			echo '<td>'.(isset($user1['bestellung']['write'])?'X':'').'</td>';
+			echo '<td>'.(isset($user1['bestellung']['delete'])?'X':'').'</td>';
+			echo '<td>'.(isset($user1['rechnung']['read'])?'X':'').'</td>';
+			echo '<td>'.(isset($user1['rechnung']['write'])?'X':'').'</td>';
+			echo '<td>'.(isset($user1['rechnung']['delete'])?'X':'').'</td>';
+			echo '<td>'.(isset($user1['freigabe'])?'X':'').'</td>';
 			echo '</tr>';
 		}
 		
