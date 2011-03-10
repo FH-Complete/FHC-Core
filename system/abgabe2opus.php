@@ -1390,7 +1390,10 @@ if($erg=pg_query($db_conn,$qry))
 			if($row->projekttyp_kurzbz=='Bachelor')
 				$typ=25;
 			$stg=($row->stg_kz<1000?'0'.$row->stg_kz:$row->stg_kz);
-			$qry_src="SELECT max(source_opus) as source FROM opus";
+			$qry_src="Select max(source_opus) as source from opus
+						UNION
+						SELECT id as source from seq_temp
+						ORDER BY source DESC LIMIT 1";
 			if($result_src = mysql_query($qry_src,$conn_ext))
 			{
 				while($row_src=mysql_fetch_object($result_src))
@@ -1471,15 +1474,15 @@ if($erg=pg_query($db_conn,$qry))
 											{
 												if($row_file=pg_fetch_object($result_file))
 												{
-													if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')))
+													if(!is_dir($opus_url.date('Y')))
 													{
-														mkdir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y'), 0775);
+														mkdir($opus_url.date('Y'), 0775);
 													}
-													if(!is_dir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus))
+													if(!is_dir($opus_url.date('Y')."/".$row_opus))
 													{
-														mkdir($opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus, 0775);
+														mkdir($opus_url.date('Y')."/".$row_opus, 0775);
 													}
-													$opus_url=$opus_url.$datum_obj->formatDatum($row->abgabedatum,'Y')."/".$row_opus;
+													$opus_url=$opus_url.date('Y')."/".$row_opus;
 													if(!is_dir($opus_url."/pdf/"))
 													{
 														mkdir($opus_url."/pdf/", 0775);
