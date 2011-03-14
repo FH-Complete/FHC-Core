@@ -134,6 +134,7 @@ if(isset($_POST['show']))
 	
 	echo '<span style="font-size: small">Zeitraum: ',$datum_obj->formatDatum($gj->start,'d.m.Y'),' - ',$datum_obj->formatDatum($gj->ende,'d.m.Y').'</span>';
 	echo '<H2>Bestellungen</H2>';
+	
 	draw_tag_table($tags_array, $kst_tags,'bestellung', $gj);
 	
 	//Tabelle auf Basis der Rechnungen
@@ -250,6 +251,7 @@ else
  */
 function draw_tag_table($tags_array, $kst_tags, $table_id, $gj)
 {
+	ksort($tags_array);
 	$vondatum = $gj->start;
 	$endedatum = $gj->ende;
 	
