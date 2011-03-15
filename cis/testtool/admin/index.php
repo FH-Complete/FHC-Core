@@ -528,6 +528,8 @@ if($result = $db->db_query($qry))
 			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'>$row->nummer</a> -";
 	}
 	echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;type=neuefrage' class='Item'>neue Frage hinzufuegen</a>";
+	if($nummer<$db->db_num_rows($result)-1)
+		echo " - <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=".($nummer+1)."' class='Item'>Weiter &gt;&gt;</a>";
 }
 
 echo "\n\n<br />";
