@@ -71,8 +71,34 @@ class organisationsform extends basis_db
 		}
 	}
 
-	public function checkCode($orgform_kurzbz)
-	{
+ /**
+  * 
+  * Orgform Kurzbezeichnung wird übergeben und alle passenden Kurzbezeichnungen werden zurückgegeben
+  * @param $orgform_kurzbz
+  */
+	
+	public function checkOrgForm($orgform_kurzbz)
+	{	
+
+		if(is_null($orgform_kurzbz))
+		{
+			$this->errormsg ="Kein gültiger Wert für Orgform Kurzbz."; 
+			return false; 
+		}
 		
+		switch ($orgform_kurzbz) 
+		{
+			case "VZ":
+				$vzArray= array('VZ', '');
+				return $vzArray; 
+			case "BB":
+				$bbArray=array('BB','DL','DDP','');
+				return $bbArray; 
+			case "VBB":
+				$vbbArray = array('VZ','BB','DDP','DL');
+				return $vbbArray; 
+			default:
+				return false; 
+		}
 	}
 }
