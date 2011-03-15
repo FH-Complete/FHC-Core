@@ -614,7 +614,7 @@ if($frage_id!='')
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
 	
-	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='40' rows='20' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td></tr>";
+	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='50' rows='27' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Level <input type='text' name='level' value='$frage->level' size='1' />
 			Nummer <input type='text' name='nummer' value='$frage->nummer' size='1' /></td>
@@ -651,7 +651,7 @@ if($frage_id!='')
 	echo "<td>Punkte</td><td><input type='text' size='8' name='punkte' value='$vorschlag->punkte' /></td>";
 	echo '</tr>';
 	echo '<tr>';
-	echo '<td>Text:</td><td><textarea name="text" id="text" rows="20" cols="40" oninput="preview()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
+	echo '<td>Text:</td><td><textarea name="text" id="text" rows="25" cols="45" oninput="preview()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
 	echo '</tr><tr valign="top">';
 	//Upload Feld fuer Bild
 	echo "<td>Bild:</td><td><input type='file' name='bild' /></td>";
