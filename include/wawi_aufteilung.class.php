@@ -177,7 +177,7 @@ class wawi_aufteilung extends basis_db
 	public function getAufteilungFromBestellung($bestellung_id)
 	{
 		
-		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($bestellung_id).";";
+		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($bestellung_id)." Order by oe_kurzbz;";
 		
 		if($this->db_query($qry))
 		{
