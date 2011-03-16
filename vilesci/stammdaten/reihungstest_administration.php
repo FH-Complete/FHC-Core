@@ -176,16 +176,17 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
 	if(is_numeric($_POST['prestudent_id']) && $_POST['prestudent_id']!='')
 	{
-		$qry="SELECT nachname,vorname,person_id,prestudent_id,pruefling_id,kurzbz,tbl_frage.nummer, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
+		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,tbl_pruefling_frage.begintime,kurzbz,tbl_frage.nummer, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
 				FROM testtool.tbl_antwort
 				JOIN testtool.tbl_vorschlag USING(vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
 				JOIN testtool.tbl_gebiet USING (gebiet_id)
 				JOIN testtool.tbl_pruefling USING (pruefling_id)
+				JOIN testtool.tbl_pruefling_frage ON (tbl_pruefling.pruefling_id=tbl_pruefling_frage.pruefling_id AND tbl_frage.frage_id =tbl_pruefling_frage.frage_id)
 				JOIN public.tbl_prestudent USING (prestudent_id)
 				JOIN public.tbl_person USING (person_id)
 				WHERE prestudent_id='".$_POST['prestudent_id']."'
-				ORDER BY kurzbz,nummer";
+				ORDER BY kurzbz,tbl_pruefling_frage.begintime,nummer";
 		if($result = $db->db_query($qry))
 		{
 			echo '<table class="liste table-stripeclass:alternate table-autostripe">
@@ -196,6 +197,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 						<th>PersonID</th>
 						<th>PrestudentID</th>
 						<th>PrueflingID</th>
+						<th>Beginnzeit</th>
 						<th>Kurzbz</th>
 						<th>Frage Nummer</th>
 						<th>Antwort Nummer</th>
@@ -211,6 +213,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				echo "<td>$row->person_id</td>";
 				echo "<td>$row->prestudent_id</td>";
 				echo "<td>$row->pruefling_id</td>";
+				echo "<td>$row->begintime</td>";
 				echo "<td>$row->kurzbz</td>";
 				echo "<td>$row->nummer</td>";
 				echo "<td>$row->antwortnummer</td>";
