@@ -848,6 +848,53 @@ class prestudent extends person
 	}
 	
 	/**
+	 * Liefert den Ersten Status eines Prestudenten mit der übergebenen Statuskurzbezeichnung
+	 * @param $prestudent_id
+	 * @param $studiensemester_kurzbz
+	 * @return boolean
+	 */
+	public function getFirstStatus($prestudent_id, $status_kurzbz)
+	{
+		if($prestudent_id=='' || !is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id' and status_kurzbz = ".$this->addslashes($status_kurzbz);
+
+
+		$qry.=" ORDER BY datum ASC, insertamum ASC, ext_id ASC LIMIT 1";
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{				
+				$this->prestudent_id = $row->prestudent_id;
+				$this->status_kurzbz = $row->status_kurzbz;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->ausbildungssemester = $row->ausbildungssemester;
+				$this->datum = $row->datum;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				return true;	
+			}
+			else 
+			{
+				$this->errormsg = 'Keine Rolle vorhanden';
+				return false;
+			}			
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der PrestudentDaten';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt alle Prestudenten der Person
 	 * @return true wenn ok, false wenn Fehler
 	 */
