@@ -176,7 +176,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
 	if(is_numeric($_POST['prestudent_id']) && $_POST['prestudent_id']!='')
 	{
-		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,tbl_pruefling_frage.begintime,kurzbz,tbl_frage.nummer, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
+		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,tbl_pruefling_frage.begintime,kurzbz,tbl_frage.nummer,level, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
 				FROM testtool.tbl_antwort
 				JOIN testtool.tbl_vorschlag USING(vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
@@ -200,6 +200,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 						<th>Beginnzeit</th>
 						<th>Kurzbz</th>
 						<th>Frage Nummer</th>
+						<th>Level</th>
 						<th>Antwort Nummer</th>
 						<th>Punkte</th>
 					</tr>
@@ -216,6 +217,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				echo "<td>$row->begintime</td>";
 				echo "<td>$row->kurzbz</td>";
 				echo "<td>$row->nummer</td>";
+				echo "<td>$row->level</td>";
 				echo "<td>$row->antwortnummer</td>";
 				echo "<td>$row->punkte</td>";
 				echo '</tr>';
