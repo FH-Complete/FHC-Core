@@ -110,7 +110,7 @@
 								</fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" content-width="55mm" vertical-align="top">
 									<fo:block font-size="10pt" padding-left="1mm" content-width="55mm">
-										<xsl:value-of select="substring(kostenstelle,0,32)" />
+										<xsl:value-of select="substring(kostenstelle,0,30)" />
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
