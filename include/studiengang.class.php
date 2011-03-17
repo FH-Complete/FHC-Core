@@ -59,6 +59,7 @@ class studiengang extends basis_db
 	public $moodle;		// boolean
 	public $lgartcode;	//integer
 	public $mischform;	// boolean
+	public $projektarbeit_note_anzeige; // boolean
 	
 	/**
 	 * Konstruktor
@@ -128,6 +129,7 @@ class studiengang extends basis_db
             	$this->aktiv=($row->aktiv=='t'?true:false);
             	$this->moodle=($row->moodle=='t'?true:false);
 				$this->mischform=($row->mischform=='t'?true:false);
+				$this->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
 			}
 		}
 		else
@@ -195,6 +197,7 @@ class studiengang extends basis_db
             $stg_obj->aktiv=($row->aktiv=='t'?true:false);
 			$stg_obj->moodle=($row->moodle=='t'?true:false);
 			$stg_obj->mischform=($row->mischform=='t'?true:false);
+			$stg_obj->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
 			
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
@@ -265,6 +268,7 @@ class studiengang extends basis_db
             $stg_obj->aktiv=($row->aktiv=='t'?true:false);
 			$stg_obj->moodle=($row->moodle=='t'?true:false);
 			$stg_obj->mischform=($row->mischform=='t'?true:false);
+			$stg_obj->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
 			
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
@@ -331,7 +335,7 @@ class studiengang extends basis_db
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, 
-				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform) VALUES ('.
+				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige) VALUES ('.
 				$this->addslashes($this->studiengang_kz).', '.
 				$this->addslashes($this->kurzbz).', '.
 				$this->addslashes($this->kurzbzlang).', '.
@@ -361,7 +365,8 @@ class studiengang extends basis_db
 				($this->testtool_sprachwahl?'true':'false').', '.
 				$this->addslashes($this->studienplaetze).', '.
 				$this->addslashes($this->lgartcode).', '.
-				($this->mischform?'true':'false').');';
+				($this->mischform?'true':'false').','.
+				($this->projektarbeit_note_anzeige?'true':'false').');';
 		}
 		else
 		{
@@ -393,6 +398,7 @@ class studiengang extends basis_db
 				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
 				'zusatzinfo_html='.$this->addslashes($this->zusatzinfo_html).', '.
 				'moodle='.($this->moodle?'true':'false').', '.
+				'projektarbeit_note_anzeige='.($this->projektarbeit_note_anzeige?'true':'false').', '.			
 				'sprache='.$this->addslashes($this->sprache).', '.
 				'testtool_sprachwahl='.($this->testtool_sprachwahl?'true':'false').', '.
 				'studienplaetze='.$this->addslashes($this->studienplaetze).', '.
@@ -476,6 +482,11 @@ class studiengang extends basis_db
 		}
 	}
 	
+	/**
+	 * Laedt einen Studiengang anhand seiner Organisationseinheit
+	 * @param $oe_kurzbz
+	 * @return boolean
+	 */
 	public function getStudiengangFromOe($oe_kurzbz)
 	{
 		$qry ="SELECT * FROM public.tbl_studiengang where oe_kurzbz =".$this->addslashes($oe_kurzbz); 
@@ -515,7 +526,8 @@ class studiengang extends basis_db
 	            $this->aktiv=($row->aktiv=='t'?true:false);
 				$this->moodle=($row->moodle=='t'?true:false);
 				$this->mischform=($row->mischform=='t'?true:false);
-				
+				$this->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+								
 				return true; 
 			}
 		}

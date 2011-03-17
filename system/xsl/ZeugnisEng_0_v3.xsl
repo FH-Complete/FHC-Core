@@ -328,7 +328,9 @@
 			<fo:table-cell border-width="0.2mm" border-style="solid">
 				<fo:block font-size="9pt" content-width="20mm" text-align="center" vertical-align="center" font-family="arial">
 					<xsl:text> </xsl:text>
-					<xsl:value-of select="note"/>
+					<xsl:if test="../projektarbeit_note_anzeige='true'">
+						<xsl:value-of select="note"/>
+					</xsl:if>
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid">

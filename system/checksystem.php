@@ -1902,7 +1902,7 @@ if(!@$db->db_query("SELECT 1 FROM wawi.tbl_zahlungstyp LIMIT 1"))
 		echo 'Tabelle wawi.tbl_zahlungstyp hinzugefuegt!<br>';
 }
 
-// oe_kurzbz zur tbl_vorlagestudeingang hinzufuegen
+// oe_kurzbz zur tbl_vorlagestudiengang hinzufuegen
 if(!@$db->db_query("SELECT oe_kurzbz FROM public.tbl_vorlagestudiengang LIMIT 1"))
 {
 	$qry = "
@@ -1929,6 +1929,174 @@ if(!@$db->db_query("SELECT kurzzeichen FROM public.tbl_organisationseinheit LIMI
 		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'Tabelle public.tbl_organisationseinheit Spalte kurzzeichen hinzugefuegt!<br>';
+}
+// kurzzeichen zu tbl_organisationseinheit hinzugefuegt zur generierung der Bestellnummer
+if(!@$db->db_query("SELECT vorlagestudiengang_id FROM public.tbl_vorlagestudiengang LIMIT 1"))
+{
+	$qry = "
+	CREATE SEQUENCE public.seq_vorlagestudiengang_vorlagestudiengang_id
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+	
+	ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN vorlagestudiengang_id bigint DEFAULT nextval('public.seq_vorlagestudiengang_vorlagestudiengang_id');
+	ALTER TABLE public.tbl_vorlagestudiengang DROP CONSTRAINT pk_tbl_vorlagestudiengang;
+	ALTER TABLE public.tbl_vorlagestudiengang ADD CONSTRAINT pk_vorlagestudiengang PRIMARY KEY (vorlagestudiengang_id);
+	ALTER TABLE public.tbl_vorlagestudiengang ALTER COLUMN studiengang_kz SET NOT NULL;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlagestudiengang: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_vorlagestudiengang Spalte vorlagestudiengang_id hinzugefuegt!<br>';
+}
+
+// Content Modul
+if(!@$db->db_query("SELECT content_id FROM campus.tbl_content LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE campus.tbl_template(
+		template_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256),
+		xsd XML,
+		xslt_xhtml XML,
+		xslfo_pdf XML
+	);
+	
+	ALTER TABLE campus.tbl_template ADD CONSTRAINT pk_template PRIMARY KEY (template_kurzbz);
+		
+	CREATE TABLE campus.tbl_content(
+		content_id bigint NOT NULL,
+		titel varchar(256),
+		template_kurzbz varchar(32) NOT NULL,
+		oe_kurzbz varchar(32),
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)		
+	);
+	CREATE SEQUENCE campus.seq_content_content_id
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+	
+	ALTER TABLE campus.tbl_content ALTER COLUMN content_id SET DEFAULT nextval('campus.seq_content_content_id');
+	ALTER TABLE campus.tbl_content ADD CONSTRAINT pk_content PRIMARY KEY (content_id);
+	ALTER TABLE campus.tbl_content ADD CONSTRAINT fk_template_content FOREIGN KEY(template_kurzbz) REFERENCES campus.tbl_template (template_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_content ADD CONSTRAINT fk_organisationseinheit_content FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	CREATE TABLE campus.tbl_contentchild(
+		contentchild_id bigint NOT NULL,
+		content_id bigint NOT NULL,
+		child_content_id bigint NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)	
+	);
+	
+	CREATE SEQUENCE campus.seq_contentchild
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+	
+	ALTER TABLE campus.tbl_contentchild ALTER COLUMN contentchild_id SET DEFAULT nextval('campus.seq_contentchild');
+	ALTER TABLE campus.tbl_contentchild ADD CONSTRAINT pk_contentchild PRIMARY KEY (contentchild_id);
+	ALTER TABLE campus.tbl_contentchild ADD CONSTRAINT fk_content_contentchild_content_id FOREIGN KEY(content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_contentchild ADD CONSTRAINT fk_content_contentchild_child_content_id FOREIGN KEY(child_content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE TABLE campus.tbl_contentsprache(
+		contentsprache_id bigint NOT NULL,
+		sprache varchar(16) NOT NULL,
+		content_id bigint NOT NULL,
+		version smallint,
+		sichtbar boolean NOT NULL,
+		content XML NOT NULL,
+		reviewvon varchar(32),
+		reviewamum timestamp,
+		updateamum timestamp,
+		updatevon varchar(32),
+		insertamum timestamp,
+		insertvon varchar(32)
+	);
+	
+	CREATE SEQUENCE campus.seq_contentsprache
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+	
+	ALTER TABLE campus.tbl_contentsprache ALTER COLUMN contentsprache_id SET DEFAULT nextval('campus.seq_contentsprache');
+	ALTER TABLE campus.tbl_contentsprache ADD CONSTRAINT pk_contentsprache PRIMARY KEY (contentsprache_id);
+	ALTER TABLE campus.tbl_contentsprache ADD CONSTRAINT fk_sprache_contentsprache FOREIGN KEY(sprache) REFERENCES public.tbl_sprache (sprache) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_contentsprache ADD CONSTRAINT fk_content_contentsprache FOREIGN KEY(content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE TABLE public.tbl_statistik (
+		statistik_kurzbz varchar(64) NOT NULL,
+		bezeichnung varchar(256),
+		content_id bigint,
+		url varchar(512),
+		gruppe varchar(256),
+		r text,
+		php text,
+		sql text,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);
+	
+	ALTER TABLE public.tbl_statistik ADD CONSTRAINT pk_statistik PRIMARY KEY (statistik_kurzbz);
+	ALTER TABLE public.tbl_statistik ADD CONSTRAINT fk_content_statistik FOREIGN KEY(content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	CREATE TABLE campus.tbl_contentgruppe (
+		content_id bigint NOT NULL,
+		gruppe_kurzbz varchar(16) NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(32)
+	);
+	ALTER TABLE campus.tbl_contentgruppe ADD CONSTRAINT fk_content_contentgruppe FOREIGN KEY(content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_contentgruppe ADD CONSTRAINT fk_gruppe_contentgruppe FOREIGN KEY(gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_contentgruppe ADD CONSTRAINT pk_contentgruppe PRIMARY KEY(content_id, gruppe_kurzbz);
+
+	ALTER TABLE public.tbl_sprache ADD COLUMN bezeichnung varchar(32)[];
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_content TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_content TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentsprache TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentsprache TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_template TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_template TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentchild TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentchild TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentgruppe TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentgruppe TO web;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_statistik TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_statistik TO web;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>Content-Modul: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Content-Modul hinzugefuegt!<br>';
+}
+// projektarbeit_note_anzeige zu tbl_studiengang hinzufuegen
+if(!@$db->db_query("SELECT projektarbeit_note_anzeige FROM public.tbl_studiengang LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_studiengang ADD COLUMN projektarbeit_note_anzeige boolean;
+	UPDATE public.tbl_studiengang SET projektarbeit_note_anzeige=true;
+	ALTER TABLE public.tbl_studiengang ALTER COLUMN projektarbeit_note_anzeige SET NOT NULL;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_studiengang Spalte projektarbeit_note_anzeige hinzugefuegt!<br>';
 }
 echo '<br>';
 
@@ -1957,6 +2125,10 @@ $tabellen=array(
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
+	"campus.tbl_content"  => array("content_id","template_kurzbz","titel","updatevon","updateamum","insertamum","insertvon","oe_kurzbz"),
+	"campus.tbl_contentchild"  => array("contentchild_id","content_id","child_content_id","updatevon","updateamum","insertamum","insertvon"),
+	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
+	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
@@ -1972,6 +2144,7 @@ $tabellen=array(
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_studentuebung"  => array("student_uid","mitarbeiter_uid","abgabe_id","uebung_id","note","mitarbeitspunkte","punkte","anmerkung","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_template"  => array("template_kurzbz","bezeichnung","xsd","xslt_xhtml","xslfo_pdf"),
 	"campus.tbl_uebung"  => array("uebung_id","gewicht","punkte","angabedatei","freigabevon","freigabebis","abgabe","beispiele","statistik","bezeichnung","positiv","defaultbemerkung","lehreinheit_id","maxstd","maxbsp","liste_id","prozent","nummer","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltung"  => array("veranstaltung_id","titel","beschreibung","veranstaltungskategorie_kurzbz","inhalt","start","ende","freigabevon","freigabeamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltungskategorie"  => array("veranstaltungskategorie_kurzbz","bezeichnung","bild","farbe"),
@@ -2057,16 +2230,17 @@ $tabellen=array(
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content"),
+	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
+	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
-	"public.tbl_vorlagestudiengang"  => array("vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz"),
+	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz"),
 	"sync.tbl_zutrittskarte"  => array("key","name","firstname","groupe","logaswnumber","physaswnumber","validstart","validend","text1","text2","text3","text4","text5","text6","pin"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
