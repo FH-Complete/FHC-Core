@@ -101,7 +101,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml_fussnote='';
 		$projektarbeit=array();
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, 
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.projektarbeit_note_anzeige, 
 					tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, 
 					tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, 
 					tbl_person.titelpost, tbl_person.anrede, tbl_studiensemester.bezeichnung as sembezeichnung, 
@@ -182,6 +182,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
+		$xml .= "		<projektarbeit_note_anzeige>".($row->projektarbeit_note_anzeige=='t'?'true':'false')."</projektarbeit_note_anzeige>";
 		
 		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".addslashes($uid_arr[$i])."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND projekttyp_kurzbz in('Bachelor', 'Diplom') ORDER BY beginn ASC, projektarbeit_id ASC";
 		if($result_proj = $db->db_query($qry_proj))
