@@ -136,16 +136,22 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "		<telefon><![CDATA[$telefon]]></telefon>\n";
 		echo "		<fax><![CDATA[$fax]]></fax>\n";		
 		echo "	</empfaenger>\n";
-		echo "	<details>\n";
-		
+				
 		$details = new wawi_bestelldetail();
 		$details->getAllDetailsFromBestellung($bestellung->bestellung_id);
 		$summe_netto=0;
 		$summe_brutto=0;
 		$summe_mwst=0;
 		
+		$i=0;
+		echo "	<details>\n";
 		foreach($details->result as $row)
 		{
+			if($i==28)
+			{
+				echo "</details>\n";
+				echo "<details_1>\n";
+			}
 			echo "		<detail>\n";
 			echo "			<position><![CDATA[$row->position]]></position>\n";
 			echo "			<menge><![CDATA[$row->menge]]></menge>\n";
@@ -162,8 +168,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$summe_brutto+=$summe_brutto_detail;
 			$summe_netto+=$row->menge*$row->preisprove;
 			$summe_mwst+=$row->menge*$row->preisprove/100*$row->mwst;
+			$i++;
 		}
-		echo "	</details>\n";
+		
+		if($i>=28)
+			echo "	</details_1>\n";
+		else
+			echo "	</details>\n";
+			
 		echo "	<aufteilungen_1>\n";
 		$anzAufteilungen = sizeof($aufteilung->result); 	
 		$i = 0;	
