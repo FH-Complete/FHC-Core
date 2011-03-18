@@ -625,7 +625,7 @@ if($frage_id!='')
 	echo "</form>";
 	echo "</td></tr>";
 	//Vorschau fuer das Text-Feld
-	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau' style='border: 1px solid black'>$frage->text</div></td></tr>";
+	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau' style='border: 1px solid black' align='center'>$frage->text</div></td></tr>";
 	echo "</table>";
 	echo '</td><td style="border-left: 1px solid black" valign="top">';
 
