@@ -343,7 +343,8 @@
 					</fo:table>
 
 				</fo:block-container>
-
+				
+				<xsl:apply-templates select="details_1"/>
 			
 				<!-- Fusszeile -->
 				<fo:block-container position="absolute" top="240mm" left="10mm">
@@ -443,6 +444,178 @@
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template>
+	
+	<xsl:template match="details_1">
+	<!-- 2. Seite beginnen wenn zu viele Details vorhanden sind -->	
+	<fo:block font-size="16pt" 
+	            font-family="sans-serif" 
+	            space-after.optimum="15pt"
+	            text-align="center"
+	            break-before="page">
+	      </fo:block>
+		<!-- Tabelle die ueber der Bestelldetail Tabelle liegt, um die vertikalen Linien zu Zeichnen -->
+
+				<fo:block-container position="absolute" top="25mm" left="9.8mm">
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2mm" border-style="solid">
+						<fo:table-column column-width="7mm"/>
+						<fo:table-column column-width="9.4mm"/>
+						<fo:table-column column-width="6.2mm"/>
+						<fo:table-column column-width="79.4mm"/>
+						<fo:table-column column-width="34.8mm"/>
+						<fo:table-column column-width="14.8mm"/>
+						<fo:table-column column-width="19.8mm"/>
+						<fo:table-column column-width="11.8mm"/>
+						<fo:table-body>
+							<fo:table-row line-height="10pt">
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
+											<!-- pos -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="10mm">
+										<!-- menge -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
+										<!-- ve -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="79mm">
+										<!-- bezeichnung -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="34mm">
+										<!-- aritikelnummer -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="15mm">
+										<!-- Preis/VE -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="20mm">
+										<!-- Summe [EUR] -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-bottom-style="solid" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="12mm">
+										<!-- UST -->
+									</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+							<fo:table-row line-height="130mm">
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
+											<!-- pos -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="10mm">
+										<!-- menge -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
+										<!-- ve -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="79mm">
+										<!-- bezeichnung -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="34mm">
+										<!-- aritikelnummer -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="15mm">
+										<!-- Preis/VE -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="20mm">
+										<!-- Summe [EUR] -->
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-left-style="solid">
+									<fo:block font-size="8pt" font-weight="bold" content-width="12mm">
+										<!-- UST -->
+									</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
+
+				</fo:block-container>
+
+				<!-- Bestelldetails -->
+				<fo:block-container position="absolute" top="25mm" left="10mm">
+					<fo:table table-layout="fixed" border-collapse="collapse">
+						<fo:table-column column-width="7mm"/>
+						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="7mm"/>
+						<fo:table-column column-width="80mm"/>
+						<fo:table-column column-width="35mm"/>
+						<fo:table-column column-width="15mm"/>
+						<fo:table-column column-width="20mm"/>
+						<fo:table-column column-width="12mm"/>
+						<fo:table-body>
+							<fo:table-row line-height="10pt">
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="7mm" text-align="center">
+										 Pos
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="10mm" text-align="center">
+										Menge
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="7mm" text-align="center">
+										VE
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="80mm" text-align="center">
+										Bezeichnung
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="35mm" text-align="center">
+										ArtikelNr
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="15mm" text-align="center">
+										Preis/VE
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="20mm" text-align="center">
+										Summe [EUR]
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell display-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="12mm" text-align="center">
+										UST
+									</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+							<xsl:apply-templates select="detail"/>
+						</fo:table-body>
+					</fo:table>
+
+				</fo:block-container>
+	</xsl:template>
+	
 	<xsl:template match="details">
 		<xsl:apply-templates select="detail"/>
 	</xsl:template>
