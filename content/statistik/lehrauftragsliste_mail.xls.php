@@ -65,7 +65,7 @@ $qry_stg = "SELECT distinct studiengang_kz
 					tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id AND
 					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
-				) as foo WHERE studiengang_kz<10000
+				) as foo
 				";
 $liste_gesamt = array();
 
