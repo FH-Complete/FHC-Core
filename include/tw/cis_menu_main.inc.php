@@ -276,15 +276,27 @@
   		<!-- FuE -->
   		
 		<tr>
-          	<td class="tdwrap"><a href="http://www.technikum-wien.at/fh/forschung___entwicklung/" class="MenuItem" onClick="js_toggle_container('FuE');" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;F &amp; E</a></td>
+          	<td class="tdwrap"><a href="private/info/forschung_und_entwicklung.html" class="MenuItem" onClick="js_toggle_container('FuE');" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Forschung &amp; Entwicklung</a></td>
         </tr>
 		<tr>
           	<td class="tdwrap">
 		  		<table class="tabcontent" id="FuE" style="display: none;">
 			  	<tr>
 			  		<td class="tdwidth10" nowrap>&nbsp;</td>
-					<td class="tdwrap"><a class="Item" href="http://www.technikum-wien.at/fh/forschung___entwicklung/forschungsaktivitaeten/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;F&amp;E Projekte</a></td>
+					<td class="tdwrap"><a class="Item" href="private/info/forschung_und_entwicklung/gefoerderte_projekte.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Gef&ouml;rderte Projekte</a></td>
 			  	</tr>
+				<tr>
+			  		<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="private/info/qm_2010/fue.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dokumente</a></td>
+			  	</tr>
+				<tr>
+			  		<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="private/info/forschung_und_entwicklung/prozesse.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Prozesse</a></td>
+			  	</tr>
+				<!--<tr>
+			  		<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td class="tdwrap"><a class="Item" href="http://www.technikum-wien.at/fh/forschung___entwicklung/forschungsaktivitaeten/" target="_blank"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;F&amp;E Projekte</a></td>
+			  	</tr>-->
 		  		</table>
 		  	</td>
   		</tr>
@@ -292,8 +304,8 @@
 		<tr>
 			<td class="tdwrap"><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Weiterbildung</a></td>
 		</tr>
-		<tr>
-			<td class="tdwrap">
+		<!--<tr>
+			<td class="tdwrap">-->
 		  	<table class="tabcontent" id="Weiterbildung" style="display: none">
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -443,6 +455,11 @@
 					</table>
 				</td>
 			</tr>
+<!--			<tr>
+		  		<td class="tdwidth10" nowrap>&nbsp;</td>
+		  		<td class="tdwrap"><a class="Item" href="private/info/smartdevices.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Smartdevices</a></td>
+			</tr>	
+-->
 			<tr>
 		  		<td class="tdwidth10" nowrap>&nbsp;</td>
 		  		<td class="tdwrap"><a class="Item" href="cisdocs/Dienstleistungskatalog.xls" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dienstleistungskatalog</a></td>
@@ -684,7 +701,7 @@
 
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm_2010/Deutsch/1_Handbuch/QM-Handbuch_FHTW_2010.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm_2010/Deutsch/1_Handbuch/QM-Handbuch_FHTW.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbuch</a></td>
 			  			</tr>
 
 				  		<tr>
@@ -705,7 +722,7 @@
 			  			</tr>
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm_2010/Deutsch/6_Ground_Rules/Ground_Rules_2010.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
+							<td class="tdwrap"><a target="_blank" class="Item" href="private/info/qm_2010/Deutsch/6_Ground_Rules/Ground_Rules_2011.pdf"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Ground Rules</a></td>
 			  			</tr>
 			  			<tr style="display:none;">
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -723,7 +740,7 @@
 						<!-- EN QM Handbuch CRM@FHTW ist nun in Documents/Support Documents CRM@FHTW-->						
 				  		<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
-							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm_2010/English/1_QM-Handbook/QM_Handbook_UASTW_2010.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
+							<td class="tdwrap"><a target="content" class="Item" href="private/info/qm_2010/English/1_QM-Handbook/QM_Handbook_UASTW.pdf" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;QM-Handbook</a></td>
 			  			</tr>
 						<!--<tr>
 				  			<td class="tdwidth10" nowrap>&nbsp;</td>
