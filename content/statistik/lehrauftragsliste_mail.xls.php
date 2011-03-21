@@ -96,13 +96,15 @@ if($result_stg = $db->db_query($qry_stg))
 
 		$format_number_colored =& $workbook->addFormat();
 		$format_number_colored->setNumFormat('0,0.00');
+		//$format_number_colored->setNumFormat('0.00');
 		$format_number_colored->setFgColor(10);
 
 		$format_number =& $workbook->addFormat();
 		$format_number->setNumFormat('0,0.00');
-
+		
 		$format_number_bold =& $workbook->addFormat();
 		$format_number_bold->setNumFormat('0,0.00');
+		//$format_number_bold->setNumFormat('0.00');
 		$format_number_bold->setBold();
 
 		$format_normal = & $workbook->addFormat();
@@ -312,23 +314,29 @@ if($result_stg = $db->db_query($qry_stg))
 				$worksheet->write($zeile,++$i,$row['nachname'], $format);
 				$gesamt->write($gesamtsheet_row,$i,$row['nachname'], $format);
 				//LVStunden
-				$worksheet->write($zeile,++$i,$row['lvstunden'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['lvstunden'], $format);
+				$lvstunden = str_replace(',', '.', $row['lvstunden']);
+				$worksheet->write($zeile,++$i,$lvstunden, $format);
+				$gesamt->write($gesamtsheet_row,$i,$lvstunden, $format);
 				//LVKosten
-				$worksheet->writeNumber($zeile,++$i,$row['lvkosten'], $formatnb);
-				$gesamt->writeNumber($gesamtsheet_row,$i,$row['lvkosten'], $formatnb);
+				$lvkosten = str_replace(',', '.', $row['lvkosten']);
+				$worksheet->writeNumber($zeile,++$i,$lvkosten, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row,$i,$lvkosten, $formatnb);
 				//Betreuerstunden
-				$worksheet->write($zeile,++$i,$row['betreuergesamtstunden'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['betreuergesamtstunden'], $format);
+				$betreuergesamtstunden = str_replace(',', '.', $row['betreuergesamtstunden']);
+				$worksheet->write($zeile,++$i,$betreuergesamtstunden, $formatnb);
+				$gesamt->write($gesamtsheet_row,$i,$betreuergesamtstunden, $formatnb);
 				//Betreuerkosten
-				$worksheet->write($zeile,++$i,$row['betreuergesamtkosten'], $formatnb);
-				$gesamt->write($gesamtsheet_row,$i,$row['betreuergesamtkosten'], $formatnb);
+				$betreuergesamtkosten = str_replace(',', '.', $row['betreuergesamtkosten']);
+				$worksheet->write($zeile,++$i,$betreuergesamtkosten, $formatnb);
+				$gesamt->write($gesamtsheet_row,$i,$betreuergesamtkosten, $formatnb);
 				//Gesamtstunden
-				$worksheet->write($zeile,++$i,$row['gesamtstunden'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['gesamtstunden'], $format);
+				$gesamtstunden = str_replace(',', '.', $row['gesamtstunden']);
+				$worksheet->write($zeile,++$i,$gesamtstunden, $formatnb);
+				$gesamt->write($gesamtsheet_row,$i,$gesamtstunden, $formatnb);
 				//Gesamtkosten
-				$worksheet->writeNumber($zeile,++$i,$row['gesamtkosten'], $formatnb);
-				$gesamt->writeNumber($gesamtsheet_row,$i,$row['gesamtkosten'], $formatnb);
+				$gesamtkosten_row = str_replace(',', '.', $row['gesamtkosten']);
+				$worksheet->writeNumber($zeile,++$i,$gesamtkosten_row, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row,$i,$gesamtkosten_row, $formatnb);
 				
 				
 				//Kosten zu den Gesamtkosten hinzurechnen
