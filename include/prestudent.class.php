@@ -379,7 +379,9 @@ class prestudent extends person
 			$qry.= " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		if($ausbildungssemester!=null)
 			$qry.= " AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
-		$qry.= ' ORDER BY '.$order;
+
+		if($order!='')
+			$qry.=" ORDER BY ".$order;
 		
 		if($this->db_query($qry))
 		{
