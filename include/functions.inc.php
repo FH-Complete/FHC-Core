@@ -812,4 +812,21 @@ function check_filename($filename)
 	else
 		return true;
 }
+
+/**
+ * Startet eine HTTP-Basic-Authentifizierung und prueft das Passwort gegen LDAP
+ * @return uid wenn erfolgreich. Fehlermeldung und Scriptabbruch bei fehlerhafter Auth.
+ */
+function manual_basic_auth()
+{
+	if(!(isset($_SERVER['PHP_AUTH_USER']) && checkldapuser($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW'])))
+	{
+		header('WWW-Authenticate: Basic realm="Technikum-Wien"');
+    	header('HTTP/1.0 401 Unauthorized');
+    	echo "Ihre Zugangsdaten sind ungueltig!";
+    	exit;
+	}
+	else
+		return $_SERVER['PHP_AUTH_USER'];
+}
 ?>
