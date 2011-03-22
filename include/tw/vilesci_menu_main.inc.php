@@ -160,6 +160,7 @@ $menu=array
 		'Ort'=>array('name'=>'Ort (Raum)', 'link'=>'stammdaten/raum_frameset.html', 'target'=>'main','permissions'=>array('basis/ort')),
 		'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main','permissions'=>array('basis/firma')),
 		'Organisationseinheiten'=>array('name'=>'Organisationseinheiten', 'link'=>'stammdaten/organisationseinheiten.php', 'target'=>'main','permissions'=>array('basis/organisationseinheit')),
+		'Statistik'=>array('name'=>'Statistik', 'link'=>'stammdaten/statistik_frameset.html', 'target'=>'main','permissions'=>array('basis/statistik')),
 		'ImExport'=>array
 		(
 			'name'=>'ImExport','permissions'=>array('admin'),
@@ -191,6 +192,7 @@ $menu=array
 	(
 		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'statistic.png',
 		'link'=>'left.php?categorie=Auswertung', 'target'=>'nav',
+	/*
 		'Raumauslastung'=>array('name'=>'Raumauslastung...', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
 		'Verplanungsuebersicht'=>array('name'=>'Verplanungsübersicht...', 'link'=>'lehre/check/verplanungsuebersicht.php', 'target'=>'main'),
 		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
@@ -206,8 +208,7 @@ $menu=array
 		'Lektorenstatistik'=>array('name'=>'Lektorenstatistik', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/lektorenstatistik.php', 'target'=>'main'),
 		'Mitarbeiterstatistik'=>array('name'=>'Mitarbeiterstatistik', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/mitarbeiterstatistik.php', 'target'=>'main'),
 		'Stromanalyse'=>array('name'=>'Stromanalyse...', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/bama_stromanalyse.php', 'target'=>'main'),
-		
-		
+	*/		
 	),
 	'Inventar'=>	array
 	(
@@ -251,4 +252,10 @@ $menu=array
 	)
 	
 );
+
+require_once(dirname(__FILE__).'/../statistik.class.php');
+$statistik = new statistik();
+$statistik = $statistik->getMenueArray(1);
+$menu['Auswertung']=array_merge($menu['Auswertung'],$statistik);
+//var_dump($menu['Auswertung']);
 ?>
