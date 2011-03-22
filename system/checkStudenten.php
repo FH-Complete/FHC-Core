@@ -19,244 +19,431 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <burkhart@technikum-wien.at>
  */
-// ************************************
-// * Script zur Pruefung und Korrektur
-// * moeglicher Inkonsistenzen
-// *
-// * - Abbrecher dürfen nicht mehr aktiv sein
-// * - Studiengang muss beim Prestudenten und beim Studenten gleich sein
-// **********************************
+
 require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis_db.class.php');
 require_once('../include/studiensemester.class.php');
-require_once('../include/person.class.php');
-require_once('../include/benutzer.class.php');
-require_once('../include/student.class.php');
+require_once('../include/organisationsform.class.php');
 require_once('../include/prestudent.class.php');
-require_once('../include/lehrverband.class.php');
-require_once('../include/mail.class.php');
+require_once('../include/student.class.php'); 
+require_once('../include/studiengang.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/datum.class.php');
 
 $db = new basis_db();
+$datum = new datum();
+$studiensemester = new studiensemester(); 
+$aktSem = $studiensemester->getaktorNext(); 
+$ausgabe = array(); 
 
-$anzahl_neue_prestudent_id=0;
-$anzahl_fehler_prestudent=0;
-$anzahl_gruppenaenderung=0;
-$anzahl_gruppenaenderung_fehler=0;
-$text='';
-$statistik ='';
-$abunterbrecher_verschoben_error=0;
-$abunterbrecher_verschoben=0;
+$text ="";
+?>
+<html>
+	<head>
+	<title>Check Studenten</title>
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	
+	<link rel="stylesheet" href="../skin/vilesci.css" type="text/css">
+	</head>
+
+	<body class="background_main">
+		<h2>Studenten Checkskript für BIS-Meldung</h2>
+<?php 
 
 /*
- *  Studiengang muss beim Prestudenten und beim Studenten gleich sein
-*/
+ *   	Studiengang muss beim Prestudenten und beim Studenten gleich sein
+ */
 
+$qry="select stud.student_uid, pre.studiengang_kz, stud.studiengang_kz studiengang 
+from public.tbl_prestudent pre 
+join public.tbl_student stud using(prestudent_id) 
+where stud.studiengang_kz != pre.studiengang_kz;"; 
 
+$text.="Suche Studiengänge die bei Prestudenten und Studenten nicht gleich sind ...<br><br>";
 
-$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE prestudent_id is null";
-if($result = $db->db_query($qry))
+if($db->db_query($qry))
 {
-	$text.="Suche Studenten mit fehlender Prestudent_id ...\n\n";
-
-	while($row = $db->db_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
-		$qry_id = "SELECT tbl_prestudent.prestudent_id FROM campus.vw_student JOIN public.tbl_prestudent USING(person_id) WHERE uid='".addslashes($row->student_uid)."' AND tbl_prestudent.studiengang_kz='$row->studiengang_kz'";
-		if($result_id = $db->db_query($qry_id))
-		{
-			if($db->db_num_rows($result_id)==1)
-			{
-				if($row_id = $db->db_fetch_object($result_id))
-				{
-					$qry_upd = "UPDATE public.tbl_student SET prestudent_id='$row_id->prestudent_id' WHERE student_uid='".addslashes($row->student_uid)."'";
-					if($db->db_query($qry_upd))
-					{
-						$text .= "Prestudent_id von $row->student_uid wurde auf $row_id->prestudent_id gesetzt\n";
-						$anzahl_neue_prestudent_id++;
-					}
-				}
-				else
-				{
-					$text .= "unbekannter Fehler\n";
-					$anzahl_fehler_prestudent++;
-				}
-			}
-			elseif($db->db_num_rows($result_id)>1)
-			{
-				$text .= "Student $row->student_uid hat keine Prestudent_id und MEHRERE passende Prestudenteintraege\n";
-				$anzahl_fehler_prestudent++;
-			}
-			elseif($db->db_num_rows($result_id)==0)
-			{
-				$text .= "Student $row->student_uid hat keine Prestudent_id und KEINE passenden Prestudenteintraege\n";
-				$anzahl_fehler_prestudent++;
-			}
-		}
-		else
-		{
-			$text.="Fehler bei Abfrage:".$db->db_last_error()."\n";
-			$anzahl_fehler_prestudent++;
-		}
+		$ausgabe[$row->studiengang][1][]= $row->student_uid; 
+		$text.="Studenten-uid: ".$row->student_uid."<br>"; 
 	}
 }
+else
+	$text.="Fehler bei der Abfrage aufgetreten. <br>"; 
 
-// *****
-// * Gruppenzuteilung von Abbrechern und Unterbrechern korrigieren.
-// * Abbrecher werden in die Gruppe 0A verschoben
-// * Unterbrecher in die Gruppe 0B
-// *****
-$text.="\n\nKorrigiere Gruppenzuteilungen von Ab-/Unterbrechern\n";
+/*	
+ * Abbrecher dürfen nicht mehr aktiv sein 
+ */
+	
+$text.= "<br>Suche alle Abbrecher die noch aktiv sind ... <br><br>";
 
-//Alle Ab-/Unterbrecher holen die nicht im 0. Semester sind
-$qry = "SELECT
-			student_uid,
-			tbl_student.studiengang_kz,
-			tbl_prestudent.prestudent_id,
-			status_kurzbz,
-			studiensemester_kurzbz
-		FROM
-			public.tbl_student,
-			public.tbl_prestudent,
-			public.tbl_prestudentstatus
-		WHERE
-			tbl_student.prestudent_id=tbl_prestudent.prestudent_id AND
-			tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id AND
-			(
-				tbl_prestudentstatus.status_kurzbz='Unterbrecher' OR
-				tbl_prestudentstatus.status_kurzbz='Abbrecher'
-			)
-			AND
-			EXISTS (SELECT
-						*
-					FROM
-						public.tbl_studentlehrverband
-					WHERE
-			        	student_uid=tbl_student.student_uid AND
-			        	studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz AND
-			        	semester<>0
-			        )
-		";
+$qry ="select pre_status.status_kurzbz, benutzer.aktiv, benutzer.uid, student.studiengang_kz studiengang
+from public.tbl_prestudentstatus pre_status 
+join public.tbl_prestudent pre using(prestudent_id)
+join public.tbl_student student using(prestudent_id)
+join public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+where pre_status.status_kurzbz ='Abbrecher' and benutzer.aktiv = 'true';";
 
-if($result = $db->db_query($qry))
+if($db->db_query($qry))
 {
-	while($row = $db->db_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
-		//Eintrag nur korrigieren wenn der Abbrecher/Unterbrecher Status der letzte in diesem Studiensemester ist
-		$prestd = new prestudent();
-		$prestd->getLastStatus($row->prestudent_id, $row->studiensemester_kurzbz);
-
-		if($prestd->status_kurzbz=='Unterbrecher' || $prestd->status_kurzbz=='Abbrecher')
-		{
-			//Studentlehrverbandeintrag aktualisieren
-			$student = new student();
-			if($student->studentlehrverband_exists($row->student_uid, $row->studiensemester_kurzbz))
-				$student->new = false;
-			else
-			{
-				$student->new = true;
-				$student->insertamum = date('Y-m-d H:i:s');
-				$student->insertvon = 'chkstudentlvb';
-			}
-
-			$student->uid = $row->student_uid;
-			$student->studiensemester_kurzbz=$row->studiensemester_kurzbz;
-			$student->studiengang_kz = $row->studiengang_kz;
-			$student->semester = '0';
-			$student->verband = ($prestd->status_kurzbz=='Unterbrecher'?'B':'A');
-			$student->gruppe = ' ';
-			$student->updateamum = date('Y-m-d H:i:s');
-			$student->updatevon = 'chkstudentlvb';
-
-			//Pruefen ob der Lehrverband exisitert, wenn nicht dann wird er angelegt
-			$lehrverband = new lehrverband();
-			if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
-			{
-				$lehrverband->studiengang_kz = $student->studiengang_kz;
-				$lehrverband->semester = $student->semester;
-				$lehrverband->verband = $student->verband;
-				$lehrverband->gruppe = $student->gruppe;
-				$lehrverband->bezeichnung = ($student->verband=='A'?'Abbrecher':'Unterbrecher');
-
-				$lehrverband->save(true);
-			}
-
-			if($student->save_studentlehrverband())
-			{
-				$text.="Student $student->uid wurde im $row->studiensemester_kurzbz in die Gruppe $student->semester$student->verband verschoben\n";
-				$abunterbrecher_verschoben++;
-			}
-			else
-			{
-				$text.="Fehler biem Speichern des Lehrverbandeintrages bei $student->student_uid:".$student->errormsg."\n";
-				$abunterbrecher_verschoben_error++;
-			}
-		}
+		$ausgabe[$row->studiengang][2][]= $row->uid; 
+		$text .="Studenten-uid: ".$row->uid."<br>"; 
 	}
 }
+else
+	$text.= "Fehler bei der Abfrage aufgetreten. <br>"; 
 
-// *****
-// * Unterschiedliche Gruppenzuteilungen in tbl_studentlehrverband - tbl_student korrigieren
-// *****
 
-$stsem = new studiensemester();
 
-$stsem = $stsem->getNearest();
+/*
+ *	Organisationsform eines Studienganges, sollte mit den Organisationsformen der Studenten übereinstimmen
+ */
 
-$text.="\n\nKorrigiere Inkonsitenzen in den Tabellen tbl_studentlehrverband, tbl_student (Verwendetes Studiensemester: $stsem)\n\n";
+$text.= "<br>Suche Studenten mit ungleichen Organisationsformeinträgen (Studiengang <--> Prestudentstatus) ... <br><br>"; 
 
-$qry = "SELECT
-			tbl_student.studiengang_kz as studiengang_kz_old,
-			tbl_student.semester as semester_old,
-			tbl_student.verband as verband_old,
-			tbl_student.gruppe as gruppe_old,
-			tbl_studentlehrverband.student_uid,
-			tbl_studentlehrverband.studiengang_kz,
-			tbl_studentlehrverband.semester,
-			tbl_studentlehrverband.verband,
-			tbl_studentlehrverband.gruppe
-		FROM
-			public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid)
-		WHERE
-			tbl_studentlehrverband.studiensemester_kurzbz='$stsem' AND
-			(
-				tbl_student.studiengang_kz<>tbl_studentlehrverband.studiengang_kz OR
-				tbl_student.semester<>tbl_studentlehrverband.semester OR
-				tbl_student.verband<>tbl_studentlehrverband.verband OR
-				tbl_student.gruppe<>tbl_studentlehrverband.gruppe
-			)";
+$orgArray = array(); 
+$orgForm = new organisationsform(); 
 
-if($result = $db->db_query($qry))
+$qry ="select studiengang.orgform_kurzbz as studorgkz, student.student_uid, prestudentstatus.orgform_kurzbz as studentorgkz, student.studiengang_kz studiengang
+from public.tbl_studiengang studiengang
+join public.tbl_student student using(studiengang_kz)
+join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudentstatus prestudentstatus using(prestudent_id)
+join public.tbl_benutzer benutzer on(benutzer.uid = student.student_uid)
+where benutzer.aktiv = 'true' and prestudentstatus.status_kurzbz ='Student'
+and studiengang.studiengang_kz < 10000
+and prestudentstatus.studiensemester_kurzbz = '$aktSem' 
+order by student_uid; "; 
+
+
+if($db->db_query($qry))
 {
-	while($row = $db->db_fetch_object($result))
+	while($row = $db->db_fetch_object())
 	{
-		$qry = "UPDATE public.tbl_student SET studiengang_kz='$row->studiengang_kz', semester='$row->semester', verband='$row->verband', gruppe='$row->gruppe' WHERE student_uid='$row->student_uid'";
-		if($db->db_query($qry))
+		$studOrgform = $row->studorgkz; 
+		$student_uid = $row->student_uid; 
+		$studentOrgform = $row->studentorgkz; 
+
+		$orgArray = $orgForm->checkOrgForm($studOrgform); 
+		if(!in_array($studentOrgform, $orgArray))
 		{
-			$text .= "Bei Student $row->student_uid wurde die Gruppenzuordnung von $row->studiengang_kz_old/$row->semester_old/$row->verband_old/$row->gruppe_old auf $row->studiengang_kz/$row->semester/$row->verband/$row->gruppe geaendert\n";
-			$anzahl_gruppenaenderung++;
-		}
-		else
-		{
-			$text.="Fehler beim Aendern der Gruppe: ".$db->db_last_error()."\n";
-			$anzahl_gruppenaenderung_fehler++;
+			$ausgabe[$row->studiengang][3][]= $row->student_uid; 
+			$text.= "Student_uid: $student_uid <br>";
 		}
 	}
 }
 else
-	$text.="Fehler bei Abfrage".$db->db_last_error();
+	$text.="Fehler bei der Abfrage aufgetreten. <br>"; 
+	
 
-$statistik .= "Prestudent_id wurde bei $anzahl_neue_prestudent_id Studenten korrigiert\n";
-$statistik .= "$anzahl_fehler_prestudent Fehler sind bei der Korrektur der Prestudent_id aufgetreten\n";
-$statistik .= "$abunterbrecher_verschoben Studenten wurden ins 0. Semester verschoben\n ";
-$statistik .= "$abunterbrecher_verschoben_error Fehler sind beim Verschieben aufgetreten\n ";
-$statistik .= "Bei $anzahl_gruppenaenderung Studenten wurde die Gruppenzuordnung korrigiert\n";
-$statistik .= "$anzahl_gruppenaenderung_fehler Fehler sind bei der Korrektur der Gruppenzuordnung aufgetreten\n";
-$statistik .= "\n\n";
+/*
+ * Abbrecher dürfen nicht wieder einen Status bekommen
+ */
 
-$mail = new mail(MAIL_ADMIN, 'vilesci@'.DOMAIN, 'CHECK Studentlehrverband', $statistik.$text);
-if($mail->send())
-	echo 'Mail an '.MAIL_ADMIN.' wurde versandt';
-else
-	echo 'Fehler beim Versenden des Mails an '.MAIL_ADMIN;
+$prestudentAbbrecher = new prestudent(); 
+$prestudentLast = new prestudent(); 
+$text.= "<br>Suche alle Abbrecher die wieder einen Status bekommen haben...<br><br>"; 
 
-echo nl2br("\n\n".$statistik.$text);
+$qry ="select student.student_uid, prestudent.prestudent_id, student.studiengang_kz studiengang
+from public.tbl_student student
+join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudentstatus prestatus using(prestudent_id) 
+where prestatus.status_kurzbz = 'Abbrecher'; "; 
 
-?>
+if($db->db_query($qry))
+{
+	while($row = $db->db_fetch_object())
+	{
+		$student_uid = $row->student_uid; 
+		$prestudent_id = $row->prestudent_id; 
+		
+		$prestudentLast->result = array(); 
+		
+		$prestudentLast->getLastStatus($prestudent_id); 
+		
+		if($prestudentLast->status_kurzbz != 'Abbrecher')
+		{
+			$ausgabe[$row->studiengang][4][]= $student_uid; 
+			$text.= "Studenten-uid: ".$student_uid."<br>";   
+		}
+	}
+}
+
+
+/*
+ * 	Aktuelles Semester beim Studenten stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein
+ */ 
+
+$text .="<br><br>Suche Studenten deren Semstern nicht mit dem Ausbildungssemesters des aktuellen Status übereinstimmt ... <br><br>"; 
+	
+$student = new student(); 
+$prestudent = new prestudent(); 
+$qry = "select distinct(student.student_uid), prestudent.prestudent_id, status.ausbildungssemester, lv.semester, student.studiengang_kz studiengang
+from public.tbl_student student
+join public.tbl_studentlehrverband lv using(student_uid)
+join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudentstatus status using(prestudent_id) 
+WHERE status.studiensemester_kurzbz = '$aktSem'  
+and lv.studiensemester_kurzbz = '$aktSem' 
+and get_rolle_prestudent (prestudent_id, null)='Student';"; 
+
+if($db->db_query($qry))
+{
+	while($row = $db->db_fetch_object())
+	{
+		$student_uid = $row->student_uid;
+		
+		if($row->ausbildungssemester != $row->semester)
+		{
+			$ausgabe[$row->studiengang][5][]= $student_uid; 
+			$text.="Studenten-uid: ".$student_uid."<br>";
+		} 
+	}
+}
+
+
+/*
+ * Inaktive Studenten sollen keinen "aktiven" Status haben (Diplomant, Student, Unterbrecher, Praktikant)
+ */	 
+
+$text.="<br><br>Suche alle inaktiven Studenten mit einem aktiven Status ... <br><br>"; 
+
+$qry = "Select distinct(student.student_uid), student.studiengang_kz studiengang 
+from public.tbl_benutzer benutzer 
+join public.tbl_student student on(benutzer.uid = student.student_uid)
+join public.tbl_prestudent prestudent using(prestudent_id)
+where benutzer.aktiv = 'false' 
+and get_rolle_prestudent (prestudent_id, '$aktSem') in ('Student', 'Diplomand', 'Unterbrecher', 'Praktikant')";
+
+if($db->db_query($qry))
+{
+	while($row = $db->db_fetch_object())
+	{
+		$ausgabe[$row->studiengang][6][]= $row->student_uid; 
+		$text.="Studenten-uid: ".$row->student_uid."<br>"; 
+	}
+}
+
+/*
+ * 	Das Datum der Inskription darf nicht vor der letzten BIS-Meldung liegen
+ * 	zB. Wenn Student im WS2009 studiert darf Studentenstatus nicht vor 15.4.2009 liegen
+ * 	zB. Wenn Student im SS2010 studiert darf Studentenstatus nicht vor 15.11.2009 liegen
+ */
+
+$text.="<br><br>Suche alle Studenten deren Inskription im aktuellen Semester vor der letzten BIS-Meldung liegt ...<br><br>";
+
+$qry ="Select distinct(student.student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang 
+from public.tbl_benutzer benutzer 
+join public.tbl_student student on(benutzer.uid = student.student_uid)
+join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudentstatus prestatus using(prestudent_id) 
+where benutzer.aktiv = 'true'"; 
+
+if($db->db_query($qry))
+{
+	while($row = $db->db_fetch_object())
+	{	
+		$prestudent = new prestudent();
+
+		$prestudent->getFirstStatus($row->prestudent_id, 'Student');
+		// wenn Student im aktuellen Semester zum ersten Mal den Status Student bekommt
+		if($prestudent->studiensemester_kurzbz == $aktSem)
+		{
+			$datumBIS = getDateForInscription($aktSem); 
+			$datumInscription = $datum->formatDatum($prestudent->datum, 'Y-m-d');
+			
+			// Wenn Inscriptionsdatum vor der letzten BIS Meldung liegt
+			if($datumInscription < $datumBIS)
+			{
+				$ausgabe[$row->studiengang][7][]= $row->student_uid; 
+				$text.= $row->student_uid ." Inskribiert am: ".$datumInscription." BIS Meldung: ".$datumBIS."<br>"; 
+			}
+		}
+
+	}
+}
+
+
+/*
+ *	Datum und Studiensemester bei den Stati sind in falscher Reihenfolge 
+ */
+
+$text.="<br><br>Suche alle Studenten die Datum und Studiensemester in deren Stati in falscher Reihenfolge haben ...<br><br>"; 
+$prestudentFirst = new prestudent();
+$prestudentSecond = new prestudent();
+$i = 0; 
+
+// alle aktiven Studenten die im aktuellen Semster den Status Student haben
+$qry_student ="Select distinct(student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang 
+from public.tbl_student student 
+join public.tbl_benutzer benutzer on(student.student_uid = benutzer.uid)
+join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudentstatus status using(prestudent_id)
+where benutzer.aktiv = 'true' 
+and status.status_kurzbz ='Student' 
+and status.studiensemester_kurzbz = '$aktSem';";
+
+if($result = $db->db_query($qry_student))
+{
+	while($student = $db->db_fetch_object($result))
+	{	
+		$qry_orderSemester ="SELECT * FROM public.tbl_prestudentstatus status 
+		join public.tbl_studiensemester semester using(studiensemester_kurzbz)
+		where prestudent_id = '$student->prestudent_id' 
+		order by start DESC, datum DESC;"; 
+		
+		if($result1 = $db->db_query($qry_orderSemester))
+		{
+			$prestudentSecond->result = array();
+			$prestudentFirst->result = array(); 
+			while($row = $db->db_fetch_object($result1))
+			{
+				$prestudentStatus = new prestudent(); 
+				
+				$prestudentStatus->prestudent_id = $row->prestudent_id; 
+				$prestudentStatus->status_kurzbz = $row->status_kurzbz; 
+				$prestudentStatus->studiensemester_kurzbz = $row->studiensemester_kurzbz; 
+				$prestudentStatus->ausbildungssemester = $row->ausbildungssemester; 
+				$prestudentStatus->datum = $row->datum; 
+				$prestudentStatus->insertamum = $row->insertamum; 
+				$prestudentStatus->insertvon = $row->insertvon;
+				$prestudentStatus->updateamum = $row->updateamum; 
+				$prestudentStatus->updatevon = $row->updatevon; 
+				$prestudentStatus->ext_id = $row->ext_id; 
+				$prestudentStatus->orgform_kurzbz = $row->orgform_kurzbz; 
+				
+				$prestudentFirst->result[] = $prestudentStatus; 
+			}
+		}
+		else 
+			$text.= "Fehler";
+
+		if(!$prestudentSecond->getPrestudentRolle($student->prestudent_id,null,null,'Datum DESC, insertamum DESC'))
+			$text.= "ERROR:".$prestudentSecond->errormsg; 
+	
+		for($i=0; $i<count($prestudentFirst->result); $i++)
+		{
+			if($prestudentFirst->result[$i]->studiensemester_kurzbz != $prestudentSecond->result[$i]->studiensemester_kurzbz)
+			{
+				$ausgabe[$student->studiengang][8][]= $student->student_uid; 
+				$text.= "Studenten-uid: ".$student->student_uid."<br>"; 
+				continue 2; 
+			}
+		}
+	}
+}
+
+/*
+ *	 Aktive Studenten ohne Status in aktuellen Studiensemester
+ */
+
+$prestudent = new prestudent(); 
+$text.="<br><br>Suche alle aktiven Studenten die keinen Status im aktuellen Studiensemester haben.<br><br>"; 
+
+$qry ="Select distinct (student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang
+from public.tbl_student student 
+join public.tbl_benutzer benutzer on (benutzer.uid = student.student_uid)
+join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudentstatus status using(prestudent_id)
+where benutzer.aktiv = 'true'"; 
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		if(!$prestudent->getLastStatus($row->prestudent_id, $aktSem))
+		{
+			$ausgabe[$row->studiengang][9][]= $row->student_uid; 
+			$text.= $row->student_uid."<br>";
+		} 
+	}
+}
+
+// Ausgabe der Studenten
+foreach($ausgabe as $stg_kz=>$value)
+{
+	$studiengang = new studiengang(); 
+	$studiengang->load($stg_kz); 
+	
+	echo "<br><br><h2>".$studiengang->bezeichnung ." (".$studiengang->kurzbzlang.")</h2>"; 
+	echo "<table border='0'>"; 
+	foreach($value as $code=>$uid)
+	{
+		switch ($code) {
+			case 1:
+					echo '<tr><td>&nbsp;</td></tr><tr><td colspan="4"><b>Studenten deren Studiengänge (Prestudent <-> Student) nicht gleich sind</b></td></tr>';
+					break;
+			case 2:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Abrecher die noch aktiv sind</b></td></td>";
+					break;
+			case 3:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten mit nicht identischen Organisationsformeinträgen (Studiengang <-> Prestudentstatus)</b></td></tr>";
+					break;
+			case 4:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Abbrecher die wieder einen Status bekommen haben</b></td></td>"; 
+					break;
+			case 5:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten deren Semester nicht mit dem Ausbildungssemester des aktuellen Status übereinstimmt</b></td></tr>";
+					break;
+			case 6:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Inaktive Studenten mit deinem aktiven Status</b></td></tr>";
+					break;
+			case 7:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten deren Inskription im aktuellen Semester vor der letzten BIS-Meldung liegt</b></td></tr>";
+					break;
+			case 8:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten die Datum und Studiensemestern in deren Stati in falscher Reihenfolge haben</b></td></tr>";
+					break;
+			case 9:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Aktive Studenten die keinen Status im aktuellen Studiensemester haben</b></td></tr>";
+					break;
+			default:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Ungültiger Code</b></td></tr>";
+					break;
+		}
+
+		foreach ($uid as $student_id)
+		{	echo "<tr>"; 
+			$student = new student(); 
+			$student->load($student_id);
+			echo '<td>'.$student->vorname.'</td><td>'.$student->nachname.'</td><td>'.$student->uid.'</td>'; 
+			echo "</tr>"; 
+		}
+		
+	}
+	echo "</table>"; 
+}
+
+//echo $text; 
+
+/*
+ * 	Gibt das Datum der BIS Meldung des übergebenen Semesters zurück
+ */
+function getDateForInscription ($semester)
+{
+	global $datum;
+	
+	$semesterYear = substr($semester,2,6);
+	$semesterType = substr($semester,0,2); 
+	
+	if($semesterType == 'SS')
+	{
+		$date = "15.11.".($semesterYear-1); 
+		$date = $datum->formatDatum($date, 'Y-m-d');
+		return $date; 
+	}
+	
+	if($semesterType == 'WS')
+	{
+		$date = '15.04'.$semesterYear; 
+		$date = $datum->formatDatum($date, 'Y-m-d'); 
+		return $date; 
+	}
+}
+?>	
+	</body>
+	</html>
