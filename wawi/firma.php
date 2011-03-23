@@ -465,7 +465,7 @@ if($method=='new' || $method=='update')
 	}
 	
 	
-	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" name="firmaForm">';
 	echo '
 	<input type="hidden" name="firma_id" value="'.$firma_id.'">
 	<input type="hidden" name="standort_id" value="'.$standort_id.'">
@@ -482,11 +482,11 @@ if($method=='new' || $method=='update')
 	</tr>
 	<tr>
 		<td>Straße:</td>
-		<td><input type="text" name="strasse" size="40" maxlength="256" value="'.$strasse.'"/></td>
+		<td><input type="text" name="strasse" size="40" maxlength="255" value="'.$strasse.'"/></td>
 	</tr>
 	<tr>
 		<td>Plz / Ort:</td>
-		<td><input type="text" size="6" name="plz" maxlength="16" value="'.$plz.'"/><input type="text" name="ort" maxlength="256" value="'.$ort.'"/></td>
+		<td><input type="text" size="6" name="plz" maxlength="10" value="'.$plz.'"/><input type="text" name="ort" maxlength="255" value="'.$ort.'"/></td>
 	</tr>
 	<tr>
 		<td>Nation:</td>
@@ -536,12 +536,41 @@ if($method=='new' || $method=='update')
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="submit" name="save" value="Speichern"/></td>
+		<td><input type="submit" name="save" value="Speichern" onclick="return validate()"/></td>
 	</tr>
 	</table>
 	';
 	
 	echo '</form>';
+	
+	echo '<script language="javascript" type="text/javascript">
+		function validate() 
+		{
+			maxlength=256;
+			
+			if(document.firmaForm.name.value == "")
+		    {
+		    	alert("Name der Firma darf nicht leer sein!");
+		    	document.firmaForm.name.focus(); 
+		    	return false;
+		    }
+	     	if(document.firmaForm.email.value.indexOf("@") == -1 && document.firmaForm.email.value != "") 
+	     	{
+		    	alert("Ungültige E-Mail Adresse eingegeben!");
+		    	document.firmaForm.email.focus();
+		    	return false;
+		    }			
+	     	if(document.firmaForm.anmerkung.value.length>=maxlength) 
+	     	{
+	          alert("Die Anmerkung darf nur 256 Zeichen lang sein. Aktuell sind es : "+document.firmaForm.anmerkung.value.length+" Zeichen.");
+	          document.firmaForm.anmerkung.focus();
+	          return false;
+	     	}
+
+		    return true; 
+  		}
+
+		</script>';
 }
 
 //Suchen von Firmen
