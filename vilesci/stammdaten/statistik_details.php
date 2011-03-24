@@ -25,6 +25,7 @@
 require_once('../../config/vilesci.config.inc.php');		
 require_once('../../include/statistik.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/berechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -63,6 +64,7 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 		$php = (isset($_POST['php'])?$_POST['php']:die('PHP fehlt'));
 		$r = (isset($_POST['r'])?$_POST['r']:die('R fehlt'));
 		$new = (isset($_POST['new'])?$_POST['new']:die('New fehlt'));
+		$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz'])?$_POST['berechtigung_kurzbz']:die('Berechtigungkurzbz fehlt'));
 		
 		if($new=='true')
 		{
@@ -89,6 +91,7 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 		$statistik->r = $r;
 		$statistik->updateamum = date('Y-m-d H:i:s');
 		$statistik->updatevon = $user;
+		$statistik->berechtigung_kurzbz = $berechtigung_kurzbz;
 		
 		if($statistik->save())
 		{		
@@ -144,17 +147,37 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 	echo '   <td>URL</td>';
 	echo '   <td><input type="text" name="url" size="80" maxlength="512" value="'.$statistik->url.'"></td>';
 	echo '   <td></td>';
-	echo '   <td>PHP</td>';
-	echo '   <td><input type="text" name="php" value="'.$statistik->php.'"></td>';
+	echo '   <td>Berechtigung</td>';
+	echo '   <td>';
+	$berechtigung = new berechtigung();
+	$berechtigung->getBerechtigungen();
+	echo '<select name="berechtigung_kurzbz">';
+	echo '<option value="">-- keine Auswahl --</option>';
+	foreach($berechtigung->result as $row)
+	{
+		if($row->berechtigung_kurzbz==$statistik->berechtigung_kurzbz)
+			$selected='selected';
+		else
+			$selected='';
+		echo '<option value="'.$row->berechtigung_kurzbz.'" '.$selected.'>'.$row->berechtigung_kurzbz.'</option>';
+	}
+	echo '</select>';
+	//<input type="text" name="berechtigung_kurzbz" value="'.$statistik->berechtigung_kurzbz.'">
+	echo '</td>';
 	echo '</tr>';
 	echo '<tr valign="top">';
-	echo '   <td>SQL</td>';
-	echo '   <td><textarea name="sql" cols="60" rows="5">'.$statistik->sql.'</textarea></td>';
+	echo '   <td rowspan="2">SQL</td>';
+	echo '   <td rowspan="2"><textarea name="sql" cols="60" rows="5">'.$statistik->sql.'</textarea></td>';
 	echo '   <td></td>';
 	echo '   <td>R</td>';
 	echo '   <td><input type="text" name="r" value="'.$statistik->r.'"></td>';
 	echo '</tr>';
-	echo '<tr>';
+	echo '<tr valign="top">';
+	echo '   <td></td>';
+	echo '   <td>PHP</td>';
+	echo '   <td><input type="text" name="php" value="'.$statistik->php.'"></td>';
+	echo '</tr>';
+	
 	echo '<tr>';
 	echo '   <td></td>';
 	echo '   <td></td>';

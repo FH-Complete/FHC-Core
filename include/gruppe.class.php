@@ -228,7 +228,7 @@ class gruppe extends basis_db
 	 * @param $sichtbar
 	 * @return boolean
 	 */
-	public function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null)
+	public function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null, $content_visible=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_gruppe WHERE 1=1';
 		if(!is_null($studiengang_kz) && $studiengang_kz!='')
@@ -239,6 +239,8 @@ class gruppe extends basis_db
 			$qry .= " AND mailgrp=".($mailgrp?'true':'false');
 		if(!is_null($sichtbar))
 			$qry .= " AND sichtbar=".($sichtbar?'true':'false');
+		if(!is_null($content_visible))
+			$qry .= " AND content_visible=".($content_visible?'true':'false');
 		$qry.=" ORDER BY beschreibung";
 		if($this->db_query($qry))
 		{

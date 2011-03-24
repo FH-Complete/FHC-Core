@@ -30,6 +30,8 @@ function get_uid()
 	{
 		if(isset($_SESSION['user']))
 			return $_SESSION['user'];
+		else
+			return manual_basic_auth();
 	}
 	// fuer Testzwecke
 	//return 'oesi';
@@ -828,5 +830,21 @@ function manual_basic_auth()
 	}
 	else
 		return $_SERVER['PHP_AUTH_USER'];
+}
+
+/**
+ * Liefert die aktuelle Sprache
+ */
+function getSprache()
+{
+	if(isset($_SESSION['FHC_SPRACHE']))
+	{
+		$sprache=$_SESSION['FHC_SPRACHE'];
+	}
+	else
+	{
+		$sprache='German';
+	}
+	return $sprache;
 }
 ?>
