@@ -107,10 +107,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis');"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng');"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
-  <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg();"/>
-  <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt');"/>
-  <command id="menu-dokumente-studienerfolg-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('', '', 'true');"/>
-  <command id="menu-dokumente-studienerfolg-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('finanzamt', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg('Studienerfolg');"/>
+  <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','finanzamt');"/>
+  <command id="menu-dokumente-studienerfolg-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolg-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','finanzamt', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolgeng-normal:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng');"/>
+  <command id="menu-dokumente-studienerfolgeng-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt');"/>
+  <command id="menu-dokumente-studienerfolgeng-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple();"/>
   <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple();"/>
@@ -504,13 +508,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 					       id        =  "menu-dokumente-studienerfolg-menu-normal"
 					       key       =  "menu-dokumente-studienerfolg-normal:key"
 					       label     = "&menu-dokumente-studienerfolg-normal.label;"
-					       oncommand   =  "StudentCreateStudienerfolg(null, \''.$stsem_kurzbz.'\');"
+					       oncommand   =  "StudentCreateStudienerfolg(\'Studienerfolg\',null, \''.$stsem_kurzbz.'\');"
 					       accesskey = "&menu-dokumente-studienerfolg-normal.accesskey;"/>
 					   	<menuitem
 					       id        =  "menu-dokumente-studienerfolg-finanzamt"
 					       key       =  "menu-dokumente-studienerfolg-finanzamt:key"
 					       label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
-					       oncommand   =  "StudentCreateStudienerfolg(\'finanzamt\', \''.$stsem_kurzbz.'\');"
+					       oncommand   =  "StudentCreateStudienerfolg(\'Studienerfolg\',\'finanzamt\', \''.$stsem_kurzbz.'\');"
 					       accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
 					    </menupopup>
 					</menu>';
@@ -529,6 +533,69 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 	               label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
 	               command   =  "menu-dokumente-studienerfolg-finanzamt:command"
 	               accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
+	            </menupopup>
+	        </menu>
+	        <menu id="menu-dokumente-studienerfolgeng" label="&menu-dokumente-studienerfolgeng.label;" accesskey="&menu-dokumente-studienerfolgeng.accesskey;">
+	          <menupopup id="menu-dokumente-studienerfolgeng-popup">
+	          <menu id="menu-dokumente-studienerfolgeng-allesemester" label="&menu-dokumente-studienerfolgeng-allesemester.label;">
+				  <menupopup id="menu-dokumente-studienerfolgeng-allesemester-popup">
+				    <menuitem
+				       id        =  "menu-dokumente-studienerfolgeng-allesemester-normal"
+				       key       =  "menu-dokumente-studienerfolgeng-allesemester-normal:key"
+				       label     = "&menu-dokumente-studienerfolgeng-allesemester-normal.label;"
+				       command   =  "menu-dokumente-studienerfolgeng-allesemester-normal:command"
+				       accesskey = "&menu-dokumente-studienerfolgeng-allesemester-normal.accesskey;"/>
+				   	<menuitem
+				       id        =  "menu-dokumente-studienerfolgeng-allesemester-finanzamt"
+				       key       =  "menu-dokumente-studienerfolgeng-allesemester-finanzamt:key"
+				       label     = "&menu-dokumente-studienerfolgeng-allesemester-finanzamt.label;"
+				       command   =  "menu-dokumente-studienerfolgeng-allesemester-finanzamt:command"
+				       accesskey = "&menu-dokumente-studienerfolgeng-allesemester-finanzamt.accesskey;"/>
+				    </menupopup>
+				</menu>
+	          <?php
+	          
+	          $qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 5";
+	          $db = new basis_db();
+	          
+	          if($db->db_query($qry))
+	          {
+	          	while($row = $db->db_fetch_object())
+	          	{
+	          		$stsem_kurzbz = $row->studiensemester_kurzbz;
+	          		
+					echo '
+					<menu id="menu-dokumente-studienerfolg-menu" label="'.$stsem_kurzbz.'">
+					  <menupopup id="menu-dokumente-studienerfolg-menu-popup">
+					    <menuitem
+					       id        =  "menu-dokumente-studienerfolgeng-menu-normal"
+					       key       =  "menu-dokumente-studienerfolgeng-normal:key"
+					       label     = "&menu-dokumente-studienerfolgeng-normal.label;"
+					       oncommand   =  "StudentCreateStudienerfolg(\'StudienerfolgEng\',null, \''.$stsem_kurzbz.'\');"
+					       accesskey = "&menu-dokumente-studienerfolgeng-normal.accesskey;"/>
+					   	<menuitem
+					       id        =  "menu-dokumente-studienerfolgeng-finanzamt"
+					       key       =  "menu-dokumente-studienerfolgeng-finanzamt:key"
+					       label     = "&menu-dokumente-studienerfolgeng-finanzamt.label;"
+					       oncommand   =  "StudentCreateStudienerfolg(\'StudienerfolgEng\',\'finanzamt\', \''.$stsem_kurzbz.'\');"
+					       accesskey = "&menu-dokumente-studienerfolgeng-finanzamt.accesskey;"/>
+					    </menupopup>
+					</menu>';
+	          	}
+	          }
+	          	?>
+	            <menuitem
+	               id        =  "menu-dokumente-studienerfolgeng-normal"
+	               key       =  "menu-dokumente-studienerfolgeng-normal:key"
+	               label     = "&menu-dokumente-studienerfolgeng-normal.label;"
+	               command   =  "menu-dokumente-studienerfolgeng-normal:command"
+	               accesskey = "&menu-dokumente-studienerfolgeng-normal.accesskey;"/>
+	           	<menuitem
+	               id        =  "menu-dokumente-studienerfolgeng-finanzamt"
+	               key       =  "menu-dokumente-studienerfolgeng-finanzamt:key"
+	               label     = "&menu-dokumente-studienerfolgeng-finanzamt.label;"
+	               command   =  "menu-dokumente-studienerfolgeng-finanzamt:command"
+	               accesskey = "&menu-dokumente-studienerfolgeng-finanzamt.accesskey;"/>
 	            </menupopup>
 	        </menu>
 	         <menuitem

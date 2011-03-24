@@ -32,7 +32,10 @@
 		
 	$uid=get_uid();
 	$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
-	
+	if(isset($_GET['lang']) && $_GET['lang']=='en')
+		$xsl = 'StudienerfolgEng';
+	else
+		$xsl = 'Studienerfolg';	
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -51,7 +54,7 @@ function createStudienerfolg()
 		finanzamt = '&typ=finanzamt';
 	else
 		finanzamt = '';
-	window.location.href= '../pdfExport.php?xml=studienerfolg.rdf.php&xsl=Studienerfolg&ss='+stsem+'&uid=<?php echo $uid;?>'+finanzamt;
+	window.location.href= '../pdfExport.php?xml=studienerfolg.rdf.php&xsl=<?php echo $xsl ?>&ss='+stsem+'&uid=<?php echo $uid;?>'+finanzamt;
 }
 </script>
 </head>
