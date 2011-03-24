@@ -171,7 +171,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$i++;
 		}
 		
-		if($i>=28)
+		if($i>28)
 			echo "	</details_1>\n";
 		else
 			echo "	</details>\n";
