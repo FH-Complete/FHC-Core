@@ -220,6 +220,23 @@
 <!ENTITY menu-dokumente-studienerfolg-allesemester-finanzamt.label	"Finanzamt">
 <!ENTITY menu-dokumente-studienerfolg-allesemester-finanzamt.accesskey	"F">
 
+<!ENTITY menu-dokumente-studienerfolgeng.label	"Studienerfolgsbestaetigung Englisch">
+<!ENTITY menu-dokumente-studienerfolgeng.accesskey	"E">
+
+<!ENTITY menu-dokumente-studienerfolgeng-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolgeng-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolgeng-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolgeng-finanzamt.accesskey	"F">
+
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester.label	"Alle Semester">
+
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-finanzamt.accesskey	"F">
+
 <!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
 <!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 

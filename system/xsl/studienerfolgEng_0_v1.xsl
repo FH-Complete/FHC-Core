@@ -30,25 +30,29 @@
 					
 					<!-- Titel -->
 					<fo:block-container position="absolute" top="20mm" left="15mm">
-						<fo:block font-size="16pt">Fachhochschule Technikum Wien</fo:block>
+						<fo:block font-size="16pt">UAS Technikum Wien</fo:block>
 					</fo:block-container>
 					
 					<fo:block-container position="absolute" top="26mm" left="15mm">
-						<fo:block font-size="12pt">Höchstädtplatz 5\nA-1200 Wien</fo:block>
+						<fo:block font-size="12pt">Hoechstaedtplatz 5\nA-1200 Vienna</fo:block>
 						<fo:block font-size="6pt">ZVR-Nr.: 074476426, DVR-Nr.: 0928381</fo:block>
 					</fo:block-container>
 
 					
 					<fo:block-container position="absolute" top="45mm" left="15mm">
 						<fo:block text-align="left" line-height="20pt" font-family="sans-serif" font-size="16pt">
-							<xsl:text>Bestätigung des Studienerfolges</xsl:text>
+							<xsl:text>Student progress report</xsl:text>
 						</fo:block>
 					</fo:block-container> 
 					
 					<!--FINANZAMT-->
 					<fo:block-container position="absolute" top="55mm" left="15mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="8pt">
-							<xsl:value-of select="finanzamt" />
+						<xsl:choose>
+							<xsl:when test="string-length(finanzamt)!=0">
+								<xsl:text>(For submission to local tax office in accordance with the Family Welfare Act 1967 section 2.1 lit.b)</xsl:text>
+							</xsl:when>
+						</xsl:choose>
 						</fo:block>
 					</fo:block-container>
 					
@@ -62,17 +66,17 @@
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Familienname, Vorname\n</xsl:text>
+												<xsl:text> Last Name, First Name\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Geburtsdatum\n</xsl:text>
+												<xsl:text> Date of Birth\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Personenkennzeichen\n</xsl:text>
+												<xsl:text> Student ID\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -106,12 +110,12 @@
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Studiengang\n</xsl:text>
+												<xsl:text> Degree Program \n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Kennzahl\n</xsl:text>
+												<xsl:text> Program Code\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -139,12 +143,12 @@
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Aktuelles Studiensemester\n</xsl:text>
+												<xsl:text> Current Year\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Aktuelles Ausbildungssemester\n</xsl:text>
+												<xsl:text> Student current enrolled in:\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 								</fo:table-row>
@@ -167,7 +171,7 @@
 					<!-- TABELLE -->
 					<fo:block-container position="absolute" top="110mm" left="15mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:text>Folgende Prüfungen wurden erfolgreich abgelegt:</xsl:text>
+							<xsl:text>The following courses have been completed successfully:</xsl:text>
 						</fo:block>
 					</fo:block-container>
 					
@@ -185,22 +189,22 @@
 								<fo:table-row  line-height="10pt">
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold">
-											<xsl:text> Lehrveranstaltung</xsl:text>
+											<xsl:text> Subject</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="24mm" text-align="center">
-											 <xsl:text>Studiensemester</xsl:text>
+											 <xsl:text>Year</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="32mm" text-align="center">
-											 <xsl:text>Ausbildungssemester</xsl:text>
+											 <xsl:text>Semester</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="13mm" text-align="center">
-											<xsl:text>Stunden</xsl:text>
+											<xsl:text>Hours</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -210,12 +214,12 @@
 									</fo:table-cell>	
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="15mm" text-align="center">
-											 <xsl:text>Datum</xsl:text>
+											 <xsl:text>Date</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="15mm" text-align="center">
-											 <xsl:text>Benotung</xsl:text>
+											 <xsl:text>Grade</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
@@ -224,7 +228,7 @@
 								    <fo:table-row  line-height="10pt">
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold">
-											<xsl:text> Semestersumme:</xsl:text>
+											<xsl:text> Total:</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -234,7 +238,7 @@
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="32mm" text-align="center">
-											 <xsl:text></xsl:text>
+											<xsl:text></xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -249,7 +253,7 @@
 									</fo:table-cell>	
 									<fo:table-cell border-width="0.2mm" border-style="solid">
 										<fo:block font-size="8pt" font-weight="bold" content-width="15mm" text-align="center">
-											 <xsl:text>Schnitt:</xsl:text>
+											 <xsl:text>Average:</xsl:text>
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell border-width="0.2mm" border-style="solid">
@@ -269,10 +273,10 @@
 							<fo:table-body>
 								<fo:table-row>
 									<fo:table-cell  border-width="0.2mm" border-style="solid">
-									<fo:block font-size="10pt">Datum: <xsl:value-of select="datum" /></fo:block>
+									<fo:block font-size="10pt">Date: <xsl:value-of select="datum" /></fo:block>
 									</fo:table-cell>
 									<fo:table-cell  border-width="0.2mm" border-style="solid">
-									<fo:block font-size="10pt" text-align="right" content-width="145mm">Gilt auch ohne Unterschrift und Stempel</fo:block>
+									<fo:block font-size="10pt" text-align="right" content-width="145mm">Digitally created - valid without signature and stamp</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-body>
@@ -283,10 +287,10 @@
 							<fo:table-body>
 								<fo:table-row>
 									<fo:table-cell>
-									<fo:block font-size="7pt">Benotung: </fo:block>
+									<fo:block font-size="7pt">Grades: </fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), angerechnet (ar), nicht beurteilt (nb),</fo:block>
+									<fo:block font-size="7pt">excellent (1), very good (2), good (3), satisfactory (4), fail (5), Credit based on previous experience/work (ar), not graded (nb),</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 								<fo:table-row>
@@ -294,7 +298,7 @@
 									<fo:block font-size="7pt"></fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">teilgenommen (tg), bestanden (b), approbiert (ap), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</fo:block>
+									<fo:block font-size="7pt">participated (tg), passed (b), successfully completed (ea), not successfully completed (nea)</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-body>
@@ -308,7 +312,19 @@
 	
 	<xsl:template match="unterrichtsfach">
 		<fo:table-row  line-height="10pt">
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="70mm"><xsl:text> </xsl:text><xsl:value-of select="bezeichnung" /></fo:block></fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" >
+				<fo:block font-size="8pt" content-width="70mm">
+					<xsl:text> </xsl:text>
+					<xsl:choose>
+						<xsl:when test="string-length(bezeichnung_englisch)!=0">
+							<xsl:value-of select="bezeichnung_englisch"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:text>[ACHTUNG: Keine englische Bezeichung für "</xsl:text><xsl:value-of select="bezeichnung"/><xsl:text>" in der Datenbank!]</xsl:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</fo:block>
+			</fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="24mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="../studiensemester_kurzbz" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="32mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="../semester" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="13mm" text-align="center"><xsl:text> </xsl:text><xsl:value-of select="sws" /></fo:block></fo:table-cell>
