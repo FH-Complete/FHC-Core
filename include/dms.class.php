@@ -75,7 +75,7 @@ class dms extends basis_db
 			{
 				$this->dms_id = $row->dms_id;
 				$this->version = $row->version;
-				$this->oe_kurzbz = $row->kurzbz;
+				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->dokument_kurzbz = $row->dokument_kurzbz;
 				$this->kategorie_kurzbz = $row->kategorie_kurzbz;
 				$this->filename = $row->filename;
