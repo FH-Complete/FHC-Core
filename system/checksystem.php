@@ -2046,11 +2046,13 @@ if(!@$db->db_query("SELECT content_id FROM campus.tbl_content LIMIT 1"))
 		insertamum timestamp,
 		insertvon varchar(32),
 		updateamum timestamp,
-		updatevon varchar(32)
+		updatevon varchar(32),
+		berechtigung_kurzbz varchar(32)
 	);
 	
 	ALTER TABLE public.tbl_statistik ADD CONSTRAINT pk_statistik PRIMARY KEY (statistik_kurzbz);
 	ALTER TABLE public.tbl_statistik ADD CONSTRAINT fk_content_statistik FOREIGN KEY(content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_statistik ADD CONSTRAINT fk_berechtigung_statistik FOREIGN KEY(berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	
 	CREATE TABLE campus.tbl_contentgruppe (
 		content_id bigint NOT NULL,
@@ -2077,6 +2079,8 @@ if(!@$db->db_query("SELECT content_id FROM campus.tbl_content LIMIT 1"))
 	
 	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_statistik TO admin;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_statistik TO web;
+	
+	ALTER TABLE public.tbl_gruppe ADD COLUMN content_visible boolean NOT NULL DEFAULT false;
 	";
 	
 	if(!$db->db_query($qry))
@@ -2097,6 +2101,57 @@ if(!@$db->db_query("SELECT projektarbeit_note_anzeige FROM public.tbl_studiengan
 		echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'Tabelle public.tbl_studiengang Spalte projektarbeit_note_anzeige hinzugefuegt!<br>';
+}
+// Dokumenten Management System
+if(!@$db->db_query("SELECT 1 FROM campus.tbl_dms LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE campus.tbl_dms(
+		dms_id bigint NOT NULL,
+		version smallint NOT NULL,
+		oe_kurzbz varchar(32),
+		dokument_kurzbz varchar(8),
+		kategorie_kurzbz varchar(32),
+		filename varchar(256),
+		mimetype varchar(256),
+		name varchar(256),
+		beschreibung text,
+		letzterzugriff timestamp,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)		
+	);
+	
+	CREATE TABLE campus.tbl_dms_kategorie(
+		kategorie_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256),
+		beschreibung text
+	);
+	
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT pk_dms PRIMARY KEY(dms_id, version);
+	ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT pk_dms_kategorie PRIMARY KEY(kategorie_kurzbz);
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT fk_organisationseinheit_dms FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT fk_dokument_dms FOREIGN KEY(dokument_kurzbz) REFERENCES public.tbl_dokument (dokument_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT fk_dms_kategorie_dms FOREIGN KEY(kategorie_kurzbz) REFERENCES campus.tbl_dms_kategorie (kategorie_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+	
+	CREATE SEQUENCE campus.seq_dms_dms_id
+	 	INCREMENT BY 1
+	 	NO MAXVALUE
+		NO MINVALUE
+		CACHE 1;
+	ALTER TABLE campus.tbl_dms ALTER COLUMN dms_id SET DEFAULT nextval('campus.seq_dms_dms_id');
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms_kategorie TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms_kategorie TO admin;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms TO admin;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_dms und campus.tbl_dms_kategorie hinzugefuegt!<br>';
 }
 echo '<br>';
 
@@ -2129,6 +2184,8 @@ $tabellen=array(
 	"campus.tbl_contentchild"  => array("contentchild_id","content_id","child_content_id","updatevon","updateamum","insertamum","insertvon"),
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_dms"  => array("dms_id","version","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
@@ -2232,7 +2289,7 @@ $tabellen=array(
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
-	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige"),

@@ -72,7 +72,7 @@ class content extends basis_db
 					AND tbl_contentsprache.sprache='".addslashes($sprache)."'";
 		if($sichtbar)
 			$qry.=" AND sichtbar=true";
-		if(!is_null($version))
+		if($version!='')
 			$qry.=" AND tbl_contentsprache.version='".addslashes($version)."'";
 		$qry.=" ORDER BY version LIMIT 1";
 
@@ -149,6 +149,123 @@ class content extends basis_db
 	}
 	
 	/**
+	 * Laedt die Gruppen, welchen diesen Content betrachten duerfen
+	 *
+	 * @param $content_id
+	 */
+	public function loadGruppen($content_id)
+	{
+		$qry = "SELECT 
+					tbl_contentgruppe.gruppe_kurzbz,
+					tbl_contentgruppe.insertamum,
+					tbl_contentgruppe.insertvon,
+					tbl_gruppe.bezeichnung
+				FROM 
+					campus.tbl_contentgruppe 
+					JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+				WHERE
+					content_id='".addslashes($content_id)."' 
+				ORDER BY gruppe_kurzbz";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				
+				$obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->bezeichnung = $row->bezeichnung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht eine Gruppenzuteilung
+	 * 
+	 * @param $content_id
+	 * @param $gruppe_kurzbz
+	 * @return boolean
+	 */
+	public function deleteGruppe($content_id, $gruppe_kurzbz)
+	{
+		$qry = "DELETE FROM campus.tbl_contentgruppe WHERE content_id='".addslashes($content_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Zuteilung';
+			return false;
+		}
+	}
+	
+	/**
+	 * Prueft ob eine Gruppenzuteilung vorhanden ist
+	 * 
+	 * @param $content_id
+	 * @param $gruppe_kurzbz
+	 * @return boolean
+	 */
+	public function isGruppeZugeteilt($content_id, $gruppe_kurzbz)
+	{
+		$qry = "SELECT 1 FROM campus.tbl_contentgruppe WHERE content_id='".addslashes($content_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."';";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Zuteilung';
+			return false;
+		}
+	}
+	
+	/**
+	 * Fuegt eine Gruppe zu einem Content hinzu
+	 * @return boolean
+	 */
+	public function addGruppe()
+	{
+		if($this->isGruppeZugeteilt($this->content_id, $this->gruppe_kurzbz))
+		{
+			$this->errormsg = 'Diese Gruppe ist bereits zugeordnet';
+			return false;
+		}
+		
+		$qry = 'INSERT INTO campus.tbl_contentgruppe (content_id, gruppe_kurzbz, insertamum, insertvon) VALUES('.
+				$this->addslashes($this->content_id).','.
+				$this->addslashes($this->gruppe_kurzbz).','.
+				$this->addslashes($this->insertamum).','.
+				$this->addslashes($this->insertvon).');';
+				
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Zuteilen der Gruppe';
+			return false;
+		}
+	}
+	
+	/**
 	 * Prueft ob ein User die Berechtigung fuer das Anzeigen des Contents besitzt
 	 * 
 	 * @param $content_id ID des Contents
@@ -211,6 +328,20 @@ class content extends basis_db
 			}
 		}
 		return $arr; 
+	}
+	
+	/**
+	 * Speichert den XML Content
+	 * @param $contentsprache_id
+	 * @param $content
+	 */
+	public function saveContent($contentsprache_id, $content)
+	{
+		$qry="UPDATE campus.tbl_contentsprache SET content='".addslashes($content)."' WHERE contentsprache_id='".addslashes($contentsprache_id)."';";
+		if($this->db_query($qry))
+			return true;
+		else
+			return false;
 	}
 }
 ?>

@@ -35,34 +35,16 @@ else
 
 $version = (isset($_GET['version'])?$_GET['version']:null);
 
-if(isset($_SESSION['FHC_SPRACHE']))
-{
-	$sprache=$_SESSION['FHC_SPRACHE'];
-}
+$sprache = getSprache();
 
-if(isset($_COOKIE['FHC_SPRACHE']))
-{
-	$cookie_sprache=$_COOKIE['FHC_SPRACHE'];
-	if(!isset($sprache))
-		$sprache=$cookie_sprache;
-}
-if(!isset($sprache))
-{
-	$sprache='German';
-}
-
-if(!isset($cookie_sprache) || $cookie_sprache!=$sprache)
-{
-	setcookie('FHC_SPRACHE',$sprache,time()+(3600*24*100));
-}
 //XML Content laden
 $content = new content();
 
 if($content->islocked($content_id))
 {
-	$uid = manual_basic_auth();
+	$uid = get_uid();
 	if(!$content->berechtigt($content_id, $uid))
-		die('Sie haben keine Berechtigung fuer diese Seite');
+		die($uid.': Sie haben keine Berechtigung fuer diese Seite');
 }
 
 if(!$content->getContent($content_id, $sprache, $version))

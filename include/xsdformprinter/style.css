@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+
+.XSDFormPrinterStyle_required
+{
+	font-size: x-small;
+	color: red;
+}
+
+.XSDFormPrinterStyle_fieldset
+{
+	background-color: lightgray;
+}

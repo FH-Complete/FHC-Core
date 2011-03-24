@@ -39,6 +39,7 @@ class statistik extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $udpatevon;
+	public $berechtigung_kurzbz;
 				
 	public $studiengang_kz;		// integer
 	public $prestudent_id;		// integer
@@ -83,6 +84,7 @@ class statistik extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->udpatevon = $row->updatevon;
+				$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				
 				return true;
 			}
@@ -125,6 +127,7 @@ class statistik extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->udpatevon = $row->updatevon;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				
 				$this->result[] = $obj;
 			}
@@ -151,7 +154,7 @@ class statistik extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_statistik(statistik_kurzbz, content_id, bezeichnung, url, sql, 
-					php, r, gruppe, insertamum, insertvon, updateamum, updatevon) VALUES('.
+					php, r, gruppe, insertamum, insertvon, updateamum, updatevon, berechtigung_kurzbz) VALUES('.
 					$this->addslashes($this->statistik_kurzbz).','.
 					$this->addslashes($this->content_id).','.
 					$this->addslashes($this->bezeichnung).','.
@@ -163,7 +166,8 @@ class statistik extends basis_db
 					$this->addslashes($this->insertamum).','.
 					$this->addslashes($this->insertvon).','.
 					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).');';
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->berechtigung_kurzbz).');';
 		}
 		else
 		{
@@ -181,7 +185,8 @@ class statistik extends basis_db
 				' insertamum='.$this->addslashes($this->insertamum).','.
 				' insertvon='.$this->addslashes($this->insertvon).','.
 				' updateamum='.$this->addslashes($this->updateamum).','.
-				' updatevon='.$this->addslashes($this->updatevon).
+				' updatevon='.$this->addslashes($this->updatevon).','.
+				' berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).
 				" WHERE statistik_kurzbz='".addslashes($this->statistik_kurzbz_orig)."'";
 		}
 		
@@ -225,10 +230,14 @@ class statistik extends basis_db
 				if($row->gruppe!='')
 				{
 					$arr[$row->gruppe][$row->statistik_kurzbz]=array('name'=>$row->bezeichnung, 'link'=>APP_ROOT.'vilesci/statistik/statistik_frameset.php?statistik_kurzbz='.$row->statistik_kurzbz, 'target'=>'main');
+					if($row->berechtigung_kurzbz!='')
+						$arr[$row->gruppe][$row->statistik_kurzbz]['permissions']=array($row->berechtigung_kurzbz);
 				}
 				else
 				{
-					$arr[$row->statistik_kurzbz]=array('name'=>$row->bezeichnung, 'link'=>APP_ROOT.'vilesci/statistik/statistik_frameset.php?statistik_kurzbz='.$row->statistik_kurzbz, 'target'=>'main');					
+					$arr[$row->statistik_kurzbz]=array('name'=>$row->bezeichnung, 'link'=>APP_ROOT.'vilesci/statistik/statistik_frameset.php?statistik_kurzbz='.$row->statistik_kurzbz, 'target'=>'main');
+					if($row->berechtigung_kurzbz!='')
+						$arr[$row->statistik_kurzbz]['permissions']=array($row->berechtigung_kurzbz);					
 				}
 			}
 		}
