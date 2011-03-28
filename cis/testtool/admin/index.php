@@ -482,7 +482,7 @@ if($result = $db->db_query($qry))
 		else 
 			$selected='';
 		
-		echo '<option value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.'</option>'."\n";
+		echo '<option value="'.$row->gebiet_id.'" '.$selected.'>'.$row->gebiet_id.' - '.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</option>'."\n";
 	}
 	echo '</select>';
 }

@@ -76,7 +76,7 @@ foreach ($gebiet->result as $row)
 	else 
 		$selected='';
 	
-	echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.'</OPTION>';	
+	echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->gebiet_id.' - '.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</OPTION>';	
 }
 echo '</SELECT>
 	<input type="submit" value="Bearbeiten">
