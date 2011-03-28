@@ -26,6 +26,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/sprache.class.php');
 require_once('../include/gruppe.class.php');
 require_once('../include/xsdformprinter/xsdformprinter.php');
+require_once('../include/organisationseinheit.class.php');
 
 $user = get_uid();
 ?>
@@ -60,7 +61,8 @@ $user = get_uid();
 			width: 420,
 			heigth: 400,
 			resizable: "yes",
-			close_previous: "no"
+			close_previous: "no",
+			popup_css : false
 		},{
 			window: win,
 			input: field_name
@@ -110,6 +112,31 @@ if(isset($_GET['method']))
 {
 	switch($_GET['method'])
 	{
+		case 'add_new_content':
+			$oe = new organisationseinheit();
+			$oe->getAll();
+			if(!isset($oe->result[0]))
+				die('Es ist keine Organisationseinheit vorhanden');
+				
+			$template = new template();
+			$template->getAll();
+			if(!isset($template->result[0]))
+				die('Es ist kein Template vorhanden');
+			
+			$content = new content();
+			$content->new = true;
+			$content->oe_kurzbz=$oe->result[0]->oe_kurzbz;
+			$content->template_kurzbz=$template->result[0]->template_kurzbz;
+			$content->titel = 'Neuer Eintrag';
+			$content->content = '<?xml version="1.0" encoding="UTF-8" ?><content></content>';		
+			$content->sichtbar=false;
+			$content->version='0';
+			$content->sprache='German';
+			$content->insertvon = $user;
+			$content->insertamum = date('Y-m-d H:i:s');
+			
+			$content->save();
+			break;
 		case 'rights_add_group':
 			if(!isset($_POST['gruppe_kurzbz']))
 				die('Fehlender Parameter');
@@ -137,6 +164,43 @@ if(isset($_GET['method']))
 				$message .= '<span class="ok">Gruppe wurde erfolgreich entfernt</span>';
 			
 			break;
+		case 'prefs_save':
+			$content = new content();
+			$titel = $_POST['titel'];
+			$oe_kurzbz=$_POST['oe_kurzbz'];
+			$sichtbar=isset($_POST['sichtbar']);
+			
+			if($content->getContent($content_id, $sprache, $version))
+			{
+				$content->titel = $titel;
+				$content->oe_kurzbz = $oe_kurzbz;
+				$content->sichtbar = $sichtbar;
+				$content->updateamum=date('Y-m-d H:i:s');
+				$content->updatevon=$user;
+				
+				if($content->save())
+					$message.='<span class="ok">Daten erfolgreich gespeichert</span>';
+				else
+					$message.='<span class="error">'.$content->errormsg.'</span>';
+			}
+			else
+				$message.='<span class="error">'.$content->errormsg.'</span>';
+			break;
+		case 'childs_add':
+			$content = new content();
+			$content->content_id = $content_id;
+			$content->child_content_id = $_POST['child_content_id'];
+			$content->insertamum = date('Y-m-d');
+			$content->insertvon = $user;
+			if($content->addChild())
+				$message.='<span class="ok">Daten erfolgreich gespeichert</span>';
+			else
+				$message.='<span class="error">'.$content->errormsg.'</span>';
+			break;
+		case 'childs_delete':
+			$content = new content();
+			$content->deleteChild($content_id, $_GET['child_content_id']);
+			break;
 		default: break;
 	}
 }
@@ -154,7 +218,7 @@ echo '<table width="100%">
 $db = new basis_db();
 
 echo '
-<a href="#Neu">Neuen Eintrag hinzufügen</a>
+<a href="'.$_SERVER['PHP_SELF'].'?action=prefs&method=add_new_content">Neuen Eintrag hinzufügen</a>
 <br><br>
 <table class="treetable">';
 $qry = "SELECT * FROM (
@@ -168,18 +232,19 @@ $qry = "SELECT * FROM (
 				ORDER BY contentchild_id, titel";
 if($result = $db->db_query($qry))
 {
-	echo '<tr>';
+	
 	while($row = $db->db_fetch_object($result))
 	{
-	
+		echo '<tr>';
 		$content = new content();
 	
 		echo '<td>';
 		drawmenulink($row->content_id, $row->titel);
 		echo '</td>';
 		drawsubmenu($row->content_id);
+		echo '</tr>';
 	}
-	echo '</td>';
+	
 }
 
 echo '</table>';
@@ -193,13 +258,16 @@ if(!is_null($content_id))
 	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=content&content_id='.$content_id.'" '.($action=='content'?'class="marked"':'').'>Inhalt</a>';
 	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=preview&content_id='.$content_id.'" '.($action=='preview'?'class="marked"':'').'>Vorschau</a>';
 	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=rights&content_id='.$content_id.'" '.($action=='rights'?'class="marked"':'').'>Rechte</a>';
+	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'" '.($action=='childs'?'class="marked"':'').'>Childs</a>';
 	echo '<div style="float: right;">'.$message.'</div>';
 	echo '<br><br>';
 
 	
 	switch($action)
 	{
-		case 'prefs': break;
+		case 'prefs':
+					print_prefs(); 
+					break;
 		case 'content': 
 					print_content();
 					break;
@@ -208,6 +276,9 @@ if(!is_null($content_id))
 					break;
 		case 'rights': 
 					print_rights();
+					break;
+		case 'childs':
+					print_childs();
 					break;
 		default: break;
 	}
@@ -221,7 +292,7 @@ echo '</body>
 function drawmenulink($id, $titel)
 {
 	global $content_id, $action, $sprache, $version;
-	echo '<a href="admin.php?content_id='.$id.'&action='.$action.'&sprache='.$sprache.'&version='.$version.'" '.($content_id==$id?'class="marked"':'').'>'.$titel.'</a>';
+	echo '<a href="admin.php?content_id='.$id.'&action='.$action.'&sprache='.$sprache.'&version='.$version.'" '.($content_id==$id?'class="marked"':'').'>'.$titel.'</a> ('.$id.')';
 }
 
 function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
@@ -244,7 +315,7 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 			
 			while($row = $db->db_fetch_object($result))
 			{
-				$vorhanden[]=$row->child_content_id;
+				//$vorhanden[]=$row->child_content_id;
 				echo "<tr>\n";
 				echo '<td>';
 				echo $einrueckung;
@@ -257,6 +328,130 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 			//echo '<br>';
 		}
 	}
+}
+
+function print_childs()
+{
+	global $content_id, $sprache, $version;
+	
+	$content = new content();
+	$content->getChilds($content_id);
+	
+	echo 'Die Mitglieder der folgenden Gruppen dürfen die Seite ansehen:<br><br>';
+	echo '
+	<script type="text/javascript">
+		$(document).ready(function() 
+		{ 
+			$("#childs_table").tablesorter(
+			{
+				sortList: [[1,1]],
+				widgets: ["zebra"]
+			});
+		});
+	</script>';
+	echo '<table id="childs_table" class="tablesorter" style="width: auto;">
+		<thead>
+		<tr>
+			<th>ID</th>
+			<th>Titel</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>';
+	foreach($content->result as $row)
+	{
+		echo '<tr>';
+		echo '<td>',$row->child_content_id,'</td>';
+		echo '<td>',$row->titel,'</td>';
+		echo '<td>
+				<a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&child_content_id='.$row->child_content_id.'&method=childs_delete" title="entfernen">
+					<img src="../skin/images/delete_x.png">
+				</a>
+			</td>';
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
+	
+	$content = new content();
+	$content->getAll();
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=childs&method=childs_add" method="POST">';
+	
+	echo '<select name="child_content_id">';
+	foreach($content->result as $row)
+	{
+		echo '<option value="'.$row->content_id.'">'.$row->titel.' ('.$row->content_id.')</option>';
+	}
+	echo '</select>';
+	echo '<input type="submit" value="Hinzufügen" name="add">';
+	echo '</form>';
+}
+
+function print_prefs()
+{
+	global $content_id, $sprache, $version;
+	
+	$content = new content();
+	if(!$content->getContent($content_id, $sprache, $version))
+		die($content->errormsg);
+		
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_save" method="POST">
+	<table>
+		<tr>
+			<td>Titel</td>
+			<td><input type="text" name="titel" size="40" maxlength="256" value="'.$content->titel.'"></td>
+		</tr>
+		<tr>
+			<td>Vorlage</td>
+			<td>
+				<SELECT name="template_kurzbz">';
+	$template = new template();
+	$template->getAll();
+	foreach($template->result as $row)
+	{
+		if($row->template_kurzbz==$content->template_kurzbz)
+			$selected='selected';
+		else
+			$selected='';
+		
+		echo '<OPTION value="'.$row->template_kurzbz.'" '.$selected.'>'.$row->bezeichnung.'</OPTION>';
+	}
+	echo '	
+				</SELECT>
+			</td>
+		</tr>
+		<tr>
+			<td>Organisationseinheit</td>
+			<td>
+				<SELECT name="oe_kurzbz">
+	';
+	$oe = new organisationseinheit();
+	$oe->getAll();
+	foreach($oe->result as $row)
+	{
+		if($row->oe_kurzbz==$content->oe_kurzbz)	
+			$selected='selected';
+		else
+			$selected='';
+		if($row->aktiv)
+			$class='';
+		else
+			$class='class="inactive"';
+		echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.' '.$class.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</OPTION>';
+	}
+	echo '	
+				</SELECT>
+			</td>
+		</tr>
+		<tr>
+			<td>Sichtbar</td>
+			<td><input type="checkbox" name="sichtbar" '.($content->sichtbar?'checked':'').'></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type="submit" value="Speichern"></td>
+		</tr>
+	</table>';	 
+	
 }
 
 function print_rights()
@@ -301,22 +496,22 @@ function print_rights()
 			echo '</tr>';
 		}
 		echo '</tbody></table>';
-		
-		$gruppe = new gruppe();
-		$gruppe->getgruppe(null, null, null, null, true);
-		
-		echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=rights&method=rights_add_group" method="POST">';
-		echo 'Gruppe <select name="gruppe_kurzbz">';
-		foreach($gruppe->result as $row)
-		{
-			echo '<option value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</option>';
-		}
-		echo '</select>';
-		echo '<input type="submit" value="Hinzufügen" name="addgroup">';
-		echo '</form>';
 	}
 	else
-		echo 'Diese Seite darf von allen angezeigt werden!';
+		echo 'Diese Seite darf von allen angezeigt werden!<br><br>';
+		
+	$gruppe = new gruppe();
+	$gruppe->getgruppe(null, null, null, null, true);
+	
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=rights&method=rights_add_group" method="POST">';
+	echo 'Gruppe <select name="gruppe_kurzbz">';
+	foreach($gruppe->result as $row)
+	{
+		echo '<option value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</option>';
+	}
+	echo '</select>';
+	echo '<input type="submit" value="Hinzufügen" name="addgroup">';
+	echo '</form>';
 }
 
 function print_content()

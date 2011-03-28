@@ -52,8 +52,8 @@ class content extends basis_db
 	{
 		parent::__construct();
 	}
-
-	public function getContent($content_id, $sprache='German', $version=null, $sichtbar=true)
+	
+	public function getContent($content_id, $sprache='German', $version=null, $sichtbar=null)
 	{
 		if(!is_numeric($content_id))
 		{
@@ -82,6 +82,7 @@ class content extends basis_db
 			{
 				$this->content_id = $row->content_id;
 				$this->titel = $row->titel;
+				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->template_kurzbz = $row->template_kurzbz;
 				$this->sprache = $row->sprache;
 				$this->contentsprache_id = $row->contentsprache_id;
@@ -342,6 +343,199 @@ class content extends basis_db
 			return true;
 		else
 			return false;
+	}
+	
+	/**
+	 * Speichert zusaetzliche Informationen zum Content 
+	 */
+	public function save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+			
+		if($new)
+		{
+			$qry = "BEGIN;INSERT INTO campus.tbl_content(template_kurzbz, oe_kurzbz, titel, updatevon, updateamum, insertvon, insertamum) VALUES(".
+					$this->addslashes($this->template_kurzbz).','.
+					$this->addslashes($this->oe_kurzbz).','.
+					$this->addslashes($this->titel).','.
+					$this->addslashes($this->updatevon).','.
+					$this->addslashes($this->updateamum).','.
+					$this->addslashes($this->insertvon).','.
+					$this->addslashes($this->insertamum).');'.
+					'INSERT INTO campus.tbl_contentsprache(content, sprache, content_id, version, sichtbar, insertamum, insertvon) VALUES('.
+					$this->addslashes($this->content).','.
+					$this->addslashes($this->sprache).','.
+					"currval('campus.seq_content_content_id'),".
+					$this->addslashes($this->version).','.
+					($this->sichtbar?'true':'false').','.
+					$this->addslashes($this->insertamum).','.
+					$this->addslashes($this->insertvon).');';					
+		}
+		else
+		{
+			$qry = "UPDATE campus.tbl_content SET ".
+					" titel=".$this->addslashes($this->titel).','.
+					" updatevon=".$this->addslashes($this->updatevon).','.
+					" updateamum=".$this->addslashes($this->updateamum).','.
+					" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).
+					" WHERE content_id='".addslashes($this->content_id)."';".
+					"UPDATE campus.tbl_contentsprache SET ".
+					" sichtbar=".($this->sichtbar?'true':'false').
+					" WHERE contentsprache_id='".addslashes($this->contentsprache_id)."';";
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				$qry = "SELECT currval('campus.seq_content_content_id') as content_id, currval('campus.seq_contentsprache') as contentsprache_id";
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						$this->content_id = $row->content_id;
+						$this->contentsprache_id = $row->contentsprache_id;
+						$this->db_query('COMMIT;');
+						return true;
+					}
+					else
+					{
+						$this->errormsg='Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK;');
+						return false;
+					}
+				}
+				else
+				{
+					$this->errormsg='Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK;');
+					return false;
+				}
+			}
+			else
+				return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Speichern der Daten';
+			return false;
+		}				
+	}
+	
+	/**
+	 * Laedt die Child-Contents eines Eintrages
+	 * 
+	 * @param $content_id
+	 */
+	public function getChilds($content_id)
+	{
+		$qry = "SELECT 
+					*
+				FROM 
+					campus.tbl_contentchild 
+					JOIN campus.tbl_content ON(tbl_content.content_id=tbl_contentchild.child_content_id)
+				WHERE 
+					tbl_contentchild.content_id='".addslashes($content_id)."' 
+				ORDER BY titel";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				
+				$obj->content_id = $row->content_id;
+				$obj->child_content_id = $row->child_content_id;
+				$obj->titel = $row->titel;
+				
+				$this->result[] = $obj;
+			}
+		}
+	}
+	
+
+	/**
+	 * Laedt alle Content Eintraege
+	 * 
+	 */
+	public function getAll()
+	{
+		$qry = "SELECT 
+					*
+				FROM 
+					campus.tbl_content
+				ORDER BY titel";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				
+				$obj->content_id = $row->content_id;
+				$obj->titel = $row->titel;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->template_kurzbz = $row->template_kurzbz;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Contents';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht eine Contentzuordnung
+	 * 
+	 * @param $content_id
+	 * @param $child_content_id
+	 * @return boolean
+	 */
+	public function deleteChild($content_id, $child_content_id)
+	{
+		$qry = "DELETE FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."' AND child_content_id='".addslashes($child_content_id)."'";
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Zuteilung';
+			return false;
+		}
+	}
+			
+	/**
+	 * Fuegt eine Gruppe zu einem Content hinzu
+	 * @return boolean
+	 */
+	public function addChild()
+	{
+		$qry = 'INSERT INTO campus.tbl_contentchild (content_id, child_content_id, insertamum, insertvon) VALUES('.
+				$this->addslashes($this->content_id).','.
+				$this->addslashes($this->child_content_id).','.
+				$this->addslashes($this->insertamum).','.
+				$this->addslashes($this->insertvon).');';
+				
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Zuteilen der Gruppe';
+			return false;
+		}
 	}
 }
 ?>

@@ -2081,6 +2081,13 @@ if(!@$db->db_query("SELECT content_id FROM campus.tbl_content LIMIT 1"))
 	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_statistik TO web;
 	
 	ALTER TABLE public.tbl_gruppe ADD COLUMN content_visible boolean NOT NULL DEFAULT false;
+	
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_contentsprache TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_contentsprache TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_contentchild TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_contentchild TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_content_content_id TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_content_content_id TO web;
 	";
 	
 	if(!$db->db_query($qry))
@@ -2146,6 +2153,9 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_dms LIMIT 1"))
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms_kategorie TO admin;
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms TO web;
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms TO admin;
+	
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_dms_dms_id TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_dms_dms_id TO web;
 	";
 	
 	if(!$db->db_query($qry))

@@ -174,5 +174,96 @@ class dms extends basis_db
 				return true;
 		}
 	}
+	
+	/**
+	 * Setzt die Zeit des letzten Zugriffs auf die Datei
+	 * 
+	 * @param $dms_id
+	 * @param $version
+	 */
+	public function touch($dms_id, $version)
+	{
+		$qry ="UPDATE campus.tbl_dms SET letzterzugriff=now() 
+			WHERE dms_id='".addslashes($dms_id)."' AND version='".addslashes($version)."';";
+		
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg='Fehler beim Aktualisieren der Zugriffszeit';
+			return false;
+		}		
+	}
+	
+	/**
+	 * Laedt alle Kategorien
+	 * @return boolean
+	 */
+	public function getKategorie()
+	{
+		$qry = "SELECT * FROM campus.tbl_dms_kategorie ORDER BY bezeichnung";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Dokumente einer Kategorie
+	 *
+	 * @param $kategorie_kurzbz
+	 */
+	public function getDocuments($kategorie_kurzbz)
+	{
+		$qry = "SELECT * FROM (
+				SELECT distinct on(dms_id) * 
+				FROM campus.tbl_dms 
+				WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."') as a
+				ORDER BY name;";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

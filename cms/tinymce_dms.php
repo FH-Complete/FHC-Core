@@ -59,11 +59,42 @@ require_once('../include/dms.class.php');
 	</script>
 </head>
 <body>
-
-<a href="#" onclick="FileBrowserDialog.mySubmit(1)">File 1</a>
-<a href="#" onclick="FileBrowserDialog.mySubmit(2)">File 2</a>
-<a href="#" onclick="FileBrowserDialog.mySubmit(3)">File 3</a>
-<a href="#" onclick="FileBrowserDialog.mySubmit(4)">File 4</a>
-
+<?php
+$kategorie_kurzbz = isset($_GET['kategorie_kurzbz'])?$_GET['kategorie_kurzbz']:'';
+echo '<h1>Dokument Auswählen</h1>
+	<table>
+		<tr>
+			<td valign="top">
+				<b>Kategorie:</b><br>';
+$dms = new dms();
+$dms->getKategorie();
+foreach($dms->result as $row)
+{
+	if($kategorie_kurzbz=='')
+		$kategorie_kurzbz=$row->kategorie_kurzbz;
+	echo '<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'">'.$row->bezeichnung.'</a><br>';
+}
+echo '</td><td valign="top">';
+$dms = new dms();
+$dms->getDocuments($kategorie_kurzbz);
+$mimetypes=array('application/pdf'=>'pdf.ico',
+				'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>'word2007.jpg',
+				'application/vnd.openxmlformats-officedocument.presentationml.presentation'=>'x-office-presentation.png',
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'excel.gif',
+				'application/zip'=>'zippic.jpg');
+foreach($dms->result as $row)
+{
+	echo '<div style="border: 1px solid black; text-align: center;">';
+	echo '<a href="#" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.')" style="font-size: small">';
+	if(array_key_exists($row->mimetype,$mimetypes))
+		echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="max-width: 100px">';
+	else
+		echo '<img src="dms.php?id='.$row->dms_id.'&notimeupdate" style="max-width: 100px">';
+	echo '<br>'.$row->name.'</a>';
+	echo '</div>';
+}
+echo '</table>';
+echo '<br><a href="dms_upload.php" target="_blank">Neue Datei hochladen</a>';
+?>
 </body>
 </html>

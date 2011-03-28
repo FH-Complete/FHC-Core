@@ -73,5 +73,39 @@ class template extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt alle Templates
+	 */
+	public function getAll()
+	{
+		$qry = 'SELECT 
+					* 
+				FROM 
+					campus.tbl_template
+				ORDER BY bezeichnung';
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new template();
+				
+				$obj->template_kurzbz = $row->template_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->xsd = $row->xsd;
+				$obj->xslt_xhtml = $row->xslt_xhtml;
+				$obj->xslfo_pdf = $row->xslfo_pdf;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Templates';
+			return false;
+		}
+	}
 }
 ?>
