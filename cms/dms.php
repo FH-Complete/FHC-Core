@@ -33,7 +33,10 @@ if(!is_numeric($id))
 $doc = new dms();
 if(!$doc->load($id))
 	die('Dieses Dokument existiert nicht mehr');
-	
+
+if(!isset($_GET['notimeupdate']))
+	$doc->touch($doc->dms_id, $doc->version);
+
 if($handle = fopen(DMS_PATH.$doc->filename,"r"))
 {
 	header("Content-type: ".$doc->mimetype);
