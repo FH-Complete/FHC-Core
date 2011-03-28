@@ -648,9 +648,9 @@ if($frage_id!='')
 	echo "<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id' />";
 	echo '<table>';
-	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' value='$vorschlag->nummer' /></td></tr>";
+	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' value='$vorschlag->nummer' /><input type='button' value='1' onclick='document.getElementById(\"nummer\").value=\"1\";' /><input type='button' value='2' onclick='document.getElementById(\"nummer\").value=\"2\";' /><input type='button' value='3' onclick='document.getElementById(\"nummer\").value=\"3\";' /><input type='button' value='4' onclick='document.getElementById(\"nummer\").value=\"4\";' /></td></tr>";
 	echo '<tr>';
-	echo "<td>Punkte</td><td><input type='text' size='8' name='punkte' value='$vorschlag->punkte' /></td>";
+	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' /><input type='button' value='1' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"1\";' /><input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' /><input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' /></td>";
 	echo '</tr>';
 	echo '<tr>';
 	echo '<td>Text:</td><td><textarea name="text" id="text" rows="25" cols="45" oninput="preview()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
