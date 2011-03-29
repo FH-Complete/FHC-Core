@@ -806,7 +806,7 @@ class prestudent extends person
 	 * @param $studiensemester_kurzbz
 	 * @return boolean
 	 */
-	public function getLastStatus($prestudent_id, $studiensemester_kurzbz='')
+	public function getLastStatus($prestudent_id, $studiensemester_kurzbz='', $status_kurzbz = '')
 	{
 		if($prestudent_id=='' || !is_numeric($prestudent_id))
 		{
@@ -818,6 +818,9 @@ class prestudent extends person
 
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			
+		if($status_kurzbz !='')
+			$qry.= " AND status_kurzbz ='".addslashes($status_kurzbz)."'";
 		
 		$qry.=" ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
 		if($this->db_query($qry))
