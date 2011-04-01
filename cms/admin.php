@@ -27,8 +27,15 @@ require_once('../include/sprache.class.php');
 require_once('../include/gruppe.class.php');
 require_once('../include/xsdformprinter/xsdformprinter.php');
 require_once('../include/organisationseinheit.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/cms'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -49,19 +56,33 @@ $user = get_uid();
 		{
 		mode : "textareas",
 		theme : "advanced",
-		file_browser_callback: "FHCFileBrowser"
+		file_browser_callback: "FHCFileBrowser",
+
+		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
+			
+		// Theme options
+        theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontsizeselect",
+        theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,|,forecolor,backcolor",
+        theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,|,print,|,ltr,rtl,|,fullscreen",
+        //theme_advanced_buttons4 : "insertfile,insertimage",
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "center",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_resizing : true,
+			
 		}
 	);
 	function FHCFileBrowser(field_name, url, type, win) 
 	{
-		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type"+type;
+		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type;
 		tinyMCE.activeEditor.windowManager.open({
 			file: cmsURL,
 			title : "FHComplete File Browser",
-			width: 420,
-			heigth: 400,
+			width: 550,
+			height: 550,
 			resizable: "yes",
 			close_previous: "no",
+			scrollbars: "yes",
 			popup_css : false
 		},{
 			window: win,
@@ -70,20 +91,6 @@ $user = get_uid();
 		return false;
 	}
 	</script>
-	<style>
-	ul
-	{
-		padding-left: 20px;
-	}
-	li
-	{
-		padding-left: 0px;
-	}
-	.marked
-	{
-		text-decoration: underline;
-	}
-	</style>
 </head>
 
 <body>
@@ -169,12 +176,14 @@ if(isset($_GET['method']))
 			$titel = $_POST['titel'];
 			$oe_kurzbz=$_POST['oe_kurzbz'];
 			$sichtbar=isset($_POST['sichtbar']);
+			$template_kurzbz = $_POST['template_kurzbz'];
 			
 			if($content->getContent($content_id, $sprache, $version))
 			{
 				$content->titel = $titel;
 				$content->oe_kurzbz = $oe_kurzbz;
 				$content->sichtbar = $sichtbar;
+				$content->template_kurzbz = $template_kurzbz;
 				$content->updateamum=date('Y-m-d H:i:s');
 				$content->updatevon=$user;
 				
@@ -337,7 +346,7 @@ function print_childs()
 	$content = new content();
 	$content->getChilds($content_id);
 	
-	echo 'Die Mitglieder der folgenden Gruppen dürfen die Seite ansehen:<br><br>';
+	echo 'Folgende Einträge sind diesem Untergeordnet:<br><br>';
 	echo '
 	<script type="text/javascript">
 		$(document).ready(function() 
@@ -527,7 +536,7 @@ function print_content()
 	$template = new template();
 	$template->load($content->template_kurzbz);
 
-	$xfp = new XSDFormPrinter\XSDFormPrinter();
+	$xfp = new XSDFormPrinter();
 	$xfp->getparams='?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=content';
 	$xfp->output($template->xsd,$content->content);
 	echo '</div>';

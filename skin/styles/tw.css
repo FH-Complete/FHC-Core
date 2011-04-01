@@ -146,6 +146,10 @@ a
 	color: #008381; text-decoration: none;
 	cursor: pointer;
 }
+a:hover
+{
+	color: Black; text-decoration: none;
+}
 a.ItemTesttool
 {
 	color: #008381;
