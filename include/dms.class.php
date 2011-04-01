@@ -110,9 +110,22 @@ class dms extends basis_db
 			
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO campus.tbl_dms(version, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz, 
+			
+			if($this->dms_id=='')
+				$dms_id="nextval('campus.seq_dms_dms_id')";
+			else
+			{
+				if(!is_numeric($this->dms_id))
+				{
+					$this->errormsg = 'dms_id ist ungueltig';
+					return false;
+				}
+				$dms_id=$this->dms_id;
+			}
+			$qry = "BEGIN;INSERT INTO campus.tbl_dms(dms_id, version, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz, 
 						filename, mimetype, name, beschreibung, letzterzugriff, insertamum, insertvon, 
 						updateamum, updatevon) VALUES(".
+					$dms_id.','.
 					$this->addslashes($this->version).','.
 					$this->addslashes($this->oe_kurzbz).','.
 					$this->addslashes($this->dokument_kurzbz).','.
@@ -147,14 +160,23 @@ class dms extends basis_db
 		{
 			if($new)
 			{
-				$qry = "SELECT currval('campus.seq_dms_dms_id') as id;";
-				if($result = $this->db_query($qry))
+				if($this->dms_id=='')
 				{
-					if($row = $this->db_fetch_object($result))
+					$qry = "SELECT currval('campus.seq_dms_dms_id') as id;";
+					if($result = $this->db_query($qry))
 					{
-						$this->dms_id = $row->id;
-						$this->db_query('COMMIT;');
-						return true;
+						if($row = $this->db_fetch_object($result))
+						{
+							$this->dms_id = $row->id;
+							$this->db_query('COMMIT;');
+							return true;
+						}
+						else
+						{
+							$this->errormsg='Fehler beim Auslesen der Sequence';
+							$this->db_query('ROLLBACK');
+							return false;
+						}
 					}
 					else
 					{
@@ -165,9 +187,8 @@ class dms extends basis_db
 				}
 				else
 				{
-					$this->errormsg='Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK');
-					return false;
+					$this->db_query('COMMIT;');
+					return true;
 				}
 			}
 			else
@@ -231,10 +252,11 @@ class dms extends basis_db
 	 */
 	public function getDocuments($kategorie_kurzbz)
 	{
-		$qry = "SELECT * FROM (
-				SELECT distinct on(dms_id) * 
+		$qry = "SELECT * FROM campus.tbl_dms where (dms_id, version) in(
+				SELECT dms_id, max(version)
 				FROM campus.tbl_dms 
-				WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."') as a
+				WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
+				GROUP BY dms_id)
 				ORDER BY name;";
 		
 		if($result = $this->db_query($qry))

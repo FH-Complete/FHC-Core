@@ -378,6 +378,7 @@ class content extends basis_db
 					" titel=".$this->addslashes($this->titel).','.
 					" updatevon=".$this->addslashes($this->updatevon).','.
 					" updateamum=".$this->addslashes($this->updateamum).','.
+					" template_kurzbz=".$this->addslashes($this->template_kurzbz).','.
 					" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).
 					" WHERE content_id='".addslashes($this->content_id)."';".
 					"UPDATE campus.tbl_contentsprache SET ".

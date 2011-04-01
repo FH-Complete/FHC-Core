@@ -17,7 +17,7 @@
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  */
-namespace XSDFormPrinter;
+//namespace XSDFormPrinter;
 
 class XSDFormPrinter
 {
@@ -28,7 +28,7 @@ class XSDFormPrinter
 	public function __construct()
 	{
 		$this->loadDefaultConfiguration();
-		require_once(__DIR__.'/types.php');
+		require_once(dirname(__FILE__).'/types.php');
 	}
 
 	/**
@@ -38,10 +38,10 @@ class XSDFormPrinter
 	 */
 	public function output($xsd, $xml)
 	{
-		$dom = new \DOMDocument();
+		$dom = new DOMDocument();
 		$dom->loadXML($xsd);
 
-		$this->xml_inhalt = new \DOMDocument();
+		$this->xml_inhalt = new DOMDocument();
 		$this->xml_inhalt->loadXML($xml);
 		
 		if($dom===false)
@@ -94,7 +94,7 @@ class XSDFormPrinter
 
 	private function loadDefaultConfiguration()
 	{
-		require_once(__DIR__.'/config.inc.php');
+		require_once(dirname(__FILE__).'/config.inc.php');
 	}
 
 	/**
@@ -225,7 +225,10 @@ class XSDFormPrinter
 		//ToDo: Create a Unique reproduceable fieldid
 		$fieldid = $this->config['PREFIX'].'FIELD_'.$name;
 		$validatefunction = $this->createValidation($fieldid, $factory[$type][1]);
-		$value = $this->xml_inhalt->getElementsByTagName($name)->item(0)->nodeValue;
+		if($this->xml_inhalt->getElementsByTagName($name)->item(0))
+			$value = $this->xml_inhalt->getElementsByTagName($name)->item(0)->nodeValue;
+		else
+			$value='';
 		$output['html'].=sprintf($this->types[$ftype],$name, $fieldid,$validatefunction, $value);
 		$output['html'].= '</td>';
 		$output['html'].= '</tr>';
