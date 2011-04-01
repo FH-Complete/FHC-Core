@@ -36,6 +36,8 @@ define('SERVER_NAME','cis.technikum-wien.at');
 	
 //Pfad zum Upload-Ordner
 define('BENOTUNGSTOOL_PATH','/websites/portal/trunk/documents/benotungstool/');
+//Pfad zu Verzeichnis fuer Dokumentenmanagementsystem (sollte ausserhalb von htdocs liegen)
+define('DMS_PATH','/var/documents/');
 
 // XML fuer XSL-Vorlagen
 define('XML_ROOT','http://dav.technikum-wien.at/oesi/portal/trunk/rdf/');
