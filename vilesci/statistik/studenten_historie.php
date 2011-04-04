@@ -117,6 +117,7 @@ echo "<table>
 			<th>Gesamt</th>
 			<th>Anfänger</th>
 			<th>Dropout</th>
+			<th>%</th>
 		</tr>
 ";
 
@@ -130,10 +131,17 @@ foreach($stsem_obj->studiensemester as $row_stsem)
 	echo '<td>'.$row_stsem->studiensemester_kurzbz.'</td>';
 	
 	$statistik->get_prestudenten($studiengang_kz, $row_stsem->studiensemester_kurzbz, $ausbildungssemester);
-	echo '<td>'.count($statistik->statistik_obj).'</td>';
+	$anf=count($statistik->statistik_obj);
+	echo '<td align="right">'.$anf.'</td>';
 	
 	$statistik->get_DropOut($studiengang_kz, $row_stsem->studiensemester_kurzbz, $ausbildungssemester);
-	echo '<td>'.count($statistik->statistik_obj).'</td>';
+	$dropout=count($statistik->statistik_obj);
+	echo '<td align="right">'.$dropout.'</td>';
+	if ($anf>0)
+		$prozent=round((100*$dropout/$anf),2);
+	else
+		$prozent='-';
+	echo '<td align="right">'.$prozent.' %</td>';
 	echo '</tr>';
 }
 echo '</tbody></table>';
