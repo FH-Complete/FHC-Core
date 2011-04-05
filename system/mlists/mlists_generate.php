@@ -871,6 +871,83 @@ $error_msg='';
 	}
 	else 
 		$error_msg.=$db->db_last_error().' '.$sql_query;
+		
+	// **************************************************************
+	// Serviceabteilungen Verteiler abgleichen
+	$mlist_name='SERVICEABTEILUNGEN';
+	$grp = new gruppe();
+	if(!$grp->exists($mlist_name))
+	{
+		$grp->gruppe_kurzbz = $mlist_name;
+		$grp->studiengang_kz = '0';
+		$grp->bezeichnung = 'LeiterInnen der Serviceabt.';
+		$grp->beschreibung = 'LeiterInnen der Serviceabteilungen';
+		$grp->semester = '0';
+		$grp->mailgrp = true;
+		$grp->sichtbar = true;
+		$grp->generiert = true;
+		$grp->aktiv = true;
+		$grp->lehre = false;
+		$grp->insertamum = date('Y-m-d H:i:s');
+		$grp->insertvon = 'mlists_generate';
+		
+		if(!$grp->save(true, false))
+			die('Fehler: '.$grp->errormsg);
+	}
+	else 
+	{
+		setGeneriert($mlist_name);
+	}
+	// Personen holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe 
+				WHERE 
+					UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND 
+					uid NOT IN (SELECT mitarbeiter_uid 
+								FROM 
+									public.tbl_mitarbeiter 
+									JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
+									JOIN public.tbl_benutzerfunktion USING(uid) 
+									JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+								WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung') AND
+								(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+								AND tbl_organisationseinheit.organisationseinheittyp_kurzbz='Abteilung')";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row=$db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	// Personen holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT distinct mitarbeiter_uid 
+								FROM 
+									public.tbl_mitarbeiter 
+									JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
+									JOIN public.tbl_benutzerfunktion USING(uid) 
+									JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+								WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung') AND
+								(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+								AND tbl_organisationseinheit.organisationseinheittyp_kurzbz='Abteilung'
+								AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row=$db->db_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	
 	echo $error_msg;
 	?>
 	<BR>
