@@ -57,21 +57,21 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 ?>
 <html>
-<head>
-<title>Gruppe-Verwaltung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript" type="text/javascript">
-function conf_del()
-{
-	return confirm('Diese Gruppe wirklich löschen?');
-}
-</script>
-</head>
+	<head>
+		<title>Gruppe-Verwaltung</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script language="JavaScript" type="text/javascript">
+		function conf_del()
+		{
+			return confirm('Diese Gruppe wirklich löschen?');
+		}
+		</script>
+	</head>
 <body>
-<H2>Gruppen - Verwaltung</H2>
+	<H2>Gruppen - Verwaltung</H2>
 <?php
 
 if (isset($_POST['newFrm']) || isset($_GET['newFrm']))
@@ -158,6 +158,8 @@ function doSave()
 	$e->generiert=isset($_POST['generiert']);
 	$e->aktiv=isset($_POST['aktiv']);
 	$e->sort=$_POST['sort'];
+	$e->content_visible=isset($_POST['content_visible']);
+	
 	if(!$e->save())
 		echo $e->errormsg;
 }
@@ -193,7 +195,7 @@ function doEdit($kurzbz,$new=false)
     			</td>
     		</tr>
 			<tr>
-				<td><i>Studiengang</i><t/td>
+				<td><i>Studiengang</i></td>
 				<td>
 					<SELECT name="studiengang_kz">
       					<option value="-1">- auswählen -</option>
@@ -212,13 +214,14 @@ function doEdit($kurzbz,$new=false)
 		    		</SELECT>
 				</td>
 			</tr>
-			<tr><td><i>Semester</i><t/td><td><input type="text" name="semester" size="2" maxlength="1" value="<?php echo $e->semester ?>"></td></tr>
-			<tr><td><i>Mailgrp</i><t/td><td><input type='checkbox' name='mailgrp' <?php echo ($e->mailgrp?'checked':'');?>>
-			<tr><td><i>Sichtbar</i><t/td><td><input type='checkbox' name='sichtbar' <?php echo ($e->sichtbar?'checked':'');?>>
-			<tr><td><i>Generiert</i><t/td><td><input type='checkbox' name='generiert' <?php echo ($e->generiert?'checked':'');?>>
-			<tr><td><i>Aktiv</i><t/td><td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>>
+			<tr><td><i>Semester</i></td><td><input type="text" name="semester" size="2" maxlength="1" value="<?php echo $e->semester ?>"></td></tr>
+			<tr><td><i>Mailgrp</i></td><td><input type='checkbox' name='mailgrp' <?php echo ($e->mailgrp?'checked':'');?>>
+			<tr><td><i>Sichtbar</i></td><td><input type='checkbox' name='sichtbar' <?php echo ($e->sichtbar?'checked':'');?>>
+			<tr><td><i>Generiert</i></td><td><input type='checkbox' name='generiert' <?php echo ($e->generiert?'checked':'');?>>
+			<tr><td><i>Aktiv</i></td><td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>>
+			<tr><td><i>ContentVisible</i></td><td><input type='checkbox' name='content_visible' <?php echo ($e->content_visible?'checked':'');?>>
 			<tr>
-				<td><i>Sort</i><t/td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
+				<td><i>Sort</i></td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
 				</td>
 			</tr>
 		</table>
@@ -287,6 +290,5 @@ function getUebersicht()
 }
 
 ?>
-
 </body>
 </html>

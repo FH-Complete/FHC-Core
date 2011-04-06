@@ -54,7 +54,7 @@ echo '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
 //Beschreibung zu der Statistik anzeigen
 if($statistik->content_id!='')
 {
-	echo "\n",'<a href="#" onclick="window.open(\'../../cms/content.php?content_id='.$statistik->content_id.'\', \'Beschreibung\', \'width=600,height=600\');">Beschreibung anzeigen</a><br><br>';
+	echo "\n",'<a href="#" onclick="window.open(\'../../cms/content.php?content_id='.$statistik->content_id.'\', \'Beschreibung\', \'width=600,height=600, scrollbars=yes\');">Beschreibung anzeigen</a><br><br>';
 }
 $variablenstring='';
 $action='';
