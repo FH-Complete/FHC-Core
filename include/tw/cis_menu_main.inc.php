@@ -65,6 +65,10 @@
 					<td class="tdwrap"></td>
 					<td><a target="content" href="private/info/oeh/index.php" class="MenuItem" onClick="js_toggle_container('oeh');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;ÖH</a>
 				  	<table class="tabcontent" id="oeh" style="display: visible">
+				  		<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/wahl2011.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Wahlen 2011</a></td>
+				  		</tr>
 						<tr>
 				  			<td class="tdwrap"></td>
 							<td><a href="private/info/oeh/index2010.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate Fr&uuml;hjahr 2010</a></td>
