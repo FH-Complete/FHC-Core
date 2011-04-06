@@ -190,7 +190,7 @@ $menu=array
 	),
 	'Auswertung'=>	array
 	(
-		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'statistic.png',
+		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','assistenz','wawi/inventar'), 'image'=>'statistic.png',
 		'link'=>'left.php?categorie=Auswertung', 'target'=>'nav',
 	/*
 		'Raumauslastung'=>array('name'=>'Raumauslastung...', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),

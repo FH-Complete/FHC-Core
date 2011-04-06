@@ -446,6 +446,7 @@ class content extends basis_db
 			{
 				$obj = new content();
 				
+				$obj->contentchild_id = $row->contentchild_id;
 				$obj->content_id = $row->content_id;
 				$obj->child_content_id = $row->child_content_id;
 				$obj->titel = $row->titel;
@@ -501,9 +502,9 @@ class content extends basis_db
 	 * @param $child_content_id
 	 * @return boolean
 	 */
-	public function deleteChild($content_id, $child_content_id)
+	public function deleteChild($contentchild_id)
 	{
-		$qry = "DELETE FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."' AND child_content_id='".addslashes($child_content_id)."'";
+		$qry = "DELETE FROM campus.tbl_contentchild WHERE contentchild_id='".addslashes($contentchild_id)."'";
 		
 		if($this->db_query($qry))
 		{

@@ -142,7 +142,15 @@ if(isset($_GET['method']))
 			$content->insertvon = $user;
 			$content->insertamum = date('Y-m-d H:i:s');
 			
-			$content->save();
+			if($content->save())
+			{
+				$message .= '<span class="ok">Eintrag wurde erfolgreich angelegt</span>';
+				$action='prefs';
+				$content_id=$content->content_id;
+			}
+			else
+				$message .= '<span class="error">'.$content->errormsg.'</span>';
+
 			break;
 		case 'rights_add_group':
 			if(!isset($_POST['gruppe_kurzbz']))
@@ -207,8 +215,19 @@ if(isset($_GET['method']))
 				$message.='<span class="error">'.$content->errormsg.'</span>';
 			break;
 		case 'childs_delete':
-			$content = new content();
-			$content->deleteChild($content_id, $_GET['child_content_id']);
+			if(isset($_GET['contentchild_id']))
+			{
+				$contentchild_id = $_GET['contentchild_id'];
+				$content = new content();
+				if($content->deleteChild($contentchild_id))
+					$message.='<span class="ok">Zuordnung wurde erfolgreich entfernt</span>';
+				else
+					$message.='<span class="error">'.$content->errormsg.'</span>';				
+			}
+			else
+			{
+				$message.='<span class="error">Fehler: ID wurde nicht uebergeben</span>';
+			}
 			break;
 		default: break;
 	}
@@ -373,7 +392,7 @@ function print_childs()
 		echo '<td>',$row->child_content_id,'</td>';
 		echo '<td>',$row->titel,'</td>';
 		echo '<td>
-				<a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&child_content_id='.$row->child_content_id.'&method=childs_delete" title="entfernen">
+				<a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_delete" title="entfernen">
 					<img src="../skin/images/delete_x.png">
 				</a>
 			</td>';

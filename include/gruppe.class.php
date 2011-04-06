@@ -38,6 +38,7 @@ class gruppe extends basis_db
 	public $generiert;				// boolean
 	public $sichtbar;				// boolean
 	public $aktiv;					// boolean
+	public $content_visible=false;	// boolean
 	public $updateamum;				// timestamp
 	public $updatevon;				// varchar(16)
 	public $insertamum;				// timestamp
@@ -127,6 +128,7 @@ class gruppe extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->sichtbar = ($row->sichtbar=='t'?true:false);
 				$this->aktiv = ($row->aktiv=='t'?true:false);
+				$this->content_visible = ($row->content_visible=='t'?true:false);
 				$this->generiert = ($row->generiert=='t'?true:false);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
@@ -173,6 +175,7 @@ class gruppe extends basis_db
 				$grp_obj->beschreibung = $row->beschreibung;
 				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
 				$grp_obj->aktiv = ($row->aktiv=='t'?true:false);
+				$grp_obj->content_visible = ($row->content_visible=='t'?true:false);
 				$grp_obj->generiert = ($row->generiert=='t'?true:false);
 				$grp_obj->updateamum = $row->updateamum;
 				$grp_obj->updatevon = $row->updatevon;
@@ -258,6 +261,7 @@ class gruppe extends basis_db
 				$grp_obj->beschreibung = $row->beschreibung;
 				$grp_obj->sichtbar = ($row->sichtbar=='t'?true:false);
 				$grp_obj->aktiv = ($row->aktiv=='t'?true:false);
+				$grp_obj->content_visible = ($row->content_visible=='t'?true:false);
 				$grp_obj->generiert = ($row->generiert=='t'?true:false);
 				$grp_obj->updateamum = $row->updateamum;
 				$grp_obj->updatevon = $row->updatevon;
@@ -370,7 +374,7 @@ class gruppe extends basis_db
 				$kurzbz = $this->gruppe_kurzbz;
 			
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
-			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre,
+			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre, content_visible,
 			                                updateamum, updatevon, insertamum, insertvon, orgform_kurzbz)
 			        VALUES('.$this->addslashes($kurzbz).','.
 					$this->addslashes($this->studiengang_kz).','.
@@ -383,6 +387,7 @@ class gruppe extends basis_db
 					($this->generiert?'true':'false').','.
 					($this->aktiv?'true':'false').','.
 					($this->lehre?'true':'false').','.
+					($this->content_visible?'true':'false').','.
 					$this->addslashes($this->updateamum).','.
 					$this->addslashes($this->updatevon).','.
 					$this->addslashes($this->insertamum).','.
@@ -402,6 +407,7 @@ class gruppe extends basis_db
 			       ' generiert='.($this->generiert?'true':'false').','.
 			       ' aktiv='.($this->aktiv?'true':'false').','.
 			       ' lehre='.($this->lehre?'true':'false').','.
+				   ' content_visible='.($this->content_visible?'true':'false').','.
 			       ' updateamum='.$this->addslashes($this->updateamum).','.
 			       ' updatevon='.$this->addslashes($this->updatevon).','.
 			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
