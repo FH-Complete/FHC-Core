@@ -1291,6 +1291,33 @@ function BISStudentenExport()
 }
 
 // ****
+// * oeffnet Script mit Plausibilitaetspruefungen eines Studiengangs
+// ****
+function BISStudentenPlausicheck()
+{
+	var tree=document.getElementById('tree-verband');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte einen Studiengang auswaehlen');
+		return;
+	}
+
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var stg_kz=tree.view.getCellText(tree.currentIndex,col);
+
+	if(stg_kz!='')
+	{
+		window.open('<?php echo APP_ROOT ?>system/checkStudenten.php?stg_kz='+stg_kz,'StudentenPlausibilitaetscheck','');
+	}
+	else
+	{
+		alert('Bitte einen Studiengang auswaehlen');
+	}
+}
+
+// ****
 // * Oeffnet den About Dialog
 // ****
 function OpenAboutDialog()

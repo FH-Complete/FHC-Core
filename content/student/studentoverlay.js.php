@@ -2492,6 +2492,41 @@ function StudentCreateZeugnis(xsl)
 }
 
 // ****
+// * Erstellt das Sammelzeugnis fuer einen Studenten
+// ****
+function StudentCreateSammelzeugnis(xsl)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	tree = document.getElementById('student-tree');
+
+	//Markierte Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{			
+			var uid = getTreeCellText(tree, 'student-treecol-uid', v);
+			paramList += ';'+uid;
+		}
+	}
+	var xsl_stg_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value
+	
+	if(paramList.replace(";",'')=='')
+	{
+		alert('Bitte einen Studenten auswaehlen');
+		return false;
+	}
+	
+	//PDF erzeugen
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=sammelzeugnis.rdf.php&xsl='+xsl+'&uid='+paramList+'&xsl_stg_kz='+xsl_stg_kz,'Sammelzeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+// ****
 // * Laedt ein Zeugnis dass in der DB gespeichert ist
 // ****
 function StudentZeugnisAnzeigen()

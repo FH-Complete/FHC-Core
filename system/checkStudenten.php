@@ -366,6 +366,10 @@ if($result = $db->db_query($qry))
 // Ausgabe der Studenten
 foreach($ausgabe as $stg_kz=>$value)
 {
+	//Wenn eine Studiengangskennzahl uebergeben wird, nur diese anzeigen und die anderen ueberspringen
+	if(isset($_REQUEST['stg_kz']) && $_REQUEST['stg_kz']!=$stg_kz)
+		continue;
+	
 	$studiengang = new studiengang(); 
 	$studiengang->load($stg_kz); 
 	
