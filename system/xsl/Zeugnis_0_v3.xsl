@@ -45,14 +45,14 @@
 					</fo:block>
 				</fo:block-container>
 				
-				<fo:block-container position="absolute" top="94.5mm" left="110.5mm">
+				<fo:block-container position="absolute" top="94.5mm" left="117.5mm">
 					<fo:block line-height="11pt" font-size="9pt" content-width="70mm" text-align="right" font-family="arial">
 						<xsl:text>Personenkennzeichen: </xsl:text><xsl:value-of select="matrikelnr" />
 						<xsl:text>\nKennzahl des Studienganges: </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text>
 					</fo:block>
 				</fo:block-container>
 
-				<fo:block-container position="absolute" top="117mm" left="28mm" height="10mm">
+				<fo:block-container position="absolute" top="117mm" left="23mm" height="10mm">
 					<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Vorname/Familienname:\n</xsl:text></fo:block>
 					<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Geburtsdatum:</xsl:text></fo:block>
 				</fo:block-container>
@@ -67,7 +67,7 @@
 				</fo:block>
 				</fo:block-container>
 				
-				<fo:block-container position="absolute" top="137mm" left="28mm">
+				<fo:block-container position="absolute" top="137mm" left="23mm">
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
 						<fo:table-column column-width="0mm"/>
 						<fo:table-column column-width="103mm"/>
@@ -139,7 +139,7 @@
 						</fo:table-body>
 					</fo:table>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="252mm" left="28mm">
+				<fo:block-container position="absolute" top="252mm" left="21.5mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="73mm" />
 						<fo:table-column column-width="17mm" />
