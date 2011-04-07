@@ -106,6 +106,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis');"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng');"/>
+  <command id="menu-dokumente-sammelzeugnis:command" oncommand="StudentCreateSammelzeugnis('Sammelzeugnis');"/>
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg('Studienerfolg');"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','finanzamt');"/>
@@ -134,6 +135,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
   <command id="menu-bis-mitarbeiter-checkfunktion:command" oncommand="BISMitarbeiterCheckFunktion();"/>
   <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
+  <command id="menu-bis-studenten-checkstudent:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
   <command id="menu-help-manual:command" oncommand="OpenManual()"/>
   <command id="menu-help-todo:command" oncommand="OpenToDoDialog()"/>
@@ -467,6 +469,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
                command   =  "menu-dokumente-zeugniseng:command"
                accesskey = "&menu-dokumente-zeugniseng.accesskey;"/>
             <menuitem
+               id        = "menu-dokumente-sammelzeugnis"
+               key       = "&menu-dokumente-sammelzeugnis.key;"
+               label     = "&menu-dokumente-sammelzeugnis.label;"
+               command   = "menu-dokumente-sammelzeugnis:command"
+               accesskey = "&menu-dokumente-sammelzeugnis.accesskey;"/>
+            <menuitem
                id        =  "menu-dokumente-diplsupplement"
                key       =  "menu-dokumente-diplsupplement:key"
                label     = "&menu-dokumente-diplsupplement.label;"
@@ -733,6 +741,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 		               label     = "&menu-bis-studenten-export.label;"
 		               command   =  "menu-bis-studenten-export:command"
 		               accesskey = "&menu-bis-studenten-export.accesskey;"/>
+		           <menuitem
+		               id        =  "menu-bis-studenten-checkstudent"
+		               key       =  "menu-bis-studenten-checkstudent:key"
+		               label     = "&menu-bis-studenten-checkstudent.label;"
+		               command   =  "menu-bis-studenten-checkstudent:command"
+		               accesskey = "&menu-bis-studenten-checkstudent.accesskey;"/>
 				</menupopup>
 			</menu>
 		</menupopup>
