@@ -363,6 +363,9 @@ else
 
 	echo '<span id="counter"></span> Minuten';
 	echo "<script>count_down($zeit)</script>";
+	
+	if($zeit<0)
+		die('</td></tr></table><center><b>Die Zeit ist abgelaufen!<br /> Bitte aktivieren Sie Javascript in Ihrem Browser!</b></center></body></html>');
 }
 echo '</td></tr>';
 echo '</table>';
