@@ -237,7 +237,7 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row line-height="130mm">
+							<fo:table-row line-height="125mm">
 								<fo:table-cell border-width="0.2mm" border-left-style="solid">
 									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
 											<!-- pos -->
