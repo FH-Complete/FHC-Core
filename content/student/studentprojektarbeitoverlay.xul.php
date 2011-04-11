@@ -45,7 +45,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</popup>
 </popupset>
 
-	<hbox flex="1">
+	<hbox>
 		<tree id="student-projektarbeit-tree" seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/projektarbeit/liste"
 			style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
