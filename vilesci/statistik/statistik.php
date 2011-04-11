@@ -136,6 +136,6 @@ function parseVars($value)
 	{
 		$result[$i] = mb_str_replace('$','',$result[$i]);
 	}
-	return $result;
+	return array_unique($result);
 }
 ?>
