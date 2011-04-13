@@ -25,6 +25,7 @@ require_once('../include/basis_db.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/student.class.php'); 
 require_once('../include/konto.class.php');
+require_once('../include/datum.class.php');
 require_once('stip.class.php'); 
 
 $SOAPServer = new SoapServer("stip.soap.wsdl");
@@ -36,7 +37,8 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 { 	
 	$prestudentID; 
 	$studentUID; 
-	$StipBezieher = new stip(); 
+	$StipBezieher = new stip();
+	$datum_obj = new datum(); 
 	
 	if(validateStipDaten($ErhKz, $AnfragedatenID, $Bezieher))
 	{
@@ -69,8 +71,12 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 			if($Bezieher->Typ == "as" || $Bezieher->Typ == "AS")
 			{
 				$StipBezieher->Inskribiert ="j";
-				$StipBezieher->Ausbildungssemester = $prestudent->ausbildungssemester; 
-				$StipBezieher->StudStatusCode = $prestudent->status_kurzbz; 
+				$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, 'SS2009');
+				//return new SoapFault("Server", "Some error message");				
+				$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, 'SS2009');
+				if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
+					$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
+
 				if($konto->checkStudienbeitrag($studentUID, 'SS2009'))
 					$StipBezieher->Studienbeitrag = 300; 
 			}
