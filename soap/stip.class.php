@@ -2,6 +2,7 @@
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/basis_db.class.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/zeugnisnote.class.php');
 
 class stip extends basis_db
 {
@@ -333,6 +334,31 @@ class stip extends basis_db
 		return $sem;
 	}
 	
+	/**
+	 * Liefert die ECTS Punkte
+	 * 
+	 * @param $prestudent_id
+	 * @param $studiensemester_kurzbz
+	 */
+	public function getErfolg($prestudent_id, $studiensemester_kurzbz)
+	{
+		$student = new student();
+		$uid = $student->getUid($prestudent_id);
+		
+		$obj = new zeugnisnote();
+		$ects=0;
+		if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz))
+			die('Fehler beim Laden der Noten:'.$obj->errormsg);
+		foreach($obj->result as $row)
+		{
+			//Note darf nicht teilnote(0), negativ(5), noch nicht eingetragen(7), nicht beurteilt (9), nicht erfolgreich absolviert (13), angerechnet(6) sein
+			if($row->zeugnis && $row->note!=0 && $row->note!=5 && $row->note!=7 && $row->note!=9 && $row->note!=13 && $row->note!=6)
+			{
+				$ects += $row->ects;
+			}
+		}
+		return number_format($ects,2,',','');
+	}
 }
 
 class error

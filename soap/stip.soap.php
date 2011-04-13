@@ -90,7 +90,7 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 				$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
 				if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
 					$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
-
+				$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
 			}
 			elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
 			{
