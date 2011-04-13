@@ -93,7 +93,7 @@ function validateStipDaten($ErhKz, $Anfragedaten, $Bezieher)
 	if(strlen($ErhKz)!=3 || !is_numeric($ErhKz))
 		return false; 
 		
-	if(strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semster != "WS" && $Bezieher->Semester != "SS"))
+	if(strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semester != "WS" && $Bezieher->Semester != "SS"))
 		return false; 
 
 	if(strlen($Bezieher->Studienjahr) != 7)
@@ -106,8 +106,8 @@ function validateStipDaten($ErhKz, $Anfragedaten, $Bezieher)
 	if(mb_strlen($Bezieher->SVNR) != 10 || !is_numeric($Bezieher->SVNR))
 		return false; 
 		
-		// preg_match funktioniert noch nicht
-	if(mb_strlen($Bezieher->Familienname) > 255 || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Familienname)<2)
+		// preg_match funktioniert noch nicht || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0
+	if(mb_strlen($Bezieher->Familienname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Familienname)<2)
 		return false; 
 		
 	if(mb_strlen($Bezieher->Vorname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Vorname) <2)
