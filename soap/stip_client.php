@@ -74,9 +74,15 @@ if(isset($_REQUEST['submit']))
 	$bezieher->Familienname= $_REQUEST['Familienname'];
 	$bezieher->Vorname= $_REQUEST['Vorname'];
 	$bezieher->Typ = $_REQUEST['Typ'];
-	
-	$response = $client->getStipDaten($ErhKz, $AnfragedatenID, $bezieher); 
-
-	echo var_dump($response); 
+	try
+	{
+		$response = $client->getStipDaten($ErhKz, $AnfragedatenID, $bezieher);
+		echo var_dump($response);
+	}
+	catch(SoapFault $fault) 
+	{
+    	echo "SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})", E_USER_ERROR;
+	}
+	 
 }
 ?>

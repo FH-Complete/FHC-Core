@@ -1,6 +1,7 @@
 <?php
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/basis_db.class.php');
+require_once('../include/studiensemester.class.php');
 
 class stip extends basis_db
 {
@@ -97,7 +98,7 @@ class stip extends basis_db
 		
 	}
 	
-/**
+	/**
 	 * 
 	 * Enter description here ...
 	 * @param unknown_type $Svnr
@@ -155,6 +156,154 @@ class stip extends basis_db
 		else 
 			return false;
 	}
+	
+	/**
+	 * 
+	 * Ermittelt den StutStatusCode
+	 */
+	public function getStudStatusCode($prestudent_id, $studiensemester_kurzbz, $bisdatum=null)
+	{
+		$qrystatus="
+			SELECT 
+				* 
+			FROM 
+				public.tbl_prestudentstatus
+			WHERE 
+				prestudent_id='$prestudent_id' 
+				AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		if(!is_null($bisdatum))
+				$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum')";
+		
+		$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
+		
+		if($resultstatus = $this->db_query($qrystatus))
+		{
+			if($this->db_num_rows($resultstatus)==0)
+			{
+				$stsem = new studiensemester();
+				$psem = $stsem->getPreviousFrom($studiensemester_kurzbz);
+				
+				$qrystatus="
+					SELECT * 
+					FROM 
+						public.tbl_prestudentstatus 
+					WHERE 
+						prestudent_id='$prestudent_id' 
+						AND studiensemester_kurzbz='$psem'";
+				if(!is_null($bisdatum)) 
+					$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum') ";
+				$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
+				
+				if(!$resultstatus = $this->db_query($qrystatus))
+				{
+					$this->errormsg='Fehler beim Laden der Daten';
+					return false;
+				}
+			}
+		}
+		if($rowstatus = $this->db_fetch_object($resultstatus))
+		{
+			switch($rowstatus->status_kurzbz)
+			{
+				case 'Student':
+				case 'Incoming':
+				case 'Outgoing':
+				case 'Praktikant':
+				case 'Diplomand':
+					$status=1;
+					break;
+				case 'Unterbrecher':
+					$status=2;
+					break;
+				case 'Absolvent':
+					$status=3;
+					break;
+				case 'Abbrecher':
+					$status=4;
+					break;
+				default:
+					$this->errormsg='Fehlerhafter Status';
+					break;
+			}
+		}
+		
+		return $status;
+	}
+	/**
+	 * 
+	 * Ermittelt den SemesterCode
+	 */
+	public function getSemester($prestudent_id, $studiensemester_kurzbz, $bisdatum=null)
+	{
+		$qrystatus="
+			SELECT 
+				* 
+			FROM 
+				public.tbl_prestudentstatus
+			WHERE 
+				prestudent_id='$prestudent_id' 
+				AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+		if(!is_null($bisdatum))
+				$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum')";
+		
+		$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
+		
+		if($resultstatus = $this->db_query($qrystatus))
+		{
+			if($this->db_num_rows($resultstatus)==0)
+			{
+				$stsem = new studiensemester();
+				$psem = $stsem->getPreviousFrom($studiensemester_kurzbz);
+				
+				$qrystatus="
+					SELECT * 
+					FROM 
+						public.tbl_prestudentstatus 
+					WHERE 
+						prestudent_id='$prestudent_id' 
+						AND studiensemester_kurzbz='$psem'";
+				if(!is_null($bisdatum)) 
+					$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum') ";
+				$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
+				
+				if(!$resultstatus = $this->db_query($qrystatus))
+				{
+					$this->errormsg='Fehler beim Laden der Daten';
+					return false;
+				}
+			}
+			
+			if($rowstatus = $this->db_fetch_object($resultstatus))
+			{
+				$qry1="
+					SELECT count(*) AS dipl FROM public.tbl_prestudentstatus 
+					WHERE 
+						prestudent_id='$prestudent_id' 
+						AND status_kurzbz='Diplomand'";
+				if(!is_null($bisdatum))
+					$qry1.=" AND (tbl_prestudentstatus.datum<'$bisdatum') ";
+				
+				if($result1 = $this->db_query($qry1))
+				{
+					if($row1 = $this->db_fetch_object($result1))
+					{
+						$sem=$rowstatus->ausbildungssemester;
+						
+						if($row1->dipl>1)
+						{
+							$sem=50;
+						}
+						if($row1->dipl>3)
+						{
+							$sem=60;
+						}
+					}
+				}
+			}
+		}
+		return $sem;
+	}
+	
 }
 
 class error
