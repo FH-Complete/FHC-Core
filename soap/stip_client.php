@@ -1,4 +1,5 @@
 <?php 
+require_once('../config/vilesci.config.inc.php');
 require_once('stip.class.php'); 
 ?>
 <html>
@@ -59,7 +60,7 @@ require_once('stip.class.php');
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient("http://calva.technikum-wien.at/burkhart/fhcomplete/trunk/soap/stip.soap.wsdl"); 
+	$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl"); 
 	
 	
 	$ErhKz = $_REQUEST['ErhKz'];
