@@ -125,7 +125,7 @@
 					
 					<fo:block-container position="absolute" top="76mm" left="16mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="studiengang" />
+							<xsl:value-of select="studiengang_englisch" />
 						</fo:block>
 					</fo:block-container>
 					<fo:block-container position="absolute" top="76mm" left="167mm">
