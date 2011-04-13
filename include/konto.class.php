@@ -514,5 +514,33 @@ class konto extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * Gibt den Betrag der Bezahlten Studiengebühr eines Semesters zurück
+	 * @param $uid StudentUID
+	 * @param $stsem Studiensemester_kurzbz
+	 */
+	public function getStudiengebuehrGesamt($uid, $stsem)
+	{
+		$qry = "select sum(betrag) as betrag from public.tbl_konto 
+				join public.tbl_benutzer benutzer using(person_id)
+				where uid='".addslashes($uid)."' and studiensemester_kurzbz = '".addslashes($stsem)."' 
+				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0;";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->betrag; 
+			}
+			return false; 
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
+			return false; 
+		}
+	}
 }
 ?>
