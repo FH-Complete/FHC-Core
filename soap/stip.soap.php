@@ -37,6 +37,7 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 { 	
 	$prestudentID; 
 	$studentUID; 
+	$studSemester; 
 	$StipBezieher = new stip();
 	$datum_obj = new datum(); 
 	
@@ -50,35 +51,46 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 		$StipBezieher->Vorname = $Bezieher->Vorname; 
 		$StipBezieher->Typ = $Bezieher->Typ; 
 		
-	
+		// Studiensemester_kurzbz auslesen
+		if($Bezieher->Semester == "WS" || $Bezieher->Semester == "ws")
+		{
+			$year = mb_substr($Bezieher->Studienjahr, 0,4); 
+			$studSemester = "WS".$year; 
+		}elseif ($Bezieher->Semester == "SS" || $Bezieher->Semester == "ss")
+		{
+			$year = mb_substr($Bezieher->Studienjahr, 0,4); 
+			$studSemester = "SS".$year; 
+		}
+		
 		if(!$prestudentID = $StipBezieher->searchPersonKz($Bezieher->PersKz))
 			if(!$prestudentID = $StipBezieher->searchSvnr($Bezieher->SVNR))
 				$prestudentID = $StipBezieher->searchVorNachname($Bezieher->Vorname, $Bezieher->Familienname);
 	
 		$prestudent = new prestudent(); 
 		$prestudent->load($prestudentID); 
-		$prestudent->getLastStatus($prestudentID); 
+			//$prestudent->loadLastStatus
 		
 		$student = new student(); 
 		$studentUID = $student->getUID($prestudentID); 
 		$student->load($studentUID); 
 		
 		$konto = new konto(); 
+		$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester);
 		
 		// Student wurde gefunden
 		if($StipBezieher->AntwortStatusCode == 1)
 		{
 			if($Bezieher->Typ == "as" || $Bezieher->Typ == "AS")
 			{
+				$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester);
+				$StipBezieher->Studienbeitrag = $studGebuehr; 
 				$StipBezieher->Inskribiert ="j";
-				$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, 'SS2009');
+				$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);
 				//return new SoapFault("Server", "Some error message");				
-				$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, 'SS2009');
+				$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
 				if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
 					$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
 
-				if($konto->checkStudienbeitrag($studentUID, 'SS2009'))
-					$StipBezieher->Studienbeitrag = 300; 
 			}
 			elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
 			{

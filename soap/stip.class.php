@@ -45,7 +45,7 @@ class stip extends basis_db
 				$this->Vorname_Antwort = $row->vorname; 
 				$this->Familienname_Antwort = $row->nachname; 
 				$this->SVNR_Antwort = $row->svnr; 
-				$this->PersKz_Antwort = $row->matrikelnr; 
+				$this->PersKz_Antwort = trim($row->matrikelnr); 
 				$this->AntwortStatusCode = 1; 
 				return $row->prestudent_id; 
 			}
@@ -80,7 +80,7 @@ class stip extends basis_db
 				$this->Vorname_Antwort = $row->vorname; 
 				$this->Familienname_Antwort = $row->nachname; 
 				$this->SVNR_Antwort = $row->svnr; 
-				$this->PersKz_Antwort = $row->matrikelnr; 
+				$this->PersKz_Antwort = trim($row->matrikelnr); 
 				$this->AntwortStatusCode = 1; 
 				return $row->prestudent_id; 
 			}
@@ -118,7 +118,7 @@ class stip extends basis_db
 				$this->Vorname_Antwort = $row->vorname; 
 				$this->Familienname_Antwort = $row->nachname; 
 				$this->SVNR_Antwort = $row->svnr; 
-				$this->PersKz_Antwort = $row->matrikelnr; 
+				$this->PersKz_Antwort = trim($row->matrikelnr); 
 				$this->AntwortStatusCode = 1; 
 				return $row->prestudent_id; 
 			}
@@ -155,6 +155,35 @@ class stip extends basis_db
 		}
 		else 
 			return false;
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $studentUID
+	 * @param unknown_type $studSemester
+	 */
+	function getOrgFormTeilCode($studentUID, $studSemester)
+	{
+		$qry = "select orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
+		from public.tbl_studiengang studiengang
+		join public.tbl_student student using(studiengang_kz)
+		join public.tbl_prestudent prestudent using(prestudent_id)
+		join public.tbl_prestudentstatus status using(prestudent_id)
+		join bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz) where student_uid='$studentUID'
+		and status.studiensemester_kurzbz ='$studSemester';";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->OrgFormTeilCode = $row->code; 
+				return true; 
+			}
+			return false; 
+		}
+		else
+			return false; 
 	}
 	
 	/**
