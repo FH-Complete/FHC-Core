@@ -178,6 +178,10 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum_iso" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-geschlecht" label="Geschlecht" flex="1" hidden="false" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geschlecht" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-semester" label="Sem." flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#semester" onclick="StudentTreeSort()"/>
@@ -270,6 +274,7 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#ersatzkennzeichen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geschlecht" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#semester" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#verband" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#gruppe" />
