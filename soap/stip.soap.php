@@ -41,7 +41,7 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 	$StipBezieher = new stip();
 	$datum_obj = new datum(); 
 	
-	if(validateStipDaten($ErhKz, $AnfragedatenID, $Bezieher))
+	if($StipBezieher->validateStipDaten($ErhKz, $AnfragedatenID, $Bezieher))
 	{
 		$StipBezieher->Semester = $Bezieher->Semester; 
 		$StipBezieher->Studienjahr = $Bezieher->Studienjahr; 
@@ -68,7 +68,7 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 	
 		$prestudent = new prestudent(); 
 		$prestudent->load($prestudentID); 
-			//$prestudent->loadLastStatus
+		$prestudent->getLastStatus($prestudentID); 
 		
 		$student = new student(); 
 		$studentUID = $student->getUID($prestudentID); 
@@ -85,11 +85,11 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 				$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester);
 				$StipBezieher->Studienbeitrag = $studGebuehr; 
 				$StipBezieher->Inskribiert ="j";
-				$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);
-				//return new SoapFault("Server", "Some error message");				
+				$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						
 				$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
 				if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
 					$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
+					
 				$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
 			}
 			elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
@@ -102,40 +102,12 @@ function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
 			
 		$new = array($Erhalter,$AnfragedatenID, $StipBezieher); 
 		return $new; 
-	}
+	}else
+	return new SoapFault("Server", $StipBezieher->errormsg);	
 	
 }
 
-function validateStipDaten($ErhKz, $Anfragedaten, $Bezieher)
-{
-	if(strlen($ErhKz)!=3 || !is_numeric($ErhKz))
-		return false; 
-		
-	if(strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semester != "WS" && $Bezieher->Semester != "SS"))
-		return false; 
 
-	if(strlen($Bezieher->Studienjahr) != 7)
-		return false; 
-	
-	// kein Mussfeld
-	if($Bezieher->PersKz != null && strlen($Bezieher->PersKz) != 10)
-		return false; 
-		
-	if(mb_strlen($Bezieher->SVNR) != 10 || !is_numeric($Bezieher->SVNR))
-		return false; 
-		
-		// preg_match funktioniert noch nicht || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0
-	if(mb_strlen($Bezieher->Familienname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Familienname)<2)
-		return false; 
-		
-	if(mb_strlen($Bezieher->Vorname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Vorname) <2)
-		return false; 
-		
-	if(mb_strlen($Bezieher->Typ) != 2 || ($Bezieher->Typ != "ag" && $Bezieher->Typ != "as" && $Bezieher->Typ != "AG" && $Bezieher->Typ != "AS"))
-		return false; 
-		
-		return true; 
-}
 
 function getErrorCode($ErhKz, $StateCode, $StateMessage, $ErrorStatusCode, $JobId, $ErrorContent)
 {
