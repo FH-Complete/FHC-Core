@@ -152,6 +152,7 @@ function draw_content_liste($row)
     		<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
     		<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
     		<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
+    		<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
     		<STUDENT:svnr>'.($row->svnr==''?'&#xA0;':'<![CDATA['.$row->svnr.']]>').'</STUDENT:svnr>
     		<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
     		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
@@ -386,7 +387,7 @@ if($xmlformat=='rdf')
 		//$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
 		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
-					SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen,
+					SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, 
