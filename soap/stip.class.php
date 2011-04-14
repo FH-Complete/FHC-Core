@@ -27,6 +27,64 @@ class stip extends basis_db
 	public $OrgFormTeilCode; 
 	public $AntwortStatusCode; 
 	
+	
+	
+	function validateStipDaten($ErhKz, $Anfragedaten, $Bezieher)
+	{
+		if(strlen($ErhKz)!=3 || !is_numeric($ErhKz))
+		{
+			$this->errormsg = "Kein gültiger Wert für ErhKz"; 
+			return false; 
+		}
+			
+		if(strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semester != "WS" && $Bezieher->Semester != "SS"))
+		{
+			$this->errormsg = "Kein gültiger Wert für Semester"; 
+			return false; 
+		}
+	
+		if(strlen($Bezieher->Studienjahr) != 7)
+		{
+			$this->errormsg = "Kein gültiger Wert für Studienjahr"; 
+			return false; 
+		}
+		
+		// kein Mussfeld
+		if($Bezieher->PersKz != null && strlen($Bezieher->PersKz) != 10)
+		{
+			$this->errormsg = "Kein gültiger Wert für PersKz"; 
+			return false; 
+		}
+			
+		if(mb_strlen($Bezieher->SVNR) != 10 || !is_numeric($Bezieher->SVNR))
+		{
+			$this->errormsg = "Kein gültiger Wert für SVNR"; 
+			return false; 
+		}
+			
+			// preg_match funktioniert noch nicht || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0
+		if(mb_strlen($Bezieher->Familienname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Familienname)<2)
+		{
+			$this->errormsg = "Kein gültiger Wert für Familienname"; 
+			return false; 
+		}
+			
+		if(mb_strlen($Bezieher->Vorname) > 255 || $Bezieher->Vorname == null || mb_strlen($Bezieher->Vorname) <2)
+		{
+			$this->errormsg = "Kein gültiger Wert für Vorname"; 
+			return false; 
+		}
+			
+		if(mb_strlen($Bezieher->Typ) != 2 || ($Bezieher->Typ != "ag" && $Bezieher->Typ != "as" && $Bezieher->Typ != "AG" && $Bezieher->Typ != "AS"))
+		{
+			$this->errormsg = "Kein gültiger Wert für Typ"; 
+			return false; 
+		}
+			
+			return true; 
+	}
+		
+	
 	/**
 	 * 
 	 * Enter description here ...
