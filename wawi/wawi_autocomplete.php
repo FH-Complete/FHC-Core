@@ -77,7 +77,8 @@
 					$kurzbz = $standort->result[0]->kurzbz;
 				else
 					$kurzbz = '';
-				echo html_entity_decode($sFirma->result[$i]->name).($kurzbz!=''?' ('.$kurzbz.')':'').'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
+				
+				echo html_entity_decode(($sFirma->result[$i]->gesperrt?'!!GESPERRT!! ':'').$sFirma->result[$i]->name).($kurzbz!=''?' ('.$kurzbz.')':'').'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
 			}
 			break;
 			
