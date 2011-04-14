@@ -33,7 +33,8 @@ require_once('../include/datum.class.php');
 $db = new basis_db();
 $datum = new datum();
 $studiensemester = new studiensemester(); 
-$aktSem = $studiensemester->getaktorNext(); 
+$aktSem = $studiensemester->getaktorNext();
+$nextSem = $studiensemester->getNextFrom($aktSem);  
 $ausgabe = array(); 
 
 $text ="";
@@ -355,7 +356,8 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		if(!$prestudent->getLastStatus($row->prestudent_id, $aktSem))
+		if(!$prestudent->getLastStatus($row->prestudent_id, $aktSem) 
+		&& !$prestudent->getLastStatus($row->prestudent_id, $nextSem))
 		{
 			$ausgabe[$row->studiengang][9][]= $row->student_uid; 
 			$text.= $row->student_uid."<br>";
@@ -394,7 +396,7 @@ foreach($ausgabe as $stg_kz=>$value)
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten deren Semester nicht mit dem Ausbildungssemester des aktuellen Status übereinstimmt</b></td></tr>";
 					break;
 			case 6:
-					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Inaktive Studenten mit deinem aktiven Status</b></td></tr>";
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Inaktive Studenten mit einem aktiven Status</b></td></tr>";
 					break;
 			case 7:
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten deren Inskription im aktuellen Semester vor der letzten BIS-Meldung liegt</b></td></tr>";
@@ -403,7 +405,7 @@ foreach($ausgabe as $stg_kz=>$value)
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studenten die Datum und Studiensemestern in deren Stati in falscher Reihenfolge haben</b></td></tr>";
 					break;
 			case 9:
-					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Aktive Studenten die keinen Status im aktuellen Studiensemester haben</b></td></tr>";
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Aktive Studenten die keinen Status im aktuellen oder nächsten Studiensemester haben</b></td></tr>";
 					break;
 			default:
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Ungültiger Code</b></td></tr>";
