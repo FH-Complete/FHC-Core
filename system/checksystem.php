@@ -2163,6 +2163,19 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_dms LIMIT 1"))
 	else 
 		echo 'Tabelle campus.tbl_dms und campus.tbl_dms_kategorie hinzugefuegt!<br>';
 }
+// projektarbeit_note_anzeige zu tbl_studiengang hinzufuegen
+if(!@$db->db_query("SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN parent_kategorie_kurzbz varchar(32);
+	ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_dms_kategorie FOREIGN KEY(parent_kategorie_kurzbz) REFERENCES campus.tbl_dms_kategorie (kategorie_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;	
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_kategorie: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_dms_kategorie Spalte parent_kategorie_kurzbz hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2195,7 +2208,7 @@ $tabellen=array(
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_dms"  => array("dms_id","version","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
-	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung"),
+	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
