@@ -134,18 +134,27 @@ class stip extends basis_db
 		
 		if($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			// wenn mehr als 1 Datensatz gefunden wird --> Fehler
+			if($this->db_num_rows() == 1 )
 			{
-				$this->Vorname_Antwort = $row->vorname; 
-				$this->Familienname_Antwort = $row->nachname; 
-				$this->SVNR_Antwort = $row->svnr; 
-				$this->PersKz_Antwort = trim($row->matrikelnr); 
-				$this->AntwortStatusCode = 1; 
-				return $row->prestudent_id; 
+				if($row = $this->db_fetch_object())
+				{
+					$this->Vorname_Antwort = $row->vorname; 
+					$this->Familienname_Antwort = $row->nachname; 
+					$this->SVNR_Antwort = $row->svnr; 
+					$this->PersKz_Antwort = trim($row->matrikelnr); 
+					$this->AntwortStatusCode = 1; 
+					return $row->prestudent_id; 
+				}
+				else
+				{
+					$this->AntwortStatusCode =2; 
+					return false; 
+				}
 			}
-			else
+			else 
 			{
-				$this->AntwortStatusCode =2; 
+				$this->AntwortStatusCode = 2; 
 				return false; 
 			}
 		}
@@ -172,20 +181,29 @@ class stip extends basis_db
 		
 		if($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			if($this->db_num_rows() == 1 )
 			{
-				$this->Vorname_Antwort = $row->vorname; 
-				$this->Familienname_Antwort = $row->nachname; 
-				$this->SVNR_Antwort = $row->svnr; 
-				$this->PersKz_Antwort = trim($row->matrikelnr); 
-				$this->AntwortStatusCode = 1; 
-				return $row->prestudent_id; 
+				if($row = $this->db_fetch_object())
+				{
+					$this->Vorname_Antwort = $row->vorname; 
+					$this->Familienname_Antwort = $row->nachname; 
+					$this->SVNR_Antwort = $row->svnr; 
+					$this->PersKz_Antwort = trim($row->matrikelnr); 
+					$this->AntwortStatusCode = 1; 
+					return $row->prestudent_id; 
+				}
+				else
+				{
+					$this->AntwortStatusCode =2; 
+					return false; 
+				}
 			}
-			else
+			else 
 			{
-				$this->AntwortStatusCode =2; 
+				$this->AntwortStatusCode = 2; 
 				return false; 
 			}
+			
 		}
 		else
 		{
