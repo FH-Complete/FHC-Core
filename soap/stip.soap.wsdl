@@ -91,12 +91,12 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="JobID" type="xsd:string"></wsdl:part>
 		<wsdl:part name="EContent" element="xsd1:ErrorContent" ></wsdl:part> 
     </wsdl:message>
-	
+ 
 	 <wsdl:message name="getErrorCodeResponse">
         <wsdl:part name="Value" type="xsd:string"></wsdl:part>
     </wsdl:message>
- 
-    <wsdl:portType name="ConfigPortType" >
+    
+	 <wsdl:portType name="ConfigPortType" >
         <wsdl:operation name="getStipDaten">
             <wsdl:input message="tns:GetStipRequest"></wsdl:input>
             <wsdl:output message="tns:GetStipResponse"></wsdl:output>        
