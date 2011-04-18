@@ -843,8 +843,26 @@ function getSprache()
 	}
 	else
 	{
-		$sprache='German';
+		if(isset($_COOKIE['FHC_SPRACHE']))
+		{
+			$sprache=$_COOKIE['FHC_SPRACHE'];
+		}
+		else
+		{
+			$sprache=DEFAULT_LANGUAGE;
+		}
+		setSprache($sprache);
 	}
 	return $sprache;
+}
+
+/**
+ * Setzt die Sprache in der Session Variable und im Cookie
+ * @param $sprache
+ */
+function setSprache($sprache)
+{
+	$SESSION['FHC_SPRACHE']=$sprache;
+	setcookie('FHC_SPRACHE',$sprache,time()+60*60*24*30,'/');
 }
 ?>

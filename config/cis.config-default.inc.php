@@ -95,6 +95,9 @@ define('DEFAULT_STYLE','tw');
 //Layout Wechsel im CIS moeglich?
 define('CHOOSE_LAYOUT',false);
 
+//Default Sprache
+define('DEFAULT_LANGUAGE','German');
+
 // MAIL Adressen
 define('MAIL_DEBUG','oesi@technikum-wien.at');
 define('MAIL_GST','pam@technikum-wien.at,oesi@technikum-wien.at');

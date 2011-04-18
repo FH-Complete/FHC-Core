@@ -496,6 +496,58 @@ class content extends basis_db
 	}
 	
 	/**
+	 * Laedt alle Content Eintraege die fuer den uebergeben Content als
+	 * Childnodes infrage kommen.
+	 * Eintraege bei denen es zu einer Rekursion im Tree kommen koennte werden
+	 * nicht geliefert
+	 */
+	public function getpossibleChilds($content_id)
+	{
+		$qry = "SELECT 
+					*
+				FROM 
+					campus.tbl_content
+				WHERE 
+					content_id NOT IN(
+						WITH RECURSIVE parents(content_id, child_content_id) as 
+						(
+							SELECT content_id, child_content_id FROM campus.tbl_contentchild 
+							WHERE child_content_id='".addslashes($content_id)."'
+							UNION ALL
+							SELECT cc.content_id, cc.child_content_id FROM campus.tbl_contentchild cc, parents 
+							WHERE cc.child_content_id=parents.content_id
+						)
+						SELECT content_id
+						FROM parents
+						GROUP BY content_id)
+					AND content_id<>'".addslashes($content_id)."'";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				
+				$obj->content_id = $row->content_id;
+				$obj->titel = $row->titel;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->template_kurzbz = $row->template_kurzbz;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Contents';
+			return false;
+		}
+	}
+	/**
 	 * Loescht eine Contentzuordnung
 	 * 
 	 * @param $content_id
@@ -536,6 +588,49 @@ class content extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Zuteilen der Gruppe';
+			return false;
+		}
+	}
+	
+	/**
+	 * Liefert die Versionen des Contents
+	 * 
+	 * @param $content_id
+	 */
+	public function loadVersionen($content_id, $sprache)
+	{
+		$qry = "SELECT
+					contentsprache_id, sprache, content_id, version, sichtbar, reviewamum, reviewvon,
+					updateamum, updatevon, insertamum, insertvon
+				FROM campus.tbl_contentsprache 
+				WHERE content_id='".addslashes($content_id)."' AND sprache='".addslashes($sprache)."'
+				ORDER BY version DESC";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				
+				$obj->contentsprache_id = $row->contentsprache_id;
+				$obj->sprache = $row->sprache;
+				$obj->content_id = $row->content_id;
+				$obj->version = $row->version;
+				$obj->sichtbar = ($row->sichtbar=='t'?true:false);
+				$obj->reviewvon = $row->reviewvon;
+				$obj->reviewamum = $row->reviewamum;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$this->result[] = $obj;
+			}
+			return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

@@ -25,9 +25,11 @@ require_once('../include/template.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/sprache.class.php');
 require_once('../include/gruppe.class.php');
+require_once('../include/datum.class.php');
 require_once('../include/xsdformprinter/xsdformprinter.php');
 require_once('../include/organisationseinheit.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/DifferenceEngine/DifferenceEngine.php');
 
 $user = get_uid();
 
@@ -57,7 +59,7 @@ if(!$rechte->isBerechtigt('basis/cms'))
 		mode : "textareas",
 		theme : "advanced",
 		file_browser_callback: "FHCFileBrowser",
-
+		
 		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
 			
 		// Theme options
@@ -78,7 +80,7 @@ if(!$rechte->isBerechtigt('basis/cms'))
 		tinyMCE.activeEditor.windowManager.open({
 			file: cmsURL,
 			title : "FHComplete File Browser",
-			width: 550,
+			width: 750,
 			height: 550,
 			resizable: "yes",
 			close_previous: "no",
@@ -96,11 +98,13 @@ if(!$rechte->isBerechtigt('basis/cms'))
 <body>
 <?php
 
-$sprache = isset($_GET['sprache'])?$_GET['sprache']:'German';
+$sprache = isset($_GET['sprache'])?$_GET['sprache']:DEFAULT_LANGUAGE;
 $version = isset($_GET['version'])?$_GET['version']:null;
 $content_id = isset($_GET['content_id'])?$_GET['content_id']:null;
 $action = isset($_GET['action'])?$_GET['action']:'';
+$method = isset($_GET['method'])?$_GET['method']:null;
 $message = '';
+$submenu_depth=0;
 
 //Inhalt Speichern
 if(isset($_POST['XSDFormPrinter_XML']))
@@ -115,9 +119,9 @@ if(isset($_POST['XSDFormPrinter_XML']))
 		$message.= '<span class="error">'.$content->errormsg.'</span>';
 }
 
-if(isset($_GET['method']))
+if(!is_null($method))
 {
-	switch($_GET['method'])
+	switch($method)
 	{
 		case 'add_new_content':
 			$oe = new organisationseinheit();
@@ -269,6 +273,7 @@ if($result = $db->db_query($qry))
 		echo '<td>';
 		drawmenulink($row->content_id, $row->titel);
 		echo '</td>';
+		$submenu_depth=0;
 		drawsubmenu($row->content_id);
 		echo '</tr>';
 	}
@@ -282,11 +287,13 @@ echo '</td><td valign="top">';
 //Editieren
 if(!is_null($content_id))
 {
-	echo '<a href="'.$_SERVER['PHP_SELF'].'?action=prefs&content_id='.$content_id.'" '.($action=='prefs'?'class="marked"':'').'>Eigenschaften</a>';
-	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=content&content_id='.$content_id.'" '.($action=='content'?'class="marked"':'').'>Inhalt</a>';
-	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=preview&content_id='.$content_id.'" '.($action=='preview'?'class="marked"':'').'>Vorschau</a>';
-	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=rights&content_id='.$content_id.'" '.($action=='rights'?'class="marked"':'').'>Rechte</a>';
-	echo ' | <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'" '.($action=='childs'?'class="marked"':'').'>Childs</a>';
+	echo get_content_link('prefs','Eigenschaften').' | ';
+	echo get_content_link('content','Inhalt').' | ';
+	echo get_content_link('preview','Vorschau').' | ';
+	echo get_content_link('rights','Rechte').' | ';
+	echo get_content_link('childs','Childs').' | ';
+	echo get_content_link('history','History');
+	
 	echo '<div style="float: right;">'.$message.'</div>';
 	echo '<br><br>';
 
@@ -300,13 +307,16 @@ if(!is_null($content_id))
 					print_content();
 					break;
 		case 'preview': 
-					echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'" style="width: 600px; height: 500px; border: 1px solid black;">';
+					echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'" style="width: 600px; height: 500px; border: 1px solid black;">';
 					break;
 		case 'rights': 
 					print_rights();
 					break;
 		case 'childs':
 					print_childs();
+					break;
+		case 'history':
+					print_history();
 					break;
 		default: break;
 	}
@@ -317,16 +327,33 @@ echo '</body>
 </html>';
 
 /******* FUNCTIONS **********/
+
+/**
+ * Gibt einen Menue Link aus
+ * @param $id
+ * @param $titel
+ */
 function drawmenulink($id, $titel)
 {
 	global $content_id, $action, $sprache, $version;
 	echo '<a href="admin.php?content_id='.$id.'&action='.$action.'&sprache='.$sprache.'&version='.$version.'" '.($content_id==$id?'class="marked"':'').'>'.$titel.'</a> ('.$id.')';
 }
 
+/**
+ * Zeichnet ein Submenue unterhalb eines Contents
+ * 
+ * @param $content_id Content ID des Parents
+ * @param $einrueckung Einrueckungszeichen fuer den Content
+ */
 function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 {
-	global $db, $action;
-	
+	global $db, $action, $submenu_depth;
+	$submenu_depth++;
+	if($submenu_depth>20)
+	{
+		echo 'Menürekursion?! -> Abbruch';
+		return 0;
+	}
 	$qry = "SELECT 
 				tbl_contentchild.content_id,
 				tbl_contentchild.child_content_id,
@@ -343,7 +370,6 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 			
 			while($row = $db->db_fetch_object($result))
 			{
-				//$vorhanden[]=$row->child_content_id;
 				echo "<tr>\n";
 				echo '<td>';
 				echo $einrueckung;
@@ -352,12 +378,24 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 				echo "</td>\n";
 				echo "</tr>\n";
 			}
-			
-			//echo '<br>';
 		}
 	}
 }
 
+/**
+ * Liefert den Link zum Anzeigen von Content Modulen
+ * @param $key Action Key
+ * @param $name Name des Links
+ */
+function get_content_link($key, $name)
+{
+	global $action, $content_id;	
+	return '<a href="'.$_SERVER['PHP_SELF'].'?action='.$key.'&content_id='.$content_id.'" '.($action==$key?'class="marked"':'').'>'.$name.'</a>';
+}
+
+/**
+ * Erstellt den Karteireiter zum Verwalten der Kindelemente eines Contents
+ */
 function print_childs()
 {
 	global $content_id, $sprache, $version;
@@ -401,7 +439,7 @@ function print_childs()
 	echo '</tbody></table>';
 	
 	$content = new content();
-	$content->getAll();
+	$content->getpossibleChilds($content_id);
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=childs&method=childs_add" method="POST">';
 	
 	echo '<select name="child_content_id">';
@@ -414,6 +452,10 @@ function print_childs()
 	echo '</form>';
 }
 
+/**
+ * Erstellt den Karteireiter zum Eintragen der Eigenschaften eines Contents
+ * 
+ */
 function print_prefs()
 {
 	global $content_id, $sprache, $version;
@@ -482,6 +524,11 @@ function print_prefs()
 	
 }
 
+/**
+ * Erstellt den Karteireiter zum Verwalten der Zugriffsrechte auf einen Content
+ * Zu einem Content können Gruppen zugeteilt werden. Diese haben dann zugriff auf den Content
+ * Wenn keine Gruppen zugeordnet sind, können alle Personen auf den Content zugreifen
+ */
 function print_rights()
 {
 	global $content_id, $sprache, $version;
@@ -542,6 +589,13 @@ function print_rights()
 	echo '</form>';
 }
 
+/**
+ * Erstellt den Karteireiter zum Eintragen des Contents
+ * 
+ * Hier wird Aufgrund der XSD Vorlage des Templates ein Formular erstellt und mit den
+ * entsprechenden Werten des XML Files vorausgefuellt. 
+ * 
+ */
 function print_content()
 {
 	global $content_id, $sprache, $version;
@@ -559,5 +613,79 @@ function print_content()
 	$xfp->getparams='?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=content';
 	$xfp->output($template->xsd,$content->content);
 	echo '</div>';
+}
+
+/**
+ * Zeigt die Historie eines Contents an. 
+ * 
+ */
+function print_history()
+{
+	global $content_id, $sprache, $version, $method;
+	if($method=='history_changes')
+	{
+		if(!isset($_GET['v1']) || !isset($_GET['v2']))
+		{
+			echo 'Invalid Parameter';
+			return false;
+		}
+		
+		$v1 = $_GET['v1'];
+		$v2 = $_GET['v2'];
+		
+		$content_old = new content();
+		$content_old->getContent($content_id, $sprache, $v1);
+		$dom = new DOMDocument();
+		$dom->loadXML($content_old->content);
+		$content_old = $dom->getElementsByTagName('inhalt')->item(0)->nodeValue;
+		
+		$content_new = new content();
+		$content_new->getContent($content_id, $sprache, $v2);
+		$dom = new DOMDocument();
+		$dom->loadXML($content_new->content);
+		$content_new = $dom->getElementsByTagName('inhalt')->item(0)->nodeValue;
+		
+		$arr_old = explode("\n",trim($content_old));
+		$arr_new = explode("\n",trim($content_new));
+		
+		$diff = new Diff($arr_new, $arr_old);
+		$tdf = new TableDiffFormatter();
+		echo '<table>';
+		echo html_entity_decode($tdf->format($diff));
+		echo '</table>';
+	}
+	else
+	{
+		$content = new content();
+		$content->loadVersionen($content_id, $sprache);
+		
+		$datum_obj = new datum();
+		echo '<h3>Versionen</h3>';
+		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
+		echo '
+			<input type="hidden" name="action" value="history">
+			<input type="hidden" name="method" value="history_changes">
+			<input type="hidden" name="sprache" value="'.$sprache.'">
+			<input type="hidden" name="version" value="'.$version.'">
+			<input type="hidden" name="content_id" value="'.$content_id.'">';
+		echo 'Änderungen von Version
+			<input type="text" value="1" size="2" name="v1"> zu 
+			<input type="text" value="2" size="2" name="v2"> 
+			<input type="submit" value="Anzeigen">
+			</form>'; 
+		echo '<ul>';
+		foreach($content->result as $row)
+		{
+			echo '<li>';
+			echo '<b>Version '.$row->version.'</b><br>Erstellt am '.$datum_obj->formatDatum($row->insertamum,'d.m.Y').' von '.$row->insertvon;
+			if($row->updateamum!='' || $row->updatevon!='')
+				echo '<br>Letzte Änderung von '.$row->updatevon.' am '.$datum_obj->formatDatum($row->updateamum,'d.m.Y');
+			if($row->reviewvon!='' || $row->reviewamum!='')
+				echo '<br>Review von '.$row->reviewvon.' am '.$datum_obj->formatDatum($row->reviewamum,'d.m.Y');
+			echo '<br><br>';
+			echo '</li>';
+		}
+		echo '</ul>';
+	}
 }
 ?>

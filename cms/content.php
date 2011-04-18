@@ -34,8 +34,7 @@ else
 	die('ContentID muss uebergeben werden');
 
 $version = (isset($_GET['version'])?$_GET['version']:null);
-
-$sprache = getSprache();
+$sprache = (isset($_GET['sprache'])?$_GET['sprache']:getSprache());
 
 //XML Content laden
 $content = new content();
