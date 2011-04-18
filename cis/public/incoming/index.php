@@ -30,10 +30,12 @@ require_once '../../../config/cis.config.inc.php';
 	</head>
 	<body>
 		<form action ="abc" method="POST">
-		<table border ="0" width ="100%">
-			<tr style="height:400px;">
+		<table border ="0" width ="100%" height="40%">
+			<tr >
 				<td align="center" valign="bottom"> <img src="../../../skin/images/tw_logo_02.jpg"></td>
 			</tr>
+		</table>
+		<table border ="0" width ="100%">
 			<tr>
 				<td>&nbsp;</td>
 			</tr>
