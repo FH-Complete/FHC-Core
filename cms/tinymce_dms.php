@@ -23,14 +23,17 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/dms.class.php');
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//DE"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 	<title>FHComplete Document Management System</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../skin/superfish.css" type="text/css">
 	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../skin/style.css.php" type="text/css">
 	<script type="text/javascript" src="../include/js/jquery.js"></script>
+	<script type="text/javascript" src="../include/js/superfish.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
 	<script type="text/javascript">
 	var FileBrowserDialog={
@@ -59,11 +62,12 @@ require_once('../include/dms.class.php');
 			}
 	};
 	
-	tinyMCEPopup.onInit.add(FileBrowserDialog.init, FileBrowserDialog);
+	//tinyMCEPopup.onInit.add(FileBrowserDialog.init, FileBrowserDialog);
 	
 	$(document).ready(function() 
 	{ 
 		$('#divupload').hide();
+		jQuery('ul.sf-menu').superfish({speed:'fast', delay:200});
 	});
 	
 	function upload(id, name)
@@ -88,6 +92,7 @@ require_once('../include/dms.class.php');
 <?php
 $user = get_uid();
 $kategorie_kurzbz = isset($_REQUEST['kategorie_kurzbz'])?$_REQUEST['kategorie_kurzbz']:'';
+$searchstring = isset($_REQUEST['searchstring'])?$_REQUEST['searchstring']:'';
 $mimetypes = array(
 	'application/pdf'=>'pdf.ico',
 	'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>'word2007.jpg',
@@ -147,69 +152,40 @@ if(isset($_POST['fileupload']))
 	}
 }
 
-
 echo '<h1>Dokument Auswählen</h1>
-	<table>
+	<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+		<input type="text" name="searchstring" value="'.$searchstring.'">
+		<input type="submit" value="Suchen">
+	</form>
+	<table cellspacing=0>
 		<tr>
-			<td valign="top" nowrap>
-				<b>Kategorie:</b><br>';
+			<td valign="top" nowrap style="border-right: 1px solid lightblue;border-top: 1px solid lightblue;padding-right:5px">
+				<h3>Kategorie:</h3>
+				';
 //Kategorien anzeigen
 
 $dms = new dms();
 $dms->getKategorie();
-foreach($dms->result as $row)
-{
-	if($kategorie_kurzbz=='')
-		$kategorie_kurzbz=$row->kategorie_kurzbz;
-	if($kategorie_kurzbz==$row->kategorie_kurzbz)
-		$class='class="marked"';
-	else
-		$class='';
-	
-	echo '
-		<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" '.$class.'>';
-	echo $row->bezeichnung.'</a><br>';
-}
-echo '
-			</td>
-			<td valign="top">';
+drawKategorieMenue($dms->result);
 
+echo '</td>
+	<td valign="top" style="border-top: 1px solid lightblue; width: 100%;">';
 //Dokumente der Ausgewaehlten Kategorie laden und Anzeigen
 $dms = new dms();
-$dms->getDocuments($kategorie_kurzbz);
+
+if($searchstring!='')
+{
+	$dms->search($searchstring);
+}
+else
+{
+	$dms->getDocuments($kategorie_kurzbz);
+}
+
+//drawFilesThumb($dms->result);
+drawFilesList($dms->result);
 
 echo '
-		<table>
-			<tr>';
-$anzahl=0;
-foreach($dms->result as $row)
-{
-	if($anzahl>2)
-	{
-		echo "
-			</tr>
-			<tr>";
-		$anzahl=0;
-	}
-	echo '
-				<td>';
-	echo '<a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">';
-	echo '<center>';
-	if(array_key_exists($row->mimetype,$mimetypes))
-		echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
-	else
-		echo '<img src="dms.php?id='.$row->dms_id.'&amp;notimeupdate" style="max-width: 100px">';
-	
-	echo '<br>'.$row->name.'</a><br>';
-	
-	//Upload einer neuen Version
-	echo '<a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Upload</a> ';
-	echo '</center></td>';
-	$anzahl++;
-}
-echo '	
-			</tr>
-		</table>
 		</td>
 	</tr>
 	</table>
@@ -229,6 +205,136 @@ echo '
 			<input type="submit" name="fileupload" value="Upload">
 		</form>
 	</div>';
+
+/************ FUNCTIONS ********************/
+/**
+ * Zeichnet das Kategorie Menu
+ * 
+ * @param $rows DMS Result Object
+ */
+function drawKategorieMenue($rows)
+{	
+	global $kategorie_kurzbz;
+	echo '<ul>';
+	foreach($rows as $row)
+	{
+		if($kategorie_kurzbz=='')
+			$kategorie_kurzbz=$row->kategorie_kurzbz;
+		if($kategorie_kurzbz==$row->kategorie_kurzbz)
+			$class='class="marked"';
+		else
+			$class='';
+		
+		echo '<li>
+			<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" '.$class.'>';
+		echo $row->bezeichnung.'</a>';
+		$dms = new dms();
+		$dms->getKategorie($row->kategorie_kurzbz);
+		if(count($dms->result)>0)
+			drawKategorieMenue($dms->result);
+		echo '</li>';
+	}
+	echo '
+				</ul>';
+}
+/**
+ * Zeichnet die Files in Listenform
+ * 
+ * @param $rows DMS Result Object
+ */
+function drawFilesList($rows)
+{
+	global $mimetypes;
+	echo '
+			<table>
+		';
+
+	foreach($rows as $row)
+	{
+		echo '
+		<tr>
+			<td>';
+		if(array_key_exists($row->mimetype,$mimetypes))
+			echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
+		else
+			echo '<img src="../skin/images/blank.png" style="height: 15px">';
+			
+		echo'
+				<a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
+				'.$row->name.'</a>
+			</td>
+
+			<td>';
+		
+		//Upload einer neuen Version
+		echo '<ul class="sf-menu">
+				<li><a href="id://'.$row->dms_id.'/Erweitert" style="font-size:small">Erweitert</a>
+					<ul>
+						<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">Auswählen</a></li>
+						<li><a href="dms.php?id='.$row->dms_id.'" style="font-size:small" target="_blank">Herunterladen</a></li>
+						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
+						<li><a href="id://'.$row->dms_id.'/ShowAll" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small" >Alle Versionen anzeigen</a></li>
+					</ul>
+				</li>
+			  </ul>';
+		echo '</td>
+		</tr>';
+		
+	}
+	echo '	
+			</table>';
+}
+/**
+ * Zeichnet die Files mit Vorschau
+ * 
+ * @param $rows DMS Result Object
+ */
+function drawFilesThumb($rows)
+{
+	global $mimetypes;
+	echo '
+			<table>
+				<tr>';
+	$anzahl=0;
+	foreach($rows as $row)
+	{
+		if($anzahl>2)
+		{
+			echo "
+				</tr>
+				<tr>";
+			$anzahl=0;
+		}
+		echo '
+					<td>';
+		echo '<center>';
+		echo '<a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">';
+		
+		if(array_key_exists($row->mimetype,$mimetypes))
+			echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
+		else
+			echo '<img src="dms.php?id='.$row->dms_id.'&amp;notimeupdate" style="max-width: 100px">';
+		echo '</a><br>';
+		//echo '<br>'.$row->name.'</a>';
+		
+		//Upload einer neuen Version
+		echo '<ul class="sf-menu">
+				<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">'.$row->name.'</a>
+					<ul>
+						<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">Auswählen</a></li>
+						<li><a href="dms.php?id='.$row->dms_id.'" style="font-size:small" target="_blank">Herunterladen</a></li>
+						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
+						<li><a href="id://'.$row->dms_id.'/ShowAll" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small" >Alle Versionen anzeigen</a></li>
+					</ul>
+				</li>
+			  </ul>';
+		echo '</center></td>';
+		$anzahl++;
+	}
+	echo '	
+				</tr>
+			</table>';
+}
 ?>
 </body>
 </html>

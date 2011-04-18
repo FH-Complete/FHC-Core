@@ -220,9 +220,15 @@ class dms extends basis_db
 	 * Laedt alle Kategorien
 	 * @return boolean
 	 */
-	public function getKategorie()
+	public function getKategorie($parent_kategorie_kurzbz='')
 	{
-		$qry = "SELECT * FROM campus.tbl_dms_kategorie ORDER BY bezeichnung";
+		$qry = "SELECT * FROM campus.tbl_dms_kategorie WHERE ";
+		
+		if($parent_kategorie_kurzbz!='')
+			$qry.=" parent_kategorie_kurzbz='".addslashes($parent_kategorie_kurzbz)."'";
+		else
+			$qry.=" parent_kategorie_kurzbz is null";
+		$qry.=" ORDER BY bezeichnung";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -256,6 +262,50 @@ class dms extends basis_db
 				SELECT dms_id, max(version)
 				FROM campus.tbl_dms 
 				WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
+				GROUP BY dms_id)
+				ORDER BY name;";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Sucht nach Dokumenten
+	 *
+	 * @param $kategorie_kurzbz
+	 */
+	public function search($suchstring)
+	{
+		$qry = "SELECT * FROM campus.tbl_dms where (dms_id, version) in(
+				SELECT dms_id, max(version)
+				FROM campus.tbl_dms 
+				WHERE lower(name) like lower('%".addslashes($suchstring)."%')
+				OR lower(beschreibung) like lower('%".addslashes($suchstring)."%')
 				GROUP BY dms_id)
 				ORDER BY name;";
 		

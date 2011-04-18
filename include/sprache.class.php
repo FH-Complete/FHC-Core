@@ -55,7 +55,7 @@ class sprache extends basis_db
 	 */
 	public function load($sprache)
 	{
-		$qry = "SELECT * from public.tbl_sprache WHERE sprache = ".addslashes($sprache)."; ";
+		$qry = "SELECT * FROM public.tbl_sprache WHERE sprache = '".addslashes($sprache)."';";
 		
 		if(!$this->db_query($qry))
 		{

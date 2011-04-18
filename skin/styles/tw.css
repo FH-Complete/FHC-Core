@@ -44,7 +44,7 @@ img
 	height:86%;
 	z-index:1000;
 } 
-/*Alle außer IE 6*/
+/*Alle auï¿½er IE 6*/
 html>body #menue
 {
 	position:absolute;
@@ -56,7 +56,7 @@ html>body #menue
 	height:82%;
 	left:20%;
 }
-/*Alle außer IE 6*/
+/*Alle auï¿½er IE 6*/
 html>body #content
 {
 	position:absolute;
@@ -270,7 +270,7 @@ TABLE#tabterm
 }
 td.ContentHeader
 {
-	background-color: #008381; /*grün*/
+	background-color: #008381; /*grï¿½n*/
 	font-weight: bold;
 	height: 19px;
 }
@@ -361,11 +361,11 @@ TR.liste
 }
 TR.liste0						
 {
-	background-color: #FFFFFF; /*weiß*/
+	background-color: #FFFFFF; /*weiï¿½*/
 }
 TR.liste1						
 {
-	background-color: #EEEEEE; /*grau fast weiß*/
+	background-color: #EEEEEE; /*grau fast weiï¿½*/
 }
 TR.tryellow
 {
@@ -397,7 +397,7 @@ TABLE#zeitsperren TD.feiertag
 }
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE /*grau fast weiß*/
+	background-color: #EEEEEE /*grau fast weiï¿½*/
 }
 
 /* Stundeplan */
@@ -641,4 +641,22 @@ img#layout
 option.inactive
 {
 	text-decoration:line-through;
+}
+
+/* Difference Engine */
+.diffchange-inline
+{
+	background-color: yellow;
+}
+.diff-deletedline
+{
+	background-color: lightgray;
+}
+.diff-marker
+{
+	background-color: none;
+}
+.diff-addedline
+{
+	background-color: lightgreen;
 }
