@@ -862,7 +862,7 @@ function getSprache()
  */
 function setSprache($sprache)
 {
-	$SESSION['FHC_SPRACHE']=$sprache;
+	$_SESSION['FHC_SPRACHE']=$sprache;
 	setcookie('FHC_SPRACHE',$sprache,time()+60*60*24*30,'/');
 }
 ?>
