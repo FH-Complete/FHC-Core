@@ -411,7 +411,7 @@ else
 		{
 			if($s->content == true)
 			{
-				$headline = $sprache->getSpracheFromIndex($i);
+				$headline = $sprache->getSpracheFromIndex($s->index);
 				echo "<th>$headline</th>\n";
 			}
 			$i++;
@@ -433,7 +433,7 @@ else
 			{
 				if($s->content == true)
 				{
-					echo '<td>'.$row->beschreibung[$i]."</td>\n"; 
+					echo '<td>'.$row->beschreibung[$s->index]."</td>\n"; 
 				}
 				$i++;
 			}
