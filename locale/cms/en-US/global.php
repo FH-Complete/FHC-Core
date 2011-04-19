@@ -19,4 +19,5 @@ $this->phrasen['global/anmerkung']='Comment';
 $this->phrasen['global/sprache']='Language';
 $this->phrasen['global/englisch']='English';
 $this->phrasen['global/deutsch']='German';
+$this->phrasen['global/titel']='Title';
 ?>
