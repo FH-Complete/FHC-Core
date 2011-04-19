@@ -40,7 +40,7 @@ require_once '../../../config/cis.config.inc.php';
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td align="center"><a href="abc">Registration</a></td>
+				<td align="center"><a href="registration.php">Registration</a></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
