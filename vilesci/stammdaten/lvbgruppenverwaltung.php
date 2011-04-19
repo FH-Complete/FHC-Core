@@ -571,7 +571,7 @@ if($type=='edit')
 					  		<td><input type='text' name='sort' size='2' maxlength='2' value='$gruppe->sort' /></td>
 					  	</tr>";
 				$stg_obj = new studiengang($studiengang_kz);
-				if($stg_obj->orgform_kurzbz=='VBB')
+				if($stg_obj->mischform)
 				{
 					echo "
 					  	<tr>
@@ -654,7 +654,7 @@ if($type=='edit')
 				  	</tr>";
 			
 			$stg_obj = new studiengang($studiengang_kz);
-			if($stg_obj->orgform_kurzbz=='VBB')
+			if($stg_obj->mischform)
 			{
 				echo "
 					  	<tr>
@@ -726,7 +726,7 @@ if($type=='edit')
 				  		<td><input type='checkbox' name='aktiv' ".($lvb->aktiv?'checked':'')." /></td>
 				  	</tr>";
 				$stg_obj = new studiengang($studiengang_kz);
-				if($stg_obj->orgform_kurzbz=='VBB')
+				if($stg_obj->mischform)
 				{ 	
 					echo "
 				  	<tr>
