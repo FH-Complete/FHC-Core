@@ -93,7 +93,7 @@ class wawi_konto extends basis_db
 			{
 				if($s->content == true)
 				{
-					$this->beschreibung[$i] = $row->{'beschreibung'.$i}; 
+					$this->beschreibung[$s->index] = $row->{'beschreibung'.$s->index}; 
 				}
 				$i++;
 			}				
@@ -150,7 +150,7 @@ class wawi_konto extends basis_db
 			{
 				if($s->content == true)
 				{
-					$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 
+					$obj->beschreibung[$s->index] = $row->{'beschreibung'.$s->index}; 
 				}
 				$i++;
 			}
@@ -365,7 +365,7 @@ class wawi_konto extends basis_db
 				{ 
 					if($s->content == true)
 					{
-						$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 
+						$obj->beschreibung[$s->index] = $row->{'beschreibung'.$s->index}; 
 					}
 					$i++;			
 				}
@@ -453,7 +453,7 @@ class wawi_konto extends basis_db
 				{
 					if($s->content == true)
 					{
-						$obj->beschreibung[$i] = $row->{'beschreibung'.$i}; 
+						$obj->beschreibung[$s->index] = $row->{'beschreibung'.$s->index}; 
 					}
 					$i++;
 				}
@@ -546,7 +546,7 @@ class wawi_konto extends basis_db
 				
 				if($s->content == true)
 				{
-					$qry_beschreibung .=$this->addslashes($this->beschreibung[$i]).',';
+					$qry_beschreibung .=$this->addslashes($this->beschreibung[$s->index]).',';
 				}
 				else 
 				{
@@ -563,7 +563,7 @@ class wawi_konto extends basis_db
 			{ 
 				if($s->content == true)
 				{
-					$qry_beschreibung .= " beschreibung[".$i."] as beschreibung".$i." ,";
+					$qry_beschreibung .= " beschreibung[".$s->index."] as beschreibung".$s->index." ,";
 				}
 				$i++;			
 			}
@@ -577,7 +577,7 @@ class wawi_konto extends basis_db
 			{ 
 				if($s->content == true)
 				{
-					$qry_beschreibung .= " beschreibung[$i]=".$this->addslashes($this->beschreibung[$i]).','; 
+					$qry_beschreibung .= " beschreibung[$s->index]=".$this->addslashes($this->beschreibung[$s->index]).','; 
 				}
 				$i++;
 			}
