@@ -20,4 +20,7 @@ $this->phrasen['global/sprache']='Language';
 $this->phrasen['global/englisch']='English';
 $this->phrasen['global/deutsch']='German';
 $this->phrasen['global/titel']='Title';
+$this->phrasen['global/geschlecht']='Gender';
+$this->phrasen['global/mann']='Male';
+$this->phrasen['global/frau']='Female';
 ?>
