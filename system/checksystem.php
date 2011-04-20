@@ -2241,7 +2241,14 @@ if(!@$db->db_query("SELECT zugangscode FROM public.tbl_person LIMIT 1"))
 		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_preincoming_lehrveranstaltung TO web;
 			
 		GRANT SELECT, UPDATE ON SEQUENCE public.seq_preincoming_preincoming_id TO admin;
-		GRANT SELECT, UPDATE ON SEQUENCE public.seq_preincoming_preincoming_id TO web;	
+		GRANT SELECT, UPDATE ON SEQUENCE public.seq_preincoming_preincoming_id TO web;
+		
+		GRANT SELECT, INSERT, UPDATE ON public.tbl_person TO web;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_adresse TO web;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_kontakt TO web;
+		GRANT SELECT, UPDATE ON SEQUENCE public.tbl_person_person_id_seq TO web;
+		GRANT SELECT, UPDATE ON SEQUENCE public.tbl_adresse_adresse_id_seq TO web;
+		GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kontakt_kontakt_id_seq TO web;
 	";
 	
 	if(!$db->db_query($qry))
