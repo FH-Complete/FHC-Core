@@ -2235,6 +2235,13 @@ if(!@$db->db_query("SELECT zugangscode FROM public.tbl_person LIMIT 1"))
 		ALTER TABLE public.tbl_person ADD COLUMN zugangscode varchar(32);
 		ALTER TABLE public.tbl_person ADD CONSTRAINT uk_zugangscode UNIQUE (zugangscode);
 		
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_preincoming TO admin;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_preincoming TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_preincoming_lehrveranstaltung TO admin;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_preincoming_lehrveranstaltung TO web;
+			
+		GRANT SELECT, UPDATE ON SEQUENCE public.seq_preincoming_preincoming_id TO admin;
+		GRANT SELECT, UPDATE ON SEQUENCE public.seq_preincoming_preincoming_id TO web;	
 	";
 	
 	if(!$db->db_query($qry))
