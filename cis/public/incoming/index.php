@@ -21,7 +21,7 @@
  */
  
 require_once '../../../config/cis.config.inc.php';
-
+header('content-type: text/html; charset=utf-8');
 ?>
 
 <html>
