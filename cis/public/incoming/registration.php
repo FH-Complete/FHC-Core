@@ -76,6 +76,12 @@ $p=new phrasen($sprache);
 				<td><input type="text" size="20" name="titel_post"></td>
 			</tr>		
 			<tr>
+				<td><?php echo $p->t('global/geschlecht');?></td>
+				<td>    <input type="radio" name="geschlecht" value="m"> <?php echo $p->t('global/mann');?>
+    					<input type="radio" name="geschlecht" value="w"> <?php echo $p->t('global/frau');?>
+    			</td>
+			</tr>	
+			<tr>
 				<td><?php echo $p->t('global/strasse');?></td>
 				<td><input type="text" size="40" name="strasse"></td>
 			</tr>	
