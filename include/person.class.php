@@ -61,6 +61,7 @@ class person extends basis_db
 	public $geburtsnation;		// varchar(3);
 	public $ext_id;				// bigint
 	public $kurzbeschreibung; 	// text
+	public $zugangscode = null; // varchar(32)
 
 	// *************************************************************************
 	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -370,7 +371,7 @@ class person extends basis_db
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
-			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung)
+			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung, zugangscode)
 			        VALUES('.$this->addslashes($this->sprache).','.
 					$this->addslashes($this->anrede).','.
 					$this->addslashes($this->titelpost).','.
@@ -397,7 +398,8 @@ class person extends basis_db
 				        $this->addslashes($this->geburtsnation).','.
 				        $this->addslashes($this->staatsbuergerschaft).','.
 				        $this->addslashes($this->ext_id).','.
-				        $this->addslashes($this->kurzbeschreibung).');';
+				        $this->addslashes($this->kurzbeschreibung).','.
+				        $this->addslashes($this->zugangscode).');';
 		}
 		else
 		{
