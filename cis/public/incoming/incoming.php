@@ -20,11 +20,64 @@
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
  
+require_once '../../../config/cis.config.inc.php';
+require_once '../../../include/mobilitaetsprogramm.class.php';
+require_once '../../../include/functions.inc.php';
+require_once '../../../include/phrasen.class.php';
+
+header('content-type: text/html; charset=utf-8');
+
+if(isset($_GET['lang']))
+	setSprache($_GET['lang']);
+
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
+$mobility = new mobilitaetsprogramm(); 
+$mobility->getAll(); 
+
 ?>
 
 <html>
 	<head>
 		<title>Incomming-Verwaltung</title>
 	</head>
-
+	<body>
+		<table width="100%" border="0">
+			<tr>
+				<td align="left"><a href="incoming.php">Administration</a> </td>
+				<td align ="right"><?php 		
+				echo $p->t("global/sprache")." ";
+				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> | 
+				<a href="'.$_SERVER['PHP_SELF'].'?lang=German">'.$p->t("global/deutsch").'</a><br>';?></td>
+			</tr>
+		</table>
+			
+		<table width ="100%" border="1">
+			<tr>
+				<td colspan="2"> Titel Vorname Nachname Titel</td>
+			</tr>	
+			<tr>
+				<td>Austauschprogramm</td>
+				<?php 
+						echo "<td><SELECT name='nation'>\n"; 
+						echo "<option value='austausch_auswahl'>-- select --</option>\n";
+						foreach ($mobility->result as $mob)
+						{
+							echo '<option value="'.$mob->mobilitaetsprogramm_code.'" >'.$mob->kurzbz."</option>\n";
+						}
+				?>		
+			</tr>
+			<tr>
+				<td colspan="2"><a href="incoming.php">Lehrveranstalltungen auswählen</a></td>
+			</tr>
+			<tr>
+				<td colspan="2"><a href="incoming.php">Learning Agreement erstellen</a></td>
+			</tr>
+			<tr>
+				<td colspan="2"><a href="incoming.php"><?php echo $p->t('incoming/uploadvondateien');?></a></td>
+			</tr>
+		</table>
+	
+	</body>
 </html>
