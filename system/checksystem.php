@@ -2176,6 +2176,72 @@ if(!@$db->db_query("SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie
 	else 
 		echo 'Tabelle campus.tbl_dms_kategorie Spalte parent_kategorie_kurzbz hinzugefuegt!<br>';
 }
+// Preincoming
+if(!@$db->db_query("SELECT zugangscode FROM public.tbl_person LIMIT 1"))
+{
+	$qry = "
+		CREATE SEQUENCE public.seq_preincoming_preincoming_id
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+			
+		CREATE TABLE public.tbl_preincoming
+		(
+		 preincoming_id Integer NOT NULL,
+		 person_id Integer NOT NULL,
+		 mobilitaetsprogramm_code Integer,
+		 zweck_code Character varying(20),
+		 firma_id Integer,
+		 anmerkung Text,
+		 universitaet Character varying(256),
+		 aktiv Boolean DEFAULT true NOT NULL,
+		 bachelorthesis Boolean NOT NULL,
+		 masterthesis Boolean NOT NULL,
+		 von Date,
+		 bis Date,
+		 uebernommen Boolean DEFAULT false NOT NULL,
+		 insertamum Timestamp,
+		 insertvon Character varying(32),
+		 updateamum Timestamp,
+		 updatevon Character varying(32)
+		);
+		
+		
+		ALTER TABLE public.tbl_preincoming ALTER COLUMN preincoming_id SET DEFAULT nextval('public.seq_preincoming_preincoming_id');
+		
+		ALTER TABLE public.tbl_preincoming ADD CONSTRAINT pk_preincoming PRIMARY KEY (preincoming_id);
+		ALTER TABLE public.tbl_preincoming ADD CONSTRAINT uk_preincoming_id UNIQUE (preincoming_id);
+
+		ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_firma_preincoming FOREIGN KEY(firma_id) REFERENCES public.tbl_firma (firma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_mobilitaetsprogramm_preincoming FOREIGN KEY(mobilitaetsprogramm_code) REFERENCES bis.tbl_mobilitaetsprogramm (mobilitaetsprogramm_code) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_zweck_preincoming FOREIGN KEY(zweck_code) REFERENCES bis.tbl_zweck (zweck_code) ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+		CREATE TABLE public.tbl_preincoming_lehrveranstaltung 
+		(
+ 			lehrveranstaltung_id Integer NOT NULL,
+ 			preincoming_id Integer NOT NULL,
+ 			insertamum Timestamp,
+ 			insertvon Character varying(32)
+		);
+		
+		ALTER TABLE public.tbl_preincoming_lehrveranstaltung ADD CONSTRAINT pk_preincoming_lehrveranstaltung PRIMARY KEY (preincoming_id, lehrveranstaltung_id);
+		ALTER TABLE public.tbl_preincoming_lehrveranstaltung ADD CONSTRAINT uk_preincoming_lehrveranstaltung UNIQUE (preincoming_id, lehrveranstaltung_id);
+
+		ALTER TABLE public.tbl_preincoming_lehrveranstaltung ADD CONSTRAINT fk_preincoming_preincoming_lehrveranstaltung FOREIGN KEY(preincoming_id) REFERENCES public.tbl_preincoming (preincoming_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE public.tbl_preincoming_lehrveranstaltung ADD CONSTRAINT fk_lehrveranstaltung_preincoming_lehrveranstaltung FOREIGN KEY(lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+		
+		ALTER TABLE public.tbl_person ADD COLUMN zugangscode varchar(32);
+		ALTER TABLE public.tbl_person ADD CONSTRAINT uk_zugangscode UNIQUE (zugangscode);
+		
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>Preincoming Modul: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Preincoming Modul hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2300,8 +2366,10 @@ $tabellen=array(
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
-	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung"),
+	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
+	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung"),
+	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id"),
