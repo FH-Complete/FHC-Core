@@ -107,7 +107,7 @@ class sprache extends basis_db
 	 */
 	public function delete($sprache)
 	{
-		$qry = "DELETE FROM public.tbl_sprache WHERE sprache = ".addslashes($sprache).";";
+		$qry = "DELETE FROM public.tbl_sprache WHERE sprache = '".addslashes($sprache)."';";
 		
 		if(!$this->db_query($qry))
 		{
