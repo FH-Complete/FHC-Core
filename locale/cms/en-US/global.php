@@ -23,4 +23,6 @@ $this->phrasen['global/titel']='Title';
 $this->phrasen['global/geschlecht']='Gender';
 $this->phrasen['global/mann']='Male';
 $this->phrasen['global/frau']='Female';
+$this->phrasen['global/staatsbuergerschaft']='Citizenship';
+$this->phrasen['global/geburtsdatum']='Date of Birth';
 ?>
