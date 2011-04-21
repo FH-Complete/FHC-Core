@@ -21,15 +21,53 @@
  */
  
 require_once '../../../config/cis.config.inc.php';
-header('content-type: text/html; charset=utf-8');
-?>
+require_once '../../../include/phrasen.class.php';
+require_once '../../../include/person.class.php'; 
 
+if(isset($_GET['lang']))
+	setSprache($_GET['lang']);
+
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
+if (isset($_POST['userid'])) 
+{
+	$login = $_REQUEST['userid']; 
+	$person = new person(); 
+		
+	session_start();
+	
+	//Zugangscode wird  überprüft
+	if($person->checkZugangscode($login))
+	{
+		$_SESSION['incoming/user'] = $login;
+
+		header('Location: incoming.php');
+		exit;
+	}
+	else
+	{
+		$errormsg= $p->t('incoming/ungueltigerbenutzer');
+	}
+}
+
+?>
 <html>
 	<head>
 		<title>Inoming-Verwaltung</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	</head>
 	<body>
-		<form action ="abc" method="POST">
+	<table width="100%" border="0">
+			<tr>
+				<td align="left"></td>
+				<td align ="right"><?php 		
+				echo $p->t("global/sprache")." ";
+				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> | 
+				<a href="'.$_SERVER['PHP_SELF'].'?lang=German">'.$p->t("global/deutsch").'</a><br>';?></td>
+			</tr>
+		</table>
+		<form action ="index.php" method="POST">
 		<table border ="0" width ="100%" height="40%">
 			<tr >
 				<td align="center" valign="bottom"> <img src="../../../skin/images/tw_logo_02.jpg"></td>
@@ -46,13 +84,20 @@ header('content-type: text/html; charset=utf-8');
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td align="center"><input type="text" size="30" value="UserID" onfocus="this.value='';"></td>
+				<td align="center"><input type="text" size="30" value="UserID" name ="userid" onfocus="this.value='';"></td>
 			</tr>
 			<tr>
 				<td align="center"><input type="password" size="30" value="UserID" onfocus="this.value='';"></td>
 			</tr>
 			<tr>
-				<td align="center"><input type="submit" value="Login"></td>
+				<td align="center"><input type="submit" value="Login" name="submit"></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td align="center"><?php if(isset($errormsg))
+							echo $errormsg; ?>
 			</tr>
 		</table>
 		</form>

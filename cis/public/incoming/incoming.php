@@ -20,7 +20,9 @@
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
  
+
 require_once '../../../config/cis.config.inc.php';
+require_once 'auth.php';
 require_once '../../../include/mobilitaetsprogramm.class.php';
 require_once '../../../include/functions.inc.php';
 require_once '../../../include/phrasen.class.php';
@@ -78,6 +80,10 @@ $mobility->getAll();
 				<td colspan="2"><a href="incoming.php"><?php echo $p->t('incoming/uploadvondateien');?></a></td>
 			</tr>
 		</table>
-	
+		<table width="100%" border="0">
+			<tr>
+				<td align="center"><a href="logout.php">Logout</a> </td>
+			</tr>
+		</table>
 	</body>
 </html>
