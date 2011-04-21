@@ -33,7 +33,7 @@ class preincoming extends basis_db
 	//Tabellenspalten
 	public $preincoming_id;		// integer
 	public $person_id;			// integer
-	public $mobilitätsprogramm_code; // integer
+	public $mobilitaetsprogramm_code; // integer
 	public $zweck_code;			// varchar(20)
 	public $firma_id;			// integer
 	public $anmerkung;			// text
