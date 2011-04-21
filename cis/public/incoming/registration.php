@@ -25,6 +25,10 @@ require_once '../../../include/person.class.php';
 require_once '../../../include/nation.class.php';
 require_once '../../../include/functions.inc.php';
 require_once '../../../include/phrasen.class.php';
+require_once '../../../include/adresse.class.php';
+require_once '../../../include/kontakt.class.php'; 
+require_once '../../../include/preincoming.class.php'; 
+require_once '../../../include/mail.class.php';
 
 header('content-type: text/html; charset=utf-8');
 
@@ -49,7 +53,7 @@ $p=new phrasen($sprache);
 	
 		<table width="100%" border="0">
 			<tr>
-				<td align="left"><a href="index.php">Login</a> > Registration </td>
+				<td align="left"><a href="index.php">Login</a> &gt; Registration </td>
 				<td align ="right"><?php 		
 				echo $p->t("global/sprache")." ";
 				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> | 
@@ -60,38 +64,56 @@ $p=new phrasen($sprache);
 		<form action="registration.php" method="POST">
 		<table border = "0" style="margin-left:40%; margin-top:10%;">
 			<tr>
-				<td><?php echo $p->t('global/titel');?> Pre</td>
-				<td><input type="text" size="20" name="titel_pre"></td>
+				<td><?php echo $p->t('global/titel');?> Post</td>
+				<td><input type="text" size="20" maxlength="32" name="titel_post"></td>
 			</tr>
 			<tr>
 				<td><?php echo $p->t('global/vorname');?></td>
-				<td><input type="text" size="40" name="vorname"></td>
+				<td><input type="text" size="40" maxlength="32" name="vorname"></td>
 			</tr>
 			<tr>
 				<td><?php echo $p->t('global/nachname');?></td>
-				<td><input type="text" size="40" name="nachname"></td>
+				<td><input type="text" size="40" maxlength="64" name="nachname"></td>
 			</tr>
 			<tr>
-				<td><?php echo $p->t('global/titel');?> Post</td>
-				<td><input type="text" size="20" name="titel_post"></td>
+				<td><?php echo $p->t('global/titel');?> Pre</td>
+				<td><input type="text" size="20" maxlength="64" name="titel_pre"></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('global/geburtsdatum');?></td>
+				<td><input type="text" size="20" name="geb_datum" value="yyyy-mm-dd" onfocus="this.value=''"; ></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('global/staatsbuergerschaft');?></td>
+				<?php 
+				echo "<td><SELECT name='staatsbuerger'>\n"; 
+				echo "<option value='staat_auswahl'>-- select --</option>\n";
+				foreach ($nation->nation as $nat)
+				{
+					echo '<option value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
+				}
+				?>		
 			</tr>		
 			<tr>
 				<td><?php echo $p->t('global/geschlecht');?></td>
-				<td>    <input type="radio" name="geschlecht" value="m"> <?php echo $p->t('global/mann');?>
+				<td>    <input type="radio" name="geschlecht" value="m" checked> <?php echo $p->t('global/mann');?>
     					<input type="radio" name="geschlecht" value="w"> <?php echo $p->t('global/frau');?>
     			</td>
 			</tr>	
 			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
 				<td><?php echo $p->t('global/strasse');?></td>
-				<td><input type="text" size="40" name="strasse"></td>
+				<td><input type="text" size="40" maxlength="256" name="strasse"></td>
 			</tr>	
 			<tr>
 				<td><?php echo $p->t('global/plz');?></td>
-				<td><input type="text" size="20" name="plz"></td>
+				<td><input type="text" size="20" maxlength="16" name="plz"></td>
 			</tr>				
 			<tr>
 				<td><?php echo $p->t('global/ort');?></td>
-				<td><input type="text" size="40" name="ort"></td>
+				<td><input type="text" size="40" maxlength="256" name="ort"></td>
 			</tr>				
 			<tr>
 				<td>Nation</td>
@@ -106,14 +128,16 @@ $p=new phrasen($sprache);
 			</tr>				
 			<tr>
 				<td>E-Mail</td>
-				<td><input type="text" size="40" name="email"></td>
+				<td><input type="text" size="40" maxlength="128" name="email"></td>
 			</tr>	
 			<tr>
 				<td><?php echo $p->t('global/anmerkung');?></td>
-				<td><textarea name="anmerkung" cols="30" rows="5"></textarea></td>
+				<td><textarea name="anmerkung" cols="31" rows="5"></textarea></td>
 			</tr>	
 			<tr>
-				<td colspan="2" align = "center"><input type="submit" name="submit" value="Registration"></td>			
+				<td colspan="2" align = "center"><input type="submit" name="submit" value="Registration"></td>		
+			</tr>
+			<tr><td><input type="hidden" name="zugangscode" value='<?php echo uniqid();?>'></td></tr>	
 		</table>
 	</form>
 	</body>
@@ -121,19 +145,93 @@ $p=new phrasen($sprache);
 
 <?php 
 if(isset($_REQUEST['submit']))
-{
-	echo var_dump($_REQUEST); 
+{	
+	$person = new person(); 
+	$adresse = new adresse();
+	$kontakt = new kontakt();
+	$preincoming = new preincoming();   
 	
 	$titel_pre = $_REQUEST['titel_pre'];
 	$vorname = $_REQUEST['vorname']; 
 	$nachname =$_REQUEST['nachname']; 
 	$titel_post = $_REQUEST['titel_post'];
+	$geb_datum = $_REQUEST['geb_datum']; 
+	$staatsbuerger = $_REQUEST['staatsbuerger']; 
+	$geschlecht = $_REQUEST['geschlecht']; 
 	$strasse = $_REQUEST['strasse']; 
 	$plz = $_REQUEST['plz']; 
 	$ort = $_REQUEST['ort']; 
 	$nation_code = $_REQUEST['nation']; 
 	$email = $_REQUEST['email']; 
 	$anmerkung = $_REQUEST['anmerkung']; 
+	$zugangscode = uniqid(); 
 	
+	$person->staatsbuergerschaft = $staatsbuerger; 
+	$person->titelpost = $titel_post; 
+	$person->titelpre = $titel_pre; 
+	$person->nachname = $nachname; 
+	$person->vorname = $vorname; 
+	$person->gebdatum = $geb_datum; 
+	$person->anmerkungen = $anmerkung; 
+	$person->geschlecht = $geschlecht; 
+	$person->aktiv = true; 	
+	$person->zugangscode = $zugangscode; 
+	$person->new = true; 
+	
+	if(!$person->save())
+		die('Fehler beim Anlegen der Person aufgetreten.'); 
+	
+	$adresse->person_id = $person->person_id; 
+	$adresse->strasse = $strasse; 
+	$adresse->plz = $plz; 
+	$adresse->ort = $ort; 
+	$adresse->nation = $nation_code; 
+	$adresse->heimatadresse = true; 
+	$adresse->zustelladresse = true; 
+	$adresse->new = true; 
+
+	if(!$adresse->save())
+		die('Fehler beim Anlegen der Adresse aufgetreten.');  
+
+	
+	$kontakt->person_id = $person->person_id; 
+	$kontakt->kontakttyp = "email"; 
+	$kontakt->kontakt = $email; 
+	$kontakt->new = true; 
+	
+	if(!$kontakt->save())
+		die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+		 
+	$preincoming->person_id = $person->person_id; 
+	$preincoming->aktiv = true; 
+	$preincoming->bachelorthesis = false; 
+	$preincoming->masterthesis = false; 
+	$preincoming->uebernommen = false; 
+	$preincoming->new = true; 
+
+	if(!$preincoming->save())
+	{
+		echo $preincoming->errormsg; 
+		die('Fehler beim Anlegen des Preincoming aufgetreten.'); 
+	}
+		
+	echo sendMail($zugangscode, $email); 
 }
+
+function sendMail($zugangscode, $email)
+{
+	$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+	$emailtext.= "Sie wurden erfolgreich am System registriert<br>";
+	$emailtext.= "Mit Hilfe der UID:".$zugangscode." können Sie sich unter http://cis.technikum-wien.at/incoming anmelden."; 
+	
+	$mail = new mail($email, 'no-reply', 'Incoming-Registration', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+	$mail->setHTMLContent($emailtext); 
+	if(!$mail->send())
+		$msg= '<span class="error">Fehler beim Senden des Mails</span><br />';
+	else
+		$msg= " Mail verschickt an $email!<br>";
+	
+	return $msg; 
+}
+
 ?>
