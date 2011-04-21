@@ -640,6 +640,29 @@ class person extends basis_db
 		}
 		return true;
 	}
+	
+	/**
+	 * 
+	 * Überprüft den übergebenen Zugangscode, wenn in Datenbank return true
+	 * @param $zugangscode
+	 */
+	public function checkZugangscode($zugangscode)
+	{
+		$qry ="Select * from public.tbl_person where zugangscode=".$this->addslashes($zugangscode).";";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+				return true; 
+			else
+				return false; 
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+	}
 
 	
 }
