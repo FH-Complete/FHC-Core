@@ -221,8 +221,8 @@ if(isset($_REQUEST['submit']))
 function sendMail($zugangscode, $email)
 {
 	$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-	$emailtext.= "Sie wurden erfolgreich am System registriert<br>";
-	$emailtext.= "Mit Hilfe der UID:".$zugangscode." können Sie sich unter http://cis.technikum-wien.at/incoming anmelden."; 
+	$emailtext.= "Sie wurden erfolgreich am System registriert.<br><br>";
+	$emailtext.= "Mit Hilfe der UID: ".$zugangscode." können Sie sich unter <a>http://cis.technikum-wien.at/incoming</a> anmelden und Ihre Daten bearbeiten."; 
 	
 	$mail = new mail($email, 'no-reply', 'Incoming-Registration', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($emailtext); 
