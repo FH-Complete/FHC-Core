@@ -87,7 +87,7 @@ class person extends basis_db
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung
+				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode
 				FROM public.tbl_person WHERE person_id='$person_id'";
 
 			if(!$this->db_query($qry))
@@ -126,6 +126,7 @@ class person extends basis_db
 				$this->staatsbuergerschaft = $row->staatsbuergerschaft;
 				$this->geburtsnation = $row->geburtsnation;
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
+				$this->zugangscode = $row->zugangscode;
 			}
 			else
 			{
