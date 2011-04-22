@@ -30,6 +30,8 @@ require_once('../../include/nation.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/mobilitaetsprogramm.class.php');
 require_once('../../include/zweck.class.php');
+require_once('../../include/akte.class.php');
+require_once('../../include/lehrveranstaltung.class.php');
 
 $user = get_uid();
 
@@ -198,6 +200,15 @@ if($method!='')
 			break;
 		case 'fasuebernahme':
 			//Uebernahme eines PreIncoming ins FAS
+			
+			// Prestudent
+			// Benutzer
+			// Student
+			// PrestudentStatus
+			// Studentlehrverband
+			// Gruppe und Zuordnung
+			// LVs Zuordnen
+			// Uebernommen Boolean setzen 
 			$message.= 'Diese Funktion ist noch nicht implemenetiert';
 			break;
 		default:
@@ -413,6 +424,7 @@ function print_personendetails()
 	echo '</form>';
 	echo '</fieldset>';
 	echo '
+	<br>
 	<fieldset>
 		<legend>Übernahme ins FAS</legend>';
 	if($inc->uebernommen)
@@ -422,7 +434,7 @@ function print_personendetails()
 	else
 	{
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?action=personendetails&amp;method=fasuebernahme&amp;preincoming_id='.$preincoming_id.'" method="POST">';
-		echo '<SELECT name="studiengang_kz">';
+		echo 'Incoming für den Studiengang: <SELECT name="studiengang_kz">';
 		$stg = new studiengang();
 		$stg->getAll('typ, kurzbz');
 		
@@ -440,12 +452,97 @@ function print_personendetails()
 
 function print_dokumente()
 {
-	echo 'Dokumente';
+	global $person, $preincoming_id, $datum_obj;
+	
+	echo '<fieldset>';
+	$akte = new akte();
+	$akte->getAkten($person->person_id);
+	
+	echo '
+	Folgende Dokumente wurden hochgeladen:<br><br>
+	<script type="text/javascript">
+	$(document).ready(function() 
+		{ 
+		    $("#dokumente").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			}); 
+		} 
+	); 
+	</script>
+	<table class="tablesorter" id="dokumente">
+		<thead>
+			<tr>
+				<th>Datum</th>
+				<th>Name</th>
+				<th>Typ</th>
+			</tr>
+		</thead>
+		<tbody>
+		';
+	foreach($akte->result as $row)
+	{
+		echo '<tr>';
+		echo '<td>'.$datum_obj->formatDatum($row->erstelltam,'d.m.Y').'</td>';
+		echo '<td><a href="../../content/akte.php?id='.$row->akte_id.'">'.$row->titel.'</a></td>';
+		echo '<td>'.$row->dokument_kurzbz.'</td>';
+		echo '</tr>';
+		
+	}
+	echo '</tbody></table>';
+	echo '</fieldset>';
 }
 
 function print_lehrveranstaltungen()
 {
-	echo 'Lehrveranstaltungen';
+	global $person, $inc, $preincoming_id, $datum_obj;
+	
+	echo '<fieldset>
+	Die Person hat sich zu folgenden LVs angemeldet:<br><br>';
+	$ids = $inc->getLehrveranstaltungen($preincoming_id);
+	
+	$stg = new studiengang();
+	$stg->getAll();
+		
+	$lv = new lehrveranstaltung();
+	$lv->loadArray($ids);
+				
+	echo '
+	<script type="text/javascript">
+	$(document).ready(function() 
+		{ 
+		    $("#lehrveranstaltungen").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			}); 
+		} 
+	); 
+	</script>
+	<table class="tablesorter" id="lehrveranstaltungen">
+		<thead>
+			<tr>
+				<th>Bezeichnung</th>
+				<th>Studiengang</th>
+				<th>Semester</th>
+			</tr>
+		</thead>
+		<tbody>';
+	foreach($lv->lehrveranstaltungen as $row)
+	{
+		echo '<tr>';
+		echo '<td>'.$row->bezeichnung.'</td>';
+		echo '<td>'.$stg->kuerzel_arr[$row->studiengang_kz].'</td>';
+		echo '<td>'.$row->semester.'. Semester</td>';
+		echo '</tr>';
+	}
+	if($inc->bachelorthesis)
+		echo '<tr><td>Bachelor Thesis</td></tr>';
+	if($inc->masterthesis)
+		echo '<tr><td>Master Thesis</td></tr>';
+	echo '</tbody></table>';
+	echo '</fieldset>';
 }
 
 ?>

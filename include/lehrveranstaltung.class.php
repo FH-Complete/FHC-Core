@@ -817,5 +817,66 @@ class lehrveranstaltung extends basis_db
 		}
 		return true;
 	}
+	
+	/**
+	 * Laedt die LVs die als Array uebergeben werden
+	 * @param $ids Array mit den LV ids
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadArray($ids)
+	{
+		if(count($ids)==0)
+			return true;
+		
+		$ids = "'".implode("','",$ids)."'";
+						
+		$qry = 'SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id in('.$ids.')';
+		$qry .=" ORDER BY bezeichnung";
+
+		if(!$result = $this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		} 
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$lv_obj = new lehrveranstaltung();
+
+			$lv_obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+			$lv_obj->studiengang_kz=$row->studiengang_kz;
+			$lv_obj->bezeichnung=$row->bezeichnung;
+			$lv_obj->kurzbz=$row->kurzbz;
+			$lv_obj->lehrform_kurzbz=$row->lehrform_kurzbz;
+			$lv_obj->semester=$row->semester;
+			$lv_obj->ects=$row->ects;
+			$lv_obj->semesterstunden=$row->semesterstunden;
+			$lv_obj->anmerkung=$row->anmerkung;
+			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
+			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->ext_id=$row->ext_id;
+			$lv_obj->insertamum=$row->insertamum;
+			$lv_obj->insertvon=$row->insertvon;
+			$lv_obj->planfaktor=$row->planfaktor;
+			$lv_obj->planlektoren=$row->planlektoren;
+			$lv_obj->planpersonalkosten=$row->planpersonalkosten;
+			$lv_obj->plankostenprolektor=$row->plankostenprolektor;
+			$lv_obj->updateamum=$row->updateamum;
+			$lv_obj->updatevon=$row->updatevon;
+			$lv_obj->sprache=$row->sprache;
+			$lv_obj->sort=$row->sort;
+			$lv_obj->incoming=$row->incoming;
+			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
+			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->koordinator=$row->koordinator;
+			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
+			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
+
+			$this->lehrveranstaltungen[] = $lv_obj;
+		}
+
+		return true;
+	}
 }
 ?>
