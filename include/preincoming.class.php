@@ -426,5 +426,82 @@ class preincoming extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt die PreIncoming anhand von Suchkriterien
+	 * 
+	 * @param $filter
+	 * @param $aktiv
+	 * @param $von
+	 * @param $bis
+	 * @param $uebernommen
+	 * @return boolean
+	 */
+	public function getPreincoming($filter, $aktiv=true, $von=null, $bis=null, $uebernommen=false)
+	{
+		$qry = "SELECT 
+					titelpre, titelpost, vorname, nachname, tbl_preincoming.*
+				FROM 
+					public.tbl_person 
+					JOIN public.tbl_preincoming USING(person_id)
+				WHERE
+					1=1";
+		
+		if($filter!='')
+		{
+			$qry.=" AND (lower(nachname) like lower('%".addslashes($filter)."%') 
+						OR lower(vorname) like lower('%".addslashes($filter)."%')
+						OR lower(nachname || ' ' || vorname) like lower('%".addslashes($filter)."%')
+						OR lower(vorname || ' ' || nachname) like lower('%".addslashes($filter)."%'))";
+		}
+		
+		if(!is_null($aktiv))
+			$qry.=" AND tbl_preincoming.aktiv=".($aktiv?'true':'false');
+		if(!is_null($uebernommen))
+			$qry.=" AND tbl_preincoming.uebernommen=".($uebernommen?'true':'false');
+		if($von!='')
+			$qry.=" AND tbl_preincoming.von>='".addslashes($von)."'";
+		if($bis!='')
+			$qry.=" AND tbl_preincoming.bis<='".addslashes($bis)."'";
+			
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new preincoming();
+				
+				$obj->preincoming_id = $row->preincoming_id;
+				$obj->person_id = $row->person_id;
+				$obj->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code;
+				$obj->zweck_code = $row->zweck_code;
+				$obj->firma_id = $row->firma_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->universitaet = $row->universitaet;
+				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->bachelorthesis = ($row->bachelorthesis=='t'?true:false);
+				$obj->masterthesis = ($row->masterthesis=='t'?true:false);
+				$obj->von = $row->von;
+				$obj->bis = $row->bis;
+				$obj->uebernommen = ($row->uebernommen=='t'?true:false);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
