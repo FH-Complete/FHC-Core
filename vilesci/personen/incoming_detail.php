@@ -32,11 +32,18 @@ require_once('../../include/mobilitaetsprogramm.class.php');
 require_once('../../include/zweck.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/prestudent.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/lehrverband.class.php');
+require_once('../../include/bisio.class.php');
+require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
 $user = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+$db = new basis_db();
 
 $datum_obj = new datum();
 $message='';
@@ -199,17 +206,228 @@ if($method!='')
 				$message.='<span class="ok">Daten wurden gespeichert</span>';
 			break;
 		case 'fasuebernahme':
-			//Uebernahme eines PreIncoming ins FAS
+			/* Uebernahme eines PreIncoming ins FAS 
+			 * - Prestudent anlegen
+			 * - Prestudent Status anlegen
+			 * - Benutzer anlegen
+			 * - Student anlegen
+			 * - Lehrverbandsgruppe anlegen und zuordnen
+			 * - Mobilitaetsprogramm
+			 * - Uebernommen Boolean setzen
+			 * 
+			 * 
+			 * Offene Punkte:
+			 * - Automatische Zuteilung zu den LVs
+			 * - E-Mail benachrichtigung an Assistenz
+			 */ 
+			$error=false;
+			$errormsg='';
 			
-			// Prestudent
-			// Benutzer
-			// Student
-			// PrestudentStatus
-			// Studentlehrverband
-			// Gruppe und Zuordnung
-			// LVs Zuordnen
-			// Uebernommen Boolean setzen 
-			$message.= 'Diese Funktion ist noch nicht implemenetiert';
+			$inc = new preincoming();
+			if($inc->load($preincoming_id))
+			{
+				$person = new person();
+				if($person->load($inc->person_id))
+				{
+					
+					//TODO:
+					$studiensemester_kurzbz = getStudiensemesterFromDatum($inc->von);
+					$ausbildungssemester=1;
+					$orgform_kurzbz='';
+					$studiengang_kz=$_POST['studiengang_kz'];
+					
+					// Prestudent
+					$prestudent = new prestudent();
+					$prestudent->person_id = $inc->person_id;
+					$prestudent->new = true;
+					$prestudent->aufmerksamdurch_kurzbz = 'k.A.';
+					$prestudent->studiengang_kz = $studiengang_kz;
+					$prestudent->reihungstestangetreten = false;
+					$prestudent->bismelden = true;
+					
+					if(!$prestudent->save())
+					{
+						$error=true;
+						$errormsg = $prestudent->errormsg;
+					}
+							
+					if(!$error)
+					{
+						//Prestudent Rolle Anlegen			
+						$rolle = new prestudent();
+				
+						$rolle->prestudent_id = $prestudent->prestudent_id;
+						$rolle->status_kurzbz = 'Incoming';
+						$rolle->studiensemester_kurzbz = $studiensemester_kurzbz;
+						$rolle->ausbildungssemester = $ausbildungssemester;
+						$rolle->orgform_kurzbz = $orgform_kurzbz;
+						$rolle->datum = date('Y-m-d');
+						$rolle->insertamum = date('Y-m-d H:i:s');
+						$rolle->insertvon = $user;
+				
+						$rolle->new = true;
+				
+						if(!$rolle->save_rolle())
+						{
+							$error = true;
+							$errormsg = $rolle->errormsg;
+						}
+						else
+							$error = false;
+					}
+				
+					if(!$error)
+					{
+						//Matrikelnummer und UID generieren
+						$matrikelnr = generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz);
+								
+						$jahr = mb_substr($matrikelnr,0, 2);
+						$stg = mb_substr($matrikelnr, 3, 4);
+						
+						$stg_obj = new studiengang();
+						$stg_obj->load(ltrim($stg,'0'));
+						
+						$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
+										
+						//Benutzerdatensatz anlegen
+						$benutzer = new benutzer();
+						$benutzer->uid = $uid;
+						$benutzer->person_id = $inc->person_id;
+						$benutzer->aktiv = true;
+						
+						$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
+						$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
+						$nachname_clean = str_replace(' ','_', $nachname_clean);
+						$vorname_clean = str_replace(' ','_', $vorname_clean);
+						
+						$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
+						$result_alias = $db->db_query($qry_alias);
+						if($db->db_num_rows($result_alias)==0)								
+							$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
+						else 
+							$benutzer->alias = '';
+													
+						$benutzer->insertamum = date('Y-m-d H:i:s');
+						$benutzer->insertvon = $user;
+										
+						if($benutzer->save(true, false))
+						{
+							//Studentendatensatz anlegen
+							$student = new student();
+							$student->uid = $uid;
+							$student->matrikelnr = $matrikelnr;
+							$student->prestudent_id = $prestudent->prestudent_id;
+							$student->studiengang_kz = $studiengang_kz;
+							$student->semester = '0';
+							$student->verband = 'I';
+							$student->gruppe = ' ';
+							$student->insertamum = date('Y-m-d H:i:s');
+							$student->insertvon = $user;
+				
+							$lvb = new lehrverband();
+							if(!$lvb->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
+							{
+								$lvb->studiengang_kz = $student->studiengang_kz;
+								$lvb->semester = $student->semester;
+								$lvb->verband = $student->verband;
+								$lvb->gruppe = $student->gruppe;
+								$lvb->bezeichnung = 'Incoming';
+								$lvb->aktiv = true;
+								
+								$lvb->save(true);
+							}
+							
+							if($student->save(true, false))
+							{
+								//StudentLehrverband anlegen
+								$studentlehrverband = new student();
+								$studentlehrverband->uid = $uid;
+								$studentlehrverband->studiensemester_kurzbz = $studiensemester_kurzbz;
+								$studentlehrverband->studiengang_kz = $studiengang_kz;
+								$studentlehrverband->semester = '0';
+								$studentlehrverband->verband = 'I';
+								$studentlehrverband->gruppe = ' ';
+								$studentlehrverband->insertamum = date('Y-m-d H:i:s');
+								$studentlehrverband->insertvon = $user;
+									
+								if(!$studentlehrverband->save_studentlehrverband(true))
+								{
+									$error = true;
+									$errormsg = 'StudentLehrverband konnte nicht angelegt werden';
+								}
+							}
+							else 
+							{
+								$error = true;
+								$errormsg = 'Student konnte nicht angelegt werden: '.$student->errormsg;
+							}
+						}
+						else 
+						{
+							$error = true;
+							$errormsg = 'Benutzer konnte nicht angelegt werden:'.$benutzer->errormsg;
+						}
+						
+						if(!$error)
+						{
+							
+							// I/O Datensatz wird nur erstellt, wenn die noetigen Daten vorhanden sind
+							if($inc->mobilitaetsprogramm_code!='' && $inc->zweck_code!='' 
+								&& $inc->von!='' && $inc->bis!='' )
+							{
+								$bisio = new bisio();
+								
+								$adresse = new adresse();
+								$adresse->load_pers($inc->person_id);
+								$nation_code='';
+								if(isset($adresse->result[0]))
+									$nation_code = $adresse->result[0]->nation;
+								if($nation_code=='')
+									$nation_code='A';
+								
+								$bisio->new = true;
+								$bisio->mobilitaetsprogramm_code = $inc->mobilitaetsprogramm_code;
+								$bisio->nation_code = $nation_code;
+								$bisio->von = $inc->von;
+								$bisio->bis = $inc->bis;
+								$bisio->zweck_code = $inc->zweck_code;
+								$bisio->student_uid = $uid;
+								$bisio->updateamum = date('Y-m-d H:i:s');
+								$bisio->updatevon = $user;
+								$bisio->insertamum = date('Y-m-d H:i:s');
+								$bisio->insertvon = $user;
+					
+								if(!$bisio->save())
+								{
+									$error=true;
+									$errormsg = 'Fehler beim Uebernehmen des IO Datensatzes';
+								}
+							}
+							
+							$inc->new=false;
+							$inc->uebernommen=true;
+							$inc->save();
+							
+						}
+					}
+					else
+					{
+						$error = true;
+						$errormsg = 'Person konnte nicht geladen werden:'.$person->errormsg;
+					}
+				}
+				
+				if(!$error)
+				{
+					$db->db_query('COMMIT');
+					$message.='<span class="ok">Uebernahme erfolgreich</span';
+				}
+				else
+				{
+					$db->db_query('ROLLBACK');
+					$message.='<span class="error">'.$errormsg.'</span>';
+				}
+			}
 			break;
 		default:
 			break;
@@ -429,7 +647,7 @@ function print_personendetails()
 		<legend>Übernahme ins FAS</legend>';
 	if($inc->uebernommen)
 	{
-		echo 'Diese Person wurde bereits ins FAS übernommen';
+		echo '<b>Diese Person wurde bereits ins FAS übernommen</b>';
 	}
 	else
 	{
@@ -544,5 +762,70 @@ function print_lehrveranstaltungen()
 	echo '</tbody></table>';
 	echo '</fieldset>';
 }
+
+
+// ****
+// * Generiert die Matrikelnummer
+// * FORMAT: 0710254001
+// * 07 = Jahr
+// * 1/2/0  = WS/SS/incoming
+// * 0254 = Studiengangskennzahl vierstellig
+// * 001 = Laufende Nummer
+// ****
+function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
+{ 
+	$db = new basis_db();
+	
+	$jahr = mb_substr($studiensemester_kurzbz, 4);	
+	$sem = mb_substr($studiensemester_kurzbz, 0, 2);
+	if($sem=='SS')
+		$jahr = $jahr-1;
+	$art =0;
+	
+	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+	
+	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
+	
+	if($db->db_query($qry))
+	{
+		if($row = $db->db_fetch_object())
+		{
+			$max = mb_substr($row->matrikelnr,7);
+		}
+		else 
+			$max = 0;
+		
+		$max += 1;
+		return $matrikelnummer.sprintf("%03d",$max);
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+function clean_string($string)
+ {
+ 	$trans = array("ä" => "ae",
+ 				   "Ä" => "Ae",
+ 				   "ö" => "oe",
+ 				   "Ö" => "Oe",
+ 				   "ü" => "ue",
+ 				   "Ü" => "Ue",
+ 				   "á" => "a",
+ 				   "à" => "a",
+ 				   "é" => "e",
+ 				   "è" => "e",
+ 				   "ó" => "o",
+ 				   "ò" => "o",
+ 				   "í" => "i",
+ 				   "ì" => "i",
+ 				   "ù" => "u",
+ 				   "ú" => "u",
+ 				   "ß" => "ss");
+	$string = strtr($string, $trans);
+    return ereg_replace("[^a-zA-Z0-9]", "", $string);
+    //[:space:]
+ }
 
 ?>

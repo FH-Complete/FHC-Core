@@ -32,6 +32,7 @@ require_once('../../include/kontakt.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/firma.class.php');
+require_once('../../include/preincoming.class.php');
 
 $user = get_uid();
 
@@ -112,7 +113,7 @@ $nation_arr['']='';
 foreach($nation->nation as $row)
 	$nation_arr[$row->code]=$row->kurztext;
 	
-$adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
+$adresstyp_arr = array(''=>'','h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
 
 // *** ADRESSEN ***
 echo "<h3>Adressen:</h3>";
@@ -218,6 +219,34 @@ if(count($preinteressent->result)>0)
 	echo '</tbody></table>';
 }
 
+//PreIncoming
+$preincoming = new preincoming();
+$preincoming->loadFromPerson($person->person_id);
+
+if(count($preincoming->result)>0)
+{
+	echo '<br><h2>Preincoming</h2>';
+	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>von</th>
+					<th>bis</th>
+				</tr>
+			</thead>
+			<tbody>';
+	foreach ($preincoming->result as $row)
+	{
+		echo '<tr>';
+		echo "<td>$row->preincoming_id</td>";
+		echo "<td>".$datum_obj->formatDatum($row->von, 'd.m.Y')."</td>";
+		echo "<td>".$datum_obj->formatDatum($row->bis, 'd.m.Y')."</td>";
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
+}
+
+//Prestudent
 $prestudent = new prestudent();
 $prestudent->getPrestudenten($person->person_id);
 if(count($prestudent->result)>0)
