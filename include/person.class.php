@@ -665,6 +665,62 @@ class person extends basis_db
 		}
 	}
 
+	/**
+	 * 
+	 * Lädt eine Person zum übergebenen Zugangscode
+	 * @param $zugangscode
+	 */
+	public function getPersonFromZugangscode($zugangscode)
+	{
+		$qry ="Select * from public.tbl_person where zugangscode=".$this->addslashes($zugangscode).";";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->person_id = $row->person_id;
+				$this->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$this->geburtsnation = $row->geburtsnation;
+				$this->sprache = $row->sprache;
+				$this->anrede = $row->anrede;
+				$this->titelpost = $row->titelpost;
+				$this->titelpre = $row->titelpre;
+				$this->nachname = $row->nachname;
+				$this->vorname = $row->vorname;
+				$this->vornamen = $row->vornamen;
+				$this->gebdatum = $row->gebdatum;
+				$this->gebort = $row->gebort;
+				$this->gebzeit = $row->gebzeit;
+				$this->foto = $row->foto;
+				$this->anmerkungen = $row->anmerkung;
+				$this->homepage = $row->homepage;
+				$this->svnr = $row->svnr;
+				$this->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$this->familienstand = $row->familienstand;
+				$this->geschlecht = $row->geschlecht;
+				$this->anzahlkinder = $row->anzahlkinder;
+				$this->aktiv = $row->aktiv;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				$this->kurzbeschreibung = $row->kurzbeschreibung;
+				$this->zugangscode = $row->zugangscode; 
+			}
+			else
+			{
+				$this->errormsg = 'Keine Person zu Zugangscode gefunden'; 
+				return false; 
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage.';
+			return false; 
+		}
+		return true; 
+	}
 	
 }
 ?>
