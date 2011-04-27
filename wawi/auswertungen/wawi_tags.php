@@ -96,9 +96,9 @@ if(isset($_POST['show']))
 				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<='$gj->ende' 
 				AND
 				(
-				EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
+				bestellung_id in (SELECT bestellung_id FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
 				OR
-				EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag WHERE bestelldetail_id=tbl_bestelldetail.bestelldetail_id)
+				bestelldetail_id in (SELECT bestelldetail_id FROM wawi.tbl_bestelldetailtag WHERE bestelldetail_id=tbl_bestelldetail.bestelldetail_id)
 				) 
 				AND kostenstelle_id IN($kstIN)
 			";
@@ -149,7 +149,7 @@ if(isset($_POST['show']))
 				JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
 			WHERE
 				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
-				AND EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
+				AND bestellung_id in (SELECT bestellung_id FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
 				AND kostenstelle_id IN ($kstIN)
 			";
 	
