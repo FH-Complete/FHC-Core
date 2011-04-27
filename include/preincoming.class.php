@@ -322,7 +322,7 @@ class preincoming extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_preincoming_lehrveranstaltung WHERE preincoming_id='".addslashes($preincoming_id)."'";
+		$qry = "SELECT * FROM public.tbl_preincoming_lehrveranstaltung WHERE preincoming_id='".addslashes($preincoming_id)."';";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -385,7 +385,7 @@ class preincoming extends basis_db
 		$qry = "SELECT 1 FROM public.tbl_preincoming_lehrveranstaltung 
 				WHERE 
 					preincoming_id='".addslashes($preincoming_id)."' 
-					AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+					AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."';";
 
 		if($result = $this->db_query($qry))
 		{
