@@ -35,6 +35,7 @@ require_once '../../../include/studiensemester.class.php';
 require_once '../../../include/studiengang.class.php';
 require_once '../../../include/lehrveranstaltung.class.php';
 require_once '../../../include/zweck.class.php';
+require_once '../../../include/studiengang.class.php';
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
@@ -99,7 +100,7 @@ $stg->getAll();
 			</tr>
 		</table>
 <?php 
-if($method =="austauschprogramm")
+if($method =="austauschprogram")
 {
 	$zweck = new zweck(); 
 	$zweck->getAll(); 	
@@ -116,13 +117,13 @@ if($method =="austauschprogramm")
 		if(!$preincoming->result[0]->save())
 			echo $preincoming->errormsg; 
 		else 
-			echo "Erfolgreich gespeichert."; 
+			echo $p->t('global/erfolgreichgespeichert');  
 	}	
 	// Ausgabe Austauschprogram Formular
-	echo '	<form method="POST" action="incoming.php?method=austauschprogramm">
+	echo '	<form method="POST" action="incoming.php?method=austauschprogram" name="AustauschForm">
 				<table width="30%" border="1" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:10%;">
 					<tr>
-						<td>Austauschprogramm auswählen </td>
+						<td>'.$p->t('incoming/austauschprgramwählen').'</td>
 						<td><SELECT name="austausch_kz"> 
 						<option value="austausch_auswahl">-- select --</option>';
 						foreach ($mobility->result as $mob)
@@ -132,22 +133,22 @@ if($method =="austauschprogramm")
 								$selected = "selected"; 
 							echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
 						}		
-		echo '			</td>
+	echo '				</td>
 					</tr>
 					<tr>
-						<td>Universität </td>
+						<td>'.$p->t('global/universität').' </td>
 						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->result[0]->universitaet.'"></td>
 					</tr>
 					<tr>
-						<td>von </td>
-						<td><input type="text" name="von" size="10"  value="'.$preincoming->result[0]->von.'"> yyyy-mm-dd</td>
+						<td>'.$p->t('global/von').' </td>
+						<td><input type="text" name="von" size="10"  value="'.$preincoming->result[0]->von.'"> (yyyy-mm-dd)</td>
 					</tr>
 					<tr>
-						<td>bis </td>
-						<td><input type="text" name="bis" size="10"  value="'.$preincoming->result[0]->bis.'"> yyyy-mm-dd</td>
+						<td>'.$p->t('global/bis').' </td>
+						<td><input type="text" name="bis" size="10"  value="'.$preincoming->result[0]->bis.'"> (yyyy-mm-dd)</td>
 					</tr>
 					<tr>
-						<td>Zweck </td>
+						<td>'.$p->t('global/zweck').' </td>
 						<td><SELECT name="zweck">
 						<option value="zweck_auswahl">-- select --</option>';
 						foreach ($zweck->result as $zwe)
@@ -159,10 +160,32 @@ if($method =="austauschprogramm")
 						}
 		echo '			</td>	
 					<tr>
-						<td colspan="2"><input type="submit" name="submit_program" value="submit"></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="2" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkAustausch()"></td>
 					</tr>
 				</table>
-			</form>'; 
+			</form>
+		
+		<script type="text/javascript">
+		function checkAustausch()
+		{
+			if(document.AustauschForm.austausch_kz.options[0].selected == true) 
+			{
+				alert("Kein Austauschprogram ausgewählt.");
+				return false; 
+			}
+			if(document.AustauschForm.zweck.options[0].selected == true)
+			{
+				alert("Keinen Zweck ausgewählt"); 
+				return false; 
+			}
+			return true; 
+		}
+		</script>';
+		
 }
 
 else if($method=="lehrveranstaltungen")
@@ -176,9 +199,9 @@ else if($method=="lehrveranstaltungen")
 			$preincoming->loadFromPerson($person->person_id); 
 			
 			if($preincoming->addLehrveranstaltung($preincoming->result[0]->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
-				echo "Erfolgreich gespeichert"; 
+				echo $p->t('global/erfolgreichgespeichert');  
 			else
-				echo "Fehler beim Speichern aufgetreten"; 
+				echo $p->t('global/fehleraufgetreten');  
 		}
 		// löschen der LV-ID
 		if($_GET['mode'] == "delete")
@@ -188,9 +211,9 @@ else if($method=="lehrveranstaltungen")
 			$preincoming->loadFromPerson($person->person_id); 
 			
 			if($preincoming->deleteLehrveranstaltung($preincoming->result[0]->preincoming_id, $_GET['id']))
-				echo "Erfolgreich gelöscht"; 
+				echo $p->t('global/erfolgreichgelöscht'); 
 			else
-				echo "Fehler beim Löschen aufgetreten"; 
+				echo $p->t('global/fehleraufgetreten');  
 		}
 	}
 	
@@ -204,8 +227,8 @@ else if($method=="lehrveranstaltungen")
 			echo '<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
-					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">Übersicht aller LVs</a></td>
-					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen&view=own">Eigene LVs</a></td>
+					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/übersichtlehrveranstaltungen').'</a></td>
+					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen&view=own">'.$p->t('incoming/eigenelehrveranstaltungen').'</a></td>
 					<td width="25%"></td>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
@@ -215,11 +238,11 @@ else if($method=="lehrveranstaltungen")
 				<tr class="liste">
 					<th></th>
 					<th class="table-sortable:numeric">ID</th>
-					<th class="table-sortable:default">Studiengang</th>
-					<th class="table-sortable:numeric">Semester</th>
-					<th class="table-sortable:default">Lehrveranstaltung</th>
-					<th class="table-sortable:default">Lehrveranstaltung Englisch</th>
-					<th>LV-Info</th>
+					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
+					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
+					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
+					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
+					<th>Info</th>
 				</tr>
 				</thead>
 				<tbody>';
@@ -227,19 +250,18 @@ else if($method=="lehrveranstaltungen")
 			{
 				$lehrveranstaltung = new lehrveranstaltung(); 
 				$lehrveranstaltung->load($lv); 
+				$studiengang = new studiengang(); 
+				$studiengang->load($lehrveranstaltung->studiengang_kz);
 				echo '<tr>';
-				echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&id='.$lv.'&view=own">delete</a></td>';
+				echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&id='.$lv.'&view=own">'.$p->t('global/löschen').'</a></td>';
 				echo '<td>',$lv,'</td>';
-				echo '<td>',$lehrveranstaltung->studiengang_kz,'</td>';
+				echo '<td>',$studiengang->kurzbzlang,'</td>';
 				echo '<td>',$lehrveranstaltung->semester,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung_english,'</td>';
-
-				echo '<td>
-					 </td>';
+				echo '<td></td>';
 				echo '</tr>';
 			}
-			
 		}
 	}
 	// Übersicht aller LVs
@@ -249,8 +271,8 @@ else if($method=="lehrveranstaltungen")
 		echo '<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
-					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">Übersicht aller LVs</a></td>
-					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen&view=own">Eigene LVs</a></td>
+					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/übersichtlehrveranstaltungen').'</a></td>
+					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen&view=own">'.$p->t('incoming/eigenelehrveranstaltungen').'</a></td>
 					<td width="25%"></td>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
@@ -304,17 +326,16 @@ else if($method=="lehrveranstaltungen")
 					";
 	
 		echo '	<form action="incoming.php?method=lehrveranstaltungen" method="POST">
-				<table width="90%" border="0" align="center" class="table-autosort:2 table-stripeclass:alternate table-autostripe">
-				<thead>
+				<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
+				<thead align="center">
 				<tr class="liste">
-					<th></th>
-					<th class="table-sortable:numeric">ID</th>
-					<th class="table-sortable:default">Studiengang</th>
-					<th class="table-sortable:numeric">Semester</th>
-					<th class="table-sortable:default">Lehrveranstaltung</th>
-					<th class="table-sortable:default">Lehrveranstaltung Englisch</th>
-					<th>LV-Info</th>
-					<th class="table-sortable:numeric">Freie Pl&auml;tze</th>
+					<th width="6%"></th>
+					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
+					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
+					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
+					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
+					<th>Info</th>
+					<th class="table-sortable:numeric">'.$p->t('incoming/freieplätze').'</th>
 				</tr>
 				</thead>
 				<tbody>';
@@ -323,25 +344,24 @@ else if($method=="lehrveranstaltungen")
 			while($row = $db->db_fetch_object($result))
 			{
 				$freieplaetze = $row->incoming - $row->anzahl;
-				if($freieplaetze<0)
-					$freieplaetze=0;
-				
-				echo '<tr>';
-				if(!$preincoming->checkLehrveranstaltung($preincoming->result[0]->preincoming_id, $row->lehrveranstaltung_id))
-					echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">add</a></td>';
-				else
-					echo '<td>added </td>';
-				echo '<td>',$row->lehrveranstaltung_id,'</td>';
-				echo '<td>',$stg->kuerzel_arr[$row->studiengang_kz],'</td>';
-				echo '<td>',$row->semester,'</td>';
-				echo '<td>',$row->bezeichnung,'</td>';
-				echo '<td>',$row->bezeichnung_english,'</td>';
-				echo '<td>
-						<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
-						<a href="#Englisch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
-					  </td>';
-				echo '<td>',$freieplaetze,'</td>';
-				echo '</tr>';
+				if($freieplaetze>0)
+				{
+					echo '<tr>';
+					if(!$preincoming->checkLehrveranstaltung($preincoming->result[0]->preincoming_id, $row->lehrveranstaltung_id))
+						echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">'.$p->t('global/anmelden').'</a></td>';
+					else
+						echo '<td>'.$p->t('global/angemeldet').'</td>';
+					echo '<td>',$stg->kuerzel_arr[$row->studiengang_kz],'</td>';
+					echo '<td>',$row->semester,'</td>';
+					echo '<td>',$row->bezeichnung,'</td>';
+					echo '<td>',$row->bezeichnung_english,'</td>';
+					echo '<td>
+							<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
+							<a href="#Englisch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
+						  </td>';
+					echo '<td>',$freieplaetze,'</td>';
+					echo '</tr>';
+				}
 			}
 		}
 		
@@ -395,17 +415,17 @@ else if ($method == "profil")
 				$kontakt->new = false; 
 				if(!$kon->save())
 				{
-					echo 'Fehler beim Anlegen des Kontaktes aufgetreten';
+					echo $p->t('global/fehleraufgetreten'); 
 					$save = false; 
 				}
 			}
 		}
 		if($save)
-			echo "Erfolgreich gespeichert"; 
+			echo $p->t('global/erfolgreichgespeichert');   
 	}
 	// Ausgabe Profil Formular
-	echo'<form action="incoming.php?method=profil" method="POST">
-		<table border = "1" align="center" style="margin-top:10%;">
+	echo'<form action="incoming.php?method=profil" method="POST" name="ProfilForm">
+		<table border = "1" align="center" style="margin-top:5%;">
 			<tr>
 				<td>'.$p->t('global/titel').' Post</td>
 				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
@@ -424,7 +444,7 @@ else if ($method == "profil")
 			</tr>
 			<tr>
 				<td>'.$p->t('global/geburtsdatum').'</td>
-				<td><input type="text" size="20" name="geb_datum" value="'.$person->gebdatum.'" onfocus="this.value="""; ></td>
+				<td><input type="text" size="20" name="geb_datum" value="'.$person->gebdatum.'" onfocus="this.value="""; > (yyyy-mm-dd)</td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/staatsbuergerschaft').'</td>
@@ -498,11 +518,35 @@ else if ($method == "profil")
 				<td><textarea name="anmerkung" cols="31" rows="5">'.$person->anmerkungen.'</textarea></td>
 			</tr>	
 			<tr>
-				<td colspan="2" align = "center"><input type="submit" name="submit_profil" value="Submit"></td>		
-			</tr>';
-	echo '	<tr><td><input type="hidden" name="zugangscode" value='.uniqid().'></td></tr>	
+				<td colspan="2" align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>		
+			</tr>
 		</table>
 	</form>';
+	
+	
+	echo '
+		<script type="text/javascript">
+		function checkProfil()
+		{
+			if(document.ProfilForm.staatsbuerger.options[0].selected == true) 
+			{
+				alert("Keine Staatsbürgerschaft ausgewählt.");
+				return false; 
+			}
+			
+			if(document.ProfilForm.nation.options[0].selected == true) 
+			{
+				alert("Keine Nation ausgewählt.");
+				return false; 
+			}
+			if(document.ProfilForm.nachname.value == "")
+			{
+				alert("Keinen Nachnamen angegeben."); 
+				return false; 
+			}
+			return true; 
+		}
+		</script>';
 }
 
 // Ausgabe Menü
@@ -511,16 +555,16 @@ else
 	echo "<br><br><br><br>"; 
 	echo "<table align ='center' width ='50%' border='2'>";
 	echo "		<tr>
-					<td><a href ='incoming.php?method=austauschprogramm '>Austauschprogramm</a></td><td></td>"; 	
+					<td><a href ='incoming.php?method=austauschprogram '>".$p->t('incoming/austauschprogram')."</a></td><td></td>"; 	
 	echo '		</tr>
 				<tr>	
-					<td><a href="incoming.php?method=profil">Persönliche Daten ändern</a></td>
+					<td><a href="incoming.php?method=profil">'.$p->t('incoming/persönlichedateneditieren').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="incoming.php?method=lehrveranstaltungen">Lehrveranstaltungen auswählen</a></td>
+					<td><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="incoming.php">Learning Agreement erstellen</a></td>
+					<td><a href="incoming.php">'.$p->t('incoming/learningagreementerstellen').'</a></td>
 				</tr>
 				<tr>
 					<td><a href="incoming.php">'.$p->t("incoming/uploadvondateien").'</a></td>
