@@ -386,6 +386,7 @@ class preincoming extends basis_db
 				WHERE 
 					preincoming_id='".addslashes($preincoming_id)."' 
 					AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)
@@ -407,12 +408,12 @@ class preincoming extends basis_db
 	 * @param $insertamum
 	 * @param $insertvon
 	 */
-	public function addLehrveranstaltung($preincoming_id, $lehrveranstaltung_id, $insertamum, $insertvon)
+	public function addLehrveranstaltung($preincoming_id, $lehrveranstaltung_id, $insertamum, $insertvon = "")
 	{
 		$qry = "INSERT INTO public.tbl_preincoming_lehrveranstaltung(lehrveranstaltung_id, 
 					preincoming_id, insertamum, insertvon) VALUES(".
-				$this->addslashes($preincoming_id).','.
 				$this->addslashes($lehrveranstaltung_id).','.
+				$this->addslashes($preincoming_id).','.
 				$this->addslashes($insertamum).','.
 				$this->addslashes($insertvon).');';
 				
