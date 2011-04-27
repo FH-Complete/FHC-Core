@@ -30,7 +30,6 @@ require_once '../../../include/kontakt.class.php';
 require_once '../../../include/preincoming.class.php'; 
 require_once '../../../include/mail.class.php';
 
-header('content-type: text/html; charset=utf-8');
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
@@ -48,6 +47,9 @@ $p=new phrasen($sprache);
 <html>
 	<head>
 		<title>Incoming-Registration</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+		<link href="../../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
 	</head>
 	<body bgcolor="F2F2F2">
 	
