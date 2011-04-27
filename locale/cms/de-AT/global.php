@@ -1,10 +1,10 @@
 <?php
-$this->phrasen['global/Studiengang']='Studiengang';
-$this->phrasen['global/Institut']='Institut';
-$this->phrasen['global/Semester']='Semester';
-$this->phrasen['global/Studienzentrum']='Studienzentrum';
-$this->phrasen['global/Studiengangsleitung']='Studiengangsleitung';
-$this->phrasen['global/Lehrveranstaltung']='Lehrveranstaltung';
+$this->phrasen['global/studiengang']='Studiengang';
+$this->phrasen['global/institut']='Institut';
+$this->phrasen['global/semester']='Semester';
+$this->phrasen['global/studienzentrum']='Studienzentrum';
+$this->phrasen['global/studiengangsleitung']='Studiengangsleitung';
+$this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung';
 
 $this->phrasen['global/speichern']='Speichern';
 $this->phrasen['global/loeschen']='Löschen';
@@ -25,4 +25,17 @@ $this->phrasen['global/mann']='Mann';
 $this->phrasen['global/frau']='Frau';
 $this->phrasen['global/staatsbuergerschaft']='Staatsbürgerschaft';
 $this->phrasen['global/geburtsdatum']='Geburtsdatum';
+$this->phrasen['global/universität']='Universität';
+
+$this->phrasen['global/von']='Von';
+$this->phrasen['global/bis']='Bis';
+$this->phrasen['global/zweck']='Zweck'; 
+$this->phrasen['global/abschicken']='Abschicken'; 
+
+$this->phrasen['global/anmelden']='Anmelden'; 
+$this->phrasen['global/angemeldet']='Angemeldet'; 
+$this->phrasen['global/löschen']='Löschen'; 
+
+$this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert'; 
+$this->phrasen['global/erfolgreichgelöscht']='Erfolgreich gelöscht'; 
 ?>

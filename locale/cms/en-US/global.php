@@ -1,10 +1,10 @@
 <?php
-$this->phrasen['global/Studiengang']='Degree-Programme';
-$this->phrasen['global/Institut']='Institute';
-$this->phrasen['global/Semester']='Semester';
-$this->phrasen['global/Studienzentrum']='Study Center';
-$this->phrasen['global/Studiengangsleitung']='Head of Department';
-$this->phrasen['global/Lehrveranstaltung']='Subject';
+$this->phrasen['global/studiengang']='Degree-Program';
+$this->phrasen['global/institut']='Institute';
+$this->phrasen['global/semester']='Semester';
+$this->phrasen['global/studienzentrum']='Study Center';
+$this->phrasen['global/studiengangsleitung']='Head of Department';
+$this->phrasen['global/lehrveranstaltung']='Subject';
 
 $this->phrasen['global/speichern']='Save';
 $this->phrasen['global/loeschen']='Delete';
@@ -25,4 +25,17 @@ $this->phrasen['global/mann']='Male';
 $this->phrasen['global/frau']='Female';
 $this->phrasen['global/staatsbuergerschaft']='Citizenship';
 $this->phrasen['global/geburtsdatum']='Date of Birth';
+$this->phrasen['global/universität']='University';
+
+$this->phrasen['global/von']='From';
+$this->phrasen['global/bis']='To';
+$this->phrasen['global/zweck']='Purpose'; 
+$this->phrasen['global/abschicken']='Submit'; 
+
+$this->phrasen['global/anmelden']='Register'; 
+$this->phrasen['global/angemeldet']='Registered'; 
+$this->phrasen['global/löschen']='Delete'; 
+
+$this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 
+$this->phrasen['global/erfolgreichgelöscht']='Successfully deleted'; 
 ?>
