@@ -56,6 +56,8 @@ if (isset($_POST['userid']))
 	<head>
 		<title>Inoming-Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+		<link href="../../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
 	<table width="100%" border="0">
