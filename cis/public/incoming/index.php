@@ -89,7 +89,7 @@ if (isset($_POST['userid']))
 				<td align="center"><input type="text" size="30" value="UserID" name ="userid" onfocus="this.value='';"></td>
 			</tr>
 			<tr>
-				<td align="center"><input type="password" size="30" value="UserID" onfocus="this.value='';"></td>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
 				<td align="center"><input type="submit" value="Login" name="submit"></td>

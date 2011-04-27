@@ -34,8 +34,6 @@ require_once '../../../include/mail.class.php';
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 
-
-
 $nation = new nation(); 
 $nation->getAll($ohnesperre = true); 
 
@@ -43,7 +41,6 @@ $sprache = getSprache();
 $p=new phrasen($sprache); 
 
 ?>
-
 <html>
 	<head>
 		<title>Incoming-Registration</title>
@@ -63,8 +60,8 @@ $p=new phrasen($sprache);
 			</tr>
 		</table>
 		
-		<form action="registration.php" method="POST">
-		<table border = "0" style="margin-left:40%; margin-top:10%;">
+		<form action="registration.php" method="POST" name="RegistrationForm">
+		<table border = "0" style="margin-left:40%; margin-top:5%;">
 			<tr>
 				<td><?php echo $p->t('global/titel');?> Post</td>
 				<td><input type="text" size="20" maxlength="32" name="titel_post"></td>
@@ -83,7 +80,7 @@ $p=new phrasen($sprache);
 			</tr>
 			<tr>
 				<td><?php echo $p->t('global/geburtsdatum');?></td>
-				<td><input type="text" size="20" name="geb_datum" value="yyyy-mm-dd" onfocus="this.value=''"; ></td>
+				<td><input type="text" size="20" name="geb_datum" value="" onfocus="this.value=''"; > (yyyy-mm-dd)</td>
 			</tr>
 			<tr>
 				<td><?php echo $p->t('global/staatsbuergerschaft');?></td>
@@ -137,14 +134,40 @@ $p=new phrasen($sprache);
 				<td><textarea name="anmerkung" cols="31" rows="5"></textarea></td>
 			</tr>	
 			<tr>
-				<td colspan="2" align = "center"><input type="submit" name="submit" value="Registration"></td>		
+				<td colspan="2" align = "center"><input type="submit" name="submit" value="Registration" onclick="return checkRegistration()"></td>		
 			</tr>
 			<tr><td><input type="hidden" name="zugangscode" value='<?php echo uniqid();?>'></td></tr>	
 		</table>
 	</form>
+	<script type="text/javascript">
+		function checkRegistration()
+		{
+			if(document.RegistrationForm.nachname.value == "")
+			{
+				alert("Kein Nachname angegeben.");
+				return false; 
+			}
+			if(document.RegistrationForm.staatsbuerger.options[0].selected == true) 
+			{
+				alert("Keine Staatsbürgerschaft ausgewählt.");
+				return false; 
+			}
+			
+			if(document.RegistrationForm.nation.options[0].selected == true) 
+			{
+				alert("Keine Nation ausgewählt.");
+				return false; 
+			}
+			if(document.RegistrationForm.email.value == "")
+			{
+				alert("Keine E-Mail Adresse angegeben.");
+				return false; 
+			}
+			return true; 
+		}
+		</script>
 	</body>
 </html>
-
 <?php 
 if(isset($_REQUEST['submit']))
 {	
@@ -195,7 +218,6 @@ if(isset($_REQUEST['submit']))
 	if(!$adresse->save())
 		die('Fehler beim Anlegen der Adresse aufgetreten.');  
 
-	
 	$kontakt->person_id = $person->person_id; 
 	$kontakt->kontakttyp = "email"; 
 	$kontakt->kontakt = $email; 
@@ -203,7 +225,7 @@ if(isset($_REQUEST['submit']))
 	
 	if(!$kontakt->save())
 		die('Fehler beim Anlegen des Kontaktes aufgetreten.');
-		 
+
 	$preincoming->person_id = $person->person_id; 
 	$preincoming->aktiv = true; 
 	$preincoming->bachelorthesis = false; 
@@ -215,8 +237,7 @@ if(isset($_REQUEST['submit']))
 	{
 		echo $preincoming->errormsg; 
 		die('Fehler beim Anlegen des Preincoming aufgetreten.'); 
-	}
-		
+	}		
 	echo sendMail($zugangscode, $email); 
 }
 
