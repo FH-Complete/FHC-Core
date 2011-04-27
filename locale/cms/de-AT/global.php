@@ -38,4 +38,5 @@ $this->phrasen['global/löschen']='Löschen';
 
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert'; 
 $this->phrasen['global/erfolgreichgelöscht']='Erfolgreich gelöscht'; 
+$this->phrasen['global/fehleraufgetreten']='Es ist ein Fehler aufgetreten'; 
 ?>
