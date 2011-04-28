@@ -325,5 +325,33 @@ class dokument extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert alle Dokumenttypen
+	 * @return true wenn ok false im Fehlerfall
+	 */
+	public function getAllDokumente()
+	{
+		$qry = "SELECT * FROM public.tbl_dokument;";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$dok = new dokument();
+				
+				$dok->dokument_kurzbz = $row->dokument_kurzbz;
+				$dok->bezeichnung = $row->bezeichnung;
+				
+				$this->result[] = $dok;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
