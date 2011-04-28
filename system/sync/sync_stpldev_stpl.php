@@ -41,6 +41,7 @@ echo '<html>
 $adress='fas_sync@technikum-wien.at';
 //$adress_stpl='pam@technikum-wien.at';
 $adress_stpl='stpl@technikum-wien.at';
+
 if (isset($_GET['sendmail']))
 {
 	if ($_GET['sendmail']=='true')
@@ -75,8 +76,19 @@ $ss->getNearestTillNext();
 $datum_begin=$ss->start;
 $datum_ende=$ss->ende;
 //$datum_begin='2008-01-07';
-$datum_ende='2011-02-05'; // $ss->ende
+$datum_ende='2011-08-05'; // $ss->ende
 
+$stgwhere = '';
+$stgwheredev = '';
+if(isset($_GET['custom']))
+{
+	$sendmail = isset($_GET['mail']);
+	$studiengang_kz=$_GET['studiengang_kz'];
+	$stgwhere = " AND studiengang_kz='".addslashes($studiengang_kz)."'";
+	$stgwheredev = " AND vw_stundenplandev.studiengang_kz='".addslashes($studiengang_kz)."'";
+	$datum_begin = $_GET['von'];
+	$datum_ende = $_GET['bis'];
+}
 // ************* FUNCTIONS **************** //
 
 function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
@@ -146,7 +158,7 @@ Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem 
 echo 'Neue Datens&auml;tze werden geholt. ('.date('H:i:s').')<BR>';flush();
 $message_stpl .= 'Neue Datens&auml;tze werden geholt. ('.date('H:i:s').')';
 
-$sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."' AND
+$sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."' ".$stgwhere." AND 
 	NOT EXISTS
 	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."' AND stundenplan_id=stundenplandev_id)
 	ORDER BY datum, stunde;";
@@ -256,7 +268,7 @@ else
 
 echo '<BR>Alte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';flush();
 $message_stpl .='<BR>Alte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';
-$sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."'
+$sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."' ".$stgwhere."
 				AND NOT EXISTS
 				(SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."' AND stundenplandev_id=stundenplan_id);";
 if (!$result = $db->db_query($sql_query))
@@ -353,7 +365,8 @@ $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_st
 				vw_stundenplandev.anmerkung!=vw_stundenplan.anmerkung OR
 				vw_stundenplandev.fix!=vw_stundenplan.fix OR
 				vw_stundenplandev.lehreinheit_id!=vw_stundenplan.lehreinheit_id )
-				AND vw_stundenplandev.datum>='".addslashes($datum_begin)."';";
+				AND vw_stundenplandev.datum>='".addslashes($datum_begin)."' 
+				AND vw_stundenplandev.datum<='".addslashes($datum_ende)."' ".$stgwheredev.";";
 //echo $sql_query.'<BR>';
 if (!$result = $db->db_query($sql_query))
 {
@@ -555,7 +568,6 @@ $message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></
 $mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'Stundenplan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 $mail->setHTMLContent($message_sync);
 $mail->send();
-
 $message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
 $mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'Stundenplan update', 'Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 $mail->setHTMLContent($message_stpl);

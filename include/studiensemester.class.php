@@ -526,5 +526,38 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt die vergangenen Studiensemester und das aktuelle
+	 *
+	 * @param limit maximale Anzahl
+	 * @return true wenn ok, sonst false
+	 */
+	public function getFinished($limit=null)
+	{
+		$qry = "SELECT * FROM public.tbl_studiensemester where start<=now() ORDER BY ende DESC";
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=' LIMIT '.$limit;
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$stsem_obj = new studiensemester();
+
+				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$stsem_obj->start = $row->start;
+				$stsem_obj->ende = $row->ende;
+
+				$this->studiensemester[] = $stsem_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Studiensemester';
+			return false;
+		}
+	}
 }
 ?>
