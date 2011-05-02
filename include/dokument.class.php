@@ -353,5 +353,25 @@ class dokument extends basis_db
 			return false;
 		}
 	}
+	
+	public function loadDokumenttyp($dokument_kurzbz)
+	{
+		$qry="Select * FROM public.tbl_dokument where dokument_kurzbz ='".addslashes($dokument_kurzbz)."';";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->dokument_kurzbz = $row->dokument_kurzbz; 
+				$this->bezeichnung = $row->bezeichnung; 
+				return true;
+			}
+		}
+		else 
+		{
+			$this->errormsg ='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
