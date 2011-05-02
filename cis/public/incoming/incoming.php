@@ -36,6 +36,7 @@ require_once '../../../include/studiengang.class.php';
 require_once '../../../include/lehrveranstaltung.class.php';
 require_once '../../../include/zweck.class.php';
 require_once '../../../include/studiengang.class.php';
+require_once '../../../include/akte.class.php';
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
@@ -121,7 +122,7 @@ if($method =="austauschprogram")
 	}	
 	// Ausgabe Austauschprogram Formular
 	echo '	<form method="POST" action="incoming.php?method=austauschprogram" name="AustauschForm">
-				<table width="30%" border="1" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:10%;">
+				<table width="40%" border="1" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:10%;">
 					<tr>
 						<td>'.$p->t('incoming/austauschprgramwählen').'</td>
 						<td><SELECT name="austausch_kz"> 
@@ -158,7 +159,7 @@ if($method =="austauschprogram")
 								$selected = "selected"; 
 							echo '<option '.$selected.' value="'.$zwe->zweck_code.'" >'.$zwe->bezeichnung."</option>\n";
 						}
-		echo '			</td>	
+	echo '				</td>	
 					<tr>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -223,8 +224,8 @@ else if($method=="lehrveranstaltungen")
 		if($_GET['view']=="own")
 		{
 			$lvs = $preincoming->getLehrveranstaltungen($preincoming->result[0]->preincoming_id); 
-			echo "<br><br><br>"; 
-			echo '<table border ="0" width="100%">
+			echo '<br><br><br> 
+				<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
 					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/übersichtlehrveranstaltungen').'</a></td>
@@ -232,8 +233,8 @@ else if($method=="lehrveranstaltungen")
 					<td width="25%"></td>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
-				</table>';
-			echo '<table width="90%" border="0" align="center" class="table-autosort:2 table-stripeclass:alternate table-autostripe">
+				</table>
+				<table width="90%" border="0" align="center" class="table-autosort:2 table-stripeclass:alternate table-autostripe">
 				<thead>
 				<tr class="liste">
 					<th></th>
@@ -267,8 +268,8 @@ else if($method=="lehrveranstaltungen")
 	// Übersicht aller LVs
 	else 
 	{
-		echo "<br><br><br>"; 
-		echo '<table border ="0" width="100%">
+		echo '<br><br><br> 
+			<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
 					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/übersichtlehrveranstaltungen').'</a></td>
@@ -276,7 +277,7 @@ else if($method=="lehrveranstaltungen")
 					<td width="25%"></td>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
-				</table>';
+			</table>';
 		
 		$qry = "SELECT 
 					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, 
@@ -364,7 +365,6 @@ else if($method=="lehrveranstaltungen")
 				}
 			}
 		}
-		
 		echo '</tbody></table>';
 	}
 }
@@ -521,39 +521,85 @@ else if ($method == "profil")
 				<td colspan="2" align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>		
 			</tr>
 		</table>
-	</form>';
+	</form>
 	
-	
-	echo '
-		<script type="text/javascript">
-		function checkProfil()
+	<script type="text/javascript">
+	function checkProfil()
+	{
+		if(document.ProfilForm.staatsbuerger.options[0].selected == true) 
 		{
-			if(document.ProfilForm.staatsbuerger.options[0].selected == true) 
-			{
-				alert("Keine Staatsbürgerschaft ausgewählt.");
-				return false; 
-			}
-			
-			if(document.ProfilForm.nation.options[0].selected == true) 
-			{
-				alert("Keine Nation ausgewählt.");
-				return false; 
-			}
-			if(document.ProfilForm.nachname.value == "")
-			{
-				alert("Keinen Nachnamen angegeben."); 
-				return false; 
-			}
-			return true; 
+			alert("Keine Staatsbürgerschaft ausgewählt.");
+			return false; 
 		}
-		</script>';
+		if(document.ProfilForm.nation.options[0].selected == true) 
+		{
+			alert("Keine Nation ausgewählt.");
+			return false; 
+		}
+		if(document.ProfilForm.nachname.value == "")
+		{
+			alert("Keinen Nachnamen angegeben."); 
+			return false; 
+		}
+		return true; 
+	}
+	</script>';
 }
+else if($method == 'files')
+{
+	$akte = new akte(); 
+	
+	if(isset($_GET['id']))
+	{
+		if($_GET['mode']=="delete")
+		{
+			if($akte->delete($_GET['id']))
+				echo "Erfolgreich gelöscht";
+			else
+				echo "Fehler beim löschen aufgetreten.";
+		}
+	}
+	echo '	<script type="text/javascript">
+		function FensterOeffnen (adresse) 
+		{
+			MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
+	  		MeinFenster.focus();
+		}
+		</script> 
+		<br><br><br> 
+			<table border ="0" width="100%">
+				<tr>
+					<td width="25%"></td>
+					<td width="25%" align="center"><a href="'.APP_ROOT.'/content/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">Upload File</a></td>
+					<td width="25%"></td>
+					<td width="25%"></td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+			</table>';
+	
 
+	$akte->getAkten($person->person_id); 
+	echo '<table  align="center" border="0">
+			<tr>
+				<th></th>
+				<th>Name</th>
+				<th>Bezeichnung</th>
+			</tr>'; 
+	foreach ($akte->result as $ak)
+	{	
+		echo '<tr>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'"><img src="'.APP_ROOT.'skin/images/delete_round.png"</a></td>
+				<td><a href="'.APP_ROOT.'content/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
+				<td>'.$ak->bezeichnung.'</td>
+			</tr>';
+	}
+	echo '</table>'; 
+}
 // Ausgabe Menü
 else 
 {
-	echo "<br><br><br><br>"; 
-	echo "<table align ='center' width ='50%' border='2'>";
+	echo '<br><br><br><br>
+		<table align ="center" width ="50%" border="2">';
 	echo "		<tr>
 					<td><a href ='incoming.php?method=austauschprogram '>".$p->t('incoming/austauschprogram')."</a></td><td></td>"; 	
 	echo '		</tr>
@@ -567,7 +613,7 @@ else
 					<td><a href="incoming.php">'.$p->t('incoming/learningagreementerstellen').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="incoming.php">'.$p->t("incoming/uploadvondateien").'</a></td>
+					<td><a href="incoming.php?method=files">'.$p->t("incoming/uploadvondateien").'</a></td>
 				</tr>
 			</table>
 			<table width="100%" border="0">
