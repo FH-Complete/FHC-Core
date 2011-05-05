@@ -62,6 +62,7 @@ require_once('stip.class.php');
 if(isset($_REQUEST['submit']))
 {
 	$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl"); 
+	//$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl", array('login'=>'stip','password'=>'stip'));
 	
 	
 	$ErhKz = $_REQUEST['ErhKz'];
