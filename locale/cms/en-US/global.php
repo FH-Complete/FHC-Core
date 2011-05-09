@@ -26,6 +26,11 @@ $this->phrasen['global/frau']='Female';
 $this->phrasen['global/staatsbuergerschaft']='Citizenship';
 $this->phrasen['global/geburtsdatum']='Date of Birth';
 $this->phrasen['global/universität']='University';
+$this->phrasen['global/code']='Code';
+$this->phrasen['global/adresse']='Address';
+$this->phrasen['global/telefon']='Telephone'; 
+$this->phrasen['global/fax']='Fax'; 
+
 
 $this->phrasen['global/von']='From';
 $this->phrasen['global/bis']='To';
