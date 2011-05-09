@@ -217,7 +217,6 @@ else if($method=="lehrveranstaltungen")
 				<thead>
 				<tr class="liste">
 					<th></th>
-					<th class="table-sortable:numeric">ID</th>
 					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
 					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
@@ -234,12 +233,14 @@ else if($method=="lehrveranstaltungen")
 				$studiengang->load($lehrveranstaltung->studiengang_kz);
 				echo '<tr>';
 				echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&id='.$lv.'&view=own">'.$p->t('global/löschen').'</a></td>';
-				echo '<td>',$lv,'</td>';
 				echo '<td>',$studiengang->kurzbzlang,'</td>';
 				echo '<td>',$lehrveranstaltung->semester,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung_english,'</td>';
-				echo '<td></td>';
+				echo '<td>
+					<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
+					<a href="#Englisch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
+					</td>';
 				echo '</tr>';
 			}
 		}
