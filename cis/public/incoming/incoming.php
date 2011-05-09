@@ -34,7 +34,6 @@ require_once '../../../include/kontakt.class.php';
 require_once '../../../include/studiensemester.class.php';
 require_once '../../../include/studiengang.class.php';
 require_once '../../../include/lehrveranstaltung.class.php';
-require_once '../../../include/zweck.class.php';
 require_once '../../../include/studiengang.class.php';
 require_once '../../../include/akte.class.php';
 
@@ -103,8 +102,6 @@ $stg->getAll();
 <?php 
 if($method =="austauschprogram")
 {
-	$zweck = new zweck(); 
-	$zweck->getAll(); 	
 	
 	// Speichert Austauschprogram in preincoming tabelle
 	if(isset($_POST['submit_program']))
@@ -113,7 +110,7 @@ if($method =="austauschprogram")
 		$preincoming->result[0]->von = $_REQUEST['von'];; 
 		$preincoming->result[0]->bis = $_REQUEST['bis']; 
 		$preincoming->result[0]->mobilitaetsprogramm_code = $_REQUEST['austausch_kz']; 
-		$preincoming->result[0]->zweck_code = $_REQUEST['zweck']; 
+
 		
 		if(!$preincoming->result[0]->save())
 			echo $preincoming->errormsg; 
@@ -141,26 +138,13 @@ if($method =="austauschprogram")
 						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->result[0]->universitaet.'"></td>
 					</tr>
 					<tr>
-						<td>'.$p->t('global/von').' </td>
+						<td>'.$p->t('incoming/studiertvon').' </td>
 						<td><input type="text" name="von" size="10"  value="'.$preincoming->result[0]->von.'"> (yyyy-mm-dd)</td>
 					</tr>
 					<tr>
-						<td>'.$p->t('global/bis').' </td>
+						<td>'.$p->t('incoming/studiertbis').' </td>
 						<td><input type="text" name="bis" size="10"  value="'.$preincoming->result[0]->bis.'"> (yyyy-mm-dd)</td>
 					</tr>
-					<tr>
-						<td>'.$p->t('global/zweck').' </td>
-						<td><SELECT name="zweck">
-						<option value="zweck_auswahl">-- select --</option>';
-						foreach ($zweck->result as $zwe)
-						{
-							$selected="";
-							if($preincoming->result[0]->zweck_code == $zwe->zweck_code)
-								$selected = "selected"; 
-							echo '<option '.$selected.' value="'.$zwe->zweck_code.'" >'.$zwe->bezeichnung."</option>\n";
-						}
-	echo '				</td>	
-					<tr>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 					</tr>
@@ -176,11 +160,6 @@ if($method =="austauschprogram")
 			if(document.AustauschForm.austausch_kz.options[0].selected == true) 
 			{
 				alert("Kein Austauschprogram ausgewählt.");
-				return false; 
-			}
-			if(document.AustauschForm.zweck.options[0].selected == true)
-			{
-				alert("Keinen Zweck ausgewählt"); 
 				return false; 
 			}
 			return true; 
@@ -367,6 +346,114 @@ else if($method=="lehrveranstaltungen")
 		}
 		echo '</tbody></table>';
 	}
+}
+else if ($method == "university")
+{
+	var_dump($_REQUEST); 
+	echo '	<form method="POST" action="incoming.php?method=university" name="UniversityForm">
+				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:10%;">
+					<tr><td><b>Sending Institution</b></td></tr>
+					<tr>
+						<td>'.$p->t('incoming/universitätsname').' </td>
+						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->result[0]->universitaet.'"></td>
+					</tr>
+					<tr>
+						<td>'.$p->t('global/code').' </td>
+						<td><input type="text" name="von" size="10"  value="'.$preincoming->result[0]->von.'"></td>
+					</tr>
+					<tr>
+						<td>'.$p->t('global/strasse').'</td>
+						<td><input type="text" size="40" maxlength="256" name="strasse"></td>
+					</tr>	
+					<tr>
+						<td>'.$p->t('global/plz').'</td>
+						<td><input type="text" size="20" maxlength="16" name="plz"></td>
+					</tr>				
+					<tr>
+						<td>'.$p->t('global/ort').'</td>
+						<td><input type="text" size="40" maxlength="256" name="ort"></td>
+					</tr>				
+					<tr>
+						<td>Nation</td>
+				
+						<td><SELECT name="nation"> 
+						<option value="nat_auswahl">-- select --</option>';
+						foreach ($nation->nation as $nat)
+						{
+							echo "<option value='$nat->code' >$nat->langtext</option>";
+						}
+										
+echo'				</tr>	
+					<tr>			
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+				
+				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
+					<tr><td><b>Department Coordinator</b></td></tr>
+					<tr>
+						<td width="25%">'.$p->t('global/vorname').' </td>
+						<td width="25%"><input type="text" name="vorname_coordinator" size="20" maxlength="256" value=""></td>
+						<td width="25%">'.$p->t('global/nachname').' </td>
+						<td width="25%"><input type="text" name="nachname_coordinator" size="20"  value=""></td>
+					</tr>
+					<tr>
+						<td>'.$p->t('global/telefon').' </td>
+						<td><input type="text" name="telefon_coordinator" size="20"  value=""></td>
+						<td>'.$p->t('global/fax').' </td>
+						<td><input type="text" name="fax_coordinator" size="20"  value=""></td>
+					</tr>
+					<tr>
+						<td>E-Mail </td>
+						<td colspan="3"><input type="text" name="email_coordinator" size="20"  value=""></td>
+					</tr>
+					</tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+				
+				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
+					<tr><td><b>International Coordinator</b></td></tr>
+					<tr>
+						<td width="25%">'.$p->t('global/vorname').' </td>
+						<td width="25%"><input type="text" name="vorname_intcoordinator" size="20" maxlength="256" value=""></td>
+						<td width="25%">'.$p->t('global/nachname').' </td>
+						<td width="25%"><input type="text" name="nachname_intcoordinator" size="20"  value=""></td>
+					</tr>
+					<tr>
+						<td>'.$p->t('global/telefon').' </td>
+						<td><input type="text" name="telefon_intcoordinator" size="20"  value=""></td>
+						<td>'.$p->t('global/fax').' </td>
+						<td><input type="text" name="fax_intcoordinator" size="20"  value=""></td>
+					</tr>
+					<tr>
+						<td>E-Mail </td>
+						<td colspan="3"><input type="text" name="email_intcoordinator" size="20"  value=""></td>
+					</tr>
+					</tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="2" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkUniversity()"></td>
+					</tr>
+				</table>
+			</form>
+		
+		<script type="text/javascript">
+		function checkUniversity()
+		{
+			if(document.AustauschForm.austausch_kz.options[0].selected == true) 
+			{
+				alert("Kein Austauschprogram ausgewählt.");
+				return false; 
+			}
+			return true; 
+		}
+		</script>';
+		
 }
 // Benutzerprofil bearbeiten
 else if ($method == "profil")
@@ -605,6 +692,9 @@ else
 	echo '		</tr>
 				<tr>	
 					<td><a href="incoming.php?method=profil">'.$p->t('incoming/persönlichedateneditieren').'</a></td>
+				</tr>
+				<tr>
+					<td><a href="incoming.php?method=university">'.$p->t("incoming/eigeneuniversitaet").'</a></td>
 				</tr>
 				<tr>
 					<td><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
