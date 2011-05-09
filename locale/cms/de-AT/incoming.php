@@ -9,5 +9,8 @@ $this->phrasen['incoming/austauschprgramwählen']= 'Austauschprogram auswählen'
 $this->phrasen['incoming/übersichtlehrveranstaltungen']= 'Übersicht aller Lehrveranstaltungen';
 $this->phrasen['incoming/eigenelehrveranstaltungen']= 'Angemeldete Lehrveranstaltungen';
 $this->phrasen['incoming/freieplätze']='Freie Plätze'; 
-
+$this->phrasen['incoming/studiertvon']='Studiert von';
+$this->phrasen['incoming/studiertbis']='Studiert bis';
+$this->phrasen['incoming/eigeneuniversitaet']='Heimatuniversität Daten';
+$this->phrasen['incoming/universitätsname']='Name der Universität';
 ?>
