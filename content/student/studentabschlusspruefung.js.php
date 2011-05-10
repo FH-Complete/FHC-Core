@@ -610,7 +610,7 @@ function StudentAbschlusspruefungLoeschen()
 // * ein Protokoll gedruckt.
 // * Den Typ (Bakk/Dipl) des Protokolls bestimmt der zuletzt markierte.
 // ****
-function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
+function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -636,10 +636,19 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple()
 	}
 
 	if(pruefungstyp_kurzbz=='Bachelor')
-		xsl='PrProtokollBakk';
+	{
+		if(lang=='de')
+			xsl='PrProtokollBakk';
+		if(lang=='en')
+			xsl='PrProtBakkEng';
+	}
 	else
-		xsl='PrProtokollDipl';
-
+	{
+		if(lang=='de')
+			xsl='PrProtokollDipl';
+		if(lang=='en')
+			xsl='PrProtDiplEng';
+	}
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
