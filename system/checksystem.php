@@ -2256,6 +2256,69 @@ if(!@$db->db_query("SELECT zugangscode FROM public.tbl_person LIMIT 1"))
 	else 
 		echo 'Preincoming Modul hinzugefuegt!<br>';
 }
+// Content Titel in Tabelle contentsprache verschoben
+if(!@$db->db_query("SELECT titel FROM campus.tbl_contentsprache LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE campus.tbl_contentsprache ADD COLUMN titel varchar(256);
+	UPDATE campus.tbl_contentsprache set titel = (SELECT titel FROM campus.tbl_content WHERE content_id=tbl_contentsprache.content_id);
+	ALTER TABLE campus.tbl_content DROP COLUMN titel;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.content: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.content Spalte titel in Tabelle contentsprache verschoben!<br>';
+}
+
+// Mobilitaetsprogramm Sichtbar Filter
+if(!@$db->db_query("SELECT sichtbar FROM bis.tbl_mobilitaetsprogramm LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE bis.tbl_mobilitaetsprogramm ADD COLUMN sichtbar boolean DEFAULT true;
+	UPDATE bis.tbl_mobilitaetsprogramm SET sichtbar=true;
+	ALTER TABLE bis.tbl_mobilitaetsprogramm ALTER COLUMN sichtbar SET NOT NULL
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>bis.mobilitaetsprogramm: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle bis.tbl_mobilitaetsprogramm Spalte sichbar hinzugefuegt!<br>';
+}
+
+// PreIncoming Erweiterungen
+if(!@$db->db_query("SELECT zgv FROM public.tbl_preincoming LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgv varchar(256);
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgv_ort varchar(256);
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgv_datum date;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgv_name varchar(256);
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgvmaster varchar(256);
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgvmaster_datum date;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN zgvmaster_ort varchar(256);
+	ALTER TABLE public.tbl_preincoming ADD COLUMN program_name varchar(256);
+	ALTER TABLE public.tbl_preincoming ADD COLUMN bachelor boolean DEFAULT false;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN master boolean DEFAULT false;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN jahre smallint;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN person_id_emergency integer;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN person_id_coordinator_dep integer;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN person_id_coordinator_int integer;
+	ALTER TABLE public.tbl_preincoming ADD COLUMN code varchar(64);
+	
+	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_emergency FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_coordinator_dep FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_coordinator_int FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE public.tbl_preincoming ALTER COLUMN bachelor SET NOT NULL;
+	ALTER TABLE public.tbl_preincoming ALTER COLUMN master SET NOT NULL;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_preincoming Erweiterungen hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -2273,7 +2336,7 @@ $tabellen=array(
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
 	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung"),
-	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung"),
+	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
@@ -2283,10 +2346,10 @@ $tabellen=array(
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
-	"campus.tbl_content"  => array("content_id","template_kurzbz","titel","updatevon","updateamum","insertamum","insertvon","oe_kurzbz"),
+	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz"),
 	"campus.tbl_contentchild"  => array("contentchild_id","content_id","child_content_id","updatevon","updateamum","insertamum","insertvon"),
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
-	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel"),
 	"campus.tbl_dms"  => array("dms_id","version","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
@@ -2382,7 +2445,7 @@ $tabellen=array(
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
-	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung"),
+	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code"),
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
