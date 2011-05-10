@@ -117,7 +117,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-dokumente-studienerfolgeng-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','', '', 'true');"/>
   <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
-  <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple();"/>
+  <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de');"/>
+  <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en');"/>
   <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple();"/>
   <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
   <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('englisch')"/>
@@ -619,6 +620,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
                label     = "&menu-dokumente-pruefungsprotokoll.label;"
                command   =  "menu-dokumente-pruefungsprotokoll:command"
                accesskey = "&menu-dokumente-pruefungsprotokoll.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-pruefungsprotokoll_englisch"
+               key       =  "menu-dokumente-pruefungsprotokoll_englisch:key"
+               label     = "&menu-dokumente-pruefungsprotokoll_englisch.label;"
+               command   =  "menu-dokumente-pruefungsprotokoll_englisch:command"
+               accesskey = "&menu-dokumente-pruefungsprotokoll_englisch.accesskey;"/>
 			<menuitem
                id        =  "menu-dokumente-pruefungszeugnis"
                key       =  "menu-dokumente-pruefungszeugnis:key"

@@ -247,6 +247,9 @@
 <!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll">
 <!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
 
+<!ENTITY menu-dokumente-pruefungsprotokoll_englisch.label		"Prüfungsprotokoll Englisch">
+<!ENTITY menu-dokumente-pruefungsprotokoll_englisch.accesskey	"P">
+
 <!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis">
 <!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
 
