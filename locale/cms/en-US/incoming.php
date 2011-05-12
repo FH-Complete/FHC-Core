@@ -9,8 +9,8 @@ $this->phrasen['incoming/austauschprgramwählen']= 'Select Exchange Program';
 $this->phrasen['incoming/übersichtlehrveranstaltungen']= 'All Subjects';
 $this->phrasen['incoming/eigenelehrveranstaltungen']= 'Registered Subjects';
 $this->phrasen['incoming/freieplätze']='Available Seats'; 
-$this->phrasen['incoming/studiertvon']='Studies abroad from';
-$this->phrasen['incoming/studiertbis']='Studies abroad to';
+$this->phrasen['incoming/studiertvon']='Studies Abroad From';
+$this->phrasen['incoming/studiertbis']='Studies Abroad To';
 $this->phrasen['incoming/eigeneuniversitaet']='Sending Institution Information';
 $this->phrasen['incoming/universitätsname']='Sending Institution Name';
 ?>
