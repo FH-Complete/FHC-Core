@@ -43,11 +43,27 @@ class preincoming extends basis_db
 	public $masterthesis;		// boolean
 	public $von;				// date
 	public $bis;				// date
+	public $code; 				// varchar
 	public $uebernommen;		// boolean
 	public $updateamum;			// timestamp
 	public $updatevon;			// string
 	public $insertamum;      	// timestamp
 	public $insertvon;      	// string
+	public $zgv; 
+	public $zgv_ort; 
+	public $zgv_datum; 
+	public $zgv_name; 
+	public $zgvmaster; 
+	public $zgvmaster_datum; 
+	public $zgvmaster_ort; 
+	public $program_name; 
+	public $bachelor; 
+	public $master; 
+	public $jahre; 
+	public $person_id_emergency; 
+	public $person_id_coordinator_dep; 
+	public $person_id_coordinator_int; 
+	
 
 	/**
 	 * Konstruktor
@@ -98,11 +114,27 @@ class preincoming extends basis_db
 			$this->masterthesis = ($row->masterthesis=='t'?true:false);
 			$this->von = $row->von;
 			$this->bis = $row->bis;
+			$this->code = $row->code; 
 			$this->uebernommen = ($row->uebernommen=='t'?true:false);
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
+			
+			$this->zgv = $row->zgv; 
+			$this->zgv_ort = $row->zgv_ort; 
+			$this->zgv_datum = $row->zgv_datum; 
+			$this->zgv_name = $row->zgv_name; 
+			$this->zgvmaster = $row->zgvmaster; 
+			$this->zgvmaster_datum = $row->zgvmaster_datum; 
+			$this->zgvmaster_ort = $row->zgvmaster_ort; 
+			$this->program_name = $row->program_name; 
+			$this->bachelor = $row->bachelor; 
+			$this->master = $row->master; 
+			$this->jahre = $row->jahre; 
+			$this->person_id_emergency = $row->person_id_emergency; 
+			$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
+			$this->person_id_coordinator_int = $row->person_id_coordinator_int; 
 		}
 		else
 		{
@@ -121,6 +153,7 @@ class preincoming extends basis_db
 	public function loadFromPerson($person_id)
 	{
 		$qry = "SELECT * FROM public.tbl_preincoming WHERE person_id='".addslashes($person_id)."'";
+		
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -139,11 +172,27 @@ class preincoming extends basis_db
 				$obj->masterthesis = ($row->masterthesis=='t'?true:false);
 				$obj->von = $row->von;
 				$obj->bis = $row->bis;
+				$obj->code = $row->code; 
 				$obj->uebernommen = ($row->uebernommen=='t'?true:false);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				
+				$obj->zgv = $row->zgv; 
+				$obj->zgv_ort = $row->zgv_ort; 
+				$obj->zgv_datum = $row->zgv_datum; 
+				$obj->zgv_name = $row->zgv_name; 
+				$obj->zgvmaster = $row->zgvmaster; 
+				$obj->zgvmaster_datum = $row->zgvmaster_datum; 
+				$obj->zgvmaster_ort = $row->zgvmaster_ort; 
+				$obj->program_name = $row->program_name; 
+				$obj->bachelor = $row->bachelor; 
+				$obj->master = $row->master; 
+				$obj->jahre = $row->jahre; 
+				$obj->person_id_emergency = $row->person_id_emergency; 
+				$obj->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
+				$obj->person_id_coordinator_int = $row->person_id_coordinator_int; 
 				
 				$this->result[] = $obj;
 			}
@@ -197,7 +246,10 @@ class preincoming extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_preincoming (person_id, mobilitaetsprogramm_code, zweck_code, 
 					firma_id, anmerkung, universitaet, aktiv, bachelorthesis, masterthesis, 
-					von, bis, uebernommen, insertamum, insertvon, updateamum, updatevon) VALUES('.
+					von, bis, code, uebernommen, insertamum, insertvon, updateamum, updatevon,
+					zgv, zgv_ort, zgv_datum, zgv_name, zgvmaster, zgvmaster_datum, zgvmaster_ort, prgoram_name,
+					bachelor, master, jahre, person_id_emergency, person_id_coordinatro_dep, person_id_coordinator_ing)
+				  VALUES('.
 			      $this->addslashes($this->person_id).', '.
 			      $this->addslashes($this->mobilitaetsprogramm_code).', '.
 			      $this->addslashes($this->zweck_code).', '.
@@ -209,11 +261,24 @@ class preincoming extends basis_db
 			      ($this->masterthesis?'true':'false').', '.
 			      $this->addslashes($this->von).', '.
 			      $this->addslashes($this->bis).', '.
-			      ($this->uebernommen?'true':'false').', '.
-			      $this->addslashes($this->insertamum).', '.
-			      $this->addslashes($this->insertvon).', '.
-			      $this->addslashes($this->updateamum).', '.
-			      $this->addslashes($this->updatevon).');';
+			      $this->addslashes($this->code).', '.
+			      ($this->uebernommen?'true':'false').', now(), '.
+			      $this->addslashes($this->insertvon).', now(), '.
+			      $this->addslashes($this->updatevon).', '.  
+			      $this->addslashes($this->zgv).', '. 
+				  $this->addslashes($this->zgv_ort).', '.
+				  $this->addslashes($this->zgv_datum).', '. 
+				  $this->addslashes($this->zgv_name).', '. 
+				  $this->addslashes($this->zgvmaster).', '.
+				  $this->addslashes($this->zgvmaster_datum).', '. 
+				  $this->addslashes($this->zgvmaster_ort).', '.
+				  $this->addslashes($this->program_name).', '.
+				   ($this->bachelor?'true':'false').', '.
+				   ($this->master?'true':'false').', '.
+				  $this->addslashes($this->jahre).', '.
+				  $this->addslashes($this->person_id_emergency).', '.
+				  $this->addslashes($this->person_id_coordinator_dep).', '.
+				  $this->addslashes($this->person_id_coordinator_int).');';  		      
 		}
 		else
 		{
@@ -235,9 +300,25 @@ class preincoming extends basis_db
 				' masterthesis='.($this->masterthesis?'true':'false').', '.
 		      	' von='.$this->addslashes($this->von).', '.
 		      	' bis='.$this->addslashes($this->bis).','.
+				' code='.$this->addslashes($this->code).','.
 				' uebernommen='.($this->uebernommen?'true':'false').', '.
-		      	' updateamum='.$this->addslashes($this->updateamum).','.
-		      	' updatevon='.$this->addslashes($this->updatevon).
+		      	' updateamum=now() ,'.
+		      	' updatevon='.$this->addslashes($this->updatevon).', '.
+
+				' zgv='.$this->addslashes($this->zgv).', '. 
+				' zgv_ort='.$this->addslashes($this->zgv_ort).', '.
+				' zgv_datum='.$this->addslashes($this->zgv_datum).', '. 
+				' zgv_name='.$this->addslashes($this->zgv_name).', '. 
+				' zgvmaster='.$this->addslashes($this->zgvmaster).', '.
+				' zgvmaster_datum='.$this->addslashes($this->zgvmaster_datum).', '. 
+				' zgvmaster_ort='.$this->addslashes($this->zgvmaster_ort).', '.
+				' program_name='.$this->addslashes($this->program_name).', '.
+				' bachelor='.($this->bachelor?'true':'false').', '.
+				' master='.($this->master?'true':'false').', '.
+				' jahre='.$this->addslashes($this->jahre).', '.
+				' person_id_emergency='.$this->addslashes($this->person_id_emergency).', '.
+				' person_id_coordinator_dep='.$this->addslashes($this->person_id_coordinator_dep).', '.
+				' person_id_coordinator_int='.$this->addslashes($this->person_id_coordinator_int).  	
 		      	' WHERE preincoming_id='.$this->preincoming_id.';';
 		}
 		
@@ -427,7 +508,7 @@ class preincoming extends basis_db
 			return false;
 		}
 	}
-	
+		
 	/**
 	 * Laedt die PreIncoming anhand von Suchkriterien
 	 * 
@@ -483,11 +564,27 @@ class preincoming extends basis_db
 				$obj->masterthesis = ($row->masterthesis=='t'?true:false);
 				$obj->von = $row->von;
 				$obj->bis = $row->bis;
+				$obj->code = $row->code; 
 				$obj->uebernommen = ($row->uebernommen=='t'?true:false);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				
+				$this->zgv = $row->zgv; 
+				$this->zgv_ort = $row->zgv_ort; 
+				$this->zgv_datum = $row->zgv_datum; 
+				$this->zgv_name = $row->zgv_name; 
+				$this->zgvmaster = $row->zgvmaster; 
+				$this->zgvmaster_datum = $row->zgvmaster_datum; 
+				$this->zgvmaster_ort = $row->zgvmaster_ort; 
+				$this->program_name = $row->program_name; 
+				$this->bachelor = $row->bachelor; 
+				$this->master = $row->master; 
+				$this->jahre = $row->jahre; 
+				$this->person_id_emergency = $row->person_id_emergency; 
+				$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
+				$this->person_id_coordinator_int = $row->person_id_coordinatro_int; 
 				
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;
