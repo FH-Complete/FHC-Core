@@ -142,6 +142,26 @@ class person extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * Löscht den Datensatz mit der übergebenen person_id
+	 * @param $person_id
+	 */
+	public function delete($person_id)
+	{
+		$qry = "DELETE from public.tbl_person where person_id = ".addslashes($person_id).";"; 
+		
+		if($this->db_query($qry))
+		{
+			return true; 
+		}
+		else
+		{
+			$this->errormsg = "Es ist ein Fehler beim Löschen der Person aufgetreten"; 
+			return false; 
+		}
+	}
 
 	// *******************************************
 	// * Prueft die Variablen vor dem Speichern
@@ -644,17 +664,22 @@ class person extends basis_db
 	
 	/**
 	 * 
-	 * Überprüft den übergebenen Zugangscode, wenn in Datenbank return true
+	 * Überprüft den übergebenen Zugangscode und retuniert die aktuelle incoming_id
 	 * @param $zugangscode
 	 */
 	public function checkZugangscode($zugangscode)
 	{
-		$qry ="Select * from public.tbl_person where zugangscode=".$this->addslashes($zugangscode).";";
+		$qry ="Select preincoming_id 
+		from public.tbl_preincoming 
+		where person_id = (Select person_id from public.tbl_person where zugangscode='4dc90370674c1') 
+		order by insertamum DESC;";
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-				return true; 
+			{
+				return $row->preincoming_id; 
+			}
 			else
 				return false; 
 		}
