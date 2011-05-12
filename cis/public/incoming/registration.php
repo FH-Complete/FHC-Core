@@ -40,6 +40,8 @@ $nation->getAll($ohnesperre = true);
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
 
+$date = new datum(); 
+
 ?>
 <html>
 	<head>
@@ -80,7 +82,7 @@ $p=new phrasen($sprache);
 			</tr>
 			<tr>
 				<td><?php echo $p->t('global/geburtsdatum');?></td>
-				<td><input type="text" size="20" name="geb_datum" value="" onfocus="this.value=''"; > (yyyy-mm-dd)</td>
+				<td><input type="text" size="20" name="geb_datum" value="" onfocus="this.value=''"; > (dd.mm.YYYY)</td>
 			</tr>
 			<tr>
 				<td><?php echo $p->t('global/staatsbuergerschaft');?></td>
@@ -180,7 +182,7 @@ if(isset($_REQUEST['submit']))
 	$vorname = $_REQUEST['vorname']; 
 	$nachname =$_REQUEST['nachname']; 
 	$titel_post = $_REQUEST['titel_post'];
-	$geb_datum = $_REQUEST['geb_datum']; 
+	$geb_datum = $date->formatDatum($_REQUEST['geb_datum'], 'Y-m-d'); 
 	$staatsbuerger = $_REQUEST['staatsbuerger']; 
 	$geschlecht = $_REQUEST['geschlecht']; 
 	$strasse = $_REQUEST['strasse']; 
@@ -232,6 +234,8 @@ if(isset($_REQUEST['submit']))
 	$preincoming->masterthesis = false; 
 	$preincoming->uebernommen = false; 
 	$preincoming->new = true; 
+	$preincoming->insertamum = date('Y-m-d H:i:s');
+	$preincoming->updateamum = date('Y-m-d H:i:s');
 
 	if(!$preincoming->save())
 	{
