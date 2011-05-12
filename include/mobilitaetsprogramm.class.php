@@ -35,11 +35,15 @@ class mobilitaetsprogramm extends basis_db
 	public $mobilitaetsprogramm_code;
 	public $kurzbz;
 	public $beschreibung;
+	public $sichtbar; 
 
 
-	public function getAll()
+	public function getAll($sichtbar = false)
 	{
-		$qry ="Select * From bis.tbl_mobilitaetsprogramm;";
+		$qry ="Select * From bis.tbl_mobilitaetsprogramm ";
+		
+		if($sichtbar == true)
+			$qry.="where sichtbar = 'true';"; 
 		
 		if($this->db_query($qry))
 		{
@@ -50,6 +54,7 @@ class mobilitaetsprogramm extends basis_db
 				$mobility->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code; 
 				$mobility->kurzbz = $row->kurzbz; 
 				$mobility->beschreibung = $row->beschreibung; 
+				$mobility->sichtbar = $row->sichtbar; 
 				
 				$this->result[]=$mobility; 
 			}
