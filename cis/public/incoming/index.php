@@ -37,10 +37,13 @@ if (isset($_POST['userid']))
 		
 	session_start();
 	
+	$preincoming=$person->checkZugangscode($login); 
+	
 	//Zugangscode wird  überprüft
-	if($person->checkZugangscode($login))
+	if($preincoming != false)
 	{
 		$_SESSION['incoming/user'] = $login;
+		$_SESSION['incoming/preincomingid'] = $preincoming; 
 
 		header('Location: incoming.php');
 		exit;
