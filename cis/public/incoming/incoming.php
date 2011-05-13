@@ -36,19 +36,12 @@ require_once '../../../include/studiengang.class.php';
 require_once '../../../include/lehrveranstaltung.class.php';
 require_once '../../../include/studiengang.class.php';
 require_once '../../../include/akte.class.php';
+require_once '../../../include/datum.class.php'; 
+require_once '../../../include/firma.class.php'; 
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 	
-$nation = new nation(); 
-$nation->getAll($ohnesperre = true); 
-	
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
-
-$mobility = new mobilitaetsprogramm(); 
-$mobility->getAll(); 
-
 $method =""; 
 $breadcrumb = ""; 
 if(isset($_GET['method']))
@@ -59,11 +52,21 @@ if(isset($_GET['method']))
 
 $zugangscode = $_SESSION['incoming/user']; 
 
+$nation = new nation(); 
+$nation->getAll($ohnesperre = true); 
+	
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
+$mobility = new mobilitaetsprogramm(); 
+$mobility->getAll(true); 
+
 $person = new person(); 
 $person->getPersonFromZugangscode($zugangscode); 
 
 $preincoming = new preincoming(); 
-$preincoming->loadFromPerson($person->person_id); 
+//$preincoming->loadFromPerson($person->person_id); 
+$preincoming->load($_SESSION['incoming/preincomingid']); 
 
 $adresse = new adresse(); 
 $adresse->load_pers($person->person_id); 
@@ -79,6 +82,10 @@ $stsem->getNextStudiensemester();
 $stg = new studiengang();
 $stg->getAll();
 
+$date = new datum(); 
+
+$firma = new firma(); 
+$firma->getFirmen('Partneruniversität');
 ?>
 <html>
 	<head>
@@ -106,13 +113,13 @@ if($method =="austauschprogram")
 	// Speichert Austauschprogram in preincoming tabelle
 	if(isset($_POST['submit_program']))
 	{
-		$preincoming->result[0]->universitaet = $_REQUEST['universitaet']; 
-		$preincoming->result[0]->von = $_REQUEST['von'];; 
-		$preincoming->result[0]->bis = $_REQUEST['bis']; 
-		$preincoming->result[0]->mobilitaetsprogramm_code = $_REQUEST['austausch_kz']; 
+		$preincoming->von = $date->formatDatum($_REQUEST['von'],'Y-m-d'); 
+		$preincoming->bis = $date->formatDatum($_REQUEST['bis'],'Y-m-d'); 
+		$preincoming->code = $_REQUEST['code']; 
+		$preincoming->mobilitaetsprogramm_code = $_REQUEST['austausch_kz']; 
+		$preincoming->updateamum = date('Y-m-d H:i:s');
 
-		
-		if(!$preincoming->result[0]->save())
+		if(!$preincoming->save())
 			echo $preincoming->errormsg; 
 		else 
 			echo $p->t('global/erfolgreichgespeichert');  
@@ -126,24 +133,24 @@ if($method =="austauschprogram")
 						<option value="austausch_auswahl">-- select --</option>';
 						foreach ($mobility->result as $mob)
 						{
-							$selected=""; 
-							if($mob->mobilitaetsprogramm_code == $preincoming->result[0]->mobilitaetsprogramm_code)
-								$selected = "selected"; 
-							echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
+								$selected=""; 
+								if($mob->mobilitaetsprogramm_code == $preincoming->mobilitaetsprogramm_code)
+									$selected = "selected"; 
+								echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
 						}		
 	echo '				</td>
 					</tr>
 					<tr>
-						<td>'.$p->t('global/universität').' </td>
-						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->result[0]->universitaet.'"></td>
+						<td>'.$p->t('global/code').' </td>
+						<td><input type="text" name="code" size="40" maxlength="256" value="'.$preincoming->code.'"></td>
 					</tr>
 					<tr>
 						<td>'.$p->t('incoming/studiertvon').' </td>
-						<td><input type="text" name="von" size="10"  value="'.$preincoming->result[0]->von.'"> (yyyy-mm-dd)</td>
+						<td><input type="text" name="von" size="10"  value="'.$date->formatDatum($preincoming->von,'d.m.Y').'"> (dd.mm.YYYY)</td>
 					</tr>
 					<tr>
 						<td>'.$p->t('incoming/studiertbis').' </td>
-						<td><input type="text" name="bis" size="10"  value="'.$preincoming->result[0]->bis.'"> (yyyy-mm-dd)</td>
+						<td><input type="text" name="bis" size="10"  value="'.$date->formatDatum($preincoming->bis,'d.m.Y').'"> (dd.mm.YYYY)</td>
 					</tr>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -164,8 +171,7 @@ if($method =="austauschprogram")
 			}
 			return true; 
 		}
-		</script>';
-		
+		</script>';	
 }
 
 else if($method=="lehrveranstaltungen")
@@ -178,7 +184,7 @@ else if($method=="lehrveranstaltungen")
 			$preincoming = new preincoming(); 
 			$preincoming->loadFromPerson($person->person_id); 
 			
-			if($preincoming->addLehrveranstaltung($preincoming->result[0]->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
+			if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
 				echo $p->t('global/erfolgreichgespeichert');  
 			else
 				echo $p->t('global/fehleraufgetreten');  
@@ -190,7 +196,7 @@ else if($method=="lehrveranstaltungen")
 			$preincoming = new preincoming(); 
 			$preincoming->loadFromPerson($person->person_id); 
 			
-			if($preincoming->deleteLehrveranstaltung($preincoming->result[0]->preincoming_id, $_GET['id']))
+			if($preincoming->deleteLehrveranstaltung($preincoming->preincoming_id, $_GET['id']))
 				echo $p->t('global/erfolgreichgelöscht'); 
 			else
 				echo $p->t('global/fehleraufgetreten');  
@@ -202,7 +208,7 @@ else if($method=="lehrveranstaltungen")
 	{
 		if($_GET['view']=="own")
 		{
-			$lvs = $preincoming->getLehrveranstaltungen($preincoming->result[0]->preincoming_id); 
+			$lvs = $preincoming->getLehrveranstaltungen($preincoming->preincoming_id); 
 			echo '<br><br><br> 
 				<table border ="0" width="100%">
 				<tr>
@@ -328,7 +334,7 @@ else if($method=="lehrveranstaltungen")
 				if($freieplaetze>0)
 				{
 					echo '<tr>';
-					if(!$preincoming->checkLehrveranstaltung($preincoming->result[0]->preincoming_id, $row->lehrveranstaltung_id))
+					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
 						echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">'.$p->t('global/anmelden').'</a></td>';
 					else
 						echo '<td>'.$p->t('global/angemeldet').'</td>';
@@ -349,65 +355,501 @@ else if($method=="lehrveranstaltungen")
 	}
 }
 else if ($method == "university")
-{
-	var_dump($_REQUEST); 
+{ 
+	// wenn schon vorhanden, laden
+	$depCoordinator = new person(); 
+	if($preincoming->person_id_coordinator_dep != "")
+		$depCoordinator->load($preincoming->person_id_coordinator_dep); 
+
+	$intCoordinator = new person(); 
+	if($preincoming->person_id_coordinator_int != "")
+		$intCoordinator->load($preincoming->person_id_coordinator_int); 
+		
+	if(isset($_POST['submit_program']))
+	{
+		if(isset($_REQUEST['universitaet']))
+		{
+			$preincoming->universitaet = $_REQUEST['universitaet']; 
+			$preincoming->updateamum = date('Y-m-d H:i:s');
+		}
+		if($_REQUEST['firma'] != 'firma_auswahl')
+		{
+			$preincoming->firma_id = $_REQUEST['firma']; 
+			$preincoming->updateamum = date('Y-m-d H:i:s');
+		}
+		else
+		{
+			$preincoming->firma_id = ""; 
+			$preincoming->updateamum = date('Y-m-d H:i:s');
+		}
+			$preincoming->program_name = $_REQUEST['name_of_program']; 
+			$preincoming->jahre = $_REQUEST['jahre']; 
+			if(isset($_REQUEST['bachelor']))
+				$preincoming->bachelor = true; 
+			else
+				$preincoming->bachelor = false; 
+			if(isset($_REQUEST['master']))
+				$preincoming->master = true; 
+			 else
+		 		$preincoming->master = false; 
+		 		
+		 	if(!$preincoming->save())
+				echo $preincoming->errormsg; 	
+		
+		// Department Coordinator bearbeiten
+		if($_REQUEST['dep_coordinator_id'] == "" && $_REQUEST['nachname_coordinator'] != "")
+		{
+			// Department Coordinator Person
+			$depCoordinator->vorname = $_REQUEST['vorname_coordinator']; 
+			$depCoordinator->nachname = $_REQUEST['nachname_coordinator']; 
+			$depCoordinator->geschlecht = "u"; 
+			$depCoordinator->new = true; 
+			$depCoordinator->aktiv = true; 
+			$depCoordinator->updateamum = date('Y-m-d H:i:s');
+			$depCoordinator->insertamum = date('Y-m-d H:i:s');
+			
+			if(!$depCoordinator->save())
+			{
+				echo $depCoordinator->errormsg; 
+				die('Fehler beim Anlegen der Person aufgetreten.'); 
+			}
+			
+			// in preincoming speichern
+			$preincoming->person_id_coordinator_dep = $depCoordinator->person_id; 
+			$preincoming->updateamum = date('Y-m-d H:i:s');
+			$preincoming->save(); 	
+		}
+		else if ($_REQUEST['dep_coordinator_id'] != "" && $_REQUEST['nachname_coordinator'] == "" && $_REQUEST['vorname_coordinator'] == "")
+		{
+			// löscht die Person
+			if(!$depCoordinator->delete($_REQUEST['dep_coordinator_id']))
+			{
+				echo $depCoordinator->errormsg; 
+				die('Fehler beim Löschen aufgetreten'); 
+			}
+			
+		}
+		else if($_REQUEST['dep_coordinator_id'] != "")
+		{
+			// Person updaten
+			$depCoordinator->load($_REQUEST['dep_coordinator_id']); 
+			$depCoordinator->vorname = $_REQUEST['vorname_coordinator']; 
+			$depCoordinator->nachname = $_REQUEST['nachname_coordinator']; 
+			$depCoordinator->updateamum = date('Y-m-d H:i:s');
+			$depCoordinator->new = false; 
+			if(!$depCoordinator->save())
+			{
+				echo $depCoordinator->errormsg; 
+				die('Fehler beim Speichern der Person aufgetreten.'); 				
+			}	
+		}
+		
+		// Department Coordinator Kontakt
+		$kontakt = new kontakt(); 	
+		
+		// wenn textbox != "" hidden_id == "" 
+		if($_REQUEST['email_coordinator'] != "" && $_REQUEST['dep_coordinator_emailId']== "")
+		{
+			{
+				// Neu anlegen
+				$kontakt->person_id = $depCoordinator->person_id; 
+				$kontakt->kontakttyp = "email"; 
+				$kontakt->kontakt = $_REQUEST['email_coordinator']; 
+				$kontakt->new = true; 
+				
+				if(!$kontakt->save())
+				{
+					echo $kontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+			}
+		}
+		else if(($_REQUEST['email_coordinator'] == "" && $_REQUEST['dep_coordinator_emailId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$kontakt->delete($_REQUEST['dep_coordinator_emailId']))
+			{
+				die("$kontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['dep_coordinator_emailId']!= "")
+		{
+			// Update
+			$kontakt->person_id = $depCoordinator->person_id; 
+			$kontakt->kontakttyp = "email"; 
+			$kontakt->kontakt = $_REQUEST['email_coordinator']; 
+			$kontakt->kontakt_id = $_REQUEST['dep_coordinator_emailId']; 
+			$kontakt->new = false; 
+		
+			if(!$kontakt->save())
+			{
+				echo $kontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+		
+		// wenn textbox und hidden id == "" dann tu nichts
+		if($_REQUEST['fax_coordinator'] != "" && $_REQUEST['dep_coordinator_faxId']== "")
+		{
+
+			// Neu anlegen
+			$kontakt->person_id = $depCoordinator->person_id; 
+			$kontakt->kontakttyp = "fax"; 
+			$kontakt->kontakt = $_REQUEST['fax_coordinator']; 
+			$kontakt->new = true; 
+			
+			if(!$kontakt->save())
+			{
+				echo $kontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+		// wenn id vorhanden und Textbox == "" löschen 
+		else if(($_REQUEST['fax_coordinator'] == "" && $_REQUEST['dep_coordinator_faxId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$kontakt->delete($_REQUEST['dep_coordinator_faxId']))
+			{
+				die("$kontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['dep_coordinator_faxId']!= "")
+		{
+			// Update
+			$kontakt->person_id = $depCoordinator->person_id; 
+			$kontakt->kontakttyp = "fax"; 
+			$kontakt->kontakt = $_REQUEST['fax_coordinator']; 
+			$kontakt->kontakt_id = $_REQUEST['dep_coordinator_faxId']; 
+			$kontakt->new = false; 
+		
+			if(!$kontakt->save())
+			{
+				echo $kontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+		
+		if($_REQUEST['telefon_coordinator'] != "" && $_REQUEST['dep_coordinator_telefonId']== "")
+		{
+				// Neu anlegen
+				$kontakt->person_id = $depCoordinator->person_id; 
+				$kontakt->kontakttyp = "telefon"; 
+				$kontakt->kontakt = $_REQUEST['telefon_coordinator']; 
+				$kontakt->new = true; 
+				
+				if(!$kontakt->save())
+				{
+					echo $kontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+		}
+		else if(($_REQUEST['telefon_coordinator'] == "" && $_REQUEST['dep_coordinator_telefonId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$kontakt->delete($_REQUEST['dep_coordinator_telefonId']))
+			{
+				die("$kontakt->errormsg");  
+			}
+		}else if($_REQUEST['dep_coordinator_telefonId']!= "")
+		{
+			// Update
+			$kontakt->person_id = $depCoordinator->person_id; 
+			$kontakt->kontakttyp = "telefon"; 
+			$kontakt->kontakt = $_REQUEST['telefon_coordinator']; 
+			$kontakt->kontakt_id = $_REQUEST['dep_coordinator_telefonId']; 
+			$kontakt->new = false; 
+		
+			if(!$kontakt->save())
+			{
+				echo $kontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+	
+		// International Coordinator bearbeiten
+		if($_REQUEST['int_coordinator_id'] == "" && $_REQUEST['nachname_intcoordinator'] != "")
+		{
+			// Department Coordinator Person
+			$intCoordinator->vorname = $_REQUEST['vorname_intcoordinator']; 
+			$intCoordinator->nachname = $_REQUEST['nachname_intcoordinator']; 
+			$intCoordinator->geschlecht = "u"; 
+			$intCoordinator->new = true; 
+			$intCoordinator->aktiv = true; 
+			
+			if(!$intCoordinator->save())
+			{
+				echo $intCoordinator->errormsg; 
+				die('Fehler beim Anlegen der Person aufgetreten.'); 
+			}
+			
+			// in preincoming speichern
+			$preincoming->person_id_coordinator_int = $intCoordinator->person_id; 
+			$preincoming->save(); 	
+		}
+		else if($_REQUEST['int_coordinator_id'] != "")
+		{
+			// Person updaten
+			$intCoordinator->load($_REQUEST['int_coordinator_id']); 
+			$intCoordinator->vorname = $_REQUEST['vorname_intcoordinator']; 
+			$intCoordinator->nachname = $_REQUEST['nachname_intcoordinator']; 
+			$intCoordinator->new = false; 
+			if(!$intCoordinator->save())
+			{
+				echo $intCoordinator->errormsg; 
+				die('Fehler beim Speichern der Person aufgetreten.'); 				
+			}	
+		}
+		
+		
+		$intkontakt = new kontakt(); 	
+			
+		// wenn textbox != "" hidden_id == "" 
+		if($_REQUEST['email_intcoordinator'] != "" && $_REQUEST['int_coordinator_emailId']== "")
+		{
+			{
+				// Neu anlegen
+				$intkontakt->person_id = $intCoordinator->person_id; 
+				$intkontakt->kontakttyp = "email"; 
+				$intkontakt->kontakt = $_REQUEST['email_intcoordinator']; 
+				$intkontakt->new = true; 
+				
+				if(!$intkontakt->save())
+				{
+					echo $intkontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+			}
+		}
+		else if(($_REQUEST['email_intcoordinator'] == "" && $_REQUEST['int_coordinator_emailId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$intkontakt->delete($_REQUEST['int_coordinator_emailId']))
+			{
+				die("$intkontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['int_coordinator_emailId']!= "")
+		{
+			// Update
+			$intkontakt->person_id = $intCoordinator->person_id; 
+			$intkontakt->kontakttyp = "email"; 
+			$intkontakt->kontakt = $_REQUEST['email_intcoordinator']; 
+			$intkontakt->kontakt_id = $_REQUEST['int_coordinator_emailId']; 
+			$intkontakt->new = false; 
+		
+			if(!$intkontakt->save())
+			{
+				echo $intkontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+		
+		if($_REQUEST['telefon_intcoordinator'] != "" && $_REQUEST['int_coordinator_telefonId']== "")
+		{
+			{
+				// Neu anlegen
+				$intkontakt->person_id = $intCoordinator->person_id; 
+				$intkontakt->kontakttyp = "telefon"; 
+				$intkontakt->kontakt = $_REQUEST['telefon_intcoordinator']; 
+				$intkontakt->new = true; 
+				
+				if(!$intkontakt->save())
+				{
+					echo $intkontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+			}
+		}
+		else if(($_REQUEST['telefon_intcoordinator'] == "" && $_REQUEST['int_coordinator_telefonId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$intkontakt->delete($_REQUEST['int_coordinator_telefonId']))
+			{
+				die("$intkontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['int_coordinator_telefonId']!= "")
+		{
+			// Update
+			$intkontakt->person_id = $intCoordinator->person_id; 
+			$intkontakt->kontakttyp = "telefon"; 
+			$intkontakt->kontakt = $_REQUEST['telefon_intcoordinator']; 
+			$intkontakt->kontakt_id = $_REQUEST['int_coordinator_telefonId']; 
+			$intkontakt->new = false; 
+		
+			if(!$intkontakt->save())
+			{
+				echo $intkontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+		
+		if($_REQUEST['fax_intcoordinator'] != "" && $_REQUEST['int_coordinator_faxId']== "")
+		{
+			{
+				// Neu anlegen
+				$intkontakt->person_id = $intCoordinator->person_id; 
+				$intkontakt->kontakttyp = "fax"; 
+				$intkontakt->kontakt = $_REQUEST['fax_intcoordinator']; 
+				$intkontakt->new = true; 
+				
+				if(!$intkontakt->save())
+				{
+					echo $intkontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+			}
+		}
+		else if(($_REQUEST['fax_intcoordinator'] == "" && $_REQUEST['int_coordinator_faxId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$intkontakt->delete($_REQUEST['int_coordinator_faxId']))
+			{
+				die("$intkontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['int_coordinator_faxId']!= "")
+		{
+			// Update
+			$intkontakt->person_id = $intCoordinator->person_id; 
+			$intkontakt->kontakttyp = "fax"; 
+			$intkontakt->kontakt = $_REQUEST['fax_intcoordinator']; 
+			$intkontakt->kontakt_id = $_REQUEST['int_coordinator_faxId']; 
+			$intkontakt->new = false; 
+		
+			if(!$intkontakt->save())
+			{
+				echo $intkontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+			
+		echo "Erfolgreich gespeichert"; 
+	}
+
+	// Department Coordinator Kontakt
+	$depCoordinatorKontakt = new kontakt(); 
+	$depCoordinatorKontakt->load_pers($depCoordinator->person_id); 
+	$depTelefon = ""; 
+	$depTelefonId = ""; 
+	$depFax = ""; 
+	$depFaxId = ""; 
+	$depEmail = ""; 
+	$depEmailId = ""; 
+	foreach ($depCoordinatorKontakt->result as $depKontakt)
+	{
+		if($depKontakt->kontakttyp == "telefon")
+		{
+			$depTelefon = $depKontakt->kontakt; 
+			$depTelefonId = $depKontakt->kontakt_id; 
+		}
+		if($depKontakt->kontakttyp == "fax")
+		{
+			$depFax = $depKontakt->kontakt; 
+			$depFaxId = $depKontakt->kontakt_id; 
+		}
+		if($depKontakt->kontakttyp == "email")
+		{
+			$depEmail = $depKontakt->kontakt; 
+			$depEmailId = $depKontakt->kontakt_id; 
+		}
+	}
+	
+	// International Coordinator Kontakt
+	$intCoordinatorKontakt = new kontakt(); 
+	$intCoordinatorKontakt->load_pers($intCoordinator->person_id); 
+	$intTelefon = ""; 
+	$intTelefonId = ""; 
+	$intFax = ""; 
+	$intFaxId = ""; 
+	$intEmail = ""; 
+	$intEmailId = ""; 
+	foreach ($intCoordinatorKontakt->result as $intKontakt)
+	{
+		if($intKontakt->kontakttyp == "telefon")
+		{
+			$intTelefon = $intKontakt->kontakt; 
+			$intTelefonId = $intKontakt->kontakt_id; 
+		}
+		if($intKontakt->kontakttyp == "fax")
+		{
+			$intFax = $intKontakt->kontakt; 
+			$intFaxId = $intKontakt->kontakt_id; 
+		}
+		if($intKontakt->kontakttyp == "email")
+		{
+			$intEmail = $intKontakt->kontakt; 
+			$intEmailId = $intKontakt->kontakt_id; 
+		}
+	}
+
+	
 	echo '	<form method="POST" action="incoming.php?method=university" name="UniversityForm">
-				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:10%;">
-					<tr><td><b>Sending Institution</b></td></tr>
+				<table width="60%" border="1" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
+					<tr><td colspan="2"><b>Sending Institution</b></td></tr>
 					<tr>
 						<td>'.$p->t('incoming/universitätsname').' </td>
-						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->result[0]->universitaet.'"></td>
-					</tr>
-					<tr>
-						<td>'.$p->t('global/code').' </td>
-						<td><input type="text" name="von" size="10"  value="'.$preincoming->result[0]->von.'"></td>
-					</tr>
-					<tr>
-						<td>'.$p->t('global/strasse').'</td>
-						<td><input type="text" size="40" maxlength="256" name="strasse"></td>
-					</tr>	
-					<tr>
-						<td>'.$p->t('global/plz').'</td>
-						<td><input type="text" size="20" maxlength="16" name="plz"></td>
-					</tr>				
-					<tr>
-						<td>'.$p->t('global/ort').'</td>
-						<td><input type="text" size="40" maxlength="256" name="ort"></td>
-					</tr>				
-					<tr>
-						<td>Nation</td>
-				
-						<td><SELECT name="nation"> 
-						<option value="nat_auswahl">-- select --</option>';
-						foreach ($nation->nation as $nat)
+						<td><SELECT name="firma"> 
+						<option value="firma_auswahl">-- other --</option>';
+						foreach ($firma->result as $firm)
 						{
-							echo "<option value='$nat->code' >$nat->langtext</option>";
+							$selected = ''; 
+							if($firm->firma_id == $preincoming->firma_id)
+								$selected = 'selected'; 
+							echo "<option value='$firm->firma_id' $selected>$firm->name</option>";
 						}
-										
-echo'				</tr>	
+	echo '				</td>
+						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->universitaet.'"></td>
+					</tr>
+					<tr>
+						<td>Name of Program:</td>
+						<td><input type="text" name="name_of_program" size=60 value="'.$preincoming->program_name.'"></td>
+					</tr>
+					<tr>';
+			$checked = ''; 
+			if($preincoming->bachelor == true)
+				$checked = 'checked';	
+echo '					<td>Bachelor´s Degree Program:</td>
+						<td><input type="checkbox" name="bachelor" '.$checked.'></td>
+					</tr>
+					<tr>';
+			$checked = ''; 
+			if($preincoming->master == true)
+				$checked = 'checked';	
+echo'					<td>Master´s Degree Program:</td>
+						<td><input type="checkbox" name="master" '.$checked.'></td>
+					</tr>
+					<tr>
+						<td>Years completetd when starting at UAS FH TW:</td>
+						<td><input type="text" name="jahre" size="2" value="'.$preincoming->jahre.'"></td>
+					</tr>
 					<tr>			
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 					</tr>
 				</table>
 				
-				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
-					<tr><td><b>Department Coordinator</b></td></tr>
+				<table width="60%" border="1" align ="center" style="border-sytle:solid;  border-width:1px;">
+					<tr><td colspan="2"><b>Department Coordinator</b></td></tr>
 					<tr>
 						<td width="25%">'.$p->t('global/vorname').' </td>
-						<td width="25%"><input type="text" name="vorname_coordinator" size="20" maxlength="256" value=""></td>
+						<td width="25%"><input type="text" name="vorname_coordinator" size="20" maxlength="256" value="'.$depCoordinator->vorname.'">
+						<input type="hidden" name = "dep_coordinator_id" id="dep_coordinator_id" value="'.$preincoming->person_id_coordinator_dep.'"></td>
 						<td width="25%">'.$p->t('global/nachname').' </td>
-						<td width="25%"><input type="text" name="nachname_coordinator" size="20"  value=""></td>
+						<td width="25%"><input type="text" name="nachname_coordinator" size="20"  value="'.$depCoordinator->nachname.'"></td>
 					</tr>
 					<tr>
 						<td>'.$p->t('global/telefon').' </td>
-						<td><input type="text" name="telefon_coordinator" size="20"  value=""></td>
+						<td><input type="text" name="telefon_coordinator" size="20"  value="'.$depTelefon.'">
+						<input type="hidden" name = "dep_coordinator_telefonId" id="dep_coordinator_telefonId" value="'.$depTelefonId.'"></td>
 						<td>'.$p->t('global/fax').' </td>
-						<td><input type="text" name="fax_coordinator" size="20"  value=""></td>
+						<td><input type="text" name="fax_coordinator" size="20"  value="'.$depFax.'">
+						<input type="hidden" name = "dep_coordinator_faxId" id="dep_coordinator_faxId" value="'.$depFaxId.'"></td>
 					</tr>
 					<tr>
 						<td>E-Mail </td>
-						<td colspan="3"><input type="text" name="email_coordinator" size="20"  value=""></td>
+						<td colspan="3"><input type="text" name="email_coordinator" size="20"  value="'.$depEmail.'">
+						<input type="hidden" name = "dep_coordinator_emailId" id="dep_coordinator_emailId" value="'.$depEmailId.'"></td>
 					</tr>
 					</tr>
 						<td>&nbsp;</td>
@@ -415,23 +857,27 @@ echo'				</tr>
 					</tr>
 				</table>
 				
-				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
-					<tr><td><b>International Coordinator</b></td></tr>
+				<table width="60%" border="1" align ="center" style="border-sytle:solid;  border-width:1px;">
+					<tr><td colspan="2"><b>International Coordinator</b></td></tr>
 					<tr>
 						<td width="25%">'.$p->t('global/vorname').' </td>
-						<td width="25%"><input type="text" name="vorname_intcoordinator" size="20" maxlength="256" value=""></td>
+						<td width="25%"><input type="text" name="vorname_intcoordinator" size="20" maxlength="256" value="'.$intCoordinator->vorname.'">
+						<input type="hidden" name = "int_coordinator_id" id="int_coordinator_id" value="'.$preincoming->person_id_coordinator_int.'"></td>
 						<td width="25%">'.$p->t('global/nachname').' </td>
-						<td width="25%"><input type="text" name="nachname_intcoordinator" size="20"  value=""></td>
+						<td width="25%"><input type="text" name="nachname_intcoordinator" size="20"  value="'.$intCoordinator->nachname.'"></td>
 					</tr>
 					<tr>
 						<td>'.$p->t('global/telefon').' </td>
-						<td><input type="text" name="telefon_intcoordinator" size="20"  value=""></td>
+						<td><input type="text" name="telefon_intcoordinator" size="20"  value="'.$intTelefon.'">
+						<input type="hidden" name = "int_coordinator_telefonId" id="int_coordinator_telefonId" value="'.$intTelefonId.'"></td></td>
 						<td>'.$p->t('global/fax').' </td>
-						<td><input type="text" name="fax_intcoordinator" size="20"  value=""></td>
+						<td><input type="text" name="fax_intcoordinator" size="20"  value="'.$intFax.'">
+						<input type="hidden" name = "int_coordinator_faxId" id="int_coordinator_faxId" value="'.$intFaxId.'"></td></td>
 					</tr>
 					<tr>
 						<td>E-Mail </td>
-						<td colspan="3"><input type="text" name="email_intcoordinator" size="20"  value=""></td>
+						<td colspan="3"><input type="text" name="email_intcoordinator" size="20"  value="'.$intEmail.'">
+						<input type="hidden" name = "int_coordinator_emailId" id="int_coordinator_emailId" value="'.$intEmailId.'"></td></td>
 					</tr>
 					</tr>
 						<td>&nbsp;</td>
@@ -459,16 +905,147 @@ echo'				</tr>
 // Benutzerprofil bearbeiten
 else if ($method == "profil")
 {	
+	var_dump($_REQUEST); 
 	// Profil speichern
 	if(isset($_POST['submit_profil']))
 	{
 		$save = true; 
+		$emergencyPerson = new person(); 
+		
+		
+	if($_REQUEST['emergency_name_id'] == "" && $_REQUEST['emergency_nachname'] != "")
+		{
+			// Emergency Person
+			$emergencyPerson->vorname = $_REQUEST['emergency_vorname']; 
+			$emergencyPerson->nachname = $_REQUEST['emergency_nachname']; 
+			$emergencyPerson->geschlecht = "u"; 
+			$emergencyPerson->new = true; 
+			$emergencyPerson->aktiv = true; 
+			$emergencyPerson->updateamum = date('Y-m-d H:i:s');
+			$emergencyPerson->insertamum = date('Y-m-d H:i:s');
+			
+			if(!$emergencyPerson->save())
+			{
+				echo $emergencyPerson->errormsg; 
+				die('Fehler beim Anlegen der Person aufgetreten.'); 
+			}
+			
+			// in preincoming speichern
+			$preincoming->person_id_emergency = $emergencyPerson->person_id; 
+			$preincoming->updateamum = date('Y-m-d H:i:s');
+			
+		}
+		else if ($_REQUEST['emergency_name_id'] != "" && $_REQUEST['emergency_nachname'] == "" && $_REQUEST['emergency_vorname'] == "")
+		{
+			// löscht die Person
+			if(!$emergencyPerson->delete($_REQUEST['emergency_name_id']))
+			{
+				echo $emergencyPerson->errormsg; 
+				die('Fehler beim Löschen aufgetreten'); 
+			}
+			
+		}
+		else if($_REQUEST['emergency_name_id'] != "")
+		{
+			// Person updaten
+			$emergencyPerson->load($_REQUEST['emergency_name_id']); 
+			$emergencyPerson->vorname = $_REQUEST['emergency_vorname']; 
+			$emergencyPerson->nachname = $_REQUEST['emergency_nachname']; 
+			$emergencyPerson->updateamum = date('Y-m-d H:i:s');
+			$emergencyPerson->new = false; 
+			if(!$emergencyPerson->save())
+			{
+				echo $emergencyPerson->errormsg; 
+				die('Fehler beim Speichern der Person aufgetreten.'); 				
+			}	
+		}
+		
+		$emkontakt = new kontakt(); 
+		if($_REQUEST['emergency_email'] != "" && $_REQUEST['emergency_emailId']== "")
+		{
+			{
+				// Neu anlegen
+				$emkontakt->person_id = $_REQUEST['emergency_name_id']; 
+				$emkontakt->kontakttyp = "email"; 
+				$emkontakt->kontakt = $_REQUEST['emergency_email']; 
+				$emkontakt->new = true; 
+				
+				if(!$emkontakt->save())
+				{
+					echo $emkontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+			}
+		}
+		else if(($_REQUEST['emergency_email'] == "" && $_REQUEST['emergency_emailId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$emkontakt->delete($_REQUEST['emergency_emailId']))
+			{
+				die("$emkontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['emergency_emailId']!= "")
+		{
+			// Update
+			$emkontakt->person_id = $_REQUEST['emergency_name_id']; 
+			$emkontakt->kontakttyp = "email"; 
+			$emkontakt->kontakt = $_REQUEST['emergency_email']; 
+			$emkontakt->kontakt_id = $_REQUEST['emergency_emailId']; 
+			$emkontakt->new = false; 
+		
+			if(!$emkontakt->save())
+			{
+				echo $emkontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
+		
+		if($_REQUEST['emergency_telefon'] != "" && $_REQUEST['emergency_telefonId']== "")
+		{
+			{
+				// Neu anlegen
+				$emkontakt->person_id = $_REQUEST['emergency_name_id']; 
+				$emkontakt->kontakttyp = "telefon"; 
+				$emkontakt->kontakt = $_REQUEST['emergency_telefon']; 
+				$emkontakt->new = true; 
+				
+				if(!$emkontakt->save())
+				{
+					echo $emkontakt->errormsg; 
+					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				}
+			}
+		}
+		else if(($_REQUEST['emergency_telefon'] == "" && $_REQUEST['emergency_telefonId']!= ""))
+		{
+			// lösche Kontakt
+			if(!$emkontakt->delete($_REQUEST['emergency_telefonId']))
+			{
+				die("$emkontakt->errormsg");  
+			}
+		}
+		else if($_REQUEST['emergency_telefonId']!= "")
+		{
+			// Update
+			$emkontakt->person_id = $_REQUEST['emergency_name_id']; 
+			$emkontakt->kontakttyp = "telefon"; 
+			$emkontakt->kontakt = $_REQUEST['emergency_telefon']; 
+			$emkontakt->kontakt_id = $_REQUEST['emergency_telefonId']; 
+			$emkontakt->new = false; 
+		
+			if(!$emkontakt->save())
+			{
+				echo $emkontakt->errormsg; 
+				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+			}
+		}
 		
 		$person->titelpost = $_REQUEST['titel_post']; 
 		$person->vorname = $_REQUEST['vorname']; 
 		$person->nachname = $_REQUEST['nachname']; 
 		$person->titelpre = $_REQUEST['titel_pre']; 
-		$person->gebdatum = $_REQUEST['geb_datum']; 
+		$person->gebdatum = $date->formatDatum($_REQUEST['geb_datum'],'Y-m-d'); 
 		$person->staatsbuergerschaft = $_REQUEST['staatsbuerger']; 
 		$person->anmerkungen = $_REQUEST['anmerkung']; 
 		$person->geschlecht = $_REQUEST['geschlecht']; 
@@ -493,8 +1070,7 @@ else if ($method == "profil")
 		{
 			echo $adresse->errormsg;
 			$save = false; 
-		}
-
+		} 
 		foreach($kontakt->result as $kon)
 		{
 			if($kon->kontakttyp=="email")
@@ -508,12 +1084,55 @@ else if ($method == "profil")
 				}
 			}
 		}
+
+		$preincoming->zgv = $_REQUEST['zgv'];
+		$preincoming->zgv_name = $_REQUEST['zgv_name']; 
+		$preincoming->zgv_ort = $_REQUEST['zgv_ort']; 
+		$preincoming->zgv_datum = $date->formatDatum($_REQUEST['zgv_datum'],'Y-m-d');
+		$preincoming->zgvmaster = $_REQUEST['zgv_master_name']; 
+		$preincoming->zgvmaster_datum = $date->formatDatum($_REQUEST['zgv_master_datum'],'Y-m-d'); 
+		$preincoming->zgvmaster_ort = $_REQUEST['zgv_master_ort']; 
+		
+		 	
+		if(!$preincoming->save())
+			$save = false; 
+			
 		if($save)
 			echo $p->t('global/erfolgreichgespeichert');   
 	}
+	
+	
+	$personEmergency = new person(); 
+	$personEmergencyKontakt = new kontakt(); 
+	$emTelefon = ""; 
+	$emTelefonId = ""; 
+	$emEmail = ""; 
+	$emEmailId = ""; 
+	
+	if($preincoming->person_id_emergency != "")
+	{
+		$personEmergency->load($preincoming->person_id_emergency); 
+		$personEmergencyKontakt->load_pers($preincoming->person_id_emergency); 
+		
+		foreach ($personEmergencyKontakt->result as $emKontakt)
+		{
+			if($emKontakt->kontakttyp == "telefon")
+			{
+				$emTelefon = $emKontakt->kontakt; 
+				$emTelefonId = $emKontakt->kontakt_id; 
+			}
+			if($emKontakt->kontakttyp == "email")
+			{
+				$emEmail = $emKontakt->kontakt; 
+				$emEmailId = $emKontakt->kontakt_id; 
+			}
+		}
+	}
 	// Ausgabe Profil Formular
 	echo'<form action="incoming.php?method=profil" method="POST" name="ProfilForm">
-		<table border = "1" align="center" style="margin-top:5%;">
+	
+	<table border =0 align="center"><tr valign="top"><td>
+		<table border = "1" >
 			<tr>
 				<td>'.$p->t('global/titel').' Post</td>
 				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
@@ -532,7 +1151,7 @@ else if ($method == "profil")
 			</tr>
 			<tr>
 				<td>'.$p->t('global/geburtsdatum').'</td>
-				<td><input type="text" size="20" name="geb_datum" value="'.$person->gebdatum.'" onfocus="this.value="""; > (yyyy-mm-dd)</td>
+				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value="""; > (dd.mm.YYYY)</td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/staatsbuergerschaft').'</td>
@@ -609,6 +1228,78 @@ else if ($method == "profil")
 				<td colspan="2" align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>		
 			</tr>
 		</table>
+		
+		
+		</td>
+		<td>
+		
+		
+		<table border =1>
+			<tr>
+				<td>University Entrance Qualification 1:</td>
+				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
+			</tr>
+			<tr>
+				<td>Issued by (name of institution):</td>
+				<td><input type="text" name="zgv_name" size=40 value="'.$preincoming->zgv_name.'"></td>
+			</tr>	
+			<tr>
+				<td>Issued in(place):</td>
+				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
+			</tr>					
+			<tr>
+				<td>Issued on (Date dd.mm.YYYY)</td>
+				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>
+			<tr>
+				<td>Bachelor´s degree (if applicable):</td>
+				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td>
+			</tr>
+			<tr>
+				<td>Issued by (name of institution):</td>
+				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster.'"></td>
+			</tr>
+			<tr>
+				<td>Issued in (place):</td>
+				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
+			</tr>
+			<tr>
+				<td>Issued on (date):</td>
+				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>
+			<tr>
+				<td colspan="2">Person to Contact in Case of Emergency:</td>
+				</td></td>
+			</tr>
+			<tr>
+				<td>First Name</td>
+				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
+				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td>
+			</tr>
+			<tr>
+				<td>Last Name</td>
+				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
+			</tr>
+			<tr>
+				<td>Phone</td>
+				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">
+				<input type="hidden" name="emergency_telefonId" id="emergency_telefonId" value="'.$emTelefonId.'"></td>
+			</tr>
+			<tr>
+				<td>Email</td>
+				<td><input type="text" size="40" name="emergency_email" value="'.$emEmail.'">
+				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
+			</tr>
+			
+			</table>
+		
+		
+		</td>
+		</tr>
+		</table>
+		
 	</form>
 	
 	<script type="text/javascript">
@@ -658,7 +1349,7 @@ else if($method == 'files')
 			<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
-					<td width="25%" align="center"><a href="'.APP_ROOT.'/content/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">Upload File</a></td>
+					<td width="25%" align="center"><a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">Upload File</a></td>
 					<td width="25%"></td>
 					<td width="25%"></td>
 				</tr>
@@ -677,7 +1368,7 @@ else if($method == 'files')
 	{	
 		echo '<tr>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'"><img src="'.APP_ROOT.'skin/images/delete_round.png"</a></td>
-				<td><a href="'.APP_ROOT.'content/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
+				<td><a href="'.APP_ROOT.'cis/public/incoming/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
 				<td>'.$ak->bezeichnung.'</td>
 			</tr>';
 	}
