@@ -2319,6 +2319,54 @@ if(!@$db->db_query("SELECT zgv FROM public.tbl_preincoming LIMIT 1"))
 		echo 'Tabelle public.tbl_preincoming Erweiterungen hinzugefuegt!<br>';
 }
 
+// CMS Updates
+if(!@$db->db_query("SELECT gesperrt_uid FROM campus.tbl_contentsprache LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE campus.tbl_contentsprache ADD COLUMN gesperrt_uid varchar(32);
+	ALTER TABLE campus.tbl_content ADD COLUMN aktiv boolean DEFAULT true;
+	ALTER TABLE campus.tbl_content ADD COLUMN menu_open boolean DEFAULT true;
+	ALTER TABLE campus.tbl_contentchild ADD COLUMN sort smallint;
+	
+	UPDATE campus.tbl_content SET aktiv=true;
+	ALTER TABLE campus.tbl_content ALTER COLUMN aktiv SET NOT NULL;
+	UPDATE campus.tbl_content SET menu_open=true;
+	ALTER TABLE campus.tbl_content ALTER COLUMN menu_open SET NOT NULL;
+	
+	CREATE TABLE campus.tbl_contentlog
+	(
+		contentlog_id integer NOT NULL,
+		uid varchar(32) NOT NULL,
+		contentsprache_id integer NOT NULL,
+		start timestamp,
+		ende timestamp
+	);
+	
+	CREATE SEQUENCE campus.seq_contentlog_contentlog_id
+		 	INCREMENT BY 1
+		 	NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+
+	ALTER TABLE campus.tbl_contentlog ALTER COLUMN contentlog_id SET DEFAULT nextval('campus.seq_contentlog_contentlog_id');
+		
+	ALTER TABLE campus.tbl_contentlog ADD CONSTRAINT pk_contentlog PRIMARY KEY (contentlog_id);
+	ALTER TABLE campus.tbl_contentlog ADD CONSTRAINT uk_contentlog_contentlog_id UNIQUE (contentlog_id);
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentlog TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentlog TO admin;
+	
+	ALTER TABLE campus.tbl_contentlog ADD CONSTRAINT fk_benutzer_contentlog FOREIGN KEY(uid) REFERENCES public.tbl_benutzer (uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE campus.tbl_contentlog ADD CONSTRAINT fk_contentsprache_contentlog FOREIGN KEY(contentsprache_id) REFERENCES campus.tbl_contentsprache (contentsprache_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+	
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_content: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_content Erweiterungen hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2346,10 +2394,11 @@ $tabellen=array(
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
-	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz"),
-	"campus.tbl_contentchild"  => array("contentchild_id","content_id","child_content_id","updatevon","updateamum","insertamum","insertvon"),
+	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz","menu_open","aktiv"),
+	"campus.tbl_contentchild"  => array("contentchild_id","content_id","child_content_id","updatevon","updateamum","insertamum","insertvon","sort"),
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
-	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel"),
+	"campus.tbl_contentlog"  => array("contentlog_id","contentsprache_id","uid","start","ende"),
+	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel","gesperrt_uid"),
 	"campus.tbl_dms"  => array("dms_id","version","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),

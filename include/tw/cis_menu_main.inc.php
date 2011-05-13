@@ -22,6 +22,25 @@
 /**
  * Hauptmenue fuer CIS
  */
+/*
+function drawSubmenu($content_id)
+{
+	global $sprache;
+	$content = new content();
+	$sprache = getSprache();
+	
+	$arr = $content->getMenueArray($content_id, $sprache);
+	echo '<table>';
+	foreach ($arr as $row)
+	{
+		echo '
+		<tr>
+		  	<td class="tdwidth10" nowrap>&nbsp;</td>
+			<td class="tdwrap"><a class="Item" href="'.$row['link'].'" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$row['name'].'</a></td>
+		</tr>';
+	}
+	echo '</table>';
+}*/
 ?>
 <table class="tabcontent">
 <tr>
@@ -68,6 +87,10 @@
 				  		<tr>
 				  			<td class="tdwrap"></td>
 							<td><a href="private/info/oeh/wahl2011.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Wahlen 2011</a></td>
+				  		</tr>
+				  		<tr>
+				  			<td class="tdwrap"></td>
+							<td><a href="private/info/oeh/KandidatInnen2011.pdf" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-KandidatInnen 2011</a></td>
 				  		</tr>
 						<tr>
 				  			<td class="tdwrap"></td>
@@ -921,6 +944,10 @@
 			  	</table>
 			</td>
 		</tr>
+		<?php
+		//Betriebsratstest
+		//drawSubmenu(24);
+		?>
  		<!-- Hauptmenue FAQ -->
  		<tr>
 			<td class="tdwrap"><a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;FAQ</a></td>
