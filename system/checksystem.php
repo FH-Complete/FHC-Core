@@ -16,8 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  ******************************************************************************
  * Beschreibung:
  * Dieses Skript prueft die gesamte Systemumgebung und sollte nach jedem Update gestartet werden.
@@ -38,6 +37,130 @@ echo '<H2>DB-Updates!</H2>';
 // ********************** Pruefungen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
+// **************** Spalte oe bei Tabelle Projekt
+if(!$result = @$db->db_query('SELECT oe_kurzbz FROM fue.tbl_projekt LIMIT 1;'))
+{
+	$qry = "ALTER TABLE fue.tbl_projekt ADD COLUMN oe_kurzbz VARCHAR(32);
+			UPDATE fue.tbl_projekt SET oe_kurzbz='etw';
+			ALTER TABLE fue.tbl_projekt ALTER COLUMN oe_kurzbz SET NOT NULL;
+			ALTER TABLE fue.tbl_projekt ADD CONSTRAINT fk_projekt_oe FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' fue.tbl_projekt: Spalte oe_kurzbz hinzugefuegt!<br>';
+}
+
+// ************** Tabellen fuer Projektphasen
+if(!$result = @$db->db_query("SELECT * FROM fue.tbl_projektphase LIMIT 1;"))
+{
+	$qry = 'CREATE TABLE "fue"."tbl_projektphase"
+			(
+				"projektphase_id" Serial NOT NULL,
+				"projekt_kurzbz" Character varying(16),
+				"projektphase_fk" Integer,
+				"bezeichnung" Character varying(32) NOT NULL,
+				"beschreibung" Text,
+				"start" Date,
+				"ende" Date,
+				"budget" Numeric(12,2),
+				"insertamum" Timestamp DEFAULT now() NOT NULL,
+				"insertvon" Character varying(32),
+				"updateamum" Timestamp DEFAULT now() NOT NULL,
+				"updatevon" Character varying(32)
+			)
+			WITH (OIDS=FALSE);
+			ALTER TABLE "fue"."tbl_projektphase" ADD CONSTRAINT "pk_projektphase" PRIMARY KEY ("projektphase_id");
+			ALTER TABLE "fue"."tbl_projektphase" ADD CONSTRAINT "fk_projektphase_projekt" FOREIGN KEY ("projekt_kurzbz") REFERENCES "fue"."tbl_projekt" ("projekt_kurzbz") ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE "fue"."tbl_projektphase" ADD CONSTRAINT "fk_projektphase_projektphase" FOREIGN KEY ("projektphase_fk") REFERENCES "fue"."tbl_projektphase" ("projektphase_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' fue.tbl_projektphase: Tabelle neu erstellt!<br>';
+}
+
+if(!$result = @$db->db_query("SELECT * FROM fue.tbl_projekttask LIMIT 1;"))
+{
+	$qry = 'CREATE TABLE "fue"."tbl_projekttask"
+			(
+				"projekttask_id" Serial NOT NULL,
+				"projektphase_id" Integer NOT NULL,
+				"bezeichnung" Character varying(256),
+				"beschreibung" Text,
+				"aufwand" Smallint,
+				"mantis_id" Bigint,
+				"insertamum" Date DEFAULT now() NOT NULL,
+				"insertvon" Character varying(32),
+				"updateamum" Date DEFAULT now() NOT NULL,
+				"updatevon" Character varying(32)
+			)
+			WITH (OIDS=FALSE);
+			ALTER TABLE "fue"."tbl_projekttask" ADD CONSTRAINT "pk_projekttask" PRIMARY KEY ("projekttask_id");
+			ALTER TABLE "fue"."tbl_projekttask" ADD CONSTRAINT "fk_projekttask_projektphase" FOREIGN KEY ("projektphase_id") REFERENCES "fue"."tbl_projektphase" ("projektphase_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekttask: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' fue.tbl_projekttask: Tabelle neu erstellt!<br>';
+}
+
+// ************** Tabellen fuer Notizen
+if(!$result = @$db->db_query("SELECT * FROM public.tbl_notiz LIMIT 1;"))
+{
+	$qry = 'CREATE TABLE public.tbl_notiz
+			(
+				notiz_id Serial NOT NULL,
+				titel Character varying(256) NOT NULL,
+				text Text,
+				verfasser_uid Character varying(32) NOT NULL,
+				bearbeiter_uid Character varying(32) NOT NULL,
+				start Date,
+				ende Date,
+				erledigt Boolean,
+				insertamum Timestamp DEFAULT now() NOT NULL,
+				insertvon Character varying(32),
+				updateamum Timestamp DEFAULT now() NOT NULL,
+				updatevon Character varying(32)
+			)
+			WITH (OIDS=FALSE);
+			ALTER TABLE public.tbl_notiz ADD CONSTRAINT pk_notiz PRIMARY KEY (notiz_id);
+			ALTER TABLE public.tbl_notiz ADD CONSTRAINT fk_notiz_benutzer_verfasser FOREIGN KEY (verfasser_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_notiz ADD CONSTRAINT fk_notiz_benutzer_bearbeiter FOREIGN KEY (bearbeiter_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE CASCADE ON UPDATE CASCADE;';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_notiz: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_notiz: Tabelle neu erstellt!<br>';
+}
+
+if(!$result = @$db->db_query("SELECT * FROM public.tbl_notizzuordnung LIMIT 1;"))
+{
+	$qry = 'CREATE TABLE public.tbl_notizzuordnung
+			(
+				notizzuordnung_id Serial NOT NULL,
+				notiz_id Integer NOT NULL,
+				projekt_kurzbz Character varying(16),
+				projektphase_id Integer,
+				projekttask_id Integer,
+				uid Character varying(32),
+				person_id Integer,
+				prestudent_id Integer,
+				bestellung_id Integer
+			)
+			WITH (OIDS=FALSE);
+			ALTER TABLE public.tbl_notizzuordnung ADD CONSTRAINT pk_notizzuordnung PRIMARY KEY (notizzuordnung_id);
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_benutzer" FOREIGN KEY ("uid") REFERENCES "public"."tbl_benutzer" ("uid") ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_notiz" FOREIGN KEY ("notiz_id") REFERENCES "public"."tbl_notiz" ("notiz_id") ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_projekt" FOREIGN KEY ("projekt_kurzbz") REFERENCES "fue"."tbl_projekt" ("projekt_kurzbz") ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_projektphase" FOREIGN KEY ("projektphase_id") REFERENCES "fue"."tbl_projektphase" ("projektphase_id") ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_projekttask" FOREIGN KEY ("projekttask_id") REFERENCES "fue"."tbl_projekttask" ("projekttask_id") ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_person" FOREIGN KEY ("person_id") REFERENCES "public"."tbl_person" ("person_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_prestudent" FOREIGN KEY ("prestudent_id") REFERENCES "public"."tbl_prestudent" ("prestudent_id") ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE "public"."tbl_notizzuordnung" ADD CONSTRAINT "fk_notizzuordnung_bestellung" FOREIGN KEY ("bestellung_id") REFERENCES "wawi"."tbl_bestellung" ("bestellung_id") ON DELETE CASCADE ON UPDATE CASCADE;';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_notizzuordnung: Tabelle neu erstellt!<br>';
+}
+
+// **************** Spalte aktiv Tabelle OE
 if(!$result = @$db->db_query("SELECT aktiv FROM public.tbl_organisationseinheit LIMIT 1;"))
 {
 	$qry = 'ALTER TABLE public.tbl_organisationseinheit ADD COLUMN aktiv boolean;
@@ -1256,6 +1379,7 @@ if(!@$db->db_query('SELECT * FROM wawi.tbl_konto LIMIT 1'))
 			
 			-- Bestelldetail
 			
+
 			CREATE TABLE wawi.tbl_bestelldetail
 			(
 				bestelldetail_id bigint NOT NULL,
@@ -2425,8 +2549,10 @@ $tabellen=array(
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz"),
 	"fue.tbl_projektbenutzer"  => array("projektbenutzer_id","uid","funktion_kurzbz","projekt_kurzbz"),
+	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon"),
+	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon"),
 	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertamum","matchdatumzeit","matchort","matchbestaetigtvon","matchbestaetigtamum","ergebniss","bestaetigtvon","bestaetigtamum"),
 	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
 	"kommune.tbl_teambenutzer"  => array("uid","team_kurzbz"),

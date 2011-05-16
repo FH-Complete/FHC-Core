@@ -2406,6 +2406,25 @@ $tabellen=array
 				"description" => ""
 			),
 			
+			'{482E0A67-F7A0-44F2-B513-E4CDBF39ABCB}' => array
+			(
+				"id" => "{482E0A67-F7A0-44F2-B513-E4CDBF39ABCB}" ,
+				"name" => "sichtbar" ,
+				"caption" => "sichtbar" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -2434,7 +2453,7 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{F65EF5CC-3B02-46A9-9267-01DA143B63D9}",
+							"id" => "{F65EF5CC-3B02-46A9-9267-01DA143B63D9}","id" => "{8F160CFB-FAB8-42FA-AFF9-14A2526FD274}",
 				   		)
 		   			),
 		   			
@@ -3246,7 +3265,7 @@ $tabellen=array
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{4DB643A4-2D32-4ACA-8CC6-35C3BC7795E7}",
+							"id" => "{4DB643A4-2D32-4ACA-8CC6-35C3BC7795E7}","id" => "{F4C72714-4556-419F-9188-598B8EDAD28C}",
 				   		)
 		   			),
 		   			
@@ -8892,12 +8911,31 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"description" => ""
 			),
 			
+			'{144CD927-C0FB-4502-844D-1FB19DA50636}' => array
+			(
+				"id" => "{144CD927-C0FB-4502-844D-1FB19DA50636}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{7EA4D2D5-EE3B-4F88-BD67-1E8FDECCBF3F}' => array
 			(
 				"id" => "{7EA4D2D5-EE3B-4F88-BD67-1E8FDECCBF3F}" ,
 				"name" => "nummer" ,
 				"caption" => "nummer" ,
-				"ordinal" => "2" ,
+				"ordinal" => "3" ,
 				"pk" => "" ,
 				"datatypeid" => "{E12D6C2A-E13A-4877-B9C4-AA7BA668C316}" ,
 				"datatypeparam1" => "8" ,
@@ -8916,7 +8954,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{FE594232-7F10-461F-B76D-85B05A1324D0}" ,
 				"name" => "titel" ,
 				"caption" => "titel" ,
-				"ordinal" => "3" ,
+				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -8935,7 +8973,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{85BE6565-80CE-44CC-B760-B345502E4A11}" ,
 				"name" => "beschreibung" ,
 				"caption" => "beschreibung" ,
-				"ordinal" => "4" ,
+				"ordinal" => "5" ,
 				"pk" => "" ,
 				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
 				"datatypeparam1" => "" ,
@@ -8952,9 +8990,9 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 			'{41A3A88A-D18B-43B3-A359-9857C6110784}' => array
 			(
 				"id" => "{41A3A88A-D18B-43B3-A359-9857C6110784}" ,
-				"name" => "beginn" ,
-				"caption" => "beginn" ,
-				"ordinal" => "5" ,
+				"name" => "start" ,
+				"caption" => "start" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -8973,12 +9011,50 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"id" => "{F9FB0446-9A4E-48DF-8898-2B7D5CC1811F}" ,
 				"name" => "ende" ,
 				"caption" => "ende" ,
-				"ordinal" => "6" ,
+				"ordinal" => "7" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F3E4FC3D-C2E5-490B-8B68-EAB881F872AF}' => array
+			(
+				"id" => "{F3E4FC3D-C2E5-490B-8B68-EAB881F872AF}" ,
+				"name" => "budget" ,
+				"caption" => "budget" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{62EFC135-8C28-4065-BAC4-27526C650667}' => array
+			(
+				"id" => "{62EFC135-8C28-4065-BAC4-27526C650667}" ,
+				"name" => "antrag_kurzbz" ,
+				"caption" => "antrag_kurzbz" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -9015,7 +9091,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{6D474BB4-B542-468F-8E66-A2DAAD9C0080}","id" => "{C34CC8D9-1155-462F-8FFB-16CD6684B08B}","id" => "{CC262E27-5F23-4F56-9A64-E7F0120C3509}",
+							"id" => "{6D474BB4-B542-468F-8E66-A2DAAD9C0080}","id" => "{C34CC8D9-1155-462F-8FFB-16CD6684B08B}","id" => "{CC262E27-5F23-4F56-9A64-E7F0120C3509}","id" => "{E1E1ECEB-2DFA-48AB-ADF2-AD2323E0E516}","id" => "{19A457EC-C1A8-4BB7-9746-A93C4ACE2B51}",
 				   		)
 		   			),
 		   			
@@ -9043,7 +9119,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				"caption" => "projektbenutzer_id" ,
 				"ordinal" => "1" ,
 				"pk" => "" ,
-				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
@@ -13278,7 +13354,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{DBF16663-DA89-4C5C-8CE1-30018FA765FE}","id" => "{9DD76DA1-77B6-42C8-9A7B-D951BC42E7CC}","id" => "{67ACFB41-4383-464D-8535-39218E13EEFA}","id" => "{E99C26C5-D6FB-4477-B802-64C8F44D5019}","id" => "{95DE5158-7895-4F08-A84C-8B114E5B38EA}","id" => "{431EB7BB-BBD8-4DCB-A63D-8AF938C10BFD}","id" => "{7E1A7746-B178-40EF-8497-BD191846C9FD}","id" => "{E9114B7C-6657-4FBF-BD85-4A435F263BF8}",
+							"id" => "{DBF16663-DA89-4C5C-8CE1-30018FA765FE}","id" => "{9DD76DA1-77B6-42C8-9A7B-D951BC42E7CC}","id" => "{67ACFB41-4383-464D-8535-39218E13EEFA}","id" => "{E99C26C5-D6FB-4477-B802-64C8F44D5019}","id" => "{95DE5158-7895-4F08-A84C-8B114E5B38EA}","id" => "{431EB7BB-BBD8-4DCB-A63D-8AF938C10BFD}","id" => "{7E1A7746-B178-40EF-8497-BD191846C9FD}","id" => "{E9114B7C-6657-4FBF-BD85-4A435F263BF8}","id" => "{C9B5B23F-5A16-46CE-A39D-9C855785EE06}",
 				   		)
 		   			),
 		   			
@@ -18268,7 +18344,7 @@ Studiengang>0 und Semester>0 -> News fuer bestimmtes Semester im Studiengang" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}","id" => "{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}","id" => "{B5CDBA7C-C418-4369-880D-F395732719F6}","id" => "{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}","id" => "{4B442C0C-6000-4003-97C8-40640D73C52B}","id" => "{A9109C87-859C-4D7C-8933-511A7231B1E8}","id" => "{71F8271B-B5B2-4002-8EC5-74639660E463}","id" => "{BF6217E2-57AB-4D99-B40D-7CBEF0466622}","id" => "{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}","id" => "{30BEDA69-44AE-49C6-9687-18D9FB5A720B}","id" => "{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}","id" => "{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}","id" => "{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}","id" => "{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}","id" => "{97064858-CA15-40E8-AE55-98B6BD1BE753}","id" => "{087640DB-A402-4657-A79B-79B6C539C027}","id" => "{3A452E95-98F0-4764-A775-011B729C69A9}","id" => "{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}","id" => "{CF08AC9E-4FD5-4F1D-B38C-708027F34218}","id" => "{B7455DCB-FB2A-4A2E-A9D8-B2912F496834}",
+							"id" => "{FE80C60C-023F-4AF7-B698-1CFC9F7E1C2D}","id" => "{51FD5C03-1ED3-4EE3-A332-F8DA632D06AC}","id" => "{B5CDBA7C-C418-4369-880D-F395732719F6}","id" => "{3631E3A5-1F99-46FD-A4BA-BB722B7DFFD9}","id" => "{4B442C0C-6000-4003-97C8-40640D73C52B}","id" => "{A9109C87-859C-4D7C-8933-511A7231B1E8}","id" => "{71F8271B-B5B2-4002-8EC5-74639660E463}","id" => "{BF6217E2-57AB-4D99-B40D-7CBEF0466622}","id" => "{AD60A4F3-2145-4880-BE2C-DE21D644B0E0}","id" => "{30BEDA69-44AE-49C6-9687-18D9FB5A720B}","id" => "{3FEC4FD0-F0D8-42DD-809E-F49ECF50879B}","id" => "{B09CC23A-3E58-40D6-9043-B0B1AFCF1F7F}","id" => "{C5E9A46B-90FF-4D0A-A4AA-B33F947A0DB5}","id" => "{E443D3A6-5E4E-41DB-AE49-66F8ADB57E62}","id" => "{97064858-CA15-40E8-AE55-98B6BD1BE753}","id" => "{087640DB-A402-4657-A79B-79B6C539C027}","id" => "{3A452E95-98F0-4764-A775-011B729C69A9}","id" => "{6FFF3B6D-C12F-4147-B3A2-01A0F133FDCC}","id" => "{CF08AC9E-4FD5-4F1D-B38C-708027F34218}","id" => "{B7455DCB-FB2A-4A2E-A9D8-B2912F496834}","id" => "{02B95A0C-644B-4DD4-94C9-3BA34DADB850}","id" => "{DE0F0B99-B793-4215-BF9F-044E6F8475E7}","id" => "{8CA05996-6162-44E6-80A3-9903776309D4}","id" => "{AE607AF0-799A-4AFE-8B4D-157A783182D8}","id" => "{06829AC1-DD34-4898-BA1B-F43A476D7BB4}","id" => "{F6581D94-8798-4820-B6B8-030D7E887D9B}",
 				   		)
 		   			),
 		   			
@@ -19277,7 +19353,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{EBEB54AB-1B3A-4FE2-A0A9-C86182A788F4}","id" => "{702AEF40-5817-43C4-93DF-6774F0C499A3}",
+							"id" => "{EBEB54AB-1B3A-4FE2-A0A9-C86182A788F4}","id" => "{702AEF40-5817-43C4-93DF-6774F0C499A3}","id" => "{749A308C-772E-4ECC-9BDB-C5D1EFB52216}","id" => "{D41B0FDD-A0AF-4AFF-9C86-30B530C68F00}",
 				   		)
 		   			),
 		   			
@@ -20434,7 +20510,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{C0ACDDA6-AB4E-4F43-A319-0290C1F664C5}","id" => "{CC1A1816-CF05-40C5-BA61-84297A6DD34D}","id" => "{E5A357B0-35BD-4269-B0D4-6E02F9CA4BF5}",
+							"id" => "{C0ACDDA6-AB4E-4F43-A319-0290C1F664C5}","id" => "{CC1A1816-CF05-40C5-BA61-84297A6DD34D}","id" => "{E5A357B0-35BD-4269-B0D4-6E02F9CA4BF5}","id" => "{91284962-D481-4920-B205-4D56B74469FB}",
 				   		)
 		   			),
 		   			
@@ -21456,7 +21532,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}","id" => "{5E64D00F-BF30-45AA-8171-0C3FCC183903}","id" => "{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}","id" => "{1B3EE35E-A221-4E54-A428-20EE997CC89A}","id" => "{5F937967-995D-456B-A9D2-DA746E123869}","id" => "{472B3BFA-5F62-40AD-B30E-4D707D2B837F}","id" => "{301871B2-5357-4E08-9F1A-D557A2C9D16B}",
+							"id" => "{7BAFC3D3-245A-443F-8205-E032B5A9928E}","id" => "{5E64D00F-BF30-45AA-8171-0C3FCC183903}","id" => "{FDF536FB-A00A-47B9-85E7-A7E9C2A020FA}","id" => "{1B3EE35E-A221-4E54-A428-20EE997CC89A}","id" => "{5F937967-995D-456B-A9D2-DA746E123869}","id" => "{472B3BFA-5F62-40AD-B30E-4D707D2B837F}","id" => "{301871B2-5357-4E08-9F1A-D557A2C9D16B}","id" => "{76F85F49-9DBB-41CB-A069-4498A44B93B9}",
 				   		)
 		   			),
 		   			
@@ -22050,6 +22126,25 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				"description" => ""
 			),
 			
+			'{2369737A-934A-44F7-8CAB-ABAD685B94E9}' => array
+			(
+				"id" => "{2369737A-934A-44F7-8CAB-ABAD685B94E9}" ,
+				"name" => "content_visible" ,
+				"caption" => "content_visible" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -22078,7 +22173,7 @@ art=tbl_benutzerrolle.art & tbl_rolleberechtigung.art" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{3229E124-B6D4-461E-B4A4-D56D63A627E9}","id" => "{C0D45455-D62E-4976-8A81-8F779C91F41B}","id" => "{4A6EFE0B-68CC-4573-AC43-C168310F9A0E}","id" => "{2F376168-E84F-4287-8A24-7C30108CD3EB}","id" => "{2E07FD73-BB4C-4AEE-9B45-C3A961B2E8D2}",
+							"id" => "{3229E124-B6D4-461E-B4A4-D56D63A627E9}","id" => "{C0D45455-D62E-4976-8A81-8F779C91F41B}","id" => "{4A6EFE0B-68CC-4573-AC43-C168310F9A0E}","id" => "{2F376168-E84F-4287-8A24-7C30108CD3EB}","id" => "{2E07FD73-BB4C-4AEE-9B45-C3A961B2E8D2}","id" => "{12F20E3B-D2BC-4B15-8131-F4E58718B58E}",
 				   		)
 		   			),
 		   			
@@ -24922,6 +25017,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{53339C1E-830A-4C45-BAF6-268943C55659}' => array
+			(
+				"id" => "{53339C1E-830A-4C45-BAF6-268943C55659}" ,
+				"name" => "zugangscode" ,
+				"caption" => "zugangscode" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -24950,7 +25064,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{FD7372C4-E1DD-4F12-918D-3A4DA8CF7036}","id" => "{8E80C392-058E-403F-9AA5-7845D311968F}","id" => "{023E2197-E937-4783-9D09-FE606DC41519}","id" => "{C1CD45D1-395A-4B39-B59F-2E89E13A750D}","id" => "{F36F7395-6885-42A5-8902-97D40342AF16}","id" => "{E1F532C1-966E-4469-B905-A8A10A375423}","id" => "{406CED68-48C4-4CDC-8D82-896F84060C81}","id" => "{4457750C-FBAD-4C70-8477-416716D7AD5D}","id" => "{8118FF48-4119-4321-B571-CE0EB46E568A}","id" => "{4390E05A-55A3-4B0F-B0B3-6E564D9018F9}","id" => "{DF4C72CD-C7D2-4F64-A891-3953B0BD2E52}","id" => "{7930DCF1-5FCE-4DCD-B50A-58773226C53F}","id" => "{D02765C1-84FD-4450-8298-39F1DF521C4C}","id" => "{F7D74494-70BA-4832-A0E4-5F36FAFF10BA}","id" => "{B552BF61-80BD-42BB-B53A-04A0EBE09FE3}",
+							"id" => "{FD7372C4-E1DD-4F12-918D-3A4DA8CF7036}","id" => "{8E80C392-058E-403F-9AA5-7845D311968F}","id" => "{023E2197-E937-4783-9D09-FE606DC41519}","id" => "{C1CD45D1-395A-4B39-B59F-2E89E13A750D}","id" => "{F36F7395-6885-42A5-8902-97D40342AF16}","id" => "{E1F532C1-966E-4469-B905-A8A10A375423}","id" => "{406CED68-48C4-4CDC-8D82-896F84060C81}","id" => "{4457750C-FBAD-4C70-8477-416716D7AD5D}","id" => "{8118FF48-4119-4321-B571-CE0EB46E568A}","id" => "{4390E05A-55A3-4B0F-B0B3-6E564D9018F9}","id" => "{DF4C72CD-C7D2-4F64-A891-3953B0BD2E52}","id" => "{7930DCF1-5FCE-4DCD-B50A-58773226C53F}","id" => "{D02765C1-84FD-4450-8298-39F1DF521C4C}","id" => "{F7D74494-70BA-4832-A0E4-5F36FAFF10BA}","id" => "{B552BF61-80BD-42BB-B53A-04A0EBE09FE3}","id" => "{B8643DDA-4E3E-4E96-BD2B-005B5D5B6A97}","id" => "{BD5224E9-A3D7-445C-8B8A-91A332B20F00}","id" => "{6E2562DC-8934-4E41-8CCC-51B2AF3F6751}","id" => "{A9FA2968-899B-4F8E-8D4D-E33E9BF88B71}","id" => "{54E475B5-8912-4DEA-9428-F9585904FD3A}",
 				   		)
 		   			),
 		   			
@@ -26347,7 +26461,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{E6F28A4B-135D-4B21-BFEB-A0B04DE07211}","id" => "{ECF5114E-27D0-4B59-A700-6B31E7145974}","id" => "{51328EC1-919B-4C5A-8951-5AF6E496497A}","id" => "{18B53C7F-FD84-4825-B3B2-7EA2064BEB9B}",
+							"id" => "{E6F28A4B-135D-4B21-BFEB-A0B04DE07211}","id" => "{ECF5114E-27D0-4B59-A700-6B31E7145974}","id" => "{51328EC1-919B-4C5A-8951-5AF6E496497A}","id" => "{18B53C7F-FD84-4825-B3B2-7EA2064BEB9B}","id" => "{0B4B53D9-028F-452A-8532-AC99F14B898E}",
 				   		)
 		   			),
 		   			
@@ -27331,6 +27445,63 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{0089CA0F-5C89-4DE5-95C6-9B8435A82560}' => array
+			(
+				"id" => "{0089CA0F-5C89-4DE5-95C6-9B8435A82560}" ,
+				"name" => "index" ,
+				"caption" => "index" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E3EFECD8-D2BF-4B01-93A6-CFF00B67DCEA}' => array
+			(
+				"id" => "{E3EFECD8-D2BF-4B01-93A6-CFF00B67DCEA}" ,
+				"name" => "content" ,
+				"caption" => "content" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{50C8C070-F10E-4B6D-B2ED-702F87F61F8A}' => array
+			(
+				"id" => "{50C8C070-F10E-4B6D-B2ED-702F87F61F8A}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -27359,7 +27530,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{BE3059FD-3FA7-4669-8A46-9A5D3943C836}","id" => "{2DD0C47B-CC2B-4A6E-83CF-CD573FF5EF36}","id" => "{0FF63A76-E599-44A2-BFCF-BDD876D04DCF}","id" => "{A77718EA-7338-4F04-B21D-497D49FF6EEC}","id" => "{8D8EE04D-0B2D-4D60-9AC7-28FDD5E259BD}","id" => "{08771D92-AE4A-485F-8F08-870B667B99CA}","id" => "{6C2773B9-37DA-4846-8E29-823971F3D59B}","id" => "{24D6C2EE-7B51-4538-8454-FB1068CC801D}","id" => "{2638BFC0-E92D-4C23-AA7B-EC87F1446B18}","id" => "{41FD15C8-58B7-41BC-ABA5-8F969A1FE7F7}",
+							"id" => "{BE3059FD-3FA7-4669-8A46-9A5D3943C836}","id" => "{2DD0C47B-CC2B-4A6E-83CF-CD573FF5EF36}","id" => "{0FF63A76-E599-44A2-BFCF-BDD876D04DCF}","id" => "{A77718EA-7338-4F04-B21D-497D49FF6EEC}","id" => "{8D8EE04D-0B2D-4D60-9AC7-28FDD5E259BD}","id" => "{08771D92-AE4A-485F-8F08-870B667B99CA}","id" => "{6C2773B9-37DA-4846-8E29-823971F3D59B}","id" => "{24D6C2EE-7B51-4538-8454-FB1068CC801D}","id" => "{2638BFC0-E92D-4C23-AA7B-EC87F1446B18}","id" => "{41FD15C8-58B7-41BC-ABA5-8F969A1FE7F7}","id" => "{433C5091-A976-4D84-AB99-37F5012B0DA5}",
 				   		)
 		   			),
 		   			
@@ -28804,6 +28975,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{9419152D-8473-406B-A3DA-F7B309912A92}' => array
+			(
+				"id" => "{9419152D-8473-406B-A3DA-F7B309912A92}" ,
+				"name" => "projektarbeit_note_anzeige" ,
+				"caption" => "projektarbeit_note_anzeige" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -28832,7 +29022,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{9A3D92DF-7BB1-4A99-B975-6BFB561CA054}","id" => "{E01A51F0-9817-4B9E-87B4-AD88511A7484}","id" => "{84834544-7C0B-4D5D-BE60-EEBBC571180A}","id" => "{03EA6ECB-3E16-4CD8-9721-33746A3D596D}","id" => "{A813A643-CDDE-440B-AF63-D9D1D6FF5779}","id" => "{76147385-7A16-4F69-A739-4A2D9945FF9F}","id" => "{1495EAA9-176B-40E1-B643-1C9128FF0F63}","id" => "{7740E93D-E105-4ABD-B5B6-BC28CE2F0C4D}","id" => "{4E67F4E3-E295-4730-9A80-D4FE6B1AAB72}","id" => "{1AA18910-AA6E-452D-98CA-AAA803D850A8}","id" => "{C36A18CB-C28D-41A0-9CCF-9A58569DA5CF}","id" => "{ADC16795-15B2-452F-9A30-8872127A5766}","id" => "{5869536B-FF07-4D5C-9192-823F468C2CF2}","id" => "{41FE7305-F8C5-453C-8EF0-675AC38B527C}","id" => "{B6D48515-C259-433D-8B83-97BB33CEF2BA}","id" => "{3CD424D6-3156-498A-B66B-5FC918CB1F44}","id" => "{36567C3B-646F-43F9-9AAB-149A263CA201}","id" => "{C7895818-115A-490E-A495-4B596DDB1000}","id" => "{F2E327C3-8E59-4D11-868A-15B5B2B2C5BB}","id" => "{23F28CA9-8BD7-472C-AAC5-39BB29ED0B5C}","id" => "{0C19F66B-7692-433D-8F78-C95A346216D2}","id" => "{6DF31221-E54A-4458-81EA-4370B5822C58}",
+							"id" => "{9A3D92DF-7BB1-4A99-B975-6BFB561CA054}","id" => "{E01A51F0-9817-4B9E-87B4-AD88511A7484}","id" => "{84834544-7C0B-4D5D-BE60-EEBBC571180A}","id" => "{03EA6ECB-3E16-4CD8-9721-33746A3D596D}","id" => "{A813A643-CDDE-440B-AF63-D9D1D6FF5779}","id" => "{76147385-7A16-4F69-A739-4A2D9945FF9F}","id" => "{1495EAA9-176B-40E1-B643-1C9128FF0F63}","id" => "{7740E93D-E105-4ABD-B5B6-BC28CE2F0C4D}","id" => "{4E67F4E3-E295-4730-9A80-D4FE6B1AAB72}","id" => "{1AA18910-AA6E-452D-98CA-AAA803D850A8}","id" => "{C36A18CB-C28D-41A0-9CCF-9A58569DA5CF}","id" => "{ADC16795-15B2-452F-9A30-8872127A5766}","id" => "{5869536B-FF07-4D5C-9192-823F468C2CF2}","id" => "{41FE7305-F8C5-453C-8EF0-675AC38B527C}","id" => "{B6D48515-C259-433D-8B83-97BB33CEF2BA}","id" => "{3CD424D6-3156-498A-B66B-5FC918CB1F44}","id" => "{36567C3B-646F-43F9-9AAB-149A263CA201}","id" => "{C7895818-115A-490E-A495-4B596DDB1000}","id" => "{F2E327C3-8E59-4D11-868A-15B5B2B2C5BB}","id" => "{23F28CA9-8BD7-472C-AAC5-39BB29ED0B5C}","id" => "{0C19F66B-7692-433D-8F78-C95A346216D2}","id" => "{6DF31221-E54A-4458-81EA-4370B5822C58}","id" => "{3ACB281D-E7B1-424A-B141-C366B3F21E6A}",
 				   		)
 		   			),
 		   			
@@ -29363,12 +29553,31 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 	    	"attribute"  => array
 	    	(
 			
+			'{D4BD2769-772B-4D55-994E-9B53C0CAF159}' => array
+			(
+				"id" => "{D4BD2769-772B-4D55-994E-9B53C0CAF159}" ,
+				"name" => "vorlagestudiengang_id" ,
+				"caption" => "vorlagestudiengang_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{862EDDBF-35B6-4AA1-B567-44AA5B127F96}' => array
 			(
 				"id" => "{862EDDBF-35B6-4AA1-B567-44AA5B127F96}" ,
 				"name" => "vorlage_kurzbz" ,
 				"caption" => "vorlage_kurzbz" ,
-				"ordinal" => "1" ,
+				"ordinal" => "2" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -29387,14 +29596,33 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{CFE4EA0B-05EF-4CBD-BAF1-34A664176AA9}" ,
 				"name" => "studiengang_kz" ,
 				"caption" => "studiengang_kz" ,
-				"ordinal" => "2" ,
+				"ordinal" => "3" ,
 				"pk" => "" ,
 				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
 				"datatypeparam1" => "" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "1",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EEA4478A-32B0-49CD-AF85-306CF9EAEA36}' => array
+			(
+				"id" => "{EEA4478A-32B0-49CD-AF85-306CF9EAEA36}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -29406,7 +29634,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{EAB427A8-738F-43D2-852D-1A6DF1391459}" ,
 				"name" => "version" ,
 				"caption" => "version" ,
-				"ordinal" => "3" ,
+				"ordinal" => "5" ,
 				"pk" => "" ,
 				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
 				"datatypeparam1" => "" ,
@@ -29425,7 +29653,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{49F6BFF7-0EBE-4212-9873-7C2F60609DA5}" ,
 				"name" => "text" ,
 				"caption" => "text" ,
-				"ordinal" => "4" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
 				"datatypeparam1" => "" ,
@@ -29453,53 +29681,17 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"keyconstraintitem"  => array
 			    	(
 					
-			   		'{E837C90F-27F5-4A0D-82DC-18DBCADD29C0}' => array
+			   		'{B283668E-D8CB-497D-9828-EFCCBC04B030}' => array
 			   		(
-		   				"id" => "{E837C90F-27F5-4A0D-82DC-18DBCADD29C0}" ,
-		   				"name" => "vorlage_kurzbz" ,
+		   				"id" => "{B283668E-D8CB-497D-9828-EFCCBC04B030}" ,
+		   				"name" => "vorlagestudiengang_id" ,
 		   				"caption" => "" ,
 		   				"ordinal" => "0" ,
 		   				"comments" => "" ,
 		   				"description" => "",
 						"attribute"  => array
 					    	(
-							"id" => "{862EDDBF-35B6-4AA1-B567-44AA5B127F96}",
-				   		),
-						"foreignkeys"  => array
-					    	(
-							
-				   		)
-		   			),
-		   			
-			   		'{E498A745-7BE6-4D1B-97DC-EF84FB69A74C}' => array
-			   		(
-		   				"id" => "{E498A745-7BE6-4D1B-97DC-EF84FB69A74C}" ,
-		   				"name" => "studiengang_kz" ,
-		   				"caption" => "" ,
-		   				"ordinal" => "1" ,
-		   				"comments" => "" ,
-		   				"description" => "",
-						"attribute"  => array
-					    	(
-							"id" => "{CFE4EA0B-05EF-4CBD-BAF1-34A664176AA9}",
-				   		),
-						"foreignkeys"  => array
-					    	(
-							
-				   		)
-		   			),
-		   			
-			   		'{61FC3AA5-3AFA-4C6B-B230-32CC8ABA3F19}' => array
-			   		(
-		   				"id" => "{61FC3AA5-3AFA-4C6B-B230-32CC8ABA3F19}" ,
-		   				"name" => "version" ,
-		   				"caption" => "" ,
-		   				"ordinal" => "2" ,
-		   				"comments" => "" ,
-		   				"description" => "",
-						"attribute"  => array
-					    	(
-							"id" => "{EAB427A8-738F-43D2-852D-1A6DF1391459}",
+							"id" => "{D4BD2769-772B-4D55-994E-9B53C0CAF159}",
 				   		),
 						"foreignkeys"  => array
 					    	(
@@ -32574,6 +32766,25 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{52D0F33C-A2CE-4F40-ABA6-5714D1A50E7C}' => array
+			(
+				"id" => "{52D0F33C-A2CE-4F40-ABA6-5714D1A50E7C}" ,
+				"name" => "kurzzeichen" ,
+				"caption" => "kurzzeichen" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -32581,8 +32792,8 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 			'{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}' => array
 			(
 				"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}" ,
-				"name" => "Key5" ,
-				"caption" => "Key5" ,
+				"name" => "pk_organisationseinheit" ,
+				"caption" => "pk_organisationseinheit" ,
 				"ordinal" => "0" ,
 				"comments" => "" ,
 				"keyconstraintitem"  => array
@@ -32602,7 +32813,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{8C907027-ADCA-4E9E-B7F6-9172E40276CE}","id" => "{A34D7372-82C3-4FB5-BCE6-178F395E2480}","id" => "{35E3574A-1362-4C1F-8A71-AE4BD850D2BB}","id" => "{4FC9C131-177B-403F-A140-080E12A95245}","id" => "{1B7E1CE7-F867-458F-9EBC-0FD4B2DB2DC9}","id" => "{DB2DF6F4-5CE8-477C-820A-2D96DFA6FDB6}","id" => "{A4881723-4E50-4A5A-A26A-47EC283155E1}","id" => "{C46B6E52-7C48-409C-A7C4-63D5442BA823}","id" => "{BA4D2F69-C753-426C-B6A5-525F7D706D13}","id" => "{61C6BE6F-9AB8-4231-A5E4-7E35ED8773ED}","id" => "{7B34F5FA-FD6A-4334-8F25-AACBF59B32E2}",
+							"id" => "{8C907027-ADCA-4E9E-B7F6-9172E40276CE}","id" => "{A34D7372-82C3-4FB5-BCE6-178F395E2480}","id" => "{35E3574A-1362-4C1F-8A71-AE4BD850D2BB}","id" => "{4FC9C131-177B-403F-A140-080E12A95245}","id" => "{1B7E1CE7-F867-458F-9EBC-0FD4B2DB2DC9}","id" => "{DB2DF6F4-5CE8-477C-820A-2D96DFA6FDB6}","id" => "{A4881723-4E50-4A5A-A26A-47EC283155E1}","id" => "{C46B6E52-7C48-409C-A7C4-63D5442BA823}","id" => "{BA4D2F69-C753-426C-B6A5-525F7D706D13}","id" => "{61C6BE6F-9AB8-4231-A5E4-7E35ED8773ED}","id" => "{7B34F5FA-FD6A-4334-8F25-AACBF59B32E2}","id" => "{3154E9AD-3008-4808-A683-1F492C0A3A95}","id" => "{76355676-7347-4DC3-B667-B3BCC991245B}","id" => "{23C5CADB-32B6-471D-A6AC-78F5F2280B49}","id" => "{D008EE51-5041-419F-9349-737DCED80EF6}",
 				   		)
 		   			),
 		   			
@@ -35095,12 +35306,31 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{C7C0BCF3-DD9B-49F8-A6A6-1FBC00F9491C}' => array
+			(
+				"id" => "{C7C0BCF3-DD9B-49F8-A6A6-1FBC00F9491C}" ,
+				"name" => "zahlungstyp_kurzbz" ,
+				"caption" => "zahlungstyp_kurzbz" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{815F8EB2-6120-4F68-BCD4-97C18D7202F9}' => array
 			(
 				"id" => "{815F8EB2-6120-4F68-BCD4-97C18D7202F9}" ,
 				"name" => "freigegeben" ,
 				"caption" => "freigegeben" ,
-				"ordinal" => "8" ,
+				"ordinal" => "9" ,
 				"pk" => "" ,
 				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
 				"datatypeparam1" => "" ,
@@ -35119,7 +35349,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{6E00E540-71A3-4A5B-BA50-996B2FE95E41}" ,
 				"name" => "bestell_nr" ,
 				"caption" => "bestell_nr" ,
-				"ordinal" => "9" ,
+				"ordinal" => "10" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "16" ,
@@ -35138,7 +35368,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{CCC50399-21E0-444F-870D-C79825EE2A71}" ,
 				"name" => "titel" ,
 				"caption" => "titel" ,
-				"ordinal" => "10" ,
+				"ordinal" => "11" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -35157,7 +35387,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{061276BF-5A24-48CB-8C98-64297529102E}" ,
 				"name" => "bemerkung" ,
 				"caption" => "bemerkung" ,
-				"ordinal" => "11" ,
+				"ordinal" => "12" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "256" ,
@@ -35176,12 +35406,12 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{516FBC44-0CF7-464D-9D7E-3C027FBCB33C}" ,
 				"name" => "liefertermin" ,
 				"caption" => "liefertermin" ,
-				"ordinal" => "12" ,
+				"ordinal" => "13" ,
 				"pk" => "" ,
-				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
-				"datatypeparam1" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
 				"datatypeparam2" => "" ,
-				"length" => "",
+				"length" => "16",
 				"unique" => "0",
 				"notnull" => "0",
 				"defaultvalue" => "",
@@ -35195,7 +35425,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{DAE353B9-6105-4B52-ADFD-2378A59C333C}" ,
 				"name" => "updateamum" ,
 				"caption" => "updateamum" ,
-				"ordinal" => "13" ,
+				"ordinal" => "14" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -35214,7 +35444,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{C5776FC5-54A7-4A80-AAFC-5525355710CB}" ,
 				"name" => "updatevon" ,
 				"caption" => "updatevon" ,
-				"ordinal" => "14" ,
+				"ordinal" => "15" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -35233,7 +35463,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{1CEDE6A7-AAAB-4254-921F-6F80C05DFD87}" ,
 				"name" => "insertamum" ,
 				"caption" => "insertamum" ,
-				"ordinal" => "15" ,
+				"ordinal" => "16" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -35252,7 +35482,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{B44E31EA-A9B5-4C74-BBBA-05595C840E0A}" ,
 				"name" => "insertvon" ,
 				"caption" => "insertvon" ,
-				"ordinal" => "16" ,
+				"ordinal" => "17" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -35271,7 +35501,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{9C8CE4F0-34D3-4F9C-A37A-44535BD0EDC1}" ,
 				"name" => "ext_id" ,
 				"caption" => "ext_id" ,
-				"ordinal" => "17" ,
+				"ordinal" => "18" ,
 				"pk" => "" ,
 				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
 				"datatypeparam1" => "" ,
@@ -35313,7 +35543,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{E6A172F9-75F2-4B11-B92C-B60EFD6E3D2C}","id" => "{D5A5F4FD-5A4B-48AA-A6B7-F0BFDEF6FA60}","id" => "{09B3B452-F304-42EA-9742-10BE0A7ACEB0}","id" => "{0B756FCF-E3B3-498D-AD8F-4FE589D0E1AB}","id" => "{8D1D27AB-2AC6-4EE2-A0A6-4FC08BD7B35D}","id" => "{3A821542-9842-4D98-A597-3AC1CEB7169A}","id" => "{CB62308D-30C4-434F-BD51-66B4505D9BAE}",
+							"id" => "{E6A172F9-75F2-4B11-B92C-B60EFD6E3D2C}","id" => "{D5A5F4FD-5A4B-48AA-A6B7-F0BFDEF6FA60}","id" => "{09B3B452-F304-42EA-9742-10BE0A7ACEB0}","id" => "{0B756FCF-E3B3-498D-AD8F-4FE589D0E1AB}","id" => "{8D1D27AB-2AC6-4EE2-A0A6-4FC08BD7B35D}","id" => "{3A821542-9842-4D98-A597-3AC1CEB7169A}","id" => "{CB62308D-30C4-434F-BD51-66B4505D9BAE}","id" => "{16FA37EE-9FF5-4869-979C-44321A49F0FE}",
 				   		)
 		   			),
 		   			
@@ -35748,25 +35978,6 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
-			'{CC6FBFCB-B32D-404A-9B00-E3D0196DB37A}' => array
-			(
-				"id" => "{CC6FBFCB-B32D-404A-9B00-E3D0196DB37A}" ,
-				"name" => "budget" ,
-				"caption" => "budget" ,
-				"ordinal" => "6" ,
-				"pk" => "" ,
-				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
-				"datatypeparam1" => "12" ,
-				"datatypeparam2" => "2" ,
-				"length" => "12",
-				"unique" => "0",
-				"notnull" => "0",
-				"defaultvalue" => "",
-				"checkconstraintname" => "",
-				"checkconstraint" => "",
-				"description" => ""
-			),
-			
 			'{1FEF6D39-35EB-437B-B149-102FC0A61F92}' => array
 			(
 				"id" => "{1FEF6D39-35EB-437B-B149-102FC0A61F92}" ,
@@ -35843,6 +36054,82 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{53B71BFA-DD3B-46CA-A0BA-DB087630CCF1}' => array
+			(
+				"id" => "{53B71BFA-DD3B-46CA-A0BA-DB087630CCF1}" ,
+				"name" => "ext_id" ,
+				"caption" => "ext_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4D366B60-4AB8-4236-962F-BCB48A669357}' => array
+			(
+				"id" => "{4D366B60-4AB8-4236-962F-BCB48A669357}" ,
+				"name" => "kostenstelle_nr" ,
+				"caption" => "kostenstelle_nr" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "4" ,
+				"datatypeparam2" => "" ,
+				"length" => "4",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4502BDFB-1ECF-4AAD-B73B-1ED63AF73E7C}' => array
+			(
+				"id" => "{4502BDFB-1ECF-4AAD-B73B-1ED63AF73E7C}" ,
+				"name" => "deaktiviertamum" ,
+				"caption" => "deaktiviertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8146AC33-AA3A-4E7F-8413-8F9270983872}' => array
+			(
+				"id" => "{8146AC33-AA3A-4E7F-8413-8F9270983872}" ,
+				"name" => "deaktiviertvon" ,
+				"caption" => "deaktiviertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 	   	),
 		"keyconstraint"  => array
 	    	(
@@ -35871,7 +36158,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{2A31D553-50F4-4E7A-A04D-9D918732F217}","id" => "{934AE6B8-19E0-4856-869D-C695B30909A7}","id" => "{A0B74FF7-8046-4A98-936F-1083DBE8F467}",
+							"id" => "{2A31D553-50F4-4E7A-A04D-9D918732F217}","id" => "{934AE6B8-19E0-4856-869D-C695B30909A7}","id" => "{A0B74FF7-8046-4A98-936F-1083DBE8F467}","id" => "{B55291B2-7F9D-429E-936C-A76E459C67B5}","id" => "{ED2BA045-FD07-416D-B4AA-C75DD4457063}",
 				   		)
 		   			),
 		   			
@@ -36389,7 +36676,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				   		),
 						"foreignkeys"  => array
 					    	(
-							"id" => "{986A1692-77B6-4100-ACD7-1F16A1B19D28}",
+							"id" => "{986A1692-77B6-4100-ACD7-1F16A1B19D28}","id" => "{622E127E-8D86-4A28-A6E8-ECC606A5AB4B}",
 				   		)
 		   			),
 		   			
@@ -36583,7 +36870,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"pk" => "" ,
 				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
 				"datatypeparam1" => "12" ,
-				"datatypeparam2" => "2" ,
+				"datatypeparam2" => "4" ,
 				"length" => "12",
 				"unique" => "0",
 				"notnull" => "0",
@@ -36863,12 +37150,31 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{E1466E3B-74B4-4D4D-AAA9-1A6D82FA70A5}' => array
+			(
+				"id" => "{E1466E3B-74B4-4D4D-AAA9-1A6D82FA70A5}" ,
+				"name" => "rechnungstyp_kurzbz" ,
+				"caption" => "rechnungstyp_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{DDE4D490-8AFB-419A-9316-7D44507A6981}' => array
 			(
 				"id" => "{DDE4D490-8AFB-419A-9316-7D44507A6981}" ,
 				"name" => "buchungsdatum" ,
 				"caption" => "buchungsdatum" ,
-				"ordinal" => "3" ,
+				"ordinal" => "4" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -36887,7 +37193,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{7B7FC66B-DB9B-4073-AE02-600AA6056665}" ,
 				"name" => "rechnungsnr" ,
 				"caption" => "rechnungsnr" ,
-				"ordinal" => "4" ,
+				"ordinal" => "5" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -36906,7 +37212,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{EE741099-FE07-47FF-A905-4B17ABA222A7}" ,
 				"name" => "rechnungsdatum" ,
 				"caption" => "rechnungsdatum" ,
-				"ordinal" => "5" ,
+				"ordinal" => "6" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -36925,7 +37231,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{83FFCC49-3CFE-44F9-A737-66F64B0926E3}" ,
 				"name" => "transfer_datum" ,
 				"caption" => "transfer_datum" ,
-				"ordinal" => "6" ,
+				"ordinal" => "7" ,
 				"pk" => "" ,
 				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
 				"datatypeparam1" => "" ,
@@ -36944,7 +37250,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{D54A2B0F-D431-428E-9033-37D9C068E8B4}" ,
 				"name" => "buchungstext" ,
 				"caption" => "buchungstext" ,
-				"ordinal" => "7" ,
+				"ordinal" => "8" ,
 				"pk" => "" ,
 				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
 				"datatypeparam1" => "" ,
@@ -36958,12 +37264,69 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"description" => ""
 			),
 			
+			'{71093EF5-A498-4095-9890-8EBEA8A8BF1E}' => array
+			(
+				"id" => "{71093EF5-A498-4095-9890-8EBEA8A8BF1E}" ,
+				"name" => "freigegeben" ,
+				"caption" => "freigegeben" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D54ACDAC-F005-435D-90D5-A94596860ABB}' => array
+			(
+				"id" => "{D54ACDAC-F005-435D-90D5-A94596860ABB}" ,
+				"name" => "freigegebenamum" ,
+				"caption" => "freigegebenamum" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BDA07A01-903A-4183-B8BE-FA3C7F8A5AB0}' => array
+			(
+				"id" => "{BDA07A01-903A-4183-B8BE-FA3C7F8A5AB0}" ,
+				"name" => "freigegebenvon" ,
+				"caption" => "freigegebenvon" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
 			'{5F373495-234A-4EDA-9996-9C057A1BA798}' => array
 			(
 				"id" => "{5F373495-234A-4EDA-9996-9C057A1BA798}" ,
 				"name" => "insertamum" ,
 				"caption" => "insertamum" ,
-				"ordinal" => "8" ,
+				"ordinal" => "12" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -36982,7 +37345,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{FDE72ABE-ACB5-4931-BB19-7D312A4CC18F}" ,
 				"name" => "insertvon" ,
 				"caption" => "insertvon" ,
-				"ordinal" => "9" ,
+				"ordinal" => "13" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -37001,7 +37364,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{F293C977-9EB5-4CAD-A8F1-85A8D0D048FA}" ,
 				"name" => "updateamum" ,
 				"caption" => "updateamum" ,
-				"ordinal" => "10" ,
+				"ordinal" => "14" ,
 				"pk" => "" ,
 				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
 				"datatypeparam1" => "" ,
@@ -37020,7 +37383,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"id" => "{E233248A-8152-4606-8671-2B2B22D9020A}" ,
 				"name" => "updatevon" ,
 				"caption" => "updatevon" ,
-				"ordinal" => "11" ,
+				"ordinal" => "15" ,
 				"pk" => "" ,
 				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
 				"datatypeparam1" => "32" ,
@@ -37320,7 +37683,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -37339,7 +37702,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "32",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -37552,7 +37915,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -37571,7 +37934,7 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 				"datatypeparam2" => "" ,
 				"length" => "32",
 				"unique" => "0",
-				"notnull" => "0",
+				"notnull" => "1",
 				"defaultvalue" => "",
 				"checkconstraintname" => "",
 				"checkconstraint" => "",
@@ -38260,6 +38623,4550 @@ ALTER TABLE tbl_mitarbeiter ALTER COLUMN personalnummer DROP NOT NULL;" ,
 						"attribute"  => array
 					    	(
 							"id" => "{2E569589-4860-4ADA-8A02-1148038D8C2E}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{4CB2D7B6-6DCE-4CCE-A121-9F5A8BA92298}'  => array
+	(
+	    	"id" => "{4CB2D7B6-6DCE-4CCE-A121-9F5A8BA92298}" ,
+	    	"name" => "tbl_konto_kostenstelle" ,
+	    	"caption" => "tbl_konto_kostenstelle" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{0BF5457D-0598-48EB-A2A5-AF97E73D9B55}' => array
+			(
+				"id" => "{0BF5457D-0598-48EB-A2A5-AF97E73D9B55}" ,
+				"name" => "konto_id" ,
+				"caption" => "konto_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{43FFE33C-2CFD-46C4-9A35-AD62D1CB151D}' => array
+			(
+				"id" => "{43FFE33C-2CFD-46C4-9A35-AD62D1CB151D}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5D9604D8-735C-4792-8EE9-3112CEFD6940}' => array
+			(
+				"id" => "{5D9604D8-735C-4792-8EE9-3112CEFD6940}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7C240286-D6EA-49E1-9E0D-26C5D07E30B0}' => array
+			(
+				"id" => "{7C240286-D6EA-49E1-9E0D-26C5D07E30B0}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{7DB47409-C516-4B51-A5D6-BBB97FD09BC9}' => array
+			(
+				"id" => "{7DB47409-C516-4B51-A5D6-BBB97FD09BC9}" ,
+				"name" => "Key26" ,
+				"caption" => "Key26" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{84D29A9A-622A-4ED8-B47C-B34BB22DF529}' => array
+			   		(
+		   				"id" => "{84D29A9A-622A-4ED8-B47C-B34BB22DF529}" ,
+		   				"name" => "konto_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{0BF5457D-0598-48EB-A2A5-AF97E73D9B55}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{FEF3F45F-A5B9-4FA5-8E48-B3EA1A1EE8CB}' => array
+			   		(
+		   				"id" => "{FEF3F45F-A5B9-4FA5-8E48-B3EA1A1EE8CB}" ,
+		   				"name" => "kostenstelle_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{43FFE33C-2CFD-46C4-9A35-AD62D1CB151D}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{52B7832E-AC7C-45AE-88E4-CE0E95E8562D}'  => array
+	(
+	    	"id" => "{52B7832E-AC7C-45AE-88E4-CE0E95E8562D}" ,
+	    	"name" => "tbl_rechnungstyp" ,
+	    	"caption" => "tbl_rechnungstyp" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{6B75E50E-AE5F-47AB-BB3A-284799C0183B}' => array
+			(
+				"id" => "{6B75E50E-AE5F-47AB-BB3A-284799C0183B}" ,
+				"name" => "rechnungstyp_kurzbz" ,
+				"caption" => "rechnungstyp_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{240A3883-77E4-44CB-B6CC-FA1D6C434F03}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{27884375-0BFE-4B59-BE69-A0A1310C5DCD}' => array
+			(
+				"id" => "{27884375-0BFE-4B59-BE69-A0A1310C5DCD}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3520820B-AB57-4FDD-A4B2-D80FA1D536E3}' => array
+			(
+				"id" => "{3520820B-AB57-4FDD-A4B2-D80FA1D536E3}" ,
+				"name" => "berechtigung_kurzbz" ,
+				"caption" => "berechtigung_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{DE040193-3F00-4010-99F8-B6946912493D}' => array
+			(
+				"id" => "{DE040193-3F00-4010-99F8-B6946912493D}" ,
+				"name" => "Key27" ,
+				"caption" => "Key27" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{0E79E098-9CA4-40FD-9233-9D91440D15BA}' => array
+			   		(
+		   				"id" => "{0E79E098-9CA4-40FD-9233-9D91440D15BA}" ,
+		   				"name" => "rechnungstyp_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6B75E50E-AE5F-47AB-BB3A-284799C0183B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{240A3883-77E4-44CB-B6CC-FA1D6C434F03}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{9D209B5E-2E56-42D5-8B4F-DF396720777B}'  => array
+	(
+	    	"id" => "{9D209B5E-2E56-42D5-8B4F-DF396720777B}" ,
+	    	"name" => "tbl_bismeldung" ,
+	    	"caption" => "tbl_bismeldung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{3A7F9B8D-001E-4D33-8FD0-0558492DBD43}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{DEAF07E7-B53E-462B-90C6-6CDDD839A809}' => array
+			(
+				"id" => "{DEAF07E7-B53E-462B-90C6-6CDDD839A809}" ,
+				"name" => "bismeldung_id" ,
+				"caption" => "bismeldung_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3251CB18-6FED-407E-94FB-00B8EDC1040C}' => array
+			(
+				"id" => "{3251CB18-6FED-407E-94FB-00B8EDC1040C}" ,
+				"name" => "melder_uid" ,
+				"caption" => "melder_uid" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D90BBED5-9D69-41D9-9583-D036D50CC510}' => array
+			(
+				"id" => "{D90BBED5-9D69-41D9-9583-D036D50CC510}" ,
+				"name" => "studiengang_kz" ,
+				"caption" => "studiengang_kz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{43C7B2E1-522A-47A0-8E48-EB11FF8F5673}' => array
+			(
+				"id" => "{43C7B2E1-522A-47A0-8E48-EB11FF8F5673}" ,
+				"name" => "typ" ,
+				"caption" => "typ" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "20" ,
+				"datatypeparam2" => "" ,
+				"length" => "20",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{11C8C090-276F-40F1-B665-6D0E10650B3F}' => array
+			(
+				"id" => "{11C8C090-276F-40F1-B665-6D0E10650B3F}" ,
+				"name" => "datum" ,
+				"caption" => "datum" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6F0008F0-FBFA-4DAA-8B01-21AA6EFE88C2}' => array
+			(
+				"id" => "{6F0008F0-FBFA-4DAA-8B01-21AA6EFE88C2}" ,
+				"name" => "daten" ,
+				"caption" => "daten" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{3F94FCD5-DA60-4889-B29B-27FE1923B4B0}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{75915168-B790-462E-9E30-77B32B97BB48}' => array
+			(
+				"id" => "{75915168-B790-462E-9E30-77B32B97BB48}" ,
+				"name" => "Key28" ,
+				"caption" => "Key28" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{5B31D1BC-B297-4A1C-9B02-268DE6D6F65B}' => array
+			   		(
+		   				"id" => "{5B31D1BC-B297-4A1C-9B02-268DE6D6F65B}" ,
+		   				"name" => "bismeldung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{DEAF07E7-B53E-462B-90C6-6CDDD839A809}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{0F28ACD0-AA94-46D7-82F7-F3205CE46105}'  => array
+	(
+	    	"id" => "{0F28ACD0-AA94-46D7-82F7-F3205CE46105}" ,
+	    	"name" => "tbl_statistik" ,
+	    	"caption" => "tbl_statistik" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{2634F2D8-32D9-4349-894B-991E1FE1C06A}' => array
+			(
+				"id" => "{2634F2D8-32D9-4349-894B-991E1FE1C06A}" ,
+				"name" => "statistik_kurzbz" ,
+				"caption" => "statistik_kurzbz" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C0332DA6-C06D-4B5A-8D04-9E8003595C13}' => array
+			(
+				"id" => "{C0332DA6-C06D-4B5A-8D04-9E8003595C13}" ,
+				"name" => "content_id" ,
+				"caption" => "content_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4AEC72A7-9F11-47E6-AD4A-4B61782561D0}' => array
+			(
+				"id" => "{4AEC72A7-9F11-47E6-AD4A-4B61782561D0}" ,
+				"name" => "berechtigung_kurzbz" ,
+				"caption" => "berechtigung_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CA7A0CE7-D995-43E9-AE64-4B59CB94B720}' => array
+			(
+				"id" => "{CA7A0CE7-D995-43E9-AE64-4B59CB94B720}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0232BB36-8052-49C7-82E0-15F325F25F43}' => array
+			(
+				"id" => "{0232BB36-8052-49C7-82E0-15F325F25F43}" ,
+				"name" => "url" ,
+				"caption" => "url" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "512" ,
+				"datatypeparam2" => "" ,
+				"length" => "512",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EB19D796-17A2-4559-BAA4-77849D911E92}' => array
+			(
+				"id" => "{EB19D796-17A2-4559-BAA4-77849D911E92}" ,
+				"name" => "sql" ,
+				"caption" => "sql" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D8682177-9549-48F5-BB06-B69BF3CC52EB}' => array
+			(
+				"id" => "{D8682177-9549-48F5-BB06-B69BF3CC52EB}" ,
+				"name" => "php" ,
+				"caption" => "php" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{86CD3BE1-397A-4E75-9FDA-0E42C77248F7}' => array
+			(
+				"id" => "{86CD3BE1-397A-4E75-9FDA-0E42C77248F7}" ,
+				"name" => "r" ,
+				"caption" => "r" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DBC90751-7F16-44D0-824E-31C6522134E1}' => array
+			(
+				"id" => "{DBC90751-7F16-44D0-824E-31C6522134E1}" ,
+				"name" => "gruppe" ,
+				"caption" => "gruppe" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{82D2385C-2C4E-4FC6-92DF-E7D5DED37C68}' => array
+			(
+				"id" => "{82D2385C-2C4E-4FC6-92DF-E7D5DED37C68}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E551A01C-6158-446C-BC4C-9B0F089A4FF3}' => array
+			(
+				"id" => "{E551A01C-6158-446C-BC4C-9B0F089A4FF3}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EEBD0F52-B5C8-44C8-8550-FB1AB8A9D618}' => array
+			(
+				"id" => "{EEBD0F52-B5C8-44C8-8550-FB1AB8A9D618}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{52E7E929-5E2A-4A28-8369-F330B878F702}' => array
+			(
+				"id" => "{52E7E929-5E2A-4A28-8369-F330B878F702}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{17AB7C7F-DF6D-47AE-89D1-410C23B70E3A}' => array
+			(
+				"id" => "{17AB7C7F-DF6D-47AE-89D1-410C23B70E3A}" ,
+				"name" => "Key29" ,
+				"caption" => "Key29" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{F164A739-8456-4684-A00A-91BC09AA9F8D}' => array
+			   		(
+		   				"id" => "{F164A739-8456-4684-A00A-91BC09AA9F8D}" ,
+		   				"name" => "statistik_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{2634F2D8-32D9-4349-894B-991E1FE1C06A}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{7F5F6EFF-296C-4D3A-9362-1F4622D3133C}'  => array
+	(
+	    	"id" => "{7F5F6EFF-296C-4D3A-9362-1F4622D3133C}" ,
+	    	"name" => "tbl_geschaeftsjahr" ,
+	    	"caption" => "tbl_geschaeftsjahr" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{18C01AA0-418C-480F-8624-CAC8BC21D82F}' => array
+			(
+				"id" => "{18C01AA0-418C-480F-8624-CAC8BC21D82F}" ,
+				"name" => "geschaeftsjahr_kurzbz" ,
+				"caption" => "geschaeftsjahr_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{69994657-573D-4A11-A318-F4990B6CE415}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D6FEFC40-C52F-4A3E-B18A-6C5B8C06C6CD}' => array
+			(
+				"id" => "{D6FEFC40-C52F-4A3E-B18A-6C5B8C06C6CD}" ,
+				"name" => "start" ,
+				"caption" => "start" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{41621C7E-C02E-4A4A-9A61-565E8C384643}' => array
+			(
+				"id" => "{41621C7E-C02E-4A4A-9A61-565E8C384643}" ,
+				"name" => "ende" ,
+				"caption" => "ende" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6A9571CA-DEE0-4A76-84FC-B5324E7147EF}' => array
+			(
+				"id" => "{6A9571CA-DEE0-4A76-84FC-B5324E7147EF}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{397A22FD-7A0F-4743-84B1-0D755B98AC6A}' => array
+			(
+				"id" => "{397A22FD-7A0F-4743-84B1-0D755B98AC6A}" ,
+				"name" => "pk_tbl_geschaeftsjahr" ,
+				"caption" => "pk_tbl_geschaeftsjahr" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{55C4947A-5433-4777-8435-6AA34C6A15FB}' => array
+			   		(
+		   				"id" => "{55C4947A-5433-4777-8435-6AA34C6A15FB}" ,
+		   				"name" => "geschaeftsjahr_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{18C01AA0-418C-480F-8624-CAC8BC21D82F}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{69994657-573D-4A11-A318-F4990B6CE415}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{89A8CB82-4650-4F5A-991D-829D1F9F0B5F}'  => array
+	(
+	    	"id" => "{89A8CB82-4650-4F5A-991D-829D1F9F0B5F}" ,
+	    	"name" => "tbl_budget" ,
+	    	"caption" => "tbl_budget" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{E878B099-81A2-47D4-8894-160D6D517855}' => array
+			(
+				"id" => "{E878B099-81A2-47D4-8894-160D6D517855}" ,
+				"name" => "kostenstelle_id" ,
+				"caption" => "kostenstelle_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3AE8079A-38F1-4B3B-B63A-ECCC11333DB5}' => array
+			(
+				"id" => "{3AE8079A-38F1-4B3B-B63A-ECCC11333DB5}" ,
+				"name" => "geschaeftsjahr_kurzbz" ,
+				"caption" => "geschaeftsjahr_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BFDF9A0B-42CD-4C8E-B458-EC732F1F0F8C}' => array
+			(
+				"id" => "{BFDF9A0B-42CD-4C8E-B458-EC732F1F0F8C}" ,
+				"name" => "budget" ,
+				"caption" => "budget" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{6AF27D63-2F4B-4732-A38A-83301FD62166}' => array
+			(
+				"id" => "{6AF27D63-2F4B-4732-A38A-83301FD62166}" ,
+				"name" => "Key30" ,
+				"caption" => "Key30" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{DD6F630D-F34C-4C32-940C-679CC5A47841}' => array
+			   		(
+		   				"id" => "{DD6F630D-F34C-4C32-940C-679CC5A47841}" ,
+		   				"name" => "kostenstelle_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{E878B099-81A2-47D4-8894-160D6D517855}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{F8D34F10-318A-48A2-AAB0-03400A2A8147}' => array
+			   		(
+		   				"id" => "{F8D34F10-318A-48A2-AAB0-03400A2A8147}" ,
+		   				"name" => "geschaeftsjahr_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{3AE8079A-38F1-4B3B-B63A-ECCC11333DB5}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{C6190BB5-54AB-4FC7-A651-07F2D468F68A}'  => array
+	(
+	    	"id" => "{C6190BB5-54AB-4FC7-A651-07F2D468F68A}" ,
+	    	"name" => "tbl_zahlungstyp" ,
+	    	"caption" => "tbl_zahlungstyp" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{97876FD7-10B3-47C6-BFE1-56CA1D775426}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{7D141143-E736-415C-92D7-43A192BDA751}' => array
+			(
+				"id" => "{7D141143-E736-415C-92D7-43A192BDA751}" ,
+				"name" => "zahlungstyp_kurzbz" ,
+				"caption" => "zahlungstyp_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{18CE797E-15E8-4465-9C5B-416226757914}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{358AC192-DD98-4903-8E47-A3CDA329CD6B}' => array
+			(
+				"id" => "{358AC192-DD98-4903-8E47-A3CDA329CD6B}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{2A6B53EC-BF2C-4C1A-9359-C80A39815C52}' => array
+			(
+				"id" => "{2A6B53EC-BF2C-4C1A-9359-C80A39815C52}" ,
+				"name" => "Key31" ,
+				"caption" => "Key31" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{132C10F0-6557-47D9-ADEA-574D2AA51279}' => array
+			   		(
+		   				"id" => "{132C10F0-6557-47D9-ADEA-574D2AA51279}" ,
+		   				"name" => "zahlungstyp_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{7D141143-E736-415C-92D7-43A192BDA751}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{18CE797E-15E8-4465-9C5B-416226757914}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{57CF0E77-D04F-44B8-93B2-66C2651DD4F8}'  => array
+	(
+	    	"id" => "{57CF0E77-D04F-44B8-93B2-66C2651DD4F8}" ,
+	    	"name" => "tbl_content" ,
+	    	"caption" => "tbl_content" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}' => array
+			(
+				"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}" ,
+				"name" => "content_id" ,
+				"caption" => "content_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{1275A75A-992B-4D46-8AFA-4A680330E370}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5E20CE75-776F-4C15-86BE-4A2EA9870E9A}' => array
+			(
+				"id" => "{5E20CE75-776F-4C15-86BE-4A2EA9870E9A}" ,
+				"name" => "template_kurzbz" ,
+				"caption" => "template_kurzbz" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B916EE8B-C3A6-45C3-8BF3-E4D6A34F8981}' => array
+			(
+				"id" => "{B916EE8B-C3A6-45C3-8BF3-E4D6A34F8981}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C45FE526-839D-4408-92B4-43D6BDBDFD73}' => array
+			(
+				"id" => "{C45FE526-839D-4408-92B4-43D6BDBDFD73}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{26ADB44B-D9DF-4B9A-9543-3D4DDB035E5C}' => array
+			(
+				"id" => "{26ADB44B-D9DF-4B9A-9543-3D4DDB035E5C}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{ADFCB4A3-2B0E-43B7-ABA7-E08F20E1FC4A}' => array
+			(
+				"id" => "{ADFCB4A3-2B0E-43B7-ABA7-E08F20E1FC4A}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{893C2838-6939-4726-B915-EA8B84A60EFC}' => array
+			(
+				"id" => "{893C2838-6939-4726-B915-EA8B84A60EFC}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{67471177-7A94-45A4-B1D8-1437296244AE}' => array
+			(
+				"id" => "{67471177-7A94-45A4-B1D8-1437296244AE}" ,
+				"name" => "menu_open" ,
+				"caption" => "menu_open" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1E5A12A4-5A5B-4B69-804B-7C5572D930D6}' => array
+			(
+				"id" => "{1E5A12A4-5A5B-4B69-804B-7C5572D930D6}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}' => array
+			(
+				"id" => "{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}" ,
+				"name" => "pk_tbl_content" ,
+				"caption" => "pk_tbl_content" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{1207D5F4-B063-4B0A-B826-306478756915}' => array
+			   		(
+		   				"id" => "{1207D5F4-B063-4B0A-B826-306478756915}" ,
+		   				"name" => "content_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{1275A75A-992B-4D46-8AFA-4A680330E370}","id" => "{29C2A665-2522-4ACD-89EC-5EADE0831C97}","id" => "{4BBD0A33-D144-4014-B82B-1052BDC175AF}","id" => "{13F275A6-6D26-4E0E-AA55-5ECCA360B25F}","id" => "{5ABE7330-6A5C-4A9D-9BBD-74EB2B9255DC}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{045AEA5F-7410-408C-93BA-10188FC3281C}'  => array
+	(
+	    	"id" => "{045AEA5F-7410-408C-93BA-10188FC3281C}" ,
+	    	"name" => "tbl_contentsprache" ,
+	    	"caption" => "tbl_contentsprache" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{819F4B37-7AA3-41FE-A8CA-D0678FD88D7B}' => array
+			(
+				"id" => "{819F4B37-7AA3-41FE-A8CA-D0678FD88D7B}" ,
+				"name" => "contentsprache_id" ,
+				"caption" => "contentsprache_id" ,
+				"ordinal" => "0" ,
+				"pk" => "{66F2B47B-6B18-4A8C-ABB6-C2C1EE2EDF48}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F2FAE884-09A5-4833-9090-8D8DC90788BE}' => array
+			(
+				"id" => "{F2FAE884-09A5-4833-9090-8D8DC90788BE}" ,
+				"name" => "sprache" ,
+				"caption" => "sprache" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{639248E5-15D7-45D6-8B89-CB7DC4453E35}' => array
+			(
+				"id" => "{639248E5-15D7-45D6-8B89-CB7DC4453E35}" ,
+				"name" => "content_id" ,
+				"caption" => "content_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1BEE33A5-7B58-4B7E-9AC5-7A2CF9E5413E}' => array
+			(
+				"id" => "{1BEE33A5-7B58-4B7E-9AC5-7A2CF9E5413E}" ,
+				"name" => "version" ,
+				"caption" => "version" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B0387566-D041-4E55-B3DD-3ACD641AC2D1}' => array
+			(
+				"id" => "{B0387566-D041-4E55-B3DD-3ACD641AC2D1}" ,
+				"name" => "sichtbar" ,
+				"caption" => "sichtbar" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8CBEF337-4C95-4B3F-B5F6-A2DD693DD87C}' => array
+			(
+				"id" => "{8CBEF337-4C95-4B3F-B5F6-A2DD693DD87C}" ,
+				"name" => "content" ,
+				"caption" => "content" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{3F94FCD5-DA60-4889-B29B-27FE1923B4B0}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3555FA8B-898B-42D3-B628-EAEDA6F6852A}' => array
+			(
+				"id" => "{3555FA8B-898B-42D3-B628-EAEDA6F6852A}" ,
+				"name" => "reviewvon" ,
+				"caption" => "reviewvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A955EFFE-4C08-4B1A-989D-92AD14DDB63E}' => array
+			(
+				"id" => "{A955EFFE-4C08-4B1A-989D-92AD14DDB63E}" ,
+				"name" => "reviewamum" ,
+				"caption" => "reviewamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{614018E9-C5BA-43FF-B0DB-C7116C9B7A14}' => array
+			(
+				"id" => "{614018E9-C5BA-43FF-B0DB-C7116C9B7A14}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4D8F69C5-CBEB-4533-AB5D-E261CA7E194B}' => array
+			(
+				"id" => "{4D8F69C5-CBEB-4533-AB5D-E261CA7E194B}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7D23CE6E-03E1-435F-8D06-C3AB1528F770}' => array
+			(
+				"id" => "{7D23CE6E-03E1-435F-8D06-C3AB1528F770}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{579AC137-4AEC-4C30-B380-62D1C2FDCC46}' => array
+			(
+				"id" => "{579AC137-4AEC-4C30-B380-62D1C2FDCC46}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5A8C58C3-21D8-442A-A94F-8BFC88AD45E7}' => array
+			(
+				"id" => "{5A8C58C3-21D8-442A-A94F-8BFC88AD45E7}" ,
+				"name" => "titel" ,
+				"caption" => "titel" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DBD2C006-645C-4B67-814D-51CD0438FD74}' => array
+			(
+				"id" => "{DBD2C006-645C-4B67-814D-51CD0438FD74}" ,
+				"name" => "gesperrt_uid" ,
+				"caption" => "gesperrt_uid" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{A912E4E9-74EF-4FB1-B7C0-5151FB28EEA6}' => array
+			(
+				"id" => "{A912E4E9-74EF-4FB1-B7C0-5151FB28EEA6}" ,
+				"name" => "Key32" ,
+				"caption" => "Key32" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{E7BA7BF5-F26E-4A41-ADBF-B3AC75808F89}' => array
+			   		(
+		   				"id" => "{E7BA7BF5-F26E-4A41-ADBF-B3AC75808F89}" ,
+		   				"name" => "contentsprache_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{819F4B37-7AA3-41FE-A8CA-D0678FD88D7B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{66F2B47B-6B18-4A8C-ABB6-C2C1EE2EDF48}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{81336C54-716D-42D0-9350-D7E8EA6B3964}'  => array
+	(
+	    	"id" => "{81336C54-716D-42D0-9350-D7E8EA6B3964}" ,
+	    	"name" => "tbl_template" ,
+	    	"caption" => "tbl_template" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{68F1243B-1732-4B6B-AC9C-10EE973DB1EE}' => array
+			(
+				"id" => "{68F1243B-1732-4B6B-AC9C-10EE973DB1EE}" ,
+				"name" => "template_kurzbz" ,
+				"caption" => "template_kurzbz" ,
+				"ordinal" => "1" ,
+				"pk" => "{57BF488C-6043-4148-8D52-98A83EA3A871}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C577FB05-9997-4935-A8AD-616DF9F04945}' => array
+			(
+				"id" => "{C577FB05-9997-4935-A8AD-616DF9F04945}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CF8B5D48-74C0-44E7-BE08-824D7991AE17}' => array
+			(
+				"id" => "{CF8B5D48-74C0-44E7-BE08-824D7991AE17}" ,
+				"name" => "xsd" ,
+				"caption" => "xsd" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{3F94FCD5-DA60-4889-B29B-27FE1923B4B0}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D718013C-6A72-4C6E-A940-01944F93F382}' => array
+			(
+				"id" => "{D718013C-6A72-4C6E-A940-01944F93F382}" ,
+				"name" => "xslt_xhtml" ,
+				"caption" => "xslt_xhtml" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{3F94FCD5-DA60-4889-B29B-27FE1923B4B0}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0718528B-2FA9-4D68-99AE-6F2A435357CC}' => array
+			(
+				"id" => "{0718528B-2FA9-4D68-99AE-6F2A435357CC}" ,
+				"name" => "xslfo_pdf" ,
+				"caption" => "xslfo_pdf" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{3F94FCD5-DA60-4889-B29B-27FE1923B4B0}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{C62FF5C4-AEFF-4DEA-A8ED-CFC2076180F2}' => array
+			(
+				"id" => "{C62FF5C4-AEFF-4DEA-A8ED-CFC2076180F2}" ,
+				"name" => "Key33" ,
+				"caption" => "Key33" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{48EA155A-F31C-4D7D-9DD4-AAD35BCBBA15}' => array
+			   		(
+		   				"id" => "{48EA155A-F31C-4D7D-9DD4-AAD35BCBBA15}" ,
+		   				"name" => "template_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{68F1243B-1732-4B6B-AC9C-10EE973DB1EE}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{57BF488C-6043-4148-8D52-98A83EA3A871}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{ACF2F013-CF1D-45E6-8770-52ACD501CF95}'  => array
+	(
+	    	"id" => "{ACF2F013-CF1D-45E6-8770-52ACD501CF95}" ,
+	    	"name" => "tbl_contentchild" ,
+	    	"caption" => "tbl_contentchild" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{0D0BD398-FF49-4C66-B9D0-2DBEC4C6CEE1}' => array
+			(
+				"id" => "{0D0BD398-FF49-4C66-B9D0-2DBEC4C6CEE1}" ,
+				"name" => "contentchild_id" ,
+				"caption" => "contentchild_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{324BEBE3-FDD2-4AB4-A93C-FA4B7F42486A}' => array
+			(
+				"id" => "{324BEBE3-FDD2-4AB4-A93C-FA4B7F42486A}" ,
+				"name" => "content_id" ,
+				"caption" => "content_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{38355B7D-0468-4CBD-A712-2D221CDDC1EF}' => array
+			(
+				"id" => "{38355B7D-0468-4CBD-A712-2D221CDDC1EF}" ,
+				"name" => "child_content_id" ,
+				"caption" => "child_content_id" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1F88B348-A81E-4444-BDC1-F24931FE24F7}' => array
+			(
+				"id" => "{1F88B348-A81E-4444-BDC1-F24931FE24F7}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F25597FB-EF5F-4CA4-B286-004745C403BC}' => array
+			(
+				"id" => "{F25597FB-EF5F-4CA4-B286-004745C403BC}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8272BC62-0C0D-4DD9-9EF3-234D35CF630B}' => array
+			(
+				"id" => "{8272BC62-0C0D-4DD9-9EF3-234D35CF630B}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{ED9A6228-3E26-45BB-B38F-31C72091D6F1}' => array
+			(
+				"id" => "{ED9A6228-3E26-45BB-B38F-31C72091D6F1}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9CA627BB-FCAD-4A63-8D18-295755005C79}' => array
+			(
+				"id" => "{9CA627BB-FCAD-4A63-8D18-295755005C79}" ,
+				"name" => "sort" ,
+				"caption" => "sort" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{8E2E8560-A261-463A-9C61-684E6A56434F}' => array
+			(
+				"id" => "{8E2E8560-A261-463A-9C61-684E6A56434F}" ,
+				"name" => "Key34" ,
+				"caption" => "Key34" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{F0B3FC5A-862A-4929-BF75-4DDC8812DF2E}' => array
+			   		(
+		   				"id" => "{F0B3FC5A-862A-4929-BF75-4DDC8812DF2E}" ,
+		   				"name" => "contentchild_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{0D0BD398-FF49-4C66-B9D0-2DBEC4C6CEE1}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{DB658D91-19F0-4480-B24D-4756A4F668F0}'  => array
+	(
+	    	"id" => "{DB658D91-19F0-4480-B24D-4756A4F668F0}" ,
+	    	"name" => "tbl_contentgruppe" ,
+	    	"caption" => "tbl_contentgruppe" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{9D9DFDD9-1210-40CF-AB82-BC90987C898C}' => array
+			(
+				"id" => "{9D9DFDD9-1210-40CF-AB82-BC90987C898C}" ,
+				"name" => "content_id" ,
+				"caption" => "content_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5E5EBA81-E608-43B6-98A7-2B7D16FA7645}' => array
+			(
+				"id" => "{5E5EBA81-E608-43B6-98A7-2B7D16FA7645}" ,
+				"name" => "gruppe_kurzbz" ,
+				"caption" => "gruppe_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{580E058B-22A0-4C50-9EA6-CD83A42780E3}' => array
+			(
+				"id" => "{580E058B-22A0-4C50-9EA6-CD83A42780E3}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BE0F81CD-7EC4-44D0-AC92-5A8CF338A62D}' => array
+			(
+				"id" => "{BE0F81CD-7EC4-44D0-AC92-5A8CF338A62D}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{3A7A6595-5154-45A6-AAD6-60C2C86BC5EA}' => array
+			(
+				"id" => "{3A7A6595-5154-45A6-AAD6-60C2C86BC5EA}" ,
+				"name" => "Key35" ,
+				"caption" => "Key35" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{26C66BD4-015C-4A10-BBEC-1E142492D74C}' => array
+			   		(
+		   				"id" => "{26C66BD4-015C-4A10-BBEC-1E142492D74C}" ,
+		   				"name" => "content_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{9D9DFDD9-1210-40CF-AB82-BC90987C898C}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{8F1AD5C8-C0A7-4A0F-8E81-F59167D78676}' => array
+			   		(
+		   				"id" => "{8F1AD5C8-C0A7-4A0F-8E81-F59167D78676}" ,
+		   				"name" => "gruppe_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{5E5EBA81-E608-43B6-98A7-2B7D16FA7645}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{0B11ED35-FBB6-43BC-8E83-A3270BA78D60}'  => array
+	(
+	    	"id" => "{0B11ED35-FBB6-43BC-8E83-A3270BA78D60}" ,
+	    	"name" => "tbl_dms" ,
+	    	"caption" => "tbl_dms" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{FABE8792-95B9-401E-8850-DE9624236623}' => array
+			(
+				"id" => "{FABE8792-95B9-401E-8850-DE9624236623}" ,
+				"name" => "dms_id" ,
+				"caption" => "dms_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{DFF61DE9-90FD-49DA-AC70-9264FFED6856}' => array
+			(
+				"id" => "{DFF61DE9-90FD-49DA-AC70-9264FFED6856}" ,
+				"name" => "version" ,
+				"caption" => "version" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{07BD2E1D-7DC9-477E-822D-9B1524A7237C}' => array
+			(
+				"id" => "{07BD2E1D-7DC9-477E-822D-9B1524A7237C}" ,
+				"name" => "oe_kurzbz" ,
+				"caption" => "oe_kurzbz" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{53FD025D-E13C-4F18-8B47-2D1A125E1C5B}' => array
+			(
+				"id" => "{53FD025D-E13C-4F18-8B47-2D1A125E1C5B}" ,
+				"name" => "dokument_kurzbz" ,
+				"caption" => "dokument_kurzbz" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "8" ,
+				"datatypeparam2" => "" ,
+				"length" => "8",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{F7158E2E-C292-4E07-9D25-658580B3BBC0}' => array
+			(
+				"id" => "{F7158E2E-C292-4E07-9D25-658580B3BBC0}" ,
+				"name" => "kategorie_kurzbz" ,
+				"caption" => "kategorie_kurzbz" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{601221C1-4FDE-4E08-9472-0215D43BE297}' => array
+			(
+				"id" => "{601221C1-4FDE-4E08-9472-0215D43BE297}" ,
+				"name" => "filename" ,
+				"caption" => "filename" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{04314C8D-CC47-4B49-8F85-6B4095DB12A5}' => array
+			(
+				"id" => "{04314C8D-CC47-4B49-8F85-6B4095DB12A5}" ,
+				"name" => "mimetype" ,
+				"caption" => "mimetype" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{05FF16BA-52A6-4AA8-9CDA-266E5E290C4D}' => array
+			(
+				"id" => "{05FF16BA-52A6-4AA8-9CDA-266E5E290C4D}" ,
+				"name" => "name" ,
+				"caption" => "name" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1A1F0E30-91E6-4A78-8F8C-EBCC6356208F}' => array
+			(
+				"id" => "{1A1F0E30-91E6-4A78-8F8C-EBCC6356208F}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2425F14D-939C-4F5F-8365-E515F63FBABA}' => array
+			(
+				"id" => "{2425F14D-939C-4F5F-8365-E515F63FBABA}" ,
+				"name" => "letzterzugriff" ,
+				"caption" => "letzterzugriff" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{AFC4F084-BBF5-423E-8EA1-2B7C6D476C47}' => array
+			(
+				"id" => "{AFC4F084-BBF5-423E-8EA1-2B7C6D476C47}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2C2EE0EA-227E-4EB9-94BA-05539202E1C3}' => array
+			(
+				"id" => "{2C2EE0EA-227E-4EB9-94BA-05539202E1C3}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E70A900F-9D4B-4252-B086-5656658ED31C}' => array
+			(
+				"id" => "{E70A900F-9D4B-4252-B086-5656658ED31C}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{331415C1-DA22-4B30-9841-DD556153AC01}' => array
+			(
+				"id" => "{331415C1-DA22-4B30-9841-DD556153AC01}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "14" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{12FD7D34-7E36-4771-853D-33F3875EBDF8}' => array
+			(
+				"id" => "{12FD7D34-7E36-4771-853D-33F3875EBDF8}" ,
+				"name" => "Key36" ,
+				"caption" => "Key36" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{EC211D28-0E26-42CE-B7B2-C75699ADA49D}' => array
+			   		(
+		   				"id" => "{EC211D28-0E26-42CE-B7B2-C75699ADA49D}" ,
+		   				"name" => "dms_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{FABE8792-95B9-401E-8850-DE9624236623}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{451CEC62-E599-4FB1-A206-44D66044EAC1}' => array
+			   		(
+		   				"id" => "{451CEC62-E599-4FB1-A206-44D66044EAC1}" ,
+		   				"name" => "version" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{DFF61DE9-90FD-49DA-AC70-9264FFED6856}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{A2D07E22-6009-40D8-9292-E22C5FF15CCA}'  => array
+	(
+	    	"id" => "{A2D07E22-6009-40D8-9292-E22C5FF15CCA}" ,
+	    	"name" => "tbl_dms_kategorie" ,
+	    	"caption" => "tbl_dms_kategorie" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{4F47288B-1992-4E37-A8EB-BBCA1C7474FA}' => array
+			(
+				"id" => "{4F47288B-1992-4E37-A8EB-BBCA1C7474FA}" ,
+				"name" => "kategorie_kurzbz" ,
+				"caption" => "kategorie_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "{45D6608F-1D4C-4EF7-B119-AC58B4A4BE26}" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{092C1FB3-8CF6-4E6A-AD95-0CB938C59191}' => array
+			(
+				"id" => "{092C1FB3-8CF6-4E6A-AD95-0CB938C59191}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A0E9175B-6F4D-4293-A760-2D73B82C5ADD}' => array
+			(
+				"id" => "{A0E9175B-6F4D-4293-A760-2D73B82C5ADD}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FB6A4A6C-1630-468A-84EA-8B42F519C408}' => array
+			(
+				"id" => "{FB6A4A6C-1630-468A-84EA-8B42F519C408}" ,
+				"name" => "parent_kategorie_kurzbz" ,
+				"caption" => "parent_kategorie_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{A79F3C1F-29C9-41CF-9BF2-21D3D3714CE1}' => array
+			(
+				"id" => "{A79F3C1F-29C9-41CF-9BF2-21D3D3714CE1}" ,
+				"name" => "Key37" ,
+				"caption" => "Key37" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{9A1BC723-FACA-4DE6-9F7B-CAA974627DDB}' => array
+			   		(
+		   				"id" => "{9A1BC723-FACA-4DE6-9F7B-CAA974627DDB}" ,
+		   				"name" => "kategorie_kurzbz" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{4F47288B-1992-4E37-A8EB-BBCA1C7474FA}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{45D6608F-1D4C-4EF7-B119-AC58B4A4BE26}","id" => "{E709B261-A797-4EC0-92EB-AD51D4E89F28}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{31FBCB29-C23E-49BB-8F8C-646706D280B2}'  => array
+	(
+	    	"id" => "{31FBCB29-C23E-49BB-8F8C-646706D280B2}" ,
+	    	"name" => "tbl_preincoming" ,
+	    	"caption" => "tbl_preincoming" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{77AFC9EC-CA15-4845-9547-B747D7A1611A}' => array
+			(
+				"id" => "{77AFC9EC-CA15-4845-9547-B747D7A1611A}" ,
+				"name" => "preincoming_id" ,
+				"caption" => "preincoming_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{4B2AA5F0-6C48-41FF-B946-641BBB45218D}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{FF7B38D8-543A-45F1-A80C-6BE124F1A0DA}' => array
+			(
+				"id" => "{FF7B38D8-543A-45F1-A80C-6BE124F1A0DA}" ,
+				"name" => "person_id" ,
+				"caption" => "person_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "nextval('seq_person_person_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3152CCD4-DC37-43C8-8B7B-15A3441F51D2}' => array
+			(
+				"id" => "{3152CCD4-DC37-43C8-8B7B-15A3441F51D2}" ,
+				"name" => "mobilitaetsprogramm_code" ,
+				"caption" => "mobilitaetsprogramm_code" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2C5ADC5E-F26D-4B36-9204-458C59EFB1BA}' => array
+			(
+				"id" => "{2C5ADC5E-F26D-4B36-9204-458C59EFB1BA}" ,
+				"name" => "zweck_code" ,
+				"caption" => "zweck_code" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "20" ,
+				"datatypeparam2" => "" ,
+				"length" => "20",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8E49B4A3-BA3B-4D2C-9088-3C3448E5C954}' => array
+			(
+				"id" => "{8E49B4A3-BA3B-4D2C-9088-3C3448E5C954}" ,
+				"name" => "firma_id" ,
+				"caption" => "firma_id" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_firma_firma_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B151A3D1-178D-4E45-A802-0249480F9B0C}' => array
+			(
+				"id" => "{B151A3D1-178D-4E45-A802-0249480F9B0C}" ,
+				"name" => "anmerkung" ,
+				"caption" => "anmerkung" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E079A28A-9AA8-410D-ABE5-2C08ACB139E7}' => array
+			(
+				"id" => "{E079A28A-9AA8-410D-ABE5-2C08ACB139E7}" ,
+				"name" => "universitaet" ,
+				"caption" => "universitaet" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{099025AD-A533-4AC4-A7AB-C368C2259854}' => array
+			(
+				"id" => "{099025AD-A533-4AC4-A7AB-C368C2259854}" ,
+				"name" => "aktiv" ,
+				"caption" => "aktiv" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "true",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1CA7E02A-F737-4BFC-8D48-EF5C02650FCA}' => array
+			(
+				"id" => "{1CA7E02A-F737-4BFC-8D48-EF5C02650FCA}" ,
+				"name" => "bachelorthesis" ,
+				"caption" => "bachelorthesis" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4D4025E6-6C31-45EC-9BD5-684CFE2A16D2}' => array
+			(
+				"id" => "{4D4025E6-6C31-45EC-9BD5-684CFE2A16D2}" ,
+				"name" => "masterthesis" ,
+				"caption" => "masterthesis" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{C28F6269-92F8-40C7-82F9-C626F1D1AC92}' => array
+			(
+				"id" => "{C28F6269-92F8-40C7-82F9-C626F1D1AC92}" ,
+				"name" => "von" ,
+				"caption" => "von" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{03EBFEE0-EC86-43E0-8A49-791CB6D8B34C}' => array
+			(
+				"id" => "{03EBFEE0-EC86-43E0-8A49-791CB6D8B34C}" ,
+				"name" => "bis" ,
+				"caption" => "bis" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{40EC7229-C02A-4BA5-87AF-C98AA6C1516F}' => array
+			(
+				"id" => "{40EC7229-C02A-4BA5-87AF-C98AA6C1516F}" ,
+				"name" => "uebernommen" ,
+				"caption" => "uebernommen" ,
+				"ordinal" => "13" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "false",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{95E6CB69-0253-42CD-AE54-046F13FB3892}' => array
+			(
+				"id" => "{95E6CB69-0253-42CD-AE54-046F13FB3892}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "14" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A43CBA64-A926-4244-9831-A0DC6CD2D1A4}' => array
+			(
+				"id" => "{A43CBA64-A926-4244-9831-A0DC6CD2D1A4}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "15" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2588FD7D-62FC-43AD-8642-D6F621FE48AE}' => array
+			(
+				"id" => "{2588FD7D-62FC-43AD-8642-D6F621FE48AE}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "16" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E950B38E-47E4-4FA5-9C7B-4E28DED32116}' => array
+			(
+				"id" => "{E950B38E-47E4-4FA5-9C7B-4E28DED32116}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "17" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{ED5D65D7-257B-4047-A31A-C1AE414784BF}' => array
+			(
+				"id" => "{ED5D65D7-257B-4047-A31A-C1AE414784BF}" ,
+				"name" => "zgv" ,
+				"caption" => "zgv" ,
+				"ordinal" => "18" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{BBAED9D5-771E-4F6A-8884-9C32F1318A28}' => array
+			(
+				"id" => "{BBAED9D5-771E-4F6A-8884-9C32F1318A28}" ,
+				"name" => "zgv_ort" ,
+				"caption" => "zgv_ort" ,
+				"ordinal" => "19" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2EE17EE6-46A4-4635-8C2F-34C5ECADC67C}' => array
+			(
+				"id" => "{2EE17EE6-46A4-4635-8C2F-34C5ECADC67C}" ,
+				"name" => "zgv_datum" ,
+				"caption" => "zgv_datum" ,
+				"ordinal" => "20" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5DE549C8-BD69-4182-BAE2-D9BEC9FDB5B0}' => array
+			(
+				"id" => "{5DE549C8-BD69-4182-BAE2-D9BEC9FDB5B0}" ,
+				"name" => "zgv_name" ,
+				"caption" => "zgv_name" ,
+				"ordinal" => "21" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9E2BBA78-7209-4F61-8FA9-03C6194BA83B}' => array
+			(
+				"id" => "{9E2BBA78-7209-4F61-8FA9-03C6194BA83B}" ,
+				"name" => "zgvmaster" ,
+				"caption" => "zgvmaster" ,
+				"ordinal" => "22" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8FC377C3-80E4-4FFD-98E3-61FF86FA5EAF}' => array
+			(
+				"id" => "{8FC377C3-80E4-4FFD-98E3-61FF86FA5EAF}" ,
+				"name" => "zgvmaster_datum" ,
+				"caption" => "zgvmaster_datum" ,
+				"ordinal" => "23" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CE79B466-1D6B-4A21-BAC1-2E3D3423D3AE}' => array
+			(
+				"id" => "{CE79B466-1D6B-4A21-BAC1-2E3D3423D3AE}" ,
+				"name" => "zgvmaster_ort" ,
+				"caption" => "zgvmaster_ort" ,
+				"ordinal" => "24" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7D27562F-FD13-4ED9-9C1C-FAC43E329F75}' => array
+			(
+				"id" => "{7D27562F-FD13-4ED9-9C1C-FAC43E329F75}" ,
+				"name" => "program_name" ,
+				"caption" => "program_name" ,
+				"ordinal" => "25" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{39F6D6FC-1B98-495A-A0FA-8504E6ACA187}' => array
+			(
+				"id" => "{39F6D6FC-1B98-495A-A0FA-8504E6ACA187}" ,
+				"name" => "bachlor" ,
+				"caption" => "bachlor" ,
+				"ordinal" => "26" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A2FC3C9E-113C-40A3-96FB-F6E5F060ABB3}' => array
+			(
+				"id" => "{A2FC3C9E-113C-40A3-96FB-F6E5F060ABB3}" ,
+				"name" => "master" ,
+				"caption" => "master" ,
+				"ordinal" => "27" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{210F0818-C0F4-48E7-9403-83E461415112}' => array
+			(
+				"id" => "{210F0818-C0F4-48E7-9403-83E461415112}" ,
+				"name" => "jahre" ,
+				"caption" => "jahre" ,
+				"ordinal" => "28" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{602F705D-6159-4152-846F-C519DC376845}' => array
+			(
+				"id" => "{602F705D-6159-4152-846F-C519DC376845}" ,
+				"name" => "person_id_emergency" ,
+				"caption" => "person_id_emergency" ,
+				"ordinal" => "29" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_person_person_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0C904A7B-27D1-474E-B04A-41772B1FEDBE}' => array
+			(
+				"id" => "{0C904A7B-27D1-474E-B04A-41772B1FEDBE}" ,
+				"name" => "person_id_coordinator_dep" ,
+				"caption" => "person_id_coordinator_dep" ,
+				"ordinal" => "30" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_person_person_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{B38BA533-3377-4CEB-A8C7-DE277878B4B9}' => array
+			(
+				"id" => "{B38BA533-3377-4CEB-A8C7-DE277878B4B9}" ,
+				"name" => "person_id_coordinator_int" ,
+				"caption" => "person_id_coordinator_int" ,
+				"ordinal" => "31" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_person_person_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{11AF33F0-79CE-4C6A-9EAE-9BF523A2105C}' => array
+			(
+				"id" => "{11AF33F0-79CE-4C6A-9EAE-9BF523A2105C}" ,
+				"name" => "code" ,
+				"caption" => "code" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "64" ,
+				"datatypeparam2" => "" ,
+				"length" => "64",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{C891BC5D-7549-425D-9AC3-85170BC708E0}' => array
+			(
+				"id" => "{C891BC5D-7549-425D-9AC3-85170BC708E0}" ,
+				"name" => "pk_preincoming" ,
+				"caption" => "pk_preincoming" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{B09F15A4-1FDE-4989-ACBA-AB7267E88C00}' => array
+			   		(
+		   				"id" => "{B09F15A4-1FDE-4989-ACBA-AB7267E88C00}" ,
+		   				"name" => "preincoming_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{77AFC9EC-CA15-4845-9547-B747D7A1611A}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{4B2AA5F0-6C48-41FF-B946-641BBB45218D}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{0A27BC0E-6212-4771-9AD9-28F3FBFB0283}' => array
+			(
+				"id" => "{0A27BC0E-6212-4771-9AD9-28F3FBFB0283}" ,
+				"name" => "preincoming_id" ,
+				"caption" => "preincoming_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{31E8CA82-1496-436D-A703-74EB46A70E8C}' => array
+			   		(
+		   				"id" => "{31E8CA82-1496-436D-A703-74EB46A70E8C}" ,
+		   				"name" => "preincoming_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{77AFC9EC-CA15-4845-9547-B747D7A1611A}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{4E1FB00A-4CD2-444B-BDE2-CE04524C814B}'  => array
+	(
+	    	"id" => "{4E1FB00A-4CD2-444B-BDE2-CE04524C814B}" ,
+	    	"name" => "tbl_preincoming_lehrveranstaltung" ,
+	    	"caption" => "tbl_preincoming_lehrveranstaltung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{88E6100B-7E32-4269-99B6-888D21966656}' => array
+			(
+				"id" => "{88E6100B-7E32-4269-99B6-888D21966656}" ,
+				"name" => "lehrveranstaltung_id" ,
+				"caption" => "lehrveranstaltung_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "nextval('lehre.seq_lehrveranstaltung_lehrveranstaltung_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{99BA8B18-CADB-49A5-8A90-6C606FD29882}' => array
+			(
+				"id" => "{99BA8B18-CADB-49A5-8A90-6C606FD29882}" ,
+				"name" => "preincoming_id" ,
+				"caption" => "preincoming_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5CBC1562-C9E8-4943-A87C-B169BA8D2A10}' => array
+			(
+				"id" => "{5CBC1562-C9E8-4943-A87C-B169BA8D2A10}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{83030804-3D9F-4725-B1D3-4CDB4FC406D2}' => array
+			(
+				"id" => "{83030804-3D9F-4725-B1D3-4CDB4FC406D2}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{CB2C8E4A-A727-4476-889B-8846C36FBD81}' => array
+			(
+				"id" => "{CB2C8E4A-A727-4476-889B-8846C36FBD81}" ,
+				"name" => "pk_preincoming_lehrveranstaltung" ,
+				"caption" => "pk_preincoming_lehrveranstaltung" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{8FAF47FB-6165-463E-8954-61AE11A38324}' => array
+			   		(
+		   				"id" => "{8FAF47FB-6165-463E-8954-61AE11A38324}" ,
+		   				"name" => "lehrveranstaltung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{88E6100B-7E32-4269-99B6-888D21966656}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+			   		'{62D6C019-6CE9-423B-B22D-5F1AE1DD9FC3}' => array
+			   		(
+		   				"id" => "{62D6C019-6CE9-423B-B22D-5F1AE1DD9FC3}" ,
+		   				"name" => "preincoming_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{99BA8B18-CADB-49A5-8A90-6C606FD29882}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{812561B5-3134-413C-9757-2FF4925B8569}'  => array
+	(
+	    	"id" => "{812561B5-3134-413C-9757-2FF4925B8569}" ,
+	    	"name" => "tbl_contentlog" ,
+	    	"caption" => "tbl_contentlog" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{A0178E89-8366-4582-834F-E124208C684D}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{6456A383-22F4-4ECA-A57C-EE63B39BD02B}' => array
+			(
+				"id" => "{6456A383-22F4-4ECA-A57C-EE63B39BD02B}" ,
+				"name" => "contentlog_id" ,
+				"caption" => "contentlog_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "1",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{CBEBA1CA-69E8-4416-BA62-225E0808872E}' => array
+			(
+				"id" => "{CBEBA1CA-69E8-4416-BA62-225E0808872E}" ,
+				"name" => "contentsprache_id" ,
+				"caption" => "contentsprache_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{357B1558-1F2E-4CB8-A693-C814DEB6C536}' => array
+			(
+				"id" => "{357B1558-1F2E-4CB8-A693-C814DEB6C536}" ,
+				"name" => "uid" ,
+				"caption" => "uid" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D3970B15-AB79-47FC-9211-68A05B54A58B}' => array
+			(
+				"id" => "{D3970B15-AB79-47FC-9211-68A05B54A58B}" ,
+				"name" => "start" ,
+				"caption" => "start" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A4A838FD-4A08-49B0-BB51-C5A7F3E127D0}' => array
+			(
+				"id" => "{A4A838FD-4A08-49B0-BB51-C5A7F3E127D0}" ,
+				"name" => "ende" ,
+				"caption" => "ende" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{675AA2E2-0392-404E-88AE-391617F21580}' => array
+			(
+				"id" => "{675AA2E2-0392-404E-88AE-391617F21580}" ,
+				"name" => "Key38" ,
+				"caption" => "Key38" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{582BA22E-76B2-4E2B-8900-C0D439EAF447}' => array
+			   		(
+		   				"id" => "{582BA22E-76B2-4E2B-8900-C0D439EAF447}" ,
+		   				"name" => "contentlog_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6456A383-22F4-4ECA-A57C-EE63B39BD02B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+			'{7BA5FDF4-5E89-4225-BFC5-C5427AEC2BD9}' => array
+			(
+				"id" => "{7BA5FDF4-5E89-4225-BFC5-C5427AEC2BD9}" ,
+				"name" => "contentlog_id" ,
+				"caption" => "contentlog_id" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{166B9E2E-D0E4-4891-AD4C-1B7A0CAD647D}' => array
+			   		(
+		   				"id" => "{166B9E2E-D0E4-4891-AD4C-1B7A0CAD647D}" ,
+		   				"name" => "contentlog_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6456A383-22F4-4ECA-A57C-EE63B39BD02B}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{3AB4277B-A321-447D-B052-5D3FC63BE7F2}'  => array
+	(
+	    	"id" => "{3AB4277B-A321-447D-B052-5D3FC63BE7F2}" ,
+	    	"name" => "tbl_projektphase" ,
+	    	"caption" => "ProjektPhase" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{23913C1C-6059-46CC-A763-615C35B6687A}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{6D1E6483-EB49-4DA0-97E4-21FEE5D327DC}' => array
+			(
+				"id" => "{6D1E6483-EB49-4DA0-97E4-21FEE5D327DC}" ,
+				"name" => "projektphase_id" ,
+				"caption" => "projektphase_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{293225B5-9274-4033-9CBC-0D61C01931D9}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8EEACFE2-B8D3-4F26-99C7-94800ED27A45}' => array
+			(
+				"id" => "{8EEACFE2-B8D3-4F26-99C7-94800ED27A45}" ,
+				"name" => "projekt_kurzbz" ,
+				"caption" => "projekt_kurzbz" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{24FD3DE3-C64E-47D7-B67F-B78E07DC0184}' => array
+			(
+				"id" => "{24FD3DE3-C64E-47D7-B67F-B78E07DC0184}" ,
+				"name" => "projektphase_fk" ,
+				"caption" => "projektphase_fk" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{5B7EA546-E115-43FE-85C9-D86527F7909C}' => array
+			(
+				"id" => "{5B7EA546-E115-43FE-85C9-D86527F7909C}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4CED6E23-51D6-42F7-B761-CA508ABEC166}' => array
+			(
+				"id" => "{4CED6E23-51D6-42F7-B761-CA508ABEC166}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{99FA8FFB-C9CB-42A5-9478-DC5309258436}' => array
+			(
+				"id" => "{99FA8FFB-C9CB-42A5-9478-DC5309258436}" ,
+				"name" => "start" ,
+				"caption" => "start" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{20FFA03B-F66E-4670-988B-337D4491C2C9}' => array
+			(
+				"id" => "{20FFA03B-F66E-4670-988B-337D4491C2C9}" ,
+				"name" => "ende" ,
+				"caption" => "ende" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{37F8B882-C32B-4966-B4E0-B74BBB5E3987}' => array
+			(
+				"id" => "{37F8B882-C32B-4966-B4E0-B74BBB5E3987}" ,
+				"name" => "budget" ,
+				"caption" => "budget" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{E62BD1D3-18CA-4571-9A16-606FF04DC894}" ,
+				"datatypeparam1" => "12" ,
+				"datatypeparam2" => "2" ,
+				"length" => "12",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0DC90627-E32F-4523-817C-F98679649CFC}' => array
+			(
+				"id" => "{0DC90627-E32F-4523-817C-F98679649CFC}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{61D71E5A-91AB-4D87-9472-7FC6E8024927}' => array
+			(
+				"id" => "{61D71E5A-91AB-4D87-9472-7FC6E8024927}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{333D96A9-4C92-4A79-9E35-9FD8474E397A}' => array
+			(
+				"id" => "{333D96A9-4C92-4A79-9E35-9FD8474E397A}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9B0879CB-C2BF-4C36-8FD7-C750B583E53E}' => array
+			(
+				"id" => "{9B0879CB-C2BF-4C36-8FD7-C750B583E53E}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{2EC8ABFB-758E-498D-B1D6-956043A8B286}' => array
+			(
+				"id" => "{2EC8ABFB-758E-498D-B1D6-956043A8B286}" ,
+				"name" => "pk_projektphase" ,
+				"caption" => "pk_projektphase" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{12723CF7-7DCF-4ADE-84F8-B544C675F989}' => array
+			   		(
+		   				"id" => "{12723CF7-7DCF-4ADE-84F8-B544C675F989}" ,
+		   				"name" => "projektphase_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{6D1E6483-EB49-4DA0-97E4-21FEE5D327DC}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{293225B5-9274-4033-9CBC-0D61C01931D9}","id" => "{C40EC62B-384A-4EC3-8601-3527B1438488}","id" => "{7DB6E542-C405-4BE1-AEB4-B6A42026B279}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{C5F36B02-0EF1-444A-8BAE-6C67957E8673}'  => array
+	(
+	    	"id" => "{C5F36B02-0EF1-444A-8BAE-6C67957E8673}" ,
+	    	"name" => "tbl_projekttask" ,
+	    	"caption" => "tbl_projekttask" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{23913C1C-6059-46CC-A763-615C35B6687A}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{84A0570C-9075-4387-8F56-982520A50322}' => array
+			(
+				"id" => "{84A0570C-9075-4387-8F56-982520A50322}" ,
+				"name" => "projekttask_id" ,
+				"caption" => "projekttask_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{65185935-F8F7-49E9-8F0C-7A21DD667C50}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{4415A5A1-72D0-4325-B92E-32F3FC22495F}' => array
+			(
+				"id" => "{4415A5A1-72D0-4325-B92E-32F3FC22495F}" ,
+				"name" => "projektphase_id" ,
+				"caption" => "projektphase_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{7134123B-13CD-4C54-AE39-4D9D76AF9D77}' => array
+			(
+				"id" => "{7134123B-13CD-4C54-AE39-4D9D76AF9D77}" ,
+				"name" => "bezeichnung" ,
+				"caption" => "bezeichnung" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{291E094E-06C1-407C-9D42-4019D94785FF}' => array
+			(
+				"id" => "{291E094E-06C1-407C-9D42-4019D94785FF}" ,
+				"name" => "beschreibung" ,
+				"caption" => "beschreibung" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{603991CB-85C4-4802-ADB5-50C23AD0EF99}' => array
+			(
+				"id" => "{603991CB-85C4-4802-ADB5-50C23AD0EF99}" ,
+				"name" => "aufwand" ,
+				"caption" => "aufwand" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{3AA5E900-D254-4FBD-AD67-AD230407284C}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D15077A1-121D-427E-B037-97379CAD4BF0}' => array
+			(
+				"id" => "{D15077A1-121D-427E-B037-97379CAD4BF0}" ,
+				"name" => "mantis_id" ,
+				"caption" => "mantis_id" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{F6C99ABF-677B-48C6-920E-F375B79C336D}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{EAE54179-8ACA-4D71-B4D2-3E2EB2C87000}' => array
+			(
+				"id" => "{EAE54179-8ACA-4D71-B4D2-3E2EB2C87000}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2D9579D7-9D0C-45A8-8EF1-2E4DAA53C379}' => array
+			(
+				"id" => "{2D9579D7-9D0C-45A8-8EF1-2E4DAA53C379}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{58EBCBC3-2479-479C-B42A-05B7C6F056CD}' => array
+			(
+				"id" => "{58EBCBC3-2479-479C-B42A-05B7C6F056CD}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{44EE1AFD-67D0-4834-8BED-364D01761F4F}' => array
+			(
+				"id" => "{44EE1AFD-67D0-4834-8BED-364D01761F4F}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{AB53FFDC-4AA1-4AC8-8C48-84DBFB5522E9}' => array
+			(
+				"id" => "{AB53FFDC-4AA1-4AC8-8C48-84DBFB5522E9}" ,
+				"name" => "pk_projekttask" ,
+				"caption" => "pk_projekttask" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{67E5EA5E-7DDC-44E9-9E24-FCEC88D1E5B1}' => array
+			   		(
+		   				"id" => "{67E5EA5E-7DDC-44E9-9E24-FCEC88D1E5B1}" ,
+		   				"name" => "projekttask_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{84A0570C-9075-4387-8F56-982520A50322}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{65185935-F8F7-49E9-8F0C-7A21DD667C50}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{6F3569D0-1CFD-4A54-89FF-9797AE4D69F2}'  => array
+	(
+	    	"id" => "{6F3569D0-1CFD-4A54-89FF-9797AE4D69F2}" ,
+	    	"name" => "tbl_notiz" ,
+	    	"caption" => "tbl_notiz" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{2A02948E-3EF0-4292-94FF-A248F5D32217}' => array
+			(
+				"id" => "{2A02948E-3EF0-4292-94FF-A248F5D32217}" ,
+				"name" => "notiz_id" ,
+				"caption" => "notiz_id" ,
+				"ordinal" => "1" ,
+				"pk" => "{CCD9642A-7AB0-4B2B-A3F1-01A1D18A1F23}" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{98FBEFD5-1C99-40AF-8F67-38164C6A4826}' => array
+			(
+				"id" => "{98FBEFD5-1C99-40AF-8F67-38164C6A4826}" ,
+				"name" => "titel" ,
+				"caption" => "titel" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "256" ,
+				"datatypeparam2" => "" ,
+				"length" => "256",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{19916300-72BD-4811-A094-9A395C09B221}' => array
+			(
+				"id" => "{19916300-72BD-4811-A094-9A395C09B221}" ,
+				"name" => "text" ,
+				"caption" => "text" ,
+				"ordinal" => "3" ,
+				"pk" => "" ,
+				"datatypeid" => "{8D91E2A4-12F5-40E3-BAC2-BFCF7BE1C8B7}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{6BC15E80-CB94-4964-BB69-DEF032785B90}' => array
+			(
+				"id" => "{6BC15E80-CB94-4964-BB69-DEF032785B90}" ,
+				"name" => "verfasser_uid" ,
+				"caption" => "verfasser_uid" ,
+				"ordinal" => "4" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{8465BF68-CB66-47EC-8549-AFBF8B90F4A7}' => array
+			(
+				"id" => "{8465BF68-CB66-47EC-8549-AFBF8B90F4A7}" ,
+				"name" => "bearbeiter_uid" ,
+				"caption" => "bearbeiter_uid" ,
+				"ordinal" => "5" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3056DF54-9797-4867-94BA-A01577EED3AF}' => array
+			(
+				"id" => "{3056DF54-9797-4867-94BA-A01577EED3AF}" ,
+				"name" => "start" ,
+				"caption" => "start" ,
+				"ordinal" => "6" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{16FD55F5-04DA-4068-9FF9-0D219247F6C3}' => array
+			(
+				"id" => "{16FD55F5-04DA-4068-9FF9-0D219247F6C3}" ,
+				"name" => "ende" ,
+				"caption" => "ende" ,
+				"ordinal" => "7" ,
+				"pk" => "" ,
+				"datatypeid" => "{5EBD99F4-5263-4410-9892-11DB7C2DF84B}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A0655C78-FA3B-4F15-9DB7-A5355596EBFD}' => array
+			(
+				"id" => "{A0655C78-FA3B-4F15-9DB7-A5355596EBFD}" ,
+				"name" => "erledigt" ,
+				"caption" => "erledigt" ,
+				"ordinal" => "8" ,
+				"pk" => "" ,
+				"datatypeid" => "{D64069A5-B04A-490B-B0A2-5144DEA81A2E}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9B86F1CD-DE9F-4FC5-8F0C-4BB8098765C5}' => array
+			(
+				"id" => "{9B86F1CD-DE9F-4FC5-8F0C-4BB8098765C5}" ,
+				"name" => "insertamum" ,
+				"caption" => "insertamum" ,
+				"ordinal" => "9" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{E6E3DB07-6582-4ACF-A555-D691D95644F4}' => array
+			(
+				"id" => "{E6E3DB07-6582-4ACF-A555-D691D95644F4}" ,
+				"name" => "insertvon" ,
+				"caption" => "insertvon" ,
+				"ordinal" => "10" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{2731E0AC-C13F-45A1-B6B3-3BF613EBD3A4}' => array
+			(
+				"id" => "{2731E0AC-C13F-45A1-B6B3-3BF613EBD3A4}" ,
+				"name" => "updateamum" ,
+				"caption" => "updateamum" ,
+				"ordinal" => "11" ,
+				"pk" => "" ,
+				"datatypeid" => "{342E3F36-138D-40F7-B1B2-D9489C848835}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "now()",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{442F6680-634E-4554-B7BC-A058314A8600}' => array
+			(
+				"id" => "{442F6680-634E-4554-B7BC-A058314A8600}" ,
+				"name" => "updatevon" ,
+				"caption" => "updatevon" ,
+				"ordinal" => "12" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{02A2A609-3513-44D2-909A-3317CA33A4DD}' => array
+			(
+				"id" => "{02A2A609-3513-44D2-909A-3317CA33A4DD}" ,
+				"name" => "pk_notiz" ,
+				"caption" => "pk_notiz" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{35DA2649-FF2C-4235-B2B8-95D769E7B9B2}' => array
+			   		(
+		   				"id" => "{35DA2649-FF2C-4235-B2B8-95D769E7B9B2}" ,
+		   				"name" => "notiz_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{2A02948E-3EF0-4292-94FF-A248F5D32217}",
+				   		),
+						"foreignkeys"  => array
+					    	(
+							"id" => "{CCD9642A-7AB0-4B2B-A3F1-01A1D18A1F23}",
+				   		)
+		   			),
+		   			
+		   		),
+			),
+			
+		),
+   	),
+    	
+	'{05A1EAFF-8F3D-4A63-8510-6A12537A3C17}'  => array
+	(
+	    	"id" => "{05A1EAFF-8F3D-4A63-8510-6A12537A3C17}" ,
+	    	"name" => "tbl_notizzuordnung" ,
+	    	"caption" => "tbl_notizzuordnung" ,
+	    	"comments" => "" ,
+	    	"storage" => "" ,
+	    	"schemaid" => "{2DF1C1D4-044F-4F45-BF9D-A4E740C9639E}" ,
+	    	"attribute"  => array
+	    	(
+			
+			'{36C521F7-73DF-4397-A353-FAAD3589D62C}' => array
+			(
+				"id" => "{36C521F7-73DF-4397-A353-FAAD3589D62C}" ,
+				"name" => "notizzuordnung_id" ,
+				"caption" => "notizzuordnung_id" ,
+				"ordinal" => "1" ,
+				"pk" => "" ,
+				"datatypeid" => "{5F0FB0CB-62A1-4BDC-A4DA-882CACFC296A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{0F8F5CE5-915E-4C74-BFAC-F62F33892DF6}' => array
+			(
+				"id" => "{0F8F5CE5-915E-4C74-BFAC-F62F33892DF6}" ,
+				"name" => "notiz_id" ,
+				"caption" => "notiz_id" ,
+				"ordinal" => "2" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "1",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{9FE2C0EE-CC71-4105-B6A9-84E0BAA5A9EA}' => array
+			(
+				"id" => "{9FE2C0EE-CC71-4105-B6A9-84E0BAA5A9EA}" ,
+				"name" => "projekt_kurzbz" ,
+				"caption" => "projekt_kurzbz" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "16" ,
+				"datatypeparam2" => "" ,
+				"length" => "16",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{1D3C5494-AE78-415D-B729-B4491436CADF}' => array
+			(
+				"id" => "{1D3C5494-AE78-415D-B729-B4491436CADF}" ,
+				"name" => "projektphase_id" ,
+				"caption" => "projektphase_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{080F6EE2-9B2B-432C-A08B-683A8140DEC6}' => array
+			(
+				"id" => "{080F6EE2-9B2B-432C-A08B-683A8140DEC6}" ,
+				"name" => "projekttask_id" ,
+				"caption" => "projekttask_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{D8124C86-4CF4-456F-8017-B23AD3E01DAD}' => array
+			(
+				"id" => "{D8124C86-4CF4-456F-8017-B23AD3E01DAD}" ,
+				"name" => "uid" ,
+				"caption" => "uid" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{ECB8F02F-B683-4252-8508-ED9D064C9AF3}" ,
+				"datatypeparam1" => "32" ,
+				"datatypeparam2" => "" ,
+				"length" => "32",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{A2EA5ED9-D611-4E38-A1F6-D43360FED126}' => array
+			(
+				"id" => "{A2EA5ED9-D611-4E38-A1F6-D43360FED126}" ,
+				"name" => "person_id" ,
+				"caption" => "person_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_person_person_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3BE36DB9-6498-4A2F-BEF6-EBF9F2647E9B}' => array
+			(
+				"id" => "{3BE36DB9-6498-4A2F-BEF6-EBF9F2647E9B}" ,
+				"name" => "prestudent_id" ,
+				"caption" => "prestudent_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "nextval('seq_prestudent_prestudent_id'::regclass)",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+			'{3D040CF5-21C6-49A2-A3F0-7B7BBDB49F98}' => array
+			(
+				"id" => "{3D040CF5-21C6-49A2-A3F0-7B7BBDB49F98}" ,
+				"name" => "bestellung_id" ,
+				"caption" => "bestellung_id" ,
+				"ordinal" => "0" ,
+				"pk" => "" ,
+				"datatypeid" => "{361EF147-269D-4247-8F7C-5A3876A3999A}" ,
+				"datatypeparam1" => "" ,
+				"datatypeparam2" => "" ,
+				"length" => "",
+				"unique" => "0",
+				"notnull" => "0",
+				"defaultvalue" => "",
+				"checkconstraintname" => "",
+				"checkconstraint" => "",
+				"description" => ""
+			),
+			
+	   	),
+		"keyconstraint"  => array
+	    	(
+			
+			'{F2FA1E25-43E6-4E7B-B822-40100242F4FC}' => array
+			(
+				"id" => "{F2FA1E25-43E6-4E7B-B822-40100242F4FC}" ,
+				"name" => "pk_notizzuordnung" ,
+				"caption" => "pk_notizzuordnung" ,
+				"ordinal" => "0" ,
+				"comments" => "" ,
+				"keyconstraintitem"  => array
+			    	(
+					
+			   		'{52FD6B24-1774-4577-BD49-217FFC307C78}' => array
+			   		(
+		   				"id" => "{52FD6B24-1774-4577-BD49-217FFC307C78}" ,
+		   				"name" => "notizzuordnung_id" ,
+		   				"caption" => "" ,
+		   				"ordinal" => "0" ,
+		   				"comments" => "" ,
+		   				"description" => "",
+						"attribute"  => array
+					    	(
+							"id" => "{36C521F7-73DF-4397-A353-FAAD3589D62C}",
 				   		),
 						"foreignkeys"  => array
 					    	(
@@ -54174,8 +59081,8 @@ $relations=array
 	'{00D8F1D4-D9D2-4E1F-A3D0-CC1C78AC43B6}'  => array
 	(
 	    	"id" => "{00D8F1D4-D9D2-4E1F-A3D0-CC1C78AC43B6}" ,
-	    	"name" => "Relationship1" ,
-	    	"caption" => "Relationship1" ,
+	    	"name" => "fk_tag_bestelldetailtag" ,
+	    	"caption" => "fk_tag_bestelldetailtag" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "1",
@@ -54223,8 +59130,8 @@ $relations=array
 	'{E71C8D04-54C0-45AD-84BF-A947DB5B9D04}'  => array
 	(
 	    	"id" => "{E71C8D04-54C0-45AD-84BF-A947DB5B9D04}" ,
-	    	"name" => "Relationship2" ,
-	    	"caption" => "Relationship2" ,
+	    	"name" => "fk_bestelldetail_bestelldetailtag" ,
+	    	"caption" => "fk_bestelldetail_bestelldetailtag" ,
 	    	"comments" => "" ,
 	    	"notes" => "",
 	    	"identifying" => "1",
@@ -54263,6 +59170,2456 @@ $relations=array
 				"KeyConstraintItem"  => array
 			    	(
 					"id" => "{DE32C997-9A9A-4F6D-B2BA-7C97D51F021F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{1B34A710-AD73-47BA-8C23-C6988FD0B136}'  => array
+	(
+	    	"id" => "{1B34A710-AD73-47BA-8C23-C6988FD0B136}" ,
+	    	"name" => "fk_konto_konto_kostenstelle" ,
+	    	"caption" => "fk_konto_konto_kostenstelle" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{9AB9F3EA-D74E-48B9-BFA2-F7AF4D9884F7}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{622E127E-8D86-4A28-A6E8-ECC606A5AB4B}' => array
+			(
+				"id" => "{622E127E-8D86-4A28-A6E8-ECC606A5AB4B}",
+				"name" => "FK konto_id - konto_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{6FA927BB-1FE8-4C8C-BD7C-6B053C17557E}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{0BF5457D-0598-48EB-A2A5-AF97E73D9B55}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{D0AD52C3-969D-4386-AD51-F4D022161102}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{22FC0193-582D-44A2-8FBF-21C60AA88958}'  => array
+	(
+	    	"id" => "{22FC0193-582D-44A2-8FBF-21C60AA88958}" ,
+	    	"name" => "fk_konto_kostenstelle_kostenstelle" ,
+	    	"caption" => "fk_konto_kostenstelle_kostenstelle" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{B55291B2-7F9D-429E-936C-A76E459C67B5}' => array
+			(
+				"id" => "{B55291B2-7F9D-429E-936C-A76E459C67B5}",
+				"name" => "FK kostenstelle_id - kostenstelle_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{43FFE33C-2CFD-46C4-9A35-AD62D1CB151D}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{43788A23-1BE0-4F92-837F-0606D31FF78F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{FF29CBAD-5507-49F3-B931-EE9C38126083}'  => array
+	(
+	    	"id" => "{FF29CBAD-5507-49F3-B931-EE9C38126083}" ,
+	    	"name" => "fk_rechnungstyp_rechnung" ,
+	    	"caption" => "fk_rechnungstyp_rechnung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{DE040193-3F00-4010-99F8-B6946912493D}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{240A3883-77E4-44CB-B6CC-FA1D6C434F03}' => array
+			(
+				"id" => "{240A3883-77E4-44CB-B6CC-FA1D6C434F03}",
+				"name" => "FK rechnungstyp_kurzbz - rechnungstyp_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{6B75E50E-AE5F-47AB-BB3A-284799C0183B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{E1466E3B-74B4-4D4D-AAA9-1A6D82FA70A5}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{0E79E098-9CA4-40FD-9233-9D91440D15BA}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{CCBF5E97-827C-4A87-A10D-CE94B5CAC89A}'  => array
+	(
+	    	"id" => "{CCBF5E97-827C-4A87-A10D-CE94B5CAC89A}" ,
+	    	"name" => "fk_benutzer_bismeldung" ,
+	    	"caption" => "fk_benutzer_bismeldung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{02B95A0C-644B-4DD4-94C9-3BA34DADB850}' => array
+			(
+				"id" => "{02B95A0C-644B-4DD4-94C9-3BA34DADB850}",
+				"name" => "FK uid - melder_uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3251CB18-6FED-407E-94FB-00B8EDC1040C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{CD1ED4C7-04E2-4A29-850A-8FBE9A72DDF2}'  => array
+	(
+	    	"id" => "{CD1ED4C7-04E2-4A29-850A-8FBE9A72DDF2}" ,
+	    	"name" => "fk_studiengang_bismeldung" ,
+	    	"caption" => "fk_studiengang_bismeldung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{C3F57DE1-8035-402C-9511-039AD1BEECBC}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{3ACB281D-E7B1-424A-B141-C366B3F21E6A}' => array
+			(
+				"id" => "{3ACB281D-E7B1-424A-B141-C366B3F21E6A}",
+				"name" => "FK studiengang_kz - studiengang_kz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F2FAF7AE-0CB7-4FE9-8A55-FED44682049E}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{D90BBED5-9D69-41D9-9583-D036D50CC510}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AED0477E-FF31-4244-87BA-2EFF14758BD8}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{B2BB4867-6905-4684-B01B-7F33F6C4171B}'  => array
+	(
+	    	"id" => "{B2BB4867-6905-4684-B01B-7F33F6C4171B}" ,
+	    	"name" => "fk_berechtigung_statistik" ,
+	    	"caption" => "fk_berechtigung_statistik" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{E35F527E-70CE-4E2D-9AC0-F0811A6423D9}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{749A308C-772E-4ECC-9BDB-C5D1EFB52216}' => array
+			(
+				"id" => "{749A308C-772E-4ECC-9BDB-C5D1EFB52216}",
+				"name" => "FK berechtigung_kurzbz - berechtigung_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{26293B40-27C5-4A09-9CE2-D04631C60468}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{4AEC72A7-9F11-47E6-AD4A-4B61782561D0}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{67DAAC44-0FEC-4BD6-AF65-51EC1A2243BC}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{0EEADCE8-8E5C-4368-95E2-D418FD361537}'  => array
+	(
+	    	"id" => "{0EEADCE8-8E5C-4368-95E2-D418FD361537}" ,
+	    	"name" => "fk_berechtigung_rechnungstyp" ,
+	    	"caption" => "fk_berechtigung_rechnungstyp" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{E35F527E-70CE-4E2D-9AC0-F0811A6423D9}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{D41B0FDD-A0AF-4AFF-9C86-30B530C68F00}' => array
+			(
+				"id" => "{D41B0FDD-A0AF-4AFF-9C86-30B530C68F00}",
+				"name" => "FK berechtigung_kurzbz - berechtigung_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{26293B40-27C5-4A09-9CE2-D04631C60468}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3520820B-AB57-4FDD-A4B2-D80FA1D536E3}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{67DAAC44-0FEC-4BD6-AF65-51EC1A2243BC}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{9E1E012B-FB37-4710-AE9E-C71363183336}'  => array
+	(
+	    	"id" => "{9E1E012B-FB37-4710-AE9E-C71363183336}" ,
+	    	"name" => "fk_kostenstelle_budget" ,
+	    	"caption" => "fk_kostenstelle_budget" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F06711F1-05C9-48B6-8535-4C2EFB9E2CCC}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{ED2BA045-FD07-416D-B4AA-C75DD4457063}' => array
+			(
+				"id" => "{ED2BA045-FD07-416D-B4AA-C75DD4457063}",
+				"name" => "FK kostenstelle_id - kostenstelle_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{945D6D33-2FC0-4F9B-9DB8-1776F0B3F303}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{E878B099-81A2-47D4-8894-160D6D517855}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{43788A23-1BE0-4F92-837F-0606D31FF78F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{4D1E6378-73C5-4CB5-9523-5DAAED4F8BF1}'  => array
+	(
+	    	"id" => "{4D1E6378-73C5-4CB5-9523-5DAAED4F8BF1}" ,
+	    	"name" => "fk_geschaeftsjahr_budget" ,
+	    	"caption" => "fk_geschaeftsjahr_budget" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{397A22FD-7A0F-4743-84B1-0D755B98AC6A}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{69994657-573D-4A11-A318-F4990B6CE415}' => array
+			(
+				"id" => "{69994657-573D-4A11-A318-F4990B6CE415}",
+				"name" => "FK geschaeftsjahr_kurzbz - geschaeftsjahr_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{18C01AA0-418C-480F-8624-CAC8BC21D82F}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3AE8079A-38F1-4B3B-B63A-ECCC11333DB5}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{55C4947A-5433-4777-8435-6AA34C6A15FB}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{CE8D10BE-C04E-4381-A10B-728F8BED856D}'  => array
+	(
+	    	"id" => "{CE8D10BE-C04E-4381-A10B-728F8BED856D}" ,
+	    	"name" => "fk_zahlungstyp_bestellung" ,
+	    	"caption" => "fk_zahlungstyp_bestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2A6B53EC-BF2C-4C1A-9359-C80A39815C52}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{18CE797E-15E8-4465-9C5B-416226757914}' => array
+			(
+				"id" => "{18CE797E-15E8-4465-9C5B-416226757914}",
+				"name" => "FK zahlungstyp_kurzbz - zahlungstyp_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{7D141143-E736-415C-92D7-43A192BDA751}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{C7C0BCF3-DD9B-49F8-A6A6-1FBC00F9491C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{132C10F0-6557-47D9-ADEA-574D2AA51279}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{D7DE62E4-BDB5-4BFC-A96C-67F17C29BA89}'  => array
+	(
+	    	"id" => "{D7DE62E4-BDB5-4BFC-A96C-67F17C29BA89}" ,
+	    	"name" => "fk_vorlagestudiengang_organisationseinheit" ,
+	    	"caption" => "fk_vorlagestudiengang_organisationseinheit" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{3154E9AD-3008-4808-A683-1F492C0A3A95}' => array
+			(
+				"id" => "{3154E9AD-3008-4808-A683-1F492C0A3A95}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{EEA4478A-32B0-49CD-AF85-306CF9EAEA36}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{F43908D4-64E8-4DF9-9B6E-4BB548C0DA4A}'  => array
+	(
+	    	"id" => "{F43908D4-64E8-4DF9-9B6E-4BB548C0DA4A}" ,
+	    	"name" => "fk_sprache_contentsprache" ,
+	    	"caption" => "fk_sprache_contentsprache" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{F6BEBF65-0503-4C0F-B9FF-99D94CEB22B2}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{433C5091-A976-4D84-AB99-37F5012B0DA5}' => array
+			(
+				"id" => "{433C5091-A976-4D84-AB99-37F5012B0DA5}",
+				"name" => "FK sprache - sprache",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{84D8B91C-7360-40E7-A49B-DAA60B56100B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{F2FAE884-09A5-4833-9090-8D8DC90788BE}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{46D40AB0-DB14-441E-B0ED-F06414D05136}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{DEBEEF46-8564-48C3-AEE0-BA509FFFF864}'  => array
+	(
+	    	"id" => "{DEBEEF46-8564-48C3-AEE0-BA509FFFF864}" ,
+	    	"name" => "fk_content_contentsprache" ,
+	    	"caption" => "fk_content_contentsprache" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{1275A75A-992B-4D46-8AFA-4A680330E370}' => array
+			(
+				"id" => "{1275A75A-992B-4D46-8AFA-4A680330E370}",
+				"name" => "FK content_id - content_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{639248E5-15D7-45D6-8B89-CB7DC4453E35}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{1207D5F4-B063-4B0A-B826-306478756915}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{2A3DD941-AB49-40E1-9C2E-21A0BEF24AC4}'  => array
+	(
+	    	"id" => "{2A3DD941-AB49-40E1-9C2E-21A0BEF24AC4}" ,
+	    	"name" => "fk_template_content" ,
+	    	"caption" => "fk_template_content" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{C62FF5C4-AEFF-4DEA-A8ED-CFC2076180F2}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{57BF488C-6043-4148-8D52-98A83EA3A871}' => array
+			(
+				"id" => "{57BF488C-6043-4148-8D52-98A83EA3A871}",
+				"name" => "FK template_kurzbz - template_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{68F1243B-1732-4B6B-AC9C-10EE973DB1EE}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{5E20CE75-776F-4C15-86BE-4A2EA9870E9A}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{48EA155A-F31C-4D7D-9DD4-AAD35BCBBA15}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{9EC2C67E-398F-4443-A22C-7EEB4B973562}'  => array
+	(
+	    	"id" => "{9EC2C67E-398F-4443-A22C-7EEB4B973562}" ,
+	    	"name" => "fk_content_statistik" ,
+	    	"caption" => "fk_content_statistik" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{29C2A665-2522-4ACD-89EC-5EADE0831C97}' => array
+			(
+				"id" => "{29C2A665-2522-4ACD-89EC-5EADE0831C97}",
+				"name" => "FK content_id - content_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{C0332DA6-C06D-4B5A-8D04-9E8003595C13}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{1207D5F4-B063-4B0A-B826-306478756915}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{B429C27D-9BA9-4E1F-B3F2-93499C156D7B}'  => array
+	(
+	    	"id" => "{B429C27D-9BA9-4E1F-B3F2-93499C156D7B}" ,
+	    	"name" => "fk_content_contentchild" ,
+	    	"caption" => "fk_content_contentchild" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{4BBD0A33-D144-4014-B82B-1052BDC175AF}' => array
+			(
+				"id" => "{4BBD0A33-D144-4014-B82B-1052BDC175AF}",
+				"name" => "FK content_id - content_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{324BEBE3-FDD2-4AB4-A93C-FA4B7F42486A}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{1207D5F4-B063-4B0A-B826-306478756915}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{0E06E5BE-8DEA-4196-9924-084D83007A12}'  => array
+	(
+	    	"id" => "{0E06E5BE-8DEA-4196-9924-084D83007A12}" ,
+	    	"name" => "fk_content_contentchild_child" ,
+	    	"caption" => "fk_content_contentchild_child" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{13F275A6-6D26-4E0E-AA55-5ECCA360B25F}' => array
+			(
+				"id" => "{13F275A6-6D26-4E0E-AA55-5ECCA360B25F}",
+				"name" => "FK content_id - child_content_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{38355B7D-0468-4CBD-A712-2D221CDDC1EF}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{1207D5F4-B063-4B0A-B826-306478756915}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{A268DB03-5D29-4070-A8B4-DCA5400331FA}'  => array
+	(
+	    	"id" => "{A268DB03-5D29-4070-A8B4-DCA5400331FA}" ,
+	    	"name" => "fk_organisationseinheit_content" ,
+	    	"caption" => "fk_organisationseinheit_content" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{76355676-7347-4DC3-B667-B3BCC991245B}' => array
+			(
+				"id" => "{76355676-7347-4DC3-B667-B3BCC991245B}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{B916EE8B-C3A6-45C3-8BF3-E4D6A34F8981}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{27B681A5-BDEE-4A52-B9EC-5FC0E4AFF9FA}'  => array
+	(
+	    	"id" => "{27B681A5-BDEE-4A52-B9EC-5FC0E4AFF9FA}" ,
+	    	"name" => "fk_content_contentgruppe" ,
+	    	"caption" => "fk_content_contentgruppe" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{3C543344-D5D2-429A-A2D4-CD8D872D1CA0}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{5ABE7330-6A5C-4A9D-9BBD-74EB2B9255DC}' => array
+			(
+				"id" => "{5ABE7330-6A5C-4A9D-9BBD-74EB2B9255DC}",
+				"name" => "FK content_id - content_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{E4E659C7-39CF-4EFC-B7FD-EB3BB8D3F089}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{9D9DFDD9-1210-40CF-AB82-BC90987C898C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{1207D5F4-B063-4B0A-B826-306478756915}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{17C1F651-5E95-4341-9E50-9929985C4942}'  => array
+	(
+	    	"id" => "{17C1F651-5E95-4341-9E50-9929985C4942}" ,
+	    	"name" => "fk_gruppe_contentgruppe" ,
+	    	"caption" => "fk_gruppe_contentgruppe" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{FE1E6CC3-0C5C-4D7C-8C72-EB6B61006929}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{12F20E3B-D2BC-4B15-8131-F4E58718B58E}' => array
+			(
+				"id" => "{12F20E3B-D2BC-4B15-8131-F4E58718B58E}",
+				"name" => "FK gruppe_kurzbz - gruppe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{213D815F-CB32-4930-94F9-993B3D7AE47B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{5E5EBA81-E608-43B6-98A7-2B7D16FA7645}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{E62A7880-E097-4032-A803-7DF6634292EB}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{A6F80362-90AA-499E-B5BA-A5A1FBA06229}'  => array
+	(
+	    	"id" => "{A6F80362-90AA-499E-B5BA-A5A1FBA06229}" ,
+	    	"name" => "fk_organisationseinheit_dms" ,
+	    	"caption" => "fk_organisationseinheit_dms" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{23C5CADB-32B6-471D-A6AC-78F5F2280B49}' => array
+			(
+				"id" => "{23C5CADB-32B6-471D-A6AC-78F5F2280B49}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{07BD2E1D-7DC9-477E-822D-9B1524A7237C}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{60267DD1-9690-429B-BD7F-812786B73523}'  => array
+	(
+	    	"id" => "{60267DD1-9690-429B-BD7F-812786B73523}" ,
+	    	"name" => "fk_dokument_dms" ,
+	    	"caption" => "fk_dokument_dms" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{EE361D18-23A4-457B-86E5-9E95C83C5F57}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{91284962-D481-4920-B205-4D56B74469FB}' => array
+			(
+				"id" => "{91284962-D481-4920-B205-4D56B74469FB}",
+				"name" => "FK dokument_kurzbz - dokument_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{EA13F305-F43B-4F8D-81F6-9D337E0ED59B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{53FD025D-E13C-4F18-8B47-2D1A125E1C5B}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{40238FFD-41C1-48D2-AD6B-F3DD75DCB623}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{9A664AD5-0ED4-4C12-9942-706B3FF47906}'  => array
+	(
+	    	"id" => "{9A664AD5-0ED4-4C12-9942-706B3FF47906}" ,
+	    	"name" => "fk_dms_kategorie_dms" ,
+	    	"caption" => "fk_dms_kategorie_dms" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A79F3C1F-29C9-41CF-9BF2-21D3D3714CE1}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{45D6608F-1D4C-4EF7-B119-AC58B4A4BE26}' => array
+			(
+				"id" => "{45D6608F-1D4C-4EF7-B119-AC58B4A4BE26}",
+				"name" => "FK kategorie_kurzbz - kategorie_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{4F47288B-1992-4E37-A8EB-BBCA1C7474FA}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{F7158E2E-C292-4E07-9D25-658580B3BBC0}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9A1BC723-FACA-4DE6-9F7B-CAA974627DDB}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{731A95F5-891C-428D-AB70-04D0424B3CAC}'  => array
+	(
+	    	"id" => "{731A95F5-891C-428D-AB70-04D0424B3CAC}" ,
+	    	"name" => "fk_dms_kategorie_dms_kategorie" ,
+	    	"caption" => "fk_dms_kategorie_dms_kategorie" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A79F3C1F-29C9-41CF-9BF2-21D3D3714CE1}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{E709B261-A797-4EC0-92EB-AD51D4E89F28}' => array
+			(
+				"id" => "{E709B261-A797-4EC0-92EB-AD51D4E89F28}",
+				"name" => "FK kategorie_kurzbz - parent_kategorie_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{4F47288B-1992-4E37-A8EB-BBCA1C7474FA}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{FB6A4A6C-1630-468A-84EA-8B42F519C408}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9A1BC723-FACA-4DE6-9F7B-CAA974627DDB}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{337F5FEF-3F6D-4721-9AFD-0BEFE163618C}'  => array
+	(
+	    	"id" => "{337F5FEF-3F6D-4721-9AFD-0BEFE163618C}" ,
+	    	"name" => "fk_person_preincoming" ,
+	    	"caption" => "fk_person_preincoming" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{B8643DDA-4E3E-4E96-BD2B-005B5D5B6A97}' => array
+			(
+				"id" => "{B8643DDA-4E3E-4E96-BD2B-005B5D5B6A97}",
+				"name" => "FK person_id - person_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{FF7B38D8-543A-45F1-A80C-6BE124F1A0DA}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{F67E10C9-CF3A-41F1-9407-E2810B4356E5}'  => array
+	(
+	    	"id" => "{F67E10C9-CF3A-41F1-9407-E2810B4356E5}" ,
+	    	"name" => "fk_lehrveranstaltung_preincoming_lehrveranstaltung" ,
+	    	"caption" => "fk_lehrveranstaltung_preincoming_lehrveranstaltung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{98A17A8E-EC74-49C0-8CAB-145890D22399}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{C9B5B23F-5A16-46CE-A39D-9C855785EE06}' => array
+			(
+				"id" => "{C9B5B23F-5A16-46CE-A39D-9C855785EE06}",
+				"name" => "FK lehrveranstaltung_id - lehrveranstaltung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{5B697829-8440-4069-A969-4AB1FC3A0347}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{88E6100B-7E32-4269-99B6-888D21966656}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{C10AB329-6B6D-4C09-9E3C-55A37F636E8A}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{AF90A484-BA8E-4355-B661-080D8F51F2D6}'  => array
+	(
+	    	"id" => "{AF90A484-BA8E-4355-B661-080D8F51F2D6}" ,
+	    	"name" => "fk_preincoming_preincoming_lehrveranstaltung" ,
+	    	"caption" => "fk_preincoming_preincoming_lehrveranstaltung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "1",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{C891BC5D-7549-425D-9AC3-85170BC708E0}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{4B2AA5F0-6C48-41FF-B946-641BBB45218D}' => array
+			(
+				"id" => "{4B2AA5F0-6C48-41FF-B946-641BBB45218D}",
+				"name" => "FK preincoming_id - preincoming_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{77AFC9EC-CA15-4845-9547-B747D7A1611A}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{99BA8B18-CADB-49A5-8A90-6C606FD29882}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{B09F15A4-1FDE-4989-ACBA-AB7267E88C00}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{54389F1F-A3E0-4165-87A4-6F2E62BAF821}'  => array
+	(
+	    	"id" => "{54389F1F-A3E0-4165-87A4-6F2E62BAF821}" ,
+	    	"name" => "fk_mobilitaetsprogramm_preincoming" ,
+	    	"caption" => "fk_mobilitaetsprogramm_preincoming" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{4F675612-A64D-4A58-BF43-AB2916560326}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{8F160CFB-FAB8-42FA-AFF9-14A2526FD274}' => array
+			(
+				"id" => "{8F160CFB-FAB8-42FA-AFF9-14A2526FD274}",
+				"name" => "FK mobilitaetsprogramm_code - mobilitaetsprogramm_code",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{DDAA5870-1AE8-4B92-B0B8-E25D975EE256}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3152CCD4-DC37-43C8-8B7B-15A3441F51D2}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{8AD6472E-DA66-4FED-AE6D-060837A9DE20}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{4CF49CD4-124C-4DC7-AFB7-CCB6E2D6A3E7}'  => array
+	(
+	    	"id" => "{4CF49CD4-124C-4DC7-AFB7-CCB6E2D6A3E7}" ,
+	    	"name" => "fk_zweck_preincoming" ,
+	    	"caption" => "fk_zweck_preincoming" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{6AA29602-7960-415B-A494-85417C8B5A6B}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{F4C72714-4556-419F-9188-598B8EDAD28C}' => array
+			(
+				"id" => "{F4C72714-4556-419F-9188-598B8EDAD28C}",
+				"name" => "FK zweck_code - zweck_code",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{58D02B6C-A792-4D33-BFE7-B1EEFE0D7507}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{2C5ADC5E-F26D-4B36-9204-458C59EFB1BA}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{8A043546-4279-4A46-858F-3EFCFA70894F}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{86779749-1BB0-4FD5-B17F-8B55B8B59040}'  => array
+	(
+	    	"id" => "{86779749-1BB0-4FD5-B17F-8B55B8B59040}" ,
+	    	"name" => "fk_firma_preincoming" ,
+	    	"caption" => "fk_firma_preincoming" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2803A3CE-B99A-41AC-9BAF-A6192F097CD4}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{76F85F49-9DBB-41CB-A069-4498A44B93B9}' => array
+			(
+				"id" => "{76F85F49-9DBB-41CB-A069-4498A44B93B9}",
+				"name" => "FK firma_id - firma_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{EC7F872F-B08A-449D-A17D-348E3FB75228}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{8E49B4A3-BA3B-4D2C-9088-3C3448E5C954}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{F57E3618-9931-4302-AFA7-B1DA23F1C590}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{FD2F1CD5-644A-4D9A-BF4B-45F7985B224D}'  => array
+	(
+	    	"id" => "{FD2F1CD5-644A-4D9A-BF4B-45F7985B224D}" ,
+	    	"name" => "fk_person_preincoming_emergency" ,
+	    	"caption" => "fk_person_preincoming_emergency" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{BD5224E9-A3D7-445C-8B8A-91A332B20F00}' => array
+			(
+				"id" => "{BD5224E9-A3D7-445C-8B8A-91A332B20F00}",
+				"name" => "FK person_id - person_id_emergency",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{602F705D-6159-4152-846F-C519DC376845}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{9D8183BF-D517-43D0-82EC-341AC6975AA1}'  => array
+	(
+	    	"id" => "{9D8183BF-D517-43D0-82EC-341AC6975AA1}" ,
+	    	"name" => "fk_person_preincoming_coordinator_dep" ,
+	    	"caption" => "fk_person_preincoming_coordinator_dep" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{6E2562DC-8934-4E41-8CCC-51B2AF3F6751}' => array
+			(
+				"id" => "{6E2562DC-8934-4E41-8CCC-51B2AF3F6751}",
+				"name" => "FK person_id - person_id_coordinator_dep",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{0C904A7B-27D1-474E-B04A-41772B1FEDBE}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{B029A0EC-D181-46EA-B742-F08847F3725D}'  => array
+	(
+	    	"id" => "{B029A0EC-D181-46EA-B742-F08847F3725D}" ,
+	    	"name" => "fk_person_preincoming_coordiantor_int" ,
+	    	"caption" => "fk_person_preincoming_coordiantor_int" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{A9FA2968-899B-4F8E-8D4D-E33E9BF88B71}' => array
+			(
+				"id" => "{A9FA2968-899B-4F8E-8D4D-E33E9BF88B71}",
+				"name" => "FK person_id - person_id_coordinator_int",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{B38BA533-3377-4CEB-A8C7-DE277878B4B9}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{8111E3D0-73C9-47CF-BE5B-90191E5890FE}'  => array
+	(
+	    	"id" => "{8111E3D0-73C9-47CF-BE5B-90191E5890FE}" ,
+	    	"name" => "fk_benutzer_contentsprache" ,
+	    	"caption" => "fk_benutzer_contentsprache" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{DE0F0B99-B793-4215-BF9F-044E6F8475E7}' => array
+			(
+				"id" => "{DE0F0B99-B793-4215-BF9F-044E6F8475E7}",
+				"name" => "FK uid - gesperrt_uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{DBD2C006-645C-4B67-814D-51CD0438FD74}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{FFA827CA-C2A5-4A33-BA51-FB481EB9D1E2}'  => array
+	(
+	    	"id" => "{FFA827CA-C2A5-4A33-BA51-FB481EB9D1E2}" ,
+	    	"name" => "fk_benutzer_contentlog" ,
+	    	"caption" => "fk_benutzer_contentlog" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{8CA05996-6162-44E6-80A3-9903776309D4}' => array
+			(
+				"id" => "{8CA05996-6162-44E6-80A3-9903776309D4}",
+				"name" => "FK uid - uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{357B1558-1F2E-4CB8-A693-C814DEB6C536}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{0B11C02A-D788-4497-8C76-126F025CC7C9}'  => array
+	(
+	    	"id" => "{0B11C02A-D788-4497-8C76-126F025CC7C9}" ,
+	    	"name" => "fk_contentsprache_contentlog" ,
+	    	"caption" => "fk_contentsprache_contentlog" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "0" ,
+	    	"refintegrityparentdelete" => "0" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A912E4E9-74EF-4FB1-B7C0-5151FB28EEA6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{66F2B47B-6B18-4A8C-ABB6-C2C1EE2EDF48}' => array
+			(
+				"id" => "{66F2B47B-6B18-4A8C-ABB6-C2C1EE2EDF48}",
+				"name" => "FK contentsprache_id - contentsprache_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{819F4B37-7AA3-41FE-A8CA-D0678FD88D7B}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{CBEBA1CA-69E8-4416-BA62-225E0808872E}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{E7BA7BF5-F26E-4A41-ADBF-B3AC75808F89}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{415C1932-4D3C-499D-8161-3D708BF136AA}'  => array
+	(
+	    	"id" => "{415C1932-4D3C-499D-8161-3D708BF136AA}" ,
+	    	"name" => "fk_projekt_oe" ,
+	    	"caption" => "fk_projekt_oe" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{5C22494A-1F6D-4CE2-8E59-47C79AAE36C6}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{D008EE51-5041-419F-9349-737DCED80EF6}' => array
+			(
+				"id" => "{D008EE51-5041-419F-9349-737DCED80EF6}",
+				"name" => "FK oe_kurzbz - oe_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{99B1972B-487E-4C1F-86F3-B15419DE291D}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{144CD927-C0FB-4502-844D-1FB19DA50636}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{9B3E6360-0810-41AE-BB3D-C30911C3D4B0}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{3474AF18-98EA-4E1C-9087-FBBF4B98CC07}'  => array
+	(
+	    	"id" => "{3474AF18-98EA-4E1C-9087-FBBF4B98CC07}" ,
+	    	"name" => "fk_projektphase_projekt" ,
+	    	"caption" => "fk_projektphase_projekt" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2EA6597E-160F-4A49-A381-2EAB32B42057}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{E1E1ECEB-2DFA-48AB-ADF2-AD2323E0E516}' => array
+			(
+				"id" => "{E1E1ECEB-2DFA-48AB-ADF2-AD2323E0E516}",
+				"name" => "FK projekt_kurzbz - projekt_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{A7574311-DA3D-40C1-9E68-5E5EB743DC26}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{8EEACFE2-B8D3-4F26-99C7-94800ED27A45}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{AF9438BB-D28A-4F98-ABBB-C3C1D8A2D36A}'  => array
+	(
+	    	"id" => "{AF9438BB-D28A-4F98-ABBB-C3C1D8A2D36A}" ,
+	    	"name" => "fk_projekttask_projektphase" ,
+	    	"caption" => "fk_projekttask_projektphase" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2EC8ABFB-758E-498D-B1D6-956043A8B286}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{293225B5-9274-4033-9CBC-0D61C01931D9}' => array
+			(
+				"id" => "{293225B5-9274-4033-9CBC-0D61C01931D9}",
+				"name" => "FK projektphase_id - projektphase_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{6D1E6483-EB49-4DA0-97E4-21FEE5D327DC}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{4415A5A1-72D0-4325-B92E-32F3FC22495F}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{12723CF7-7DCF-4ADE-84F8-B544C675F989}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{312BF434-1178-4C61-95CE-BC8D4A88FFBF}'  => array
+	(
+	    	"id" => "{312BF434-1178-4C61-95CE-BC8D4A88FFBF}" ,
+	    	"name" => "fk_projektphase_projektphase" ,
+	    	"caption" => "fk_projektphase_projektphase" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2EC8ABFB-758E-498D-B1D6-956043A8B286}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{C40EC62B-384A-4EC3-8601-3527B1438488}' => array
+			(
+				"id" => "{C40EC62B-384A-4EC3-8601-3527B1438488}",
+				"name" => "FK projektphase_id - projektphase_fk",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{6D1E6483-EB49-4DA0-97E4-21FEE5D327DC}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{24FD3DE3-C64E-47D7-B67F-B78E07DC0184}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{12723CF7-7DCF-4ADE-84F8-B544C675F989}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{F4E69C7C-27C7-4739-B961-843E523DAAF0}'  => array
+	(
+	    	"id" => "{F4E69C7C-27C7-4739-B961-843E523DAAF0}" ,
+	    	"name" => "fk_notizzuordnung_notiz" ,
+	    	"caption" => "fk_notizzuordnung_notiz" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "1",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{02A2A609-3513-44D2-909A-3317CA33A4DD}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{CCD9642A-7AB0-4B2B-A3F1-01A1D18A1F23}' => array
+			(
+				"id" => "{CCD9642A-7AB0-4B2B-A3F1-01A1D18A1F23}",
+				"name" => "FK notiz_id - notiz_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{2A02948E-3EF0-4292-94FF-A248F5D32217}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{0F8F5CE5-915E-4C74-BFAC-F62F33892DF6}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{35DA2649-FF2C-4235-B2B8-95D769E7B9B2}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{99F4E4B3-E197-45EF-AFEE-C893735FE3F4}'  => array
+	(
+	    	"id" => "{99F4E4B3-E197-45EF-AFEE-C893735FE3F4}" ,
+	    	"name" => "fk_notiz_benutzer_verfasser" ,
+	    	"caption" => "fk_notiz_benutzer_verfasser" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{AE607AF0-799A-4AFE-8B4D-157A783182D8}' => array
+			(
+				"id" => "{AE607AF0-799A-4AFE-8B4D-157A783182D8}",
+				"name" => "FK uid - verfasser_uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{6BC15E80-CB94-4964-BB69-DEF032785B90}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{C46E22BE-5FD0-4630-BD19-988C9AFDCF28}'  => array
+	(
+	    	"id" => "{C46E22BE-5FD0-4630-BD19-988C9AFDCF28}" ,
+	    	"name" => "fk_notiz_benutzer_bearbeiter" ,
+	    	"caption" => "fk_notiz_benutzer_bearbeiter" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{06829AC1-DD34-4898-BA1B-F43A476D7BB4}' => array
+			(
+				"id" => "{06829AC1-DD34-4898-BA1B-F43A476D7BB4}",
+				"name" => "FK uid - bearbeiter_uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{8465BF68-CB66-47EC-8549-AFBF8B90F4A7}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{3BF7C90B-0CBD-49E5-810C-57F6E34BA270}'  => array
+	(
+	    	"id" => "{3BF7C90B-0CBD-49E5-810C-57F6E34BA270}" ,
+	    	"name" => "fk_notizzuordnung_projekt" ,
+	    	"caption" => "fk_notizzuordnung_projekt" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2EA6597E-160F-4A49-A381-2EAB32B42057}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{19A457EC-C1A8-4BB7-9746-A93C4ACE2B51}' => array
+			(
+				"id" => "{19A457EC-C1A8-4BB7-9746-A93C4ACE2B51}",
+				"name" => "FK projekt_kurzbz - projekt_kurzbz",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{A7574311-DA3D-40C1-9E68-5E5EB743DC26}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{9FE2C0EE-CC71-4105-B6A9-84E0BAA5A9EA}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{6F85B8D9-9C3E-43B2-B97A-B7190E52F711}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{9A202DD9-9963-4507-AC29-6045267F53C3}'  => array
+	(
+	    	"id" => "{9A202DD9-9963-4507-AC29-6045267F53C3}" ,
+	    	"name" => "fk_notizzuordnung_projektphase" ,
+	    	"caption" => "fk_notizzuordnung_projektphase" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{2EC8ABFB-758E-498D-B1D6-956043A8B286}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{7DB6E542-C405-4BE1-AEB4-B6A42026B279}' => array
+			(
+				"id" => "{7DB6E542-C405-4BE1-AEB4-B6A42026B279}",
+				"name" => "FK projektphase_id - projektphase_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{6D1E6483-EB49-4DA0-97E4-21FEE5D327DC}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{1D3C5494-AE78-415D-B729-B4491436CADF}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{12723CF7-7DCF-4ADE-84F8-B544C675F989}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{118D0D46-FEE9-4F42-A9F4-7CA65B7549C4}'  => array
+	(
+	    	"id" => "{118D0D46-FEE9-4F42-A9F4-7CA65B7549C4}" ,
+	    	"name" => "fk_notizzuordnung_projekttask" ,
+	    	"caption" => "fk_notizzuordnung_projekttask" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{AB53FFDC-4AA1-4AC8-8C48-84DBFB5522E9}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{65185935-F8F7-49E9-8F0C-7A21DD667C50}' => array
+			(
+				"id" => "{65185935-F8F7-49E9-8F0C-7A21DD667C50}",
+				"name" => "FK projekttask_id - projekttask_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{84A0570C-9075-4387-8F56-982520A50322}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{080F6EE2-9B2B-432C-A08B-683A8140DEC6}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{67E5EA5E-7DDC-44E9-9E24-FCEC88D1E5B1}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{3D35A973-7B7D-4DD5-9870-9F5F562D8130}'  => array
+	(
+	    	"id" => "{3D35A973-7B7D-4DD5-9870-9F5F562D8130}" ,
+	    	"name" => "fk_notizzuordnung_benutzer" ,
+	    	"caption" => "fk_notizzuordnung_benutzer" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{70EE0BEF-C69B-4791-AEBC-2767B8F1CFB3}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{F6581D94-8798-4820-B6B8-030D7E887D9B}' => array
+			(
+				"id" => "{F6581D94-8798-4820-B6B8-030D7E887D9B}",
+				"name" => "FK uid - uid",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FB409F67-7476-4E1F-88C7-F3E6BC9BE1C3}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{D8124C86-4CF4-456F-8017-B23AD3E01DAD}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{AA8ACCF4-983D-47F3-B631-844DA7380947}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{0B97F6DE-9184-4FED-A5CB-3396C3C3015D}'  => array
+	(
+	    	"id" => "{0B97F6DE-9184-4FED-A5CB-3396C3C3015D}" ,
+	    	"name" => "fk_notizzuordnung_person" ,
+	    	"caption" => "fk_notizzuordnung_person" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "1" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{A3924212-CBE9-44C0-8A44-FF0E51FA3FAE}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{54E475B5-8912-4DEA-9428-F9585904FD3A}' => array
+			(
+				"id" => "{54E475B5-8912-4DEA-9428-F9585904FD3A}",
+				"name" => "FK person_id - person_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{FAA719ED-2B3A-4CD7-B49D-6D1E943670C0}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{A2EA5ED9-D611-4E38-A1F6-D43360FED126}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{DE49ABD7-521A-4811-AA7E-CB6A7B6E62D7}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{04C4C137-A46E-4CF3-8E6A-6C0989FAEFFB}'  => array
+	(
+	    	"id" => "{04C4C137-A46E-4CF3-8E6A-6C0989FAEFFB}" ,
+	    	"name" => "fk_notizzuordnung_prestudent" ,
+	    	"caption" => "fk_notizzuordnung_prestudent" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{9A90C061-59B6-48A5-A355-68B2557322D7}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{0B4B53D9-028F-452A-8532-AC99F14B898E}' => array
+			(
+				"id" => "{0B4B53D9-028F-452A-8532-AC99F14B898E}",
+				"name" => "FK prestudent_id - prestudent_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{256A4E7F-24F0-4524-8F51-050BFA7D98D5}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3BE36DB9-6498-4A2F-BEF6-EBF9F2647E9B}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{68456598-CEAF-4256-8EAE-7C65CBFC101E}",
+		   		)
+			),
+			
+	   	)
+   	),
+    	
+	'{CD01C907-6906-4AE4-9972-837F81144705}'  => array
+	(
+	    	"id" => "{CD01C907-6906-4AE4-9972-837F81144705}" ,
+	    	"name" => "fk_notizzuordnung_bestellung" ,
+	    	"caption" => "fk_notizzuordnung_bestellung" ,
+	    	"comments" => "" ,
+	    	"notes" => "",
+	    	"identifying" => "0",
+	    	"mandatoryparent" => "0",
+	    	"mandatorychild" => "0",
+	    	"cardinalitychild" => "-1",
+	    	"refintegrityparentupdate" => "2" ,
+	    	"refintegrityparentdelete" => "2" ,
+	    	"refintegritychildupdate" => "0" ,
+	    	"refintegritychildinsert" => "0" ,
+		"key"  => array
+	    	(
+			"id" => "{03759997-0FFB-488B-951E-B109A571A007}",
+   		),
+	    	"foreignkeys"  => array
+	    	(
+			
+			'{16FA37EE-9FF5-4869-979C-44321A49F0FE}' => array
+			(
+				"id" => "{16FA37EE-9FF5-4869-979C-44321A49F0FE}",
+				"name" => "FK bestellung_id - bestellung_id",
+				"comments" => "",
+				"notes" => "",
+				"deferred" => "",
+				"deferrable" => "",
+				"matchtype" => "",
+				"createindextofk" => "",
+				"attrparent"  => array
+			    	(
+					"id" => "{F5E1D84A-4D7F-47B7-9358-D7DA21FDF423}",
+		   		),
+				"attrchild"  => array
+			    	(
+					"id" => "{3D040CF5-21C6-49A2-A3F0-7B7BBDB49F98}",
+		   		),
+				"KeyConstraintItem"  => array
+			    	(
+					"id" => "{93F3BC78-2E81-4736-92E1-2F03D677ABBA}",
 		   		)
 			),
 			
@@ -54413,3 +61770,4 @@ $datatypes['']=array
 );
 
 ?>
+  	
