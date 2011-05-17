@@ -202,7 +202,8 @@ else if($method=="lehrveranstaltungen")
 		{
 			$lvs = $preincoming->getLehrveranstaltungen($preincoming->preincoming_id); 
 			echo '<br><br><br> 
-				<table border ="0" width="100%">
+
+			<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
 					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/übersichtlehrveranstaltungen').'</a></td>
@@ -1359,7 +1360,7 @@ else
 					<td><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="incoming.php">'.$p->t('incoming/learningagreementerstellen').'</a></td>
+					<td><a href="learningAgreementPdf.php?id='.$preincoming->preincoming_id.'">'.$p->t('incoming/learningagreementerstellen').'</a></td>
 				</tr>
 				<tr>
 					<td><a href="incoming.php?method=files">'.$p->t("incoming/uploadvondateien").'</a></td>
