@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 
 class vorlage extends basis_db
 {
@@ -84,7 +85,7 @@ class vorlage extends basis_db
 			}
 			$qry.=" ORDER BY version DESC LIMIT 1";
 		}
-
+		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
