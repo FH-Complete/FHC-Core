@@ -72,6 +72,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$zusatzinfo_html = '';
 	$ext_id = '';
 	$aktiv = true;
+	$mischform = true;
 	$neu = 'true';
 	$oe_kurzbz='';
 	$moodle = true;
@@ -129,6 +130,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$orgform_kurzbz = $_POST['orgform_kurzbz'];
 		$lgartcode = $_POST['lgartcode'];
 		$aktiv = isset($_POST['aktiv']);
+		$mischform = isset($_POST['mischform']);
 			
 		$ext_id = $_POST['ext_id'];
 
@@ -154,6 +156,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$sg_update->titelbescheidvom = $titelbescheidvom;
 		$sg_update->zusatzinfo_html = $zusatzinfo_html;
 		$sg_update->aktiv = $aktiv;
+		$sg_update->mischform = $mischform;
 		$sg_update->ext_id = $ext_id;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
 		$sg_update->moodle = $moodle;
@@ -207,6 +210,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$zusatzinfo_html = $sg->zusatzinfo_html;
 		$ext_id = $sg->ext_id;
 		$aktiv = $sg->aktiv;
+		$mischform = $sg->mischform;
 		$oe_kurzbz = $sg->oe_kurzbz;
 		$neu = 'false';
 		$moodle = $sg->moodle;
@@ -300,7 +304,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Moodle</td>\n";
 	$htmlstr .= " 					<td>\n";
-	if($moodle == 't')
+	if($moodle)
 		$chk = "checked";
 	else
 		$chk = '';
@@ -310,11 +314,22 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td valign='top'>Projektarbeitsnote</td>\n";
 	$htmlstr .= " 					<td>\n";
-	if($projektarbeit_note_anzeige == 't')
+	if($projektarbeit_note_anzeige)
 		$chk = "checked";
 	else
 		$chk = '';
 	$htmlstr .= "						<input type='checkbox' name='projektarbeit_note_anzeige' ".$chk." onchange='submitable()'>";
+	$htmlstr .= " 					</td>\n";
+	$htmlstr .= "				</tr>\n";
+	$htmlstr .= "				<tr>\n";
+	$htmlstr .= "					<td valign='top'>Mischform</td>\n";
+	$htmlstr .= " 					<td>\n";
+	
+	if($mischform)
+		$chk = "checked";
+	else
+		$chk = '';
+	$htmlstr .= "						<input type='checkbox' name='mischform' ".$chk." onchange='submitable()'>";
 	$htmlstr .= " 					</td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "			</table>\n";
