@@ -178,8 +178,6 @@ else if($method=="lehrveranstaltungen")
 		if($_GET['mode']=="add")
 		{
 			$id= $_GET['id']; 
-			$preincoming = new preincoming(); 
-			$preincoming->loadFromPerson($person->person_id); 
 			
 			if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
 				echo $p->t('global/erfolgreichgespeichert');  
@@ -190,8 +188,6 @@ else if($method=="lehrveranstaltungen")
 		if($_GET['mode'] == "delete")
 		{
 			$id= $_GET['id']; 
-			$preincoming = new preincoming(); 
-			$preincoming->loadFromPerson($person->person_id); 
 			
 			if($preincoming->deleteLehrveranstaltung($preincoming->preincoming_id, $_GET['id']))
 				echo $p->t('global/erfolgreichgelöscht'); 
