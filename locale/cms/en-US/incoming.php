@@ -13,4 +13,14 @@ $this->phrasen['incoming/studiertvon']='Studies Abroad From';
 $this->phrasen['incoming/studiertbis']='Studies Abroad To';
 $this->phrasen['incoming/eigeneuniversitaet']='Sending Institution Information';
 $this->phrasen['incoming/universitätsname']='Sending Institution Name';
+$this->phrasen['incoming/zugangsvoraussetzung']='University Entrance Qualification 1';
+$this->phrasen['incoming/abgelegtin']='Issued at (Name of Institution)';
+$this->phrasen['incoming/abgelegtinort']='Issued in (Ort)';
+$this->phrasen['incoming/abgelegtam']='Issued on (Date, dd.mm.YYYY)';
+$this->phrasen['incoming/zugangsvoraussetzungmaster']='Master Entrance Qualification';
+$this->phrasen['incoming/personimernstfall']='Person to Contact in Case of Emergency';
+$this->phrasen['incoming/bachelorstudiengang']='Bachelor´s Degree Program';
+$this->phrasen['incoming/masterstudiengang']='Master´s Degree Program';
+$this->phrasen['incoming/studienrichtung']='Name of Program';
+$this->phrasen['incoming/jahrestudiert']='Years completetd when starting at UAS FH TW';
 ?>

@@ -44,4 +44,5 @@ $this->phrasen['global/löschen']='Delete';
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 
 $this->phrasen['global/erfolgreichgelöscht']='Successfully deleted'; 
 $this->phrasen['global/fehleraufgetreten']='Error occured'; 
+$this->phrasen['global/emailgesendetan']='E-Mail sent to'; 
 ?>
