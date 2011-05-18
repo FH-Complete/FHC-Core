@@ -28,24 +28,57 @@ require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/reihungstest.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $datum_obj = new datum();
+
+if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
+{
+	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+	if (is_null($search) ||$search=='')
+		exit();	
+	$qry = "SELECT 
+				nachname, vorname, prestudent_id,
+				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg, 
+				get_rolle_prestudent(prestudent_id, null) as status
+			FROM 
+				public.tbl_person 
+				JOIN public.tbl_prestudent USING(person_id)
+				JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE
+				lower(nachname) like '%".addslashes(mb_strtolower($search))."%' OR
+				lower(vorname) like '%".addslashes(mb_strtolower($search))."%' OR
+				lower(nachname || ' ' || vorname) like '%".addslashes(mb_strtolower($search))."%' OR
+				lower(vorname || ' ' || nachname) like '%".addslashes(mb_strtolower($search))."%'
+			";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			echo html_entity_decode($row->vorname).' '.html_entity_decode($row->nachname).'|'.html_entity_decode($row->stg).'|'.html_entity_decode($row->status).'|'.html_entity_decode($row->prestudent_id)."\n";
+		}
+	}
+	exit;
+}
 	
 $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
-	<html>
+<html>
 	<head>
-	<title>Reihungstest Administration</title>
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<title>Reihungstest Administration</title>
+		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+
+		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script> 
 	</head>
 	<body class="Background_main">
 	<h2>Reihungstest - Administration</h2>';
@@ -53,6 +86,23 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 
+if(isset($_POST['personzuteilen']))
+{
+	$prestudent = new prestudent();
+	if($prestudent->load($_POST['prestudent_id']))
+	{
+		$prestudent->reihungstest_id=$_POST['reihungstest_id'];
+		$prestudent->new=false;
+		if($prestudent->save())
+			echo '<span class="ok">Zuteilung gespeichert</span>';
+		else
+			echo '<span class="error">Fehler beim Speichern der Zuteilung</span>';
+	}
+	else
+	{
+		echo '<span class="error">Fehler beim Laden des Prestudenten</span>';
+	}	
+}
 //Anzeigen der kommenden Reihungstesttermine:
 echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen der kommenden Reihungstests</a>';
 
@@ -96,6 +146,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 	}
 }
 
+// Antworten des Dummy Studenten löschen
 echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" onclick="return confirm(\'Dummyanworten wirklich löschen?\');">Antworten des Dummy Studenten löschen</a>';
 
 if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
@@ -108,7 +159,7 @@ if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 		echo ' <b>Fehler beim Löschen der Antworten</b>';
 }
 
-//$prestudent_id=null;
+// Antworten eines Gebietes einer Person löschen
 $ps=new prestudent();
 $datum=date('Y-m-d');
 $ps->getPrestudentRT($datum,true);
@@ -171,6 +222,7 @@ if(isset($_POST['deleteteilgebiet']))
 	}
 }
 
+// Testergebnisse anzeigen
 echo '<hr><br><form action="'.$_SERVER['PHP_SELF'].'" method="POST">Testergebnisse der Person mit der Prestudent_id <input type="text" name="prestudent_id"><input type="submit" value="anzeigen" name="testergebnisanzeigen"></form>';
 if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
@@ -226,6 +278,8 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 		}
 	}
 }
+
+//Studiengang von Dummy Aendern
 echo '<hr><br>';
 if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
@@ -261,6 +315,48 @@ echo '</SELECT>
 <input type="submit" name="savedummystg" value="Speichern">
 </form>
 ';
+
+// Hinzufuegen von Personen zum RT
+echo '<hr><br>Personen zum RT hinzufuegen';
+
+$rt = new reihungstest();
+$rt->getAll(date('Y-m-d'));
+echo '
+<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
+Person <input id="prestudent_name" name="prestudent_name" size="32" maxlength="30" value="" />
+<input type="hidden" id="prestudent_id" name="prestudent_id" value="" />
+<SELECT name="reihungstest_id">
+';
+foreach($rt->result as $row)
+{
+	if($row->datum==date('Y-m-d'))
+		$selected='selected';
+	else
+		$selected='';
+	echo '<OPTION value="'.$row->reihungstest_id.'" '.$selected.'>'.$row->datum.' '.$row->uhrzeit.' '.$row->anmerkung.'</OPTION>';
+}
+echo '</SELECT>
+<input type="submit" value="zuteilen" name="personzuteilen">
+</form>';
+echo "<script type='text/javascript'>
+function formatItem(row) 
+{
+    return row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3];
+}	
+
+$('#prestudent_name').autocomplete('reihungstest_administration.php', 
+	  		  	{
+	  			minChars:2,
+	  			matchSubset:1,matchContains:1,
+	  			width:500,
+	  			formatItem:formatItem,
+	  			extraParams:{'autocomplete':'prestudent'	
+		  		}
+	  	  }).result(function(event, item) {
+	  		  $('#prestudent_id').val(item[3]);
+	  	  });	  	
+</script>";
+
+echo '</body>
+</html>';
 ?>
-</body>
-</html>
