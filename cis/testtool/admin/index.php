@@ -94,6 +94,7 @@ $save_vorschlag_error=false;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml; charset=utf-8" />
+<title>Testtool-Administration</title>
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css" />
 <script language="Javascript">
 //Vorschau anzeigen
@@ -616,7 +617,10 @@ if($frage_id!='')
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
 	
-	echo "<tr><td colspan='2'>\n<textarea name='text' id='text' cols='50' rows='27' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td></tr>";
+	echo "<tr valign='top'><td colspan='2'>\n<textarea name='text' id='text' cols='50' rows='27' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td>";
+	echo "<table><tr><input type='button' value='MathML' onclick='document.getElementById(\"text\").value=\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;&lt;/math&gt;\";' />";
+	echo "<tr>&lt;br/&gt;</tr>";
+	echo "</tr></table></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Level <input type='text' name='level' value='$frage->level' size='1' />
 			Nummer <input type='text' name='nummer' value='$frage->nummer' size='1' /></td>
@@ -650,10 +654,11 @@ if($frage_id!='')
 	echo '<table>';
 	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' value='$vorschlag->nummer' /><input type='button' value='1' onclick='document.getElementById(\"nummer\").value=\"1\";' /><input type='button' value='2' onclick='document.getElementById(\"nummer\").value=\"2\";' /><input type='button' value='3' onclick='document.getElementById(\"nummer\").value=\"3\";' /><input type='button' value='4' onclick='document.getElementById(\"nummer\").value=\"4\";' /></td></tr>";
 	echo '<tr>';
-	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' /><input type='button' value='1' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"1\";' /><input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' /><input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' /></td>";
+	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' /><input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' /><input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' /><input type='button' value='+1' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"1\";' /><input type='button' value='+1/3' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.3333\";' /><input type='button' value='+1/2' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.5\";' /></td>";
 	echo '</tr>';
-	echo '<tr>';
-	echo '<td>Text:</td><td><textarea name="text" id="text" rows="25" cols="45" oninput="preview()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
+	echo '<tr valign="top">';
+	echo '<td>Text:</td><td><textarea name="text" id="text_vorschlag" rows="25" cols="45" oninput="preview()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
+	echo "<td><input type='button' value='MathML' onclick='document.getElementById(\"text_vorschlag\").value=\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;&lt;/math&gt;\";' /></td>";
 	echo '</tr><tr valign="top">';
 	//Upload Feld fuer Bild
 	echo "<td>Bild:</td><td><input type='file' name='bild' /></td>";
