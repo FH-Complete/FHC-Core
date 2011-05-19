@@ -84,11 +84,11 @@ $studiengang->load($stundenplan->studiengang_kz);
 			<rows>
 				<row>
 					<label value="Titel" />
-					<textbox id="stpl-details-dialog-textbox-titel" value="<?php echo $stundenplan->titel; ?>"  maxlength="32"/>
+					<textbox id="stpl-details-dialog-textbox-titel" value="<?php echo htmlentities($stundenplan->titel); ?>"  maxlength="32"/>
       			</row>
       			<row>
 					<label value="Anmerkung" />
-					<textbox id="stpl-details-dialog-textbox-anmerkung" value="<?php echo $stundenplan->anmerkung; ?>"  maxlength="256"/>
+					<textbox id="stpl-details-dialog-textbox-anmerkung" value="<?php echo htmlentities($stundenplan->anmerkung); ?>"  maxlength="256"/>
       			</row>
 				<row>
 					<spacer />
