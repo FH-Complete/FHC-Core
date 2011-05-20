@@ -22,12 +22,13 @@
 
 // Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
 require_once 'auth.php';
-require_once('../../../config/vilesci.config.inc.php');
+require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/akte.class.php');
-require_once ('../../../include/dokument.class.php');
+require_once('../../../include/dokument.class.php');
+require_once('../../../include/mail.class.php');
 
 header("Content-Type: text/html; charset=utf-8");
 
@@ -91,6 +92,20 @@ if(isset($_POST['submitbild']))
 		}
 		else
 			echo "<b>Erfolgreich gespeichert.</b>"; 
+		if($akte->dokument_kurzbz == "LearnAgr")
+		{
+			// sende Email zu Assistenz
+			$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+			$emailtext.= "Es wurde ein Learning Agreement auf das System hochgeladen."; 
+			$mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'Learning-Agreement Upload', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+			$mail->setHTMLContent($emailtext); 
+			if(!$mail->send())
+				$msg= '<span class="error">Fehler beim Senden des Mails</span><br />';
+			else
+				$msg= $p->t('global/emailgesendetan')." $email!<br>";
+			
+			return $msg; 
+		}
 	}
 }
 
@@ -109,7 +124,7 @@ if(isset($_GET['person_id']))
 				foreach ($dokument->result as $dok)
 				{
 					$selected =""; 
-					if($dok->dokument_kurzbz == "Sonst")
+					if($dok->dokument_kurzbz == "LearnAgr")
 						$selected = "selected";
 					echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung."</option>\n";
 				}
@@ -123,6 +138,7 @@ else
 {
 	echo "Es wurde keine Person_id angegeben";
 }
+
 ?>
 </body>
 </html>
