@@ -124,7 +124,7 @@ if($method =="austauschprogram")
 	}	
 	// Ausgabe Austauschprogram Formular
 	echo '	<form method="POST" action="incoming.php?method=austauschprogram" name="AustauschForm">
-				<table width="40%" border="1" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:10%;">
+				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
 					<tr>
 						<td>'.$p->t('incoming/austauschprgramwählen').'</td>
 						<td><SELECT name="austausch_kz"> 
@@ -212,7 +212,7 @@ else if($method=="lehrveranstaltungen")
 				</tr>
 				<tr><td>&nbsp;</td></tr>
 				</table>
-				<table width="90%" border="0" align="center" class="table-autosort:2 table-stripeclass:alternate table-autostripe">
+				<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
 				<thead>
 				<tr class="liste">
 					<th></th>
@@ -409,7 +409,7 @@ else if ($method == "university")
 			if(!$depCoordinator->save())
 			{
 				echo $depCoordinator->errormsg; 
-				die('Fehler beim Anlegen der Person aufgetreten.'); 
+				die($p->t('global/fehleraufgetreten'));
 			}
 			
 			// in preincoming speichern
@@ -423,7 +423,7 @@ else if ($method == "university")
 			if(!$depCoordinator->delete($_REQUEST['dep_coordinator_id']))
 			{
 				echo $depCoordinator->errormsg; 
-				die('Fehler beim Löschen aufgetreten'); 
+				die($p->t('global/fehleraufgetreten'));
 			}
 			
 		}
@@ -438,7 +438,7 @@ else if ($method == "university")
 			if(!$depCoordinator->save())
 			{
 				echo $depCoordinator->errormsg; 
-				die('Fehler beim Speichern der Person aufgetreten.'); 				
+				die($p->t('global/fehleraufgetreten'));				
 			}	
 		}
 		// Department Coordinator Kontakt
@@ -456,7 +456,7 @@ else if ($method == "university")
 				if(!$kontakt->save())
 				{
 					echo $kontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 			}
 		}
@@ -480,7 +480,7 @@ else if ($method == "university")
 			if(!$kontakt->save())
 			{
 				echo $kontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		// wenn textbox und hidden id == "" dann tu nichts
@@ -495,7 +495,7 @@ else if ($method == "university")
 			if(!$kontakt->save())
 			{
 				echo $kontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		// wenn id vorhanden und Textbox == "" löschen 
@@ -517,7 +517,7 @@ else if ($method == "university")
 			if(!$kontakt->save())
 			{
 				echo $kontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		
@@ -532,7 +532,7 @@ else if ($method == "university")
 				if(!$kontakt->save())
 				{
 					echo $kontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 		}
 		else if(($_REQUEST['telefon_coordinator'] == "" && $_REQUEST['dep_coordinator_telefonId']!= ""))
@@ -554,7 +554,7 @@ else if ($method == "university")
 			if(!$kontakt->save())
 			{
 				echo $kontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 	
@@ -571,7 +571,7 @@ else if ($method == "university")
 			if(!$intCoordinator->save())
 			{
 				echo $intCoordinator->errormsg; 
-				die('Fehler beim Anlegen der Person aufgetreten.'); 
+				die($p->t('global/fehleraufgetreten'));
 			}
 			
 			// in preincoming speichern
@@ -588,7 +588,7 @@ else if ($method == "university")
 			if(!$intCoordinator->save())
 			{
 				echo $intCoordinator->errormsg; 
-				die('Fehler beim Speichern der Person aufgetreten.'); 				
+				die($p->t('global/fehleraufgetreten'));				
 			}	
 		}
 		
@@ -606,7 +606,7 @@ else if ($method == "university")
 				if(!$intkontakt->save())
 				{
 					echo $intkontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 			}
 		}
@@ -630,7 +630,7 @@ else if ($method == "university")
 			if(!$intkontakt->save())
 			{
 				echo $intkontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		
@@ -646,7 +646,7 @@ else if ($method == "university")
 				if(!$intkontakt->save())
 				{
 					echo $intkontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 			}
 		}
@@ -670,7 +670,7 @@ else if ($method == "university")
 			if(!$intkontakt->save())
 			{
 				echo $intkontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		
@@ -686,7 +686,7 @@ else if ($method == "university")
 				if(!$intkontakt->save())
 				{
 					echo $intkontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 			}
 		}
@@ -710,11 +710,11 @@ else if ($method == "university")
 			if(!$intkontakt->save())
 			{
 				echo $intkontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 			
-		echo "Erfolgreich gespeichert"; 
+		echo $p->t('global/erfolgreichgespeichert');  
 	}
 
 	// Department Coordinator Kontakt
@@ -774,7 +774,7 @@ else if ($method == "university")
 	}
 
 	echo '	<form method="POST" action="incoming.php?method=university" name="UniversityForm">
-				<table width="60%" border="1" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
+				<table width="60%" border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
 					<tr><td colspan="2"><b>Sending Institution</b></td></tr>
 					<tr>
 						<td>'.$p->t('incoming/universitätsname').' </td>
@@ -791,25 +791,25 @@ else if ($method == "university")
 						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->universitaet.'"></td>
 					</tr>
 					<tr>
-						<td>Name of Program:</td>
+						<td>'.$p->t('incoming/studienrichtung').'</td>
 						<td><input type="text" name="name_of_program" size=60 value="'.$preincoming->program_name.'"></td>
 					</tr>
 					<tr>';
 			$checked = ''; 
 			if($preincoming->bachelor == true)
 				$checked = 'checked';	
-echo '					<td>Bachelor´s Degree Program:</td>
+echo '					<td>'.$p->t('incoming/bachelorstudiengang').'</td>
 						<td><input type="checkbox" name="bachelor" '.$checked.'></td>
 					</tr>
 					<tr>';
 			$checked = ''; 
 			if($preincoming->master == true)
 				$checked = 'checked';	
-echo'					<td>Master´s Degree Program:</td>
+echo'					<td>'.$p->t('incoming/masterstudiengang').'</td>
 						<td><input type="checkbox" name="master" '.$checked.'></td>
 					</tr>
 					<tr>
-						<td>Years completetd when starting at UAS FH TW:</td>
+						<td>'.$p->t('incoming/jahrestudiert').'</td>
 						<td><input type="text" name="jahre" size="2" value="'.$preincoming->jahre.'"></td>
 					</tr>
 					<tr>			
@@ -818,7 +818,7 @@ echo'					<td>Master´s Degree Program:</td>
 					</tr>
 				</table>
 				
-				<table width="60%" border="1" align ="center" style="border-sytle:solid;  border-width:1px;">
+				<table width="60%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
 					<tr><td colspan="2"><b>Department Coordinator</b></td></tr>
 					<tr>
 						<td width="25%">'.$p->t('global/vorname').' </td>
@@ -846,7 +846,7 @@ echo'					<td>Master´s Degree Program:</td>
 					</tr>
 				</table>
 				
-				<table width="60%" border="1" align ="center" style="border-sytle:solid;  border-width:1px;">
+				<table width="60%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
 					<tr><td colspan="2"><b>International Coordinator</b></td></tr>
 					<tr>
 						<td width="25%">'.$p->t('global/vorname').' </td>
@@ -873,7 +873,7 @@ echo'					<td>Master´s Degree Program:</td>
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan="2" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkUniversity()"></td>
+						<td colspan="4" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkUniversity()"></td>
 					</tr>
 				</table>
 			</form>
@@ -913,7 +913,7 @@ else if ($method == "profil")
 			if(!$emergencyPerson->save())
 			{
 				echo $emergencyPerson->errormsg; 
-				die('Fehler beim Anlegen der Person aufgetreten.'); 
+				die($p->t('global/fehleraufgetreten')); 
 			}
 			
 			// in preincoming speichern
@@ -926,7 +926,7 @@ else if ($method == "profil")
 			if(!$emergencyPerson->delete($_REQUEST['emergency_name_id']))
 			{
 				echo $emergencyPerson->errormsg; 
-				die('Fehler beim Löschen aufgetreten'); 
+				die($p->t('global/fehleraufgetreten')); 
 			}
 		}
 		else if($_REQUEST['emergency_name_id'] != "")
@@ -940,7 +940,7 @@ else if ($method == "profil")
 			if(!$emergencyPerson->save())
 			{
 				echo $emergencyPerson->errormsg; 
-				die('Fehler beim Speichern der Person aufgetreten.'); 				
+				die($p->t('global/fehleraufgetreten')); 				
 			}	
 		}
 		$emkontakt = new kontakt(); 
@@ -956,7 +956,7 @@ else if ($method == "profil")
 				if(!$emkontakt->save())
 				{
 					echo $emkontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 			}
 		}
@@ -980,7 +980,7 @@ else if ($method == "profil")
 			if(!$emkontakt->save())
 			{
 				echo $emkontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		
@@ -996,7 +996,7 @@ else if ($method == "profil")
 				if(!$emkontakt->save())
 				{
 					echo $emkontakt->errormsg; 
-					die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+					die($p->t('global/fehleraufgetreten'));
 				}
 			}
 		}
@@ -1020,7 +1020,7 @@ else if ($method == "profil")
 			if(!$emkontakt->save())
 			{
 				echo $emkontakt->errormsg; 
-				die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+				die($p->t('global/fehleraufgetreten'));
 			}
 		}
 		
@@ -1070,9 +1070,10 @@ else if ($method == "profil")
 		$preincoming->zgv_name = $_REQUEST['zgv_name']; 
 		$preincoming->zgv_ort = $_REQUEST['zgv_ort']; 
 		$preincoming->zgv_datum = $date->formatDatum($_REQUEST['zgv_datum'],'Y-m-d');
-		$preincoming->zgvmaster = $_REQUEST['zgv_master_name']; 
+		$preincoming->zgvmaster = $_REQUEST['zgv_master']; 
 		$preincoming->zgvmaster_datum = $date->formatDatum($_REQUEST['zgv_master_datum'],'Y-m-d'); 
 		$preincoming->zgvmaster_ort = $_REQUEST['zgv_master_ort']; 
+		$preincoming->zgvmaster_name = $_REQUEST['zgv_master_name']; 
 		if(!$preincoming->save())
 			$save = false; 
 			
@@ -1109,8 +1110,8 @@ else if ($method == "profil")
 	// Ausgabe Profil Formular
 	echo'<form action="incoming.php?method=profil" method="POST" name="ProfilForm">
 	
-	<table border =0 align="center"><tr valign="top"><td>
-		<table border = "1" >
+	<table border =0 align="center" style="margin-top:5%;" ><tr valign="top" ><td>
+		<table border = "0" >
 			<tr>
 				<td>'.$p->t('global/titel').' Post</td>
 				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
@@ -1207,56 +1208,56 @@ else if ($method == "profil")
 		</table>
 		</td>
 		<td>
-		<table border =1>
+		<table border =0>
 			<tr>
-				<td>University Entrance Qualification 1:</td>
+				<td>'.$p->t('incoming/zugangsvoraussetzung').'</td>
 				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
 			</tr>
 			<tr>
-				<td>Issued by (name of institution):</td>
+				<td>'.$p->t('incoming/abgelegtin').'</td>
 				<td><input type="text" name="zgv_name" size=40 value="'.$preincoming->zgv_name.'"></td>
 			</tr>	
 			<tr>
-				<td>Issued in(place):</td>
+				<td>'.$p->t('incoming/abgelegtinort').'</td>
 				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
 			</tr>					
 			<tr>
-				<td>Issued on (Date dd.mm.YYYY)</td>
+				<td>'.$p->t('incoming/abgelegtam').'</td>
 				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
 			</tr>
 			<tr><td>&nbsp;</td></tr>
 			<tr>
-				<td>Bachelor´s degree (if applicable):</td>
+				<td>'.$p->t('incoming/zugangsvoraussetzungmaster').'</td>
 				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td>
 			</tr>
 			<tr>
-				<td>Issued by (name of institution):</td>
-				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster.'"></td>
+				<td>'.$p->t('incoming/abgelegtin').'</td>
+				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td>
 			</tr>
 			<tr>
-				<td>Issued in (place):</td>
+				<td>'.$p->t('incoming/abgelegtinort').'</td>
 				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
 			</tr>
 			<tr>
-				<td>Issued on (date):</td>
+				<td>'.$p->t('incoming/abgelegtam').'</td>
 				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
 			</tr>
 			<tr><td>&nbsp;</td></tr>
 			<tr>
-				<td colspan="2">Person to Contact in Case of Emergency:</td>
+				<td colspan="2">'.$p->t('incoming/personimernstfall').':</td>
 				</td></td>
 			</tr>
 			<tr>
-				<td>First Name</td>
+				<td>'.$p->t('global/vorname').'</td>
 				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
 				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td>
 			</tr>
 			<tr>
-				<td>Last Name</td>
+				<td>'.$p->t('global/nachname').'</td>
 				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
 			</tr>
 			<tr>
-				<td>Phone</td>
+				<td>'.$p->t('global/telefon').'</td>
 				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">
 				<input type="hidden" name="emergency_telefonId" id="emergency_telefonId" value="'.$emTelefonId.'"></td>
 			</tr>
@@ -1302,12 +1303,12 @@ else if($method == 'files')
 		if($_GET['mode']=="delete")
 		{
 			if($akte->delete($_GET['id']))
-				echo "Erfolgreich gelöscht";
+				echo($p->t('global/erfolgreichgelöscht'));
 			else
-				echo "Fehler beim löschen aufgetreten.";
+				echo($p->t('global/fehleraufgetreten'));
 		}
 	}
-	echo '	<script type="text/javascript">
+echo 	'<script type="text/javascript">
 		function FensterOeffnen (adresse) 
 		{
 			MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
@@ -1315,15 +1316,15 @@ else if($method == 'files')
 		}
 		</script> 
 		<br><br><br> 
-			<table border ="0" width="100%">
-				<tr>
-					<td width="25%"></td>
-					<td width="25%" align="center"><a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">Upload File</a></td>
-					<td width="25%"></td>
-					<td width="25%"></td>
-				</tr>
-				<tr><td>&nbsp;</td></tr>
-			</table>';
+		<table border ="0" width="100%">
+			<tr>
+				<td width="25%"></td>
+				<td width="25%" align="center"><a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">Upload File</a></td>
+				<td width="25%"></td>
+				<td width="25%"></td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>
+		</table>';
 	
 	$akte->getAkten($person->person_id); 
 	echo '<table  align="center" border="0">
