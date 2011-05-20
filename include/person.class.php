@@ -671,7 +671,7 @@ class person extends basis_db
 	{
 		$qry ="Select preincoming_id 
 		from public.tbl_preincoming 
-		where person_id = (Select person_id from public.tbl_person where zugangscode='4dc90370674c1') 
+		where person_id = (Select person_id from public.tbl_person where zugangscode='".$zugangscode."') 
 		order by insertamum DESC;";
 
 		if($this->db_query($qry))
