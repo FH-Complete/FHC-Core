@@ -56,6 +56,7 @@ class preincoming extends basis_db
 	public $zgvmaster; 
 	public $zgvmaster_datum; 
 	public $zgvmaster_ort; 
+	public $zgvmaster_name; 
 	public $program_name; 
 	public $bachelor; 
 	public $master; 
@@ -126,6 +127,7 @@ class preincoming extends basis_db
 			$this->zgv_datum = $row->zgv_datum; 
 			$this->zgv_name = $row->zgv_name; 
 			$this->zgvmaster = $row->zgvmaster; 
+			$this->zgvmaster_name = $row->zgvmaster_name; 
 			$this->zgvmaster_datum = $row->zgvmaster_datum; 
 			$this->zgvmaster_ort = $row->zgvmaster_ort; 
 			$this->program_name = $row->program_name; 
@@ -183,7 +185,8 @@ class preincoming extends basis_db
 				$obj->zgv_ort = $row->zgv_ort; 
 				$obj->zgv_datum = $row->zgv_datum; 
 				$obj->zgv_name = $row->zgv_name; 
-				$obj->zgvmaster = $row->zgvmaster; 
+				$obj->zgvmaster = $row->zgvmaster;
+				$obj->zgvmaster_name = $row->zgvmaster_name;
 				$obj->zgvmaster_datum = $row->zgvmaster_datum; 
 				$obj->zgvmaster_ort = $row->zgvmaster_ort; 
 				$obj->program_name = $row->program_name; 
@@ -247,8 +250,8 @@ class preincoming extends basis_db
 			$qry='BEGIN;INSERT INTO public.tbl_preincoming (person_id, mobilitaetsprogramm_code, zweck_code, 
 					firma_id, anmerkung, universitaet, aktiv, bachelorthesis, masterthesis, 
 					von, bis, code, uebernommen, insertamum, insertvon, updateamum, updatevon,
-					zgv, zgv_ort, zgv_datum, zgv_name, zgvmaster, zgvmaster_datum, zgvmaster_ort, prgoram_name,
-					bachelor, master, jahre, person_id_emergency, person_id_coordinatro_dep, person_id_coordinator_ing)
+					zgv, zgv_ort, zgv_datum, zgv_name, zgvmaster, zgvmaster_name, zgvmaster_datum, zgvmaster_ort, program_name,
+					bachelor, master, jahre, person_id_emergency, person_id_coordinator_dep, person_id_coordinator_int)
 				  VALUES('.
 			      $this->addslashes($this->person_id).', '.
 			      $this->addslashes($this->mobilitaetsprogramm_code).', '.
@@ -270,6 +273,7 @@ class preincoming extends basis_db
 				  $this->addslashes($this->zgv_datum).', '. 
 				  $this->addslashes($this->zgv_name).', '. 
 				  $this->addslashes($this->zgvmaster).', '.
+				  $this->addslashes($this->zgvmaster_name).', '.
 				  $this->addslashes($this->zgvmaster_datum).', '. 
 				  $this->addslashes($this->zgvmaster_ort).', '.
 				  $this->addslashes($this->program_name).', '.
@@ -310,6 +314,7 @@ class preincoming extends basis_db
 				' zgv_datum='.$this->addslashes($this->zgv_datum).', '. 
 				' zgv_name='.$this->addslashes($this->zgv_name).', '. 
 				' zgvmaster='.$this->addslashes($this->zgvmaster).', '.
+				' zgvmaster_name='.$this->addslashes($this->zgvmaster_name).', '.			
 				' zgvmaster_datum='.$this->addslashes($this->zgvmaster_datum).', '. 
 				' zgvmaster_ort='.$this->addslashes($this->zgvmaster_ort).', '.
 				' program_name='.$this->addslashes($this->program_name).', '.
@@ -576,6 +581,7 @@ class preincoming extends basis_db
 				$this->zgv_datum = $row->zgv_datum; 
 				$this->zgv_name = $row->zgv_name; 
 				$this->zgvmaster = $row->zgvmaster; 
+				$this->zgvmaster_name = $row->zgvmaster_name; 
 				$this->zgvmaster_datum = $row->zgvmaster_datum; 
 				$this->zgvmaster_ort = $row->zgvmaster_ort; 
 				$this->program_name = $row->program_name; 
