@@ -247,16 +247,18 @@ if(isset($_REQUEST['submit']))
 
 function sendMail($zugangscode, $email)
 {
+	global $p; 
 	$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-	$emailtext.= "Sie wurden erfolgreich am System registriert.<br><br>";
-	$emailtext.= "Mit Hilfe der UID: ".$zugangscode." können Sie sich unter <a href=\"http://cis.technikum-wien.at/incoming\">http://cis.technikum-wien.at/incoming</a> anmelden und Ihre Daten bearbeiten."; 
+	$emailtext.= "Vielen Dank für Ihre Registrierung an der Fachhochschule Technikum Wien.<br><br>Sie wurden erfolgreich am System registriert.<br><br><br>Mit Hilfe Ihrer UID: <b>".$zugangscode."</b> können Sie sich in unserem 
+	System (<a href=\"".APP_ROOT."/cis/public/incoming\">Link zur Anmeldung</a>) anmelden und Ihre Daten bearbeiten.<br><br><br> 
+	Mit freundlichen Grüßen, <br><br>FH Technikum Wien International<br>Center for International Relations & Cross-Cultural Education<br>UAS Technikum Wien<br>Hoechstaedtplatz 5, 1200 Wien, AUSTRIA"; 
 	
 	$mail = new mail($email, 'no-reply', 'Incoming-Registration', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($emailtext); 
 	if(!$mail->send())
 		$msg= '<span class="error">Fehler beim Senden des Mails</span><br />';
 	else
-		$msg= " Mail verschickt an $email!<br>";
+		$msg= $p->t('global/emailgesendetan')." $email!<br>";
 	
 	return $msg; 
 }
