@@ -227,8 +227,8 @@ if(!$error)
 			$stundenplan->ort_kurzbz = $_POST['ort_kurzbz'];
 			$stundenplan->datum = $_POST['datum'];
 			$stundenplan->stunde = $_POST['stunde'];
-			$stundenplan->titel = html_entity_decode($_POST['titel']);
-			$stundenplan->anmerkung = html_entity_decode($_POST['anmerkung']);
+			$stundenplan->titel = htmlspecialchars_decode($_POST['titel']);
+			$stundenplan->anmerkung = htmlspecialchars_decode($_POST['anmerkung']);
 			$stundenplan->fix = ($_POST['fix']=='true'?true:false);
 			$stundenplan->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 			$stundenplan->updateamum = date('Y-m-d H:i:s');
