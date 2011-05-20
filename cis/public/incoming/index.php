@@ -74,6 +74,9 @@ if (isset($_POST['userid']))
 		</table>
 		<form action ="index.php" method="POST">
 		<table border ="0" width ="100%" height="40%">
+			<tr height="50%">
+				<td align ="center"><span style="font-size:1.2em">Anmeldung für Incoming an der Fachhochschule Technikum Wien</span></td>
+			</tr>
 			<tr >
 				<td align="center" valign="bottom"> <img src="../../../skin/images/tw_logo_02.jpg"></td>
 			</tr>
