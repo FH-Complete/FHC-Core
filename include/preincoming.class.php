@@ -131,8 +131,8 @@ class preincoming extends basis_db
 			$this->zgvmaster_datum = $row->zgvmaster_datum; 
 			$this->zgvmaster_ort = $row->zgvmaster_ort; 
 			$this->program_name = $row->program_name; 
-			$this->bachelor = $row->bachelor; 
-			$this->master = $row->master; 
+			$this->bachelor = ($row->bachelor=='t'?true:false);
+			$this->master = ($row->master=='t'?true:false); 
 			$this->jahre = $row->jahre; 
 			$this->person_id_emergency = $row->person_id_emergency; 
 			$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
@@ -190,8 +190,8 @@ class preincoming extends basis_db
 				$obj->zgvmaster_datum = $row->zgvmaster_datum; 
 				$obj->zgvmaster_ort = $row->zgvmaster_ort; 
 				$obj->program_name = $row->program_name; 
-				$obj->bachelor = $row->bachelor; 
-				$obj->master = $row->master; 
+				$obj->bachelor = ($row->bachelor=='t'?true:false); 
+				$obj->master = ($row->master=='t'?true:false); 
 				$obj->jahre = $row->jahre; 
 				$obj->person_id_emergency = $row->person_id_emergency; 
 				$obj->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
@@ -585,12 +585,12 @@ class preincoming extends basis_db
 				$this->zgvmaster_datum = $row->zgvmaster_datum; 
 				$this->zgvmaster_ort = $row->zgvmaster_ort; 
 				$this->program_name = $row->program_name; 
-				$this->bachelor = $row->bachelor; 
-				$this->master = $row->master; 
+				$this->bachelor = ($row->bachelor=='t'?true:false);
+				$this->master = ($row->master=='t'?true:false);
 				$this->jahre = $row->jahre; 
 				$this->person_id_emergency = $row->person_id_emergency; 
 				$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
-				$this->person_id_coordinator_int = $row->person_id_coordinatro_int; 
+				$this->person_id_coordinator_int = $row->person_id_coordinator_int; 
 				
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;
