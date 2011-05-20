@@ -2357,6 +2357,9 @@ if(!@$db->db_query("SELECT gesperrt_uid FROM campus.tbl_contentsprache LIMIT 1")
 	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentlog TO web;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_contentlog TO admin;
 	
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_contentlog_contentlog_id TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_contentlog_contentlog_id TO web;
+	
 	ALTER TABLE campus.tbl_contentlog ADD CONSTRAINT fk_benutzer_contentlog FOREIGN KEY(uid) REFERENCES public.tbl_benutzer (uid) ON UPDATE CASCADE ON DELETE RESTRICT;
 	ALTER TABLE campus.tbl_contentlog ADD CONSTRAINT fk_contentsprache_contentlog FOREIGN KEY(contentsprache_id) REFERENCES campus.tbl_contentsprache (contentsprache_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
