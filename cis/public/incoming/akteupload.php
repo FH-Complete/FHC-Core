@@ -103,8 +103,6 @@ if(isset($_POST['submitbild']))
 				$msg= '<span class="error">Fehler beim Senden des Mails</span><br />';
 			else
 				$msg= $p->t('global/emailgesendetan')." $email!<br>";
-			
-			return $msg; 
 		}
 	}
 }
