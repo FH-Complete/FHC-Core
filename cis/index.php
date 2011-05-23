@@ -34,7 +34,7 @@ require_once('../config/cis.config.inc.php');
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body>
-<table class="tabcontent">
+<table class="tabcontent" border="0">
 	 
 	  <tr>
 	    <td width="170" class="tdwrap" onclick="self.location.href='index.php'">
@@ -44,6 +44,9 @@ require_once('../config/cis.config.inc.php');
         <td id="header">
     	    	<div class="header_line" ></div>
         </td>
+		<td width="10" class="tdwrap">
+			<div style="font-size: 10px;"><i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></div>
+		</td>
  	</tr>
 
    	 <tr>
