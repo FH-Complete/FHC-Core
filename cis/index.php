@@ -34,7 +34,7 @@ require_once('../config/cis.config.inc.php');
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body>
-<table class="tabcontent" border="0">
+<table class="tabcontent">
 	 
 	  <tr>
 	    <td width="170" class="tdwrap" onclick="self.location.href='index.php'">
@@ -51,7 +51,7 @@ require_once('../config/cis.config.inc.php');
 
    	 <tr>
 			<td id="footer">&nbsp;</td>
-    	    <td><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
+    	    <td colspan="2"><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
 	</tr>
 </table>
 <iframe id="menue" src="menu.php" name="menu" frameborder="0">
