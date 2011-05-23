@@ -1331,7 +1331,8 @@ echo 	'<script type="text/javascript">
 else 
 {
 	echo '<br><br><br><br>
-		<table align ="center" width ="50%" border="1">';
+	<fieldset>
+		<table align ="center"  border="0">';
 	echo "		<tr>
 					<td><a href ='incoming.php?method=austauschprogram '>".$p->t('incoming/austauschprogram')."</a></td><td></td>"; 	
 	echo '		</tr>
@@ -1353,7 +1354,7 @@ else
 			</table>
 			<table width="100%" border="0">
 				<tr>
-					<td align="center"><a href="logout.php">Logout</a> </td>
+					<td align="right"><a href="logout.php">Logout</a> </td>
 				</tr>
 			</table>';
 }
