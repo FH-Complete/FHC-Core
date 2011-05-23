@@ -37,6 +37,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/lehrverband.class.php');
 require_once('../../include/bisio.class.php');
+require_once('../../include/firma.class.php');
 require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
 $user = get_uid();
@@ -96,9 +97,12 @@ if($method!='')
 			   isset($_POST['titelpre']) && isset($_POST['titelpost']) && isset($_POST['vorname']) &&
 			   isset($_POST['nachname']) && isset($_POST['anmerkung']) && isset($_POST['strasse']) &&
 			   isset($_POST['plz']) && isset($_POST['ort']) && isset($_POST['nation']) &&
-			   isset($_POST['email']) && isset($_POST['universitaet']) && isset($_POST['mobilitaetsprogramm']) &&
-			   isset($_POST['zweck']) && isset($_POST['von']) && isset($_POST['bis']))
+			   isset($_POST['zgv']) && isset($_POST['zgv_name']) && isset($_POST['zgv_ort']) && isset($_POST['zgv_datum']) && 
+			   isset($_POST['zgv_master']) && isset($_POST['zgv_master_name']) && isset($_POST['zgv_master_ort']) && isset($_POST['zgv_master_datum']) &&   
+			   isset($_POST['email']) && isset($_POST['universitaet']) && isset($_POST['mobilitaetsprogramm']) && isset($_POST['studienbezeichnung']) &&
+			   isset($_POST['jahre']) && isset($_POST['zweck']) && isset($_POST['von']) && isset($_POST['bis']))
 			{
+			
 				$person_id = $_POST['person_id'];
 				$adresse_id = $_POST['adresse_id'];
 				$kontakt_id = $_POST['kontakt_id'];
@@ -117,7 +121,22 @@ if($method!='')
 				$zweck = $_POST['zweck'];
 				$von = $_POST['von'];
 				$bis = $_POST['bis'];
+				$zgv = $_POST['zgv']; 
+				$zgv_name = $_POST['zgv_name']; 
+				$zgv_ort = $_POST['zgv_ort']; 
+				$zgv_datum = $_POST['zgv_datum']; 
 				$aktiv = isset($_POST['aktiv']);
+				$zgvmaster = $_POST['zgv_master']; 
+				$zgvmaster_name = $_POST['zgv_master_name']; 
+				$zgvmaster_ort = $_POST['zgv_master_ort']; 
+				$zgvmaster_datum = $_POST['zgv_master_datum']; 
+				$studienbezeichnung = $_POST['studienbezeichnung']; 
+				$bachelor = isset($_POST['bachelor']);
+				$master = isset($_POST['master']);
+				$jahre = $_POST['jahre']; 
+				$firma_auswahl = ($_POST['firma']!= 'firma_auswahl' ? $_POST['firma']:''); 
+				echo $firma_auswahl; 
+				
 				
 				//Person
 				$person = new person();
@@ -194,6 +213,19 @@ if($method!='')
 					$inc->bis = $datum_obj->formatDatum($bis);
 					$inc->updateamum = date('Y-m-d H:i:s');
 					$inc->updatevon = $user;
+					$inc->zgv = $zgv; 
+					$inc->zgv_name = $zgv_name; 
+					$inc->zgv_ort = $zgv_ort; 
+					$inc->zgv_datum = $datum_obj->formatDatum($zgv_datum); 
+					$inc->zgvmaster = $zgvmaster; 
+					$inc->zgvmaster_name = $zgvmaster_name; 
+					$inc->zgvmaster_ort = $zgvmaster_ort;  
+					$inc->zgvmaster_datum = $datum_obj->formatDatum($zgvmaster_datum); 
+					$inc->program_name = $studienbezeichnung; 
+					$inc->master = $master; 
+					$inc->bachelor = $bachelor; 
+					$inc->jahre = $jahre; 
+					$inc->firma_id = $firma_auswahl; 
 					$inc->new = false;
 					
 					if(!$inc->save())
@@ -447,6 +479,8 @@ echo ' | ';
 print_menu('Dokumente', 'dokumente');
 echo ' | ';
 print_menu('Lehrveranstaltungen', 'lehrveranstaltungen');
+echo ' | ';
+print_menu('Ansprechpersonen', 'ansprechpersonen');
 echo '<div style="float:right">'.$message.'</div>';
 echo '<br />';
 switch($action)
@@ -459,6 +493,9 @@ switch($action)
 		break;
 	case 'lehrveranstaltungen':
 		print_lehrveranstaltungen();
+		break;
+	case 'ansprechpersonen':
+		print_ansprechpersonen();
 		break;
 	default:
 		break;
@@ -481,6 +518,146 @@ function print_menu($name, $value)
 }
 
 /**
+ * Erstellt den Tab zur Anzeige der Ansprechpersonen
+ */
+function print_ansprechpersonen()
+{
+	global $inc, $preincoming_id;
+	if($inc->person_id_emergency != "")
+	{
+		$emergencyPerson = new person(); 
+		$emergencyPerson->load($inc->person_id_emergency); 
+		
+		$emergencyKontakt = new kontakt(); 
+		$emergencyKontakt->load_pers($emergencyPerson->person_id); 
+		$emTelefon = ""; 
+		$emEmail = ""; 
+		foreach ($emergencyKontakt->result as $emKontakt)
+		{
+			if($emKontakt->kontakttyp == "telefon")
+				$emTelefon = $emKontakt->kontakt; 
+
+			if($emKontakt->kontakttyp == "email")
+				$emEmail = $emKontakt->kontakt; 
+		}
+	}
+	
+	if($inc->person_id_coordinator_dep != "")
+	{
+		$depPerson = new person(); 
+		$depPerson->load($inc->person_id_coordinator_dep); 
+		
+		$depKontakt = new kontakt(); 
+		$depKontakt->load_pers($depPerson->person_id); 
+		$depTelefon = ""; 
+		$depEmail = ""; 
+		$depFax =""; 
+		foreach ($depKontakt->result as $depKontakt)
+		{
+			if($depKontakt->kontakttyp == "telefon")
+				$depTelefon = $depKontakt->kontakt; 
+
+			if($depKontakt->kontakttyp == "email")
+				$depEmail = $depKontakt->kontakt; 
+				
+			if($depKontakt->kontakttyp == "fax")
+				$depFax = $depKontakt->kontakt; 
+		}
+	}
+	
+	if($inc->person_id_coordinator_dep != "")
+	{
+		$intPerson = new person(); 
+		$intPerson->load($inc->person_id_coordinator_int); 
+		
+		$intKontakt = new kontakt(); 
+		$intKontakt->load_pers($intPerson->person_id); 
+		$intTelefon = ""; 
+		$intEmail = ""; 
+		$intFax =""; 
+		foreach ($intKontakt->result as $intKontakt)
+		{
+			if($intKontakt->kontakttyp == "telefon")
+				$intTelefon = $depKontakt->kontakt; 
+
+			if($intKontakt->kontakttyp == "email")
+				$intEmail = $depKontakt->kontakt; 
+				
+			if($intKontakt->kontakttyp == "fax")
+				$intFax = $depKontakt->kontakt; 
+		}
+	}
+	
+	echo '<fieldset>';
+	echo '<table border ="0">
+			<tr>
+				<td colspan="4">Ansprechperson für den Ernstfall </td>
+			</tr>
+			<tr>
+				<td>Vorname: </td>
+				<td><input type="text" size ="12" value="'.$emergencyPerson->vorname.'" readonly></td>
+				<td></td>
+				<td>Nachname: </td>
+				<td><input type="text" size="15" value="'.$emergencyPerson->nachname.'" readonly></td>
+			</tr>
+			<tr>
+				<td>Telefon: </td>
+				<td><input type="text" size="12" value="'.$emTelefon.'" readonly></td>
+				<td></td>
+				<td>E-Mail: </td>
+				<td><input type="text" size="15" value="'.$emEmail.'" readonly></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="4">Department Koordinator</td>
+			</tr>
+			<tr>
+				<td>Vorname: </td>
+				<td><input type="text" size ="12" value="'.$depPerson->vorname.'" readonly></td>
+				<td></td>
+				<td>Nachname: </td>
+				<td><input type="text" size="15" value="'.$depPerson->nachname.'" readonly></td>
+			</tr>
+			<tr>
+				<td>Telefon: </td>
+				<td><input type="text" size="12" value="'.$depTelefon.'" readonly></td>
+				<td></td>
+				<td>E-Mail: </td>
+				<td><input type="text" size="15" value="'.$depEmail.'" readonly></td>
+			</tr>
+			<tr>
+				<td>Fax: </td>
+				<td><input type="text" size="12" value="'.$depFax.'" readonly></td>
+			</tr>
+			<tr>
+				<td colspan="4">International Koordinator</td>
+			</tr>
+			<tr>
+				<td>Vorname: </td>
+				<td><input type="text" size ="12" value="'.$intPerson->vorname.'" readonly></td>
+				<td></td>
+				<td>Nachname: </td>
+				<td><input type="text" size="15" value="'.$intPerson->nachname.'" readonly></td>
+			</tr>
+			<tr>
+				<td>Telefon: </td>
+				<td><input type="text" size="12" value="'.$intTelefon.'" readonly></td>
+				<td></td>
+				<td>E-Mail: </td>
+				<td><input type="text" size="15" value="'.$intEmail.'" readonly></td>
+			</tr>
+			<tr>
+				<td>Fax: </td>
+				<td><input type="text" size="12" value="'.$intFax.'" readonly></td>
+			</tr>
+		</table>';
+				
+}
+
+
+/**
  * Erstellt den Tab zur Anzeige der Personendetails
  */
 function print_personendetails()
@@ -496,6 +673,9 @@ function print_personendetails()
 	$kontakt->load_pers($person->person_id);
 	if(isset($kontakt->result[0]))
 		$kontakt = $kontakt->result[0];
+	
+	$firma = new firma(); 
+	$firma->getFirmen('Partneruniversität');
 	
 	echo '<fieldset>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=personendetails&method=saveperson&preincoming_id='.$preincoming_id.'" method="POST">';
@@ -563,17 +743,82 @@ function print_personendetails()
 				<td></td>
 			</tr>
 			<tr>
-				<td>Universität</td>
-				<td colspan="4"><input type="text" name="universitaet" size="50" value="'.$inc->universitaet.'"></td>
-								
-				<td>Aktiv</td>
-				<td><input type="checkbox" name="aktiv" '.($inc->aktiv?'checked':'').'></td>
+				<td>ZGV 1</td>
+				<td><input type="text" name="zgv" size="30" value="'.$inc->zgv.'"></td>
+				<td></td>
+				<td>ZGV 1 Ort</td>
+				<td colspan = "2"><input type="text" name="zgv_ort" size="30" value="'.$inc->zgv_ort.'"></td>
 			</tr>
+			<tr>
+				<td>ZGV 1 Institution</td>
+				<td><input type="text" name="zgv_name" size="30" value="'.$inc->zgv_name.'"></td>
+				<td></td>
+				<td>ZGV 1 Datum</td>
+				<td colspan="2"><input type="text" name="zgv_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgv_datum,'d.m.Y').'"></td>
+			</tr>
+			<tr>
+				<td>ZGV MSc</td>
+				<td><input type="text" name="zgv_master" size="30" value="'.$inc->zgvmaster.'"></td>
+				<td></td>
+				<td>ZGV MSc Ort</td>
+				<td colspan="2"><input type="text" name="zgv_master_ort" size="30" value="'.$inc->zgvmaster_ort.'"></td>
+			</tr>
+			<tr>
+				<td>ZGV MSc Institution</td>
+				<td><input type="text" name="zgv_master_name" size="30" value="'.$inc->zgvmaster_name.'"></td>
+				<td></td>
+				<td>ZGV MSc Datum</td>
+				<td colspan="2"><input type="text" name="zgv_master_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgvmaster_datum,'d.m.Y').'"></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Universität</td>
+				<td colspan="2"><input type="text" name="universitaet" size="30" value="'.$inc->universitaet.'"></td>	
+				<td></td>	
+				<td>Jahre</td>
+				<td colspan="2"><input type="text" name="jahre" size="5" value="'.$inc->jahre.'"></td>	
+				
+			</tr>
+			<tr>
+				<td>Universität Dropdown</td>
+				<td colspan ="4"><SELECT name="firma"> 
+						<option value="firma_auswahl">-- other --</option>';
+						foreach ($firma->result as $firm)
+						{
+							$selected = ''; 
+							if($firm->firma_id == $inc->firma_id)
+								$selected = 'selected'; 
+							echo "<option value='$firm->firma_id' $selected>$firm->name</option>";
+						}
+echo'			</td>
+			</tr>
+			<tr>
+				<td>Studienbezeichnung</td>
+				<td colspan="2"><input type="text" name="studienbezeichnung" size="30" value="'.$inc->program_name.'"></td>	
+				<td></td>	
+				<td>
+				BSC
+				<input type="checkbox" name="bachelor" '.($inc->bachelor?'checked':'').'>
+				MSC
+				<input type="checkbox" name="master" '.($inc->master?'checked':'').'></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Aktiv
+				<input type="checkbox" name="aktiv" '.($inc->aktiv?'checked':'').'></td>
+				<td></td>	
+				<td></td>
+			</tr>	
 			<tr>
 				<td>Mobilitätsprogramm</td>
 				<td><SELECT name="mobilitaetsprogramm">
 						<OPTION value="">-- keine Auswahl --</OPTION>';
-
 	$mob = new mobilitaetsprogramm();
 	$mob->getAll();
 	
