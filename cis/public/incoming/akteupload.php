@@ -38,9 +38,10 @@ if(isset($_GET['lang']))
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
 
-
 $PHP_SELF = $_SERVER['PHP_SELF'];
-echo "<html><body>";
+echo "<html>
+		<head><title>File-Upload</title></head>
+		<body>";
 
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
@@ -99,6 +100,7 @@ if(isset($_POST['submitbild']))
 		}
 		else
 			echo "<b>Erfolgreich gespeichert.</b>"; 
+echo "<script>window.opener.location.reload();</script>"; 			
 		if($akte->dokument_kurzbz == "LearnAgr")
 		{
 			// sende Email zu Assistenz
@@ -133,11 +135,15 @@ if(isset($_GET['person_id']))
 						$selected = "selected";
 					echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung."</option>\n";
 				}
-	
-	
-	echo "
-			</form>
-		</td></tr>";
+echo "				</select>
+					</td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+				<tr>
+					<td><input type='button' value='close' onclick='window.opener.location.reload();window.close();'></td>
+				</tr>
+			</table>
+			</form>";
 }
 else
 {
