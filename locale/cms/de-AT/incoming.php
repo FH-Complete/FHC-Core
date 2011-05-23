@@ -13,6 +13,7 @@ $this->phrasen['incoming/studiertvon']='Studiert von';
 $this->phrasen['incoming/studiertbis']='Studiert bis';
 $this->phrasen['incoming/eigeneuniversitaet']='Heimatuniversität Daten';
 $this->phrasen['incoming/universitätsname']='Name der Universität';
+$this->phrasen['incoming/universitätsnameerweitert']='Name der Universität (erweitert)';
 $this->phrasen['incoming/zugangsvoraussetzung']='Zugangsvoraussetzung 1';
 $this->phrasen['incoming/abgelegtin']='Abgelegt in (Name der Institution)';
 $this->phrasen['incoming/abgelegtinort']='Abgelegt in (Ort)';
