@@ -13,6 +13,7 @@ $this->phrasen['incoming/studiertvon']='Studies Abroad From';
 $this->phrasen['incoming/studiertbis']='Studies Abroad To';
 $this->phrasen['incoming/eigeneuniversitaet']='Sending Institution Information';
 $this->phrasen['incoming/universitätsname']='Sending Institution Name';
+$this->phrasen['incoming/universitätsnameerweitert']='Sending Institution Name (Advanced)';
 $this->phrasen['incoming/zugangsvoraussetzung']='University Entrance Qualification 1';
 $this->phrasen['incoming/abgelegtin']='Issued at (Name of Institution)';
 $this->phrasen['incoming/abgelegtinort']='Issued in (Ort)';
