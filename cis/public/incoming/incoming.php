@@ -124,38 +124,46 @@ if($method =="austauschprogram")
 	}	
 	// Ausgabe Austauschprogram Formular
 	echo '	<form method="POST" action="incoming.php?method=austauschprogram" name="AustauschForm">
-				<table width="40%" border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
-					<tr>
-						<td>'.$p->t('incoming/austauschprgramwählen').'</td>
-						<td><SELECT name="austausch_kz"> 
-						<option value="austausch_auswahl">-- select --</option>';
-						foreach ($mobility->result as $mob)
-						{
-								$selected=""; 
-								if($mob->mobilitaetsprogramm_code == $preincoming->mobilitaetsprogramm_code)
-									$selected = "selected"; 
-								echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
-						}		
-	echo '				</td>
+
+				<table  border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
+				<tr>
+					<td>
+					<fieldset>
+					<table>
+						<tr>
+							<td>'.$p->t('incoming/austauschprgramwählen').'</td>
+							<td><SELECT name="austausch_kz"> 
+							<option value="austausch_auswahl">-- select --</option>';
+							foreach ($mobility->result as $mob)
+							{
+									$selected=""; 
+									if($mob->mobilitaetsprogramm_code == $preincoming->mobilitaetsprogramm_code)
+										$selected = "selected"; 
+									echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
+							}		
+	echo '					</td>
+						</tr>
+						<tr>
+							<td>'.$p->t('global/code').' </td>
+							<td><input type="text" name="code" size="40" maxlength="256" value="'.$preincoming->code.'"></td>
+						</tr>
+						<tr>
+							<td>'.$p->t('incoming/studiertvon').' </td>
+							<td><input type="text" name="von" size="10"  value="'.$date->formatDatum($preincoming->von,'d.m.Y').'"> (dd.mm.YYYY)</td>
+						</tr>
+						<tr>
+							<td>'.$p->t('incoming/studiertbis').' </td>
+							<td><input type="text" name="bis" size="10"  value="'.$date->formatDatum($preincoming->bis,'d.m.Y').'"> (dd.mm.YYYY)</td>
+						</tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td colspan="2" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkAustausch()"></td>
+						</tr>
+					</td>
 					</tr>
-					<tr>
-						<td>'.$p->t('global/code').' </td>
-						<td><input type="text" name="code" size="40" maxlength="256" value="'.$preincoming->code.'"></td>
-					</tr>
-					<tr>
-						<td>'.$p->t('incoming/studiertvon').' </td>
-						<td><input type="text" name="von" size="10"  value="'.$date->formatDatum($preincoming->von,'d.m.Y').'"> (dd.mm.YYYY)</td>
-					</tr>
-					<tr>
-						<td>'.$p->t('incoming/studiertbis').' </td>
-						<td><input type="text" name="bis" size="10"  value="'.$date->formatDatum($preincoming->bis,'d.m.Y').'"> (dd.mm.YYYY)</td>
-					</tr>
-						<td>&nbsp;</td>
-						<td>&nbsp;</td>
-					</tr>
-					<tr>
-						<td colspan="2" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkAustausch()"></td>
-					</tr>
+					</table>
 				</table>
 			</form>
 		
@@ -774,11 +782,14 @@ else if ($method == "university")
 	}
 
 	echo '	<form method="POST" action="incoming.php?method=university" name="UniversityForm">
-				<table width="60%" border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
+				<table border ="0" style="margin-top:50px;" align="center" >
+				<tr><td>
+					<fieldset>
+					<table border ="0">
 					<tr><td colspan="2"><b>Sending Institution</b></td></tr>
 					<tr>
 						<td>'.$p->t('incoming/universitätsname').' </td>
-						<td><SELECT name="firma"> 
+						<td colspan="3"><SELECT name="firma"> 
 						<option value="firma_auswahl">-- other --</option>';
 						foreach ($firma->result as $firm)
 						{
@@ -787,12 +798,16 @@ else if ($method == "university")
 								$selected = 'selected'; 
 							echo "<option value='$firm->firma_id' $selected>$firm->name</option>";
 						}
-	echo '				</td>
-						<td><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->universitaet.'"></td>
+echo '					</td>
+						
+					</tr>
+					<tr >
+						<td>'.$p->t('incoming/universitätsnameerweitert').'</td>
+						<td colspan="2"><input type="text" name="universitaet" size="40" maxlength="256" value="'.$preincoming->universitaet.'"></td>
 					</tr>
 					<tr>
 						<td>'.$p->t('incoming/studienrichtung').'</td>
-						<td><input type="text" name="name_of_program" size=60 value="'.$preincoming->program_name.'"></td>
+						<td colspan="2"><input type="text" name="name_of_program" size=60 value="'.$preincoming->program_name.'"></td>
 					</tr>
 					<tr>';
 			$checked = ''; 
@@ -815,58 +830,48 @@ echo'					<td>'.$p->t('incoming/masterstudiengang').'</td>
 					<tr>			
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
-					</tr>
-				</table>
-				
-				<table width="60%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
-					<tr><td colspan="2"><b>Department Coordinator</b></td></tr>
+					</tr>		
+			
+					<tr>
+						<td colspan="2"><b>Department Coordinator</b></td>
+						<td colspan="2"><b>International Coordinator</b></td></tr>
 					<tr>
 						<td width="25%">'.$p->t('global/vorname').' </td>
 						<td width="25%"><input type="text" name="vorname_coordinator" size="20" maxlength="256" value="'.$depCoordinator->vorname.'">
 						<input type="hidden" name = "dep_coordinator_id" id="dep_coordinator_id" value="'.$preincoming->person_id_coordinator_dep.'"></td>
-						<td width="25%">'.$p->t('global/nachname').' </td>
-						<td width="25%"><input type="text" name="nachname_coordinator" size="20"  value="'.$depCoordinator->nachname.'"></td>
-					</tr>
-					<tr>
-						<td>'.$p->t('global/telefon').' </td>
-						<td><input type="text" name="telefon_coordinator" size="20"  value="'.$depTelefon.'">
-						<input type="hidden" name = "dep_coordinator_telefonId" id="dep_coordinator_telefonId" value="'.$depTelefonId.'"></td>
-						<td>'.$p->t('global/fax').' </td>
-						<td><input type="text" name="fax_coordinator" size="20"  value="'.$depFax.'">
-						<input type="hidden" name = "dep_coordinator_faxId" id="dep_coordinator_faxId" value="'.$depFaxId.'"></td>
-					</tr>
-					<tr>
-						<td>E-Mail </td>
-						<td colspan="3"><input type="text" name="email_coordinator" size="20"  value="'.$depEmail.'">
-						<input type="hidden" name = "dep_coordinator_emailId" id="dep_coordinator_emailId" value="'.$depEmailId.'"></td>
-					</tr>
-					</tr>
-						<td>&nbsp;</td>
-						<td>&nbsp;</td>
-					</tr>
-				</table>
-				
-				<table width="60%" border="0" align ="center" style="border-sytle:solid;  border-width:1px;">
-					<tr><td colspan="2"><b>International Coordinator</b></td></tr>
-					<tr>
 						<td width="25%">'.$p->t('global/vorname').' </td>
 						<td width="25%"><input type="text" name="vorname_intcoordinator" size="20" maxlength="256" value="'.$intCoordinator->vorname.'">
 						<input type="hidden" name = "int_coordinator_id" id="int_coordinator_id" value="'.$preincoming->person_id_coordinator_int.'"></td>
+					</tr>
+					<tr>
+						<td width="25%">'.$p->t('global/nachname').' </td>
+						<td width="25%"><input type="text" name="nachname_coordinator" size="20"  value="'.$depCoordinator->nachname.'"></td>
 						<td width="25%">'.$p->t('global/nachname').' </td>
 						<td width="25%"><input type="text" name="nachname_intcoordinator" size="20"  value="'.$intCoordinator->nachname.'"></td>
 					</tr>
 					<tr>
 						<td>'.$p->t('global/telefon').' </td>
+						<td><input type="text" name="telefon_coordinator" size="20"  value="'.$depTelefon.'">
+						<input type="hidden" name = "dep_coordinator_telefonId" id="dep_coordinator_telefonId" value="'.$depTelefonId.'"></td>
+						<td>'.$p->t('global/telefon').' </td>
 						<td><input type="text" name="telefon_intcoordinator" size="20"  value="'.$intTelefon.'">
-						<input type="hidden" name = "int_coordinator_telefonId" id="int_coordinator_telefonId" value="'.$intTelefonId.'"></td></td>
+						<input type="hidden" name = "int_coordinator_telefonId" id="int_coordinator_telefonId" value="'.$intTelefonId.'"></td>
+					</tr>
+					<tr>
+						<td>'.$p->t('global/fax').' </td>
+						<td><input type="text" name="fax_coordinator" size="20"  value="'.$depFax.'">
+						<input type="hidden" name = "dep_coordinator_faxId" id="dep_coordinator_faxId" value="'.$depFaxId.'"></td>
 						<td>'.$p->t('global/fax').' </td>
 						<td><input type="text" name="fax_intcoordinator" size="20"  value="'.$intFax.'">
-						<input type="hidden" name = "int_coordinator_faxId" id="int_coordinator_faxId" value="'.$intFaxId.'"></td></td>
+						<input type="hidden" name = "int_coordinator_faxId" id="int_coordinator_faxId" value="'.$intFaxId.'"></td>						
 					</tr>
 					<tr>
 						<td>E-Mail </td>
+						<td><input type="text" name="email_coordinator" size="20"  value="'.$depEmail.'">
+						<input type="hidden" name = "dep_coordinator_emailId" id="dep_coordinator_emailId" value="'.$depEmailId.'"></td>
+						<td>E-Mail </td>
 						<td colspan="3"><input type="text" name="email_intcoordinator" size="20"  value="'.$intEmail.'">
-						<input type="hidden" name = "int_coordinator_emailId" id="int_coordinator_emailId" value="'.$intEmailId.'"></td></td>
+						<input type="hidden" name = "int_coordinator_emailId" id="int_coordinator_emailId" value="'.$intEmailId.'"></td>
 					</tr>
 					</tr>
 						<td>&nbsp;</td>
@@ -875,6 +880,9 @@ echo'					<td>'.$p->t('incoming/masterstudiengang').'</td>
 					<tr>
 						<td colspan="4" align = "center"><input type="submit" name="submit_program" value="'.$p->t('global/speichern').'" onclick="return checkUniversity()"></td>
 					</tr>
+					</td>
+					</tr>
+					</table>
 				</table>
 			</form>
 		
@@ -1109,28 +1117,39 @@ else if ($method == "profil")
 	}
 	// Ausgabe Profil Formular
 	echo'<form action="incoming.php?method=profil" method="POST" name="ProfilForm">
-	
-	<table border =0 align="center" style="margin-top:5%;" ><tr valign="top" ><td>
+	<table border =0 align="center" style="margin-top:5%;" >
+	<tr valign="top" ><td>
+		<fieldset>
 		<table border = "0" >
+		<tr><td>
 			<tr>
 				<td>'.$p->t('global/titel').' Post</td>
 				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
+				<td>'.$p->t('incoming/zugangsvoraussetzung').'</td>
+				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/vorname').'</td>
-				<td><input type="text" size="40" maxlength="32" name="vorname" value="'.$person->vorname.'"></td>
+				<td><input type="text" size="20" maxlength="32" name="vorname" value="'.$person->vorname.'"></td>
+				<td>'.$p->t('incoming/abgelegtin').'</td>
+				<td><input type="text" name="zgv_name" size=40 value="'.$preincoming->zgv_name.'"></td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/nachname').'</td>
-				<td><input type="text" size="40" maxlength="64" name="nachname" value="'.$person->nachname.'"></td>
+				<td><input type="text" size="20" maxlength="64" name="nachname" value="'.$person->nachname.'"></td>
+				<td>'.$p->t('incoming/abgelegtinort').'</td>
+				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/titel').' Pre</td>
 				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
+				<td>'.$p->t('incoming/abgelegtam').'</td>
+				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/geburtsdatum').'</td>
 				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value="""; > (dd.mm.YYYY)</td>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/staatsbuergerschaft').'</td>
@@ -1145,7 +1164,9 @@ else if ($method == "profil")
 					echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}
 	
-	echo'	</td></tr>		
+echo'			</td>	
+				<td>'.$p->t('incoming/zugangsvoraussetzungmaster').'</td>
+				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td></tr>		
 			<tr>
 				<td>'.$p->t('global/geschlecht').'</td>';
 	if($person->geschlecht == "m")
@@ -1157,23 +1178,31 @@ else if ($method == "profil")
 			echo '
 				<td>    <input type="radio" name="geschlecht" value="m"> '.$p->t('global/mann').'
     					<input type="radio" name="geschlecht" value="w" checked>'.$p->t('global/frau').'
-    			</td>';
-			
-	echo'	</tr>	
+    			</td>';		
+		
+echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
+				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td></tr>	
 			<tr>
 				<td>&nbsp;</td>
+				<td></td>
+				<td>'.$p->t('incoming/abgelegtinort').'</td>
+				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/strasse').'</td>
 				<td><input type="text" size="40" maxlength="256" name="strasse" value="'.$adresse->result[0]->strasse.'"></td>
+				<td>'.$p->t('incoming/abgelegtam').'</td>
+				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
 			</tr>	
 			<tr>
 				<td>'.$p->t('global/plz').'</td>
-				<td><input type="text" size="20" maxlength="16" name="plz" value="'.$adresse->result[0]->plz.'"></td>
+				<td><input type="text" size="10" maxlength="16" name="plz" value="'.$adresse->result[0]->plz.'"></td>
 			</tr>				
 			<tr>
 				<td>'.$p->t('global/ort').'</td>
 				<td><input type="text" size="40" maxlength="256" name="ort" value="'.$adresse->result[0]->ort.'"></td>
+				<td colspan="2">'.$p->t('incoming/personimernstfall').':</td>
+				</td></td>
 			</tr>				
 			<tr>
 				<td>Nation</td>
@@ -1186,7 +1215,10 @@ else if ($method == "profil")
 						$selected = "selected"; 
 					echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}		
-	echo '	</tr>				
+	echo '		</td>
+				<td>'.$p->t('global/vorname').'</td>
+				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
+				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td></tr>				
 			<tr>
 				<td>E-Mail</td>'; 
 	foreach($kontakt->result as $kon)
@@ -1196,76 +1228,28 @@ else if ($method == "profil")
 			$email = $kon->kontakt;
 		}
 	}
-	echo'	<td><input type="text" size="40" maxlength="128" name="email" value="'.$email.'"></td>
-			</tr>	
-			<tr>
-				<td>'.$p->t('global/anmerkung').'</td>
-				<td><textarea name="anmerkung" cols="31" rows="5">'.$person->anmerkungen.'</textarea></td>
-			</tr>	
-			<tr>
-				<td colspan="2" align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>		
-			</tr>
-		</table>
-		</td>
-		<td>
-		<table border =0>
-			<tr>
-				<td>'.$p->t('incoming/zugangsvoraussetzung').'</td>
-				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
-			</tr>
-			<tr>
-				<td>'.$p->t('incoming/abgelegtin').'</td>
-				<td><input type="text" name="zgv_name" size=40 value="'.$preincoming->zgv_name.'"></td>
-			</tr>	
-			<tr>
-				<td>'.$p->t('incoming/abgelegtinort').'</td>
-				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
-			</tr>					
-			<tr>
-				<td>'.$p->t('incoming/abgelegtam').'</td>
-				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
-			</tr>
-			<tr><td>&nbsp;</td></tr>
-			<tr>
-				<td>'.$p->t('incoming/zugangsvoraussetzungmaster').'</td>
-				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td>
-			</tr>
-			<tr>
-				<td>'.$p->t('incoming/abgelegtin').'</td>
-				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td>
-			</tr>
-			<tr>
-				<td>'.$p->t('incoming/abgelegtinort').'</td>
-				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
-			</tr>
-			<tr>
-				<td>'.$p->t('incoming/abgelegtam').'</td>
-				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
-			</tr>
-			<tr><td>&nbsp;</td></tr>
-			<tr>
-				<td colspan="2">'.$p->t('incoming/personimernstfall').':</td>
-				</td></td>
-			</tr>
-			<tr>
-				<td>'.$p->t('global/vorname').'</td>
-				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
-				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td>
-			</tr>
-			<tr>
+	echo'		<td><input type="text" size="40" maxlength="128" name="email" value="'.$email.'"></td>
 				<td>'.$p->t('global/nachname').'</td>
 				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
-			</tr>
+			</tr>	
 			<tr>
+				<td>&nbsp;</td>
+				<td></td>
 				<td>'.$p->t('global/telefon').'</td>
 				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">
 				<input type="hidden" name="emergency_telefonId" id="emergency_telefonId" value="'.$emTelefonId.'"></td>
 			</tr>
-			<tr>
+			<tr valign="top">
+				<td>'.$p->t('global/anmerkung').'</td>
+				<td><textarea name="anmerkung" cols="31" rows="5">'.$person->anmerkungen.'</textarea></td>
 				<td>Email</td>
 				<td><input type="text" size="40" name="emergency_email" value="'.$emEmail.'">
 				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
+			</tr>	
+			<tr>
+				<td colspan="4" align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>		
 			</tr>
+
 			</table>
 		</td>
 		</tr>
@@ -1347,7 +1331,7 @@ echo 	'<script type="text/javascript">
 else 
 {
 	echo '<br><br><br><br>
-		<table align ="center" width ="50%" border="2">';
+		<table align ="center" width ="50%" border="1">';
 	echo "		<tr>
 					<td><a href ='incoming.php?method=austauschprogram '>".$p->t('incoming/austauschprogram')."</a></td><td></td>"; 	
 	echo '		</tr>
