@@ -29,8 +29,15 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/akte.class.php');
 require_once('../../../include/dokument.class.php');
 require_once('../../../include/mail.class.php');
+require_once('../../../include/phrasen.class.php'); 
 
 header("Content-Type: text/html; charset=utf-8");
+
+if(isset($_GET['lang']))
+	setSprache($_GET['lang']);
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 echo "<html><body>";
@@ -102,7 +109,7 @@ if(isset($_POST['submitbild']))
 			if(!$mail->send())
 				$msg= '<span class="error">Fehler beim Senden des Mails</span><br />';
 			else
-				$msg= $p->t('global/emailgesendetan')." $email!<br>";
+				$msg= $p->t('global/emailgesendetan');
 		}
 	}
 }
