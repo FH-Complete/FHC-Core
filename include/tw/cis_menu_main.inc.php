@@ -482,11 +482,11 @@ function drawSubmenu($content_id)
 					</table>
 				</td>
 			</tr>
-<!--			<tr>
+			<tr>
 		  		<td class="tdwidth10" nowrap>&nbsp;</td>
 		  		<td class="tdwrap"><a class="Item" href="private/info/smartdevices.html" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Smartdevices</a></td>
 			</tr>	
--->
+
 			<tr>
 		  		<td class="tdwidth10" nowrap>&nbsp;</td>
 		  		<td class="tdwrap"><a class="Item" href="cisdocs/Dienstleistungskatalog.xls" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Dienstleistungskatalog</a></td>
