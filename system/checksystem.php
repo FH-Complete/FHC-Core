@@ -2553,7 +2553,8 @@ if(!$result = @$db->db_query("SELECT * FROM public.tbl_notizzuordnung LIMIT 1;")
 
 if(!$result = @$db->db_query('SELECT zgvmaster_name FROM public.tbl_preincoming LIMIT 1;'))
 {
-	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN zgvmaster_name VARCHAR(256);";
+	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN zgvmaster_name VARCHAR(256);
+			GRANT DELETE ON public.tbl_person TO web;";
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
 	else 
