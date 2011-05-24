@@ -26,6 +26,7 @@ require_once('../../include/news.class.php');
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="refresh" content="60">
 <link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
 <title>NEWS</title>
 </head>
@@ -33,7 +34,7 @@ require_once('../../include/news.class.php');
 <body>
 <table id="inhalt" class="tabcontent">
   <tr>
-    <td class="tdwidth10">&nbsp;</td>
+    <td class="tdwidth_left">&nbsp;</td>
     <td><table class="tabcontent">
       <tr>
         <td class="ContentHeader"><font class="ContentHeader">&nbsp;News</font></td>
@@ -83,7 +84,7 @@ require_once('../../include/news.class.php');
 		<td>&nbsp;</td>
 	  </tr>
     </table></td>
-	<td class="tdwidth30">&nbsp;</td>
+	<td class="tdwidth_right">&nbsp;</td>
   </tr>
 </table>
 </body>
