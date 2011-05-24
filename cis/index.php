@@ -36,18 +36,18 @@ require_once('../config/cis.config.inc.php');
 <body>
 <table class="tabcontent">
 	 
-	  <tr>
+	<tr>
 	    <td width="170" class="tdwrap" onclick="self.location.href='index.php'">
 			<div class="home_logo">&nbsp;</div>
 	    </td>
 		
-        <td id="header">
+        <td id="header" width="100%">
     	    	<div class="header_line" ></div>
         </td>
-		<td width="10" class="tdwrap">
-			<div style="font-size: 10px;"><i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></div>
+		<td nowrap class="tdwrap">
+			<div style="font-size: 10px;"><i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></i></div>
 		</td>
- 	</tr>
+	</tr>
 
    	 <tr>
 			<td id="footer">&nbsp;</td>
