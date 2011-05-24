@@ -19,6 +19,7 @@
  *          Karl Burkhart 		< burkhart@technikum-wien.at >
  */
 require_once('../../../config/cis.config.inc.php');
+require_once 'auth.php';
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/lvinfo.class.php');
