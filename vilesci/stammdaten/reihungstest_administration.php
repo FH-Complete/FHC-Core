@@ -176,7 +176,7 @@ foreach($ps->result as $prestd)
 	else
 		$selected='';
 	
-	echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname."</OPTION>\n";
+	echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.'; ID='.$prestd->prestudent_id.'; '.$prestd->gebdatum."</OPTION>\n";
 }
 echo '</SELECT>';
 
@@ -196,7 +196,7 @@ if($result = $db->db_query($qry))
 	echo '</SELECT>';
 }
 
-echo '<input type="submit" value="Teilgebiet l&ouml;schen" name="deleteteilgebiet"></form>';
+echo '<input type="submit" value="Teilgebiet l&ouml;schen" name="deleteteilgebiet">&nbsp;&nbsp;&nbsp;&nbsp;';
 if(isset($_POST['deleteteilgebiet']))
 {
 	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
@@ -207,15 +207,40 @@ if(isset($_POST['deleteteilgebiet']))
 		if($pruefling->pruefling_id=='')
 			die('Pruefling wurde nicht gefunden');
 	
-		$qry = "DELETE FROM testtool.tbl_antwort 
+		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id' AND
+				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');
+				
+				DELETE FROM testtool.tbl_antwort 
 				WHERE pruefling_id='$pruefling->pruefling_id' AND 
 				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN 
-				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."'));
-				DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id' AND
-				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');";
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."'));";
 		if($result = $db->db_query($qry))
 		{
 			echo '<b>'.$db->db_affected_rows($result).' Antworten wurden gelöscht</b>';
+		}
+		else 
+			echo '<b>Fehler beim Löschen der Daten</b>';
+	}
+}
+
+echo '<input type="submit" value="! Alle Teilgebiete l&ouml;schen !" name="delete_all"></form>';
+if(isset($_POST['delete_all']))
+{
+	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
+	   is_numeric($_POST['prestudent']) && is_numeric($_POST['gebiet']))
+	{
+		$pruefling = new pruefling();
+		$pruefling->getPruefling($_POST['prestudent']);
+		if($pruefling->pruefling_id=='')
+			die('Pruefling wurde nicht gefunden');
+	
+		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id';
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id='$pruefling->pruefling_id';";
+				
+				
+		if($result = $db->db_query($qry))
+		{
+			echo '<b> Alle '.$db->db_affected_rows($result).' Antworten wurden gelöscht</b>';
 		}
 		else 
 			echo '<b>Fehler beim Löschen der Daten</b>';
@@ -228,7 +253,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
 	if(is_numeric($_POST['prestudent_id']) && $_POST['prestudent_id']!='')
 	{
-		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,tbl_pruefling_frage.begintime,kurzbz,tbl_frage.nummer,level, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
+		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,tbl_pruefling_frage.begintime,bezeichnung,kurzbz,tbl_frage.nummer,level, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
 				FROM testtool.tbl_antwort
 				JOIN testtool.tbl_vorschlag USING(vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
@@ -250,10 +275,10 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 						<th>PrestudentID</th>
 						<th>PrueflingID</th>
 						<th>Beginnzeit</th>
-						<th>Kurzbz</th>
-						<th>Frage Nummer</th>
+						<th>Gebiet</th>
+						<th>Frage #</th>
 						<th>Level</th>
-						<th>Antwort Nummer</th>
+						<th>Antwort #</th>
 						<th>Punkte</th>
 					</tr>
 					</thead>
@@ -267,7 +292,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				echo "<td>$row->prestudent_id</td>";
 				echo "<td>$row->pruefling_id</td>";
 				echo "<td>$row->begintime</td>";
-				echo "<td>$row->kurzbz</td>";
+				echo "<td>$row->bezeichnung ($row->kurzbz)</td>";
 				echo "<td>$row->nummer</td>";
 				echo "<td>$row->level</td>";
 				echo "<td>$row->antwortnummer</td>";

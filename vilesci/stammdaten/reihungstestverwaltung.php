@@ -359,7 +359,7 @@
 			else
 				$selected='';
 				
-			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&reihungstest_id=$row->reihungstest_id' $selected>$row->datum $row->uhrzeit $row->ort_kurzbz $row->anmerkung</OPTION>";
+			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&reihungstest_id=$row->reihungstest_id' $selected>$row->datum $row->uhrzeit ".$studiengang->kuerzel_arr[$row->studiengang_kz]." $row->ort_kurzbz $row->anmerkung</OPTION>";
 		}
 		echo "</SELECT>";
 		echo "<INPUT type='button' value='Anzeigen' onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>";
@@ -460,7 +460,12 @@
 			echo '</td></tr></table>';
 			
 			//Liste der Interessenten die zum Reihungstest angemeldet sind
-			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest_id' ORDER BY nachname, vorname";
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email, 
+			(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND datum=(SELECT MAX(datum) FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Interessent') LIMIT 1) as ausbildungssemester 
+			FROM public.tbl_prestudent 
+			JOIN public.tbl_person USING(person_id) 
+			WHERE reihungstest_id='$reihungstest_id' 
+			ORDER BY nachname, vorname";
 			$mailto = '';
 			if($result = $db->db_query($qry))
 			{
@@ -474,6 +479,7 @@
 							<th class='table-sortable:default'>Vorname</th>
 							<th class='table-sortable:default'>Nachname</th>
 							<th class='table-sortable:default'>Studiengang</th>
+							<th class='table-sortable:default'>Einstiegssemester</th>
 							<th class='table-sortable:default'>Geburtsdatum</th>
 							<th class='table-sortable:default'>EMail</th>
 							<th class='table-sortable:default'>bereits absolvierte RTs</th>
@@ -506,6 +512,7 @@
 							<td>$row->vorname</td>
 							<td>$row->nachname</td>
 							<td>".$stg_arr[$row->studiengang_kz]."</td>
+							<td>$row->ausbildungssemester</td>
 							<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
 							<td><a href='mailto:$row->email'>$row->email</a></td>
 							<td>$rt_in_anderen_stg</td>
