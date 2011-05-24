@@ -46,7 +46,7 @@ $method ="";
 $breadcrumb = ""; 
 if(isset($_GET['method']))
 {
-	$method = $_GET['method']; 
+	$method = htmlspecialchars($_GET['method']); 
 	$breadcrumb = "> ".ucfirst($method);
 }
 
@@ -98,7 +98,7 @@ $firma->getFirmen('Partneruniversität');
 		<table width="100%" border="0">
 			<tr>
 				<td align="left" width="33%"><a href="incoming.php">Administration </a> <?php echo $breadcrumb ?> </td>
-				<td align="center" width="33%"><?php echo $person->titelpost." ".$person->vorname." ".$person->nachname." ".$person->titelpre?>
+				<td align="center" width="33%"><?php echo $person->titelpre." ".$person->vorname." ".$person->nachname." ".$person->titelpost?>
 				<td align ="right" width="33%"><?php 		
 				echo $p->t("global/sprache")." ";
 				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> | 
@@ -245,8 +245,8 @@ else if($method=="lehrveranstaltungen")
 				echo '<td>',$lehrveranstaltung->bezeichnung,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung_english,'</td>';
 				echo '<td>
-					<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
-					<a href="#Englisch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
+					<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
+					<a href="#Englisch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
 					</td>';
 				echo '</tr>';
 			}
@@ -344,8 +344,8 @@ else if($method=="lehrveranstaltungen")
 					echo '<td>',$row->bezeichnung,'</td>';
 					echo '<td>',$row->bezeichnung_english,'</td>';
 					echo '<td>
-							<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
-							<a href="#Englisch" class="Item" onclick="javascript:window.open(\'ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
+							<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
+							<a href="#Englisch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
 						  </td>';
 					echo '<td>',$freieplaetze,'</td>';
 					echo '</tr>';
@@ -428,12 +428,15 @@ else if ($method == "university")
 		else if ($_REQUEST['dep_coordinator_id'] != "" && $_REQUEST['nachname_coordinator'] == "" && $_REQUEST['vorname_coordinator'] == "")
 		{
 			// löscht die Department Coordinator Person
+			$preincoming->person_id_coordinator_dep = "";
+			if(!$preincoming->save())
+					die($preincoming->errormsg);  
+					
 			if(!$depCoordinator->delete($_REQUEST['dep_coordinator_id']))
 			{
-				echo $depCoordinator->errormsg; 
-				die($p->t('global/fehleraufgetreten'));
-			}
-			
+					echo $depCoordinator->errormsg; 
+					die($p->t('global/fehleraufgetreten'));
+			}	
 		}
 		else if($_REQUEST['dep_coordinator_id'] != "")
 		{
@@ -473,7 +476,7 @@ else if ($method == "university")
 			// lösche Email-Kontakt
 			if(!$kontakt->delete($_REQUEST['dep_coordinator_emailId']))
 			{
-				die("$kontakt->errormsg");  
+				die($kontakt->errormsg);  
 			}
 		}
 		else if($_REQUEST['dep_coordinator_emailId']!= "")
@@ -585,6 +588,19 @@ else if ($method == "university")
 			// in preincoming speichern
 			$preincoming->person_id_coordinator_int = $intCoordinator->person_id; 
 			$preincoming->save(); 	
+		}
+		else if ($_REQUEST['int_coordinator_id'] != "" && $_REQUEST['nachname_intcoordinator'] == "" && $_REQUEST['vorname_intcoordinator'] == "")
+		{
+			// löscht die Department Coordinator Person
+			$preincoming->person_id_coordinator_int = "";
+			if(!$preincoming->save())
+					echo $preincoming->errormsg;  
+			if(!$intCoordinator->delete($_REQUEST['int_coordinator_id']))
+			{
+					echo $intCoordinator->errormsg; 
+					die($p->t('global/fehleraufgetreten'));
+			}
+			
 		}
 		else if($_REQUEST['int_coordinator_id'] != "")
 		{
@@ -727,7 +743,7 @@ else if ($method == "university")
 
 	// Department Coordinator Kontakt
 	$depCoordinatorKontakt = new kontakt(); 
-	$depCoordinatorKontakt->load_pers($depCoordinator->person_id); 
+	$depCoordinatorKontakt->load_pers($preincoming->person_id_coordinator_dep); 
 	$depTelefon = ""; 
 	$depTelefonId = ""; 
 	$depFax = ""; 
@@ -780,6 +796,18 @@ else if ($method == "university")
 			$intEmailId = $intKontakt->kontakt_id; 
 		}
 	}
+
+	// Wenn die Person gerade gelöscht wurde zeige sie nicht mehr an
+	if($preincoming->person_id_coordinator_dep == "")
+	{
+		$depCoordinator->vorname = ""; 
+		$depCoordinator->nachname ="";
+	} 
+	if($preincoming->person_id_coordinator_int == "")
+	{
+		$intCoordinator->vorname = ""; 
+		$intCoordinator->nachname = "";
+	} 
 
 	echo '	<form method="POST" action="incoming.php?method=university" name="UniversityForm">
 				<table border ="0" style="margin-top:50px;" align="center" >
@@ -931,6 +959,10 @@ else if ($method == "profil")
 		else if ($_REQUEST['emergency_name_id'] != "" && $_REQUEST['emergency_nachname'] == "" && $_REQUEST['emergency_vorname'] == "")
 		{
 			// löscht die Person
+			$preincoming->person_id_emergency = ""; 
+			if(!$preincoming->save())
+				die($p->t('global/fehleraufgetreten')); 
+			
 			if(!$emergencyPerson->delete($_REQUEST['emergency_name_id']))
 			{
 				echo $emergencyPerson->errormsg; 
@@ -956,7 +988,7 @@ else if ($method == "profil")
 		{
 			{
 				// Neu anlegen
-				$emkontakt->person_id = $_REQUEST['emergency_name_id']; 
+				$emkontakt->person_id = $emergencyPerson->person_id; 
 				$emkontakt->kontakttyp = "email"; 
 				$emkontakt->kontakt = $_REQUEST['emergency_email']; 
 				$emkontakt->new = true; 
@@ -996,7 +1028,7 @@ else if ($method == "profil")
 		{
 			{
 				// Neu anlegen
-				$emkontakt->person_id = $_REQUEST['emergency_name_id']; 
+				$emkontakt->person_id = $emergencyPerson->person_id; 
 				$emkontakt->kontakttyp = "telefon"; 
 				$emkontakt->kontakt = $_REQUEST['emergency_telefon']; 
 				$emkontakt->new = true; 
@@ -1123,8 +1155,8 @@ else if ($method == "profil")
 		<table border = "0" >
 		<tr><td>
 			<tr>
-				<td>'.$p->t('global/titel').' Post</td>
-				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
+				<td>'.$p->t('global/titel').' Pre</td>
+				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
 				<td>'.$p->t('incoming/zugangsvoraussetzung').'</td>
 				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
 			</tr>
@@ -1141,8 +1173,8 @@ else if ($method == "profil")
 				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/titel').' Pre</td>
-				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
+				<td>'.$p->t('global/titel').' Post</td>
+				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
 				<td>'.$p->t('incoming/abgelegtam').'</td>
 				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
 			</tr>
@@ -1315,7 +1347,7 @@ echo 	'<script type="text/javascript">
 			<tr>
 				<th></th>
 				<th>Name</th>
-				<th>Bezeichnung</th>
+				<th>'.$p->t('global/bezeichnung').'</th>
 			</tr>'; 
 	foreach ($akte->result as $ak)
 	{	
@@ -1331,17 +1363,17 @@ echo 	'<script type="text/javascript">
 else 
 {
 	echo '<br><br><br><br>
-	<fieldset>
-		<table align ="center"  border="0">';
-	echo "		<tr>
-					<td><a href ='incoming.php?method=austauschprogram '>".$p->t('incoming/austauschprogram')."</a></td><td></td>"; 	
-	echo '		</tr>
+		<fieldset>
+		<table align ="center"  border="0">
 				<tr>	
 					<td><a href="incoming.php?method=profil">'.$p->t('incoming/persönlichedateneditieren').'</a></td>
 				</tr>
 				<tr>
 					<td><a href="incoming.php?method=university">'.$p->t("incoming/eigeneuniversitaet").'</a></td>
 				</tr>
+				<tr>
+					<td><a href ="incoming.php?method=austauschprogram">'.$p->t('incoming/austauschprogram').'</a></td>	
+				</tr>				
 				<tr>
 					<td><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 				</tr>
