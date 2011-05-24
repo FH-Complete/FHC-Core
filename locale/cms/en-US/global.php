@@ -30,7 +30,7 @@ $this->phrasen['global/code']='Code';
 $this->phrasen['global/adresse']='Address';
 $this->phrasen['global/telefon']='Telephone'; 
 $this->phrasen['global/fax']='Fax'; 
-
+$this->phrasen['global/bezeichnung']='Description'; 
 
 $this->phrasen['global/von']='From';
 $this->phrasen['global/bis']='To';
