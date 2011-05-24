@@ -452,7 +452,7 @@ if($method!='')
 				if(!$error)
 				{
 					$db->db_query('COMMIT');
-					$message.='<span class="ok">Uebernahme erfolgreich</span';
+					$message.='<span class="ok">Uebernahme erfolgreich</span>';
 				}
 				else
 				{
@@ -565,7 +565,7 @@ function print_ansprechpersonen()
 		}
 	}
 	
-	if($inc->person_id_coordinator_dep != "")
+	if($inc->person_id_coordinator_int != "")
 	{
 		$intPerson = new person(); 
 		$intPerson->load($inc->person_id_coordinator_int); 
@@ -578,84 +578,82 @@ function print_ansprechpersonen()
 		foreach ($intKontakt->result as $intKontakt)
 		{
 			if($intKontakt->kontakttyp == "telefon")
-				$intTelefon = $depKontakt->kontakt; 
+				$intTelefon = $intKontakt->kontakt; 
 
 			if($intKontakt->kontakttyp == "email")
-				$intEmail = $depKontakt->kontakt; 
+				$intEmail = $intKontakt->kontakt; 
 				
 			if($intKontakt->kontakttyp == "fax")
-				$intFax = $depKontakt->kontakt; 
+				$intFax = $intKontakt->kontakt; 
 		}
 	}
 	
 	echo '<fieldset>';
 	echo '<table border ="0">
 			<tr>
-				<td colspan="4">Ansprechperson für den Ernstfall </td>
+				<td colspan="4"><b>Ansprechperson für den Ernstfall</b></td>
 			</tr>
 			<tr>
 				<td>Vorname: </td>
-				<td><input type="text" size ="12" value="'.$emergencyPerson->vorname.'" readonly></td>
+				<td><input type="text" size ="22" value="'.$emergencyPerson->vorname.'" readonly></td>
 				<td></td>
 				<td>Nachname: </td>
-				<td><input type="text" size="15" value="'.$emergencyPerson->nachname.'" readonly></td>
+				<td><input type="text" size="25" value="'.$emergencyPerson->nachname.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Telefon: </td>
-				<td><input type="text" size="12" value="'.$emTelefon.'" readonly></td>
+				<td><input type="text" size="22" value="'.$emTelefon.'" readonly></td>
 				<td></td>
 				<td>E-Mail: </td>
-				<td><input type="text" size="15" value="'.$emEmail.'" readonly></td>
+				<td><input type="text" size="25" value="'.$emEmail.'" readonly></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td colspan="4">Department Koordinator</td>
+				<td colspan="4"><b>Department Koordinator</b></td>
 			</tr>
 			<tr>
 				<td>Vorname: </td>
-				<td><input type="text" size ="12" value="'.$depPerson->vorname.'" readonly></td>
+				<td><input type="text" size ="22" value="'.$depPerson->vorname.'" readonly></td>
 				<td></td>
 				<td>Nachname: </td>
-				<td><input type="text" size="15" value="'.$depPerson->nachname.'" readonly></td>
+				<td><input type="text" size="25" value="'.$depPerson->nachname.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Telefon: </td>
-				<td><input type="text" size="12" value="'.$depTelefon.'" readonly></td>
+				<td><input type="text" size="22" value="'.$depTelefon.'" readonly></td>
 				<td></td>
 				<td>E-Mail: </td>
-				<td><input type="text" size="15" value="'.$depEmail.'" readonly></td>
+				<td><input type="text" size="25" value="'.$depEmail.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Fax: </td>
-				<td><input type="text" size="12" value="'.$depFax.'" readonly></td>
+				<td><input type="text" size="22" value="'.$depFax.'" readonly></td>
 			</tr>
 			<tr>
-				<td colspan="4">International Koordinator</td>
+				<td colspan="4"><b>International Koordinator</b></td>
 			</tr>
 			<tr>
 				<td>Vorname: </td>
-				<td><input type="text" size ="12" value="'.$intPerson->vorname.'" readonly></td>
+				<td><input type="text" size ="22" value="'.$intPerson->vorname.'" readonly></td>
 				<td></td>
 				<td>Nachname: </td>
-				<td><input type="text" size="15" value="'.$intPerson->nachname.'" readonly></td>
+				<td><input type="text" size="25" value="'.$intPerson->nachname.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Telefon: </td>
-				<td><input type="text" size="12" value="'.$intTelefon.'" readonly></td>
+				<td><input type="text" size="22" value="'.$intTelefon.'" readonly></td>
 				<td></td>
 				<td>E-Mail: </td>
-				<td><input type="text" size="15" value="'.$intEmail.'" readonly></td>
+				<td><input type="text" size="25" value="'.$intEmail.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Fax: </td>
-				<td><input type="text" size="12" value="'.$intFax.'" readonly></td>
+				<td><input type="text" size="22" value="'.$intFax.'" readonly></td>
 			</tr>
-		</table>';
-				
+		</table>';			
 }
-
 
 /**
  * Erstellt den Tab zur Anzeige der Personendetails
@@ -746,26 +744,26 @@ function print_personendetails()
 				<td>ZGV 1</td>
 				<td><input type="text" name="zgv" size="30" value="'.$inc->zgv.'"></td>
 				<td></td>
-				<td>ZGV 1 Ort</td>
-				<td colspan = "2"><input type="text" name="zgv_ort" size="30" value="'.$inc->zgv_ort.'"></td>
-			</tr>
-			<tr>
-				<td>ZGV 1 Institution</td>
-				<td><input type="text" name="zgv_name" size="30" value="'.$inc->zgv_name.'"></td>
-				<td></td>
-				<td>ZGV 1 Datum</td>
-				<td colspan="2"><input type="text" name="zgv_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgv_datum,'d.m.Y').'"></td>
-			</tr>
-			<tr>
 				<td>ZGV MSc</td>
-				<td><input type="text" name="zgv_master" size="30" value="'.$inc->zgvmaster.'"></td>
+				<td colspan="2"><input type="text" name="zgv_master" size="30" value="'.$inc->zgvmaster.'"></td>
+			</tr>
+			<tr>
+				<td>ZGV 1 Ort</td>
+				<td><input type="text" name="zgv_ort" size="30" value="'.$inc->zgv_ort.'"></td>
 				<td></td>
 				<td>ZGV MSc Ort</td>
 				<td colspan="2"><input type="text" name="zgv_master_ort" size="30" value="'.$inc->zgvmaster_ort.'"></td>
 			</tr>
 			<tr>
+				<td>ZGV 1 Institution</td>
+				<td><input type="text" name="zgv_name" size="30" value="'.$inc->zgv_name.'"></td>
+				<td></td>
 				<td>ZGV MSc Institution</td>
-				<td><input type="text" name="zgv_master_name" size="30" value="'.$inc->zgvmaster_name.'"></td>
+				<td colspan="2"><input type="text" name="zgv_master_name" size="30" value="'.$inc->zgvmaster_name.'"></td>
+			</tr>
+			<tr>
+				<td>ZGV 1 Datum</td>
+				<td><input type="text" name="zgv_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgv_datum,'d.m.Y').'"></td>
 				<td></td>
 				<td>ZGV MSc Datum</td>
 				<td colspan="2"><input type="text" name="zgv_master_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgvmaster_datum,'d.m.Y').'"></td>
@@ -780,7 +778,6 @@ function print_personendetails()
 			<tr>
 				<td>Universität</td>
 				<td colspan="2"><input type="text" name="universitaet" size="30" value="'.$inc->universitaet.'"></td>	
-				<td></td>	
 				<td>Jahre</td>
 				<td colspan="2"><input type="text" name="jahre" size="5" value="'.$inc->jahre.'"></td>	
 				
@@ -810,9 +807,7 @@ echo'			</td>
 				<td></td>
 			</tr>
 			<tr>
-				<td>Aktiv
-				<input type="checkbox" name="aktiv" '.($inc->aktiv?'checked':'').'></td>
-				<td></td>	
+				<td>&nbsp;</td>	
 				<td></td>
 			</tr>	
 			<tr>
@@ -879,6 +874,15 @@ echo'			</td>
 					</script>		
 				</td>
 				
+				<td>Aktiv
+				<input type="checkbox" name="aktiv" '.($inc->aktiv?'checked':'').'></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
 				<td></td>
 				<td><input type="submit" name="save" value="Speichern"></td>
 			</tr>
