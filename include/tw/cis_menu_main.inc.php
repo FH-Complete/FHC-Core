@@ -22,25 +22,79 @@
 /**
  * Hauptmenue fuer CIS
  */
-/*
+
+/**
+ * Zeichnet einen Menueeintrag aus dem CMS System
+ * 
+ * @param $content_id
+ */
 function drawSubmenu($content_id)
 {
 	global $sprache;
 	$content = new content();
 	$sprache = getSprache();
 	
-	$arr = $content->getMenueArray($content_id, $sprache);
-	echo '<table>';
+	$arr = $content->getMenueArray($content_id, $sprache, true);
 	foreach ($arr as $row)
+	{
+		drawEntry($row);
+	}
+}
+
+/**
+ * Prueft ob der Menueeintrag Submenues hat
+ * 
+ * @param $item Menue Array
+ * @return boolean
+ */
+function EntryHasChilds($item)
+{
+	foreach($item as $row)
+	{
+		if(is_array($row) && isset($row['name']))
+			return true;
+	}
+	
+	return false;
+}
+
+/**
+ * Zeichnet den Menueeintrag samt Untermenues
+ * @param $item Menue Array
+ */
+function drawEntry($item)
+{
+	if(EntryHasChilds($item))
+	{
+		echo '
+		<tr>
+			<td class="tdwidth10" nowrap>&nbsp;</td>
+			<td class="tdwrap">
+				<a href="#'.$item['link'].'" class="MenuItem" onClick="return(js_toggle_container(\'Content'.$item['content_id'].'\'));">
+					<img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$item['name'].'
+				</a>
+			<table class="tabcontent" id="Content'.$item['content_id'].'" style="display: '.($item['open']?'visible':'none').'">';
+		foreach($item as $row)
+		{
+			if(is_array($row) && isset($row['name']))
+			{
+				drawEntry($row);
+			}
+		}	
+		echo '
+				</table>
+			</td>
+		</tr>';
+	}
+	else
 	{
 		echo '
 		<tr>
 		  	<td class="tdwidth10" nowrap>&nbsp;</td>
-			<td class="tdwrap"><a class="Item" href="'.$row['link'].'" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$row['name'].'</a></td>
+			<td class="tdwrap"><a class="Item" href="'.$item['link'].'" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$item['name'].'</a></td>
 		</tr>';
 	}
-	echo '</table>';
-}*/
+}
 ?>
 <table class="tabcontent">
 <tr>
@@ -82,12 +136,8 @@ function drawSubmenu($content_id)
 					<td><a href="private/info/oeh/index.php" target="content" class="Item" ><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Wahl</a></td>
 	-->
 					<td class="tdwrap"></td>
-					<td><a target="content" href="private/info/oeh/index.php" class="MenuItem" onClick="js_toggle_container('oeh');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;ÖH</a>
+					<td><a target="content" href="?oeh" class="MenuItem" onClick="js_toggle_container('oeh');return false;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;ÖH</a>
 				  	<table class="tabcontent" id="oeh" style="display: visible">
-				  		<tr>
-				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/wahl2011.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Wahlen 2011</a></td>
-				  		</tr>
 				  		<tr>
 				  			<td class="tdwrap"></td>
 							<td><a href="private/info/oeh/KandidatInnen2011.pdf" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-KandidatInnen 2011</a></td>
@@ -98,8 +148,9 @@ function drawSubmenu($content_id)
 				  		</tr>
 				  		<tr>
 				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/index2010herbst.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate Herbst 2010</a></td>
+							<td><a href="private/info/oeh/index2011.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate Frühjahr 2011</a></td>
 				  		</tr>
+				  		
 				  		<!-- <tr>
 				  			<td class="tdwrap"></td>
 							<td><a href="private/info/oeh/bewerber.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Kandidatur</a></td>
@@ -331,8 +382,8 @@ function drawSubmenu($content_id)
 		<tr>
 			<td class="tdwrap"><a href="private/info/weiterbildung/info.html" target="content" class="MenuItem" onClick="js_toggle_container('Weiterbildung');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Weiterbildung</a></td>
 		</tr>
-		<!--<tr>
-			<td class="tdwrap">-->
+		<tr>
+			<td class="tdwrap">
 		  	<table class="tabcontent" id="Weiterbildung" style="display: none">
 				<tr>
 					<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -941,13 +992,13 @@ function drawSubmenu($content_id)
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/betriebsratswahl.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Betriebsratswahl</a></td>
 		  		</tr>
+		  		<?php
+					//drawSubmenu(24);
+				?>
 			  	</table>
 			</td>
 		</tr>
-		<?php
-		//Betriebsratstest
-		//drawSubmenu(24);
-		?>
+		
  		<!-- Hauptmenue FAQ -->
  		<tr>
 			<td class="tdwrap"><a href="?FAQ" class="MenuItem" onClick="return(js_toggle_container('FAQ'));"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;FAQ</a></td>
