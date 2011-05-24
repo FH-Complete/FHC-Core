@@ -26,6 +26,7 @@
  * daraus ein PDF (xslfo2pdf)
  */
 require_once('../../../config/vilesci.config.inc.php');
+require_once 'auth.php';
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../../../include/akte.class.php');
