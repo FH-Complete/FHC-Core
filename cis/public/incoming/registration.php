@@ -205,7 +205,6 @@ if(isset($_REQUEST['submit']))
 	$person->nachname = $nachname; 
 	$person->vorname = $vorname; 
 	$person->gebdatum = $geb_datum; 
-	$person->anmerkungen = $anmerkung; 
 	$person->geschlecht = $geschlecht; 
 	$person->aktiv = true; 	
 	$person->zugangscode = $zugangscode; 
@@ -235,6 +234,8 @@ if(isset($_REQUEST['submit']))
 		die('Fehler beim Anlegen des Kontaktes aufgetreten.');
 
 	$preincoming->person_id = $person->person_id; 
+	$preincoming->anmerkung = $anmerkung; 
+	$preincoming->zweck_code = 1; 
 	$preincoming->aktiv = true; 
 	$preincoming->bachelorthesis = false; 
 	$preincoming->masterthesis = false; 
