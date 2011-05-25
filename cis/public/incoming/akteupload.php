@@ -100,12 +100,15 @@ if(isset($_POST['submitbild']))
 		}
 		else
 			echo "<b>Erfolgreich gespeichert.</b>"; 
-echo "<script>window.opener.location.reload();</script>"; 			
+		echo "<script>window.opener.location.reload();</script>"; 			
 		if($akte->dokument_kurzbz == "LearnAgr")
 		{
 			// sende Email zu Assistenz
+			$person = new person(); 
+			$person->load($_GET['person_id']); 
+			
 			$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-			$emailtext.= "Es wurde ein Learning Agreement auf das System hochgeladen."; 
+			$emailtext.= "Es wurde ein neues Dokument auf das System hochgeladen.<br><br>Vorname/Nachname: <b>".$person->vorname." ".$person->nachname."</b><br>Dokumenttyp: <b>Learning Agreement</b>"; 
 			$mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'Learning-Agreement Upload', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 			$mail->setHTMLContent($emailtext); 
 			if(!$mail->send())
