@@ -99,6 +99,8 @@ if (!$db = new basis_db())
 			$pruefungsordnung_en = $lvinfo_obj->pruefungsordnung;
 			$anmerkungen_en = $lvinfo_obj->anmerkungen;
 		}
+		else
+			die('Es sind keine Informationen zu dieser Lehrveranstaltung vorhanden');
 	}
 	else
 		die('Fehler bei der Parameteruebergabe');
