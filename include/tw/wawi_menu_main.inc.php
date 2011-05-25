@@ -82,6 +82,7 @@ $menu=array
 			'name'=>'', 'permissions'=>array('wawi/rechnung'),'link'=>'rechnung.php?method=suche', 'target'=>'content',
 			'Kostenstelle'=>array ('name'=>'Kostenstelle', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/kostenstelle.php', 'target'=>'content'),
 			'Tags'=>array ('name'=>'Tags', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/wawi_tags.php', 'target'=>'content'),
+			'Konto'=>array ('name'=>'Konto', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/konto.php', 'target'=>'content'),
 			'Aufteilung'=>array ('name'=>'Aufteilung', 'permissions'=>array('wawi/bestellung'),'link'=>'auswertungen/aufteilung.php', 'target'=>'content')
 		)
 	)
