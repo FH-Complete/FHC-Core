@@ -1070,7 +1070,6 @@ else if ($method == "profil")
 		$person->titelpre = $_REQUEST['titel_pre']; 
 		$person->gebdatum = $date->formatDatum($_REQUEST['geb_datum'],'Y-m-d'); 
 		$person->staatsbuergerschaft = $_REQUEST['staatsbuerger']; 
-		$person->anmerkungen = $_REQUEST['anmerkung']; 
 		$person->geschlecht = $_REQUEST['geschlecht']; 
 		$person->aktiv = true; 
 		$person->new = false; 
@@ -1109,6 +1108,7 @@ else if ($method == "profil")
 		$preincoming->zgv = $_REQUEST['zgv'];
 		$preincoming->zgv_name = $_REQUEST['zgv_name']; 
 		$preincoming->zgv_ort = $_REQUEST['zgv_ort']; 
+		$preincoming->anmerkung = $_REQUEST['anmerkung']; 
 		$preincoming->zgv_datum = $date->formatDatum($_REQUEST['zgv_datum'],'Y-m-d');
 		$preincoming->zgvmaster = $_REQUEST['zgv_master']; 
 		$preincoming->zgvmaster_datum = $date->formatDatum($_REQUEST['zgv_master_datum'],'Y-m-d'); 
@@ -1273,7 +1273,7 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 			</tr>
 			<tr valign="top">
 				<td>'.$p->t('global/anmerkung').'</td>
-				<td><textarea name="anmerkung" cols="31" rows="5">'.$person->anmerkungen.'</textarea></td>
+				<td><textarea name="anmerkung" cols="31" rows="5">'.$preincoming->anmerkung.'</textarea></td>
 				<td>Email</td>
 				<td><input type="text" size="40" name="emergency_email" value="'.$emEmail.'">
 				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
