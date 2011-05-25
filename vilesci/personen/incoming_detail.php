@@ -269,11 +269,18 @@ if($method!='')
 					$studiengang_kz=$_POST['studiengang_kz'];
 					
 					// Prestudent
+					$preincoming = new preincoming(); 
+					$preincoming->load($preincoming_id); 
+					
 					$prestudent = new prestudent();
 					$prestudent->person_id = $inc->person_id;
 					$prestudent->new = true;
 					$prestudent->aufmerksamdurch_kurzbz = 'k.A.';
 					$prestudent->studiengang_kz = $studiengang_kz;
+					$prestudent->zgvort = $preincoming->zgv_ort; 
+					$prestudent->zgvdatum = $preincoming->zgv_datum; 
+					$prestudent->zgvmaort = $preincoming->zgvmaster_ort; 
+					$prestudent->zgvmadatum = $preincoming->zgvmaster_datum; 
 					$prestudent->reihungstestangetreten = false;
 					$prestudent->bismelden = true;
 					
@@ -523,15 +530,15 @@ function print_menu($name, $value)
 function print_ansprechpersonen()
 {
 	global $inc, $preincoming_id;
+	$emergencyPerson = new person();
+	$emTelefon = ""; 
+	$emEmail = ""; 
 	if($inc->person_id_emergency != "")
 	{
-		$emergencyPerson = new person(); 
 		$emergencyPerson->load($inc->person_id_emergency); 
 		
 		$emergencyKontakt = new kontakt(); 
 		$emergencyKontakt->load_pers($emergencyPerson->person_id); 
-		$emTelefon = ""; 
-		$emEmail = ""; 
 		foreach ($emergencyKontakt->result as $emKontakt)
 		{
 			if($emKontakt->kontakttyp == "telefon")
@@ -542,16 +549,16 @@ function print_ansprechpersonen()
 		}
 	}
 	
+	$depPerson = new person(); 
+	$depTelefon = ""; 
+	$depEmail = ""; 
+	$depFax =""; 
 	if($inc->person_id_coordinator_dep != "")
 	{
-		$depPerson = new person(); 
 		$depPerson->load($inc->person_id_coordinator_dep); 
 		
 		$depKontakt = new kontakt(); 
 		$depKontakt->load_pers($depPerson->person_id); 
-		$depTelefon = ""; 
-		$depEmail = ""; 
-		$depFax =""; 
 		foreach ($depKontakt->result as $depKontakt)
 		{
 			if($depKontakt->kontakttyp == "telefon")
@@ -565,16 +572,18 @@ function print_ansprechpersonen()
 		}
 	}
 	
+	$intPerson = new person(); 
+	$intTelefon = ""; 
+	$intEmail = ""; 
+	$intFax =""; 
+	
 	if($inc->person_id_coordinator_int != "")
 	{
-		$intPerson = new person(); 
 		$intPerson->load($inc->person_id_coordinator_int); 
 		
 		$intKontakt = new kontakt(); 
 		$intKontakt->load_pers($intPerson->person_id); 
-		$intTelefon = ""; 
-		$intEmail = ""; 
-		$intFax =""; 
+
 		foreach ($intKontakt->result as $intKontakt)
 		{
 			if($intKontakt->kontakttyp == "telefon")
@@ -595,17 +604,17 @@ function print_ansprechpersonen()
 			</tr>
 			<tr>
 				<td>Vorname: </td>
-				<td><input type="text" size ="22" value="'.$emergencyPerson->vorname.'" readonly></td>
+				<td><input type="text" size ="30" value="'.$emergencyPerson->vorname.'" readonly></td>
 				<td></td>
 				<td>Nachname: </td>
-				<td><input type="text" size="25" value="'.$emergencyPerson->nachname.'" readonly></td>
+				<td><input type="text" size="30" value="'.$emergencyPerson->nachname.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Telefon: </td>
-				<td><input type="text" size="22" value="'.$emTelefon.'" readonly></td>
+				<td><input type="text" size="30" value="'.$emTelefon.'" readonly></td>
 				<td></td>
 				<td>E-Mail: </td>
-				<td><input type="text" size="25" value="'.$emEmail.'" readonly></td>
+				<td><input type="text" size="30" value="'.$emEmail.'" readonly></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
@@ -615,42 +624,42 @@ function print_ansprechpersonen()
 			</tr>
 			<tr>
 				<td>Vorname: </td>
-				<td><input type="text" size ="22" value="'.$depPerson->vorname.'" readonly></td>
+				<td><input type="text" size ="30" value="'.$depPerson->vorname.'" readonly></td>
 				<td></td>
 				<td>Nachname: </td>
-				<td><input type="text" size="25" value="'.$depPerson->nachname.'" readonly></td>
+				<td><input type="text" size="30" value="'.$depPerson->nachname.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Telefon: </td>
-				<td><input type="text" size="22" value="'.$depTelefon.'" readonly></td>
+				<td><input type="text" size="30" value="'.$depTelefon.'" readonly></td>
 				<td></td>
 				<td>E-Mail: </td>
-				<td><input type="text" size="25" value="'.$depEmail.'" readonly></td>
+				<td><input type="text" size="30" value="'.$depEmail.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Fax: </td>
-				<td><input type="text" size="22" value="'.$depFax.'" readonly></td>
+				<td><input type="text" size="30" value="'.$depFax.'" readonly></td>
 			</tr>
 			<tr>
 				<td colspan="4"><b>International Koordinator</b></td>
 			</tr>
 			<tr>
 				<td>Vorname: </td>
-				<td><input type="text" size ="22" value="'.$intPerson->vorname.'" readonly></td>
+				<td><input type="text" size ="30" value="'.$intPerson->vorname.'" readonly></td>
 				<td></td>
 				<td>Nachname: </td>
-				<td><input type="text" size="25" value="'.$intPerson->nachname.'" readonly></td>
+				<td><input type="text" size="30" value="'.$intPerson->nachname.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Telefon: </td>
-				<td><input type="text" size="22" value="'.$intTelefon.'" readonly></td>
+				<td><input type="text" size="30" value="'.$intTelefon.'" readonly></td>
 				<td></td>
 				<td>E-Mail: </td>
-				<td><input type="text" size="25" value="'.$intEmail.'" readonly></td>
+				<td><input type="text" size="30" value="'.$intEmail.'" readonly></td>
 			</tr>
 			<tr>
 				<td>Fax: </td>
-				<td><input type="text" size="22" value="'.$intFax.'" readonly></td>
+				<td><input type="text" size="30" value="'.$intFax.'" readonly></td>
 			</tr>
 		</table>';			
 }
@@ -763,10 +772,24 @@ function print_personendetails()
 			</tr>
 			<tr>
 				<td>ZGV 1 Datum</td>
-				<td><input type="text" name="zgv_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgv_datum,'d.m.Y').'"></td>
+				<td><input type="text" name="zgv_datum" id="zgv_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgv_datum,'d.m.Y').'">
+					<script type="text/javascript">
+					$(document).ready(function() 
+					{ 
+					    $( "#zgv_datum" ).datepicker($.datepicker.regional["de"]);
+					});
+					</script>	
+				</td>
 				<td></td>
 				<td>ZGV MSc Datum</td>
-				<td colspan="2"><input type="text" name="zgv_master_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgvmaster_datum,'d.m.Y').'"></td>
+				<td colspan="2"><input type="text" id="zgv_master_datum" name="zgv_master_datum" size="30" value="'.$datum_obj->formatDatum($inc->zgvmaster_datum,'d.m.Y').'">
+					<script type="text/javascript">
+					$(document).ready(function() 
+					{ 
+					    $( "#zgv_master_datum" ).datepicker($.datepicker.regional["de"]);
+					});
+					</script>				
+				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
