@@ -775,7 +775,7 @@ elseif($aktion == 'save')
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 		
 		$newBestellung = new wawi_bestellung(); 
-		$newBestellung->titel = $_POST['titel'];
+		$newBestellung->titel = mb_str_replace("'", "´", $_POST['titel']);
 		
 		if($_POST['filter_kst']=='opt_kostenstelle')
 			$newBestellung->kostenstelle_id = null; 
@@ -910,8 +910,8 @@ if($_GET['method']=='update')
 				$bestellung_new->firma_id = $_POST['firma_id'];
 				$bestellung_new->lieferadresse = $_POST['filter_lieferadresse'];
 				$bestellung_new->rechnungsadresse = $_POST['filter_rechnungsadresse'];
-				$bestellung_new->titel = $_POST['titel'];
-				$bestellung_new->bemerkung = $_POST['bemerkung'];
+				$bestellung_new->titel = mb_str_replace("'", "´", $_POST['titel']);
+				$bestellung_new->bemerkung = mb_str_replace("'", "´",$_POST['bemerkung']);
 				$bestellung_new->liefertermin = $_POST['liefertermin']; 
 				$bestellung_new->updateamum = date('Y-m-d H:i:s');
 				$bestellung_new->updatevon = $user; 
@@ -995,10 +995,10 @@ if($_GET['method']=='update')
 							$bestell_detail->sort = $_POST["sort_$i"];
 						else 
 							$bestell_detail->sort = $_POST["pos_$i"];
-							
+						var_dump($_POST["beschreibung_$i"]); 
 						$bestell_detail->menge = $menge;
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+						$bestell_detail->beschreibung = mb_str_replace("'", "´",$_POST["beschreibung_$i"]);
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
 						$bestell_detail->preisprove = mb_str_replace(',','.', $_POST["preisprove_$i"]);
 						$bestell_detail->mwst = $_POST["mwst_$i"];
@@ -1016,9 +1016,9 @@ if($_GET['method']=='update')
 						$bestell_detail->position = $_POST["pos_$i"];
 						$bestell_detail->menge = $menge;
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
+						$bestell_detail->beschreibung = mb_str_replace("'", "´",$_POST["beschreibung_$i"]);
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-						$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
+						$bestell_detail->preisprove =$_POST["preisprove_$i"];
 						$bestell_detail->mwst = $_POST["mwst_$i"];
 						if($_POST["sort_$i"] != '')
 							$bestell_detail->sort = $_POST["sort_$i"];
