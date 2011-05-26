@@ -27,12 +27,12 @@ class benutzergruppe extends basis_db
 	public $benutzergruppen = array(); // benutzergruppe Objekt
 	
 	//Tabellenspalten
-	public $uid;			// varchar(16)
-	public $gruppe_kurzbz;	// varchar(16)
+	public $uid;			// varchar(32)
+	public $gruppe_kurzbz;	// varchar(32)
 	public $updateamum;		// timestamp
-	public $updatevon;		// varchar(16)
+	public $updatevon;		// varchar(32)
 	public $insertamum;		// timestamp
-	public $insertvon;		// varchar(16)
+	public $insertvon;		// varchar(32)
 	public $studiensemester_kurzbz; // varchar(16)
 	
 	/**
@@ -123,24 +123,23 @@ class benutzergruppe extends basis_db
 	 */
 	protected function validate()
 	{
-		if(mb_strlen($this->uid)>16)
+		if(mb_strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nich laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nich laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->gruppe_kurzbz)>16)
+		if(mb_strlen($this->gruppe_kurzbz)>32)
 		{
-			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->updatevon)>16)
+		if(mb_strlen($this->updatevon)>32)
 		{
-			//ToDo: Just 4 Sync dannach wieder errormsg setzen
-			$this->updatevon = mb_substr($this->updatevon,0,15);
+			$this->errormsg = 'Updatevon darf nicht laenger als 32 Zeichen sein';
 		}
-		if(mb_strlen($this->insertvon)>16)
+		if(mb_strlen($this->insertvon)>32)
 		{
-			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Insertvon darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		

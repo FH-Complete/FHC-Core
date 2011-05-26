@@ -48,7 +48,8 @@ if (isset($_POST['new']))
 	$e->insertamum = date('Y-m-d H:i:s');
 	$e->insertvon = $user;
 	$e->uid = $_POST['uid'];
-	$e->save();
+	if(!$e->save())
+		die($e->errormsg);
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
