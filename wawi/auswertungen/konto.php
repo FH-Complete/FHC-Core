@@ -90,7 +90,7 @@ if(isset($_POST['show']))
 	$kstIN=$db->implode4SQL($_POST['kst']);
 	//Tabelle auf Basis der Bestellungen
 	$qry = "SELECT 
-				tbl_bestellung.bestellung_id, sum (menge*preisprove*(100+mwst)/100) as brutto,
+				tbl_bestellung.bestellung_id, sum (menge*preisprove*(100+COALESCE(mwst,0))/100) as brutto,
 				tbl_bestellung.kostenstelle_id, tbl_konto.beschreibung[1], tbl_konto.konto_id
 			FROM 
 				wawi.tbl_bestellung 
@@ -132,7 +132,7 @@ if(isset($_POST['show']))
 	$kst_konto=array();
 	$konto_array=array();
 	$qry = "SELECT 
-				(betrag*(100+mwst)/100) as brutto, tbl_bestellung.bestellung_id, tbl_bestellung.konto_id,
+				(betrag*(100+COALESCE(mwst,0))/100) as brutto, tbl_bestellung.bestellung_id, tbl_bestellung.konto_id,
 				tbl_bestellung.kostenstelle_id, tbl_konto.beschreibung[1]
 			FROM 
 				wawi.tbl_bestellung 
