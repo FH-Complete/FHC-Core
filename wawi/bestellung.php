@@ -995,7 +995,7 @@ if($_GET['method']=='update')
 							$bestell_detail->sort = $_POST["sort_$i"];
 						else 
 							$bestell_detail->sort = $_POST["pos_$i"];
-						var_dump($_POST["beschreibung_$i"]); 
+
 						$bestell_detail->menge = $menge;
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 						$bestell_detail->beschreibung = mb_str_replace("'", "´",$_POST["beschreibung_$i"]);
