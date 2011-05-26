@@ -62,6 +62,12 @@ if(count($kst_array)==0)
 	<script type="text/javascript" src="../../include/js/jquery.js"></script> 
 	<script type="text/javascript" src="../../include/js/jquery.metadata.js"></script> 
 	<script type="text/javascript" src="../../include/js/jquery.tablesorter.js"></script>
+	<script type="text/javascript">
+ 	function alleMarkieren(checked)
+ 	{
+ 	 	checkbox = $(':checkbox').attr('checked',checked);
+ 	}
+	</script>
 </head>
 <body>
 <h1>Bericht - Konto</h1>
@@ -84,7 +90,7 @@ if(isset($_POST['show']))
 	$kstIN=$db->implode4SQL($_POST['kst']);
 	//Tabelle auf Basis der Bestellungen
 	$qry = "SELECT 
-				distinct tbl_bestellung.bestellung_id, 
+				tbl_bestellung.bestellung_id, sum (menge*preisprove*(100+mwst)/100) as brutto,
 				tbl_bestellung.kostenstelle_id, tbl_konto.beschreibung[1], tbl_konto.konto_id
 			FROM 
 				wawi.tbl_bestellung 
@@ -93,6 +99,8 @@ if(isset($_POST['show']))
 			WHERE
 				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<='$gj->ende' 
 				AND kostenstelle_id IN($kstIN)
+			group by tbl_bestellung.bestellung_id, tbl_bestellung.kostenstelle_id, tbl_konto.beschreibung, tbl_konto.konto_id
+			order by beschreibung
 			";
 
 	if($result = $db->db_query($qry))
@@ -100,21 +108,24 @@ if(isset($_POST['show']))
 		while($row = $db->db_fetch_object($result))
 		{
 			if(!isset($konto_array[$row->konto_id]))
-					$konto_array[$row->konto_id]=0;
-								 
-			$brutto = $bestellung->getBrutto($row->bestellung_id); 
+				$konto_array[$row->konto_id]=0;
 			
 			if(isset($kst_konto[$row->kostenstelle_id]) && isset($kst_konto[$row->kostenstelle_id][$row->konto_id]))
-				$kst_konto[$row->kostenstelle_id][$row->konto_id]+=$brutto;
+			{
+				$kst_konto[$row->kostenstelle_id][$row->konto_id]+=$row->brutto;
+			}
 			else
-				$kst_konto[$row->kostenstelle_id][$row->konto_id]=$brutto;
+			{
+				 $kst_konto[$row->kostenstelle_id][$row->konto_id]=$row->brutto+0;
+			}
 		}
 	}
 	else
 		die('Fehler bei Datenbankzugriff');
-	
+
 	echo '<span style="font-size: small">Zeitraum: ',$datum_obj->formatDatum($gj->start,'d.m.Y'),' - ',$datum_obj->formatDatum($gj->ende,'d.m.Y').'</span>';
 	echo '<H2>Bestellungen</H2>';
+
 	draw_konto_table($konto_array, $kst_konto,'bestellung', $gj);
 	
 	//Tabelle auf Basis der Rechnungen
@@ -122,15 +133,17 @@ if(isset($_POST['show']))
 	$konto_array=array();
 	$qry = "SELECT 
 				(betrag*(100+mwst)/100) as brutto, tbl_bestellung.bestellung_id, tbl_bestellung.konto_id,
-				tbl_bestellung.kostenstelle_id
+				tbl_bestellung.kostenstelle_id, tbl_konto.beschreibung[1]
 			FROM 
 				wawi.tbl_bestellung 
+				JOIN wawi.tbl_konto USING(konto_id)
 				JOIN wawi.tbl_rechnung USING(bestellung_id)
 				JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
 			WHERE
 				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
 				AND bestellung_id in (SELECT bestellung_id FROM wawi.tbl_bestellungtag WHERE bestellung_id=tbl_bestellung.bestellung_id)
 				AND kostenstelle_id IN ($kstIN)
+			order by beschreibung
 			";
 
 	if($result = $db->db_query($qry))
@@ -140,19 +153,24 @@ if(isset($_POST['show']))
 			//Bestelldetailtags laden
 			if(!isset($konto_array[$row->konto_id]))
 					$konto_array[$row->konto_id]=0;
-								 
-			//$brutto = $bestellung->getBrutto($row->bestellung_id); 
 			
 			if(isset($kst_konto[$row->kostenstelle_id]) && isset($kst_konto[$row->kostenstelle_id][$row->konto_id]))
+			{
 				$kst_konto[$row->kostenstelle_id][$row->konto_id]+=$row->brutto;
+				
+			}
 			else
+			{
 				$kst_konto[$row->kostenstelle_id][$row->konto_id]=$row->brutto;
+				
+			}
 		}
 	}
 	else
 		die('Fehler bei Datenbankzugriff');
 	
 	echo '<H2>Rechnungen</H2>';
+
 	draw_konto_table($konto_array, $kst_konto,'rechnung', $gj);
 }else {
 
@@ -229,8 +247,8 @@ if(isset($_POST['show']))
  */
 function draw_konto_table($konto_array, $kst_konto, $table_id, $gj)
 {
-	ksort($konto_array);
-	
+	ksort($kst_konto); 
+
 	$vondatum = $gj->start;
 	$endedatum = $gj->ende;
 	
@@ -284,9 +302,12 @@ function draw_konto_table($konto_array, $kst_konto, $table_id, $gj)
 				echo '</td>';
 				//Kostenstellensumme berechnen
 				$kst_summe += $konten_value[$konten];
-				
+
 				//Kontensumme berechnen
-				$konto_array[$konten]+=$konten_value[$konten];
+				settype($konto_array[$konten],'float');
+				settype($konten_value[$konten], 'float'); 
+				$konto_array[$konten] +=$konten_value[$konten];
+				
 			}
 			else
 				echo '<td>&nbsp;</td>';
@@ -298,9 +319,11 @@ function draw_konto_table($konto_array, $kst_konto, $table_id, $gj)
 		 <tfoot>
 		 	<tr>
 		 		<th>Summe</th>';
-	$gesamt_summe=0;
+	settype($gesamt_summe, 'float');
+	$gesamt_summe = 0; 
 	foreach($konto_array as $konten=>$summe)
 	{
+		settype($summe, 'float'); 
 		$gesamt_summe+=$summe;
 		echo '<th class="number">',number_format($summe,2,',','.'),'</th>';
 	}
