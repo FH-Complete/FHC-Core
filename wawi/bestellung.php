@@ -615,7 +615,7 @@ if($aktion == 'suche')
 		
 		$status = new wawi_bestellstatus(); 
 		$bestellnummer = (isset($_REQUEST['bestellnr'])?$_REQUEST['bestellnr']:'');
-		$titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
+		$titel = (isset($_REQUEST['titel'])?mb_str_replace("'", "´",$_REQUEST['titel']):'');
 		$evon = (isset($_REQUEST['evon'])?$_REQUEST['evon']:'');
 		$ebis = (isset($_REQUEST['ebis'])?$_REQUEST['ebis']:'');
 		$bvon = (isset($_REQUEST['bvon'])?$_REQUEST['bvon']:'');
@@ -636,7 +636,7 @@ if($aktion == 'suche')
 		$tagsNotExists = (isset ($_REQUEST['tagsvorhanden'])?true:false); 
 		$ohneFreigabe = (isset ($_REQUEST['ohneFreigabe'])?true:false); 
 
-		$bestellposition= (isset($_REQUEST['bestellposition'])?$_REQUEST['bestellposition']:'');
+		$bestellposition= (isset($_REQUEST['bestellposition'])?mb_str_replace("'", "´", $_REQUEST['bestellposition']):'');
 		$bestellung = new wawi_bestellung();
 		
 		if($evon != '') 
