@@ -998,9 +998,9 @@ if($_GET['method']=='update')
 
 						$bestell_detail->menge = $menge;
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-						$bestell_detail->beschreibung = mb_str_replace("'", "´",$_POST["beschreibung_$i"]);
+						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-						$bestell_detail->preisprove = mb_str_replace(',','.', $_POST["preisprove_$i"]);
+						$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
 						$bestell_detail->mwst = $_POST["mwst_$i"];
 						$bestell_detail->updateamum = date('Y-m-d H:i:s');
 						$bestell_detail->updatevon = $user;
@@ -1016,9 +1016,9 @@ if($_GET['method']=='update')
 						$bestell_detail->position = $_POST["pos_$i"];
 						$bestell_detail->menge = $menge;
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
-						$bestell_detail->beschreibung = mb_str_replace("'", "´",$_POST["beschreibung_$i"]);
+						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-						$bestell_detail->preisprove =$_POST["preisprove_$i"];
+						$bestell_detail->preisprove =mb_str_replace(',', '.', $_POST["preisprove_$i"]);
 						$bestell_detail->mwst = $_POST["mwst_$i"];
 						if($_POST["sort_$i"] != '')
 							$bestell_detail->sort = $_POST["sort_$i"];
