@@ -837,15 +837,15 @@ function manual_basic_auth()
  */
 function getSprache()
 {
-	if(isset($_SESSION['FHC_SPRACHE']))
+	if(isset($_SESSION['sprache']))
 	{
-		$sprache=$_SESSION['FHC_SPRACHE'];
+		$sprache=$_SESSION['sprache'];
 	}
 	else
 	{
-		if(isset($_COOKIE['FHC_SPRACHE']))
+		if(isset($_COOKIE['sprache']))
 		{
-			$sprache=$_COOKIE['FHC_SPRACHE'];
+			$sprache=$_COOKIE['sprache'];
 		}
 		else
 		{
@@ -862,7 +862,7 @@ function getSprache()
  */
 function setSprache($sprache)
 {
-	$_SESSION['FHC_SPRACHE']=$sprache;
-	setcookie('FHC_SPRACHE',$sprache,time()+60*60*24*30,'/');
+	$_SESSION['sprache']=$sprache;
+	setcookie('sprache',$sprache,time()+60*60*24*30,'/');
 }
 ?>

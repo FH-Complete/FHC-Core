@@ -184,6 +184,7 @@ class benutzerfunktion extends basis_db
 			$qry.=" AND semester='".addslashes($semester)."'";
 
 		$qry.=" ORDER BY funktion_kurzbz, oe_kurzbz, semester";
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))

@@ -28,11 +28,12 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class sprache extends basis_db
 {
 	public $result; 
-	
+	public static $index_arr;
 	public $sprache; 	// string
 	public $locale; 	
 	public $index; 		// int, id des array index
 	public $content;	// boolean 
+	public $bezeichnung_arr;
 	
 	/**
 	 * 
@@ -77,9 +78,13 @@ class sprache extends basis_db
 	 * Lädt alle verfügbaren Sprachen
 	 * @return true bei Erfolg, false wenn ein Fehler aufgetreten ist. 
 	 */
-	public function getAll()
+	public function getAll($content=null)
 	{
-		$qry = "SELECT * FROM public.tbl_sprache;";
+		$qry = "SELECT *,".$this->getSprachQuery('bezeichnung')." FROM public.tbl_sprache";
+		
+		if(!is_null($content))
+			$qry.= " WHERE content=".($content?'true':'false');
+		$qry.=" ORDER BY sprache";
 		
 		if(!$this->db_query($qry))
 		{
@@ -94,10 +99,33 @@ class sprache extends basis_db
 			$sprache->locale = $row->locale;
 			$sprache->index = $row->index;
 			$sprache->content = ($row->content=='t'?true:false); 
+			$sprache->bezeichnung_arr=$this->parseSprachResult('bezeichnung',$row);
 			
 			$this->result[] = $sprache; 
 		}
  			return true; 
+	}
+	
+	/**
+	 * 
+	 * Lädt das Index Array
+	 * @return true bei Erfolg, false wenn ein Fehler aufgetreten ist. 
+	 */
+	public function loadIndexArray()
+	{
+		$qry = "SELECT sprache, index FROM public.tbl_sprache ORDER BY index";
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg ="Fehler bei der Abfrage.";
+			return false;
+		}
+		
+		while($row = $this->db_fetch_object())
+		{
+			$this->index_arr[$row->sprache]=$row->index; 
+		}
+ 		return true; 
 	}
 	
 	/**
@@ -151,7 +179,7 @@ class sprache extends basis_db
 	public function getSpracheFromIndex($index)
 	{
 		$sprache = ''; 
-		$qry = "SELECT sprache FROM public.tbl_sprache WHERE index = $index ;";
+		$qry = "SELECT sprache FROM public.tbl_sprache WHERE index = '".addslashes($index)."';";
 		
 		if(!$this->db_query($qry))
 		{
@@ -164,5 +192,51 @@ class sprache extends basis_db
 			$sprache = $row->sprache; 
 		}
 		return $sprache; 
+	}
+	
+	/**
+	 * Liefert einen String mit den aufgespaltenen Elementen fuer mehrsprachige Arrays 
+	 * Der Result der Query kann dann mittels parseSprachResult wieder in ein Array umgewandelt werden
+	 * 
+	 * @param $feldname
+	 * @return string mit den aufgeschluesselten Arrayelementen der Sprache 
+	 */
+	public function getSprachQuery($feldname)
+	{
+		$result = '';
+		
+		if(!isset($this->index_arr))
+			$this->loadIndexArray();
+			
+		foreach($this->index_arr as $sprache=>$index)
+		{
+			$result .= $feldname.'['.$index.'] as '.$feldname.'_'.$index.',';
+		}
+		return mb_substr($result,0,-1);
+	}
+	
+	/**
+	 * Wandelt den Result von mehrsprachigen Arrays in einer SQL Query in ein PHP Array um 
+	 * 
+	 * @param $feldname name der Datenbankspalte
+	 * @param $row row des SQL Results
+	 * @return array mit den Sprachen der Spalte
+	 */
+	public function parseSprachResult($feldname, $row)
+	{
+		$result = array();
+		
+		if(!isset($this->index_arr))
+			$this->getAll();
+			
+		foreach($this->index_arr as $sprache=>$index)
+		{
+			$name = $feldname.'_'.$index;
+			if(isset($row->$name))
+				$result[$sprache] = $row->$name;
+			else
+				$result[$sprache] = null;	
+		}
+		return $result;
 	}
 }

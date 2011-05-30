@@ -28,34 +28,32 @@ require_once('../include/content.class.php');
 require_once('../include/template.class.php');
 require_once('../include/functions.inc.php');
 
-if(isset($_GET['content_id']))
-	$content_id = $_GET['content_id'];
-else
-	die('ContentID muss uebergeben werden');
-
 $version = (isset($_GET['version'])?$_GET['version']:null);
 $sprache = (isset($_GET['sprache'])?$_GET['sprache']:getSprache());
 $sichtbar = !isset($_GET['sichtbar']);
 
 //XML Content laden
 $content = new content();
+$db = new basis_db();
 
-if($content->islocked($content_id))
+
+$qry = "SELECT content FROM campus.tbl_content JOIN campus.tbl_contentsprache USING(content_id) WHERE tbl_content.template_kurzbz='news'";
+$content = '<?xml version="1.0" encoding="UTF-8"?><content>';
+if($result = $db->db_query($qry))
 {
-	$uid = get_uid();
-	if(!$content->berechtigt($content_id, $uid))
-		die($uid.': Sie haben keine Berechtigung fuer diese Seite');
+	while($row = $db->db_fetch_object($result))
+	{
+		$content .=$row->content;
+	}
 }
-
-if(!$content->getContent($content_id, $sprache, $version, $sichtbar, true))
-	die($content->errormsg);
-
+$content .= '</content>';
+//echo $content;
 $XML = new DOMDocument();
-$XML->loadXML($content->content);
+$XML->loadXML($content);
 
 //XSLT Vorlage laden
 $template = new template();
-if(!$template->load($content->template_kurzbz))
+if(!$template->load('news'))
 	die($template->errormsg);
 
 $xsltemplate = new DOMDocument();

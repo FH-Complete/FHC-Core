@@ -2307,9 +2307,9 @@ if(!@$db->db_query("SELECT zgv FROM public.tbl_preincoming LIMIT 1"))
 	ALTER TABLE public.tbl_preincoming ADD COLUMN person_id_coordinator_int integer;
 	ALTER TABLE public.tbl_preincoming ADD COLUMN code varchar(64);
 	
-	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_emergency FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_coordinator_dep FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_coordinator_int FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_emergency FOREIGN KEY(person_id_emergency) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_coordinator_dep FOREIGN KEY(person_id_coordinator_dep) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ALTER TABLE public.tbl_preincoming ADD CONSTRAINT fk_person_preincoming_coordinator_int FOREIGN KEY(person_id_coordinator_int) REFERENCES public.tbl_person (person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 	ALTER TABLE public.tbl_preincoming ALTER COLUMN bachelor SET NOT NULL;
 	ALTER TABLE public.tbl_preincoming ALTER COLUMN master SET NOT NULL;
 	";
