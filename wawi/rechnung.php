@@ -528,7 +528,7 @@ if($aktion=='update')
 	if(isset($_GET['id']))
 	{
 		echo '<div style="float:right">'.$ausgabemsg.'</div>';
-		echo '<h1>Rechnung Bearbeiten</h1>';
+		echo '<h1>Rechnung bearbeiten</h1>';
 		
 		$rechnung_id = $_GET['id'];
 		if(!is_numeric($rechnung_id))
