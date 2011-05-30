@@ -430,9 +430,13 @@ TABLE.stdplan TD
 /* Fonts */
 h1 
 { 
-	font-size: medium;
+	font-size: small;
 	color: #ffffff; 
-	background-color: #009e84; 
+	background-color: #008381; /*gruen*/
+	font-weight: bold;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 4px;
 }
 h1 td
 { 
@@ -452,9 +456,17 @@ h1 a:hover
 
 h2 
 { 
+/*
 	font-size: small; 
 	color: #ffffff; 
-	background-color: #00a4d2; /*hellblau*/
+	background-color: #00a4d2; 
+	*/
+	background-color: #CCCCCC; /*mittel-grau */
+	font-weight: normal;
+	font-size: small;
+	height: 19px;
+	padding-top: 2px;
+	padding-left: 2px;
 }
 h2 td
 { 
@@ -510,7 +522,7 @@ font.ContentHeader
 	background-color: #F0F0F0;
 	
 }
-#news .news .titel
+#news .news .titel table
 {
 	font-weight: bold;
 	font-size: small;

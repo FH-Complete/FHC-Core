@@ -391,6 +391,40 @@ class organisationseinheit extends basis_db
 	}
 	
 	/**
+	 * Liefert die OEs die im Tree ueberhalb der uebergebene OE liegen
+	 * 
+	 * @param $oe_kurzbz
+	 */
+	public function getParents($oe_kurzbz)
+	{
+		$parents=array();
+		
+		$qry="WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		(
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			WHERE oe_kurzbz='".addslashes($oe_kurzbz)."' and aktiv = true 
+			UNION ALL
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			WHERE o.oe_kurzbz=oes.oe_parent_kurzbz and aktiv = true
+		)
+		SELECT oe_kurzbz
+		FROM oes";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$parents[]=$row->oe_kurzbz;
+			}
+			return $parents;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';
+			return false;
+		}		
+	}
+	
+	/**
 	 * Prueft ob $child eine Organisationseinheit unterhalb der OE $oe_kurzbz ist
 	 *
 	 * @param $oe_kurzbz parent organisationseinheit
