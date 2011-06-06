@@ -253,6 +253,9 @@
 <!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis">
 <!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
 
+<!ENTITY menu-dokumente-pruefungszeugnis_englisch.label		"Prüfungszeugnis Englisch">
+<!ENTITY menu-dokumente-pruefungszeugnis_englisch.accesskey	"G">
+
 <!ENTITY menu-dokumente-urkunde_deutsch.label		"Urkunde Deutsch">
 <!ENTITY menu-dokumente-urkunde_deutsch.accesskey	"D">
 
