@@ -119,7 +119,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de');"/>
   <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en');"/>
-  <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple();"/>
+  <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('deutsch');"/>
+  <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('englisch');"/>
   <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
   <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('englisch')"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
@@ -632,6 +633,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
                label     = "&menu-dokumente-pruefungszeugnis.label;"
                command   =  "menu-dokumente-pruefungszeugnis:command"
                accesskey = "&menu-dokumente-pruefungszeugnis.accesskey;"/>
+               <menuitem
+               id        =  "menu-dokumente-pruefungszeugnis_englisch"
+               key       =  "menu-dokumente-pruefungszeugnis_englisch:key"
+               label     = "&menu-dokumente-pruefungszeugnis_englisch.label;"
+               command   =  "menu-dokumente-pruefungszeugnis_englisch:command"
+               accesskey = "&menu-dokumente-pruefungszeugnis_englisch.accesskey;"/>
 			<menuitem
                id        =  "menu-dokumente-urkunde_deutsch"
                key       =  "menu-dokumente-urkunde_deutsch:key"
