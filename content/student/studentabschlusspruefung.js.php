@@ -710,7 +710,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 // * ein Zeugnis gedruckt.
 // * Den Typ (Bakk/Dipl) des Zeugnisses bestimmt der zuletzt markierte.
 // ****
-function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
+function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(sprache)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -733,10 +733,19 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple()
 	}
 
 	if(pruefungstyp_kurzbz=='Bachelor')
-		xsl='Bakkzeugnis';
+	{
+		if(sprache=="deutsch")
+			xsl='Bakkzeugnis';
+		else
+			xsl='BakkzeugnisEng';
+	}
 	else
-		xsl='Diplomzeugnis';
-
+	{
+		if(sprache=="deutsch")
+			xsl='Diplomzeugnis';
+		else
+			xsl='DiplomzeugnisEng';
+	}
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
