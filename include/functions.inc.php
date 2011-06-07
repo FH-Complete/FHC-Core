@@ -418,6 +418,82 @@ function checkalias($alias)
 
 }
 
+/**
+ * 
+ * Gibt UID zur passenden Kartennummer zurück, false im Fehlerfall 
+ * @param $number
+ */
+function getUidFromCardNumber($number)
+{
+	if($connect=@ldap_connect(LDAP_SERVER))
+	{
+	    // bind to ldap connection
+	    if(($bind=@ldap_bind($connect)) == false)
+	    {
+			print "bind:__FAILED__<br>\n";
+			return false;
+	    }
+
+	    // search for card id
+	    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+	    {
+			print "failure: search in LDAP-tree failed<br>";
+			return false;
+	    }
+
+	    // wurde keiner gefunden, versuche mit 0 davor
+		if (ldap_count_entries($connect, $res_id) == 0)
+	    {
+	    	$number = "0".$number; 
+	    	 // search for card id 0[Number]
+		    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+		    {
+				print "failure: search in LDAP-tree failed<br>";
+				return false;
+		    }
+		    if (ldap_count_entries($connect, $res_id) == 0)
+		    {
+			    $number = "0".$number; 
+		    	 // search for card id 00[Number]
+			    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+			    {
+					print "failure: search in LDAP-tree failed<br>";
+					return false;
+			    }
+			    if (ldap_count_entries($connect, $res_id) == 0)
+			    {
+				    $number = "0".$number; 
+				    echo $number; 
+			    	 // search for card id 000[Number]
+				    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+				    {
+						print "failure: search in LDAP-tree failed<br>";
+						return false;
+				    }
+				    if (ldap_count_entries($connect, $res_id) == 0)
+			    	{
+			    		print "failure: no person found<br>"; 
+			    		return false; 
+			    	}
+			    }
+		    }
+	    }
+		$info = ldap_get_entries($connect, $res_id); 
+		// gibt uid zurück
+		return($info[0]['uid'][0]); 
+	    
+	    @ldap_close($connect);
+		return true;
+	}
+	else
+	{
+		// no conection to ldap server
+		echo "no connection to '$ldap_server'<br>\n";
+	}
+	@ldap_close($connect);
+	return(false);
+}
+
 // ****************************************************************
 // * Prueft ob im LDAP ein User mit diesem Passwort existiert
 // ****************************************************************
