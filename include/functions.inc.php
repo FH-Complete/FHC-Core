@@ -479,7 +479,7 @@ function getUidFromCardNumber($number)
 		    }
 	    }
 		$info = ldap_get_entries($connect, $res_id); 
-		// gibt uid zurück
+		// gibt uid der Person zurück --> [0] für erste Person 
 		return($info[0]['uid'][0]); 
 	    
 	    @ldap_close($connect);
