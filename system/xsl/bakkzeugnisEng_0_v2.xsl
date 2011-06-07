@@ -23,7 +23,7 @@
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="65mm" left="21.5mm">
-				<fo:block line-height="16pt" font-family="arial" font-size="16pt" content-width="90mm"><xsl:text> Studiengang</xsl:text></fo:block>
+				<fo:block line-height="16pt" font-family="arial" font-size="16pt" content-width="90mm"><xsl:text> Degree-Program</xsl:text></fo:block>
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="72mm" left="21.5mm">
