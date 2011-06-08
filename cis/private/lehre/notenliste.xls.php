@@ -245,7 +245,7 @@ $qry = "SELECT
 	$worksheet->write(++$lines,0,'Notenschlüssel: 1-Sehr Gut, 2-Gut, 3-Befriedigend, 4-Genügend,');
 	$worksheet->write(++$lines,0,'5-Nicht Genügend, 6-Angerechnet, 7-nicht beurteilt,');
 	$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
-	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert');	
+	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert, 14-nicht bestanden');	
 	$lines++;
 	$worksheet->write(++$lines,0,'(i)  ... Incoming');	
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
