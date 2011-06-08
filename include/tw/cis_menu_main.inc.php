@@ -70,7 +70,7 @@ function drawEntry($item)
 		<tr>
 			<td class="tdwidth10" nowrap>&nbsp;</td>
 			<td class="tdwrap">
-				<a href="#'.$item['link'].'" class="MenuItem" onClick="return(js_toggle_container(\'Content'.$item['content_id'].'\'));">
+				<a href="'.$item['link'].'" target="content" class="MenuItem" onClick="js_toggle_container(\'Content'.$item['content_id'].'\');">
 					<img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$item['name'].'
 				</a>
 			<table class="tabcontent" id="Content'.$item['content_id'].'" style="display: '.($item['open']?'visible':'none').'">';
@@ -138,14 +138,6 @@ function drawEntry($item)
 					<td class="tdwrap"></td>
 					<td><a target="content" href="?oeh" class="MenuItem" onClick="js_toggle_container('oeh');return false;"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;ÖH</a>
 				  	<table class="tabcontent" id="oeh" style="display: visible">
-				  		<tr>
-				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/KandidatInnen2011.pdf" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-KandidatInnen 2011</a></td>
-				  		</tr>
-						<tr>
-				  			<td class="tdwrap"></td>
-							<td><a href="private/info/oeh/index2010.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate Fr&uuml;hjahr 2010</a></td>
-				  		</tr>
 				  		<tr>
 				  			<td class="tdwrap"></td>
 							<td><a href="private/info/oeh/index2011.php" target="content" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;&Ouml;H-Mandate Frühjahr 2011</a></td>
@@ -993,7 +985,7 @@ function drawEntry($item)
 					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/betriebsratswahl.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Betriebsratswahl</a></td>
 		  		</tr>
 		  		<?php
-					//drawSubmenu(24);
+					//drawSubmenu(25);
 				?>
 			  	</table>
 			</td>
