@@ -272,6 +272,7 @@ class dms extends basis_db
 				$obj = new dms();
 				
 				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -316,6 +317,7 @@ class dms extends basis_db
 				$obj = new dms();
 				
 				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -335,6 +337,79 @@ class dms extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
+		}
+	}
+	
+/**
+ * 
+ * lädt alle Versionen zu einer übergebenen ID
+ * @param $id der zu ladenden Dokumente
+ */
+	public function getAllVersions($id)
+	{
+		if(!is_numeric($id))
+		{
+			$this->errormsg = "Falsche Dokument ID"; 
+			return false; 
+		}
+		
+		$qry =	"SELECT * FROM campus.tbl_dms
+				 WHERE dms_id = '".addslashes($id)."' ORDER BY version ASC;";	
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->version = $row->version; 
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * Überprüft ob die übergebene Version die aktuellste ist
+	 * @param $id
+	 * @param $version
+	 */
+	public function checkVersion($id, $version)
+	{
+		$qry = "SELECT * FROM campus.tbl_dms 
+		WHERE dms_id = '".addslashes($id)."' and 
+		version > '".addslashes($version)."' ;";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return true; 
+			}
+			return false; 
+		}
+		else 
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+			return false; 
 		}
 	}
 }
