@@ -24,14 +24,21 @@ require_once('../include/dms.class.php');
 
 if(!isset($_GET['id']))
 	die('ID muss uebergeben werden');
+
+if(!isset($_GET['version']))
+	die('Version muss uebergeben werden'); 
 	
 $id = $_GET['id'];
+$version = $_GET['version']; 
 
 if(!is_numeric($id))
 	die('ID ist ungueltig');
 	
+if(!is_numeric($version))
+	die('Version ist ungueltig'); 
+	
 $doc = new dms();
-if(!$doc->load($id))
+if(!$doc->load($id,$version))
 	die('Dieses Dokument existiert nicht mehr');
 
 if(!isset($_GET['notimeupdate']))
