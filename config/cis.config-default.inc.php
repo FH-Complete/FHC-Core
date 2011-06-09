@@ -119,4 +119,11 @@ define('OPUS_PATH_PAA','/var/www/htdocs/opus/htdocs/volltexte/');
 //Pfad zu den Rauminfos
 define('RAUMINFO_PATH','/documents/rauminfo/');
 
+//Default Sprache
+define('DEFAULT_LANGUAGE','German');
+
+//Dokumentemanagement-System
+define('DMS_PATH','/var/www/oesi/documents/');
+define('IMPORT_PATH','/var/www/import/'); 
+
 ?>
