@@ -302,14 +302,11 @@ class dms extends basis_db
 	 */
 	public function search($suchstring)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms where (dms_id, version) in(
-				SELECT dms_id, max(version)
-				FROM campus.tbl_dms 
+		$qry = "SELECT * FROM campus.tbl_dms 
 				WHERE lower(name) like lower('%".addslashes($suchstring)."%')
 				OR lower(beschreibung) like lower('%".addslashes($suchstring)."%')
-				GROUP BY dms_id)
-				ORDER BY name;";
-		
+				;";
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
