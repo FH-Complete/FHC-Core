@@ -418,9 +418,15 @@ function drawFilesList($rows)
 			echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
 		else
 			echo '<img src="../skin/images/blank.png" style="height: 15px">';
+			
+		// wenn es noch höhere Versionen zu diesem Dokument gibt, wird dieses gekennzeichnet 
 		$newVersion = '';
+		$newerVersionAlert='';
 		if($dms->checkVersion($row->dms_id, $row->version))
-			$newVersion = '*'; 	
+		{
+			$newVersion = '*';
+			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokumentes. Es wird die aktuellste eingefügt.\');';  	
+		}
 			
 		echo'
 				<a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
@@ -439,7 +445,7 @@ function drawFilesList($rows)
 		echo '<ul class="sf-menu">
 				<li><a href="id://'.$row->dms_id.'/Erweitert" style="font-size:small">Erweitert</a>
 					<ul>
-						<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">Auswählen</a></li>
+						<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="'.$newerVersionAlert.' FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">Auswählen</a></li>
 						<li><a href="dms.php?id='.$row->dms_id.'&version='.$row->version.'" style="font-size:small" target="_blank">Herunterladen</a></li>
 						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
 						<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'" style="font-size:small" >Alle Versionen anzeigen</a></li>
