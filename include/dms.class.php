@@ -395,13 +395,12 @@ class dms extends basis_db
 		WHERE dms_id = '".addslashes($id)."' and 
 		version > '".addslashes($version)."' ;";
 
-		if($this->db_query($qry))
+		if($result = $this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
-			{
-				return true; 
-			}
-			return false; 
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
 		}
 		else 
 		{
