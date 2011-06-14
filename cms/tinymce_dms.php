@@ -425,11 +425,11 @@ function drawFilesList($rows)
 		if($dms->checkVersion($row->dms_id, $row->version))
 		{
 			$newVersion = '*';
-			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokumentes. Es wird die aktuellste eingefügt.\');';  	
+			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokuments. Es wird die aktuellste eingefügt.\');';  	
 		}
 			
 		echo'
-				<a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
+				<a href="id://'.$row->dms_id.'/Auswahl" onclick="'.$newerVersionAlert.' FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
 				'.$row->name.' '.$newVersion.'</a>
 			</td>';
 		
