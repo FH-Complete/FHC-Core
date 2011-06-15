@@ -28,6 +28,7 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/note.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -155,23 +156,11 @@ else
 			//Nur freigegebene Noten anzeigen
 			if($row->freigabedatum>=$row->lvbenotungsdatum)
 			{
-				//lv-Note ausgeben
-				switch($row->lvnote)
-				{
-					case  1: $tbl.= "Sehr gut"; 						break;
-					case  2: $tbl.= "Gut";							break;
-					case  3: $tbl.= "Befriedigend";					break;
-					case  4: $tbl.= "Gen&uuml;gend";					break;
-					case  5: $tbl.= "Nicht Gen&uuml;gend";			break;
-					case  6: $tbl.= "Angerechnet";					break;
-					case  7: $tbl.= "Nicht Beurteilt";				break;
-					case  8: $tbl.= "Teilgenommen";					break;
-					case  9: $tbl.= "Noch nicht eingetragen";			break;
-					case 10: $tbl.= "Bestanden";						break;
-					case 11: $tbl.= "Approbiert";						break;
-					case 12: $tbl.= "erfolgreich Absolviert";			break;
-					case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
-				}
+				$note = new note();
+				if($note->load($row->lvnote))
+					$tbl.=$note->bezeichnung;
+				else
+					$tbl.=$row->lvnote;
 			}
 			$tbl.= "</td>";
 			if ($row->note != $row->lvnote && $row->lvnote != NULL)
@@ -180,23 +169,13 @@ else
 				$markier = "";
 			$tbl .= "<td".$markier.">";
 			
-			//Note ausgeben
-			switch($row->note)
-			{
-				case  1: $tbl.= "Sehr gut"; 						break;
-				case  2: $tbl.= "Gut";							break;
-				case  3: $tbl.= "Befriedigend";					break;
-				case  4: $tbl.= "Gen&uuml;gend";					break;
-				case  5: $tbl.= "Nicht Gen&uuml;gend";			break;
-				case  6: $tbl.= "Angerechnet";					break;
-				case  7: $tbl.= "Nicht Beurteilt";				break;
-				case  8: $tbl.= "Teilgenommen";					break;
-				case  9: $tbl.= "Noch nicht eingetragen";			break;
-				case 10: $tbl.= "Bestanden";						break;
-				case 11: $tbl.= "Approbiert";						break;
-				case 12: $tbl.= "erfolgreich Absolviert";			break;
-				case 13: $tbl.= "nicht erfolgreich Absolviert";	break;
-			}
+			$note = new note();
+			if($note->load($row->note))
+				$tbl.=$note->bezeichnung;
+			else
+				$tbl.=$row->note;
+		
+			
 			$tbl .= "</td>";
 			$tbl .= '<td>'.$datum_obj->formatDatum($row->benotungsdatum,'d.m.Y').'</td>';
 			$tbl .= "</tr>";
