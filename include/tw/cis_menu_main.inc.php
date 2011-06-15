@@ -968,7 +968,7 @@ function drawEntry($item)
 		<tr>
 			<td class="tdwrap">
 			<table class="tabcontent" id="BTR" style="display: none">
-		  		<tr>
+		  		<!-- <tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/news.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;News</a></td>
 		  		</tr>
@@ -983,9 +983,9 @@ function drawEntry($item)
 		  		<tr>
 		  			<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td class="tdwrap"><a class="Item" href="private/info/betriebsrat/betriebsratswahl.php" target="content"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;Betriebsratswahl</a></td>
-		  		</tr>
+		  		</tr> -->
 		  		<?php
-					//drawSubmenu(25);
+					drawSubmenu(23);
 				?>
 			  	</table>
 			</td>
