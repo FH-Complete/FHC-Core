@@ -49,10 +49,14 @@ $datum_obj = new datum();
 $db = new basis_db();
 
 $abschlussbeurteilung_arr = array();
+$abschlussbeurteilung_arrEnglish = array(); 
 $qry = "SELECT * FROM lehre.tbl_abschlussbeurteilung";
 if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
+	{
 		$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung;
+		$abschlussbeurteilung_arrEng[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung_english; 
+	}
 
 $note_arr = array();
 $qry = "SELECT * FROM lehre.tbl_note";
@@ -62,7 +66,7 @@ if($db->db_query($qry))
 		
 	function draw_content_xml($row)
 	{
-		global $rdf_url, $datum_obj, $abschlussbeurteilung_arr, $note_arr;
+		global $rdf_url, $datum_obj, $abschlussbeurteilung_arr, $abschlussbeurteilung_arrEng, $note_arr;
 		$vorsitz = '';
 		$pruefer1= '';
 		$pruefer2= '';
@@ -177,6 +181,7 @@ if($db->db_query($qry))
 		<pruefer3><![CDATA['.$row->pruefer3.']]></pruefer3>
 		<pruefer3_nachname><![CDATA['.$pruefer3.']]></pruefer3_nachname>
 		<abschlussbeurteilung_kurzbz><![CDATA['.($row->abschlussbeurteilung_kurzbz!=''?$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]:'').']]></abschlussbeurteilung_kurzbz>
+		<abschlussbeurteilung_kurzbzEng><![CDATA['.($row->abschlussbeurteilung_kurzbz!=''?$abschlussbeurteilung_arrEng[$row->abschlussbeurteilung_kurzbz]:'').']]></abschlussbeurteilung_kurzbzEng>
 		<akadgrad_id><![CDATA['.$row->akadgrad_id.']]></akadgrad_id>
 		<datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></datum>
 		<datum_iso><![CDATA['.$row->datum.']]></datum_iso>
