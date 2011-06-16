@@ -1116,7 +1116,7 @@ if(isset($_GET['excel']))
 						public.tbl_person JOIN public.tbl_prestudent USING (person_id) 
 						JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE 
-						true $stgwhere
+						true $stgwhere AND studiengang_kz>0 AND studiengang_kz<10000
 					GROUP BY 
 						person_id,status_kurzbz,studiensemester_kurzbz
 					HAVING 
@@ -1620,7 +1620,7 @@ if(isset($_GET['excel']))
 						public.tbl_person JOIN public.tbl_prestudent USING (person_id) 
 						JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE 
-						true $stgwhere
+						true $stgwhere AND studiengang_kz>0 AND studiengang_kz<10000 AND datum<='$datum'
 					GROUP BY 
 						person_id,status_kurzbz,studiensemester_kurzbz
 					HAVING 
@@ -1832,7 +1832,7 @@ else
 		}
 		else 
 			$stgwhere='';
-			
+		
 		$i=0;
 		$qry="SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='$stsem'";
 		if($result = $db->db_query($qry))
@@ -2335,7 +2335,7 @@ else
 						public.tbl_person JOIN public.tbl_prestudent USING (person_id) 
 						JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					WHERE 
-						true $stgwhere
+						true $stgwhere AND studiengang_kz>0 AND studiengang_kz<10000
 					GROUP BY 
 						person_id,status_kurzbz,studiensemester_kurzbz
 					HAVING 
@@ -2622,7 +2622,7 @@ else
 							public.tbl_person JOIN public.tbl_prestudent USING (person_id) 
 							JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE 
-							true $stgwhere
+							true $stgwhere AND studiengang_kz>0 AND studiengang_kz<10000 AND datum<='$datum'
 						GROUP BY 
 							person_id,status_kurzbz,studiensemester_kurzbz
 						HAVING 
