@@ -19,15 +19,15 @@
 			<fo:flow flow-name="xsl-region-body" >
 
 				<fo:block-container position="absolute" top="43mm" left="21.5mm">
-				<fo:block line-height="19pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="90mm"><xsl:text> BACHELOR-\n PRÜFUNGSZEUGNIS</xsl:text></fo:block>
+				<fo:block line-height="19pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="90mm"><xsl:text> BACHELOR OF SCIENCE\n CERTIFICATE</xsl:text></fo:block>
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="65mm" left="21.5mm">
-				<fo:block line-height="16pt" font-family="arial" font-size="16pt" content-width="90mm"><xsl:text> Degree-Program</xsl:text></fo:block>
+				<fo:block line-height="16pt" font-family="arial" font-size="16pt" content-width="90mm"><xsl:text> Degree Program</xsl:text></fo:block>
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="72mm" left="21.5mm">
-				<fo:block line-height="18pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="90mm"><xsl:text> </xsl:text><xsl:value-of select="stg_bezeichnung"/></fo:block>
+				<fo:block line-height="18pt" font-family="arial" font-size="16pt" font-weight="bold" content-width="90mm"><xsl:text> </xsl:text><xsl:value-of select="stg_bezeichnung_engl"/></fo:block>
 				</fo:block-container>
  
 				<fo:block-container position="absolute" top="94.5mm" left="117.5mm">
@@ -60,7 +60,7 @@
 						<fo:table-body>
 							<fo:table-row>
 								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" font-weight="bold" content-width="60mm"><xsl:text> Final assessment</xsl:text></fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" font-weight="bold" content-width="95mm"><xsl:text> </xsl:text><xsl:value-of select="abschlussbeurteilung_kurzbz" /></fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" font-weight="bold" content-width="95mm"><xsl:text> </xsl:text><xsl:value-of select="abschlussbeurteilung_kurzbzEng" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
 								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" content-width="60mm"><xsl:text> Date of assesment:</xsl:text></fo:block></fo:table-cell>
@@ -71,7 +71,7 @@
 							</fo:table-row>
 							<fo:table-row>
 								<fo:table-cell number-columns-spanned="2">
-								<fo:block line-height="8pt" font-family="arial" font-size="6pt" content-width="150mm"><xsl:text>Final assessment: passed with distinction, passed with merit, Passed \nLegal Background: Pursuant to section 5 subsection 1 of the University of Applied Sciences Studies Act (FHStG), BGBI. Nr. </xsl:text><xsl:value-of select="bescheidbgbl1" /><xsl:text> idgF</xsl:text></fo:block>
+								<fo:block line-height="8pt" font-family="arial" font-size="6pt" content-width="150mm"><xsl:text>Final assessment: passed with distinction, passed with merit, Passed \nPursuant to section 5 subsection 1 of the University of Applied Sciences Studies Act (FHStG), BGBI. Nr. </xsl:text><xsl:value-of select="bescheidbgbl1" /><xsl:text> idgF</xsl:text></fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
