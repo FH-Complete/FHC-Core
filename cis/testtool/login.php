@@ -261,9 +261,13 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '<br /><br /><br />
 		<center>
 		<span style="font-size: 1.2em; font-style: italic;">
-			Herzlich Willkommen zum Reihungstest der Fachhochschule Technikum-Wien<br /><br />
-			Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson<br /><br />
-			Wir wünschen Ihnen einen erfolgreichen Start ins Studium
+			Herzlich Willkommen zum Reihungstest der Fachhochschule Technikum-Wien.<br /><br />
+			Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson.<br /><br />
+			Wir wünschen Ihnen einen erfolgreichen Start ins Studium.<br /><br />
+			---------------<br /><br />
+			Welcome to the placement test of UAS Technikum Wien.<br /><br />
+			Please wait for the tutor\'s instructions before you log in.<br /><br />
+			We wish you a good start to your studies.
 		</span>
 		</center>';
 	}
