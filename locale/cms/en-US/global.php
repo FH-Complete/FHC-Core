@@ -6,6 +6,16 @@ $this->phrasen['global/studienzentrum']='Study Center';
 $this->phrasen['global/studiengangsleitung']='Head of Department';
 $this->phrasen['global/lehrveranstaltung']='Subject';
 
+$this->phrasen['global/studiengangsmanagement']='Study Management';
+$this->phrasen['global/geschaeftsfuehrendeltg']='business Leadership';
+$this->phrasen['global/stellvertreter']='Deputy';
+$this->phrasen['global/sekretariat']='Secretariat';
+$this->phrasen['global/studentenvertreter']='Student Representatives';
+
+$this->phrasen['global/lehrziele']='Teaching goals';
+$this->phrasen['global/allgemeinerdownload']='Global Download';
+$this->phrasen['global/newsgroups']='Newsgroups';
+
 $this->phrasen['global/speichern']='Save';
 $this->phrasen['global/loeschen']='Delete';
 $this->phrasen['global/editieren']='Edit';

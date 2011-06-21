@@ -56,16 +56,24 @@ if($result = $db->db_query($qry))
 		$content->version = 1;
 		if($content->save(true))
 		{
-			$qry = "UPDATE campus.tbl_news SET content_id='".$content->content_id."' WHERE news_id='".$row->news_id."';";
-			
-			if($db->db_query($qry))
+			if($content->saveContentSprache(true))
 			{
-				echo "ID $row->news_id angelegt<br>";
-				$ok++;
+				$qry = "UPDATE campus.tbl_news SET content_id='".$content->content_id."' WHERE news_id='".$row->news_id."';";
+				
+				if($db->db_query($qry))
+				{
+					echo "ID $row->news_id angelegt<br>";
+					$ok++;
+				}
+				else
+				{
+					echo "News Update Failed $row->news_id<br>";
+					$fehler++;
+				}
 			}
 			else
 			{
-				echo "News Update Failed $row->news_id<br>";
+				echo "Content Sprache Update Failed $row->news_id<br>";
 				$fehler++;
 			}
 		}

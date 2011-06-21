@@ -35,15 +35,19 @@ class XSDFormPrinter
 	 * 
 	 * Erzeugt das Formular
 	 * @param $xsd XSD File (nicht der Filename)
+	 * @param $xml XML mit den Daten die vorausgefuellt werden sollen
 	 */
 	public function output($xsd, $xml)
 	{
 		$dom = new DOMDocument();
 		$dom->loadXML($xsd);
 
-		$this->xml_inhalt = new DOMDocument();
-		$this->xml_inhalt->loadXML($xml);
 		
+		$this->xml_inhalt = new DOMDocument();
+		if($xml!='')
+		{
+			$this->xml_inhalt->loadXML($xml);
+		}
 		if($dom===false)
 		{
 			echo 'Failed to load XSD into DOM';

@@ -393,16 +393,7 @@ class content extends basis_db
 					$this->addslashes($this->insertvon).','.
 					$this->addslashes($this->insertamum).','.
 					($this->aktiv?'true':'false').','.
-					($this->menu_open?'true':'false').');'.
-					'INSERT INTO campus.tbl_contentsprache(content, sprache, content_id, version, sichtbar, insertamum, insertvon, titel) VALUES('.
-					$this->addslashes($this->content).','.
-					$this->addslashes($this->sprache).','.
-					"currval('campus.seq_content_content_id'),".
-					$this->addslashes($this->version).','.
-					($this->sichtbar?'true':'false').','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->titel).');';					
+					($this->menu_open?'true':'false').');';
 		}
 		else
 		{
@@ -413,24 +404,19 @@ class content extends basis_db
 					" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).','.
 					" aktiv=".($this->aktiv?'true':'false').','.
 					" menu_open=".($this->menu_open?'true':'false').
-					" WHERE content_id='".addslashes($this->content_id)."';".
-					"UPDATE campus.tbl_contentsprache SET ".
-					" titel=".($this->addslashes($this->titel)).','.
-					" sichtbar=".($this->sichtbar?'true':'false').
-					" WHERE contentsprache_id='".addslashes($this->contentsprache_id)."';";
+					" WHERE content_id='".addslashes($this->content_id)."';";
 		}
 		
 		if($this->db_query($qry))
 		{
 			if($new)
 			{
-				$qry = "SELECT currval('campus.seq_content_content_id') as content_id, currval('campus.seq_contentsprache') as contentsprache_id";
+				$qry = "SELECT currval('campus.seq_content_content_id') as content_id";
 				if($result = $this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object($result))
 					{
 						$this->content_id = $row->content_id;
-						$this->contentsprache_id = $row->contentsprache_id;
 						$this->db_query('COMMIT;');
 						return true;
 					}
@@ -688,7 +674,9 @@ class content extends basis_db
 					FROM 
 						campus.tbl_content
 						LEFT JOIN campus.tbl_contentchild USING(content_id)
-					WHERE content_id NOT IN (SELECT child_content_id FROM campus.tbl_contentchild WHERE child_content_id=tbl_content.content_id)
+					WHERE
+						tbl_content.template_kurzbz<>'news' AND 
+						content_id NOT IN (SELECT child_content_id FROM campus.tbl_contentchild WHERE child_content_id=tbl_content.content_id)
 					) as a
 				ORDER BY sort";
 		
@@ -718,7 +706,49 @@ class content extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt alle Content Eintraege die keine Childs von anderen Contenteintraegen sind
+	 * @return boolean
+	 */
+	public function getNews()
+	{
+		$qry = "SELECT 
+					*										
+				FROM
+					campus.tbl_content
+					JOIN campus.tbl_news USING(content_id)
+				WHERE
+					tbl_news.datum>=now()-'2 month'::interval
+				ORDER BY datum DESC LIMIT 100";
 		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+								
+				$obj->content_id = $row->content_id;
+				$obj->template_kurzbz = $row->template_kurzbz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->menu_open = ($row->menu_open=='t'?true:false);
+				
+				$this->result[] = $obj;
+			}
+			return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 	/**
 	 * Sortiert einen Menueeintrag nach oben
 	 * @param $contentchild_id

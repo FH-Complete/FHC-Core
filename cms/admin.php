@@ -63,6 +63,7 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 		{
 		mode : "textareas",
 		theme : "advanced",
+		language : "de",
 		file_browser_callback: "FHCFileBrowser",
 		
 		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
@@ -113,6 +114,7 @@ $action = isset($_GET['action'])?$_GET['action']:'';
 $method = isset($_GET['method'])?$_GET['method']:null;
 $message = '';
 $submenu_depth=0;
+$datum_obj = new datum();
 
 //Inhalt Speichern
 if(isset($_POST['XSDFormPrinter_XML']))
@@ -191,9 +193,14 @@ if(!is_null($method))
 			
 			if($content->save())
 			{
-				$message .= '<span class="ok">Eintrag wurde erfolgreich angelegt</span>';
-				$action='prefs';
-				$content_id=$content->content_id;
+				if($content->saveContentSprache())
+				{
+					$message .= '<span class="ok">Eintrag wurde erfolgreich angelegt</span>';
+					$action='prefs';
+					$content_id=$content->content_id;
+				}
+				else
+					$message .= '<span class="error">'.$content->errormsg.'</span>';
 			}
 			else
 				$message .= '<span class="error">'.$content->errormsg.'</span>';
@@ -328,7 +335,12 @@ if(!is_null($method))
 				$content->updatevon=$user;
 				
 				if($content->save())
-					$message.='<span class="ok">Daten erfolgreich gespeichert</span>';
+				{
+					if($content->saveContentSprache())
+						$message.='<span class="ok">Daten erfolgreich gespeichert</span>';
+					else
+						$message.='<span class="error">'.$content->errormsg.'</span>';
+				}
 				else
 					$message.='<span class="error">'.$content->errormsg.'</span>';
 			}
@@ -608,8 +620,16 @@ else
 		$menu='content';		
 }
 
-$rootcontent = new content();
-$rootcontent->getRootContent();
+if($menu=='news')
+{
+	$rootcontent = new content();
+	$rootcontent->getNews();
+}
+else
+{
+	$rootcontent = new content();
+	$rootcontent->getRootContent();
+}
 
 foreach($rootcontent->result as $row)
 {
@@ -626,7 +646,7 @@ foreach($rootcontent->result as $row)
 	if($content->template_kurzbz=='news')
 	{
 		$output.= '<td>';
-		$output.= drawmenulink($row->content_id, $content->titel.' '.$content->insertamum, $content->oe_kurzbz);
+		$output.= drawmenulink($row->content_id, mb_substr($content->titel,0,15).' '.$datum_obj->formatDatum($content->insertamum,'d.m.Y'), $content->oe_kurzbz);
 		
 		$output.= '</td>';
 	}
@@ -653,7 +673,7 @@ echo '</table>';
 echo '</td><td valign="top">';
 
 //Editieren
-if(!is_null($content_id))
+if(!is_null($content_id) && $content_id!='')
 {
 	echo '<h2>Content ID: '.$content_id.' | Version:'.$version.' | Sprache:'.$sprache.'</h2>';
 	$content = new content();

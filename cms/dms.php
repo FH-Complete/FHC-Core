@@ -25,16 +25,16 @@ require_once('../include/dms.class.php');
 if(!isset($_GET['id']))
 	die('ID muss uebergeben werden');
 
-if(!isset($_GET['version']))
-	die('Version muss uebergeben werden'); 
+//if(!isset($_GET['version']))
+//	die('Version muss uebergeben werden'); 
 	
 $id = $_GET['id'];
-$version = $_GET['version']; 
+$version = isset($_GET['version'])?$_GET['version']:null; 
 
 if(!is_numeric($id))
 	die('ID ist ungueltig');
 	
-if(!is_numeric($version))
+if($version!='' && !is_numeric($version))
 	die('Version ist ungueltig'); 
 	
 $doc = new dms();
