@@ -2560,6 +2560,22 @@ if(!$result = @$db->db_query('SELECT zgvmaster_name FROM public.tbl_preincoming 
 	else 
 		echo ' public.tbl_preincoming: Spalte zgvmaster_name hinzugefuegt!<br>';
 }
+
+if(!$result = @$db->db_query('SELECT content_id FROM campus.tbl_news LIMIT 1;'))
+{
+	$qry = "ALTER TABLE campus.tbl_news ADD COLUMN content_id integer;
+			DROP TABLE campus.tbl_newssprache;
+			ALTER TABLE campus.tbl_news ADD CONSTRAINT fk_content_news FOREIGN KEY (content_id) REFERENCES campus.tbl_content (content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+			CREATE INDEX idx_contentsprache_sprache ON campus.tbl_contentsprache (sprache);
+			CREATE INDEX idx_contentsprache_version ON campus.tbl_contentsprache (version);
+			CREATE INDEX idx_contentsprache_content_id ON campus.tbl_contentsprache (content_id);";
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_news: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'campus.tbl_news: Spalte content_id hinzugefuegt, tbl_newssprache entfernt, div. Indizes hinzugefuegt!<br>';
+}
+
+
 echo '<br>';
 
 $tabellen=array(
@@ -2599,8 +2615,7 @@ $tabellen=array(
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
-	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis"),
-	"campus.tbl_newssprache"  => array("sprache","news_id","betreff","text","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
 	"campus.tbl_paabgabetyp"  => array("paabgabetyp_kurzbz","bezeichnung"),

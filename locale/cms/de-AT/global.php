@@ -4,7 +4,17 @@ $this->phrasen['global/institut']='Institut';
 $this->phrasen['global/semester']='Semester';
 $this->phrasen['global/studienzentrum']='Studienzentrum';
 $this->phrasen['global/studiengangsleitung']='Studiengangsleitung';
-$this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung';
+$this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung'; 
+
+$this->phrasen['global/studiengangsmanagement']='Studiengangsmanagement';
+$this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
+$this->phrasen['global/stellvertreter']='Stellvertreter';
+$this->phrasen['global/sekretariat']='Sekretariat';
+$this->phrasen['global/studentenvertreter']='Studentenvertreter';
+
+$this->phrasen['global/lehrziele']='Lehrziele';
+$this->phrasen['global/allgemeinerdownload']='Allgemeiner Download';
+$this->phrasen['global/newsgroups']='Newsgroups';
 
 $this->phrasen['global/speichern']='Speichern';
 $this->phrasen['global/loeschen']='Löschen';
