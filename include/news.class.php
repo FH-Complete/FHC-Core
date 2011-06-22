@@ -28,19 +28,21 @@ class news extends basis_db
 	
 	//Tabellenspalten
 	public $news_id;			// serial
-	public $betreff;			// varchar(128)
-	public $text;				// string
 	public $semester;			// smallint
 	public $fachbereich_kurzbz;// varchar(16)
 	public $uid;				// varchar(16)
 	public $studiengang_kz;	// integer
-	public $verfasser;			// varchar(64)
 	public $datum;				// @date
 	public $updateamum;		// timestamp
 	public $updatevon=0;		// string
 	public $insertamum;		// timestamp
 	public $insertvon=0;		// string
 	public $datum_bis;			// @date
+	public $content_id;
+	
+	public $betreff;
+	public $verfasser;
+	public $text;
 	
 	
 	/**
@@ -55,45 +57,7 @@ class news extends basis_db
 		if($news_id != null)
 			$this->load($news_id);
 	}
-	
-	/**
-	 * Laedt alle verfuegbaren News
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	public function getAll()
-	{
-		$qry = 'SELECT * FROM campus.tbl_news ORDER BY news_id;';
 		
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = 'Fehler beim Laden der Datensaetze';
-			return false;
-		}
-		
-		while($row = $this->db_fetch_object())
-		{
-			$news_obj = new news();
-			
-			$news_obj->news_id = $row->news_id;
-			$news_obj->betreff = $row->betreff;
-			$news_obj->text = $row->text;
-			$news_obj->semester = $row->semester;
-			$news_obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
-			$news_obj->uid = $row->uid;
-			$news_obj->studiengang_kz=$row->studiengang_kz;
-			$news_obj->verfasser = $row->verfasser;
-			$news_obj->datum = $row->datum;
-			$news_obj->datum_bis = $row->datum_bis;
-			$news_obj->insertamum=$row->insertamum;
-			$news_obj->insertvon=$row->insertvon;
-			$news_obj->updateamum=$row->updateamum;
-			$news_obj->updatevon=$row->updatevon;
-			
-			$this->result[] = $news_obj;
-		}
-		return true;
-	}
-	
 	/**
 	 * Laedt alle News die nicht aelter
 	 * als $maxalter Tage sind
@@ -127,7 +91,7 @@ class news extends basis_db
 		$qry.=' ORDER BY datum DESC, updateamum DESC';
 		if(trim($maxnews)!='0')
 			$qry.= " LIMIT ".trim($maxnews);
-#		echo "$maxalter, $studiengang_kz, $semester, $all, $fachbereich_kurzbz, $maxnews <br> $qry";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -139,61 +103,17 @@ class news extends basis_db
 				$newsobj->studiengang_kz = $row->studiengang_kz;
 				$newsobj->semester = $row->semester;
 				$newsobj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
-				$newsobj->betreff = $row->betreff;
-				$newsobj->text = $row->text;
-				$newsobj->verfasser = $row->verfasser;
 				$newsobj->datum		= $row->datum;
 				$newsobj->datum_bis = $row->datum_bis;
 				$newsobj->updateamum = $row->updateamum;
 				$newsobj->updatevon = $row->updateamum;
 				$newsobj->insertamum = $row->insertamum;
 				$newsobj->insertvon = $row->insertvon;
+				$newsobj->content_id = $row->content_id;
 				
-				$this->result[] = $newsobj;
-			}
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der News';
-			return false;
-		}
-	}
-	
-	/**
-	 * Liefert die News fuer einen Fachbereich
-	 *
-	 * @param $fachbereich_kurzbz
-	 * @param $datum
-	 * @return boolean
-	 */
-	public function getFBNews($fachbereich_kurzbz, $datum)
-	{
-		$qry = "SELECT * FROM campus.tbl_news WHERE fachbereich_kurzbz='$fachbereich_kurzbz'";
-		if($datum!='')
-			$qry.=" AND datum='$datum'";
-		$qry.=" ORDER BY datum";
-		
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$newsobj = new news();
-				
-				$newsobj->news_id = $row->news_id;
-				$newsobj->uid = $row->uid;
-				$newsobj->studiengang_kz = $row->studiengang_kz;
-				$newsobj->semester = $row->semester;
-				$newsobj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$newsobj->betreff = $row->betreff;
-				$newsobj->text = $row->text;
 				$newsobj->verfasser = $row->verfasser;
-				$newsobj->datum		= $row->datum;
-				$newsobj->datum_bis = $row->datum_bis;
-				$newsobj->updateamum = $row->updateamum;
-				$newsobj->updatevon = $row->updateamum;
-				$newsobj->insertamum = $row->insertamum;
-				$newsobj->insertvon = $row->insertvon;
+				$newsobj->text = $row->text;
 				
 				$this->result[] = $newsobj;
 			}
@@ -229,20 +149,22 @@ class news extends basis_db
 		
 		if($row = $this->db_fetch_object())
 		{
-			$this->news_id		= $row->news_id;
-			$this->betreff			= $row->betreff;
-			$this->text			= $row->text;
-			$this->semester		= $row->semester;
+			$this->news_id = $row->news_id;
+			$this->semester	= $row->semester;
 			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
-			$this->uid			= $row->uid;
-			$this->studiengang_kz	= $row->studiengang_kz;
-			$this->verfasser		= $row->verfasser;
-			$this->datum			= $row->datum;
-			$this->datum_bis		= $row->datum_bis;
-			$this->insertamum		= $row->insertamum;
-			$this->insertvon		= $row->insertvon;
-			$this->updateamum		= $row->updateamum;
-			$this->updatevon		= $row->updatevon;
+			$this->uid = $row->uid;
+			$this->studiengang_kz = $row->studiengang_kz;
+			$this->datum = $row->datum;
+			$this->datum_bis = $row->datum_bis;
+			$this->insertamum = $row->insertamum;
+			$this->insertvon = $row->insertvon;
+			$this->updateamum = $row->updateamum;
+			$this->updatevon = $row->updatevon;
+			$this->content_id = $row->content_id;
+			
+			$this->betreff = $row->betreff;
+			$this->verfasser = $row->verfasser;
+			$this->text = $row->text;
 		}
 		else 
 		{
@@ -266,15 +188,26 @@ class news extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM campus.tbl_news WHERE news_id='$news_id'";
-		
-		if($this->db_query($qry))
-			return true;
+		if($this->load($news_id))
+		{
+			$qry = "
+				DELETE FROM campus.tbl_news WHERE news_id='".addslashes($news_id)."';
+				DELETE FROM campus.tbl_contentsprache WHERE content_id='".addslashes($this->content_id)."';
+				DELETE FROM campus.tbl_content WHERE content_id='".addslashes($this->content_id)."';
+				";
+			
+			if($this->db_query($qry))
+				return true;
+			else
+			{
+				$this->errormsg = 'Fehler beim Löschen';
+				return false;
+			}
+		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Löschen';
 			return false;
-		}		
+		}
 	}
 	
 	/**
@@ -283,17 +216,6 @@ class news extends basis_db
 	 */
 	public function validate()
 	{	
-		//Laenge Pruefen
-		if(mb_strlen($this->betreff)>128)           
-		{
-			$this->errormsg = 'Betreff darf nicht laenger als 128 Zeichen sein';
-			return false;
-		}		
-		if(mb_strlen($this->verfasser)>64)
-		{
-			$this->errormsg = 'Verfasser darf nicht laenger als 64 Zeichen sein';
-			return false;
-		}	
 		$this->errormsg = '';
 		return true;		
 	}
@@ -312,21 +234,19 @@ class news extends basis_db
 		{
 			//Neuen Datensatz anlegen	
 						
-			$qry = 'INSERT INTO campus.tbl_news (betreff, text, semester, fachbereich_kurzbz, uid, studiengang_kz, verfasser, datum, datum_bis, insertamum, insertvon, 
-				updateamum, updatevon) VALUES ('.
-				$this->addslashes($this->betreff).', '.
-				$this->addslashes($this->text).', '.
+			$qry = 'BEGIN;INSERT INTO campus.tbl_news (semester, fachbereich_kurzbz, uid, studiengang_kz, datum, datum_bis, 
+						insertamum, insertvon, updateamum, updatevon, content_id) VALUES ('.
 				$this->addslashes($this->semester).', '.
 				$this->addslashes($this->fachbereich_kurzbz).', '.
 				$this->addslashes($this->uid).', '.
 				$this->addslashes($this->studiengang_kz).', '.
-				$this->addslashes($this->verfasser).', '.
-				$this->addslashes($this->getSQLDate($this->datum)).', '.
-				$this->addslashes($this->getSQLDate($this->datum_bis)).', '.
+				$this->addslashes($this->datum).', '.
+				$this->addslashes($this->datum_bis).', '.
 				$this->addslashes($this->insertamum).', '.
 				$this->addslashes($this->insertvon).', '.
 				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).'); ';
+				$this->addslashes($this->updatevon).','.
+				$this->addslashes($this->content_id).'); ';
 				
 		}
 		else 
@@ -341,24 +261,46 @@ class news extends basis_db
 			}
 			
 			$qry = 'UPDATE campus.tbl_news SET '. 
-				'betreff='.$this->addslashes($this->betreff).', '.
-				'text='.$this->addslashes($this->text).', '.
 				'semester='.$this->addslashes($this->semester).', '.
 				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
 				'uid='.$this->addslashes($this->uid).', '.
 				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
-				'verfasser='.$this->addslashes($this->verfasser).', '.
-				'datum='.$this->addslashes($this->getSQLDate($this->datum)).', '.
-				'datum_bis='.$this->addslashes($this->getSQLDate($this->datum_bis)).', '.
+				'datum='.$this->addslashes($this->datum).', '.
+				'datum_bis='.$this->addslashes($this->datum_bis).', '.
 				'insertamum='.$this->addslashes($this->insertamum).', '.
 				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).'  '.
+				'updatevon='.$this->addslashes($this->updatevon).', '.
+				'content_id='.$this->addslashes($this->content_id).' '.
 				'WHERE news_id = '.$this->addslashes($this->news_id).';';
 		}
 		
 		if($this->db_query($qry))
 		{
+			if($this->new)
+			{
+				$qry = "SELECT currval('campus.tbl_news_news_id_seq') as id";
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						$this->news_id=$row->id;
+						$this->db_query('COMMIT;');
+					}
+					else
+					{
+						$this->errormsg='Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK');
+						return false;
+					}
+				}
+				else
+				{
+					$this->errormsg='Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK');
+					return false;
+				}
+			}
 			return true;
 		}
 		else
@@ -367,39 +309,5 @@ class news extends basis_db
 			return false;
 		}		
 	}
-	
-	
-	/**
-	 * Ermittelt das Datumsformat fuer SQL
-	 * @param $datum das konvertiert werden soll
-	 * @return Datum wenn ok, false im Fehlerfall
-	 */
-	public function getSQLDate($datum)
-	{
-		if ( is_null($datum) || empty($datum) )
-			return $datum;
-	
-		$date=explode('.',$datum);
-		if (@checkdate($date[1], $date[0], $date[2]))
-		{
-			 return $date[2].'-'.$date[1].'-'.$date[0];	
-		}	 	
-		if (@checkdate($date[2], $date[0], $date[1]))
-		{
-			 return $date[0].'-'.$date[1].'-'.$date[2];	
-		}	 	
-
-		$date=explode('-',$datum);
-		if (@checkdate($date[1], $date[0], $date[2]))
-		{
-			 return $date[2].'-'.$date[1].'-'.$date[0];	
-		}	 	
-		if (@checkdate($date[2], $date[0], $date[1]))
-		{
-			 return $date[0].'-'.$date[1].'-'.$date[2];	
-		}	 	
-		return false;
-	
-	}	
 }
 ?>
