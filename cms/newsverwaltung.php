@@ -17,6 +17,9 @@
  *
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
+/**
+ * Diese Seite dient zum Anlegen und aendern von Newseintraegen 
+ */
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
@@ -49,8 +52,6 @@ else
 
 $news_id = (isset($_REQUEST['news_id'])?$_REQUEST['news_id']:null);
 $datum_obj = new datum();
-//ToDo: markieren des richtigen Tabs
-$tabselect=0;
 $content = new content();
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -67,12 +68,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce.js"></script>
 	
 	<title>'.$p->t('news/newsverwaltung').'</title>
-	<script language="Javascript">
-	$(document).ready(function() {
-		$("#tabs").tabs();
-		$( "#tabs" ).tabs( "option", "selected", '.$tabselect.');
-	})
-	
+	<script type="text/javascript">
+
 
 	tinyMCE.init
 	(
@@ -120,6 +117,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	</script>
 </head>
 <body>';
+
+//Uebersetzung anlegen
 if(isset($_GET['action']) && $_GET['action']=='add_uebersetzung')
 {
 	$news = new news();
@@ -145,6 +144,7 @@ if(isset($_GET['action']) && $_GET['action']=='add_uebersetzung')
 		echo '<span class="ok">'.$content->errormsg.'</span>';
 }
 
+//Eintrag entfernen
 if(isset($_GET['action']) && $_GET['action']=='delete')
 {
 	if(!$rechte->isBerechtigt('basis/news',null, 'suid'))
@@ -170,6 +170,7 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 	
 }
 
+//Speichern eines Eintrags
 if(isset($_POST['save']))
 {
 	$news_id = $_POST['news_id'];
@@ -344,21 +345,28 @@ else
 }
 
 echo '</td></tr></table>';
+
+//Tabs fuer alle vorhandenen Sprachen anlegen
 echo '<div id="tabs" style="font-size:80%;">
 		<ul class="css-tabs">';
 	
 foreach($sprachen as $lang)
 {
-	echo '<li><a href="#'.$lang.'">'.$lang.'</a></li>';
+	$sprache_obj = new sprache();
+	$bezeichnung = $sprache_obj->getBezeichnung($lang, $sprache);
+	echo '<li><a href="#'.$lang.'">'.$bezeichnung.'</a></li>';
 }
 if($news->content_id!='')
 {
 	echo '<li><a href="#add" title="'.$p->t('news/uebersetzen').'">+</a></li>';
 }
 echo '</ul>';
-
+$idx=0;
 foreach($sprachen as $lang)
 {
+	$sprachindex[$lang]=$idx;
+	$idx++;
+	
 	$verfasser='';
 	$betreff='';
 	$text='';
@@ -399,7 +407,7 @@ foreach($sprachen as $lang)
 	echo '</div>';
 }
 
-//DropDown zum Anlegen von Uebersetzungen
+//Anlegen von Uebersetzungen
 if($news->content_id!='')
 {
 	echo '<div id="add">';
@@ -410,7 +418,7 @@ if($news->content_id!='')
 	$sprache_obj->getAll(true);
 	
 	//Wenn noch nicht alle Uebersetzungen vorhanden sind, 
-	//wird ein Formular zum Erstellen der Uebersetzung angezeigt.
+	//wird ein Link zum Erstellen der Uebersetzung angezeigt.
 	if(count($vorhandene_sprachen)<count($sprache_obj->result))
 	{
 
@@ -418,7 +426,7 @@ if($news->content_id!='')
 		foreach($sprache_obj->result as $row)
 		{
 			if(!in_array($row->sprache, $vorhandene_sprachen))
-				echo '<br /><a href="'.$_SERVER['PHP_SELF'].'?news_id='.$news_id.'&action=add_uebersetzung&lang='.$row->sprache.'">'.$row->bezeichnung_arr[$sprache].'</a>';		
+				echo '<br /><a style="color:#008381" href="'.$_SERVER['PHP_SELF'].'?news_id='.$news_id.'&action=add_uebersetzung&lang='.$row->sprache.'">'.$row->bezeichnung_arr[$sprache].'</a>';		
 		}
 	}
 	else
@@ -428,8 +436,26 @@ if($news->content_id!='')
 	echo '  </div>';
 }
 echo '</div><br />';
-echo '<input type="submit" name="save" value="'.$p->t('global/speichern').'">';
+//Beim Speichern wird der Index des Tabs gespeichert damit nachher der richtige wieder markiert werden kann
+echo '<input type="hidden" id="tabselect" name="tabselect" value="">';
+echo '<input type="submit" name="save" value="'.$p->t('global/speichern').'" onclick="var idx=$( \'#tabs\').tabs(\'option\',\'selected\');$(\'#tabselect\').val(idx);">';
 echo '</form>';
+if(isset($_POST['tabselect']) && $_POST['tabselect']!='')
+	$tabselect=$_POST['tabselect'];
+else
+{
+	if(isset($_GET['lang']))
+		$tabselect = $sprachindex[$_GET['lang']];
+	else
+		$tabselect = $sprachindex[DEFAULT_LANGUAGE];
+}
+echo '<script type="text/javascript">
+	$(document).ready(function() {
+		$("#tabs").tabs();
+		$( "#tabs").tabs( "select", '.$tabselect.');
+	})
+	</script>
+';
 
 // Newseintraege Anzeigen
 echo '<hr>
