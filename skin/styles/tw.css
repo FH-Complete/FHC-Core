@@ -230,17 +230,24 @@ a.head:hover
 
 
 /* Tables */
+TABLE
+{
+	font-size: small; 
+}
+
 TABLE.tabcontent
 {
 	margin: 0px;
 	padding: 0px;
 	border-style: none;
 	width: 100%;
+	font-size: small; 
 	/*
 	cellspacing: 0;
 	cellpadding: 0;
 	*/
 }
+
 TABLE.tabcontent2
 {
 	margin: 0px;
@@ -278,7 +285,8 @@ td.ContentHeader2
 {
 	background-color: #CCCCCC; /*mittel-grau */
 	font-weight: normal;
-	height: 19px
+	height: 19px; 
+
 }
 td.ContentHeader3					
 {
