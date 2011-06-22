@@ -176,10 +176,15 @@ if(!is_null($method))
 			$template->getAll();
 			if(!isset($template->result[0]))
 				die('Es ist kein Template vorhanden');
+				
+			if(in_array('etw',$berechtigte_oe))
+				$oe = 'etw';
+			else
+				$oe = $berechtigte_oe[0];
 			
 			$content = new content();
 			$content->new = true;
-			$content->oe_kurzbz=$berechtigte_oe[0];
+			$content->oe_kurzbz=$oe;
 			$content->template_kurzbz=$template->result[0]->template_kurzbz;
 			$content->titel = 'Neuer Eintrag';
 			$content->aktiv=true;
