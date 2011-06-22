@@ -192,7 +192,7 @@ if(!is_null($method))
 			$content->content = '<?xml version="1.0" encoding="UTF-8" ?><content></content>';		
 			$content->sichtbar=false;
 			$content->version='1';
-			$content->sprache='German';
+			$content->sprache=DEFAULT_LANGUAGE;
 			$content->insertvon = $user;
 			$content->insertamum = date('Y-m-d H:i:s');
 			
@@ -203,6 +203,8 @@ if(!is_null($method))
 					$message .= '<span class="ok">Eintrag wurde erfolgreich angelegt</span>';
 					$action='prefs';
 					$content_id=$content->content_id;
+					$version=1;
+					$sprache=DEFAULT_LANGUAGE;
 				}
 				else
 					$message .= '<span class="error">'.$content->errormsg.'</span>';
@@ -1137,9 +1139,14 @@ function print_content()
 	}
 	echo '
 	<br>
-	<h3>Vorschau</h3>
-	<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar" style="width: 800px; height: 500px; border: 1px solid black;">
-	';
+	<h3>Vorschau</h3>';
+	//Bei Redirects wird die Vorschau nicht im IFrame gezeigt, da durch eventuelles weiterleiten durch 
+	// Javascript in der Vorschau die CMS Seite geschlossen wird.
+
+	if($content->template_kurzbz=='redirect')
+		echo '<a href="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar" target="_blank">Vorschau in eigenem Fenster öffnen</a>';
+	else
+		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar" style="width: 800px; height: 500px; border: 1px solid black;">';
 }
 
 /**
