@@ -109,6 +109,7 @@
 // ***********************************************************************************************
 	// @$mdl_course_id Moodle - ID suche
        $mdl_course_id=(isset($_REQUEST['mdl_course_id'])?trim($_REQUEST['mdl_course_id']):'');
+       $studSem = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:''); 
 
 	//---------------------------------------------------------------------------
 	// Pruefen vor dem Datenlesen ob die Verarbeitung bereits erfolgen muss
@@ -119,12 +120,14 @@
 	    	$bKopieren=(isset($_REQUEST['kopieren'])?trim($_REQUEST['kopieren']):false);
 			if ($bWartung || $bKopieren)
 				moodlekurswartung($mdl_course_id,$errormsg );
+
 	}
 
 	//---------------------------------------------------------------------------
 	// Check Moodle
        $mdl_course_stat='';
-       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'','','','','',false,false,false))
+
+       if(!$objMoodle->getAllMoodleVariant($mdl_course_id,'',$studSem,'','','',false,false,false))
 		{
              die('Moodle-Kurs '.$objMoodle->mdl_course_id.' wurde in Lehre nicht gefunden! '.$objMoodle->errormsg);
        }
@@ -621,8 +624,6 @@
 			$errormsg[]='Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !';
 			return false;
 		}		
-
-		
 		
 	        if (!$objMoodle = new moodle_course())
 		         die('Fehler beim Oeffnen der Moodleverbindung');
@@ -642,6 +643,9 @@
         	if (!$stsem = new studiensemester())
 	        	 die('Fehler beim Oeffnen der Studiensemester');
 
+	       	// alter Pfad des Moodle Kurses
+	       	$oldPath = $objMoodle->getPath($mdl_course_id); 
+	        	 
 	    	$bWartung=(isset($_REQUEST['aenderung']) && !empty($_REQUEST['aenderung'])?true:false);
 	    	$bKopieren=(isset($_REQUEST['kopieren']) && !empty($_REQUEST['kopieren'])?true:false);
 			$aendern_studiensemester_kurzbz=(isset($_REQUEST['aendern_studiensemester_kurzbz'])?trim($_REQUEST['aendern_studiensemester_kurzbz']):'');
@@ -713,6 +717,7 @@
 		 }
 
 		$objMoodle->mdl_course_id=$mdl_course_id;
+
 		$objMoodle->studiensemester_kurzbz=$aendern_studiensemester_kurzbz;
 
 		// Kurztext des Moodlekurses neu ermitteln
@@ -743,7 +748,7 @@
 				if (is_array($objMoodle->lehreinheit_id))
 					$objMoodle->lehreinheit_id=$objMoodle->lehreinheit_id[0];
 
-				if (!$objMoodle->update_moodle())
+				if (!$objMoodle->update_moodle($oldPath))
 				{
 	       	     	$errormsg[]='Fehler Moodle-Kurs aendern '.$mdl_course_id.' '.$aendern_bezeichnung.' '.$aendern_kurzbezeichnung.' '.$objMoodle->errormsg;
 					return false;
