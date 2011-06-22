@@ -239,4 +239,24 @@ class sprache extends basis_db
 		}
 		return $result;
 	}
+	
+	/**
+	 * 
+	 * Liefert die Bezeichnung einer Sprache in der angegebenen Sprache
+	 * @param $sprache Kurzbezeichnung der Sprache dessen Bezeichnung geladen werden soll
+	 * @param $anzeigesprache Sprache in der die bezeichnung geladen werden soll
+	 */
+	public function getBezeichnung($sprache, $anzeigesprache)
+	{
+		$qry = "SELECT bezeichnung[(SELECT index FROM public.tbl_sprache WHERE sprache='".addslashes($anzeigesprache)."')] 
+				FROM public.tbl_sprache WHERE sprache='".addslashes($sprache)."' ";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->bezeichnung;
+			}
+		}
+	}
 }
