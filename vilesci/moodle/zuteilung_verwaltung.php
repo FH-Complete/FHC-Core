@@ -535,6 +535,7 @@
           		                       $content.= '<input style="display:none" type="text" name="lehrveranstaltung_id" value="'.$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="lehreinheit_id" value="'.$arrMoodlekurs[$i]->moodle_lehreinheit_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$arrMoodlekurs[$i]->mdl_course_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.$arrMoodlekurs[$i]->studiensemester_kurzbz.'" />';
                                             $content.= '<input style="display:none" type="text" name="wartung" value="wartung" />';
                                             $content.= '<input style="display:none" type="text" name="debug" value="'.$bDebug.'" />';
                                             $content.= '<img height="15" src="../../skin/images/edit.png" border="0" title="MoodleKurs aendern" alt="edit.png" />';
@@ -548,6 +549,7 @@
           		                       $content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$arrMoodlekurs[$i]->moodle_mdl_course_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="lehrveranstaltung_id" value="'.$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="lehreinheit_id" value="'.$arrMoodlekurs[$i]->moodle_lehreinheit_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.$arrMoodlekurs[$i]->studiensemester_kurzbz.'" />';
                                             $content.= '<input style="display:none" type="text" name="entfernen" value="entfernen" />';
                                             $content.= '<input style="display:none" type="text" name="debug" value="'.$bDebug.'" />';
                                             $content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';
@@ -564,6 +566,7 @@
           		                       $content.= '<input style="display:none" type="text" name="mdl_course_id" value="'.$arrMoodlekurs[$i]->moodle_mdl_course_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="lehrveranstaltung_id" value="'.$arrMoodlekurs[$i]->moodle_lehrveranstaltung_id.'" />';
           		                       $content.= '<input style="display:none" type="text" name="lehreinheit_id" value="'.$arrMoodlekurs[$i]->moodle_lehreinheit_id.'" />';
+          		                       $content.= '<input style="display:none" type="text" name="studiensemester_kurzbz" value="'.$arrMoodlekurs[$i]->studiensemester_kurzbz.'" />';
                                             $content.= '<input style="display:none" type="text" name="entfernen" value="entfernen" />';
                                             $content.= '<input style="display:none" type="text" name="debug" value="'.$bDebug.'" />';
                                             $content.= '<img height="15" src="../../skin/images/table_row_delete.png" border="0" title="MoodleKurs entfernen" alt="table_row_delete.png" />';
