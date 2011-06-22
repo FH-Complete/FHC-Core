@@ -927,7 +927,7 @@ class moodle_course extends basis_db
 	 * Aendert einen Kurs im Moodle an
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function update_moodle()
+	public function update_moodle($oldPath = null)
 	{
 		if($this->mdl_course_id=='')
 		{
@@ -1050,12 +1050,8 @@ class moodle_course extends basis_db
 				$this->errormsg = 'Fehler beim Entfernen des Context eintrages.  '. pg_last_error();
 				return false;
 		}		
-		*/		
-		//zum vorherigen Pfad die aktuelle id hinzufuegen
-		$path = $this->mdl_context_path.'/'.$this->mdl_course_id;
-		//vorherige tiefe um 1 erhoehen
-		$depth = $this->mdl_context_depth+1;
-	
+		*/	
+
 		$update=false;
 		$qry = "SELECT id FROM public.mdl_context WHERE contextlevel='50' and instanceid=".$this->addslashes($this->mdl_course_id)." ;";
 		if($result = pg_query($this->conn_moodle, $qry))
@@ -1066,8 +1062,14 @@ class moodle_course extends basis_db
 				$update=true;
 			}
 		}
+		
 		if($update)
 		{
+			//zum vorherigen Pfad die aktuelle id hinzufuegen
+			$path = $this->mdl_context_path.'/'.$this->mdl_context_id;
+			//vorherige tiefe um 1 erhoehen
+			$depth = $this->mdl_context_depth+1;
+			
 			$qry = "UPDATE public.mdl_context SET 
 				contextlevel=50,
 				instanceid=".$this->addslashes($this->mdl_course_id).",
@@ -1080,9 +1082,41 @@ class moodle_course extends basis_db
 				$this->errormsg = 'Fehler beim Update des Contexts';
 				return false;
 			} 
+			
+			$qry = "UPDATE public.mdl_context SET 
+				path=".$this->addslashes($path)."|| '/' || mdl_context.id
+				WHERE path LIKE '".$oldPath."%';";
+			if(!pg_query($this->conn_moodle, $qry))
+			{
+				pg_query($this->conn_moodle, 'ROLLBACK');
+				$this->errormsg = 'Fehler beim Update des Contexts';
+				return false;
+			}
 		}
 		else
 		{
+			$qry ="SELECT nextval('mdl_context_id_seq') as nextId";
+			if($result = pg_query($this->conn_moodle, $qry))
+			{
+				if($row=pg_fetch_object($result))
+				{
+					// nächste id herausfinden -> wegen insert
+					$path = $this->mdl_context_path.'/'.$row->nextId;
+					// tiefe um 1 erhoehen
+					$depth = $this->mdl_context_depth+1;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Select der Sequence :'. pg_last_error();
+					return false;
+				}	
+			}
+			else 
+			{	
+				$this->errormsg = 'Fehler beim Select der Sequence :'. pg_last_error();
+				return false;
+			}
+			
 			//Context eintragen
 			$qry = "INSERT INTO public.mdl_context(contextlevel, instanceid, path, depth) VALUES('50', ".
 			$this->addslashes($this->mdl_course_id).",'".$this->addslashes($path)."',".$this->addslashes($depth).");";
@@ -1625,6 +1659,42 @@ class moodle_course extends basis_db
 			return false;
 		}
 	}
+	
+	
+	
+	/**
+	 * Liefert den Path zur Übergebenen InstanceId und Contextlevel zurück
+	 * @param instanceId Kurs ID
+	 * @param contextLevel Integer     
+	 * @return path wenn ok, false im Fehlerfall
+	 */
+	public function getPath($instanceId, $contextLevel = '50')
+	{
+		if(!is_numeric($instanceId))
+		{
+			$this->errormsg = 'Moodle_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.mdl_context WHERE 
+		instanceid=".$this->addslashes($instanceId)." AND 
+		contextlevel = ".$this->addslashes($contextLevel).";";
+
+		if($result = pg_query($this->conn_moodle, $qry))
+		{
+			if($row = pg_fetch_object($result))
+			{
+				return $row->path; 
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
+			return false;
+		}
+	}
+	
+	
 	
 	/**
 	 * Legt einen Testkurs an
