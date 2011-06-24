@@ -815,7 +815,7 @@ class content extends basis_db
 				WHERE contentchild_id='".addslashes($nachbar_id)."';
 				UPDATE campus.tbl_contentchild SET sort='".addslashes($nachbar_sort)."' 
 				WHERE contentchild_id='".addslashes($contentchild_id)."';";
-		echo $qry;
+		
 		if($this->db_query($qry))
 			return true;
 		else
