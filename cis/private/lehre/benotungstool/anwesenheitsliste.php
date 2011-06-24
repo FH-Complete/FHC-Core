@@ -83,6 +83,7 @@ else
 if (isset($_GET["download_abgabe"])){
 	$file=$_GET["download_abgabe"];
 	$uebung_id = $_GET["uebung_id"];
+	$uid = $_GET['uid'];
 	$ueb = new uebung();
 	$ueb->load_studentuebung($uid, $uebung_id);
 	$ueb->load_abgabe($ueb->abgabe_id);
