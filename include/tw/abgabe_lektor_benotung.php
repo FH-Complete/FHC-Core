@@ -841,7 +841,7 @@ else
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<90)
+						else if(document.getElementById("summe2").value<91)
 						{
 							ergebnis=2;
 						}
@@ -877,7 +877,7 @@ else
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<90)
+						else if(document.getElementById("summe2").value<91)
 						{
 							ergebnis=2;
 						}
@@ -1040,8 +1040,9 @@ else
 		$htmlstr .= "<td align='center'><input type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
 		$htmlstr .= "<td colspan='4'>Note</td><td align='center'><input type='text' name='note' value='".$note."' id='note' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
 		$htmlstr .="</table>";
+				
 		$htmlstr .= "<br><table border='1' align='center' width='70%'>";
-		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <90 : Note 2</td><td>90<= Ergebnis : Note 1</td></tr>";
+		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <91 : Note 2</td><td>91<= Ergebnis : Note 1</td></tr>";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Diplomarbeit gesamt negativ</td></tr>";
@@ -1051,9 +1052,15 @@ else
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Bachelorarbeit gesamt negativ</td></tr>";
 		}
 		$htmlstr .= "</table>";
+		if($row->projekttyp_kurzbz!='Bachelor')
+		{
+			$htmlstr.="<br><center>Das Gutachten des/der 2. Gutachters/Gutachterin liegt vor und ist in die Benotung miteinbezogen</center><br>";
+		}
+		 
 		//$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken' onclick='this.disabled=true;'>";
-		$htmlstr .= "<br><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken'>";
-		$htmlstr .="</form>";
+		$htmlstr .= "<br><center><input type='submit' name='drucken' value='Formular ausdrucken' id='drucken'></center>";
+		$htmlstr.="<br>Bitte klicken Sie auf den Button 'Formular ausdrucken' um das Benotungsformular zu erstellen. Das ausgedruckte, unterschriebene Formular ist im jeweiligen Sekretariat abzugeben.";
+		$htmlstr .="</form><br><br><br><br><br><br>";
 		$htmlstr .="</body></html>";
 		echo $htmlstr;
 		echo '<script type="text/javascript">
