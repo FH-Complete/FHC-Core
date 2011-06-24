@@ -522,8 +522,8 @@ class content extends basis_db
 				if($sichtbar && !$content->sichtbar)
 					continue;
 			
-				$arr[$content->titel]=array('name'=>$content->titel, 'link'=>APP_ROOT.'cms/content.php?content_id='.$row->child_content_id, 'target'=>'main', 'open'=>($content->menu_open?'true':'false'),'content_id'=>$content->content_id);
-				$arr[$content->titel]=array_merge($arr[$content->titel],$this->getMenueArray($row->child_content_id, $sprache, $sichtbar));
+				$arr[$content->content_id]=array('name'=>$content->titel, 'link'=>APP_ROOT.'cms/content.php?content_id='.$row->child_content_id, 'target'=>'main', 'open'=>($content->menu_open?'true':'false'),'content_id'=>$content->content_id,'template'=>$content->template_kurzbz);
+				$arr[$content->content_id]=array_merge($arr[$content->content_id],$this->getMenueArray($row->child_content_id, $sprache, $sichtbar));
 			}
 		}
 		return $arr; 
@@ -587,6 +587,7 @@ class content extends basis_db
 						FROM parents
 						GROUP BY content_id)
 					AND content_id<>'".addslashes($content_id)."'
+					AND template_kurzbz<>'news'
 				ORDER BY titel";
 
 		if($result = $this->db_query($qry))
@@ -643,11 +644,12 @@ class content extends basis_db
 	 */
 	public function addChild()
 	{
-		$qry = 'INSERT INTO campus.tbl_contentchild (content_id, child_content_id, insertamum, insertvon) VALUES('.
+		$qry = 'INSERT INTO campus.tbl_contentchild (content_id, child_content_id, insertamum, insertvon, sort) VALUES('.
 				$this->addslashes($this->content_id).','.
 				$this->addslashes($this->child_content_id).','.
 				$this->addslashes($this->insertamum).','.
-				$this->addslashes($this->insertvon).');';
+				$this->addslashes($this->insertvon).','.
+				$this->addslashes($this->sort).');';
 				
 		if($this->db_query($qry))
 		{
@@ -660,6 +662,29 @@ class content extends basis_db
 		}
 	}
 	
+	/**
+	 * Holt die hochste Sortierung eines Contentteilbaums
+	 * 
+	 * @param $content_id
+	 */
+	public function getMaxSort($content_id)
+	{
+		$qry="SELECT max(sort) as max FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."'";
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->max;
+			}
+			else
+				return '0';
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei Abfrage';
+			return false;
+		}
+	}
 	/**
 	 * Laedt alle Content Eintraege die keine Childs von anderen Contenteintraegen sind
 	 * @return boolean
@@ -773,7 +798,10 @@ class content extends basis_db
 				$nachbar_sort = $row->sort;
 			}
 			else
-				return 0;
+			{
+				$this->errormsg='Dies ist bereits der oberste Eintrag';
+				return false;
+			}
 		}
 		else
 		{
@@ -787,6 +815,7 @@ class content extends basis_db
 				WHERE contentchild_id='".addslashes($nachbar_id)."';
 				UPDATE campus.tbl_contentchild SET sort='".addslashes($nachbar_sort)."' 
 				WHERE contentchild_id='".addslashes($contentchild_id)."';";
+		echo $qry;
 		if($this->db_query($qry))
 			return true;
 		else
@@ -820,7 +849,10 @@ class content extends basis_db
 				$nachbar_sort = $row->sort;
 			}
 			else
-				return 0;
+			{
+				$this->errormsg='Dies ist bereits der unterste Eintrag';
+				return false;
+			}
 		}
 		else
 		{
