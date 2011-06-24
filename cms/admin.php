@@ -520,6 +520,8 @@ if(!is_null($method))
 			$content->child_content_id = $_POST['child_content_id'];
 			$content->insertamum = date('Y-m-d');
 			$content->insertvon = $user;
+			$content->sort=$content->getMaxSort($content_id)+1;
+			
 			if($content->addChild())
 				$message.='<span class="ok">Daten erfolgreich gespeichert</span>';
 			else
@@ -558,7 +560,7 @@ if(!is_null($method))
 				$contentchild_id = $_GET['contentchild_id'];
 				$content = new content();
 				if($content->SortUp($contentchild_id))
-					$message.='<span class="ok">Sortieren erfolgrecih</span>';
+					$message.='<span class="ok">Sortieren erfolgreich</span>';
 				else
 					$message.='<span class="error">'.$content->errormsg.'</span>';				
 			}
