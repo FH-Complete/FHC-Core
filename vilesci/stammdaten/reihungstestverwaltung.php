@@ -472,7 +472,7 @@
 				echo 'Anzahl: '.$db->db_num_rows($result);
 				$pruefling = new pruefling();
 				
-				echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
+				echo "<table class='liste table-autosort:3 table-stripeclass:alternate table-autostripe'>
 						<thead>
 						<tr class='liste'>
 							<th class='table-sortable:default' title='PrestudentID'>ID</th>
