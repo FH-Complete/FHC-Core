@@ -154,11 +154,11 @@ if($importFile != '')
     	else
     		echo 'Fehler beim Speichern der Daten';
     	
-    	/*if(!chgrp($filename,'dms'))
+    	if(!chgrp(DMS_PATH.$filename,'dms'))
 			echo 'CHGRP failed';
-		if(!chmod($filename, 0774))
+		if(!chmod(DMS_PATH.$filename, 0774))
 			echo 'CHMOD failed';
-		exec('sudo chown wwwrun '.$filename);	*/
+		exec('sudo chown wwwrun '.$filename);	
     		
     	// Lösche File aus Verzeichnis nachdem es raufgeladen wurde
     	if(!unlink(IMPORT_PATH.$importFile))
