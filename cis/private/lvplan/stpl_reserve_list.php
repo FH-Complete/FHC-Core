@@ -23,10 +23,17 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/phrasen.class.php'); 
 
 if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
+if(isset($_GET['lang']))
+	setSprache($_GET['lang']);
+	
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+	
 $uid = get_uid();
 
 if (isset($_GET['id']))
@@ -39,21 +46,21 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($p->t('global/keineBerechtigungFuerDieseSeite')); ;
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Reservierungsliste</title>
+	<title><?php echo $p->t('global/reservierungsliste');?></title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
 	<H2>
 		<table class="tabcontent">
 			<tr>
-				<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Reservierungen</td>
+				<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('global/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('global/reservierungen');?></td>
 				<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 			</tr>
 		</table>
@@ -66,9 +73,9 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			die('ungueltige ID');
 		$sql_query="DELETE FROM campus.tbl_reservierung WHERE reservierung_id='".addslashes($id)."'";
 		if($db->db_query($sql_query))
-			echo '<b>Reservierung wurde geloescht</b><br>';
+			echo '<b>'.$p->t('global/reservierungWurdeGeloescht').'</b><br>';
 		else 
-			echo '<b>Fehler beim Loeschen der Reservierung!</b><br>';
+			echo '<b>'.$p->t('global/fehleraufgetreten').'!</b><br>';
 	}
 
 	//Aktuelle Reservierungen abfragen.
@@ -87,17 +94,17 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	
 	if ($num_rows_res>0)
 	{
-		echo 'Eigene Reservierungen:<br>';
+		echo $p->t('global/eigeneReservierungen').':<br>';
 		echo '<table border="0">';
 		echo '
 			<tr class="liste">
-				<th>Datum</th>
-				<th>Titel</th>
-				<th>Stunde</th>
-				<th>Ort</th>
-				<th>Person</th>
-				<th>Beschreibung</th>
-				<th>Aktion</th>
+				<th>'.$p->t('global/datum').'</th>
+				<th>'.$p->t('global/titel').'</th>
+				<th>'.$p->t('global/stunde').'</th>
+				<th>'.$ort_kurzbz.'</th>
+				<th>'.$pers_uid.'</th>
+				<th>'.$p->t('global/beschreibung').'</th>
+				<th>'.$p->t('global/aktion').'</th>
 			</tr>';
 		for ($i=0; $i<$num_rows_res; $i++)
 		{
@@ -114,7 +121,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			$datum1 = $datum_obj->formatDatum($datum1, 'd.m.Y');
 			if($insertamum!='')
 				$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
-			echo '<tr class="liste'.$zeile.'" title="angelegt am '.$insertamum.' von '.$insertvon.'">';
+			echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.$p->t('global/von').' '.$insertvon.'">';
 			echo '<td>'.$datum1.'</td>';
 			echo '<td>'.$titel.'</td>';
 			echo '<td>'.$stunde.'</td>';
@@ -146,17 +153,17 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		$num_rows_res=$db->db_num_rows($erg_res);
 		if ($num_rows_res>0)
 		{
-			echo 'Alle Reservierungen:<br>';
+			echo $p->t('global/alleReservierungen').':<br>';
 			echo '<table border="0">';
 			echo '
 				<tr class="liste">
-					<th>Datum</th>
-					<th>Titel</th>
-					<th>Stunde</th>
-					<th>Ort</th>
-					<th>Person</th>
-					<th>Beschreibung</th>
-					<th>Aktion</th>
+					<th>'.$p->t('global/datum').'</th>
+					<th>'.$p->t('global/titel').'</th>
+					<th>'.$p->t('global/stunde').'</th>
+					<th>'.$p->t('global/raum').'</th>
+					<th>'.$p->t('global/person').'</th>
+					<th>'.$p->t('global/beschreibung').'</th>
+					<th>'.$p->t('global/aktion').'</th>
 				</tr>';
 	
 			for ($i=0; $i<$num_rows_res; $i++)
@@ -175,7 +182,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				$datum = $datum_obj->formatDatum($datum, 'd.m.Y');
 				if($insertamum!='')
 					$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
-				echo '<tr class="liste'.$zeile.'" title="angelegt am '.$insertamum.' von '.$insertvon.'">';
+				echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.$p->t('global/von').' '.$insertvon.'">';
 				echo '<td>'.$datum.'</td>';
 				echo '<td>'.$titel.'</td>';
 				echo '<td>'.$stunde.'</td>';
@@ -192,7 +199,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		}
 	}
 	else 
-		echo '<a href="stpl_reserve_list.php?alle=true">Alle Reservierungen anzeigen</a>';
+		echo '<a href="stpl_reserve_list.php?alle=true">'.$p->t('global/alleReservierungenAnzeigen').'</a>';
 	
 ?>
 </body>
