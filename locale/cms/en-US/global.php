@@ -19,6 +19,8 @@ $this->phrasen['global/newsgroups']='Newsgroups';
 $this->phrasen['global/speichern']='Save';
 $this->phrasen['global/loeschen']='Delete';
 $this->phrasen['global/editieren']='Edit';
+$this->phrasen['global/suchen']='Search';
+$this->phrasen['global/alle']='All';
 
 $this->phrasen['global/vorname']='First Name';
 $this->phrasen['global/nachname']='Last Name';
@@ -41,18 +43,67 @@ $this->phrasen['global/adresse']='Address';
 $this->phrasen['global/telefon']='Telephone'; 
 $this->phrasen['global/fax']='Fax'; 
 $this->phrasen['global/bezeichnung']='Description'; 
+$this->phrasen['global/datum']='Date'; 
+$this->phrasen['global/stunde']='Hour'; 
+$this->phrasen['global/person']='Person'; 
+$this->phrasen['global/personen']='Number of Persons'; 
+$this->phrasen['global/beschreibung']='Description'; 
+$this->phrasen['global/angelegtAm']='created:'; 
 
 $this->phrasen['global/von']='From';
 $this->phrasen['global/bis']='To';
 $this->phrasen['global/zweck']='Purpose'; 
 $this->phrasen['global/abschicken']='Submit'; 
+$this->phrasen['global/aktion']='Action'; 
+$this->phrasen['global/nummer']='Number'; 
 
 $this->phrasen['global/anmelden']='Register'; 
 $this->phrasen['global/angemeldet']='Registered'; 
 $this->phrasen['global/löschen']='Delete'; 
 
+// Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 
 $this->phrasen['global/erfolgreichgelöscht']='Successfully deleted'; 
 $this->phrasen['global/fehleraufgetreten']='Error occured'; 
 $this->phrasen['global/emailgesendetan']='E-Mail sent to'; 
+$this->phrasen['global/keineBerechtigungFuerDieseSeite']='Sie haben keine Berechtigung für diese Seite'; 
+$this->phrasen['global/fehlerBeimOeffnenDerDatenbankverbindung']='Fehler beim Öffnen der Datenbankverbindung'; 
+
+// LV - Plan
+$this->phrasen['global/lehrveranstaltungsplan']='Schedule'; 
+$this->phrasen['global/persoenlicherLvPlan']='Your personal schedule'; 
+$this->phrasen['global/stammdatenKontrollieren']='Check your profile';
+$this->phrasen['global/profil']='PROFILE';
+$this->phrasen['global/saalplan']='Rooms'; 
+$this->phrasen['global/lektorenplan']='Lector'; 
+$this->phrasen['global/saalreservierung']='Room reservation'; 
+$this->phrasen['global/saal']='Room'; 
+$this->phrasen['global/lektor']='Lector'; 
+$this->phrasen['global/reservierungsliste']='Reservation list';
+$this->phrasen['global/reservierungenLoeschen']='Delete reservations';
+$this->phrasen['global/raumsuche']='Room search';
+$this->phrasen['global/lehrverband']='Lehr-Verband'; 
+$this->phrasen['global/sem']='Sem'; 
+$this->phrasen['global/ver']='Ver'; 
+$this->phrasen['global/grp']='Grp'; 
+$this->phrasen['global/lehrverbaende']='Lehrverbände'; 
+$this->phrasen['global/uebersichtDerLehrvebaende']='Overview der Lehrverbände'; 
+$this->phrasen['global/fehlerUndFeedback']='Send Errors and Feedback to'; 
+$this->phrasen['global/lvKoordinationsstelle']='LV-Koordinationsstelle'; 
+$this->phrasen['global/reservierungen']='Reservations'; 
+$this->phrasen['global/reservierungWurdeGeloescht'] = 'Reservation successfully deleted'; 
+$this->phrasen['global/alleReservierungenAnzeigen']='Show all reservations'; 
+$this->phrasen['global/alleReservierungen']='All reservations'; 
+$this->phrasen['global/zurReservierung']='Reservation';
+$this->phrasen['global/raum']='Room'; 
+$this->phrasen['global/raumtyp']='Roomtype'; 
+$this->phrasen['global/anzahlPersonen']='Number of persons'; 
+$this->phrasen['global/datumAngeben']='There was no date entered'; 
+$this->phrasen['global/vonZeitEingeben']='No valid FROM-Time'; 
+$this->phrasen['global/bisZeitEingeben']='No valid TO-Time'; 
+$this->phrasen['global/datumUngueltig']='Invalid date! Please insert valid date dd.mm.YYYY (31.12.2011)';
+$this->phrasen['global/rauminfoAnzeigen']='Show roominformation';
+$this->phrasen['global/vonZeitFormat']='FROM-Time must have the format hh:mm (12:30)';
+$this->phrasen['global/bisZeitFormat']='TO-Time must have the format hh:mm (12:30)';
+$this->phrasen['global/eigeneReservierungen']='Own reservations'; 
 ?>
