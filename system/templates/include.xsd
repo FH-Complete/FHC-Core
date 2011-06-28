@@ -2,6 +2,5 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 <xs:element name="content">
 	<xs:element name="url" type="xs:string"/>
-	<xs:element name="target" type="xs:string"/>
 </xs:element>
 </xs:schema>

@@ -43,6 +43,35 @@ class organisationsform extends basis_db
 	}
 	
 	/**
+	 * Laedt eine Organisationsform
+	 * @param $orgform_kurzbz
+	 */
+	public function load($orgform_kurzbz)
+	{
+		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz='".addslashes($orgform_kurzbz)."'"; 
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$orgform = new organisationsform(); 
+				
+				$this->orgform_kurzbz = $row->orgform_kurzbz; 
+				$this->code = $row->code; 
+				$this->bezeichnung = $row->bezeichnung; 
+				$this->rolle = $row->rolle; 
+				
+				$result[] = $orgform; 
+			}
+		}
+		else
+		{
+			$this->errormsg ="Fehler bei der Abfrage aufgetreten"; 
+			return false; 
+		}
+	}
+	
+	/**
 	 * 
 	 * Liefert alle Organisationsformen zurück
 	 */

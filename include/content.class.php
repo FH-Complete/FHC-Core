@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
-require_once('basis_db.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class content extends basis_db
 {
