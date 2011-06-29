@@ -188,9 +188,9 @@ if(!is_null($method))
 			$content->template_kurzbz=$template->result[0]->template_kurzbz;
 			$content->titel = 'Neuer Eintrag';
 			$content->aktiv=true;
-			$content->menu_open=true;
+			$content->menu_open=false;
 			$content->content = '<?xml version="1.0" encoding="UTF-8" ?><content></content>';		
-			$content->sichtbar=false;
+			$content->sichtbar=true;
 			$content->version='1';
 			$content->sprache=DEFAULT_LANGUAGE;
 			$content->insertvon = $user;
