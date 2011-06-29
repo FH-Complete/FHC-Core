@@ -827,7 +827,7 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 	global $db, $action, $submenu_depth, $sprache;
 	$output='';
 	$submenu_depth++;
-	if($submenu_depth>100)
+	if($submenu_depth>10000)
 	{
 		echo 'Menürekursion?! -> Abbruch';
 		return 0;
