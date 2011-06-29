@@ -20,7 +20,24 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Simane-Sequens <gerald.simane@technikum-wien.at>.
  */
+
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/wochenplan.class.php');
+require_once('../../../include/reservierung.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/ort.class.php');
+require_once('../../../include/phrasen.class.php');
+
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+	
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
+$uid=get_uid();
 ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
@@ -42,7 +59,7 @@
 <BODY id="inhalt">
 <H2><table class="tabcontent">
 	<tr>
-	<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Wochenplan</td>
+	<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('global/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('global/wochenplan');?></td>
 	<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 	</tr>
 	</table>
@@ -62,18 +79,6 @@
 //$type='ort';
 //$ort_kurzbz='EDV6.08';
 //$datum=1102260015;
-
-require_once('../../../config/cis.config.inc.php');
-require_once('../../../include/functions.inc.php');
-require_once('../../../include/wochenplan.class.php');
-require_once('../../../include/reservierung.class.php');
-require_once('../../../include/benutzerberechtigung.class.php');
-require_once('../../../include/ort.class.php');
-
-if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
-
-$uid=get_uid();
 
 // Deutsche Umgebung
 //$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
@@ -169,7 +174,7 @@ elseif (check_lektor($uid))
 	$user='lektor';
 else
 {
-	die("Fehler: Ihr User wurde nicht gefunden!");
+	die($p->t('global/userNichtGefunden'));
 	//GastAccountHack
 	//$user='student';
 }
@@ -189,7 +194,7 @@ if (isset($reserve) && $raumres)
 {
 	$ort_obj = new ort();
 	if(!$ort_obj->load($ort_kurzbz))
-		die('Dieser Ort existiert nicht');
+		die($p->t('global/raumExistiertNicht'));
 	
 	if(!$erg_std=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
@@ -214,11 +219,11 @@ if (isset($reserve) && $raumres)
 				if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
 				{
 					if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
-						echo "<br>Eingabe Titel und Beschreibung fehlt! <br>";
+						echo "<br>".$p->t('global/titelUndBeschreibungFehlt')."! <br>";
 					else if (empty($_REQUEST['titel']) )
-						echo "<br>Eingabe Titel  fehlt! <br>";
+						echo "<br>".$p->t('global/titelFehlt')."! <br>";
 					else if ( empty($_REQUEST['beschreibung']))
-						echo "<br>Eingabe Beschreibung fehlt! <br>";
+						echo "<br>".$p->t('global/beschreibungFehlt')."! <br>";
 					else
 					{			 
 	  					$reservierung = new reservierung();
@@ -253,7 +258,7 @@ if (isset($reserve) && $raumres)
 				}
 				else
 				{
-					echo "<br>$ort_kurzbz bereits reserviert: $datum_res - Stunde $stunde <br>";
+					echo "<br>$ort_kurzbz ".$p->t('global/bereitsReserviert').": $datum_res - Stunde $stunde <br>";
 				}	
 			}
 		}
@@ -296,6 +301,6 @@ if (isset($count))
 	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";
 ?>
 <HR>
-<P>Fehler und Feedback bitte an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>">LV-Koordinationsstelle</A>.</P>
+<P><?php echo $p->t('global/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('global/lvKoordinationsstelle');?></A>.</P>
 </BODY>
 </HTML>

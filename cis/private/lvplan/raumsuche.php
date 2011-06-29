@@ -33,9 +33,6 @@ $raumtyp = (isset($_POST['raumtyp'])?$_POST['raumtyp']:'');
 $anzahlpersonen = (isset($_POST['anzahlpersonen'])?$_POST['anzahlpersonen']:'0');
 $sent = true; //isset($_POST['sent']);
 $datum_obj = new datum();
-
-if(isset($_GET['lang']))
-	setSprache($_GET['lang']);
 	
 $sprache = getSprache(); 	
 $p = new phrasen($sprache);
@@ -132,7 +129,7 @@ if($sent)
 		//Von Zeit pruefen
 		if(!preg_match('/^[0-9]{2}:[0-9]{2}$/', $vonzeit))
 		{
-			echo "<br>".$p->t('global/toZeitFormat');
+			echo "<br>".$p->t('global/vonZeitFormat');
 			$error = true;
 		}
 		//Bis Zeit pruefen

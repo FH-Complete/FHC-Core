@@ -27,9 +27,6 @@ require_once('../../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-
-if(isset($_GET['lang']))
-	setSprache($_GET['lang']);
 	
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
@@ -46,7 +43,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
-	die($p->t('global/keineBerechtigungFuerDieseSeite')); ;
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">

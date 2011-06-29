@@ -34,10 +34,14 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/phrasen.class.php'); 
 
 if(!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+	
 //Startwerte setzen
 if(!isset($_GET['db_stpl_table']))
 	$db_stpl_table='stundenplan';
@@ -135,7 +139,7 @@ else
 {
 	echo '<html>';
 	echo '<head>';
-	echo '<title>Kalender</title>';
+	echo '<title>'.$p->t('global/kalender').'</title>';
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
 	echo '<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">';
 	echo '<link rel="stylesheet" type="text/css" media="print" href="../../../skin/print.css" />';
@@ -148,7 +152,7 @@ if(!isset($begin) || !isset($ende))
 	// datum holen falls nicht gesetzt
 	if (!isset($_GET['semesterplan']))
 	{
-		die("Datum ist nicht gesetzt!");
+		die($p->t('global/datumNichtGesetzt')."!");
 	}
 	else
 	{
@@ -163,21 +167,21 @@ if(!isset($begin) || !isset($ende))
 		}
 		else
 		{
-			die('Studiensemester konnte nicht gefunden werden!');
+			die($p->t('global/studiensemesterKonnteNichtGefundenWerden').'!');
 		}
 		$result_semester=$db->db_query("SELECT wert FROM public.tbl_variable WHERE uid='$uid' AND name='db_stpl_table';");
 		if($db->db_num_rows($result_semester)>0)
 			$db_stpl_table=$db->db_result($result_semester,0,'wert');
 		else
 		{
-			die('User nicht vorhanden!');
+			die($p->t('global/userNichtGefunden').'!');
 		}
 	}
 }
 
 if($ende-$begin>31536000)
 {
-	die("Datumsbereich ist zu grosz!");
+	die($p->t('global/datumsbereichZuGross')."!");
 }
 
 if(!isset($type))
@@ -273,7 +277,7 @@ elseif($format=='ical')
 // Print in HTML-File
 else
 {
-	echo '<P class="dont-print">Fehler und Feedback bitte an <A class="Item" href="mailto:'.MAIL_LVPLAN.'">LV-Plan</A></P>';
+	echo '<P class="dont-print">'.$p->t('global/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('global/lvKoordinationsstelle').'</A></P>';
 	echo '</body></html>';
 }
 ?>

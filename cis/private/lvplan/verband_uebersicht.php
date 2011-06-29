@@ -1,17 +1,43 @@
 <?php
-	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-	include('../../../include/functions.inc.php');
+/* Copyright (C) 2006 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Karl Burkhart <burkhart@technikum-wien.at>.
+ */
 
-	if(!($erg=$db->db_query("SELECT * FROM tbl_studiengang WHERE studiengang_kz>0 ORDER BY kurzbz")))
-  		die($db->db_last_error());
-	$num_rows=$db->db_num_rows($erg);
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/phrasen.class.php'); 
+
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+	
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+	
+if(!($erg=$db->db_query("SELECT * FROM tbl_studiengang WHERE studiengang_kz>0 ORDER BY kurzbz")))
+	die($db->db_last_error());
+$num_rows=$db->db_num_rows($erg);
 ?>
 <html>
 <head>
-	<title>&Uuml;bersicht der Lehrverb&auml;nde</title>
+	<title><?php echo $p->t('global/uebersichtDerLehrverbaende');?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
@@ -19,7 +45,7 @@
 <body id="inhalt">
 	<H2><table class="tabcontent" id="inhalt">
 		<tr>
-		<td>&nbsp;<a class="Item" href="index.php">Lehrveranstaltungsplan</a> &gt;&gt; Lehrverb&auml;nde</td>
+		<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('global/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('global/lehrverbaende');?></td>
 		<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 		</tr>
 		</table>
