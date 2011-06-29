@@ -19,13 +19,20 @@
 	// Wochentage auf Deutsch (Zeitwunsch)
 	global $tagbez;
 	$tagbez=array();
-	$tagbez[0]="Sonntag";
-	$tagbez[1]="Montag";
-	$tagbez[2]="Dienstag";
-	$tagbez[3]="Mittwoch";
-	$tagbez[4]="Donnerstag";
-	$tagbez[5]="Freitag";
-	$tagbez[6]="Samstag";
+	$tagbez[1][1]="Montag";
+	$tagbez[1][2]="Dienstag";
+	$tagbez[1][3]="Mittwoch";
+	$tagbez[1][4]="Donnerstag";
+	$tagbez[1][5]="Freitag";
+	$tagbez[1][6]="Samstag";
+	$tagbez[1][7]="Sonntag";
+	$tagbez[2][1]="Monday";
+	$tagbez[2][2]="Tuesday";
+	$tagbez[2][3]="Wednesday";
+	$tagbez[2][4]="Thursday";
+	$tagbez[2][5]="Friday";
+	$tagbez[2][6]="Saturday";
+	$tagbez[2][7]="Sunday";
 
 	// Studiengaenge die keine Alias Email Adressen erhalten
 	$noalias=array();
