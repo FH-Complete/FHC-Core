@@ -36,6 +36,9 @@ require_once(dirname(__FILE__).'/studiengang.class.php');
 require_once(dirname(__FILE__).'/mitarbeiter.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 require_once(dirname(__FILE__).'/zeitsperre.class.php');
+require_once(dirname(__FILE__).'/phrasen.class.php'); 
+require_once(dirname(__FILE__).'/globals.inc.php'); 
+require_once(dirname(__FILE__).'/sprache.class.php'); 
 
 class wochenplan extends basis_db
 {
@@ -104,6 +107,7 @@ class wochenplan extends basis_db
 		$this->datum=mktime();
 		$this->init_stdplan();
 		$this->crlf=crlf();
+		
 	}
 
 	/**
@@ -390,6 +394,9 @@ class wochenplan extends basis_db
 	 */
 	public function draw_header()
 	{
+		$sprache = getSprache(); 
+		$p=new phrasen($sprache); 
+		
 		echo '<TABLE width="100%" bgcolor="#EEEEEE" border="0" cellspacing="0">'.$this->crlf;
 		echo '	<TR>'.$this->crlf;
 		echo '		<TD valign="bottom">'.$this->crlf;
@@ -398,16 +405,16 @@ class wochenplan extends basis_db
 			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' '.$this->pers_titelpost.' - '.$this->pers_uid.'<br>';
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			echo '<strong>Studiengang: </strong>'.$this->stg_kurzbzlang.' - '.$this->stg_bez.'<br>';
-			echo 'Semester: '.$this->sem.'<br>';
+			echo '<strong>'.$p->t('global/studiengang').': </strong>'.$this->stg_kurzbzlang.' - '.$this->stg_bez.'<br>';
+			echo $p->t('global/semester').': '.$this->sem.'<br>';
 			if ($this->ver!='0' && $this->ver!='' && $this->ver!=null)
-				echo 'Verband: '.$this->ver.'<br>';
+				echo $p->t('global/verband').': '.$this->ver.'<br>';
 			if ($this->grp!='0' && $this->grp!='' && $this->grp!=null)
-				echo 'Gruppe: '.$this->grp.'<br>';
+				echo $p->t('global/gruppe').': '.$this->grp.'<br>';
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort')
-			echo '<strong>Ort: </strong>'.(1==1 || is_file(RAUMINFO_PATH.trim($this->ort_kurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($this->ort_kurzbz).'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung.'<br>';
+			echo '<strong>'.$p->t('global/raum').': </strong>'.(1==1 || is_file(RAUMINFO_PATH.trim($this->ort_kurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($this->ort_kurzbz).'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung.'<br>';
 		echo '</P>'.$this->crlf;
 		echo '			<div valign="bottom" align="center">'.$this->crlf;
 
@@ -416,7 +423,7 @@ class wochenplan extends basis_db
 		//global $kalender_begin_ws, $kalender_ende_ws, $kalender_begin_ss, $kalender_ende_ss;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
-		echo '				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Kalender:&nbsp;&nbsp;&nbsp;&nbsp;</strong>'.$this->crlf;
+		echo '				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>'.$p->t('global/kalender').':&nbsp;&nbsp;&nbsp;&nbsp;</strong>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/website.png" height="24" alt="HTML" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="24" alt="CSV" border="0"></A>'.$this->crlf;
@@ -528,6 +535,12 @@ class wochenplan extends basis_db
 	 */
 	public function draw_week($raumres, $user_uid='')
 	{
+		global $tagbez;
+		$sprache = getSprache(); 
+		$spracheLoad = new sprache(); 
+		$spracheLoad->load($sprache); 
+		$p=new phrasen($sprache); 
+		
 		$o_datum=new datum();
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
@@ -544,7 +557,7 @@ class wochenplan extends basis_db
 		echo '	<table class="stdplan" width="100%" border="1" cellpadding="0" cellspacing="0" name="Stundenplantabelle" align="center">'.$this->crlf;
 		// Kopfzeile darstellen
 	  	echo '<thead><tr>'.$this->crlf;
-		echo '			<th align="right">Stunde&nbsp;<br>Beginn&nbsp;<br>Ende&nbsp;</th>'.$this->crlf;
+		echo '			<th align="right">'.$p->t('global/stunde').'&nbsp;<br>'.$p->t('global/beginn').'&nbsp;<br>'.$p->t('global/ende').'&nbsp;</th>'.$this->crlf;
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
 			$row = $this->db_fetch_object($result_stunde);
@@ -565,8 +578,9 @@ class wochenplan extends basis_db
 		$datum=$datum_mon=$this->datum;
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
-	  		echo '<tr><td>'.strftime("%A",$datum).'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
-			for ($k=0; $k<$num_rows_stunde; $k++)
+	  		//echo '<tr><td>'.strftime("%A",$datum).'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
+	  		echo '<tr><td>'.$tagbez[$spracheLoad->index][$i].'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
+	  		for ($k=0; $k<$num_rows_stunde; $k++)
 			{
 				$row = $this->db_fetch_object($result_stunde, $k);
 				$j = $row->stunde;
@@ -720,8 +734,8 @@ class wochenplan extends basis_db
 		if ($raumres && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
 			echo '<table><tr>';
-			echo '	<td>Titel:</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
-			echo '	<td>Beschreibung:</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
+			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
+			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
 			
 			$rechte = new benutzerberechtigung();
 			$rechte->getBerechtigungen($user_uid);
@@ -758,7 +772,7 @@ class wochenplan extends basis_db
 				$stg->loadArray($rechte->getStgKz('lehre/reservierung'),'typ, kurzbz',true);
 				
 				//Studiengang
-				echo '<td>Studiengang</td><td> <SELECT name="studiengang_kz">'.$this->crlf;
+				echo '<td>'.$p->t('global/studiengang').'</td><td> <SELECT name="studiengang_kz">'.$this->crlf;
 				echo '<OPTION value="0">*</OPTION>'.$this->crlf;
 				foreach($stg->result as $row)
 				{
@@ -767,7 +781,7 @@ class wochenplan extends basis_db
 				echo '</SELECT></td>';
 				
 				//Semester
-				echo '<td>Semester </td>
+				echo '<td>'.$p->t('global/semester').' </td>
 					<td>
 					<SELECT name="semester" />
 						<OPTION value="">*</OPTION>
@@ -784,7 +798,7 @@ class wochenplan extends basis_db
 					'.$this->crlf;
 				
 				//Verband
-				echo '<td>Verband</td>
+				echo '<td>'.$p->t('global/verband').'</td>
 					<td>
 					<SELECT name="verband" />
 						<OPTION value="">*</OPTION>
@@ -798,7 +812,7 @@ class wochenplan extends basis_db
 					</td>'.$this->crlf;
 				
 				//Gruppe
-				echo '<td>Gruppe</td>
+				echo '<td>'.$p->t('global/gruppe').'</td>
 					<td>
 					<SELECT name="gruppe" />
 						<OPTION value="">*</OPTION>
@@ -810,7 +824,7 @@ class wochenplan extends basis_db
 					</td>'.$this->crlf;
 				
 				//Spezialgruppe
-				echo '<td>Spezialgruppe</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
+				echo '<td>'.$p->t('global/spezialgruppe').'</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
 				echo '<OPTION value="">*</OPTION>'.$this->crlf;
 				
 				//Spezialgruppen aus den Studiengaengen mit erweiterten Reservierungsberechtigung holen
@@ -845,7 +859,7 @@ class wochenplan extends basis_db
 			echo '</td>';
 			
 			echo '</tr></table></form>';
-			echo ' <a href="/cis/private/lvplan/stpl_reserve_list.php">Reservierungen löschen </a>';
+			echo ' <a href="/cis/private/lvplan/stpl_reserve_list.php">'.$p->t('global/reservierungenLoeschen').' </a>';
 		}
 	}
 
@@ -2172,7 +2186,31 @@ class wochenplan extends basis_db
 		}
 		else
 			return false;
-	}									
+	}		
+}
+
+function jahreskalenderjump($link)
+{
+	$sprache = getSprache(); 
+	$p=new phrasen($sprache); 
+	
+	$crlf=crlf();
+	$datum=mktime();
+	$woche=kalenderwoche($datum);
+	$datum=montag($datum);
+	echo '			<SMALL><CENTER><B>'.$p->t('global/springeZuKw').'</B><BR><SMALL>'.$crlf;
+	for ($anz=1;$anz<26;$anz++)
+	{
+		$linknew=$link.'&datum='.$datum;
+		if ($woche==53)
+			$woche=1;
+		echo '			<A HREF="'.$linknew.'">'.$woche.'</A>'.$crlf;
+		if ($anz%5==0)
+			echo '			<br>'.$crlf;
+		$datum+=60*60*24*7;
+		$woche++;
+	}
+	echo '			</SMALL></CENTER></SMALL>'.$crlf;
 }
 
 ?>
