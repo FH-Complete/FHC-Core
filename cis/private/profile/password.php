@@ -31,7 +31,7 @@
 Es wird sowohl Ihr Windows als auch Ihr Unix bzw. Mail Passwort geändert!</p>
 <form method="POST" action="changepass.php">
   <table><tr><td>Username:</td>
-    <td><INPUT type="text" name="username" readonly value="<?php echo $uid ?>"
+    <td><INPUT type="text" name="username" readonly value="<?php echo $uid ?>">
     </td></tr>
     <tr><td>Altes Passwort:</td>
     <td><INPUT type="password" name="oldpass"></td></tr>
