@@ -1861,6 +1861,12 @@ if(!$error)
 									$errormsg = "Diese Zutrittskarte ist bereits ausgegeben an: $row_bmp->vorname $row_bmp->nachname ($row_bmp->uid)";
 								}
 							}
+							else
+							{
+								$error = true;
+								$return = false;
+								$errormsg = 'Fehler beim Laden der Zutrittskarte';
+							}
 						}
 						
 						if(!$error)
