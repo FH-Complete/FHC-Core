@@ -21,6 +21,9 @@ $this->phrasen['global/loeschen']='Delete';
 $this->phrasen['global/editieren']='Edit';
 $this->phrasen['global/suchen']='Search';
 $this->phrasen['global/alle']='All';
+$this->phrasen['global/abbrechen']='Cancel';
+$this->phrasen['global/eintragen']='Register';
+$this->phrasen['global/zurueck']='Back';
 
 $this->phrasen['global/vorname']='First Name';
 $this->phrasen['global/nachname']='Last Name';
@@ -76,6 +79,9 @@ $this->phrasen['global/fehlerBeimOeffnenDerDatenbankverbindung']='Cant open Data
 $this->phrasen['global/userNichtGefunden']='No user found'; 
 $this->phrasen['global/datumNichtGesetzt']='Date is missing';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'No semester found';
+$this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Error finding the UID';
+$this->phrasen['global/nichtAngemeldet'] = 'You are not logged in. No UID found';
+$this->phrasen['global/LDAPserverNichtErreichbar']='Error connecting to LDAP-Server'; 
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Schedule'; 
@@ -123,4 +129,8 @@ $this->phrasen['global/bereitsReserviert']='already reserved';
 $this->phrasen['global/spezialgruppe']='Special group';
 $this->phrasen['global/datumsbereichZuGross'] = 'Invalid date';
 $this->phrasen['global/springeZuKw']='Jump to KW';
+
+//infrastruktur
+$this->phrasen['global/MACadresse']='MAC-adress';
+$this->phrasen['global/passwort']='Password';
 ?>
