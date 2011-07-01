@@ -21,6 +21,9 @@ $this->phrasen['global/loeschen']='Löschen';
 $this->phrasen['global/editieren']='Editieren';
 $this->phrasen['global/suchen']='Suchen';
 $this->phrasen['global/alle']='Alle';
+$this->phrasen['global/abbrechen']='Abbrechen';
+$this->phrasen['global/eintragen']='Eintragen';
+$this->phrasen['global/zurueck']='Zurück';
 
 $this->phrasen['global/vorname']='Vorname';
 $this->phrasen['global/nachname']='Nachname';
@@ -76,6 +79,9 @@ $this->phrasen['global/fehlerBeimOeffnenDerDatenbankverbindung']='Fehler beim Ö
 $this->phrasen['global/userNichtGefunden']='Es wurde kein User gefunden'; 
 $this->phrasen['global/datumNichtGesetzt']='Datum ist nicht gesetzt';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'Studiensemester konnte nicht gefunden werden';
+$this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Fehler beim ermitteln der UID';
+$this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden';
+$this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar'; 
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Lehrveranstaltungsplan'; 
@@ -123,4 +129,8 @@ $this->phrasen['global/bereitsReserviert']='bereits reserviert';
 $this->phrasen['global/spezialgruppe']='Spezialgruppe';
 $this->phrasen['global/datumsbereichZuGross'] = 'Datumsbereich ist zu groß';
 $this->phrasen['global/springeZuKw']='Springe zu KW';
+
+//infrastruktur
+$this->phrasen['global/MACadresse']='MAC-Adresse';
+$this->phrasen['global/passwort']='Passwort';
 ?>
