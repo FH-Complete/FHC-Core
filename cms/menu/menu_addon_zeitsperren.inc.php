@@ -1,4 +1,25 @@
 <?php
+/* Copyright (C) 2011 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ */
+/**
+ * Menu Addon fuer Zeitsperren
+ */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
@@ -9,6 +30,8 @@ class menu_addon_zeitsperren extends menu_addon
 {
 	public function __construct()
 	{
+		parent::__construct();
+		
 		$sprache = getSprache();
 		$user = get_uid();
 		
@@ -67,10 +90,9 @@ class menu_addon_zeitsperren extends menu_addon
 								   'link'  => 'private/profile/zeitsperre.php?funktion=lkt&stg_kz='.$row->studiengang_kz,
 								   'name'  => $p->t('menu/lektoren').' '.$row->kurzbzlang
 								  );
-				
 			}	
 		}
-		$this->outputItems();
+		$this->output();
 	}
 }
 

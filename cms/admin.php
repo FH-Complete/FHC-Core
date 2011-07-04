@@ -134,6 +134,7 @@ if(!is_null($method))
 	switch($method)
 	{
 		case 'content_sperre':
+			//Sperren und Freigeben von Content
 			if(!isset($_GET['contentsprache_id']))
 				die('Falsche Parameteruebergabe');
 				
@@ -166,6 +167,7 @@ if(!is_null($method))
 			}
 			break;
 		case 'add_new_content':
+			//Anlegen von neuem Content
 			if(!$rechte->isBerechtigt('basis/cms', null, 'sui'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -214,6 +216,7 @@ if(!is_null($method))
 
 			break;
 		case 'add_uebersetzung':
+			//Anlegen von Uebersetzungen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'sui'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -245,6 +248,7 @@ if(!is_null($method))
 
 			break;
 		case 'add_newversion':
+			//Neue Version anlegen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'sui'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -277,6 +281,7 @@ if(!is_null($method))
 
 			break;
 		case 'rights_add_group':
+			//Gruppe fuer Berechtigung hinzufuegen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -299,6 +304,7 @@ if(!is_null($method))
 			
 			break;
 		case 'rights_delete_group':
+			//Gruppe fuer Berechtigung entfernen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -316,6 +322,7 @@ if(!is_null($method))
 			
 			break;
 		case 'prefs_save':
+			//Einstellungen speichern
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -355,160 +362,165 @@ if(!is_null($method))
 				$message.='<span class="error">'.$content->errormsg.'</span>';
 			break;
 		case 'prefs_reviewed':
-				$bf = new benutzerfunktion();
-				if($bf->benutzerfunktion_exists($user, 'review'))
-				{
-					$content = new content();
-					$content->getContent($content_id, $sprache, $version);
-					
-					$content->reviewamum = date('Y-m-d H:i:s');
-					$content->reviewvon = $user;
-					
-					if($content->saveContentSprache(false))
-						$message.='<span class="ok">Erfolgreich reviewed</span>';
-					else
-						$message.='<span class="error">'.$content->errormsg.'</span>';
-				}
-				else
-				{
-					$message.='<span class="error">Sie dürfen kein Review durchführen</span>';
-				}
-				break;
-		case 'prefs_requestreview':
+			//Review und sichtbar schalten
+			$bf = new benutzerfunktion();
+			if($bf->benutzerfunktion_exists($user, 'review') || $rechte->isBerechtigt('basis/cms_review'))
+			{
 				$content = new content();
 				$content->getContent($content_id, $sprache, $version);
+				
+				$content->reviewamum = date('Y-m-d H:i:s');
+				$content->reviewvon = $user;
+				$content->sichtbar = true;
+				
+				if($content->saveContentSprache(false))
+					$message.='<span class="ok">Erfolgreich reviewed</span>';
+				else
+					$message.='<span class="error">'.$content->errormsg.'</span>';
+			}
+			else
+			{
+				$message.='<span class="error">Sie dürfen kein Review durchführen</span>';
+			}
+			break;
+		case 'prefs_requestreview':
+			//Review beantragen
+			$content = new content();
+			$content->getContent($content_id, $sprache, $version);
 
-				$oe = new organisationseinheit();
-				$oe_arr = $oe->getParents($content->oe_kurzbz);
-				
-				foreach($oe_arr as $organisationseinheit)
-				{
-					echo $organisationseinheit;
-					$fkt = new benutzerfunktion();
-					$fkt->getBenutzerFunktionen('review', $organisationseinheit);
-					if(count($fkt->result)>0)
-						break;
-				}
-				
-				if(count($fkt->result)==0)
-					$fkt->getBenutzerFunktionen('review');
-				$to='';
-				foreach($fkt->result as $row)
-				{
-					if($to!='')
-						$to.=',';
-					$to .= $row->uid.'@'.DOMAIN;
-				}
+			$oe = new organisationseinheit();
+			$oe_arr = $oe->getParents($content->oe_kurzbz);
+			
+			foreach($oe_arr as $organisationseinheit)
+			{
+				echo $organisationseinheit;
+				$fkt = new benutzerfunktion();
+				$fkt->getBenutzerFunktionen('review', $organisationseinheit);
+				if(count($fkt->result)>0)
+					break;
+			}
+			
+			if(count($fkt->result)==0)
+				$fkt->getBenutzerFunktionen('review');
+			$to='';
+			foreach($fkt->result as $row)
+			{
 				if($to!='')
+					$to.=',';
+				$to .= $row->uid.'@'.DOMAIN;
+			}
+			if($to!='')
+			{
+				$from = 'no-reply@'.DOMAIN;
+				$subject = 'CMS Review Request';
+				$text = "Dies ist eine automatisch generierte E-Mail.\n\n
+						Es wurde ein Review für die Seite '$content->titel' ($sprache, Version $version) angefordert.\n
+						\n
+						(um den Link anzuzeigen müssen Sie in die HTML Ansicht wechseln)
+						\n
+						\n
+						Mit freundlichen Grüßen\n
+						\n
+						FH Technikum Wien\n
+						Hoechstaedtplatz 5, 1200 Wien, AUSTRIA";
+				$texthtml = "Dies ist eine automatisch generierte E-Mail.<br><br>
+						Es wurde ein Review für die Seite '$content->titel' ($sprache, Version $version) angefordert.<br>
+						<br>
+						<a href=\"".APP_ROOT."cms/admin.php?content_id=".$content->content_id."&sprache=$sprache&version=$version&action=content\">zum Artikel</a>
+						<br>
+						<br>
+						Mit freundlichen Grüßen<br>
+						<br>
+						FH Technikum Wien<br>
+						Hoechstaedtplatz 5, 1200 Wien, AUSTRIA
+						";
+				
+				$mail = new mail($to, $from, $subject, $text);
+				$mail->setHTMLContent($texthtml);
+				if($mail->send())
 				{
-					$from = 'no-reply@'.DOMAIN;
-					$subject = 'CMS Review Request';
-					$text = "Dies ist eine automatisch generierte E-Mail.\n\n
-							Es wurde ein Review für die Seite '$content->titel' ($sprache, Version $version) angefordert.\n
-							\n
-							(um den Link anzuzeigen müssen Sie in die HTML Ansicht wechseln)
-							\n
-							\n
-							Mit freundlichen Grüßen\n
-							\n
-							FH Technikum Wien\n
-							Hoechstaedtplatz 5, 1200 Wien, AUSTRIA";
-					$texthtml = "Dies ist eine automatisch generierte E-Mail.<br><br>
-							Es wurde ein Review für die Seite '$content->titel' ($sprache, Version $version) angefordert.<br>
-							<br>
-							<a href=\"".APP_ROOT."cms/admin.php?content_id=".$content->content_id."&sprache=$sprache&version=$version&action=content\">zum Artikel</a>
-							<br>
-							<br>
-							Mit freundlichen Grüßen<br>
-							<br>
-							FH Technikum Wien<br>
-							Hoechstaedtplatz 5, 1200 Wien, AUSTRIA
-							";
-					
-					$mail = new mail($to, $from, $subject, $text);
-					$mail->setHTMLContent($texthtml);
-					if($mail->send())
-					{
-						$message.='<span class="ok">Review Anforderung wurde an '.$to.' versendet</span>';
-					}
-					else
-					{
-						$message.='<span class="error">Fehler beim Senden des Mails an '.$to.'</span>';
-					}
+					$message.='<span class="ok">Review Anforderung wurde an '.$to.' versendet</span>';
 				}
 				else
 				{
-					$message.='<span class="error">Es ist kein Review Team vorhanden</span>';
+					$message.='<span class="error">Fehler beim Senden des Mails an '.$to.'</span>';
 				}
+			}
+			else
+			{
+				$message.='<span class="error">Es ist kein Review Team vorhanden</span>';
+			}
 			break;
 		case 'prefs_requesttranslate':
-				$content = new content();
-				$content->getContent($content_id, $sprache, $version);
+			//Uebersetzer Informieren
+			$content = new content();
+			$content->getContent($content_id, $sprache, $version);
 
-				$oe = new organisationseinheit();
-				$oe_arr = $oe->getParents($content->oe_kurzbz);
-				
-				foreach($oe_arr as $organisationseinheit)
-				{
-					echo $organisationseinheit;
-					$fkt = new benutzerfunktion();
-					$fkt->getBenutzerFunktionen('translate', $organisationseinheit);
-					if(count($fkt->result)>0)
-						break;
-				}
-				
-				if(count($fkt->result)==0)
-					$fkt->getBenutzerFunktionen('translate');
-				$to='';
-				foreach($fkt->result as $row)
-				{
-					if($to!='')
-						$to.=',';
-					$to .= $row->uid.'@'.DOMAIN;
-				}
+			$oe = new organisationseinheit();
+			$oe_arr = $oe->getParents($content->oe_kurzbz);
+			
+			foreach($oe_arr as $organisationseinheit)
+			{
+				echo $organisationseinheit;
+				$fkt = new benutzerfunktion();
+				$fkt->getBenutzerFunktionen('translate', $organisationseinheit);
+				if(count($fkt->result)>0)
+					break;
+			}
+			
+			if(count($fkt->result)==0)
+				$fkt->getBenutzerFunktionen('translate');
+			$to='';
+			foreach($fkt->result as $row)
+			{
 				if($to!='')
+					$to.=',';
+				$to .= $row->uid.'@'.DOMAIN;
+			}
+			if($to!='')
+			{
+				$from = 'no-reply@'.DOMAIN;
+				$subject = 'CMS Review Request';
+				$text = "Dies ist eine automatisch generierte E-Mail.\n\n
+						Es wurde ein Artikel angelegt/bearbeitet. Dieser kann nun übersetzt werden: '$content->titel'.\n
+						\n
+						(um den Link anzuzeigen müssen Sie in die HTML Ansicht wechseln)
+						\n
+						\n
+						Mit freundlichen Grüßen\n
+						\n
+						FH Technikum Wien\n
+						Hoechstaedtplatz 5, 1200 Wien, AUSTRIA";
+				$texthtml = "Dies ist eine automatisch generierte E-Mail.<br><br>
+						Es wurde ein Artikel angelegt/bearbeitet. Dieser kann nun übersetzt werden: '$content->titel'<br>
+						<br>
+						<a href=\"".APP_ROOT."cms/admin.php?content_id=".$content->content_id."&sprache=$sprache&version=$version)&action=content\">zum Artikel</a>
+						<br>
+						<br>
+						Mit freundlichen Grüßen<br>
+						<br>
+						FH Technikum Wien<br>
+						Hoechstaedtplatz 5, 1200 Wien, AUSTRIA
+						";
+				
+				$mail = new mail($to, $from, $subject, $text);
+				$mail->setHTMLContent($texthtml);
+				if($mail->send())
 				{
-					$from = 'no-reply@'.DOMAIN;
-					$subject = 'CMS Review Request';
-					$text = "Dies ist eine automatisch generierte E-Mail.\n\n
-							Es wurde ein Artikel angelegt/bearbeitet. Dieser kann nun übersetzt werden: '$content->titel'.\n
-							\n
-							(um den Link anzuzeigen müssen Sie in die HTML Ansicht wechseln)
-							\n
-							\n
-							Mit freundlichen Grüßen\n
-							\n
-							FH Technikum Wien\n
-							Hoechstaedtplatz 5, 1200 Wien, AUSTRIA";
-					$texthtml = "Dies ist eine automatisch generierte E-Mail.<br><br>
-							Es wurde ein Artikel angelegt/bearbeitet. Dieser kann nun übersetzt werden: '$content->titel'<br>
-							<br>
-							<a href=\"".APP_ROOT."cms/admin.php?content_id=".$content->content_id."&sprache=$sprache&version=$version)&action=content\">zum Artikel</a>
-							<br>
-							<br>
-							Mit freundlichen Grüßen<br>
-							<br>
-							FH Technikum Wien<br>
-							Hoechstaedtplatz 5, 1200 Wien, AUSTRIA
-							";
-					
-					$mail = new mail($to, $from, $subject, $text);
-					$mail->setHTMLContent($texthtml);
-					if($mail->send())
-					{
-						$message.='<span class="ok">Übersetzungsanforderung wurde an '.$to.' versendet</span>';
-					}
-					else
-					{
-						$message.='<span class="error">Fehler beim Senden des Mails an '.$to.'</span>';
-					}
+					$message.='<span class="ok">Übersetzungsanforderung wurde an '.$to.' versendet</span>';
 				}
 				else
 				{
-					$message.='<span class="error">Es ist kein Übersetzer eingetragen</span>';
+					$message.='<span class="error">Fehler beim Senden des Mails an '.$to.'</span>';
 				}
+			}
+			else
+			{
+				$message.='<span class="error">Es ist kein Übersetzer eingetragen</span>';
+			}
 			break;
 		case 'childs_add':
+			//Untereintraege zuordnen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -528,6 +540,7 @@ if(!is_null($method))
 				$message.='<span class="error">'.$content->errormsg.'</span>';
 			break;
 		case 'childs_delete':
+			//Untereintraege entfernen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -549,6 +562,7 @@ if(!is_null($method))
 			}
 			break;
 		case 'childs_sort_up':
+			//hochsortieren von Untereintraegen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -570,6 +584,7 @@ if(!is_null($method))
 			}
 			break;
 		case 'childs_sort_down':
+			//runtersortieren von Untereintraegen
 			if(!$rechte->isBerechtigt('basis/cms', null, 'su'))
 			{
 				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
@@ -935,7 +950,7 @@ function print_childs()
  */
 function print_prefs()
 {
-	global $content_id, $sprache, $version, $user;
+	global $content_id, $sprache, $version, $user, $rechte;
 	
 	$content = new content();
 	if(!$content->getContent($content_id, $sprache, $version))
@@ -1019,8 +1034,8 @@ function print_prefs()
 	echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	echo '<input type="submit" value="Review anfordern" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_requestreview\'">';
 	$bf = new benutzerfunktion();
-	if($bf->benutzerfunktion_exists($user, 'review'))
-		echo '<input type="submit" value="Review OK" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_reviewed\'">';
+	if($bf->benutzerfunktion_exists($user, 'review')  || $rechte->isBerechtigt('basis/cms_review'))
+		echo '<input type="submit" value="Review OK / Publish" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_reviewed\'">';
 	
 	echo '<input type="submit" value="Übersetzer benachrichtigen" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_requesttranslate\'">';
 	

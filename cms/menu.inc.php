@@ -25,6 +25,14 @@
 require_once(dirname(__FILE__).'/../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../include/content.class.php');
 
+//Parameter fuer Redirect URLS
+$params = array();
+foreach($_REQUEST as $key=>$value)
+	$params[$key]=$value;
+
+//Parameter fuer Include Addons
+$includeparams = array();
+
 /**
  * Zeichnet einen Menueeintrag aus dem CMS System
  * 
@@ -143,7 +151,8 @@ function DrawLink($link, $target, $name, $content_id=null)
  */
 function Redirect($content_id, $name)
 {
-	global $sprache;
+	global $sprache, $params;
+	
 	$content = new content();
 	$content->getContent($content_id, $sprache, null, true, true);
 	
@@ -159,7 +168,7 @@ function Redirect($content_id, $name)
 		$url='';
 		
 	//Variablen Ersetzen
-	foreach($_REQUEST as $key=>$value)
+	foreach($params as $key=>$value)
 	{
 		$url = str_replace('$'.$key,addslashes($value),$url);
 	}
@@ -180,7 +189,7 @@ function Redirect($content_id, $name)
  */
 function IncludeMenuAddon($content_id)
 {
-	global $sprache;
+	global $sprache, $includeparams;
 	$content = new content();
 	$content->getContent($content_id, $sprache, null, true, true);
 	
@@ -195,11 +204,7 @@ function IncludeMenuAddon($content_id)
 		$url='';
 	if($url!='')
 	{
-		DrawLink('#open','_self',$content->titel,$content_id);
-		echo '
-			<table class="tabcontent" id="Content'.$content_id.'" style="display: '.($content->menu_open?'visible':'none').'"><tr><td>';
-		include(dirname(__FILE__).'/menu/'.$url);	
-		echo '</td></tr></table>';
-		
+		$includeparams['content']=$content;
+		include(dirname(__FILE__).'/menu/'.$url);		
 	}
 }
